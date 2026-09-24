@@ -19,8 +19,8 @@ export default function ErrorPage({
         </div>
         <h1 className="mt-4 text-lg font-semibold">Something went wrong</h1>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          This page hit an unexpected problem. Your data is safe. Try again, or go back to the
-          overview.
+          This page hit an unexpected problem. Your data is safe. Try again, or
+          go back to the overview.
         </p>
         <div className="mt-5 flex justify-center gap-2">
           <Button variant="secondary" asChild>

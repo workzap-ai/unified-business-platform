@@ -3,7 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PageHeader, PageShell, RequirePermission } from "@/components/app/page";
+import {
+  PageHeader,
+  PageShell,
+  RequirePermission,
+} from "@/components/app/page";
 import { FormActions, useUnsavedChangesWarning } from "@/components/app/forms";
 import { Card } from "@/components/ui/display";
 import { useScopedMutation } from "@/hooks/use-scoped";
@@ -34,11 +38,15 @@ function CustomerNew() {
   const dirty = form.formState.isDirty;
   useUnsavedChangesWarning(dirty && !form.formState.isSubmitSuccessful);
 
-  const create = useScopedMutation((values: CustomerFormValues) => customersService.create(formToInput(values)), {
-    invalidate: [["customers"]],
-    success: (c) => `${c.name} added`,
-    error: "The customer couldn't be saved. Check the details and try again.",
-  });
+  const create = useScopedMutation(
+    (values: CustomerFormValues) =>
+      customersService.create(formToInput(values)),
+    {
+      invalidate: [["customers"]],
+      success: (c) => `${c.name} added`,
+      error: "The customer couldn't be saved. Check the details and try again.",
+    },
+  );
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {

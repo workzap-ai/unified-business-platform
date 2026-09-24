@@ -1,7 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Bookmark, BookmarkPlus, Check, ChevronDown, Search, Star, Trash2, X } from "lucide-react";
+import { useLocalStorageState } from "@/hooks/use-local-storage";
+import {
+  Bookmark,
+  BookmarkPlus,
+  Check,
+  ChevronDown,
+  Search,
+  Star,
+  Trash2,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +26,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/overlays";
+
+const NO_VIEWS: SavedView[] = [];
 
 export function SearchInput({
   value,
@@ -50,7 +62,10 @@ export function SearchInput({
   }, [draft, delay, onChange]);
   return (
     <div className={cn("relative min-w-0", className)}>
-      <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+      <Search
+        className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
+        aria-hidden="true"
+      />
       <Input
         type="search"
         value={draft}
@@ -118,13 +133,20 @@ export function FilterSelect({
       <DropdownMenuContent align="start" className="w-56">
         <DropdownMenuLabel>{label}</DropdownMenuLabel>
         {options.map((option) => (
-          <DropdownMenuItem key={option.value} onSelect={() => onChange(option.value === value ? "" : option.value)}>
+          <DropdownMenuItem
+            key={option.value}
+            onSelect={() =>
+              onChange(option.value === value ? "" : option.value)
+            }
+          >
             <span className="flex size-4 items-center justify-center">
               {option.value === value && <Check className="!text-primary" />}
             </span>
             <span className="flex-1">{option.label}</span>
             {option.count !== undefined && (
-              <span className="tabular text-xs text-muted-foreground">{option.count}</span>
+              <span className="tabular text-xs text-muted-foreground">
+                {option.count}
+              </span>
             )}
           </DropdownMenuItem>
         ))}
@@ -155,21 +177,38 @@ export function FilterBar({
   className?: string;
 }) {
   return (
-    <div className={cn("mb-3 flex flex-col gap-2 md:flex-row md:items-center", className)}>
+    <div
+      className={cn(
+        "mb-3 flex flex-col gap-2 md:flex-row md:items-center",
+        className,
+      )}
+    >
       <div className="scrollbar-thin flex min-w-0 flex-1 items-center gap-2 overflow-x-auto pb-0.5">
         {children}
         {activeCount > 0 && onClear && (
-          <Button variant="ghost" size="sm" onClick={onClear} className="shrink-0 text-muted-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClear}
+            className="shrink-0 text-muted-foreground"
+          >
             Clear all
           </Button>
         )}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {actions && (
+        <div className="flex shrink-0 items-center gap-2">{actions}</div>
+      )}
     </div>
   );
 }
 
-export type SavedView = { id: string; name: string; params: Record<string, string>; builtIn?: boolean };
+export type SavedView = {
+  id: string;
+  name: string;
+  params: Record<string, string>;
+  builtIn?: boolean;
+};
 
 /**
  * Saved views: built-in views from the page plus views the member saves. Saved views are
@@ -187,25 +226,12 @@ export function SavedViews({
   onApply: (params: Record<string, string>) => void;
 }) {
   const storageKey = `platform.views.${tableId}`;
-  const [custom, setCustom] = useState<SavedView[]>([]);
+  const [custom, persist] = useLocalStorageState<SavedView[]>(
+    storageKey,
+    NO_VIEWS,
+  );
   const [name, setName] = useState("");
   const [open, setOpen] = useState(false);
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) setCustom(JSON.parse(raw) as SavedView[]);
-    } catch {
-      /* ignore */
-    }
-  }, [storageKey]);
-  const persist = (next: SavedView[]) => {
-    setCustom(next);
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(next));
-    } catch {
-      /* ignore */
-    }
-  };
   const relevant = (params: Record<string, string>) =>
     Object.entries(params).filter(([k, v]) => v && k !== "page");
   const same = (a: Record<string, string>, b: Record<string, string>) => {
@@ -234,7 +260,9 @@ export function SavedViews({
           {view.name}
         </button>
       ))}
-      {custom.length > 0 && <span className="mx-1 h-4 w-px shrink-0 bg-border" aria-hidden="true" />}
+      {custom.length > 0 && (
+        <span className="mx-1 h-4 w-px shrink-0 bg-border" aria-hidden="true" />
+      )}
       {custom.map((view) => (
         <span key={view.id} className="group flex shrink-0 items-center">
           <button
@@ -243,7 +271,9 @@ export function SavedViews({
             aria-pressed={activeView?.id === view.id}
             className={cn(
               "flex h-7 items-center gap-1 rounded-md px-2.5 text-[13px] font-medium",
-              activeView?.id === view.id ? "bg-foreground text-background" : "text-foreground-secondary hover:bg-surface-muted",
+              activeView?.id === view.id
+                ? "bg-foreground text-background"
+                : "text-foreground-secondary hover:bg-surface-muted",
             )}
           >
             <Star className="size-3" aria-hidden="true" /> {view.name}
@@ -270,12 +300,22 @@ export function SavedViews({
               onSubmit={(e) => {
                 e.preventDefault();
                 if (!name.trim()) return;
-                persist([...custom, { id: `view-${Date.now()}`, name: name.trim().slice(0, 40), params: current }]);
+                persist([
+                  ...custom,
+                  {
+                    id: `view-${Date.now()}`,
+                    name: name.trim().slice(0, 40),
+                    params: current,
+                  },
+                ]);
                 setName("");
                 setOpen(false);
               }}
             >
-              <label htmlFor={`${tableId}-view-name`} className="text-[13px] font-medium">
+              <label
+                htmlFor={`${tableId}-view-name`}
+                className="text-[13px] font-medium"
+              >
                 View name
               </label>
               <Input
@@ -286,8 +326,15 @@ export function SavedViews({
                 placeholder="e.g. Overdue, high value"
                 autoFocus
               />
-              <p className="mt-1.5 text-2xs text-muted-foreground">Saves the current filters and search on this device.</p>
-              <Button type="submit" size="sm" className="mt-3 w-full" disabled={!name.trim()}>
+              <p className="mt-1.5 text-2xs text-muted-foreground">
+                Saves the current filters and search on this device.
+              </p>
+              <Button
+                type="submit"
+                size="sm"
+                className="mt-3 w-full"
+                disabled={!name.trim()}
+              >
                 <Bookmark /> Save view
               </Button>
             </form>

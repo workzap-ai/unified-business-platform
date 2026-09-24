@@ -16,14 +16,20 @@ import { isDemo } from "@/lib/data-mode";
 import { useSession } from "./session-provider";
 
 const schema = z.object({
-  email: z.string().trim().min(1, "Enter your email").email("Enter a valid email address"),
+  email: z
+    .string()
+    .trim()
+    .min(1, "Enter your email")
+    .email("Enter a valid email address"),
   password: z.string().min(1, "Enter your password"),
 });
 type Values = z.infer<typeof schema>;
 
 function safeNext(value: string | null) {
   // Only same-site relative paths; never an open redirect.
-  return value && value.startsWith("/") && !value.startsWith("//") ? value : "/";
+  return value && value.startsWith("/") && !value.startsWith("//")
+    ? value
+    : "/";
 }
 
 export function LoginForm() {
@@ -35,7 +41,10 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { email: isDemo ? "demo@example.com" : "", password: isDemo ? "sample-data-only" : "" },
+    defaultValues: {
+      email: isDemo ? "demo@example.com" : "",
+      password: isDemo ? "sample-data-only" : "",
+    },
   });
 
   useEffect(() => {
@@ -59,16 +68,31 @@ export function LoginForm() {
   return (
     <div>
       <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
-      <p className="mt-1.5 text-sm text-muted-foreground">Welcome back. Sign in to your workspace.</p>
+      <p className="mt-1.5 text-sm text-muted-foreground">
+        Welcome back. Sign in to your workspace.
+      </p>
       {isDemo && (
-        <Notice tone="pi" icon={FlaskConical} className="mt-6" title="Sample-data mode">
-          This build runs on fictional sample data. Any email and password sign you in; nothing is
-          sent to a server.
+        <Notice
+          tone="pi"
+          icon={FlaskConical}
+          className="mt-6"
+          title="Sample-data mode"
+        >
+          This build runs on fictional sample data. Any email and password sign
+          you in; nothing is sent to a server.
         </Notice>
       )}
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4" noValidate>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="mt-6 space-y-4"
+        noValidate
+      >
         {error && <InlineError message={error} />}
-        <FormField label="Email" htmlFor="email" error={form.formState.errors.email}>
+        <FormField
+          label="Email"
+          htmlFor="email"
+          error={form.formState.errors.email}
+        >
           <Input
             id="email"
             type="email"
@@ -78,7 +102,11 @@ export function LoginForm() {
             {...form.register("email")}
           />
         </FormField>
-        <FormField label="Password" htmlFor="password" error={form.formState.errors.password}>
+        <FormField
+          label="Password"
+          htmlFor="password"
+          error={form.formState.errors.password}
+        >
           <div className="relative">
             <Input
               id="password"
@@ -94,17 +122,29 @@ export function LoginForm() {
               className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              {showPassword ? (
+                <EyeOff className="size-4" />
+              ) : (
+                <Eye className="size-4" />
+              )}
             </button>
           </div>
         </FormField>
-        <Button type="submit" className="w-full" size="lg" loading={form.formState.isSubmitting}>
+        <Button
+          type="submit"
+          className="w-full"
+          size="lg"
+          loading={form.formState.isSubmitting}
+        >
           Sign in
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-muted-foreground">
         New here?{" "}
-        <Link href="/register" className="font-medium text-primary hover:underline">
+        <Link
+          href="/register"
+          className="font-medium text-primary hover:underline"
+        >
           Create a workspace
         </Link>
       </p>

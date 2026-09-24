@@ -5,12 +5,20 @@ import { Check, ChevronsUpDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Avatar, Skeleton } from "@/components/ui/display";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/overlays";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/overlays";
 import { useScopedQuery } from "@/hooks/use-scoped";
 import { customersService } from "@/features/customers/service";
 import { errorMessage } from "@/services/api-client";
 
-export type PickedCustomer = { id: string; name: string; detail?: string | null };
+export type PickedCustomer = {
+  id: string;
+  name: string;
+  detail?: string | null;
+};
 
 function useDebounced<T>(value: T, delay = 250) {
   const [debounced, setDebounced] = useState(value);
@@ -42,7 +50,12 @@ export function CustomerPicker({
   const listId = useId();
   const query = useScopedQuery(
     ["customers", { search: debounced, status: "active", pageSize: 8 }],
-    () => customersService.list({ search: debounced || undefined, status: "active", pageSize: 8 }),
+    () =>
+      customersService.list({
+        search: debounced || undefined,
+        status: "active",
+        pageSize: 8,
+      }),
     { enabled: open, placeholderData: (previous) => previous },
   );
   const items = query.data?.items ?? [];
@@ -51,7 +64,11 @@ export function CustomerPicker({
   function choose(index: number) {
     const customer = items[index];
     if (!customer) return;
-    onChange({ id: customer.id, name: customer.name, detail: customer.company ?? customer.email ?? customer.phone });
+    onChange({
+      id: customer.id,
+      name: customer.name,
+      detail: customer.company ?? customer.email ?? customer.phone,
+    });
     setOpen(false);
     setSearch("");
   }
@@ -63,7 +80,7 @@ export function CustomerPicker({
           id={id}
           type="button"
           disabled={disabled}
-          aria-invalid={invalid || undefined}
+          data-invalid={invalid || undefined}
           aria-haspopup="listbox"
           aria-expanded={open}
           className={cn(
@@ -76,13 +93,22 @@ export function CustomerPicker({
               <Avatar name={value.name} size="sm" />
               <span className="min-w-0 flex-1 truncate">
                 <span className="font-medium">{value.name}</span>
-                {value.detail && <span className="ml-2 text-muted-foreground">{value.detail}</span>}
+                {value.detail && (
+                  <span className="ml-2 text-muted-foreground">
+                    {value.detail}
+                  </span>
+                )}
               </span>
             </>
           ) : (
-            <span className="flex-1 text-muted-foreground/80">Choose a customer…</span>
+            <span className="flex-1 text-muted-foreground/80">
+              Choose a customer…
+            </span>
           )}
-          <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <ChevronsUpDown
+            className="size-4 shrink-0 text-muted-foreground"
+            aria-hidden="true"
+          />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-[min(28rem,calc(100vw-2rem))] p-0">
@@ -115,7 +141,11 @@ export function CustomerPicker({
             role="combobox"
             aria-expanded="true"
             aria-controls={listId}
-            aria-activedescendant={items[activeIndex] ? `${listId}-${items[activeIndex].id}` : undefined}
+            aria-activedescendant={
+              items[activeIndex]
+                ? `${listId}-${items[activeIndex].id}`
+                : undefined
+            }
             className="h-8 pl-8 text-[13px]"
           />
         </div>
@@ -132,7 +162,9 @@ export function CustomerPicker({
             </p>
           ) : items.length === 0 ? (
             <p className="px-3 py-4 text-center text-[13px] text-muted-foreground">
-              {debounced ? `No active customers match "${debounced}".` : "No active customers yet."}
+              {debounced
+                ? `No active customers match "${debounced}".`
+                : "No active customers yet."}
             </p>
           ) : (
             <ul id={listId} role="listbox" aria-label="Customers">
@@ -153,14 +185,25 @@ export function CustomerPicker({
                   >
                     <Avatar name={customer.name} size="sm" />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-medium">{customer.name}</span>
-                      {(customer.company || customer.email || customer.phone) && (
+                      <span className="block truncate font-medium">
+                        {customer.name}
+                      </span>
+                      {(customer.company ||
+                        customer.email ||
+                        customer.phone) && (
                         <span className="block truncate text-xs text-muted-foreground">
-                          {[customer.company, customer.email ?? customer.phone].filter(Boolean).join(" · ")}
+                          {[customer.company, customer.email ?? customer.phone]
+                            .filter(Boolean)
+                            .join(" · ")}
                         </span>
                       )}
                     </span>
-                    {selected && <Check className="size-4 shrink-0 text-primary" aria-hidden="true" />}
+                    {selected && (
+                      <Check
+                        className="size-4 shrink-0 text-primary"
+                        aria-hidden="true"
+                      />
+                    )}
                   </li>
                 );
               })}

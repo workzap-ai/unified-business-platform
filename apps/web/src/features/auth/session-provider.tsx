@@ -33,14 +33,19 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const query = useQuery({
     queryKey: SESSION_KEY,
     queryFn: () => authService.session(),
-    retry: (count, error) => !(error instanceof ApiError && error.status === 401) && count < 1,
+    retry: (count, error) =>
+      !(error instanceof ApiError && error.status === 401) && count < 1,
     staleTime: 60_000,
     refetchOnWindowFocus: true,
   });
 
-  const anonymous = query.error instanceof ApiError && query.error.status === 401;
+  const anonymous =
+    query.error instanceof ApiError && query.error.status === 401;
   const session = anonymous ? null : (query.data ?? null);
-  const permissions = useMemo(() => new Set(session?.permissions ?? []), [session]);
+  const permissions = useMemo(
+    () => new Set(session?.permissions ?? []),
+    [session],
+  );
 
   // Workspace data never survives an identity or workspace change: cancel and drop it.
   const purgeWorkspaceData = useCallback(async () => {
@@ -58,10 +63,20 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const value: SessionContextValue = {
     session,
-    status: query.isPending ? "loading" : anonymous ? "anonymous" : query.isError ? "error" : "ready",
+    status: query.isPending
+      ? "loading"
+      : anonymous
+        ? "anonymous"
+        : query.isError
+          ? "error"
+          : "ready",
     can: (permission) => permissions.has(permission),
     canAny: (...list) => list.some((p) => permissions.has(p)),
-    scopeKey: ["ws", session?.tenant?.id ?? "none", session?.environment?.id ?? "none"] as const,
+    scopeKey: [
+      "ws",
+      session?.tenant?.id ?? "none",
+      session?.environment?.id ?? "none",
+    ] as const,
     login: async (input) => {
       const next = await authService.login(input);
       await adopt(next);
@@ -95,7 +110,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     retry: () => void query.refetch(),
   };
 
-  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
+  return (
+    <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
+  );
 }
 
 export function useSession() {

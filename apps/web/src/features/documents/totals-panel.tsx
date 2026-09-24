@@ -5,7 +5,12 @@ import { formatMoney, toCents } from "@/lib/format";
 import { Skeleton } from "@/components/ui/display";
 import { computeTotals, formatRate, type PricedLine } from "./lib";
 
-type Totals = { subtotal: string; discount_total: string; tax_total: string; total: string };
+type Totals = {
+  subtotal: string;
+  discount_total: string;
+  tax_total: string;
+  total: string;
+};
 
 /**
  * Subtotal → discounts → tax → total. Pass `lines` for a live preview computed in integer
@@ -43,15 +48,28 @@ export function TotalsPanel({
     <div className={className}>
       <dl className="space-y-1.5 text-[13px]">
         <Row label="Subtotal" value={formatMoney(values.subtotal, currency)} />
-        {hasDiscount && <Row label="Discounts" value={`−${formatMoney(values.discount_total, currency)}`} />}
+        {hasDiscount && (
+          <Row
+            label="Discounts"
+            value={`−${formatMoney(values.discount_total, currency)}`}
+          />
+        )}
         <Row
           label={taxRate ? `Tax (${formatRate(taxRate)})` : "Tax"}
-          value={taxRate ? formatMoney(values.tax_total, currency) : "Calculated on save"}
+          value={
+            taxRate
+              ? formatMoney(values.tax_total, currency)
+              : "Calculated on save"
+          }
           muted={!taxRate}
         />
         <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-border pt-2.5">
-          <dt className="text-sm font-semibold">{taxRate || totals ? "Total" : "Total before tax"}</dt>
-          <dd className="tabular text-lg font-semibold tracking-tight">{formatMoney(values.total, currency)}</dd>
+          <dt className="text-sm font-semibold">
+            {taxRate || totals ? "Total" : "Total before tax"}
+          </dt>
+          <dd className="tabular text-lg font-semibold tracking-tight">
+            {formatMoney(values.total, currency)}
+          </dd>
         </div>
       </dl>
       {preview && (
@@ -63,11 +81,26 @@ export function TotalsPanel({
   );
 }
 
-function Row({ label, value, muted = false }: { label: string; value: string; muted?: boolean }) {
+function Row({
+  label,
+  value,
+  muted = false,
+}: {
+  label: string;
+  value: string;
+  muted?: boolean;
+}) {
   return (
     <div className="flex items-baseline justify-between gap-4">
       <dt className="text-muted-foreground">{label}</dt>
-      <dd className={cn("tabular font-medium", muted && "text-xs font-normal text-muted-foreground")}>{value}</dd>
+      <dd
+        className={cn(
+          "tabular font-medium",
+          muted && "text-xs font-normal text-muted-foreground",
+        )}
+      >
+        {value}
+      </dd>
     </div>
   );
 }

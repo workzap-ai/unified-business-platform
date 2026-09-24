@@ -9,7 +9,12 @@ import type { NavItem, Navigation, SectionKey } from "./types";
 export function useNavigationKey() {
   const { scopeKey, session } = useSession();
   // Navigation depends on permissions too (demo role switching, role changes).
-  return [...scopeKey, "navigation", (session?.permissions ?? []).length, session?.roles.join(",")] as const;
+  return [
+    ...scopeKey,
+    "navigation",
+    (session?.permissions ?? []).length,
+    session?.roles.join(","),
+  ] as const;
 }
 
 export function useNavigation() {
@@ -26,8 +31,16 @@ export function useNavOrderMutation() {
   const client = useQueryClient();
   const key = useNavigationKey();
   return useMutation({
-    mutationFn: ({ section, order }: { section: SectionKey; order: string[] | null }) =>
-      order ? navigationService.saveOrder(section, order) : navigationService.reset(section),
+    mutationFn: ({
+      section,
+      order,
+    }: {
+      section: SectionKey;
+      order: string[] | null;
+    }) =>
+      order
+        ? navigationService.saveOrder(section, order)
+        : navigationService.reset(section),
     onMutate: async ({ section, order }) => {
       await client.cancelQueries({ queryKey: key });
       const previous = client.getQueryData<Navigation>(key);
@@ -61,8 +74,12 @@ function routeMatches(route: string, pathname: string) {
 }
 
 /** Deepest matching top-level item and child for the current URL. */
-export function findActive(navigation: Navigation | undefined, pathname: string) {
-  let best: { item: NavItem; child: NavItem | null; score: number } | null = null;
+export function findActive(
+  navigation: Navigation | undefined,
+  pathname: string,
+) {
+  let best: { item: NavItem; child: NavItem | null; score: number } | null =
+    null;
   for (const section of navigation?.sections ?? []) {
     for (const item of section.items) {
       if (routeMatches(item.route, pathname)) {

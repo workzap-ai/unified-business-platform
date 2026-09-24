@@ -1,11 +1,18 @@
 import { humanize } from "@/lib/format";
-import type { AgentKey, HandoffReason, HandoffStatus, ProviderHealth, ProviderName } from "../types";
+import type {
+  AgentKey,
+  HandoffReason,
+  HandoffStatus,
+  ProviderHealth,
+  ProviderName,
+} from "../types";
 
 /** Query keys for PI workspace data. Invalidate the `["pi"]` prefix after PI mutations. */
 export const piKeys = {
   all: ["pi"] as const,
   overview: ["pi", "overview"] as const,
-  conversations: (filters: Record<string, unknown>) => ["pi", "conversations", filters] as const,
+  conversations: (filters: Record<string, unknown>) =>
+    ["pi", "conversations", filters] as const,
   messages: (id: string) => ["pi", "messages", id] as const,
   context: (id: string) => ["pi", "context", id] as const,
   handoffs: (status?: string) => ["pi", "handoffs", status ?? "all"] as const,
@@ -24,7 +31,9 @@ export const HANDOFF_REASON_LABELS: Record<HandoffReason, string> = {
   manual: "Created by operator",
 };
 
-export const HANDOFF_REASONS = Object.keys(HANDOFF_REASON_LABELS) as HandoffReason[];
+export const HANDOFF_REASONS = Object.keys(
+  HANDOFF_REASON_LABELS,
+) as HandoffReason[];
 
 export const AGENT_LABELS: Record<AgentKey, string> = {
   router: "Router",
@@ -35,7 +44,10 @@ export const AGENT_LABELS: Record<AgentKey, string> = {
   handoff: "Handoff",
 };
 
-export function agentLabel(key: AgentKey | null | undefined, names?: Map<string, string>) {
+export function agentLabel(
+  key: AgentKey | null | undefined,
+  names?: Map<string, string>,
+) {
   if (!key) return "PI";
   return names?.get(key) ?? AGENT_LABELS[key] ?? humanize(key);
 }
@@ -75,4 +87,5 @@ export function formatMs(ms: number | null | undefined) {
   return `${(ms / 1000).toFixed(ms < 10_000 ? 1 : 0)}s`;
 }
 
-export const inboxHref = (conversationId: string) => `/pi/inbox?conversation=${encodeURIComponent(conversationId)}`;
+export const inboxHref = (conversationId: string) =>
+  `/pi/inbox?conversation=${encodeURIComponent(conversationId)}`;

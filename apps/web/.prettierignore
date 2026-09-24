@@ -5,3 +5,5 @@ next-env.d.ts
 playwright-report
 test-results
 *.tsbuildinfo
+# Generated from the API navigation registry (python -m app.modules.navigation.export)
+*.generated.json

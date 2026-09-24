@@ -1,5 +1,11 @@
 # Architecture baseline and target
 
+> Current state (2026-09-24): auth, RBAC, environments, all core business modules, the
+> product and navigation registries, and the complete web UI are implemented; the PI
+> backend is not. See PROJECT_STATUS.md for verification and ADR 0005 for environment
+> scope, the navigation registry and UI data modes. The stage table below is the original
+> plan and is kept for history.
+
 Updated at Stage 2, 2026-09-23. The technical and organization-data foundations are implemented. Authentication, RBAC, business modules, product registry, and AI remain future stages. No pre-existing application required migration or replacement.
 
 ## Implemented foundation

@@ -32,7 +32,12 @@ export const customerDetailSchema = customerSchema.extend({
     open_conversations: z.number(),
   }),
 });
-export const noteSchema = z.object({ id, author_label: z.string(), body: z.string(), created_at: ts });
+export const noteSchema = z.object({
+  id,
+  author_label: z.string(),
+  body: z.string(),
+  created_at: ts,
+});
 export const activitySchema = z.object({
   id,
   kind: z.string(),
@@ -55,7 +60,12 @@ export type CustomerInput = {
 };
 
 /* Catalog -------------------------------------------------------------------- */
-export const categorySchema = z.object({ id, name: z.string(), slug: z.string(), description: z.string() });
+export const categorySchema = z.object({
+  id,
+  name: z.string(),
+  slug: z.string(),
+  description: z.string(),
+});
 export const variantSchema = z.object({
   id,
   product_id: id,
@@ -137,7 +147,14 @@ export const movementSchema = z.object({
   variant_id: id,
   location_id: id,
   quantity: z.number(),
-  kind: z.enum(["receipt", "adjustment", "sale", "return", "transfer_in", "transfer_out"]),
+  kind: z.enum([
+    "receipt",
+    "adjustment",
+    "sale",
+    "return",
+    "transfer_in",
+    "transfer_out",
+  ]),
   reason: z.string(),
   balance_after: z.number(),
   ref_type: z.string().nullable(),
@@ -175,7 +192,11 @@ export const leadSchema = z.object({
   customer_name: z.string().nullable(),
   next_stages: z.array(z.string()),
 });
-export const pipelineStageSchema = z.object({ stage: z.string(), count: z.number(), value: decimal });
+export const pipelineStageSchema = z.object({
+  stage: z.string(),
+  count: z.number(),
+  value: decimal,
+});
 export type Lead = z.infer<typeof leadSchema>;
 export type LeadStage = Lead["stage"];
 export type PipelineStage = z.infer<typeof pipelineStageSchema>;
@@ -203,7 +224,16 @@ export const quoteSchema = z.object({
   number: z.string(),
   customer_id: id,
   lead_id: id.nullable(),
-  status: z.enum(["draft", "pending_approval", "approved", "sent", "accepted", "rejected", "expired", "cancelled"]),
+  status: z.enum([
+    "draft",
+    "pending_approval",
+    "approved",
+    "sent",
+    "accepted",
+    "rejected",
+    "expired",
+    "cancelled",
+  ]),
   source: z.enum(["manual", "pi"]),
   ...totals,
   tax_rate: decimal,
@@ -235,7 +265,14 @@ export const orderSchema = z.object({
   number: z.string(),
   customer_id: id,
   quote_id: id.nullable(),
-  status: z.enum(["draft", "confirmed", "processing", "shipped", "delivered", "cancelled"]),
+  status: z.enum([
+    "draft",
+    "confirmed",
+    "processing",
+    "shipped",
+    "delivered",
+    "cancelled",
+  ]),
   source: z.enum(["manual", "pi", "quote"]),
   ...totals,
   tax_rate: decimal,
@@ -247,7 +284,9 @@ export const orderSchema = z.object({
   customer_name: z.string().nullable(),
 });
 export const orderDetailSchema = orderSchema.extend({
-  lines: z.array(z.object({ ...lineBase, sku: z.string().nullable(), quantity: z.number() })),
+  lines: z.array(
+    z.object({ ...lineBase, sku: z.string().nullable(), quantity: z.number() }),
+  ),
   next_actions: z.array(z.string()),
   invoice_id: id.nullable(),
   invoice_number: z.string().nullable(),
@@ -255,7 +294,11 @@ export const orderDetailSchema = orderSchema.extend({
 export type Order = z.infer<typeof orderSchema>;
 export type OrderDetail = z.infer<typeof orderDetailSchema>;
 export type OrderStatus = Order["status"];
-export type OrderLineInput = { variant_id: string; quantity: number; discount: string };
+export type OrderLineInput = {
+  variant_id: string;
+  quantity: number;
+  discount: string;
+};
 
 export const paymentSchema = z.object({
   id,
@@ -302,18 +345,36 @@ export type Payment = z.infer<typeof paymentSchema>;
 export type Invoice = z.infer<typeof invoiceSchema>;
 export type InvoiceDetail = z.infer<typeof invoiceDetailSchema>;
 export type BillingSummary = z.infer<typeof billingSummarySchema>;
-export type PaymentInput = { amount: string; method: Payment["method"]; received_on?: string; reference: string };
+export type PaymentInput = {
+  amount: string;
+  method: Payment["method"];
+  received_on?: string;
+  reference: string;
+};
 export type InvoiceInput = {
   customer_id: string;
   due_date?: string | null;
   notes: string;
-  lines: { description: string; quantity: string; unit_price: string; discount: string }[];
+  lines: {
+    description: string;
+    quantity: string;
+    unit_price: string;
+    discount: string;
+  }[];
 };
 
 /* Finance --------------------------------------------------------------------------- */
 export const EXPENSE_CATEGORIES = [
-  "rent", "payroll", "utilities", "inventory", "marketing", "software", "travel", "taxes",
-  "professional_services", "other",
+  "rent",
+  "payroll",
+  "utilities",
+  "inventory",
+  "marketing",
+  "software",
+  "travel",
+  "taxes",
+  "professional_services",
+  "other",
 ] as const;
 export const expenseSchema = z.object({
   id,
@@ -336,8 +397,12 @@ export const financeSummarySchema = z.object({
   cash_out: decimal,
   net_cash: decimal,
   receivables: decimal,
-  aging: z.array(z.object({ bucket: z.string(), amount: decimal, count: z.number() })),
-  expenses_by_category: z.array(z.object({ category: z.string(), amount: decimal })),
+  aging: z.array(
+    z.object({ bucket: z.string(), amount: decimal, count: z.number() }),
+  ),
+  expenses_by_category: z.array(
+    z.object({ category: z.string(), amount: decimal }),
+  ),
 });
 export type Expense = z.infer<typeof expenseSchema>;
 export type FinanceSummary = z.infer<typeof financeSummarySchema>;
@@ -392,8 +457,19 @@ export type EmployeeInput = {
 };
 
 /* Organization ---------------------------------------------------------------------------- */
-export const departmentSchema = z.object({ id, tenant_id: id, name: z.string(), code: z.string(), branch_id: id.nullable() });
-export const branchSchema = z.object({ id, tenant_id: id, name: z.string(), code: z.string() });
+export const departmentSchema = z.object({
+  id,
+  tenant_id: id,
+  name: z.string(),
+  code: z.string(),
+  branch_id: id.nullable(),
+});
+export const branchSchema = z.object({
+  id,
+  tenant_id: id,
+  name: z.string(),
+  code: z.string(),
+});
 export type Department = z.infer<typeof departmentSchema>;
 export type Branch = z.infer<typeof branchSchema>;
 
@@ -429,7 +505,9 @@ export const overviewSchema = z.object({
   inventory_alerts: metric,
   quotes: metric,
   employees: metric,
-  installed_products: z.array(z.object({ key: z.string(), name: z.string(), enabled: z.boolean() })),
+  installed_products: z.array(
+    z.object({ key: z.string(), name: z.string(), enabled: z.boolean() }),
+  ),
   recent_activity: z.array(
     z.object({
       id,
@@ -446,22 +524,37 @@ export type Metric = NonNullable<Overview["revenue"]>;
 
 export const revenueReportSchema = z.object({
   currency: z.string(),
-  months: z.array(z.object({ month: z.string(), invoiced: decimal, collected: decimal })),
+  months: z.array(
+    z.object({ month: z.string(), invoiced: decimal, collected: decimal }),
+  ),
   total_invoiced: decimal,
   total_collected: decimal,
 });
-const statusCount = z.object({ status: z.string(), count: z.number(), value: decimal });
+const statusCount = z.object({
+  status: z.string(),
+  count: z.number(),
+  value: decimal,
+});
 export const ordersReportSchema = z.object({
   currency: z.string(),
   by_status: z.array(statusCount),
-  by_day: z.array(z.object({ day: z.string(), count: z.number(), value: decimal })),
+  by_day: z.array(
+    z.object({ day: z.string(), count: z.number(), value: decimal }),
+  ),
   average_order_value: decimal,
 });
 export const customersReportSchema = z.object({
   currency: z.string(),
   total: z.number(),
   new_by_month: z.array(z.tuple([z.string(), z.number()])),
-  top: z.array(z.object({ customer_id: id, name: z.string(), invoiced: decimal, orders: z.number() })),
+  top: z.array(
+    z.object({
+      customer_id: id,
+      name: z.string(),
+      invoiced: decimal,
+      orders: z.number(),
+    }),
+  ),
 });
 export const quotesReportSchema = z.object({
   currency: z.string(),
@@ -469,7 +562,11 @@ export const quotesReportSchema = z.object({
   conversion_rate: nullableDecimal,
   open_value: decimal,
 });
-export const inventoryReportSchema = z.object({ low_stock_count: z.number(), stock_value: decimal, currency: z.string() });
+export const inventoryReportSchema = z.object({
+  low_stock_count: z.number(),
+  stock_value: decimal,
+  currency: z.string(),
+});
 export type RevenueReport = z.infer<typeof revenueReportSchema>;
 export type OrdersReport = z.infer<typeof ordersReportSchema>;
 export type CustomersReport = z.infer<typeof customersReportSchema>;

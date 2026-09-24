@@ -6,7 +6,8 @@
 
 export type ConversationStatus = "open" | "closed";
 export type ConversationMode = "ai" | "human";
-export type HandoffStatus = "open" | "assigned" | "in_progress" | "resolved" | "closed";
+export type HandoffStatus =
+  "open" | "assigned" | "in_progress" | "resolved" | "closed";
 export type HandoffReason =
   | "customer_request"
   | "low_confidence"
@@ -16,7 +17,13 @@ export type HandoffReason =
   | "complaint"
   | "sensitive"
   | "manual";
-export type AgentKey = "router" | "customer_memory" | "support" | "requirement" | "sales_order" | "handoff";
+export type AgentKey =
+  | "router"
+  | "customer_memory"
+  | "support"
+  | "requirement"
+  | "sales_order"
+  | "handoff";
 export type ProviderName = "openai" | "gemini" | "groq";
 
 export type Conversation = {
@@ -39,7 +46,11 @@ export type Conversation = {
   pending_confirmation: boolean;
 };
 
-export type ToolEvent = { tool: string; status: "success" | "denied" | "error" | "confirmation_required"; summary: string };
+export type ToolEvent = {
+  tool: string;
+  status: "success" | "denied" | "error" | "confirmation_required";
+  summary: string;
+};
 
 export type Message = {
   id: string;
@@ -48,14 +59,34 @@ export type Message = {
   sender_type: "customer" | "ai" | "human" | "system";
   message_type: "text" | "audio" | "image" | "interactive";
   body: string;
-  media: { mime_type: string; size: number; duration_s?: number; transcript?: string; description?: string } | null;
-  status: "received" | "processed" | "skipped" | "failed" | "queued" | "sent" | "delivered" | "read";
+  media: {
+    mime_type: string;
+    size: number;
+    duration_s?: number;
+    transcript?: string;
+    description?: string;
+  } | null;
+  status:
+    | "received"
+    | "processed"
+    | "skipped"
+    | "failed"
+    | "queued"
+    | "sent"
+    | "delivered"
+    | "read";
   error_code: string | null;
   agent_key: AgentKey | null;
   sent_by_label: string | null;
   created_at: string;
   tool_events: ToolEvent[];
-  confirmation: { kind: "order_summary"; status: "pending" | "confirmed" | "cancelled" | "expired"; reference: string; total: string; currency: string } | null;
+  confirmation: {
+    kind: "order_summary";
+    status: "pending" | "confirmed" | "cancelled" | "expired";
+    reference: string;
+    total: string;
+    currency: string;
+  } | null;
 };
 
 export type AgentRun = {
@@ -77,9 +108,20 @@ export type AgentRun = {
 
 export type ConversationContext = {
   conversation: Conversation;
-  memory: { id: string; kind: "preference" | "requirement" | "context"; content: string; created_at: string }[];
+  memory: {
+    id: string;
+    kind: "preference" | "requirement" | "context";
+    content: string;
+    created_at: string;
+  }[];
   knowledge_used: { title: string; source: string; snippet: string }[];
-  recent_orders: { id: string; number: string; status: string; total: string; created_at: string }[];
+  recent_orders: {
+    id: string;
+    number: string;
+    status: string;
+    total: string;
+    created_at: string;
+  }[];
   open_quotes: { id: string; number: string; status: string; total: string }[];
   balance: string | null;
   currency: string;
@@ -181,7 +223,8 @@ export type WebhookEvent = {
 export type KnowledgeSource = {
   id: string;
   name: string;
-  kind: "company_info" | "faq" | "policy" | "catalog" | "approved_answer" | "file";
+  kind:
+    "company_info" | "faq" | "policy" | "catalog" | "approved_answer" | "file";
   description: string;
   status: "active" | "disabled";
   documents: number;
@@ -231,8 +274,16 @@ export type PiOverview = {
   fallback_count: number;
   tool_calls: number;
   tool_failures: number;
-  whatsapp: Pick<WhatsAppConnection, "status" | "display_phone_number" | "last_inbound_at"> | null;
-  knowledge: { sources: number; documents_ready: number; documents_failed: number; passages: number };
+  whatsapp: Pick<
+    WhatsAppConnection,
+    "status" | "display_phone_number" | "last_inbound_at"
+  > | null;
+  knowledge: {
+    sources: number;
+    documents_ready: number;
+    documents_failed: number;
+    passages: number;
+  };
   providers: ProviderHealth[];
   volume: { day: string; inbound: number; ai: number; human: number }[];
   agent_activity: { agent: AgentKey; runs: number }[];
@@ -245,7 +296,12 @@ export type PiAnalytics = {
   range: AnalyticsRange;
   currency_note: string;
   conversations: { day: string; started: number; resolved: number }[];
-  messages: { day: string; inbound: number; outbound_ai: number; outbound_human: number }[];
+  messages: {
+    day: string;
+    inbound: number;
+    outbound_ai: number;
+    outbound_human: number;
+  }[];
   latency: { day: string; p50: number; p95: number }[];
   runs_by_agent: { agent: AgentKey; runs: number; failures: number }[];
   intents: { intent: string; count: number }[];
@@ -253,8 +309,18 @@ export type PiAnalytics = {
   handoffs_by_reason: { reason: HandoffReason; count: number }[];
   handoffs_by_day: { day: string; opened: number; resolved: number }[];
   fallbacks: { day: string; count: number }[];
-  fallback_pairs: { from: ProviderName; to: ProviderName | "handoff"; count: number; top_reason: string }[];
-  provider_usage: { day: string; openai: number; gemini: number; groq: number }[];
+  fallback_pairs: {
+    from: ProviderName;
+    to: ProviderName | "handoff";
+    count: number;
+    top_reason: string;
+  }[];
+  provider_usage: {
+    day: string;
+    openai: number;
+    gemini: number;
+    groq: number;
+  }[];
   tokens: { day: string; input: number; output: number }[];
   cost_estimate: { day: string; amount: number }[] | null;
   totals: {
@@ -277,7 +343,10 @@ export type PiSettings = {
   timezone: string;
   business_hours: {
     enabled: boolean;
-    days: Record<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun", { open: boolean; start: string; end: string }>;
+    days: Record<
+      "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun",
+      { open: boolean; start: string; end: string }
+    >;
     outside_hours: "reply" | "reply_with_notice" | "handoff_only";
     notice: string;
   };
@@ -288,8 +357,18 @@ export type PiSettings = {
     greeting: string;
     sign_off: string;
   };
-  ai_config: { router_alias: "fast" | "balanced"; reply_alias: "fast" | "balanced" | "reasoning"; temperature: string; clarify_before_handoff: number };
-  provider_config: { order: ProviderName[]; retry_transient: boolean; max_retries: number; timeout_seconds: number };
+  ai_config: {
+    router_alias: "fast" | "balanced";
+    reply_alias: "fast" | "balanced" | "reasoning";
+    temperature: string;
+    clarify_before_handoff: number;
+  };
+  provider_config: {
+    order: ProviderName[];
+    retry_transient: boolean;
+    max_retries: number;
+    timeout_seconds: number;
+  };
   tool_permissions: Record<string, boolean>;
   handoff_rules: {
     keywords: string[];
@@ -298,7 +377,24 @@ export type PiSettings = {
     handoff_on_complaint: boolean;
     notify_roles: string[];
   };
-  knowledge_config: { top_k: number; min_score: string; semantic_enabled: boolean; cite_sources_to_operators: boolean };
-  whatsapp_config: { send_read_receipts: boolean; typing_indicator: boolean; media_voice: boolean; media_images: boolean; max_media_mb: number };
-  permissions: { role: string; view_inbox: boolean; reply: boolean; takeover: boolean; configure: boolean }[];
+  knowledge_config: {
+    top_k: number;
+    min_score: string;
+    semantic_enabled: boolean;
+    cite_sources_to_operators: boolean;
+  };
+  whatsapp_config: {
+    send_read_receipts: boolean;
+    typing_indicator: boolean;
+    media_voice: boolean;
+    media_images: boolean;
+    max_media_mb: number;
+  };
+  permissions: {
+    role: string;
+    view_inbox: boolean;
+    reply: boolean;
+    takeover: boolean;
+    configure: boolean;
+  }[];
 };

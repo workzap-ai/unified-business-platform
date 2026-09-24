@@ -102,12 +102,15 @@ function DropdownMenuItem({
   className,
   destructive,
   ...props
-}: React.ComponentProps<typeof DropdownPrimitive.Item> & { destructive?: boolean }) {
+}: React.ComponentProps<typeof DropdownPrimitive.Item> & {
+  destructive?: boolean;
+}) {
   return (
     <DropdownPrimitive.Item
       className={cn(
         itemClass,
-        destructive && "text-danger data-[highlighted]:bg-danger-soft [&_svg]:text-danger",
+        destructive &&
+          "text-danger data-[highlighted]:bg-danger-soft [&_svg]:text-danger",
         className,
       )}
       {...props}
@@ -121,7 +124,10 @@ function DropdownMenuCheckboxItem({
   ...props
 }: React.ComponentProps<typeof DropdownPrimitive.CheckboxItem>) {
   return (
-    <DropdownPrimitive.CheckboxItem className={cn(itemClass, "pl-7", className)} {...props}>
+    <DropdownPrimitive.CheckboxItem
+      className={cn(itemClass, "pl-7", className)}
+      {...props}
+    >
       <span className="absolute left-2 flex size-4 items-center justify-center">
         <DropdownPrimitive.ItemIndicator>
           <Check className="!text-primary" />
@@ -151,7 +157,12 @@ function DropdownMenuSeparator({
   className,
   ...props
 }: React.ComponentProps<typeof DropdownPrimitive.Separator>) {
-  return <DropdownPrimitive.Separator className={cn("-mx-1 my-1 h-px bg-border", className)} {...props} />;
+  return (
+    <DropdownPrimitive.Separator
+      className={cn("-mx-1 my-1 h-px bg-border", className)}
+      {...props}
+    />
+  );
 }
 
 function DropdownMenuSubTrigger({
@@ -209,7 +220,12 @@ function DialogContent({
   size?: "sm" | "md" | "lg" | "xl";
   hideClose?: boolean;
 }) {
-  const sizes = { sm: "max-w-md", md: "max-w-lg", lg: "max-w-2xl", xl: "max-w-4xl" };
+  const sizes = {
+    sm: "max-w-md",
+    md: "max-w-lg",
+    lg: "max-w-2xl",
+    xl: "max-w-4xl",
+  };
   return (
     <DialogPrimitive.Portal>
       <Overlay />
@@ -245,7 +261,9 @@ function DialogHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("border-b border-border px-5 pt-4 pb-3.5 pr-12", className)}>
+    <div
+      className={cn("border-b border-border px-5 pt-4 pb-3.5 pr-12", className)}
+    >
       <DialogPrimitive.Title className="text-base font-semibold tracking-tight">
         {title}
       </DialogPrimitive.Title>
@@ -254,14 +272,21 @@ function DialogHeader({
           {description}
         </DialogPrimitive.Description>
       ) : (
-        <DialogPrimitive.Description className="sr-only">{title}</DialogPrimitive.Description>
+        <DialogPrimitive.Description className="sr-only">
+          {title}
+        </DialogPrimitive.Description>
       )}
     </div>
   );
 }
 
 function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("min-h-0 flex-1 overflow-y-auto px-5 py-4", className)} {...props} />;
+  return (
+    <div
+      className={cn("min-h-0 flex-1 overflow-y-auto px-5 py-4", className)}
+      {...props}
+    />
+  );
 }
 
 function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
@@ -286,7 +311,12 @@ function SheetContent({
   side?: "left" | "right";
   width?: "sm" | "md" | "lg" | "xl";
 }) {
-  const widths = { sm: "sm:max-w-sm", md: "sm:max-w-md", lg: "sm:max-w-xl", xl: "sm:max-w-3xl" };
+  const widths = {
+    sm: "sm:max-w-sm",
+    md: "sm:max-w-md",
+    lg: "sm:max-w-xl",
+    xl: "sm:max-w-3xl",
+  };
   return (
     <DialogPrimitive.Portal>
       <Overlay />

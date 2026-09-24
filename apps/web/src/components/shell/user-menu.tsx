@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, Eye, Keyboard, LogOut, Moon, Plus, Sun, UserRound } from "lucide-react";
+import {
+  Check,
+  Eye,
+  Keyboard,
+  LogOut,
+  Moon,
+  Plus,
+  Sun,
+  UserRound,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "@/components/ui/display";
 import {
@@ -48,7 +57,9 @@ export function UserMenu() {
           <Avatar name={name} size="md" />
           <div className="min-w-0">
             <p className="truncate text-[13px] font-semibold">{name}</p>
-            <p className="truncate text-xs text-muted-foreground">{session.user.email}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {session.user.email}
+            </p>
           </div>
         </div>
         <DropdownMenuSeparator />
@@ -57,8 +68,11 @@ export function UserMenu() {
             <UserRound /> Account & security
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => setTheme(theme === "dark" ? "light" : "dark")}>
-          {theme === "dark" ? <Sun /> : <Moon />} {theme === "dark" ? "Light" : "Dark"} theme
+        <DropdownMenuItem
+          onSelect={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {theme === "dark" ? <Sun /> : <Moon />}{" "}
+          {theme === "dark" ? "Light" : "Dark"} theme
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={open}>
           <Keyboard /> Search & shortcuts
@@ -75,11 +89,15 @@ export function UserMenu() {
                 <DropdownMenuItem
                   key={role.key}
                   onSelect={() =>
-                    void setDemoRole(role.key).then(() => toast.success(`Viewing as ${role.name}`))
+                    void setDemoRole(role.key).then(() =>
+                      toast.success(`Viewing as ${role.name}`),
+                    )
                   }
                 >
                   <span className="flex-1">{role.name}</span>
-                  {session.roles.includes(role.key) && <Check className="!text-primary" />}
+                  {session.roles.includes(role.key) && (
+                    <Check className="!text-primary" />
+                  )}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuSubContent>

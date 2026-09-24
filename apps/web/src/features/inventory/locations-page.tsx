@@ -8,8 +8,19 @@ import { MapPin, Plus, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, NativeSelect } from "@/components/ui/input";
 import { Badge } from "@/components/ui/display";
-import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from "@/components/ui/overlays";
-import { PageHeader, PageShell, ModuleNav, RequirePermission } from "@/components/app/page";
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "@/components/ui/overlays";
+import {
+  PageHeader,
+  PageShell,
+  ModuleNav,
+  RequirePermission,
+} from "@/components/app/page";
 import { DataTable, type Column } from "@/components/app/data-table";
 import { FormField } from "@/components/app/forms";
 import { EmptyState, InlineError, Notice } from "@/components/app/states";
@@ -23,7 +34,6 @@ import { inventoryService } from "./service";
 import { SLUG_PATTERN as SLUG, slugify } from "@/features/catalog/lib";
 import { useLocations } from "./hooks";
 
-
 export function LocationsPage() {
   return (
     <RequirePermission permission="inventory.read" area="inventory">
@@ -33,7 +43,11 @@ export function LocationsPage() {
 }
 
 function useBranches(enabled: boolean) {
-  return useScopedQuery(["organization", "branches"], () => adminService.branches(), { enabled, retry: false, staleTime: 60_000 });
+  return useScopedQuery(
+    ["organization", "branches"],
+    () => adminService.branches(),
+    { enabled, retry: false, staleTime: 60_000 },
+  );
 }
 
 function LocationsPageInner() {
@@ -42,7 +56,8 @@ function LocationsPageInner() {
   const locations = useLocations();
   const branches = useBranches(true);
   const [open, setOpen] = useState(false);
-  const branchName = (id: string | null) => (id ? (branches.data?.find((b) => b.id === id)?.name ?? "—") : null);
+  const branchName = (id: string | null) =>
+    id ? (branches.data?.find((b) => b.id === id)?.name ?? "—") : null;
 
   const columns: Column<Location>[] = [
     {
@@ -62,14 +77,27 @@ function LocationsPageInner() {
         </div>
       ),
     },
-    { key: "code", header: "Code", hideBelow: "sm", cell: (l) => <span className="font-mono text-xs">{l.code}</span> },
+    {
+      key: "code",
+      header: "Code",
+      hideBelow: "sm",
+      cell: (l) => <span className="font-mono text-xs">{l.code}</span>,
+    },
     {
       key: "branch",
       header: "Branch",
       hideBelow: "md",
-      cell: (l) => branchName(l.branch_id) ?? <span className="text-muted-foreground">No branch</span>,
+      cell: (l) =>
+        branchName(l.branch_id) ?? (
+          <span className="text-muted-foreground">No branch</span>
+        ),
     },
-    { key: "status", header: "Status", align: "right", cell: (l) => <StatusBadge status={l.status} /> },
+    {
+      key: "status",
+      header: "Status",
+      align: "right",
+      cell: (l) => <StatusBadge status={l.status} />,
+    },
   ];
 
   return (
@@ -112,22 +140,35 @@ function LocationsPageInner() {
       />
       {locations.data && locations.data.length > 0 && (
         <p className="mt-3 text-xs text-muted-foreground">
-          Locations are part of the stock ledger history, so they can't be deleted here.
+          Locations are part of the stock ledger history, so they can’t be
+          deleted here.
         </p>
       )}
-      <LocationDialog open={open} onOpenChange={setOpen} branches={branches.data} branchesFailed={branches.isError} />
+      <LocationDialog
+        open={open}
+        onOpenChange={setOpen}
+        branches={branches.data}
+        branchesFailed={branches.isError}
+      />
     </PageShell>
   );
 }
 
 const schema = z.object({
-  name: z.string().trim().min(1, "Enter a name").max(120, "Keep the name under 120 characters"),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Enter a name")
+    .max(120, "Keep the name under 120 characters"),
   code: z
     .string()
     .trim()
     .min(1, "Enter a code")
     .max(40, "Keep the code under 40 characters")
-    .regex(SLUG, "Use lowercase letters, numbers and single hyphens, e.g. main-warehouse"),
+    .regex(
+      SLUG,
+      "Use lowercase letters, numbers and single hyphens, e.g. main-warehouse",
+    ),
   branch_id: z.string(),
 });
 type Values = z.infer<typeof schema>;
@@ -143,24 +184,33 @@ function LocationDialog({
   branches: { id: string; name: string }[] | undefined;
   branchesFailed: boolean;
 }) {
-  const [codeTouched, setCodeTouched] = useState(false);
-  const { register, handleSubmit, reset, setValue, setError, control, formState } = useForm<Values>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    setError,
+    control,
+    formState,
+  } = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: { name: "", code: "", branch_id: "" },
   });
   useEffect(() => {
     if (open) {
       reset({ name: "", code: "", branch_id: "" });
-      setCodeTouched(false);
     }
   }, [open, reset]);
   const name = useWatch({ control, name: "name" });
+  // Keep generating from the name until the member edits the code by hand.
+  const codeTouched = Boolean(formState.dirtyFields.code);
   useEffect(() => {
     if (!codeTouched) setValue("code", slugify(name, 40));
   }, [name, codeTouched, setValue]);
 
   const mutation = useScopedMutation(
-    (input: { name: string; code: string; branch_id: string | null }) => inventoryService.createLocation(input),
+    (input: { name: string; code: string; branch_id: string | null }) =>
+      inventoryService.createLocation(input),
     {
       invalidate: [["inventory"]],
       success: (l) => `Location “${l.name}” added`,
@@ -171,23 +221,51 @@ function LocationDialog({
 
   const submit = handleSubmit((values) =>
     mutation.mutate(
-      { name: values.name.trim(), code: values.code.trim(), branch_id: values.branch_id || null },
+      {
+        name: values.name.trim(),
+        code: values.code.trim(),
+        branch_id: values.branch_id || null,
+      },
       {
         onError: (e) => {
-          if (e instanceof ApiError && e.status === 409) setError("code", { message: "Another location already uses this code" });
+          if (e instanceof ApiError && e.status === 409)
+            setError("code", {
+              message: "Another location already uses this code",
+            });
         },
       },
     ),
   );
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !mutation.isPending && onOpenChange(next)}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => !mutation.isPending && onOpenChange(next)}
+    >
       <DialogContent size="sm">
-        <DialogHeader title="Add location" description="A place where stock is held and counted." />
-        <form onSubmit={submit} noValidate className="flex min-h-0 flex-1 flex-col">
+        <DialogHeader
+          title="Add location"
+          description="A place where stock is held and counted."
+        />
+        <form
+          onSubmit={submit}
+          noValidate
+          className="flex min-h-0 flex-1 flex-col"
+        >
           <DialogBody className="space-y-4">
-            <FormField label="Name" htmlFor="location-name" required error={formState.errors.name}>
-              <Input id="location-name" autoFocus placeholder="Main warehouse" aria-invalid={Boolean(formState.errors.name)} {...register("name")} />
+            <FormField
+              label="Name"
+              htmlFor="location-name"
+              required
+              error={formState.errors.name}
+            >
+              <Input
+                id="location-name"
+                autoFocus
+                placeholder="Main warehouse"
+                aria-invalid={Boolean(formState.errors.name)}
+                {...register("name")}
+              />
             </FormField>
             <FormField
               label="Code"
@@ -201,11 +279,14 @@ function LocationDialog({
                 className="font-mono"
                 placeholder="main-warehouse"
                 aria-invalid={Boolean(formState.errors.code)}
-                {...register("code", { onChange: () => setCodeTouched(true) })}
+                {...register("code")}
               />
             </FormField>
             {branchesFailed ? (
-              <Notice tone="neutral">Branches couldn't be loaded, so this location won't be linked to a branch.</Notice>
+              <Notice tone="neutral">
+                Branches couldn’t be loaded, so this location won’t be linked to
+                a branch.
+              </Notice>
             ) : branches && branches.length > 0 ? (
               <FormField label="Branch" htmlFor="location-branch" optional>
                 <NativeSelect id="location-branch" {...register("branch_id")}>
@@ -218,12 +299,19 @@ function LocationDialog({
                 </NativeSelect>
               </FormField>
             ) : null}
-            {mutation.isError && !(mutation.error instanceof ApiError && mutation.error.status === 409) && (
-              <InlineError message={errorMessage(mutation.error)} />
-            )}
+            {mutation.isError &&
+              !(
+                mutation.error instanceof ApiError &&
+                mutation.error.status === 409
+              ) && <InlineError message={errorMessage(mutation.error)} />}
           </DialogBody>
           <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)} disabled={mutation.isPending}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => onOpenChange(false)}
+              disabled={mutation.isPending}
+            >
               Cancel
             </Button>
             <Button type="submit" loading={mutation.isPending}>

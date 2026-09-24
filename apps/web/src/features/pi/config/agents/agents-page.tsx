@@ -89,7 +89,11 @@ function Agents() {
         </Card>
       ) : !list ? (
         <>
-          <CardsSkeleton count={1} itemClassName="h-32" className="mb-4 md:grid-cols-1 xl:grid-cols-1" />
+          <CardsSkeleton
+            count={1}
+            itemClassName="h-32"
+            className="mb-4 md:grid-cols-1 xl:grid-cols-1"
+          />
           <CardsSkeleton />
         </>
       ) : list.length === 0 ? (

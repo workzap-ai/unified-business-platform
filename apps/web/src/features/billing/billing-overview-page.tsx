@@ -1,12 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { subDays, format } from "date-fns";
-import { AlertTriangle, CheckCircle2, FilePen, FilePlus2, Receipt, Wallet } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  FilePen,
+  FilePlus2,
+  Receipt,
+  Wallet,
+} from "lucide-react";
 import { formatMoney, formatNumber, pluralize } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, Skeleton } from "@/components/ui/display";
-import { ModuleNav, PageHeader, PageShell, RequirePermission } from "@/components/app/page";
+import {
+  ModuleNav,
+  PageHeader,
+  PageShell,
+  RequirePermission,
+} from "@/components/app/page";
 import { MetricCard, MetricGrid } from "@/components/app/metric-card";
 import { DistributionBar } from "@/components/app/charts";
 import { DataTable, type Column } from "@/components/app/data-table";
@@ -14,18 +25,11 @@ import { EmptyState, ErrorState } from "@/components/app/states";
 import { useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
 import { financeService } from "@/features/finance/service";
+import { AGING_LABELS, periodRange } from "@/features/finance/utils";
 import type { Invoice } from "@/features/business/types";
 import { billingService } from "./service";
 import { DueDate } from "./invoice-bits";
 import { formatDay, methodLabel } from "./utils";
-
-const AGING_LABELS: Record<string, string> = {
-  current: "Not yet due",
-  "1-30": "1–30 days",
-  "31-60": "31–60 days",
-  "61-90": "61–90 days",
-  "90+": "90+ days",
-};
 
 export function BillingOverviewPage() {
   return (
@@ -37,19 +41,25 @@ export function BillingOverviewPage() {
 
 function BillingOverview() {
   const { can } = useSession();
-  const end = format(new Date(), "yyyy-MM-dd");
-  const start = format(subDays(new Date(), 29), "yyyy-MM-dd");
+  const { start, end } = periodRange(30);
 
-  const summary = useScopedQuery(["billing", "summary"], () => billingService.summary());
-  const overdue = useScopedQuery(["invoices", { overdue: true, pageSize: 8 }], () =>
-    billingService.invoices({ overdue: true, pageSize: 8 }),
+  const summary = useScopedQuery(["billing", "summary"], () =>
+    billingService.summary(),
+  );
+  const overdue = useScopedQuery(
+    ["invoices", { overdue: true, pageSize: 8 }],
+    () => billingService.invoices({ overdue: true, pageSize: 8 }),
   );
   const payments = useScopedQuery(["payments", { page: 1, pageSize: 6 }], () =>
     billingService.payments({ page: 1, pageSize: 6 }),
   );
-  const finance = useScopedQuery(["finance", "summary", start, end], () => financeService.summary(start, end), {
-    enabled: can("finance.read"),
-  });
+  const finance = useScopedQuery(
+    ["finance", "summary", start, end],
+    () => financeService.summary(start, end),
+    {
+      enabled: can("finance.read"),
+    },
+  );
 
   const data = summary.data;
   const currency = data?.currency ?? "USD";
@@ -60,7 +70,10 @@ function BillingOverview() {
       key: "number",
       header: "Invoice",
       cell: (i) => (
-        <Link href={`/billing/invoices/${i.id}`} className="font-medium hover:underline">
+        <Link
+          href={`/billing/invoices/${i.id}`}
+          className="font-medium hover:underline"
+        >
           {i.number}
         </Link>
       ),
@@ -68,7 +81,11 @@ function BillingOverview() {
     {
       key: "customer",
       header: "Customer",
-      cell: (i) => <span className="block max-w-48 truncate">{i.customer_name ?? "—"}</span>,
+      cell: (i) => (
+        <span className="block max-w-48 truncate">
+          {i.customer_name ?? "—"}
+        </span>
+      ),
       hideBelow: "sm",
     },
     { key: "due", header: "Due", cell: (i) => <DueDate invoice={i} /> },
@@ -76,7 +93,11 @@ function BillingOverview() {
       key: "balance",
       header: "Balance due",
       align: "right",
-      cell: (i) => <span className="tabular font-medium">{formatMoney(i.balance_due, i.currency)}</span>,
+      cell: (i) => (
+        <span className="tabular font-medium">
+          {formatMoney(i.balance_due, i.currency)}
+        </span>
+      ),
     },
   ];
 
@@ -99,7 +120,11 @@ function BillingOverview() {
 
       {summary.isError ? (
         <Card className="mb-4">
-          <ErrorState error={summary.error} onRetry={() => void summary.refetch()} compact />
+          <ErrorState
+            error={summary.error}
+            onRetry={() => void summary.refetch()}
+            compact
+          />
         </Card>
       ) : (
         <MetricGrid>
@@ -118,7 +143,11 @@ function BillingOverview() {
             href="/billing/invoices?overdue=true"
             tone={data && data.overdue_count > 0 ? "danger" : "default"}
             value={data ? formatMoney(data.overdue, currency) : "—"}
-            detail={data ? pluralize(data.overdue_count, "invoice") + " past due" : undefined}
+            detail={
+              data
+                ? pluralize(data.overdue_count, "invoice") + " past due"
+                : undefined
+            }
           />
           <MetricCard
             label="Collected this month"
@@ -126,7 +155,9 @@ function BillingOverview() {
             loading={loading}
             href="/billing/payments"
             tone="success"
-            value={data ? formatMoney(data.collected_this_month, currency) : "—"}
+            value={
+              data ? formatMoney(data.collected_this_month, currency) : "—"
+            }
             detail="Payments received"
           />
           <MetricCard
@@ -135,7 +166,11 @@ function BillingOverview() {
             loading={loading}
             href="/billing/invoices?status=draft"
             value={data ? formatNumber(data.draft_count) : "—"}
-            detail={data && data.draft_count > 0 ? "Waiting to be issued" : "Nothing waiting"}
+            detail={
+              data && data.draft_count > 0
+                ? "Waiting to be issued"
+                : "Nothing waiting"
+            }
           />
         </MetricGrid>
       )}
@@ -144,12 +179,20 @@ function BillingOverview() {
         <section aria-labelledby="overdue-heading" className="min-w-0">
           <div className="mb-2 flex items-end justify-between gap-3">
             <div>
-              <h2 id="overdue-heading" className="text-[15px] font-semibold tracking-tight">
+              <h2
+                id="overdue-heading"
+                className="text-[15px] font-semibold tracking-tight"
+              >
                 Overdue invoices
               </h2>
-              <p className="mt-0.5 text-[13px] text-muted-foreground">Oldest balances to chase first.</p>
+              <p className="mt-0.5 text-[13px] text-muted-foreground">
+                Oldest balances to chase first.
+              </p>
             </div>
-            <Link href="/billing/invoices?overdue=true" className="text-xs font-medium text-primary hover:underline">
+            <Link
+              href="/billing/invoices?overdue=true"
+              className="text-xs font-medium text-primary hover:underline"
+            >
               View all
             </Link>
           </div>
@@ -181,7 +224,10 @@ function BillingOverview() {
                 title="Receivables aging"
                 description="Open balances by days past due"
                 actions={
-                  <Link href="/finance/receivables" className="text-xs font-medium text-primary hover:underline">
+                  <Link
+                    href="/finance/receivables"
+                    className="text-xs font-medium text-primary hover:underline"
+                  >
                     Details
                   </Link>
                 }
@@ -193,9 +239,15 @@ function BillingOverview() {
                     <Skeleton className="h-16" />
                   </div>
                 ) : finance.isError ? (
-                  <ErrorState error={finance.error} onRetry={() => void finance.refetch()} compact />
+                  <ErrorState
+                    error={finance.error}
+                    onRetry={() => void finance.refetch()}
+                    compact
+                  />
                 ) : finance.data.aging.every((a) => Number(a.amount) === 0) ? (
-                  <p className="py-3 text-[13px] text-muted-foreground">No open balances right now.</p>
+                  <p className="py-3 text-[13px] text-muted-foreground">
+                    No open balances right now.
+                  </p>
                 ) : (
                   <DistributionBar
                     segments={finance.data.aging.map((a) => ({
@@ -203,7 +255,9 @@ function BillingOverview() {
                       label: AGING_LABELS[a.bucket] ?? a.bucket,
                       value: Number(a.amount),
                     }))}
-                    format={(v) => formatMoney(v, finance.data.currency, { compact: true })}
+                    format={(v) =>
+                      formatMoney(v, finance.data.currency, { compact: true })
+                    }
                   />
                 )}
               </div>
@@ -214,7 +268,10 @@ function BillingOverview() {
             <CardHeader
               title="Recent payments"
               actions={
-                <Link href="/billing/payments" className="text-xs font-medium text-primary hover:underline">
+                <Link
+                  href="/billing/payments"
+                  className="text-xs font-medium text-primary hover:underline"
+                >
                   View all
                 </Link>
               }
@@ -227,10 +284,15 @@ function BillingOverview() {
                   ))}
                 </div>
               ) : payments.isError ? (
-                <ErrorState error={payments.error} onRetry={() => void payments.refetch()} compact />
+                <ErrorState
+                  error={payments.error}
+                  onRetry={() => void payments.refetch()}
+                  compact
+                />
               ) : payments.data.items.length === 0 ? (
                 <p className="px-2 pt-1 pb-3 text-[13px] text-muted-foreground">
-                  No payments recorded yet. Payments appear here when you record them on an issued invoice.
+                  No payments recorded yet. Payments appear here when you record
+                  them on an issued invoice.
                 </p>
               ) : (
                 <ul>
@@ -248,7 +310,11 @@ function BillingOverview() {
                             {p.customer_name ?? p.invoice_number ?? p.number}
                           </span>
                           <span className="block truncate text-xs text-muted-foreground">
-                            {[p.invoice_number, methodLabel(p.method), formatDay(p.received_on)]
+                            {[
+                              p.invoice_number,
+                              methodLabel(p.method),
+                              formatDay(p.received_on),
+                            ]
                               .filter(Boolean)
                               .join(" · ")}
                           </span>

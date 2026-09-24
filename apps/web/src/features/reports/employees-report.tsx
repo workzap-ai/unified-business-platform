@@ -23,13 +23,20 @@ export function EmployeesReport() {
 }
 
 function EmployeesContent() {
-  const query = useScopedQuery(["reports", "employees"], () => reportsService.employees());
+  const query = useScopedQuery(["reports", "employees"], () =>
+    reportsService.employees(),
+  );
   const data = query.data;
   const loading = query.isPending;
 
-  if (query.isError) return <ErrorState error={query.error} onRetry={() => void query.refetch()} />;
+  if (query.isError)
+    return (
+      <ErrorState error={query.error} onRetry={() => void query.refetch()} />
+    );
 
-  const departments = data ? [...data.by_department].sort((a, b) => b[1] - a[1]) : undefined;
+  const departments = data
+    ? [...data.by_department].sort((a, b) => b[1] - a[1])
+    : undefined;
 
   return (
     <>
@@ -41,31 +48,57 @@ function EmployeesContent() {
               label: "Headcount by department",
               filename: "headcount-by-department",
               headers: ["Department", "Employees"],
-              rows: () => (departments ?? []).map(([name, count]) => [name, count]),
+              rows: () =>
+                (departments ?? []).map(([name, count]) => [name, count]),
             },
           ]}
         />
       </div>
 
       <MetricGrid>
-        <MetricCard label="Total employees" icon={Users} loading={loading} value={formatNumber(data?.total)} href="/hr/employees" />
+        <MetricCard
+          label="Total employees"
+          icon={Users}
+          loading={loading}
+          value={formatNumber(data?.total)}
+          href="/hr/employees"
+        />
         <MetricCard
           label="Active"
           icon={UserCheck}
           loading={loading}
           tone="success"
           value={formatNumber(data?.active)}
-          detail={data ? `${formatPercent(ratio(data.active, data.total))} of total` : undefined}
+          detail={
+            data
+              ? `${formatPercent(ratio(data.active, data.total))} of total`
+              : undefined
+          }
         />
-        <MetricCard label="On leave" icon={Plane} loading={loading} tone={(data?.on_leave ?? 0) > 0 ? "warning" : "default"} value={formatNumber(data?.on_leave)} />
-        <MetricCard label="Terminated" icon={UserMinus} loading={loading} value={formatNumber(data?.terminated)} detail="Kept for records" />
+        <MetricCard
+          label="On leave"
+          icon={Plane}
+          loading={loading}
+          tone={(data?.on_leave ?? 0) > 0 ? "warning" : "default"}
+          value={formatNumber(data?.on_leave)}
+        />
+        <MetricCard
+          label="Terminated"
+          icon={UserMinus}
+          loading={loading}
+          value={formatNumber(data?.terminated)}
+          detail="Kept for records"
+        />
       </MetricGrid>
 
       <ChartCard
         className="mt-4"
         title="Headcount by department"
         description="Employees per department"
-        data={departments?.map(([name, count]) => ({ department: name, employees: count }))}
+        data={departments?.map(([name, count]) => ({
+          department: name,
+          employees: count,
+        }))}
         loading={loading}
         xKey="department"
         xLabel="Department"

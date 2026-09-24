@@ -14,7 +14,8 @@ const badgeVariants = cva(
     variants: {
       tone: {
         neutral: "border-border bg-surface-muted text-foreground-secondary",
-        primary: "border-transparent bg-primary-soft text-primary-soft-foreground",
+        primary:
+          "border-transparent bg-primary-soft text-primary-soft-foreground",
         success: "border-transparent bg-success-soft text-success",
         warning: "border-transparent bg-warning-soft text-warning",
         danger: "border-transparent bg-danger-soft text-danger",
@@ -33,10 +34,13 @@ function Badge({
   dot = false,
   children,
   ...props
-}: React.ComponentProps<"span"> & VariantProps<typeof badgeVariants> & { dot?: boolean }) {
+}: React.ComponentProps<"span"> &
+  VariantProps<typeof badgeVariants> & { dot?: boolean }) {
   return (
     <span className={cn(badgeVariants({ tone }), className)} {...props}>
-      {dot && <span className="size-1.5 rounded-full bg-current" aria-hidden="true" />}
+      {dot && (
+        <span className="size-1.5 rounded-full bg-current" aria-hidden="true" />
+      )}
       <span className="truncate">{children}</span>
     </span>
   );
@@ -46,7 +50,10 @@ function Badge({
 
 const Tabs = TabsPrimitive.Root;
 
-function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.List>) {
+function TabsList({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.List>) {
   return (
     <TabsPrimitive.List
       className={cn(
@@ -58,7 +65,10 @@ function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimi
   );
 }
 
-function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+function TabsTrigger({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
     <TabsPrimitive.Trigger
       className={cn(
@@ -70,11 +80,22 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
   );
 }
 
-function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) {
-  return <TabsPrimitive.Content className={cn("pt-4 outline-none", className)} {...props} />;
+function TabsContent({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Content>) {
+  return (
+    <TabsPrimitive.Content
+      className={cn("pt-4 outline-none", className)}
+      {...props}
+    />
+  );
 }
 
-function SegmentedList({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.List>) {
+function SegmentedList({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.List>) {
   return (
     <TabsPrimitive.List
       className={cn(
@@ -155,9 +176,18 @@ function Avatar({
         className,
       )}
     >
-      {src && <AvatarPrimitive.Image src={src} alt="" className="size-full object-cover" />}
+      {src && (
+        <AvatarPrimitive.Image
+          src={src}
+          alt=""
+          className="size-full object-cover"
+        />
+      )}
       <AvatarPrimitive.Fallback
-        className={cn("flex size-full items-center justify-center", paletteFor(name))}
+        className={cn(
+          "flex size-full items-center justify-center",
+          paletteFor(name),
+        )}
         delayMs={src ? 300 : 0}
       >
         {initials(name)}
@@ -178,7 +208,13 @@ function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function Spinner({ className, label = "Loading" }: { className?: string; label?: string }) {
+function Spinner({
+  className,
+  label = "Loading",
+}: {
+  className?: string;
+  label?: string;
+}) {
   return (
     <span role="status" className={cn("inline-flex items-center", className)}>
       <span className="size-4 animate-spin rounded-full border-2 border-border-strong border-t-primary" />
@@ -190,7 +226,10 @@ function Spinner({ className, label = "Loading" }: { className?: string; label?:
 function Card({ className, ...props }: React.ComponentProps<"section">) {
   return (
     <section
-      className={cn("rounded-xl border border-border bg-surface shadow-sm", className)}
+      className={cn(
+        "rounded-xl border border-border bg-surface shadow-sm",
+        className,
+      )}
       {...props}
     />
   );
@@ -210,17 +249,32 @@ function CardHeader({
   icon?: React.ReactNode;
 }) {
   return (
-    <header className={cn("flex items-start justify-between gap-3 px-4 pt-3.5 pb-2", className)}>
+    <header
+      className={cn(
+        "flex items-start justify-between gap-3 px-4 pt-3.5 pb-2",
+        className,
+      )}
+    >
       <div className="flex min-w-0 items-start gap-2.5">
-        {icon && <span className="mt-0.5 text-muted-foreground [&_svg]:size-4">{icon}</span>}
+        {icon && (
+          <span className="mt-0.5 text-muted-foreground [&_svg]:size-4">
+            {icon}
+          </span>
+        )}
         <div className="min-w-0">
-          <h2 className="text-[13.5px] font-semibold tracking-tight">{title}</h2>
+          <h2 className="text-[13.5px] font-semibold tracking-tight">
+            {title}
+          </h2>
           {description && (
-            <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {description}
+            </p>
           )}
         </div>
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-1.5">{actions}</div>}
+      {actions && (
+        <div className="flex shrink-0 items-center gap-1.5">{actions}</div>
+      )}
     </header>
   );
 }

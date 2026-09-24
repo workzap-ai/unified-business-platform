@@ -30,7 +30,11 @@ export function primaryNav(page: Page) {
 export async function mainLabels(page: Page) {
   const nav = primaryNav(page);
   await expect(nav.locator("a[data-nav-key]").first()).toBeVisible();
-  return nav.locator("a[data-nav-key]").evaluateAll((links) =>
-    links.map((a) => (a.querySelector("span.truncate")?.textContent ?? "").trim()),
-  );
+  return nav
+    .locator("a[data-nav-key]")
+    .evaluateAll((links) =>
+      links.map((a) =>
+        (a.querySelector("span.truncate")?.textContent ?? "").trim(),
+      ),
+    );
 }

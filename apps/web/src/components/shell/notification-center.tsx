@@ -3,14 +3,27 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, Bell, CheckCheck, CircleAlert, Info } from "lucide-react";
+import {
+  AlertTriangle,
+  Bell,
+  CheckCheck,
+  CircleAlert,
+  Info,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { relativeTime } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/display";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/overlays";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/overlays";
 import { useSession } from "@/features/auth/session-provider";
-import { notificationsService, type Notification } from "@/features/notifications/service";
+import {
+  notificationsService,
+  type Notification,
+} from "@/features/notifications/service";
 
 export const SEVERITY_ICON = {
   info: { icon: Info, className: "text-info bg-info-soft" },
@@ -18,22 +31,54 @@ export const SEVERITY_ICON = {
   critical: { icon: CircleAlert, className: "text-danger bg-danger-soft" },
 } as const;
 
-export function NotificationRow({ n, onOpen }: { n: Notification; onOpen?: () => void }) {
+export function NotificationRow({
+  n,
+  onOpen,
+}: {
+  n: Notification;
+  onOpen?: () => void;
+}) {
   const tone = SEVERITY_ICON[n.severity];
   const body = (
-    <div className={cn("flex gap-3 rounded-md px-2.5 py-2.5 hover:bg-surface-muted", !n.read && "bg-primary-soft/40")}>
-      <span className={cn("mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full", tone.className)}>
+    <div
+      className={cn(
+        "flex gap-3 rounded-md px-2.5 py-2.5 hover:bg-surface-muted",
+        !n.read && "bg-primary-soft/40",
+      )}
+    >
+      <span
+        className={cn(
+          "mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full",
+          tone.className,
+        )}
+      >
         <tone.icon className="size-3.5" aria-hidden="true" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex items-start gap-2">
-          <span className={cn("min-w-0 flex-1 text-[13px] leading-snug", !n.read ? "font-semibold" : "font-medium")}>
+          <span
+            className={cn(
+              "min-w-0 flex-1 text-[13px] leading-snug",
+              !n.read ? "font-semibold" : "font-medium",
+            )}
+          >
             {n.title}
           </span>
-          {!n.read && <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" aria-label="Unread" />}
+          {!n.read && (
+            <span
+              className="mt-1.5 size-2 shrink-0 rounded-full bg-primary"
+              aria-label="Unread"
+            />
+          )}
         </span>
-        {n.body && <span className="mt-0.5 line-clamp-2 block text-xs text-muted-foreground">{n.body}</span>}
-        <span className="mt-1 block text-2xs text-muted-foreground">{relativeTime(n.created_at)}</span>
+        {n.body && (
+          <span className="mt-0.5 line-clamp-2 block text-xs text-muted-foreground">
+            {n.body}
+          </span>
+        )}
+        <span className="mt-1 block text-2xs text-muted-foreground">
+          {relativeTime(n.created_at)}
+        </span>
       </span>
     </div>
   );
@@ -64,7 +109,8 @@ export function NotificationCenter() {
   });
   const markAll = useMutation({
     mutationFn: () => notificationsService.markRead(null),
-    onSuccess: () => client.invalidateQueries({ queryKey: [...scopeKey, "notifications"] }),
+    onSuccess: () =>
+      client.invalidateQueries({ queryKey: [...scopeKey, "notifications"] }),
   });
   if (!enabled) return null;
   const count = unread.data ?? 0;
@@ -75,7 +121,9 @@ export function NotificationCenter() {
         <button
           type="button"
           className="relative flex size-8 items-center justify-center rounded-md text-foreground-secondary hover:bg-surface-muted hover:text-foreground"
-          aria-label={count ? `Notifications, ${count} unread` : "Notifications"}
+          aria-label={
+            count ? `Notifications, ${count} unread` : "Notifications"
+          }
         >
           <Bell className="size-4" aria-hidden="true" />
           {count > 0 && (
@@ -85,7 +133,10 @@ export function NotificationCenter() {
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-[min(380px,calc(100vw-1.5rem))] p-0">
+      <PopoverContent
+        align="end"
+        className="w-[min(380px,calc(100vw-1.5rem))] p-0"
+      >
         <div className="flex items-center justify-between border-b border-border px-3.5 py-2.5">
           <p className="text-sm font-semibold">Notifications</p>
           <Button
@@ -109,15 +160,24 @@ export function NotificationCenter() {
               </div>
             ))
           ) : list.isError ? (
-            <p className="px-3 py-6 text-center text-sm text-muted-foreground">Notifications could not be loaded.</p>
+            <p className="px-3 py-6 text-center text-sm text-muted-foreground">
+              Notifications could not be loaded.
+            </p>
           ) : list.data.items.length === 0 ? (
             <div className="px-3 py-10 text-center">
-              <Bell className="mx-auto size-6 text-border-strong" aria-hidden="true" />
-              <p className="mt-2 text-sm font-medium">You're all caught up</p>
-              <p className="text-xs text-muted-foreground">Handoffs, stock and billing alerts appear here.</p>
+              <Bell
+                className="mx-auto size-6 text-border-strong"
+                aria-hidden="true"
+              />
+              <p className="mt-2 text-sm font-medium">You’re all caught up</p>
+              <p className="text-xs text-muted-foreground">
+                Handoffs, stock and billing alerts appear here.
+              </p>
             </div>
           ) : (
-            list.data.items.map((n) => <NotificationRow key={n.id} n={n} onOpen={() => setOpen(false)} />)
+            list.data.items.map((n) => (
+              <NotificationRow key={n.id} n={n} onOpen={() => setOpen(false)} />
+            ))
           )}
         </div>
         <Link

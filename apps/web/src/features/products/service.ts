@@ -23,10 +23,19 @@ export interface ProductsService {
   setEnabled(key: string, enabled: boolean): Promise<ProductState[]>;
 }
 
-const PI_FEATURES = ["text", "voice", "vision", "knowledge", "orders", "quotes", "handoff"];
+const PI_FEATURES = [
+  "text",
+  "voice",
+  "vision",
+  "knowledge",
+  "orders",
+  "quotes",
+  "handoff",
+];
 
 const demoProducts = demoCollection<ProductState[]>("products", (profile) => {
-  const installed = profile.kind !== "empty" || profile.tenantId === "tenant-northwind";
+  const installed =
+    profile.kind !== "empty" || profile.tenantId === "tenant-northwind";
   const enabled = profile.kind !== "empty";
   return [
     {
@@ -71,11 +80,17 @@ const demo: ProductsService = {
 
 const live: ProductsService = {
   list: () => apiRequest("GET", "/products", z.array(productStateSchema)),
-  install: (key) => apiRequest("POST", `/products/${key}/install`, z.array(productStateSchema)),
+  install: (key) =>
+    apiRequest("POST", `/products/${key}/install`, z.array(productStateSchema)),
   setEnabled: (key, enabled) =>
-    apiRequest("PUT", `/products/${key}/environment`, z.array(productStateSchema), {
-      body: { enabled },
-    }),
+    apiRequest(
+      "PUT",
+      `/products/${key}/environment`,
+      z.array(productStateSchema),
+      {
+        body: { enabled },
+      },
+    ),
 };
 
 export const productsService = select<ProductsService>({ demo, live });

@@ -1,5 +1,10 @@
 /** Recently opened records (per browser, per workspace) for the command menu. */
-export type RecentItem = { href: string; title: string; kind: string; at: number };
+export type RecentItem = {
+  href: string;
+  title: string;
+  kind: string;
+  at: number;
+};
 
 const KEY = "platform.recent";
 const MAX = 8;

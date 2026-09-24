@@ -10,10 +10,13 @@ export default function NotFound() {
         </div>
         <h1 className="mt-4 text-lg font-semibold">Page not found</h1>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          The page may have moved, or the link is incomplete. Use search (Ctrl K) to find what
-          you need.
+          The page may have moved, or the link is incomplete. Use search (Ctrl
+          K) to find what you need.
         </p>
-        <Link href="/" className="mt-5 inline-block text-sm font-medium text-primary hover:underline">
+        <Link
+          href="/"
+          className="mt-5 inline-block text-sm font-medium text-primary hover:underline"
+        >
           Return home
         </Link>
       </div>

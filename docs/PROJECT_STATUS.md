@@ -1,103 +1,117 @@
 # Project status
 
-CURRENT STAGE: 2 — Database + Multi-Tenant Foundation
+Updated: 2026-09-24.
 
-STATUS: Complete within Stage 2 scope. PostgreSQL isolation and migration checks pass. Authentication, RBAC, and production readiness are not implemented.
+CURRENT PHASE: UI-first milestone complete (verified in a browser on sample data). Next:
+real API connection and backend completion, starting with automated tests for the new
+backend modules, then the PI backend.
 
-Updated: 2026-09-23.
+Nothing here is production-ready. No deployment, penetration test, or load test has been
+performed.
 
-## Completed
+## Summary
 
-- Five UUID-based models/tables: platform_users, tenants, tenant_memberships, branches, departments.
-- Revision 0001_tenant_foundation with timestamps, uniqueness, indexes, status/name/code checks, restrictive foreign keys, and a composite department-to-branch ownership constraint.
-- Explicit model registry used by Alembic; no schema creation at application startup.
-- Immutable internal TenantScope, active membership/user/tenant resolution, scoped repositories, and organization services. Tenant predicates and active membership checks cover reads, lists, updates, and deletes. Inserts derive ownership from scope.
-- Read-only tenant/branch API contracts behind an unconditional 401 identity boundary until Stage 3. No browser identity override and no HTTP mutations.
-- Tenant/branch context and selectors, tenant-specific query keys, switch-time cancellation/cache removal, scoped payload checks, and deny-by-default permission-display preparation.
-- Real PostgreSQL isolation tests and migration round trip. CI now enables database tests with TEST_DATABASE_URL.
-
-## In progress
-
-None. Stage 2 stops here. Redis/worker, Docker builds, and remote CI are still unverified in this environment; no production-readiness claim is made.
-
-## Next step
-
-Stage 3 — Authentication + Secure Sessions, only after explicit authorization. Replace the fail-closed authenticated_user_id dependency with verified session identity. Purge frontend caches whenever identity changes or logs out. Add credentials/session migrations after 0001; do not edit the applied migration.
-
-## Backend
-
-Organization models reside in their respective modules; tenants contains scope resolution, schemas, service, and read routes. The shared TenantRepository requires scope and rechecks membership in SQL. Services participate in a caller-owned transaction and use savepoints for translated constraint conflicts. They do not grant business mutation permissions; public writes await RBAC.
-
-Users and tenants are global roots; memberships/branches/departments have tenant ownership. Departments optionally reference a same-tenant branch. These definitions are shared across future environments. No passwords, sessions, roles, business modules, product registry, or AI functionality was added.
-
-## Frontend
-
-TenantProvider and selectors are installed in the existing shell. Selection is explicit and in memory only. Switching clears the branch, cancels/removes previous-tenant queries, and cannot display another tenant's returned branch payload. Lists support loading more pages. Empty, unauthorized, loading, and error states are handled.
-
-Actual API requests return 401 until Stage 3, so selectors remain disabled without authenticated data. Browser tests use mocked authorized responses. PermissionGate grants nothing until Stage 4 supplies verified permissions. No login page or fabricated tenant records were introduced.
-
-## Database and migrations
-
-Revision: 0001_tenant_foundation; parent: base.
-
-Verified against PostgreSQL 17.11 using an official portable EDB archive in ignored .cache/postgres-portable. A generated-password, loopback-only cluster in .cache/pg-stage2 served port 55432. Tests used a non-superuser owner and disposable stage2_test database. Per-test data rolled back. The temporary server was stopped after validation; binaries and test files remain ignored for reuse.
-
-Upgrade from empty database, downgrade on confirmed-empty tables, re-upgrade, and Alembic metadata comparison passed. Downgrade destroys the five tables; never run it on working data without a deliberate recovery plan. pgvector is not enabled by this migration.
-
-## API changes
-
-- GET /api/v1/tenants?page=1&page_size=100.
-- GET /api/v1/tenants/{tenant_id}/branches with the same pagination.
-- Both deny normal requests with 401 until verified session authentication exists.
-- With a verified actor in tests, memberships filter tenants, foreign/missing tenants produce equivalent 404 responses, and branches are scoped.
-- Existing health endpoints are unchanged.
-
-See [API conventions](API_CONVENTIONS.md).
-
-## Security and tenant isolation
-
-PostgreSQL tests prove cross-tenant reads, updates, deletes, guessed IDs, mismatched branch references, forged internal scope combinations, revoked memberships, inactive identities/tenants, and multiple-membership scope separation behave correctly. Ownership fields are rejected in input schemas. Same-tenant positive paths also pass.
-
-RLS is not enabled. Raw/privileged SQL can bypass repository scope; no database-wide row-security claim is made. Reassess runtime/migration roles and RLS in Stages 4/17. Active membership is not action permission. See [ADR 0004](adr/0004-tenant-ownership-and-scope.md).
-
-## Test status and last verified commands
-
-| Command/check | Result |
+| Area | State |
 | --- | --- |
-| ruff format --check . | Passed; 39 Python files |
-| ruff check . | Passed |
-| mypy app | Passed; strict, 32 source files |
-| pytest -q with TEST_DATABASE_URL | 25 passed: 12 unit/API checks and 13 PostgreSQL checks; 1 Redis/worker test skipped |
-| alembic upgrade head | Passed on disposable PostgreSQL |
-| alembic downgrade base, then upgrade head | Passed on confirmed-empty disposable database |
-| alembic check | Passed before and after round trip; no drift |
-| npm run format / lint / typecheck | Passed |
-| npm run build | Passed |
-| npm test | 7 Chromium tests passed |
-| Docker / Redis worker / remote CI | Not run locally; tooling/services unavailable |
-| Git status / diff | Unavailable; no Git on PATH or workspace .git |
+| Web app: shell, navigation, all modules, PI workspace, admin | Built; runs on sample data; 88 routes; verified in Chromium |
+| Web app: live API mode | Business-module services target the implemented API contracts; not yet exercised against a running API |
+| Backend: auth, RBAC, environments, audit, product registry, navigation | Implemented; lint + strict mypy clean; navigation has unit tests; others lack dedicated tests |
+| Backend: customers, catalog, inventory, sales, quotes, orders, billing, finance, HR, reports | Implemented services + routes; migrated; **no dedicated tests yet** |
+| Backend: PI | Schema only (migration 0002). No PI services, routes, AI gateway, WhatsApp, or agents yet |
+| Redis/ARQ worker, Docker, remote CI | Not run in this environment (tooling unavailable) |
 
-Initial long-line and selector-label issues were fixed before final checks. PostgreSQL tests are real database tests, not SQLite approximations. Browser API responses are mocked and do not verify a real login.
+## Web app (apps/web)
 
-## Performance
+- Design system: tokens (light/dark), primitives on Radix, business primitives (page shell,
+  data table with sorting/selection/column visibility/pagination, URL-synced filters,
+  saved views, metric cards, charts with table views, record header, timelines, forms,
+  confirm dialogs, stepper). Chart palette validated for contrast and colour-vision
+  separation in both themes.
+- Shell: sidebar rendered from the navigation registry (default order Overview, Customers /
+  CRM, Catalog, PI, Inventory, Sales, Quotes, Orders, Billing, Finance, HR, Reports; admin
+  section separate); drag-and-drop and keyboard reordering, per-user persistence, reset;
+  collapsed rail on tablet, drawer on mobile; tenant and environment switchers;
+  notifications; command menu (pages from the registry, module actions, record search,
+  recent items); breadcrumbs from the registry; theme toggle.
+- Modules: Overview; Customers/CRM (list, create, detail with tabs, segments); Sales
+  (overview, pipeline board, leads, lead detail); Catalog (overview, products, create,
+  detail, categories, pricing); Inventory (overview, stock with adjustment drawer,
+  locations, movement ledger); Quotes (list, approvals, guided builder, detail, edit);
+  Orders (list, fulfillment board, builder, detail); Billing (overview, invoices, create,
+  detail with payments, payments); Finance (overview, receivables, expenses); HR (overview,
+  directory, create, profile, departments); Reports (catalog + 8 reports with CSV export).
+- PI workspace: overview, 3-panel inbox (thread, takeover, composer, context panel),
+  handoff queue by status, agents (list, configuration wizard, detail, versions with diff
+  and rollback, tools), WhatsApp (connection, status, webhook events with replay),
+  knowledge (overview, sources, documents, ingestion), analytics (6 sections), settings
+  (10 sections).
+- Admin: settings, members, roles and permission matrix, role editor, branches,
+  departments, environments, audit log, platform products, notifications, account.
 
-Tenant-first composite indexes support ownership and reference checks. Queries are paginated with bounded page sizes and deterministic ordering; no unbounded list endpoint or relationship N+1 access was added. Scope joins add authorization checks to statements. No load benchmark was run.
+### Data modes
 
-## Known issues
+`NEXT_PUBLIC_DATA_MODE=live` calls the API through the same-origin `/api/v1` proxy.
+Otherwise the app runs on fictional in-browser sample data, marked "Sample data" in the
+header. Sample data covers a retail workspace (Northwind), a services workspace
+(Brightline) and an empty staging environment for first-use states. Container builds
+default to live mode.
 
-- Git and Docker remain unavailable. Portable PostgreSQL resolved the database-testing blocker for this stage, not Docker or Redis/worker verification.
-- Runtime auth is intentionally denied pending Stage 3. RBAC and RLS remain unimplemented.
-- Starlette TestClient emits the existing HTTPX deprecation warning; tests pass.
-- The existing ESLint 9 deprecation and version-tagged container images remain Stage 1 maintenance notes.
-- Remote CI definitions are updated but not executed here.
-- Stage 18 quality gate remains unmet; PI must not begin.
+- Business modules: live adapters call the implemented endpoints; demo adapters mirror the
+  same contracts and key business rules.
+- PI: there is no PI API yet. The live adapter reports "PI isn't connected in this
+  environment yet" instead of returning data. PI screens are demonstrable only in sample
+  mode.
 
-## Environment variables
+## Backend (apps/api)
 
-Existing API/Compose/frontend settings remain unchanged. New test setting: TEST_DATABASE_URL, pointing to a migrated disposable PostgreSQL database with a name ending _test. Missing value skips PostgreSQL tests; an incompatible URL/database name fails explicitly. RUN_INTEGRATION=1 independently enables the Linux Redis/worker test. Never point tests at production.
+Implemented since Stage 2 (single migration `0002_business_platform_pi`):
+- Password auth (Argon2id), opaque server-side sessions, session-bound CSRF, origin check,
+  lockout, Redis rate limiting (fails open), server-held workspace/environment selection.
+- RBAC: permission catalog, system roles per tenant, custom roles (no escalation), member
+  management with last-owner protection.
+- Environments; environment-scoped business data via composite foreign keys.
+- Audit log (redacted), notifications, product registry (PI seeded), navigation registry
+  with per-user order preferences.
+- Business modules listed in the summary, with Decimal/NUMERIC money, state machines, row
+  locking for stock and numbering, idempotent order stock effects, auto-invoicing.
+- PI tables (conversations, messages, runs, tool calls, handoffs, memory, knowledge,
+  WhatsApp connections and webhook receipts); optional pgvector columns added only where
+  the extension can be created.
 
-No dependency changes or production credentials were added. Local tools remain Python 3.12.10, Node 26.10.0, npm 11.19.1; CI targets Python 3.12 and Node 22.
+## Verification (2026-09-24)
 
-## Documentation
+| Check | Result |
+| --- | --- |
+| Web: prettier, eslint, typecheck | Pass |
+| Web: production build | Pass (88 app routes) |
+| Web: Playwright (16 tests: resolver unit tests, sidebar order/persist/reset/drag, role gating, product gating per environment, mobile drawer, command menu, workspace isolation, every registered route renders) | 16 passed |
+| Visual QA | 14 routes at 1440px and 8 at 390px screenshotted and reviewed; no console errors or horizontal overflow; one truncation defect fixed |
+| API: ruff format/check, mypy strict (121 files) | Pass |
+| API: pytest with PostgreSQL 17 | 36 passed, 1 skipped (Redis worker, Linux only) |
+| Alembic: upgrade, downgrade to 0001, re-upgrade, check | Pass; no drift |
+| Docker / Redis worker / remote CI | Not run (unavailable locally) |
+| Live web ↔ API end to end | Not run yet |
 
-[Setup](../README.md), [architecture](ARCHITECTURE.md), [security](SECURITY.md), [handoff](AI_HANDOFF.md), [API conventions](API_CONVENTIONS.md), and [decisions](adr/README.md).
+## Known gaps and limitations
+
+- No automated tests yet for auth, RBAC, business modules, or cross-tenant isolation of the
+  new tables. These are the first backend task.
+- The web app has not been run against the live API; contract mismatches may exist.
+- PI backend (AI gateway with OpenAI → Gemini → Groq fallback, WhatsApp webhook and worker
+  pipeline, LangGraph agents, controlled tools, memory/RAG, voice/vision) is not built.
+- pgvector is unavailable locally, so semantic retrieval is untested; full-text search is
+  the fallback.
+- Password reset and email verification are not implemented (no email delivery).
+- RLS is not enabled (see ADR 0004).
+- Sample-data mutations are in memory and reset on reload.
+- Some list views are capped at 100 rows client-side because the API has no filter for that
+  view (noted in the UI where it applies).
+
+## Next steps
+
+1. Backend tests: auth/session/CSRF, RBAC, tenant and environment isolation of every new
+   table, money and state-machine rules, order/stock/invoice flows.
+2. Run the web app in live mode against the API; fix contract mismatches; Playwright E2E
+   against a real database.
+3. PI backend: AI gateway and fallback, WhatsApp webhook → queue → pipeline, agents and
+   controlled tools, memory/RAG, handoff/takeover enforcement, then connect the PI UI.

@@ -4,7 +4,11 @@ import { cn } from "@/lib/utils";
 const fieldBase =
   "w-full min-w-0 rounded-md border border-border bg-surface px-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground/80 hover:border-border-strong focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/15 disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-danger aria-invalid:ring-danger/15";
 
-function Input({ className, type = "text", ...props }: React.ComponentProps<"input">) {
+function Input({
+  className,
+  type = "text",
+  ...props
+}: React.ComponentProps<"input">) {
   return (
     <input
       type={type}
@@ -25,7 +29,11 @@ function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
   );
 }
 
-function NativeSelect({ className, children, ...props }: React.ComponentProps<"select">) {
+function NativeSelect({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"select">) {
   return (
     <select
       data-slot="select"

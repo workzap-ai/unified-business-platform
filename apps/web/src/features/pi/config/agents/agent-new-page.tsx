@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Controller, useForm, type Path } from "react-hook-form";
+import { Controller, useForm, type Path, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AlertTriangle, ArrowLeft, ArrowRight, Rocket } from "lucide-react";
@@ -12,11 +12,7 @@ import { formatNumber } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Badge, Card, Skeleton } from "@/components/ui/display";
 import { Textarea } from "@/components/ui/input";
-import {
-  Checkbox,
-  RadioGroup,
-  RadioGroupItem,
-} from "@/components/ui/controls";
+import { Checkbox, RadioGroup, RadioGroupItem } from "@/components/ui/controls";
 import {
   PageHeader,
   PageShell,
@@ -78,7 +74,7 @@ function AgentWizard() {
   const router = useRouter();
   const params = useSearchParams();
   const [step, setStep] = useState(0);
-  const [prefilledFor, setPrefilledFor] = useState<string | null>(null);
+  const prefilledFor = useRef<string | null>(null);
   const [published, setPublished] = useState(false);
 
   const agents = useScopedQuery(piKeys.agents, () => piService.agents());
@@ -95,7 +91,7 @@ function AgentWizard() {
       note: "",
     },
   });
-  const agentId = form.watch("agent_id");
+  const agentId = useWatch({ control: form.control, name: "agent_id" });
   const agent = agents.data?.find((a) => a.id === agentId || a.key === agentId);
   const versions = useScopedQuery(
     piKeys.versions(agent?.id ?? "none"),
@@ -107,7 +103,7 @@ function AgentWizard() {
 
   // Start from the agent's current configuration whenever a different agent is chosen.
   useEffect(() => {
-    if (!agent || !versions.data || prefilledFor === agent.id) return;
+    if (!agent || !versions.data || prefilledFor.current === agent.id) return;
     form.reset({
       agent_id: agent.id,
       instructions: active?.instructions ?? "",
@@ -116,9 +112,10 @@ function AgentWizard() {
       tools: agent.tools,
       note: "",
     });
-    setPrefilledFor(agent.id);
-  }, [agent, versions.data, active, prefilledFor, form]);
+    prefilledFor.current = agent.id;
+  }, [agent, versions.data, active, form]);
 
+  const values = useWatch({ control: form.control }) as Values;
   useUnsavedChangesWarning(form.formState.isDirty && !published);
 
   const publish = useScopedMutation(
@@ -174,7 +171,6 @@ function AgentWizard() {
     );
   }
 
-  const values = form.watch();
   const loadingAgent = Boolean(agent) && versions.isPending;
 
   return (
@@ -390,8 +386,10 @@ function AgentWizard() {
                     label: "Will publish as",
                     value: (
                       <Badge tone="success" dot>
-                        v{(versions.data?.[0]?.version ?? agent.current_version) + 1} ·
-                        active
+                        v
+                        {(versions.data?.[0]?.version ??
+                          agent.current_version) + 1}{" "}
+                        · active
                       </Badge>
                     ),
                   },
@@ -541,7 +539,12 @@ function BasicsStep({
           tone="info"
           title={`An unpublished draft exists (v${draft.version})`}
           action={
-            <Button type="button" size="xs" variant="secondary" onClick={onLoadDraft}>
+            <Button
+              type="button"
+              size="xs"
+              variant="secondary"
+              onClick={onLoadDraft}
+            >
               Start from draft
             </Button>
           }
@@ -665,7 +668,10 @@ function ReviewSummary({
     <div className="space-y-4">
       <PropertyList
         items={[
-          { label: "Model", value: change(agent.model_alias, values.model_alias) },
+          {
+            label: "Model",
+            value: change(agent.model_alias, values.model_alias),
+          },
           {
             label: "Temperature",
             value: change(temperatureBefore, temperatureAfter),
@@ -687,7 +693,9 @@ function ReviewSummary({
       <SideBySideDiff
         before={active?.instructions ?? ""}
         after={values.instructions}
-        beforeLabel={active ? `Active · v${active.version}` : "No active version"}
+        beforeLabel={
+          active ? `Active · v${active.version}` : "No active version"
+        }
         afterLabel="Draft (this configuration)"
       />
     </div>

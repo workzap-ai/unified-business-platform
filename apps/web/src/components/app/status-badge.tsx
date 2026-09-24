@@ -1,7 +1,15 @@
 import { Badge } from "@/components/ui/display";
 import { humanize } from "@/lib/format";
 
-type Tone = "neutral" | "primary" | "success" | "warning" | "danger" | "info" | "pi" | "outline";
+type Tone =
+  | "neutral"
+  | "primary"
+  | "success"
+  | "warning"
+  | "danger"
+  | "info"
+  | "pi"
+  | "outline";
 
 /** One vocabulary of status tones across every module so states read the same everywhere. */
 const TONES: Record<string, Tone> = {

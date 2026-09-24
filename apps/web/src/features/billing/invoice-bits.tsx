@@ -19,7 +19,11 @@ export function InvoiceStatus({
   );
 }
 
-export function DueDate({ invoice }: { invoice: Pick<Invoice, "status" | "due_date"> }) {
+export function DueDate({
+  invoice,
+}: {
+  invoice: Pick<Invoice, "status" | "due_date">;
+}) {
   const hint = dueHint(invoice);
   return (
     <div className="leading-tight">

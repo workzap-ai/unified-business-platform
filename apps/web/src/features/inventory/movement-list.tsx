@@ -34,7 +34,12 @@ export function MovementList({
       </ul>
     );
   }
-  if (!movements.length) return <p className="py-6 text-center text-[13px] text-muted-foreground">{empty}</p>;
+  if (!movements.length)
+    return (
+      <p className="py-6 text-center text-[13px] text-muted-foreground">
+        {empty}
+      </p>
+    );
   return (
     <ul className="divide-y divide-border">
       {movements.map((m) => {
@@ -43,17 +48,28 @@ export function MovementList({
         const kind = MOVEMENT_KINDS[m.kind];
         return (
           <li key={m.id} className="flex items-center gap-3 py-2.5">
-            <Quantity value={m.quantity} className="w-14 shrink-0 text-right text-[13px]" />
+            <Quantity
+              value={m.quantity}
+              className="w-14 shrink-0 text-right text-[13px]"
+            />
             <div className="min-w-0 flex-1">
               <p className="truncate text-[13px] font-medium">
                 {showProduct ? (
                   info ? (
-                    <Link href={`/catalog/products/${info.product_id}`} className="hover:underline">
+                    <Link
+                      href={`/catalog/products/${info.product_id}`}
+                      className="hover:underline"
+                    >
                       {info.product_name}
-                      <span className="font-normal text-muted-foreground"> · {info.sku}</span>
+                      <span className="font-normal text-muted-foreground">
+                        {" "}
+                        · {info.sku}
+                      </span>
                     </Link>
                   ) : (
-                    <span className="font-mono text-xs text-muted-foreground">Variant {shortId(m.variant_id)}</span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      Variant {shortId(m.variant_id)}
+                    </span>
                   )
                 ) : (
                   m.reason || kind.label
@@ -63,14 +79,19 @@ export function MovementList({
                 {showProduct && m.reason ? `${m.reason} · ` : ""}
                 {location ? `${location.name} · ` : ""}
                 {m.actor_label} ·{" "}
-                <time dateTime={m.created_at} title={formatDateTime(m.created_at)}>
+                <time
+                  dateTime={m.created_at}
+                  title={formatDateTime(m.created_at)}
+                >
                   {relativeTime(m.created_at)}
                 </time>
               </p>
             </div>
             <div className="flex shrink-0 flex-col items-end gap-1">
               <Badge tone={kind.tone}>{kind.label}</Badge>
-              <span className="tabular text-2xs text-muted-foreground">Balance {formatNumber(m.balance_after)}</span>
+              <span className="tabular text-2xs text-muted-foreground">
+                Balance {formatNumber(m.balance_after)}
+              </span>
             </div>
           </li>
         );

@@ -1,10 +1,19 @@
 import { apiRequest, ApiError, DemoError } from "@/services/api-client";
 import { demoDelay, select } from "@/lib/data-mode";
-import { DEMO_ENVIRONMENTS, demoSession, readDemoState } from "@/demo/workspace";
+import {
+  DEMO_ENVIRONMENTS,
+  demoSession,
+  readDemoState,
+} from "@/demo/workspace";
 import { demoEnabledProducts } from "@/features/products/service";
 import registry from "./registry.generated.json";
 import { resolveNavigation, validateCustomOrder } from "./resolve";
-import { navigationSchema, type NavDefinition, type Navigation, type SectionKey } from "./types";
+import {
+  navigationSchema,
+  type NavDefinition,
+  type Navigation,
+  type SectionKey,
+} from "./types";
 
 export interface NavigationService {
   get(): Promise<Navigation>;
@@ -18,7 +27,12 @@ const live: NavigationService = {
     apiRequest("PUT", `/navigation/preferences/${section}`, navigationSchema, {
       body: { order },
     }),
-  reset: (section) => apiRequest("DELETE", `/navigation/preferences/${section}`, navigationSchema),
+  reset: (section) =>
+    apiRequest(
+      "DELETE",
+      `/navigation/preferences/${section}`,
+      navigationSchema,
+    ),
 };
 
 /* Demo: the same registry definitions (generated from the API), resolved in the browser.
@@ -30,7 +44,9 @@ const orderKey = (tenantId: string) => `platform.demo.nav-order.${tenantId}`;
 function readOrders(): Partial<Record<SectionKey, string[]>> {
   try {
     const raw = window.localStorage.getItem(orderKey(readDemoState().tenantId));
-    return raw ? (JSON.parse(raw) as Partial<Record<SectionKey, string[]>>) : {};
+    return raw
+      ? (JSON.parse(raw) as Partial<Record<SectionKey, string[]>>)
+      : {};
   } catch {
     return {};
   }
@@ -38,7 +54,10 @@ function readOrders(): Partial<Record<SectionKey, string[]>> {
 
 function writeOrders(orders: Partial<Record<SectionKey, string[]>>) {
   try {
-    window.localStorage.setItem(orderKey(readDemoState().tenantId), JSON.stringify(orders));
+    window.localStorage.setItem(
+      orderKey(readDemoState().tenantId),
+      JSON.stringify(orders),
+    );
   } catch {
     /* ignore */
   }
@@ -71,7 +90,12 @@ function demoContext() {
 }
 
 async function demoResolve(): Promise<Navigation> {
-  return resolveNavigation(definitions, demoContext(), readOrders(), await demoBadges());
+  return resolveNavigation(
+    definitions,
+    demoContext(),
+    readOrders(),
+    await demoBadges(),
+  );
 }
 
 const demo: NavigationService = {
@@ -82,7 +106,8 @@ const demo: NavigationService = {
   async saveOrder(section, order) {
     await demoDelay(150);
     const current = await demoResolve();
-    const visible = current.sections.find((s) => s.key === section)?.items ?? [];
+    const visible =
+      current.sections.find((s) => s.key === section)?.items ?? [];
     try {
       validateCustomOrder(visible, order);
     } catch {

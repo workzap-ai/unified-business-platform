@@ -8,7 +8,11 @@ export const workspaceRefSchema = z.object({
 });
 
 export const sessionSchema = z.object({
-  user: z.object({ id: z.string(), email: z.string(), display_name: z.string() }),
+  user: z.object({
+    id: z.string(),
+    email: z.string(),
+    display_name: z.string(),
+  }),
   tenant: workspaceRefSchema.nullable(),
   environment: workspaceRefSchema.nullable(),
   branch: workspaceRefSchema.nullable(),
@@ -16,7 +20,11 @@ export const sessionSchema = z.object({
   roles: z.array(z.string()),
 });
 
-export const tenantSchema = z.object({ id: z.string(), name: z.string(), slug: z.string() });
+export const tenantSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+});
 
 export const environmentSchema = z.object({
   id: z.string(),

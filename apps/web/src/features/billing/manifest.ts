@@ -22,7 +22,10 @@ export const billingManifest: ModuleManifest = {
     permission: "billing.read",
     icon: Receipt,
     search: async (query) => {
-      const page = await billingService.invoices({ search: query, pageSize: 5 });
+      const page = await billingService.invoices({
+        search: query,
+        pageSize: 5,
+      });
       return page.items.map((invoice) => ({
         id: invoice.id,
         title: invoice.number,

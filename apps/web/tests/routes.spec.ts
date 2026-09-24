@@ -41,10 +41,17 @@ test("every registered route renders a page", async ({ page }) => {
   for (const route of routes) {
     await page.goto(route);
     await page.waitForLoadState("networkidle");
-    const notFound = await page.getByRole("heading", { name: "Page not found" }).count();
-    const crashed = await page.getByRole("heading", { name: "Something went wrong" }).count();
+    const notFound = await page
+      .getByRole("heading", { name: "Page not found" })
+      .count();
+    const crashed = await page
+      .getByRole("heading", { name: "Something went wrong" })
+      .count();
     const heading = await page.locator("main h1").count();
-    if (notFound || crashed || !heading) failures.push(`${route}: ${notFound ? "404" : crashed ? "error boundary" : "no h1"}`);
+    if (notFound || crashed || !heading)
+      failures.push(
+        `${route}: ${notFound ? "404" : crashed ? "error boundary" : "no h1"}`,
+      );
   }
   expect(failures).toEqual([]);
 });

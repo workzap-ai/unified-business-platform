@@ -28,14 +28,20 @@ export function timelineKind(kind: string): string {
     "created",
     "updated",
   ];
-  const direct = known.find((name) => k === name || k.startsWith(`${name}.`) || k.startsWith(`${name}_`));
+  const direct = known.find(
+    (name) =>
+      k === name || k.startsWith(`${name}.`) || k.startsWith(`${name}_`),
+  );
   if (direct) return direct;
   if (k.includes("message") || k.includes("whatsapp")) return "conversation";
   if (k.includes("archiv") || k.includes("restor")) return "status";
   return known.find((name) => k.includes(name)) ?? "system";
 }
 
-export function refHref(refType: string | null, refId: string | null): string | undefined {
+export function refHref(
+  refType: string | null,
+  refId: string | null,
+): string | undefined {
   if (!refType || !refId) return undefined;
   switch (refType) {
     case "order":
@@ -70,8 +76,21 @@ function csvCell(value: string | null | undefined): string {
 }
 
 /** Client-side CSV of the given rows (current page selection). */
-export function downloadCustomersCsv(rows: Customer[], filename = "customers.csv") {
-  const header = ["Name", "Email", "Phone", "Company", "Status", "Source", "Tags", "Last contacted", "Created"];
+export function downloadCustomersCsv(
+  rows: Customer[],
+  filename = "customers.csv",
+) {
+  const header = [
+    "Name",
+    "Email",
+    "Phone",
+    "Company",
+    "Status",
+    "Source",
+    "Tags",
+    "Last contacted",
+    "Created",
+  ];
   const lines = rows.map((c) =>
     [
       c.name,
@@ -87,7 +106,9 @@ export function downloadCustomersCsv(rows: Customer[], filename = "customers.csv
       .map(csvCell)
       .join(","),
   );
-  const blob = new Blob([[header.join(","), ...lines].join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const blob = new Blob([[header.join(","), ...lines].join("\r\n")], {
+    type: "text/csv;charset=utf-8",
+  });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;

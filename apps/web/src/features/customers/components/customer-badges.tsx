@@ -3,7 +3,11 @@ import { Badge } from "@/components/ui/display";
 import type { Customer } from "@/features/business/types";
 import { CUSTOMER_SOURCE_LABELS } from "../lib";
 
-export function CustomerSourceBadge({ source }: { source: Customer["source"] }) {
+export function CustomerSourceBadge({
+  source,
+}: {
+  source: Customer["source"];
+}) {
   if (source === "whatsapp") {
     return (
       <Badge tone="info">
@@ -26,7 +30,10 @@ export function TagList({ tags, max = 3 }: { tags: string[]; max?: number }) {
         </Badge>
       ))}
       {rest > 0 && (
-        <span className="text-xs text-muted-foreground" title={tags.slice(max).join(", ")}>
+        <span
+          className="text-xs text-muted-foreground"
+          title={tags.slice(max).join(", ")}
+        >
           +{rest}
         </span>
       )}

@@ -29,7 +29,13 @@ export function PageShell({
     full: "max-w-none",
   };
   return (
-    <div className={cn("mx-auto w-full px-4 py-5 sm:px-6 lg:px-8 lg:py-6", widths[width], className)}>
+    <div
+      className={cn(
+        "mx-auto w-full px-4 py-5 sm:px-6 lg:px-8 lg:py-6",
+        widths[width],
+        className,
+      )}
+    >
       {children}
     </div>
   );
@@ -55,16 +61,24 @@ export function PageHeader({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           {eyebrow && (
-            <div className="mb-1 text-xs font-medium text-muted-foreground">{eyebrow}</div>
+            <div className="mb-1 text-xs font-medium text-muted-foreground">
+              {eyebrow}
+            </div>
           )}
           <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-[22px]">
             {title}
           </h1>
           {description && (
-            <p className="mt-1 max-w-2xl text-[13.5px] text-muted-foreground">{description}</p>
+            <p className="mt-1 max-w-2xl text-[13.5px] text-muted-foreground">
+              {description}
+            </p>
           )}
         </div>
-        {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
+        {actions && (
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            {actions}
+          </div>
+        )}
       </div>
       {children}
     </header>
@@ -86,9 +100,15 @@ export function SectionHeader({
     <div className={cn("mb-3 flex items-end justify-between gap-3", className)}>
       <div className="min-w-0">
         <h2 className="text-[15px] font-semibold tracking-tight">{title}</h2>
-        {description && <p className="mt-0.5 text-[13px] text-muted-foreground">{description}</p>}
+        {description && (
+          <p className="mt-0.5 text-[13px] text-muted-foreground">
+            {description}
+          </p>
+        )}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {actions && (
+        <div className="flex shrink-0 items-center gap-2">{actions}</div>
+      )}
     </div>
   );
 }
@@ -97,19 +117,30 @@ export function SectionHeader({
  * Module workspace tabs rendered from the navigation registry's child pages, so a
  * module's sub-navigation is registered once and also powers search and breadcrumbs.
  */
-export function ModuleNav({ moduleKey, className }: { moduleKey: string; className?: string }) {
+export function ModuleNav({
+  moduleKey,
+  className,
+}: {
+  moduleKey: string;
+  className?: string;
+}) {
   const { data } = useNavigation();
   const pathname = usePathname();
-  const module = data?.sections.flatMap((s) => s.items).find((i) => i.key === moduleKey);
-  const children = module?.children ?? [];
+  const moduleItem = data?.sections
+    .flatMap((s) => s.items)
+    .find((i) => i.key === moduleKey);
+  const children = moduleItem?.children ?? [];
   if (children.length < 2) return null;
   const activeRoute = children
     .filter((c) => pathname === c.route || pathname.startsWith(`${c.route}/`))
     .sort((a, b) => b.route.length - a.route.length)[0]?.route;
   return (
     <nav
-      aria-label={`${module?.label ?? "Module"} sections`}
-      className={cn("scrollbar-thin -mx-4 mb-5 overflow-x-auto border-b border-border px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8", className)}
+      aria-label={`${moduleItem?.label ?? "Module"} sections`}
+      className={cn(
+        "scrollbar-thin -mx-4 mb-5 overflow-x-auto border-b border-border px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8",
+        className,
+      )}
     >
       <ul className="flex min-w-max items-center gap-1">
         {children.map((child) => {
@@ -153,20 +184,30 @@ export function RequirePermission({
   area?: string;
 }) {
   const { can, canAny } = useSession();
-  const ok = Array.isArray(permission) ? canAny(...permission) : can(permission);
+  const ok = Array.isArray(permission)
+    ? canAny(...permission)
+    : can(permission);
   if (ok) return <>{children}</>;
   return (
     <PageShell width="narrow">
       <div className="mt-10 rounded-xl border border-border bg-surface p-8 text-center shadow-sm">
         <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-surface-muted">
-          <NavIcon name="shield-check" className="size-5 text-muted-foreground" />
+          <NavIcon
+            name="shield-check"
+            className="size-5 text-muted-foreground"
+          />
         </div>
-        <h1 className="mt-4 text-base font-semibold">You don't have access to {area ?? "this area"}</h1>
+        <h1 className="mt-4 text-base font-semibold">
+          You don’t have access to {area ?? "this area"}
+        </h1>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          Your role doesn't include this permission. Ask a workspace administrator if you need
-          access.
+          Your role doesn’t include this permission. Ask a workspace
+          administrator if you need access.
         </p>
-        <Link href="/" className="mt-5 inline-block text-sm font-medium text-primary hover:underline">
+        <Link
+          href="/"
+          className="mt-5 inline-block text-sm font-medium text-primary hover:underline"
+        >
           Back to overview
         </Link>
       </div>

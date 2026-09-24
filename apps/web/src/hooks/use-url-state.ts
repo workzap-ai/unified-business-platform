@@ -24,13 +24,18 @@ export function useUrlState<T extends Record<string, string>>(defaults: T) {
   }, [params, serializedDefaults]);
 
   const set = useCallback(
-    (patch: Partial<T>, options: { resetPage?: boolean } = { resetPage: true }) => {
+    (
+      patch: Partial<T>,
+      options: { resetPage?: boolean } = { resetPage: true },
+    ) => {
       const base = JSON.parse(serializedDefaults) as T;
       const next = new URLSearchParams(params.toString());
       const merged: Record<string, string | undefined> = { ...patch };
-      if (options.resetPage !== false && !("page" in patch) && "page" in base) merged.page = base.page;
+      if (options.resetPage !== false && !("page" in patch) && "page" in base)
+        merged.page = base.page;
       for (const [key, value] of Object.entries(merged)) {
-        if (value === undefined || value === "" || value === base[key]) next.delete(key);
+        if (value === undefined || value === "" || value === base[key])
+          next.delete(key);
         else next.set(key, value);
       }
       const qs = next.toString();
@@ -39,7 +44,10 @@ export function useUrlState<T extends Record<string, string>>(defaults: T) {
     [params, pathname, router, serializedDefaults],
   );
 
-  const reset = useCallback(() => router.replace(pathname, { scroll: false }), [pathname, router]);
+  const reset = useCallback(
+    () => router.replace(pathname, { scroll: false }),
+    [pathname, router],
+  );
   return [state, set, reset] as const;
 }
 

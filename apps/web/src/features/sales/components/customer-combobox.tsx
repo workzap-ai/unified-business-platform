@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Command } from "cmdk";
 import { Check, ChevronsUpDown, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, Spinner } from "@/components/ui/display";
 import { fieldBase } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/overlays";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/overlays";
 import { useScopedQuery } from "@/hooks/use-scoped";
 import { customersService } from "@/features/customers/service";
 
@@ -29,6 +33,7 @@ export function CustomerCombobox({
   disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const listId = useId();
   const [search, setSearch] = useState("");
   const [debounced, setDebounced] = useState("");
 
@@ -39,7 +44,12 @@ export function CustomerCombobox({
 
   const results = useScopedQuery(
     ["customers", "picker", debounced],
-    () => customersService.list({ search: debounced || undefined, status: "active", pageSize: 8 }),
+    () =>
+      customersService.list({
+        search: debounced || undefined,
+        status: "active",
+        pageSize: 8,
+      }),
     { enabled: open, placeholderData: (previous) => previous },
   );
 
@@ -58,11 +68,15 @@ export function CustomerCombobox({
             type="button"
             role="combobox"
             aria-expanded={open}
+            aria-controls={listId}
             aria-haspopup="listbox"
             aria-invalid={invalid || undefined}
             aria-describedby={describedBy}
             disabled={disabled}
-            className={cn(fieldBase, "flex h-9 items-center gap-2 pr-8 text-left")}
+            className={cn(
+              fieldBase,
+              "flex h-9 items-center gap-2 pr-8 text-left",
+            )}
           >
             {value ? (
               <>
@@ -70,15 +84,23 @@ export function CustomerCombobox({
                 <span className="truncate">{value.name}</span>
               </>
             ) : (
-              <span className="text-muted-foreground/80">Search customers…</span>
+              <span className="text-muted-foreground/80">
+                Search customers…
+              </span>
             )}
-            <ChevronsUpDown className="absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <ChevronsUpDown
+              className="absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden="true"
+            />
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-64 p-0">
           <Command shouldFilter={false} loop label="Choose a customer">
             <div className="flex items-center gap-2 border-b border-border px-3">
-              <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <Search
+                className="size-4 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
               <Command.Input
                 value={search}
                 onValueChange={setSearch}
@@ -88,9 +110,14 @@ export function CustomerCombobox({
               />
               {results.isFetching && <Spinner label="Searching customers" />}
             </div>
-            <Command.List className="scrollbar-thin max-h-64 overflow-y-auto p-1">
+            <Command.List
+              id={listId}
+              className="scrollbar-thin max-h-64 overflow-y-auto p-1"
+            >
               {results.isError ? (
-                <p className="px-3 py-6 text-center text-[13px] text-danger">Customers couldn&apos;t be loaded.</p>
+                <p className="px-3 py-6 text-center text-[13px] text-danger">
+                  Customers couldn&apos;t be loaded.
+                </p>
               ) : (
                 <>
                   {!results.isPending && (
@@ -107,10 +134,22 @@ export function CustomerCombobox({
                     >
                       <Avatar name={c.name} size="sm" />
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate font-medium">{c.name}</span>
-                        <span className="block truncate text-xs text-muted-foreground">{c.phone ?? c.company ?? c.email ?? "No contact details"}</span>
+                        <span className="block truncate font-medium">
+                          {c.name}
+                        </span>
+                        <span className="block truncate text-xs text-muted-foreground">
+                          {c.phone ??
+                            c.company ??
+                            c.email ??
+                            "No contact details"}
+                        </span>
                       </span>
-                      {value?.id === c.id && <Check className="size-4 text-primary" aria-hidden="true" />}
+                      {value?.id === c.id && (
+                        <Check
+                          className="size-4 text-primary"
+                          aria-hidden="true"
+                        />
+                      )}
                     </Command.Item>
                   ))}
                 </>

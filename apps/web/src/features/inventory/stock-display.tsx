@@ -8,14 +8,22 @@ import { StatusBadge } from "@/components/app/status-badge";
 import { STOCK_STATE_LABEL, type StockState } from "./lib";
 
 /** Stock health chip. "untracked" reads as a quiet outline so it never looks like a problem. */
-export function StockChip({ state, label }: { state: StockState | "untracked"; label?: string }) {
+export function StockChip({
+  state,
+  label,
+}: {
+  state: StockState | "untracked";
+  label?: string;
+}) {
   if (state === "untracked")
     return (
       <Badge tone="outline" className="text-muted-foreground">
         {label ?? "Not tracked"}
       </Badge>
     );
-  return <StatusBadge status={state} label={label ?? STOCK_STATE_LABEL[state]} />;
+  return (
+    <StatusBadge status={state} label={label ?? STOCK_STATE_LABEL[state]} />
+  );
 }
 
 /**
@@ -35,7 +43,8 @@ export function AvailableBar({
 }) {
   const scale = Math.max((threshold ?? 0) * 2, 1);
   const value = Math.max(0, Math.min(100, (available / scale) * 100));
-  const tone = state === "out" ? "danger" : state === "low" ? "warning" : "success";
+  const tone =
+    state === "out" ? "danger" : state === "low" ? "warning" : "success";
   return (
     <div className={cn("flex items-center justify-end gap-2", className)}>
       <Progress
@@ -57,9 +66,21 @@ export function AvailableBar({
   );
 }
 
-export function Quantity({ value, className }: { value: number; className?: string }) {
+export function Quantity({
+  value,
+  className,
+}: {
+  value: number;
+  className?: string;
+}) {
   return (
-    <span className={cn("tabular font-semibold", value > 0 ? "text-success" : value < 0 ? "text-danger" : "", className)}>
+    <span
+      className={cn(
+        "tabular font-semibold",
+        value > 0 ? "text-success" : value < 0 ? "text-danger" : "",
+        className,
+      )}
+    >
       {value > 0 ? "+" : value < 0 ? "−" : ""}
       {formatNumber(Math.abs(value))}
     </span>

@@ -9,6 +9,7 @@ import { isDemo } from "@/lib/data-mode";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/display";
 import { SheetContent, Tooltip } from "@/components/ui/overlays";
+import { useLocalStorageState } from "@/hooks/use-local-storage";
 import { useSession } from "@/features/auth/session-provider";
 import { Breadcrumbs, BreadcrumbProvider } from "./breadcrumbs";
 import { CommandMenuProvider } from "./command-menu";
@@ -38,7 +39,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (status === "anonymous") {
-      router.replace(`/login${pathname && pathname !== "/" ? `?next=${encodeURIComponent(pathname)}` : ""}`);
+      router.replace(
+        `/login${pathname && pathname !== "/" ? `?next=${encodeURIComponent(pathname)}` : ""}`,
+      );
     }
   }, [status, router, pathname]);
 
@@ -47,9 +50,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex min-h-dvh items-center justify-center p-6">
         <div className="max-w-sm text-center">
-          <h1 className="text-lg font-semibold">We couldn't reach your workspace</h1>
+          <h1 className="text-lg font-semibold">
+            We couldn’t reach your workspace
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            The service may be restarting or your connection dropped. Your data is safe.
+            The service may be restarting or your connection dropped. Your data
+            is safe.
           </p>
           <Button className="mt-5" onClick={retry}>
             Try again
@@ -71,29 +77,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 function ShellFrame({ children }: { children: React.ReactNode }) {
   const wide = useMediaQuery("(min-width: 1024px)");
   const tablet = useMediaQuery("(min-width: 768px)");
-  const [userCollapsed, setUserCollapsed] = useState(false);
+  const [userCollapsed, setUserCollapsed] = useLocalStorageState<boolean>(
+    COLLAPSE_KEY,
+    false,
+  );
+  // The mobile drawer closes through the sidebar's onNavigate when a link is chosen.
   const [mobileOpen, setMobileOpen] = useState(false);
-  const pathname = usePathname();
 
-  useEffect(() => {
-    try {
-      setUserCollapsed(localStorage.getItem(COLLAPSE_KEY) === "1");
-    } catch {
-      /* ignore */
-    }
-  }, []);
-  useEffect(() => setMobileOpen(false), [pathname]);
-
-  const collapsed = !wide || userCollapsed;
-  function toggle() {
-    const next = !userCollapsed;
-    setUserCollapsed(next);
-    try {
-      localStorage.setItem(COLLAPSE_KEY, next ? "1" : "0");
-    } catch {
-      /* ignore */
-    }
-  }
+  const collapsed = !wide || Boolean(userCollapsed);
+  const toggle = () => setUserCollapsed((current) => !current);
 
   return (
     <div className="flex min-h-dvh">
@@ -111,13 +103,24 @@ function ShellFrame({ children }: { children: React.ReactNode }) {
           )}
           aria-label="Sidebar"
         >
-          <Sidebar collapsed={collapsed} onToggleCollapsed={wide ? toggle : undefined} />
+          <Sidebar
+            collapsed={collapsed}
+            onToggleCollapsed={wide ? toggle : undefined}
+          />
         </aside>
       )}
       <DialogPrimitive.Root open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" width="sm" className="w-[86vw] max-w-[300px] border-sidebar-border bg-sidebar p-0 [&>button]:text-sidebar-muted">
-          <DialogPrimitive.Title className="sr-only">Navigation</DialogPrimitive.Title>
-          <DialogPrimitive.Description className="sr-only">Main and admin navigation</DialogPrimitive.Description>
+        <SheetContent
+          side="left"
+          width="sm"
+          className="w-[86vw] max-w-[300px] border-sidebar-border bg-sidebar p-0 [&>button]:text-sidebar-muted"
+        >
+          <DialogPrimitive.Title className="sr-only">
+            Navigation
+          </DialogPrimitive.Title>
+          <DialogPrimitive.Description className="sr-only">
+            Main and admin navigation
+          </DialogPrimitive.Description>
           <Sidebar variant="mobile" onNavigate={() => setMobileOpen(false)} />
         </SheetContent>
       </DialogPrimitive.Root>
@@ -141,7 +144,8 @@ function ShellFrame({ children }: { children: React.ReactNode }) {
             {isDemo && (
               <Tooltip content="You're viewing fictional sample data. Nothing here is real business data, and changes reset when the page reloads.">
                 <span className="hidden items-center gap-1 rounded-full border border-dashed border-pi/50 px-2 py-0.5 text-2xs font-semibold text-pi md:inline-flex">
-                  <FlaskConical className="size-3" aria-hidden="true" /> Sample data
+                  <FlaskConical className="size-3" aria-hidden="true" /> Sample
+                  data
                 </span>
               </Tooltip>
             )}
@@ -161,7 +165,11 @@ function ShellFrame({ children }: { children: React.ReactNode }) {
 
 function ShellSkeleton() {
   return (
-    <div className="flex min-h-dvh" aria-busy="true" aria-label="Loading workspace">
+    <div
+      className="flex min-h-dvh"
+      aria-busy="true"
+      aria-label="Loading workspace"
+    >
       <div className="hidden w-[248px] shrink-0 bg-sidebar p-3 md:block">
         <div className="flex items-center gap-2.5 p-1.5">
           <Skeleton className="size-8 bg-sidebar-hover" />
@@ -169,7 +177,11 @@ function ShellSkeleton() {
         </div>
         <div className="mt-6 space-y-2.5 px-2">
           {Array.from({ length: 11 }, (_, i) => (
-            <Skeleton key={i} className="h-3.5 bg-sidebar-hover" style={{ width: `${55 + ((i * 17) % 35)}%` }} />
+            <Skeleton
+              key={i}
+              className="h-3.5 bg-sidebar-hover"
+              style={{ width: `${55 + ((i * 17) % 35)}%` }}
+            />
           ))}
         </div>
       </div>
@@ -197,14 +209,19 @@ function NoWorkspace() {
       <div className="max-w-md rounded-xl border border-border bg-surface p-8 text-center shadow-sm">
         <h1 className="text-lg font-semibold">No workspace yet</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Your account isn't a member of any active workspace. Ask an administrator to invite
-          you, or create a new workspace.
+          Your account isn’t a member of any active workspace. Ask an
+          administrator to invite you, or create a new workspace.
         </p>
         <div className="mt-6 flex justify-center gap-2">
-          <Button variant="secondary" onClick={() => void logout().then(() => router.push("/login"))}>
+          <Button
+            variant="secondary"
+            onClick={() => void logout().then(() => router.push("/login"))}
+          >
             Sign out
           </Button>
-          <Button onClick={() => router.push("/register")}>Create workspace</Button>
+          <Button onClick={() => router.push("/register")}>
+            Create workspace
+          </Button>
         </div>
       </div>
     </div>

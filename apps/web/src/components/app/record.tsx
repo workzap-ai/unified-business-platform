@@ -56,7 +56,12 @@ export function RecordHeader({
     <header className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
       <div className="flex min-w-0 items-start gap-3.5">
         {avatar ? (
-          <Avatar name={avatar} size="xl" square className="size-12 text-base" />
+          <Avatar
+            name={avatar}
+            size="xl"
+            square
+            className="size-12 text-base"
+          />
         ) : Icon ? (
           <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-muted text-muted-foreground">
             <Icon className="size-5.5" aria-hidden="true" />
@@ -64,7 +69,9 @@ export function RecordHeader({
         ) : null}
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="min-w-0 truncate text-xl font-semibold tracking-tight">{title}</h1>
+            <h1 className="min-w-0 truncate text-xl font-semibold tracking-tight">
+              {title}
+            </h1>
             {status}
             {identifier && (
               <span className="rounded-md bg-surface-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
@@ -72,11 +79,23 @@ export function RecordHeader({
               </span>
             )}
           </div>
-          {subtitle && <p className="mt-0.5 text-[13.5px] text-muted-foreground">{subtitle}</p>}
-          {meta && <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-muted-foreground">{meta}</div>}
+          {subtitle && (
+            <p className="mt-0.5 text-[13.5px] text-muted-foreground">
+              {subtitle}
+            </p>
+          )}
+          {meta && (
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-muted-foreground">
+              {meta}
+            </div>
+          )}
         </div>
       </div>
-      {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
+      {actions && (
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {actions}
+        </div>
+      )}
     </header>
   );
 }
@@ -91,13 +110,24 @@ export function PropertyList({
   columns?: 1 | 2;
 }) {
   return (
-    <dl className={cn("grid gap-x-6", columns === 2 ? "sm:grid-cols-2" : "", className)}>
+    <dl
+      className={cn(
+        "grid gap-x-6",
+        columns === 2 ? "sm:grid-cols-2" : "",
+        className,
+      )}
+    >
       {items.map((item) => (
-        <div key={item.label} className="flex items-start justify-between gap-4 border-b border-border py-2.5 last:border-0 sm:[&:nth-last-child(2)]:border-0">
+        <div
+          key={item.label}
+          className="flex items-start justify-between gap-4 border-b border-border py-2.5 last:border-0 sm:[&:nth-last-child(2)]:border-0"
+        >
           <dt className="shrink-0 text-[13px] text-muted-foreground">
             {item.hint ? (
               <Tooltip content={item.hint}>
-                <span className="cursor-help underline decoration-dotted underline-offset-2">{item.label}</span>
+                <span className="cursor-help underline decoration-dotted underline-offset-2">
+                  {item.label}
+                </span>
               </Tooltip>
             ) : (
               item.label
@@ -124,18 +154,30 @@ export type TimelineEvent = {
 
 const EVENT_ICONS: Record<string, { icon: LucideIcon; className: string }> = {
   created: { icon: FilePlus2, className: "bg-primary-soft text-primary" },
-  updated: { icon: Pencil, className: "bg-surface-muted text-muted-foreground" },
+  updated: {
+    icon: Pencil,
+    className: "bg-surface-muted text-muted-foreground",
+  },
   note: { icon: StickyNote, className: "bg-warning-soft text-warning" },
   order: { icon: ShoppingCart, className: "bg-info-soft text-info" },
   quote: { icon: FilePlus2, className: "bg-info-soft text-info" },
-  invoice: { icon: CreditCard, className: "bg-surface-muted text-foreground-secondary" },
+  invoice: {
+    icon: CreditCard,
+    className: "bg-surface-muted text-foreground-secondary",
+  },
   payment: { icon: CreditCard, className: "bg-success-soft text-success" },
   conversation: { icon: MessageSquare, className: "bg-pi-soft text-pi" },
   handoff: { icon: UserCheck, className: "bg-warning-soft text-warning" },
   ai: { icon: Bot, className: "bg-pi-soft text-pi" },
-  status: { icon: ArrowRightLeft, className: "bg-surface-muted text-foreground-secondary" },
+  status: {
+    icon: ArrowRightLeft,
+    className: "bg-surface-muted text-foreground-secondary",
+  },
   lead: { icon: Zap, className: "bg-primary-soft text-primary" },
-  system: { icon: CircleDot, className: "bg-surface-muted text-muted-foreground" },
+  system: {
+    icon: CircleDot,
+    className: "bg-surface-muted text-muted-foreground",
+  },
 };
 
 export function ActivityTimeline({
@@ -164,7 +206,17 @@ export function ActivityTimeline({
       </ul>
     );
   }
-  if (!events.length) return <p className={cn("py-6 text-center text-[13px] text-muted-foreground", className)}>{empty}</p>;
+  if (!events.length)
+    return (
+      <p
+        className={cn(
+          "py-6 text-center text-[13px] text-muted-foreground",
+          className,
+        )}
+      >
+        {empty}
+      </p>
+    );
   return (
     <ol className={cn("relative", className)}>
       {events.map((event, index) => {
@@ -172,8 +224,14 @@ export function ActivityTimeline({
         const Icon = style.icon;
         const content = (
           <>
-            <p className="text-[13px] leading-snug font-medium">{event.title}</p>
-            {event.description && <p className="mt-0.5 text-[13px] text-muted-foreground">{event.description}</p>}
+            <p className="text-[13px] leading-snug font-medium">
+              {event.title}
+            </p>
+            {event.description && (
+              <p className="mt-0.5 text-[13px] text-muted-foreground">
+                {event.description}
+              </p>
+            )}
             <p className="mt-0.5 text-xs text-muted-foreground">
               {event.actor && <span>{event.actor} · </span>}
               <time dateTime={event.at} title={formatDateTime(event.at)}>
@@ -185,14 +243,25 @@ export function ActivityTimeline({
         return (
           <li key={event.id} className="relative flex gap-3 pb-4 last:pb-0">
             {index < events.length - 1 && (
-              <span className="absolute top-7 bottom-0 left-3.5 w-px bg-border" aria-hidden="true" />
+              <span
+                className="absolute top-7 bottom-0 left-3.5 w-px bg-border"
+                aria-hidden="true"
+              />
             )}
-            <span className={cn("relative z-[1] flex size-7 shrink-0 items-center justify-center rounded-full", style.className)}>
+            <span
+              className={cn(
+                "relative z-[1] flex size-7 shrink-0 items-center justify-center rounded-full",
+                style.className,
+              )}
+            >
               <Icon className="size-3.5" aria-hidden="true" />
             </span>
             <div className="min-w-0 flex-1 pt-0.5">
               {event.href ? (
-                <Link href={event.href} className="block rounded hover:underline">
+                <Link
+                  href={event.href}
+                  className="block rounded hover:underline"
+                >
                   {content}
                 </Link>
               ) : (
@@ -233,7 +302,10 @@ export function RelatedList<T>({
           <>
             {action}
             {viewAllHref && (
-              <Link href={viewAllHref} className="text-xs font-medium text-primary hover:underline">
+              <Link
+                href={viewAllHref}
+                className="text-xs font-medium text-primary hover:underline"
+              >
                 View all
               </Link>
             )}
@@ -248,9 +320,15 @@ export function RelatedList<T>({
             ))}
           </div>
         ) : items.length === 0 ? (
-          <p className="px-2 pt-1 pb-3 text-[13px] text-muted-foreground">{empty}</p>
+          <p className="px-2 pt-1 pb-3 text-[13px] text-muted-foreground">
+            {empty}
+          </p>
         ) : (
-          <ul>{items.map((item) => <li key={getKey(item)}>{render(item)}</li>)}</ul>
+          <ul>
+            {items.map((item) => (
+              <li key={getKey(item)}>{render(item)}</li>
+            ))}
+          </ul>
         )}
       </div>
     </Card>

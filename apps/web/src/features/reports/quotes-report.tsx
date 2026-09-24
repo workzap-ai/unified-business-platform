@@ -14,7 +14,16 @@ import { reportsService } from "./service";
 import { ExportMenu, ReportShell, ratio } from "./components";
 
 type StatusRow = QuotesReportData["by_status"][number];
-const STATUS_ORDER = ["draft", "pending_approval", "approved", "sent", "accepted", "rejected", "expired", "cancelled"];
+const STATUS_ORDER = [
+  "draft",
+  "pending_approval",
+  "approved",
+  "sent",
+  "accepted",
+  "rejected",
+  "expired",
+  "cancelled",
+];
 
 export function QuotesReport() {
   return (
@@ -30,7 +39,9 @@ export function QuotesReport() {
 }
 
 function QuotesContent() {
-  const query = useScopedQuery(["reports", "quotes"], () => reportsService.quotes());
+  const query = useScopedQuery(["reports", "quotes"], () =>
+    reportsService.quotes(),
+  );
   const data = query.data;
   const currency = data?.currency ?? "USD";
   const loading = query.isPending;
@@ -43,16 +54,48 @@ function QuotesContent() {
     : undefined;
   const total = byStatus?.reduce((s, r) => s + r.count, 0) ?? 0;
   const accepted = byStatus?.find((r) => r.status === "accepted");
-  const conversion = data?.conversion_rate === null || data?.conversion_rate === undefined ? null : Number(data.conversion_rate);
+  const conversion =
+    data?.conversion_rate === null || data?.conversion_rate === undefined
+      ? null
+      : Number(data.conversion_rate);
 
   const columns: Column<StatusRow>[] = [
-    { key: "status", header: "Status", cell: (r) => <StatusBadge status={r.status} /> },
-    { key: "count", header: "Quotes", align: "right", cell: (r) => <span className="tabular">{formatNumber(r.count)}</span> },
-    { key: "share", header: "Share", align: "right", hideBelow: "sm", cell: (r) => <span className="tabular text-muted-foreground">{formatPercent(ratio(r.count, total))}</span> },
-    { key: "value", header: "Value", align: "right", cell: (r) => <span className="tabular">{formatMoney(r.value, currency)}</span> },
+    {
+      key: "status",
+      header: "Status",
+      cell: (r) => <StatusBadge status={r.status} />,
+    },
+    {
+      key: "count",
+      header: "Quotes",
+      align: "right",
+      cell: (r) => <span className="tabular">{formatNumber(r.count)}</span>,
+    },
+    {
+      key: "share",
+      header: "Share",
+      align: "right",
+      hideBelow: "sm",
+      cell: (r) => (
+        <span className="tabular text-muted-foreground">
+          {formatPercent(ratio(r.count, total))}
+        </span>
+      ),
+    },
+    {
+      key: "value",
+      header: "Value",
+      align: "right",
+      cell: (r) => (
+        <span className="tabular">{formatMoney(r.value, currency)}</span>
+      ),
+    },
   ];
 
-  if (query.isError) return <ErrorState error={query.error} onRetry={() => void query.refetch()} />;
+  if (query.isError)
+    return (
+      <ErrorState error={query.error} onRetry={() => void query.refetch()} />
+    );
 
   return (
     <>
@@ -64,36 +107,75 @@ function QuotesContent() {
               label: "Quotes by status",
               filename: "quotes-by-status",
               headers: ["Status", "Quotes", "Value", "Currency"],
-              rows: () => (byStatus ?? []).map((r) => [statusLabel(r.status), r.count, r.value, currency]),
+              rows: () =>
+                (byStatus ?? []).map((r) => [
+                  statusLabel(r.status),
+                  r.count,
+                  r.value,
+                  currency,
+                ]),
             },
           ]}
         />
       </div>
 
       <MetricGrid>
-        <MetricCard label="Quotes" icon={FileText} loading={loading} value={formatNumber(total)} detail="All quotes in this environment" href="/quotes" />
-        <MetricCard label="Open value" icon={Wallet} loading={loading} value={formatMoney(data?.open_value, currency)} detail="Draft, awaiting approval, approved or sent" />
+        <MetricCard
+          label="Quotes"
+          icon={FileText}
+          loading={loading}
+          value={formatNumber(total)}
+          detail="All quotes in this environment"
+          href="/quotes"
+        />
+        <MetricCard
+          label="Open value"
+          icon={Wallet}
+          loading={loading}
+          value={formatMoney(data?.open_value, currency)}
+          detail="Draft, awaiting approval, approved or sent"
+        />
         <MetricCard
           label="Conversion rate"
           icon={Percent}
           loading={loading}
           value={formatPercent(conversion, 1)}
-          detail={conversion === null ? "No decided quotes yet" : "Accepted ÷ accepted, rejected and expired"}
+          detail={
+            conversion === null
+              ? "No decided quotes yet"
+              : "Accepted ÷ accepted, rejected and expired"
+          }
         />
-        <MetricCard label="Accepted" icon={CheckCircle2} loading={loading} tone="success" value={formatNumber(accepted?.count ?? 0)} detail={accepted ? formatMoney(accepted.value, currency) : undefined} />
+        <MetricCard
+          label="Accepted"
+          icon={CheckCircle2}
+          loading={loading}
+          tone="success"
+          value={formatNumber(accepted?.count ?? 0)}
+          detail={accepted ? formatMoney(accepted.value, currency) : undefined}
+        />
       </MetricGrid>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
         <Card>
-          <CardHeader title="By status" description="Share of quotes in each state" />
+          <CardHeader
+            title="By status"
+            description="Share of quotes in each state"
+          />
           <CardBody>
             {loading ? (
               <Skeleton className="h-16" />
             ) : total === 0 ? (
-              <p className="py-4 text-[13px] text-muted-foreground">No quotes yet.</p>
+              <p className="py-4 text-[13px] text-muted-foreground">
+                No quotes yet.
+              </p>
             ) : (
               <DistributionBar
-                segments={(byStatus ?? []).map((r) => ({ key: r.status, label: statusLabel(r.status), value: r.count }))}
+                segments={(byStatus ?? []).map((r) => ({
+                  key: r.status,
+                  label: statusLabel(r.status),
+                  value: r.count,
+                }))}
                 format={(v) => formatNumber(v)}
               />
             )}
@@ -107,7 +189,11 @@ function QuotesContent() {
           rowHref={(r) => `/quotes?status=${r.status}`}
           loading={loading}
           loadingRows={6}
-          empty={<p className="px-4 py-8 text-center text-[13px] text-muted-foreground">No quotes yet.</p>}
+          empty={
+            <p className="px-4 py-8 text-center text-[13px] text-muted-foreground">
+              No quotes yet.
+            </p>
+          }
         />
       </div>
     </>

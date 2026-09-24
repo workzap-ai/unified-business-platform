@@ -1,11 +1,26 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Command } from "cmdk";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Clock, CornerDownLeft, LogOut, Moon, Search, Sun } from "lucide-react";
+import {
+  ArrowRight,
+  Clock,
+  CornerDownLeft,
+  LogOut,
+  Moon,
+  Search,
+  Sun,
+} from "lucide-react";
 import { Kbd } from "@/components/ui/controls";
 import { Spinner } from "@/components/ui/display";
 import { useSession } from "@/features/auth/session-provider";
@@ -28,7 +43,11 @@ function useDebounced<T>(value: T, delay = 200) {
   return debounced;
 }
 
-export function CommandMenuProvider({ children }: { children: React.ReactNode }) {
+export function CommandMenuProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const show = useCallback(() => setOpen(true), []);
   useEffect(() => {
@@ -51,7 +70,9 @@ export function CommandMenuProvider({ children }: { children: React.ReactNode })
             className="fixed top-[12vh] left-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-xl -translate-x-1/2 animate-scale-in overflow-hidden rounded-xl border border-border bg-surface shadow-lg outline-none"
             aria-describedby={undefined}
           >
-            <DialogPrimitive.Title className="sr-only">Search and commands</DialogPrimitive.Title>
+            <DialogPrimitive.Title className="sr-only">
+              Search and commands
+            </DialogPrimitive.Title>
             {open && <CommandPalette onDone={() => setOpen(false)} />}
           </DialogPrimitive.Content>
         </DialogPrimitive.Portal>
@@ -70,16 +91,24 @@ function CommandPalette({ onDone }: { onDone: () => void }) {
   const scope = scopeKey.join(":");
 
   const providers = useMemo(
-    () => MODULE_MANIFESTS.flatMap((m) => (m.search && can(m.search.permission) ? [m.search] : [])),
+    () =>
+      MODULE_MANIFESTS.flatMap((m) =>
+        m.search && can(m.search.permission) ? [m.search] : [],
+      ),
     [can],
   );
   const records = useQuery({
     queryKey: [...scopeKey, "command-search", term],
     queryFn: async () => {
-      const results = await Promise.allSettled(providers.map((p) => p.search(term)));
+      const results = await Promise.allSettled(
+        providers.map((p) => p.search(term)),
+      );
       return providers.map((provider, i) => ({
         provider,
-        results: results[i]?.status === "fulfilled" ? results[i].value.slice(0, 5) : [],
+        results:
+          results[i]?.status === "fulfilled"
+            ? results[i].value.slice(0, 5)
+            : [],
       }));
     },
     enabled: term.length >= 2,
@@ -93,10 +122,24 @@ function CommandPalette({ onDone }: { onDone: () => void }) {
 
   const pages = (navigation.data?.sections ?? []).flatMap((section) =>
     section.items.flatMap((item) => [
-      { key: item.key, label: item.label, route: item.route, icon: item.icon, parent: null as string | null, keywords: item.keywords },
+      {
+        key: item.key,
+        label: item.label,
+        route: item.route,
+        icon: item.icon,
+        parent: null as string | null,
+        keywords: item.keywords,
+      },
       ...item.children
         .filter((c) => c.route !== item.route)
-        .map((c) => ({ key: c.key, label: c.label, route: c.route, icon: c.icon, parent: item.label, keywords: c.keywords })),
+        .map((c) => ({
+          key: c.key,
+          label: c.label,
+          route: c.route,
+          icon: c.icon,
+          parent: item.label,
+          keywords: c.keywords,
+        })),
     ]),
   );
   const actions = MODULE_MANIFESTS.flatMap((m) => m.actions ?? []).filter(
@@ -124,13 +167,20 @@ function CommandPalette({ onDone }: { onDone: () => void }) {
       </div>
       <Command.List className="scrollbar-thin max-h-[min(60vh,440px)] overflow-y-auto py-1">
         <Command.Empty className="px-4 py-10 text-center text-sm text-muted-foreground">
-          {term.length >= 2 && records.isFetching ? "Searching…" : "No matches. Try a customer, SKU or order number."}
+          {term.length >= 2 && records.isFetching
+            ? "Searching…"
+            : "No matches. Try a customer, SKU or order number."}
         </Command.Empty>
 
         {query.length === 0 && recent.length > 0 && (
           <Command.Group heading="Recent" className={group}>
             {recent.map((r) => (
-              <Command.Item key={r.href} value={`recent ${r.title} ${r.kind}`} onSelect={() => go(r.href)} className={item}>
+              <Command.Item
+                key={r.href}
+                value={`recent ${r.title} ${r.kind}`}
+                onSelect={() => go(r.href)}
+                className={item}
+              >
                 <Clock />
                 <span className="flex-1 truncate">{r.title}</span>
                 <span className="text-xs text-muted-foreground">{r.kind}</span>
@@ -141,7 +191,12 @@ function CommandPalette({ onDone }: { onDone: () => void }) {
 
         {(records.data ?? []).map(({ provider, results }) =>
           results.length ? (
-            <Command.Group key={provider.key} heading={provider.label} className={group} forceMount>
+            <Command.Group
+              key={provider.key}
+              heading={provider.label}
+              className={group}
+              forceMount
+            >
               {results.map((r) => (
                 <Command.Item
                   key={r.id}
@@ -151,7 +206,11 @@ function CommandPalette({ onDone }: { onDone: () => void }) {
                 >
                   <provider.icon />
                   <span className="min-w-0 flex-1 truncate">{r.title}</span>
-                  {r.subtitle && <span className="max-w-40 truncate text-xs text-muted-foreground">{r.subtitle}</span>}
+                  {r.subtitle && (
+                    <span className="max-w-40 truncate text-xs text-muted-foreground">
+                      {r.subtitle}
+                    </span>
+                  )}
                 </Command.Item>
               ))}
             </Command.Group>
@@ -185,7 +244,9 @@ function CommandPalette({ onDone }: { onDone: () => void }) {
             >
               <NavIcon name={p.icon} />
               <span className="flex-1">
-                {p.parent && <span className="text-muted-foreground">{p.parent} / </span>}
+                {p.parent && (
+                  <span className="text-muted-foreground">{p.parent} / </span>
+                )}
                 {p.label}
               </span>
               <ArrowRight className="!size-3.5 opacity-0 [[aria-selected=true]_&]:opacity-100" />
@@ -219,8 +280,13 @@ function CommandPalette({ onDone }: { onDone: () => void }) {
         </Command.Group>
       </Command.List>
       <div className="flex items-center gap-3 border-t border-border bg-surface-muted/60 px-3.5 py-2 text-2xs text-muted-foreground">
-        <span className="flex items-center gap-1"><Kbd>↑</Kbd><Kbd>↓</Kbd> navigate</span>
-        <span className="flex items-center gap-1"><Kbd>↵</Kbd> open</span>
+        <span className="flex items-center gap-1">
+          <Kbd>↑</Kbd>
+          <Kbd>↓</Kbd> navigate
+        </span>
+        <span className="flex items-center gap-1">
+          <Kbd>↵</Kbd> open
+        </span>
         <span className="ml-auto">Type 2+ characters to search records</span>
       </div>
     </Command>

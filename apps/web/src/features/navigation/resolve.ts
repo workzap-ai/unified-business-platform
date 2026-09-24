@@ -14,30 +14,46 @@ export type NavContext = {
 
 export function allowed(item: NavDefinition, context: NavContext): boolean {
   if (!item.enabled || !item.visible) return false;
-  if (!item.required_permissions.every((p) => context.permissions.has(p))) return false;
-  if (item.any_permissions.length && !item.any_permissions.some((p) => context.permissions.has(p)))
+  if (!item.required_permissions.every((p) => context.permissions.has(p)))
     return false;
-  if (item.required_roles.length && !item.required_roles.some((r) => context.roles.has(r)))
+  if (
+    item.any_permissions.length &&
+    !item.any_permissions.some((p) => context.permissions.has(p))
+  )
+    return false;
+  if (
+    item.required_roles.length &&
+    !item.required_roles.some((r) => context.roles.has(r))
+  )
     return false;
   if (item.required_product) {
     const features = context.products[item.required_product];
     if (!features) return false;
-    if (item.required_feature && !features.includes(item.required_feature)) return false;
+    if (item.required_feature && !features.includes(item.required_feature))
+      return false;
   }
-  if (item.environment_scope && !item.environment_scope.includes(context.environmentKind))
+  if (
+    item.environment_scope &&
+    !item.environment_scope.includes(context.environmentKind)
+  )
     return false;
   return true;
 }
 
-const bySortOrder = (a: { sort_order: number; key: string }, b: { sort_order: number; key: string }) =>
-  a.sort_order - b.sort_order || a.key.localeCompare(b.key);
+const bySortOrder = (
+  a: { sort_order: number; key: string },
+  b: { sort_order: number; key: string },
+) => a.sort_order - b.sort_order || a.key.localeCompare(b.key);
 
 /**
  * Apply a saved custom order to visible items. Hidden/unknown saved keys are skipped;
  * visible items missing from the saved order (new modules) are inserted after their
  * nearest preceding item in default order.
  */
-export function mergeOrder<T extends { key: string }>(defaults: T[], custom: readonly string[]): T[] {
+export function mergeOrder<T extends { key: string }>(
+  defaults: T[],
+  custom: readonly string[],
+): T[] {
   const byKey = new Map(defaults.map((item) => [item.key, item]));
   const seen = new Set<string>();
   const ordered: T[] = [];
@@ -65,7 +81,11 @@ export function mergeOrder<T extends { key: string }>(defaults: T[], custom: rea
   return ordered;
 }
 
-function toItem(definition: NavDefinition, children: NavItem[], badge: number | null): NavItem {
+function toItem(
+  definition: NavDefinition,
+  children: NavItem[],
+  badge: number | null,
+): NavItem {
   return {
     key: definition.key,
     label: definition.label,
@@ -88,33 +108,49 @@ export function resolveNavigation(
   customOrders: Partial<Record<SectionKey, readonly string[]>> = {},
   badges: Record<string, number | null> = {},
 ): Navigation {
-  const sections: Navigation["sections"] = (["main", "admin"] as const).map((section) => {
-    const visible = definitions
-      .filter((d) => d.section === section && d.parent === null && allowed(d, context))
-      .sort(bySortOrder);
-    const ordered = mergeOrder(visible, customOrders[section] ?? []);
-    return {
-      key: section,
-      label: section === "main" ? "Main" : "Admin",
-      customized: (customOrders[section] ?? []).length > 0,
-      items: ordered.map((definition) =>
-        toItem(
-          definition,
-          definitions
-            .filter((d) => d.parent === definition.key && allowed(d, context))
-            .sort(bySortOrder)
-            .map((child) => toItem(child, [], child.badge ? (badges[child.badge] ?? null) : null)),
-          definition.badge ? (badges[definition.badge] ?? null) : null,
+  const sections: Navigation["sections"] = (["main", "admin"] as const).map(
+    (section) => {
+      const visible = definitions
+        .filter(
+          (d) =>
+            d.section === section && d.parent === null && allowed(d, context),
+        )
+        .sort(bySortOrder);
+      const ordered = mergeOrder(visible, customOrders[section] ?? []);
+      return {
+        key: section,
+        label: section === "main" ? "Main" : "Admin",
+        customized: (customOrders[section] ?? []).length > 0,
+        items: ordered.map((definition) =>
+          toItem(
+            definition,
+            definitions
+              .filter((d) => d.parent === definition.key && allowed(d, context))
+              .sort(bySortOrder)
+              .map((child) =>
+                toItem(
+                  child,
+                  [],
+                  child.badge ? (badges[child.badge] ?? null) : null,
+                ),
+              ),
+            definition.badge ? (badges[definition.badge] ?? null) : null,
+          ),
         ),
-      ),
-    };
-  });
+      };
+    },
+  );
   return { sections };
 }
 
-export function validateCustomOrder(visible: { key: string }[], order: string[]): string[] {
+export function validateCustomOrder(
+  visible: { key: string }[],
+  order: string[],
+): string[] {
   const keys = new Set(visible.map((v) => v.key));
-  if (new Set(order).size !== order.length) throw new Error("Duplicate navigation keys");
-  if (!order.every((key) => keys.has(key))) throw new Error("Unavailable navigation item");
+  if (new Set(order).size !== order.length)
+    throw new Error("Duplicate navigation keys");
+  if (!order.every((key) => keys.has(key)))
+    throw new Error("Unavailable navigation item");
   return order;
 }

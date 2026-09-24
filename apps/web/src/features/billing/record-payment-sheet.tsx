@@ -28,13 +28,21 @@ export function RecordPaymentSheet({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <SheetContent width="md">
-        {open && <PaymentForm invoice={invoice} onDone={() => onOpenChange(false)} />}
+        {open && (
+          <PaymentForm invoice={invoice} onDone={() => onOpenChange(false)} />
+        )}
       </SheetContent>
     </Dialog>
   );
 }
 
-function PaymentForm({ invoice, onDone }: { invoice: InvoiceDetail; onDone: () => void }) {
+function PaymentForm({
+  invoice,
+  onDone,
+}: {
+  invoice: InvoiceDetail;
+  onDone: () => void;
+}) {
   const balance = toCents(invoice.balance_due);
   const [serverError, setServerError] = useState<string | null>(null);
   const schema = z.object({
@@ -42,7 +50,10 @@ function PaymentForm({ invoice, onDone }: { invoice: InvoiceDetail; onDone: () =
       .string()
       .trim()
       .regex(MONEY_PATTERN, "Use an amount like 250.00")
-      .refine((v) => toCents(v) > BigInt(0), "Enter an amount greater than zero")
+      .refine(
+        (v) => toCents(v) > BigInt(0),
+        "Enter an amount greater than zero",
+      )
       .refine(
         (v) => toCents(v) <= balance,
         `Can't exceed the balance due of ${formatMoney(invoice.balance_due, invoice.currency)}`,
@@ -52,19 +63,31 @@ function PaymentForm({ invoice, onDone }: { invoice: InvoiceDetail; onDone: () =
       .string()
       .min(1, "Choose the date the money arrived")
       .refine((v) => v <= todayISO(), "The date can't be in the future"),
-    reference: z.string().trim().max(120, "Keep the reference under 120 characters"),
+    reference: z
+      .string()
+      .trim()
+      .max(120, "Keep the reference under 120 characters"),
   });
   type Values = z.infer<typeof schema>;
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { amount: invoice.balance_due, method: "bank_transfer", received_on: todayISO(), reference: "" },
+    defaultValues: {
+      amount: invoice.balance_due,
+      method: "bank_transfer",
+      received_on: todayISO(),
+      reference: "",
+    },
   });
   const { register, handleSubmit, formState } = form;
   const { errors } = formState;
 
   const record = useScopedMutation(
-    (input: { amount: string; method: Payment["method"]; received_on: string; reference: string }) =>
-      billingService.recordPayment(invoice.id, input),
+    (input: {
+      amount: string;
+      method: Payment["method"];
+      received_on: string;
+      reference: string;
+    }) => billingService.recordPayment(invoice.id, input),
     {
       invalidate: [["invoices"], ["billing"], ["payments"], ["finance"]],
       success: (payment) => `Payment ${payment.number} recorded`,
@@ -75,15 +98,27 @@ function PaymentForm({ invoice, onDone }: { invoice: InvoiceDetail; onDone: () =
   const onSubmit = handleSubmit((values) => {
     setServerError(null);
     record.mutate(
-      { amount: values.amount.trim(), method: values.method, received_on: values.received_on, reference: values.reference.trim() },
-      { onError: (e) => setServerError(errorMessage(e, "The payment couldn't be recorded.")) },
+      {
+        amount: values.amount.trim(),
+        method: values.method,
+        received_on: values.received_on,
+        reference: values.reference.trim(),
+      },
+      {
+        onError: (e) =>
+          setServerError(errorMessage(e, "The payment couldn't be recorded.")),
+      },
     );
   });
 
   const saving = record.isPending;
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex h-full min-h-0 flex-col">
+    <form
+      onSubmit={onSubmit}
+      noValidate
+      className="flex h-full min-h-0 flex-col"
+    >
       <DialogHeader
         title="Record payment"
         description={`Money received against ${invoice.number}${invoice.customer_name ? ` from ${invoice.customer_name}` : ""}.`}
@@ -92,11 +127,15 @@ function PaymentForm({ invoice, onDone }: { invoice: InvoiceDetail; onDone: () =
         <dl className="grid grid-cols-2 gap-3 rounded-lg bg-surface-muted/70 p-3 text-[13px]">
           <div>
             <dt className="text-xs text-muted-foreground">Invoice total</dt>
-            <dd className="tabular font-medium">{formatMoney(invoice.total, invoice.currency)}</dd>
+            <dd className="tabular font-medium">
+              {formatMoney(invoice.total, invoice.currency)}
+            </dd>
           </div>
           <div>
             <dt className="text-xs text-muted-foreground">Balance due</dt>
-            <dd className="tabular font-semibold">{formatMoney(invoice.balance_due, invoice.currency)}</dd>
+            <dd className="tabular font-semibold">
+              {formatMoney(invoice.balance_due, invoice.currency)}
+            </dd>
           </div>
         </dl>
         {serverError && <InlineError message={serverError} />}
@@ -117,8 +156,17 @@ function PaymentForm({ invoice, onDone }: { invoice: InvoiceDetail; onDone: () =
             {...register("amount")}
           />
         </FormField>
-        <FormField label="Method" htmlFor="payment-method" required error={errors.method?.message}>
-          <NativeSelect id="payment-method" disabled={saving} {...register("method")}>
+        <FormField
+          label="Method"
+          htmlFor="payment-method"
+          required
+          error={errors.method?.message}
+        >
+          <NativeSelect
+            id="payment-method"
+            disabled={saving}
+            {...register("method")}
+          >
             {PAYMENT_METHODS.map((m) => (
               <option key={m.value} value={m.value}>
                 {m.label}
@@ -126,7 +174,12 @@ function PaymentForm({ invoice, onDone }: { invoice: InvoiceDetail; onDone: () =
             ))}
           </NativeSelect>
         </FormField>
-        <FormField label="Received on" htmlFor="payment-date" required error={errors.received_on?.message}>
+        <FormField
+          label="Received on"
+          htmlFor="payment-date"
+          required
+          error={errors.received_on?.message}
+        >
           <Input
             id="payment-date"
             type="date"
@@ -143,11 +196,20 @@ function PaymentForm({ invoice, onDone }: { invoice: InvoiceDetail; onDone: () =
           error={errors.reference?.message}
           help="Bank reference, receipt or transaction ID."
         >
-          <Input id="payment-reference" disabled={saving} {...register("reference")} />
+          <Input
+            id="payment-reference"
+            disabled={saving}
+            {...register("reference")}
+          />
         </FormField>
       </div>
       <div className="flex flex-col-reverse gap-2 border-t border-border bg-surface-muted/60 px-5 py-3 sm:flex-row sm:justify-end">
-        <Button type="button" variant="secondary" onClick={onDone} disabled={saving}>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onDone}
+          disabled={saving}
+        >
           Cancel
         </Button>
         <Button type="submit" loading={saving}>

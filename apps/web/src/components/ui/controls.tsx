@@ -10,7 +10,10 @@ import * as SeparatorPrimitive from "@radix-ui/react-separator";
 import { Check, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-function Label({ className, ...props }: React.ComponentProps<typeof LabelPrimitive.Root>) {
+function Label({
+  className,
+  ...props
+}: React.ComponentProps<typeof LabelPrimitive.Root>) {
   return (
     <LabelPrimitive.Root
       className={cn(
@@ -45,7 +48,10 @@ function Checkbox({
   );
 }
 
-function Switch({ className, ...props }: React.ComponentProps<typeof SwitchPrimitive.Root>) {
+function Switch({
+  className,
+  ...props
+}: React.ComponentProps<typeof SwitchPrimitive.Root>) {
   return (
     <SwitchPrimitive.Root
       className={cn(
@@ -63,7 +69,12 @@ function RadioGroup({
   className,
   ...props
 }: React.ComponentProps<typeof RadioGroupPrimitive.Root>) {
-  return <RadioGroupPrimitive.Root className={cn("grid gap-2", className)} {...props} />;
+  return (
+    <RadioGroupPrimitive.Root
+      className={cn("grid gap-2", className)}
+      {...props}
+    />
+  );
 }
 
 function RadioGroupItem({
@@ -100,7 +111,10 @@ function Progress({
   };
   return (
     <ProgressPrimitive.Root
-      className={cn("relative h-1.5 w-full overflow-hidden rounded-full bg-surface-sunken", className)}
+      className={cn(
+        "relative h-1.5 w-full overflow-hidden rounded-full bg-surface-sunken",
+        className,
+      )}
       value={value}
       {...props}
     >
@@ -142,4 +156,13 @@ function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
   );
 }
 
-export { Label, Checkbox, Switch, RadioGroup, RadioGroupItem, Progress, Separator, Kbd };
+export {
+  Label,
+  Checkbox,
+  Switch,
+  RadioGroup,
+  RadioGroupItem,
+  Progress,
+  Separator,
+  Kbd,
+};

@@ -18,8 +18,10 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
             refetchOnWindowFocus: false,
             // Never retry authorization or not-found responses.
             retry: (count, error) =>
-              !(error instanceof ApiError && [401, 403, 404, 409, 422].includes(error.status)) &&
-              count < 1,
+              !(
+                error instanceof ApiError &&
+                [401, 403, 404, 409, 422].includes(error.status)
+              ) && count < 1,
           },
           mutations: { retry: false },
         },

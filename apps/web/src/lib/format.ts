@@ -1,4 +1,9 @@
-import { differenceInCalendarDays, format, formatDistanceToNowStrict, isValid } from "date-fns";
+import {
+  differenceInCalendarDays,
+  format,
+  formatDistanceToNowStrict,
+  isValid,
+} from "date-fns";
 
 /**
  * Money arrives from the API as decimal strings (PostgreSQL NUMERIC / Python Decimal).
@@ -10,7 +15,8 @@ export function toCents(value: string | number | null | undefined): bigint {
   const text = typeof value === "number" ? value.toFixed(2) : value.trim();
   const negative = text.startsWith("-");
   const [whole = "0", fraction = ""] = text.replace("-", "").split(".");
-  const cents = BigInt(whole || "0") * BigInt(100) + BigInt((fraction + "00").slice(0, 2));
+  const cents =
+    BigInt(whole || "0") * BigInt(100) + BigInt((fraction + "00").slice(0, 2));
   return negative ? -cents : cents;
 }
 
@@ -45,7 +51,10 @@ export function formatMoney(
   return formatter.format(Number(value));
 }
 
-export function formatNumber(value: number | string | null | undefined, compact = false) {
+export function formatNumber(
+  value: number | string | null | undefined,
+  compact = false,
+) {
   if (value === null || value === undefined || value === "") return "—";
   return new Intl.NumberFormat("en-US", {
     notation: compact ? "compact" : "standard",
@@ -60,11 +69,27 @@ export function formatPercent(value: number | null | undefined, digits = 0) {
 
 function parse(value: string | Date | null | undefined): Date | null {
   if (!value) return null;
-  const date = value instanceof Date ? value : new Date(value);
+  // Date-only values ("2026-09-24") are calendar days, not UTC instants: parse them in
+  // local time so users west of UTC don't see the previous day.
+  const dateOnly =
+    typeof value === "string" ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(value) : null;
+  const date =
+    value instanceof Date
+      ? value
+      : dateOnly
+        ? new Date(
+            Number(dateOnly[1]),
+            Number(dateOnly[2]) - 1,
+            Number(dateOnly[3]),
+          )
+        : new Date(value);
   return isValid(date) ? date : null;
 }
 
-export function formatDate(value: string | Date | null | undefined, pattern = "d MMM yyyy") {
+export function formatDate(
+  value: string | Date | null | undefined,
+  pattern = "d MMM yyyy",
+) {
   const date = parse(value);
   return date ? format(date, pattern) : "—";
 }
@@ -85,7 +110,9 @@ export function relativeTime(value: string | Date | null | undefined) {
   return `${formatDistanceToNowStrict(date)} ago`;
 }
 
-export function daysUntil(value: string | Date | null | undefined): number | null {
+export function daysUntil(
+  value: string | Date | null | undefined,
+): number | null {
   const date = parse(value);
   return date ? differenceInCalendarDays(date, new Date()) : null;
 }
@@ -94,6 +121,10 @@ export function humanize(value: string) {
   return value.replace(/[_-]+/g, " ").replace(/^\w/, (c) => c.toUpperCase());
 }
 
-export function pluralize(count: number, singular: string, plural = `${singular}s`) {
+export function pluralize(
+  count: number,
+  singular: string,
+  plural = `${singular}s`,
+) {
   return `${formatNumber(count)} ${count === 1 ? singular : plural}`;
 }

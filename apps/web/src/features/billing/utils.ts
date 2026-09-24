@@ -39,7 +39,10 @@ export function dueHint(
   if (days === null) return null;
   if (days < 0) return { text: `${dayCount(-days)} overdue`, tone: "danger" };
   if (days === 0) return { text: "Due today", tone: "warning" };
-  return { text: `Due in ${dayCount(days)}`, tone: days <= 3 ? "warning" : "muted" };
+  return {
+    text: `Due in ${dayCount(days)}`,
+    tone: days <= 3 ? "warning" : "muted",
+  };
 }
 
 export const PAYMENT_METHODS: { value: Payment["method"]; label: string }[] = [
@@ -62,14 +65,24 @@ export const MONEY_PATTERN = /^\d{1,12}(\.\d{1,2})?$/;
 export const QUANTITY_PATTERN = /^\d{1,9}(\.\d{1,3})?$/;
 
 /** Parses a non-negative decimal string into an integer scaled by 10^digits (no floats). */
-export function scaled(value: string | null | undefined, digits: number): bigint {
+export function scaled(
+  value: string | null | undefined,
+  digits: number,
+): bigint {
   const text = (value ?? "").trim();
-  if (!/^-?\d*(\.\d*)?$/.test(text) || text === "" || text === "." || text === "-") return BigInt(0);
+  if (
+    !/^-?\d*(\.\d*)?$/.test(text) ||
+    text === "" ||
+    text === "." ||
+    text === "-"
+  )
+    return BigInt(0);
   const negative = text.startsWith("-");
   const [whole = "0", fraction = ""] = text.replace("-", "").split(".");
   const factor = BigInt(10) ** BigInt(digits);
   const result =
-    BigInt(whole || "0") * factor + BigInt((fraction + "0".repeat(digits)).slice(0, digits) || "0");
+    BigInt(whole || "0") * factor +
+    BigInt((fraction + "0".repeat(digits)).slice(0, digits) || "0");
   return negative ? -result : result;
 }
 
@@ -92,5 +105,7 @@ export function formatRate(rate: string) {
   const bp = scaled(rate, 4);
   const whole = bp / BigInt(100);
   const rest = bp % BigInt(100);
-  return rest === BigInt(0) ? `${whole}%` : `${whole}.${rest.toString().padStart(2, "0").replace(/0$/, "")}%`;
+  return rest === BigInt(0)
+    ? `${whole}%`
+    : `${whole}.${rest.toString().padStart(2, "0").replace(/0$/, "")}%`;
 }

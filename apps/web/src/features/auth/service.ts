@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { apiRequest, ApiError, DemoError, pageSchema } from "@/services/api-client";
+import {
+  apiRequest,
+  ApiError,
+  DemoError,
+  pageSchema,
+} from "@/services/api-client";
 import { demoDelay, select } from "@/lib/data-mode";
 import {
   DEMO_ENVIRONMENTS,
@@ -33,8 +38,10 @@ export interface AuthService {
 
 const live: AuthService = {
   session: () => apiRequest("GET", "/auth/session", sessionSchema),
-  login: (input) => apiRequest("POST", "/auth/login", sessionSchema, { body: input }),
-  register: (input) => apiRequest("POST", "/auth/register", sessionSchema, { body: input }),
+  login: (input) =>
+    apiRequest("POST", "/auth/login", sessionSchema, { body: input }),
+  register: (input) =>
+    apiRequest("POST", "/auth/register", sessionSchema, { body: input }),
   logout: () => apiRequest("POST", "/auth/logout", null),
   logoutAll: () => apiRequest("POST", "/auth/logout-all", null),
   selectWorkspace: (tenant_id, environment_id) =>
@@ -42,11 +49,17 @@ const live: AuthService = {
       body: { tenant_id, environment_id: environment_id ?? null },
     }),
   tenants: async () =>
-    (await apiRequest("GET", "/tenants", pageSchema(tenantSchema), { query: { page_size: 100 } }))
-      .items,
-  environments: () => apiRequest("GET", "/environments", z.array(environmentSchema)),
+    (
+      await apiRequest("GET", "/tenants", pageSchema(tenantSchema), {
+        query: { page_size: 100 },
+      })
+    ).items,
+  environments: () =>
+    apiRequest("GET", "/environments", z.array(environmentSchema)),
   changePassword: (current_password, new_password) =>
-    apiRequest("POST", "/auth/password", null, { body: { current_password, new_password } }),
+    apiRequest("POST", "/auth/password", null, {
+      body: { current_password, new_password },
+    }),
 };
 
 function requireDemoSession(): Session {
@@ -70,7 +83,11 @@ const demo: AuthService = {
   },
   async register() {
     await demoDelay(400);
-    writeDemoState({ signedIn: true, tenantId: "tenant-brightline", environmentId: "env-bl-prod" });
+    writeDemoState({
+      signedIn: true,
+      tenantId: "tenant-brightline",
+      environmentId: "env-bl-prod",
+    });
     return requireDemoSession();
   },
   async logout() {
@@ -86,7 +103,8 @@ const demo: AuthService = {
     const environments = DEMO_ENVIRONMENTS[tenantId];
     if (!environments) throw new ApiError(404, "RESOURCE_NOT_FOUND");
     const env =
-      environments.find((e) => e.id === environmentId) ?? environments.find((e) => e.is_default);
+      environments.find((e) => e.id === environmentId) ??
+      environments.find((e) => e.is_default);
     if (!env) throw new ApiError(404, "RESOURCE_NOT_FOUND");
     writeDemoState({ tenantId, environmentId: env.id });
     return requireDemoSession();
@@ -101,7 +119,8 @@ const demo: AuthService = {
   },
   async changePassword(current, next) {
     await demoDelay(300);
-    if (current === next) throw new DemoError("Choose a password different from the current one.");
+    if (current === next)
+      throw new DemoError("Choose a password different from the current one.");
   },
 };
 

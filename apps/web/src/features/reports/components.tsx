@@ -11,7 +11,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/overlays";
-import { ModuleNav, PageHeader, PageShell, RequirePermission } from "@/components/app/page";
+import {
+  ModuleNav,
+  PageHeader,
+  PageShell,
+  RequirePermission,
+} from "@/components/app/page";
 import { csvFilename, downloadCsv, type CsvValue } from "./csv";
 
 /**
@@ -61,12 +66,24 @@ export type CsvExport = {
 };
 
 /** "Export CSV" as a single button, or a menu when a report offers several tables. */
-export function ExportMenu({ exports, disabled }: { exports: CsvExport[]; disabled?: boolean }) {
-  const run = (e: CsvExport) => downloadCsv(csvFilename(e.filename), e.headers, e.rows());
+export function ExportMenu({
+  exports,
+  disabled,
+}: {
+  exports: CsvExport[];
+  disabled?: boolean;
+}) {
+  const run = (e: CsvExport) =>
+    downloadCsv(csvFilename(e.filename), e.headers, e.rows());
   if (exports.length === 1) {
     const only = exports[0]!;
     return (
-      <Button variant="secondary" size="sm" onClick={() => run(only)} disabled={disabled}>
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={() => run(only)}
+        disabled={disabled}
+      >
         <Download /> Export CSV
       </Button>
     );
@@ -119,14 +136,20 @@ export function RangeTabs({
 export function monthLabel(month: string, short = false) {
   const [y, m] = month.split("-").map(Number);
   if (!y || !m) return month;
-  return new Date(y, m - 1, 1).toLocaleDateString("en-US", short ? { month: "short" } : { month: "short", year: "numeric" });
+  return new Date(y, m - 1, 1).toLocaleDateString(
+    "en-US",
+    short ? { month: "short" } : { month: "short", year: "numeric" },
+  );
 }
 
 /** "2026-09-14" → "Sep 14". */
 export function dayLabel(day: string) {
   const [y, m, d] = day.slice(0, 10).split("-").map(Number);
   if (!y || !m || !d) return day;
-  return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 }
 
 /** Sum decimal strings exactly (integer cents). */
@@ -134,7 +157,10 @@ export function sumMoney(values: (string | null | undefined)[]) {
   return centsToString(values.reduce((sum, v) => sum + toCents(v), BigInt(0)));
 }
 
-export function ratio(part: string | number, whole: string | number): number | null {
+export function ratio(
+  part: string | number,
+  whole: string | number,
+): number | null {
   const w = Number(whole);
   if (!w) return null;
   return Number(part) / w;

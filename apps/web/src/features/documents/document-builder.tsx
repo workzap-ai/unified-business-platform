@@ -6,12 +6,26 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, ArrowRight, Info, Mail, Phone, Building2, Stamp, UserPlus, Warehouse } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Info,
+  Mail,
+  Phone,
+  Building2,
+  Stamp,
+  UserPlus,
+  Warehouse,
+} from "lucide-react";
 import { formatDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
 import { Avatar, Card, CardBody, CardHeader } from "@/components/ui/display";
-import { FormField, Stepper, useUnsavedChangesWarning } from "@/components/app/forms";
+import {
+  FormField,
+  Stepper,
+  useUnsavedChangesWarning,
+} from "@/components/app/forms";
 import { InlineError, Notice } from "@/components/app/states";
 import { StatusBadge } from "@/components/app/status-badge";
 import { useScopedMutation } from "@/hooks/use-scoped";
@@ -25,18 +39,31 @@ import { TotalsPanel } from "./totals-panel";
 import { DocumentView } from "./document-view";
 import { useBusinessSettings } from "./hooks";
 import { approvalReasons, computeTotals, dateFromToday } from "./lib";
-import { linesSchema, toOrderLineInputs, toQuoteLineInputs, type DraftLine } from "./schema";
+import {
+  linesSchema,
+  toOrderLineInputs,
+  toQuoteLineInputs,
+  type DraftLine,
+} from "./schema";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 function builderSchema(kind: "quote" | "order") {
   return z.object({
-    customer: z.custom<SelectedCustomer | null>().refine((v): boolean => v !== null && v !== undefined, "Choose a customer"),
+    customer: z
+      .custom<SelectedCustomer | null>()
+      .refine(
+        (v): boolean => v !== null && v !== undefined,
+        "Choose a customer",
+      ),
     lines: linesSchema(kind),
     valid_until: z
       .string()
       .refine((v) => v === "" || DATE_PATTERN.test(v), "Choose a valid date")
-      .refine((v) => v === "" || v >= dateFromToday(0), "The validity date can't be in the past"),
+      .refine(
+        (v) => v === "" || v >= dateFromToday(0),
+        "The validity date can't be in the past",
+      ),
     notes: z.string().max(4000, "Keep notes under 4,000 characters"),
   });
 }
@@ -65,7 +92,13 @@ const STEPS = [
  * Guided builder for quotes and orders: customer → items → review. Catalog prices are
  * locked; totals are previewed in integer cents and priced authoritatively by the server.
  */
-export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; initial: BuilderInitial }) {
+export function DocumentBuilder({
+  kind,
+  initial,
+}: {
+  kind: "quote" | "order";
+  initial: BuilderInitial;
+}) {
   const router = useRouter();
   const { can } = useSession();
   const editing = Boolean(initial.documentId);
@@ -83,15 +116,30 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
     },
     mode: "onTouched",
   });
-  const { control, register, handleSubmit, trigger, setValue, getValues, formState } = form;
+  const {
+    control,
+    register,
+    handleSubmit,
+    trigger,
+    setValue,
+    getValues,
+    formState,
+  } = form;
   const values = useWatch({ control }) as BuilderValues;
   useUnsavedChangesWarning(formState.isDirty && !done);
 
   // Default validity from business settings once they load (new quotes only).
   const validityDays = settings.data?.quote_validity_days;
   useEffect(() => {
-    if (kind === "quote" && !editing && validityDays !== undefined && !getValues("valid_until")) {
-      setValue("valid_until", dateFromToday(validityDays), { shouldDirty: false });
+    if (
+      kind === "quote" &&
+      !editing &&
+      validityDays !== undefined &&
+      !getValues("valid_until")
+    ) {
+      setValue("valid_until", dateFromToday(validityDays), {
+        shouldDirty: false,
+      });
     }
   }, [kind, editing, validityDays, getValues, setValue]);
 
@@ -100,24 +148,45 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
   const lines = values.lines ?? [];
   const totals = computeTotals(lines, taxRate);
   const reasons =
-    kind === "quote" ? approvalReasons({ ...totals, source: initial.source ?? "manual" }, settings.data, currency) : [];
+    kind === "quote"
+      ? approvalReasons(
+          { ...totals, source: initial.source ?? "manual" },
+          settings.data,
+          currency,
+        )
+      : [];
 
   const save = useScopedMutation(
     async (v: BuilderValues) => {
       const notes = v.notes.trim();
       if (kind === "quote") {
-        const input = { valid_until: v.valid_until || null, notes, lines: toQuoteLineInputs(v.lines) };
+        const input = {
+          valid_until: v.valid_until || null,
+          notes,
+          lines: toQuoteLineInputs(v.lines),
+        };
         const result = initial.documentId
           ? await documentsService.updateQuote(initial.documentId, input)
-          : await documentsService.createQuote({ ...input, customer_id: v.customer!.id });
-        return { id: result.id, href: `/quotes/${result.id}`, number: result.number };
+          : await documentsService.createQuote({
+              ...input,
+              customer_id: v.customer!.id,
+            });
+        return {
+          id: result.id,
+          href: `/quotes/${result.id}`,
+          number: result.number,
+        };
       }
       const result = await documentsService.createOrder({
         customer_id: v.customer!.id,
         notes,
         lines: toOrderLineInputs(v.lines),
       });
-      return { id: result.id, href: `/orders/${result.id}`, number: result.number };
+      return {
+        id: result.id,
+        href: `/orders/${result.id}`,
+        number: result.number,
+      };
     },
     {
       invalidate: [[kind === "quote" ? "quotes" : "orders"], ["customers"]],
@@ -135,7 +204,11 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
   );
 
   async function next() {
-    const fields: (keyof BuilderValues)[][] = [["customer"], ["lines"], ["valid_until", "notes"]];
+    const fields: (keyof BuilderValues)[][] = [
+      ["customer"],
+      ["lines"],
+      ["valid_until", "notes"],
+    ];
     const ok = await trigger(fields[step]);
     if (ok) setStep((s) => Math.min(STEPS.length - 1, s + 1));
   }
@@ -166,14 +239,23 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
         <Card>
           <CardHeader
             title="Who is this for?"
-            description={editing ? "The customer can't be changed on an existing draft." : `Pick the customer this ${noun} is addressed to.`}
+            description={
+              editing
+                ? "The customer can't be changed on an existing draft."
+                : `Pick the customer this ${noun} is addressed to.`
+            }
           />
           <CardBody className="space-y-4">
             <Controller
               control={control}
               name="customer"
               render={({ field, fieldState }) => (
-                <FormField label="Customer" htmlFor="builder-customer" required error={fieldState.error}>
+                <FormField
+                  label="Customer"
+                  htmlFor="builder-customer"
+                  required
+                  error={fieldState.error}
+                >
                   <CustomerSelector
                     id="builder-customer"
                     value={field.value ?? null}
@@ -190,8 +272,12 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
               can("customers.write") && (
                 <p className="text-[13px] text-muted-foreground">
                   New customer?{" "}
-                  <Link href="/customers/new" className="inline-flex items-center gap-1 font-medium text-primary hover:underline">
-                    <UserPlus className="size-3.5" aria-hidden="true" /> Add them first
+                  <Link
+                    href="/customers/new"
+                    className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                  >
+                    <UserPlus className="size-3.5" aria-hidden="true" /> Add
+                    them first
                   </Link>
                 </p>
               )
@@ -221,7 +307,8 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
                     lines={field.value}
                     onChange={(next) => {
                       field.onChange(next);
-                      if (formState.isSubmitted || fieldState.error) void trigger("lines");
+                      if (formState.isSubmitted || fieldState.error)
+                        void trigger("lines");
                     }}
                     currency={currency}
                     errors={formState.errors.lines}
@@ -231,12 +318,25 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
             </CardBody>
           </Card>
           <Card className="h-fit lg:sticky lg:top-4">
-            <CardHeader title="Summary" description={`${lines.length} ${lines.length === 1 ? "line" : "lines"}`} />
+            <CardHeader
+              title="Summary"
+              description={`${lines.length} ${lines.length === 1 ? "line" : "lines"}`}
+            />
             <CardBody>
-              <TotalsPanel lines={lines} taxRate={taxRate} currency={currency} loading={settings.isPending} preview />
+              <TotalsPanel
+                lines={lines}
+                taxRate={taxRate}
+                currency={currency}
+                loading={settings.isPending}
+                preview
+              />
               {kind === "quote" && reasons.length > 0 && (
                 <p className="mt-3 flex items-start gap-1.5 text-xs text-warning">
-                  <Stamp className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" /> Will need approval before sending
+                  <Stamp
+                    className="mt-0.5 size-3.5 shrink-0"
+                    aria-hidden="true"
+                  />{" "}
+                  Will need approval before sending
                 </p>
               )}
             </CardBody>
@@ -252,17 +352,34 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
             status={<StatusBadge status="draft" />}
             dates={[
               { label: "Date", value: formatDate(new Date()) },
-              ...(kind === "quote" ? [{ label: "Valid until", value: values.valid_until ? formatDate(values.valid_until) : "Default" }] : []),
+              ...(kind === "quote"
+                ? [
+                    {
+                      label: "Valid until",
+                      value: values.valid_until
+                        ? formatDate(values.valid_until)
+                        : "Default",
+                    },
+                  ]
+                : []),
             ]}
             billTo={
               values.customer
                 ? {
                     name: values.customer.name,
-                    lines: [values.customer.company, values.customer.email, values.customer.phone],
+                    lines: [
+                      values.customer.company,
+                      values.customer.email,
+                      values.customer.phone,
+                    ],
                   }
                 : null
             }
-            lines={lines.map((l) => ({ ...l, id: l.key, custom: l.variant_id === null }))}
+            lines={lines.map((l) => ({
+              ...l,
+              id: l.key,
+              custom: l.variant_id === null,
+            }))}
             taxRate={taxRate}
             currency={currency}
             notes={values.notes?.trim()}
@@ -287,16 +404,28 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
                       id="builder-valid-until"
                       type="date"
                       min={dateFromToday(0)}
-                      aria-invalid={Boolean(formState.errors.valid_until) || undefined}
+                      aria-invalid={
+                        Boolean(formState.errors.valid_until) || undefined
+                      }
                       {...register("valid_until")}
                     />
                   </FormField>
                 )}
-                <FormField label="Notes" htmlFor="builder-notes" optional error={formState.errors.notes} help="Shown on the document.">
+                <FormField
+                  label="Notes"
+                  htmlFor="builder-notes"
+                  optional
+                  error={formState.errors.notes}
+                  help="Shown on the document."
+                >
                   <Textarea
                     id="builder-notes"
                     rows={4}
-                    placeholder={kind === "quote" ? "Delivery terms, payment terms, scope…" : "Delivery instructions, references…"}
+                    placeholder={
+                      kind === "quote"
+                        ? "Delivery terms, payment terms, scope…"
+                        : "Delivery instructions, references…"
+                    }
                     aria-invalid={Boolean(formState.errors.notes) || undefined}
                     {...register("notes")}
                   />
@@ -304,18 +433,30 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
               </CardBody>
             </Card>
             {kind === "quote" && reasons.length > 0 && (
-              <Notice tone="warning" icon={Stamp} title="Approval will be needed">
+              <Notice
+                tone="warning"
+                icon={Stamp}
+                title="Approval will be needed"
+              >
                 <ul className="list-disc space-y-0.5 pl-4">
                   {reasons.map((r) => (
                     <li key={r}>{r}</li>
                   ))}
                 </ul>
-                <p className="mt-1">After you submit, a reviewer approves it before it can be sent.</p>
+                <p className="mt-1">
+                  After you submit, a reviewer approves it before it can be
+                  sent.
+                </p>
               </Notice>
             )}
             {kind === "order" && (
-              <Notice tone="info" icon={Warehouse} title="Nothing is deducted yet">
-                The order is saved as a draft. Stock is checked and deducted, and prices re-verified, when you confirm it.
+              <Notice
+                tone="info"
+                icon={Warehouse}
+                title="Nothing is deducted yet"
+              >
+                The order is saved as a draft. Stock is checked and deducted,
+                and prices re-verified, when you confirm it.
               </Notice>
             )}
             <Notice tone="neutral" icon={Info}>
@@ -331,7 +472,12 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
 
       {save.isError && (
         <div className="mt-4">
-          <InlineError message={errorMessage(save.error, `The ${noun} couldn't be saved. Please try again.`)} />
+          <InlineError
+            message={errorMessage(
+              save.error,
+              `The ${noun} couldn't be saved. Please try again.`,
+            )}
+          />
         </div>
       )}
 
@@ -341,7 +487,12 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
         </Button>
         <div className="ml-auto flex items-center gap-2">
           {step > 0 && (
-            <Button type="button" variant="secondary" onClick={() => setStep((s) => s - 1)} disabled={save.isPending}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setStep((s) => s - 1)}
+              disabled={save.isPending}
+            >
               <ArrowLeft /> Back
             </Button>
           )}
@@ -350,8 +501,16 @@ export function DocumentBuilder({ kind, initial }: { kind: "quote" | "order"; in
               Continue <ArrowRight />
             </Button>
           ) : (
-            <Button type="submit" loading={save.isPending} disabled={save.isPending}>
-              {editing ? "Save changes" : kind === "quote" ? "Create draft quote" : "Create draft order"}
+            <Button
+              type="submit"
+              loading={save.isPending}
+              disabled={save.isPending}
+            >
+              {editing
+                ? "Save changes"
+                : kind === "quote"
+                  ? "Create draft quote"
+                  : "Create draft order"}
             </Button>
           )}
         </div>
@@ -375,12 +534,15 @@ function CustomerSummary({ customer }: { customer: SelectedCustomer }) {
           <ul className="mt-1 space-y-0.5 text-muted-foreground">
             {details.map((d) => (
               <li key={d.value} className="flex items-center gap-1.5 truncate">
-                <d.icon className="size-3.5 shrink-0" aria-hidden="true" /> {d.value}
+                <d.icon className="size-3.5 shrink-0" aria-hidden="true" />{" "}
+                {d.value}
               </li>
             ))}
           </ul>
         ) : (
-          <p className="mt-0.5 text-muted-foreground">No contact details on file.</p>
+          <p className="mt-0.5 text-muted-foreground">
+            No contact details on file.
+          </p>
         )}
       </div>
     </div>

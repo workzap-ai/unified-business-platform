@@ -23,14 +23,23 @@ export function slugify(value: string, max = 80) {
     .replace(/-+$/g, "");
 }
 
-export function priceRange(min: string | null, max: string | null, currency: string | null | undefined) {
+export function priceRange(
+  min: string | null,
+  max: string | null,
+  currency: string | null | undefined,
+) {
   if (min === null && max === null) return "—";
   const cur = currency ?? "USD";
-  if (min === null || max === null || min === max) return formatMoney(min ?? max, cur);
+  if (min === null || max === null || min === max)
+    return formatMoney(min ?? max, cur);
   return `${formatMoney(min, cur)} – ${formatMoney(max, cur)}`;
 }
 
-export type AllProducts = { items: ProductListItem[]; total: number; truncated: boolean };
+export type AllProducts = {
+  items: ProductListItem[];
+  total: number;
+  truncated: boolean;
+};
 
 const PAGE = 100;
 const MAX_PAGES = 10;
@@ -42,7 +51,9 @@ export async function fetchAllProducts(): Promise<AllProducts> {
   const pages = Math.min(Math.ceil(first.total / PAGE), MAX_PAGES);
   if (pages > 1) {
     const rest = await Promise.all(
-      Array.from({ length: pages - 1 }, (_, i) => catalogService.products({ page: i + 2, pageSize: PAGE })),
+      Array.from({ length: pages - 1 }, (_, i) =>
+        catalogService.products({ page: i + 2, pageSize: PAGE }),
+      ),
     );
     for (const page of rest) items.push(...page.items);
   }
@@ -50,7 +61,9 @@ export async function fetchAllProducts(): Promise<AllProducts> {
 }
 
 export function attributeEntries(attributes: Record<string, unknown>) {
-  return Object.entries(attributes).filter(([, v]) => v !== null && v !== undefined && v !== "");
+  return Object.entries(attributes).filter(
+    ([, v]) => v !== null && v !== undefined && v !== "",
+  );
 }
 
 export function formatAttribute(value: unknown) {

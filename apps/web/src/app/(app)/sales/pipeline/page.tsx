@@ -1,12 +1,8 @@
-// import type { Metadata } from "next";
-// import { PipelineBoardPage } from "@/features/sales/pipeline-board-page";
+import type { Metadata } from "next";
+import { PipelineBoardPage } from "@/features/sales/pipeline-board-page";
 
-// export const metadata: Metadata = { title: "Pipeline" };
-
-// export default function Page() {
-//   return <PipelineBoardPage />;
-// }
+export const metadata: Metadata = { title: "Pipeline" };
 
 export default function Page() {
-  return null;
+  return <PipelineBoardPage />;
 }

@@ -9,8 +9,10 @@ export function rng(seed: number) {
   };
   return {
     next,
-    int: (min: number, max: number) => Math.floor(next() * (max - min + 1)) + min,
-    pick: <T>(items: readonly T[]): T => items[Math.floor(next() * items.length)] as T,
+    int: (min: number, max: number) =>
+      Math.floor(next() * (max - min + 1)) + min,
+    pick: <T>(items: readonly T[]): T =>
+      items[Math.floor(next() * items.length)] as T,
     chance: (p: number) => next() < p,
     weighted: <T>(entries: readonly (readonly [T, number])[]): T => {
       const total = entries.reduce((sum, [, w]) => sum + w, 0);

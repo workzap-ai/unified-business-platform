@@ -56,7 +56,8 @@
   --chart-grid: #e6e9e5;
 
   --shadow-sm: 0 1px 2px rgb(16 29 25 / 0.06);
-  --shadow-md: 0 4px 16px -4px rgb(16 29 25 / 0.12), 0 1px 3px rgb(16 29 25 / 0.06);
+  --shadow-md:
+    0 4px 16px -4px rgb(16 29 25 / 0.12), 0 1px 3px rgb(16 29 25 / 0.06);
   --shadow-lg: 0 18px 48px -12px rgb(16 29 25 / 0.28);
 }
 
@@ -151,7 +152,8 @@
   --color-card: var(--surface);
   --color-muted: var(--surface-muted);
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Mono", monospace;
 
   --text-2xs: 0.6875rem;

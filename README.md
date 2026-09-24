@@ -1,12 +1,37 @@
-# Platform foundation
+# Business platform
 
-Stage 2 foundation for a modular business platform. Includes FastAPI, a Next.js shell, PostgreSQL organization models/migration, tenant-scoped services, selectors, Redis/ARQ configuration, and tests. No business modules, authentication, RBAC, or PI functionality exists yet. Tenant read endpoints intentionally return 401 until Stage 3 supplies verified sessions.
+Multi-tenant business platform (FastAPI + PostgreSQL API, Next.js web app) with core modules
+(Customers/CRM, Catalog, Inventory, Sales, Quotes, Orders, Billing, Finance, HR, Reports)
+and PI, an installable AI WhatsApp assistant product. The complete web UI runs today on
+labelled sample data; the business API is implemented but only partly tested; the PI
+backend is not built yet. See [project status](docs/PROJECT_STATUS.md) for exactly what is
+verified.
 
-Read [project status](docs/PROJECT_STATUS.md), [architecture](docs/ARCHITECTURE.md), [security](docs/SECURITY.md), and [handoff](docs/AI_HANDOFF.md) before making changes. Stage 3 requires separate authorization.
+Read [project status](docs/PROJECT_STATUS.md), [architecture](docs/ARCHITECTURE.md),
+[security](docs/SECURITY.md), [frontend guide](docs/FRONTEND_GUIDE.md) and
+[handoff](docs/AI_HANDOFF.md) before making changes.
+
+## Quick look at the UI (no API needed)
+
+```powershell
+Set-Location apps/web
+npm.cmd ci
+npm.cmd run dev
+```
+
+Open http://localhost:3000 and sign in with any email/password. Without
+`NEXT_PUBLIC_DATA_MODE=live` the app uses fictional in-browser sample data (marked
+"Sample data"); changes reset on reload. Try switching workspace (Northwind retail,
+Brightline services), switching to the Staging environment (first-use empty states, PI
+not enabled), and "View as role" in the account menu.
+
+To use the real API instead, set `NEXT_PUBLIC_DATA_MODE=live` and
+`API_PROXY_TARGET=http://localhost:8000` in `apps/web/.env.local` (the browser calls
+same-origin `/api/v1`, proxied to the API).
 
 ## Requirements
 
-Python 3.12+, Node 22+ (Node 22 in CI/containers), npm, and Docker with Compose for local PostgreSQL/Redis and full-stack checks. Git is needed for version control. The Stage 1 workstation has Python/Node/npm but no available Git or Docker.
+Python 3.12+, Node 22+ (Node 22 in CI/containers), npm, and Docker with Compose for local PostgreSQL/Redis and full-stack checks. The current development workstation has no Docker, so container and Redis checks have not run locally.
 
 ## Run with Docker
 
@@ -20,7 +45,7 @@ docker compose exec api alembic upgrade head
 
 Open http://localhost:3000. API documentation is at http://localhost:8000/docs. Health endpoints are /api/v1/health/live and /api/v1/health/ready. The example credentials are local placeholders, not production secrets. If your password contains URL-reserved characters, supply a correctly URL-encoded DATABASE_URL and adjust the Compose database URL accordingly.
 
-Compose binds published ports to loopback. It uses persistent named database/Redis volumes; ordinary `docker compose down` retains data. The supplied Compose configuration is development-only. pgvector is available in the database image but not enabled. Alembic revision 0001_tenant_foundation creates five identity/organization tables. Back up any existing database before applying migrations; downgrade removes those tables and their data.
+Compose binds published ports to loopback. It uses persistent named database/Redis volumes; ordinary `docker compose down` retains data. The supplied Compose configuration is development-only. Revision 0002 creates the auth, RBAC, business, product-registry, navigation and PI tables, enables pg_trgm, and adds pgvector embedding columns when the extension can be created (it can in the Compose image). Back up any existing database before applying migrations; downgrade removes those tables and their data.
 
 ## Run applications locally (PowerShell)
 
@@ -45,7 +70,7 @@ npm.cmd ci
 npm.cmd run dev
 ```
 
-The browser API defaults to http://localhost:8000/api/v1. Override NEXT_PUBLIC_API_BASE_URL in apps/web/.env.local if needed; production builds embed this value. It must contain no credentials. Use localhost in the browser to match the default CORS origin.
+For live data set NEXT_PUBLIC_DATA_MODE=live and API_PROXY_TARGET=http://localhost:8000 in apps/web/.env.local; both are read at build/start time. The browser calls same-origin /api/v1, which Next proxies to the API, so the HttpOnly session cookie stays first-party.
 
 Run the worker in its Linux container (ARQ's process signal handling is not supported by this foundation on native Windows):
 
@@ -98,10 +123,10 @@ npx.cmd playwright install chromium
 npm.cmd test
 ```
 
-Browser tests start an isolated production web server on port 3100 and mock API responses; they do not replace real service integration tests. `npm run start` assembles static assets into the standalone build before starting it. CI configuration is in .github/workflows/checks.yml and has not been run remotely during this stage.
+Browser tests start an isolated production web server on port 3100 in sample-data mode (no API); they do not replace integration tests against the real API. `npm run start` assembles static assets into the standalone build before starting it. CI configuration is in .github/workflows/checks.yml and has not been run remotely during this stage.
 
 ## Dependency maintenance
 
 Install backend packages using the hashed lock files. To intentionally update them, install pip-tools in your tooling environment and run pip-compile --generate-hashes --strip-extras against apps/api/pyproject.toml, once for requirements.lock and once with --extra dev for requirements-dev.lock. Review changes and run checks on Python 3.12/Linux as well as the local environment. npm ci consumes apps/web/package-lock.json; use npm install only when intentionally changing dependencies.
 
-LangChain and LangGraph are deferred until the AI stages. packages/shared, packages/config, and business feature directories will be created when concrete shared code or approved modules require them.
+LangGraph is installed for the PI agent phase but not used yet. packages/shared and packages/config will be created when concrete shared code requires them.

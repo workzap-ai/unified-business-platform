@@ -46,14 +46,28 @@ function BillingContent() {
   const canFinance = can("finance.read");
   const start = localDate(-30);
   const end = localDate(0);
-  const summary = useScopedQuery(["billing", "summary"], () => billingService.summary());
-  const finance = useScopedQuery(["finance", "summary", start, end], () => financeService.summary(start, end), { enabled: canFinance });
-  const revenue = useScopedQuery(["reports", "revenue", 12], () => reportsService.revenue(12));
+  const summary = useScopedQuery(["billing", "summary"], () =>
+    billingService.summary(),
+  );
+  const finance = useScopedQuery(
+    ["finance", "summary", start, end],
+    () => financeService.summary(start, end),
+    { enabled: canFinance },
+  );
+  const revenue = useScopedQuery(["reports", "revenue", 12], () =>
+    reportsService.revenue(12),
+  );
   const s = summary.data;
   const currency = s?.currency ?? revenue.data?.currency ?? "USD";
   const loading = summary.isPending;
 
-  if (summary.isError) return <ErrorState error={summary.error} onRetry={() => void summary.refetch()} />;
+  if (summary.isError)
+    return (
+      <ErrorState
+        error={summary.error}
+        onRetry={() => void summary.refetch()}
+      />
+    );
 
   const aging = finance.data?.aging ?? [];
   const agingTotal = aging.reduce((sum, a) => sum + Number(a.amount), 0);
@@ -68,7 +82,12 @@ function BillingContent() {
               label: "Collections per month",
               filename: "collections-per-month",
               headers: ["Month", "Collected", "Currency"],
-              rows: () => (revenue.data?.months ?? []).map((m) => [m.month, m.collected, revenue.data?.currency]),
+              rows: () =>
+                (revenue.data?.months ?? []).map((m) => [
+                  m.month,
+                  m.collected,
+                  revenue.data?.currency,
+                ]),
             },
             ...(finance.data
               ? [
@@ -76,7 +95,13 @@ function BillingContent() {
                     label: "Receivables aging",
                     filename: "receivables-aging",
                     headers: ["Bucket", "Invoices", "Amount", "Currency"],
-                    rows: () => aging.map((a) => [BUCKET_LABELS[a.bucket] ?? a.bucket, a.count, a.amount, finance.data?.currency]),
+                    rows: () =>
+                      aging.map((a) => [
+                        BUCKET_LABELS[a.bucket] ?? a.bucket,
+                        a.count,
+                        a.amount,
+                        finance.data?.currency,
+                      ]),
                   },
                 ]
               : []),
@@ -85,28 +110,57 @@ function BillingContent() {
       </div>
 
       <MetricGrid>
-        <MetricCard label="Outstanding" icon={Receipt} loading={loading} value={formatMoney(s?.outstanding, currency)} detail="Issued, not yet paid" href="/billing/invoices?status=issued" />
+        <MetricCard
+          label="Outstanding"
+          icon={Receipt}
+          loading={loading}
+          value={formatMoney(s?.outstanding, currency)}
+          detail="Issued, not yet paid"
+          href="/billing/invoices?status=issued"
+        />
         <MetricCard
           label="Overdue"
           icon={AlertTriangle}
           loading={loading}
           tone={s && s.overdue_count > 0 ? "danger" : "default"}
           value={formatMoney(s?.overdue, currency)}
-          detail={s ? `${formatNumber(s.overdue_count)} overdue invoice${s.overdue_count === 1 ? "" : "s"}` : undefined}
+          detail={
+            s
+              ? `${formatNumber(s.overdue_count)} overdue invoice${s.overdue_count === 1 ? "" : "s"}`
+              : undefined
+          }
           href="/billing/invoices?overdue=true"
         />
-        <MetricCard label="Collected this month" icon={HandCoins} loading={loading} tone="success" value={formatMoney(s?.collected_this_month, currency)} />
-        <MetricCard label="Draft invoices" icon={FilePen} loading={loading} value={formatNumber(s?.draft_count)} detail="Not issued yet" href="/billing/invoices?status=draft" />
+        <MetricCard
+          label="Collected this month"
+          icon={HandCoins}
+          loading={loading}
+          tone="success"
+          value={formatMoney(s?.collected_this_month, currency)}
+        />
+        <MetricCard
+          label="Draft invoices"
+          icon={FilePen}
+          loading={loading}
+          value={formatNumber(s?.draft_count)}
+          detail="Not issued yet"
+          href="/billing/invoices?status=draft"
+        />
       </MetricGrid>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
         <Card>
           <CardHeader
             title="Receivables aging"
-            description={canFinance ? "Open balances by days past due" : undefined}
+            description={
+              canFinance ? "Open balances by days past due" : undefined
+            }
             actions={
               canFinance ? (
-                <Link href="/finance" className="text-xs font-medium text-primary hover:underline">
+                <Link
+                  href="/finance"
+                  className="text-xs font-medium text-primary hover:underline"
+                >
                   Finance
                 </Link>
               ) : undefined
@@ -114,21 +168,35 @@ function BillingContent() {
           />
           <CardBody>
             {!canFinance ? (
-              <p className="py-4 text-[13px] text-muted-foreground">Receivables aging is visible to members with finance access.</p>
+              <p className="py-4 text-[13px] text-muted-foreground">
+                Receivables aging is visible to members with finance access.
+              </p>
             ) : finance.isPending ? (
               <Skeleton className="h-20" />
             ) : finance.isError ? (
-              <ErrorState compact error={finance.error} onRetry={() => void finance.refetch()} />
+              <ErrorState
+                compact
+                error={finance.error}
+                onRetry={() => void finance.refetch()}
+              />
             ) : agingTotal === 0 ? (
-              <p className="py-4 text-[13px] text-muted-foreground">No open receivables.</p>
+              <p className="py-4 text-[13px] text-muted-foreground">
+                No open receivables.
+              </p>
             ) : (
               <>
                 <p className="tabular mb-3 text-[22px] leading-tight font-semibold tracking-tight">
                   {formatMoney(finance.data.receivables, finance.data.currency)}
                 </p>
                 <DistributionBar
-                  segments={aging.map((a) => ({ key: a.bucket, label: BUCKET_LABELS[a.bucket] ?? a.bucket, value: Number(a.amount) }))}
-                  format={(v) => formatMoney(v, finance.data.currency, { compact: true })}
+                  segments={aging.map((a) => ({
+                    key: a.bucket,
+                    label: BUCKET_LABELS[a.bucket] ?? a.bucket,
+                    value: Number(a.amount),
+                  }))}
+                  format={(v) =>
+                    formatMoney(v, finance.data.currency, { compact: true })
+                  }
                 />
               </>
             )}
@@ -137,13 +205,20 @@ function BillingContent() {
 
         {revenue.isError ? (
           <Card>
-            <ErrorState compact error={revenue.error} onRetry={() => void revenue.refetch()} />
+            <ErrorState
+              compact
+              error={revenue.error}
+              onRetry={() => void revenue.refetch()}
+            />
           </Card>
         ) : (
           <ChartCard
             title="Collections per month"
             description="Payments received, last 12 months"
-            data={revenue.data?.months.map((m) => ({ month: monthLabel(m.month, true), collected: Number(m.collected) }))}
+            data={revenue.data?.months.map((m) => ({
+              month: monthLabel(m.month, true),
+              collected: Number(m.collected),
+            }))}
             loading={revenue.isPending}
             xKey="month"
             xLabel="Month"
@@ -154,7 +229,13 @@ function BillingContent() {
             headline={
               revenue.data && (
                 <p className="text-[13px] text-muted-foreground">
-                  Total collected <span className="tabular font-semibold text-foreground">{formatMoney(revenue.data.total_collected, revenue.data.currency)}</span>
+                  Total collected{" "}
+                  <span className="tabular font-semibold text-foreground">
+                    {formatMoney(
+                      revenue.data.total_collected,
+                      revenue.data.currency,
+                    )}
+                  </span>
                 </p>
               )
             }

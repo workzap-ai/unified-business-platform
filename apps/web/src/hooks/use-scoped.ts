@@ -36,11 +36,17 @@ export function useScopedMutation<TInput, TResult>(
     success,
     error: errorFallback = "That didn't work. Please try again.",
     onSuccess,
+    toastErrors = true,
+    invalidateGlobal = [],
   }: {
     invalidate?: readonly unknown[][];
+    /** Unscoped keys to refresh too (e.g. the workspace switcher's options). */
+    invalidateGlobal?: readonly unknown[][];
     success?: string | ((result: TResult) => string);
     error?: string;
     onSuccess?: (result: TResult, input: TInput) => void;
+    /** Set false when the caller shows the error inline (avoids a duplicate toast). */
+    toastErrors?: boolean;
   } = {},
 ) {
   const client = useQueryClient();
@@ -48,10 +54,22 @@ export function useScopedMutation<TInput, TResult>(
   return useMutation<TResult, unknown, TInput>({
     mutationFn: fn,
     onSuccess: async (result, input) => {
-      await Promise.all(invalidate.map((k) => client.invalidateQueries({ queryKey: [...scopeKey, ...k] })));
-      if (success) toast.success(typeof success === "function" ? success(result) : success);
+      await Promise.all([
+        ...invalidate.map((k) =>
+          client.invalidateQueries({ queryKey: [...scopeKey, ...k] }),
+        ),
+        ...invalidateGlobal.map((k) =>
+          client.invalidateQueries({ queryKey: [...k] }),
+        ),
+      ]);
+      if (success)
+        toast.success(
+          typeof success === "function" ? success(result) : success,
+        );
       onSuccess?.(result, input);
     },
-    onError: (e) => toast.error(errorMessage(e, errorFallback)),
+    onError: (e) => {
+      if (toastErrors) toast.error(errorMessage(e, errorFallback));
+    },
   });
 }

@@ -31,7 +31,9 @@ export class ApiError extends Error {
   }
 }
 
-export const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api/v1").replace(/\/$/, "");
+export const API_BASE = (
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api/v1"
+).replace(/\/$/, "");
 export const CSRF_COOKIE = "platform_csrf";
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -78,14 +80,17 @@ export async function apiRequest<T>(
     cache: "no-store",
     headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
-    signal: options.signal ? AbortSignal.any([options.signal, timeout]) : timeout,
+    signal: options.signal
+      ? AbortSignal.any([options.signal, timeout])
+      : timeout,
   });
   if (response.status === 204) return undefined as T;
   const body: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     const parsed = errorSchema.safeParse(body);
     const fields = parsed.success
-      ? ((parsed.data.error.details?.fields as Record<string, string> | undefined) ?? {})
+      ? ((parsed.data.error.details?.fields as
+          Record<string, string> | undefined) ?? {})
       : {};
     throw new ApiError(
       response.status,
@@ -98,21 +103,31 @@ export async function apiRequest<T>(
   return schema ? schema.parse(body) : (body as T);
 }
 
-export function apiGet<T>(path: string, schema: z.ZodType<T>, signal?: AbortSignal) {
+export function apiGet<T>(
+  path: string,
+  schema: z.ZodType<T>,
+  signal?: AbortSignal,
+) {
   return apiRequest("GET", path, schema, { signal });
 }
 
 /** Operator-safe message: fixed server messages for business rules, generic otherwise. */
-export function errorMessage(error: unknown, fallback = "Something went wrong. Please try again.") {
+export function errorMessage(
+  error: unknown,
+  fallback = "Something went wrong. Please try again.",
+) {
   if (error instanceof ApiError) {
     if (error.status === 401) return "Your session has ended. Sign in again.";
     if (error.status === 403) return "You don't have permission to do that.";
     if (error.status === 404) return "That record could not be found.";
     if (error.status === 429) return "Too many attempts. Please wait a moment.";
-    if ([409, 422].includes(error.status) && error.serverMessage) return error.serverMessage;
-    if (error.status >= 500) return "The service had a problem. Please try again shortly.";
+    if ([409, 422].includes(error.status) && error.serverMessage)
+      return error.serverMessage;
+    if (error.status >= 500)
+      return "The service had a problem. Please try again shortly.";
   }
-  if (error instanceof DemoError || error instanceof ServiceNotConnectedError) return error.message;
+  if (error instanceof DemoError || error instanceof ServiceNotConnectedError)
+    return error.message;
   return fallback;
 }
 
@@ -122,7 +137,9 @@ export class DemoError extends Error {}
 /** A product capability whose backend API is not deployed in this environment yet. */
 export class ServiceNotConnectedError extends Error {
   constructor(public service: string) {
-    super(`${service} isn't connected in this environment yet. Its backend is deployed in a later phase.`);
+    super(
+      `${service} isn't connected in this environment yet. Its backend is deployed in a later phase.`,
+    );
     this.name = "ServiceNotConnectedError";
   }
 }
@@ -135,5 +152,12 @@ export const pageSchema = <T extends z.ZodTypeAny>(item: T) =>
     page_size: z.number().int().positive(),
   });
 
-export type Page<T> = { items: T[]; total: number; page: number; page_size: number };
-export const decimal = z.union([z.string(), z.number()]).transform((v) => String(v));
+export type Page<T> = {
+  items: T[];
+  total: number;
+  page: number;
+  page_size: number;
+};
+export const decimal = z
+  .union([z.string(), z.number()])
+  .transform((v) => String(v));

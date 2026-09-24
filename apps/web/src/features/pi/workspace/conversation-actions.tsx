@@ -6,7 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { NativeSelect, Textarea } from "@/components/ui/input";
-import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from "@/components/ui/overlays";
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "@/components/ui/overlays";
 import { ConfirmDialog, FormField } from "@/components/app/forms";
 import { useScopedMutation } from "@/hooks/use-scoped";
 import { piService } from "../service";
@@ -19,7 +25,8 @@ const INVALIDATE = [[...piKeys.all], ["navigation"]];
 export function useConversationActions(id: string) {
   const takeover = useScopedMutation(() => piService.takeover(id), {
     invalidate: INVALIDATE,
-    success: "You're handling this conversation. PI's automatic replies are paused.",
+    success:
+      "You're handling this conversation. PI's automatic replies are paused.",
     error: "Couldn't take over the conversation. Please try again.",
   });
   const returnToAi = useScopedMutation(() => piService.returnToAi(id), {
@@ -88,7 +95,10 @@ const handoffSchema = z.object({
   summary: z
     .string()
     .trim()
-    .min(10, "Add a short summary (at least 10 characters) so the team knows what's needed.")
+    .min(
+      10,
+      "Add a short summary (at least 10 characters) so the team knows what's needed.",
+    )
     .max(1000, "Keep the summary under 1,000 characters."),
 });
 type HandoffForm = z.infer<typeof handoffSchema>;
@@ -104,13 +114,21 @@ export function CreateHandoffDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const form = useForm<HandoffForm>({ resolver: zodResolver(handoffSchema), defaultValues: { reason: "manual", summary: "" } });
-  const create = useScopedMutation((input: HandoffForm) => piService.createHandoff(conversationId, input.reason, input.summary), {
-    invalidate: INVALIDATE,
-    success: "Handoff created. Your team can pick it up from the handoff queue.",
-    error: "Couldn't create the handoff.",
-    onSuccess: () => onOpenChange(false),
+  const form = useForm<HandoffForm>({
+    resolver: zodResolver(handoffSchema),
+    defaultValues: { reason: "manual", summary: "" },
   });
+  const create = useScopedMutation(
+    (input: HandoffForm) =>
+      piService.createHandoff(conversationId, input.reason, input.summary),
+    {
+      invalidate: INVALIDATE,
+      success:
+        "Handoff created. Your team can pick it up from the handoff queue.",
+      error: "Couldn't create the handoff.",
+      onSuccess: () => onOpenChange(false),
+    },
+  );
   useEffect(() => {
     if (open) form.reset({ reason: "manual", summary: "" });
   }, [open, form]);
@@ -118,11 +136,27 @@ export function CreateHandoffDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="md">
-        <form onSubmit={form.handleSubmit((values) => create.mutate(values))} noValidate className="flex min-h-0 flex-col">
-          <DialogHeader title="Create handoff" description={`Ask your team to follow up with ${customerName}.`} />
+        <form
+          onSubmit={form.handleSubmit((values) => create.mutate(values))}
+          noValidate
+          className="flex min-h-0 flex-col"
+        >
+          <DialogHeader
+            title="Create handoff"
+            description={`Ask your team to follow up with ${customerName}.`}
+          />
           <DialogBody className="space-y-4">
-            <FormField label="Reason" htmlFor="handoff-reason" required error={errors.reason}>
-              <NativeSelect id="handoff-reason" {...form.register("reason")} aria-invalid={Boolean(errors.reason)}>
+            <FormField
+              label="Reason"
+              htmlFor="handoff-reason"
+              required
+              error={errors.reason}
+            >
+              <NativeSelect
+                id="handoff-reason"
+                {...form.register("reason")}
+                aria-invalid={Boolean(errors.reason)}
+              >
                 {HANDOFF_REASONS.map((r) => (
                   <option key={r} value={r}>
                     {HANDOFF_REASON_LABELS[r]}
@@ -143,13 +177,22 @@ export function CreateHandoffDialog({
                 maxLength={1000}
                 placeholder="e.g. Customer wants wholesale pricing for 40 bags a month; needs approval."
                 aria-invalid={Boolean(errors.summary)}
-                aria-describedby={errors.summary ? "handoff-summary-error" : "handoff-summary-help"}
+                aria-describedby={
+                  errors.summary
+                    ? "handoff-summary-error"
+                    : "handoff-summary-help"
+                }
                 {...form.register("summary")}
               />
             </FormField>
           </DialogBody>
           <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)} disabled={create.isPending}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => onOpenChange(false)}
+              disabled={create.isPending}
+            >
               Cancel
             </Button>
             <Button type="submit" loading={create.isPending}>

@@ -4,9 +4,26 @@ import Link from "next/link";
 import { FileText, Plus, SearchX } from "lucide-react";
 import { formatDate, formatMoney, relativeTime } from "@/lib/format";
 import { Button } from "@/components/ui/button";
-import { ModuleNav, PageHeader, PageShell, RequirePermission } from "@/components/app/page";
-import { ColumnsMenu, DataTable, Pagination, useColumnVisibility, type Column } from "@/components/app/data-table";
-import { FilterBar, FilterSelect, SavedViews, SearchInput, type SavedView } from "@/components/app/filters";
+import {
+  ModuleNav,
+  PageHeader,
+  PageShell,
+  RequirePermission,
+} from "@/components/app/page";
+import {
+  ColumnsMenu,
+  DataTable,
+  Pagination,
+  useColumnVisibility,
+  type Column,
+} from "@/components/app/data-table";
+import {
+  FilterBar,
+  FilterSelect,
+  SavedViews,
+  SearchInput,
+  type SavedView,
+} from "@/components/app/filters";
 import { EmptyState } from "@/components/app/states";
 import { StatusBadge, statusLabel } from "@/components/app/status-badge";
 import { useScopedQuery } from "@/hooks/use-scoped";
@@ -17,14 +34,33 @@ import { documentsService } from "./service";
 import { SourceBadge, ValidUntil } from "./badges";
 
 const PAGE_SIZE = 25;
-const STATUSES: Quote["status"][] = ["draft", "pending_approval", "approved", "sent", "accepted", "rejected", "expired", "cancelled"];
+const STATUSES: Quote["status"][] = [
+  "draft",
+  "pending_approval",
+  "approved",
+  "sent",
+  "accepted",
+  "rejected",
+  "expired",
+  "cancelled",
+];
 
 const VIEWS: SavedView[] = [
   { id: "all", name: "All", params: {}, builtIn: true },
   { id: "drafts", name: "Drafts", params: { status: "draft" }, builtIn: true },
-  { id: "approval", name: "Needs approval", params: { status: "pending_approval" }, builtIn: true },
+  {
+    id: "approval",
+    name: "Needs approval",
+    params: { status: "pending_approval" },
+    builtIn: true,
+  },
   { id: "sent", name: "Sent", params: { status: "sent" }, builtIn: true },
-  { id: "accepted", name: "Accepted", params: { status: "accepted" }, builtIn: true },
+  {
+    id: "accepted",
+    name: "Accepted",
+    params: { status: "accepted" },
+    builtIn: true,
+  },
 ];
 
 const COLUMNS: Column<Quote>[] = [
@@ -32,7 +68,10 @@ const COLUMNS: Column<Quote>[] = [
     key: "number",
     header: "Number",
     cell: (q) => (
-      <Link href={`/quotes/${q.id}`} className="font-mono text-[12.5px] font-medium hover:underline">
+      <Link
+        href={`/quotes/${q.id}`}
+        className="font-mono text-[12.5px] font-medium hover:underline"
+      >
         {q.number}
       </Link>
     ),
@@ -40,22 +79,50 @@ const COLUMNS: Column<Quote>[] = [
   {
     key: "customer",
     header: "Customer",
-    cell: (q) => <span className="block max-w-56 truncate font-medium">{q.customer_name ?? "Unknown customer"}</span>,
+    cell: (q) => (
+      <span className="block max-w-56 truncate font-medium">
+        {q.customer_name ?? "Unknown customer"}
+      </span>
+    ),
   },
-  { key: "status", header: "Status", cell: (q) => <StatusBadge status={q.status} /> },
-  { key: "source", header: "Source", cell: (q) => <SourceBadge source={q.source} />, hideBelow: "lg", optional: true },
+  {
+    key: "status",
+    header: "Status",
+    cell: (q) => <StatusBadge status={q.status} />,
+  },
+  {
+    key: "source",
+    header: "Source",
+    cell: (q) => <SourceBadge source={q.source} />,
+    hideBelow: "lg",
+    optional: true,
+  },
   {
     key: "total",
     header: "Total",
     align: "right",
-    cell: (q) => <span className="tabular font-medium">{formatMoney(q.total, q.currency)}</span>,
+    cell: (q) => (
+      <span className="tabular font-medium">
+        {formatMoney(q.total, q.currency)}
+      </span>
+    ),
   },
-  { key: "valid_until", header: "Valid until", cell: (q) => <ValidUntil quote={q} />, hideBelow: "md", optional: true },
+  {
+    key: "valid_until",
+    header: "Valid until",
+    cell: (q) => <ValidUntil quote={q} />,
+    hideBelow: "md",
+    optional: true,
+  },
   {
     key: "created",
     header: "Created",
     cell: (q) => (
-      <time dateTime={q.created_at} title={formatDate(q.created_at)} className="text-muted-foreground">
+      <time
+        dateTime={q.created_at}
+        title={formatDate(q.created_at)}
+        className="text-muted-foreground"
+      >
         {relativeTime(q.created_at)}
       </time>
     ),
@@ -74,11 +141,20 @@ export function QuotesListPage() {
 
 function QuotesList() {
   const { can } = useSession();
-  const [state, set, reset] = useUrlState({ search: "", status: "", page: "1" });
+  const [state, set, reset] = useUrlState({
+    search: "",
+    status: "",
+    page: "1",
+  });
   const page = Math.max(1, Number(state.page) || 1);
   const { hidden, toggle } = useColumnVisibility("quotes", COLUMNS);
   const query = useScopedQuery(["quotes", "list", state], () =>
-    documentsService.quotes({ page, pageSize: PAGE_SIZE, search: state.search || undefined, status: state.status || undefined }),
+    documentsService.quotes({
+      page,
+      pageSize: PAGE_SIZE,
+      search: state.search || undefined,
+      status: state.status || undefined,
+    }),
   );
   const filtered = Boolean(state.search || state.status);
   const canWrite = can("quotes.write");
@@ -103,12 +179,16 @@ function QuotesList() {
         tableId="quotes"
         views={VIEWS}
         current={{ search: state.search, status: state.status }}
-        onApply={(params) => set({ search: params.search ?? "", status: params.status ?? "" })}
+        onApply={(params) =>
+          set({ search: params.search ?? "", status: params.status ?? "" })
+        }
       />
       <FilterBar
         activeCount={(state.search ? 1 : 0) + (state.status ? 1 : 0)}
         onClear={reset}
-        actions={<ColumnsMenu columns={COLUMNS} hidden={hidden} onToggle={toggle} />}
+        actions={
+          <ColumnsMenu columns={COLUMNS} hidden={hidden} onToggle={toggle} />
+        }
       >
         <SearchInput
           value={state.search}

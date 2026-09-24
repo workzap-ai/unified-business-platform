@@ -3,7 +3,13 @@ import { Badge } from "@/components/ui/display";
 import { humanize } from "@/lib/format";
 import type { Lead, LeadStage } from "@/features/business/types";
 
-export const STAGES: LeadStage[] = ["new", "qualified", "proposal", "won", "lost"];
+export const STAGES: LeadStage[] = [
+  "new",
+  "qualified",
+  "proposal",
+  "won",
+  "lost",
+];
 export const OPEN_STAGES: LeadStage[] = ["new", "qualified", "proposal"];
 
 export const STAGE_LABELS: Record<LeadStage, string> = {
@@ -39,7 +45,13 @@ export function stageLabel(stage: string) {
   return isStage(stage) ? STAGE_LABELS[stage] : humanize(stage);
 }
 
-export function LeadSourceBadge({ source, compact = false }: { source: Lead["source"]; compact?: boolean }) {
+export function LeadSourceBadge({
+  source,
+  compact = false,
+}: {
+  source: Lead["source"];
+  compact?: boolean;
+}) {
   if (source === "pi") {
     return (
       <Badge tone="pi">
@@ -65,5 +77,7 @@ export function formatRequirement(value: unknown): string {
 }
 
 export function requirementEntries(requirements: Record<string, unknown>) {
-  return Object.entries(requirements).filter(([, v]) => v !== null && v !== undefined && v !== "");
+  return Object.entries(requirements).filter(
+    ([, v]) => v !== null && v !== undefined && v !== "",
+  );
 }

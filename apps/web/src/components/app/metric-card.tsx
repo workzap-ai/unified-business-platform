@@ -44,8 +44,12 @@ export function MetricCard({
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <p className="truncate text-[12.5px] font-medium text-muted-foreground">{label}</p>
-        {Icon && <Icon className={cn("size-4 shrink-0", accent)} aria-hidden="true" />}
+        <p className="truncate text-[12.5px] font-medium text-muted-foreground">
+          {label}
+        </p>
+        {Icon && (
+          <Icon className={cn("size-4 shrink-0", accent)} aria-hidden="true" />
+        )}
       </div>
       {loading ? (
         <Skeleton className="mt-2.5 h-7 w-24" />
@@ -55,14 +59,19 @@ export function MetricCard({
         </p>
       )}
       <div className="mt-auto flex min-h-5 items-center gap-2 pt-1.5 text-xs text-muted-foreground">
-        {change && change.value !== null && !loading && <Change {...change} value={change.value} />}
+        {change && change.value !== null && !loading && (
+          <Change {...change} value={change.value} />
+        )}
         {detail && !loading && <span className="truncate">{detail}</span>}
       </div>
       {children}
     </div>
   );
   return href ? (
-    <Link href={href} className="block h-full rounded-xl focus-visible:outline-2 focus-visible:outline-ring">
+    <Link
+      href={href}
+      className="block h-full rounded-xl focus-visible:outline-2 focus-visible:outline-ring"
+    >
       {body}
     </Link>
   ) : (
@@ -87,19 +96,36 @@ function Change({
     <span
       className={cn(
         "tabular inline-flex items-center gap-0.5 font-semibold",
-        good === null ? "text-muted-foreground" : good ? "text-success" : "text-danger",
+        good === null
+          ? "text-muted-foreground"
+          : good
+            ? "text-success"
+            : "text-danger",
       )}
     >
       <Icon className="size-3.5" aria-hidden="true" />
       {flat ? "0%" : `${Math.abs(value * 100).toFixed(value > 9.99 ? 0 : 1)}%`}
-      {label && <span className="font-normal text-muted-foreground">{label}</span>}
+      {label && (
+        <span className="font-normal text-muted-foreground">{label}</span>
+      )}
     </span>
   );
 }
 
-export function MetricGrid({ children, className }: { children: React.ReactNode; className?: string }) {
+export function MetricGrid({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className={cn("grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4", className)}>
+    <div
+      className={cn(
+        "grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4",
+        className,
+      )}
+    >
       {children}
     </div>
   );

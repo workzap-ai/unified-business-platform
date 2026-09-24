@@ -29,7 +29,10 @@ function profileFor(scopeKey: string): DemoProfile {
   return { scopeKey, tenantId, environmentId, kind };
 }
 
-export function demoCollection<T>(name: string, seed: (profile: DemoProfile) => T): () => T {
+export function demoCollection<T>(
+  name: string,
+  seed: (profile: DemoProfile) => T,
+): () => T {
   return () => {
     const key = demoScopeKey();
     let bucket = stores.get(key);
@@ -50,10 +53,18 @@ export function demoId(prefix: string) {
 
 export function paginate<T>(items: T[], page = 1, pageSize = 25) {
   const start = (page - 1) * pageSize;
-  return { items: items.slice(start, start + pageSize), total: items.length, page, page_size: pageSize };
+  return {
+    items: items.slice(start, start + pageSize),
+    total: items.length,
+    page,
+    page_size: pageSize,
+  };
 }
 
-export function matches(text: string | null | undefined, query: string | undefined | null) {
+export function matches(
+  text: string | null | undefined,
+  query: string | undefined | null,
+) {
   if (!query) return true;
   return (text ?? "").toLowerCase().includes(query.trim().toLowerCase());
 }

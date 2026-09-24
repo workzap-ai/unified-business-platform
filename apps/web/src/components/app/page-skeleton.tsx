@@ -1,8 +1,16 @@
 import { Skeleton } from "@/components/ui/display";
 
-export function PageSkeleton({ variant = "list" }: { variant?: "list" | "detail" | "dashboard" }) {
+export function PageSkeleton({
+  variant = "list",
+}: {
+  variant?: "list" | "detail" | "dashboard";
+}) {
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6" aria-busy="true" aria-label="Loading">
+    <div
+      className="mx-auto w-full max-w-[1400px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6"
+      aria-busy="true"
+      aria-label="Loading"
+    >
       <Skeleton className="h-6 w-48" />
       <Skeleton className="mt-2 h-4 w-80 max-w-full" />
       {variant === "dashboard" && (

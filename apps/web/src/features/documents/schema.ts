@@ -1,7 +1,13 @@
 import { z } from "zod";
 import { toCents } from "@/lib/format";
 import type { OrderLineInput, QuoteLineInput } from "@/features/business/types";
-import { INTEGER_PATTERN, lineGrossCents, MONEY_PATTERN, newKey, QUANTITY_PATTERN } from "./lib";
+import {
+  INTEGER_PATTERN,
+  lineGrossCents,
+  MONEY_PATTERN,
+  newKey,
+  QUANTITY_PATTERN,
+} from "./lib";
 
 export type LinesMode = "quote" | "order";
 
@@ -33,29 +39,68 @@ export function draftLineSchema(mode: LinesMode) {
     .superRefine((line, ctx) => {
       const custom = line.variant_id === null;
       if (custom && mode === "order") {
-        ctx.addIssue({ code: "custom", path: ["description"], message: "Orders only accept catalog items" });
+        ctx.addIssue({
+          code: "custom",
+          path: ["description"],
+          message: "Orders only accept catalog items",
+        });
       }
       if (custom && !line.description.trim()) {
-        ctx.addIssue({ code: "custom", path: ["description"], message: "Describe the service" });
+        ctx.addIssue({
+          code: "custom",
+          path: ["description"],
+          message: "Describe the service",
+        });
       } else if (line.description.trim().length > 300) {
-        ctx.addIssue({ code: "custom", path: ["description"], message: "Keep it under 300 characters" });
+        ctx.addIssue({
+          code: "custom",
+          path: ["description"],
+          message: "Keep it under 300 characters",
+        });
       }
       if (custom && !MONEY_PATTERN.test(line.unit_price.trim())) {
-        ctx.addIssue({ code: "custom", path: ["unit_price"], message: "Enter a price like 1500.00" });
+        ctx.addIssue({
+          code: "custom",
+          path: ["unit_price"],
+          message: "Enter a price like 1500.00",
+        });
       }
       const qty = line.quantity.trim();
       if (mode === "order") {
-        if (!INTEGER_PATTERN.test(qty) || Number(qty) < 1 || Number(qty) > 100_000) {
-          ctx.addIssue({ code: "custom", path: ["quantity"], message: "Whole units, 1–100,000" });
+        if (
+          !INTEGER_PATTERN.test(qty) ||
+          Number(qty) < 1 ||
+          Number(qty) > 100_000
+        ) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["quantity"],
+            message: "Whole units, 1–100,000",
+          });
         }
       } else if (!QUANTITY_PATTERN.test(qty) || Number(qty) <= 0) {
-        ctx.addIssue({ code: "custom", path: ["quantity"], message: "More than 0, up to 3 decimals" });
+        ctx.addIssue({
+          code: "custom",
+          path: ["quantity"],
+          message: "More than 0, up to 3 decimals",
+        });
       }
       const discount = line.discount.trim() || "0";
       if (!MONEY_PATTERN.test(discount)) {
-        ctx.addIssue({ code: "custom", path: ["discount"], message: "Enter an amount like 250.00" });
-      } else if (MONEY_PATTERN.test(line.unit_price.trim()) && toCents(discount) > lineGrossCents(line.unit_price, qty || "0")) {
-        ctx.addIssue({ code: "custom", path: ["discount"], message: "Discount exceeds the line amount" });
+        ctx.addIssue({
+          code: "custom",
+          path: ["discount"],
+          message: "Enter an amount like 250.00",
+        });
+      } else if (
+        MONEY_PATTERN.test(line.unit_price.trim()) &&
+        toCents(discount) > lineGrossCents(line.unit_price, qty || "0")
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["discount"],
+          message: "Discount exceeds the line amount",
+        });
       }
     });
 }
@@ -70,7 +115,11 @@ export function linesSchema(mode: LinesMode) {
 export function toQuoteLineInputs(lines: DraftLine[]): QuoteLineInput[] {
   return lines.map((line) =>
     line.variant_id
-      ? { variant_id: line.variant_id, quantity: line.quantity.trim(), discount: line.discount.trim() || "0" }
+      ? {
+          variant_id: line.variant_id,
+          quantity: line.quantity.trim(),
+          discount: line.discount.trim() || "0",
+        }
       : {
           variant_id: null,
           description: line.description.trim(),
@@ -83,8 +132,15 @@ export function toQuoteLineInputs(lines: DraftLine[]): QuoteLineInput[] {
 
 export function toOrderLineInputs(lines: DraftLine[]): OrderLineInput[] {
   return lines
-    .filter((line): line is DraftLine & { variant_id: string } => line.variant_id !== null)
-    .map((line) => ({ variant_id: line.variant_id, quantity: Number(line.quantity.trim()), discount: line.discount.trim() || "0" }));
+    .filter(
+      (line): line is DraftLine & { variant_id: string } =>
+        line.variant_id !== null,
+    )
+    .map((line) => ({
+      variant_id: line.variant_id,
+      quantity: Number(line.quantity.trim()),
+      discount: line.discount.trim() || "0",
+    }));
 }
 
 type ExistingLine = {

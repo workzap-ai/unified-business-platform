@@ -40,9 +40,18 @@ export function DocumentView({
   number?: string | null;
   status?: React.ReactNode;
   dates: { label: string; value: React.ReactNode }[];
-  billTo: { name: string; href?: string; lines?: (string | null | undefined)[] } | null;
+  billTo: {
+    name: string;
+    href?: string;
+    lines?: (string | null | undefined)[];
+  } | null;
   lines: DocumentLine[];
-  totals?: { subtotal: string; discount_total: string; tax_total: string; total: string };
+  totals?: {
+    subtotal: string;
+    discount_total: string;
+    tax_total: string;
+    total: string;
+  };
   taxRate: string | null | undefined;
   currency: string;
   notes?: string;
@@ -56,13 +65,22 @@ export function DocumentView({
   return (
     <article
       aria-label={`${kind} ${number ?? "preview"}`}
-      className={cn("rounded-xl border border-border bg-surface shadow-sm", className)}
+      className={cn(
+        "rounded-xl border border-border bg-surface shadow-sm",
+        className,
+      )}
     >
       <header className="flex flex-col gap-4 border-b border-border px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:px-7 sm:py-6">
         <div className="min-w-0">
-          <p className="text-2xs font-semibold tracking-wide text-muted-foreground uppercase">{kind}</p>
+          <p className="text-2xs font-semibold tracking-wide text-muted-foreground uppercase">
+            {kind}
+          </p>
           <p className="mt-1 font-mono text-lg font-semibold tracking-tight">
-            {number ?? <span className="font-sans text-muted-foreground">Number assigned on save</span>}
+            {number ?? (
+              <span className="font-sans text-muted-foreground">
+                Number assigned on save
+              </span>
+            )}
           </p>
           {status && <div className="mt-2">{status}</div>}
         </div>
@@ -80,26 +98,31 @@ export function DocumentView({
       </header>
 
       <section className="border-b border-border px-5 py-4 sm:px-7">
-        <p className="text-2xs font-semibold tracking-wide text-muted-foreground uppercase">Bill to</p>
+        <p className="text-2xs font-semibold tracking-wide text-muted-foreground uppercase">
+          Bill to
+        </p>
         {billTo ? (
           <div className="mt-1 text-[13px]">
             {billTo.href ? (
-              <Link href={billTo.href} className="text-sm font-semibold hover:underline">
+              <Link
+                href={billTo.href}
+                className="text-sm font-semibold hover:underline"
+              >
                 {billTo.name}
               </Link>
             ) : (
               <p className="text-sm font-semibold">{billTo.name}</p>
             )}
-            {billTo.lines
-              ?.filter(Boolean)
-              .map((line) => (
-                <p key={line} className="text-muted-foreground">
-                  {line}
-                </p>
-              ))}
+            {billTo.lines?.filter(Boolean).map((line) => (
+              <p key={line} className="text-muted-foreground">
+                {line}
+              </p>
+            ))}
           </div>
         ) : (
-          <p className="mt-1 text-[13px] text-muted-foreground">No customer selected</p>
+          <p className="mt-1 text-[13px] text-muted-foreground">
+            No customer selected
+          </p>
         )}
       </section>
 
@@ -108,7 +131,10 @@ export function DocumentView({
           <caption className="sr-only">{kind} lines</caption>
           <thead>
             <tr className="border-b border-border text-xs text-muted-foreground">
-              <th scope="col" className="px-5 py-2 text-left font-medium sm:pl-7">
+              <th
+                scope="col"
+                className="px-5 py-2 text-left font-medium sm:pl-7"
+              >
                 Description
               </th>
               <th scope="col" className="px-3 py-2 text-right font-medium">
@@ -122,7 +148,10 @@ export function DocumentView({
                   Discount
                 </th>
               )}
-              <th scope="col" className="px-5 py-2 text-right font-medium sm:pr-7">
+              <th
+                scope="col"
+                className="px-5 py-2 text-right font-medium sm:pr-7"
+              >
                 Amount
               </th>
             </tr>
@@ -130,26 +159,42 @@ export function DocumentView({
           <tbody>
             {lines.length === 0 ? (
               <tr>
-                <td colSpan={anyDiscount ? 5 : 4} className="px-7 py-8 text-center text-muted-foreground">
+                <td
+                  colSpan={anyDiscount ? 5 : 4}
+                  className="px-7 py-8 text-center text-muted-foreground"
+                >
                   No lines on this {kind.toLowerCase()}.
                 </td>
               </tr>
             ) : (
               lines.map((line) => (
-                <tr key={line.id} className="border-b border-border last:border-0">
+                <tr
+                  key={line.id}
+                  className="border-b border-border last:border-0"
+                >
                   <td className="px-5 py-2.5 align-top sm:pl-7">
-                    <p className="font-medium">{line.description || "Untitled line"}</p>
+                    <p className="font-medium">
+                      {line.description || "Untitled line"}
+                    </p>
                     {line.sku ? (
-                      <p className="font-mono text-xs text-muted-foreground">{line.sku}</p>
+                      <p className="font-mono text-xs text-muted-foreground">
+                        {line.sku}
+                      </p>
                     ) : line.custom ? (
                       <p className="text-xs text-muted-foreground">Service</p>
                     ) : null}
                   </td>
-                  <td className="tabular px-3 py-2.5 text-right align-top">{formatNumber(line.quantity)}</td>
-                  <td className="tabular px-3 py-2.5 text-right align-top">{formatMoney(line.unit_price, currency)}</td>
+                  <td className="tabular px-3 py-2.5 text-right align-top">
+                    {formatNumber(line.quantity)}
+                  </td>
+                  <td className="tabular px-3 py-2.5 text-right align-top">
+                    {formatMoney(line.unit_price, currency)}
+                  </td>
                   {anyDiscount && (
                     <td className="tabular px-3 py-2.5 text-right align-top text-muted-foreground">
-                      {toCents(line.discount) > BigInt(0) ? `−${formatMoney(line.discount, currency)}` : "—"}
+                      {toCents(line.discount) > BigInt(0)
+                        ? `−${formatMoney(line.discount, currency)}`
+                        : "—"}
                     </td>
                   )}
                   <td className="tabular px-5 py-2.5 text-right align-top font-medium sm:pr-7">
@@ -166,8 +211,12 @@ export function DocumentView({
         <div className="min-w-0 text-[13px]">
           {notes ? (
             <>
-              <p className="text-2xs font-semibold tracking-wide text-muted-foreground uppercase">Notes</p>
-              <p className="mt-1 whitespace-pre-line text-foreground-secondary">{notes}</p>
+              <p className="text-2xs font-semibold tracking-wide text-muted-foreground uppercase">
+                Notes
+              </p>
+              <p className="mt-1 whitespace-pre-line text-foreground-secondary">
+                {notes}
+              </p>
             </>
           ) : null}
         </div>

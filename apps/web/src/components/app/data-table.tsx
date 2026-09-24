@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Columns3, X } from "lucide-react";
+import { useLocalStorageState } from "@/hooks/use-local-storage";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronLeft,
+  ChevronRight,
+  Columns3,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatNumber } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -35,30 +42,25 @@ export type Column<T> = {
 
 type SortState = { key: string; direction: "asc" | "desc" } | null;
 
-const HIDE = { sm: "hidden sm:table-cell", md: "hidden md:table-cell", lg: "hidden lg:table-cell", xl: "hidden xl:table-cell" };
+const HIDE = {
+  sm: "hidden sm:table-cell",
+  md: "hidden md:table-cell",
+  lg: "hidden lg:table-cell",
+  xl: "hidden xl:table-cell",
+};
 
 export function useColumnVisibility<T>(tableId: string, columns: Column<T>[]) {
   const initial = columns.filter((c) => c.defaultHidden).map((c) => c.key);
-  const [hidden, setHidden] = useState<string[]>(initial);
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(`platform.columns.${tableId}`);
-      if (raw) setHidden(JSON.parse(raw) as string[]);
-    } catch {
-      /* ignore */
-    }
-  }, [tableId]);
-  const toggle = (key: string) => {
-    setHidden((current) => {
-      const next = current.includes(key) ? current.filter((k) => k !== key) : [...current, key];
-      try {
-        localStorage.setItem(`platform.columns.${tableId}`, JSON.stringify(next));
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
-  };
+  const [hidden, setHidden] = useLocalStorageState<string[]>(
+    `platform.columns.${tableId}`,
+    initial,
+  );
+  const toggle = (key: string) =>
+    setHidden((current) =>
+      current.includes(key)
+        ? current.filter((k) => k !== key)
+        : [...current, key],
+    );
   return { hidden, toggle };
 }
 
@@ -143,7 +145,8 @@ export function DataTable<T>({
   const router = useRouter();
   const visible = columns.filter((c) => !hiddenColumns.includes(c.key));
   const ids = rows?.map(getRowId) ?? [];
-  const allSelected = selectable && ids.length > 0 && ids.every((id) => selected?.has(id));
+  const allSelected =
+    selectable && ids.length > 0 && ids.every((id) => selected?.has(id));
   const someSelected = selectable && ids.some((id) => selected?.has(id));
   const cellPad = density === "compact" ? "px-3 py-2" : "px-3.5 py-3";
 
@@ -172,21 +175,35 @@ export function DataTable<T>({
         type="button"
         onClick={() =>
           onSortChange(
-            !active ? { key: column.key, direction: "asc" } : sort?.direction === "asc" ? { key: column.key, direction: "desc" } : null,
+            !active
+              ? { key: column.key, direction: "asc" }
+              : sort?.direction === "asc"
+                ? { key: column.key, direction: "desc" }
+                : null,
           )
         }
-        className={cn("inline-flex items-center gap-1 hover:text-foreground", active && "text-foreground")}
+        className={cn(
+          "inline-flex items-center gap-1 hover:text-foreground",
+          active && "text-foreground",
+        )}
         aria-label={`Sort by ${typeof content === "string" ? content : column.key}`}
       >
         {content}
-        {active && (sort?.direction === "asc" ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />)}
+        {active &&
+          (sort?.direction === "asc" ? (
+            <ArrowUp className="size-3" />
+          ) : (
+            <ArrowDown className="size-3" />
+          ))}
       </button>
     );
   }
 
   if (error) {
     return (
-      <div className={cn("rounded-xl border border-border bg-surface", className)}>
+      <div
+        className={cn("rounded-xl border border-border bg-surface", className)}
+      >
         <ErrorState error={error} onRetry={onRetry} compact />
       </div>
     );
@@ -195,7 +212,12 @@ export function DataTable<T>({
   const isEmpty = !loading && rows !== undefined && rows.length === 0;
 
   return (
-    <div className={cn("overflow-hidden rounded-xl border border-border bg-surface shadow-sm", className)}>
+    <div
+      className={cn(
+        "overflow-hidden rounded-xl border border-border bg-surface shadow-sm",
+        className,
+      )}
+    >
       <div className="scrollbar-thin overflow-x-auto">
         <table className="w-full border-collapse text-[13px]">
           {caption && <caption className="sr-only">{caption}</caption>}
@@ -204,7 +226,13 @@ export function DataTable<T>({
               {selectable && (
                 <th scope="col" className="w-10 px-3 py-2">
                   <Checkbox
-                    checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                    checked={
+                      allSelected
+                        ? true
+                        : someSelected
+                          ? "indeterminate"
+                          : false
+                    }
                     onCheckedChange={toggleAll}
                     aria-label="Select all rows on this page"
                   />
@@ -216,7 +244,11 @@ export function DataTable<T>({
                   scope="col"
                   style={column.width ? { width: column.width } : undefined}
                   aria-sort={
-                    sort?.key === column.key ? (sort.direction === "asc" ? "ascending" : "descending") : undefined
+                    sort?.key === column.key
+                      ? sort.direction === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : undefined
                   }
                   className={cn(
                     "px-3 py-2 text-left text-xs font-medium whitespace-nowrap text-muted-foreground",
@@ -241,8 +273,17 @@ export function DataTable<T>({
                       </td>
                     )}
                     {visible.map((column, j) => (
-                      <td key={column.key} className={cn(cellPad, column.hideBelow && HIDE[column.hideBelow])}>
-                        <Skeleton className="h-3.5" style={{ width: `${40 + ((i * 13 + j * 29) % 50)}%` }} />
+                      <td
+                        key={column.key}
+                        className={cn(
+                          cellPad,
+                          column.hideBelow && HIDE[column.hideBelow],
+                        )}
+                      >
+                        <Skeleton
+                          className="h-3.5"
+                          style={{ width: `${40 + ((i * 13 + j * 29) % 50)}%` }}
+                        />
                       </td>
                     ))}
                   </tr>
@@ -258,7 +299,12 @@ export function DataTable<T>({
                       onClick={(event) => {
                         if (!clickable) return;
                         const target = event.target as HTMLElement;
-                        if (target.closest("a,button,input,[role=checkbox],[data-no-row-click]")) return;
+                        if (
+                          target.closest(
+                            "a,button,input,[role=checkbox],[data-no-row-click]",
+                          )
+                        )
+                          return;
                         if (onRowClick) onRowClick(row);
                         else if (href) router.push(href);
                       }}
@@ -322,18 +368,35 @@ export function Pagination({
   const from = (page - 1) * pageSize + 1;
   const to = Math.min(total, page * pageSize);
   return (
-    <div className={cn("mt-3 flex items-center justify-between gap-3 text-[13px] text-muted-foreground", className)}>
+    <div
+      className={cn(
+        "mt-3 flex items-center justify-between gap-3 text-[13px] text-muted-foreground",
+        className,
+      )}
+    >
       <p className="tabular">
         {formatNumber(from)}–{formatNumber(to)} of {formatNumber(total)}
       </p>
       <div className="flex items-center gap-1">
-        <Button variant="secondary" size="icon-sm" onClick={() => onPage(page - 1)} disabled={page <= 1} aria-label="Previous page">
+        <Button
+          variant="secondary"
+          size="icon-sm"
+          onClick={() => onPage(page - 1)}
+          disabled={page <= 1}
+          aria-label="Previous page"
+        >
           <ChevronLeft />
         </Button>
         <span className="tabular px-2">
           Page {page} of {pages}
         </span>
-        <Button variant="secondary" size="icon-sm" onClick={() => onPage(page + 1)} disabled={page >= pages} aria-label="Next page">
+        <Button
+          variant="secondary"
+          size="icon-sm"
+          onClick={() => onPage(page + 1)}
+          disabled={page >= pages}
+          aria-label="Next page"
+        >
           <ChevronRight />
         </Button>
       </div>
@@ -357,8 +420,12 @@ export function BulkBar({
       aria-label="Bulk actions"
       className="sticky bottom-4 z-20 mx-auto mt-3 flex w-fit max-w-full animate-scale-in items-center gap-2 rounded-lg border border-border bg-foreground px-2 py-1.5 text-background shadow-lg"
     >
-      <span className="tabular px-2 text-[13px] font-medium">{count} selected</span>
-      <div className="flex items-center gap-1 [&_button]:text-background [&_button:hover]:bg-background/15">{children}</div>
+      <span className="tabular px-2 text-[13px] font-medium">
+        {count} selected
+      </span>
+      <div className="flex items-center gap-1 [&_button]:text-background [&_button:hover]:bg-background/15">
+        {children}
+      </div>
       <button
         type="button"
         onClick={onClear}

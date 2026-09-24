@@ -30,6 +30,7 @@ export const piKeys = {
   document: (id: string) => ["pi", "knowledge", "document", id] as const,
   analytics: (range: number) => ["pi", "analytics", range] as const,
   settings: ["pi", "settings"] as const,
+  overview: ["pi", "overview"] as const,
 };
 
 /* Vocabulary ----------------------------------------------------------------------------- */
@@ -155,13 +156,14 @@ export function SubNav({
   className?: string;
 }) {
   const pathname = usePathname();
+  const path = (href: string) => href.split("?")[0]!;
   const active = items
     .filter((i) =>
       i.exact
-        ? pathname === i.href
-        : pathname === i.href || pathname.startsWith(`${i.href}/`),
+        ? pathname === path(i.href)
+        : pathname === path(i.href) || pathname.startsWith(`${path(i.href)}/`),
     )
-    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+    .sort((a, b) => path(b.href).length - path(a.href).length)[0]?.href;
   return (
     <nav
       aria-label={label}

@@ -1,4 +1,10 @@
-import { apiRequest, ApiError, DemoError, pageSchema, type Page } from "@/services/api-client";
+import {
+  apiRequest,
+  ApiError,
+  DemoError,
+  pageSchema,
+  type Page,
+} from "@/services/api-client";
 import { demoDelay, select } from "@/lib/data-mode";
 import { demoBusiness } from "@/demo/business";
 import { demoId, matches, paginate } from "@/demo/store";
@@ -33,17 +39,31 @@ const live: CustomersService = {
       query: { page, page_size: pageSize, search, status, tag },
     }),
   get: (id) => apiRequest("GET", `/customers/${id}`, customerDetailSchema),
-  create: (input) => apiRequest("POST", "/customers", customerSchema, { body: input }),
-  update: (id, input) => apiRequest("PATCH", `/customers/${id}`, customerSchema, { body: input }),
+  create: (input) =>
+    apiRequest("POST", "/customers", customerSchema, { body: input }),
+  update: (id, input) =>
+    apiRequest("PATCH", `/customers/${id}`, customerSchema, { body: input }),
   setStatus: (id, status) =>
-    apiRequest("PUT", `/customers/${id}/status`, customerSchema, { body: { status } }),
+    apiRequest("PUT", `/customers/${id}/status`, customerSchema, {
+      body: { status },
+    }),
   notes: (id, page = 1) =>
-    apiRequest("GET", `/customers/${id}/notes`, pageSchema(noteSchema), { query: { page, page_size: 50 } }),
-  addNote: (id, body) => apiRequest("POST", `/customers/${id}/notes`, noteSchema, { body: { body } }),
-  activities: (id, page = 1) =>
-    apiRequest("GET", `/customers/${id}/activities`, pageSchema(activitySchema), {
+    apiRequest("GET", `/customers/${id}/notes`, pageSchema(noteSchema), {
       query: { page, page_size: 50 },
     }),
+  addNote: (id, body) =>
+    apiRequest("POST", `/customers/${id}/notes`, noteSchema, {
+      body: { body },
+    }),
+  activities: (id, page = 1) =>
+    apiRequest(
+      "GET",
+      `/customers/${id}/activities`,
+      pageSchema(activitySchema),
+      {
+        query: { page, page_size: 50 },
+      },
+    ),
 };
 
 function find(id: string) {
@@ -52,9 +72,20 @@ function find(id: string) {
   return customer;
 }
 
-function assertUniquePhone(phone: string | null | undefined, exceptId?: string) {
-  if (phone && demoBusiness().customers.some((c) => c.phone === phone && c.id !== exceptId)) {
-    throw new ApiError(409, "RESOURCE_CONFLICT", undefined, "A customer with this phone number already exists");
+function assertUniquePhone(
+  phone: string | null | undefined,
+  exceptId?: string,
+) {
+  if (
+    phone &&
+    demoBusiness().customers.some((c) => c.phone === phone && c.id !== exceptId)
+  ) {
+    throw new ApiError(
+      409,
+      "RESOURCE_CONFLICT",
+      undefined,
+      "A customer with this phone number already exists",
+    );
   }
 }
 
@@ -78,7 +109,10 @@ const demo: CustomersService = {
       (c) =>
         (!status || c.status === status) &&
         (!tag || c.tags.includes(tag)) &&
-        (!search || [c.name, c.email, c.phone, c.company].some((v) => matches(v, search))),
+        (!search ||
+          [c.name, c.email, c.phone, c.company].some((v) =>
+            matches(v, search),
+          )),
     );
     return paginate(rows, page, pageSize);
   },
@@ -87,17 +121,31 @@ const demo: CustomersService = {
     const business = demoBusiness();
     const customer = find(id);
     const balance = business.invoices
-      .filter((i) => i.customer_id === id && ["issued", "partially_paid"].includes(i.status))
+      .filter(
+        (i) =>
+          i.customer_id === id &&
+          ["issued", "partially_paid"].includes(i.status),
+      )
       .reduce((sum, i) => sum + toCents(i.balance_due), BigInt(0));
     const { demoPi } = await import("@/features/pi/demo-data");
     return {
       ...customer,
       summary: {
-        order_count: business.orders.filter((o) => o.customer_id === id && o.status !== "cancelled").length,
-        open_quote_count: business.quotes.filter((q) => q.customer_id === id && ["draft", "pending_approval", "approved", "sent"].includes(q.status)).length,
+        order_count: business.orders.filter(
+          (o) => o.customer_id === id && o.status !== "cancelled",
+        ).length,
+        open_quote_count: business.quotes.filter(
+          (q) =>
+            q.customer_id === id &&
+            ["draft", "pending_approval", "approved", "sent"].includes(
+              q.status,
+            ),
+        ).length,
         outstanding_balance: centsToString(balance),
         currency: business.settings.default_currency,
-        open_conversations: demoPi().conversations.filter((c) => c.customer_id === id && c.status === "open").length,
+        open_conversations: demoPi().conversations.filter(
+          (c) => c.customer_id === id && c.status === "open",
+        ).length,
       },
     };
   },
@@ -129,7 +177,9 @@ const demo: CustomersService = {
       ...(input.email !== undefined && { email: input.email || null }),
       ...(input.phone !== undefined && { phone: input.phone || null }),
       ...(input.company !== undefined && { company: input.company || null }),
-      ...(input.tags !== undefined && { tags: [...new Set(input.tags)].sort() }),
+      ...(input.tags !== undefined && {
+        tags: [...new Set(input.tags)].sort(),
+      }),
     });
     log(id, "updated", "Customer details updated");
     return { ...customer };
@@ -143,13 +193,23 @@ const demo: CustomersService = {
   async notes(id) {
     await demoDelay();
     find(id);
-    return paginate(demoBusiness().notes.filter((n) => n.customer_id === id), 1, 50);
+    return paginate(
+      demoBusiness().notes.filter((n) => n.customer_id === id),
+      1,
+      50,
+    );
   },
   async addNote(id, body) {
     await demoDelay(200);
     find(id);
     if (!body.trim()) throw new DemoError("Write a note first.");
-    const note = { id: demoId("note"), customer_id: id, author_label: "Amina Rahman", body, created_at: new Date().toISOString() };
+    const note = {
+      id: demoId("note"),
+      customer_id: id,
+      author_label: "Amina Rahman",
+      body,
+      created_at: new Date().toISOString(),
+    };
     demoBusiness().notes.unshift(note);
     log(id, "note", body.slice(0, 120));
     return note;

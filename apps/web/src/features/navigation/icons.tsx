@@ -94,7 +94,13 @@ const ICONS: Record<string, LucideIcon> = {
   workflow: Workflow,
 };
 
-export function NavIcon({ name, className }: { name: string; className?: string }) {
+export function NavIcon({
+  name,
+  className,
+}: {
+  name: string;
+  className?: string;
+}) {
   const Icon = ICONS[name] ?? Circle;
   return <Icon className={className} aria-hidden="true" />;
 }

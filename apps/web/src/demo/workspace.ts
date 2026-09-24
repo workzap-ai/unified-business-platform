@@ -12,17 +12,46 @@ export const DEMO_USER = {
 };
 
 export const DEMO_TENANTS: Tenant[] = [
-  { id: "tenant-northwind", name: "Northwind Trading Co.", slug: "northwind-trading" },
-  { id: "tenant-brightline", name: "Brightline Studio", slug: "brightline-studio" },
+  {
+    id: "tenant-northwind",
+    name: "Northwind Trading Co.",
+    slug: "northwind-trading",
+  },
+  {
+    id: "tenant-brightline",
+    name: "Brightline Studio",
+    slug: "brightline-studio",
+  },
 ];
 
 export const DEMO_ENVIRONMENTS: Record<string, Environment[]> = {
   "tenant-northwind": [
-    { id: "env-nw-prod", key: "production", name: "Production", kind: "production", status: "active", is_default: true },
-    { id: "env-nw-staging", key: "staging", name: "Staging", kind: "staging", status: "active", is_default: false },
+    {
+      id: "env-nw-prod",
+      key: "production",
+      name: "Production",
+      kind: "production",
+      status: "active",
+      is_default: true,
+    },
+    {
+      id: "env-nw-staging",
+      key: "staging",
+      name: "Staging",
+      kind: "staging",
+      status: "active",
+      is_default: false,
+    },
   ],
   "tenant-brightline": [
-    { id: "env-bl-prod", key: "production", name: "Production", kind: "production", status: "active", is_default: true },
+    {
+      id: "env-bl-prod",
+      key: "production",
+      name: "Production",
+      kind: "production",
+      status: "active",
+      is_default: true,
+    },
   ],
 };
 
@@ -47,7 +76,9 @@ export function readDemoState(): DemoState {
   if (typeof window === "undefined") return DEFAULT_STATE;
   try {
     const raw = window.localStorage.getItem(KEY);
-    return raw ? { ...DEFAULT_STATE, ...(JSON.parse(raw) as Partial<DemoState>) } : DEFAULT_STATE;
+    return raw
+      ? { ...DEFAULT_STATE, ...(JSON.parse(raw) as Partial<DemoState>) }
+      : DEFAULT_STATE;
   } catch {
     return DEFAULT_STATE;
   }
@@ -80,15 +111,23 @@ export function demoScopeKey(): string {
 export function demoSession(): Session | null {
   const state = readDemoState();
   if (!state.signedIn) return null;
-  const tenant = DEMO_TENANTS.find((t) => t.id === state.tenantId) ?? DEMO_TENANTS[0]!;
+  const tenant =
+    DEMO_TENANTS.find((t) => t.id === state.tenantId) ?? DEMO_TENANTS[0]!;
   const environments = DEMO_ENVIRONMENTS[tenant.id] ?? [];
   const environment =
-    environments.find((e) => e.id === state.environmentId) ?? environments[0] ?? null;
+    environments.find((e) => e.id === state.environmentId) ??
+    environments[0] ??
+    null;
   return {
     user: DEMO_USER,
     tenant: { id: tenant.id, name: tenant.name, key: tenant.slug },
     environment: environment
-      ? { id: environment.id, name: environment.name, key: environment.key, kind: environment.kind }
+      ? {
+          id: environment.id,
+          name: environment.name,
+          key: environment.key,
+          kind: environment.kind,
+        }
       : null,
     branch: null,
     permissions: demoPermissions(state.role),

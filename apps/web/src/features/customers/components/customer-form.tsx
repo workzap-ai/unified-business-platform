@@ -13,7 +13,11 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const E164 = /^\+[1-9]\d{6,14}$/;
 
 export const customerFormSchema = z.object({
-  name: z.string().trim().min(1, "Enter the customer's name").max(200, "Keep the name under 200 characters"),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Enter the customer's name")
+    .max(200, "Keep the name under 200 characters"),
   email: z
     .string()
     .trim()
@@ -22,17 +26,32 @@ export const customerFormSchema = z.object({
   phone: z
     .string()
     .trim()
-    .refine((v) => !v || E164.test(normalizePhone(v)), "Use international format, e.g. +92 300 1234567"),
+    .refine(
+      (v) => !v || E164.test(normalizePhone(v)),
+      "Use international format, e.g. +92 300 1234567",
+    ),
   company: z.string().trim().max(200, "Keep the company under 200 characters"),
   tags: z.array(z.string()).max(20, "Use at most 20 tags"),
 });
 
 export type CustomerFormValues = z.infer<typeof customerFormSchema>;
 
-export const emptyCustomerForm: CustomerFormValues = { name: "", email: "", phone: "", company: "", tags: [] };
+export const emptyCustomerForm: CustomerFormValues = {
+  name: "",
+  email: "",
+  phone: "",
+  company: "",
+  tags: [],
+};
 
 export function customerToForm(c: Customer): CustomerFormValues {
-  return { name: c.name, email: c.email ?? "", phone: c.phone ?? "", company: c.company ?? "", tags: c.tags };
+  return {
+    name: c.name,
+    email: c.email ?? "",
+    phone: c.phone ?? "",
+    company: c.company ?? "",
+    tags: c.tags,
+  };
 }
 
 export function formToInput(values: CustomerFormValues): CustomerInput {
@@ -49,29 +68,52 @@ export function formToInput(values: CustomerFormValues): CustomerInput {
  * Maps server errors onto fields: duplicate phone (409) goes to the phone field, 422
  * field errors to their fields. Returns true if something was shown inline.
  */
-export function applyCustomerServerError(form: UseFormReturn<CustomerFormValues>, error: unknown): boolean {
+export function applyCustomerServerError(
+  form: UseFormReturn<CustomerFormValues>,
+  error: unknown,
+): boolean {
   if (!(error instanceof ApiError)) return false;
   let shown = false;
   if (error.status === 409) {
-    form.setError("phone", { type: "server", message: errorMessage(error, "A customer with this phone number already exists") });
+    form.setError("phone", {
+      type: "server",
+      message: errorMessage(
+        error,
+        "A customer with this phone number already exists",
+      ),
+    });
     form.setFocus("phone");
     return true;
   }
   for (const [field, message] of Object.entries(error.fields)) {
     if (field in emptyCustomerForm) {
-      form.setError(field as keyof CustomerFormValues, { type: "server", message });
+      form.setError(field as keyof CustomerFormValues, {
+        type: "server",
+        message,
+      });
       shown = true;
     }
   }
   return shown;
 }
 
-function ContactFields({ form, idPrefix }: { form: UseFormReturn<CustomerFormValues>; idPrefix: string }) {
+function ContactFields({
+  form,
+  idPrefix,
+}: {
+  form: UseFormReturn<CustomerFormValues>;
+  idPrefix: string;
+}) {
   const { register, formState } = form;
   const e = formState.errors;
   return (
     <>
-      <FormField label="Full name" htmlFor={`${idPrefix}-name`} required error={e.name}>
+      <FormField
+        label="Full name"
+        htmlFor={`${idPrefix}-name`}
+        required
+        error={e.name}
+      >
         <Input
           id={`${idPrefix}-name`}
           autoComplete="off"
@@ -81,7 +123,12 @@ function ContactFields({ form, idPrefix }: { form: UseFormReturn<CustomerFormVal
         />
       </FormField>
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Email" htmlFor={`${idPrefix}-email`} optional error={e.email}>
+        <FormField
+          label="Email"
+          htmlFor={`${idPrefix}-email`}
+          optional
+          error={e.email}
+        >
           <Input
             id={`${idPrefix}-email`}
             type="email"
@@ -105,7 +152,9 @@ function ContactFields({ form, idPrefix }: { form: UseFormReturn<CustomerFormVal
             placeholder="+92 300 1234567"
             autoComplete="off"
             aria-invalid={!!e.phone || undefined}
-            aria-describedby={e.phone ? `${idPrefix}-phone-error` : `${idPrefix}-phone-help`}
+            aria-describedby={
+              e.phone ? `${idPrefix}-phone-error` : `${idPrefix}-phone-help`
+            }
             {...register("phone")}
           />
         </FormField>
@@ -114,10 +163,21 @@ function ContactFields({ form, idPrefix }: { form: UseFormReturn<CustomerFormVal
   );
 }
 
-function CompanyField({ form, idPrefix }: { form: UseFormReturn<CustomerFormValues>; idPrefix: string }) {
+function CompanyField({
+  form,
+  idPrefix,
+}: {
+  form: UseFormReturn<CustomerFormValues>;
+  idPrefix: string;
+}) {
   const e = form.formState.errors;
   return (
-    <FormField label="Company" htmlFor={`${idPrefix}-company`} optional error={e.company}>
+    <FormField
+      label="Company"
+      htmlFor={`${idPrefix}-company`}
+      optional
+      error={e.company}
+    >
       <Input
         id={`${idPrefix}-company`}
         autoComplete="off"
@@ -128,7 +188,13 @@ function CompanyField({ form, idPrefix }: { form: UseFormReturn<CustomerFormValu
   );
 }
 
-function TagsField({ form, idPrefix }: { form: UseFormReturn<CustomerFormValues>; idPrefix: string }) {
+function TagsField({
+  form,
+  idPrefix,
+}: {
+  form: UseFormReturn<CustomerFormValues>;
+  idPrefix: string;
+}) {
   const e = form.formState.errors;
   return (
     <FormField
@@ -156,16 +222,29 @@ function TagsField({ form, idPrefix }: { form: UseFormReturn<CustomerFormValues>
 }
 
 /** Full-page layout: one FormSection per group. */
-export function CustomerFormSections({ form }: { form: UseFormReturn<CustomerFormValues> }) {
+export function CustomerFormSections({
+  form,
+}: {
+  form: UseFormReturn<CustomerFormValues>;
+}) {
   return (
     <>
-      <FormSection title="Contact" description="How your team and PI reach this customer.">
+      <FormSection
+        title="Contact"
+        description="How your team and PI reach this customer."
+      >
         <ContactFields form={form} idPrefix="customer" />
       </FormSection>
-      <FormSection title="Organization" description="The business this customer buys for, if any.">
+      <FormSection
+        title="Organization"
+        description="The business this customer buys for, if any."
+      >
         <CompanyField form={form} idPrefix="customer" />
       </FormSection>
-      <FormSection title="Tags" description="Group customers into segments and saved views.">
+      <FormSection
+        title="Tags"
+        description="Group customers into segments and saved views."
+      >
         <TagsField form={form} idPrefix="customer" />
       </FormSection>
     </>
@@ -173,7 +252,11 @@ export function CustomerFormSections({ form }: { form: UseFormReturn<CustomerFor
 }
 
 /** Compact stacked layout for dialogs. */
-export function CustomerFormStack({ form }: { form: UseFormReturn<CustomerFormValues> }) {
+export function CustomerFormStack({
+  form,
+}: {
+  form: UseFormReturn<CustomerFormValues>;
+}) {
   return (
     <div className="space-y-4">
       <ContactFields form={form} idPrefix="edit-customer" />

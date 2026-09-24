@@ -19,7 +19,10 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import {
+  restrictToParentElement,
+  restrictToVerticalAxis,
+} from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
 import {
   ArrowDown,
@@ -37,7 +40,11 @@ import { cn } from "@/lib/utils";
 import { Kbd } from "@/components/ui/controls";
 import { Skeleton } from "@/components/ui/display";
 import { Tooltip } from "@/components/ui/overlays";
-import { findActive, useNavOrderMutation, useNavigation } from "@/features/navigation/hooks";
+import {
+  findActive,
+  useNavOrderMutation,
+  useNavigation,
+} from "@/features/navigation/hooks";
 import { NavIcon } from "@/features/navigation/icons";
 import type { NavItem, NavSection } from "@/features/navigation/types";
 import { errorMessage } from "@/services/api-client";
@@ -68,7 +75,11 @@ export function Sidebar({
     <div className="flex h-full min-h-0 flex-col bg-sidebar text-sidebar-foreground">
       <div className={cn("shrink-0 px-3 pt-3", compact && "px-2")}>
         <WorkspaceSwitcher compact={compact} />
-        <Tooltip content="Search and commands (Ctrl K)" side="right" disabled={!compact}>
+        <Tooltip
+          content="Search and commands (Ctrl K)"
+          side="right"
+          disabled={!compact}
+        >
           <button
             type="button"
             onClick={() => {
@@ -85,7 +96,9 @@ export function Sidebar({
             {!compact && (
               <>
                 <span className="flex-1 text-left">Search…</span>
-                <Kbd className="border-sidebar-border bg-sidebar text-sidebar-muted">Ctrl K</Kbd>
+                <Kbd className="border-sidebar-border bg-sidebar text-sidebar-muted">
+                  Ctrl K
+                </Kbd>
               </>
             )}
           </button>
@@ -98,7 +111,10 @@ export function Sidebar({
         ) : navigation.isError ? (
           <div className="px-2 py-3 text-xs text-sidebar-muted">
             Navigation could not be loaded.{" "}
-            <button className="underline" onClick={() => void navigation.refetch()}>
+            <button
+              className="underline"
+              onClick={() => void navigation.refetch()}
+            >
               Retry
             </button>
           </div>
@@ -123,7 +139,10 @@ export function Sidebar({
                   >
                     Admin
                     <ChevronDown
-                      className={cn("size-3 transition-transform", !adminOpen && "-rotate-90")}
+                      className={cn(
+                        "size-3 transition-transform",
+                        !adminOpen && "-rotate-90",
+                      )}
                       aria-hidden="true"
                     />
                   </button>
@@ -152,7 +171,10 @@ export function Sidebar({
 
       {variant === "desktop" && onToggleCollapsed && (
         <div className="shrink-0 border-t border-sidebar-border p-2">
-          <Tooltip content={collapsed ? "Expand sidebar" : "Collapse sidebar"} side="right">
+          <Tooltip
+            content={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            side="right"
+          >
             <button
               type="button"
               onClick={onToggleCollapsed}
@@ -184,7 +206,12 @@ function NavSkeleton({ compact }: { compact: boolean }) {
       {Array.from({ length: 12 }, (_, i) => (
         <div key={i} className="flex h-8 items-center gap-2.5 px-1.5">
           <Skeleton className="size-4 bg-sidebar-hover" />
-          {!compact && <Skeleton className="h-3 flex-1 bg-sidebar-hover" style={{ maxWidth: 80 + ((i * 37) % 60) }} />}
+          {!compact && (
+            <Skeleton
+              className="h-3 flex-1 bg-sidebar-hover"
+              style={{ maxWidth: 80 + ((i * 37) % 60) }}
+            />
+          )}
         </div>
       ))}
     </div>
@@ -206,7 +233,9 @@ function MainSection({
   const mutation = useNavOrderMutation();
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
   const keys = section.items.map((i) => i.key);
 
@@ -215,7 +244,8 @@ function MainSection({
       { section: "main", order },
       {
         onSuccess: () => toast.success("Sidebar order saved"),
-        onError: (error) => toast.error(errorMessage(error, "Sidebar order could not be saved.")),
+        onError: (error) =>
+          toast.error(errorMessage(error, "Sidebar order could not be saved.")),
       },
     );
   }
@@ -230,7 +260,13 @@ function MainSection({
   function onDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-    save(arrayMove(keys, keys.indexOf(String(active.id)), keys.indexOf(String(over.id))));
+    save(
+      arrayMove(
+        keys,
+        keys.indexOf(String(active.id)),
+        keys.indexOf(String(over.id)),
+      ),
+    );
   }
 
   return (
@@ -247,7 +283,10 @@ function MainSection({
                 onClick={() =>
                   mutation.mutate(
                     { section: "main", order: null },
-                    { onSuccess: () => toast.success("Sidebar reset to the default order") },
+                    {
+                      onSuccess: () =>
+                        toast.success("Sidebar reset to the default order"),
+                    },
                   )
                 }
                 disabled={!section.customized || mutation.isPending}
@@ -365,7 +404,9 @@ function NavLink({
             className={cn(
               "size-4",
               product && !active && "text-pi",
-              !product && !active && "text-sidebar-muted group-hover:text-sidebar-foreground",
+              !product &&
+                !active &&
+                "text-sidebar-muted group-hover:text-sidebar-foreground",
             )}
           />
           {compact && item.badge ? (
@@ -379,7 +420,9 @@ function NavLink({
               <span
                 className={cn(
                   "rounded px-1 text-[9.5px] font-bold tracking-wide uppercase",
-                  active ? "bg-pi-soft text-pi-soft-foreground" : "bg-pi/15 text-pi",
+                  active
+                    ? "bg-pi-soft text-pi-soft-foreground"
+                    : "bg-pi/15 text-pi",
                 )}
               >
                 AI
@@ -389,7 +432,9 @@ function NavLink({
               <span
                 className={cn(
                   "tabular min-w-5 rounded-full px-1.5 text-center text-[11px] leading-[18px] font-semibold",
-                  active ? "bg-sidebar-active-foreground/10" : "bg-sidebar-hover text-sidebar-foreground",
+                  active
+                    ? "bg-sidebar-active-foreground/10"
+                    : "bg-sidebar-hover text-sidebar-foreground",
                 )}
               >
                 {item.badge > 99 ? "99+" : item.badge}
@@ -413,7 +458,14 @@ function SortableNavItem({
   last: boolean;
   onMove: (delta: -1 | 1) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: item.key,
   });
   return (
@@ -422,7 +474,8 @@ function SortableNavItem({
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
         "relative flex h-8 items-center gap-1.5 rounded-md border border-dashed border-sidebar-border bg-sidebar-elevated pr-1 pl-1 text-[13.5px] font-medium",
-        isDragging && "z-10 border-solid border-sidebar-muted/60 bg-sidebar-hover shadow-lg",
+        isDragging &&
+          "z-10 border-solid border-sidebar-muted/60 bg-sidebar-hover shadow-lg",
       )}
       data-sortable-key={item.key}
     >
@@ -435,7 +488,13 @@ function SortableNavItem({
       >
         <GripVertical className="size-3.5" aria-hidden="true" />
       </button>
-      <NavIcon name={item.icon} className={cn("size-4 shrink-0", item.type === "product" ? "text-pi" : "text-sidebar-muted")} />
+      <NavIcon
+        name={item.icon}
+        className={cn(
+          "size-4 shrink-0",
+          item.type === "product" ? "text-pi" : "text-sidebar-muted",
+        )}
+      />
       <span className="min-w-0 flex-1 truncate">{item.label}</span>
       <button
         type="button"

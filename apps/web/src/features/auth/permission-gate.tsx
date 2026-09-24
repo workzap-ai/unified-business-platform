@@ -18,6 +18,7 @@ export function PermissionGate({
   fallback?: React.ReactNode;
 }) {
   const { can, canAny } = useSession();
-  const allowed = (permission ? can(permission) : true) && (any ? canAny(...any) : true);
+  const allowed =
+    (permission ? can(permission) : true) && (any ? canAny(...any) : true);
   return allowed ? children : fallback;
 }
