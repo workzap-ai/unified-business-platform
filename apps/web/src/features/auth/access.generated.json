@@ -1,0 +1,427 @@
+{
+  "permissions": [
+    {
+      "group": "Overview",
+      "key": "overview.read",
+      "label": "View overview dashboard"
+    },
+    {
+      "group": "Customers",
+      "key": "customers.read",
+      "label": "View customers"
+    },
+    {
+      "group": "Customers",
+      "key": "customers.write",
+      "label": "Create and edit customers"
+    },
+    {
+      "group": "Catalog",
+      "key": "catalog.read",
+      "label": "View catalog"
+    },
+    {
+      "group": "Catalog",
+      "key": "catalog.write",
+      "label": "Manage catalog"
+    },
+    {
+      "group": "Inventory",
+      "key": "inventory.read",
+      "label": "View inventory"
+    },
+    {
+      "group": "Inventory",
+      "key": "inventory.adjust",
+      "label": "Adjust stock"
+    },
+    {
+      "group": "Sales",
+      "key": "sales.read",
+      "label": "View sales pipeline"
+    },
+    {
+      "group": "Sales",
+      "key": "sales.write",
+      "label": "Manage leads and opportunities"
+    },
+    {
+      "group": "Quotes",
+      "key": "quotes.read",
+      "label": "View quotes"
+    },
+    {
+      "group": "Quotes",
+      "key": "quotes.write",
+      "label": "Create and edit quotes"
+    },
+    {
+      "group": "Quotes",
+      "key": "quotes.approve",
+      "label": "Approve quotes"
+    },
+    {
+      "group": "Orders",
+      "key": "orders.read",
+      "label": "View orders"
+    },
+    {
+      "group": "Orders",
+      "key": "orders.write",
+      "label": "Create and progress orders"
+    },
+    {
+      "group": "Orders",
+      "key": "orders.cancel",
+      "label": "Cancel orders"
+    },
+    {
+      "group": "Billing",
+      "key": "billing.read",
+      "label": "View invoices and payments"
+    },
+    {
+      "group": "Billing",
+      "key": "billing.write",
+      "label": "Issue invoices and record payments"
+    },
+    {
+      "group": "Finance",
+      "key": "finance.read",
+      "label": "View finance"
+    },
+    {
+      "group": "Finance",
+      "key": "finance.write",
+      "label": "Record expenses"
+    },
+    {
+      "group": "HR",
+      "key": "hr.read",
+      "label": "View employees"
+    },
+    {
+      "group": "HR",
+      "key": "hr.write",
+      "label": "Manage employees"
+    },
+    {
+      "group": "HR",
+      "key": "hr.sensitive",
+      "label": "View compensation and sensitive HR data"
+    },
+    {
+      "group": "Reports",
+      "key": "reports.read",
+      "label": "View reports"
+    },
+    {
+      "group": "PI",
+      "key": "pi.read",
+      "label": "Use PI workspace"
+    },
+    {
+      "group": "PI",
+      "key": "pi.inbox.reply",
+      "label": "Reply to and take over conversations"
+    },
+    {
+      "group": "PI",
+      "key": "pi.handoffs.manage",
+      "label": "Manage handoffs"
+    },
+    {
+      "group": "PI",
+      "key": "pi.agents.manage",
+      "label": "Configure PI agents"
+    },
+    {
+      "group": "PI",
+      "key": "pi.knowledge.manage",
+      "label": "Manage PI knowledge"
+    },
+    {
+      "group": "PI",
+      "key": "pi.whatsapp.manage",
+      "label": "Manage WhatsApp connection"
+    },
+    {
+      "group": "PI",
+      "key": "pi.settings.manage",
+      "label": "Manage PI settings"
+    },
+    {
+      "group": "PI",
+      "key": "pi.analytics.read",
+      "label": "View PI analytics"
+    },
+    {
+      "group": "PI",
+      "key": "pi.memory.read",
+      "label": "View customer memory"
+    },
+    {
+      "group": "Administration",
+      "key": "admin.members.read",
+      "label": "View members"
+    },
+    {
+      "group": "Administration",
+      "key": "admin.members.manage",
+      "label": "Manage members"
+    },
+    {
+      "group": "Administration",
+      "key": "admin.roles.manage",
+      "label": "Manage roles"
+    },
+    {
+      "group": "Administration",
+      "key": "admin.organization.manage",
+      "label": "Manage branches and departments"
+    },
+    {
+      "group": "Administration",
+      "key": "admin.environments.manage",
+      "label": "Manage environments"
+    },
+    {
+      "group": "Administration",
+      "key": "admin.products.manage",
+      "label": "Install and configure products"
+    },
+    {
+      "group": "Administration",
+      "key": "settings.manage",
+      "label": "Manage workspace settings"
+    },
+    {
+      "group": "Administration",
+      "key": "audit.read",
+      "label": "View audit log"
+    },
+    {
+      "group": "Administration",
+      "key": "notifications.read",
+      "label": "Receive notifications"
+    }
+  ],
+  "roles": [
+    {
+      "description": "Full access, including ownership",
+      "key": "owner",
+      "name": "Owner",
+      "permissions": [
+        "admin.environments.manage",
+        "admin.members.manage",
+        "admin.members.read",
+        "admin.organization.manage",
+        "admin.products.manage",
+        "admin.roles.manage",
+        "audit.read",
+        "billing.read",
+        "billing.write",
+        "catalog.read",
+        "catalog.write",
+        "customers.read",
+        "customers.write",
+        "finance.read",
+        "finance.write",
+        "hr.read",
+        "hr.sensitive",
+        "hr.write",
+        "inventory.adjust",
+        "inventory.read",
+        "notifications.read",
+        "orders.cancel",
+        "orders.read",
+        "orders.write",
+        "overview.read",
+        "pi.agents.manage",
+        "pi.analytics.read",
+        "pi.handoffs.manage",
+        "pi.inbox.reply",
+        "pi.knowledge.manage",
+        "pi.memory.read",
+        "pi.read",
+        "pi.settings.manage",
+        "pi.whatsapp.manage",
+        "quotes.approve",
+        "quotes.read",
+        "quotes.write",
+        "reports.read",
+        "sales.read",
+        "sales.write",
+        "settings.manage"
+      ]
+    },
+    {
+      "description": "Full workspace administration",
+      "key": "admin",
+      "name": "Administrator",
+      "permissions": [
+        "admin.environments.manage",
+        "admin.members.manage",
+        "admin.members.read",
+        "admin.organization.manage",
+        "admin.products.manage",
+        "admin.roles.manage",
+        "audit.read",
+        "billing.read",
+        "billing.write",
+        "catalog.read",
+        "catalog.write",
+        "customers.read",
+        "customers.write",
+        "finance.read",
+        "finance.write",
+        "hr.read",
+        "hr.sensitive",
+        "hr.write",
+        "inventory.adjust",
+        "inventory.read",
+        "notifications.read",
+        "orders.cancel",
+        "orders.read",
+        "orders.write",
+        "overview.read",
+        "pi.agents.manage",
+        "pi.analytics.read",
+        "pi.handoffs.manage",
+        "pi.inbox.reply",
+        "pi.knowledge.manage",
+        "pi.memory.read",
+        "pi.read",
+        "pi.settings.manage",
+        "pi.whatsapp.manage",
+        "quotes.approve",
+        "quotes.read",
+        "quotes.write",
+        "reports.read",
+        "sales.read",
+        "sales.write",
+        "settings.manage"
+      ]
+    },
+    {
+      "description": "Runs day-to-day business operations",
+      "key": "manager",
+      "name": "Manager",
+      "permissions": [
+        "admin.members.read",
+        "billing.read",
+        "billing.write",
+        "catalog.read",
+        "catalog.write",
+        "customers.read",
+        "customers.write",
+        "finance.read",
+        "hr.read",
+        "inventory.adjust",
+        "inventory.read",
+        "notifications.read",
+        "orders.cancel",
+        "orders.read",
+        "orders.write",
+        "overview.read",
+        "pi.analytics.read",
+        "pi.handoffs.manage",
+        "pi.inbox.reply",
+        "pi.memory.read",
+        "pi.read",
+        "quotes.approve",
+        "quotes.read",
+        "quotes.write",
+        "reports.read",
+        "sales.read",
+        "sales.write"
+      ]
+    },
+    {
+      "description": "Customers, quotes, and orders",
+      "key": "sales",
+      "name": "Sales",
+      "permissions": [
+        "catalog.read",
+        "customers.read",
+        "customers.write",
+        "inventory.read",
+        "notifications.read",
+        "orders.read",
+        "orders.write",
+        "overview.read",
+        "quotes.read",
+        "quotes.write",
+        "sales.read",
+        "sales.write"
+      ]
+    },
+    {
+      "description": "Customer conversations and handoffs",
+      "key": "support",
+      "name": "Support",
+      "permissions": [
+        "catalog.read",
+        "customers.read",
+        "customers.write",
+        "inventory.read",
+        "notifications.read",
+        "orders.read",
+        "overview.read",
+        "pi.handoffs.manage",
+        "pi.inbox.reply",
+        "pi.memory.read",
+        "pi.read"
+      ]
+    },
+    {
+      "description": "Billing, finance, and reports",
+      "key": "accountant",
+      "name": "Accountant",
+      "permissions": [
+        "billing.read",
+        "billing.write",
+        "customers.read",
+        "finance.read",
+        "finance.write",
+        "notifications.read",
+        "orders.read",
+        "overview.read",
+        "reports.read"
+      ]
+    },
+    {
+      "description": "Employee records",
+      "key": "hr",
+      "name": "HR",
+      "permissions": [
+        "hr.read",
+        "hr.sensitive",
+        "hr.write",
+        "notifications.read",
+        "overview.read"
+      ]
+    },
+    {
+      "description": "Read-only access",
+      "key": "viewer",
+      "name": "Viewer",
+      "permissions": [
+        "admin.members.read",
+        "billing.read",
+        "catalog.read",
+        "customers.read",
+        "finance.read",
+        "inventory.read",
+        "notifications.read",
+        "orders.read",
+        "overview.read",
+        "pi.analytics.read",
+        "pi.read",
+        "quotes.read",
+        "reports.read",
+        "sales.read"
+      ]
+    }
+  ]
+}
