@@ -53,7 +53,7 @@ const schema = z.object({
   customer: z
     .object({ id: z.string(), name: z.string(), detail: z.string().nullable().optional() })
     .nullable()
-    .refine((v) => v !== null, "Choose who this invoice is for"),
+    .refine((v): boolean => v !== null, "Choose who this invoice is for"),
   due_date: z.string().refine((v) => !v || v >= todayISO(), "The due date can't be in the past"),
   notes: z.string().max(2000, "Keep notes under 2,000 characters"),
   lines: z.array(lineSchema).min(1, "Add at least one line"),

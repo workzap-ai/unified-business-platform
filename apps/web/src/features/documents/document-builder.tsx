@@ -31,7 +31,7 @@ const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 function builderSchema(kind: "quote" | "order") {
   return z.object({
-    customer: z.custom<SelectedCustomer | null>().refine((v) => v !== null && v !== undefined, "Choose a customer"),
+    customer: z.custom<SelectedCustomer | null>().refine((v): boolean => v !== null && v !== undefined, "Choose a customer"),
     lines: linesSchema(kind),
     valid_until: z
       .string()
