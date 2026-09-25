@@ -55,7 +55,7 @@ from app.modules.pi.service_conversation import (
 )
 from app.modules.pi.tools.base import PI_RUNTIME_PERMISSIONS
 from app.modules.pi.tools.registry import ToolRegistry
-from app.modules.pi.whatsapp import WhatsApp, decrypt_token
+from app.modules.pi.whatsapp import WhatsApp
 from app.modules.products.service import enabled_products, product_enabled
 from app.modules.tenants.models import Tenant
 from app.shared.errors import BusinessRuleViolation, PermissionDenied
@@ -76,6 +76,12 @@ MEDIA_NOTICE = "Thanks for the attachment. A member of our team will review it a
 async def system_scope(
     session: AsyncSession, connection: WhatsAppConnection
 ) -> WorkspaceScope | None:
+    if connection.integration_connection_id:
+        from app.modules.integrations.models import IntegrationConnection
+
+        linked = await session.get(IntegrationConnection, connection.integration_connection_id)
+        if linked is None or linked.status not in {"connected", "degraded"}:
+            return None
     active = await session.scalar(
         select(Environment.id).where(
             Environment.tenant_id == connection.tenant_id,
@@ -307,13 +313,14 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 )
             )
             media_id = str(message.media.get("provider_media_id", ""))
-            token = connection.access_token_encrypted
             await session.commit()  # No transaction is held across provider calls.
             try:
                 if not allowed:
                     raise GatewayUnavailable()
+                from app.integrations.whatsapp_bridge import token as connection_token
+
                 content, mime = await WhatsApp(ctx["settings"], ctx["http"]).media(
-                    media_id, decrypt_token(ctx["settings"], token)
+                    media_id, await connection_token(session, ctx["settings"], connection)
                 )
                 limit = min(
                     ctx["settings"].media_max_bytes,
@@ -833,7 +840,9 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             return
         try:
             whatsapp = WhatsApp(ctx["settings"], ctx["http"])
-            token = decrypt_token(ctx["settings"], connection.access_token_encrypted)
+            from app.integrations.whatsapp_bridge import token as connection_token
+
+            token = await connection_token(session, ctx["settings"], connection)
             if reminder:
                 message.provider_message_id, message.body = await whatsapp.send_template(
                     connection.phone_number_id,

@@ -6,8 +6,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "predev": "node scripts/ensure-api.mjs",
     "dev": "next dev --hostname 0.0.0.0",
+    "api:check": "node scripts/ensure-api.mjs",
     "build": "next build",
     "start": "node scripts/start.mjs",
     "lint": "eslint .",

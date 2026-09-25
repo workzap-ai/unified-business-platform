@@ -214,7 +214,9 @@ async def enqueue_events(queue: JobQueue, ids: list[UUID]) -> None:
         )
 
 
-async def process(session: AsyncSession, settings: Settings, event_id: UUID) -> str:
+async def process(
+    session: AsyncSession, settings: Settings, event_id: UUID, context: dict[str, Any] | None = None
+) -> str:
     """Run the handler for one inbound event. Idempotent and safe to repeat."""
     event = await session.scalar(
         select(InboundEvent)
@@ -230,6 +232,43 @@ async def process(session: AsyncSession, settings: Settings, event_id: UUID) -> 
     event.attempt_count += 1
     await session.flush()
     handler = handler_for(event.integration_key, event.event_type)
+    pi_event_ids: list[str] = []
+    if handler is None and context is not None:
+
+        async def business_handler(
+            db: AsyncSession, business_scope: WorkspaceScope, incoming: InboundEvent
+        ) -> str:
+            if incoming.integration_key == "stripe" and incoming.event_type in {
+                "checkout.session.completed",
+                "checkout.session.async_payment_succeeded",
+            }:
+                from app.integrations.business import settle_checkout
+                from app.integrations.http import OutboundClient
+
+                linked = await db.get(IntegrationConnection, incoming.connection_id)
+                assert linked is not None
+                return await settle_checkout(
+                    db,
+                    settings,
+                    OutboundClient(
+                        settings, context["http"], resolver=context.get("integration_resolver")
+                    ),
+                    linked,
+                    str((incoming.payload or {}).get("object_id", "")),
+                )
+            if incoming.integration_key == "whatsapp_meta" and incoming.event_type in {
+                "message.received",
+                "message.status",
+            }:
+                from app.integrations.whatsapp_bridge import receive
+
+                pi_id = await receive(db, incoming)
+                if pi_id:
+                    pi_event_ids.append(str(pi_id))
+                    return "processed"
+            return "ignored"
+
+        handler = business_handler
     if handler is None:
         event.status, event.processed_at, event.error_code = "ignored", now(), None
         await session.commit()
@@ -259,6 +298,11 @@ async def process(session: AsyncSession, settings: Settings, event_id: UUID) -> 
     event.status = outcome if outcome in ("processed", "ignored") else "processed"
     event.processed_at, event.error_code, event.next_attempt_at = now(), None, None
     await session.commit()
+    if context is not None:
+        from app.integrations.jobs import _enqueue
+
+        for pi_id in pi_event_ids:
+            await _enqueue(context, "process_pi_event", pi_id, f"pi:{pi_id}")
     return event.status
 
 

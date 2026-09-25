@@ -11,7 +11,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from app.core.config import Settings, get_settings
 from app.core.database import create_engine
 from app.core.exceptions import install_handlers
-from app.core.jobs import create_queue
+from app.core.jobs import InlineQueue, create_queue
 from app.core.logging import configure_logging
 from app.core.middleware import OriginCheckMiddleware, RequestContextMiddleware
 from app.health import router
@@ -31,6 +31,7 @@ from app.modules.hr.routes import router as hr_router
 from app.modules.integrations.routes import router as integrations_router
 from app.modules.integrations.webhook_routes import PublicWebhookOriginExemption
 from app.modules.integrations.webhook_routes import router as integration_webhook_router
+from app.modules.integrations.workflow_routes import router as integration_workflow_router
 from app.modules.inventory.routes import router as inventory_router
 from app.modules.navigation.routes import router as navigation_router
 from app.modules.notifications.routes import router as notifications_router
@@ -79,6 +80,7 @@ ROUTERS = [
     onboarding_router,
     onboarding_public_router,
     integrations_router,
+    integration_workflow_router,
     # Public, signature-authenticated: /webhooks/{integration_key}/{endpoint_token}.
     integration_webhook_router,
     # PI API routers are added with the PI backend phase (schema exists in 0002).
@@ -110,6 +112,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             app.state.redis = redis
             app.state.http = client
             app.state.queue = create_queue(config, app.state.sessions, client)
+            if (
+                isinstance(app.state.queue, InlineQueue)
+                and config.app_env != "test"
+                and config.integrations_enabled
+            ):
+                app.state.queue.start_sweeper()
             try:
                 yield
             finally:

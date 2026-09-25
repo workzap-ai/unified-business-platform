@@ -46,7 +46,7 @@ def _log(operation: str, job_id: str, status: str) -> None:
 
 async def process_inbound_event(ctx: dict[str, Any], event_id: str) -> str:
     async with ctx["sessions"]() as session:
-        result = await webhooks.process(session, ctx["settings"], UUID(event_id))
+        result = await webhooks.process(session, ctx["settings"], UUID(event_id), ctx)
     logger.info("integration_inbound_event", extra={"webhook_event_id": event_id, "status": result})
     return result
 
@@ -83,6 +83,8 @@ async def run_sync_job(ctx: dict[str, Any], job_id: str) -> str:
 
 
 async def integrations_sweep(ctx: dict[str, Any]) -> dict[str, int]:
+    from app.integrations import workflows
+
     settings = ctx["settings"]
     await dispatch_outbox(ctx)
     current = datetime.now(UTC)
@@ -128,10 +130,29 @@ async def integrations_sweep(ctx: dict[str, Any]) -> dict[str, int]:
         )
     for job_id in {*(j.id for j in retry_jobs), *pending_jobs}:
         await _enqueue(ctx, "run_sync_job", str(job_id), f"intg:sync:{job_id}:sweep")
+    async with ctx["sessions"]() as session:
+        operations = await workflows.due(session)
+    for operation_id in operations:
+        await _enqueue(
+            ctx,
+            "deliver_integration_operation",
+            str(operation_id),
+            f"intg:operation:{operation_id}:{current.timestamp()}",
+        )
     return {"deliveries": len(deliveries), "events": len(events), "purged": purged}
 
 
+async def deliver_integration_operation(ctx: dict[str, Any], operation_id: str) -> str:
+    from app.integrations.workflows import deliver
+
+    async with ctx["sessions"]() as session:
+        return await deliver(
+            session, ctx["settings"], _http(ctx), UUID(operation_id), ctx.get("redis")
+        )
+
+
 JOBS: dict[str, Callable[..., Awaitable[Any]]] = {
+    "deliver_integration_operation": deliver_integration_operation,
     "process_inbound_event": process_inbound_event,
     "dispatch_outbox": dispatch_outbox,
     "deliver_webhook": deliver_webhook,

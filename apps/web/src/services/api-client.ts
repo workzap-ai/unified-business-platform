@@ -82,11 +82,14 @@ export async function apiRequest<T>(
   } = {},
 ): Promise<T> {
   const headers: Record<string, string> = { Accept: "application/json" };
+  const multipart =
+    typeof FormData !== "undefined" && options.body instanceof FormData;
   if (expectedWorkspace && !path.startsWith("/auth/")) {
     headers["X-Workspace-Tenant"] = expectedWorkspace.tenant;
     headers["X-Workspace-Environment"] = expectedWorkspace.environment;
   }
-  if (options.body !== undefined) headers["Content-Type"] = "application/json";
+  if (options.body !== undefined && !multipart)
+    headers["Content-Type"] = "application/json";
   if (method !== "GET") {
     const csrf = readCookie(CSRF_COOKIE);
     if (csrf) headers["X-CSRF-Token"] = csrf;
@@ -99,8 +102,11 @@ export async function apiRequest<T>(
       credentials: "include",
       cache: "no-store",
       headers,
-      body:
-        options.body === undefined ? undefined : JSON.stringify(options.body),
+      body: multipart
+        ? (options.body as FormData)
+        : options.body === undefined
+          ? undefined
+          : JSON.stringify(options.body),
       signal: options.signal
         ? AbortSignal.any([options.signal, timeout])
         : timeout,

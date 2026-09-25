@@ -33,6 +33,10 @@ import { ErrorState, Notice } from "@/components/app/states";
 import { useBreadcrumbs } from "@/components/shell/breadcrumbs";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
+import {
+  InvoiceIntegrationActions,
+  RecordAttachments,
+} from "@/features/integrations/business-panels";
 import type { InvoiceDetail } from "@/features/business/types";
 import { billingService } from "./service";
 import { InvoiceStatus } from "./invoice-bits";
@@ -204,6 +208,15 @@ function InvoiceDetailView({ id }: { id: string }) {
         <InvoiceDocument invoice={invoice} />
 
         <div className="flex min-w-0 flex-col gap-4">
+          <InvoiceIntegrationActions
+            id={id}
+            open={["issued", "partially_paid"].includes(invoice.status)}
+          />
+          <RecordAttachments
+            type="invoice"
+            id={id}
+            permission="billing.write"
+          />
           <Card>
             <CardHeader title="Summary" />
             <div className="px-4 pb-2">

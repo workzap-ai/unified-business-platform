@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { RecordAttachments } from "@/features/integrations/business-panels";
 import Link from "next/link";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -484,6 +485,7 @@ function OrderRecord({ id }: { id: string }) {
           </Card>
         </aside>
       </div>
+      <RecordAttachments type="order" id={id} permission="orders.write" />
 
       <ConfirmDialog
         open={confirming === "confirm"}

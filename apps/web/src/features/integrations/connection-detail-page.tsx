@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { WorkflowPanel } from "./workflow-panel";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -399,6 +400,11 @@ function ConnectionDetailView({
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-4">
+          <WorkflowPanel
+            id={c.id}
+            provider={c.integration_key}
+            active={["connected", "degraded"].includes(c.status)}
+          />
           <Card>
             <CardHeader
               title="Health"

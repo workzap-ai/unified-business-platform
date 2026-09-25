@@ -1,5 +1,40 @@
 import { expect, test } from "@playwright/test";
-import { ApiError, apiRequest, errorMessage } from "../src/services/api-client";
+import {
+  ApiError,
+  apiRequest,
+  bindApiWorkspace,
+  errorMessage,
+} from "../src/services/api-client";
+
+test("file uploads preserve multipart boundaries, credentials and workspace guards", async () => {
+  const original = globalThis.fetch;
+  const form = new FormData();
+  form.append("file", new Blob(["attachment content"]), "test.txt");
+  form.append("request_id", "stable-request-id");
+  bindApiWorkspace("tenant-a", "environment-b");
+  let calls = 0;
+  globalThis.fetch = async (_, options) => {
+    calls++;
+    expect(options?.body).toBe(form);
+    expect(options?.credentials).toBe("include");
+    const headers = new Headers(options?.headers);
+    expect(headers.has("Content-Type")).toBe(false);
+    expect(headers.get("X-Workspace-Tenant")).toBe("tenant-a");
+    expect(headers.get("X-Workspace-Environment")).toBe("environment-b");
+    return new Response(JSON.stringify({ status: "succeeded" }), {
+      status: 201,
+    });
+  };
+  try {
+    await expect(
+      apiRequest("POST", "/files/records/customer/123", null, { body: form }),
+    ).resolves.toEqual({ status: "succeeded" });
+    expect(calls).toBe(1);
+  } finally {
+    bindApiWorkspace(undefined, undefined);
+    globalThis.fetch = original;
+  }
+});
 
 test("network failures are classified without retrying a registration", async () => {
   const original = globalThis.fetch;

@@ -427,9 +427,7 @@ async def add_document(
         data, request.app.state.settings.knowledge_upload_max_bytes
     )
     await session.commit()
-    await request.app.state.queue.enqueue(
-        "embed_document", str(row.id), job_id=f"embedding:{row.id}"
-    )
+    await request.app.state.queue.enqueue("index_document", str(row.id), job_id=f"index:{row.id}")
     return await document_view(row, scope, session)
 
 
@@ -499,19 +497,13 @@ async def retry_document(
     await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
     service = KnowledgeService(session, scope)
     row = await service.documents.get(document_id, for_update=True)
-    if row.status == "ready":
-        await request.app.state.queue.enqueue(
-            "embed_document",
-            str(row.id),
-            job_id=f"embedding-retry:{row.id}:{row.updated_at.isoformat()}",
-        )
-        return await document_view(row, scope, session)
-    await service.reindex(row)
+    if row.status != "ready":
+        await service.reindex(row)
     await session.commit()
     await request.app.state.queue.enqueue(
-        "embed_document",
+        "index_document",
         str(row.id),
-        job_id=f"embedding-retry:{row.id}:{row.updated_at.isoformat()}",
+        job_id=f"index-retry:{row.id}:{row.updated_at.isoformat()}",
     )
     return await document_view(row, scope, session)
 
@@ -525,6 +517,7 @@ async def add_faq(
         data.as_document(), request.app.state.settings.knowledge_upload_max_bytes
     )
     await session.commit()
+    await request.app.state.queue.enqueue("index_document", str(row.id), job_id=f"index:{row.id}")
     return await document_view(row, scope, session)
 
 
@@ -549,6 +542,7 @@ async def upload_document(
         limit,
     )
     await session.commit()
+    await request.app.state.queue.enqueue("index_document", str(row.id), job_id=f"index:{row.id}")
     return await document_view(row, scope, session)
 
 

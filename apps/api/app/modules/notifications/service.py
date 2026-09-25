@@ -40,7 +40,7 @@ async def notify(
     """Record a permission-scoped notification; duplicates by dedupe_key are ignored."""
     if permission is None and recipient_user_id is None:
         raise ValueError("A notification needs an audience")
-    await session.execute(
+    notification_id = await session.scalar(
         insert(Notification)
         .values(
             tenant_id=scope.tenant_id,
@@ -55,7 +55,18 @@ async def notify(
             dedupe_key=dedupe_key,
         )
         .on_conflict_do_nothing()
+        .returning(Notification.id)
     )
+    if notification_id is not None:
+        from app.integrations.outbox import EntityRef, emit
+
+        await emit(
+            session,
+            scope,
+            "notification.created",
+            {"title": title[:160], "body": body[:500], "severity": severity},
+            EntityRef("notification", notification_id),
+        )
 
 
 class NotificationService:

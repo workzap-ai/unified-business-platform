@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { RecordAttachments } from "@/features/integrations/business-panels";
 import Link from "next/link";
 import {
   Archive,
@@ -307,6 +308,11 @@ function CustomerRecord({ customer }: { customer: CustomerDetail }) {
           <NotesTab customerId={customer.id} />
         </TabsContent>
       </Tabs>
+      <RecordAttachments
+        type="customer"
+        id={customer.id}
+        permission="customers.write"
+      />
 
       {canWrite && (
         <CustomerEditDialog

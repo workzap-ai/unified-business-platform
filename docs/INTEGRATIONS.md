@@ -1,11 +1,49 @@
 # Integration platform
 
-Status (2026-09-25): implemented and tested against PostgreSQL with mocked providers
-(httpx `MockTransport`). **Live verification against real provider accounts is UNVERIFIED
-for every provider.** Redis-dependent behaviour (token buckets, ARQ cron) is tested with
-fakes only; no Redis exists on the development workstation.
+Status (2026-09-25): provider adapters and business workflows are implemented. Business
+tests use real PostgreSQL and mocked provider networks; they do not prove real email
+delivery or paid transactions. Read-only live checks are recorded in
+[INTEGRATION_CHECK_2026-09-25.md](INTEGRATION_CHECK_2026-09-25.md). Redis-dependent behavior
+uses fakes in the workstation tests; Redis is not running locally.
 
 HTTP contract: [contracts/integrations-api.md](contracts/integrations-api.md).
+
+## Using integrations in business workflows
+
+Connecting a provider verifies credentials. Configure its business use in the connection's
+**Use this integration** panel:
+
+- Resend, SMTP, SendGrid, Slack and generic webhooks: choose business events, add email
+  recipients where applicable, and save with automatic delivery enabled. New events become
+  durable operations; historical events are not replayed. `notification.created` also lets
+  existing application notifications, including PI handoffs, reach the configured channel.
+- Email: **Email invoice** on issued invoices queues a summary for the customer's saved
+  email. The latest verified workspace email connection is selected. It does not require
+  event alerts to be enabled. Check operation history for delivery status.
+- Stripe: **Create payment link** on an open invoice creates a hosted Checkout Session.
+  Configure the displayed inbound endpoint in Stripe for `checkout.session.completed` and
+  `checkout.session.async_payment_succeeded`, including its signing secret. Verified payment
+  callbacks update the invoice once. An inconsistent payment or changed invoice balance
+  requires review. Stripe sandbox uses test payments; use a test workspace for that work.
+- S3: invoice, customer and order detail screens now support upload, attachment download and
+  deletion. Storage keys contain tenant/environment IDs; record permissions apply.
+- WhatsApp: **Use for PI messaging** links the verified number to PI without another token
+  setup. PI must be installed/enabled, and the integration needs an app secret and verification
+  token. Point Meta at the integration endpoint shown on the connection. Inbound messages and
+  delivery receipts enter the existing PI pipeline. Token rotation and disabling propagate
+  to PI. Legacy PI connections remain supported.
+- API keys: use scoped bearer keys on `/api/v1/external/customers` or
+  `/api/v1/external/invoices/{id}`. Revocation, expiry and creator permission changes apply.
+
+Delivery runs through the existing production ARQ cron. Development inline mode now scans
+durable integration work every 15 seconds, including failed queue submissions. Operation
+history refreshes in the connection screen. An interrupted send requires explicit review;
+idempotent retries keep the same operation ID and stop before the provider's 24-hour window.
+Email sending still requires a verified domain and valid account credentials; no provider
+connection or alert recipient is silently created. Planned catalog providers remain planned.
+
+Apply Alembic revision `3ad535597720` before starting this version; it adds workflow/operation
+tables and an optional link from PI's WhatsApp connection to its integration connection.
 
 ## Architecture
 
@@ -189,7 +227,7 @@ the full key is stored; lookup by the public prefix; constant-time compare. Scop
 creator's permissions and never `api_keys.manage`. At use, effective permissions = scopes ∩
 the creator's current grants; revoked/expired keys, inactive creator membership, tenant or
 environment fail with 401. `app.modules.integrations.api_keys.ApiKeyScope` is the FastAPI
-dependency for future public API routes: it yields a system `WorkspaceScope` pinned to the
+dependency for the external API routes: it yields a system `WorkspaceScope` pinned to the
 key's tenant+environment (repositories isolate exactly as for users). `last_used_at` is
 updated at most once a minute; a per-key Redis rate limit (600/min, fail-open) applies.
 

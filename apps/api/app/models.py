@@ -1,6 +1,7 @@
 """Explicit model registry for migrations; no schema creation at import time."""
 
 from app.ai.models import AIUsageEvent
+from app.integrations.workflow_models import IntegrationOperation, IntegrationWorkflow
 from app.modules.access.models import MembershipRole, Role, RolePermission
 from app.modules.audit.models import AuditEvent
 from app.modules.auth.models import AuthSession, UserCredential
@@ -50,6 +51,8 @@ from app.shared.sequences import DocumentSequence
 from app.workflows.models import WorkflowRun
 
 __all__ = [
+    "IntegrationOperation",
+    "IntegrationWorkflow",
     "WorkflowRun",
     "AIUsageEvent",
     "AuditEvent",

@@ -1,5 +1,46 @@
 # Integrations API contract (v1)
 
+## Business workflow routes (2026-09-25)
+
+Paths below include `/api/v1`. Session routes retain active workspace/environment and
+CSRF checks; public API-key routes use bearer credentials exclusively.
+
+| Route | Permission / behavior |
+| --- | --- |
+| `GET /integrations/capabilities` | Signed-in workspace; `{email, storage, payments}` readiness |
+| `GET /integrations/connections/{id}/workflow` | `integrations.read`; `{enabled, event_types, recipients}` |
+| `PUT /integrations/connections/{id}/workflow` | `integrations.manage`; same body, supported events, verified connection, email recipients required when enabled |
+| `GET /integrations/connections/{id}/operations` | `integrations.read`; latest 100 durable business operations |
+| `POST /integrations/operations/{id}/retry` | `integrations.operate`; failed notification only; `{acknowledge_duplicate_risk:true}` required for `needs_review` |
+| `POST /integrations/connections/{id}/activate-pi` | `integrations.manage` + `pi.whatsapp.manage`, PI installed/enabled; `{status, connection_id}` |
+| `POST /billing/invoices/{id}/checkout` | `billing.write`; open invoice, connected Stripe with signing secret; returns durable checkout operation |
+| `POST /billing/invoices/{id}/email` | `billing.write`; `{request_id: UUID}`; customer email, connected email provider; 202 operation, not delivery confirmation |
+| `GET /files/records/{type}/{id}` | Record read permission; attachment operations, latest 100 |
+| `POST /files/records/{type}/{id}` | Record write permission; multipart `file` + `request_id`; non-empty, configured cap up to 25 MiB; 201 operation |
+| `GET /files/{id}/download` | Record read permission; attachment disposition, octet-stream, private/no-store |
+| `DELETE /files/{id}` | Record write permission; idempotent S3 delete, 204 |
+| `GET /external/customers` | Bearer API key with `customers.read`; paginated customers |
+| `GET /external/invoices/{id}` | Bearer API key with `billing.read`; invoice detail |
+
+`type` is `customer`, `order`, or `invoice`. Operation fields: `id`, `connection_id`,
+`kind` (`notification|checkout|file`), `status`, `attempts`, `last_error`, `created_at`,
+`entity_type`, `entity_id`, `output`. Statuses: `pending|running|succeeded|failed|needs_review|cancelled`.
+No credentials or recipient addresses are returned in operation history. Checkout output
+includes hosted Stripe `url`, connection `mode`, and `payment_state`; file output includes
+`name`, `size`, and workspace-prefixed storage `key`.
+
+Saving an enabled event workflow applies only to new events, never historical backlog.
+Disconnecting/disabling or removing a recipient/event cancels matching queued alerts.
+Resend and generic webhook delivery use a stable operation ID across bounded retries.
+Uncertain non-idempotent sends and interrupted claims require review before retry.
+Generic receivers must deduplicate `X-Platform-Delivery-Id`. Invoice email and file requests
+reuse the supplied UUID on transport retries. A reused file UUID with different bytes is
+rejected. Stripe checkout callbacks never trust invoice metadata: the server retrieves the
+session and checks amount, currency, client reference and mode before recording one payment.
+An invoice balance changed after checkout creation requires manual payment reconciliation.
+
+## Connection management
+
 The backend (`apps/api/app/modules/integrations`) and the web app
 (`apps/web/src/features/integrations`) both implement this contract. Change it here first.
 

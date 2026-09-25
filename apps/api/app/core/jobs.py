@@ -66,6 +66,28 @@ class InlineQueue:
         self.ctx["queue"] = self
         self.tasks: set[asyncio.Task[Any]] = set()
         self.seen: set[str] = set()
+        self.sweeper: asyncio.Task[None] | None = None
+
+    def start_sweeper(self, interval: float = 15) -> None:
+        """Development's periodic durable-work scan, equivalent to the ARQ cron."""
+
+        async def sweep() -> None:
+            from app.integrations.jobs import integrations_sweep
+            from app.modules.pi.knowledge_jobs import sweep_knowledge
+
+            while True:
+                await asyncio.sleep(interval)
+                try:
+                    await integrations_sweep(self.ctx)
+                except Exception:
+                    logger.warning("integration_sweep_failed")
+                try:
+                    await sweep_knowledge(self.ctx)
+                except Exception:
+                    logger.warning("knowledge_sweep_failed")
+
+        if self.sweeper is None:
+            self.sweeper = asyncio.create_task(sweep())
 
     async def enqueue(self, name: str, *args: str, job_id: str | None = None) -> bool:
         from app.worker import JOB_FUNCTIONS
@@ -81,6 +103,9 @@ class InlineQueue:
                 await function(self.ctx, *args)
             except Exception:
                 logger.error("inline_job_failed")
+            finally:
+                if job_id is not None:
+                    self.seen.discard(job_id)
 
         task = asyncio.create_task(run())
         self.tasks.add(task)
@@ -92,6 +117,9 @@ class InlineQueue:
             await asyncio.gather(*list(self.tasks), return_exceptions=True)
 
     async def close(self) -> None:
+        if self.sweeper is not None:
+            self.sweeper.cancel()
+            await asyncio.gather(self.sweeper, return_exceptions=True)
         await self.drain()
 
 

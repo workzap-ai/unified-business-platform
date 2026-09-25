@@ -324,6 +324,11 @@ async def save_connection(
         raise BusinessRuleViolation(
             "CONNECTION_IMMUTABLE", "Create a separate environment to connect a different number"
         )
+    if row and row.integration_connection_id and data.access_token:
+        raise BusinessRuleViolation(
+            "TOKEN_MANAGED_BY_INTEGRATION",
+            "Update this connection's token in Settings > Integrations",
+        )
     values = data.model_dump(exclude={"access_token"})
     if data.access_token:
         values["access_token_encrypted"] = encrypt_token(

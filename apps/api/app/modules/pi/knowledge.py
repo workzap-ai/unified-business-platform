@@ -134,9 +134,9 @@ class KnowledgeService:
         await self.reindex(doc)
         return doc
 
-    async def reindex(self, doc: KnowledgeDocument) -> None:
+    async def reindex(self, doc: KnowledgeDocument, *, background: bool = False) -> None:
         self.scope.require("pi.knowledge.manage")
-        if doc.byte_size > SYNC_INDEX_MAX_BYTES:
+        if doc.byte_size > SYNC_INDEX_MAX_BYTES and not background:
             doc.status = "pending"
             return
         await self.session.execute(

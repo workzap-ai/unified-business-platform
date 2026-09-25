@@ -11,6 +11,7 @@ from app.core.database import create_engine
 from app.integrations.jobs import JOBS as INTEGRATION_JOBS
 from app.integrations.jobs import integrations_sweep
 from app.modules.pi.followups import sweep_followups
+from app.modules.pi.knowledge_jobs import index_document, sweep_knowledge
 from app.modules.pi.runtime import process_pi_event, send_pi_message, sweep_pi
 from app.modules.pi.semantic import embed_document
 
@@ -27,6 +28,8 @@ JOB_FUNCTIONS: dict[str, Callable[..., Awaitable[Any]]] = {
     "sweep_pi": sweep_pi,
     "sweep_followups": sweep_followups,
     "embed_document": embed_document,
+    "index_document": index_document,
+    "sweep_knowledge": sweep_knowledge,
     # Integration platform: inbound events, outbox dispatch, deliveries, sync, sweep.
     **INTEGRATION_JOBS,
 }
@@ -52,6 +55,7 @@ class WorkerSettings:
     cron_jobs = [
         cron(sweep_pi, second={0, 30}, unique=True),
         cron(sweep_followups, minute=set(range(0, 60, 5)), second=10, unique=True),
+        cron(sweep_knowledge, second={20, 50}, unique=True),
         cron(integrations_sweep, second={15}, unique=True),
     ]
     redis_settings = RedisSettings.from_dsn(get_settings().redis_url.get_secret_value())

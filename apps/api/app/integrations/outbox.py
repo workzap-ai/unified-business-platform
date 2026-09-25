@@ -97,6 +97,7 @@ async def emit(
         entity_id=entity_ref.entity_id if entity_ref else None,
         status="pending",
         available_at=now(),
+        created_at=now(),
         correlation_id=(correlation_id or scope.request_id or None),
         origin=origin[:80] if origin else None,
         fingerprint=fingerprint(event_type, payload, entity_ref),
@@ -119,6 +120,9 @@ async def dispatch_pending(session: AsyncSession, settings: Settings) -> list[UU
     )
     created: list[UUID] = []
     for event in events:
+        from app.integrations.workflows import fanout
+
+        await fanout(session, event)
         subscriptions = await session.scalars(
             select(WebhookSubscription).where(
                 WebhookSubscription.tenant_id == event.tenant_id,

@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import { resolve } from "node:path";
 import nextEnv from "@next/env";
 
-// npm run dev must not silently start a live UI without its local API.
+// Optional API startup and readiness check, invoked with npm run api:check.
 nextEnv.loadEnvConfig(process.cwd(), true);
 if (process.env.NEXT_PUBLIC_DATA_MODE !== "demo") {
   const target = new URL(

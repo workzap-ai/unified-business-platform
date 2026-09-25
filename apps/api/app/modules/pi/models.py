@@ -127,6 +127,7 @@ class WhatsAppConnection(WorkspaceRow):
     __tablename__ = "whatsapp_connections"
     __table_args__ = workspace_args(
         "whatsapp_connections",
+        scoped_fk("whatsapp_connections", "integration_connection_id", "integration_connections"),
         # Globally unique: inbound webhooks are routed to a tenant by phone number id.
         UniqueConstraint("provider", "phone_number_id", name="uq_whatsapp_connections_number"),
         CheckConstraint(_in("status", ("pending", "active", "disabled", "error")), name="status"),
@@ -134,6 +135,7 @@ class WhatsAppConnection(WorkspaceRow):
         CheckConstraint("phone_number_id ~ '^[0-9]{5,32}$'", name="phone_number_id_format"),
     )
     provider: Mapped[str] = mapped_column(String(20), default="meta_cloud")
+    integration_connection_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     phone_number_id: Mapped[str] = mapped_column(String(32))
     display_phone_number: Mapped[str] = mapped_column(String(32))
     business_account_id: Mapped[str] = mapped_column(String(32), default="", server_default="")

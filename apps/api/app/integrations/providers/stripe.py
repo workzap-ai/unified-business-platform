@@ -40,6 +40,7 @@ from app.integrations.registry import (
 
 KEY = re.compile(r"^(sk|rk)_(test|live)_[A-Za-z0-9]{10,}$")
 ID = re.compile(r"^[a-z]{2,8}_[A-Za-z0-9]{6,64}$")
+CHECKOUT_ID = re.compile(r"^cs_(?:test_|live_)?[A-Za-z0-9]{6,200}$")
 CURRENCY = re.compile(r"^[a-z]{3}$")
 
 DEFINITION = IntegrationDefinition(
@@ -84,6 +85,29 @@ DEFINITION = IntegrationDefinition(
 
 
 class StripeProvider(PaymentProvider, WebhookReceiver, CustomerSyncSource):
+    async def checkout(
+        self, ctx: ProviderContext, data: dict[str, str], key: str
+    ) -> dict[str, Any]:
+        response = await ctx.http.request(
+            "POST",
+            f"{ctx.settings.stripe_api_base_url}/v1/checkout/sessions",
+            headers={**self._headers(ctx), "Idempotency-Key": key},
+            form=data,
+            context=ctx.call,
+        )
+        return response.ensure_success().json_object()
+
+    async def checkout_status(self, ctx: ProviderContext, session_id: str) -> dict[str, Any]:
+        if not CHECKOUT_ID.fullmatch(session_id):
+            raise IntegrationError("INVALID_CHECKOUT", "Invalid payment session")
+        response = await ctx.http.request(
+            "GET",
+            f"{ctx.settings.stripe_api_base_url}/v1/checkout/sessions/{session_id}",
+            headers=self._headers(ctx),
+            context=ctx.call,
+        )
+        return response.ensure_success().json_object()
+
     key = "stripe"
     capabilities = frozenset(DEFINITION.capabilities)
 

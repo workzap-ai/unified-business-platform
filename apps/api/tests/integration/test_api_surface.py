@@ -27,6 +27,15 @@ async def test_all_static_workspace_read_endpoints(api):
         # Knowledge search is the only static read requiring a query value.
         params = {"q": "service policy"} if path.endswith("/knowledge/search") else {}
         response = await api.get(path, params=params)
+        if path.startswith("/api/v1/external/"):
+            # External integrations use API keys, never the workspace session cookie.
+            assert response.status_code == 401, path
+            continue
+        if path.startswith("/api/v1/external/"):
+            # Bearer-only APIs must reject a browser session; scoped-key use is
+            # exercised in test_integration_workflows.
+            assert response.status_code == 401, path
+            continue
         assert response.status_code == 200, f"{path}: {response.status_code} {response.text[:300]}"
         checked.append(path)
     assert len(checked) >= 60

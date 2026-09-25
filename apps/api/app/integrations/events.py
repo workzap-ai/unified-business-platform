@@ -3,6 +3,7 @@
 from typing import Final
 
 EVENT_TYPES: Final[dict[str, str]] = {
+    "notification.created": "A workspace notification was created",
     "customer.created": "A customer was created",
     "customer.updated": "A customer was updated",
     "order.created": "An order was created",
