@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.pagination import Page, Pagination
 from app.modules.audit.service import record
+from app.modules.branches.models import Branch
 from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.models import CatalogProduct, CatalogVariant
 from app.modules.inventory.models import InventoryLocation, StockLevel, StockMovement
@@ -66,6 +67,14 @@ class InventoryService:
 
     async def create_location(self, data: LocationCreate) -> InventoryLocation:
         self.scope.require("inventory.adjust")
+        if data.branch_id is not None:
+            branch = await self.session.scalar(
+                select(Branch.id).where(
+                    Branch.tenant_id == self.scope.tenant_id, Branch.id == data.branch_id
+                )
+            )
+            if branch is None:
+                raise ResourceNotFound
         await self.default_location()
         try:
             async with self.session.begin_nested():

@@ -7,6 +7,7 @@ from sqlalchemy.engine import Connection
 from app import models  # noqa: F401 -- register every mapped model for autogeneration
 from app.core.config import get_settings
 from app.core.database import Base, create_engine
+from app.modules.integrations import models as integration_models  # noqa: F401
 
 target_metadata = Base.metadata
 

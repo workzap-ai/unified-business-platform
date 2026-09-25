@@ -9,7 +9,7 @@
 export type DataMode = "demo" | "live";
 
 export const dataMode: DataMode =
-  process.env.NEXT_PUBLIC_DATA_MODE === "live" ? "live" : "demo";
+  process.env.NEXT_PUBLIC_DATA_MODE === "demo" ? "demo" : "live";
 
 export const isDemo = dataMode === "demo";
 

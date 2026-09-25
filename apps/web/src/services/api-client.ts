@@ -36,6 +36,14 @@ export const API_BASE = (
 ).replace(/\/$/, "");
 export const CSRF_COOKIE = "platform_csrf";
 
+let expectedWorkspace: { tenant: string; environment: string } | null = null;
+export function bindApiWorkspace(
+  tenant: string | undefined,
+  environment: string | undefined,
+) {
+  expectedWorkspace = tenant && environment ? { tenant, environment } : null;
+}
+
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 type Query = Record<string, string | number | boolean | null | undefined>;
 
@@ -68,22 +76,36 @@ export async function apiRequest<T>(
   options: { body?: unknown; query?: Query; signal?: AbortSignal } = {},
 ): Promise<T> {
   const headers: Record<string, string> = { Accept: "application/json" };
+  if (expectedWorkspace && !path.startsWith("/auth/")) {
+    headers["X-Workspace-Tenant"] = expectedWorkspace.tenant;
+    headers["X-Workspace-Environment"] = expectedWorkspace.environment;
+  }
   if (options.body !== undefined) headers["Content-Type"] = "application/json";
   if (method !== "GET") {
     const csrf = readCookie(CSRF_COOKIE);
     if (csrf) headers["X-CSRF-Token"] = csrf;
   }
   const timeout = AbortSignal.timeout(15_000);
-  const response = await fetch(`${API_BASE}${buildPath(path, options.query)}`, {
-    method,
-    credentials: "include",
-    cache: "no-store",
-    headers,
-    body: options.body === undefined ? undefined : JSON.stringify(options.body),
-    signal: options.signal
-      ? AbortSignal.any([options.signal, timeout])
-      : timeout,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${buildPath(path, options.query)}`, {
+      method,
+      credentials: "include",
+      cache: "no-store",
+      headers,
+      body:
+        options.body === undefined ? undefined : JSON.stringify(options.body),
+      signal: options.signal
+        ? AbortSignal.any([options.signal, timeout])
+        : timeout,
+    });
+  } catch (error) {
+    if (options.signal?.aborted) throw error;
+    throw new ApiError(
+      0,
+      timeout.aborted ? "REQUEST_TIMEOUT" : "NETWORK_UNAVAILABLE",
+    );
+  }
   if (response.status === 204) return undefined as T;
   const body: unknown = await response.json().catch(() => null);
   if (!response.ok) {
@@ -94,7 +116,11 @@ export async function apiRequest<T>(
       : {};
     throw new ApiError(
       response.status,
-      parsed.success ? parsed.data.error.code : "REQUEST_FAILED",
+      parsed.success
+        ? parsed.data.error.code
+        : response.status >= 500
+          ? "SERVICE_UNAVAILABLE"
+          : "REQUEST_FAILED",
       response.headers.get("x-request-id") ?? undefined,
       parsed.success ? parsed.data.error.message : undefined,
       fields,
@@ -117,6 +143,15 @@ export function errorMessage(
   fallback = "Something went wrong. Please try again.",
 ) {
   if (error instanceof ApiError) {
+    if (error.code === "NETWORK_UNAVAILABLE")
+      return "We couldn’t connect to the service. Check your connection and try again.";
+    if (error.code === "REQUEST_TIMEOUT")
+      return "The service took too long to respond. Refresh before trying again.";
+    if (
+      error.code === "SERVICE_UNAVAILABLE" ||
+      [502, 503, 504].includes(error.status)
+    )
+      return "The service is temporarily unavailable. Please try again shortly.";
     if (error.status === 401) return "Your session has ended. Sign in again.";
     if (error.status === 403) return "You don't have permission to do that.";
     if (error.status === 404) return "That record could not be found.";

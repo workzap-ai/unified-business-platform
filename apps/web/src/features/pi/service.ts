@@ -1,14 +1,10 @@
-import {
-  ApiError,
-  DemoError,
-  ServiceNotConnectedError,
-  type Page,
-} from "@/services/api-client";
+import { ApiError, DemoError, type Page } from "@/services/api-client";
 import { demoDelay, select } from "@/lib/data-mode";
 import { demoBusiness } from "@/demo/business";
 import { demoId, matches, paginate } from "@/demo/store";
 import { rng } from "@/demo/random";
 import { demoPi } from "./demo-data";
+import { piLive } from "./live";
 import type {
   Agent,
   AgentKey,
@@ -52,6 +48,8 @@ export interface PiService {
   overview(): Promise<PiOverview>;
   conversations(filters: ConversationFilters): Promise<Page<Conversation>>;
   context(id: string): Promise<ConversationContext>;
+  /** Permanently removes one remembered fact (privacy); the audit log records the action. */
+  deleteMemory(conversationId: string, memoryId: string): Promise<void>;
   messages(id: string): Promise<Message[]>;
   sendMessage(id: string, body: string): Promise<Message>;
   takeover(id: string): Promise<Conversation>;
@@ -133,10 +131,10 @@ export interface PiService {
   ): Promise<PiSettings>;
 }
 
-/* Live: the PI API is implemented in the PI backend phase. Until then every call fails
-   clearly instead of returning fabricated data. */
-const notConnected = () => Promise.reject(new ServiceNotConnectedError("PI"));
-const live = new Proxy({} as PiService, { get: () => notConnected });
+/* Live: every method calls the PI API (see ./live.ts). States that need a connected
+   WhatsApp number or AI providers (delivery, automated replies) come from the backend as
+   explicit statuses and error codes; nothing is simulated in live mode. */
+const live = piLive;
 
 /* Demo --------------------------------------------------------------------------------- */
 
@@ -179,7 +177,7 @@ const HANDOFF_FLOW: Record<
   ("assign" | "start" | "resolve" | "close" | "reopen")[]
 > = {
   open: ["assign", "start", "close"],
-  assigned: ["assign", "start", "resolve", "close"],
+  assigned: ["assign", "start", "close"],
   in_progress: ["assign", "resolve"],
   resolved: ["close", "reopen"],
   closed: ["reopen"],
@@ -281,6 +279,14 @@ const demo: PiService = {
       page,
       50,
     );
+  },
+  async deleteMemory(conversationId, memoryId) {
+    await demoDelay(120);
+    const pi = demoPi();
+    const rows = pi.memory[conversationId] ?? [];
+    if (!rows.some((m) => m.id === memoryId))
+      throw new ApiError(404, "RESOURCE_NOT_FOUND");
+    pi.memory[conversationId] = rows.filter((m) => m.id !== memoryId);
   },
   async context(id) {
     await demoDelay(150);

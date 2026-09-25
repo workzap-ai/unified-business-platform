@@ -46,8 +46,10 @@ from app.modules.sales.models import SalesLead
 from app.modules.tenants.models import Tenant
 from app.modules.users.models import PlatformUser
 from app.shared.sequences import DocumentSequence
+from app.workflows.models import WorkflowRun
 
 __all__ = [
+    "WorkflowRun",
     "AIUsageEvent",
     "AuditEvent",
     "AuthSession",

@@ -57,7 +57,7 @@ export type Message = {
   conversation_id: string;
   direction: "inbound" | "outbound";
   sender_type: "customer" | "ai" | "human" | "system";
-  message_type: "text" | "audio" | "image" | "interactive";
+  message_type: "text" | "audio" | "image" | "interactive" | "other";
   body: string;
   media: {
     mime_type: string;
@@ -72,6 +72,7 @@ export type Message = {
     | "skipped"
     | "failed"
     | "queued"
+    | "processing"
     | "sent"
     | "delivered"
     | "read";
@@ -92,7 +93,7 @@ export type Message = {
 export type AgentRun = {
   id: string;
   message_id: string;
-  status: "completed" | "failed" | "handoff" | "skipped";
+  status: "running" | "completed" | "failed" | "handoff" | "skipped";
   intent: string | null;
   confidence: number | null;
   agent_path: AgentKey[];
@@ -253,7 +254,7 @@ export type ProviderHealth = {
   name: ProviderName;
   role: "primary" | "fallback" | "secondary_fallback";
   configured: boolean;
-  status: "healthy" | "degraded" | "down" | "unconfigured";
+  status: "healthy" | "degraded" | "down" | "unconfigured" | "unknown";
   success_rate: number;
   p50_ms: number;
   requests_24h: number;

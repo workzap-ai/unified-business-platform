@@ -13,7 +13,7 @@ from app.shared.scope import WorkspaceScope
 
 router = APIRouter(prefix="/audit", tags=["audit"])
 Read = Annotated[WorkspaceScope, Depends(require("audit.read"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 
 
 class AuditView(BaseModel):

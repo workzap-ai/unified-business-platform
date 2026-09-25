@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, ChevronRight } from "lucide-react";
+import { ArrowUpRight, ChevronRight, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   formatDate,
@@ -14,7 +14,8 @@ import {
 import { Avatar, Badge, Skeleton } from "@/components/ui/display";
 import { ErrorState } from "@/components/app/states";
 import { StatusBadge } from "@/components/app/status-badge";
-import { useScopedQuery } from "@/hooks/use-scoped";
+import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
+import { useSession } from "@/features/auth/session-provider";
 import { piService } from "../service";
 import type { AgentRun, ConversationContext } from "../types";
 import {
@@ -51,6 +52,16 @@ export function useConversationContext(id: string) {
 export function ContextPanel({ conversationId }: { conversationId: string }) {
   const query = useConversationContext(conversationId);
   const names = usePiNames();
+  const { can } = useSession();
+  const canForget = can("pi.memory.read") && can("pi.inbox.reply");
+  const forget = useScopedMutation(
+    (memoryId: string) => piService.deleteMemory(conversationId, memoryId),
+    {
+      invalidate: [[...piKeys.context(conversationId)]],
+      success: () => "Removed from PI's memory",
+      error: "Couldn't remove this memory.",
+    },
+  );
 
   if (query.isError)
     return (
@@ -157,6 +168,18 @@ export function ContextPanel({ conversationId }: { conversationId: string }) {
                 <span className="ml-1 text-xs text-muted-foreground">
                   · {relativeTime(m.created_at)}
                 </span>
+                {canForget && (
+                  <button
+                    type="button"
+                    className="ml-1.5 inline-flex rounded align-middle text-muted-foreground hover:text-danger focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
+                    aria-label="Forget this memory"
+                    title="Forget this memory"
+                    disabled={forget.isPending}
+                    onClick={() => forget.mutate(m.id)}
+                  >
+                    <Trash2 className="size-3.5" aria-hidden="true" />
+                  </button>
+                )}
               </li>
             ))}
           </ul>

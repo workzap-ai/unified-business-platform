@@ -20,7 +20,7 @@ from app.shared.scope import WorkspaceScope
 router = APIRouter(prefix="/sales", tags=["sales"])
 Read = Annotated[WorkspaceScope, Depends(require("sales.read"))]
 Write = Annotated[WorkspaceScope, Depends(require("sales.write"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 
 
 @router.get("/pipeline", response_model=list[PipelineStage])

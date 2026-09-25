@@ -267,7 +267,7 @@ class QuoteService:
         self.scope.require("quotes.approve" if action == "approve" else "quotes.write")
         if action == "submit" and quote.status != "draft":
             raise BusinessRuleViolation("INVALID_TRANSITION", "Only drafts can be submitted")
-        if action == "send" and quote.valid_until < date.today():
+        if action in ("send", "accept") and quote.valid_until < date.today():
             raise BusinessRuleViolation("QUOTE_EXPIRED", "This quote's validity date has passed")
         QUOTE_STATES.ensure(quote.status, target)
         previous, quote.status = quote.status, target

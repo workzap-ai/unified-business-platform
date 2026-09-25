@@ -23,7 +23,7 @@ router = APIRouter(tags=["access"])
 MembersRead = Annotated[WorkspaceScope, Depends(require("admin.members.read"))]
 MembersManage = Annotated[WorkspaceScope, Depends(require("admin.members.manage"))]
 RolesManage = Annotated[WorkspaceScope, Depends(require("admin.roles.manage"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 
 
 @router.get("/permissions", response_model=list[PermissionView])

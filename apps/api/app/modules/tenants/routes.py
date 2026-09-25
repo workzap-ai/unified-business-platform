@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_session
@@ -14,7 +14,7 @@ from app.modules.tenants.service import OrganizationService, list_tenants
 router = APIRouter(prefix="/tenants", tags=["tenants"])
 Actor = Annotated[UUID, Depends(authenticated_user_id)]
 Session = Annotated[AsyncSession, Depends(get_session)]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 
 
 @router.get("", response_model=Page[TenantView])

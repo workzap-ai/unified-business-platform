@@ -178,6 +178,7 @@ const demo: CatalogService = {
     );
     const product: ProductDetail = {
       id,
+      offering_type: input.offering_type,
       name: input.name,
       description: input.description,
       category_id: input.category_id,

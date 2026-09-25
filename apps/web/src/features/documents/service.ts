@@ -43,7 +43,7 @@ export type QuoteAction =
   | "expire"
   | "cancel";
 export type OrderAction =
-  "confirm" | "start_processing" | "ship" | "deliver" | "cancel";
+  "confirm" | "start_processing" | "ship" | "deliver" | "complete" | "cancel";
 
 export const QUOTE_ACTIONS: Record<
   Quote["status"],
@@ -248,7 +248,10 @@ function orderView(o: OrderDetail): OrderDetail {
   return {
     ...o,
     lines: o.lines.map((l) => ({ ...l })),
-    next_actions: ORDER_FLOW[o.status],
+    next_actions:
+      o.fulfillment_type === "service" && o.status === "processing"
+        ? ["complete", "cancel"]
+        : ORDER_FLOW[o.status],
   };
 }
 
@@ -439,6 +442,11 @@ const demo: DocumentsService = {
     const index = variantIndex(business);
     const orderId = demoId("ord");
     const order: OrderDetail = {
+      fulfillment_type: quote.lines.some(
+        (l) => l.variant_id && index.get(l.variant_id)?.variant.track_inventory,
+      )
+        ? "hybrid"
+        : "service",
       id: orderId,
       number: nextNumber(business, "order"),
       customer_id: quote.customer_id,
@@ -519,6 +527,11 @@ const demo: DocumentsService = {
       false,
     );
     const order: OrderDetail = {
+      fulfillment_type: input.lines.some(
+        (l) => index.get(l.variant_id)?.variant.track_inventory,
+      )
+        ? "hybrid"
+        : "service",
       id: demoId("ord"),
       number: nextNumber(business, "order"),
       customer_id: customer.id,
@@ -586,7 +599,7 @@ const demo: DocumentsService = {
     await demoDelay(350);
     const business = demoBusiness();
     const order = findOrder(id);
-    if (!ORDER_FLOW[order.status].includes(action))
+    if (!orderView(order).next_actions.includes(action))
       rule(
         "INVALID_TRANSITION",
         `An order cannot ${action.replace(/_/g, " ")} from ${order.status}`,
@@ -644,6 +657,7 @@ const demo: DocumentsService = {
         start_processing: "processing",
         ship: "shipped",
         deliver: "delivered",
+        complete: "delivered",
         cancel: "cancelled",
       } as const
     )[action];

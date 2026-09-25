@@ -54,6 +54,7 @@ def test_default_main_order_is_the_product_contract():
         "branches",
         "departments",
         "environments",
+        "integrations",
         "audit",
         "products",
         "notifications",

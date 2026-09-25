@@ -10,7 +10,7 @@ from app.modules.audit.service import record
 from app.modules.billing.models import Invoice
 from app.modules.billing.service import BillingService
 from app.modules.business_settings.service import get_settings_row
-from app.modules.catalog.models import CatalogVariant
+from app.modules.catalog.models import CatalogProduct, CatalogVariant
 from app.modules.catalog.service import CatalogService
 from app.modules.customers.models import Customer
 from app.modules.customers.service import log_activity
@@ -37,7 +37,7 @@ ORDER_STATES = StateMachine(
     {
         "draft": frozenset({"confirmed", "cancelled"}),
         "confirmed": frozenset({"processing", "cancelled"}),
-        "processing": frozenset({"shipped", "cancelled"}),
+        "processing": frozenset({"shipped", "delivered", "cancelled"}),
         "shipped": frozenset({"delivered"}),
         "delivered": frozenset(),
         "cancelled": frozenset(),
@@ -48,9 +48,26 @@ ACTION_TARGET = {
     "start_processing": "processing",
     "ship": "shipped",
     "deliver": "delivered",
+    "complete": "delivered",
     "cancel": "cancelled",
 }
 STOCK_DEDUCTED = frozenset({"confirmed", "processing", "shipped", "delivered"})
+
+
+def fulfillment_type(types: list[str]) -> str:
+    if all(t in {"service", "package"} for t in types):
+        return "service"
+    return "product" if all(t == "product" for t in types) else "hybrid"
+
+
+def action_applies(order: Order, action: str) -> bool:
+    if action == "complete":
+        return order.fulfillment_type == "service" and order.status == "processing"
+    if action in {"ship", "deliver"} and order.fulfillment_type == "service":
+        return False
+    if action == "deliver" and order.status != "shipped":
+        return False
+    return True
 
 
 class OrderService:
@@ -118,7 +135,7 @@ class OrderService:
         next_actions = [
             action
             for action, target in ACTION_TARGET.items()
-            if ORDER_STATES.can(order.status, target)
+            if ORDER_STATES.can(order.status, target) and action_applies(order, action)
         ]
         return OrderDetail(
             **OrderView.model_validate(order).model_dump(),
@@ -134,8 +151,10 @@ class OrderService:
         settings = await get_settings_row(self.session, self.scope)
         catalog = CatalogService(self.session, self.scope)
         priced: list[tuple[CatalogVariant, str, int, Decimal]] = []
+        offering_types = []
         for item in inputs:
             variant, product = await catalog.sellable_variant(item.variant_id)
+            offering_types.append(product.offering_type)
             if variant.currency != order.currency:
                 raise BusinessRuleViolation(
                     "CURRENCY_MISMATCH", "All order items must use the workspace currency"
@@ -178,6 +197,7 @@ class OrderService:
                     line_total=line_total,
                 )
             )
+        order.fulfillment_type = fulfillment_type(offering_types)
         order.subtotal, order.discount_total = totals.subtotal, totals.discount_total
         order.tax_rate, order.tax_total, order.total = (
             settings.tax_rate,
@@ -284,6 +304,22 @@ class OrderService:
             [x.variant_id for x in lines if x.variant_id]
         )
         # The accepted quote's agreed prices carry over.
+        products = {
+            p.id: p.offering_type
+            for p in await self.session.scalars(
+                WorkspaceRepository(self.session, CatalogProduct, self.scope)
+                .select()
+                .where(CatalogProduct.id.in_({v.product_id for v in variants.values()}))
+            )
+        }
+        order.fulfillment_type = fulfillment_type(
+            [
+                products.get(variants[x.variant_id].product_id, "service")
+                if x.variant_id in variants
+                else "service"
+                for x in lines
+            ]
+        )
         for line in lines:
             variant = variants.get(line.variant_id) if line.variant_id else None
             self.session.add(
@@ -326,6 +362,11 @@ class OrderService:
             raise BusinessRuleViolation("UNKNOWN_ACTION", "Unknown order action")
         self.scope.require("orders.cancel" if action == "cancel" else "orders.write")
         order = await self.orders.get(order_id, for_update=True)
+        if not action_applies(order, action):
+            raise BusinessRuleViolation(
+                "FULFILLMENT_ACTION_INVALID",
+                "This action does not apply to this order's fulfillment",
+            )
         ORDER_STATES.ensure(order.status, target)
         previous = order.status
         lines = await self.lines_for(order.id)

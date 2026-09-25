@@ -5,13 +5,14 @@ from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.pagination import Page, Pagination
-from app.modules.access.models import MembershipRole, Role
+from app.modules.access.models import MembershipRole, Role, RolePermission
 from app.modules.access.schemas import MemberCreate, MemberView
-from app.modules.access.service import assign_roles, owner_count
+from app.modules.access.service import assign_roles, membership_grants, owner_count
 from app.modules.audit.service import record
 from app.modules.auth.crypto import hash_password
 from app.modules.auth.models import AuthSession, UserCredential
 from app.modules.memberships.models import Membership
+from app.modules.tenants.models import Tenant
 from app.modules.users.models import PlatformUser
 from app.shared.errors import BusinessRuleViolation, Conflict, ResourceNotFound
 from app.shared.scope import WorkspaceScope
@@ -135,23 +136,60 @@ class MemberService:
         # Only owners may grant the owner role; nobody can grant access they lack.
         if any(r.key == "owner" for r in roles) and not await self._is_owner():
             raise BusinessRuleViolation("OWNER_REQUIRED", "Only owners can assign ownership")
+        if self.scope.membership_id is None:
+            raise BusinessRuleViolation("MEMBERSHIP_REQUIRED", "An active membership is required")
+        held, _ = await membership_grants(
+            self.session, self.scope.tenant_id, self.scope.membership_id
+        )
+        granted = set(
+            await self.session.scalars(
+                select(RolePermission.permission).where(
+                    RolePermission.tenant_id == self.scope.tenant_id,
+                    RolePermission.role_id.in_(role_ids),
+                )
+            )
+        )
+        if not granted <= held:
+            raise BusinessRuleViolation(
+                "PERMISSION_ESCALATION", "Cannot grant permissions you do not hold"
+            )
         await assign_roles(self.session, self.scope.tenant_id, membership_id, role_ids)
 
-    async def _is_owner(self) -> bool:
-        if self.scope.membership_id is None:
+    async def _is_owner(self, membership_id: UUID | None = None) -> bool:
+        membership_id = membership_id or self.scope.membership_id
+        if membership_id is None:
             return False
         found = await self.session.scalar(
             select(Role.id)
             .join(MembershipRole, MembershipRole.role_id == Role.id)
             .where(
                 MembershipRole.tenant_id == self.scope.tenant_id,
-                MembershipRole.membership_id == self.scope.membership_id,
+                MembershipRole.membership_id == membership_id,
                 Role.key == "owner",
             )
         )
         return found is not None
 
+    async def _ensure_can_manage(self, target: Membership) -> None:
+        """Owners are managed only by owners; nobody manages someone with more access."""
+        if self.scope.membership_id is None:
+            raise BusinessRuleViolation("MEMBERSHIP_REQUIRED", "An active membership is required")
+        if await self._is_owner(target.id) and not await self._is_owner():
+            raise BusinessRuleViolation("OWNER_REQUIRED", "Only owners can change an owner")
+        held, _ = await membership_grants(
+            self.session, self.scope.tenant_id, self.scope.membership_id
+        )
+        target_grants, _ = await membership_grants(self.session, self.scope.tenant_id, target.id)
+        if not target_grants <= held:
+            raise BusinessRuleViolation(
+                "PERMISSION_ESCALATION", "Cannot change a member who holds access you do not"
+            )
+
     async def _membership(self, membership_id: UUID) -> tuple[Membership, PlatformUser]:
+        # Serialize ownership changes across different target members.
+        await self.session.scalar(
+            select(Tenant.id).where(Tenant.id == self.scope.tenant_id).with_for_update()
+        )
         row = (
             await self.session.execute(
                 select(Membership, PlatformUser)
@@ -167,6 +205,7 @@ class MemberService:
     async def update_roles(self, membership_id: UUID, role_ids: list[UUID]) -> MemberView:
         self.scope.require("admin.members.manage")
         membership, user = await self._membership(membership_id)
+        await self._ensure_can_manage(membership)
         owner_ids = set(
             await self.session.scalars(
                 select(Role.id).where(Role.tenant_id == self.scope.tenant_id, Role.key == "owner")
@@ -194,6 +233,7 @@ class MemberService:
         membership, _user = await self._membership(membership_id)
         if membership.id == self.scope.membership_id:
             raise BusinessRuleViolation("SELF_REVOKE", "You cannot remove yourself")
+        await self._ensure_can_manage(membership)
         if await owner_count(self.session, self.scope.tenant_id, exclude=membership.id) == 0:
             raise BusinessRuleViolation("LAST_OWNER", "A workspace needs at least one owner")
         membership.status = "revoked"

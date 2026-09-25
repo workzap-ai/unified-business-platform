@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.pagination import Page, Pagination
 from app.modules.audit.service import record
+from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.models import CatalogCategory, CatalogProduct, CatalogVariant
 from app.modules.catalog.schemas import (
     CategoryCreate,
@@ -140,6 +141,7 @@ class CatalogService:
         )
         names = await self._category_names({product.category_id} if product.category_id else set())
         return ProductDetail(
+            offering_type=product.offering_type,
             id=product.id,
             name=product.name,
             description=product.description,
@@ -154,6 +156,8 @@ class CatalogService:
 
     async def create_product(self, data: ProductCreate) -> CatalogProduct:
         self.scope.require("catalog.write")
+        for variant in data.variants:
+            await self._validate_tracking(data.offering_type, variant.track_inventory)
         if data.category_id:
             await self.categories.get(data.category_id)
         if len({v.sku.lower() for v in data.variants}) != len(data.variants):
@@ -201,7 +205,8 @@ class CatalogService:
 
     async def add_variant(self, product_id: UUID, data: VariantCreate) -> CatalogVariant:
         self.scope.require("catalog.write")
-        await self.products.get(product_id)
+        product = await self.products.get(product_id)
+        await self._validate_tracking(product.offering_type, data.track_inventory)
         try:
             async with self.session.begin_nested():
                 variant = await self.variants.add(
@@ -221,6 +226,11 @@ class CatalogService:
     async def update_variant(self, variant_id: UUID, data: VariantUpdate) -> CatalogVariant:
         self.scope.require("catalog.write")
         variant = await self.variants.get(variant_id, for_update=True)
+        product = await self.products.get(variant.product_id)
+        await self._validate_tracking(
+            product.offering_type,
+            data.track_inventory if data.track_inventory is not None else variant.track_inventory,
+        )
         changes = data.model_dump(exclude_unset=True)
         old_price = variant.price
         for field in (
@@ -246,6 +256,17 @@ class CatalogService:
             details=details,
         )
         return variant
+
+    async def _validate_tracking(self, offering_type: str, tracked: bool) -> None:
+        if not tracked:
+            return
+        settings = await get_settings_row(self.session, self.scope)
+        if offering_type == "service" or settings.business_type == "service_business":
+            raise BusinessRuleViolation(
+                "INVENTORY_NOT_APPLICABLE",
+                "Services do not track stock; enable a product or hybrid business "
+                "for physical items",
+            )
 
     # Read helpers used by other modules and PI tools ---------------------------------
     async def variants_by_ids(self, ids: Sequence[UUID]) -> dict[UUID, CatalogVariant]:

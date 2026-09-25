@@ -111,7 +111,7 @@ export function ReportsCatalog() {
   return (
     <ReportShell
       title="Reports"
-      description="Business reports across revenue, sales, stock, people and PI."
+      description="Revenue, customer growth, proposals, delivery, billing, people and PI."
       area="reports"
     >
       <CatalogContent />

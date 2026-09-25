@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
@@ -13,6 +14,7 @@ from app.shared.scope import WorkspaceScope
 
 class BusinessSettingsView(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+    business_type: Literal["service_business", "product_business", "hybrid_business"]
     default_currency: str
     tax_rate: Decimal
     auto_invoice_on_order_confirm: bool
@@ -25,6 +27,7 @@ class BusinessSettingsView(BaseModel):
 
 class BusinessSettingsUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    business_type: Literal["service_business", "product_business", "hybrid_business"] | None = None
     default_currency: Currency | None = None
     tax_rate: Rate | None = None
     auto_invoice_on_order_confirm: bool | None = None

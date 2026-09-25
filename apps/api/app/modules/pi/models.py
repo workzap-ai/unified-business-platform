@@ -15,6 +15,7 @@ from sqlalchemy import (
     CheckConstraint,
     Computed,
     DateTime,
+    Float,
     ForeignKey,
     ForeignKeyConstraint,
     Index,
@@ -522,3 +523,5 @@ class KnowledgeChunk(WorkspaceRow):
         TSVECTOR, Computed("to_tsvector('simple', content)", persisted=True)
     )
     embedding_model: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    # Portable storage; optional pgvector cosine operations are enabled by the operator.
+    embedding_values: Mapped[list[float] | None] = mapped_column(ARRAY(Float), nullable=True)

@@ -13,6 +13,7 @@ from app.modules.customers.models import Customer
 from app.modules.customers.service import log_activity
 from app.modules.sales.models import SalesLead
 from app.modules.sales.schemas import LeadCreate, LeadListItem, LeadUpdate, PipelineStage
+from app.shared.money import quantize
 from app.shared.scope import WorkspaceScope
 from app.shared.state_machine import StateMachine
 from app.shared.workspace_repository import WorkspaceRepository, like_pattern
@@ -68,19 +69,20 @@ class SalesService:
         return Page(items=items, total=total, page=page.page, page_size=page.page_size)
 
     async def pipeline(self) -> list[PipelineStage]:
+        # Values in other currencies are counted but never added to workspace-currency totals.
+        currency = (await get_settings_row(self.session, self.scope)).default_currency
+        value = func.sum(SalesLead.estimated_value).filter(SalesLead.currency == currency)
         rows = await self.session.execute(
-            select(
-                SalesLead.stage, func.count(), func.coalesce(func.sum(SalesLead.estimated_value), 0)
-            )
+            select(SalesLead.stage, func.count(), func.coalesce(value, 0))
             .where(self.leads.predicate())
             .group_by(SalesLead.stage)
         )
-        found = {stage: (int(n), Decimal(v)) for stage, n, v in rows}
+        found = {stage: (int(n), quantize(Decimal(v))) for stage, n, v in rows}
         return [
             PipelineStage(
                 stage=s,
-                count=found.get(s, (0, Decimal(0)))[0],
-                value=found.get(s, (0, Decimal(0)))[1],
+                count=found.get(s, (0, Decimal("0.00")))[0],
+                value=found.get(s, (0, Decimal("0.00")))[1],
             )
             for s in ("new", "qualified", "proposal", "won", "lost")
         ]
@@ -127,6 +129,8 @@ class SalesService:
             if field in changes and (changes[field] is not None or field != "title"):
                 setattr(lead, field, changes[field])
         await self.session.flush()
+        # updated_at is a server-side onupdate value; load it now, not lazily in the response.
+        await self.session.refresh(lead, ["updated_at"])
         await record(
             self.session,
             "sales.lead_updated",
@@ -144,6 +148,7 @@ class SalesService:
         previous, lead.stage = lead.stage, stage
         lead.closed_at = datetime.now(UTC) if stage in ("won", "lost") else None
         await self.session.flush()
+        await self.session.refresh(lead, ["updated_at"])
         await record(
             self.session,
             "sales.lead_stage_changed",
@@ -203,6 +208,7 @@ class SalesService:
             lead.missing_information = missing[:20]
             action = "sales.requirement_updated"
         await self.session.flush()
+        await self.session.refresh(lead, ["updated_at"])
         await record(
             self.session,
             action,

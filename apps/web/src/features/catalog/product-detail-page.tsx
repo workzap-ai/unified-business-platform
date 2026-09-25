@@ -145,7 +145,7 @@ function ProductDetailInner({ id }: { id: string }) {
         icon={Package}
         title={p.name}
         status={<StatusBadge status={p.status} />}
-        subtitle={p.category_name ?? "Uncategorized"}
+        subtitle={`${p.offering_type.toUpperCase()} · ${p.category_name ?? "Uncategorized"}`}
         meta={
           <>
             <span className="tabular">

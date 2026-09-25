@@ -439,6 +439,7 @@ const SERVICE_PRODUCTS: ProductTemplate[] = [
 function settingsFor(profile: DemoProfile): BusinessSettings {
   if (profile.kind === "services") {
     return {
+      business_type: "service_business",
       default_currency: "USD",
       tax_rate: "0.0000",
       auto_invoice_on_order_confirm: true,
@@ -450,6 +451,7 @@ function settingsFor(profile: DemoProfile): BusinessSettings {
     };
   }
   return {
+    business_type: "hybrid_business",
     default_currency: "PKR",
     tax_rate: "0.1600",
     auto_invoice_on_order_confirm: true,
@@ -515,6 +517,7 @@ function buildCatalog(
     );
     return {
       id: productId,
+      offering_type: t.tracked === false ? "service" : "product",
       name: t.name,
       description: t.description,
       category_id: `cat-${prefix}-${t.category}`,
@@ -984,6 +987,7 @@ function build(profile: DemoProfile): DemoBusiness {
     const created = daysAgo(age, r.int(9, 21));
     const confirmed = status !== "draft" && status !== "cancelled";
     const order: OrderDetail = {
+      fulfillment_type: services ? "service" : "product",
       id: orderId,
       number,
       customer_id: customer.id,

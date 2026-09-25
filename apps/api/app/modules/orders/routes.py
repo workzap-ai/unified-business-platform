@@ -18,7 +18,7 @@ from app.shared.scope import WorkspaceScope
 router = APIRouter(prefix="/orders", tags=["orders"])
 Read = Annotated[WorkspaceScope, Depends(require("orders.read"))]
 Write = Annotated[WorkspaceScope, Depends(require("orders.write"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 OrderStatus = Literal["draft", "confirmed", "processing", "shipped", "delivered", "cancelled"]
 
 

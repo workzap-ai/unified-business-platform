@@ -294,7 +294,7 @@ export function DocumentBuilder({
               description={
                 kind === "quote"
                   ? "Catalog items use their current catalog price. Use a custom line for services."
-                  : "Catalog items only. Quantities are whole units; stock is deducted on confirmation."
+                  : "Select service or product options. Only physical items with inventory tracking affect stock on confirmation."
               }
             />
             <CardBody>

@@ -42,7 +42,7 @@ def build_registry() -> NavigationRegistry:
             30,
             required_permissions=("catalog.read",),
             analytics_id="nav.catalog",
-            keywords=("products", "sku", "pricing"),
+            keywords=("services", "offerings", "packages", "products", "pricing"),
         ),
         NavDefinition(
             "pi",
@@ -209,6 +209,17 @@ def build_registry() -> NavigationRegistry:
             analytics_id="nav.environments",
         ),
         NavDefinition(
+            "integrations",
+            "Integrations",
+            "/settings/integrations",
+            "plug",
+            "admin",
+            65,
+            required_permissions=("integrations.read",),
+            analytics_id="nav.integrations",
+            keywords=("connections", "webhooks", "oauth", "sync", "api keys"),
+        ),
+        NavDefinition(
             "audit",
             "Audit Logs",
             "/settings/audit",
@@ -344,7 +355,72 @@ def build_registry() -> NavigationRegistry:
             analytics_id="nav.pi.settings",
         ),
     ]
-    for item in [*main, *admin, *pi_children, *module_pages()]:
+    integration_children = [
+        NavDefinition(
+            f"integrations-{key}",
+            label,
+            route,
+            icon,
+            "admin",
+            order,
+            type="page",
+            parent="integrations",
+            required_permissions=(permission,),
+            analytics_id=f"nav.integrations.{key}",
+        )
+        for key, label, route, icon, order, permission in [
+            ("catalog", "Directory", "/settings/integrations", "plug", 10, "integrations.read"),
+            (
+                "webhooks",
+                "Outbound webhooks",
+                "/settings/integrations/webhooks",
+                "send",
+                20,
+                "integrations.read",
+            ),
+            (
+                "events",
+                "Inbound events",
+                "/settings/integrations/events",
+                "inbox",
+                30,
+                "integrations.read",
+            ),
+            (
+                "jobs",
+                "Sync jobs",
+                "/settings/integrations/jobs",
+                "refresh-cw",
+                40,
+                "integrations.read",
+            ),
+            (
+                "failures",
+                "Failures",
+                "/settings/integrations/failures",
+                "triangle-alert",
+                50,
+                "integrations.read",
+            ),
+            (
+                "health",
+                "Health",
+                "/settings/integrations/health",
+                "activity",
+                60,
+                "integrations.read",
+            ),
+            (
+                "api-keys",
+                "API keys",
+                "/settings/integrations/api-keys",
+                "key-round",
+                70,
+                "api_keys.manage",
+            ),
+        ]
+    ]
+    for item in [*main, *admin, *pi_children, *integration_children, *module_pages()]:
         registry.register(item)
     return registry
 
@@ -382,7 +458,15 @@ def module_pages() -> list[NavDefinition]:
             "customers", "segments", "Segments", "/customers/segments", "tags", 20, "customers.read"
         ),
         page("catalog", "overview", "Overview", "/catalog", "gauge", 10, "catalog.read"),
-        page("catalog", "products", "Products", "/catalog/products", "package", 20, "catalog.read"),
+        page(
+            "catalog",
+            "products",
+            "Services & offerings",
+            "/catalog/products",
+            "package",
+            20,
+            "catalog.read",
+        ),
         page(
             "catalog",
             "categories",

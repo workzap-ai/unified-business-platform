@@ -3,7 +3,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, Response, status
 from pydantic import BaseModel, ConfigDict, StringConstraints
 from sqlalchemy import func, select
 
@@ -26,7 +26,7 @@ from app.shared.scope import WorkspaceScope
 router = APIRouter(prefix="/organization", tags=["organization"])
 Manage = Annotated[WorkspaceScope, Depends(require("admin.organization.manage"))]
 Settings = Annotated[WorkspaceScope, Depends(require("settings.manage"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 
 
 class OrganizationView(BaseModel):

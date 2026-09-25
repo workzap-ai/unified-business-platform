@@ -191,6 +191,26 @@
       "label": "Install and configure products"
     },
     {
+      "group": "Integrations",
+      "key": "integrations.read",
+      "label": "View integrations and their health"
+    },
+    {
+      "group": "Integrations",
+      "key": "integrations.manage",
+      "label": "Connect, configure and disconnect integrations"
+    },
+    {
+      "group": "Integrations",
+      "key": "integrations.operate",
+      "label": "Retry, replay and resync integration work"
+    },
+    {
+      "group": "Integrations",
+      "key": "api_keys.manage",
+      "label": "Create and revoke API keys"
+    },
+    {
       "group": "Administration",
       "key": "settings.manage",
       "label": "Manage workspace settings"
@@ -218,6 +238,7 @@
         "admin.organization.manage",
         "admin.products.manage",
         "admin.roles.manage",
+        "api_keys.manage",
         "audit.read",
         "billing.read",
         "billing.write",
@@ -230,6 +251,9 @@
         "hr.read",
         "hr.sensitive",
         "hr.write",
+        "integrations.manage",
+        "integrations.operate",
+        "integrations.read",
         "inventory.adjust",
         "inventory.read",
         "notifications.read",
@@ -266,6 +290,7 @@
         "admin.organization.manage",
         "admin.products.manage",
         "admin.roles.manage",
+        "api_keys.manage",
         "audit.read",
         "billing.read",
         "billing.write",
@@ -278,6 +303,9 @@
         "hr.read",
         "hr.sensitive",
         "hr.write",
+        "integrations.manage",
+        "integrations.operate",
+        "integrations.read",
         "inventory.adjust",
         "inventory.read",
         "notifications.read",

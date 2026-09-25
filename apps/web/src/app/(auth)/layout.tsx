@@ -33,8 +33,8 @@ export default function AuthLayout({
               <span>
                 <span className="font-semibold">PI answers on WhatsApp</span>
                 <span className="block text-sidebar-muted">
-                  Checks real stock and prices, drafts orders, and hands off to
-                  your team when a person should decide.
+                  Checks approved offerings and prices, drafts quotes, and hands
+                  off to your team when a person should decide.
                 </span>
               </span>
             </li>
@@ -46,8 +46,8 @@ export default function AuthLayout({
               <span>
                 <span className="font-semibold">Every module connected</span>
                 <span className="block text-sidebar-muted">
-                  A confirmed order moves stock, issues the invoice and shows up
-                  on the customer.
+                  Turn customer requirements into quotes, service orders and
+                  invoices linked to one customer record.
                 </span>
               </span>
             </li>

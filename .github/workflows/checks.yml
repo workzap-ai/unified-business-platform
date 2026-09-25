@@ -2,9 +2,13 @@ name: Foundation checks
 on: [push, pull_request]
 permissions:
   contents: read
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   backend:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     services:
       postgres:
         image: pgvector/pgvector:pg17
@@ -48,6 +52,7 @@ jobs:
       - run: pytest -q
   frontend:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: apps/web
@@ -63,10 +68,28 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build
+        env:
+          NEXT_PUBLIC_DATA_MODE: demo
       - run: npx playwright install --with-deps chromium
       - run: npm test
+  dependency-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      # Known-vulnerability audit of the exact locked dependency sets.
+      - run: pipx run pip-audit --strict --disable-pip -r apps/api/requirements.lock
+      - run: npm audit --omit=dev --audit-level=high
+        working-directory: apps/web
   containers:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - run: cp .env.example .env

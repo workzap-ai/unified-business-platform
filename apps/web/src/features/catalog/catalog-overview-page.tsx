@@ -88,12 +88,12 @@ function CatalogOverviewInner() {
     <>
       <PageHeader
         title="Catalog"
-        description="Products, variants and prices used by quotes, orders, inventory and PI."
+        description="Services, packages and products with approved pricing for your customer lifecycle."
         actions={
           canWrite ? (
             <Button asChild>
               <Link href="/catalog/products/new">
-                <Plus /> Add product
+                <Plus /> Add offering
               </Link>
             </Button>
           ) : undefined
@@ -124,12 +124,12 @@ function CatalogOverviewInner() {
           <EmptyState
             icon={Package}
             title="Your catalog is empty"
-            description="Add the products you sell with their prices. Quotes, orders, stock and PI's answers all start here."
+            description="Add your services and prices, then prepare quotes and deliver customer orders."
             action={
               canWrite ? (
                 <Button size="sm" asChild>
                   <Link href="/catalog/products/new">
-                    <Plus /> Add your first product
+                    <Plus /> Add your first offering
                   </Link>
                 </Button>
               ) : undefined
@@ -150,7 +150,7 @@ function CatalogOverviewInner() {
       {header}
       <MetricGrid className={canStock ? "xl:grid-cols-5" : "xl:grid-cols-4"}>
         <MetricCard
-          label="Active products"
+          label="Active offerings"
           icon={Package}
           loading={loading}
           value={formatNumber(active.length)}
@@ -158,16 +158,16 @@ function CatalogOverviewInner() {
           detail={
             items.length > active.length
               ? `${formatNumber(items.length - active.length)} inactive`
-              : "All products active"
+              : "All offerings active"
           }
         />
         <MetricCard
-          label="Variants"
+          label="Pricing options"
           icon={Layers}
           loading={loading}
           value={formatNumber(variants)}
           href="/catalog/pricing"
-          detail="Sellable SKUs"
+          detail="Service and product options"
         />
         <MetricCard
           label="Categories"
@@ -211,8 +211,8 @@ function CatalogOverviewInner() {
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader
-            title="Products by category"
-            description="Share of all products"
+            title="Offerings by category"
+            description="Share of all offerings"
             actions={
               <Link
                 href="/catalog/categories"
@@ -276,7 +276,7 @@ function CatalogOverviewInner() {
               href="/catalog/products"
               className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
             >
-              All products <ArrowRight className="size-3" />
+              All offerings <ArrowRight className="size-3" />
             </Link>
           }
         />

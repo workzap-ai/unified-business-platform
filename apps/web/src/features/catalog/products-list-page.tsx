@@ -117,7 +117,7 @@ function ProductsListInner() {
   const columns: Column<ProductListItem>[] = [
     {
       key: "product",
-      header: "Product",
+      header: "Offering",
       cell: (p) => (
         <div className="flex min-w-0 items-center gap-2.5">
           <span className="hidden size-8 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-muted text-muted-foreground sm:flex">
@@ -131,6 +131,7 @@ function ProductsListInner() {
               {p.name}
             </Link>
             <p className="truncate text-xs text-muted-foreground">
+              {p.offering_type.toUpperCase()} ·{" "}
               {p.category_name ?? "Uncategorized"}
             </p>
           </div>
@@ -227,13 +228,13 @@ function ProductsListInner() {
   return (
     <PageShell>
       <PageHeader
-        title="Products"
+        title="Services & offerings"
         description="Everything you sell, with variants, prices and what PI can offer customers."
         actions={
           canWrite ? (
             <Button asChild>
               <Link href="/catalog/products/new">
-                <Plus /> Add product
+                <Plus /> Add offering
               </Link>
             </Button>
           ) : undefined
@@ -347,7 +348,7 @@ function ProductsListInner() {
                 canWrite ? (
                   <Button size="sm" asChild>
                     <Link href="/catalog/products/new">
-                      <Plus /> Add product
+                      <Plus /> Add offering
                     </Link>
                   </Button>
                 ) : undefined

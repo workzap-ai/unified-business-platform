@@ -152,7 +152,7 @@ export function WorkspaceSwitcher({ compact = false }: { compact?: boolean }) {
             <Layers className="size-4" aria-hidden="true" /> Manage environments
           </Link>
           <Link
-            href="/register"
+            href="/workspaces/new"
             onClick={() => setOpen(false)}
             className="flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] text-muted-foreground hover:bg-surface-muted hover:text-foreground"
           >

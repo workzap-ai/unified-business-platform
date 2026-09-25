@@ -18,7 +18,7 @@ from app.shared.scope import WorkspaceScope
 router = APIRouter(prefix="/inventory", tags=["inventory"])
 Read = Annotated[WorkspaceScope, Depends(require("inventory.read"))]
 Adjust = Annotated[WorkspaceScope, Depends(require("inventory.adjust"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 
 
 @router.get("/locations", response_model=list[LocationView])

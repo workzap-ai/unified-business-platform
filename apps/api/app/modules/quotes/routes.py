@@ -15,7 +15,7 @@ from app.shared.scope import WorkspaceScope
 router = APIRouter(prefix="/quotes", tags=["quotes"])
 Read = Annotated[WorkspaceScope, Depends(require("quotes.read"))]
 Write = Annotated[WorkspaceScope, Depends(require("quotes.write"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 QuoteStatus = Literal[
     "draft", "pending_approval", "approved", "sent", "accepted", "rejected", "expired", "cancelled"
 ]

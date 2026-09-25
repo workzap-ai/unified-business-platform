@@ -130,7 +130,9 @@ export function demoSession(): Session | null {
         }
       : null,
     branch: null,
-    permissions: demoPermissions(state.role),
+    permissions: demoPermissions(state.role).filter(
+      (p) => tenant.id !== "tenant-brightline" || !p.startsWith("inventory."),
+    ),
     roles: [state.role],
   };
 }

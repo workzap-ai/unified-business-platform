@@ -18,7 +18,7 @@ from app.shared.scope import WorkspaceScope
 router = APIRouter(prefix="/finance", tags=["finance"])
 Read = Annotated[WorkspaceScope, Depends(require("finance.read"))]
 Write = Annotated[WorkspaceScope, Depends(require("finance.write"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 
 
 @router.get("/summary", response_model=FinanceSummary)

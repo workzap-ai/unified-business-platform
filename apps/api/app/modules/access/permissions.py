@@ -49,6 +49,10 @@ _DEFS: list[tuple[str, str, str]] = [
     ("admin.organization.manage", "Manage branches and departments", "Administration"),
     ("admin.environments.manage", "Manage environments", "Administration"),
     ("admin.products.manage", "Install and configure products", "Administration"),
+    ("integrations.read", "View integrations and their health", "Integrations"),
+    ("integrations.manage", "Connect, configure and disconnect integrations", "Integrations"),
+    ("integrations.operate", "Retry, replay and resync integration work", "Integrations"),
+    ("api_keys.manage", "Create and revoke API keys", "Integrations"),
     ("settings.manage", "Manage workspace settings", "Administration"),
     ("audit.read", "View audit log", "Administration"),
     ("notifications.read", "Receive notifications", "Administration"),
@@ -62,7 +66,7 @@ def _pick(*prefixes: str, exclude: tuple[str, ...] = ()) -> frozenset[str]:
     return frozenset(p for p in ALL if any(p.startswith(x) for x in prefixes) and p not in exclude)
 
 
-READ_ONLY = frozenset(p for p in ALL if p.endswith(".read")) - {"audit.read"}
+READ_ONLY = frozenset(p for p in ALL if p.endswith(".read")) - {"audit.read", "integrations.read"}
 
 SYSTEM_ROLES: dict[str, tuple[str, str, frozenset[str]]] = {
     "owner": ("Owner", "Full access, including ownership", ALL),

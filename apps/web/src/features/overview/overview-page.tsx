@@ -39,6 +39,7 @@ import { billingService } from "@/features/billing/service";
 import { piService } from "@/features/pi/service";
 import { productsService } from "@/features/products/service";
 import type { Metric } from "@/features/business/types";
+import { isDemo } from "@/lib/data-mode";
 
 function greeting() {
   const hour = new Date().getHours();
@@ -201,10 +202,10 @@ export function OverviewPage() {
       permission: "billing.write",
     },
     {
-      label: "Adjust stock",
-      href: "/inventory/stock",
-      icon: Warehouse,
-      permission: "inventory.adjust",
+      label: "Add service",
+      href: "/catalog/products/new",
+      icon: FileText,
+      permission: "catalog.write",
     },
     {
       label: "Open PI inbox",
@@ -244,6 +245,11 @@ export function OverviewPage() {
             {session?.tenant?.name ?? "your workspace"} today.
           </p>
         </div>
+        {!isDemo && (
+          <Button asChild variant="outline">
+            <Link href="/workflows">Business workflows</Link>
+          </Button>
+        )}
       </header>
 
       {empty && (
@@ -256,14 +262,14 @@ export function OverviewPage() {
               </h2>
               <p className="mt-1.5 max-w-lg text-[13.5px] text-muted-foreground">
                 This environment has no business data yet. Add customers and
-                products, then connect WhatsApp so PI can start answering with
-                your real catalog and stock.
+                services and prices, then create your first proposal and start
+                delivering work.
               </p>
             </div>
             <ol className="space-y-2 text-[13px]">
               {[
-                ["Add your products and prices", "/catalog/products/new"],
-                ["Create a stock location", "/inventory/locations"],
+                ["Add your services and prices", "/catalog/products/new"],
+                ["Prepare your first quote", "/quotes/new"],
                 ["Add your first customer", "/customers/new"],
                 ["Install and connect PI", "/settings/products"],
               ].map(([label, href], i) => (

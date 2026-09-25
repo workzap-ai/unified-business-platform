@@ -1,6 +1,7 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,14 +21,44 @@ from app.modules.auth.schemas import (
 )
 from app.modules.auth.service import AuthContext, AuthService, IssuedSession
 from app.modules.branches.models import Branch
+from app.modules.business_settings.capabilities import business_permissions
+from app.modules.business_settings.models import BusinessSettings
 from app.modules.environments.models import Environment
 from app.modules.memberships.models import Membership
 from app.modules.tenants.context import active_memberships
 from app.modules.tenants.models import Tenant
+from app.modules.tenants.onboarding import provision_tenant
 from app.shared.errors import BusinessRuleViolation, Unauthenticated
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 Session = Annotated[AsyncSession, Depends(get_session)]
+
+
+class WorkspaceCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    name: str = Field(min_length=1, max_length=160)
+    business_type: Literal["service_business", "product_business", "hybrid_business"] = (
+        "service_business"
+    )
+
+
+@router.post("/workspaces", response_model=SessionView, status_code=201)
+async def create_workspace(
+    data: WorkspaceCreate, request: Request, auth: Auth, session: Session
+) -> SessionView:
+    if not await hit(request, "workspace-create", str(auth.user.id), 10, 3600):
+        raise HTTPException(429)
+    tenant, environment, _ = await provision_tenant(session, auth.user, data.name)
+    session.add(
+        BusinessSettings(
+            tenant_id=tenant.id, environment_id=environment.id, business_type=data.business_type
+        )
+    )
+    await AuthService(session, request.app.state.settings).select_workspace(
+        auth.session, tenant.id, environment.id, None
+    )
+    await session.commit()
+    return await session_view(session, auth)
 
 
 def set_cookies(response: Response, settings: Settings, issued: IssuedSession) -> None:
@@ -83,6 +114,9 @@ async def session_view(session: AsyncSession, context: AuthContext) -> SessionVi
                     )
                 )
                 if env is not None:
+                    permissions = await business_permissions(
+                        session, membership.tenant_id, env.id, permissions
+                    )
                     environment = WorkspaceRef(id=env.id, name=env.name, key=env.key, kind=env.kind)
             if auth.active_branch_id is not None:
                 b = await session.scalar(

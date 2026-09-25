@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.core.pagination import Page, Pagination
@@ -11,7 +11,7 @@ from app.shared.scope import WorkspaceScope
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 Read = Annotated[WorkspaceScope, Depends(require("notifications.read"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 
 
 class MarkRead(BaseModel):

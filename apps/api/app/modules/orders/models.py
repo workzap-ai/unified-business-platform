@@ -25,6 +25,9 @@ class Order(WorkspaceRow):
     __tablename__ = "orders"
     __table_args__ = workspace_args(
         "orders",
+        CheckConstraint(
+            "fulfillment_type IN ('service', 'product', 'hybrid')", name="fulfillment_type"
+        ),
         scoped_fk("orders", "customer_id", "customers"),
         scoped_fk("orders", "quote_id", "quotes"),
         UniqueConstraint("tenant_id", "environment_id", "number", name="uq_orders_number"),
@@ -57,6 +60,9 @@ class Order(WorkspaceRow):
         Index("ix_orders_customer", "tenant_id", "environment_id", "customer_id", "created_at"),
     )
     number: Mapped[str] = mapped_column(String(20))
+    fulfillment_type: Mapped[str] = mapped_column(
+        String(16), default="service", server_default="service"
+    )
     customer_id: Mapped[UUID] = mapped_column(Uuid)
     quote_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     status: Mapped[str] = mapped_column(String(16), default="draft", server_default="draft")

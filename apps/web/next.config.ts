@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 // Server-side proxy target for /api/v1 (live data mode). Browsers call same-origin
 // /api/v1 so the HttpOnly session cookie is first-party. Evaluated at build time.
 const apiTarget = (
-  process.env.API_PROXY_TARGET ?? "http://localhost:8000"
+  process.env.API_PROXY_TARGET ?? "http://127.0.0.1:8000"
 ).replace(/\/$/, "");
 
 const nextConfig: NextConfig = {

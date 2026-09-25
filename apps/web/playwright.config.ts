@@ -1,5 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
+  testIgnore: ["**/live.spec.ts", "**/auth.live.spec.ts"],
   testDir: "./tests",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,

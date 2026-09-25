@@ -22,7 +22,7 @@ from app.shared.scope import WorkspaceScope
 router = APIRouter(prefix="/catalog", tags=["catalog"])
 Read = Annotated[WorkspaceScope, Depends(require("catalog.read"))]
 Write = Annotated[WorkspaceScope, Depends(require("catalog.write"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 
 
 @router.get("/categories", response_model=list[CategoryView])

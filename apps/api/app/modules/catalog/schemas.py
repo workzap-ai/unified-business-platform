@@ -18,6 +18,7 @@ Sku = Annotated[
     StringConstraints(strip_whitespace=True, pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"),
 ]
 Status = Literal["active", "inactive"]
+OfferingType = Literal["service", "product", "hybrid", "package"]
 
 
 def _attributes(value: dict[str, Any]) -> dict[str, Any]:
@@ -53,7 +54,7 @@ class VariantCreate(BaseModel):
     name: Name
     price: Money
     currency: Currency
-    track_inventory: bool = True
+    track_inventory: bool = False
     low_stock_threshold: int | None = Field(default=None, ge=0, le=1_000_000)
     attributes: Attributes = Field(default_factory=dict)
 
@@ -84,6 +85,7 @@ class VariantView(BaseModel):
 
 class ProductCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    offering_type: OfferingType = "service"
     name: Name
     description: Annotated[str, StringConstraints(strip_whitespace=True, max_length=5000)] = ""
     category_id: UUID | None = None
@@ -106,6 +108,7 @@ class ProductUpdate(BaseModel):
 
 class ProductView(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+    offering_type: OfferingType
     id: UUID
     name: str
     description: str

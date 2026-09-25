@@ -115,3 +115,25 @@ Implemented since Stage 2 (single migration `0002_business_platform_pi`):
    against a real database.
 3. PI backend: AI gateway and fallback, WhatsApp webhook → queue → pipeline, agents and
    controlled tools, memory/RAG, handoff/takeover enforcement, then connect the PI UI.
+
+## Backend test coverage (2026-09-25)
+
+HTTP-level tests through the FastAPI app against real PostgreSQL 17 (68 new tests; full
+suite 174 passed, 1 skipped). Shared helpers: `tests/support/workspace.py`; fixtures
+`stack` (per-request sessions on one rolled-back connection) and `live_stack` (real pool and
+commits, uniquely named tenants) in `tests/integration/conftest.py`.
+
+- `test_auth_sessions.py`: register/login/logout/logout-all, password change, lockout,
+  cookie flags, hashed session/CSRF tokens, CSRF and origin enforcement, forged/revoked/
+  expired sessions, workspace switching limited to held memberships.
+- `test_rbac.py`: all system roles × ~75 routes, capability gating, HR sensitive fields,
+  custom-role escalation, owner protection and last-owner rules.
+- `test_isolation_matrix.py`: tenant B and tenant A's staging env cannot list, read, write or
+  reference any tenant A production row (including totals, reports and the audit log);
+  composite FKs reject cross-environment inserts.
+- `test_money_and_states.py`, `unit/test_money.py`: ROUND_HALF_UP totals, currency rules,
+  quote/order/invoice/lead/expense state machines.
+- `test_order_flows.py`, `test_concurrency.py`: quote → order → stock → invoice → payment,
+  cancellation reversal, idempotent stock effects, oversell/overpay/double-confirm and
+  document-numbering safety under concurrency.
+- `test_reports.py`: bounded parameters and figures computed from scoped data.

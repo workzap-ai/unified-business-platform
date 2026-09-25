@@ -79,6 +79,7 @@ export const variantSchema = z.object({
   attributes: z.record(z.string(), z.unknown()),
 });
 const productBase = z.object({
+  offering_type: z.enum(["service", "product", "hybrid", "package"]),
   id,
   name: z.string(),
   description: z.string(),
@@ -112,6 +113,7 @@ export type VariantInput = {
   low_stock_threshold: number | null;
 };
 export type ProductInput = {
+  offering_type: "service" | "product" | "hybrid" | "package";
   name: string;
   description: string;
   category_id: string | null;
@@ -261,6 +263,7 @@ export type QuoteLineInput = {
 };
 
 export const orderSchema = z.object({
+  fulfillment_type: z.enum(["service", "product", "hybrid"]),
   id,
   number: z.string(),
   customer_id: id,
@@ -475,6 +478,11 @@ export type Branch = z.infer<typeof branchSchema>;
 
 /* Settings -------------------------------------------------------------------------------- */
 export const businessSettingsSchema = z.object({
+  business_type: z.enum([
+    "service_business",
+    "product_business",
+    "hybrid_business",
+  ]),
   default_currency: z.string(),
   tax_rate: decimal,
   auto_invoice_on_order_confirm: z.boolean(),

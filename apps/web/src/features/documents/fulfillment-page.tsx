@@ -38,7 +38,7 @@ const LANES: Lane[] = [
   {
     status: "confirmed",
     title: "Confirmed",
-    description: "Stock reserved, ready to pick",
+    description: "Ready to begin delivery",
     next: {
       action: "start_processing",
       label: "Start processing",
@@ -49,7 +49,7 @@ const LANES: Lane[] = [
   {
     status: "processing",
     title: "Processing",
-    description: "Being picked and packed",
+    description: "Service work and product fulfillment in progress",
     next: {
       action: "ship",
       label: "Mark shipped",
@@ -82,7 +82,7 @@ export function FulfillmentPage() {
         <div className="mx-auto max-w-[1400px]">
           <PageHeader
             title="Fulfillment"
-            description="Move confirmed orders through processing, shipping and delivery."
+            description="Deliver services and fulfill product orders through their authorized steps."
           />
           <ModuleNav moduleKey="orders" />
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -166,7 +166,15 @@ function LaneColumn({ lane }: { lane: Lane }) {
 
 function OrderCard({ order, lane }: { order: Order; lane: Lane }) {
   const { can } = useSession();
-  const next = lane.next;
+  const next: Lane["next"] =
+    order.fulfillment_type === "service" && order.status === "processing"
+      ? {
+          action: "complete",
+          label: "Complete service",
+          icon: PackageCheck,
+          done: "completed",
+        }
+      : lane.next;
   const advance = useScopedMutation(
     (action: OrderAction) => documentsService.orderAction(order.id, action),
     {

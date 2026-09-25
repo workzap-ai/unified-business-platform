@@ -75,6 +75,11 @@ const ACTIONS: Record<
     icon: PackageOpen,
     permission: "orders.write",
   },
+  complete: {
+    label: "Complete service",
+    icon: CheckCircle2,
+    permission: "orders.write",
+  },
   ship: { label: "Mark shipped", icon: Truck, permission: "orders.write" },
   deliver: {
     label: "Mark delivered",
@@ -524,15 +529,19 @@ function OrderRecord({ id }: { id: string }) {
 }
 
 function orderSteps(o: OrderDetail): FlowStep[] {
-  const reached = FLOW.indexOf(o.status);
+  const flow =
+    o.fulfillment_type === "service"
+      ? FLOW.filter((s) => s !== "shipped")
+      : FLOW;
+  const reached = flow.indexOf(o.status);
   const labels: Record<string, string> = {
     draft: "Draft",
     confirmed: "Confirmed",
     processing: "Processing",
     shipped: "Shipped",
-    delivered: "Delivered",
+    delivered: o.fulfillment_type === "service" ? "Completed" : "Delivered",
   };
-  return FLOW.map((status, index) => ({
+  return flow.map((status, index) => ({
     key: status,
     label: labels[status]!,
     state:

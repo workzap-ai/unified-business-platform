@@ -29,7 +29,7 @@ from app.shared.workspace_repository import WorkspaceRepository
 router = APIRouter(prefix="/customers", tags=["customers"])
 Read = Annotated[WorkspaceScope, Depends(require("customers.read"))]
 Write = Annotated[WorkspaceScope, Depends(require("customers.write"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 
 
 async def summary_for(

@@ -42,6 +42,12 @@ import {
   Wallet,
   Warehouse,
   Workflow,
+  Activity,
+  KeyRound,
+  Plug,
+  RefreshCw,
+  Send,
+  TriangleAlert,
   type LucideIcon,
 } from "lucide-react";
 
@@ -92,6 +98,12 @@ const ICONS: Record<string, LucideIcon> = {
   wallet: Wallet,
   warehouse: Warehouse,
   workflow: Workflow,
+  "triangle-alert": TriangleAlert,
+  send: Send,
+  "refresh-cw": RefreshCw,
+  plug: Plug,
+  "key-round": KeyRound,
+  activity: Activity,
 };
 
 export function NavIcon({

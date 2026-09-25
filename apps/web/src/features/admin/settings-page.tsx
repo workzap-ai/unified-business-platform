@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NativeSelect } from "@/components/ui/input";
 import { Switch } from "@/components/ui/controls";
 import { Skeleton } from "@/components/ui/display";
 import {
@@ -188,6 +188,11 @@ const percentField = (label: string) =>
     );
 
 const businessSchema = z.object({
+  business_type: z.enum([
+    "service_business",
+    "product_business",
+    "hybrid_business",
+  ]),
   default_currency: z
     .string()
     .trim()
@@ -225,6 +230,7 @@ function fromPercent(percent: string) {
 
 function toForm(s: BusinessSettings): BusinessValues {
   return {
+    business_type: s.business_type,
     default_currency: s.default_currency,
     tax_rate: toPercent(s.tax_rate),
     auto_invoice_on_order_confirm: s.auto_invoice_on_order_confirm,
@@ -238,6 +244,7 @@ function toForm(s: BusinessSettings): BusinessValues {
 
 function toInput(v: BusinessValues): Partial<BusinessSettings> {
   return {
+    business_type: v.business_type,
     default_currency: v.default_currency.trim().toUpperCase(),
     tax_rate: fromPercent(v.tax_rate),
     auto_invoice_on_order_confirm: v.auto_invoice_on_order_confirm,
@@ -256,6 +263,7 @@ function BusinessSettingsForm() {
   const form = useForm<BusinessValues>({
     resolver: zodResolver(businessSchema),
     defaultValues: {
+      business_type: "service_business",
       default_currency: "",
       tax_rate: "0",
       auto_invoice_on_order_confirm: false,
@@ -328,6 +336,18 @@ function BusinessSettingsForm() {
       })}
     >
       <FormSection
+        title="Business capabilities"
+        description="Choose how this environment operates. Service businesses do not need inventory."
+      >
+        <FormField label="Business type" htmlFor="business-type" required>
+          <NativeSelect id="business-type" {...form.register("business_type")}>
+            <option value="service_business">Service business</option>
+            <option value="product_business">Product business</option>
+            <option value="hybrid_business">Services and products</option>
+          </NativeSelect>
+        </FormField>
+      </FormSection>
+      <FormSection
         title="Money & tax"
         description="Currency and tax used for new documents. Existing documents keep their values."
       >
@@ -376,7 +396,7 @@ function BusinessSettingsForm() {
               Invoice automatically when an order is confirmed
             </label>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Creates a draft invoice from the order lines. You still issue it.
+              Creates and issues an invoice from the confirmed order lines.
             </p>
           </div>
           <Controller

@@ -8,6 +8,7 @@ import {
 } from "@/features/documents/manifest";
 import { financeManifest } from "@/features/finance/manifest";
 import { hrManifest } from "@/features/hr/manifest";
+import { integrationsManifest } from "@/features/integrations/manifest";
 import { piManifest } from "@/features/pi/manifest";
 import type { ModuleManifest } from "./types";
 
@@ -26,4 +27,5 @@ export const MODULE_MANIFESTS: ModuleManifest[] = [
   hrManifest,
   piManifest,
   adminManifest,
+  integrationsManifest,
 ];

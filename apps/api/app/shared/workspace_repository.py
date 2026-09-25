@@ -46,7 +46,7 @@ class WorkspaceRepository[T: WorkspaceRow]:
     async def get(self, record_id: UUID, *, for_update: bool = False) -> T:
         statement = self.select().where(self.model.id == record_id)
         if for_update:
-            statement = statement.with_for_update()
+            statement = statement.with_for_update().execution_options(populate_existing=True)
         record = await self.session.scalar(statement)
         if record is None:
             raise ResourceNotFound

@@ -194,15 +194,41 @@ const DELIVERY: Record<
     label: "Not delivered",
     className: "text-danger",
   },
+  skipped: {
+    icon: AlertCircle,
+    label: "Not sent",
+    className: "text-warning",
+  },
 };
+
+/* Backend delivery codes, explained honestly. Unknown codes fall back to the raw code. */
+const DELIVERY_REASONS: Record<string, string> = {
+  WHATSAPP_NOT_CONNECTED: "delivery requires a connected WhatsApp number",
+  MESSAGE_WINDOW_CLOSED:
+    "the customer must message again first (24-hour window)",
+  HUMAN_TAKEOVER: "a team member took over before it was sent",
+  CONVERSATION_CLOSED: "the conversation was closed",
+  SENDER_NOT_PERMITTED: "the sender no longer has reply permission",
+  DELIVERY_UNCONFIRMED:
+    "WhatsApp did not confirm delivery; check before resending",
+  WHATSAPP_REJECTED: "WhatsApp rejected the message",
+};
+
+function deliveryLabel(message: Message, base: string) {
+  if (!message.error_code) return base;
+  const reason = DELIVERY_REASONS[message.error_code] ?? message.error_code;
+  return `${base} (${reason})`;
+}
 
 function DeliveryStatus({ message }: { message: Message }) {
   const d = DELIVERY[message.status];
   if (!d) return null;
   const Icon = d.icon;
   const label =
-    message.status === "failed" && message.error_code
-      ? `${d.label} (WhatsApp rejected the message)`
+    message.status === "failed" ||
+    message.status === "skipped" ||
+    message.status === "queued"
+      ? deliveryLabel(message, d.label)
       : d.label;
   return (
     <Tooltip content={label}>

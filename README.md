@@ -2,10 +2,32 @@
 
 Multi-tenant business platform (FastAPI + PostgreSQL API, Next.js web app) with core modules
 (Customers/CRM, Catalog, Inventory, Sales, Quotes, Orders, Billing, Finance, HR, Reports)
-and PI, an installable AI WhatsApp assistant product. The complete web UI runs today on
-labelled sample data; the business API is implemented but only partly tested; the PI
-backend is not built yet. See [project status](docs/PROJECT_STATUS.md) for exactly what is
-verified.
+and PI, an installable AI WhatsApp assistant product. Live API mode is the default;
+labelled sample data is available explicitly with `NEXT_PUBLIC_DATA_MODE=demo`.
+Registration and workspace pages need the API and a migrated PostgreSQL database.
+
+## Start the configured local workspace (Windows)
+
+From the repository root:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-local.ps1
+```
+
+This starts the configured portable PostgreSQL cluster when present, applies pending
+migrations, starts the API on `127.0.0.1:8000`, and starts or reuses the website on
+`localhost:3000`. Open http://localhost:3000/register. The API reads `apps/api/.env`;
+local logs are in `.cache/local`. Keep these local files private. The current workstation
+uses a persistent `owner_os_development` database, separate from the disposable test
+database. Local `JOB_QUEUE_MODE=inline` runs jobs without a worker; production requires
+Redis and ARQ. Redis-backed rate limiting remains unavailable without Redis.
+
+If registration reports a service error and `/` cannot reach the workspace, check
+http://localhost:3000/api/v1/health/live. A failed proxy request usually means only the
+website is running. Run the startup command above and retry. If using a custom API
+address, set `API_PROXY_TARGET` in `apps/web/.env.local` and restart the website; Next
+production builds need rebuilding when this value changes. Running only `npm run dev`
+does not start the backend.
 
 Read [project status](docs/PROJECT_STATUS.md), [architecture](docs/ARCHITECTURE.md),
 [security](docs/SECURITY.md), [frontend guide](docs/FRONTEND_GUIDE.md) and
@@ -16,18 +38,19 @@ Read [project status](docs/PROJECT_STATUS.md), [architecture](docs/ARCHITECTURE.
 ```powershell
 Set-Location apps/web
 npm.cmd ci
+$env:NEXT_PUBLIC_DATA_MODE='demo'
 npm.cmd run dev
 ```
 
-Open http://localhost:3000 and sign in with any email/password. Without
-`NEXT_PUBLIC_DATA_MODE=live` the app uses fictional in-browser sample data (marked
+Open http://localhost:3000 and sign in with any email/password.
+`NEXT_PUBLIC_DATA_MODE=demo` explicitly enables fictional in-browser sample data (marked
 "Sample data"); changes reset on reload. Try switching workspace (Northwind retail,
 Brightline services), switching to the Staging environment (first-use empty states, PI
 not enabled), and "View as role" in the account menu.
 
 To use the real API instead, set `NEXT_PUBLIC_DATA_MODE=live` and
 `API_PROXY_TARGET=http://localhost:8000` in `apps/web/.env.local` (the browser calls
-same-origin `/api/v1`, proxied to the API).
+same-origin `/api/v1`, proxied to the API). Live mode is already the default.
 
 ## Requirements
 

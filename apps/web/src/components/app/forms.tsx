@@ -102,6 +102,7 @@ export function FormSection({
 
 export function FormActions({
   dirty,
+  disabled,
   saving,
   onCancel,
   submitLabel = "Save",
@@ -110,6 +111,7 @@ export function FormActions({
   extra,
 }: {
   dirty?: boolean;
+  disabled?: boolean;
   saving?: boolean;
   onCancel?: () => void;
   submitLabel?: string;
@@ -157,7 +159,7 @@ export function FormActions({
       <Button
         type="submit"
         loading={saving}
-        disabled={saving || dirty === false}
+        disabled={disabled || saving || dirty === false}
       >
         {submitLabel}
       </Button>

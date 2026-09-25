@@ -67,6 +67,7 @@ const variantSchema = z.object({
 });
 
 const schema = z.object({
+  offering_type: z.enum(["service", "product", "hybrid", "package"]),
   name: z
     .string()
     .trim()
@@ -104,7 +105,7 @@ const blankVariant = (currency: string): Values["variants"][number] => ({
   name: "",
   price: "",
   currency,
-  track_inventory: true,
+  track_inventory: false,
   low_stock_threshold: "",
 });
 
@@ -127,6 +128,7 @@ function ProductCreateInner() {
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: {
+      offering_type: "service",
       name: "",
       description: "",
       category_id: "",
@@ -145,7 +147,10 @@ function ProductCreateInner() {
   useEffect(() => {
     if (!defaultCurrency) return;
     getValues("variants").forEach((v, i) => {
-      if (!v.currency) setValue(`variants.${i}.currency`, defaultCurrency);
+      if (!v.currency)
+        setValue(`variants.${i}.currency`, defaultCurrency, {
+          shouldValidate: true,
+        });
     });
   }, [defaultCurrency, getValues, setValue]);
 
@@ -168,6 +173,7 @@ function ProductCreateInner() {
     setServerError(null);
     mutation.mutate(
       {
+        offering_type: v.offering_type,
         name: v.name.trim(),
         description: v.description.trim(),
         category_id: v.category_id || null,
@@ -177,7 +183,8 @@ function ProductCreateInner() {
           name: x.name.trim(),
           price: x.price.trim(),
           currency: x.currency,
-          track_inventory: x.track_inventory,
+          track_inventory:
+            v.offering_type === "service" ? false : x.track_inventory,
           low_stock_threshold:
             x.track_inventory && x.low_stock_threshold
               ? Number(x.low_stock_threshold)
@@ -204,8 +211,8 @@ function ProductCreateInner() {
   return (
     <PageShell>
       <PageHeader
-        title="Add product"
-        description="Create a product with at least one sellable variant. You can add stock after saving."
+        title="Add offering"
+        description="Create a service, product or package with approved pricing for quotes and orders."
         eyebrow={
           <Link
             href="/catalog/products"
@@ -222,8 +229,16 @@ function ProductCreateInner() {
               title="Basic information"
               description="How the product appears in quotes, orders and PI conversations."
             >
+              <FormField label="Offering type" htmlFor="offering-type" required>
+                <NativeSelect id="offering-type" {...register("offering_type")}>
+                  <option value="service">Service</option>
+                  <option value="product">Product</option>
+                  <option value="hybrid">Hybrid offering</option>
+                  <option value="package">Package</option>
+                </NativeSelect>
+              </FormField>
               <FormField
-                label="Product name"
+                label="Offering name"
                 htmlFor="product-name"
                 required
                 error={formState.errors.name}
@@ -320,8 +335,8 @@ function ProductCreateInner() {
             </FormSection>
 
             <FormSection
-              title="Variants"
-              description="Each variant has its own SKU, price and stock. Use one variant for products without options."
+              title="Pricing options"
+              description="Set the price for a session, project, monthly service or product option. Stock tracking is optional for physical items."
             >
               <ol className="space-y-3">
                 {fields.map((field, index) => {
@@ -360,7 +375,7 @@ function ProductCreateInner() {
                           <Input
                             id={id("sku")}
                             className="font-mono"
-                            placeholder="CHR-ERG-BLK"
+                            placeholder="WEB-STARTER"
                             aria-invalid={Boolean(errors?.sku)}
                             {...register(`variants.${index}.sku`)}
                           />
@@ -416,7 +431,10 @@ function ProductCreateInner() {
                             render={({ field: f }) => (
                               <Switch
                                 id={id("track")}
-                                checked={f.value}
+                                checked={
+                                  watched.offering_type !== "service" && f.value
+                                }
+                                disabled={watched.offering_type === "service"}
                                 onCheckedChange={f.onChange}
                               />
                             )}
@@ -493,8 +511,9 @@ function ProductCreateInner() {
         </div>
         <FormActions
           dirty={formState.isDirty}
+          disabled={!defaultCurrency}
           saving={mutation.isPending}
-          submitLabel="Create product"
+          submitLabel="Create offering"
           onCancel={() => router.push("/catalog/products")}
         />
       </form>
@@ -586,8 +605,8 @@ function ReviewCard({
           </p>
         )}
         <p className="mt-3 text-xs text-muted-foreground">
-          New products start active. Stock starts at zero until you record a
-          receipt.
+          New offerings start active. Services can be quoted and ordered
+          immediately without inventory.
         </p>
       </div>
     </Card>

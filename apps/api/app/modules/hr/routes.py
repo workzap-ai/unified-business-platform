@@ -18,7 +18,7 @@ from app.shared.scope import WorkspaceScope
 router = APIRouter(prefix="/hr", tags=["hr"])
 Read = Annotated[WorkspaceScope, Depends(require("hr.read"))]
 Write = Annotated[WorkspaceScope, Depends(require("hr.write"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 
 
 @router.get("/headcount", response_model=Headcount)

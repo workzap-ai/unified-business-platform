@@ -4,6 +4,7 @@ import {
   ApiError,
   DemoError,
   pageSchema,
+  bindApiWorkspace,
 } from "@/services/api-client";
 import { demoDelay, select } from "@/lib/data-mode";
 import {
@@ -28,6 +29,10 @@ export interface AuthService {
   session(): Promise<Session>;
   login(input: LoginInput): Promise<Session>;
   register(input: RegisterInput): Promise<Session>;
+  createWorkspace(
+    name: string,
+    businessType: "service_business" | "product_business" | "hybrid_business",
+  ): Promise<Session>;
   logout(): Promise<void>;
   selectWorkspace(tenantId: string, environmentId?: string): Promise<Session>;
   tenants(): Promise<Tenant[]>;
@@ -37,17 +42,26 @@ export interface AuthService {
 }
 
 const live: AuthService = {
-  session: () => apiRequest("GET", "/auth/session", sessionSchema),
+  session: () =>
+    apiRequest("GET", "/auth/session", sessionSchema).then(bindSession),
   login: (input) =>
-    apiRequest("POST", "/auth/login", sessionSchema, { body: input }),
+    apiRequest("POST", "/auth/login", sessionSchema, { body: input }).then(
+      bindSession,
+    ),
   register: (input) =>
-    apiRequest("POST", "/auth/register", sessionSchema, { body: input }),
+    apiRequest("POST", "/auth/register", sessionSchema, { body: input }).then(
+      bindSession,
+    ),
+  createWorkspace: (name, business_type) =>
+    apiRequest("POST", "/auth/workspaces", sessionSchema, {
+      body: { name, business_type },
+    }),
   logout: () => apiRequest("POST", "/auth/logout", null),
   logoutAll: () => apiRequest("POST", "/auth/logout-all", null),
   selectWorkspace: (tenant_id, environment_id) =>
     apiRequest("PUT", "/auth/session/workspace", sessionSchema, {
       body: { tenant_id, environment_id: environment_id ?? null },
-    }),
+    }).then(bindSession),
   tenants: async () =>
     (
       await apiRequest("GET", "/tenants", pageSchema(tenantSchema), {
@@ -62,6 +76,11 @@ const live: AuthService = {
     }),
 };
 
+function bindSession(session: Session): Session {
+  bindApiWorkspace(session.tenant?.id, session.environment?.id);
+  return session;
+}
+
 function requireDemoSession(): Session {
   const session = demoSession();
   if (!session) throw new ApiError(401, "UNAUTHORIZED");
@@ -69,6 +88,9 @@ function requireDemoSession(): Session {
 }
 
 const demo: AuthService = {
+  async createWorkspace() {
+    throw new DemoError("New workspaces require a live API connection.");
+  },
   async session() {
     await demoDelay(60);
     return requireDemoSession();

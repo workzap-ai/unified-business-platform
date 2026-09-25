@@ -35,6 +35,9 @@ class CatalogProduct(WorkspaceRow):
     __tablename__ = "catalog_products"
     __table_args__ = workspace_args(
         "catalog_products",
+        CheckConstraint(
+            "offering_type IN ('service', 'product', 'hybrid', 'package')", name="offering_type"
+        ),
         scoped_fk("catalog_products", "category_id", "catalog_categories"),
         CheckConstraint("status IN ('active', 'inactive')", name="status"),
         CheckConstraint("length(btrim(name)) > 0", name="name_nonempty"),
@@ -47,6 +50,9 @@ class CatalogProduct(WorkspaceRow):
         ),
     )
     name: Mapped[str] = mapped_column(String(200))
+    offering_type: Mapped[str] = mapped_column(
+        String(16), default="service", server_default="service"
+    )
     description: Mapped[str] = mapped_column(Text, default="", server_default="")
     category_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     status: Mapped[str] = mapped_column(String(16), default="active", server_default="active")
@@ -76,6 +82,6 @@ class CatalogVariant(WorkspaceRow):
     price: Mapped[Decimal] = mapped_column(MONEY_SQL)
     currency: Mapped[str] = mapped_column(String(3))
     status: Mapped[str] = mapped_column(String(16), default="active", server_default="active")
-    track_inventory: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    track_inventory: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     low_stock_threshold: Mapped[int | None] = mapped_column(Integer, nullable=True)
     attributes: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, server_default="{}")

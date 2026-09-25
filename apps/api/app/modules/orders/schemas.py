@@ -29,7 +29,7 @@ class OrderLinesUpdate(BaseModel):
 
 class OrderTransition(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    action: Literal["confirm", "start_processing", "ship", "deliver", "cancel"]
+    action: Literal["confirm", "start_processing", "ship", "deliver", "complete", "cancel"]
 
 
 class OrderLineView(BaseModel):
@@ -47,6 +47,7 @@ class OrderLineView(BaseModel):
 
 class OrderView(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+    fulfillment_type: Literal["service", "product", "hybrid"]
     id: UUID
     number: str
     customer_id: UUID

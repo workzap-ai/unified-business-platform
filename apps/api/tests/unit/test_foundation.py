@@ -42,6 +42,17 @@ def test_readiness_success(settings):
         assert client.get("/api/v1/health/ready").json() == {"status": "ok"}
 
 
+def test_inline_readiness_does_not_require_unused_worker_infrastructure(settings):
+    settings.job_queue_mode = "inline"
+    with TestClient(create_app(settings)) as client:
+        connection = AsyncMock()
+        client.app.state.engine = SimpleNamespace(connect=lambda: connection)
+        client.app.state.redis.ping = AsyncMock(side_effect=ConnectionError)
+        assert client.get("/api/v1/health/ready").status_code == 200
+        client.app.state.redis.ping.assert_not_called()
+        connection.__aenter__.return_value.execute.assert_awaited_once()
+
+
 def test_safe_errors_and_validation(settings):
     app = create_app(settings)
 

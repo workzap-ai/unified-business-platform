@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
 from app.modules.access.service import membership_grants
 from app.modules.auth.dependencies import Auth
+from app.modules.business_settings.capabilities import business_permissions
 from app.modules.environments.models import Environment
 from app.modules.memberships.models import Membership
 from app.modules.tenants.context import active_memberships
@@ -20,6 +21,16 @@ Session = Annotated[AsyncSession, Depends(get_session)]
 async def workspace_scope(request: Request, auth: Auth, session: Session) -> WorkspaceScope:
     """Server-held workspace selection, revalidated against active membership per request."""
     selected = auth.session
+    expected_tenant = request.headers.get("x-workspace-tenant")
+    expected_environment = request.headers.get("x-workspace-environment")
+    if (expected_tenant and expected_tenant != str(selected.active_tenant_id)) or (
+        expected_environment and expected_environment != str(selected.active_environment_id)
+    ):
+        raise BusinessRuleViolation(
+            "WORKSPACE_CHANGED",
+            "Your workspace changed in another tab. Refresh before continuing.",
+            status=409,
+        )
     if selected.active_tenant_id is None or selected.active_environment_id is None:
         raise BusinessRuleViolation(
             "WORKSPACE_NOT_SELECTED", "Choose a workspace to continue", status=409
@@ -41,6 +52,9 @@ async def workspace_scope(request: Request, auth: Auth, session: Session) -> Wor
             "WORKSPACE_NOT_SELECTED", "Choose an environment to continue", status=409
         )
     permissions, _roles = await membership_grants(session, membership.tenant_id, membership.id)
+    permissions = await business_permissions(
+        session, membership.tenant_id, environment, permissions
+    )
     return WorkspaceScope(
         tenant_id=membership.tenant_id,
         environment_id=environment,

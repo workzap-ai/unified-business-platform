@@ -20,7 +20,7 @@ from app.shared.scope import WorkspaceScope
 router = APIRouter(prefix="/billing", tags=["billing"])
 Read = Annotated[WorkspaceScope, Depends(require("billing.read"))]
 Write = Annotated[WorkspaceScope, Depends(require("billing.write"))]
-Paging = Annotated[Pagination, Query()]
+Paging = Annotated[Pagination, Depends()]
 InvoiceStatus = Literal["draft", "issued", "partially_paid", "paid", "void"]
 
 

@@ -63,6 +63,7 @@ class InlineQueue:
         http: httpx.AsyncClient,
     ) -> None:
         self.ctx: dict[str, Any] = {"settings": settings, "sessions": sessions, "http": http}
+        self.ctx["queue"] = self
         self.tasks: set[asyncio.Task[Any]] = set()
         self.seen: set[str] = set()
 

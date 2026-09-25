@@ -1,7 +1,8 @@
+import hashlib
 import re
 import secrets
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.access.service import assign_roles, seed_system_roles
@@ -32,6 +33,10 @@ async def provision_tenant(
 
     Runs inside the caller's transaction; the caller commits.
     """
+    lock_key = int.from_bytes(
+        hashlib.sha256(slugify(name).encode()).digest()[:8], "big", signed=True
+    )
+    await session.execute(text("SELECT pg_advisory_xact_lock(:key)"), {"key": lock_key})
     tenant = Tenant(name=name, slug=await unique_slug(session, name))
     session.add(tenant)
     await session.flush()
