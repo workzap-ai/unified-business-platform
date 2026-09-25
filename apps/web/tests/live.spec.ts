@@ -114,40 +114,80 @@ test("live registration, service offering, PI contracts and workspace pages", as
   await expect(page.getByRole("heading", { name: /completed/i })).toBeVisible();
   // Exercise the saved approval UI through the entire quote/order lifecycle.
   const create = async (path: string, data: unknown) => {
-    const response = await page.request.post(`/api/v1/${path}`, { data, headers });
+    const response = await page.request.post(`/api/v1/${path}`, {
+      data,
+      headers,
+    });
     expect(response.ok(), `${path}: ${response.status()}`).toBeTruthy();
     return response.json();
   };
-  const customer = await create("customers", { name: "Workflow browser client", tags: [] });
-  const offerings = await (await page.request.get("/api/v1/catalog/products")).json();
-  const offering = await (await page.request.get(`/api/v1/catalog/products/${offerings.items[0].id}`)).json();
-  const quote = await create("quotes", { customer_id: customer.id, lines: [{ variant_id: offering.variants[0].id, quantity: 1 }] });
+  const customer = await create("customers", {
+    name: "Workflow browser client",
+    tags: [],
+  });
+  const offerings = await (
+    await page.request.get("/api/v1/catalog/products")
+  ).json();
+  const offering = await (
+    await page.request.get(`/api/v1/catalog/products/${offerings.items[0].id}`)
+  ).json();
+  const quote = await create("quotes", {
+    customer_id: customer.id,
+    lines: [{ variant_id: offering.variants[0].id, quantity: 1 }],
+  });
   await page.goto("/workflows");
   const approveAction = async (kind: string, id: string, action: string) => {
     await page.getByLabel("Record type", { exact: true }).selectOption(kind);
     await page.getByLabel("Business record", { exact: true }).selectOption(id);
-    await page.getByLabel("Action", { exact: true }).selectOption(`${kind}.${action}`);
-    await page.getByRole("button", { name: "Prepare review", exact: true }).click();
-    await expect(page.getByRole("button", { name: "Approve and run", exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Approve and run", exact: true }).click();
-    await expect(page.getByRole("heading", { name: new RegExp(`${kind} ${action.replaceAll("_", " ")}.*completed`, "i") })).toBeVisible();
+    await page
+      .getByLabel("Action", { exact: true })
+      .selectOption(`${kind}.${action}`);
+    await page
+      .getByRole("button", { name: "Prepare review", exact: true })
+      .click();
+    await expect(
+      page.getByRole("button", { name: "Approve and run", exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole("button", { name: "Approve and run", exact: true })
+      .click();
+    await expect(
+      page.getByRole("heading", {
+        name: new RegExp(
+          `${kind} ${action.replaceAll("_", " ")}.*completed`,
+          "i",
+        ),
+      }),
+    ).toBeVisible();
   };
   for (const action of ["submit", "send", "accept", "convert"]) {
     await approveAction("quotes", quote.id, action);
   }
-  const accepted = await (await page.request.get(`/api/v1/quotes/${quote.id}`)).json();
+  const accepted = await (
+    await page.request.get(`/api/v1/quotes/${quote.id}`)
+  ).json();
   for (const action of ["confirm", "start_processing", "complete"]) {
     await approveAction("orders", accepted.order_id, action);
   }
-  const delivered = await (await page.request.get(`/api/v1/orders/${accepted.order_id}`)).json();
+  const delivered = await (
+    await page.request.get(`/api/v1/orders/${accepted.order_id}`)
+  ).json();
   expect(delivered.status).toBe("delivered");
   await page.goto(`/billing/invoices/${delivered.invoice_id}`);
-  await page.getByRole("button", { name: "Record payment", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Record payment", exact: true })
+    .click();
   const payment = page.getByRole("dialog", { name: "Record payment" });
-  await payment.getByLabel("Reference", { exact: true }).fill("BROWSER-VERIFIED");
-  await payment.getByRole("button", { name: "Record payment", exact: true }).click();
+  await payment
+    .getByLabel("Reference", { exact: true })
+    .fill("BROWSER-VERIFIED");
+  await payment
+    .getByRole("button", { name: "Record payment", exact: true })
+    .click();
   await expect(payment).not.toBeVisible();
-  const paid = await (await page.request.get(`/api/v1/billing/invoices/${delivered.invoice_id}`)).json();
+  const paid = await (
+    await page.request.get(`/api/v1/billing/invoices/${delivered.invoice_id}`)
+  ).json();
   expect(paid.status).toBe("paid");
   expect(paid.balance_due).toBe("0.00");
   const original = await (

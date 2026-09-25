@@ -546,6 +546,7 @@ def module_pages() -> list[NavDefinition]:
         ),
         page("hr", "overview", "Overview", "/hr", "gauge", 10, "hr.read"),
         page("hr", "employees", "Employees", "/hr/employees", "users", 20, "hr.read"),
+        page("hr", "onboarding", "Onboarding", "/hr/onboarding", "user-plus", 25, "hr.write"),
         page("hr", "departments", "Departments", "/hr/departments", "network", 30, "hr.read"),
         page("reports", "overview", "Overview", "/reports", "gauge", 10, "reports.read"),
         page(

@@ -1,8 +1,8 @@
-from datetime import UTC, datetime
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel
-from sqlalchemy import ColumnElement, and_, exists, func, or_, select
+from sqlalchemy import ColumnElement, and_, exists, func, literal, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -119,25 +119,22 @@ class NotificationService:
     async def mark_read(self, ids: list[UUID] | None) -> None:
         if self.scope.user_id is None:
             return
-        statement = select(Notification.id).where(self._audience(), ~self._read())
+        statement = select(
+            Notification.tenant_id,
+            Notification.id,
+            literal(self.scope.user_id),
+            func.now(),
+        ).where(self._audience(), ~self._read())
         if ids is not None:
             statement = statement.where(Notification.id.in_(ids))
-        visible = list(await self.session.scalars(statement.limit(500)))
-        if not visible:
-            return
-        now = datetime.now(UTC)
+        # Let PostgreSQL insert every visible unread row without a client-side cap
+        # or a large parameter list. Server defaults generate a distinct id per row.
         await self.session.execute(
             insert(NotificationRead)
-            .values(
-                [
-                    {
-                        "tenant_id": self.scope.tenant_id,
-                        "notification_id": nid,
-                        "user_id": self.scope.user_id,
-                        "read_at": now,
-                    }
-                    for nid in visible
-                ]
+            .from_select(
+                ["tenant_id", "notification_id", "user_id", "read_at"],
+                statement.order_by(Notification.id),
+                include_defaults=False,
             )
             .on_conflict_do_nothing()
         )

@@ -67,8 +67,12 @@ class RequestContextMiddleware:
 
         try:
             await self.app(scope, receive, send_response)
-        except Exception:
-            logger.error("request_failed", extra={"request_id": request_id})
+        except Exception as exc:
+            # Class name only: exception text can carry SQL, payloads or secrets.
+            logger.error(
+                "request_failed",
+                extra={"request_id": request_id, "error_kind": type(exc).__name__},
+            )
             if sent:
                 raise
             response = error_response(

@@ -25,6 +25,8 @@ from app.modules.catalog.routes import router as catalog_router
 from app.modules.customers.routes import router as customers_router
 from app.modules.environments.routes import router as environments_router
 from app.modules.finance.routes import router as finance_router
+from app.modules.hr.onboarding_routes import public_router as onboarding_public_router
+from app.modules.hr.onboarding_routes import router as onboarding_router
 from app.modules.hr.routes import router as hr_router
 from app.modules.integrations.routes import router as integrations_router
 from app.modules.integrations.webhook_routes import PublicWebhookOriginExemption
@@ -74,6 +76,8 @@ ROUTERS = [
     billing_router,
     finance_router,
     hr_router,
+    onboarding_router,
+    onboarding_public_router,
     integrations_router,
     # Public, signature-authenticated: /webhooks/{integration_key}/{endpoint_token}.
     integration_webhook_router,

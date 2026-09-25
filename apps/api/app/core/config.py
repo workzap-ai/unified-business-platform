@@ -20,7 +20,29 @@ class Settings(BaseSettings):
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     db_pool_size: int = Field(default=5, ge=1, le=50)
     db_max_overflow: int = Field(default=5, ge=0, le=50)
+    # Wait for a free pooled connection; separate from dependency (health) timeouts.
+    db_pool_timeout_seconds: float = Field(default=10, gt=0, le=60)
     dependency_timeout_seconds: float = Field(default=3, gt=0, le=30)
+
+    # Database hosting. Neon (serverless PostgreSQL) is the supported managed database:
+    # DATABASE_URL may be Neon's pooled connection string as copied from the console
+    # (postgresql://…-pooler…neon.tech/db?sslmode=require&channel_binding=require);
+    # MIGRATION_DATABASE_URL should be the direct (unpooled) endpoint for Alembic.
+    # SSL, pooler mode and prepared-statement handling are derived from the URL unless
+    # set explicitly below.
+    migration_database_url: SecretStr | None = None  # empty means "same as DATABASE_URL"
+    database_ssl: Literal["disable", "prefer", "require", "verify-full"] | None = None
+    database_ssl_root_cert: str | None = None  # CA bundle path for private certificates
+    database_pooled: bool | None = None  # PgBouncer transaction pooling (Neon "-pooler")
+    # Protocol-level prepared statements through the pooler. Neon's PgBouncer supports
+    # them (measured: one round trip per cached query instead of two), so the default is
+    # on for Neon and off for other PgBouncer deployments.
+    database_pooler_prepared_statements: bool | None = None
+    db_connect_timeout_seconds: float = Field(default=10, gt=0, le=60)  # Neon cold starts
+    # "ipv4" skips IPv6 addresses for the database host: on networks without working IPv6
+    # the driver otherwise waits on each unreachable AAAA address before trying IPv4.
+    database_ip_family: Literal["auto", "ipv4"] = "auto"
+    db_pool_recycle_seconds: int = Field(default=300, ge=30, le=3600)
 
     # Authentication and sessions
     session_cookie_name: str = "platform_session"
@@ -147,13 +169,19 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_connections(self) -> "Settings":
+        from app.core.database import resolve_database
+
         try:
-            db = make_url(self.database_url.get_secret_value())
+            databases = [
+                resolve_database(self, url.get_secret_value())
+                for url in (self.database_url, self.migration_database_url)
+                if url is not None and url.get_secret_value()
+            ]
             cache = make_url(self.redis_url.get_secret_value())
         except Exception:
             raise ValueError("Invalid connection configuration") from None
-        if db.drivername != "postgresql+asyncpg" or cache.drivername not in {"redis", "rediss"}:
-            raise ValueError("Use PostgreSQL asyncpg and Redis connection URLs")
+        if cache.drivername not in {"redis", "rediss"}:
+            raise ValueError("Use PostgreSQL and Redis connection URLs")
         if not self.allowed_hosts or "*" in self.allowed_hosts:
             raise ValueError("Explicit allowed hosts are required")
         if any(not origin.startswith(("http://", "https://")) for origin in self.cors_origins):
@@ -165,6 +193,8 @@ class Settings(BaseSettings):
                 raise ValueError("Production requires the ARQ job queue")
             if self.cookie_secure is False:
                 raise ValueError("Production requires secure cookies")
+            if any(db.remote and db.ssl_mode in (None, "disable", "prefer") for db in databases):
+                raise ValueError("Production requires SSL for remote databases")
             # Integrations: fail closed on credential storage and plaintext egress.
             if self.integrations_enabled and not self.secrets_encryption_key:
                 raise ValueError("Production integrations require SECRETS_ENCRYPTION_KEY")

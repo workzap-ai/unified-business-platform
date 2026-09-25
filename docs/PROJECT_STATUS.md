@@ -92,6 +92,34 @@ Implemented since Stage 2 (single migration `0002_business_platform_pi`):
 | Docker / Redis worker / remote CI | Not run (unavailable locally) |
 | Live web ↔ API end to end | Not run yet |
 
+## Update 2026-09-25
+
+| Area | State | Evidence |
+| --- | --- | --- |
+| Database: Neon | Owner's Neon project (PostgreSQL 18.6, us-east-2) is the live database; pooled endpoint for the API, direct endpoint for migrations, verified TLS; migrated to `0005_employee_onboarding`; `vector` + `pg_trgm` created | ADR 0006; `alembic check` clean on Neon; unit tests `test_database_neon.py` |
+| Local test database | Portable PostgreSQL 17 on 55432 remains the test target; tests never read `apps/api/.env` | `tests/conftest.py` |
+| HR onboarding links | HR creates a single-use link (1–30 days); the employee fills in the CNIC form on `/onboarding/<token>`; HR reviews, approves (creates the employee) or rejects; CNIC/bank/contact details encrypted at rest; duplicate CNIC detection via keyed hash; audit + HR notification | `tests/integration/test_employee_onboarding.py` (4 passed) |
+| Integration platform | Contract endpoints, webhooks in/out, outbox, sync skeleton, API keys, 8 adapters (live providers UNVERIFIED) | `docs/INTEGRATIONS.md`; 135 tests |
+| Business domain events | Customers, quotes, orders, invoices, payments, low stock write outbox events in the business transaction | `test_domain_events.py` |
+| AI gateway | Provider taxonomy, fallback, circuit breaker, usage/budgets (live providers UNVERIFIED) | `docs/AI_GATEWAY.md`; 59 tests |
+| PI | Controlled product tools plus service conversations, internal briefs, multilingual replies, audio/image/video input and consented template reminders | See `docs/PI_SERVICES.md` for activation and verification |
+| Full backend suite | 366 passed, 1 skipped (Redis worker) | 2026-09-25 run |
+| Web | format, lint, typecheck, demo production build and 34 Playwright tests pass (build into `NEXT_DIST_DIR=.next-test` so it can run beside `next dev`) | 2026-09-25 |
+| Web ↔ live API (owner's Neon, Mendeez "Sample data" environment) | Every registered route opened in a browser with no error state; HR onboarding end to end (create link → employee submits at 390px → HR approves → employee shows encrypted personal details); integrations endpoints parse with the web contract (`tests/integrations.live.spec.ts`) | 2026-09-25 |
+
+Not built / stopped: platform subscriptions and entitlements (agent stopped before writing
+code); integrations admin console pages are built (directory, connection detail, webhooks,
+events, jobs, failures, health, API keys) and pass lint/typecheck but were not browser-tested
+before that agent was stopped. PI now has LLM-written service replies, requirement briefs,
+customer memory, media understanding and follow-up scheduling. Background knowledge indexing
+and delegation to the shared WhatsApp integration adapter remain separate follow-ups.
+
+Fixed from live testing: integration definitions failed to parse (`options: null`);
+PI pages and the reports catalog called PI APIs in environments where PI is not enabled
+(now an "enable PI" state); the database driver hung on this network's broken IPv6
+(`DATABASE_IP_FAMILY=ipv4`); registration took ~52 s over Neon (batched role seeding,
+single-query workspace scope).
+
 ## Known gaps and limitations
 
 - No automated tests yet for auth, RBAC, business modules, or cross-tenant isolation of the

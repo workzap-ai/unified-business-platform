@@ -20,6 +20,10 @@ depends_on = None
 
 
 def _optional_vector_columns() -> None:
+    if op.get_context().as_sql:
+        # Offline SQL scripts cannot probe privileges; apply pgvector columns manually.
+        op.execute("-- optional: CREATE EXTENSION vector; embedding columns (see ADR 0005)")
+        return
     bind = op.get_bind()
     available = bind.execute(
         sa.text("SELECT 1 FROM pg_available_extensions WHERE name = 'vector'")

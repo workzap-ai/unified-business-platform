@@ -27,7 +27,7 @@ from app.ai.errors import (
     ProviderError,
 )
 from app.ai.health import ProviderHealth, health_for
-from app.ai.media import validate_audio, validate_image
+from app.ai.media import validate_audio, validate_image, validate_video
 from app.ai.providers.base import parse_json_text
 from app.ai.registry import (
     KNOWN_PROVIDERS,
@@ -53,6 +53,7 @@ from app.ai.types import (
     TranscriptionRequest,
     TranscriptionResponse,
     Usage,
+    VideoPart,
 )
 from app.ai.usage import (
     BudgetGuard,
@@ -169,6 +170,9 @@ class LLMManager:
             else (OutputSchema.of(schema))
         )
         vision = any(m.images() for m in messages)
+        videos = [part for m in messages for part in m.parts() if isinstance(part, VideoPart)]
+        for part in videos:
+            validate_video(part.data, part.mime_type, self.settings.media_max_bytes)
 
         async def call(provider: Any, name: str, model: str) -> LLMResponse:
             request = LLMRequest(
@@ -192,7 +196,7 @@ class LLMManager:
             scope,
             alias=alias,
             purpose=purpose,
-            capability="vision" if vision else "chat",
+            capability="video" if videos else "vision" if vision else "chat",
             call=call,
             usage_of=lambda r: r.usage,
             conversation_id=conversation_id,

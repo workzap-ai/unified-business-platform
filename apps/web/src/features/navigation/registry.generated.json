@@ -573,6 +573,30 @@
     "visible": true
   },
   {
+    "analytics_id": "nav.hr.onboarding",
+    "any_permissions": [],
+    "badge": null,
+    "description": "",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "user-plus",
+    "key": "hr-onboarding",
+    "keywords": [],
+    "label": "Onboarding",
+    "parent": "hr",
+    "required_feature": null,
+    "required_permissions": [
+      "hr.write"
+    ],
+    "required_product": null,
+    "required_roles": [],
+    "route": "/hr/onboarding",
+    "section": "main",
+    "sort_order": 25,
+    "type": "page",
+    "visible": true
+  },
+  {
     "analytics_id": "nav.hr.overview",
     "any_permissions": [],
     "badge": null,

@@ -4,6 +4,11 @@ from fastapi.testclient import TestClient
 from app.core.config import Settings
 from app.main import create_app
 
+# Tests never read apps/api/.env: it points at the owner's real database and holds real
+# provider keys and the encryption key. Configuration comes from explicit arguments and
+# the environment prepared by the test runner (.cache/test-env.sh or CI).
+Settings.model_config["env_file"] = None
+
 
 @pytest.fixture
 def settings():
@@ -25,3 +30,12 @@ def settings():
 def client(settings):
     with TestClient(create_app(settings), raise_server_exceptions=False) as client:
         yield client
+
+
+@pytest.fixture(autouse=True)
+def _reset_rate_limit_cooldown():
+    from app.core import rate_limit
+
+    rate_limit._redis_down_until = 0.0
+    yield
+    rate_limit._redis_down_until = 0.0

@@ -56,6 +56,27 @@ same-origin `/api/v1`, proxied to the API). Live mode is already the default.
 
 Python 3.12+, Node 22+ (Node 22 in CI/containers), npm, and Docker with Compose for local PostgreSQL/Redis and full-stack checks. The current development workstation has no Docker, so container and Redis checks have not run locally.
 
+## Database: Neon
+
+Shared and production environments use [Neon](https://neon.tech) (managed PostgreSQL;
+see [ADR 0006](docs/adr/0006-neon-managed-postgresql.md)). In `apps/api/.env`:
+
+```ini
+# Pooled endpoint, pasted from the Neon console as-is (the API and worker use it)
+DATABASE_URL=postgresql://<role>:<password>@<endpoint>-pooler.<region>.aws.neon.tech/<db>?sslmode=require&channel_binding=require
+# Direct endpoint (Alembic migrations)
+MIGRATION_DATABASE_URL=postgresql://<role>:<password>@<endpoint>.<region>.aws.neon.tech/<db>?sslmode=require
+```
+
+Then, from `apps/api`: `..\..\.venv\Scripts\alembic.exe upgrade head`. Once, as the
+database owner, run `ALTER ROLE <role> SET statement_timeout = '10s';` (the pooler cannot
+set it per connection). Neon provides `pg_trgm` and `vector`, so semantic retrieval
+columns are created. For tests, create a Neon branch with a database whose name ends in
+`_test` and point `TEST_DATABASE_URL` at it; never at the main branch.
+
+A local PostgreSQL (compose `postgres` service or any PostgreSQL 17) still works for
+offline development.
+
 ## Run with Docker
 
 From the repository root, copy .env.example to .env, choose a local development password, then run:

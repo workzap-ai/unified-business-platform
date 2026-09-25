@@ -38,9 +38,17 @@ async def _enqueue(ctx: dict[str, Any], name: str, arg: str, job_id: str) -> Non
             logger.warning("integration_enqueue_failed")
 
 
+def _log(operation: str, job_id: str, status: str) -> None:
+    logger.info(
+        "integration_job", extra={"operation": operation, "job_id": job_id, "status": status}
+    )
+
+
 async def process_inbound_event(ctx: dict[str, Any], event_id: str) -> str:
     async with ctx["sessions"]() as session:
-        return await webhooks.process(session, ctx["settings"], UUID(event_id))
+        result = await webhooks.process(session, ctx["settings"], UUID(event_id))
+    logger.info("integration_inbound_event", extra={"webhook_event_id": event_id, "status": result})
+    return result
 
 
 async def dispatch_outbox(ctx: dict[str, Any]) -> int:
@@ -56,7 +64,9 @@ async def dispatch_outbox(ctx: dict[str, Any]) -> int:
 
 async def deliver_webhook(ctx: dict[str, Any], delivery_id: str) -> str:
     async with ctx["sessions"]() as session:
-        return await outbox.deliver(session, ctx["settings"], _http(ctx), UUID(delivery_id))
+        result = await outbox.deliver(session, ctx["settings"], _http(ctx), UUID(delivery_id))
+    _log("deliver_webhook", delivery_id, result)
+    return result
 
 
 async def run_sync_job(ctx: dict[str, Any], job_id: str) -> str:
@@ -64,6 +74,7 @@ async def run_sync_job(ctx: dict[str, Any], job_id: str) -> str:
         result = await sync.run_job(
             session, ctx["settings"], _http(ctx), UUID(job_id), redis=ctx.get("redis")
         )
+    _log("run_sync_job", job_id, result)
     if result == "continued":
         await _enqueue(
             ctx, "run_sync_job", job_id, f"intg:sync:{job_id}:cont:{datetime.now(UTC).timestamp()}"

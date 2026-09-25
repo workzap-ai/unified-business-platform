@@ -20,6 +20,7 @@ import { Skeleton } from "@/components/ui/display";
 import { EmptyState } from "@/components/app/states";
 import { useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
+import { useNavItemAvailable } from "@/features/navigation/hooks";
 import { billingService } from "@/features/billing/service";
 import { piService } from "@/features/pi/service";
 import { reportsService } from "./service";
@@ -121,6 +122,7 @@ export function ReportsCatalog() {
 
 function CatalogContent() {
   const { can } = useSession();
+  const piAvailable = useNavItemAvailable("pi");
   const allow = {
     revenue: can("billing.read"),
     customers: can("customers.read"),
@@ -129,7 +131,8 @@ function CatalogContent() {
     quotes: can("quotes.read"),
     billing: can("billing.read"),
     employees: can("hr.read"),
-    pi: can("pi.analytics.read"),
+    // PI analytics only where PI is installed and enabled for this environment.
+    pi: can("pi.analytics.read") && piAvailable === true,
   };
   const revenue = useScopedQuery(
     ["reports", "revenue", 12],

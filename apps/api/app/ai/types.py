@@ -46,7 +46,16 @@ class ImagePart:
         return f"ImagePart(mime_type={self.mime_type!r}, bytes={len(self.data)})"
 
 
-ContentPart = TextPart | ImagePart
+@dataclass(frozen=True, slots=True)
+class VideoPart:
+    data: bytes
+    mime_type: str
+
+    def __repr__(self) -> str:
+        return f"VideoPart(mime_type={self.mime_type!r}, bytes={len(self.data)})"
+
+
+ContentPart = TextPart | ImagePart | VideoPart
 
 
 @dataclass(frozen=True, slots=True)

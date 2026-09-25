@@ -6,7 +6,7 @@ from sqlalchemy.engine import Connection
 
 from app import models  # noqa: F401 -- register every mapped model for autogeneration
 from app.core.config import get_settings
-from app.core.database import Base, create_engine
+from app.core.database import Base, create_engine, resolve_database
 from app.modules.integrations import models as integration_models  # noqa: F401
 
 target_metadata = Base.metadata
@@ -33,9 +33,19 @@ def include_object(
     return True
 
 
+def migration_url() -> str:
+    """Neon: migrations run on the direct endpoint, not the PgBouncer pooler."""
+    settings = get_settings()
+    direct = settings.migration_database_url
+    if direct is not None and direct.get_secret_value():
+        return direct.get_secret_value()
+    return settings.database_url.get_secret_value()
+
+
 def offline() -> None:
+    settings = get_settings()
     context.configure(
-        url=get_settings().database_url.get_secret_value(),
+        url=resolve_database(settings, migration_url()).url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -47,7 +57,7 @@ def offline() -> None:
 
 
 async def online() -> None:
-    engine = create_engine(get_settings())
+    engine = create_engine(get_settings(), migration_url())
 
     def run(connection: Connection) -> None:
         context.configure(

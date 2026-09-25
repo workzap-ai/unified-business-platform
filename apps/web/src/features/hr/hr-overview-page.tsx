@@ -25,6 +25,7 @@ import { useSession } from "@/features/auth/session-provider";
 import type { Employee } from "@/features/business/types";
 import { daysFromToday, formatDay } from "@/features/billing/utils";
 import { hrService } from "./service";
+import { OnboardingSummaryCard } from "./onboarding-summary-card";
 import { ROSTER_PAGE_SIZE } from "./utils";
 
 export function HROverviewPage() {
@@ -86,6 +87,7 @@ function HROverview() {
         }
       />
       <ModuleNav moduleKey="hr" />
+      {can("hr.write") && <OnboardingSummaryCard />}
 
       {headcount.isError ? (
         <Card className="mb-4">

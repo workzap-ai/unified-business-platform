@@ -27,7 +27,10 @@ services:
     build: ./apps/api
     environment: &api_environment
       APP_ENV: development
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-platform}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-platform}
+      # Set DATABASE_URL / MIGRATION_DATABASE_URL in .env to use Neon instead of the
+      # local postgres container.
+      DATABASE_URL: ${DATABASE_URL_COMPOSE:-postgresql+asyncpg://${POSTGRES_USER:-platform}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-platform}}
+      MIGRATION_DATABASE_URL: ${MIGRATION_DATABASE_URL_COMPOSE:-}
       REDIS_URL: redis://redis:6379/0
       CORS_ORIGINS: '["http://localhost:3000"]'
       ALLOWED_HOSTS: '["localhost","127.0.0.1","api"]'

@@ -1,11 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bot } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Badge, Skeleton } from "@/components/ui/display";
 import { Tooltip } from "@/components/ui/overlays";
-import { ModuleNav, RequirePermission } from "@/components/app/page";
+import { ModuleNav, PageShell, RequirePermission } from "@/components/app/page";
+import { EmptyState } from "@/components/app/states";
+import { useSession } from "@/features/auth/session-provider";
+import { useNavItemAvailable } from "@/features/navigation/hooks";
 import { useScopedQuery } from "@/hooks/use-scoped";
 import { piService } from "../service";
 import type { PiOverview } from "../types";
@@ -19,6 +24,15 @@ export function PiWorkspaceLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const fullBleed =
     pathname === "/pi/inbox" || pathname.startsWith("/pi/inbox/");
+  const available = useNavItemAvailable("pi");
+  if (available === false) return <PiUnavailable />;
+  if (available === undefined)
+    return (
+      <PageShell>
+        <Skeleton className="h-9 w-48" />
+        <Skeleton className="mt-6 h-64 rounded-xl" />
+      </PageShell>
+    );
   return (
     <RequirePermission permission="pi.read" area="PI">
       <div
@@ -34,6 +48,32 @@ export function PiWorkspaceLayout({ children }: { children: React.ReactNode }) {
         )}
       </div>
     </RequirePermission>
+  );
+}
+
+/** PI is an installable product: explain how to enable it instead of failing requests. */
+function PiUnavailable() {
+  const { can, session } = useSession();
+  const manage = can("admin.products.manage");
+  return (
+    <PageShell>
+      <EmptyState
+        icon={Bot}
+        title="PI isn't enabled in this environment"
+        description={
+          manage
+            ? `Install PI and enable it for ${session?.environment?.name ?? "this environment"} in Platform Products. Then connect WhatsApp and add your knowledge.`
+            : "Ask a workspace administrator to install and enable PI for this environment."
+        }
+        action={
+          manage ? (
+            <Button asChild>
+              <Link href="/settings/products">Open Platform Products</Link>
+            </Button>
+          ) : undefined
+        }
+      />
+    </PageShell>
   );
 }
 

@@ -7,6 +7,8 @@ const apiTarget = (
 ).replace(/\/$/, "");
 
 const nextConfig: NextConfig = {
+  // A separate build directory lets test builds run next to a running `next dev`.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   output: "standalone",
   poweredByHeader: false,
   async rewrites() {

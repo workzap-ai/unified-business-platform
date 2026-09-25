@@ -17,6 +17,7 @@ import { MetricCard, MetricGrid } from "@/components/app/metric-card";
 import { ErrorState, Notice } from "@/components/app/states";
 import { useScopedQuery } from "@/hooks/use-scoped";
 import { piService } from "@/features/pi/service";
+import { useNavItemAvailable } from "@/features/navigation/hooks";
 import { ExportMenu, ReportShell, dayLabel } from "./components";
 
 export function PiReport() {
@@ -40,9 +41,19 @@ export function PiReport() {
 }
 
 function PiContent() {
-  const query = useScopedQuery(["pi", "analytics", 30], () =>
-    piService.analytics(30),
+  const available = useNavItemAvailable("pi");
+  const query = useScopedQuery(
+    ["pi", "analytics", 30],
+    () => piService.analytics(30),
+    { enabled: available === true },
   );
+  if (available === false)
+    return (
+      <Notice tone="neutral" icon={Bot} title="PI isn't enabled here">
+        PI analytics appear once PI is installed and enabled for this
+        environment in Platform Products.
+      </Notice>
+    );
   const data = query.data;
   const t = data?.totals;
   const loading = query.isPending;

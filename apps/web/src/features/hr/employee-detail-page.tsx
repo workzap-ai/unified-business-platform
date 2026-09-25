@@ -35,6 +35,7 @@ import { useSession } from "@/features/auth/session-provider";
 import type { Employee, EmployeeInput } from "@/features/business/types";
 import { daysFromToday, formatDay, todayISO } from "@/features/billing/utils";
 import { hrService } from "./service";
+import { PersonalDetailsCard } from "./personal-details-card";
 import {
   CompensationFields,
   PersonFields,
@@ -329,6 +330,7 @@ function EmployeeDetail({ id }: { id: string }) {
               />
             </div>
           </Card>
+          <PersonalDetailsCard employee={employee} />
         </div>
 
         <div className="flex min-w-0 flex-col gap-4">

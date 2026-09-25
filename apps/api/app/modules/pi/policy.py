@@ -1,3 +1,4 @@
+import re
 from datetime import UTC, datetime, time
 from decimal import Decimal, InvalidOperation
 from typing import Any
@@ -22,7 +23,14 @@ def validate_section(section: str, value: Any) -> None:
                 ensure(time.fromisoformat(day["start"]) < time.fromisoformat(day["end"]))
             ensure(len(value["notice"]) <= 1000)
         if section == "response_rules":
-            ensure(value["language"] in {"auto", "en", "ur", "roman_ur"})
+            ensure(
+                bool(
+                    re.fullmatch(
+                        r"auto|roman_ur|[a-z]{2,3}(?:[-_][A-Za-z0-9]{2,8})?", value["language"]
+                    )
+                )
+            )
+            ensure(value["service_mode"] in {"auto", "service"})
             ensure(value["tone"] in {"friendly", "formal", "concise"})
             ensure(len(value["greeting"]) <= 2000 and len(value["sign_off"]) <= 200)
         if section == "ai_config":
@@ -45,6 +53,16 @@ def validate_section(section: str, value: Any) -> None:
             ensure(1 <= value["top_k"] <= 10 and 0 <= Decimal(value["min_score"]) <= 1)
         if section == "whatsapp_config":
             ensure(1 <= value["max_media_mb"] <= 50)
+            ensure(1 <= value["reminder_after_days"] <= 30)
+            templates = value["reminder_templates"]
+            ensure(len(templates) <= 50)
+            for language, template in templates.items():
+                ensure(
+                    bool(re.fullmatch(r"roman_ur|[a-z]{2,3}(?:[-_][A-Za-z0-9]{2,8})?", language))
+                )
+                ensure(isinstance(template, dict) and set(template) == {"name", "language"})
+                ensure(bool(re.fullmatch(r"[a-z0-9_]{1,512}", template["name"])))
+                ensure(bool(re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", template["language"])))
             if value["send_read_receipts"] or value["typing_indicator"]:
                 raise BusinessRuleViolation(
                     "UNSUPPORTED_SETTING",

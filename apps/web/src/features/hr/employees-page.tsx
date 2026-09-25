@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutGrid, SearchX, Table2, UserPlus, Users } from "lucide-react";
+import {
+  LayoutGrid,
+  Link2,
+  SearchX,
+  Table2,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Avatar,
@@ -174,11 +181,18 @@ function EmployeeDirectory() {
         description="Everyone on the team, their role and where they sit."
         actions={
           canWrite ? (
-            <Button asChild>
-              <Link href="/hr/employees/new">
-                <UserPlus /> Add employee
-              </Link>
-            </Button>
+            <>
+              <Button variant="secondary" asChild>
+                <Link href="/hr/onboarding?create=1">
+                  <Link2 /> Send onboarding link
+                </Link>
+              </Button>
+              <Button asChild>
+                <Link href="/hr/employees/new">
+                  <UserPlus /> Add employee
+                </Link>
+              </Button>
+            </>
           ) : undefined
         }
       />

@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.pagination import Page, Pagination
+from app.integrations.outbox import EntityRef, emit
 from app.modules.audit.service import record
 from app.modules.branches.models import Branch
 from app.modules.business_settings.service import get_settings_row
@@ -265,10 +266,10 @@ class InventoryService:
             )
         )
         if quantity < 0:
-            await self._low_stock_alert(variant_id)
+            await self._low_stock_alert(variant_id, quantity)
         return movement
 
-    async def _low_stock_alert(self, variant_id: UUID) -> None:
+    async def _low_stock_alert(self, variant_id: UUID, quantity: int) -> None:
         variant = await self.variants.get(variant_id)
         if not variant.track_inventory:
             return
@@ -286,11 +287,24 @@ class InventoryService:
                 "inventory",
                 f"Low stock: {variant.sku}",
                 f"{variant.name} has {available} available (threshold {threshold}).",
-                link="/inventory?low_only=true",
+                link="/inventory/stock?low_only=true",
                 permission="inventory.read",
                 severity="warning",
                 dedupe_key=f"low-stock:{variant_id}:{date.today().isoformat()}",
             )
+            if available - quantity > threshold:  # this movement crossed the threshold
+                await emit(
+                    self.session,
+                    self.scope,
+                    "inventory.low",
+                    {
+                        "variant_id": str(variant_id),
+                        "sku": variant.sku,
+                        "available": available,
+                        "threshold": threshold,
+                    },
+                    EntityRef("product_variant", variant_id),
+                )
 
     async def adjust(self, data: StockAdjustment) -> StockMovement:
         self.scope.require("inventory.adjust")

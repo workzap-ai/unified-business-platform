@@ -2,7 +2,7 @@ from datetime import date
 from decimal import Decimal
 from uuid import UUID
 
-from sqlalchemy import CheckConstraint, Date, ForeignKeyConstraint, Index, String, Uuid
+from sqlalchemy import CheckConstraint, Date, ForeignKeyConstraint, Index, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.shared.models import WorkspaceRow, scoped_fk, workspace_args
@@ -30,7 +30,14 @@ class Employee(WorkspaceRow):
             "termination_date IS NULL OR termination_date >= hire_date", name="dates_ordered"
         ),
         CheckConstraint("manager_id IS NULL OR manager_id <> id", name="not_own_manager"),
+        CheckConstraint("gender IS NULL OR gender IN ('male', 'female')", name="gender"),
+        CheckConstraint(
+            "work_arrangement IS NULL OR work_arrangement IN "
+            "('onsite', 'hybrid', 'remote', 'freelancer')",
+            name="work_arrangement",
+        ),
         Index("ix_employees_scope_status", "tenant_id", "environment_id", "status"),
+        Index("ix_employees_cnic_hash", "tenant_id", "environment_id", "cnic_hash"),
         Index("ix_employees_department", "tenant_id", "department_id"),
     )
     full_name: Mapped[str] = mapped_column(String(160))
@@ -46,3 +53,11 @@ class Employee(WorkspaceRow):
     # Sensitive: only returned to holders of hr.sensitive.
     salary: Mapped[Decimal | None] = mapped_column(MONEY_SQL, nullable=True)
     salary_currency: Mapped[str | None] = mapped_column(String(3), nullable=True)
+    gender: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    date_of_birth: Mapped[date | None] = mapped_column(Date, nullable=True)
+    work_arrangement: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    # Sensitive personal details (CNIC, family, address, emergency contacts, bank, NTN),
+    # encrypted with the platform credential key; readable only with hr.sensitive.
+    personal_details_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Keyed hash of the normalized CNIC for duplicate detection without decryption.
+    cnic_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)

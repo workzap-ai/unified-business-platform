@@ -47,6 +47,8 @@ async def context(conversation_id: UUID, scope: Scope, session: Session) -> dict
         "balance": None,
         "currency": (await get_settings_row(session, scope)).default_currency,
         "runs": [],
+        "service_brief": conversation.service_brief,
+        "followup_due_at": conversation.followup_due_at,
     }
     if scope.can("pi.memory.read"):
         memory_rows = await session.scalars(

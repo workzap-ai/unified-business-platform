@@ -1,4 +1,4 @@
-import { IdCard, UserPlus } from "lucide-react";
+import { IdCard, Link2, UserPlus } from "lucide-react";
 import type { ModuleManifest } from "@/features/modules/types";
 import { statusLabel } from "@/components/app/status-badge";
 import { hrService } from "./service";
@@ -13,6 +13,21 @@ export const hrManifest: ModuleManifest = {
       icon: UserPlus,
       permission: "hr.write",
       keywords: ["employee", "hire", "staff", "person", "hr"],
+    },
+    {
+      id: "hr.onboarding-link",
+      label: "Send onboarding link",
+      href: "/hr/onboarding?create=1",
+      icon: Link2,
+      permission: "hr.write",
+      keywords: [
+        "onboarding",
+        "new employee",
+        "joining",
+        "cnic",
+        "form",
+        "link",
+      ],
     },
   ],
   search: {

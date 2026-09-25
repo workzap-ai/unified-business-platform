@@ -207,6 +207,7 @@ class PiConversation(WorkspaceRow):
         ),
         Index("ix_pi_conversations_scope_last", "tenant_id", "environment_id", "last_message_at"),
         Index("ix_pi_conversations_customer", "tenant_id", "environment_id", "customer_id"),
+        Index("ix_pi_conversations_followup_due", "followup_due_at"),
     )
     customer_id: Mapped[UUID] = mapped_column(Uuid)
     connection_id: Mapped[UUID] = mapped_column(Uuid)
@@ -221,6 +222,8 @@ class PiConversation(WorkspaceRow):
     unread_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     summary: Mapped[str] = mapped_column(Text, default="", server_default="")
     summary_message_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    service_brief: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, server_default="{}")
+    followup_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     language: Mapped[str | None] = mapped_column(String(16), nullable=True)
     clarification_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     failure_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
@@ -234,7 +237,8 @@ class PiMessage(WorkspaceRow):
         CheckConstraint(_in("direction", ("inbound", "outbound")), name="direction"),
         CheckConstraint(_in("sender_type", ("customer", "ai", "human", "system")), name="sender"),
         CheckConstraint(
-            _in("message_type", ("text", "audio", "image", "interactive", "other")), name="type"
+            _in("message_type", ("text", "audio", "image", "video", "interactive", "other")),
+            name="type",
         ),
         CheckConstraint(
             _in(

@@ -7,6 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.pagination import Page, Pagination
+from app.integrations.outbox import EntityRef, emit
 from app.modules.audit.service import record
 from app.modules.billing.models import Invoice, InvoiceLine, Payment
 from app.modules.billing.schemas import (
@@ -45,6 +46,19 @@ OPEN_STATUSES = ("issued", "partially_paid")
 
 def balance(invoice: Invoice) -> Decimal:
     return quantize(invoice.total - invoice.amount_paid)
+
+
+def _invoice_payload(invoice: Invoice) -> dict[str, str | None]:
+    return {
+        "invoice_id": str(invoice.id),
+        "number": invoice.number,
+        "status": invoice.status,
+        "customer_id": str(invoice.customer_id) if invoice.customer_id else None,
+        "order_id": str(invoice.order_id) if invoice.order_id else None,
+        "total": str(invoice.total),
+        "amount_paid": str(invoice.amount_paid),
+        "currency": invoice.currency,
+    }
 
 
 class BillingService:
@@ -232,6 +246,13 @@ class BillingService:
             entity_id=invoice.id,
             details={"order": order.number, "total": str(invoice.total)},
         )
+        await emit(
+            self.session,
+            self.scope,
+            "invoice.issued",
+            _invoice_payload(invoice),
+            EntityRef("invoice", invoice.id),
+        )
         return invoice
 
     async def act(self, invoice_id: UUID, action: str) -> Invoice:
@@ -261,6 +282,14 @@ class BillingService:
             entity_type="invoice",
             entity_id=invoice.id,
         )
+        if action == "issue":
+            await emit(
+                self.session,
+                self.scope,
+                "invoice.issued",
+                _invoice_payload(invoice),
+                EntityRef("invoice", invoice.id),
+            )
         return invoice
 
     async def void_for_order(self, order_id: UUID) -> None:
@@ -312,6 +341,28 @@ class BillingService:
             entity_id=payment.id,
             details={"invoice": invoice.number, "amount": str(amount)},
         )
+        await emit(
+            self.session,
+            self.scope,
+            "payment.received",
+            {
+                "payment_id": str(payment.id),
+                "number": payment.number,
+                "invoice_id": str(invoice.id),
+                "amount": str(amount),
+                "currency": invoice.currency,
+                "method": payment.method,
+            },
+            EntityRef("payment", payment.id),
+        )
+        if invoice.status == "paid":
+            await emit(
+                self.session,
+                self.scope,
+                "invoice.paid",
+                _invoice_payload(invoice),
+                EntityRef("invoice", invoice.id),
+            )
         return payment
 
     async def payments_page(self, page: Pagination) -> Page[PaymentView]:

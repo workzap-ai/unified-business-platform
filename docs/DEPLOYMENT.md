@@ -11,7 +11,7 @@ topology and the checks that must pass before a first deployment. The supplied
 | web | `apps/web/Dockerfile` (Next.js standalone, `node server.js`, non-root) | stateless, horizontal | none |
 | api | `apps/api/Dockerfile` (`uvicorn app.main:create_app --factory`) | stateless, horizontal | none |
 | worker | same image, `arq app.worker.WorkerSettings` | horizontal (jobs are idempotent) | none |
-| PostgreSQL 17 + pgvector | managed service recommended | primary + replica | **source of truth** |
+| PostgreSQL 17 + pgvector | **Neon** (ADR 0006): pooled endpoint for API/worker, direct endpoint for migrations | Neon autoscaling; read replicas optional | **source of truth** |
 | Redis 7 | managed service recommended, AOF on, `noeviction` | single primary | queue, rate limits, short-lived locks (not business truth) |
 | Object storage | S3-compatible (S3, R2, MinIO) via the storage integration | — | uploaded files |
 
@@ -38,7 +38,7 @@ removing the old key.
    migrations up/down/up + drift check, backend tests with PostgreSQL + Redis, web build,
    Playwright, dependency audit, container build).
 2. Back up the database (see [DISASTER_RECOVERY.md](DISASTER_RECOVERY.md)).
-3. Run `alembic upgrade head` once, from a single release job, before new API/worker pods
+3. Run `alembic upgrade head` (against `MIGRATION_DATABASE_URL`, the Neon direct endpoint) once, from a single release job, before new API/worker pods
    receive traffic. Migrations are written to be additive where possible; review any
    destructive downgrade before use.
 4. Roll out api and worker, then web. Readiness: `GET /api/v1/health/ready` (PostgreSQL +
@@ -48,7 +48,8 @@ removing the old key.
 ## Production readiness gate
 
 Every item below is currently **UNVERIFIED** unless PROJECT_STATUS.md records evidence:
-TLS termination and HSTS; managed database backups with a tested restore; Redis
+Neon project with production branch protected, role `statement_timeout` set, and the API
+connecting through the pooler with verified TLS; TLS termination and HSTS; managed database backups with a tested restore; Redis
 persistence; secret store wiring; separate migration and runtime database roles; log
 shipping with redaction; tracing/error monitoring backend; alerting on queue depth,
 webhook failures, provider fallback rate and 5xx rate; WhatsApp/AI/email/storage provider

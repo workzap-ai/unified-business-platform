@@ -90,9 +90,10 @@ export const configFieldSchema = z.object({
   required: z.boolean(),
   secret: z.boolean(),
   help: z.string().nullable().optional(),
+  // The API sends null for non-select fields.
   options: z
     .array(z.object({ value: z.string(), label: z.string() }))
-    .optional(),
+    .nullish(),
 });
 
 export const definitionSchema = z.object({

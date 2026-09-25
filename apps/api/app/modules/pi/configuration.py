@@ -33,6 +33,7 @@ DEFAULTS: dict[str, Any] = {
         "tone": "friendly",
         "greeting": "Hello! How can we help?",
         "sign_off": "",
+        "service_mode": "auto",
     },
     "ai_config": {
         "router_alias": "fast",
@@ -57,9 +58,13 @@ DEFAULTS: dict[str, Any] = {
     "whatsapp_config": {
         "send_read_receipts": False,
         "typing_indicator": False,
-        "media_voice": False,
-        "media_images": False,
+        "media_voice": True,
+        "media_images": True,
+        "media_video": True,
         "max_media_mb": 10,
+        "reminder_enabled": True,
+        "reminder_after_days": 7,
+        "reminder_templates": {},
     },
 }
 
@@ -86,6 +91,10 @@ async def settings_row(session: AsyncSession, scope: WorkspaceScope) -> PiSettin
         .execution_options(populate_existing=True)
     )
     assert row is not None
+    # New settings are available to existing workspaces without overwriting their choices.
+    for key, defaults in DEFAULTS.items():
+        if isinstance(defaults, dict):
+            setattr(row, key, {**deepcopy(defaults), **getattr(row, key)})
     return row
 
 

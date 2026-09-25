@@ -382,7 +382,10 @@ export function BusinessHoursForm({ settings }: { settings: PiSettings }) {
 /* Response rules -------------------------------------------------------------------- */
 
 const responseSchema = z.object({
-  language: z.enum(["auto", "en", "ur", "roman_ur"]),
+  language: z
+    .string()
+    .regex(/^(auto|roman_ur|[a-z]{2,3}([-_][A-Za-z0-9]{2,8})?)$/),
+  service_mode: z.enum(["auto", "service"]),
   max_reply_chars: num()
     .int()
     .min(100, "At least 100")
@@ -396,7 +399,10 @@ type ResponseValues = z.infer<typeof responseSchema>;
 export function ResponseRulesForm({ settings }: { settings: PiSettings }) {
   const form = useForm<ResponseValues>({
     resolver: zodResolver(responseSchema),
-    defaultValues: settings.response_rules,
+    defaultValues: {
+      ...settings.response_rules,
+      service_mode: settings.response_rules.service_mode ?? "auto",
+    },
   });
   const save = useSaveSection("response_rules");
   const { onSubmit, savedAt } = useSubmit(form, save.mutateAsync, (v) => v);
@@ -414,12 +420,22 @@ export function ResponseRulesForm({ settings }: { settings: PiSettings }) {
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <FormField
+            label="Service enquiries"
+            htmlFor="rr-services"
+            help="Service conversations collect requirements and send your team a brief. PI never quotes a service price."
+          >
+            <NativeSelect id="rr-services" {...form.register("service_mode")}>
+              <option value="auto">Use business type</option>
+              <option value="service">Treat all enquiries as services</option>
+            </NativeSelect>
+          </FormField>
+          <FormField
             label="Reply language"
             htmlFor="rr-lang"
             help="Auto matches the customer's language."
           >
             <NativeSelect id="rr-lang" {...form.register("language")}>
-              <option value="auto">Auto-detect</option>
+              <option value="auto">Match customer — any language</option>
               <option value="en">English</option>
               <option value="ur">Urdu</option>
               <option value="roman_ur">Roman Urdu</option>
@@ -1256,6 +1272,16 @@ const waSchema = z.object({
   typing_indicator: z.boolean(),
   media_voice: z.boolean(),
   media_images: z.boolean(),
+  media_video: z.boolean(),
+  reminder_enabled: z.boolean(),
+  reminder_after_days: num().int().min(1).max(30),
+  reminder_templates: z.record(
+    z.string().regex(/^(roman_ur|[a-z]{2,3}([-_][A-Za-z0-9]{2,8})?)$/),
+    z.object({
+      name: z.string().regex(/^[a-z0-9_]{1,512}$/),
+      language: z.string().regex(/^[a-z]{2,3}(_[A-Z]{2})?$/),
+    }),
+  ),
   max_media_mb: num()
     .int()
     .min(1, "At least 1 MB")
@@ -1266,7 +1292,13 @@ type WaValues = z.infer<typeof waSchema>;
 export function WhatsAppConfigForm({ settings }: { settings: PiSettings }) {
   const form = useForm<WaValues>({
     resolver: zodResolver(waSchema),
-    defaultValues: settings.whatsapp_config,
+    defaultValues: {
+      ...settings.whatsapp_config,
+      media_video: settings.whatsapp_config.media_video ?? true,
+      reminder_enabled: settings.whatsapp_config.reminder_enabled ?? true,
+      reminder_after_days: settings.whatsapp_config.reminder_after_days ?? 7,
+      reminder_templates: settings.whatsapp_config.reminder_templates ?? {},
+    },
   });
   const save = useSaveSection("whatsapp_config");
   const { onSubmit, savedAt } = useSubmit(form, save.mutateAsync, (v) => v);
@@ -1311,6 +1343,12 @@ export function WhatsAppConfigForm({ settings }: { settings: PiSettings }) {
           label="Images"
           description="Describe images, e.g. product photos, to understand the request."
         />
+        <SwitchField
+          form={form}
+          name="media_video"
+          label="Videos"
+          description="Understand short videos and their speech. Requires a configured video provider; unsupported files go to your team."
+        />
         <FormField
           label="Maximum media size (MB)"
           htmlFor="wa-max"
@@ -1327,7 +1365,130 @@ export function WhatsAppConfigForm({ settings }: { settings: PiSettings }) {
           />
         </FormField>
       </FormSection>
+      <FormSection
+        title="Follow-up reminders"
+        description="One reminder after an unanswered service conversation. PI asks the customer for permission and stops after an opt-out, reply, closure or human takeover."
+      >
+        <SwitchField
+          form={form}
+          name="reminder_enabled"
+          label="Send follow-up reminders"
+          description="Uses an approved WhatsApp template in the customer's language."
+        />
+        <FormField
+          label="Days without a reply"
+          htmlFor="wa-reminder-days"
+          error={err.reminder_after_days}
+        >
+          <Input
+            id="wa-reminder-days"
+            type="number"
+            min={1}
+            max={30}
+            {...form.register("reminder_after_days", { valueAsNumber: true })}
+          />
+        </FormField>
+        <Controller
+          control={form.control}
+          name="reminder_templates"
+          render={({ field }) => (
+            <ReminderTemplatesEditor
+              value={field.value}
+              onChange={field.onChange}
+            />
+          )}
+        />
+        {err.reminder_templates && (
+          <p role="alert" className="text-sm text-danger">
+            Check the language codes and template names.
+          </p>
+        )}
+      </FormSection>
     </SettingsForm>
+  );
+}
+
+function ReminderTemplatesEditor({
+  value,
+  onChange,
+}: {
+  value: Record<string, { name: string; language: string }>;
+  onChange: (value: Record<string, { name: string; language: string }>) => void;
+}) {
+  const [customerLanguage, setCustomerLanguage] = useState("");
+  const [name, setName] = useState("");
+  const [templateLanguage, setTemplateLanguage] = useState("");
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground">
+        Add an approved text template without variables or buttons for each
+        customer language. For Roman Urdu, use customer language roman_ur and
+        the language approved by Meta. Set your WhatsApp business account ID on
+        the connection page.
+      </p>
+      {Object.entries(value).map(([language, template]) => (
+        <div
+          key={language}
+          className="flex items-center justify-between gap-2 rounded border p-2 text-sm"
+        >
+          <span>
+            {language}: {template.name} ({template.language})
+          </span>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => {
+              const next = { ...value };
+              delete next[language];
+              onChange(next);
+            }}
+          >
+            Remove
+          </Button>
+        </div>
+      ))}
+      <div className="grid gap-2 sm:grid-cols-3">
+        <Input
+          aria-label="Customer language code"
+          placeholder="Customer language: en"
+          value={customerLanguage}
+          onChange={(e) => setCustomerLanguage(e.target.value)}
+        />
+        <Input
+          aria-label="Approved reminder template name"
+          placeholder="Template: service_followup"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <Input
+          aria-label="Meta template language code"
+          placeholder="Meta language: en_US"
+          value={templateLanguage}
+          onChange={(e) => setTemplateLanguage(e.target.value)}
+        />
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={
+          !customerLanguage.trim() || !name.trim() || !templateLanguage.trim()
+        }
+        onClick={() => {
+          onChange({
+            ...value,
+            [customerLanguage.trim()]: {
+              name: name.trim(),
+              language: templateLanguage.trim(),
+            },
+          });
+          setCustomerLanguage("");
+          setName("");
+          setTemplateLanguage("");
+        }}
+      >
+        Add template
+      </Button>
+    </div>
   );
 }
 

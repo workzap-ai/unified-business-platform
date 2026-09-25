@@ -27,6 +27,20 @@ export function useNavigation() {
   });
 }
 
+/**
+ * Whether a navigation item (e.g. an installed product such as "pi") is available in
+ * the current workspace. The backend resolves installation, enablement, permissions and
+ * environment, so this is the right gate for optional cross-module queries.
+ * Returns undefined while navigation is loading.
+ */
+export function useNavItemAvailable(key: string): boolean | undefined {
+  const { data } = useNavigation();
+  if (!data) return undefined;
+  return data.sections.some((section) =>
+    section.items.some((item) => item.key === key),
+  );
+}
+
 export function useNavOrderMutation() {
   const client = useQueryClient();
   const key = useNavigationKey();

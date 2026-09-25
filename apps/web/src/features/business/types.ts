@@ -433,6 +433,13 @@ export const employeeSchema = z.object({
   termination_date: z.string().nullable(),
   salary: nullableDecimal.optional(),
   salary_currency: z.string().nullable().optional(),
+  gender: z.enum(["male", "female"]).nullable().optional(),
+  work_arrangement: z
+    .enum(["onsite", "hybrid", "remote", "freelancer"])
+    .nullable()
+    .optional(),
+  date_of_birth: z.string().nullable().optional(),
+  has_personal_details: z.boolean().optional(),
   sensitive_visible: z.boolean(),
   created_at: ts,
 });

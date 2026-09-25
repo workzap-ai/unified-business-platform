@@ -38,7 +38,7 @@ export type Conversation = {
   last_message_preview: string;
   last_sender: "customer" | "ai" | "human" | "system";
   unread_count: number;
-  language: "en" | "ur" | "roman_ur" | null;
+  language: string | null;
   handoff_id: string | null;
   handoff_status: HandoffStatus | null;
   last_intent: string | null;
@@ -57,7 +57,7 @@ export type Message = {
   conversation_id: string;
   direction: "inbound" | "outbound";
   sender_type: "customer" | "ai" | "human" | "system";
-  message_type: "text" | "audio" | "image" | "interactive" | "other";
+  message_type: "text" | "audio" | "image" | "video" | "interactive" | "other";
   body: string;
   media: {
     mime_type: string;
@@ -109,6 +109,14 @@ export type AgentRun = {
 
 export type ConversationContext = {
   conversation: Conversation;
+  service_brief?: {
+    requirements?: Record<string, string>;
+    missing?: string[];
+    reminder_consent?: string;
+    ready_for_team?: boolean;
+    awaiting_customer?: boolean;
+  };
+  followup_due_at?: string | null;
   memory: {
     id: string;
     kind: "preference" | "requirement" | "context";
@@ -352,7 +360,8 @@ export type PiSettings = {
     notice: string;
   };
   response_rules: {
-    language: "auto" | "en" | "ur" | "roman_ur";
+    language: string;
+    service_mode: "auto" | "service";
     max_reply_chars: number;
     tone: "friendly" | "formal" | "concise";
     greeting: string;
@@ -389,7 +398,11 @@ export type PiSettings = {
     typing_indicator: boolean;
     media_voice: boolean;
     media_images: boolean;
+    media_video: boolean;
     max_media_mb: number;
+    reminder_enabled: boolean;
+    reminder_after_days: number;
+    reminder_templates: Record<string, { name: string; language: string }>;
   };
   permissions: {
     role: string;

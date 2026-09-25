@@ -23,6 +23,8 @@ const TONES: Record<string, Tone> = {
   sent: "info",
   accepted: "success",
   rejected: "danger",
+  submitted: "primary",
+  revoked: "neutral",
   expired: "neutral",
   cancelled: "neutral",
   confirmed: "info",

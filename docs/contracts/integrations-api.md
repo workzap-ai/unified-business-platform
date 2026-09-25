@@ -173,3 +173,43 @@ or mutates business data.
 ```
 
 `scopes` are permission keys and cannot exceed the creator's permissions.
+
+## Implementation notes (backend, v1)
+
+Clarifications and additive changes made while implementing; the web app may rely on them.
+
+- **Additive:** `ConnectionDetail.webhook_url: string | null` — the provider callback URL
+  for definitions with `webhook_support` (`{INTEGRATIONS_PUBLIC_BASE_URL}/api/v1/webhooks/{integration_key}/{endpoint_token}`); `null` when not applicable or not configured.
+- Create endpoints (`POST /connections`, `/webhooks`, `/api-keys`, `/connections/{id}/sync`)
+  answer **201**; other mutations 200 unless noted (204 for deletes).
+- `POST /connections` runs the create-time test only when credentials were supplied and the
+  definition is not OAuth; `PUT …/credentials` and `POST …/enable` also re-test and return the
+  resulting status (`connected` or `error`).
+- `mode: "sandbox"` is rejected (`422 SANDBOX_UNSUPPORTED`) for definitions with
+  `supports_sandbox: false`. Stripe additionally requires test keys for sandbox and live keys
+  for production.
+- Secret fields sent inside `config` are rejected (`422 INVALID_CONFIGURATION`) so they can
+  never be stored unencrypted. Without a server encryption key, credential writes fail with
+  `503 ENCRYPTION_NOT_CONFIGURED`.
+- `GET /oauth/callback` requires the session and `integrations.manage`. When the state is
+  unknown, reused, expired or belongs to another user/workspace the redirect target is
+  `/settings/integrations?oauth=error` (no connection id is revealed).
+- Outbound webhook URLs failing SSRF validation → `422 URL_REJECTED`. Unknown event types →
+  `422 UNKNOWN_EVENT_TYPE`. `DELETE /webhooks/{id}` soft-deletes and cancels pending
+  deliveries (their status becomes `cancelled`).
+- `POST /deliveries/{id}/retry` is idempotent: retrying a `pending`/`running` delivery returns
+  it unchanged; `succeeded`/`cancelled` → `409 NOT_RETRYABLE`. `POST /events/{id}/replay` on an
+  already `queued`/`processing` event returns it unchanged.
+- Sync controls: `resume` only from `paused`, `retry` only from `failed`/`dead_letter`
+  (`422 INVALID_TRANSITION` otherwise); a second active job for the same connection+entity →
+  `409 RESOURCE_CONFLICT`.
+- Provider-side errors raised by synchronous calls use the standard envelope with the
+  integration error code (e.g. `PROVIDER_UNAVAILABLE` 503, `RATE_LIMITED` 429,
+  `CIRCUIT_OPEN` 503). `TestResult` never errors for provider failures: it returns `ok: false`.
+- API key `secret` format: `pk_live_<8 hex>_<43 chars>` (production environments) or
+  `pk_test_…`; `prefix` is `pk_live_<8 hex>`. `api_keys.manage` can never be a key scope.
+- `Failure.integration_key` for deliveries is `generic_webhook` (subscriptions are not bound
+  to a connection); `connection_id` is `null` for them.
+- Public inbound routes (not under `/integrations`): `POST|GET /api/v1/webhooks/{integration_key}/{endpoint_token}`
+  (signature-authenticated; 404 unknown token, 401 bad/missing/stale signature, 400 invalid
+  payload, 413 too large, 200 `{received, accepted, duplicates}`).

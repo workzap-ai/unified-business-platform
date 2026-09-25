@@ -48,6 +48,7 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
         "agent": "gemini-2.5-flash",
         "summarize": "gemini-2.5-flash-lite",
         "vision": "gemini-2.5-flash",
+        "video": "gemini-2.5-flash",
         "embed": "gemini-embedding-001",
         "transcribe": "gemini-2.5-flash",
     },

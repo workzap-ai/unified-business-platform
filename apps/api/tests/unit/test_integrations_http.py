@@ -285,6 +285,8 @@ async def test_logs_never_contain_secrets(caplog):
             )
     finally:
         logger.propagate = False
-    text = json.dumps([r.getMessage() for r in caplog.records])
+    from app.core.logging import JsonFormatter
+
+    text = json.dumps([JsonFormatter().format(r) for r in caplog.records])
     assert "SECRETVALUE" not in text and "SECRETTOKEN" not in text
     assert "api.example.com" in text

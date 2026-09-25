@@ -17,6 +17,11 @@ async def business_permissions(
             BusinessSettings.environment_id == environment_id,
         )
     )
+    return apply_business_type(kind, permissions)
+
+
+def apply_business_type(kind: str | None, permissions: frozenset[str]) -> frozenset[str]:
+    """Service businesses have no stock: inventory permissions do not apply."""
     if kind is None or kind == "service_business":
         return frozenset(p for p in permissions if not p.startswith("inventory."))
     return permissions

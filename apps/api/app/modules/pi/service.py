@@ -173,6 +173,7 @@ class PiService:
         await self.require("pi.handoffs.manage")
         conversation = await self.conversations.get(conversation_id, for_update=True)
         conversation.mode = "human"
+        conversation.followup_due_at = None
         await self.cancel_pending(conversation.id)
         existing = await self.handoffs.find(
             PiHandoff.conversation_id == conversation.id,
@@ -215,9 +216,11 @@ class PiService:
             conversation.unread_count = 0
         elif action == "close":
             conversation.status = "closed"
+            conversation.followup_due_at = None
         elif action == "takeover":
             # Durable flag: the pipeline, tools, sender and sweeper all check it.
             conversation.mode = "human"
+            conversation.followup_due_at = None
             conversation.assigned_user_id = self.scope.user_id
             await self.cancel_pending(conversation.id)
         elif action == "return-to-ai":

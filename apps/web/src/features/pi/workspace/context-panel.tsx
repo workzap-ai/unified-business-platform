@@ -135,7 +135,7 @@ export function ContextPanel({ conversationId }: { conversationId: string }) {
         <SectionLabel>
           <span id="ctx-summary">Conversation summary</span>
         </SectionLabel>
-        <p className="mt-1.5 text-[13px] leading-relaxed text-foreground-secondary">
+        <p className="mt-1.5 whitespace-pre-wrap text-[13px] leading-relaxed text-foreground-secondary">
           {c.summary || "No summary yet."}
         </p>
         {c.last_intent && (
@@ -147,6 +147,41 @@ export function ContextPanel({ conversationId }: { conversationId: string }) {
           </p>
         )}
       </section>
+
+      {ctx.service_brief?.requirements && (
+        <section className="p-4" aria-label="Service brief">
+          <SectionLabel>Service requirements</SectionLabel>
+          <dl className="mt-2 space-y-2 text-xs">
+            {Object.entries(ctx.service_brief.requirements)
+              .filter(([, value]) => value)
+              .map(([key, value]) => (
+                <div key={key}>
+                  <dt className="font-semibold">{humanize(key)}</dt>
+                  <dd className="mt-0.5 whitespace-pre-wrap break-words text-muted-foreground">
+                    {value}
+                  </dd>
+                </div>
+              ))}
+          </dl>
+          {!!ctx.service_brief.missing?.length && (
+            <p className="mt-3 text-xs">
+              Still needed: {ctx.service_brief.missing.join(", ")}
+            </p>
+          )}
+          <p className="mt-3 text-xs text-muted-foreground">
+            Pricing and delivery require your team&apos;s review.
+          </p>
+          <p className="mt-2 text-xs">
+            Reminder permission:{" "}
+            {humanize(ctx.service_brief.reminder_consent ?? "unknown")}
+          </p>
+          {ctx.followup_due_at && (
+            <p className="mt-1 text-xs">
+              Follow-up due: {formatDate(ctx.followup_due_at)}
+            </p>
+          )}
+        </section>
+      )}
 
       <section className="p-4">
         <SectionLabel>What PI remembers</SectionLabel>

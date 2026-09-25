@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
   Bell,
@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { relativeTime } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/display";
+import { ErrorState } from "@/components/app/states";
+import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import {
   Popover,
   PopoverContent,
@@ -40,7 +42,7 @@ export function NotificationRow({
 }) {
   const tone = SEVERITY_ICON[n.severity];
   const body = (
-    <div
+    <span
       className={cn(
         "flex gap-3 rounded-md px-2.5 py-2.5 hover:bg-surface-muted",
         !n.read && "bg-primary-soft/40",
@@ -80,12 +82,25 @@ export function NotificationRow({
           {relativeTime(n.created_at)}
         </span>
       </span>
-    </div>
+    </span>
   );
   return n.link ? (
-    <Link href={n.link} onClick={onOpen} className="block">
+    <Link
+      href={n.link}
+      onClick={onOpen}
+      className="block rounded-md focus-visible:outline-2 focus-visible:outline-ring"
+    >
       {body}
     </Link>
+  ) : onOpen && !n.read ? (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-label={`Mark as read: ${n.title}`}
+      className="block w-full rounded-md text-left focus-visible:outline-2 focus-visible:outline-ring"
+    >
+      {body}
+    </button>
   ) : (
     body
   );
@@ -96,22 +111,30 @@ export function NotificationCenter() {
   const client = useQueryClient();
   const [open, setOpen] = useState(false);
   const enabled = can("notifications.read");
-  const unread = useQuery({
-    queryKey: [...scopeKey, "notifications", "unread"],
-    queryFn: () => notificationsService.unreadCount(),
-    enabled,
-    refetchInterval: 60_000,
+  const unread = useScopedQuery(
+    ["notifications", "unread"],
+    () => notificationsService.unreadCount(),
+    { enabled, refetchInterval: 60_000 },
+  );
+  const list = useScopedQuery(
+    ["notifications", "recent"],
+    () => notificationsService.list({ pageSize: 8 }),
+    { enabled: enabled && open, refetchInterval: 60_000 },
+  );
+  const markAll = useScopedMutation(() => notificationsService.markRead(null), {
+    invalidate: [["notifications"], ["navigation"]],
   });
-  const list = useQuery({
-    queryKey: [...scopeKey, "notifications", "recent"],
-    queryFn: () => notificationsService.list({ pageSize: 8 }),
-    enabled: enabled && open,
-  });
-  const markAll = useMutation({
-    mutationFn: () => notificationsService.markRead(null),
-    onSuccess: () =>
-      client.invalidateQueries({ queryKey: [...scopeKey, "notifications"] }),
-  });
+  const markOne = useScopedMutation(
+    (id: string) => notificationsService.markRead([id]),
+    { invalidate: [["notifications"], ["navigation"]] },
+  );
+  const [scope, tenant, environment] = scopeKey;
+  useEffect(() => {
+    if (unread.data !== undefined)
+      void client.invalidateQueries({
+        queryKey: [scope, tenant, environment, "navigation"],
+      });
+  }, [client, scope, tenant, environment, unread.data]);
   if (!enabled) return null;
   const count = unread.data ?? 0;
 
@@ -142,7 +165,7 @@ export function NotificationCenter() {
           <Button
             variant="ghost"
             size="xs"
-            onClick={() => markAll.mutate()}
+            onClick={() => markAll.mutate(undefined)}
             disabled={count === 0 || markAll.isPending}
           >
             <CheckCheck /> Mark all read
@@ -160,9 +183,12 @@ export function NotificationCenter() {
               </div>
             ))
           ) : list.isError ? (
-            <p className="px-3 py-6 text-center text-sm text-muted-foreground">
-              Notifications could not be loaded.
-            </p>
+            <ErrorState
+              compact
+              title="Notifications could not be loaded"
+              error={list.error}
+              onRetry={() => void list.refetch()}
+            />
           ) : list.data.items.length === 0 ? (
             <div className="px-3 py-10 text-center">
               <Bell
@@ -176,7 +202,14 @@ export function NotificationCenter() {
             </div>
           ) : (
             list.data.items.map((n) => (
-              <NotificationRow key={n.id} n={n} onOpen={() => setOpen(false)} />
+              <NotificationRow
+                key={n.id}
+                n={n}
+                onOpen={() => {
+                  if (!n.read) markOne.mutate(n.id);
+                  if (n.link) setOpen(false);
+                }}
+              />
             ))
           )}
         </div>

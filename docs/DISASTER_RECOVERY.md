@@ -17,7 +17,7 @@ A backup that has never been restored is not a verified backup.
 
 | Asset | Source of truth | Backup mechanism (intended) |
 | --- | --- | --- |
-| Business, PI, integration and audit data | PostgreSQL | managed daily snapshots + WAL archiving for point-in-time recovery; retention `<N days>` |
+| Business, PI, integration and audit data | PostgreSQL on Neon | Neon history retention (point-in-time restore / branch from a past timestamp); retention window `<per Neon plan>`; plus periodic `pg_dump` exports to object storage for provider-independent recovery |
 | Uploaded files / knowledge documents | object storage | bucket versioning + cross-region replication or scheduled copy |
 | Queued jobs | Redis (ARQ) | not backed up; rebuilt from the database (see below) |
 | Encryption keys, provider secrets | secret store | secret-store versioning; keys escrowed separately from database backups |
@@ -29,7 +29,10 @@ backups.
 
 ## Recovery procedures
 
-**Database.** Restore the snapshot or point-in-time target into a new instance, run
+**Database.** On Neon, create a branch from the target timestamp (or restore the branch
+in place), verify it, then point `DATABASE_URL`/`MIGRATION_DATABASE_URL` at it. For
+provider loss, restore the latest `pg_dump` into any PostgreSQL 17 with pgvector.
+In either case run
 `alembic current` to confirm the revision matches the deployed code, point the API/worker
 at it, and check `/api/v1/health/ready`.
 

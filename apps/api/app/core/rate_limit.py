@@ -1,9 +1,15 @@
 import hashlib
 import logging
+import time
 
 from fastapi import Request
 
 logger = logging.getLogger("platform")
+
+# After a Redis failure, skip Redis for a short cooldown instead of paying the
+# connection timeout on every request (the limiter fails open either way).
+REDIS_RETRY_SECONDS = 30.0
+_redis_down_until = 0.0
 
 
 def client_ip(request: Request) -> str:
@@ -23,6 +29,9 @@ async def hit(request: Request, bucket: str, key: str, limit: int, window_second
     Fails open when Redis is unavailable: durable account lockout in PostgreSQL still
     protects credentials, and an outage must not lock every user out.
     """
+    global _redis_down_until
+    if time.monotonic() < _redis_down_until:
+        return True
     digest = hashlib.sha256(key.encode()).hexdigest()[:32]
     redis_key = f"ratelimit:{bucket}:{digest}"
     try:
@@ -32,5 +41,6 @@ async def hit(request: Request, bucket: str, key: str, limit: int, window_second
             await redis.expire(redis_key, window_seconds)
         return int(count) <= limit
     except Exception:
+        _redis_down_until = time.monotonic() + REDIS_RETRY_SECONDS
         logger.warning("rate_limit_unavailable")
         return True

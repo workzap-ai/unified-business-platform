@@ -6,6 +6,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.pagination import Page, Pagination
+from app.integrations.outbox import EntityRef, emit
 from app.modules.audit.service import record
 from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.service import CatalogService
@@ -296,4 +297,18 @@ class QuoteService:
             entity_id=quote.id,
             details={"from": previous, "to": target},
         )
+        if target in ("sent", "approved"):
+            await emit(
+                self.session,
+                self.scope,
+                f"quote.{target}",
+                {
+                    "quote_id": str(quote.id),
+                    "number": quote.number,
+                    "customer_id": str(quote.customer_id) if quote.customer_id else None,
+                    "total": str(quote.total),
+                    "currency": quote.currency,
+                },
+                EntityRef("quote", quote.id),
+            )
         return quote

@@ -7,6 +7,7 @@ __pycache__/
 *.egg-info/
 node_modules/
 .next/
+.next-*/
 playwright-report/
 test-results/
 .env

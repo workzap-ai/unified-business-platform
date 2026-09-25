@@ -49,12 +49,14 @@ const live: AuthService = {
       bindSession,
     ),
   register: (input) =>
-    apiRequest("POST", "/auth/register", sessionSchema, { body: input }).then(
-      bindSession,
-    ),
+    apiRequest("POST", "/auth/register", sessionSchema, {
+      body: input,
+      timeoutMs: 90_000,
+    }).then(bindSession),
   createWorkspace: (name, business_type) =>
     apiRequest("POST", "/auth/workspaces", sessionSchema, {
       body: { name, business_type },
+      timeoutMs: 90_000,
     }),
   logout: () => apiRequest("POST", "/auth/logout", null),
   logoutAll: () => apiRequest("POST", "/auth/logout-all", null),

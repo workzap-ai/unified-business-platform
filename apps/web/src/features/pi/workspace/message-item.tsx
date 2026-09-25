@@ -155,15 +155,18 @@ function MediaBlock({ message }: { message: Message }) {
       </div>
     );
   }
-  if (message.message_type === "image") {
+  if (message.message_type === "image" || message.message_type === "video") {
     return (
       <div className="mb-1 min-w-52">
         <div
           className="flex h-28 items-center justify-center rounded-xl border border-border bg-surface-sunken text-muted-foreground"
           role="img"
-          aria-label="Image sent by the customer"
+          aria-label={`${message.message_type === "video" ? "Video" : "Image"} sent by the customer`}
         >
           <ImageIcon className="size-6" aria-hidden="true" />
+          {message.message_type === "video" && (
+            <span className="ml-2 text-xs">Video</span>
+          )}
         </div>
         {media?.description && (
           <div className="mt-2">

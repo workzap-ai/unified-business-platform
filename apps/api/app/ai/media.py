@@ -38,12 +38,16 @@ def _signature(mime: str, content: bytes) -> bool:
         "audio/wav": lambda c: c[:4] == b"RIFF" and c[8:12] == b"WAVE",
         "audio/webm": lambda c: c.startswith(b"\x1a\x45\xdf\xa3"),
         "audio/flac": lambda c: c.startswith(b"fLaC"),
+        "video/mp4": lambda c: c[4:8] == b"ftyp",
+        "video/3gpp": lambda c: c[4:8] == b"ftyp",
+        "video/webm": lambda c: c.startswith(b"\x1a\x45\xdf\xa3"),
     }
     check = checks.get(mime)
     return bool(check and check(content))
 
 
 IMAGE_MIME_TYPES = frozenset({"image/png", "image/jpeg", "image/webp"})
+VIDEO_MIME_TYPES = frozenset({"video/mp4", "video/3gpp", "video/webm"})
 AUDIO_MIME_TYPES = frozenset(
     {"audio/ogg", "audio/mpeg", "audio/mp4", "audio/aac", "audio/wav", "audio/webm", "audio/flac"}
 )
@@ -61,7 +65,7 @@ def validate_media(content: bytes, mime: str, limit: int) -> str:
         raise MediaValidationError("empty")
     if len(content) > limit:
         raise MediaValidationError("too_large")
-    if normalized not in IMAGE_MIME_TYPES | AUDIO_MIME_TYPES:
+    if normalized not in IMAGE_MIME_TYPES | AUDIO_MIME_TYPES | VIDEO_MIME_TYPES:
         raise MediaValidationError("unsupported_type")
     if not _signature(normalized, content):
         raise MediaValidationError("content_mismatch")
@@ -78,6 +82,13 @@ def validate_image(content: bytes, mime: str, limit: int) -> str:
 def validate_audio(content: bytes, mime: str, limit: int) -> str:
     normalized = validate_media(content, mime, min(limit, PROVIDER_AUDIO_MAX_BYTES))
     if normalized not in AUDIO_MIME_TYPES:
+        raise MediaValidationError("unsupported_type")
+    return normalized
+
+
+def validate_video(content: bytes, mime: str, limit: int) -> str:
+    normalized = validate_media(content, mime, min(limit, 16 * 1024 * 1024))
+    if normalized not in VIDEO_MIME_TYPES:
         raise MediaValidationError("unsupported_type")
     return normalized
 

@@ -19,6 +19,10 @@ async def test_configuration_knowledge_analytics_and_policy(api, business_db, mo
 
     monkeypatch.setattr("app.core.middleware.logger.error", expose_error)
     app, ctx = await setup_pi(api, business_db)
+    # The catalog-tool policy path applies to product enquiries. Services never quote prices.
+    assert (
+        await api.patch("/api/v1/settings/business", json={"business_type": "product_business"})
+    ).status_code == 200
     for path in (
         "settings",
         "agents",
@@ -93,14 +97,17 @@ async def test_configuration_knowledge_analytics_and_policy(api, business_db, mo
     await ctx["http"].aclose()
 
 
-async def test_quote_draft_uses_catalog_and_records_tool_audit(api, business_db):
+async def test_product_quote_draft_uses_catalog_and_records_tool_audit(api, business_db):
     app, ctx = await setup_pi(api, business_db)
+    assert (
+        await api.patch("/api/v1/settings/business", json={"business_type": "product_business"})
+    ).status_code == 200
     await create(
         api,
         "catalog/products",
         {
             "name": "Website",
-            "offering_type": "service",
+            "offering_type": "product",
             "variants": [{"sku": "WEB", "name": "Standard", "price": "1250.00", "currency": "USD"}],
         },
     )

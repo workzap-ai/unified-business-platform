@@ -73,7 +73,13 @@ export async function apiRequest<T>(
   method: Method,
   path: string,
   schema: z.ZodType<T> | null,
-  options: { body?: unknown; query?: Query; signal?: AbortSignal } = {},
+  options: {
+    body?: unknown;
+    query?: Query;
+    signal?: AbortSignal;
+    /** Override for slow, one-off operations such as provisioning a workspace. */
+    timeoutMs?: number;
+  } = {},
 ): Promise<T> {
   const headers: Record<string, string> = { Accept: "application/json" };
   if (expectedWorkspace && !path.startsWith("/auth/")) {
@@ -85,7 +91,7 @@ export async function apiRequest<T>(
     const csrf = readCookie(CSRF_COOKIE);
     if (csrf) headers["X-CSRF-Token"] = csrf;
   }
-  const timeout = AbortSignal.timeout(15_000);
+  const timeout = AbortSignal.timeout(options.timeoutMs ?? 30_000);
   let response: Response;
   try {
     response = await fetch(`${API_BASE}${buildPath(path, options.query)}`, {

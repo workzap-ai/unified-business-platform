@@ -3,8 +3,9 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 // Next's standalone output omits static assets; assemble them for local runs.
-const standalone = resolve(".next/standalone");
-cpSync(resolve(".next/static"), resolve(standalone, ".next/static"), {
+const distDir = process.env.NEXT_DIST_DIR || ".next";
+const standalone = resolve(distDir, "standalone");
+cpSync(resolve(distDir, "static"), resolve(standalone, distDir, "static"), {
   recursive: true,
 });
 if (existsSync("public")) {

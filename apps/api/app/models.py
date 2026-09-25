@@ -13,6 +13,7 @@ from app.modules.departments.models import Department
 from app.modules.environments.models import Environment
 from app.modules.finance.models import Expense
 from app.modules.hr.models import Employee
+from app.modules.hr.onboarding import EmployeeOnboarding
 from app.modules.inventory.models import InventoryLocation, StockLevel, StockMovement
 from app.modules.memberships.models import Membership
 from app.modules.navigation.models import NavigationPreference
@@ -64,6 +65,7 @@ __all__ = [
     "Department",
     "DocumentSequence",
     "Employee",
+    "EmployeeOnboarding",
     "Environment",
     "EnvironmentProductInstallation",
     "Expense",

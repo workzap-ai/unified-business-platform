@@ -44,7 +44,6 @@ import httpx
 
 from app.core.config import Settings
 from app.integrations.errors import IntegrationError, OutboundUrlRejected, error_for_status
-from app.integrations.redaction import redact_url
 
 logger = logging.getLogger("platform")
 
@@ -396,9 +395,16 @@ class OutboundClient:
         return OutboundResponse(status, response.headers, data, elapsed)
 
     def _log(self, method: str, url: str, status: int, started: float, outcome: str) -> None:
+        # Structured and allowlisted (app.core.logging): host only, never path/query/body.
+        try:
+            host = urlsplit(url).hostname or "unknown"
+        except ValueError:
+            host = "invalid"
         logger.info(
-            f"integration_http {method} {redact_url(url)} outcome={outcome}",
+            "integration_http",
             extra={
+                "provider": host[:120],
+                "operation": f"{method} {outcome}",
                 "status_code": status,
                 "duration_ms": round((time.perf_counter() - started) * 1000, 2),
             },

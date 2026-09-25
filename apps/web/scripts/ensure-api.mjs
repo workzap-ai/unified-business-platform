@@ -58,7 +58,9 @@ if (process.env.NEXT_PUBLIC_DATA_MODE !== "demo") {
     signal: AbortSignal.timeout(5000),
   });
   if (!ready.ok) {
-    throw new Error("The API is running, but its database or required queue is unavailable. Check apps/api/.env and start its dependencies.");
+    throw new Error(
+      "The API is running, but its database or required queue is unavailable. Check apps/api/.env and start its dependencies.",
+    );
   }
   console.log(`API connection and dependencies verified: ${target.origin}`);
 }

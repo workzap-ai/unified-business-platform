@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Bell, CheckCheck } from "lucide-react";
 import { formatDate, humanize } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -58,22 +58,33 @@ export function NotificationsPage() {
 function NotificationsContent() {
   const [state, setState] = useUrlState({ view: "all", kind: "", page: "1" });
   const unreadOnly = state.view === "unread";
-  const page = Math.max(1, Number(state.page) || 1);
+  const parsedPage = Number(state.page);
+  const page =
+    Number.isSafeInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const list = useScopedQuery(
     ["notifications", "inbox", { page, unreadOnly }],
     () => notificationsService.list({ page, pageSize: PAGE_SIZE, unreadOnly }),
+    { refetchInterval: 60_000 },
   );
   const unread = useScopedQuery(["notifications", "unread"], () =>
     notificationsService.unreadCount(),
   );
   const markAll = useScopedMutation(() => notificationsService.markRead(null), {
-    invalidate: [["notifications"]],
+    invalidate: [["notifications"], ["navigation"]],
     success: "All notifications marked as read",
   });
   const markOne = useScopedMutation(
     (id: string) => notificationsService.markRead([id]),
-    { invalidate: [["notifications"]] },
+    { invalidate: [["notifications"], ["navigation"]] },
   );
+
+  const total = list.data?.total;
+  useEffect(() => {
+    if (total === undefined) return;
+    const lastPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    if (page > lastPage)
+      setState({ page: String(lastPage) }, { resetPage: false });
+  }, [page, total, setState]);
 
   const items = list.data?.items;
   const kindOptions = useMemo(() => {

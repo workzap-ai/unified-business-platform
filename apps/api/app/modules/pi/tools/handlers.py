@@ -648,6 +648,9 @@ async def send_whatsapp_message(ctx: ToolContext, data: SendInput) -> SendOutput
                 agent_key=ctx.agent_key,
                 run_id=ctx.run.id,
                 idempotency_key=key,
+                media={"service_inbound_at": ctx.conversation.last_inbound_at.isoformat()}
+                if ctx.conversation.service_brief and ctx.conversation.last_inbound_at
+                else {},
             )
         )
         ctx.run.response_message_id = existing.id

@@ -6,6 +6,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.pagination import Page, Pagination
+from app.integrations.outbox import EntityRef, emit
 from app.modules.audit.service import record
 from app.modules.billing.models import Invoice
 from app.modules.billing.service import BillingService
@@ -43,6 +44,28 @@ ORDER_STATES = StateMachine(
         "cancelled": frozenset(),
     },
 )
+ORDER_EVENTS = {
+    "confirmed": "order.confirmed",
+    "cancelled": "order.cancelled",
+    "delivered": "order.fulfilled",
+}
+
+
+def _order_payload(order: Order) -> dict[str, str | None]:
+    return {
+        "order_id": str(order.id),
+        "number": order.number,
+        "status": order.status,
+        "customer_id": str(order.customer_id) if order.customer_id else None,
+        "total": str(order.total),
+        "currency": order.currency,
+    }
+
+
+def _ref(order: Order) -> EntityRef:
+    return EntityRef("order", order.id)
+
+
 ACTION_TARGET = {
     "confirm": "confirmed",
     "start_processing": "processing",
@@ -248,6 +271,7 @@ class OrderService:
             entity_id=order.id,
             details={"number": order.number, "total": str(order.total), "source": source},
         )
+        await emit(self.session, self.scope, "order.created", _order_payload(order), _ref(order))
         return order
 
     async def update_lines(self, order_id: UUID, inputs: list[OrderLineInput]) -> Order:
@@ -354,6 +378,7 @@ class OrderService:
             entity_id=order.id,
             details={"quote": quote.number},
         )
+        await emit(self.session, self.scope, "order.created", _order_payload(order), _ref(order))
         return order
 
     async def transition(self, order_id: UUID, action: str) -> Order:
@@ -393,6 +418,9 @@ class OrderService:
             entity_id=order.id,
             details={"from": previous, "to": target, "total": str(order.total)},
         )
+        event = ORDER_EVENTS.get(target)
+        if event:
+            await emit(self.session, self.scope, event, _order_payload(order), _ref(order))
         return order
 
     async def _confirm_effects(self, order: Order, lines: list[OrderLine]) -> None:

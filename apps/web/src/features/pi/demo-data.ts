@@ -306,6 +306,7 @@ function defaultSettings(tools: string[]): PiSettings {
     },
     response_rules: {
       language: "auto",
+      service_mode: "auto",
       max_reply_chars: 700,
       tone: "friendly",
       greeting: "Assalam o alaikum! This is PI from Northwind Trading.",
@@ -352,7 +353,11 @@ function defaultSettings(tools: string[]): PiSettings {
       typing_indicator: true,
       media_voice: true,
       media_images: true,
+      media_video: true,
       max_media_mb: 10,
+      reminder_enabled: true,
+      reminder_after_days: 7,
+      reminder_templates: {},
     },
     permissions: [
       {

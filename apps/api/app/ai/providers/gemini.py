@@ -29,6 +29,7 @@ from app.ai.types import (
     TranscriptionRequest,
     TranscriptionResponse,
     Usage,
+    VideoPart,
 )
 
 MODEL_ID = re.compile(r"^[A-Za-z0-9._-]{1,120}$")
@@ -45,7 +46,7 @@ _SCHEMA_KEYS = {
     "type", "format", "description", "nullable", "enum", "properties", "required", "items",
     "minItems", "maxItems", "minimum", "maximum", "anyOf", "propertyOrdering",
 }  # fmt: skip
-Capability = Literal["chat", "vision", "embed", "transcribe"]
+Capability = Literal["chat", "vision", "video", "embed", "transcribe"]
 
 
 def to_gemini_schema(schema: Mapping[str, Any]) -> dict[str, Any]:
@@ -116,7 +117,9 @@ class GeminiProvider(HttpAdapter):
         api_key: SecretStr,
         *,
         name: str = "gemini",
-        capabilities: frozenset[Capability] = frozenset({"chat", "vision", "embed", "transcribe"}),
+        capabilities: frozenset[Capability] = frozenset(
+            {"chat", "vision", "video", "embed", "transcribe"}
+        ),
     ) -> None:
         super().__init__(name, http, base_url)
         self._key = api_key
@@ -240,7 +243,7 @@ class GeminiProvider(HttpAdapter):
                 for part in message.parts():
                     if isinstance(part, TextPart) and part.text:
                         parts.append({"text": part.text})
-                    elif isinstance(part, ImagePart):
+                    elif isinstance(part, (ImagePart, VideoPart)):
                         parts.append(
                             {
                                 "inlineData": {

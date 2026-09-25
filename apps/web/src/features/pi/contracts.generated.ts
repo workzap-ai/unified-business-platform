@@ -54,12 +54,7 @@ export const ConversationSchema: z.ZodType<Pi.Conversation> = z.object({
     z.literal("system"),
   ]),
   unread_count: z.number(),
-  language: z.union([
-    z.null(),
-    z.literal("en"),
-    z.literal("ur"),
-    z.literal("roman_ur"),
-  ]),
+  language: z.union([z.null(), z.string()]),
   handoff_id: z.union([z.null(), z.string()]),
   handoff_status: z.union([
     z.null(),
@@ -97,6 +92,7 @@ export const MessageSchema: z.ZodType<Pi.Message> = z.object({
     z.literal("text"),
     z.literal("audio"),
     z.literal("image"),
+    z.literal("video"),
     z.literal("interactive"),
     z.literal("other"),
   ]),
@@ -228,12 +224,7 @@ export const ConversationContextSchema: z.ZodType<Pi.ConversationContext> =
         z.literal("system"),
       ]),
       unread_count: z.number(),
-      language: z.union([
-        z.null(),
-        z.literal("en"),
-        z.literal("ur"),
-        z.literal("roman_ur"),
-      ]),
+      language: z.union([z.null(), z.string()]),
       handoff_id: z.union([z.null(), z.string()]),
       handoff_status: z.union([
         z.null(),
@@ -247,6 +238,25 @@ export const ConversationContextSchema: z.ZodType<Pi.ConversationContext> =
       summary: z.string(),
       pending_confirmation: z.boolean(),
     }),
+    service_brief: z
+      .union([
+        z.undefined(),
+        z.object({
+          requirements: z
+            .union([z.undefined(), z.record(z.string(), z.string())])
+            .optional(),
+          missing: z.union([z.undefined(), z.array(z.string())]).optional(),
+          reminder_consent: z.union([z.undefined(), z.string()]).optional(),
+          ready_for_team: z
+            .union([z.undefined(), z.literal(false), z.literal(true)])
+            .optional(),
+          awaiting_customer: z
+            .union([z.undefined(), z.literal(false), z.literal(true)])
+            .optional(),
+        }),
+      ])
+      .optional(),
+    followup_due_at: z.union([z.undefined(), z.null(), z.string()]).optional(),
     memory: z.array(
       z.object({
         id: z.string(),
@@ -752,12 +762,8 @@ export const PiSettingsSchema: z.ZodType<Pi.PiSettings> = z.object({
     notice: z.string(),
   }),
   response_rules: z.object({
-    language: z.union([
-      z.literal("en"),
-      z.literal("ur"),
-      z.literal("roman_ur"),
-      z.literal("auto"),
-    ]),
+    language: z.string(),
+    service_mode: z.union([z.literal("auto"), z.literal("service")]),
     max_reply_chars: z.number(),
     tone: z.union([
       z.literal("friendly"),
@@ -804,7 +810,14 @@ export const PiSettingsSchema: z.ZodType<Pi.PiSettings> = z.object({
     typing_indicator: z.boolean(),
     media_voice: z.boolean(),
     media_images: z.boolean(),
+    media_video: z.boolean(),
     max_media_mb: z.number(),
+    reminder_enabled: z.boolean(),
+    reminder_after_days: z.number(),
+    reminder_templates: z.record(
+      z.string(),
+      z.object({ name: z.string(), language: z.string() }),
+    ),
   }),
   permissions: z.array(
     z.object({

@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.pagination import Page, Pagination
+from app.integrations.outbox import EntityRef, emit
 from app.modules.audit.service import record
 from app.modules.customers.models import Customer, CustomerActivity, CustomerNote
 from app.modules.customers.schemas import (
@@ -103,6 +104,13 @@ class CustomerService:
             entity_id=customer.id,
             details={"source": source},
         )
+        await emit(
+            self.session,
+            self.scope,
+            "customer.created",
+            {"customer_id": str(customer.id), "name": customer.name, "source": source},
+            EntityRef("customer", customer.id),
+        )
         return customer
 
     async def update(self, customer_id: UUID, data: CustomerUpdate) -> Customer:
@@ -130,6 +138,13 @@ class CustomerService:
             entity_type="customer",
             entity_id=customer.id,
             details={"fields": sorted(changes)},
+        )
+        await emit(
+            self.session,
+            self.scope,
+            "customer.updated",
+            {"customer_id": str(customer.id), "fields": sorted(changes)},
+            EntityRef("customer", customer.id),
         )
         return customer
 

@@ -99,7 +99,10 @@ async def webhook(api, app, text, mid="wamid.test-1", valid=True):
     )
 
 
-async def test_webhook_service_search_dedup_takeover_and_handoff(api, business_db):
+async def test_webhook_service_search_dedup_takeover_and_handoff(api, business_db, monkeypatch):
+    from test_pi_service_conversations import mock_turns, turn
+
+    mock_turns(monkeypatch, turn())
     app, ctx = await setup_pi(api, business_db)
     await create(
         api,
@@ -130,7 +133,9 @@ async def test_webhook_service_search_dedup_takeover_and_handoff(api, business_d
         == 1
     )
     outbound = await business_db.scalar(select(PiMessage).where(PiMessage.direction == "outbound"))
-    assert "1500.00 USD" in outbound.body
+    assert "1500" not in outbound.body and "main maqsad" in outbound.body
+    conversation = await business_db.scalar(select(PiConversation))
+    assert "Website" in conversation.service_brief["requirements"]["service"]
     await send_pi_message(ctx, str(outbound.id))
     assert outbound.status == "sent"
     response = await api.get("/api/v1/pi/conversations")

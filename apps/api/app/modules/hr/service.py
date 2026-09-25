@@ -68,6 +68,10 @@ class EmployeeView(BaseModel):
     termination_date: date | None
     salary: Decimal | None = None
     salary_currency: str | None = None
+    gender: str | None = None
+    work_arrangement: str | None = None
+    date_of_birth: date | None = None  # hr.sensitive only
+    has_personal_details: bool = False
     sensitive_visible: bool
     created_at: datetime
 
@@ -102,6 +106,10 @@ class HRService:
             termination_date=row.termination_date,
             salary=row.salary if sensitive else None,
             salary_currency=row.salary_currency if sensitive else None,
+            gender=row.gender,
+            work_arrangement=row.work_arrangement,
+            date_of_birth=row.date_of_birth if sensitive else None,
+            has_personal_details=row.personal_details_encrypted is not None,
             sensitive_visible=sensitive,
             created_at=row.created_at,
         )

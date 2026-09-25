@@ -14,12 +14,15 @@ async def test_customer_confirmation_requires_delivered_summary_and_exact_refere
     api, business_db
 ):
     app, ctx = await setup_pi(api, business_db)
+    assert (
+        await api.patch("/api/v1/settings/business", json={"business_type": "product_business"})
+    ).status_code == 200
     await create(
         api,
         "catalog/products",
         {
             "name": "Website",
-            "offering_type": "service",
+            "offering_type": "product",
             "variants": [{"sku": "WEB", "name": "Standard", "price": "1250.00", "currency": "USD"}],
         },
     )

@@ -1,7 +1,7 @@
 from collections.abc import Sequence
-from uuid import UUID
+from uuid import UUID, uuid4
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, insert, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -39,21 +39,35 @@ async def membership_grants(
 
 
 async def seed_system_roles(session: AsyncSession, tenant_id: UUID) -> dict[str, Role]:
-    roles: dict[str, Role] = {}
-    for key, (name, description, _permissions) in SYSTEM_ROLES.items():
-        role = Role(
-            tenant_id=tenant_id, key=key, name=name, description=description, is_system=True
+    # Two multi-row statements rather than one INSERT per role and permission: remote
+    # databases (Neon) cost a network round trip per statement.
+    ids = {key: uuid4() for key in SYSTEM_ROLES}
+    await session.execute(
+        insert(Role).values(
+            [
+                {
+                    "id": ids[key],
+                    "tenant_id": tenant_id,
+                    "key": key,
+                    "name": name,
+                    "description": description,
+                    "is_system": True,
+                }
+                for key, (name, description, _permissions) in SYSTEM_ROLES.items()
+            ]
         )
-        session.add(role)
-        roles[key] = role
-    await session.flush()
-    for key, role in roles.items():
-        session.add_all(
-            RolePermission(tenant_id=tenant_id, role_id=role.id, permission=p)
-            for p in sorted(SYSTEM_ROLES[key][2])
+    )
+    await session.execute(
+        insert(RolePermission).values(
+            [
+                {"id": uuid4(), "tenant_id": tenant_id, "role_id": ids[key], "permission": p}
+                for key, (_name, _description, permissions) in SYSTEM_ROLES.items()
+                for p in sorted(permissions)
+            ]
         )
-    await session.flush()
-    return roles
+    )
+    rows = await session.scalars(select(Role).where(Role.id.in_(list(ids.values()))))
+    return {role.key: role for role in rows}
 
 
 async def assign_roles(
