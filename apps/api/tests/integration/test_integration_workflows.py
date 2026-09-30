@@ -143,6 +143,9 @@ async def test_invoice_email_is_durable_idempotent_and_disabled_connection_stops
     assert await jobs.deliver_integration_operation(env["ctx"], one.json()["id"]) == "succeeded"
     sent = [r for r in env["provider"].requests if r.url.path == "/emails"]
     assert len(sent) == 1 and json.loads(sent[0].content)["to"] == ["customer@example.com"]
+    email = json.loads(sent[0].content)
+    assert email["subject"].startswith("Invoice ") and "[info]" not in email["subject"]
+    assert "Hello Paying customer" in email["text"]
     new = await env["api"].post(url, json={"request_id": str(uuid4())})
     await env["api"].post(f"/api/v1/integrations/connections/{connection['id']}/disable")
     assert await jobs.deliver_integration_operation(env["ctx"], new.json()["id"]) == "cancelled"

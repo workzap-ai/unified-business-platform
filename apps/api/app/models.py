@@ -38,6 +38,45 @@ from app.modules.pi.models import (
     WhatsAppConnection,
     WhatsAppWebhookEvent,
 )
+from app.modules.pi_saas.customer_payment_models import (
+    PiCustomerPaymentSettings,
+    PiPaymentRequest,
+)
+from app.modules.pi_saas.models import (
+    PiBillingEvent,
+    PiBookableService,
+    PiBooking,
+    PiBusinessAccount,
+    PiBusinessVerification,
+    PiCampaign,
+    PiCampaignRecipient,
+    PiConversationNote,
+    PiConversationTag,
+    PiCustomerConsent,
+    PiDigest,
+    PiKnowledgeDraft,
+    PiOperatorAssignment,
+    PiOperatorMember,
+    PiPlan,
+    PiPlatformInvoice,
+    PiPlatformSetting,
+    PiPlatformState,
+    PiPoolNumber,
+    PiProviderConnection,
+    PiProviderEvent,
+    PiSavedReply,
+    PiStaffRequest,
+    PiSubscription,
+    PiSupportGrant,
+    PiTask,
+    PiTicket,
+    PiUsageCounter,
+)
+from app.modules.pi_saas.payment_models import (
+    PiCheckoutAttempt,
+    PiCollectionSettings,
+    PiManualPayment,
+)
 from app.modules.products.models import (
     EnvironmentProductInstallation,
     PlatformProduct,
@@ -47,10 +86,46 @@ from app.modules.quotes.models import Quote, QuoteLine
 from app.modules.sales.models import SalesLead
 from app.modules.tenants.models import Tenant
 from app.modules.users.models import PlatformUser
+from app.modules.workspace_agent.models import WorkspaceAgentAction, WorkspaceTask
 from app.shared.sequences import DocumentSequence
 from app.workflows.models import WorkflowRun
 
 __all__ = [
+    "WorkspaceAgentAction",
+    "WorkspaceTask",
+    "PiCustomerPaymentSettings",
+    "PiPaymentRequest",
+    "PiCheckoutAttempt",
+    "PiCollectionSettings",
+    "PiManualPayment",
+    "PiBillingEvent",
+    "PiBookableService",
+    "PiBooking",
+    "PiBusinessAccount",
+    "PiCampaign",
+    "PiCampaignRecipient",
+    "PiDigest",
+    "PiBusinessVerification",
+    "PiPlatformSetting",
+    "PiPlatformState",
+    "PiPoolNumber",
+    "PiConversationNote",
+    "PiConversationTag",
+    "PiCustomerConsent",
+    "PiKnowledgeDraft",
+    "PiOperatorAssignment",
+    "PiOperatorMember",
+    "PiPlan",
+    "PiPlatformInvoice",
+    "PiProviderConnection",
+    "PiProviderEvent",
+    "PiSavedReply",
+    "PiStaffRequest",
+    "PiSubscription",
+    "PiSupportGrant",
+    "PiTask",
+    "PiTicket",
+    "PiUsageCounter",
     "IntegrationOperation",
     "IntegrationWorkflow",
     "WorkflowRun",

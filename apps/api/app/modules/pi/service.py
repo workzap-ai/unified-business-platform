@@ -1,7 +1,8 @@
 from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import false, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.pagination import Page, Pagination
@@ -70,10 +71,38 @@ async def require_pi(
         )
 
 
+class VisibleConversations(WorkspaceRepository[PiConversation]):
+    """Record-level inbox scope. Members without ``pi.inbox.all`` see only conversations
+    assigned to them (directly or through an active handoff). Every read, count, search
+    and mutation goes through this predicate, so hidden conversations are "not found".
+    System actors (the PI runtime) are bound by tenant/environment scope only."""
+
+    def predicate(self) -> Any:
+        base = super().predicate()
+        if self.scope.is_system or self.scope.can("pi.inbox.all"):
+            return base
+        if self.scope.user_id is None:
+            return base & false()
+        handed_to_me = (
+            select(PiHandoff.conversation_id)
+            .where(
+                PiHandoff.tenant_id == self.scope.tenant_id,
+                PiHandoff.environment_id == self.scope.environment_id,
+                PiHandoff.status.in_(ACTIVE_HANDOFF),
+                PiHandoff.assigned_user_id == self.scope.user_id,
+            )
+            .scalar_subquery()
+        )
+        return base & or_(
+            PiConversation.assigned_user_id == self.scope.user_id,
+            PiConversation.id.in_(handed_to_me),
+        )
+
+
 class PiService:
     def __init__(self, session: AsyncSession, scope: WorkspaceScope) -> None:
         self.session, self.scope = session, scope
-        self.conversations = WorkspaceRepository(session, PiConversation, scope)
+        self.conversations = VisibleConversations(session, PiConversation, scope)
         self.messages = WorkspaceRepository(session, PiMessage, scope)
         self.handoffs = WorkspaceRepository(session, PiHandoff, scope)
         self.customers = WorkspaceRepository(session, Customer, scope)
@@ -118,7 +147,16 @@ class PiService:
             customer_phone=customer.phone,
             handoff_id=handoff.id if handoff else None,
             handoff_status=handoff.status if handoff else None,
-            assigned_label=handoff.assigned_label if handoff else None,
+            assigned_label=(handoff.assigned_label if handoff and handoff.assigned_label else None)
+            or (
+                await self.session.scalar(
+                    select(PlatformUser.display_name).where(
+                        PlatformUser.id == conversation.assigned_user_id
+                    )
+                )
+                if conversation.assigned_user_id
+                else None
+            ),
             last_sender=last.sender_type if last else "customer",
             last_intent=await self.session.scalar(
                 WorkspaceRepository(self.session, PiAgentRun, self.scope)
@@ -139,23 +177,82 @@ class PiService:
         )
 
     async def search(
-        self, page: Pagination, search: str | None, status: str | None, mode: str | None
+        self,
+        page: Pagination,
+        search: str | None,
+        status: str | None,
+        mode: str | None,
+        assignment: str | None = None,
+        unread: bool | None = None,
     ) -> Page[ConversationView]:
+        """Inbox list. ``search`` matches customer name, phone, WhatsApp number or any
+        message text in the conversation; ``assignment`` is ``mine`` or ``unassigned``."""
         await self.require()
         query = self.conversations.select()
         if search:
-            matching = (
-                self.customers.select()
-                .with_only_columns(Customer.id)
-                .where(Customer.name.ilike(like_pattern(search)))
+            pattern = like_pattern(search)
+            digits = "".join(ch for ch in search if ch.isdigit())
+            customer_match = [Customer.name.ilike(pattern), Customer.email.ilike(pattern)]
+            if len(digits) >= 3:
+                customer_match += [
+                    Customer.phone.ilike(f"%{digits}%"),
+                    Customer.whatsapp_id.ilike(f"%{digits}%"),
+                ]
+            matching_customers = (
+                self.customers.select().with_only_columns(Customer.id).where(or_(*customer_match))
             )
-            query = query.where(PiConversation.customer_id.in_(matching))
+            matching_messages = (
+                self.messages.select()
+                .with_only_columns(PiMessage.conversation_id)
+                .where(PiMessage.body.ilike(pattern))
+            )
+            clauses = [
+                PiConversation.customer_id.in_(matching_customers),
+                PiConversation.id.in_(matching_messages),
+            ]
+            if len(digits) >= 3:
+                clauses.append(PiConversation.contact_wa_id.ilike(f"%{digits}%"))
+            query = query.where(or_(*clauses))
         if status:
             query = query.where(PiConversation.status == status)
         if mode:
             query = query.where(PiConversation.mode == mode)
+        if assignment == "mine":
+            if self.scope.user_id is None:
+                raise PermissionDenied
+            handed_to_me = (
+                self.handoffs.select()
+                .with_only_columns(PiHandoff.conversation_id)
+                .where(
+                    PiHandoff.status.in_(ACTIVE_HANDOFF),
+                    PiHandoff.assigned_user_id == self.scope.user_id,
+                )
+            )
+            query = query.where(
+                or_(
+                    PiConversation.assigned_user_id == self.scope.user_id,
+                    PiConversation.id.in_(handed_to_me),
+                )
+            )
+        elif assignment == "unassigned":
+            assigned_handoffs = (
+                self.handoffs.select()
+                .with_only_columns(PiHandoff.conversation_id)
+                .where(
+                    PiHandoff.status.in_(ACTIVE_HANDOFF),
+                    PiHandoff.assigned_user_id.is_not(None),
+                )
+            )
+            query = query.where(
+                PiConversation.assigned_user_id.is_(None),
+                PiConversation.id.not_in(assigned_handoffs),
+            )
+        if unread is True:
+            query = query.where(PiConversation.unread_count > 0)
+        elif unread is False:
+            query = query.where(PiConversation.unread_count == 0)
         rows, count = await self.conversations.page(
-            query.order_by(PiConversation.last_message_at.desc()), page
+            query.order_by(PiConversation.last_message_at.desc(), PiConversation.id.desc()), page
         )
         return Page(
             items=[await self.view(row) for row in rows],
@@ -267,7 +364,11 @@ class PiService:
             connection
             and connection.status == "active"
             and connection.verified_at is not None
-            and connection.access_token_encrypted
+            and (
+                connection.access_token_encrypted
+                or connection.integration_connection_id is not None
+                or connection.provider == "kapso"  # authenticated by the project key
+            )
         )
         message = await self.messages.add(
             self.messages.new(

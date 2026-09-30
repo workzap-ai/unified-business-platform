@@ -17,6 +17,7 @@ import { NotificationCenter } from "./notification-center";
 import { Sidebar } from "./sidebar";
 import { QuickCreate, UserMenu } from "./user-menu";
 import { EnvironmentSwitcher } from "./workspace-switcher";
+import { WorkspaceAgentProvider } from "@/features/workspace-agent/workspace-agent";
 
 const COLLAPSE_KEY = "platform.sidebar.collapsed";
 
@@ -68,7 +69,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <CommandMenuProvider>
       <BreadcrumbProvider>
-        <ShellFrame>{children}</ShellFrame>
+        <WorkspaceAgentProvider>
+          <ShellFrame>{children}</ShellFrame>
+        </WorkspaceAgentProvider>
       </BreadcrumbProvider>
     </CommandMenuProvider>
   );

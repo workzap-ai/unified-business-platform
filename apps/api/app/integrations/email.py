@@ -10,9 +10,11 @@ settings (PLATFORM_SMTP_*). Without either, sending fails with EMAIL_NOT_CONFIGU
 """
 
 import html
+import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from string import Template
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,7 +23,13 @@ from app.core.config import Settings
 from app.integrations.catalog import REGISTRY
 from app.integrations.http import CallContext, OutboundClient
 from app.integrations.providers.smtp import SmtpProvider
-from app.integrations.registry import EmailMessage, EmailProvider, ProviderContext, SendResult
+from app.integrations.registry import (
+    EmailAttachment,
+    EmailMessage,
+    EmailProvider,
+    ProviderContext,
+    SendResult,
+)
 from app.integrations.runtime import ConnectionRuntime
 from app.modules.integrations.models import IntegrationConnection
 from app.shared.errors import BusinessRuleViolation
@@ -79,6 +87,13 @@ TEMPLATES: dict[str, EmailTemplate] = {
         '<p>Last error: $error</p><p><a href="$link">Review the connection</a></p>',
         variables=frozenset({"integration", "workspace", "error", "link"}),
         links=frozenset({"link"}),
+    ),
+    # Transactional message from a business to its own customer (booking confirmations).
+    "customer_notice": EmailTemplate(
+        subject="$title",
+        text="Hello $name,\n\n$message\n\n$workspace",
+        html="<p>Hello $name,</p><p>$message</p>",
+        variables=frozenset({"name", "title", "message", "workspace"}),
     ),
     "system_alert": EmailTemplate(
         subject="[$severity] $title",
@@ -201,3 +216,30 @@ class EmailService:
                 idempotency_key=idempotency_key,
             )
         )
+
+
+CALENDAR_FILE = re.compile(r"[A-Za-z0-9_.-]{1,60}\.ics")
+MAX_ATTACHMENT_CHARS = 64 * 1024
+
+
+def calendar_attachments(raw: Any) -> tuple[EmailAttachment, ...]:
+    """Attachments an operation may carry: at most two small iCalendar files. Anything
+    else is dropped, so an operation input can never smuggle arbitrary files."""
+    if not isinstance(raw, list):
+        return ()
+    out: list[EmailAttachment] = []
+    for item in raw[:2]:
+        if not isinstance(item, dict):
+            continue
+        name, kind, content = item.get("filename"), item.get("content_type"), item.get("content")
+        if (
+            isinstance(name, str)
+            and CALENDAR_FILE.fullmatch(name)
+            and isinstance(kind, str)
+            and kind.startswith("text/calendar")
+            and isinstance(content, str)
+            and len(content) <= MAX_ATTACHMENT_CHARS
+            and content.startswith("BEGIN:VCALENDAR")
+        ):
+            out.append(EmailAttachment(filename=name, content_type=kind[:80], content=content))
+    return tuple(out)

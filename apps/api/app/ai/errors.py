@@ -59,6 +59,11 @@ CIRCUIT_KINDS = frozenset(
         ErrorKind.UNAVAILABLE,
     }
 )
+# The request itself is at fault, so every provider would refuse it: stop the chain.
+STOP_KINDS = frozenset({ErrorKind.INVALID_REQUEST, ErrorKind.CONTENT_POLICY, ErrorKind.PERMANENT})
+# This provider's account can't serve anyone (bad/revoked key, credits or daily quota
+# finished): fall back to the next provider and keep this one out for a long cooldown.
+DISABLE_KINDS = frozenset({ErrorKind.AUTH, ErrorKind.QUOTA})
 # Failures worth one more try on the same provider before falling back.
 SAME_PROVIDER_RETRY_KINDS = frozenset(
     {ErrorKind.TIMEOUT, ErrorKind.CONNECTION, ErrorKind.UNAVAILABLE, ErrorKind.RATE_LIMIT}
@@ -94,6 +99,11 @@ class ProviderError(AIGatewayError):
     @property
     def permanent(self) -> bool:
         return not self.transient
+
+    @property
+    def stops_chain(self) -> bool:
+        """True when trying another provider cannot help (see STOP_KINDS)."""
+        return self.kind in STOP_KINDS
 
     def _describe(self) -> str:
         detail = f" (HTTP {self.status_code})" if self.status_code else ""
@@ -161,7 +171,10 @@ class AllProvidersFailed(GatewayUnavailable):
 
 
 class PermanentProviderFailure(GatewayUnavailable):
-    """A permanent error (auth, invalid request, content policy) stopped the chain."""
+    """A request error (invalid request, content policy) stopped the chain.
+
+    Credential and billing errors (AUTH, QUOTA) are provider-specific: they fall back to
+    the next provider and surface as AllProvidersFailed when nothing else can answer."""
 
     def __init__(
         self,

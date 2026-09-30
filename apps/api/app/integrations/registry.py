@@ -149,6 +149,16 @@ class NormalizedEvent:
 
 
 @dataclass(frozen=True, slots=True)
+class EmailAttachment:
+    """A small text attachment (only calendar invitations are allowed; see
+    ``integrations.email.calendar_attachments``)."""
+
+    filename: str
+    content_type: str
+    content: str
+
+
+@dataclass(frozen=True, slots=True)
 class EmailMessage:
     to: Sequence[str]
     subject: str
@@ -157,6 +167,7 @@ class EmailMessage:
     from_address: str | None = None
     reply_to: str | None = None
     idempotency_key: str | None = None
+    attachments: tuple[EmailAttachment, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

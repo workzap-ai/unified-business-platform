@@ -159,6 +159,8 @@ async def reminder_workspace(api, business_db, monkeypatch):
     policy.whatsapp_config = {
         **policy.whatsapp_config,
         "reminder_templates": {"en": {"name": "service_followup", "language": "en_US"}},
+        "quiet_start": 0,
+        "quiet_end": 0,  # the reminder tests run at any hour
     }
     connection = await business_db.scalar(
         select(WhatsAppConnection).where(WhatsAppConnection.tenant_id == conversation.tenant_id)
@@ -173,6 +175,17 @@ async def reminder_workspace(api, business_db, monkeypatch):
 
 async def test_weekly_reminder_uses_approved_template_once(api, business_db, monkeypatch):
     pi, conversation = await reminder_workspace(api, business_db, monkeypatch)
+    # Consent the customer gave in the chat is also on their customer record.
+    from app.modules.pi_saas.models import PiCustomerConsent
+
+    consent = await business_db.scalar(
+        select(PiCustomerConsent).where(
+            PiCustomerConsent.customer_id == conversation.customer_id,
+            PiCustomerConsent.purpose == "reminders",
+        )
+    )
+    assert consent is not None and consent.status == "granted"
+    assert consent.source.startswith("Customer said")
     await sweep_followups(pi.ctx)
     await sweep_followups(pi.ctx)
     reminders = [m for m in await pi.outbound() if m.media.get("reminder")]

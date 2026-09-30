@@ -2,6 +2,7 @@ import { expect, type Page } from "@playwright/test";
 
 export const DEFAULT_MAIN = [
   "Overview",
+  "Pi Agent Beta",
   "Customers / CRM",
   "Catalog",
   "PI",

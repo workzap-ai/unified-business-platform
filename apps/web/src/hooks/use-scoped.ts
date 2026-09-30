@@ -1,9 +1,12 @@
 "use client";
 
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery,
   useQueryClient,
+  type InfiniteData,
+  type UseInfiniteQueryOptions,
   type UseQueryOptions,
 } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -23,6 +26,30 @@ export function useScopedQuery<T>(
   return useQuery<T>({
     queryKey: [...scopeKey, ...key],
     queryFn: fn,
+    ...options,
+    enabled: status === "ready" && (options.enabled ?? true),
+  });
+}
+
+/** Workspace-scoped infinite query (load-more pagination); keys are scoped like `useScopedQuery`. */
+export function useScopedInfiniteQuery<T, P>(
+  key: readonly unknown[],
+  fn: (pageParam: P) => Promise<T>,
+  options: Omit<
+    UseInfiniteQueryOptions<
+      T,
+      Error,
+      InfiniteData<T, P>,
+      readonly unknown[],
+      P
+    >,
+    "queryKey" | "queryFn"
+  >,
+) {
+  const { scopeKey, status } = useSession();
+  return useInfiniteQuery<T, Error, InfiniteData<T, P>, readonly unknown[], P>({
+    queryKey: [...scopeKey, ...key],
+    queryFn: ({ pageParam }) => fn(pageParam as P),
     ...options,
     enabled: status === "ready" && (options.enabled ?? true),
   });

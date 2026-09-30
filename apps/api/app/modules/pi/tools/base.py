@@ -49,6 +49,7 @@ class ToolContext:
     run: PiAgentRun | None
     agent_key: str
     confirmation: str | None = None
+    http: tuple[Any, Any] | None = None  # (settings, httpx client) for provider calls
 
 
 Handler = Callable[[ToolContext, Any], Awaitable[ToolOutput]]

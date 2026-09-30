@@ -629,6 +629,39 @@ class SendOutput(ToolOutput):
     delivery: str
 
 
+async def _delivery_status(ctx: ToolContext) -> str:
+    """``human_approved``: every AI reply waits for a person. ``mixed``: replies that
+    follow a completed business action (order, quote, booking ...) wait; answers and
+    discovery questions go out. ``ai_led`` (default): queued for delivery."""
+    from app.modules.pi.configuration import settings_row
+    from app.modules.pi.models import PiToolCall
+    from app.modules.pi.tools.catalog import TOOL_CATALOG
+
+    mode = (await settings_row(ctx.session, ctx.scope)).response_rules.get("execution_mode")
+    if mode == "human_approved":
+        return "pending_approval"
+    if mode == "mixed" and ctx.run is not None:
+        mutating = [
+            name
+            for name, spec in TOOL_CATALOG.items()
+            if spec.mutation and name not in {"send_whatsapp_message", "create_handoff"}
+        ]
+        acted = await ctx.session.scalar(
+            WorkspaceRepository(ctx.session, PiToolCall, ctx.scope)
+            .select()
+            .with_only_columns(PiToolCall.id)
+            .where(
+                PiToolCall.run_id == ctx.run.id,
+                PiToolCall.status == "success",
+                PiToolCall.tool_key.in_(mutating),
+            )
+            .limit(1)
+        )
+        if acted is not None:
+            return "pending_approval"
+    return "queued"
+
+
 async def send_whatsapp_message(ctx: ToolContext, data: SendInput) -> SendOutput:
     """Queues one AI reply per inbound message. Delivery happens in the send job, which
     re-checks takeover, connection and the 24-hour window; it never reports 'sent' here."""
@@ -637,14 +670,16 @@ async def send_whatsapp_message(ctx: ToolContext, data: SendInput) -> SendOutput
     repo = WorkspaceRepository(ctx.session, PiMessage, ctx.scope)
     key = f"reply:{ctx.run.message_id}"
     existing = await repo.find(PiMessage.idempotency_key == key)
+    status = "queued"
     if existing is None:
+        status = await _delivery_status(ctx)
         existing = await repo.add(
             repo.new(
                 conversation_id=ctx.conversation.id,
                 direction="outbound",
                 sender_type="ai",
                 body=data.body,
-                status="queued",
+                status=status,
                 agent_key=ctx.agent_key,
                 run_id=ctx.run.id,
                 idempotency_key=key,
@@ -654,6 +689,19 @@ async def send_whatsapp_message(ctx: ToolContext, data: SendInput) -> SendOutput
             )
         )
         ctx.run.response_message_id = existing.id
+        if status == "pending_approval":
+            from app.modules.notifications.service import notify
+
+            await notify(
+                ctx.session,
+                ctx.scope,
+                "pi.reply_approval",
+                "A PI reply is waiting for your approval",
+                data.body[:200],
+                link=f"/pi/inbox?conversation={ctx.conversation.id}",
+                permission="pi.inbox.reply",
+                dedupe_key=f"pi-approval:{existing.id}",
+            )
     return SendOutput(
         message_id=existing.id,
         status=existing.status,

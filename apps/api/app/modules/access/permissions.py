@@ -12,6 +12,9 @@ class PermissionDef:
 
 _DEFS: list[tuple[str, str, str]] = [
     ("overview.read", "View overview dashboard", "Overview"),
+    ("tasks.read", "View own workspace tasks", "Workspace tasks"),
+    ("tasks.write", "Create and update own workspace tasks", "Workspace tasks"),
+    ("tasks.manage", "Manage and assign all workspace tasks", "Workspace tasks"),
     ("customers.read", "View customers", "Customers"),
     ("customers.write", "Create and edit customers", "Customers"),
     ("catalog.read", "View catalog", "Catalog"),
@@ -43,6 +46,20 @@ _DEFS: list[tuple[str, str, str]] = [
     ("pi.settings.manage", "Manage PI settings", "PI"),
     ("pi.analytics.read", "View PI analytics", "PI"),
     ("pi.memory.read", "View customer memory", "PI"),
+    ("pi.inbox.all", "See every conversation (otherwise only assigned ones)", "PI"),
+    ("pi.inbox.assign", "Assign conversations to team members", "PI"),
+    ("pi.inbox.notes", "Read and write internal conversation notes", "PI"),
+    ("pi.customers.export", "Export customer records and memory", "PI"),
+    ("pi.knowledge.publish", "Publish knowledge that customers can see", "PI"),
+    ("pi.billing.read", "View the Pi plan, usage and invoices", "PI"),
+    ("pi.billing.manage", "Change the Pi plan, spend limit or cancel", "PI"),
+    ("pi.support.grant", "Approve and revoke operator support access", "PI"),
+    ("pi.bookings.read", "View bookings and bookable services", "PI"),
+    ("pi.bookings.manage", "Create, change and cancel bookings", "PI"),
+    ("pi.work.read", "View tasks and support tickets", "PI"),
+    ("pi.work.manage", "Create and update tasks and support tickets", "PI"),
+    ("pi.campaigns.read", "View WhatsApp campaigns and their results", "PI"),
+    ("pi.campaigns.manage", "Create, schedule and cancel WhatsApp campaigns", "PI"),
     ("admin.members.read", "View members", "Administration"),
     ("admin.members.manage", "Manage members", "Administration"),
     ("admin.roles.manage", "Manage roles", "Administration"),
@@ -76,7 +93,9 @@ SYSTEM_ROLES: dict[str, tuple[str, str, frozenset[str]]] = {
         "Runs day-to-day business operations",
         READ_ONLY
         | _pick("customers.", "catalog.", "inventory.", "sales.", "quotes.", "orders.")
-        | {"billing.write", "pi.inbox.reply", "pi.handoffs.manage", "notifications.read"},
+        | {"billing.write", "pi.inbox.reply", "pi.handoffs.manage", "notifications.read"}
+        | {"pi.inbox.all", "pi.inbox.assign", "pi.inbox.notes"}
+        | {"pi.bookings.manage", "pi.work.manage", "pi.campaigns.manage"},
     ),
     "sales": (
         "Sales",
@@ -91,8 +110,24 @@ SYSTEM_ROLES: dict[str, tuple[str, str, frozenset[str]]] = {
         frozenset(
             {"customers.read", "customers.write", "catalog.read", "inventory.read", "orders.read"}
             | {"pi.read", "pi.inbox.reply", "pi.handoffs.manage", "pi.memory.read"}
-            | {"overview.read", "notifications.read"}
+            | {"pi.inbox.all", "pi.inbox.notes", "overview.read", "notifications.read"}
+            | {"pi.bookings.read", "pi.bookings.manage", "pi.work.read", "pi.work.manage"}
         ),
+    ),
+    "member": (
+        "Sales/Support member",
+        "Handles conversations assigned to them",
+        frozenset(
+            {"customers.read", "customers.write", "catalog.read", "orders.read"}
+            | {"pi.read", "pi.inbox.reply", "pi.handoffs.manage", "pi.memory.read"}
+            | {"pi.inbox.notes", "notifications.read"}
+            | {"pi.bookings.read", "pi.bookings.manage", "pi.work.read", "pi.work.manage"}
+        ),
+    ),
+    "billing": (
+        "Billing",
+        "Pi plan, usage and invoices",
+        frozenset({"pi.billing.read", "pi.billing.manage", "overview.read", "notifications.read"}),
     ),
     "accountant": (
         "Accountant",
@@ -102,10 +137,23 @@ SYSTEM_ROLES: dict[str, tuple[str, str, frozenset[str]]] = {
         | {"notifications.read"},
     ),
     "hr": ("HR", "Employee records", _pick("hr.") | {"overview.read", "notifications.read"}),
-    "viewer": ("Viewer", "Read-only access", READ_ONLY - {"hr.read", "pi.memory.read"}),
+    "viewer": (
+        "Viewer",
+        "Read-only access",
+        (READ_ONLY - {"hr.read", "pi.memory.read", "pi.billing.read"}) | {"pi.inbox.all"},
+    ),
 }
 
 # Permissions granted to PI's system actor. Tools additionally check their own rules.
+# Owner OS tasks are independent of customer-facing PI work items.
+for _role_key, (_name, _description, _permissions) in list(SYSTEM_ROLES.items()):
+    _task_permissions = {"tasks.read"}
+    if _role_key != "viewer":
+        _task_permissions.add("tasks.write")
+    if _role_key in {"owner", "admin", "manager"}:
+        _task_permissions.add("tasks.manage")
+    SYSTEM_ROLES[_role_key] = (_name, _description, _permissions | _task_permissions)
+
 PI_SYSTEM_PERMISSIONS = frozenset(
     {
         "customers.read",
@@ -120,6 +168,11 @@ PI_SYSTEM_PERMISSIONS = frozenset(
         "billing.write",
         "sales.write",
         "pi.read",
+        # Native bookings, tasks and tickets created from customer conversations.
+        "pi.bookings.read",
+        "pi.bookings.manage",
+        "pi.work.read",
+        "pi.work.manage",
     }
 )
 

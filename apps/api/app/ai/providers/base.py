@@ -97,6 +97,8 @@ def error_body(response: httpx.Response) -> dict[str, Any]:
 def classify_status(status: int) -> ErrorKind:
     if status in (401, 403):
         return ErrorKind.AUTH
+    if status == 402:  # payment required: the account's credits are finished
+        return ErrorKind.QUOTA
     if status == 429:
         return ErrorKind.RATE_LIMIT
     if status == 404:

@@ -15,13 +15,14 @@ from typing import TYPE_CHECKING, Any
 
 import httpx
 
+from app.ai.providers.anthropic import AnthropicProvider
 from app.ai.providers.gemini import GeminiProvider
 from app.ai.providers.openai import OpenAICompatibleProvider
 
 if TYPE_CHECKING:
     from app.core.config import Settings
 
-KNOWN_PROVIDERS = ("openai", "gemini", "groq")
+KNOWN_PROVIDERS = ("openai", "gemini", "groq", "anthropic")
 ALIAS_PATTERN = re.compile(r"^[a-z][a-z0-9_-]{0,19}$")  # ai_usage_events.alias is 20 chars
 
 # Legacy/alternative alias names -> canonical alias.
@@ -54,10 +55,17 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
     },
     "groq": {
         "router": "llama-3.1-8b-instant",
-        "agent": "llama-3.3-70b-versatile",
+        "agent": "openai/gpt-oss-120b",
         "summarize": "llama-3.1-8b-instant",
         "vision": "meta-llama/llama-4-scout-17b-16e-instruct",
         "transcribe": "whisper-large-v3-turbo",
+    },
+    # Claude: chat and vision only (embeddings and transcription stay on OpenAI/Gemini).
+    "anthropic": {
+        "router": "claude-haiku-4-5-20251001",
+        "agent": "claude-sonnet-5-5",
+        "summarize": "claude-haiku-4-5-20251001",
+        "vision": "claude-sonnet-5-5",
     },
 }
 
@@ -69,7 +77,7 @@ DEFAULT_PRICES: dict[str, tuple[Decimal, Decimal]] = {
     "gemini:gemini-2.5-flash": (Decimal("0.30"), Decimal("2.50")),
     "gemini:gemini-2.5-flash-lite": (Decimal("0.10"), Decimal("0.40")),
     "groq:llama-3.1-8b-instant": (Decimal("0.05"), Decimal("0.08")),
-    "groq:llama-3.3-70b-versatile": (Decimal("0.59"), Decimal("0.79")),
+    "groq:openai/gpt-oss-120b": (Decimal("0.59"), Decimal("0.79")),
 }
 
 
@@ -184,6 +192,10 @@ class ProviderRegistry:
                 settings.groq_api_key,
                 capabilities=frozenset({"chat", "vision", "transcribe"}),
                 structured_mode=settings.groq_structured_output,
+            )
+        if settings.anthropic_api_key:
+            providers["anthropic"] = AnthropicProvider(
+                http, settings.anthropic_base_url, settings.anthropic_api_key
             )
         return cls(providers)
 

@@ -1,20 +1,25 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { MessagesSquare, PanelRightClose } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { DialogHeader, SheetContent } from "@/components/ui/overlays";
 import { EmptyState } from "@/components/app/states";
-import { useScopedQuery } from "@/hooks/use-scoped";
+import { useScopedInfiniteQuery } from "@/hooks/use-scoped";
 import { useUrlState } from "@/hooks/use-url-state";
-import { piService, type ConversationFilters } from "../service";
+import {
+  CONVERSATION_PAGE_SIZE,
+  piService,
+  type ConversationFilters,
+} from "../service";
 import { piKeys } from "./lib";
 import { ContextPanel } from "./context-panel";
 import { ConversationList, type InboxFilters } from "./conversation-list";
 import { ConversationThread } from "./conversation-thread";
 import { useMediaQuery } from "./parts";
+import type { Conversation } from "../types";
 
 const DEFAULTS = {
   conversation: "",
@@ -43,17 +48,36 @@ export function InboxPage() {
         : "",
     unread: state.unread === "1" || undefined,
   };
-  const conversations = useScopedQuery(
-    piKeys.conversations(filters),
-    () => piService.conversations(filters),
+  // Offset pages with "Load more"; polling refreshes every loaded page.
+  const conversations = useScopedInfiniteQuery(
+    piKeys.inbox(filters),
+    (page: number) =>
+      piService.conversations({
+        ...filters,
+        page,
+        page_size: CONVERSATION_PAGE_SIZE,
+      }),
     {
+      initialPageParam: 1,
+      getNextPageParam: (last) =>
+        last.page * last.page_size < last.total ? last.page + 1 : undefined,
       refetchInterval: 30_000,
       placeholderData: (previous) => previous,
     },
   );
+  const pages = conversations.data?.pages;
+  const listData = useMemo(() => {
+    if (!pages?.length) return undefined;
+    // New conversations can shift offset pages; never show a row twice.
+    const byId = new Map<string, Conversation>();
+    for (const c of pages.flatMap((p) => p.items))
+      if (!byId.has(c.id)) byId.set(c.id, c);
+    const items = [...byId.values()];
+    return { items, total: pages[pages.length - 1]!.total };
+  }, [pages]);
 
   const selectedId = state.conversation;
-  const listItem = conversations.data?.items.find((c) => c.id === selectedId);
+  const listItem = listData?.items.find((c) => c.id === selectedId);
 
   const onFilters = useCallback(
     (patch: Partial<InboxFilters>) => setState(patch),
@@ -87,7 +111,16 @@ export function InboxPage() {
       }}
       onFilters={onFilters}
       onClear={onClear}
-      query={conversations}
+      query={{
+        data: listData,
+        isPending: conversations.isPending,
+        isError: conversations.isError,
+        error: conversations.error,
+        refetch: conversations.refetch,
+        hasMore: conversations.hasNextPage,
+        loadingMore: conversations.isFetchingNextPage,
+        loadMore: () => void conversations.fetchNextPage(),
+      }}
       selectedId={selectedId}
       onSelect={select}
     />

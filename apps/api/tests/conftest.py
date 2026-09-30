@@ -18,6 +18,7 @@ def settings():
         openai_api_key=None,
         gemini_api_key=None,
         groq_api_key=None,
+        anthropic_api_key=None,
         app_env="test",
         database_url="postgresql+asyncpg://test:test@127.0.0.1:1/test",
         redis_url="redis://127.0.0.1:1/0",

@@ -6,7 +6,8 @@ from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
 
-ProviderName = Literal["openai", "gemini", "groq", ""]
+ProviderName = Literal["openai", "gemini", "groq", "anthropic", ""]
+PI_DEV_ORIGIN = "http://localhost:3200"
 
 
 class Settings(BaseSettings):
@@ -69,12 +70,15 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr | None = None
     gemini_api_key: SecretStr | None = None
     groq_api_key: SecretStr | None = None
+    anthropic_api_key: SecretStr | None = None
     openai_models: dict[str, str] = {}
     gemini_models: dict[str, str] = {}
     groq_models: dict[str, str] = {}
+    anthropic_models: dict[str, str] = {}
     openai_base_url: str = "https://api.openai.com/v1"
     gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
     groq_base_url: str = "https://api.groq.com/openai/v1"
+    anthropic_base_url: str = "https://api.anthropic.com/v1"
     llm_timeout_seconds: float = Field(default=20, gt=0, le=120)
     llm_max_retries: int = Field(default=1, ge=0, le=3)
     semantic_search_enabled: bool = False
@@ -86,6 +90,11 @@ class Settings(BaseSettings):
     groq_structured_output: Literal["json_schema", "json_object"] = "json_object"
     llm_circuit_failure_threshold: int = Field(default=3, ge=1, le=100)
     llm_circuit_cooldown_seconds: float = Field(default=30, gt=0, le=3600)
+    # A rejected key or finished credits/quota pauses that provider this long (requests go
+    # to the next provider meanwhile). Saving a new key for it ends the pause at once.
+    llm_circuit_quota_cooldown_seconds: float = Field(default=600, gt=0, le=86400)
+    # After the three-slot order, also try any other provider that has a key.
+    ai_failover_all_configured: bool = True
     llm_retry_after_max_seconds: float = Field(default=2, ge=0, le=30)
     # "provider:model" -> {"input": USD per 1M tokens, "output": USD per 1M tokens}
     ai_model_prices: dict[str, dict[str, Decimal]] = {}
@@ -150,7 +159,47 @@ class Settings(BaseSettings):
     storage_max_upload_bytes: int = Field(default=25 * 1024 * 1024, ge=1024, le=5 * 1024**3)
     # Stripe API base (override only for tests/mocks)
     stripe_api_base_url: str = "https://api.stripe.com"
+    # Google Calendar: the platform's OAuth web client (each business still authorizes
+    # its own calendar). Base URL override only for tests/mocks.
+    google_oauth_client_id: str | None = None
+    google_oauth_client_secret: SecretStr | None = None
+    google_calendar_api_base_url: str = "https://www.googleapis.com/calendar/v3"
+    # Shopify: the platform's Shopify app (Dev Dashboard). Each store owner authorizes it.
+    shopify_client_id: str | None = None
+    shopify_client_secret: SecretStr | None = None
+    shopify_api_version: str = Field(default="2026-07", pattern=r"^\d{4}-\d{2}$")
     api_key_max_per_environment: int = Field(default=50, ge=1, le=1000)
+
+    # --- Standalone Pi WhatsApp app (see docs/PI_SAAS.md) ---
+    # Browser origins of the separate Pi frontend. Pi sessions use their own cookies and
+    # are accepted only on /api/v1/pi-app routes; Owner OS sessions never reach them.
+    pi_app_origins: list[str] = [PI_DEV_ORIGIN]
+    pi_app_public_url: str = PI_DEV_ORIGIN
+    pi_session_cookie_name: str = "pi_session"
+    pi_csrf_cookie_name: str = "pi_csrf"
+    pi_allow_registration: bool = True
+    pi_trial_plan: str = "starter"
+    pi_past_due_grace_days: int = Field(default=7, ge=0, le=60)
+    # A business connects WhatsApp only after the operator approved its verification and
+    # it paid (or was given a free plan). Owner OS workspaces are never gated.
+    pi_whatsapp_requires_approval: bool = True
+    pi_number_hold_days: int = Field(default=7, ge=1, le=30)
+    # Kapso (WhatsApp onboarding provider). One server-held project key operates the
+    # connections each business authorizes; it is never a customer's Meta token.
+    kapso_api_key: SecretStr | None = None
+    kapso_webhook_secret: SecretStr | None = None
+    kapso_base_url: str = "https://api.kapso.ai"
+    kapso_meta_api_version: str = "v24.0"
+    kapso_setup_countries: list[str] = []  # ISO codes offered for new-number requests
+    # Who pays Meta's message fees on numbers set up through Kapso: "partner_managed" is
+    # billed to the platform's Kapso credits (and recovered through Pi plans);
+    # "customer_managed" means each business pays Meta directly.
+    kapso_meta_billing_mode: Literal["partner_managed", "customer_managed"] = "partner_managed"
+    # Kapso customer that holds the platform's shared number pool.
+    kapso_pool_customer_name: str = "Pi number pool"
+    # Platform billing for Pi subscriptions (separate from any business's own Stripe).
+    pi_billing_stripe_secret_key: SecretStr | None = None
+    pi_billing_stripe_webhook_secret: SecretStr | None = None
 
     @property
     def secure_cookies(self) -> bool:
@@ -184,7 +233,10 @@ class Settings(BaseSettings):
             raise ValueError("Use PostgreSQL and Redis connection URLs")
         if not self.allowed_hosts or "*" in self.allowed_hosts:
             raise ValueError("Explicit allowed hosts are required")
-        if any(not origin.startswith(("http://", "https://")) for origin in self.cors_origins):
+        if any(
+            not origin.startswith(("http://", "https://"))
+            for origin in [*self.cors_origins, *self.pi_app_origins]
+        ):
             raise ValueError("Explicit HTTP origins are required")
         if self.app_env == "production":
             if any(not origin.startswith("https://") for origin in self.cors_origins):
@@ -205,6 +257,18 @@ class Settings(BaseSettings):
             for base in (self.integrations_public_base_url, self.oauth_redirect_base_url):
                 if base and not base.startswith("https://"):
                     raise ValueError("Production integration URLs require HTTPS")
+            # An unconfigured Pi app stays disabled in production (no allowed origins,
+            # no public URL) instead of failing existing Owner OS deployments.
+            if self.pi_app_origins == [PI_DEV_ORIGIN]:
+                self.pi_app_origins = []
+            if self.pi_app_public_url == PI_DEV_ORIGIN:
+                self.pi_app_public_url = ""
+            if any(not origin.startswith("https://") for origin in self.pi_app_origins):
+                raise ValueError("Production Pi app origins require HTTPS")
+            if self.pi_app_public_url and not self.pi_app_public_url.startswith("https://"):
+                raise ValueError("Production Pi app URL requires HTTPS")
+            if self.pi_session_cookie_name == self.session_cookie_name:
+                raise ValueError("Pi and Owner OS sessions need distinct cookie names")
         return self
 
 

@@ -39,6 +39,7 @@ import { ApiError } from "@/services/api-client";
 import { piService } from "../../service";
 import type { WhatsAppConnection } from "../../types";
 import { humanizeError, piKeys } from "../shared";
+import { KapsoConnect } from "./kapso-connect";
 import { WhatsAppNav } from "./whatsapp-nav";
 
 export function WhatsAppConnectionPage() {
@@ -97,6 +98,7 @@ function Connection() {
         }
       />
       <WhatsAppNav />
+      <KapsoConnect onChange={() => void connection.refetch()} />
 
       {connection.isError ? (
         <Card>
@@ -111,8 +113,11 @@ function Connection() {
           <Skeleton className="h-80 rounded-xl" />
         </div>
       ) : !c ? (
-        <>
-          <Card className="mb-4">
+        <details className="rounded-xl border border-border bg-surface p-4">
+          <summary className="cursor-pointer text-sm font-medium">
+            Advanced: connect with your own Meta app keys
+          </summary>
+          <Card className="my-4">
             <EmptyState
               tone="pi"
               icon={MessageCircle}
@@ -121,8 +126,8 @@ function Connection() {
             />
           </Card>
           <ConnectionForm connection={null} />
-        </>
-      ) : (
+        </details>
+      ) : c.provider === "kapso" ? null : (
         <div className="space-y-4">
           <div className="grid gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
             <Summary connection={c} />

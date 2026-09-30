@@ -1,0 +1,11 @@
+full_name,job_title,employment_type,hire_date,email
+Sample Employee 01,Operations Assistant,full_time,2026-10-01,employee01@example.com
+Sample Employee 02,Customer Support,full_time,2026-10-01,employee02@example.com
+Sample Employee 03,Sales Associate,full_time,2026-10-01,employee03@example.com
+Sample Employee 04,Accounts Assistant,part_time,2026-10-01,employee04@example.com
+Sample Employee 05,HR Assistant,full_time,2026-10-01,employee05@example.com
+Sample Employee 06,Project Coordinator,contract,2026-10-01,employee06@example.com
+Sample Employee 07,Designer,contract,2026-10-01,employee07@example.com
+Sample Employee 08,Software Engineer,full_time,2026-10-01,employee08@example.com
+Sample Employee 09,Marketing Assistant,intern,2026-10-01,employee09@example.com
+Sample Employee 10,Office Administrator,full_time,2026-10-01,employee10@example.com

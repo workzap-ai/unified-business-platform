@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Controller, useForm, type Path, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { z } from "zod";
 import { AlertTriangle, ArrowLeft, ArrowRight, Rocket } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ import {
 import { ErrorState, Notice } from "@/components/app/states";
 import { PropertyList } from "@/components/app/record";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
+import { ApiError, errorMessage } from "@/services/api-client";
 import { piService } from "../../service";
 import type { Agent, AgentVersion, ToolDefinition } from "../../types";
 import {
@@ -121,24 +123,27 @@ function AgentWizard() {
   const publish = useScopedMutation(
     async (values: Values) => {
       if (!agent) throw new Error("No agent selected");
-      const version = await piService.publishVersion(agent.id, {
-        instructions: values.instructions,
-        model_alias: values.model_alias,
-        temperature: values.temperature.toFixed(2),
-        note: values.note,
-      });
+      // One atomic request: the version and every tool change apply together or not at all.
       const before = new Set(agent.tools);
       const after = new Set(values.tools);
-      for (const key of values.tools)
-        if (!before.has(key)) await piService.setAgentTool(agent.id, key, true);
-      for (const key of agent.tools)
-        if (!after.has(key)) await piService.setAgentTool(agent.id, key, false);
-      return version;
+      const tools: Record<string, boolean> = {};
+      for (const key of after) if (!before.has(key)) tools[key] = true;
+      for (const key of before) if (!after.has(key)) tools[key] = false;
+      return piService.publishAgent(agent.id, {
+        version: {
+          instructions: values.instructions,
+          model_alias: values.model_alias,
+          temperature: values.temperature.toFixed(2),
+          note: values.note,
+        },
+        tools,
+      });
     },
     {
       invalidate: [[...piKeys.agents], [...piKeys.tools]],
       success: (v) => `Version ${v.version} published and active`,
-      error: "The configuration couldn't be published. Nothing was changed.",
+      // Shown by onSubmit so the message can say whether anything changed.
+      toastErrors: false,
     },
   );
 
@@ -149,7 +154,10 @@ function AgentWizard() {
 
   const onSubmit = form.handleSubmit(async (values) => {
     if (step !== STEPS.length - 1) return;
-    const version = await publish.mutateAsync(values).catch(() => null);
+    const version = await publish.mutateAsync(values).catch((error) => {
+      toast.error(publishErrorMessage(error));
+      return null;
+    });
     if (!version || !agent) return;
     setPublished(true);
     router.push(`/pi/agents/${agent.id}`);
@@ -425,8 +433,11 @@ function AgentWizard() {
           >
             {step === 0 ? "Cancel" : "Back"}
           </Button>
+          {/* Distinct keys: reusing one DOM button whose type flips to "submit" while the
+              Continue click is still being handled would publish immediately. */}
           {step < STEPS.length - 1 ? (
             <Button
+              key="continue"
               type="button"
               onClick={() => void next()}
               disabled={loadingAgent}
@@ -434,7 +445,7 @@ function AgentWizard() {
               Continue <ArrowRight />
             </Button>
           ) : (
-            <Button type="submit" loading={publish.isPending}>
+            <Button key="publish" type="submit" loading={publish.isPending}>
               <Rocket /> Publish version
             </Button>
           )}
@@ -442,6 +453,17 @@ function AgentWizard() {
       </form>
     </PageShell>
   );
+}
+
+const UNCERTAIN_OUTCOME = ["REQUEST_TIMEOUT", "NETWORK_UNAVAILABLE"];
+
+/** Publishing is one atomic request, so a server-reported failure changed nothing. */
+function publishErrorMessage(error: unknown) {
+  const base = errorMessage(error, "The configuration couldn't be published.");
+  // Without a response we can't know whether the request reached the server.
+  if (error instanceof ApiError && UNCERTAIN_OUTCOME.includes(error.code))
+    return base;
+  return `${base} Nothing was published: the active version and tools are unchanged.`;
 }
 
 function StepTitle({

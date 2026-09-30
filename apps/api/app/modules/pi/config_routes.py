@@ -216,6 +216,54 @@ async def publish_version(
     return version_view(row, row.version)
 
 
+class PublishInput(BaseModel):
+    """A version plus tool changes, applied together or not at all."""
+
+    model_config = ConfigDict(extra="forbid")
+    version: VersionInput
+    tools: dict[str, bool] = Field(default_factory=dict, max_length=len(TOOL_CATALOG))
+
+
+@router.post("/agents/{agent_id}/publish")
+async def publish_agent(
+    agent_id: UUID, data: PublishInput, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Atomic publication: every tool key is validated before anything is written, and
+    the version and tool settings commit in one transaction."""
+    await PiService(session, scope).require("pi.agents.manage")
+    unknown = sorted(k for k in data.tools if k not in TOOL_CATALOG)
+    if unknown:
+        raise BusinessRuleViolation(
+            "UNKNOWN_TOOL", f"Unknown PI tool {unknown[0]}; nothing was published"
+        )
+    row = await publish(session, scope, agent_id, data.version)
+    for key, enabled in sorted(data.tools.items()):
+        await session.execute(
+            insert(PiAgentTool)
+            .values(
+                tenant_id=scope.tenant_id,
+                environment_id=scope.environment_id,
+                agent_id=agent_id,
+                tool_key=key,
+                enabled=enabled,
+            )
+            .on_conflict_do_update(constraint="uq_pi_agent_tools_entry", set_={"enabled": enabled})
+        )
+    if data.tools:
+        from app.modules.audit.service import record
+
+        await record(
+            session,
+            "pi.agent_tools_published",
+            scope=scope,
+            entity_type="pi_agent",
+            entity_id=agent_id,
+            details={"version": row.version, "tools": data.tools},
+        )
+    await session.commit()
+    return version_view(row, row.version)
+
+
 @router.post("/agents/{agent_id}/versions/{version_id}/rollback")
 async def rollback(
     agent_id: UUID, version_id: UUID, scope: Scope, session: Session
@@ -513,6 +561,8 @@ async def add_faq(
     data: FaqInput, request: Request, scope: Scope, session: Session
 ) -> dict[str, Any]:
     await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
+    # Ingesting here makes the text customer-visible at once, so it is publishing.
+    scope.require("pi.knowledge.publish")
     row = await KnowledgeService(session, scope).ingest(
         data.as_document(), request.app.state.settings.knowledge_upload_max_bytes
     )
@@ -532,6 +582,7 @@ async def upload_document(
 ) -> dict[str, Any]:
     """Multipart upload. The type is decided by content sniffing, not the client header."""
     await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
+    scope.require("pi.knowledge.publish")  # direct ingest publishes; drafts go via teach
     limit = request.app.state.settings.knowledge_upload_max_bytes
     raw = await file.read(limit + 1)
     text = sniff_text(raw, limit)

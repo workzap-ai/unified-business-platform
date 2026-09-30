@@ -113,8 +113,89 @@ def normalize(payload: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 class WhatsApp:
-    def __init__(self, settings: Settings, http: httpx.AsyncClient) -> None:
-        self.settings, self.http = settings, http
+    """Meta-compatible WhatsApp messaging over a selected transport.
+
+    ``meta_cloud`` calls the Graph API with the number's own access token. ``kapso`` calls
+    Kapso's Meta-compatible proxy with the server-held project key; each business still
+    authorizes its own number through Kapso's setup link, so the key only reaches numbers
+    connected to this project.
+    """
+
+    def __init__(
+        self, settings: Settings, http: httpx.AsyncClient, provider: str = "meta_cloud"
+    ) -> None:
+        self.settings, self.http, self.provider = settings, http, provider
+
+    def _endpoint(self, token: str) -> tuple[str, dict[str, str]]:
+        if self.provider == "kapso":
+            key = self.settings.kapso_api_key
+            if key is None:
+                raise BusinessRuleViolation(
+                    "CONNECTION_NOT_CONFIGURED", "Messaging is not configured", 503
+                )
+            base = self.settings.kapso_base_url.rstrip("/")
+            return (
+                f"{base}/meta/whatsapp/{self.settings.kapso_meta_api_version}",
+                {"X-API-Key": key.get_secret_value()},
+            )
+        return (
+            f"{self.settings.whatsapp_graph_base_url}/{self.settings.whatsapp_graph_version}",
+            {"Authorization": f"Bearer {token}"},
+        )
+
+    async def template_body(self, account: str, template: dict[str, str], token: str) -> str:
+        """The approved text of a no-variable template, checked live against Meta
+        (approval, exact language, no variables or buttons). HTTP errors propagate."""
+        if (
+            not re.fullmatch(r"[0-9]{5,32}", account)
+            or not re.fullmatch(r"[a-z0-9_]{1,512}", template.get("name", ""))
+            or not re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", template.get("language", ""))
+        ):
+            raise BusinessRuleViolation("REMINDER_TEMPLATE_INVALID", "Invalid reminder template")
+        base, headers = self._endpoint(token)
+        response = await self.http.get(
+            f"{base}/{account}/message_templates",
+            headers=headers,
+            params={
+                "name": template["name"],
+                "fields": "name,status,language,components",
+                "limit": 100,
+            },
+            timeout=15,
+            follow_redirects=False,
+        )
+        response.raise_for_status()
+        approved = next(
+            (
+                item
+                for item in response.json().get("data", [])
+                if item.get("name") == template["name"]
+                and item.get("language") == template["language"]
+                and item.get("status") == "APPROVED"
+            ),
+            None,
+        )
+        if not approved:
+            raise BusinessRuleViolation(
+                "REMINDER_TEMPLATE_NOT_APPROVED", "Reminder template is not approved"
+            )
+        components = approved.get("components", [])
+        if any(
+            "{{" in str(c)
+            or (c.get("type") == "HEADER" and c.get("format") != "TEXT")
+            or c.get("type") == "BUTTONS"
+            for c in components
+        ):
+            raise BusinessRuleViolation(
+                "REMINDER_TEMPLATE_PARAMETERS",
+                "Use a text template without variables or buttons",
+            )
+        body = next((c.get("text", "") for c in components if c.get("type") == "BODY"), "")
+        if not body:
+            raise BusinessRuleViolation(
+                "REMINDER_TEMPLATE_INVALID", "Reminder template has no text"
+            )
+        return str(body)
 
     async def send_template(
         self,
@@ -125,57 +206,9 @@ class WhatsApp:
         token: str,
     ) -> tuple[str, str]:
         """Check Meta approval/language, then send a no-variable reminder template."""
-        if (
-            not re.fullmatch(r"[0-9]{5,32}", account)
-            or not re.fullmatch(r"[a-z0-9_]{1,512}", template.get("name", ""))
-            or not re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", template.get("language", ""))
-        ):
-            raise BusinessRuleViolation("REMINDER_TEMPLATE_INVALID", "Invalid reminder template")
-        base = f"{self.settings.whatsapp_graph_base_url}/{self.settings.whatsapp_graph_version}"
-        headers = {"Authorization": f"Bearer {token}"}
+        base, headers = self._endpoint(token)
         try:
-            response = await self.http.get(
-                f"{base}/{account}/message_templates",
-                headers=headers,
-                params={
-                    "name": template["name"],
-                    "fields": "name,status,language,components",
-                    "limit": 100,
-                },
-                timeout=15,
-                follow_redirects=False,
-            )
-            response.raise_for_status()
-            approved = next(
-                (
-                    item
-                    for item in response.json().get("data", [])
-                    if item.get("name") == template["name"]
-                    and item.get("language") == template["language"]
-                    and item.get("status") == "APPROVED"
-                ),
-                None,
-            )
-            if not approved:
-                raise BusinessRuleViolation(
-                    "REMINDER_TEMPLATE_NOT_APPROVED", "Reminder template is not approved"
-                )
-            components = approved.get("components", [])
-            if any(
-                "{{" in str(c)
-                or (c.get("type") == "HEADER" and c.get("format") != "TEXT")
-                or c.get("type") == "BUTTONS"
-                for c in components
-            ):
-                raise BusinessRuleViolation(
-                    "REMINDER_TEMPLATE_PARAMETERS",
-                    "Use a text template without variables or buttons",
-                )
-            body = next((c.get("text", "") for c in components if c.get("type") == "BODY"), "")
-            if not body:
-                raise BusinessRuleViolation(
-                    "REMINDER_TEMPLATE_INVALID", "Reminder template has no text"
-                )
+            body = await self.template_body(account, template, token)
             response = await self.http.post(
                 f"{base}/{number}/messages",
                 headers=headers,
@@ -201,11 +234,60 @@ class WhatsApp:
                 "DELIVERY_UNCONFIRMED", "Reminder delivery could not be confirmed", 503
             ) from None
 
-    async def send(self, number: str, recipient: str, body: str, token: str) -> str:
+    async def send_flow(
+        self,
+        number: str,
+        recipient: str,
+        body: str,
+        flow: dict[str, str],
+        flow_token: str,
+        token: str,
+    ) -> str:
+        """Send a published WhatsApp Flow (form) as an interactive session message."""
+        base, headers = self._endpoint(token)
         try:
             response = await self.http.post(
-                f"{self.settings.whatsapp_graph_base_url}/{self.settings.whatsapp_graph_version}/{number}/messages",
-                headers={"Authorization": f"Bearer {token}"},
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "interactive",
+                    "interactive": {
+                        "type": "flow",
+                        "body": {"text": body[:1024]},
+                        "action": {
+                            "name": "flow",
+                            "parameters": {
+                                "flow_message_version": "3",
+                                "flow_token": flow_token,
+                                "flow_id": flow["flow_id"],
+                                "flow_cta": flow["cta"][:20],
+                                "flow_action": "navigate",
+                                "flow_action_payload": {"screen": flow["screen"]},
+                            },
+                        },
+                    },
+                },
+                timeout=15,
+                follow_redirects=False,
+            )
+            response.raise_for_status()
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Form delivery could not be confirmed", 503
+            ) from None
+
+    async def send(self, number: str, recipient: str, body: str, token: str) -> str:
+        base, headers = self._endpoint(token)
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
                 json={
                     "messaging_product": "whatsapp",
                     "to": recipient,
@@ -229,12 +311,12 @@ class WhatsApp:
     async def media(self, media_id: str, token: str) -> tuple[bytes, str]:
         if not re.fullmatch(r"[0-9]{5,32}", media_id):
             raise BusinessRuleViolation("INVALID_MEDIA", "Unsupported media")
+        base, headers = self._endpoint(token)
+        hosts = {"lookaside.fbsbx.com", "lookaside.facebook.com"}
+        if self.provider == "kapso":
+            hosts.add(urlparse(self.settings.kapso_base_url).hostname or "")
         try:
-            metadata = await self.http.get(
-                f"{self.settings.whatsapp_graph_base_url}/{self.settings.whatsapp_graph_version}/{media_id}",
-                headers={"Authorization": f"Bearer {token}"},
-                timeout=10,
-            )
+            metadata = await self.http.get(f"{base}/{media_id}", headers=headers, timeout=10)
             metadata.raise_for_status()
             data = metadata.json()
             url, mime = data["url"], data["mime_type"]
@@ -244,7 +326,7 @@ class WhatsApp:
             parsed = urlparse(url)
             if (
                 parsed.scheme != "https"
-                or parsed.hostname not in {"lookaside.fbsbx.com", "lookaside.facebook.com"}
+                or parsed.hostname not in hosts
                 or parsed.username
                 or parsed.port not in {None, 443}
             ):
@@ -269,7 +351,7 @@ class WhatsApp:
             async with self.http.stream(
                 "GET",
                 url,
-                headers={"Authorization": f"Bearer {token}"},
+                headers=headers,
                 timeout=15,
                 follow_redirects=False,
             ) as response:

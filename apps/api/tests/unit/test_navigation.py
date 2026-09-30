@@ -14,6 +14,7 @@ from app.modules.navigation.registry import (
 
 DEFAULT_MAIN = [
     "Overview",
+    "Pi Agent Beta",
     "Customers / CRM",
     "Catalog",
     "PI",
@@ -96,7 +97,15 @@ def test_feature_gated_children_follow_enabled_features():
 def test_role_permissions_shape_the_sidebar():
     support = SYSTEM_ROLES["support"][2]
     visible = labels(REGISTRY.resolve(context(permissions=support))["main"])
-    assert visible == ["Overview", "Customers / CRM", "Catalog", "PI", "Inventory", "Orders"]
+    assert visible == [
+        "Overview",
+        "Pi Agent Beta",
+        "Customers / CRM",
+        "Catalog",
+        "PI",
+        "Inventory",
+        "Orders",
+    ]
 
 
 def test_custom_order_is_applied_and_new_modules_use_default_sort_order():
@@ -105,6 +114,7 @@ def test_custom_order_is_applied_and_new_modules_use_default_sort_order():
     custom = [
         "pi",
         "overview",
+        "workspace-agent",
         "customers",
         "catalog",
         "inventory",
@@ -138,7 +148,7 @@ def test_custom_order_is_applied_and_new_modules_use_default_sort_order():
     # Permission gate still applies to the new module.
     denied = registry.resolve(context(permissions=ALL - {"billing.read"}), {"main": custom})
     assert "subscriptions" not in [i.definition.key for i in denied["main"]]
-    assert len(visible) == 12
+    assert len(visible) == 13
 
 
 def test_new_module_inserted_between_neighbours_in_custom_order():

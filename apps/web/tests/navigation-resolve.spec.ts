@@ -13,6 +13,7 @@ import type { NavDefinition } from "../src/features/navigation/types";
 const definitions = registry as NavDefinition[];
 const DEFAULT = [
   "Overview",
+  "Pi Agent Beta",
   "Customers / CRM",
   "Catalog",
   "PI",
@@ -61,6 +62,7 @@ test("custom order applies and a newly registered module appears by sort order",
   const custom = [
     "pi",
     "overview",
+    "workspace-agent",
     "customers",
     "catalog",
     "inventory",

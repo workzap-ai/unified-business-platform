@@ -199,7 +199,7 @@ export type ToolDefinition = {
 
 export type WhatsAppConnection = {
   id: string;
-  provider: "meta_cloud";
+  provider: "meta_cloud" | "kapso";
   phone_number_id: string;
   display_phone_number: string;
   business_account_id: string;

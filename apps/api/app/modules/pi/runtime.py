@@ -27,6 +27,7 @@ from app.ai.types import Message, TextPart, VideoPart
 from app.modules.business_settings.capabilities import business_permissions
 from app.modules.customers.service import CustomerService
 from app.modules.environments.models import Environment
+from app.modules.pi import price_policy
 from app.modules.pi.agents import AgentContext, run_specialists
 from app.modules.pi.configuration import seed_agents, settings_row
 from app.modules.pi.graph import AGENTS, RouteState, keyword_intent, route_message
@@ -47,7 +48,9 @@ from app.modules.pi.service import HANDOFF_NOTICE, PiService
 from app.modules.pi.service_conversation import (
     ServiceTurn,
     compose_service_turn,
+    offered_labels,
     prepare_context,
+    run_service_action,
     save_service_turn,
     schedule_followup,
     service_mode,
@@ -56,6 +59,7 @@ from app.modules.pi.service_conversation import (
 from app.modules.pi.tools.base import PI_RUNTIME_PERMISSIONS
 from app.modules.pi.tools.registry import ToolRegistry
 from app.modules.pi.whatsapp import WhatsApp
+from app.modules.pi_saas.entitlement import entitlement, meter, meter_ai
 from app.modules.products.service import enabled_products, product_enabled
 from app.modules.tenants.models import Tenant
 from app.shared.errors import BusinessRuleViolation, PermissionDenied
@@ -172,7 +176,13 @@ async def persist_inbound(
             sender_type="customer",
             message_type=payload["message_type"],
             body=payload["body"],
-            media={"provider_media_id": payload["media_id"]} if payload.get("media_id") else {},
+            media=(
+                {"provider_media_id": payload["media_id"]}
+                if payload.get("media_id")
+                else {"form_response": payload["form"]}
+                if isinstance(payload.get("form"), dict)
+                else {}
+            ),
             provider_message_id=payload["message_id"],
             status="received",
         )
@@ -260,6 +270,17 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         event.attempts += 1
         message = await persist_inbound(session, event, connection, scope)
         event.status = "queued" if message else "processed"
+        if message is not None:
+            await meter(session, scope.tenant_id, scope.environment_id, "messages_in")
+            # Payment proof reaches the staff "to verify" queue even with automation off.
+            from app.modules.pi_saas.campaigns import note_opt_out
+            from app.modules.pi_saas.customer_payments import note_customer_proof
+
+            await note_customer_proof(session, scope, message)
+            from app.modules.pi_saas.flows import note_form_reply
+
+            await note_form_reply(session, ctx["settings"], scope, message)
+            await note_opt_out(session, scope, message)  # "STOP" withdraws consent at once
         await session.commit()
         if message is None:
             return
@@ -267,15 +288,19 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         message_id, conversation_id = message.id, message.conversation_id
         conversation = await service.conversations.get(conversation_id)
         policy = await settings_row(session, scope)
-        # 1. Human takeover / disabled automation: persist only, never reply.
+        # 1. Human takeover / disabled automation / inactive plan: persist only, never reply.
+        plan = await entitlement(session, scope.tenant_id, scope.environment_id)
         if (
             conversation.mode == "human"
             or conversation.status != "open"
             or not policy.auto_reply_enabled
+            or not plan.automation
             or message.status != "received"
         ):
             if message.status == "received":
                 message.status = "skipped"
+                if not plan.automation:
+                    message.error_code = (plan.reason or "PLAN_INACTIVE")[:64]
             event.status = "processed"
             await session.commit()
             return
@@ -296,7 +321,8 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             return
         body = message.body
         # 3. Media understanding retains the caption and uses scoped usage/budgets.
-        if message.message_type != "text":
+        # A form reply is already text (its answers), so it goes straight to Pi.
+        if message.message_type not in {"text", "interactive"}:
             features = (await enabled_products(session, scope)).get("pi", set())
             audio = message.message_type == "audio"
             allowed = (
@@ -319,9 +345,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     raise GatewayUnavailable()
                 from app.integrations.whatsapp_bridge import token as connection_token
 
-                content, mime = await WhatsApp(ctx["settings"], ctx["http"]).media(
-                    media_id, await connection_token(session, ctx["settings"], connection)
-                )
+                content, mime = await WhatsApp(
+                    ctx["settings"], ctx["http"], connection.provider
+                ).media(media_id, await connection_token(session, ctx["settings"], connection))
                 limit = min(
                     ctx["settings"].media_max_bytes,
                     int(policy.whatsapp_config.get("max_media_mb", 10)) * 1024 * 1024,
@@ -446,13 +472,13 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             else None
         )
         if service_context is not None:
+            # Payment questions go to a person unless the business collects payments
+            # through Pi; disputes still do (the composer must request a human).
+            review_intents = {"human_request", "complaint", "payment", "order_status", "invoice"}
+            if service_context.get("payment_methods"):
+                review_intents -= {"payment", "invoice"}
             service_context["operator_review_required"] = bool(
-                keyword_handoff
-                or (
-                    fast_intent
-                    and fast_intent[0]
-                    in {"human_request", "complaint", "payment", "order_status", "invoice"}
-                )
+                keyword_handoff or (fast_intent and fast_intent[0] in review_intents)
             )
         inbound_snapshot = conversation.last_inbound_at
         await session.commit()
@@ -509,7 +535,8 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             from app.ai.embeddings import embed
             from app.modules.pi.semantic import semantic_search, vector_available
 
-            if await vector_available(session):
+            embedding_model = ctx["settings"].openai_models.get("embedding")
+            if embedding_model and await vector_available(session):
                 await session.commit()
                 try:
                     vectors = await embed(ctx["settings"], ctx["http"], [body[:4000]])
@@ -517,7 +544,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                         session,
                         scope,
                         vectors[0],
-                        ctx["settings"].openai_models["embedding"],
+                        embedding_model,
                         top_k,
                         float(policy.knowledge_config.get("min_score", "0.30")),
                     )
@@ -565,6 +592,13 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         session.add(run)
         await session.flush()
         _record_usage(session, scope, conversation, run, gateway, routing_alias)
+        await meter_ai(
+            session,
+            [
+                (scope.tenant_id, scope.environment_id, a.input_tokens, a.output_tokens, None)
+                for a in gateway.attempts
+            ],
+        )
         if service_turn is not None and service_turn._attempts:
             # The scoped manager already persisted usage; populate the run without billing twice.
             attempts = service_turn._attempts
@@ -575,6 +609,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             run.latency_ms = sum(a.latency_ms for a in attempts)
             run.input_tokens = sum(a.input_tokens or 0 for a in attempts)
             run.output_tokens = sum(a.output_tokens or 0 for a in attempts)
+
         agent_ctx = AgentContext(
             session=session,
             scope=scope,
@@ -583,10 +618,11 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             run=run,
             policy=policy,
             decision=decision,
-            registry=ToolRegistry(session),
+            registry=ToolRegistry(session, (ctx["settings"], ctx["http"])),
             extra_passages=extra_passages,
         )
         reply: str | None = None
+        service_appendix: str | None = None
         reply_agent = "router"
         handoff_reason: str | None = None
         handoff_summary = "Customer conversation requires human review."
@@ -607,6 +643,12 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     if service_turn.request_human:
                         handoff_reason = "customer_request"
                         handoff_summary = service_turn.summary
+                    elif service_context is not None:
+                        service_appendix, failed = await run_service_action(
+                            agent_ctx, service_turn, service_context, message.body
+                        )
+                        if failed:
+                            handoff_reason, handoff_summary = "tool_failure", failed
             elif not service_discovery:
                 reply, handoff_reason = await handle_confirmation(agent_ctx)
             if reply is not None or handoff_reason is not None:
@@ -661,22 +703,28 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             handoff_summary = "The requested action requires operator review."
         # 8. Validate, then queue through the controlled send tool.
         if reply is not None:
-            if outside_hours(policy) and policy.business_hours.get("outside_hours") == (
-                "reply_with_notice"
-            ):
-                notice_text = str(policy.business_hours.get("notice", ""))
-                reply = f"{reply}\n{notice_text}".strip()
-                agent_ctx.facts.append(notice_text)
             try:
+                # Validate generated text before appending operator-approved notices: a
+                # business-hours notice may legitimately contain digits ("9am-5pm").
+                max_chars = int(policy.response_rules.get("max_reply_chars", 4000))
+                mode = price_policy.price_mode(policy.response_rules, service_turn is not None)
                 if service_turn is not None:
                     reply = validate_service_reply(
-                        reply, int(policy.response_rules.get("max_reply_chars", 4000))
+                        reply, max_chars, mode, offered_labels(service_context)
                     )
-                text = validate_reply(
-                    reply,
-                    agent_ctx.facts,
-                    int(policy.response_rules.get("max_reply_chars", 4000)),
-                )
+                elif (code := price_policy.check(reply, mode)) is not None:
+                    raise ReplyRejected(code)
+                if service_appendix:
+                    # Confirmed by the booking tool (not model text), so dates are allowed.
+                    reply = f"{reply}\n{service_appendix}"
+                    agent_ctx.facts.append(service_appendix)
+                if outside_hours(policy) and policy.business_hours.get("outside_hours") == (
+                    "reply_with_notice"
+                ):
+                    notice_text = str(policy.business_hours.get("notice", ""))
+                    reply = f"{reply}\n{notice_text}".strip()
+                    agent_ctx.facts.append(notice_text)
+                text = validate_reply(reply, agent_ctx.facts, max_chars)
                 sent = await agent_ctx.tool(reply_agent, "send_whatsapp_message", {"body": text})
                 if sent.ok and sent.data is not None:
                     outbound.append(str(sent.data["message_id"]))
@@ -699,6 +747,11 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 run=run,
             )
             outbound += [notice] if notice else []
+            if handoff_reason == "low_confidence" and message.message_type == "text":
+                # Ask Owner: an unanswered question becomes a staff request with context.
+                from app.modules.pi_saas.teach import ask_owner
+
+                await ask_owner(session, scope, conversation, message, handoff_summary)
             if run.agent_path[-1] != "handoff":
                 run.agent_path = [*run.agent_path, "handoff"]
         run.status = "handoff" if handoff_reason else "completed"
@@ -709,6 +762,15 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             "processed",
             datetime.now(UTC),
         )
+        # A form Pi decided to send in this turn goes out with the reply.
+        forms = await session.scalars(
+            select(PiMessage.id).where(
+                service.messages.predicate(),
+                PiMessage.status == "queued",
+                PiMessage.idempotency_key.like(f"pi:{message_id}:form:%"),
+            )
+        )
+        outbound += [str(f) for f in forms]
         await session.commit()
     await enqueue_sends(ctx, outbound)
 
@@ -769,6 +831,12 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
         message = await service.messages.get(message.id, for_update=True)
         if message.status != "queued":
             return
+        allowed = await entitlement(session, scope.tenant_id, scope.environment_id)
+        if not allowed.sending or (message.sender_type == "ai" and not allowed.automation):
+            # Re-checked at send time: a plan that lapsed after queueing blocks delivery.
+            message.status, message.error_code = "skipped", (allowed.reason or "PLAN_INACTIVE")[:64]
+            await session.commit()
+            return
         if conversation.status != "open" or (
             message.sender_type == "ai" and conversation.mode != "ai"
         ):
@@ -784,7 +852,14 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
         await session.refresh(connection)
         policy = await settings_row(session, scope)
         reminder = message.media.get("reminder")
+        campaign = message.media.get("campaign")
         from app.modules.pi.followups import reminder_allowed
+
+        campaign_block = None
+        if campaign:
+            from app.modules.pi_saas.campaigns import send_block
+
+            campaign_block = await send_block(session, scope, message, conversation)
 
         sender_allowed = True
         if message.sender_type == "human":
@@ -810,8 +885,11 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
         skip = (
             "CONVERSATION_CLOSED"
             if conversation.status != "open"
+            else campaign_block
+            if campaign_block
             else "MESSAGE_WINDOW_CLOSED"
             if not reminder
+            and not campaign
             and (
                 not conversation.last_inbound_at
                 or conversation.last_inbound_at < datetime.now(UTC) - timedelta(hours=24)
@@ -839,22 +917,33 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             await session.commit()
             return
         try:
-            whatsapp = WhatsApp(ctx["settings"], ctx["http"])
+            whatsapp = WhatsApp(ctx["settings"], ctx["http"], connection.provider)
             from app.integrations.whatsapp_bridge import token as connection_token
 
             token = await connection_token(session, ctx["settings"], connection)
-            if reminder:
+            if reminder or campaign:
                 message.provider_message_id, message.body = await whatsapp.send_template(
                     connection.phone_number_id,
                     connection.business_account_id,
                     conversation.contact_wa_id,
-                    reminder["template"],
+                    (reminder or campaign or {})["template"],
                     token,
                 )
-                conversation.service_brief = {
-                    **conversation.service_brief,
-                    "reminded_source_id": reminder["source_message_id"],
-                }
+                if reminder:
+                    conversation.service_brief = {
+                        **conversation.service_brief,
+                        "reminded_source_id": reminder["source_message_id"],
+                    }
+            elif message.media.get("flow"):
+                form = message.media["flow"]
+                message.provider_message_id = await whatsapp.send_flow(
+                    connection.phone_number_id,
+                    conversation.contact_wa_id,
+                    message.body,
+                    form["flow"],
+                    form["token"],
+                    token,
+                )
             else:
                 message.provider_message_id = await whatsapp.send(
                     connection.phone_number_id, conversation.contact_wa_id, message.body, token
@@ -862,6 +951,9 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                 if message.sender_type == "ai" and conversation.service_brief:
                     schedule_followup(conversation, policy)
             message.status, message.error_code = "sent", None
+            await meter(session, scope.tenant_id, scope.environment_id, "messages_out")
+            if reminder or campaign:
+                await meter(session, scope.tenant_id, scope.environment_id, "template_messages")
             conversation.last_message_at = connection.last_outbound_at = datetime.now(UTC)
             conversation.last_message_preview = message.body[:200]
         except BusinessRuleViolation as exc:
@@ -880,11 +972,12 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                     dedupe_key=f"pi-reminder-failed:{message.id}",
                 )
             connection.last_error_code, connection.last_error_at = exc.code[:64], datetime.now(UTC)
-            await service.handoff(
-                conversation.id,
-                "tool_failure",
-                "Outbound delivery could not be confirmed. Review before retrying.",
-            )
+            if not campaign:  # A failed broadcast is reported in its results, not handed off.
+                await service.handoff(
+                    conversation.id,
+                    "tool_failure",
+                    "Outbound delivery could not be confirmed. Review before retrying.",
+                )
         await session.commit()
 
 

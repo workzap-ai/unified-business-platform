@@ -13,6 +13,9 @@ export const piKeys = {
   overview: ["pi", "overview"] as const,
   conversations: (filters: Record<string, unknown>) =>
     ["pi", "conversations", filters] as const,
+  /** Inbox list pages (infinite query); shares the conversations prefix for invalidation. */
+  inbox: (filters: Record<string, unknown>) =>
+    ["pi", "conversations", "inbox", filters] as const,
   messages: (id: string) => ["pi", "messages", id] as const,
   context: (id: string) => ["pi", "context", id] as const,
   handoffs: (status?: string) => ["pi", "handoffs", status ?? "all"] as const,

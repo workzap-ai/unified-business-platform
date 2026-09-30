@@ -177,7 +177,9 @@ async def test_definitions_directory(env):
     items = (await env["api"].get("/api/v1/integrations/definitions")).json()
     by_key = {d["key"]: d for d in items}
     assert by_key["generic_webhook"]["availability"] == "available"
-    assert by_key["google_calendar"]["availability"] == "planned"
+    assert by_key["google_calendar"]["availability"] == "available"
+    assert by_key["shopify"]["availability"] == "beta"  # connected from the Pi app only
+    assert by_key["microsoft_calendar"]["availability"] == "planned"
     assert by_key["stripe"]["sync_support"] == ["pull"]
     assert by_key["slack"]["sync_support"] == ["none"]
     secret_field = next(

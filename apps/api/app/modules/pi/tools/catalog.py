@@ -1,6 +1,9 @@
 """The fixed PI tool catalog. Agents can only use tools listed here."""
 
+from app.modules.pi.tools import connector_handlers as c
+from app.modules.pi.tools import flow_handlers as f
 from app.modules.pi.tools import handlers as h
+from app.modules.pi.tools import work_handlers as w
 from app.modules.pi.tools.base import ToolSpec
 
 _SPECS = (
@@ -164,4 +167,126 @@ _SPECS = (
     ),
 )
 
-TOOL_CATALOG: dict[str, ToolSpec] = {spec.name: spec for spec in _SPECS}
+_WORK_SPECS = (
+    ToolSpec(
+        "check_availability",
+        "List bookable services and their free times (business timezone).",
+        w.AvailabilityInput,
+        w.AvailabilityOutput,
+        w.check_availability,
+        "pi.bookings.read",
+    ),
+    ToolSpec(
+        "create_booking",
+        "Book one free time the customer explicitly agreed to. Rechecks availability.",
+        w.BookingInput,
+        w.BookingOut,
+        w.create_booking,
+        "pi.bookings.manage",
+        mutation=True,
+    ),
+    ToolSpec(
+        "cancel_booking",
+        "Cancel one of the current customer's own bookings.",
+        w.BookingIdInput,
+        w.BookingOut,
+        w.cancel_booking,
+        "pi.bookings.manage",
+        mutation=True,
+    ),
+    ToolSpec(
+        "get_bookings",
+        "List the current customer's upcoming bookings.",
+        h.Empty,
+        w.BookingsOutput,
+        w.get_bookings,
+        "pi.bookings.read",
+    ),
+    ToolSpec(
+        "create_task",
+        "Create a follow-up task for the team about this customer.",
+        w.TaskInput,
+        w.TaskOut,
+        w.create_task,
+        "pi.work.manage",
+        mutation=True,
+    ),
+    ToolSpec(
+        "create_ticket",
+        "Log a support issue for the team with a priority.",
+        w.TicketInput,
+        w.TicketOut,
+        w.create_ticket,
+        "pi.work.manage",
+        mutation=True,
+    ),
+    ToolSpec(
+        "request_payment",
+        "Send payment instructions for the current customer's own open invoice.",
+        w.PaymentRequestInput,
+        w.PaymentRequestOut,
+        w.request_payment,
+        "billing.write",
+        mutation=True,
+    ),
+    ToolSpec(
+        "get_payment_status",
+        "Read the current customer's payment requests and whether they are paid.",
+        h.Empty,
+        w.PaymentStatusOutput,
+        w.get_payment_status,
+        "billing.read",
+    ),
+    ToolSpec(
+        "get_project_status",
+        "Read customer-visible status of the current customer's projects.",
+        h.Empty,
+        w.ProjectStatusOutput,
+        w.get_project_status,
+        "pi.work.read",
+    ),
+)
+
+# Tools backed by connections the business authorized itself (Google Calendar, Shopify,
+# its email provider). Without the connection they refuse or report `connected: false`.
+_CONNECTOR_SPECS = (
+    ToolSpec(
+        "reschedule_booking",
+        "Move one of the current customer's bookings to a free time they agreed to.",
+        c.RescheduleInput,
+        w.BookingOut,
+        c.reschedule_booking,
+        "pi.bookings.manage",
+        mutation=True,
+    ),
+    ToolSpec(
+        "email_booking_confirmation",
+        "Email a booking confirmation to the current customer's address on file.",
+        c.BookingEmailInput,
+        c.BookingEmailOut,
+        c.email_booking_confirmation,
+        "pi.bookings.manage",
+        mutation=True,
+    ),
+    ToolSpec(
+        "get_store_orders",
+        "Read the current customer's recent Shopify orders and delivery status.",
+        h.Empty,
+        c.StoreOrdersOutput,
+        c.get_store_orders,
+        "orders.read",
+    ),
+    ToolSpec(
+        "send_form",
+        "Send the business's WhatsApp form (lead details, booking request or feedback).",
+        f.FormInput,
+        f.FormOut,
+        f.send_form,
+        "pi.inbox.reply",
+        mutation=True,
+    ),
+)
+
+TOOL_CATALOG: dict[str, ToolSpec] = {
+    spec.name: spec for spec in (*_SPECS, *_WORK_SPECS, *_CONNECTOR_SPECS)
+}

@@ -131,7 +131,7 @@ class WhatsAppConnection(WorkspaceRow):
         # Globally unique: inbound webhooks are routed to a tenant by phone number id.
         UniqueConstraint("provider", "phone_number_id", name="uq_whatsapp_connections_number"),
         CheckConstraint(_in("status", ("pending", "active", "disabled", "error")), name="status"),
-        CheckConstraint(_in("provider", ("meta_cloud",)), name="provider"),
+        CheckConstraint(_in("provider", ("meta_cloud", "kapso")), name="provider"),
         CheckConstraint("phone_number_id ~ '^[0-9]{5,32}$'", name="phone_number_id_format"),
     )
     provider: Mapped[str] = mapped_column(String(20), default="meta_cloud")
@@ -255,6 +255,7 @@ class PiMessage(WorkspaceRow):
                     "sent",
                     "delivered",
                     "read",
+                    "pending_approval",
                 ),
             ),
             name="status",

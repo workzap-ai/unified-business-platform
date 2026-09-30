@@ -19,7 +19,9 @@ logger = logging.getLogger("platform")
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 Key = Annotated[str, Path(pattern=r"^[a-z0-9_]{2,60}$")]
 Token = Annotated[str, Path(min_length=32, max_length=64)]
-PUBLIC_WEBHOOK_PATH = re.compile(r"^/api/v1/webhooks/[a-z0-9_]{2,60}/[A-Za-z0-9_-]{32,64}/?$")
+PUBLIC_WEBHOOK_PATH = re.compile(
+    r"^/api/v1/webhooks/(?:[a-z0-9_]{2,60}/[A-Za-z0-9_-]{32,64}|kapso|pi-billing/stripe)/?$"
+)
 
 
 class PublicWebhookOriginExemption:

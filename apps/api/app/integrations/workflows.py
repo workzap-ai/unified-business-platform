@@ -10,7 +10,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings
-from app.integrations.email import EMAIL_KEYS, render_template
+from app.integrations.email import EMAIL_KEYS, calendar_attachments, render_template
 from app.integrations.errors import IntegrationError
 from app.integrations.events import EVENT_TYPES
 from app.integrations.http import CallContext, OutboundClient
@@ -200,15 +200,26 @@ async def deliver(
 
     async def send(ctx: ProviderContext) -> dict[str, Any]:
         if isinstance(provider, EmailProvider):
-            rendered = render_template(
-                "system_alert",
-                {
-                    "severity": "info",
-                    "title": title,
-                    "message": message,
-                    "workspace": "your workspace",
-                },
-            )
+            if event is None and op.input.get("template") == "customer_notice":
+                rendered = render_template(
+                    "customer_notice",
+                    {
+                        "name": str(op.input.get("name") or "there"),
+                        "title": title,
+                        "message": message,
+                        "workspace": str(op.input.get("business") or "our team"),
+                    },
+                )
+            else:
+                rendered = render_template(
+                    "system_alert",
+                    {
+                        "severity": "info",
+                        "title": title,
+                        "message": message,
+                        "workspace": "your workspace",
+                    },
+                )
             result = await provider.send_email(
                 ctx,
                 EmailMessage(
@@ -217,6 +228,9 @@ async def deliver(
                     text=rendered.text,
                     html=rendered.html,
                     idempotency_key=str(op.id),
+                    attachments=(
+                        calendar_attachments(op.input.get("attachments")) if event is None else ()
+                    ),
                 ),
             )
             return {"provider_message_id": result.provider_message_id}

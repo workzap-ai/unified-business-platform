@@ -4,6 +4,7 @@ Test connection: GET /v3/scopes (read-only) and check for `mail.send`.
 Send: POST /v3/mail/send -> 202 Accepted with an X-Message-Id header.
 """
 
+import base64
 import time
 from collections.abc import Mapping
 from typing import Any
@@ -111,6 +112,16 @@ class SendGridProvider(EmailProvider):
         }
         if message.reply_to:
             body["reply_to"] = {"email": safe_email(message.reply_to)}
+        if message.attachments:
+            body["attachments"] = [
+                {
+                    "content": base64.b64encode(a.content.encode()).decode(),
+                    "filename": a.filename,
+                    "type": a.content_type,
+                    "disposition": "attachment",
+                }
+                for a in message.attachments
+            ]
         response = await ctx.http.request(
             "POST",
             f"{BASE}/mail/send",

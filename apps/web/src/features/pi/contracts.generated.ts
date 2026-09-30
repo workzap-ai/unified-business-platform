@@ -443,7 +443,7 @@ export const ToolDefinitionSchema: z.ZodType<Pi.ToolDefinition> = z.object({
 export const WhatsAppConnectionSchema: z.ZodType<Pi.WhatsAppConnection> =
   z.object({
     id: z.string(),
-    provider: z.literal("meta_cloud"),
+    provider: z.union([z.literal("meta_cloud"), z.literal("kapso")]),
     phone_number_id: z.string(),
     display_phone_number: z.string(),
     business_account_id: z.string(),

@@ -33,7 +33,35 @@ export type ConversationFilters = {
   assignment?: "mine" | "unassigned" | "";
   unread?: boolean;
   page?: number;
+  page_size?: number;
 };
+
+/** Page size the inbox requests; matches the API's default conversation page. */
+export const CONVERSATION_PAGE_SIZE = 25;
+/** Messages per history page (the API accepts up to 100). */
+export const HISTORY_PAGE_SIZE = 50;
+
+export type HistoryCursor = {
+  limit?: number;
+  /** ISO timestamp of the oldest message already loaded. */
+  before?: string | null;
+  /** Id of the oldest message already loaded (tie-breaker for equal timestamps). */
+  before_id?: string | null;
+};
+
+/** One page of a conversation's history, oldest message first. */
+export type MessageHistory = {
+  items: Message[];
+  has_more: boolean;
+  /** Pass back as `before`/`before_id` to load the next older page; null when none. */
+  before: string | null;
+  before_id: string | null;
+};
+
+export type AgentVersionInput = Pick<
+  AgentVersion,
+  "instructions" | "model_alias" | "temperature" | "note"
+>;
 
 export type AgentTestResult = {
   simulated: boolean;
@@ -51,6 +79,8 @@ export interface PiService {
   /** Permanently removes one remembered fact (privacy); the audit log records the action. */
   deleteMemory(conversationId: string, memoryId: string): Promise<void>;
   messages(id: string): Promise<Message[]>;
+  /** Cursor-paginated history: the latest page without a cursor, older pages with one. */
+  history(id: string, cursor?: HistoryCursor): Promise<MessageHistory>;
   sendMessage(id: string, body: string): Promise<Message>;
   takeover(id: string): Promise<Conversation>;
   returnToAi(id: string): Promise<Conversation>;
@@ -72,10 +102,15 @@ export interface PiService {
   versions(agentId: string): Promise<AgentVersion[]>;
   publishVersion(
     agentId: string,
-    input: Pick<
-      AgentVersion,
-      "instructions" | "model_alias" | "temperature" | "note"
-    >,
+    input: AgentVersionInput,
+  ): Promise<AgentVersion>;
+  /**
+   * Publishes a version and tool changes in one atomic request: if any tool key is
+   * invalid (422 UNKNOWN_TOOL) nothing is published or changed.
+   */
+  publishAgent(
+    agentId: string,
+    input: { version: AgentVersionInput; tools: Record<string, boolean> },
   ): Promise<AgentVersion>;
   rollback(agentId: string, versionId: string): Promise<AgentVersion>;
   setAgentEnabled(agentId: string, enabled: boolean): Promise<Agent>;
@@ -260,9 +295,18 @@ const demo: PiService = {
       auto_reply_enabled: pi.settings.auto_reply_enabled,
     };
   },
-  async conversations({ search, status, mode, assignment, unread, page = 1 }) {
+  async conversations({
+    search,
+    status,
+    mode,
+    assignment,
+    unread,
+    page = 1,
+    page_size = CONVERSATION_PAGE_SIZE,
+  }) {
     await demoDelay();
-    const rows = demoPi().conversations.filter(
+    const pi = demoPi();
+    const rows = pi.conversations.filter(
       (c) =>
         (!status || c.status === status) &&
         (!mode || c.mode === mode) &&
@@ -272,12 +316,13 @@ const demo: PiService = {
         (!search ||
           matches(c.customer_name, search) ||
           matches(c.last_message_preview, search) ||
-          matches(c.customer_phone, search)),
+          matches(c.customer_phone, search) ||
+          (pi.messages[c.id] ?? []).some((m) => matches(m.body, search))),
     );
     return paginate(
       rows.map((c) => ({ ...c })),
       page,
-      50,
+      page_size,
     );
   },
   async deleteMemory(conversationId, memoryId) {
@@ -335,6 +380,30 @@ const demo: PiService = {
     await demoDelay(120);
     conv(id);
     return [...(demoPi().messages[id] ?? [])];
+  },
+  async history(id, { limit = HISTORY_PAGE_SIZE, before, before_id } = {}) {
+    await demoDelay(120);
+    conv(id);
+    const all = demoPi().messages[id] ?? [];
+    // Demo messages are stored oldest first; the cursor is the oldest loaded message.
+    let end = all.length;
+    if (before_id) {
+      const index = all.findIndex((m) => m.id === before_id);
+      end = index >= 0 ? index : end;
+    }
+    if (before && (!before_id || end === all.length)) {
+      const index = all.findIndex((m) => m.created_at >= before);
+      end = index >= 0 ? index : all.length;
+    }
+    const start = Math.max(0, end - Math.max(1, Math.min(100, limit)));
+    const items = all.slice(start, end).map((m) => ({ ...m }));
+    const hasMore = start > 0;
+    return {
+      items,
+      has_more: hasMore,
+      before: hasMore ? (items[0]?.created_at ?? null) : null,
+      before_id: hasMore ? (items[0]?.id ?? null) : null,
+    };
   },
   async sendMessage(id, body) {
     await demoDelay(300);
@@ -534,6 +603,28 @@ const demo: PiService = {
       temperature: input.temperature,
     });
     return version;
+  },
+  async publishAgent(agentId, { version, tools }) {
+    const pi = demoPi();
+    const agent = pi.agents.find((a) => a.id === agentId);
+    if (!agent) throw new ApiError(404, "RESOURCE_NOT_FOUND");
+    // Validate everything first so a bad tool key changes nothing (atomic, like the API).
+    const known = new Set(pi.tools.map((t) => t.key));
+    const unknown = Object.keys(tools).filter((key) => !known.has(key));
+    if (unknown.length)
+      throw new ApiError(
+        422,
+        "UNKNOWN_TOOL",
+        undefined,
+        `Unknown tool: ${unknown.join(", ")}`,
+      );
+    const published = await demo.publishVersion(agentId, version);
+    const next = new Set(agent.tools);
+    for (const [key, enabled] of Object.entries(tools))
+      if (enabled) next.add(key);
+      else next.delete(key);
+    agent.tools = [...next];
+    return published;
   },
   async rollback(agentId, versionId) {
     await demoDelay(300);

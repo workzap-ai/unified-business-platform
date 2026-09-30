@@ -6,6 +6,21 @@
       "label": "View overview dashboard"
     },
     {
+      "group": "Workspace tasks",
+      "key": "tasks.read",
+      "label": "View own workspace tasks"
+    },
+    {
+      "group": "Workspace tasks",
+      "key": "tasks.write",
+      "label": "Create and update own workspace tasks"
+    },
+    {
+      "group": "Workspace tasks",
+      "key": "tasks.manage",
+      "label": "Manage and assign all workspace tasks"
+    },
+    {
       "group": "Customers",
       "key": "customers.read",
       "label": "View customers"
@@ -161,6 +176,76 @@
       "label": "View customer memory"
     },
     {
+      "group": "PI",
+      "key": "pi.inbox.all",
+      "label": "See every conversation (otherwise only assigned ones)"
+    },
+    {
+      "group": "PI",
+      "key": "pi.inbox.assign",
+      "label": "Assign conversations to team members"
+    },
+    {
+      "group": "PI",
+      "key": "pi.inbox.notes",
+      "label": "Read and write internal conversation notes"
+    },
+    {
+      "group": "PI",
+      "key": "pi.customers.export",
+      "label": "Export customer records and memory"
+    },
+    {
+      "group": "PI",
+      "key": "pi.knowledge.publish",
+      "label": "Publish knowledge that customers can see"
+    },
+    {
+      "group": "PI",
+      "key": "pi.billing.read",
+      "label": "View the Pi plan, usage and invoices"
+    },
+    {
+      "group": "PI",
+      "key": "pi.billing.manage",
+      "label": "Change the Pi plan, spend limit or cancel"
+    },
+    {
+      "group": "PI",
+      "key": "pi.support.grant",
+      "label": "Approve and revoke operator support access"
+    },
+    {
+      "group": "PI",
+      "key": "pi.bookings.read",
+      "label": "View bookings and bookable services"
+    },
+    {
+      "group": "PI",
+      "key": "pi.bookings.manage",
+      "label": "Create, change and cancel bookings"
+    },
+    {
+      "group": "PI",
+      "key": "pi.work.read",
+      "label": "View tasks and support tickets"
+    },
+    {
+      "group": "PI",
+      "key": "pi.work.manage",
+      "label": "Create and update tasks and support tickets"
+    },
+    {
+      "group": "PI",
+      "key": "pi.campaigns.read",
+      "label": "View WhatsApp campaigns and their results"
+    },
+    {
+      "group": "PI",
+      "key": "pi.campaigns.manage",
+      "label": "Create, schedule and cancel WhatsApp campaigns"
+    },
+    {
       "group": "Administration",
       "key": "admin.members.read",
       "label": "View members"
@@ -263,20 +348,37 @@
         "overview.read",
         "pi.agents.manage",
         "pi.analytics.read",
+        "pi.billing.manage",
+        "pi.billing.read",
+        "pi.bookings.manage",
+        "pi.bookings.read",
+        "pi.campaigns.manage",
+        "pi.campaigns.read",
+        "pi.customers.export",
         "pi.handoffs.manage",
+        "pi.inbox.all",
+        "pi.inbox.assign",
+        "pi.inbox.notes",
         "pi.inbox.reply",
         "pi.knowledge.manage",
+        "pi.knowledge.publish",
         "pi.memory.read",
         "pi.read",
         "pi.settings.manage",
+        "pi.support.grant",
         "pi.whatsapp.manage",
+        "pi.work.manage",
+        "pi.work.read",
         "quotes.approve",
         "quotes.read",
         "quotes.write",
         "reports.read",
         "sales.read",
         "sales.write",
-        "settings.manage"
+        "settings.manage",
+        "tasks.manage",
+        "tasks.read",
+        "tasks.write"
       ]
     },
     {
@@ -315,20 +417,37 @@
         "overview.read",
         "pi.agents.manage",
         "pi.analytics.read",
+        "pi.billing.manage",
+        "pi.billing.read",
+        "pi.bookings.manage",
+        "pi.bookings.read",
+        "pi.campaigns.manage",
+        "pi.campaigns.read",
+        "pi.customers.export",
         "pi.handoffs.manage",
+        "pi.inbox.all",
+        "pi.inbox.assign",
+        "pi.inbox.notes",
         "pi.inbox.reply",
         "pi.knowledge.manage",
+        "pi.knowledge.publish",
         "pi.memory.read",
         "pi.read",
         "pi.settings.manage",
+        "pi.support.grant",
         "pi.whatsapp.manage",
+        "pi.work.manage",
+        "pi.work.read",
         "quotes.approve",
         "quotes.read",
         "quotes.write",
         "reports.read",
         "sales.read",
         "sales.write",
-        "settings.manage"
+        "settings.manage",
+        "tasks.manage",
+        "tasks.read",
+        "tasks.write"
       ]
     },
     {
@@ -353,16 +472,29 @@
         "orders.write",
         "overview.read",
         "pi.analytics.read",
+        "pi.billing.read",
+        "pi.bookings.manage",
+        "pi.bookings.read",
+        "pi.campaigns.manage",
+        "pi.campaigns.read",
         "pi.handoffs.manage",
+        "pi.inbox.all",
+        "pi.inbox.assign",
+        "pi.inbox.notes",
         "pi.inbox.reply",
         "pi.memory.read",
         "pi.read",
+        "pi.work.manage",
+        "pi.work.read",
         "quotes.approve",
         "quotes.read",
         "quotes.write",
         "reports.read",
         "sales.read",
-        "sales.write"
+        "sales.write",
+        "tasks.manage",
+        "tasks.read",
+        "tasks.write"
       ]
     },
     {
@@ -381,7 +513,9 @@
         "quotes.read",
         "quotes.write",
         "sales.read",
-        "sales.write"
+        "sales.write",
+        "tasks.read",
+        "tasks.write"
       ]
     },
     {
@@ -396,10 +530,54 @@
         "notifications.read",
         "orders.read",
         "overview.read",
+        "pi.bookings.manage",
+        "pi.bookings.read",
         "pi.handoffs.manage",
+        "pi.inbox.all",
+        "pi.inbox.notes",
         "pi.inbox.reply",
         "pi.memory.read",
-        "pi.read"
+        "pi.read",
+        "pi.work.manage",
+        "pi.work.read",
+        "tasks.read",
+        "tasks.write"
+      ]
+    },
+    {
+      "description": "Handles conversations assigned to them",
+      "key": "member",
+      "name": "Sales/Support member",
+      "permissions": [
+        "catalog.read",
+        "customers.read",
+        "customers.write",
+        "notifications.read",
+        "orders.read",
+        "pi.bookings.manage",
+        "pi.bookings.read",
+        "pi.handoffs.manage",
+        "pi.inbox.notes",
+        "pi.inbox.reply",
+        "pi.memory.read",
+        "pi.read",
+        "pi.work.manage",
+        "pi.work.read",
+        "tasks.read",
+        "tasks.write"
+      ]
+    },
+    {
+      "description": "Pi plan, usage and invoices",
+      "key": "billing",
+      "name": "Billing",
+      "permissions": [
+        "notifications.read",
+        "overview.read",
+        "pi.billing.manage",
+        "pi.billing.read",
+        "tasks.read",
+        "tasks.write"
       ]
     },
     {
@@ -415,7 +593,9 @@
         "notifications.read",
         "orders.read",
         "overview.read",
-        "reports.read"
+        "reports.read",
+        "tasks.read",
+        "tasks.write"
       ]
     },
     {
@@ -427,7 +607,9 @@
         "hr.sensitive",
         "hr.write",
         "notifications.read",
-        "overview.read"
+        "overview.read",
+        "tasks.read",
+        "tasks.write"
       ]
     },
     {
@@ -445,10 +627,15 @@
         "orders.read",
         "overview.read",
         "pi.analytics.read",
+        "pi.bookings.read",
+        "pi.campaigns.read",
+        "pi.inbox.all",
         "pi.read",
+        "pi.work.read",
         "quotes.read",
         "reports.read",
-        "sales.read"
+        "sales.read",
+        "tasks.read"
       ]
     }
   ]

@@ -6,6 +6,7 @@ from fastapi import APIRouter, Request
 from sqlalchemy import func, literal_column, select
 
 from app.ai.models import AIUsageEvent
+from app.ai.registry import ModelRegistry
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.billing.models import Invoice
@@ -27,6 +28,7 @@ from app.modules.pi.models import (
 )
 from app.modules.pi.service import PiService
 from app.modules.quotes.models import Quote
+from app.shared.errors import ResourceNotFound
 from app.shared.models import WorkspaceRow
 from app.shared.workspace_repository import WorkspaceRepository
 
@@ -179,6 +181,10 @@ async def customer_memory(
     service = PiService(session, scope)
     await service.require("pi.memory.read")
     await service.customers.get(customer_id)
+    if not scope.can("pi.inbox.all") and (
+        await service.conversations.find(PiConversation.customer_id == customer_id) is None
+    ):
+        raise ResourceNotFound  # Memory follows conversation visibility.
     rows = await session.scalars(
         WorkspaceRepository(session, PiMemory, scope)
         .select()
@@ -198,6 +204,10 @@ async def delete_memory(memory_id: UUID, scope: Scope, session: Session) -> None
     repo = WorkspaceRepository(session, PiMemory, scope)
     row = await repo.get(memory_id, for_update=True)
     customer_id = row.customer_id
+    if not scope.can("pi.inbox.all") and (
+        await service.conversations.find(PiConversation.customer_id == customer_id) is None
+    ):
+        raise ResourceNotFound
     await repo.delete(row)
     await record(
         session,
@@ -222,7 +232,8 @@ async def count(session: Session, scope: Scope, model: type[WorkspaceRow], *cond
 
 @router.get("/overview")
 async def overview(request: Request, scope: Scope, session: Session) -> dict[str, Any]:
-    await PiService(session, scope).require()
+    # Workspace-wide counts: only for members who may see every conversation.
+    await PiService(session, scope).require("pi.inbox.all")
     since = datetime.now(UTC) - timedelta(days=7)
     conversations = await count(session, scope, PiConversation, PiConversation.created_at >= since)
     active = await count(session, scope, PiConversation, PiConversation.status == "open")
@@ -261,9 +272,15 @@ async def overview(request: Request, scope: Scope, session: Session) -> dict[str
     connection = await WorkspaceRepository(session, WhatsAppConnection, scope).find()
     config = await settings_row(session, scope)
     providers = []
-    for i, provider in enumerate(request.app.state.settings.provider_order()):
-        key = getattr(request.app.state.settings, f"{provider}_api_key")
-        configured = bool(key and getattr(request.app.state.settings, f"{provider}_models"))
+    app_settings = request.app.state.settings
+    models = ModelRegistry.from_settings(app_settings)
+    for i, provider in enumerate(app_settings.provider_order()):
+        key = getattr(app_settings, f"{provider}_api_key")
+        # Configured = a key plus a conversational model the gateway would actually use,
+        # including enabled default aliases (not only explicit overrides).
+        configured = bool(key) and any(
+            models.resolve(provider, alias) for alias in ("router", "agent")
+        )
         usage = WorkspaceRepository(session, AIUsageEvent, scope)
         n, success, p50 = (
             await session.execute(
@@ -281,7 +298,7 @@ async def overview(request: Request, scope: Scope, session: Session) -> dict[str
         providers.append(
             {
                 "name": provider,
-                "role": ["primary", "fallback", "secondary_fallback"][i],
+                "role": ["primary", "fallback", "secondary_fallback"][min(i, 2)],
                 "configured": configured,
                 "status": "unconfigured"
                 if not configured

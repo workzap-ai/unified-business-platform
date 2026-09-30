@@ -161,7 +161,9 @@ class GeminiProvider(HttpAdapter):
                 except ValueError:
                     pass
         kind = classify_status(status)
-        if "API_KEY_INVALID" in reasons or state in {"UNAUTHENTICATED", "PERMISSION_DENIED"}:
+        if "BILLING_DISABLED" in reasons:
+            kind = ErrorKind.QUOTA
+        elif "API_KEY_INVALID" in reasons or state in {"UNAUTHENTICATED", "PERMISSION_DENIED"}:
             kind = ErrorKind.AUTH
         elif status == 429 or state == "RESOURCE_EXHAUSTED":
             kind = ErrorKind.QUOTA if "PerDay" in quota_ids else ErrorKind.RATE_LIMIT

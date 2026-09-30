@@ -1,10 +1,11 @@
 import re
-from datetime import UTC, datetime, time
+from datetime import UTC, datetime, time, tzinfo
 from decimal import Decimal, InvalidOperation
 from typing import Any
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from app.modules.pi.models import PiSettings
+from app.modules.pi.price_policy import PRICE_MODES
 from app.shared.errors import BusinessRuleViolation
 
 
@@ -31,6 +32,11 @@ def validate_section(section: str, value: Any) -> None:
                 )
             )
             ensure(value["service_mode"] in {"auto", "service"})
+            ensure(value.get("price_disclosure", "") in ("", *PRICE_MODES))
+            ensure(value.get("execution_mode", "") in ("", "human_approved", "mixed", "ai_led"))
+            ensure(
+                bool(re.fullmatch(r"[a-z]{2,3}", str(value.get("staff_summary_language", "en"))))
+            )
             ensure(value["tone"] in {"friendly", "formal", "concise"})
             ensure(len(value["greeting"]) <= 2000 and len(value["sign_off"]) <= 200)
         if section == "ai_config":
@@ -54,6 +60,11 @@ def validate_section(section: str, value: Any) -> None:
         if section == "whatsapp_config":
             ensure(1 <= value["max_media_mb"] <= 50)
             ensure(1 <= value["reminder_after_days"] <= 30)
+            ensure(0 <= int(value.get("quiet_start", 21)) <= 23)
+            ensure(0 <= int(value.get("quiet_end", 9)) <= 23)
+            from app.modules.pi_saas.flows import valid_config
+
+            ensure(valid_config(value.get("flows", {})))
             templates = value["reminder_templates"]
             ensure(len(templates) <= 50)
             for language, template in templates.items():
@@ -72,10 +83,21 @@ def validate_section(section: str, value: Any) -> None:
         raise BusinessRuleViolation("INVALID_SETTING", "Invalid PI configuration value") from None
 
 
+def zone(name: str) -> tzinfo:
+    """IANA zone; UTC works even where the OS has no tz database (Windows without
+    the tzdata package). Other names still need a tz database and fail loudly."""
+    try:
+        return ZoneInfo(name)
+    except ZoneInfoNotFoundError:
+        if name in {"UTC", "Etc/UTC", "GMT"}:
+            return UTC
+        raise
+
+
 def outside_hours(policy: PiSettings) -> bool:
     if not policy.business_hours.get("enabled"):
         return False
-    now = datetime.now(UTC).astimezone(ZoneInfo(policy.timezone))
+    now = datetime.now(UTC).astimezone(zone(policy.timezone))
     key = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")[now.weekday()]
     day = policy.business_hours["days"][key]
     return not day["open"] or not (

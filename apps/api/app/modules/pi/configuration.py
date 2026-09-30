@@ -15,6 +15,24 @@ from app.shared.errors import BusinessRuleViolation
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
 
+OPT_IN_TOOLS = frozenset(
+    {
+        "check_availability",
+        "create_booking",
+        "cancel_booking",
+        "get_bookings",
+        "create_task",
+        "create_ticket",
+        "get_project_status",
+        "request_payment",
+        "get_payment_status",
+        "reschedule_booking",
+        "email_booking_confirmation",
+        "send_form",
+        "get_store_orders",
+    }
+)
+
 DEFAULTS: dict[str, Any] = {
     "auto_reply_enabled": True,
     "timezone": "UTC",
@@ -34,6 +52,11 @@ DEFAULTS: dict[str, Any] = {
         "greeting": "Hello! How can we help?",
         "sign_off": "",
         "service_mode": "auto",
+        # "" = automatic (services never publish prices; products quote approved prices).
+        "price_disclosure": "",
+        # ai_led | mixed | human_approved (see tools.handlers._delivery_status).
+        "execution_mode": "ai_led",
+        "staff_summary_language": "en",
     },
     "ai_config": {
         "router_alias": "fast",
@@ -41,7 +64,9 @@ DEFAULTS: dict[str, Any] = {
         "temperature": "0.20",
         "clarify_before_handoff": 1,
     },
-    "tool_permissions": {key: True for key in TOOL_CATALOG},
+    # Tools added after launch are opt-in, so existing workspaces never start creating
+    # bookings, tasks or tickets without choosing to.
+    "tool_permissions": {key: key not in OPT_IN_TOOLS for key in TOOL_CATALOG},
     "handoff_rules": {
         "keywords": ["human", "representative"],
         "low_confidence_threshold": "0.75",
@@ -65,6 +90,11 @@ DEFAULTS: dict[str, Any] = {
         "reminder_enabled": True,
         "reminder_after_days": 7,
         "reminder_templates": {},
+        # No reminders between these local hours (start == end turns quiet hours off).
+        "quiet_start": 21,
+        "quiet_end": 9,
+        # WhatsApp Flows the business published: {"lead": {"flow_id", "cta", "screen"}}.
+        "flows": {},
     },
 }
 

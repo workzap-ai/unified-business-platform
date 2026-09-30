@@ -211,6 +211,13 @@ class SmtpProvider(EmailProvider):
         mime.set_content(message.text)
         if message.html:
             mime.add_alternative(message.html, subtype="html")
+        for attachment in message.attachments:
+            mime.add_attachment(
+                attachment.content.encode(),
+                maintype="text",
+                subtype="calendar",
+                filename=attachment.filename,
+            )
         return mime
 
     async def send_email(self, ctx: ProviderContext, message: EmailMessage) -> SendResult:

@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.audience import Audience
 from app.core.config import Settings
 from app.modules.audit.service import record
 from app.modules.auth.crypto import digest, hash_password, needs_rehash, new_token, verify_password
@@ -21,6 +23,14 @@ from app.modules.users.models import PlatformUser
 from app.shared.errors import BusinessRuleViolation, Conflict, ResourceNotFound, Unauthenticated
 
 TOUCH_INTERVAL = timedelta(minutes=5)
+
+
+def pi_business_tenants() -> Any:
+    """Tenants that are Pi businesses (not closed). Imported lazily: auth sits below
+    the product modules in the dependency order."""
+    from app.modules.pi_saas.models import PiBusinessAccount
+
+    return select(PiBusinessAccount.tenant_id).where(PiBusinessAccount.status != "closed")
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,7 +54,9 @@ class AuthService:
     def __init__(self, session: AsyncSession, settings: Settings) -> None:
         self.session, self.settings = session, settings
 
-    async def _issue(self, user: PlatformUser, user_agent: str) -> IssuedSession:
+    async def _issue(
+        self, user: PlatformUser, user_agent: str, audience: Audience = "owner_os"
+    ) -> IssuedSession:
         token, csrf = new_token(), new_token()
         current = now()
         auth = AuthSession(
@@ -54,6 +66,7 @@ class AuthService:
             expires_at=current + timedelta(hours=self.settings.session_ttl_hours),
             last_seen_at=current,
             user_agent=user_agent[:200],
+            audience=audience,
         )
         await self._default_workspace(auth)
         self.session.add(auth)
@@ -61,9 +74,10 @@ class AuthService:
         return IssuedSession(auth, token, csrf)
 
     async def _default_workspace(self, auth: AuthSession) -> None:
-        membership = await self.session.scalar(
-            active_memberships(auth.user_id).order_by(Membership.created_at).limit(1)
-        )
+        query = active_memberships(auth.user_id)
+        if auth.audience == "pi":
+            query = query.where(Membership.tenant_id.in_(pi_business_tenants()))
+        membership = await self.session.scalar(query.order_by(Membership.created_at).limit(1))
         if membership is None:
             return
         environment = await self.session.scalar(
@@ -107,7 +121,9 @@ class AuthService:
         )
         return issued
 
-    async def login(self, email: str, password: str, user_agent: str) -> IssuedSession:
+    async def login(
+        self, email: str, password: str, user_agent: str, audience: Audience = "owner_os"
+    ) -> IssuedSession:
         row = (
             await self.session.execute(
                 select(PlatformUser, UserCredential)
@@ -137,8 +153,14 @@ class AuthService:
         credential.locked_until = None
         if needs_rehash(credential.password_hash):
             credential.password_hash = hash_password(password)
-        issued = await self._issue(user, user_agent)
-        await record(self.session, "auth.login", actor_user_id=user.id, entity_type="user")
+        issued = await self._issue(user, user_agent, audience)
+        await record(
+            self.session,
+            "auth.login",
+            actor_user_id=user.id,
+            entity_type="user",
+            details={"audience": audience},
+        )
         return issued
 
     async def _failed(self, user: PlatformUser | None, reason: str) -> None:
@@ -152,13 +174,14 @@ class AuthService:
             details={"reason": reason},
         )
 
-    async def resolve(self, token: str) -> AuthContext:
+    async def resolve(self, token: str, audience: Audience = "owner_os") -> AuthContext:
         row = (
             await self.session.execute(
                 select(AuthSession, PlatformUser)
                 .join(PlatformUser, PlatformUser.id == AuthSession.user_id)
                 .where(
                     AuthSession.token_hash == digest(token),
+                    AuthSession.audience == audience,
                     AuthSession.revoked_at.is_(None),
                     AuthSession.expires_at > now(),
                     PlatformUser.status == "active",
@@ -226,9 +249,11 @@ class AuthService:
         environment_id: UUID | None,
         branch_id: UUID | None,
     ) -> None:
-        membership = await self.session.scalar(
-            active_memberships(auth.user_id).where(Membership.tenant_id == tenant_id)
-        )
+        query = active_memberships(auth.user_id).where(Membership.tenant_id == tenant_id)
+        if auth.audience == "pi":
+            # The Pi app only ever selects Pi businesses, never other workspaces.
+            query = query.where(Membership.tenant_id.in_(pi_business_tenants()))
+        membership = await self.session.scalar(query)
         if membership is None:
             raise ResourceNotFound
         env_query = select(Environment).where(

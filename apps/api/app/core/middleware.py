@@ -7,6 +7,7 @@ from starlette.datastructures import Headers, MutableHeaders
 from starlette.requests import Request
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from app.core.audience import audience_for_path
 from app.core.exceptions import error_response
 
 logger = logging.getLogger("platform")
@@ -19,17 +20,26 @@ class OriginCheckMiddleware:
 
     Defense in depth next to session-bound CSRF tokens. Requests without an Origin
     header (server-to-server webhooks, CLI clients) are not affected here; cookie
-    authenticated mutations still require the CSRF token.
+    authenticated mutations still require the CSRF token. Pi app routes accept only the
+    Pi app's origins, and every other route only the Owner OS origins.
     """
 
-    def __init__(self, app: ASGIApp, allowed_origins: list[str]) -> None:
+    def __init__(
+        self, app: ASGIApp, allowed_origins: list[str], pi_origins: list[str] | None = None
+    ) -> None:
         self.app = app
         self.allowed = {o.rstrip("/") for o in allowed_origins}
+        self.pi_allowed = {o.rstrip("/") for o in (pi_origins or [])}
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] == "http" and scope["method"] in UNSAFE_METHODS:
             origin = Headers(scope=scope).get("origin")
-            if origin and origin.rstrip("/") not in self.allowed:
+            allowed = (
+                self.pi_allowed
+                if audience_for_path(scope.get("path", "")) == "pi"
+                else self.allowed
+            )
+            if origin and origin.rstrip("/") not in allowed:
                 response = error_response(Request(scope), 403, "FORBIDDEN", "Access denied")
                 await response(scope, receive, send)
                 return

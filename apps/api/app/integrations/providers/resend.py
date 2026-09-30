@@ -5,6 +5,7 @@ with name `restricted_api_key`; that still proves the key is valid, so the test 
 success with a note. Send: POST /emails with an Idempotency-Key header.
 """
 
+import base64
 import time
 from collections.abc import Mapping
 from typing import Any
@@ -100,6 +101,15 @@ class ResendProvider(EmailProvider):
             body["html"] = message.html
         if message.reply_to:
             body["reply_to"] = safe_email(message.reply_to)
+        if message.attachments:
+            body["attachments"] = [
+                {
+                    "filename": a.filename,
+                    "content": base64.b64encode(a.content.encode()).decode(),
+                    "content_type": a.content_type,
+                }
+                for a in message.attachments
+            ]
         headers = self._headers(ctx)
         if message.idempotency_key:
             headers["idempotency-key"] = message.idempotency_key[:256]

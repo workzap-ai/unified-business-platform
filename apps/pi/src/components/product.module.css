@@ -1,0 +1,287 @@
+.sidebar {
+  width: 244px;
+  padding: 27px 16px 18px;
+  background: var(--surface);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px;
+  margin-bottom: 31px;
+}
+.brandCaption {
+  color: var(--muted-foreground);
+  font-size: 8px;
+  letter-spacing: 1.4px;
+  line-height: 1.7;
+  border-left: 1px solid var(--border);
+  padding-left: 12px;
+}
+.business {
+  padding: 4px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  border-radius: 14px;
+}
+.nav {
+  margin-top: 29px;
+}
+.nav::before {
+  content: "WORKSPACE";
+  display: block;
+  padding: 0 13px;
+  margin-bottom: 12px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+}
+.nav a {
+  min-height: 45px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 450;
+}
+.nav a[aria-current="page"] {
+  border-color: color-mix(in srgb, var(--accent) 12%, transparent);
+  font-weight: 550;
+}
+.nav a[aria-current="page"]::after {
+  content: "";
+  margin-left: auto;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.sidebarNote {
+  margin-top: auto;
+  padding: 19px 17px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: var(--background);
+}
+.sidebarNote > svg {
+  color: var(--accent);
+}
+.sidebarNote h2 {
+  font-size: 14px;
+  font-weight: 550;
+  margin-top: 10px;
+  letter-spacing: -0.3px;
+}
+.sidebarNote p {
+  margin-top: 7px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.8;
+}
+.sidebarNote a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 17px;
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--accent);
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 65px;
+  padding: 0 30px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.crumb strong {
+  color: var(--foreground);
+  font-weight: 500;
+}
+.topbar .tryLink,
+.topbar > a {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  min-height: 36px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 500;
+}
+.sectionNav {
+  margin-bottom: 27px;
+}
+.sectionNav > div {
+  gap: 4px;
+  padding: 5px;
+  border-radius: 13px;
+  box-shadow: var(--shadow-sm);
+}
+.sectionNav a {
+  height: 40px;
+  border-radius: 8px;
+  font-size: 13px;
+  padding: 0 15px;
+}
+.setup {
+  padding-top: 6px;
+}
+.setup > div:first-child {
+  padding: 22px 24px;
+  margin-bottom: 23px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--accent-soft);
+}
+.setup h1 {
+  font-size: 30px;
+  letter-spacing: -1px;
+  margin-bottom: 5px;
+}
+.setup ol {
+  gap: 8px;
+  margin-bottom: 25px;
+}
+.setup ol button {
+  min-height: 46px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+.setup h2 {
+  letter-spacing: -0.5px;
+}
+.inbox {
+  box-shadow: var(--shadow-sm);
+}
+.inbox > div {
+  border-radius: 18px;
+}
+.inboxHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 3px 8px;
+}
+.inboxHeading h1 {
+  font-size: 23px;
+  font-weight: 550;
+  letter-spacing: -0.9px;
+}
+.inboxHeading > span {
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 33px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 10px;
+}
+.inbox [role="tab"] {
+  height: 38px;
+  font-size: 12px;
+  padding-left: 13px;
+  padding-right: 13px;
+}
+.customerList > ul > li > a {
+  min-height: 85px;
+  gap: 15px;
+}
+.customerList > ul > li > a > span:first-child {
+  width: 43px;
+  height: 43px;
+  background: var(--accent-soft);
+  color: var(--accent-soft-foreground);
+  border-radius: 14px;
+}
+.overviewCards > a {
+  display: block;
+  transition: transform 0.2s;
+}
+.overviewCards > a:hover {
+  transform: translateY(-3px);
+}
+.overviewCards > a > div {
+  height: 100%;
+  min-height: 150px;
+}
+.overviewCards h2 {
+  font-size: 17px;
+  letter-spacing: -0.4px;
+}
+.overviewCards p {
+  margin-top: 6px;
+  line-height: 1.8;
+}
+.overviewCards svg {
+  stroke-width: 1.6;
+}
+@media (max-width: 1023px) {
+  .sidebar {
+    width: 224px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .brand {
+    gap: 8px;
+  }
+  .brandCaption {
+    font-size: 7px;
+    padding-left: 8px;
+  }
+  .topbar {
+    padding: 0 24px;
+  }
+  .setup > div:first-child {
+    padding: 20px;
+  }
+}
+@media (max-width: 767px) {
+  .topbar {
+    display: none;
+  }
+  .sectionNav a {
+    min-height: 42px;
+    padding: 0 13px;
+  }
+  .setup > div:first-child {
+    padding: 19px 16px;
+    gap: 12px;
+  }
+  .setup h1 {
+    font-size: 26px;
+  }
+  .setup > div:first-child p {
+    font-size: 13px;
+  }
+  .setup ol {
+    gap: 5px;
+  }
+  .setup ol button {
+    padding: 0 9px;
+    font-size: 11px;
+  }
+  .inbox > div {
+    border-radius: 0;
+  }
+  .customerList > ul > li > a {
+    min-height: 80px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .overviewCards > a {
+    transition: none;
+  }
+  .overviewCards > a:hover {
+    transform: none;
+  }
+}

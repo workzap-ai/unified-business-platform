@@ -610,10 +610,15 @@ async def test_smtp_destination_policy():
 
 def test_registry_honesty():
     planned = [d for d in REGISTRY.all() if d.availability == "planned"]
-    assert {"google_calendar", "quickbooks", "shopify", "microsoft_teams"} <= {
+    assert {"microsoft_calendar", "quickbooks", "woocommerce", "microsoft_teams"} <= {
         d.key for d in planned
     }
     assert all(REGISTRY.provider(d.key) is None and not d.connectable for d in planned)
+    # Real adapters exist for these; each business still authorizes its own account.
+    for key in ("google_calendar", "shopify"):
+        definition = REGISTRY.definition(key)
+        assert definition is not None and definition.connectable
+        assert REGISTRY.provider(key) is not None
     syncing = [d.key for d in REGISTRY.all() if d.syncs]
     assert syncing == ["stripe"]
     assert all(d.sync_support == ("none",) for d in REGISTRY.all() if d.key != "stripe")

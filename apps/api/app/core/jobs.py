@@ -74,6 +74,7 @@ class InlineQueue:
         async def sweep() -> None:
             from app.integrations.jobs import integrations_sweep
             from app.modules.pi.knowledge_jobs import sweep_knowledge
+            from app.worker import JOB_FUNCTIONS
 
             while True:
                 await asyncio.sleep(interval)
@@ -85,6 +86,20 @@ class InlineQueue:
                     await sweep_knowledge(self.ctx)
                 except Exception:
                     logger.warning("knowledge_sweep_failed")
+                # Recovery of stuck PI receipts/sends and due follow-ups (ARQ cron parity).
+                # Follow-ups still re-check consent, connection and templates at send time.
+                for name in (
+                    "sweep_pi",
+                    "sweep_followups",
+                    "sweep_pi_saas",
+                    "sweep_pi_calendar",
+                    "sweep_pi_campaigns",
+                    "sweep_pi_digests",
+                ):
+                    try:
+                        await JOB_FUNCTIONS[name](self.ctx)
+                    except Exception:
+                        logger.warning("pi_sweep_failed")
 
         if self.sweeper is None:
             self.sweeper = asyncio.create_task(sweep())

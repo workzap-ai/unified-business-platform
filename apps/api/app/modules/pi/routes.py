@@ -7,7 +7,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import PlainTextResponse
-from sqlalchemy import func, select
+from sqlalchemy import and_, false, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 
@@ -15,6 +15,7 @@ from app.core.pagination import Page, Pagination
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.pi.models import (
+    PiConversation,
     PiHandoff,
     PiMessage,
     PiPendingAction,
@@ -30,6 +31,7 @@ from app.modules.pi.schemas import (
     HandoffAction,
     HandoffInput,
     HandoffView,
+    MessageHistory,
     MessageView,
     StatusInput,
 )
@@ -122,8 +124,12 @@ async def conversations(
     search: str | None = Query(None, max_length=100),
     status: Literal["open", "closed"] | None = None,
     mode: Literal["ai", "human"] | None = None,
+    assignment: Literal["all", "mine", "unassigned"] | None = None,
+    unread: bool | None = None,
 ) -> Page[ConversationView]:
-    return await PiService(session, scope).search(pagination, search, status, mode)
+    return await PiService(session, scope).search(
+        pagination, search, status, mode, None if assignment == "all" else assignment, unread
+    )
 
 
 def tool_summary(call: PiToolCall) -> str:
@@ -187,23 +193,67 @@ async def message_views(
     return result
 
 
+async def _history(
+    session: Session,
+    scope: Scope,
+    conversation_id: UUID,
+    before: datetime | None,
+    before_id: UUID | None,
+    limit: int,
+) -> tuple[list[PiMessage], bool]:
+    service = PiService(session, scope)
+    await service.require()
+    await service.conversations.get(conversation_id)
+    query = service.messages.select().where(PiMessage.conversation_id == conversation_id)
+    if before is not None:
+        # Keyset cursor on (created_at, id): rows sharing a timestamp are never skipped.
+        query = query.where(
+            or_(
+                PiMessage.created_at < before,
+                and_(PiMessage.created_at == before, PiMessage.id < before_id)
+                if before_id is not None
+                else false(),
+            )
+        )
+    rows = list(
+        await session.scalars(
+            query.order_by(PiMessage.created_at.desc(), PiMessage.id.desc()).limit(limit + 1)
+        )
+    )
+    return list(reversed(rows[:limit])), len(rows) > limit
+
+
 @router.get("/conversations/{conversation_id}/messages", response_model=list[MessageView])
 async def messages(
     conversation_id: UUID,
     scope: Scope,
     session: Session,
     before: datetime | None = None,
+    before_id: UUID | None = None,
     limit: int = Query(100, ge=1, le=200),
 ) -> list[MessageView]:
     """Newest ``limit`` messages (optionally older than the ``before`` cursor), oldest first."""
-    service = PiService(session, scope)
-    await service.require()
-    await service.conversations.get(conversation_id)
-    query = service.messages.select().where(PiMessage.conversation_id == conversation_id)
-    if before is not None:
-        query = query.where(PiMessage.created_at < before)
-    rows = list(await session.scalars(query.order_by(PiMessage.created_at.desc()).limit(limit)))
-    return await message_views(session, scope, conversation_id, list(reversed(rows)))
+    rows, _ = await _history(session, scope, conversation_id, before, before_id, limit)
+    return await message_views(session, scope, conversation_id, rows)
+
+
+@router.get("/conversations/{conversation_id}/history", response_model=MessageHistory)
+async def history(
+    conversation_id: UUID,
+    scope: Scope,
+    session: Session,
+    before: datetime | None = None,
+    before_id: UUID | None = None,
+    limit: int = Query(50, ge=1, le=200),
+) -> MessageHistory:
+    """A page of messages, oldest first, with a cursor for loading older history."""
+    rows, has_more = await _history(session, scope, conversation_id, before, before_id, limit)
+    return MessageHistory(
+        items=await message_views(session, scope, conversation_id, rows),
+        has_more=has_more,
+        before=rows[0].created_at if has_more and rows else None,
+        before_id=rows[0].id if has_more and rows else None,
+    )
 
 
 @router.post("/conversations/{conversation_id}/messages", response_model=MessageView)
@@ -236,7 +286,11 @@ async def conversation_action(
 async def handoffs(scope: Scope, session: Session, status: str | None = None) -> list[HandoffView]:
     service = PiService(session, scope)
     await service.require("pi.read", "handoff")
-    query = service.handoffs.select()
+    query = service.handoffs.select().where(
+        PiHandoff.conversation_id.in_(
+            service.conversations.select().with_only_columns(PiConversation.id)
+        )
+    )
     if status:
         query = query.where(PiHandoff.status == status)
     rows = await session.scalars(query.order_by(PiHandoff.created_at.desc()).limit(100))
@@ -289,10 +343,24 @@ def connection_view(row: WhatsAppConnection) -> dict[str, Any]:
     }
 
 
+async def _current_connection(session: Any, scope: Any) -> WhatsAppConnection | None:
+    """The workspace's number: the active one first (an old, disabled Meta number and a
+    newer Kapso number can both exist)."""
+    row: WhatsAppConnection | None = await session.scalar(
+        WorkspaceRepository(session, WhatsAppConnection, scope)
+        .select()
+        .order_by(
+            (WhatsAppConnection.status == "active").desc(), WhatsAppConnection.updated_at.desc()
+        )
+        .limit(1)
+    )
+    return row
+
+
 @router.get("/whatsapp")
 async def connection(scope: Scope, session: Session) -> dict[str, Any] | None:
     await PiService(session, scope).require("pi.whatsapp.manage")
-    row = await WorkspaceRepository(session, WhatsAppConnection, scope).find()
+    row = await _current_connection(session, scope)
     if not row:
         return None
     result = connection_view(row)
@@ -360,8 +428,11 @@ async def save_connection(
 @router.put("/whatsapp/status")
 async def connection_status(data: StatusInput, scope: Scope, session: Session) -> dict[str, Any]:
     await PiService(session, scope).require("pi.whatsapp.manage")
-    row = await WorkspaceRepository(session, WhatsAppConnection, scope).find()
-    if row is None or (data.status == "active" and not row.access_token_encrypted):
+    row = await _current_connection(session, scope)
+    # Kapso numbers are sent with the platform's server-held key, so they have no token.
+    if row is None or (
+        data.status == "active" and not row.access_token_encrypted and row.provider != "kapso"
+    ):
         raise BusinessRuleViolation("CONNECTION_NOT_CONFIGURED", "Configure the connection first")
     row.status = data.status
     await record(

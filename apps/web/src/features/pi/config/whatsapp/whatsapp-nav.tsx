@@ -10,6 +10,7 @@ export function WhatsAppNav() {
         { href: "/pi/whatsapp", label: "Connection", exact: true },
         { href: "/pi/whatsapp/status", label: "Status" },
         { href: "/pi/whatsapp/events", label: "Events" },
+        { href: "/pi/setup", label: "All tools setup" },
       ]}
     />
   );

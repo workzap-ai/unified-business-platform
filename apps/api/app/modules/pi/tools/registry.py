@@ -15,8 +15,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.audit.service import record
-from app.modules.pi.configuration import settings_row
+from app.modules.pi.configuration import OPT_IN_TOOLS, settings_row
 from app.modules.pi.models import PiAgent, PiAgentRun, PiAgentTool, PiConversation, PiToolCall
+from app.modules.pi.price_policy import NO_DISCLOSURE, redact_prices
 from app.modules.pi.tools.base import (
     PI_RUNTIME_PERMISSIONS,
     ToolContext,
@@ -43,9 +44,15 @@ SAFE_MESSAGES = {
 }
 
 
+# Tools whose output carries catalog prices or totals.
+PRICED_TOOLS = frozenset(
+    {"search_products", "get_product", "check_inventory", "calculate_order_total"}
+)
+
+
 class ToolRegistry:
-    def __init__(self, session: AsyncSession) -> None:
-        self.session = session
+    def __init__(self, session: AsyncSession, http: tuple[Any, Any] | None = None) -> None:
+        self.session, self.http = session, http
 
     @staticmethod
     def catalog() -> dict[str, ToolSpec]:
@@ -54,7 +61,9 @@ class ToolRegistry:
     async def enabled_tools(self, scope: WorkspaceScope, agent_key: str | None) -> frozenset[str]:
         policy = await settings_row(self.session, scope)
         enabled = {
-            name for name in TOOL_CATALOG if policy.tool_permissions.get(name, True) is not False
+            name
+            for name in TOOL_CATALOG
+            if policy.tool_permissions.get(name, name not in OPT_IN_TOOLS) is True
         }
         if agent_key:
             agent = await WorkspaceRepository(self.session, PiAgent, scope).find(
@@ -122,7 +131,9 @@ class ToolRegistry:
                     SAFE_MESSAGES["CONFIRMATION_REQUIRED"],
                     "confirmation_required",
                 )
-            context = ToolContext(self.session, scope, current, run, agent_key, confirmation)
+            context = ToolContext(
+                self.session, scope, current, run, agent_key, confirmation, self.http
+            )
             async with self.session.begin_nested():
                 output = await spec.handler(context, data)
             result = ToolResult(
@@ -160,6 +171,12 @@ class ToolRegistry:
                 message=SAFE_MESSAGES["RESOURCE_NOT_FOUND"],
             )
         await self._persist(scope, conversation, spec, result, args, run, agent_key, started)
+        if result.ok and result.data is not None and tool_name in PRICED_TOOLS:
+            rules = (await settings_row(self.session, scope)).response_rules
+            if rules.get("price_disclosure") in NO_DISCLOSURE:
+                # The model cannot disclose what it never receives. The persisted tool call
+                # keeps the full result for staff review.
+                result = result.model_copy(update={"data": redact_prices(result.data)})
         return result
 
     async def _persist(

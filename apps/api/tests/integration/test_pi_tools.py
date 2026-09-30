@@ -53,6 +53,22 @@ def test_catalog_is_complete_and_typed() -> None:
         "search_customer_memory",
         "create_handoff",
         "send_whatsapp_message",
+        # Opt-in native work tools (bookings, tasks, tickets, customer payments).
+        "check_availability",
+        "create_booking",
+        "cancel_booking",
+        "get_bookings",
+        "create_task",
+        "create_ticket",
+        "get_project_status",
+        "request_payment",
+        "get_payment_status",
+        # Opt-in tools backed by business-owned connections (Google Calendar, Shopify, email).
+        "reschedule_booking",
+        "email_booking_confirmation",
+        "get_store_orders",
+        # Opt-in WhatsApp Flows (forms) the business published itself.
+        "send_form",
     }
     assert [k for k, s in TOOL_CATALOG.items() if s.requires_confirmation] == ["create_order"]
     for spec in TOOL_CATALOG.values():

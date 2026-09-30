@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Uuid
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Integer, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -32,6 +32,7 @@ class AuthSession(Record, Base):
     __table_args__ = (
         Index("ix_auth_sessions_user_active", "user_id", "revoked_at"),
         Index("ix_auth_sessions_expires", "expires_at"),
+        CheckConstraint("audience IN ('owner_os', 'pi')", name="audience"),
     )
     user_id: Mapped[UUID] = mapped_column(ForeignKey("platform_users.id", ondelete="CASCADE"))
     token_hash: Mapped[str] = mapped_column(String(64), unique=True)
@@ -40,6 +41,9 @@ class AuthSession(Record, Base):
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     user_agent: Mapped[str] = mapped_column(String(200), default="", server_default="")
+    # Which application issued the session. A Pi customer session is only accepted by
+    # /api/v1/pi-app routes, and an Owner OS session only by the others.
+    audience: Mapped[str] = mapped_column(String(16), default="owner_os", server_default="owner_os")
     active_tenant_id: Mapped[UUID | None] = mapped_column(
         ForeignKey("tenants.id", ondelete="SET NULL"), nullable=True
     )

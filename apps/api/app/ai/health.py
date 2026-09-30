@@ -19,6 +19,9 @@ class _Circuit:
     failures: int = 0
     opened_at: float | None = None
     probing: bool = False
+    cooldown: float | None = None  # None = the default transient cooldown
+    reason: str | None = None  # "auth"/"quota" when the account itself can't serve
+    fingerprint: str | None = None  # credential the verdict was about
 
 
 class ProviderHealth:
@@ -27,6 +30,10 @@ class ProviderHealth:
     After the cooldown one probe request is allowed (half_open); success closes the
     circuit, failure re-opens it. State is per process (each API/worker process
     learns independently) and never shared through Redis.
+
+    ``disable`` opens the circuit at once for ``disable_seconds`` when the provider
+    account can't serve anyone (rejected key, credits/quota finished). Saving a new key
+    clears it immediately: see ``credential``.
     """
 
     def __init__(
@@ -34,9 +41,11 @@ class ProviderHealth:
         failure_threshold: int = 3,
         cooldown_seconds: float = 30.0,
         clock: Callable[[], float] = time.monotonic,
+        disable_seconds: float = 600.0,
     ) -> None:
         self.failure_threshold = failure_threshold
         self.cooldown_seconds = cooldown_seconds
+        self.disable_seconds = disable_seconds
         self.clock = clock
         self._circuits: dict[str, _Circuit] = {}
 
@@ -47,7 +56,8 @@ class ProviderHealth:
         circuit = self._get(provider)
         if circuit.opened_at is None:
             return "closed"
-        if self.clock() - circuit.opened_at >= self.cooldown_seconds:
+        cooldown = self.cooldown_seconds if circuit.cooldown is None else circuit.cooldown
+        if self.clock() - circuit.opened_at >= cooldown:
             return "half_open"
         return "open"
 
@@ -65,7 +75,20 @@ class ProviderHealth:
         return True
 
     def record_success(self, provider: str) -> None:
-        self._circuits[provider] = _Circuit()
+        self._circuits[provider] = _Circuit(fingerprint=self._get(provider).fingerprint)
+
+    def disable(self, provider: str, reason: str) -> None:
+        """Take the provider out now for ``disable_seconds`` (then one probe is allowed)."""
+        circuit = self._get(provider)
+        circuit.failures += 1
+        circuit.opened_at, circuit.probing = self.clock(), False
+        circuit.cooldown, circuit.reason = self.disable_seconds, reason
+
+    def credential(self, provider: str, fingerprint: str) -> None:
+        """A different key than the one a verdict was about: forget that verdict."""
+        circuit = self._get(provider)
+        if circuit.fingerprint != fingerprint:
+            self._circuits[provider] = _Circuit(fingerprint=fingerprint)
 
     def record_failure(self, provider: str) -> None:
         circuit = self._get(provider)
@@ -73,6 +96,7 @@ class ProviderHealth:
         if circuit.opened_at is not None:  # failed half-open probe: open again
             circuit.opened_at = self.clock()
             return
+        circuit.cooldown, circuit.reason = None, None
         circuit.failures += 1
         if circuit.failures >= self.failure_threshold:
             circuit.opened_at = self.clock()
@@ -83,7 +107,11 @@ class ProviderHealth:
 
     def snapshot(self) -> dict[str, dict[str, object]]:
         return {
-            name: {"state": self.state(name), "consecutive_failures": c.failures}
+            name: {
+                "state": self.state(name),
+                "consecutive_failures": c.failures,
+                "reason": c.reason if c.opened_at is not None else None,
+            }
             for name, c in self._circuits.items()
         }
 
@@ -100,7 +128,9 @@ def health_for(settings: Settings) -> ProviderHealth:
     health = _health_by_settings.get(key)
     if health is None:
         health = ProviderHealth(
-            settings.llm_circuit_failure_threshold, settings.llm_circuit_cooldown_seconds
+            settings.llm_circuit_failure_threshold,
+            settings.llm_circuit_cooldown_seconds,
+            disable_seconds=settings.llm_circuit_quota_cooldown_seconds,
         )
         _health_by_settings[key] = health
         weakref.finalize(settings, _health_by_settings.pop, key, None)

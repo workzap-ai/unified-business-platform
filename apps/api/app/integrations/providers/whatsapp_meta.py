@@ -302,6 +302,11 @@ class WhatsAppMetaProvider(WhatsAppProvider):
                 number = str(value.get("metadata", {}).get("phone_number_id", ""))
                 if not NUMBER_ID.fullmatch(number):
                     continue
+                profiles = {
+                    str(c.get("wa_id", "")): str((c.get("profile") or {}).get("name", ""))[:160]
+                    for c in value.get("contacts", [])[:100]
+                    if isinstance(c, dict)
+                }
                 for message in value.get("messages", [])[:100]:
                     mid, sender = message.get("id"), str(message.get("from", ""))
                     if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
@@ -310,6 +315,11 @@ class WhatsAppMetaProvider(WhatsAppProvider):
                         continue
                     kind = str(message.get("type", "other"))
                     part = message.get(kind, {}) if isinstance(message.get(kind), dict) else {}
+                    reply_text, form = None, None
+                    if kind == "interactive":
+                        from app.modules.pi_saas.flows import interactive_reply
+
+                        kind, reply_text, form = interactive_reply(message)
                     events.append(
                         NormalizedEvent(
                             provider_event_id=mid,
@@ -319,12 +329,18 @@ class WhatsAppMetaProvider(WhatsAppProvider):
                                 "phone_number_id": number,
                                 "message_id": mid,
                                 "from": sender,
-                                "type": kind if kind in {"text", *MEDIA_TYPES} else "other",
-                                "text": str(message.get("text", {}).get("body", ""))[:4096]
+                                "type": kind
+                                if kind in {"text", "interactive", *MEDIA_TYPES}
+                                else "other",
+                                "text": reply_text
+                                if reply_text is not None
+                                else str(message.get("text", {}).get("body", ""))[:4096]
                                 if kind == "text"
                                 else str(part.get("caption", ""))[:1024],
+                                "form": form,
                                 "media_id": str(part.get("id", ""))[:64] or None,
                                 "timestamp": str(message.get("timestamp", ""))[:16],
+                                "profile_name": profiles.get(sender, ""),
                             },
                         )
                     )

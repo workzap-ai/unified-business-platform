@@ -37,10 +37,11 @@ test("sidebar order can be changed by keyboard, persists across reload, and rese
   await page.getByRole("button", { name: "Done" }).click();
   const expected = [
     "Overview",
+    "Pi Agent Beta",
     "PI",
     "Customers / CRM",
     "Catalog",
-    ...DEFAULT_MAIN.slice(4),
+    ...DEFAULT_MAIN.slice(5),
   ];
   await expect.poll(() => mainLabels(page)).toEqual(expected);
   await page.reload();
@@ -83,6 +84,7 @@ test("permissions shape navigation (viewing as Support)", async ({ page }) => {
     .poll(() => mainLabels(page))
     .toEqual([
       "Overview",
+      "Pi Agent Beta",
       "Customers / CRM",
       "Catalog",
       "PI",

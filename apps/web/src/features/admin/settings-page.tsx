@@ -561,6 +561,22 @@ function WhereThingsLive() {
     permission: string;
   }[] = [
     {
+      label: "Pi operator console",
+      description:
+        "Pi businesses, all workspaces, plans, support access and platform health",
+      href: "/operator",
+      icon: ShieldCheck,
+      permission: "settings.manage",
+    },
+    {
+      label: "Pi subscriptions & payments",
+      description:
+        "Operator billing, PKR bank/cash collections and provider setup",
+      href: "/settings/pi-billing",
+      icon: ShieldCheck,
+      permission: "settings.manage",
+    },
+    {
       label: "Members",
       description: "Invite people and assign roles",
       href: "/settings/members",

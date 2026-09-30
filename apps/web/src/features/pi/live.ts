@@ -3,6 +3,13 @@ import { apiRequest, pageSchema } from "@/services/api-client";
 import type { PiService } from "./service";
 import * as schema from "./contracts.generated";
 
+const MessageHistorySchema = z.object({
+  items: z.array(schema.MessageSchema),
+  has_more: z.boolean(),
+  before: z.string().nullable(),
+  before_id: z.string().nullable(),
+});
+
 export const piLive: PiService = {
   overview: () => apiRequest("GET", "/pi/overview", schema.PiOverviewSchema),
   conversations: (filters) =>
@@ -27,6 +34,11 @@ export const piLive: PiService = {
       `/pi/conversations/${id}/messages`,
       z.array(schema.MessageSchema),
     ),
+  // Without a cursor the API returns the latest page; `limit` defaults server-side.
+  history: (id, { limit, before, before_id } = {}) =>
+    apiRequest("GET", `/pi/conversations/${id}/history`, MessageHistorySchema, {
+      query: { limit, before, before_id },
+    }),
   sendMessage: (id, body) =>
     apiRequest(
       "POST",
@@ -84,6 +96,10 @@ export const piLive: PiService = {
     ),
   publishVersion: (id, input) =>
     apiRequest("POST", `/pi/agents/${id}/versions`, schema.AgentVersionSchema, {
+      body: input,
+    }),
+  publishAgent: (id, input) =>
+    apiRequest("POST", `/pi/agents/${id}/publish`, schema.AgentVersionSchema, {
       body: input,
     }),
   rollback: (id, versionId) =>

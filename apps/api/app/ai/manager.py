@@ -4,6 +4,7 @@ embeddings, speech-to-text) with fallback, circuit breaking, budgets and meterin
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import logging
 import math
 import re
@@ -19,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.ai.errors import (
     CIRCUIT_KINDS,
+    DISABLE_KINDS,
     SAME_PROVIDER_RETRY_KINDS,
     AllProvidersFailed,
     AttemptSummary,
@@ -73,13 +75,27 @@ PURPOSE_PATTERN = re.compile(r"^[a-z][a-z0-9_.-]{0,19}$")  # ai_usage_events.pur
 MAX_EMBED_BATCH = 100
 
 
+def _api_key(settings: Settings, provider: str) -> str:
+    key = getattr(settings, f"{provider}_api_key", None)
+    return key.get_secret_value() if key is not None else ""
+
+
+def key_fingerprint(settings: Settings, provider: str) -> str:
+    """Short, non-reversible id of the provider key (lets a new key clear a pause)."""
+    return hashlib.sha256(_api_key(settings, provider).encode()).hexdigest()[:16]
+
+
 class FallbackPolicy:
     """Provider order from Settings.provider_order(); bounded same-provider retries.
 
     - transient error: retry the same provider (timeout/connection/5xx/429 with a short
       Retry-After) up to ``max_retries`` times, then move to the next provider;
-    - permanent error (auth, invalid request, content policy): stop immediately;
+    - account error (rejected key, credits/quota finished): move to the next provider
+      and pause this one (``ProviderHealth.disable``);
+    - request error (invalid request, content policy): stop immediately;
     - every provider failed or skipped: AllProvidersFailed (human handoff signal).
+
+    With ``ai_failover_all_configured`` any other provider that has a key is tried last.
     """
 
     def __init__(self, order: Sequence[str], max_retries: int, retry_after_max: float) -> None:
@@ -88,11 +104,10 @@ class FallbackPolicy:
 
     @classmethod
     def from_settings(cls, settings: Settings) -> FallbackPolicy:
-        return cls(
-            settings.provider_order(),
-            settings.llm_max_retries,
-            settings.llm_retry_after_max_seconds,
-        )
+        order = settings.provider_order()
+        if settings.ai_failover_all_configured:
+            order += [p for p in KNOWN_PROVIDERS if p not in order and _api_key(settings, p)]
+        return cls(order, settings.llm_max_retries, settings.llm_retry_after_max_seconds)
 
     def retry_delay(self, error: ProviderError, retry: int, max_retries: int) -> float | None:
         """Seconds to wait before retrying the same provider, or None to move on."""
@@ -398,6 +413,7 @@ class LLMManager:
         if scope is not None:
             await BudgetGuard.from_settings(self.settings, self.usage_store).check(scope.tenant_id)
         policy = FallbackPolicy.from_settings(self.settings)
+        self.health.disable_seconds = self.settings.llm_circuit_quota_cooldown_seconds
         retries = policy.max_retries if max_retries is None else max_retries
         providers, models, prices = self.providers, self.models, self.prices
         order = [p for p in policy.order if only is None or p in only]
@@ -425,6 +441,7 @@ class LLMManager:
             if not model:
                 summary.append(AttemptSummary(name, "", "skipped", "no_model"))
                 continue
+            self.health.credential(name, key_fingerprint(self.settings, name))
             if not self.health.allow(name):
                 summary.append(AttemptSummary(name, model, "skipped", "circuit_open"))
                 continue
@@ -494,11 +511,13 @@ class LLMManager:
                     await finish()
                     assert result is not None
                     return result, attempts
-                if error.kind in CIRCUIT_KINDS:
+                if error.kind in DISABLE_KINDS:
+                    self.health.disable(name, error.kind.value)
+                elif error.kind in CIRCUIT_KINDS:
                     self.health.record_failure(name)
                 else:
                     self.health.release(name)
-                if error.permanent:
+                if error.stops_chain:
                     await finish()
                     raise PermanentProviderFailure(error, summary, attempts)
                 delay = policy.retry_delay(error, retry, retries)
@@ -558,6 +577,7 @@ def provider_status(settings: Settings, health: ProviderHealth | None = None) ->
                 "in_order": name in order,
                 "active": configured and name in order,
                 "circuit": health.state(name),
+                "paused_reason": snapshot.get("reason"),
                 "consecutive_failures": snapshot["consecutive_failures"],
                 "models": models.get(name, {}),
             }
@@ -576,5 +596,6 @@ def provider_status(settings: Settings, health: ProviderHealth | None = None) ->
         "circuit": {
             "failure_threshold": health.failure_threshold,
             "cooldown_seconds": health.cooldown_seconds,
+            "quota_cooldown_seconds": settings.llm_circuit_quota_cooldown_seconds,
         },
     }

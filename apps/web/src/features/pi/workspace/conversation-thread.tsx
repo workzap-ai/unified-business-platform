@@ -1,6 +1,13 @@
 "use client";
 
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Link from "next/link";
 import { isToday, isYesterday } from "date-fns";
 import {
@@ -29,7 +36,7 @@ import { EmptyState, ErrorState } from "@/components/app/states";
 import { StatusBadge, statusLabel } from "@/components/app/status-badge";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
-import { piService } from "../service";
+import { HISTORY_PAGE_SIZE, piService, type MessageHistory } from "../service";
 import type { Conversation, Message } from "../types";
 import { piKeys } from "./lib";
 import { Composer } from "./composer";
@@ -69,13 +76,31 @@ export function ConversationThread({
   const canHandoff = canAny("pi.handoffs.manage", "pi.inbox.reply");
   const context = useConversationContext(conversationId);
   const conversation = context.data?.conversation ?? listItem;
-  const messages = useScopedQuery<Message[]>(
+  // Only the latest page is polled; older pages are fetched on demand and kept locally
+  // (the component is keyed by conversation, so they reset when switching threads).
+  const latest = useScopedQuery<MessageHistory>(
     piKeys.messages(conversationId),
-    () => piService.messages(conversationId),
+    () => piService.history(conversationId, { limit: HISTORY_PAGE_SIZE }),
     {
       refetchInterval: 15_000,
     },
   );
+  const [older, setOlder] = useState<{
+    items: Message[];
+    before: string | null;
+    before_id: string | null;
+    hasMore: boolean;
+  } | null>(null);
+  const messageList = useMemo(() => {
+    const recent = latest.data?.items;
+    if (!recent) return undefined;
+    if (!older) return recent;
+    // Older pages were seeded with the latest page seen at the time, so nothing is lost
+    // when polling moves the latest window forward. Fresh copies win (status updates).
+    const fresh = new Set(recent.map((m) => m.id));
+    return [...older.items.filter((m) => !fresh.has(m.id)), ...recent];
+  }, [latest.data, older]);
+  const hasOlder = older ? older.hasMore : Boolean(latest.data?.has_more);
   const names = usePiNames();
   const actions = useConversationActions(conversationId);
   const [confirm, setConfirm] = useState<
@@ -89,7 +114,7 @@ export function ConversationThread({
     error: "Couldn't mark the conversation as read.",
   });
   const marked = useRef<string | null>(null);
-  const loaded = messages.isSuccess;
+  const loaded = latest.isSuccess;
   const { mutate: markReadMutate } = markRead;
   useEffect(() => {
     if (!loaded || marked.current === conversationId) return;
@@ -101,14 +126,45 @@ export function ConversationThread({
   const scroller = useRef<HTMLDivElement>(null);
   const stick = useRef(true);
   const lastId = useRef<string | null>(null);
-  const count = messages.data?.length ?? 0;
+  // Set just before older messages are prepended, so the reader's position is kept.
+  const anchor = useRef<{ height: number; top: number } | null>(null);
+  const count = messageList?.length ?? 0;
   useLayoutEffect(() => {
     const el = scroller.current;
     if (!el || !count) return;
-    if (lastId.current !== conversationId || stick.current)
+    if (anchor.current) {
+      el.scrollTop =
+        anchor.current.top + (el.scrollHeight - anchor.current.height);
+      anchor.current = null;
+    } else if (lastId.current !== conversationId || stick.current)
       el.scrollTop = el.scrollHeight;
     lastId.current = conversationId;
   }, [count, conversationId]);
+
+  const loadOlder = useScopedMutation(
+    () => {
+      const cursor = older ?? latest.data;
+      return piService.history(conversationId, {
+        limit: HISTORY_PAGE_SIZE,
+        before: cursor?.before,
+        before_id: cursor?.before_id,
+      });
+    },
+    {
+      error: "Couldn't load older messages. Please try again.",
+      onSuccess: (page) => {
+        const el = scroller.current;
+        if (el && page.items.length)
+          anchor.current = { height: el.scrollHeight, top: el.scrollTop };
+        setOlder((prev) => ({
+          items: [...page.items, ...(prev?.items ?? latest.data?.items ?? [])],
+          before: page.before,
+          before_id: page.before_id,
+          hasMore: page.has_more,
+        }));
+      },
+    },
+  );
 
   const run = (mutation: {
     mutate: (v: undefined, o?: { onSuccess?: () => void }) => void;
@@ -283,12 +339,12 @@ export function ConversationThread({
         aria-live="polite"
         aria-relevant="additions"
       >
-        {messages.isError ? (
+        {latest.isError ? (
           <ErrorState
-            error={messages.error}
-            onRetry={() => void messages.refetch()}
+            error={latest.error}
+            onRetry={() => void latest.refetch()}
           />
-        ) : messages.isPending ? (
+        ) : latest.isPending || !messageList ? (
           <ul className="space-y-4" aria-hidden="true">
             {Array.from({ length: 6 }, (_, i) => (
               <li key={i} className={i % 2 ? "flex justify-end" : "flex"}>
@@ -299,7 +355,7 @@ export function ConversationThread({
               </li>
             ))}
           </ul>
-        ) : messages.data.length === 0 ? (
+        ) : messageList.length === 0 ? (
           <EmptyState
             compact
             icon={MessageSquareOff}
@@ -307,33 +363,47 @@ export function ConversationThread({
             description="Messages in this conversation will appear here."
           />
         ) : (
-          <ol className="mx-auto max-w-3xl space-y-3" aria-label="Messages">
-            {messages.data.map((m, i) => {
-              const prev = messages.data[i - 1];
-              const newDay =
-                !prev ||
-                new Date(prev.created_at).toDateString() !==
-                  new Date(m.created_at).toDateString();
-              return (
-                <Fragment key={m.id}>
-                  {newDay && (
-                    <li
-                      className="flex items-center gap-3 py-1"
-                      role="separator"
-                      aria-label={dayLabel(m.created_at)}
-                    >
-                      <span className="h-px flex-1 bg-border" />
-                      <span className="text-2xs font-medium text-muted-foreground">
-                        {dayLabel(m.created_at)}
-                      </span>
-                      <span className="h-px flex-1 bg-border" />
-                    </li>
-                  )}
-                  <MessageItem message={m} names={names} />
-                </Fragment>
-              );
-            })}
-          </ol>
+          <>
+            {hasOlder && (
+              <div className="mb-3 flex justify-center">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => loadOlder.mutate(undefined)}
+                  loading={loadOlder.isPending}
+                >
+                  Load older messages
+                </Button>
+              </div>
+            )}
+            <ol className="mx-auto max-w-3xl space-y-3" aria-label="Messages">
+              {messageList.map((m, i) => {
+                const prev = messageList[i - 1];
+                const newDay =
+                  !prev ||
+                  new Date(prev.created_at).toDateString() !==
+                    new Date(m.created_at).toDateString();
+                return (
+                  <Fragment key={m.id}>
+                    {newDay && (
+                      <li
+                        className="flex items-center gap-3 py-1"
+                        role="separator"
+                        aria-label={dayLabel(m.created_at)}
+                      >
+                        <span className="h-px flex-1 bg-border" />
+                        <span className="text-2xs font-medium text-muted-foreground">
+                          {dayLabel(m.created_at)}
+                        </span>
+                        <span className="h-px flex-1 bg-border" />
+                      </li>
+                    )}
+                    <MessageItem message={m} names={names} />
+                  </Fragment>
+                );
+              })}
+            </ol>
+          </>
         )}
       </div>
 

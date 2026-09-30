@@ -121,6 +121,21 @@ class SqlUsageStore:
             return
         async with self.sessions() as session:
             session.add_all([r.to_row() for r in records])
+            from app.modules.pi_saas.entitlement import meter_ai
+
+            await meter_ai(
+                session,
+                [
+                    (
+                        r.tenant_id,
+                        r.environment_id,
+                        r.input_tokens,
+                        r.output_tokens,
+                        r.estimated_cost,
+                    )
+                    for r in records
+                ],
+            )
             await session.commit()
 
     async def totals_since(self, tenant_id: UUID, since: datetime) -> UsageTotals:

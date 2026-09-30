@@ -11,6 +11,24 @@ from app.modules.pi.models import PiConversation, PiMessage, WhatsAppConnection
 from app.modules.pi.service import PiService
 
 
+def quiet_until(
+    timezone: str, start: int = 21, end: int = 9, now: datetime | None = None
+) -> datetime | None:
+    """During quiet hours [start, end) in the business's time zone, when they end (the
+    next local ``end`` o'clock); otherwise None. start == end means no quiet hours."""
+    from app.modules.pi.policy import zone
+
+    local = (now or datetime.now(UTC)).astimezone(zone(timezone))
+    hour = local.hour
+    quiet = start != end and (start <= hour or hour < end if start > end else start <= hour < end)
+    if not quiet:
+        return None
+    wake = local.replace(hour=end, minute=0, second=0, microsecond=0)
+    if wake <= local:
+        wake += timedelta(days=1)
+    return wake.astimezone(UTC)
+
+
 async def sweep_followups(ctx: dict[str, Any]) -> None:
     from app.modules.pi.runtime import enqueue_sends, system_scope
 
@@ -62,6 +80,22 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
                 # Revisit configuration without starving other tenants' due reminders.
                 conversation.followup_due_at = datetime.now(UTC) + timedelta(hours=1)
                 continue
+            later = quiet_until(
+                policy.timezone,
+                int(policy.whatsapp_config.get("quiet_start", 21)),
+                int(policy.whatsapp_config.get("quiet_end", 9)),
+            )
+            if later is not None:
+                conversation.followup_due_at = later  # Never at night; sent next morning.
+                continue
+            from app.modules.pi_saas.entitlement import remaining as allowance_left
+
+            left = await allowance_left(
+                session, scope.tenant_id, scope.environment_id, "messages_out"
+            )
+            if left is not None and left <= 0:
+                conversation.followup_due_at = datetime.now(UTC) + timedelta(hours=6)
+                continue  # Monthly allowance used up: try later, never over the limit.
             service = PiService(session, scope)
             key = f"pi-followup:{conversation.id}:{source}"
             existing = await service.messages.find(PiMessage.idempotency_key == key)

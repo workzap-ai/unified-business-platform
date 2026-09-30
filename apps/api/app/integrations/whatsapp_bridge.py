@@ -79,6 +79,9 @@ async def activate(
     return {"status": "active", "connection_id": str(row.id)}
 
 
+PI_MEDIA_TYPES = frozenset({"audio", "image", "video"})
+
+
 async def receive(session: AsyncSession, event: InboundEvent) -> UUID | None:
     data = event.payload or {}
     connection = await session.scalar(
@@ -95,6 +98,8 @@ async def receive(session: AsyncSession, event: InboundEvent) -> UUID | None:
         connection.verified_at = datetime.now(UTC)
     status = event.event_type == "message.status"
     mid = str(data.get("message_id", ""))
+    kind = str(data.get("type", "other"))
+    kind = kind if kind in {"text", "interactive", *PI_MEDIA_TYPES} else "other"
     raw_key = f"{connection.phone_number_id}:{mid}" + (f":{data.get('status')}" if status else "")
     payload = {
         "key": raw_key,
@@ -102,10 +107,13 @@ async def receive(session: AsyncSession, event: InboundEvent) -> UUID | None:
         "number": connection.phone_number_id,
         "message_id": mid,
         "sender": data.get("from", ""),
-        "profile": None,
-        "message_type": data.get("type", "other"),
+        "profile": (str(data.get("profile_name") or "")[:160] or None),
+        # PI stores text/audio/image/video; documents and stickers go to a person as
+        # "other" rather than violating the message-type constraint.
+        "message_type": kind,
         "body": data.get("text", ""),
-        "media_id": data.get("media_id"),
+        "media_id": data.get("media_id") if kind in PI_MEDIA_TYPES else None,
+        "form": data.get("form") if kind == "interactive" else None,
         "state": data.get("status"),
     }
     return await session.scalar(
@@ -130,6 +138,9 @@ async def receive(session: AsyncSession, event: InboundEvent) -> UUID | None:
 
 async def token(session: AsyncSession, settings: Settings, connection: WhatsAppConnection) -> str:
     from app.modules.pi.whatsapp import decrypt_token
+
+    if connection.provider == "kapso":
+        return ""  # Kapso authenticates with the server-held project key, not a token.
 
     if connection.integration_connection_id:
         linked = await session.get(IntegrationConnection, connection.integration_connection_id)

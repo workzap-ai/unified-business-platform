@@ -111,3 +111,10 @@ class HandoffView(BaseModel):
     assigned_at: datetime | None
     resolved_at: datetime | None
     resolution_note: str
+
+
+class MessageHistory(BaseModel):
+    items: list[MessageView]
+    has_more: bool
+    before: datetime | None = None
+    before_id: UUID | None = None

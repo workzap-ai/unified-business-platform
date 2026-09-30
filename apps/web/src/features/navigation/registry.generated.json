@@ -1810,5 +1810,33 @@
     "sort_order": 10,
     "type": "module",
     "visible": true
+  },
+  {
+    "analytics_id": "nav.workspace-agent",
+    "any_permissions": [],
+    "badge": null,
+    "description": "Your permission-aware Owner OS workspace assistant",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "bot",
+    "key": "workspace-agent",
+    "keywords": [
+      "assistant",
+      "tasks",
+      "employees",
+      "import",
+      "agenta"
+    ],
+    "label": "Pi Agent Beta",
+    "parent": null,
+    "required_feature": null,
+    "required_permissions": [],
+    "required_product": null,
+    "required_roles": [],
+    "route": "/workspace-agent",
+    "section": "main",
+    "sort_order": 15,
+    "type": "module",
+    "visible": true
   }
 ]

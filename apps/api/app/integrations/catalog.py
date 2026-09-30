@@ -7,9 +7,11 @@ subscriptions.
 
 from app.integrations.providers import (
     generic_webhook,
+    google_calendar,
     resend,
     s3,
     sendgrid,
+    shopify,
     slack,
     smtp,
     stripe,
@@ -33,6 +35,8 @@ REGISTRY.register(resend.DEFINITION, resend.ResendProvider())
 REGISTRY.register(sendgrid.DEFINITION, sendgrid.SendGridProvider())
 REGISTRY.register(s3.DEFINITION, s3.S3Provider())
 REGISTRY.register(stripe.DEFINITION, stripe.StripeProvider())
+REGISTRY.register(google_calendar.DEFINITION, google_calendar.GoogleCalendarProvider())
+REGISTRY.register(shopify.DEFINITION, shopify.ShopifyProvider())
 
 
 def _planned(
@@ -64,22 +68,6 @@ def _planned(
     )
 
 
-_planned(
-    "google_calendar",
-    "Google Calendar",
-    "Sync bookings and appointments with Google Calendar.",
-    "calendar",
-    "Google",
-    "oauth2_pkce",
-    "https://developers.google.com/calendar/api",
-    ("calendar_events",),
-    ("https://www.googleapis.com/auth/calendar.events",),
-    OAuthSpec(
-        "https://accounts.google.com/o/oauth2/v2/auth",
-        "https://oauth2.googleapis.com/token",
-        "https://oauth2.googleapis.com/revoke",
-    ),
-)
 _planned(
     "microsoft_calendar",
     "Microsoft Outlook Calendar",
@@ -130,16 +118,6 @@ _planned(
     "oauth2_pkce",
     "https://developer.xero.com/documentation/api/accounting/overview",
     ("invoices", "payments", "customers"),
-)
-_planned(
-    "shopify",
-    "Shopify",
-    "Import orders and products from a Shopify store.",
-    "commerce",
-    "Shopify",
-    "oauth2",
-    "https://shopify.dev/docs/api/admin-rest",
-    ("orders", "products"),
 )
 _planned(
     "woocommerce",

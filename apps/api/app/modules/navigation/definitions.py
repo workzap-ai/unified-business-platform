@@ -12,6 +12,17 @@ def build_registry() -> NavigationRegistry:
     registry = NavigationRegistry()
     main = [
         NavDefinition(
+            "workspace-agent",
+            "Pi Agent Beta",
+            "/workspace-agent",
+            "bot",
+            "main",
+            15,
+            analytics_id="nav.workspace-agent",
+            keywords=("assistant", "tasks", "employees", "import", "agenta"),
+            description="Your permission-aware Owner OS workspace assistant",
+        ),
+        NavDefinition(
             "overview",
             "Overview",
             "/",

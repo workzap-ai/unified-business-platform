@@ -1337,6 +1337,41 @@ function build(profile: DemoProfile): PiDemo {
       ],
       { last_intent: "greeting", summary: "Asked about Sunday opening." },
     );
+    // A long-running regular customer: more history than one page, so the thread shows
+    // "Load older messages" (cursor pagination) in the demo.
+    const weekly: Turn[] = [
+      {
+        from: "customer",
+        text: "Starting a weekly standing order: 2 bags of House Espresso, please.",
+        ago: 64,
+      },
+      {
+        from: "ai",
+        agent: "sales_order",
+        text: "Noted — I'll share a draft each week for you to confirm before anything is ordered.",
+        ago: 63.99,
+      },
+    ];
+    for (let week = 1; week < 32; week++) {
+      const ago = 64 - week * 2;
+      weekly.push(
+        {
+          from: "customer",
+          text: `Week ${week + 1}: same order as last week, please.`,
+          ago,
+        },
+        {
+          from: "ai",
+          agent: "sales_order",
+          text: `Week ${week + 1} draft is ready: 2 × House Espresso. Reply YES to confirm.`,
+          ago: ago - 0.01,
+        },
+      );
+    }
+    addConversation(28, weekly, {
+      last_intent: "reorder",
+      summary: "Weekly standing order for House Espresso.",
+    });
     // Generated volume
     const quick: [string, string, string][] = [
       [

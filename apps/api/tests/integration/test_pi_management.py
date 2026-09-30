@@ -254,7 +254,10 @@ async def test_agent_versions_are_immutable_and_rollback_republishes(
     )
     assert invalid.status_code == 422
     tools = (await api.get("/api/v1/pi/tools")).json()
-    assert len(tools) == 18
+    assert len(tools) == 31
+    # Tools added after launch are opt-in: listed, but off until the business enables them.
+    off = {t["key"] for t in tools if not t["enabled"]}
+    assert {"create_booking", "create_ticket", "request_payment", "get_store_orders"} <= off
     assert [t["key"] for t in tools if t["requires_confirmation"]] == ["create_order"]
     catalog = (await api.get("/api/v1/pi/tools/catalog")).json()
     assert all("input_schema" in t and "output_schema" in t for t in catalog)

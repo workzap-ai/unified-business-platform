@@ -216,7 +216,6 @@ async def test_all_providers_failing_raises_handoff_signal(settings, scope):
 @pytest.mark.parametrize(
     "status,body,kind",
     [
-        (401, {"error": {"code": "invalid_api_key"}}, "auth"),
         (400, {"error": {"code": "invalid_value"}}, "invalid_request"),
         (400, {"error": {"code": "content_policy_violation"}}, "content_policy"),
     ],
@@ -518,7 +517,7 @@ async def test_api_keys_never_appear_in_errors_or_logs(settings, scope):
         )
         with pytest.raises(AllProvidersFailed) as failed:
             await ask(manager_for(settings, router), scope)
-        router = Router(openai=httpx.Response(401, json={"error": {"message": echo}}))
+        router = Router(openai=httpx.Response(400, json={"error": {"message": echo}}))
         with pytest.raises(PermanentProviderFailure) as permanent:
             await ask(manager_for(settings, router), scope)
     finally:

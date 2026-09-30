@@ -20,7 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatNumber, humanize, relativeTime } from "@/lib/format";
+import { humanize, relativeTime } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Badge, Card, Skeleton } from "@/components/ui/display";
 import {
@@ -1494,18 +1494,6 @@ function ReminderTemplatesEditor({
 
 /* Permissions ------------------------------------------------------------------------ */
 
-const permSchema = z.object({
-  permissions: z.array(
-    z.object({
-      role: z.string(),
-      view_inbox: z.boolean(),
-      reply: z.boolean(),
-      takeover: z.boolean(),
-      configure: z.boolean(),
-    }),
-  ),
-});
-type PermValues = z.infer<typeof permSchema>;
 const PERM_COLUMNS = [
   ["view_inbox", "View inbox"],
   ["reply", "Reply"],
@@ -1514,48 +1502,39 @@ const PERM_COLUMNS = [
 ] as const;
 
 export function PermissionsForm({ settings }: { settings: PiSettings }) {
-  const form = useForm<PermValues>({
-    resolver: zodResolver(permSchema),
-    defaultValues: { permissions: settings.permissions },
-  });
-  const save = useSaveSection("permissions");
-  const { onSubmit, savedAt } = useSubmit(
-    form,
-    save.mutateAsync,
-    (v) => v.permissions,
-  );
-  const rows = useWatch({ control: form.control, name: "permissions" });
+  const rows = settings.permissions;
   return (
-    <SettingsForm
-      form={form}
-      onSubmit={onSubmit}
-      saving={save.isPending}
-      savedAt={savedAt}
-    >
+    <Card className="min-w-0 p-5 sm:p-6">
       <Notice tone="neutral" className="mb-5">
-        Roles are managed in{" "}
+        PI access is managed in{" "}
         <Link
           href="/settings/roles"
           className="font-medium text-primary hover:underline"
         >
           Roles &amp; Permissions
         </Link>
-        . These switches refine what each role can do in PI; the server enforces
-        them on every request.
+        . Your current access is shown below.
       </Notice>
       {rows.length === 0 ? (
-        <p className="text-[13px] text-muted-foreground">No roles found.</p>
+        <p className="text-[13px] text-muted-foreground">
+          No permissions available.
+        </p>
       ) : (
-        <div className="scrollbar-thin overflow-x-auto">
+        <div
+          className="scrollbar-thin relative overflow-x-auto"
+          role="region"
+          aria-label="PI permissions"
+          tabIndex={0}
+        >
           <table className="w-full min-w-[480px] text-[13px]">
-            <caption className="sr-only">PI permissions by role</caption>
+            <caption className="sr-only">Current PI access</caption>
             <thead>
               <tr className="border-b border-border">
                 <th
                   scope="col"
                   className="px-2 py-2 text-left text-xs font-medium text-muted-foreground"
                 >
-                  Role
+                  Member or role
                 </th>
                 {PERM_COLUMNS.map(([, label]) => (
                   <th
@@ -1569,27 +1548,17 @@ export function PermissionsForm({ settings }: { settings: PiSettings }) {
               </tr>
             </thead>
             <tbody>
-              {rows.map((row, i) => (
+              {rows.map((row) => (
                 <tr
                   key={row.role}
                   className="border-b border-border last:border-0"
                 >
                   <th scope="row" className="px-2 py-2.5 text-left font-medium">
-                    {humanize(row.role)}
+                    {row.role}
                   </th>
-                  {PERM_COLUMNS.map(([key, label]) => (
+                  {PERM_COLUMNS.map(([key]) => (
                     <td key={key} className="px-2 py-2.5 text-center">
-                      <Controller
-                        control={form.control}
-                        name={`permissions.${i}.${key}`}
-                        render={({ field }) => (
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            aria-label={`${humanize(row.role)}: ${label}`}
-                          />
-                        )}
-                      />
+                      {row[key] ? "Allowed" : "Not allowed"}
                     </td>
                   ))}
                 </tr>
@@ -1598,9 +1567,6 @@ export function PermissionsForm({ settings }: { settings: PiSettings }) {
           </table>
         </div>
       )}
-      <p className="mt-3 text-xs text-muted-foreground">
-        {formatNumber(rows.length)} roles
-      </p>
-    </SettingsForm>
+    </Card>
   );
 }

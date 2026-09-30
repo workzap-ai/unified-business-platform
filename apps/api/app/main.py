@@ -1,3 +1,5 @@
+import asyncio
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -38,18 +40,61 @@ from app.modules.notifications.routes import router as notifications_router
 from app.modules.orders.routes import router as orders_router
 from app.modules.pi.analytics import router as pi_analytics_router
 from app.modules.pi.config_routes import router as pi_config_router
+from app.modules.pi.inbox_routes import router as pi_inbox_router
+from app.modules.pi.kapso_routes import router as pi_kapso_router
 from app.modules.pi.read_routes import router as pi_read_router
 from app.modules.pi.routes import router as pi_router
 from app.modules.pi.routes import webhook_router
+from app.modules.pi_saas.app_routes import router as pi_app_router
+from app.modules.pi_saas.campaign_routes import router as pi_campaign_router
+from app.modules.pi_saas.connector_routes import router as pi_connector_router
+from app.modules.pi_saas.connector_routes import web_router as pi_connector_web_router
+from app.modules.pi_saas.customer_payment_routes import router as pi_customer_payment_router
+from app.modules.pi_saas.digest_routes import operator_router as pi_operator_digest_router
+from app.modules.pi_saas.digest_routes import router as pi_digest_router
+from app.modules.pi_saas.operator_number_routes import router as pi_operator_number_router
+from app.modules.pi_saas.operator_routes import router as pi_operator_router
+from app.modules.pi_saas.operator_system_routes import router as pi_operator_system_router
+from app.modules.pi_saas.operator_workspace_routes import router as operator_workspace_router
+from app.modules.pi_saas.payment_routes import client_router as pi_payment_router
+from app.modules.pi_saas.payment_routes import operator_router as pi_payment_operator_router
+from app.modules.pi_saas.platform_config_routes import router as pi_platform_config_router
+from app.modules.pi_saas.review_routes import operator_router as pi_operator_review_router
+from app.modules.pi_saas.review_routes import router as pi_review_router
+from app.modules.pi_saas.setup_routes import operator_router as pi_operator_setup_router
+from app.modules.pi_saas.setup_routes import router as pi_setup_router
+from app.modules.pi_saas.setup_routes import web_router as setup_web_router
+from app.modules.pi_saas.webhook_routes import router as pi_saas_webhook_router
+from app.modules.pi_saas.whatsapp_tools import router as pi_whatsapp_tools_router
+from app.modules.pi_saas.work_routes import router as pi_work_router
 from app.modules.products.routes import router as products_router
 from app.modules.quotes.routes import router as quotes_router
 from app.modules.reports.routes import router as reports_router
 from app.modules.sales.routes import router as sales_router
 from app.modules.tenants.organization_routes import router as organization_router
 from app.modules.tenants.routes import router as tenant_router
+from app.modules.workspace_agent.routes import router as workspace_agent_router
 from app.workflows.routes import router as workflows_router
 
 ROUTERS = [
+    workspace_agent_router,
+    pi_payment_operator_router,
+    pi_inbox_router,
+    pi_work_router,
+    pi_customer_payment_router,
+    pi_operator_router,
+    pi_operator_digest_router,
+    pi_operator_number_router,
+    pi_operator_system_router,
+    pi_platform_config_router,
+    pi_operator_review_router,
+    pi_kapso_router,
+    pi_connector_web_router,
+    setup_web_router,
+    pi_whatsapp_tools_router,
+    pi_operator_setup_router,
+    operator_workspace_router,
+    pi_saas_webhook_router,
     pi_read_router,
     pi_analytics_router,
     pi_config_router,
@@ -86,6 +131,52 @@ ROUTERS = [
     # PI API routers are added with the PI backend phase (schema exists in 0002).
 ]
 
+# The standalone Pi app: its own routes plus the shared PI routers under /api/v1/pi-app.
+# Only Pi app sessions are accepted there (see app/core/audience.py); Owner OS routes
+# such as members, reports or finance are deliberately not mounted for that audience.
+PI_APP_ROUTERS = [
+    pi_payment_router,
+    pi_app_router,
+    pi_read_router,
+    pi_analytics_router,
+    pi_config_router,
+    pi_router,
+    pi_inbox_router,
+    pi_work_router,
+    pi_customer_payment_router,
+    # Business-owned Google Calendar / Shopify connections (Pi app only).
+    pi_connector_router,
+    pi_campaign_router,
+    pi_digest_router,
+    pi_setup_router,
+    pi_review_router,
+    pi_whatsapp_tools_router,
+    notifications_router,
+    # Core invoicing for the business's own customers (billing.read / billing.write).
+    billing_router,
+]
+
+
+async def _platform_config_loop(app: FastAPI) -> None:
+    """Apply operator-saved platform keys at start-up, then pick up changes made by other
+    processes (see pi_saas.platform_config)."""
+    from app.modules.pi_saas import platform_config
+
+    first = True
+    while True:
+        try:
+            async with app.state.sessions() as session:
+                if first:
+                    await platform_config.apply(session, app.state.settings)
+                    first = False
+                else:
+                    await platform_config.refresh(session, app.state.settings)
+        except asyncio.CancelledError:
+            raise
+        except Exception:  # noqa: BLE001 - .env values keep working
+            logging.getLogger("platform").warning("platform_config_load_failed")
+        await asyncio.sleep(15)
+
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     config = settings or get_settings()
@@ -112,6 +203,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             app.state.redis = redis
             app.state.http = client
             app.state.queue = create_queue(config, app.state.sessions, client)
+            config_task = None
+            if config.app_env != "test":
+                config_task = asyncio.create_task(_platform_config_loop(app))
             if (
                 isinstance(app.state.queue, InlineQueue)
                 and config.app_env != "test"
@@ -121,6 +215,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             try:
                 yield
             finally:
+                if config_task is not None:
+                    config_task.cancel()
                 try:
                     await app.state.queue.close()
                     await redis.aclose()
@@ -139,14 +235,28 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     install_integration_handlers(app)
     for item in ROUTERS:
         app.include_router(item, prefix="/api/v1")
-    app.add_middleware(OriginCheckMiddleware, allowed_origins=config.cors_origins)
+    for item in PI_APP_ROUTERS:
+        if item is pi_app_router:
+            prefix = "/api/v1"
+        elif item is billing_router:
+            # Business invoicing lives beside (not inside) the Pi subscription billing
+            # routes, so no path is shadowed: /api/v1/pi-app/sales/billing/...
+            prefix = "/api/v1/pi-app/sales"
+        else:
+            prefix = "/api/v1/pi-app"
+        app.include_router(item, prefix=prefix)
+    app.add_middleware(
+        OriginCheckMiddleware,
+        allowed_origins=config.cors_origins,
+        pi_origins=config.pi_app_origins,
+    )
     # Must wrap OriginCheckMiddleware: drops Origin only on public integration webhooks.
     app.add_middleware(PublicWebhookOriginExemption)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.allowed_hosts)
     app.add_middleware(RequestContextMiddleware)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=config.cors_origins,
+        allow_origins=[*config.cors_origins, *config.pi_app_origins],
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
         allow_headers=["Content-Type", "X-Correlation-ID", "X-CSRF-Token"],

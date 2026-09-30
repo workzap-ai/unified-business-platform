@@ -96,7 +96,7 @@ Agents ask for an alias and never a model ID. `ModelRegistry.resolve(provider, a
 | alias | openai | gemini | groq |
 | --- | --- | --- | --- |
 | router | gpt-4o-mini | gemini-2.5-flash-lite | llama-3.1-8b-instant |
-| agent | gpt-4o-mini | gemini-2.5-flash | llama-3.3-70b-versatile |
+| agent | gpt-4o-mini | gemini-2.5-flash | openai/gpt-oss-120b |
 | summarize | gpt-4o-mini | gemini-2.5-flash-lite | llama-3.1-8b-instant |
 | vision | gpt-4o-mini | gemini-2.5-flash | meta-llama/llama-4-scout-17b-16e-instruct |
 | embed | text-embedding-3-small | gemini-embedding-001 | (none) |

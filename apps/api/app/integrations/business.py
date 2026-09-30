@@ -26,6 +26,7 @@ from app.modules.billing.service import BillingService
 from app.modules.customers.models import Customer
 from app.modules.integrations.models import IntegrationConnection
 from app.modules.orders.models import Order
+from app.modules.tenants.models import Tenant
 from app.shared.errors import BusinessRuleViolation, ResourceNotFound
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
@@ -139,7 +140,10 @@ async def checkout(
     http: OutboundClient,
     scope: WorkspaceScope,
     invoice_id: UUID,
+    request_key: str = "",
 ) -> dict[str, Any]:
+    """``request_key`` distinguishes separate payment requests for the same balance (for
+    example a new Pi payment request after the previous link expired)."""
     scope.require("billing.write")
     invoice = await WorkspaceRepository(session, Invoice, scope).get(invoice_id, for_update=True)
     if invoice.status not in {"issued", "partially_paid"}:
@@ -159,6 +163,8 @@ async def checkout(
     if settings.app_env == "production" and not base.startswith("https://"):
         raise BusinessRuleViolation("PUBLIC_URL_REQUIRED", "Configure an HTTPS application URL")
     key = f"checkout:{invoice.id}:{connection.id}:{invoice.amount_paid}:{balance}"
+    if request_key:
+        key = f"{key}:{hashlib.sha256(request_key.encode()).hexdigest()[:16]}"
     op = await operation(
         session,
         scope,
@@ -298,6 +304,7 @@ async def email_invoice(
             "CUSTOMER_EMAIL_REQUIRED", "Add a valid email address to the customer first"
         ) from None
     connection = await connection_for(session, scope, EMAIL_KEYS)
+    tenant = await session.get(Tenant, scope.tenant_id)
     return await operation(
         session,
         scope,
@@ -307,6 +314,10 @@ async def email_invoice(
         "invoice",
         invoice.id,
         {
+            # Customer-facing wording, not the internal "[info] ..." system alert.
+            "template": "customer_notice",
+            "name": customer.name,
+            "business": tenant.name if tenant else "",
             "recipient": address,
             "title": f"Invoice {invoice.number}",
             "message": (

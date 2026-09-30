@@ -8,6 +8,7 @@ restarts without extra infrastructure. Validation treats every reply as untruste
 import re
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal, InvalidOperation
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -114,7 +115,37 @@ LEAK_PATTERNS = (
     re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b", re.I),
 )
 AMOUNT = re.compile(r"\d[\d,]*\.\d{2}\b")
+# Whole or decimal numbers written next to a currency marker ("Rs 500", "500 AED").
+_CUR = r"(?:rs\.?|pkr|usd|aed|sar|qar|eur|gbp|inr|dollars?|rupees?|dirhams?|riyals?|[$€£₹﷼])"
+CURRENCY_AMOUNT = re.compile(
+    rf"{_CUR}\s?(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s?{_CUR}(?![a-z])", re.IGNORECASE
+)
 STOCK = re.compile(r"\b(\d+)\s+(?:available|in stock|units?)\b", re.IGNORECASE)
+# A standalone number in evidence (not part of an ID, a word or a longer figure).
+EVIDENCE_NUMBER = re.compile(r"(?<![\w.,])\d[\d,]*(?:\.\d+)?(?!\w)")
+
+
+# Accepted digit grouping: 1,500,000 (Western) or 15,00,000 (South Asian). Anything else,
+# such as "1,50", is ambiguous (it may mean 1.50) and is never treated as evidence.
+GROUPED = re.compile(r"\d{1,3}(?:,\d{3})+|\d{1,2}(?:,\d{2})*,\d{3}")
+
+
+def _decimal(figure: str) -> Decimal | None:
+    figure = figure.strip(",.")
+    whole = figure.split(".")[0]
+    if "," in whole and not GROUPED.fullmatch(whole):
+        return None
+    try:
+        return Decimal(figure.replace(",", ""))
+    except InvalidOperation:
+        return None
+
+
+def evidence_amounts(evidence: str) -> set[Decimal]:
+    """Canonical values of every number in the evidence, so "1,500" equals "1500.00"
+    and "50" never matches inside "150.00"."""
+    values = {_decimal(m.group()) for m in EVIDENCE_NUMBER.finditer(evidence)}
+    return {v for v in values if v is not None}
 
 
 class ReplyRejected(Exception):
@@ -133,8 +164,11 @@ def validate_reply(text: str, facts: list[str], max_chars: int) -> str:
         if pattern.search(reply):
             raise ReplyRejected("LEAK_BLOCKED")
     evidence = "\n".join(facts)
-    for amount in AMOUNT.findall(reply):
-        if amount not in evidence and amount.replace(",", "") not in evidence:
+    known = evidence_amounts(evidence)
+    figures = AMOUNT.findall(reply) + [a or b for a, b in CURRENCY_AMOUNT.findall(reply)]
+    for figure in figures:
+        # Compare canonical values, never substrings of serialized evidence.
+        if _decimal(figure) not in known:
             raise ReplyRejected("UNSUPPORTED_FACT")
     for figure in STOCK.findall(reply):
         if not re.search(rf"\b{figure}\b", evidence):

@@ -16,6 +16,13 @@ async def test_all_static_workspace_read_endpoints(api):
         await api.put("/api/v1/products/pi/environment", json={"enabled": True})
     ).status_code == 200
     schema = (await api.get("/openapi.json")).json()
+    workspace = (await api.get("/api/v1/auth/session")).json()
+    api.headers.update(
+        {
+            "x-workspace-tenant": workspace["tenant"]["id"],
+            "x-workspace-environment": workspace["environment"]["id"],
+        }
+    )
     checked = []
     for path, methods in schema["paths"].items():
         if (
@@ -30,6 +37,16 @@ async def test_all_static_workspace_read_endpoints(api):
         if path.startswith("/api/v1/external/"):
             # External integrations use API keys, never the workspace session cookie.
             assert response.status_code == 401, path
+            continue
+        if path.startswith("/api/v1/pi-app/"):
+            # The standalone Pi app has its own session audience: an Owner OS session is
+            # never accepted there. Only the public plan list needs no session.
+            expected = 200 if path == "/api/v1/pi-app/plans" else 401
+            assert response.status_code == expected, f"{path}: {response.status_code}"
+            continue
+        if path.startswith("/api/v1/operator/"):
+            # Operator routes require an operator membership, not just a workspace role.
+            assert response.status_code == 403, path
             continue
         if path.startswith("/api/v1/external/"):
             # Bearer-only APIs must reject a browser session; scoped-key use is

@@ -106,14 +106,18 @@ async def start(
     connection: IntegrationConnection,
     definition: IntegrationDefinition,
     requested_scopes: list[str] | None = None,
+    *,
+    callback_uri: str | None = None,
 ) -> str:
+    """`callback_uri` is set only by server code for a separately registered app callback
+    (the standalone Pi app); it never comes from request input."""
     spec = _spec(definition)
     if scope.user_id is None:
         raise BusinessRuleViolation("OAUTH_USER_REQUIRED", "Sign in to connect this integration")
     manager = CredentialManager(settings)
     credentials = manager.decrypt_json(connection.credentials_encrypted)
     client_id, _secret = _client(settings, spec, connection, credentials)
-    uri = redirect_uri(settings)
+    uri = callback_uri or redirect_uri(settings)
     scopes = validate_scopes(definition, requested_scopes)
     state = secrets.token_urlsafe(32)
     verifier = secrets.token_urlsafe(64)[:96]

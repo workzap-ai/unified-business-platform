@@ -85,6 +85,15 @@ async def workspace_scope(request: Request, auth: Auth, session: Session) -> Wor
         raise BusinessRuleViolation(
             "WORKSPACE_NOT_SELECTED", "Choose an environment to continue", status=409
         )
+    if selected.audience == "pi":
+        # A Pi app session may only act inside a Pi business (never another workspace).
+        from app.modules.pi_saas.models import PiBusinessAccount
+
+        status = await session.scalar(
+            select(PiBusinessAccount.status).where(PiBusinessAccount.tenant_id == tenant_id)
+        )
+        if status is None or status == "closed":
+            raise PermissionDenied
     permissions = apply_business_type(business_type, frozenset(granted or ()))
     return WorkspaceScope(
         tenant_id=tenant_id,
