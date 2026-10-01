@@ -188,7 +188,7 @@ class Settings(BaseSettings):
     # connections each business authorizes; it is never a customer's Meta token.
     kapso_api_key: SecretStr | None = None
     kapso_webhook_secret: SecretStr | None = None
-    kapso_base_url: str = "https://api.kapso.ai"
+    kapso_base_url: str = "https://api.kapso.ai/platform/v1"
     kapso_meta_api_version: str = "v24.0"
     kapso_setup_countries: list[str] = []  # ISO codes offered for new-number requests
     # Who pays Meta's message fees on numbers set up through Kapso: "partner_managed" is
