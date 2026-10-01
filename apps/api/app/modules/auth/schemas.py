@@ -56,6 +56,29 @@ class ChangePasswordRequest(BaseModel):
         return value
 
 
+class ForgotPasswordRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    email: Annotated[str, StringConstraints(min_length=3, max_length=254)]
+
+    @field_validator("email")
+    @classmethod
+    def _email(cls, value: str) -> str:
+        return normalize_email(value)
+
+
+class ResetPasswordRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    token: Annotated[str, StringConstraints(min_length=1, max_length=128)]
+    new_password: Password
+
+    @field_validator("new_password")
+    @classmethod
+    def _strength(cls, value: str) -> str:
+        if len(set(value)) < 5:
+            raise ValueError("Password is too simple")
+        return value
+
+
 class WorkspaceSelection(BaseModel):
     model_config = ConfigDict(extra="forbid")
     tenant_id: UUID

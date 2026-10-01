@@ -1,5 +1,6 @@
 """Authentication, sessions, CSRF and origin checks through the real HTTP stack."""
 
+import re
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
@@ -7,11 +8,13 @@ import pytest
 from sqlalchemy import select, update
 
 from app.modules.auth.crypto import digest
-from app.modules.auth.models import AuthSession, UserCredential
+from app.modules.auth.models import AuthSession, PasswordResetToken, UserCredential
 from app.modules.users.models import PlatformUser
 from tests.support.workspace import PASSWORD, add_member, error_code, unique
 
 pytestmark = pytest.mark.integration
+
+LINK_TOKEN = re.compile(r"[?&]token=([^&\s]+)")
 
 
 def cookie_attributes(response, name):
@@ -353,6 +356,106 @@ async def test_workspace_switch_only_to_memberships_and_environments_held(stack)
         assert (await alice.get("customers")).status_code == 409
         await alice.switch(own_tenant)
         assert (await alice.get("customers")).status_code == 200
+
+
+@pytest.fixture
+def captured_emails(monkeypatch):
+    """Replace the real SMTP send with a recorder: no network call, no SMTP config
+    needed, and the test can read the token out of the link it was given."""
+    sent: list[dict] = []
+
+    async def fake(settings, http, template, to, variables, **kwargs):
+        sent.append({"template": template, "to": list(to), "variables": dict(variables)})
+
+    monkeypatch.setattr("app.modules.auth.service.send_platform_template", fake)
+    return sent
+
+
+async def test_forgot_password_is_silent_about_account_existence_and_only_emails_real_ones(
+    stack, captured_emails
+):
+    async with stack.browser() as browser:
+        owner = await stack.register(browser)
+    async with stack.browser() as anon:
+        known = await anon.post(
+            "/api/v1/auth/forgot-password", json={"email": owner.email.upper()}
+        )
+        unknown = await anon.post(
+            "/api/v1/auth/forgot-password", json={"email": f"{unique('nobody')}@example.com"}
+        )
+        assert known.status_code == unknown.status_code == 204
+        assert len(captured_emails) == 1  # only the real account triggers an email
+        sent = captured_emails[0]
+        assert sent["template"] == "password_reset" and sent["to"] == [owner.email]
+        assert sent["variables"]["minutes"] == "30"
+
+
+async def test_reset_password_flow_sets_new_password_and_revokes_every_session(
+    stack, captured_emails
+):
+    async with stack.browser() as first, stack.browser() as second, stack.browser() as anon:
+        owner = await stack.register(first)
+        other = await stack.login(second, owner.email)
+
+        assert (
+            await anon.post("/api/v1/auth/forgot-password", json={"email": owner.email})
+        ).status_code == 204
+        link = captured_emails[0]["variables"]["link"]
+        token = LINK_TOKEN.search(link).group(1)
+
+        weak = await anon.post(
+            "/api/v1/auth/reset-password", json={"token": token, "new_password": "short"}
+        )
+        assert weak.status_code == 422
+
+        bad_token = await anon.post(
+            "/api/v1/auth/reset-password",
+            json={"token": "not-a-real-token", "new_password": PASSWORD},
+        )
+        assert bad_token.status_code == 422 and error_code(bad_token) == "INVALID_RESET_TOKEN"
+
+        new_password = "Freshly-Reset-Secret-5"
+        reset = await anon.post(
+            "/api/v1/auth/reset-password", json={"token": token, "new_password": new_password}
+        )
+        assert reset.status_code == 204
+
+        # Single-use: the same token cannot be replayed.
+        replay = await anon.post(
+            "/api/v1/auth/reset-password",
+            json={"token": token, "new_password": "Another-One-99"},
+        )
+        assert replay.status_code == 422 and error_code(replay) == "INVALID_RESET_TOKEN"
+
+        # Every session open before the reset was ended.
+        assert (await other.get("auth/session")).status_code == 401
+
+    async with stack.browser() as fresh:
+        old = await fresh.post(
+            "/api/v1/auth/login", json={"email": owner.email, "password": PASSWORD}
+        )
+        assert old.status_code == 401
+        await stack.login(fresh, owner.email, new_password)
+
+
+async def test_reset_password_token_cannot_be_used_once_expired(stack):
+    async with stack.browser() as browser:
+        owner = await stack.register(browser)
+    user_id = owner.session["user"]["id"]
+    token = "x" * 43
+    await db_execute(
+        stack,
+        PasswordResetToken.__table__.insert().values(
+            user_id=user_id,
+            token_hash=digest(token),
+            expires_at=datetime.now(UTC) - timedelta(seconds=1),
+        ),
+    )
+    async with stack.browser() as anon:
+        response = await anon.post(
+            "/api/v1/auth/reset-password", json={"token": token, "new_password": PASSWORD}
+        )
+        assert response.status_code == 422 and error_code(response) == "INVALID_RESET_TOKEN"
 
 
 async def test_member_created_with_initial_password_can_sign_in_and_existing_is_untouched(stack):

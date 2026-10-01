@@ -101,6 +101,18 @@ TEMPLATES: dict[str, EmailTemplate] = {
         html="<p><b>$title</b></p><p>$message</p>",
         variables=frozenset({"severity", "title", "message", "workspace"}),
     ),
+    # Account-level (not workspace-scoped): self-service password reset.
+    "password_reset": EmailTemplate(
+        subject="Reset your password",
+        text="Hello $name,\n\nUse this link to choose a new password: $link\n"
+        "This link expires in $minutes minutes and can only be used once.\n\n"
+        "If you did not request this, ignore this email; your password stays unchanged.",
+        html="<p>Hello $name,</p><p><a href=\"$link\">Choose a new password</a></p>"
+        "<p>This link expires in $minutes minutes and can only be used once.</p>"
+        "<p>If you did not request this, ignore this email; your password stays unchanged.</p>",
+        variables=frozenset({"name", "link", "minutes", "workspace"}),
+        links=frozenset({"link"}),
+    ),
 }
 
 
@@ -126,6 +138,48 @@ def render_template(name: str, variables: Mapping[str, str]) -> RenderedEmail:
         text=Template(template.text).safe_substitute(values),
         html=Template(_LAYOUT).safe_substitute(body=body, workspace=escaped["workspace"]),
     )
+
+
+def platform_smtp_context(
+    settings: Settings, http: OutboundClient, request_id: str | None = None
+) -> ProviderContext:
+    if not settings.platform_smtp_host or not settings.platform_smtp_from:
+        raise BusinessRuleViolation("EMAIL_NOT_CONFIGURED", "Email sending is not configured", 503)
+    return ProviderContext(
+        settings=settings,
+        http=http,
+        config={
+            "host": settings.platform_smtp_host,
+            "port": settings.platform_smtp_port,
+            "security": settings.platform_smtp_security,
+            "username": settings.platform_smtp_username,
+            "from_address": settings.platform_smtp_from,
+        },
+        credentials={"password": settings.platform_smtp_password.get_secret_value()}
+        if settings.platform_smtp_password
+        else {},
+        call=CallContext(request_id=request_id),
+    )
+
+
+async def send_platform_template(
+    settings: Settings,
+    http: OutboundClient,
+    template: str,
+    to: Sequence[str],
+    variables: Mapping[str, str],
+    *,
+    request_id: str | None = None,
+) -> SendResult:
+    """Account-level email that always goes out from the platform SMTP server, never a
+    workspace's connected integration: used before any tenant is in scope (password
+    reset, other auth-only notices)."""
+    rendered = render_template(template, variables)
+    message = EmailMessage(
+        to=list(to), subject=rendered.subject, text=rendered.text, html=rendered.html
+    )
+    ctx = platform_smtp_context(settings, http, request_id)
+    return await SmtpProvider().send_email(ctx, message)
 
 
 class EmailService:
@@ -156,26 +210,7 @@ class EmailService:
         return found
 
     def _platform_context(self) -> ProviderContext:
-        s = self.settings
-        if not s.platform_smtp_host or not s.platform_smtp_from:
-            raise BusinessRuleViolation(
-                "EMAIL_NOT_CONFIGURED", "Email sending is not configured", 503
-            )
-        return ProviderContext(
-            settings=s,
-            http=self.http,
-            config={
-                "host": s.platform_smtp_host,
-                "port": s.platform_smtp_port,
-                "security": s.platform_smtp_security,
-                "username": s.platform_smtp_username,
-                "from_address": s.platform_smtp_from,
-            },
-            credentials={"password": s.platform_smtp_password.get_secret_value()}
-            if s.platform_smtp_password
-            else {},
-            call=CallContext(request_id=self.scope.request_id),
-        )
+        return platform_smtp_context(self.settings, self.http, self.scope.request_id)
 
     async def send(self, message: EmailMessage) -> SendResult:
         connection = await self._connection()

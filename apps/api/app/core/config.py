@@ -55,6 +55,12 @@ class Settings(BaseSettings):
     login_lockout_minutes: int = Field(default=15, ge=1, le=1440)
     rate_limit_login_per_minute: int = Field(default=10, ge=1, le=1000)
     trusted_proxy_hops: int = Field(default=0, ge=0, le=3)
+    # Self-service "forgot password": token lifetime, and rate limits for both steps.
+    password_reset_ttl_minutes: int = Field(default=30, ge=5, le=1440)
+    rate_limit_password_reset_per_hour: int = Field(default=5, ge=1, le=100)
+    # Canonical browser origin of the web app, used to build links sent in email (password
+    # reset). Kept separate from cors_origins, which may list several allowed origins.
+    web_public_url: str = "http://localhost:3000"
 
     # Background jobs: 'inline' runs jobs in-process and is only for development/tests.
     job_queue_mode: Literal["arq", "inline"] = "arq"
@@ -235,7 +241,7 @@ class Settings(BaseSettings):
             raise ValueError("Explicit allowed hosts are required")
         if any(
             not origin.startswith(("http://", "https://"))
-            for origin in [*self.cors_origins, *self.pi_app_origins]
+            for origin in [*self.cors_origins, *self.pi_app_origins, self.web_public_url]
         ):
             raise ValueError("Explicit HTTP origins are required")
         if self.app_env == "production":

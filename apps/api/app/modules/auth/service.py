@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -9,9 +10,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.audience import Audience
 from app.core.config import Settings
+from app.integrations.email import send_platform_template
+from app.integrations.errors import IntegrationError
+from app.integrations.http import OutboundClient
 from app.modules.audit.service import record
 from app.modules.auth.crypto import digest, hash_password, needs_rehash, new_token, verify_password
-from app.modules.auth.models import AuthSession, UserCredential
+from app.modules.auth.models import AuthSession, PasswordResetToken, UserCredential
 from app.modules.auth.schemas import RegisterRequest
 from app.modules.branches.models import Branch
 from app.modules.environments.models import Environment
@@ -23,6 +27,7 @@ from app.modules.users.models import PlatformUser
 from app.shared.errors import BusinessRuleViolation, Conflict, ResourceNotFound, Unauthenticated
 
 TOUCH_INTERVAL = timedelta(minutes=5)
+logger = logging.getLogger("platform")
 
 
 def pi_business_tenants() -> Any:
@@ -241,6 +246,94 @@ class AuthService:
             .values(revoked_at=now())
         )
         await record(self.session, "auth.password_changed", actor_user_id=auth.user_id)
+
+    async def request_password_reset(self, email: str, http: OutboundClient) -> None:
+        """Always completes the same way regardless of whether the email matches an
+        account: the response never reveals account existence, and a failure to send
+        the email (misconfigured SMTP, provider outage) is logged, not raised, so it
+        cannot be distinguished from "no such account" either."""
+        user = await self.session.scalar(
+            select(PlatformUser).where(PlatformUser.email == email, PlatformUser.status == "active")
+        )
+        if user is None:
+            return
+        current = now()
+        await self.session.execute(
+            update(PasswordResetToken)
+            .where(PasswordResetToken.user_id == user.id, PasswordResetToken.used_at.is_(None))
+            .values(used_at=current)
+        )
+        token = new_token()
+        self.session.add(
+            PasswordResetToken(
+                user_id=user.id,
+                token_hash=digest(token),
+                expires_at=current + timedelta(minutes=self.settings.password_reset_ttl_minutes),
+            )
+        )
+        await record(
+            self.session,
+            "auth.password_reset_requested",
+            actor_user_id=user.id,
+            entity_type="user",
+            entity_id=user.id,
+        )
+        link = f"{self.settings.web_public_url}/reset-password?token={token}"
+        try:
+            await send_platform_template(
+                self.settings,
+                http,
+                "password_reset",
+                [user.email],
+                {
+                    "name": user.display_name,
+                    "link": link,
+                    "minutes": str(self.settings.password_reset_ttl_minutes),
+                },
+            )
+        except (BusinessRuleViolation, IntegrationError):
+            logger.warning("password_reset_email_failed", extra={"user_id": str(user.id)})
+
+    async def reset_password(self, token: str, new_password: str) -> None:
+        current = now()
+        reset = await self.session.scalar(
+            select(PasswordResetToken)
+            .where(PasswordResetToken.token_hash == digest(token))
+            .with_for_update()
+        )
+        if (
+            reset is None
+            or reset.used_at is not None
+            or reset.expires_at <= current
+        ):
+            raise BusinessRuleViolation(
+                "INVALID_RESET_TOKEN", "This reset link is invalid or has expired"
+            )
+        credential = await self.session.scalar(
+            select(UserCredential).where(UserCredential.user_id == reset.user_id).with_for_update()
+        )
+        if credential is None:
+            raise BusinessRuleViolation(
+                "INVALID_RESET_TOKEN", "This reset link is invalid or has expired"
+            )
+        reset.used_at = current
+        credential.password_hash = hash_password(new_password)
+        credential.password_changed_at = current
+        credential.failed_attempts = 0
+        credential.locked_until = None
+        # A forgotten password often means a lost device too; end every session.
+        await self.session.execute(
+            update(AuthSession)
+            .where(AuthSession.user_id == reset.user_id, AuthSession.revoked_at.is_(None))
+            .values(revoked_at=current)
+        )
+        await record(
+            self.session,
+            "auth.password_reset",
+            actor_user_id=reset.user_id,
+            entity_type="user",
+            entity_id=reset.user_id,
+        )
 
     async def select_workspace(
         self,

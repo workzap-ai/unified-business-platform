@@ -8,12 +8,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import Settings
 from app.core.database import get_session
 from app.core.rate_limit import client_ip, hit
+from app.integrations.http import OutboundClient
 from app.modules.access.service import membership_grants
 from app.modules.auth.dependencies import Auth
 from app.modules.auth.schemas import (
     ChangePasswordRequest,
+    ForgotPasswordRequest,
     LoginRequest,
     RegisterRequest,
+    ResetPasswordRequest,
     SessionView,
     UserView,
     WorkspaceRef,
@@ -210,10 +213,42 @@ async def select_workspace(
     return await session_view(session, auth)
 
 
+@router.post("/forgot-password", status_code=status.HTTP_204_NO_CONTENT)
+async def forgot_password(
+    data: ForgotPasswordRequest, request: Request, session: Session
+) -> Response:
+    settings = request.app.state.settings
+    limit = settings.rate_limit_password_reset_per_hour
+    if not await hit(
+        request, "forgot-password-ip", client_ip(request), limit, 3600
+    ) or not await hit(request, "forgot-password-account", data.email, limit, 3600):
+        raise HTTPException(status_code=429)
+    http = OutboundClient(settings, request.app.state.http)
+    await AuthService(session, settings).request_password_reset(data.email, http)
+    await session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/reset-password", status_code=status.HTTP_204_NO_CONTENT)
+async def reset_password(
+    data: ResetPasswordRequest, request: Request, session: Session
+) -> Response:
+    settings = request.app.state.settings
+    if not await hit(request, "reset-password", client_ip(request), 20, 3600):
+        raise HTTPException(status_code=429)
+    await AuthService(session, settings).reset_password(data.token, data.new_password)
+    await session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
 @router.post("/password", status_code=status.HTTP_204_NO_CONTENT)
 async def change_password(
     data: ChangePasswordRequest, request: Request, auth: Auth, session: Session
 ) -> Response:
+    # A stolen session cookie still needs the current password; rate-limit guessing it,
+    # same as login, instead of leaving this one mutating endpoint unlimited.
+    if not await hit(request, "change-password", str(auth.user.id), 10, 3600):
+        raise HTTPException(status_code=429)
     try:
         await AuthService(session, request.app.state.settings).change_password(
             auth.session, data.current_password, data.new_password

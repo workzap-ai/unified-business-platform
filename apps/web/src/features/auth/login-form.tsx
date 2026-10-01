@@ -37,6 +37,7 @@ export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const next = safeNext(params.get("next"));
+  const justReset = params.get("reset") === "1";
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const form = useForm<Values>({
@@ -80,6 +81,11 @@ export function LoginForm() {
         >
           This build runs on fictional sample data. Any email and password sign
           you in; nothing is sent to a server.
+        </Notice>
+      )}
+      {justReset && !isDemo && (
+        <Notice tone="success" className="mt-6">
+          Your password was reset. Sign in with your new password.
         </Notice>
       )}
       <form
@@ -149,7 +155,14 @@ export function LoginForm() {
         </Link>
       </p>
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        Forgot your password? Ask a workspace administrator to reset access.
+        Forgot your password?{" "}
+        <Link
+          href="/forgot-password"
+          className="font-medium text-primary hover:underline"
+        >
+          Reset it
+        </Link>
+        .
       </p>
     </div>
   );

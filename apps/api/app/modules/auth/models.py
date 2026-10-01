@@ -21,6 +21,21 @@ class UserCredential(Record, Base):
     password_changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class PasswordResetToken(Record, Base):
+    """One-time, short-lived token for self-service password reset.
+
+    Only a SHA-256 digest is stored, never the raw token (matching AuthSession).
+    Requesting a new reset invalidates any earlier unused token for the same user.
+    """
+
+    __tablename__ = "password_reset_tokens"
+    __table_args__ = (Index("ix_password_reset_tokens_user", "user_id"),)
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("platform_users.id", ondelete="CASCADE"))
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
 class AuthSession(Record, Base):
     """Opaque server-side session. Only a SHA-256 digest of the token is stored.
 

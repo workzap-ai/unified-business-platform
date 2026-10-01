@@ -39,6 +39,8 @@ export interface AuthService {
   environments(): Promise<Environment[]>;
   changePassword(current: string, next: string): Promise<void>;
   logoutAll(): Promise<void>;
+  forgotPassword(email: string): Promise<void>;
+  resetPassword(token: string, newPassword: string): Promise<void>;
 }
 
 const live: AuthService = {
@@ -75,6 +77,12 @@ const live: AuthService = {
   changePassword: (current_password, new_password) =>
     apiRequest("POST", "/auth/password", null, {
       body: { current_password, new_password },
+    }),
+  forgotPassword: (email) =>
+    apiRequest("POST", "/auth/forgot-password", null, { body: { email } }),
+  resetPassword: (token, new_password) =>
+    apiRequest("POST", "/auth/reset-password", null, {
+      body: { token, new_password },
     }),
 };
 
@@ -145,6 +153,17 @@ const demo: AuthService = {
     await demoDelay(300);
     if (current === next)
       throw new DemoError("Choose a password different from the current one.");
+  },
+  async forgotPassword() {
+    await demoDelay(400);
+    // No real email goes out in sample-data mode; the response always looks the
+    // same either way, matching the live API's non-enumerating behavior.
+  },
+  async resetPassword() {
+    await demoDelay(300);
+    throw new DemoError(
+      "Password reset requires a live API connection: this build never sends the email that carries the reset link.",
+    );
   },
 };
 
