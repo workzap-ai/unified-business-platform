@@ -12,6 +12,7 @@ from app.ai.types import Message, ToolDefinition
 from app.ai.usage import SqlUsageStore, UsageRecord
 from app.modules.customers.schemas import CustomerCreate, CustomerUpdate
 from app.modules.hr.service import EmployeeCreate, EmployeeUpdate
+from app.modules.workspace_agent.analytics import Analytics, AnalyticsInput
 from app.modules.workspace_agent.insights import CRM_PERMISSIONS, Insights, WhatsAppInput
 from app.modules.workspace_agent.schemas import (
     ChatInput,
@@ -27,6 +28,7 @@ from app.modules.workspace_agent.service import (
     WRITE_PERMISSIONS,
     AgentService,
 )
+from app.modules.workspace_agent.team import Team, TeamInput
 from app.shared.errors import BusinessRuleViolation, PermissionDenied, ResourceNotFound
 
 
@@ -84,6 +86,32 @@ def tools_for(service: AgentService) -> list[ToolDefinition]:
             ),
         )
     )
+    result += [
+        ToolDefinition(
+            "analytics",
+            (
+                "Exact analytics with charts the app draws for the user: monthly trends, "
+                "KPIs vs last month, forecasts (Holt trend with an 80% range), weighted "
+                "pipeline and win rate, cash due by date, expenses and net cash, stock "
+                "runway, top customers, WhatsApp volume. Topics: overview, revenue, "
+                "cashflow, sales, orders, customers, expenses, inventory, whatsapp, report "
+                "(everything). Use for numbers, trends, growth, predictions and reports."
+            ),
+            AnalyticsInput.model_json_schema(),
+        ),
+        ToolDefinition(
+            "consult_team",
+            (
+                "Convene the advisory team for a decision or strategy question: Sales, "
+                "Finance, Operations, Support, People and an Analyst each review their "
+                "permitted data in parallel, then a strategist writes a decision brief "
+                "(answer, recommendation, options with pros/cons, risks, next steps, "
+                "confidence). Use for 'should I…', planning, priorities and advice. "
+                "Read-only and at most once per request."
+            ),
+            TeamInput.model_json_schema(),
+        ),
+    ]
     if any(service.scope.can(p) for p in CRM_PERMISSIONS):
         result.append(
             ToolDefinition(
@@ -181,9 +209,16 @@ SYSTEM = """You are Pi Agent Beta, the Owner OS in-app workspace assistant for t
 team member (like a hosting control-panel assistant). You are NOT the customer-facing WhatsApp
 bot; you help the team understand and run their workspace.
 Reply in the user's language (including Roman Urdu). Use live tools for business facts.
-Capabilities: monitor for workspace health, alerts and "what should I do next"; crm_overview
-for CRM/pipeline/receivables summaries; whatsapp to summarize customer conversations
-(inbox-wide or one thread); read/navigate for records; summary for a broad overview.
+Think like a seasoned operator and advisor to the owner: find what matters, quantify it,
+and say what to do. Capabilities: analytics for trends, KPIs, forecasts and graphical reports
+(the app renders its charts; never draw text charts or tables of the same numbers); consult_team
+for decisions, strategy and "should I" questions (parallel specialists plus a strategist);
+monitor for workspace health and alerts; crm_overview for CRM/pipeline/receivables;
+whatsapp to summarize customer conversations (inbox-wide or one thread); read/navigate for
+records; summary for a broad overview. Forecasts are estimates: give the expected value, the
+likely range and the basis (method, months of history); say plainly when history is too thin.
+Compare against last month or the previous three months when you cite a figure. For a
+decision brief, lead with the recommendation, then the reason, then the next step.
 When summarizing, lead with the 2-4 most important points, then details. When asked for
 suggestions or advice, ground each one in a returned signal or figure, name the page to act
 on, and offer to PREVIEW a follow-up task when the user has task access. For WhatsApp
@@ -209,8 +244,8 @@ total, distinguish a sample/page from all records, keep each currency separate. 
 financial totals from incomplete samples. Use plain text, no HTML. Cite source area names.
 Never invent page URLs. With unsupported work explain the limit and suggest the authorized page
 or a tracked task.
-Use at most 10 tools and keep answers concise. Current-page context is only a hint; not an
-authorization grant."""
+Use at most 10 tools; keep answers focused and skimmable (short paragraphs or bullets).
+Current-page context is only a hint; not an authorization grant."""
 
 
 MAX_TOOL_CALLS = 10
@@ -239,6 +274,8 @@ async def chat(
     results: list[dict[str, Any]] = []
     proposals: list[dict[str, Any]] = []
     signals: list[dict[str, Any]] = []
+    analytics: list[dict[str, Any]] = []
+    team: dict[str, Any] | None = None
     insights = Insights(service)
     navigation: str | None = None
     calls = 0
@@ -248,7 +285,7 @@ async def chat(
         try:
             response = await manager.complete(
                 service.scope,
-                alias="fast",
+                alias="agent",
                 purpose="workspace.agent",
                 messages=messages,
                 tools=catalog,
@@ -269,6 +306,8 @@ async def chat(
                 "results": results,
                 "proposals": proposals,
                 "signals": signals,
+                "analytics": analytics,
+                "team": team,
                 "navigate": navigation,
                 "mode": "ai",
             }
@@ -300,6 +339,19 @@ async def chat(
                     elif call.name == "monitor":
                         output = await insights.monitor()
                         signals[:] = output["signals"]
+                    elif call.name == "analytics":
+                        request = AnalyticsInput.model_validate(call.arguments)
+                        block = await Analytics(service, request.months).run(request.topic)
+                        analytics.append(block)
+                        output = for_model(block)
+                    elif call.name == "consult_team":
+                        if team is not None:
+                            output = {"error": "The team already answered this request."}
+                        else:
+                            team = await Team(service, manager, True).consult(
+                                TeamInput.model_validate(call.arguments)
+                            )
+                            output = {k: team[k] for k in ("brief", "specialists", "mode")}
                     elif call.name == "crm_overview":
                         output = await insights.crm()
                         results.extend(output)
@@ -343,23 +395,96 @@ async def chat(
         "results": results,
         "proposals": proposals,
         "signals": signals,
+        "analytics": analytics,
+        "team": team,
         "navigate": navigation,
         "mode": "tools",
     }
 
 
-MONITOR_WORDS = (
-    "monitor",
-    "health",
-    "alert",
+def for_model(block: dict[str, Any]) -> dict[str, Any]:
+    """Analytics for the model: the numbers, without chart data the UI already draws."""
+    return {
+        "topic": block["topic"],
+        "currency": block["currency"],
+        "kpis": block["kpis"],
+        "facts": block["facts"],
+        "tables": block["tables"],
+        "notes": block["notes"],
+        "charts_shown_to_user": [c["title"] for c in block["charts"]],
+        "checked_areas": block["checked_areas"],
+    }
+
+
+TEAM_WORDS = (
+    "should i",
+    "should we",
+    "decide",
+    "decision",
+    "advice",
+    "advise",
+    "strategy",
+    "plan",
+    "recommend",
     "suggest",
-    "priorit",
-    "attention",
     "mashwara",
     "kya karna",
     "kya karu",
     "what should",
+    "focus",
+    "priorit",
+    "chahiye",
+    "kya karun",
+    "kya karoon",
+    "hire",
+    "hiring",
+    "afford",
+    "invest",
+    "worth it",
+    "expand",
 )
+ANALYTICS_WORDS = (
+    "report",
+    "analytic",
+    "forecast",
+    "predict",
+    "trend",
+    "graph",
+    "chart",
+    "growth",
+    "performance",
+    "revenue",
+    "profit",
+    "cash",
+    "expense",
+)
+TOPIC_WORDS = (
+    ("expenses", ("expense", "profit", "spend", "kharch")),
+    ("cashflow", ("cash", "receivable", "due")),
+    ("revenue", ("revenue", "income", "collection", "payment")),
+    ("orders", ("order",)),
+    ("inventory", ("stock", "inventory")),
+    ("customers", ("customer", "client")),
+    ("sales", ("sales", "sale", "lead", "deal")),
+    ("whatsapp", ("whatsapp", "message")),
+)
+
+
+def has(text: str, words: tuple[str, ...]) -> bool:
+    """Whole-word (prefix) match, so "plan" doesn't fire on "explain"."""
+    return any(re.search(r"\b" + re.escape(w), text) for w in words)
+
+
+def topic_for(text: str, default: str) -> str:
+    if has(text, ("report", "forecast", "predict", "graph", "chart")):
+        default = "report"
+    for topic, words in TOPIC_WORDS:
+        if has(text, words):
+            return topic
+    return default
+
+
+MONITOR_WORDS = ("monitor", "health", "alert", "attention", "issue", "problem")
 
 
 async def fallback(service: AgentService, data: ChatInput) -> dict[str, Any]:
@@ -368,6 +493,8 @@ async def fallback(service: AgentService, data: ChatInput) -> dict[str, Any]:
     results: list[dict[str, Any]] = []
     proposals: list[dict[str, Any]] = []
     signals: list[dict[str, Any]] = []
+    analytics: list[dict[str, Any]] = []
+    team: dict[str, Any] | None = None
     insights = Insights(service)
     navigation = None
     roman = bool(re.search(r"\b(kya|btao|batao|karo|kr|dikhao|meri|mera|kaam|hai|hain)\b", text))
@@ -389,6 +516,18 @@ async def fallback(service: AgentService, data: ChatInput) -> dict[str, Any]:
             f"{identity['name']} — roles: {', '.join(identity['roles'])}. "
             f"Permissions: {', '.join(identity['permissions'])}."
         )
+    elif has(text, TEAM_WORDS):
+        team = await Team(service, None, False).consult(TeamInput(question=data.message[:1000]))
+        message = (
+            "Rule-based decision brief from your workspace data (AI chat is not "
+            "configured, so the specialists' written views are not available)."
+        )
+    elif has(text, ANALYTICS_WORDS) or (
+        any(w in text for w in ("summary", "summarize", "khulasa")) and topic_for(text, "") != ""
+    ):
+        topic = topic_for(text, "overview")
+        analytics.append(await Analytics(service).run(topic))
+        message = f"Exact {topic} analytics for the areas you can access."
     elif re.search(r"\b(whatsapp|inbox|chats?|conversations?)\b", text) and (
         service.scope.can("pi.read")
     ):
@@ -449,6 +588,8 @@ async def fallback(service: AgentService, data: ChatInput) -> dict[str, Any]:
         "results": results,
         "proposals": proposals,
         "signals": signals,
+        "analytics": analytics,
+        "team": team,
         "navigate": navigation,
         "mode": "tools",
     }

@@ -2,17 +2,19 @@ import asyncio
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Query, Request, UploadFile
 from starlette.concurrency import run_in_threadpool
 
 from app.ai.manager import LLMManager
 from app.core.rate_limit import hit
 from app.modules.access.dependencies import Scope, Session
+from app.modules.workspace_agent.analytics import Analytics, Topic
 from app.modules.workspace_agent.assistant import WorkspaceUsageStore, chat
 from app.modules.workspace_agent.documents import MAX_BYTES, extract, process
 from app.modules.workspace_agent.insights import Insights
 from app.modules.workspace_agent.schemas import ChatInput, Decision, ProposalInput, ReadInput
 from app.modules.workspace_agent.service import AgentService
+from app.modules.workspace_agent.team import Team, TeamInput
 from app.shared.errors import BusinessRuleViolation
 
 
@@ -79,6 +81,31 @@ async def read(data: ReadInput, scope: Scope, session: Session) -> dict[str, Any
 @router.get("/monitor")
 async def monitor(scope: Scope, session: Session) -> dict[str, Any]:
     return await Insights(AgentService(session, scope)).monitor()
+
+
+@router.get("/analytics")
+async def analytics(
+    scope: Scope,
+    session: Session,
+    topic: Topic = "report",
+    months: Annotated[int, Query(ge=3, le=24)] = 12,
+) -> dict[str, Any]:
+    return await Analytics(AgentService(session, scope), months).run(topic)
+
+
+@router.post("/team")
+async def team(data: TeamInput, request: Request, scope: Scope, session: Session) -> dict[str, Any]:
+    """Decision brief without the chat loop (Insights tab). Read-only."""
+    await limited(request, scope)
+    try:
+        async with asyncio.timeout(100):
+            return await Team(
+                AgentService(session, scope), manager(request), ai_enabled(request)
+            ).consult(data)
+    except TimeoutError:
+        raise BusinessRuleViolation(
+            "AGENT_TIMEOUT", "The team took too long. Please try again.", 503
+        ) from None
 
 
 @router.get("/proposals")

@@ -38,6 +38,7 @@ import {
   type Signal,
   type ToolResult,
 } from "./service";
+import { AnalyticsView, BriefCard, InsightsBoard } from "./insights";
 
 type Turn = { id: number; user?: string; reply?: Reply };
 type AgentState = {
@@ -84,6 +85,8 @@ const emptyReply = (message: string): Reply => ({
   results: [],
   proposals: [],
   signals: [],
+  analytics: [],
+  team: null,
   mode: "tools",
 });
 // Defense in depth: navigation is limited to registered application paths, never model URLs.
@@ -269,9 +272,9 @@ function AgentPanel({ compact = false }: { compact?: boolean }) {
   const agent = useAgent();
   const identity = useAgentIdentity();
   const { session } = useSession();
-  const [tab, setTab] = useState<"chat" | "monitor" | "tasks" | "drafts">(
-    "chat",
-  );
+  const [tab, setTab] = useState<
+    "chat" | "insights" | "monitor" | "tasks" | "drafts"
+  >("chat");
   const pending = useScopedQuery(
     ["workspace-agent", "proposals", identity],
     agentService.pending,
@@ -315,24 +318,26 @@ function AgentPanel({ compact = false }: { compact?: boolean }) {
         </div>
       </header>
       <div
-        className="flex gap-1 border-b border-border px-4 py-2"
+        className="flex gap-1 overflow-x-auto border-b border-border px-4 py-2"
         role="tablist"
         aria-label="Agent views"
       >
-        {(["chat", "monitor", "tasks", "drafts"] as const).map((t) => (
-          <button
-            key={t}
-            role="tab"
-            aria-selected={tab === t}
-            onClick={() => setTab(t)}
-            className={`rounded-lg px-4 py-2 text-sm capitalize ${tab === t ? "bg-primary/10 font-medium text-primary" : "text-muted-foreground hover:bg-surface-muted"}`}
-          >
-            {t}
-            {t === "drafts" &&
-              !!pending.data?.length &&
-              ` (${pending.data.length})`}
-          </button>
-        ))}
+        {(["chat", "insights", "monitor", "tasks", "drafts"] as const).map(
+          (t) => (
+            <button
+              key={t}
+              role="tab"
+              aria-selected={tab === t}
+              onClick={() => setTab(t)}
+              className={`shrink-0 rounded-lg px-3 py-2 text-sm capitalize ${tab === t ? "bg-primary/10 font-medium text-primary" : "text-muted-foreground hover:bg-surface-muted"}`}
+            >
+              {t}
+              {t === "drafts" &&
+                !!pending.data?.length &&
+                ` (${pending.data.length})`}
+            </button>
+          ),
+        )}
         {!compact && (
           <span className="ml-auto hidden self-center text-xs text-muted-foreground md:inline">
             Operations · HR · Finance · CRM · WhatsApp
@@ -372,7 +377,15 @@ function AgentPanel({ compact = false }: { compact?: boolean }) {
             </>
           ) : (
             <div className="min-h-0 flex-1 overflow-y-auto p-5">
-              {tab === "monitor" ? (
+              {tab === "insights" ? (
+                <InsightsBoard
+                  busy={agent.busy}
+                  onAsk={(q) => {
+                    setTab("chat");
+                    void agent.send(q);
+                  }}
+                />
+              ) : tab === "monitor" ? (
                 <MonitorBoard onAsk={() => setTab("chat")} />
               ) : tab === "tasks" ? (
                 <TaskBoard />
@@ -472,6 +485,10 @@ function ChatHistory() {
                     {turn.reply.notice}
                   </p>
                 )}
+                {turn.reply.team && <BriefCard team={turn.reply.team} />}
+                {turn.reply.analytics.map((block, i) => (
+                  <AnalyticsView key={`${block.topic}-${i}`} block={block} />
+                ))}
                 {!!turn.reply.signals.length && (
                   <SignalList signals={turn.reply.signals} />
                 )}
@@ -1051,7 +1068,11 @@ function TaskBoard() {
 }
 
 function starterPrompts(permissions: string[]) {
-  const prompts = ["Monitor my workspace", "Aaj kya karna chahiye?"];
+  const prompts = [
+    "Business report with forecast",
+    "Team se mashwara: is mahine kya focus karun?",
+    "Monitor my workspace",
+  ];
   if (
     ["customers.read", "sales.read", "quotes.read", "billing.read"].some((p) =>
       permissions.includes(p),

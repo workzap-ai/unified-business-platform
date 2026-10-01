@@ -29,6 +29,15 @@ interface PoolNumber {
   offered_to_you: boolean;
 }
 
+const PROBLEM_MESSAGES: Record<string, string> = {
+  WEBHOOK_NOT_REGISTERED:
+    "This number is connected, but Kapso has nowhere to send its WhatsApp messages yet, so chats won't reach Pi. Click \"Check health\" to retry.",
+};
+function problemMessage(code: string | null | undefined, fallback: string): string {
+  if (!code) return fallback;
+  return PROBLEM_MESSAGES[code] ?? fallback;
+}
+
 const kapsoKey = ["pi", "whatsapp", "kapso"] as const;
 const poolKey = ["pi", "whatsapp", "pool"] as const;
 
@@ -92,31 +101,38 @@ function KapsoPanel({ onChange }: { onChange?: () => void }) {
     return (
       <Card className="mb-4">
         <CardHeader title="Connected through Kapso" />
-        <CardBody className="flex flex-wrap items-center gap-3">
-          <ShieldCheck className="size-5 text-success" aria-hidden />
-          <span className="font-medium tabular-nums">
-            {c.display_phone_number}
-          </span>
-          {c.health?.status ? (
-            <Badge tone="outline">{c.health.status}</Badge>
+        <CardBody className="space-y-3">
+          {c.problem ? (
+            <Notice tone="warning" title="Messages may not be arriving">
+              {problemMessage(c.problem, c.problem)}
+            </Notice>
           ) : null}
-          <span className="flex-1" />
-          <Button
-            variant="secondary"
-            size="sm"
-            loading={health.isPending}
-            onClick={() => health.mutate(undefined)}
-          >
-            Check health
-          </Button>
-          <Button
-            variant="danger-outline"
-            size="sm"
-            loading={disconnect.isPending}
-            onClick={() => disconnect.mutate(undefined)}
-          >
-            Disconnect
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <ShieldCheck className="size-5 text-success" aria-hidden />
+            <span className="font-medium tabular-nums">
+              {c.display_phone_number}
+            </span>
+            {c.health?.status ? (
+              <Badge tone="outline">{c.health.status}</Badge>
+            ) : null}
+            <span className="flex-1" />
+            <Button
+              variant="secondary"
+              size="sm"
+              loading={health.isPending}
+              onClick={() => health.mutate(undefined)}
+            >
+              Check health
+            </Button>
+            <Button
+              variant="danger-outline"
+              size="sm"
+              loading={disconnect.isPending}
+              onClick={() => disconnect.mutate(undefined)}
+            >
+              Disconnect
+            </Button>
+          </div>
         </CardBody>
       </Card>
     );
@@ -141,7 +157,7 @@ function KapsoPanel({ onChange }: { onChange?: () => void }) {
         ) : null}
         {c.status === "action_required" || c.status === "disconnected" ? (
           <Notice tone="danger" title="Your number needs attention">
-            {c.problem ?? "Reconnect it below. Your conversations are kept."}
+            {problemMessage(c.problem, "Reconnect it below. Your conversations are kept.")}
           </Notice>
         ) : null}
         <section aria-labelledby="pool-title" className="space-y-3">

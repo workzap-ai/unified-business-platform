@@ -8,7 +8,7 @@ import json
 from uuid import UUID
 
 import pytest
-from pi_saas_support import FakeProvider, configure, pi_client, pi_register
+from pi_saas_support import FakeProvider, configure, pi_client, pi_register, worker_ctx
 from sqlalchemy import func, select, text
 from test_pi_pipeline import pi_workspace
 from test_pi_saas import _kapso, _message_event, _run_jobs
@@ -62,6 +62,7 @@ async def test_owner_os_workspace_connects_its_own_number_through_kapso(api, app
         # The Kapso number is now the workspace's active number; the Meta one stops.
         current = (await api.get("/api/v1/pi/whatsapp")).json()
         assert current["provider"] == "kapso" and current["status"] == "active"
+        assert current["webhook_url"] == "/api/v1/webhooks/whatsapp"  # the app's own inbox page
         old = await business_db.scalar(
             select(WhatsAppConnection).where(WhatsAppConnection.phone_number_id == "111222333")
         )
@@ -77,6 +78,45 @@ async def test_owner_os_workspace_connects_its_own_number_through_kapso(api, app
             select(PiMessage).where(PiMessage.provider_message_id == "wamid.os1")
         )
         assert message is not None and str(message.tenant_id) == pi.tenant_id
+    finally:
+        await pi.close()
+
+
+async def test_webhook_registration_failure_is_visible_and_self_heals(api, app, business_db):
+    """A number can finish Kapso's own setup (confirmed, "connected") while we never
+    had a public HTTPS address to give Kapso for the webhook. Nothing before this test
+    noticed: the connection looked healthy and no WhatsApp message ever arrived. The
+    gap must be surfaced on the connection and fixed automatically once the address is
+    set, without the business reconnecting their number."""
+    pi = await pi_workspace(api, business_db, number="111222444")
+    provider = _provider(app)
+    try:
+        app.state.settings.integrations_public_base_url = None  # not configured yet
+        await api.post("/api/v1/pi/whatsapp/kapso/setup", json={})
+        row = await business_db.scalar(
+            select(PiProviderConnection).where(PiProviderConnection.tenant_id == UUID(pi.tenant_id))
+        )
+        provider.add_number(row.external_customer_id, "4040404999", "+92 300 9999999")
+        confirmed = await api.post("/api/v1/pi/whatsapp/kapso/confirm")
+        assert confirmed.json()["status"] == "connected"
+        assert "4040404999" not in provider.webhooks
+        status = (await api.get("/api/v1/pi/whatsapp/kapso")).json()
+        assert status["connection"]["problem"] == "WEBHOOK_NOT_REGISTERED"
+
+        # The operator sets the public address; "Check health" retries right away.
+        app.state.settings.integrations_public_base_url = PUBLIC
+        healed = await api.post("/api/v1/pi/whatsapp/kapso/health")
+        assert healed.json()["problem"] is None
+        assert provider.webhooks["4040404999"][0]["url"] == f"{PUBLIC}/api/v1/webhooks/kapso"
+
+        # Without anyone clicking anything, the periodic sweep heals it too.
+        row.last_error_code = "WEBHOOK_NOT_REGISTERED"
+        await business_db.commit()
+        from app.modules.pi_saas import jobs
+
+        await jobs.sweep_pi_saas(worker_ctx(app, business_db))
+        await business_db.refresh(row)
+        assert row.last_error_code is None
     finally:
         await pi.close()
 

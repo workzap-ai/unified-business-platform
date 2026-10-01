@@ -130,6 +130,21 @@ const NAV = [
     cap: "operator.team.manage",
   },
   {
+    href: "/operator/users",
+    label: "Users",
+    cap: "operator.users.read",
+  },
+  {
+    href: "/operator/audit",
+    label: "Audit log",
+    cap: "operator.audit.read",
+  },
+  {
+    href: "/operator/system",
+    label: "System",
+    cap: "operator.system.read",
+  },
+  {
     href: "/operator/keys",
     label: "Platform keys",
     cap: "operator.settings.manage",

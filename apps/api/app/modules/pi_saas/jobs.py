@@ -101,6 +101,20 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
         except Exception:  # noqa: BLE001 - retried on the next sweep
             await session.rollback()
             logger.warning("pi_lifecycle_sweep_failed")
+    # A number can look connected while its webhook never registered with Kapso (missing
+    # public URL/secret at setup time, or a transient provider failure); retry until it
+    # takes, so messages start arriving without anyone clicking "Check health".
+    async with ctx["sessions"]() as session:
+        try:
+            healed = await connections.retry_unregistered_webhooks(
+                session, ctx["settings"], ctx["http"]
+            )
+            await session.commit()
+            if healed:
+                logger.info("pi_webhook_self_healed", extra={"count": healed})
+        except Exception:  # noqa: BLE001 - retried on the next sweep
+            await session.rollback()
+            logger.warning("pi_webhook_retry_failed")
     for event_id in providers:
         await _enqueue(ctx, "process_pi_provider_event", str(event_id), f"pi-provider:{event_id}")
     for event_id in bills:

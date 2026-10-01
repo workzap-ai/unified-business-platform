@@ -313,9 +313,24 @@ async def confirm_setup(
         row.setup_status = "processing"
         return row
     await link_number(session, target, row, chosen)
-    await register_webhook(settings, http, chosen.phone_number_id)
+    await _ensure_webhook_registered(settings, http, row, chosen.phone_number_id)
     await _refresh(session, scope, target)
     return row
+
+
+async def _ensure_webhook_registered(
+    settings: Settings, http: httpx.AsyncClient, row: PiProviderConnection, phone_number_id: str
+) -> str:
+    """Register (or confirm) the number's webhook and record whether it worked.
+
+    A number can look "connected" while Kapso has nowhere to send its messages — the
+    public URL or secret was missing, or the provider call failed — and nothing else
+    ever retries it. Surface that as ``last_error_code`` so the operator sees it and
+    ``check_health`` can self-heal it.
+    """
+    result = await register_webhook(settings, http, phone_number_id)
+    row.last_error_code = None if result in {"created", "exists"} else "WEBHOOK_NOT_REGISTERED"
+    return result
 
 
 def webhook_url(settings: Settings) -> str:
@@ -456,7 +471,33 @@ async def check_health(
         return row
     row.health = await Kapso(settings, http).health(row.phone_number_id)
     row.health_checked_at = datetime.now(UTC)
+    if row.last_error_code == "WEBHOOK_NOT_REGISTERED":
+        await _ensure_webhook_registered(settings, http, row, row.phone_number_id)
     return row
+
+
+async def retry_unregistered_webhooks(
+    session: AsyncSession, settings: Settings, http: httpx.AsyncClient
+) -> int:
+    """Self-heal connections whose webhook never registered (e.g. a public URL or
+    secret added after setup, or a transient provider failure). Called from the
+    periodic sweep so nobody has to click "Check health" to fix it."""
+    rows = list(
+        await session.scalars(
+            select(PiProviderConnection).where(
+                PiProviderConnection.status == "connected",
+                PiProviderConnection.last_error_code == "WEBHOOK_NOT_REGISTERED",
+                PiProviderConnection.phone_number_id.is_not(None),
+            )
+        )
+    )
+    healed = 0
+    for row in rows:
+        assert row.phone_number_id is not None
+        result = await _ensure_webhook_registered(settings, http, row, row.phone_number_id)
+        if result in {"created", "exists"}:
+            healed += 1
+    return healed
 
 
 def _parse_time(value: str | None) -> datetime | None:

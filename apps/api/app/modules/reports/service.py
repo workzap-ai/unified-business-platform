@@ -111,6 +111,16 @@ class Overview(BaseModel):
     recent_activity: list[ActivityItem]
 
 
+def month_of(column: Any) -> Any:
+    """First day of the column's month as a DATE in the session time zone.
+
+    ``date_trunc`` alone returns a timestamptz at local midnight; turning that into a
+    UTC datetime moves it into the previous month whenever the database time zone is
+    ahead of UTC. Casting to DATE keeps the calendar month.
+    """
+    return cast(func.date_trunc("month", column), Date)
+
+
 def month_key(value: date) -> str:
     return f"{value.year:04d}-{value.month:02d}"
 
@@ -144,7 +154,7 @@ class ReportService:
         currency = await self.currency()
         buckets = months_back(max(1, min(months, 24)))
         start = buckets[0]
-        invoiced_month = func.date_trunc("month", Invoice.issue_date)
+        invoiced_month = month_of(Invoice.issue_date)
         invoiced = await self.session.execute(
             select(invoiced_month, func.sum(Invoice.total))
             .where(
@@ -155,7 +165,7 @@ class ReportService:
             )
             .group_by(invoiced_month)
         )
-        collected_month = func.date_trunc("month", Payment.received_on)
+        collected_month = month_of(Payment.received_on)
         collected = await self.session.execute(
             select(collected_month, func.sum(Payment.amount))
             .where(
@@ -230,13 +240,13 @@ class ReportService:
             select(func.count()).select_from(Customer).where(self.customers.predicate())
         )
         start = months_back(12)[0]
-        created_month = func.date_trunc("month", Customer.created_at)
+        created_month = month_of(Customer.created_at)
         month_rows = await self.session.execute(
             select(created_month, func.count())
             .where(self.customers.predicate(), Customer.created_at >= start)
             .group_by(created_month)
         )
-        counts = {month_key(m.date()): int(n) for m, n in month_rows}
+        counts = {month_key(m): int(n) for m, n in month_rows}
         top_rows = await self.session.execute(
             select(
                 Customer.id,

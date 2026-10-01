@@ -59,11 +59,108 @@ const monitorSchema = z.object({
   signals: z.array(signalSchema),
   healthy: z.boolean(),
 });
+export const kpiSchema = z.object({
+  key: z.string(),
+  label: z.string(),
+  value: z.number(),
+  unit: z.enum(["currency", "count", "percent", "days"]),
+  currency: z.string().nullable(),
+  previous: z.number().nullable(),
+  change_pct: z.number().nullable(),
+  good: z.enum(["up", "down"]),
+  detail: z.string(),
+  compare: z.string().nullish(),
+});
+const cell = z.union([z.string(), z.number(), z.null()]);
+export const chartSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  kind: z.enum(["bar", "line", "area"]),
+  x_key: z.string(),
+  x_label: z.string(),
+  series: z.array(
+    z.object({
+      key: z.string(),
+      label: z.string(),
+      dashed: z.boolean().optional(),
+    }),
+  ),
+  data: z.array(z.record(z.string(), cell)),
+  unit: z.enum(["currency", "count", "percent", "days"]),
+  currency: z.string().nullable(),
+  stacked: z.boolean(),
+});
+const tableSchema = z.object({
+  title: z.string(),
+  columns: z.array(z.string()),
+  rows: z.array(z.record(z.string(), cell)),
+  note: z.string().optional(),
+});
+export const analyticsSchema = z.object({
+  area: z.literal("analytics"),
+  topic: z.string(),
+  currency: z.string(),
+  months: z.number(),
+  kpis: z.array(kpiSchema),
+  charts: z.array(chartSchema),
+  tables: z.array(tableSchema),
+  notes: z.array(z.string()),
+  checked_areas: z.array(z.string()),
+  generated_at: z.string(),
+});
+const level = z.enum(["high", "medium", "low"]);
+const recommendationSchema = z.object({
+  action: z.string(),
+  why: z.string(),
+  impact: level,
+  effort: level,
+  page: z.string().nullable(),
+});
+export const teamSchema = z.object({
+  area: z.literal("team"),
+  question: z.string(),
+  mode: z.enum(["ai", "rules"]),
+  brief: z.object({
+    answer: z.string(),
+    recommendation: z.string(),
+    options: z.array(
+      z.object({
+        name: z.string(),
+        pros: z.array(z.string()),
+        cons: z.array(z.string()),
+        expected_impact: z.string(),
+      }),
+    ),
+    risks: z.array(z.string()),
+    next_steps: z.array(recommendationSchema),
+    confidence: level,
+    assumptions: z.array(z.string()),
+  }),
+  specialists: z.array(
+    z.object({
+      role: z.string(),
+      title: z.string(),
+      headline: z.string(),
+      findings: z.array(z.string()),
+      risks: z.array(z.string()),
+      opportunities: z.array(z.string()),
+      recommendations: z.array(recommendationSchema),
+      confidence: level,
+      data_gaps: z.array(z.string()),
+    }),
+  ),
+  consulted: z.array(z.string()),
+  kpis: z.array(kpiSchema),
+  checked_areas: z.array(z.string()),
+});
 const replySchema = z.object({
   message: z.string(),
   results: z.array(resultSchema),
   proposals: z.array(proposalSchema),
   signals: z.array(signalSchema).default([]),
+  analytics: z.array(analyticsSchema).default([]),
+  team: teamSchema.nullable().default(null),
   navigate: z.string().nullable().optional(),
   mode: z.string(),
   notice: z.string().optional(),
@@ -74,10 +171,24 @@ export type ToolResult = z.infer<typeof resultSchema>;
 export type Signal = z.infer<typeof signalSchema>;
 export type MonitorReport = z.infer<typeof monitorSchema>;
 export type Reply = z.infer<typeof replySchema>;
+export type Kpi = z.infer<typeof kpiSchema>;
+export type ChartSpec = z.infer<typeof chartSchema>;
+export type AnalyticsBlock = z.infer<typeof analyticsSchema>;
+export type TeamBrief = z.infer<typeof teamSchema>;
 const base = "/workspace-agent";
 export const agentService = {
   context: () => apiRequest("GET", `${base}/context`, contextSchema),
   monitor: () => apiRequest("GET", `${base}/monitor`, monitorSchema),
+  analytics: (topic = "report", months = 12) =>
+    apiRequest("GET", `${base}/analytics`, analyticsSchema, {
+      query: { topic, months },
+    }),
+  team: (question: string, signal?: AbortSignal) =>
+    apiRequest("POST", `${base}/team`, teamSchema, {
+      body: { question },
+      signal,
+      timeoutMs: 120000,
+    }),
   pending: () =>
     apiRequest("GET", `${base}/proposals`, z.array(proposalSchema)),
   chat: (

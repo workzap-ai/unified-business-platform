@@ -338,16 +338,9 @@ def connection_view(row: WhatsAppConnection) -> dict[str, Any]:
     return {
         **{key: getattr(row, key) for key in keys},
         "has_access_token": bool(row.access_token_encrypted),
-
-        # frontend ko relative route dikha sakte ho
-        "webhook_path": "/api/v1/webhooks/whatsapp",
-
+        "webhook_url": "/api/v1/webhooks/whatsapp",
         "webhook_verified": bool(row.verified_at),
-        "messages_24h": {
-            "inbound": 0,
-            "outbound": 0,
-            "failed": 0,
-        },
+        "messages_24h": {"inbound": 0, "outbound": 0, "failed": 0},
     }
 
 

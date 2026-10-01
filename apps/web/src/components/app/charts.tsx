@@ -33,7 +33,8 @@ export const SERIES = [
   "var(--chart-5)",
 ];
 
-export type Series = { key: string; label: string };
+/** ``dashed`` marks projected values (forecasts); a ``null`` value leaves a gap. */
+export type Series = { key: string; label: string; dashed?: boolean };
 type Datum = Record<string, string | number | null>;
 
 const axis = { fontSize: 11, fill: "var(--muted-foreground)" };
@@ -60,24 +61,26 @@ function ChartTooltip({
     <div className="min-w-36 rounded-lg border border-border bg-surface px-3 py-2 text-xs shadow-md">
       <p className="mb-1.5 font-semibold text-foreground">{label}</p>
       <ul className="space-y-1">
-        {payload.map((p) => {
-          const s = series.find((x) => x.key === p.dataKey);
-          return (
-            <li key={String(p.dataKey)} className="flex items-center gap-2">
-              <span
-                className="h-0.5 w-3 rounded-full"
-                style={{ background: p.color }}
-                aria-hidden="true"
-              />
-              <span className="flex-1 text-muted-foreground">
-                {s?.label ?? p.dataKey}
-              </span>
-              <span className="tabular font-semibold text-foreground">
-                {format(Number(p.value ?? 0))}
-              </span>
-            </li>
-          );
-        })}
+        {payload
+          .filter((p) => p.value !== null && p.value !== undefined)
+          .map((p) => {
+            const s = series.find((x) => x.key === p.dataKey);
+            return (
+              <li key={String(p.dataKey)} className="flex items-center gap-2">
+                <span
+                  className="h-0.5 w-3 rounded-full"
+                  style={{ background: p.color }}
+                  aria-hidden="true"
+                />
+                <span className="flex-1 text-muted-foreground">
+                  {s?.label ?? p.dataKey}
+                </span>
+                <span className="tabular font-semibold text-foreground">
+                  {format(Number(p.value ?? 0))}
+                </span>
+              </li>
+            );
+          })}
       </ul>
     </div>
   );
@@ -90,8 +93,16 @@ function Legend({ series }: { series: Series[] }) {
       {series.map((s, i) => (
         <li key={s.key} className="flex items-center gap-1.5">
           <span
-            className="size-2.5 rounded-[3px]"
-            style={{ background: SERIES[i % SERIES.length] }}
+            className={
+              s.dashed
+                ? "h-0.5 w-3 border-t-2 border-dashed"
+                : "size-2.5 rounded-[3px]"
+            }
+            style={
+              s.dashed
+                ? { borderColor: SERIES[i % SERIES.length] }
+                : { background: SERIES[i % SERIES.length] }
+            }
             aria-hidden="true"
           />
           {s.label}
@@ -142,7 +153,9 @@ function DataTableView({
               <td className="px-3 py-1.5">{String(row[xKey])}</td>
               {series.map((s) => (
                 <td key={s.key} className="tabular px-3 py-1.5 text-right">
-                  {format(Number(row[s.key] ?? 0))}
+                  {row[s.key] === null || row[s.key] === undefined
+                    ? "—"
+                    : format(Number(row[s.key]))}
                 </td>
               ))}
             </tr>
@@ -338,6 +351,7 @@ export function ChartCard({
                         dataKey={s.key}
                         stroke={SERIES[i % SERIES.length]}
                         strokeWidth={2}
+                        strokeDasharray={s.dashed ? "6 4" : undefined}
                         dot={false}
                         activeDot={{
                           r: 4.5,
