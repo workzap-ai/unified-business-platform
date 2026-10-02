@@ -327,6 +327,32 @@ class WhatsApp:
                 "DELIVERY_UNCONFIRMED", "Form delivery could not be confirmed", 503
             ) from None
 
+    async def mark_read(self, number: str, message_id: str, *, typing: bool = True) -> bool:
+        """Blue ticks plus "typing…" on the customer's phone while Pi works on a reply.
+        Best effort: it never delays or fails the reply. Kapso numbers only (the Meta
+        path needs the number's own token, which the caller doesn't hold here)."""
+        if self.provider != "kapso" or not message_id or self.settings.kapso_api_key is None:
+            return False
+        base, headers = self._endpoint("")
+        body: dict[str, Any] = {
+            "messaging_product": "whatsapp",
+            "status": "read",
+            "message_id": message_id,
+        }
+        if typing:
+            body["typing_indicator"] = {"type": "text"}
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json=body,
+                timeout=5,
+                follow_redirects=False,
+            )
+        except httpx.HTTPError:
+            return False
+        return response.status_code < 400
+
     async def send(self, number: str, recipient: str, body: str, token: str) -> str:
         base, headers = self._endpoint(token)
         try:

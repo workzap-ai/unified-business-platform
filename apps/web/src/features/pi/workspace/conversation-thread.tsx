@@ -82,7 +82,14 @@ export function ConversationThread({
     piKeys.messages(conversationId),
     () => piService.history(conversationId, { limit: HISTORY_PAGE_SIZE }),
     {
-      refetchInterval: 15_000,
+      // Feels live: every 3 s while open, every second while a reply is still going
+      // out (queued/processing). Polling pauses when the tab is in the background.
+      refetchInterval: (query) =>
+        query.state.data?.items.some(
+          (m) => m.status === "queued" || m.status === "processing",
+        )
+          ? 1_000
+          : 3_000,
     },
   );
   const [older, setOlder] = useState<{

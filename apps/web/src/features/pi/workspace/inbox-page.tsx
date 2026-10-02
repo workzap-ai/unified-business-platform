@@ -61,7 +61,8 @@ export function InboxPage() {
       initialPageParam: 1,
       getNextPageParam: (last) =>
         last.page * last.page_size < last.total ? last.page + 1 : undefined,
-      refetchInterval: 30_000,
+      // New customer messages show up within a few seconds.
+      refetchInterval: 5_000,
       placeholderData: (previous) => previous,
     },
   );

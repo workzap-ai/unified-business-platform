@@ -237,7 +237,7 @@ function ConversationList({
     initialPageParam: 1,
     getNextPageParam: (last) =>
       last.page * last.page_size < last.total ? last.page + 1 : undefined,
-    refetchInterval: 20_000,
+    refetchInterval: 5_000, // new customer messages show up within seconds
   });
   if (list.isPending) {
     return (
@@ -634,7 +634,14 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
       last.has_more && last.before && last.before_id
         ? { before: last.before, before_id: last.before_id }
         : undefined,
-    refetchInterval: 15_000,
+    // Feels live: every 3 s while open, every second while a reply is still going
+    // out. Polling pauses when the tab is in the background.
+    refetchInterval: (query) =>
+      query.state.data?.pages[0]?.items.some(
+        (m) => m.status === "queued" || m.status === "processing",
+      )
+        ? 1_000
+        : 3_000,
   });
   const markRead = useAction(
     () => post(`/pi/conversations/${id}/actions/read`),

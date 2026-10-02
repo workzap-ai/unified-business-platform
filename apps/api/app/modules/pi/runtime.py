@@ -11,6 +11,7 @@ Receipts are the inbound outbox; queued PiMessage rows are the outbound outbox.
 External delivery uncertainty never triggers a blind resend.
 """
 
+import asyncio
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
@@ -243,6 +244,20 @@ def _keyword_handoff(policy: PiSettings, body: str) -> bool:
     return any(word in value for word in words)
 
 
+_typing_tasks: set[asyncio.Task[bool]] = set()
+
+
+def _show_typing(
+    ctx: dict[str, Any], connection: WhatsAppConnection, message_id: str | None
+) -> None:
+    if connection.provider != "kapso" or not message_id or not connection.phone_number_id:
+        return
+    whatsapp = WhatsApp(ctx["settings"], ctx["http"], connection.provider)
+    task = asyncio.create_task(whatsapp.mark_read(connection.phone_number_id, message_id))
+    _typing_tasks.add(task)
+    task.add_done_callback(_typing_tasks.discard)
+
+
 async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
     outbound: list[str] = []
     async with ctx["sessions"]() as session:
@@ -320,6 +335,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             await enqueue_sends(ctx, outbound)
             return
         body = message.body
+        # The customer sees "read" and "typing…" right away while Pi works (best effort,
+        # in the background so it never adds to the reply time).
+        _show_typing(ctx, connection, message.provider_message_id)
         # 3. Media understanding retains the caption and uses scoped usage/budgets.
         # A form reply is already text (its answers), so it goes straight to Pi.
         if message.message_type not in {"text", "interactive"}:

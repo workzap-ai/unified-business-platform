@@ -1,10 +1,20 @@
 """End to end: a business is approved, gets a free plan, its pool number connects, it
 launches, and a customer's WhatsApp messages get Pi's replies through Kapso."""
 
+import asyncio
+import json
+
 import pytest
 from sqlalchemy import select
 from test_pi_business_journey import DETAILS, _operator, _pool, _provider, _tenant
-from test_pi_saas import _kapso, _message_event, _onboard, _publish_all_drafts, _run_jobs
+from test_pi_saas import (
+    _is_read_receipt,
+    _kapso,
+    _message_event,
+    _onboard,
+    _publish_all_drafts,
+    _run_jobs,
+)
 
 from app.modules.pi.models import PiMessage
 from app.modules.pi_saas.models import PiPoolNumber
@@ -18,7 +28,19 @@ def app(api):
 
 
 def _sends(provider, number: str) -> list:
-    return [r for r in provider.requests if r.url.path.endswith(f"/{number}/messages")]
+    return [
+        r
+        for r in provider.requests
+        if r.url.path.endswith(f"/{number}/messages") and not _is_read_receipt(r)
+    ]
+
+
+def _receipts(provider, number: str) -> list:
+    return [
+        json.loads(r.content)
+        for r in provider.requests
+        if r.url.path.endswith(f"/{number}/messages") and _is_read_receipt(r)
+    ]
 
 
 async def test_approved_business_talks_to_customers_on_its_number(
@@ -101,6 +123,11 @@ async def test_approved_business_talks_to_customers_on_its_number(
     assert reply is not None and reply.status == "sent", reply and reply.status
     assert "salam" in reply.body.lower()
     assert len(_sends(provider, "6300000001")) == 1
+    await asyncio.sleep(0)  # let the background read receipt finish
+    [receipt] = _receipts(provider, "6300000001")
+    assert receipt["message_id"] == "wamid.conv1" and receipt["typing_indicator"] == {
+        "type": "text"
+    }
 
     # The conversation continues in the same thread.
     mock_turns(monkeypatch, turn(reply="Hamare cakes 1,200 se shuru hote hain."))

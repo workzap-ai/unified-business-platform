@@ -126,6 +126,14 @@ def _message_event(number: str, sender: str, text: str, mid: str) -> dict:
     }
 
 
+def _is_read_receipt(request) -> bool:
+    """The blue-tick + typing request Pi sends while it works (not a customer message)."""
+    try:
+        return json.loads(request.content).get("status") == "read"
+    except ValueError:
+        return False
+
+
 async def _kapso(client, event_type: str, event: dict, key: str | None = None):
     body = json.dumps(event).encode()
     return await client.post(
@@ -400,11 +408,26 @@ async def test_lapsed_plan_blocks_automation_and_queued_sends(app, provider, bus
     )
     business_db.add(queued)
     await business_db.flush()
-    before = len([r for r in provider.requests if r.url.path.endswith("/messages")])
+    before = len(
+        [
+            r
+            for r in provider.requests
+            if r.url.path.endswith("/messages") and not _is_read_receipt(r)
+        ]
+    )
     await send_pi_message(worker_ctx(app, business_db), str(queued.id))
     await business_db.refresh(queued)
     assert queued.status == "skipped" and queued.error_code == "TRIAL_ENDED"
-    assert len([r for r in provider.requests if r.url.path.endswith("/messages")]) == before
+    assert (
+        len(
+            [
+                r
+                for r in provider.requests
+                if r.url.path.endswith("/messages") and not _is_read_receipt(r)
+            ]
+        )
+        == before
+    )
     await client.aclose()
 
 
@@ -699,7 +722,9 @@ async def test_human_approved_mode_holds_ai_replies_until_approved(
         )
     )
     assert drafted is not None
-    assert not [r for r in provider.requests if r.url.path.endswith("/messages")]
+    assert not [
+        r for r in provider.requests if r.url.path.endswith("/messages") and not _is_read_receipt(r)
+    ]
     approvals = (await client.get("/api/v1/pi-app/pi/approvals")).json()
     assert [a["message_id"] for a in approvals] == [str(drafted.id)]
     approved = await client.post(
@@ -710,7 +735,9 @@ async def test_human_approved_mode_holds_ai_replies_until_approved(
     await _run_jobs(app, provider, business_db)
     await business_db.refresh(drafted)
     assert drafted.status == "sent"
-    sends = [r for r in provider.requests if r.url.path.endswith("/messages")]
+    sends = [
+        r for r in provider.requests if r.url.path.endswith("/messages") and not _is_read_receipt(r)
+    ]
     assert len(sends) == 1 and "/meta/whatsapp/v24.0/7777777777/messages" in str(sends[0].url)
     assert sends[0].headers["x-api-key"]
     await client.aclose()
