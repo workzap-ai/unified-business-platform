@@ -6,6 +6,8 @@ import {
   Building2,
   CheckCircle2,
   FileText,
+  Link2,
+  QrCode,
   Receipt,
   Upload,
 } from "lucide-react";
@@ -121,8 +123,39 @@ function PaymentDetails({
       onSuccess: onChange,
     },
   );
+  const copyLink = useAction(
+    () =>
+      post<{ token: string; url: string; expires_at: string }>(
+        `/billing/payments/${payment.id}/link`,
+      ),
+    {
+      success: "Payment link copied — share it with the payer",
+      onSuccess: async (link) => {
+        try {
+          await navigator.clipboard.writeText(link.url);
+        } catch {
+          // Clipboard access can be denied; the link is still valid, just not copied.
+        }
+      },
+    },
+  );
+  const downloadQr = useAction(
+    () =>
+      post<{ token: string; url: string; expires_at: string }>(
+        `/billing/payments/${payment.id}/link`,
+      ),
+    {
+      onSuccess: (link) => {
+        const a = document.createElement("a");
+        a.href = `/api/v1/pi-app/pay/${link.token}/qr.png`;
+        a.download = `pi-payment-qr-${payment.id.slice(0, 8)}.png`;
+        a.click();
+      },
+    },
+  );
   const bank = payment.method === "bank_transfer";
   const pending = payment.status === "awaiting_payment";
+  const linkable = pending || payment.status === "submitted";
   return (
     <div className="space-y-5">
       <div className="rounded-xl bg-accent-soft p-4">
@@ -148,6 +181,30 @@ function PaymentDetails({
       >
         {STATUS[payment.status]}
       </Badge>
+      {linkable && canManage ? (
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            loading={copyLink.isPending}
+            onClick={() => copyLink.mutate(undefined)}
+          >
+            <Link2 size={15} aria-hidden />
+            Copy payment link
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            loading={downloadQr.isPending}
+            onClick={() => downloadQr.mutate(undefined)}
+          >
+            <QrCode size={15} aria-hidden />
+            Download QR
+          </Button>
+        </div>
+      ) : null}
       <dl className="space-y-2 text-sm">
         <div>
           <dt className="text-muted-foreground">Pay to</dt>

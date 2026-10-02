@@ -4,7 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Banknote,
   CreditCard,
+  Link2,
   Plus,
+  QrCode,
   Smartphone,
   Trash2,
   Wallet,
@@ -576,6 +578,61 @@ function SettingsForm({ initial }: { initial: PaymentSettings }) {
   );
 }
 
+function RequestLinkActions({ requestId }: { requestId: string }) {
+  const copyLink = useAction(
+    () =>
+      post<{ token: string; url: string; expires_at: string }>(
+        `/pi/payment-requests/${requestId}/link`,
+      ),
+    {
+      success: "Payment link copied — share it with the customer",
+      onSuccess: async (link) => {
+        try {
+          await navigator.clipboard.writeText(link.url);
+        } catch {
+          // Clipboard access can be denied; the link is still valid, just not copied.
+        }
+      },
+    },
+  );
+  const downloadQr = useAction(
+    () =>
+      post<{ token: string; url: string; expires_at: string }>(
+        `/pi/payment-requests/${requestId}/link`,
+      ),
+    {
+      onSuccess: (link) => {
+        const a = document.createElement("a");
+        a.href = `/api/v1/pi-app/pay/request/${link.token}/qr.png`;
+        a.download = `pi-payment-qr-${requestId.slice(0, 8)}.png`;
+        a.click();
+      },
+    },
+  );
+  return (
+    <>
+      <Button
+        size="sm"
+        variant="secondary"
+        loading={copyLink.isPending}
+        onClick={() => copyLink.mutate(undefined)}
+      >
+        <Link2 size={14} aria-hidden />
+        Copy link
+      </Button>
+      <Button
+        size="sm"
+        variant="secondary"
+        loading={downloadQr.isPending}
+        onClick={() => downloadQr.mutate(undefined)}
+      >
+        <QrCode size={14} aria-hidden />
+        QR
+      </Button>
+    </>
+  );
+}
+
 function RequestsQueue() {
   const key = useBusinessKey();
   const can = useCan();
@@ -655,6 +712,10 @@ function RequestsQueue() {
                   </span>
                 </span>
                 <PaymentStatus status={r.status} />
+                {can("billing.write") &&
+                ["open", "awaiting_verification"].includes(r.status) ? (
+                  <RequestLinkActions requestId={r.id} />
+                ) : null}
                 {can("billing.write") &&
                 r.method !== "stripe" &&
                 ["open", "awaiting_verification"].includes(r.status) ? (
