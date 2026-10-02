@@ -27,6 +27,8 @@ import {
   PageHeader,
 } from "@/components/ui";
 import { DigestCard } from "@/features/digest-card";
+import { useAccount } from "@/features/setup";
+import { WhatsAppLiveCard } from "@/features/whatsapp-live";
 import { errorText, get } from "@/lib/api";
 import { REASON_LABEL, STATE_LABEL, count } from "@/lib/format";
 import { useBusinessKey } from "@/lib/session";
@@ -155,6 +157,20 @@ function StatusCard({ data }: { data: HomeView }) {
   );
 }
 
+/** The live-number card, once WhatsApp is connected. */
+function HomeWhatsApp() {
+  const account = useAccount();
+  const connection = account.data?.whatsapp;
+  if (connection?.status !== "connected" || !connection.display_phone_number)
+    return null;
+  return (
+    <WhatsAppLiveCard
+      number={connection.display_phone_number}
+      live={account.data?.setup_state === "active"}
+    />
+  );
+}
+
 export function HomePage() {
   const key = useBusinessKey();
   const home = useQuery({
@@ -191,6 +207,7 @@ export function HomePage() {
         />
       </div>
       <StatusCard data={home.data} />
+      <HomeWhatsApp />
       <section aria-labelledby="needs-you">
         <h2 id="needs-you" className="mb-3 text-base font-semibold">
           Needs your attention
