@@ -59,7 +59,7 @@ async def process_pi_billing_event(ctx: dict[str, Any], event_id: str) -> None:
         row.attempts += 1
         try:
             async with session.begin_nested():
-                await billing.apply_event(session, ctx["settings"], row)
+                await billing.apply_event(session, ctx["settings"], row, ctx["http"])
         except Exception as exc:  # noqa: BLE001
             row.error_code = str(getattr(exc, "code", type(exc).__name__))[:64]
             row.status = "failed" if row.attempts >= MAX_ATTEMPTS else "received"

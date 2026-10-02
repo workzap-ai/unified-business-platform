@@ -14,12 +14,14 @@ from decimal import Decimal
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
+import httpx
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import Settings
 from app.modules.audit.service import record
-from app.modules.pi_saas.billing import subscription_for
+from app.modules.pi_saas.billing import account_name, send_billing_email, subscription_for
 from app.modules.pi_saas.models import PiBusinessAccount, PiPlan, PiPlatformInvoice
 from app.modules.pi_saas.payment_models import (
     PiCheckoutAttempt,
@@ -130,7 +132,7 @@ def payment_view(row: PiManualPayment) -> dict[str, Any]:
 
 
 async def audit(
-    session: AsyncSession, row: PiManualPayment, actor: UUID, action: str, **details: Any
+    session: AsyncSession, row: PiManualPayment, actor: UUID | None, action: str, **details: Any
 ) -> None:
     await record(
         session,
@@ -270,7 +272,11 @@ async def create_payment(
 
 
 async def submit_payment(
-    session: AsyncSession, tenant_id: UUID, payment_id: UUID, actor: UUID, data: PaymentSubmission
+    session: AsyncSession,
+    tenant_id: UUID,
+    payment_id: UUID,
+    actor: UUID | None,
+    data: PaymentSubmission,
 ) -> PiManualPayment:
     await subscription_for(session, tenant_id)
     row = await payment_for(session, tenant_id, payment_id, lock=True)
@@ -342,7 +348,15 @@ def add_months(value: datetime, count: int) -> datetime:
 
 
 async def decide_payment(
-    session: AsyncSession, tenant_id: UUID, payment_id: UUID, actor: UUID, action: str, note: str
+    session: AsyncSession,
+    tenant_id: UUID,
+    payment_id: UUID,
+    actor: UUID,
+    action: str,
+    note: str,
+    *,
+    settings: Settings | None = None,
+    http: httpx.AsyncClient | None = None,
 ) -> PiManualPayment:
     sub = await subscription_for(session, tenant_id)
     row = await payment_for(session, tenant_id, payment_id, lock=True)
@@ -394,6 +408,26 @@ async def decide_payment(
         actor,
     )
     await audit(session, row, actor, f"payment_{target}", reason=note)
+    if action == "approve" and settings is not None:
+        business = await account_name(session, tenant_id)
+        await send_billing_email(
+            session,
+            settings,
+            http,
+            tenant_id,
+            "pi_payment_receipt",
+            {
+                "business": business,
+                "plan": row.plan_name,
+                "amount": f"PKR {row.amount:,.2f}",
+                "receipt": row.receipt_number or "",
+                "period": (
+                    f"{row.period_start:%d %b %Y} to {row.period_end:%d %b %Y}"
+                    if row.period_start and row.period_end
+                    else ""
+                ),
+            },
+        )
     return row
 
 

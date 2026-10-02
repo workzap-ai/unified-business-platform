@@ -10,6 +10,7 @@ Plans have no hard-coded prices: an operator sets the price and Stripe price id 
 plan can be bought. Trials need no payment method and run on the configured plan.
 """
 
+import logging
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
@@ -21,8 +22,13 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings
+from app.integrations.email import send_platform_template
+from app.integrations.errors import IntegrationError
+from app.integrations.http import OutboundClient
 from app.integrations.providers.stripe import StripeProvider
+from app.modules.access.models import MembershipRole, RolePermission
 from app.modules.audit.service import record
+from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
 from app.modules.pi_saas.json_util import as_dict, as_list
 from app.modules.pi_saas.models import (
@@ -33,8 +39,11 @@ from app.modules.pi_saas.models import (
     PiSubscription,
 )
 from app.modules.pi_saas.payment_models import PiCheckoutAttempt, PiManualPayment
+from app.modules.users.models import PlatformUser
 from app.shared.errors import BusinessRuleViolation
 from app.shared.scope import WorkspaceScope
+
+logger = logging.getLogger("platform")
 
 ZERO_DECIMAL = {
     "BIF",
@@ -153,6 +162,74 @@ async def subscription_for(session: AsyncSession, tenant_id: UUID) -> PiSubscrip
     if row is None:
         raise BusinessRuleViolation("NO_SUBSCRIPTION", "No Pi plan is set up", 404)
     return row
+
+
+async def account_name(session: AsyncSession, tenant_id: UUID) -> str:
+    return (
+        await session.scalar(
+            select(PiBusinessAccount.name).where(PiBusinessAccount.tenant_id == tenant_id)
+        )
+    ) or "your business"
+
+
+async def billing_recipients(session: AsyncSession, tenant_id: UUID) -> list[tuple[str, str]]:
+    """Active members who can manage this tenant's Pi billing: the email audience for
+    subscription notices. An empty result just means no email goes out — the in-app
+    notification (``notify(...)``) still reaches the same audience on read."""
+    rows = await session.execute(
+        select(PlatformUser.email, PlatformUser.display_name)
+        .join(Membership, Membership.user_id == PlatformUser.id)
+        .join(
+            MembershipRole,
+            (MembershipRole.tenant_id == Membership.tenant_id)
+            & (MembershipRole.membership_id == Membership.id),
+        )
+        .join(
+            RolePermission,
+            (RolePermission.tenant_id == MembershipRole.tenant_id)
+            & (RolePermission.role_id == MembershipRole.role_id),
+        )
+        .where(
+            Membership.tenant_id == tenant_id,
+            Membership.status == "active",
+            PlatformUser.status == "active",
+            RolePermission.permission == "pi.billing.manage",
+        )
+        .distinct()
+        .limit(10)
+    )
+    return [(email, name) for email, name in rows]
+
+
+async def send_billing_email(
+    session: AsyncSession,
+    settings: Settings,
+    http: httpx.AsyncClient | None,
+    tenant_id: UUID,
+    template: str,
+    variables: dict[str, str],
+) -> None:
+    """Best-effort account-level email (same transport as password reset/verify email):
+    never raises, so a misconfigured or down mail provider can never block billing state
+    changes. ``http`` is optional so direct, non-HTTP callers (and existing tests that
+    call ``apply_event`` without one) simply skip sending."""
+    if http is None:
+        return
+    recipients = await billing_recipients(session, tenant_id)
+    if not recipients:
+        return
+    outbound = OutboundClient(settings, http)
+    for email, name in recipients:
+        try:
+            await send_platform_template(
+                settings,
+                outbound,
+                template,
+                [email],
+                {**variables, "name": name or "there"},
+            )
+        except (BusinessRuleViolation, IntegrationError):
+            logger.warning("pi_billing_email_failed", extra={"template": template})
 
 
 async def checkout(
@@ -490,7 +567,12 @@ async def _subscription(session: AsyncSession, obj: dict[str, Any]) -> PiSubscri
     return None
 
 
-async def apply_event(session: AsyncSession, settings: Settings, row: PiBillingEvent) -> None:
+async def apply_event(
+    session: AsyncSession,
+    settings: Settings,
+    row: PiBillingEvent,
+    http: httpx.AsyncClient | None = None,
+) -> None:
     obj = as_dict(row.payload.get("object"))
     created = _ts(row.payload.get("created")) or datetime.now(UTC)
     subscription = await _subscription(session, obj)
@@ -608,6 +690,22 @@ async def apply_event(session: AsyncSession, settings: Settings, row: PiBillingE
             subscription.status = "active"
         if recent and kind in {"invoice.paid", "invoice.payment_failed"}:
             subscription.last_event_at = created
+        if recent and kind == "invoice.paid":
+            currency = str(obj.get("currency") or subscription.currency).upper()[:3]
+            amount = _money(obj.get("amount_paid"), currency)
+            business = await account_name(session, subscription.tenant_id)
+            await send_billing_email(
+                session,
+                settings,
+                http,
+                subscription.tenant_id,
+                "pi_invoice_paid",
+                {
+                    "business": business,
+                    "amount": f"{amount} {currency}",
+                    "link": f"{settings.pi_app_public_url.rstrip('/')}/settings/billing",
+                },
+            )
     else:
         row.status = "ignored"
         return
@@ -643,6 +741,15 @@ async def apply_event(session: AsyncSession, settings: Settings, row: PiBillingE
                 link="/settings/billing",
                 permission="pi.billing.read",
                 dedupe_key=f"pi-billing:{subscription.id}:{subscription.status}",
+            )
+        if subscription.status == "past_due":
+            await send_billing_email(
+                session,
+                settings,
+                http,
+                subscription.tenant_id,
+                "pi_billing_past_due",
+                {"link": f"{settings.pi_app_public_url.rstrip('/')}/settings/billing"},
             )
 
 
