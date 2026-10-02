@@ -23,6 +23,9 @@ def _rejection_kind(response: httpx.Response) -> str:
     except ValueError:
         return f"http_{response.status_code}"
     error = data.get("error") if isinstance(data, dict) else None
+    if isinstance(data, dict) and isinstance(data.get("code"), str) and data["code"]:
+        # Kapso's own refusals: {"error": "...", "code": "funding_required_unverified"}
+        return re.sub(r"[^a-z0-9]+", "_", data["code"].lower()).strip("_")[:60]
     if isinstance(error, dict):
         code = error.get("code") or error.get("error_subcode")
         if code:
@@ -41,6 +44,13 @@ def check_sent(response: httpx.Response) -> None:
             "whatsapp_send_rejected",
             extra={"provider": "whatsapp", "status_code": response.status_code, "error_kind": kind},
         )
+        if response.status_code == 402 or "funding" in kind or "billing" in kind:
+            # The account's WhatsApp billing blocks paid sends (Kapso/Meta side).
+            raise BusinessRuleViolation(
+                "WHATSAPP_BILLING_PAUSED",
+                f"WhatsApp sending is paused until billing is fixed ({kind})",
+                422,
+            )
         raise BusinessRuleViolation(
             "WHATSAPP_REJECTED", f"WhatsApp refused the message ({kind})", 422
         )

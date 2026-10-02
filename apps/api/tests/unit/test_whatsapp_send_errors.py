@@ -33,6 +33,18 @@ async def test_kapso_window_refusal_is_rejected(settings):
     assert "24_hour_window" in caught.value.message
 
 
+async def test_kapso_billing_block_is_named(settings):
+    body = {
+        "error": "Paid WhatsApp sends are paused until the billing issue is resolved",
+        "code": "funding_required_unverified",
+    }
+    whatsapp = _client(settings, httpx.Response(402, json=body))
+    with pytest.raises(BusinessRuleViolation) as caught:
+        await whatsapp.send("1258916823982550", "923112546598", "hi", "")
+    assert caught.value.code == "WHATSAPP_BILLING_PAUSED"
+    assert "funding_required_unverified" in caught.value.message
+
+
 async def test_server_errors_stay_unconfirmed(settings):
     whatsapp = _client(settings, httpx.Response(502, text="bad gateway"))
     with pytest.raises(BusinessRuleViolation) as caught:

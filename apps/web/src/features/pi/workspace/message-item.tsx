@@ -215,6 +215,8 @@ const DELIVERY_REASONS: Record<string, string> = {
   DELIVERY_UNCONFIRMED:
     "WhatsApp did not confirm delivery; check before resending",
   WHATSAPP_REJECTED: "WhatsApp rejected the message",
+  WHATSAPP_BILLING_PAUSED:
+    "sending is paused until the WhatsApp account's billing is fixed in Kapso/Meta",
 };
 
 function deliveryLabel(message: Message, base: string) {
