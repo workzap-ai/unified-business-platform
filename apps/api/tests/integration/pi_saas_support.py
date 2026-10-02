@@ -47,6 +47,7 @@ class FakeProvider:
         self.webhooks: dict[str, list[dict[str, Any]]] = {}
         self.flows: list[dict[str, Any]] = []
         self.connected_tokens: list[str] = []
+        self.setup_links: list[dict[str, Any]] = []
 
     def add_number(
         self, customer_id: str, phone_number_id: str, display: str, **extra: Any
@@ -79,6 +80,14 @@ class FakeProvider:
                 self.customers[customer_id] = body["customer"]["external_customer_id"]
                 return httpx.Response(201, json={"data": {"id": customer_id}})
             if path.endswith("/setup_links") and request.method == "POST":
+                # Like real Kapso: the fields must be wrapped in "setup_link".
+                link = json.loads(request.content or b"{}").get("setup_link")
+                if not isinstance(link, dict) or not link.get("success_redirect_url"):
+                    return httpx.Response(
+                        400,
+                        json={"error": "param is missing or the value is empty: setup_link"},
+                    )
+                self.setup_links.append(link)
                 return httpx.Response(
                     201,
                     json={

@@ -239,7 +239,9 @@ class Kapso:
             body["provision_phone_number"] = True
             body["phone_number_country_isos"] = [provision_country]
         data = (
-            await self._request("POST", f"/customers/{customer_id}/setup_links", json=body)
+            await self._request(
+                "POST", f"/customers/{customer_id}/setup_links", json={"setup_link": body}
+            )
         ).get("data") or {}
         link_id, url = str(data.get("id", "")), str(data.get("url", ""))
         if not SAFE_ID.fullmatch(link_id) or not url.startswith("https://"):
