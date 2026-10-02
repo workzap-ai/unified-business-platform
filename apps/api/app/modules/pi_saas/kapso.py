@@ -33,6 +33,7 @@ businesses in our database; nothing is purchased automatically.
 
 import hashlib
 import hmac
+import logging
 import re
 from dataclasses import dataclass
 from typing import Any
@@ -43,10 +44,41 @@ from app.core.config import Settings
 from app.modules.pi_saas.json_util import as_dict, as_list
 from app.shared.errors import BusinessRuleViolation
 
+logger = logging.getLogger("platform")
+
 PHONE_NUMBER_ID = re.compile(r"^[0-9]{5,32}$")
 SAFE_ID = re.compile(r"^[A-Za-z0-9_-]{1,120}$")
 CONNECTION_TYPES = ("coexistence", "dedicated")
 SETUP_LANGUAGES = {"en", "es", "pt", "hi", "id", "ar"}
+
+
+def _error_slug(response: httpx.Response) -> str:
+    """Kapso's error as a short identifier (letters, digits, underscores only), e.g.
+    "param_is_missing_or_the_value_is_empty_or_invalid_setup_link"."""
+    try:
+        data = response.json()
+    except ValueError:
+        return "unreadable"
+    error = data.get("error") if isinstance(data, dict) else None
+    if isinstance(error, dict):
+        error = error.get("code") or error.get("message")
+    text = str(error or data.get("message") or "") if isinstance(data, dict) else ""
+    return re.sub(r"[^a-z0-9]+", "_", text.lower()).strip("_")[:80] or "unknown"
+
+
+def _log_failure(response: httpx.Response) -> None:
+    """Record why Kapso refused a request, within the logging allowlist: Kapso's status,
+    the endpoint without ids, and its error as an identifier (never payloads or keys)."""
+    path = re.sub(r"/[0-9a-fA-F-]{8,}|/[0-9]{5,}", "/{id}", response.request.url.path)
+    logger.warning(
+        "kapso_request_failed",
+        extra={
+            "provider": "kapso",
+            "status_code": response.status_code,
+            "operation": path[:120],
+            "error_kind": _error_slug(response),
+        },
+    )
 
 
 class KapsoUnavailable(BusinessRuleViolation):
@@ -185,6 +217,7 @@ class Kapso:
                 "PROVIDER_NOT_FOUND", "The provider record was not found", 404
             )
         if response.status_code >= 400:
+            _log_failure(response)
             raise KapsoUnavailable("PROVIDER_ERROR")
         if response.status_code == 204 or not response.content:
             return {}
@@ -196,7 +229,25 @@ class Kapso:
             raise KapsoUnavailable("PROVIDER_BAD_RESPONSE")
         return data
 
+    async def find_customer(self, external_id: str, max_pages: int = 10) -> str | None:
+        """The Kapso customer already made for this external id, if any."""
+        for page in range(1, max_pages + 1):
+            data = await self._request("GET", "/customers", params={"page": page, "per_page": 100})
+            items = [i for i in as_list(data.get("data")) if isinstance(i, dict)]
+            for item in items:
+                if item.get("external_customer_id") == external_id:
+                    found = str(item.get("id") or "")
+                    return found if SAFE_ID.fullmatch(found) else None
+            if len(items) < 100:
+                return None
+        return None
+
     async def create_customer(self, name: str, external_id: str) -> str:
+        # Reuse an existing customer: a retry (or a lost database row) must never leave
+        # duplicates in Kapso or fail because the external id is already taken.
+        existing = await self.find_customer(external_id)
+        if existing:
+            return existing
         data = await self._request(
             "POST",
             "/customers",
@@ -400,6 +451,7 @@ class Kapso:
                 "PROVIDER_REJECTED_CREDENTIALS", "The WhatsApp provider rejected our access", 502
             )
         if response.status_code >= 400:
+            _log_failure(response)
             raise KapsoUnavailable("PROVIDER_ERROR")
         return data if isinstance(data, dict) else {}
 

@@ -79,6 +79,16 @@ class FakeProvider:
                 customer_id = str(uuid4())
                 self.customers[customer_id] = body["customer"]["external_customer_id"]
                 return httpx.Response(201, json={"data": {"id": customer_id}})
+            if path == "/platform/v1/customers" and request.method == "GET":
+                return httpx.Response(
+                    200,
+                    json={
+                        "data": [
+                            {"id": cid, "external_customer_id": ext}
+                            for cid, ext in self.customers.items()
+                        ]
+                    },
+                )
             if path.endswith("/setup_links") and request.method == "POST":
                 # Like real Kapso: the fields must be wrapped in "setup_link".
                 link = json.loads(request.content or b"{}").get("setup_link")
