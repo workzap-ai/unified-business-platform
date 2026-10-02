@@ -53,11 +53,12 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
         "embed": "gemini-embedding-001",
         "transcribe": "gemini-2.5-flash",
     },
+    # Groq retired its Llama chat models; gpt-oss is what the platform key can use
+    # (checked live on 2 Oct 2026). No vision model there, so images stay elsewhere.
     "groq": {
-        "router": "llama-3.1-8b-instant",
+        "router": "openai/gpt-oss-20b",
         "agent": "openai/gpt-oss-120b",
-        "summarize": "llama-3.1-8b-instant",
-        "vision": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "summarize": "openai/gpt-oss-20b",
         "transcribe": "whisper-large-v3-turbo",
     },
     # Claude: chat and vision only (embeddings and transcription stay on OpenAI/Gemini).
