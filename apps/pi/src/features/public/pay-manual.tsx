@@ -95,7 +95,8 @@ function ProofForm({
     payerName.trim().length >= 2 &&
     Boolean(paidOn) &&
     Boolean(file) &&
-    !fileTooLarge;
+    !fileTooLarge &&
+    (!bank || reference.trim().length >= 3);
   return (
     <form
       className="space-y-4"
@@ -130,6 +131,8 @@ function ProofForm({
           id="pay-reference"
           value={reference}
           onChange={(e) => setReference(e.target.value)}
+          required={bank}
+          minLength={bank ? 3 : undefined}
           maxLength={120}
         />
       </Field>
