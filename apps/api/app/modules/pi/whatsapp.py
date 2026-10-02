@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import logging
 import re
 from typing import Any
 from urllib.parse import urlparse
@@ -10,6 +11,40 @@ from cryptography.fernet import Fernet, InvalidToken
 from app.ai.media import normalize_mime
 from app.core.config import Settings
 from app.shared.errors import BusinessRuleViolation
+
+logger = logging.getLogger("platform")
+
+
+def _rejection_kind(response: httpx.Response) -> str:
+    """Meta's error code, or the provider's error text as an identifier, e.g.
+    "131042" (payment issue) or "cannot_send_non_template_messages_outside_the_24"."""
+    try:
+        data = response.json()
+    except ValueError:
+        return f"http_{response.status_code}"
+    error = data.get("error") if isinstance(data, dict) else None
+    if isinstance(error, dict):
+        code = error.get("code") or error.get("error_subcode")
+        if code:
+            return str(code)[:20]
+        error = error.get("message") or error.get("type")
+    text = re.sub(r"[^a-z0-9]+", "_", str(error or "").lower()).strip("_")
+    return text[:60] or f"http_{response.status_code}"
+
+
+def check_sent(response: httpx.Response) -> None:
+    """A 4xx is WhatsApp (or Kapso) refusing the message: nothing was sent, so say so
+    and log why. Timeouts and 5xx stay "unconfirmed" (it may have been sent)."""
+    if 400 <= response.status_code < 500:
+        kind = _rejection_kind(response)
+        logger.warning(
+            "whatsapp_send_rejected",
+            extra={"provider": "whatsapp", "status_code": response.status_code, "error_kind": kind},
+        )
+        raise BusinessRuleViolation(
+            "WHATSAPP_REJECTED", f"WhatsApp refused the message ({kind})", 422
+        )
+    response.raise_for_status()
 
 
 def encrypt_token(settings: Settings, token: str) -> str:
@@ -224,7 +259,7 @@ class WhatsApp:
                 timeout=15,
                 follow_redirects=False,
             )
-            response.raise_for_status()
+            check_sent(response)
             mid = response.json()["messages"][0]["id"]
             if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
                 raise ValueError
@@ -272,7 +307,7 @@ class WhatsApp:
                 timeout=15,
                 follow_redirects=False,
             )
-            response.raise_for_status()
+            check_sent(response)
             mid = response.json()["messages"][0]["id"]
             if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
                 raise ValueError
@@ -297,7 +332,7 @@ class WhatsApp:
                 timeout=15,
                 follow_redirects=False,
             )
-            response.raise_for_status()
+            check_sent(response)
             mid = response.json()["messages"][0]["id"]
             if not isinstance(mid, str) or len(mid) > 160:
                 raise ValueError
