@@ -35,6 +35,10 @@ export const memberSchema = z.object({
   roles: z.array(z.string()),
   role_ids: z.array(z.string()),
   joined_at: z.string(),
+  // Set only on the response to a fresh invite: a copyable fallback in case the
+  // invitation email doesn't arrive. Null for an existing account, and for every
+  // member returned by the list/search endpoint.
+  invite_link: z.string().nullable(),
 });
 export const roleSchema = z.object({
   id: z.string(),
@@ -86,7 +90,6 @@ export interface AdminService {
   addMember(input: {
     email: string;
     display_name: string;
-    initial_password?: string | null;
     role_ids: string[];
   }): Promise<Member>;
   updateMemberRoles(id: string, roleIds: string[]): Promise<Member>;
@@ -267,6 +270,7 @@ const demoAdmin = demoCollection<AdminData>("admin", (profile) => {
     roles: [role],
     role_ids: [`role-${role}`],
     joined_at: daysAgo(400 - i * 30),
+    invite_link: null,
   }));
   if (commerce) {
     roles.push({
@@ -418,6 +422,8 @@ const demo: AdminService = {
       roles: roles.map((r) => r.key),
       role_ids: roles.map((r) => r.id),
       joined_at: new Date().toISOString(),
+      // No real email goes out in sample-data mode, so there is nothing to link to.
+      invite_link: null,
     };
     data.members.push(member);
     roles.forEach((r) => (r.member_count += 1));

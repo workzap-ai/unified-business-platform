@@ -198,6 +198,60 @@ async def test_registration_provisions_a_separate_business_and_pi_only_session(
     await client.aclose()
 
 
+async def test_pi_forgot_and_reset_password_use_the_shared_credential(
+    app, provider, business_db, monkeypatch
+):
+    """Pi has its own session/cookies, but the password is the same PlatformUser
+    credential Owner OS uses, so the shared reset flow applies here too."""
+    sent: list[dict] = []
+
+    async def fake(settings, http, template, to, variables, **kwargs):
+        sent.append({"template": template, "to": list(to), "variables": dict(variables)})
+
+    monkeypatch.setattr("app.modules.auth.service.send_platform_template", fake)
+
+    client = pi_client(app)
+    view = await pi_register(client)
+    email = view["user"]["email"]
+    await client.aclose()
+    sent.clear()  # drop the sign-up verification email; not what this test checks
+
+    async with pi_client(app) as anon:
+        known = await anon.post("/api/v1/pi-app/auth/forgot-password", json={"email": email})
+        unknown = await anon.post(
+            "/api/v1/pi-app/auth/forgot-password",
+            json={"email": f"nobody-{uuid4().hex}@example.com"},
+        )
+        assert known.status_code == unknown.status_code == 204
+        assert len(sent) == 1 and sent[0]["to"] == [email]
+        link = sent[0]["variables"]["link"]
+        assert link.startswith(app.state.settings.pi_app_public_url)
+        token = link.split("token=")[1]
+
+        bad = await anon.post(
+            "/api/v1/pi-app/auth/reset-password",
+            json={"token": "not-a-real-token", "new_password": PASSWORD},
+        )
+        assert bad.status_code == 422
+
+        new_password = "Freshly-Reset-Pi-Secret-5"
+        reset = await anon.post(
+            "/api/v1/pi-app/auth/reset-password",
+            json={"token": token, "new_password": new_password},
+        )
+        assert reset.status_code == 204
+
+    async with pi_client(app) as fresh:
+        old = await fresh.post(
+            "/api/v1/pi-app/auth/login", json={"email": email, "password": PASSWORD}
+        )
+        assert old.status_code == 401
+        good = await fresh.post(
+            "/api/v1/pi-app/auth/login", json={"email": email, "password": new_password}
+        )
+        assert good.status_code == 200
+
+
 async def test_onboarding_is_resumable_and_launch_requires_real_readiness(
     app, provider, business_db
 ):
@@ -471,21 +525,17 @@ async def _member_client(app, owner, role: str):
     email = f"{role}-{uuid4().hex}@example.com"
     response = await owner.post(
         "/api/v1/pi-app/team",
-        json={
-            "email": email,
-            "display_name": role.title(),
-            "role": role,
-            "temporary_password": PASSWORD,
-        },
+        json={"email": email, "display_name": role.title(), "role": role},
     )
     assert response.status_code == 201, response.text
+    token = response.json()["invite_link"].split("token=")[1]
     client = pi_client(app)
-    login = await client.post(
-        "/api/v1/pi-app/auth/login", json={"email": email, "password": PASSWORD}
+    accepted = await client.post(
+        "/api/v1/pi-app/auth/accept-invite", json={"token": token, "new_password": PASSWORD}
     )
-    assert login.status_code == 200, login.text
+    assert accepted.status_code == 201, accepted.text
     client.headers["x-csrf-token"] = client.cookies["pi_csrf"]
-    return client, login.json(), response.json()["membership_id"]
+    return client, accepted.json(), response.json()["membership_id"]
 
 
 async def test_members_only_see_assigned_conversations_and_view_only_cannot_act(

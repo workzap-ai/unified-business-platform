@@ -54,6 +54,9 @@ class MemberView(BaseModel):
     roles: list[str]
     role_ids: list[UUID]
     joined_at: datetime
+    # Set only on the response to a fresh invite (a new platform account): a fallback
+    # the admin can copy and share if the invitation email doesn't arrive.
+    invite_link: str | None = None
 
 
 class MemberCreate(BaseModel):
@@ -62,8 +65,6 @@ class MemberCreate(BaseModel):
     display_name: Annotated[
         str, StringConstraints(strip_whitespace=True, min_length=1, max_length=160)
     ]
-    # Only used when the email has no platform account yet; never overwrites credentials.
-    initial_password: Annotated[str, StringConstraints(min_length=12, max_length=128)] | None = None
     role_ids: list[UUID] = Field(min_length=1, max_length=10)
 
     @field_validator("email")

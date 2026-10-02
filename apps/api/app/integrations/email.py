@@ -113,6 +113,55 @@ TEMPLATES: dict[str, EmailTemplate] = {
         variables=frozenset({"name", "link", "minutes", "workspace"}),
         links=frozenset({"link"}),
     ),
+    "verify_email": EmailTemplate(
+        subject="Confirm your email address",
+        text="Hello $name,\n\nConfirm this is your email address: $link\n"
+        "This link expires in $hours hours.\n\n"
+        "If you did not create this account, ignore this email.",
+        html='<p>Hello $name,</p><p><a href="$link">Confirm your email address</a></p>'
+        "<p>This link expires in $hours hours.</p>"
+        "<p>If you did not create this account, ignore this email.</p>",
+        variables=frozenset({"name", "link", "hours", "workspace"}),
+        links=frozenset({"link"}),
+    ),
+    # Account-level (not workspace-scoped): Pi subscription billing notices, sent from
+    # the platform SMTP server, the same as password reset/verify email — a business's
+    # own connected email integration is for messaging ITS customers, not for the
+    # platform billing that business.
+    "pi_payment_receipt": EmailTemplate(
+        subject="Payment received — $business",
+        text="Hello $name,\n\nWe received your payment for $business.\n\n"
+        "Plan: $plan\nAmount: $amount\nReceipt: $receipt\nService period: $period\n\n"
+        "Thank you for your business.",
+        html="<p>Hello $name,</p><p>We received your payment for <b>$business</b>.</p>"
+        "<ul><li>Plan: $plan</li><li>Amount: $amount</li><li>Receipt: $receipt</li>"
+        "<li>Service period: $period</li></ul><p>Thank you for your business.</p>",
+        variables=frozenset(
+            {"name", "business", "plan", "amount", "receipt", "period", "workspace"}
+        ),
+    ),
+    "pi_billing_past_due": EmailTemplate(
+        subject="Action needed: update your Pi payment details",
+        text="Hello $name,\n\nYour Pi subscription payment is past due. Update your "
+        "payment details to keep Pi replying to your customers: $link\n\n"
+        "If you already paid, you can ignore this message.",
+        html="<p>Hello $name,</p><p>Your Pi subscription payment is past due. Update "
+        "your payment details to keep Pi replying to your customers.</p>"
+        '<p><a href="$link">Update payment details</a></p>'
+        "<p>If you already paid, you can ignore this message.</p>",
+        variables=frozenset({"name", "link", "workspace"}),
+        links=frozenset({"link"}),
+    ),
+    "pi_invoice_paid": EmailTemplate(
+        subject="Payment confirmed — $business",
+        text="Hello $name,\n\nWe've received your payment of $amount for $business. "
+        "Your Pi subscription is up to date.\n\nView your billing: $link",
+        html="<p>Hello $name,</p><p>We've received your payment of <b>$amount</b> for "
+        "<b>$business</b>. Your Pi subscription is up to date.</p>"
+        '<p><a href="$link">View your billing</a></p>',
+        variables=frozenset({"name", "business", "amount", "link", "workspace"}),
+        links=frozenset({"link"}),
+    ),
 }
 
 

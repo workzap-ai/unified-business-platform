@@ -228,15 +228,20 @@ async def test_hr_writer_without_sensitive_access_cannot_set_salary(stack):
         roles = {r["key"]: r["id"] for r in (await owner.get("roles")).json()}
         assert roles["hr-clerk"] == role["id"]
         email = f"{unique('clerk')}@example.com"
-        await owner.create(
+        created = await owner.create(
             "members",
             {
                 "email": email,
                 "display_name": "Clerk",
-                "initial_password": "Clerk-Password-123",
                 "role_ids": [role["id"]],
             },
         )
+        token = created["invite_link"].split("token=")[1]
+        accepted = await mb.post(
+            "/api/v1/auth/accept-invite",
+            json={"token": token, "new_password": "Clerk-Password-123"},
+        )
+        assert accepted.status_code == 201, accepted.text
         clerk = await stack.login(mb, email, "Clerk-Password-123")
         body = {
             "full_name": "Someone",
@@ -268,15 +273,20 @@ async def test_custom_roles_cannot_escalate_beyond_their_creator(stack):
             },
         )
         email = f"{unique('delegate')}@example.com"
-        await owner.create(
+        created = await owner.create(
             "members",
             {
                 "email": email,
                 "display_name": "Delegate",
-                "initial_password": "Delegate-Pass-123",
                 "role_ids": [delegated["id"]],
             },
         )
+        token = created["invite_link"].split("token=")[1]
+        accepted = await db.post(
+            "/api/v1/auth/accept-invite",
+            json={"token": token, "new_password": "Delegate-Pass-123"},
+        )
+        assert accepted.status_code == 201, accepted.text
         delegate = await stack.login(db, email, "Delegate-Pass-123")
         roles = {r["key"]: r for r in (await delegate.get("roles")).json()}
 
@@ -313,7 +323,6 @@ async def test_custom_roles_cannot_escalate_beyond_their_creator(stack):
         new_member = {
             "email": f"{unique('victim')}@example.com",
             "display_name": "New",
-            "initial_password": "Victim-Password-1",
         }
         for key, code in (("admin", "PERMISSION_ESCALATION"), ("owner", "OWNER_REQUIRED")):
             response = await delegate.post(
@@ -332,6 +341,12 @@ async def test_custom_roles_cannot_escalate_beyond_their_creator(stack):
         # A role still assigned to someone cannot be deleted.
         assert (await delegate.delete(f"roles/{reader['id']}")).status_code == 409
 
+        victim_token = viewer["invite_link"].split("token=")[1]
+        accepted = await vb.post(
+            "/api/v1/auth/accept-invite",
+            json={"token": victim_token, "new_password": "Victim-Password-1"},
+        )
+        assert accepted.status_code == 201, accepted.text
         session = (await stack.login(vb, new_member["email"], "Victim-Password-1")).session
         assert session["permissions"] == ["customers.read"]
         assert set((await delegate.get("auth/session")).json()["permissions"]) == {

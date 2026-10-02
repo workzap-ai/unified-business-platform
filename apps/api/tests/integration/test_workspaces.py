@@ -85,19 +85,20 @@ async def test_member_permissions_revocation_and_foreign_roles(api):
         {
             "email": email,
             "display_name": "Reader",
-            "initial_password": "MemberSecure123!",
             "role_ids": [role["id"]],
         },
     )
+    token = member["invite_link"].split("token=")[1]
     async with httpx.AsyncClient(
         transport=api._transport,
         base_url="http://testserver",
         headers={"origin": "http://localhost:3000"},
     ) as reader:
         response = await reader.post(
-            "/api/v1/auth/login", json={"email": email, "password": "MemberSecure123!"}
+            "/api/v1/auth/accept-invite",
+            json={"token": token, "new_password": "MemberSecure123!"},
         )
-        assert response.status_code == 200, response.text
+        assert response.status_code == 201, response.text
         reader.headers["x-csrf-token"] = reader.cookies["platform_csrf"]
         assert (await reader.get("/api/v1/customers")).status_code == 200
         assert (await reader.post("/api/v1/customers", json={"name": "Denied"})).status_code == 403

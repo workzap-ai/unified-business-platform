@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/display";
 import { SheetContent, Tooltip } from "@/components/ui/overlays";
 import { useLocalStorageState } from "@/hooks/use-local-storage";
 import { useSession } from "@/features/auth/session-provider";
+import { VerifyEmailBanner } from "@/features/auth/verify-email-banner";
 import { Breadcrumbs, BreadcrumbProvider } from "./breadcrumbs";
 import { CommandMenuProvider } from "./command-menu";
 import { NotificationCenter } from "./notification-center";
@@ -158,6 +159,7 @@ function ShellFrame({ children }: { children: React.ReactNode }) {
             <UserMenu />
           </div>
         </header>
+        <VerifyEmailBanner />
         <main id="main" className="min-w-0 flex-1" tabIndex={-1}>
           {children}
         </main>

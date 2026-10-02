@@ -41,6 +41,9 @@ export interface AuthService {
   logoutAll(): Promise<void>;
   forgotPassword(email: string): Promise<void>;
   resetPassword(token: string, newPassword: string): Promise<void>;
+  verifyEmail(token: string): Promise<void>;
+  resendVerification(): Promise<void>;
+  acceptInvite(token: string, newPassword: string): Promise<Session>;
 }
 
 const live: AuthService = {
@@ -84,6 +87,14 @@ const live: AuthService = {
     apiRequest("POST", "/auth/reset-password", null, {
       body: { token, new_password },
     }),
+  verifyEmail: (token) =>
+    apiRequest("POST", "/auth/verify-email", null, { body: { token } }),
+  resendVerification: () =>
+    apiRequest("POST", "/auth/resend-verification", null, { body: {} }),
+  acceptInvite: (token, new_password) =>
+    apiRequest("POST", "/auth/accept-invite", sessionSchema, {
+      body: { token, new_password },
+    }).then(bindSession),
 };
 
 function bindSession(session: Session): Session {
@@ -163,6 +174,21 @@ const demo: AuthService = {
     await demoDelay(300);
     throw new DemoError(
       "Password reset requires a live API connection: this build never sends the email that carries the reset link.",
+    );
+  },
+  async verifyEmail() {
+    await demoDelay(300);
+    throw new DemoError(
+      "Email verification requires a live API connection: this build never sends the email that carries the link.",
+    );
+  },
+  async resendVerification() {
+    await demoDelay(200);
+  },
+  async acceptInvite() {
+    await demoDelay(300);
+    throw new DemoError(
+      "Accepting an invite requires a live API connection: this build never sends the email that carries the invite link.",
     );
   },
 };

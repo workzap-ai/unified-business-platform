@@ -1,21 +1,29 @@
-from datetime import UTC, datetime
+import logging
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.audience import Audience
+from app.core.config import Settings
 from app.core.pagination import Page, Pagination
+from app.integrations.email import send_platform_template
+from app.integrations.errors import IntegrationError
+from app.integrations.http import OutboundClient
 from app.modules.access.models import MembershipRole, Role, RolePermission
 from app.modules.access.schemas import MemberCreate, MemberView
 from app.modules.access.service import assign_roles, membership_grants, owner_count
 from app.modules.audit.service import record
-from app.modules.auth.crypto import hash_password
-from app.modules.auth.models import AuthSession, UserCredential
+from app.modules.auth.crypto import digest, hash_password, new_token
+from app.modules.auth.models import AuthSession, MemberInviteToken, UserCredential
 from app.modules.memberships.models import Membership
 from app.modules.tenants.models import Tenant
 from app.modules.users.models import PlatformUser
 from app.shared.errors import BusinessRuleViolation, Conflict, ResourceNotFound
 from app.shared.scope import WorkspaceScope
+
+logger = logging.getLogger("platform")
 
 
 class MemberService:
@@ -81,23 +89,28 @@ class MemberService:
         items = [self._build(m, u, roles.get(m.id, [])) for m, u in rows]
         return Page(items=items, total=int(total or 0), page=page.page, page_size=page.page_size)
 
-    async def add(self, data: MemberCreate) -> MemberView:
+    async def add(
+        self,
+        data: MemberCreate,
+        http: OutboundClient,
+        settings: Settings,
+        audience: Audience = "owner_os",
+    ) -> MemberView:
         self.scope.require("admin.members.manage")
         user = await self.session.scalar(
             select(PlatformUser).where(PlatformUser.email == data.email)
         )
+        is_new_account = user is None
         if user is None:
-            if not data.initial_password:
-                raise BusinessRuleViolation(
-                    "PASSWORD_REQUIRED", "An initial password is required for new accounts"
-                )
             user = PlatformUser(email=data.email, display_name=data.display_name)
             self.session.add(user)
             await self.session.flush()
             self.session.add(
                 UserCredential(
                     user_id=user.id,
-                    password_hash=hash_password(data.initial_password),
+                    # Random and never revealed: nobody can sign in until the
+                    # invitation link below is used to set a real password.
+                    password_hash=hash_password(new_token()),
                     password_changed_at=datetime.now(UTC),
                 )
             )
@@ -123,7 +136,57 @@ class MemberService:
             entity_id=existing.id,
             include_environment=False,
         )
-        return await self._view(existing, user)
+        invite_link = await self._invite(user, http, settings, audience, is_new_account)
+        view = await self._view(existing, user)
+        return view.model_copy(update={"invite_link": invite_link})
+
+    async def _invite(
+        self,
+        user: PlatformUser,
+        http: OutboundClient,
+        settings: Settings,
+        audience: Audience,
+        is_new_account: bool,
+    ) -> str | None:
+        """New accounts get a one-time link to set their first password; an existing
+        person added to another workspace already has one, so they just get pointed
+        at sign-in. Either way, a failed send never blocks adding the member."""
+        base = settings.pi_app_public_url if audience == "pi" else settings.web_public_url
+        invite_link: str | None = None
+        if is_new_account:
+            current = datetime.now(UTC)
+            token = new_token()
+            self.session.add(
+                MemberInviteToken(
+                    user_id=user.id,
+                    tenant_id=self.scope.tenant_id,
+                    token_hash=digest(token),
+                    expires_at=current + timedelta(minutes=settings.member_invite_ttl_minutes),
+                )
+            )
+            invite_link = f"{base}/accept-invite?token={token}"
+            link = invite_link
+        else:
+            link = f"{base}/{'sign-in' if audience == 'pi' else 'login'}"
+        tenant_name = await self.session.scalar(
+            select(Tenant.name).where(Tenant.id == self.scope.tenant_id)
+        )
+        try:
+            await send_platform_template(
+                settings,
+                http,
+                "invitation",
+                [user.email],
+                {
+                    "name": user.display_name,
+                    "inviter": self.scope.actor_label,
+                    "workspace": tenant_name or "your workspace",
+                    "link": link,
+                },
+            )
+        except (BusinessRuleViolation, IntegrationError):
+            logger.warning("invitation_email_failed", extra={"user_id": str(user.id)})
+        return invite_link
 
     async def _assign(self, membership_id: UUID, role_ids: list[UUID]) -> None:
         roles = (

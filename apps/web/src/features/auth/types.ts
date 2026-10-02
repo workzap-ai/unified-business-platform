@@ -12,6 +12,7 @@ export const sessionSchema = z.object({
     id: z.string(),
     email: z.string(),
     display_name: z.string(),
+    email_verified: z.boolean(),
   }),
   tenant: workspaceRefSchema.nullable(),
   environment: workspaceRefSchema.nullable(),

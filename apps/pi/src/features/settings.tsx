@@ -36,6 +36,7 @@ import {
   Spinner,
 } from "@/components/ui";
 import { BusinessReview, NotificationSettings } from "@/features/journey";
+import { WhatsAppLiveCard } from "@/features/whatsapp-live";
 import { SetupCenter } from "@/features/setup-center";
 import { WhatsAppConnect, useAccount } from "@/features/setup";
 import { GettingPaid } from "@/features/getting-paid";
@@ -253,6 +254,13 @@ export function WhatsAppPage() {
         />
       ) : (
         <div className="space-y-6">
+          {status.data.production.status === "connected" &&
+          status.data.production.display_phone_number ? (
+            <WhatsAppLiveCard
+              number={status.data.production.display_phone_number}
+              live={account.data?.setup_state === "active"}
+            />
+          ) : null}
           <Card>
             <CardSection className="space-y-4">
               <div className="flex flex-wrap items-center gap-2">
@@ -460,103 +468,142 @@ function InviteDialog({ roles }: { roles: TeamView["roles"] }) {
     email: "",
     display_name: "",
     role: "member",
-    temporary_password: "",
   });
+  const [invited, setInvited] = React.useState<{
+    name: string;
+    link: string | null;
+  } | null>(null);
   const invite = useAction(
-    () =>
-      post("/team", {
-        ...form,
-        temporary_password: form.temporary_password || null,
-      }),
+    () => post<{ display_name: string; invite_link: string | null }>("/team", form),
     {
       invalidate: [["team"]],
-      success: "Added. Share the temporary password with them privately.",
-      onSuccess: () => {
-        setOpen(false);
-        setForm({
-          email: "",
-          display_name: "",
-          role: "member",
-          temporary_password: "",
-        });
+      onSuccess: (member) => {
+        setForm({ email: "", display_name: "", role: "member" });
+        if (member.invite_link) {
+          setInvited({ name: member.display_name, link: member.invite_link });
+        } else {
+          setOpen(false);
+        }
       },
     },
   );
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) setInvited(null);
+      }}
+    >
       <Button onClick={() => setOpen(true)}>
         <UserPlus className="size-4" aria-hidden /> Add a person
       </Button>
-      <DialogContent
-        title="Add someone to your team"
-        description="They sign in to Pi with their email."
-      >
-        <div className="space-y-4">
-          <Field label="Name" htmlFor="inv-name">
-            <Input
-              id="inv-name"
-              value={form.display_name}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, display_name: e.target.value }))
-              }
-            />
-          </Field>
-          <Field label="Email" htmlFor="inv-email">
-            <Input
-              id="inv-email"
-              type="email"
-              value={form.email}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, email: e.target.value }))
-              }
-            />
-          </Field>
-          <Field
-            label="Role"
-            htmlFor="inv-role"
-            hint={roles.find((r) => r.key === form.role)?.description}
-          >
-            <Select
-              id="inv-role"
-              value={form.role}
-              onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
+      {invited ? (
+        <DialogContent
+          title="Invitation sent"
+          description={`${invited.name} will get an email with a link to set their password.`}
+        >
+          <div className="space-y-4">
+            <Field
+              label="Or share this link directly"
+              htmlFor="inv-link"
+              hint="Works once, and expires in 7 days. Useful if the email doesn't arrive."
             >
-              {roles
-                .filter((r) => r.key !== "owner")
-                .map((r) => (
-                  <option key={r.key} value={r.key}>
-                    {r.name}
-                  </option>
-                ))}
-            </Select>
-          </Field>
-          <Field
-            label="Temporary password"
-            htmlFor="inv-pw"
-            hint="Needed only if they don't have a Pi account yet. At least 12 characters."
-            optional
-          >
-            <Input
-              id="inv-pw"
-              type="password"
-              autoComplete="new-password"
-              value={form.temporary_password}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, temporary_password: e.target.value }))
-              }
-            />
-          </Field>
-          <Button
-            className="w-full"
-            loading={invite.isPending}
-            disabled={!form.email || !form.display_name}
-            onClick={() => invite.mutate(undefined)}
-          >
-            Add to team
-          </Button>
-        </div>
-      </DialogContent>
+              <InviteLinkField link={invited.link ?? ""} />
+            </Field>
+            <Button className="w-full" onClick={() => setOpen(false)}>
+              Done
+            </Button>
+          </div>
+        </DialogContent>
+      ) : (
+        <DialogContent
+          title="Add someone to your team"
+          description="Invite them by email. If they already have a Pi account, they're added right away."
+        >
+          <div className="space-y-4">
+            <Field label="Name" htmlFor="inv-name">
+              <Input
+                id="inv-name"
+                value={form.display_name}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, display_name: e.target.value }))
+                }
+              />
+            </Field>
+            <Field label="Email" htmlFor="inv-email">
+              <Input
+                id="inv-email"
+                type="email"
+                value={form.email}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, email: e.target.value }))
+                }
+              />
+            </Field>
+            <Field
+              label="Role"
+              htmlFor="inv-role"
+              hint={roles.find((r) => r.key === form.role)?.description}
+            >
+              <Select
+                id="inv-role"
+                value={form.role}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, role: e.target.value }))
+                }
+              >
+                {roles
+                  .filter((r) => r.key !== "owner")
+                  .map((r) => (
+                    <option key={r.key} value={r.key}>
+                      {r.name}
+                    </option>
+                  ))}
+              </Select>
+            </Field>
+            <Button
+              className="w-full"
+              loading={invite.isPending}
+              disabled={!form.email || !form.display_name}
+              onClick={() => invite.mutate(undefined)}
+            >
+              Send invite
+            </Button>
+          </div>
+        </DialogContent>
+      )}
     </Dialog>
+  );
+}
+
+function InviteLinkField({ link }: { link: string }) {
+  const [copied, setCopied] = React.useState(false);
+  return (
+    <div className="flex items-center gap-2">
+      <input
+        id="inv-link"
+        readOnly
+        value={link}
+        onFocus={(e) => e.currentTarget.select()}
+        className="h-9 min-w-0 flex-1 rounded-md border border-border bg-surface px-2.5 font-mono text-xs"
+      />
+      <Button
+        type="button"
+        variant="secondary"
+        className="h-9 shrink-0 px-3"
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(link);
+            setCopied(true);
+          } catch {
+            setCopied(false);
+          }
+        }}
+      >
+        {copied ? "Copied" : "Copy"}
+      </Button>
+    </div>
   );
 }
 

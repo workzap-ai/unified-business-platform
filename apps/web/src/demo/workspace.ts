@@ -9,6 +9,7 @@ export const DEMO_USER = {
   id: "user-demo-owner",
   email: "demo@example.com",
   display_name: "Amina Rahman",
+  email_verified: true,
 };
 
 export const DEMO_TENANTS: Tenant[] = [

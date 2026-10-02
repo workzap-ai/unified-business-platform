@@ -27,6 +27,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_session
 from app.core.rate_limit import client_ip, hit
+from app.integrations.http import OutboundClient
 from app.modules.access.dependencies import Scope
 from app.modules.access.members import MemberService
 from app.modules.access.models import Role
@@ -37,7 +38,14 @@ from app.modules.audit.service import record
 from app.modules.auth.crypto import hash_password
 from app.modules.auth.dependencies import Auth
 from app.modules.auth.models import UserCredential
-from app.modules.auth.schemas import Password, normalize_email
+from app.modules.auth.schemas import (
+    AcceptInviteRequest,
+    ForgotPasswordRequest,
+    Password,
+    ResetPasswordRequest,
+    VerifyEmailRequest,
+    normalize_email,
+)
 from app.modules.auth.service import AuthService, IssuedSession, pi_business_tenants
 from app.modules.business_settings.models import BusinessSettings
 from app.modules.memberships.models import Membership
@@ -184,7 +192,12 @@ async def _session_view(
             else "production",
         }
     return {
-        "user": {"id": user.id, "email": user.email, "display_name": user.display_name},
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "display_name": user.display_name,
+            "email_verified": user.email_verified,
+        },
         "business": current,
         "businesses": sorted(businesses, key=lambda b: b["name"].lower()),
         "permissions": sorted(permissions),
@@ -226,9 +239,28 @@ async def register(
     service = AuthService(session, settings)
     issued = await service._issue(user, request.headers.get("user-agent", ""), "pi")
     await record(session, "auth.registered", actor_user_id=user.id, details={"audience": "pi"})
+    http = OutboundClient(settings, request.app.state.http)
+    await service.start_email_verification(user, http, "pi")
     await session.commit()
     _set_cookies(response, request, issued)
     return await _session_view(session, issued.record, user)
+
+
+@router.post("/auth/accept-invite", status_code=201)
+async def accept_invite(
+    data: AcceptInviteRequest, request: Request, response: Response, session: Session
+) -> dict[str, Any]:
+    settings = request.app.state.settings
+    if not await hit(request, "pi-accept-invite", client_ip(request), 20, 3600):
+        raise HTTPException(status_code=429)
+    service = AuthService(session, settings)
+    issued = await service.accept_invite(
+        data.token, data.new_password, request.headers.get("user-agent", ""), "pi"
+    )
+    await session.commit()
+    _set_cookies(response, request, issued)
+    context = await service.resolve(issued.token, "pi")
+    return await _session_view(session, context.session, context.user)
 
 
 @router.post("/auth/login")
@@ -267,6 +299,56 @@ async def logout(request: Request, auth: Auth, session: Session) -> Response:
 @router.get("/auth/session")
 async def current_session(auth: Auth, session: Session) -> dict[str, Any]:
     return await _session_view(session, auth.session, auth.user)
+
+
+@router.post("/auth/verify-email", status_code=status.HTTP_204_NO_CONTENT)
+async def verify_email(data: VerifyEmailRequest, request: Request, session: Session) -> Response:
+    settings = request.app.state.settings
+    if not await hit(request, "pi-verify-email", client_ip(request), 20, 3600):
+        raise HTTPException(status_code=429)
+    await AuthService(session, settings).verify_email(data.token)
+    await session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/auth/resend-verification", status_code=status.HTTP_204_NO_CONTENT)
+async def resend_verification(request: Request, auth: Auth, session: Session) -> Response:
+    settings = request.app.state.settings
+    limit = settings.rate_limit_email_verification_per_hour
+    if not await hit(request, "pi-resend-verification", str(auth.user.id), limit, 3600):
+        raise HTTPException(status_code=429)
+    http = OutboundClient(settings, request.app.state.http)
+    await AuthService(session, settings).resend_verification(auth.user, http, "pi")
+    await session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/auth/forgot-password", status_code=status.HTTP_204_NO_CONTENT)
+async def forgot_password(
+    data: ForgotPasswordRequest, request: Request, session: Session
+) -> Response:
+    settings = request.app.state.settings
+    limit = settings.rate_limit_password_reset_per_hour
+    if not await hit(
+        request, "pi-forgot-password-ip", client_ip(request), limit, 3600
+    ) or not await hit(request, "pi-forgot-password-account", data.email, limit, 3600):
+        raise HTTPException(status_code=429)
+    http = OutboundClient(settings, request.app.state.http)
+    await AuthService(session, settings).request_password_reset(data.email, http, "pi")
+    await session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/auth/reset-password", status_code=status.HTTP_204_NO_CONTENT)
+async def reset_password(
+    data: ResetPasswordRequest, request: Request, session: Session
+) -> Response:
+    settings = request.app.state.settings
+    if not await hit(request, "pi-reset-password", client_ip(request), 20, 3600):
+        raise HTTPException(status_code=429)
+    await AuthService(session, settings).reset_password(data.token, data.new_password)
+    await session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.put("/auth/business")
@@ -919,7 +1001,6 @@ class TeamInvite(BaseModel):
     email: EmailStr
     display_name: Annotated[str, StringConstraints(min_length=1, max_length=160)]
     role: Literal["admin", "manager", "member", "viewer", "billing"]
-    temporary_password: Password | None = None
 
 
 class TeamRole(BaseModel):
@@ -973,7 +1054,9 @@ async def team(scope: Scope, session: Session) -> dict[str, Any]:
 
 
 @router.post("/team", status_code=201)
-async def invite(data: TeamInvite, scope: Scope, session: Session) -> dict[str, Any]:
+async def invite(
+    data: TeamInvite, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
     scope.require("admin.members.manage")
     current = await entitlement(session, scope.tenant_id)
     seats = current.allowances.get("seats")
@@ -984,16 +1067,25 @@ async def invite(data: TeamInvite, scope: Scope, session: Session) -> dict[str, 
         raise BusinessRuleViolation(
             "SEAT_LIMIT", "Your plan's team seats are all in use. Upgrade to add more people.", 409
         )
+    settings = request.app.state.settings
+    http = OutboundClient(settings, request.app.state.http)
     member = await MemberService(session, scope).add(
         MemberCreate(
             email=data.email,
             display_name=data.display_name,
-            initial_password=data.temporary_password,
             role_ids=[await _role_id(session, scope.tenant_id, data.role)],
-        )
+        ),
+        http,
+        settings,
+        "pi",
     )
     await session.commit()
-    return {"membership_id": member.membership_id, "email": member.email, "roles": member.roles}
+    return {
+        "membership_id": member.membership_id,
+        "email": member.email,
+        "roles": member.roles,
+        "invite_link": member.invite_link,
+    }
 
 
 @router.put("/team/{membership_id}")
@@ -1131,8 +1223,6 @@ async def website(
 ) -> dict[str, Any]:
     if not await hit(request, "pi-website", str(scope.tenant_id), 20, 3600):
         raise HTTPException(status_code=429)
-    from app.integrations.http import OutboundClient
-
     draft = await teach.import_website(
         session,
         request.app.state.settings,

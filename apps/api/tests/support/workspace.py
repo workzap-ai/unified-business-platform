@@ -183,17 +183,29 @@ async def accepted_quote(actor: Actor, customer_id: str, lines: list[dict[str, A
 
 
 async def add_member(owner: Actor, role_keys: list[str], password: str = PASSWORD) -> str:
+    """Invite a member and immediately accept the invite with a known password, so
+    callers can log in as them right away. Real invitees do this in their own
+    browser; here it reuses the owner's client, so its session cookies are saved and
+    restored around the call (accept-invite would otherwise sign the owner out by
+    overwriting them with the new member's session)."""
     roles = {r["key"]: r["id"] for r in (await owner.get("roles")).json()}
     email = f"{unique('member')}@example.com"
-    await owner.create(
+    created = await owner.create(
         "members",
         {
             "email": email,
             "display_name": "Member",
-            "initial_password": password,
             "role_ids": [roles[k] for k in role_keys],
         },
     )
+    token = created["invite_link"].split("token=")[1]
+    saved_cookies = dict(owner.client.cookies)
+    accepted = await owner.post(
+        "auth/accept-invite", {"token": token, "new_password": password}
+    )
+    assert accepted.status_code == 201, accepted.text
+    owner.client.cookies.clear()
+    owner.client.cookies.update(saved_cookies)
     return email
 
 

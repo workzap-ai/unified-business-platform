@@ -406,16 +406,26 @@ async def test_rbac_denies_without_permissions(env):
     )
     for role, email_prefix in ((reader_role, "reader"), (nobody_role, "nobody")):
         email = f"{email_prefix}-{uuid4().hex}@example.com"
-        await create(
+        created = await create(
             api,
             "members",
             {
                 "email": email,
                 "display_name": email_prefix,
-                "initial_password": "MemberSecure123!",
                 "role_ids": [role["id"]],
             },
         )
+        token = created["invite_link"].split("token=")[1]
+        async with httpx.AsyncClient(
+            transport=api._transport,
+            base_url="http://testserver",
+            headers={"origin": "http://localhost:3000"},
+        ) as acceptor:
+            accept = await acceptor.post(
+                "/api/v1/auth/accept-invite",
+                json={"token": token, "new_password": "MemberSecure123!"},
+            )
+            assert accept.status_code == 201, accept.text
         async with httpx.AsyncClient(
             transport=api._transport,
             base_url="http://testserver",

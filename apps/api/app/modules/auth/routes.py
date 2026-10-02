@@ -12,6 +12,7 @@ from app.integrations.http import OutboundClient
 from app.modules.access.service import membership_grants
 from app.modules.auth.dependencies import Auth
 from app.modules.auth.schemas import (
+    AcceptInviteRequest,
     ChangePasswordRequest,
     ForgotPasswordRequest,
     LoginRequest,
@@ -19,6 +20,7 @@ from app.modules.auth.schemas import (
     ResetPasswordRequest,
     SessionView,
     UserView,
+    VerifyEmailRequest,
     WorkspaceRef,
     WorkspaceSelection,
 )
@@ -148,7 +150,25 @@ async def register(
     if not await hit(request, "register", client_ip(request), 5, 3600):
         raise HTTPException(status_code=429)
     service = AuthService(session, settings)
-    issued = await service.register(data, request.headers.get("user-agent", ""))
+    http = OutboundClient(settings, request.app.state.http)
+    issued = await service.register(data, request.headers.get("user-agent", ""), http)
+    await session.commit()
+    set_cookies(response, settings, issued)
+    context = await service.resolve(issued.token)
+    return await session_view(session, context)
+
+
+@router.post("/accept-invite", response_model=SessionView, status_code=status.HTTP_201_CREATED)
+async def accept_invite(
+    data: AcceptInviteRequest, request: Request, response: Response, session: Session
+) -> SessionView:
+    settings = request.app.state.settings
+    if not await hit(request, "accept-invite", client_ip(request), 20, 3600):
+        raise HTTPException(status_code=429)
+    service = AuthService(session, settings)
+    issued = await service.accept_invite(
+        data.token, data.new_password, request.headers.get("user-agent", "")
+    )
     await session.commit()
     set_cookies(response, settings, issued)
     context = await service.resolve(issued.token)
@@ -211,6 +231,28 @@ async def select_workspace(
     )
     await session.commit()
     return await session_view(session, auth)
+
+
+@router.post("/verify-email", status_code=status.HTTP_204_NO_CONTENT)
+async def verify_email(data: VerifyEmailRequest, request: Request, session: Session) -> Response:
+    settings = request.app.state.settings
+    if not await hit(request, "verify-email", client_ip(request), 20, 3600):
+        raise HTTPException(status_code=429)
+    await AuthService(session, settings).verify_email(data.token)
+    await session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/resend-verification", status_code=status.HTTP_204_NO_CONTENT)
+async def resend_verification(request: Request, auth: Auth, session: Session) -> Response:
+    settings = request.app.state.settings
+    limit = settings.rate_limit_email_verification_per_hour
+    if not await hit(request, "resend-verification", str(auth.user.id), limit, 3600):
+        raise HTTPException(status_code=429)
+    http = OutboundClient(settings, request.app.state.http)
+    await AuthService(session, settings).resend_verification(auth.user, http)
+    await session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/forgot-password", status_code=status.HTTP_204_NO_CONTENT)

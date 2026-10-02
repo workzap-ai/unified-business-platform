@@ -5,6 +5,8 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
+  Check,
+  Copy,
   MoreHorizontal,
   ShieldCheck,
   UserMinus,
@@ -352,20 +354,9 @@ const addSchema = z.object({
     .min(1, "Enter their name")
     .max(120, "Keep the name under 120 characters"),
   role_ids: z.array(z.string()).min(1, "Choose at least one role"),
-  initial_password: z
-    .string()
-    .refine(
-      (v) => !v || v.length >= 12,
-      "Use at least 12 characters, or leave empty",
-    ),
 });
 type AddValues = z.infer<typeof addSchema>;
-const emptyAdd: AddValues = {
-  email: "",
-  display_name: "",
-  role_ids: [],
-  initial_password: "",
-};
+const emptyAdd: AddValues = { email: "", display_name: "", role_ids: [] };
 
 function AddMemberDialog({
   open,
@@ -381,31 +372,67 @@ function AddMemberDialog({
     defaultValues: emptyAdd,
   });
   const [serverError, setServerError] = useState<string | null>(null);
+  const [invited, setInvited] = useState<{ name: string; link: string } | null>(
+    null,
+  );
   const add = useScopedMutation(
     (input: AddValues) =>
       adminService.addMember({
         email: input.email.trim(),
         display_name: input.display_name.trim(),
         role_ids: input.role_ids,
-        initial_password: input.initial_password || null,
       }),
     {
       invalidate: [
         ["admin", "members"],
         ["admin", "roles"],
       ],
-      success: (m) => `${m.display_name} added`,
+      success: (m) =>
+        m.invite_link ? `Invitation sent to ${m.display_name}` : `${m.display_name} added`,
     },
   );
   const e = form.formState.errors;
   const saving = add.isPending;
+
+  if (invited) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent size="md">
+          <DialogHeader
+            title="Invitation sent"
+            description={`${invited.name} will get an email with a link to set their password.`}
+          />
+          <DialogBody className="space-y-3">
+            <FormField
+              label="Or share this link directly"
+              htmlFor="invite-link"
+              help="Works once, and expires in 7 days. Useful if the email doesn't arrive."
+            >
+              <InviteLinkField link={invited.link} />
+            </FormField>
+          </DialogBody>
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                setInvited(null);
+                form.reset(emptyAdd);
+                onOpenChange(false);
+              }}
+            >
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={(next) => !saving && onOpenChange(next)}>
       <DialogContent size="md">
         <DialogHeader
           title="Add member"
-          description="Give someone access to this workspace. They sign in with their email."
+          description="Invite someone to this workspace by email. If they already have an account, they're added right away."
         />
         <form
           noValidate
@@ -413,8 +440,12 @@ function AddMemberDialog({
           onSubmit={form.handleSubmit(async (values) => {
             setServerError(null);
             try {
-              await add.mutateAsync(values);
-              onOpenChange(false);
+              const member = await add.mutateAsync(values);
+              if (member.invite_link) {
+                setInvited({ name: member.display_name, link: member.invite_link });
+              } else {
+                onOpenChange(false);
+              }
             } catch (error) {
               if (error instanceof ApiError && error.fields.email)
                 form.setError("email", {
@@ -478,27 +509,6 @@ function AddMemberDialog({
                 )}
               />
             </FormField>
-            <FormField
-              label="Initial password"
-              htmlFor="add-password"
-              optional
-              error={e.initial_password}
-              help="Only used if this email has no account yet. At least 12 characters; share it privately."
-            >
-              <Input
-                id="add-password"
-                type="password"
-                autoComplete="new-password"
-                disabled={saving}
-                aria-invalid={!!e.initial_password || undefined}
-                aria-describedby={
-                  e.initial_password
-                    ? "add-password-error"
-                    : "add-password-help"
-                }
-                {...form.register("initial_password")}
-              />
-            </FormField>
             {serverError && <InlineError message={serverError} />}
           </DialogBody>
           <DialogFooter>
@@ -511,12 +521,43 @@ function AddMemberDialog({
               Cancel
             </Button>
             <Button type="submit" loading={saving}>
-              Add member
+              Send invite
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function InviteLinkField({ link }: { link: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="flex items-center gap-2">
+      <input
+        id="invite-link"
+        readOnly
+        value={link}
+        onFocus={(e) => e.currentTarget.select()}
+        className="h-9 min-w-0 flex-1 rounded-md border border-border bg-surface px-2.5 font-mono text-xs"
+      />
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        className="h-9 shrink-0"
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(link);
+            setCopied(true);
+          } catch {
+            setCopied(false);
+          }
+        }}
+      >
+        {copied ? <Check /> : <Copy />} {copied ? "Copied" : "Copy"}
+      </Button>
+    </div>
   );
 }
 

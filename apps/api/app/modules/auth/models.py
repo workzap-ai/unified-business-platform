@@ -36,6 +36,32 @@ class PasswordResetToken(Record, Base):
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
+class EmailVerificationToken(Record, Base):
+    """One-time, short-lived token proving the owner of `platform_users.email` clicked
+    the link sent there. Same digest-only, single-use shape as PasswordResetToken."""
+
+    __tablename__ = "email_verification_tokens"
+    __table_args__ = (Index("ix_email_verification_tokens_user", "user_id"),)
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("platform_users.id", ondelete="CASCADE"))
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class MemberInviteToken(Record, Base):
+    """One-time, short-lived token letting a newly invited member set their first real
+    password. The placeholder credential created at invite time (a hash of a random
+    value never given to anyone) cannot be entered by anyone until this is accepted."""
+
+    __tablename__ = "member_invite_tokens"
+    __table_args__ = (Index("ix_member_invite_tokens_user", "user_id"),)
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("platform_users.id", ondelete="CASCADE"))
+    tenant_id: Mapped[UUID] = mapped_column(ForeignKey("tenants.id", ondelete="CASCADE"))
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
 class AuthSession(Record, Base):
     """Opaque server-side session. Only a SHA-256 digest of the token is stored.
 

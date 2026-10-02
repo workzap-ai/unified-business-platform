@@ -15,7 +15,13 @@ from app.integrations.errors import IntegrationError
 from app.integrations.http import OutboundClient
 from app.modules.audit.service import record
 from app.modules.auth.crypto import digest, hash_password, needs_rehash, new_token, verify_password
-from app.modules.auth.models import AuthSession, PasswordResetToken, UserCredential
+from app.modules.auth.models import (
+    AuthSession,
+    EmailVerificationToken,
+    MemberInviteToken,
+    PasswordResetToken,
+    UserCredential,
+)
 from app.modules.auth.schemas import RegisterRequest
 from app.modules.branches.models import Branch
 from app.modules.environments.models import Environment
@@ -96,7 +102,9 @@ class AuthService:
         auth.active_environment_id = environment.id if environment else None
         auth.active_branch_id = None
 
-    async def register(self, data: RegisterRequest, user_agent: str) -> IssuedSession:
+    async def register(
+        self, data: RegisterRequest, user_agent: str, http: OutboundClient
+    ) -> IssuedSession:
         if not self.settings.allow_registration:
             raise BusinessRuleViolation("REGISTRATION_DISABLED", "Registration is not available")
         try:
@@ -124,6 +132,7 @@ class AuthService:
             entity_type="user",
             entity_id=user.id,
         )
+        await self.start_email_verification(user, http)
         return issued
 
     async def login(
@@ -247,11 +256,16 @@ class AuthService:
         )
         await record(self.session, "auth.password_changed", actor_user_id=auth.user_id)
 
-    async def request_password_reset(self, email: str, http: OutboundClient) -> None:
+    async def request_password_reset(
+        self, email: str, http: OutboundClient, audience: Audience = "owner_os"
+    ) -> None:
         """Always completes the same way regardless of whether the email matches an
         account: the response never reveals account existence, and a failure to send
         the email (misconfigured SMTP, provider outage) is logged, not raised, so it
-        cannot be distinguished from "no such account" either."""
+        cannot be distinguished from "no such account" either.
+
+        The credential is shared across both apps, so any account can reset from
+        either one; `audience` only picks which app's URL goes in the email link."""
         user = await self.session.scalar(
             select(PlatformUser).where(PlatformUser.email == email, PlatformUser.status == "active")
         )
@@ -278,7 +292,8 @@ class AuthService:
             entity_type="user",
             entity_id=user.id,
         )
-        link = f"{self.settings.web_public_url}/reset-password?token={token}"
+        base = self.settings.pi_app_public_url if audience == "pi" else self.settings.web_public_url
+        link = f"{base}/reset-password?token={token}"
         try:
             await send_platform_template(
                 self.settings,
@@ -334,6 +349,121 @@ class AuthService:
             entity_type="user",
             entity_id=reset.user_id,
         )
+
+    async def start_email_verification(
+        self, user: PlatformUser, http: OutboundClient, audience: Audience = "owner_os"
+    ) -> None:
+        """Best-effort: called right after sign-up (and from "resend"), never raises on
+        a send failure since nothing is gated on verification yet."""
+        current = now()
+        await self.session.execute(
+            update(EmailVerificationToken)
+            .where(
+                EmailVerificationToken.user_id == user.id, EmailVerificationToken.used_at.is_(None)
+            )
+            .values(used_at=current)
+        )
+        token = new_token()
+        self.session.add(
+            EmailVerificationToken(
+                user_id=user.id,
+                token_hash=digest(token),
+                expires_at=current
+                + timedelta(minutes=self.settings.email_verification_ttl_minutes),
+            )
+        )
+        base = self.settings.pi_app_public_url if audience == "pi" else self.settings.web_public_url
+        link = f"{base}/verify-email?token={token}"
+        try:
+            await send_platform_template(
+                self.settings,
+                http,
+                "verify_email",
+                [user.email],
+                {
+                    "name": user.display_name,
+                    "link": link,
+                    "hours": str(self.settings.email_verification_ttl_minutes // 60),
+                },
+            )
+        except (BusinessRuleViolation, IntegrationError):
+            logger.warning("verification_email_failed", extra={"user_id": str(user.id)})
+
+    async def resend_verification(
+        self, user: PlatformUser, http: OutboundClient, audience: Audience = "owner_os"
+    ) -> None:
+        if user.email_verified_at is not None:
+            return
+        await self.start_email_verification(user, http, audience)
+
+    async def verify_email(self, token: str) -> None:
+        current = now()
+        verification = await self.session.scalar(
+            select(EmailVerificationToken)
+            .where(EmailVerificationToken.token_hash == digest(token))
+            .with_for_update()
+        )
+        if (
+            verification is None
+            or verification.used_at is not None
+            or verification.expires_at <= current
+        ):
+            raise BusinessRuleViolation(
+                "INVALID_VERIFICATION_TOKEN", "This verification link is invalid or has expired"
+            )
+        verification.used_at = current
+        user = await self.session.get(PlatformUser, verification.user_id)
+        if user is not None and user.email_verified_at is None:
+            user.email_verified_at = current
+            await record(
+                self.session,
+                "auth.email_verified",
+                actor_user_id=user.id,
+                entity_type="user",
+                entity_id=user.id,
+            )
+
+    async def accept_invite(
+        self, token: str, new_password: str, user_agent: str, audience: Audience = "owner_os"
+    ) -> IssuedSession:
+        """First login for a member invited by email: sets their real password over
+        the placeholder credential created at invite time, then signs them in."""
+        current = now()
+        invite = await self.session.scalar(
+            select(MemberInviteToken)
+            .where(MemberInviteToken.token_hash == digest(token))
+            .with_for_update()
+        )
+        if invite is None or invite.used_at is not None or invite.expires_at <= current:
+            raise BusinessRuleViolation(
+                "INVALID_INVITE_TOKEN", "This invitation link is invalid or has expired"
+            )
+        credential = await self.session.scalar(
+            select(UserCredential).where(UserCredential.user_id == invite.user_id).with_for_update()
+        )
+        user = await self.session.get(PlatformUser, invite.user_id)
+        if credential is None or user is None:
+            raise BusinessRuleViolation(
+                "INVALID_INVITE_TOKEN", "This invitation link is invalid or has expired"
+            )
+        invite.used_at = current
+        credential.password_hash = hash_password(new_password)
+        credential.password_changed_at = current
+        credential.failed_attempts = 0
+        credential.locked_until = None
+        if user.email_verified_at is None:
+            # Clicking the emailed link already proves the mailbox is real.
+            user.email_verified_at = current
+        issued = await self._issue(user, user_agent, audience)
+        await record(
+            self.session,
+            "auth.invite_accepted",
+            actor_user_id=user.id,
+            tenant_id=invite.tenant_id,
+            entity_type="user",
+            entity_id=user.id,
+        )
+        return issued
 
     async def select_workspace(
         self,

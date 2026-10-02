@@ -376,6 +376,7 @@ async def test_forgot_password_is_silent_about_account_existence_and_only_emails
 ):
     async with stack.browser() as browser:
         owner = await stack.register(browser)
+    captured_emails.clear()  # drop the sign-up verification email; not what this test checks
     async with stack.browser() as anon:
         known = await anon.post(
             "/api/v1/auth/forgot-password", json={"email": owner.email.upper()}
@@ -396,6 +397,7 @@ async def test_reset_password_flow_sets_new_password_and_revokes_every_session(
     async with stack.browser() as first, stack.browser() as second, stack.browser() as anon:
         owner = await stack.register(first)
         other = await stack.login(second, owner.email)
+        captured_emails.clear()  # drop the sign-up verification email
 
         assert (
             await anon.post("/api/v1/auth/forgot-password", json={"email": owner.email})
@@ -458,10 +460,58 @@ async def test_reset_password_token_cannot_be_used_once_expired(stack):
         assert response.status_code == 422 and error_code(response) == "INVALID_RESET_TOKEN"
 
 
-async def test_member_created_with_initial_password_can_sign_in_and_existing_is_untouched(stack):
+async def test_member_invited_by_email_accepts_and_signs_in(stack):
     async with stack.browser() as browser:
         owner = await stack.register(browser)
         email = await add_member(owner, ["viewer"], password="Initial-Secret-42")
     async with stack.browser() as browser:
         member = await stack.login(browser, email, "Initial-Secret-42")
         assert member.session["roles"] == ["viewer"]
+
+
+async def test_member_invite_sets_a_placeholder_credential_nobody_knows(stack):
+    async with stack.browser() as browser:
+        owner = await stack.register(browser)
+        roles = {r["key"]: r["id"] for r in (await owner.get("roles")).json()}
+        email = f"{unique('member')}@example.com"
+        created = await owner.create(
+            "members",
+            {"email": email, "display_name": "Member", "role_ids": [roles["viewer"]]},
+        )
+        assert created["invite_link"] and "token=" in created["invite_link"]
+    async with stack.browser() as anon:
+        # Nobody can sign in until the invite is accepted; there is no password to guess.
+        guess = await anon.post(
+            "/api/v1/auth/login", json={"email": email, "password": PASSWORD}
+        )
+        assert guess.status_code == 401
+        token = created["invite_link"].split("token=")[1]
+        accepted = await anon.post(
+            "/api/v1/auth/accept-invite", json={"token": token, "new_password": PASSWORD}
+        )
+        assert accepted.status_code == 201 and accepted.json()["roles"] == ["viewer"]
+        # Single-use.
+        replay = await anon.post(
+            "/api/v1/auth/accept-invite",
+            json={"token": token, "new_password": "Another-One-99"},
+        )
+        assert replay.status_code == 422 and error_code(replay) == "INVALID_INVITE_TOKEN"
+
+
+async def test_adding_an_existing_user_as_a_member_never_touches_their_password(stack):
+    async with stack.browser() as first, stack.browser() as second:
+        alice = await stack.register(first)
+        bob = await stack.register(second)
+        roles = {r["key"]: r["id"] for r in (await bob.get("roles")).json()}
+        created = await bob.create(
+            "members",
+            {
+                "email": alice.email,
+                "display_name": "Alice",
+                "role_ids": [roles["viewer"]],
+            },
+        )
+        # Alice already has an account: no invite token, nothing new to accept.
+        assert created["invite_link"] is None
+    async with stack.browser() as browser:
+        await stack.login(browser, alice.email)  # her original password still works

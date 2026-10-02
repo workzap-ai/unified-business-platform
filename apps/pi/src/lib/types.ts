@@ -11,7 +11,12 @@ export type SetupState =
   | "action_required";
 
 export interface SessionView {
-  user: { id: string; email: string; display_name: string };
+  user: {
+    id: string;
+    email: string;
+    display_name: string;
+    email_verified: boolean;
+  };
   business: {
     id: string;
     name: string;

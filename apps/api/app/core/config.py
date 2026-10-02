@@ -58,6 +58,11 @@ class Settings(BaseSettings):
     # Self-service "forgot password": token lifetime, and rate limits for both steps.
     password_reset_ttl_minutes: int = Field(default=30, ge=5, le=1440)
     rate_limit_password_reset_per_hour: int = Field(default=5, ge=1, le=100)
+    # Email verification: sent at sign-up, resendable; nothing is gated on it yet.
+    email_verification_ttl_minutes: int = Field(default=1440, ge=5, le=10080)
+    rate_limit_email_verification_per_hour: int = Field(default=5, ge=1, le=100)
+    # Member invites: how long an invited person has to set their first password.
+    member_invite_ttl_minutes: int = Field(default=10080, ge=60, le=43200)
     # Canonical browser origin of the web app, used to build links sent in email (password
     # reset). Kept separate from cors_origins, which may list several allowed origins.
     web_public_url: str = "http://localhost:3000"

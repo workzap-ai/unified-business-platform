@@ -1,9 +1,10 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
 
 from app.core.pagination import Page, Pagination
+from app.integrations.http import OutboundClient
 from app.modules.access.dependencies import Session, require
 from app.modules.access.members import MemberService
 from app.modules.access.permissions import PERMISSIONS
@@ -103,8 +104,12 @@ async def members(
 
 
 @router.post("/members", response_model=MemberView, status_code=status.HTTP_201_CREATED)
-async def add_member(data: MemberCreate, scope: MembersManage, session: Session) -> MemberView:
-    result = await MemberService(session, scope).add(data)
+async def add_member(
+    data: MemberCreate, scope: MembersManage, session: Session, request: Request
+) -> MemberView:
+    settings = request.app.state.settings
+    http = OutboundClient(settings, request.app.state.http)
+    result = await MemberService(session, scope).add(data, http, settings)
     await session.commit()
     return result
 

@@ -59,25 +59,27 @@ async def test_pi_requires_installation_enablement_and_features(
 async def member_client(api: httpx.AsyncClient, role: str) -> httpx.AsyncClient:
     roles = {r["key"]: r["id"] for r in (await api.get("/api/v1/roles")).json()}
     email = f"{role}-{uuid4().hex[:8]}@example.com"
-    await create(
+    created = await create(
         api,
         "members",
         {
             "email": email,
             "display_name": role.title(),
-            "initial_password": "ServiceFlow!Secure234",
             "role_ids": [roles[role]],
         },
     )
+    token = created["invite_link"].split("token=")[1]
     client = httpx.AsyncClient(
         transport=httpx.ASGITransport(app=api._transport.app),  # type: ignore[attr-defined]
         base_url="http://testserver",
         headers={"origin": "http://localhost:3000"},
     )
+    # Accepting the invite signs this client in as the new member directly.
     response = await client.post(
-        "/api/v1/auth/login", json={"email": email, "password": "ServiceFlow!Secure234"}
+        "/api/v1/auth/accept-invite",
+        json={"token": token, "new_password": "ServiceFlow!Secure234"},
     )
-    assert response.status_code == 200, response.text
+    assert response.status_code == 201, response.text
     client.headers["x-csrf-token"] = client.cookies["platform_csrf"]
     return client
 

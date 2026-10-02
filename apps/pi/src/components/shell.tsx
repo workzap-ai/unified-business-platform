@@ -22,9 +22,9 @@ import * as React from "react";
 import { Wordmark } from "@/components/brand";
 import { NotificationBell } from "@/features/journey";
 import { Badge, Button, ErrorState, Spinner, cn } from "@/components/ui";
-import { errorText } from "@/lib/api";
+import { errorText, post } from "@/lib/api";
 import { STATE_LABEL } from "@/lib/format";
-import { useSession, useSignOut, useSwitchBusiness } from "@/lib/session";
+import { useAction, useSession, useSignOut, useSwitchBusiness } from "@/lib/session";
 import s from "./product.module.css";
 
 const NAV = [
@@ -117,6 +117,39 @@ function BusinessMenu() {
         </Menu.Content>
       </Menu.Portal>
     </Menu.Root>
+  );
+}
+
+function VerifyEmailBanner({ email }: { email: string }) {
+  const [dismissed, setDismissed] = React.useState(false);
+  const resend = useAction(() => post("/auth/resend-verification"), {
+    success: "Verification email sent.",
+  });
+  if (dismissed) return null;
+  return (
+    <div
+      className="flex items-center gap-3 bg-warning-soft px-4 py-2 text-sm text-warning"
+      role="status"
+    >
+      <span className="min-w-0 flex-1 truncate">
+        Confirm your email ({email}) to secure your account.
+      </span>
+      <button
+        type="button"
+        className="shrink-0 font-medium underline-offset-2 hover:underline disabled:opacity-60"
+        onClick={() => resend.mutate()}
+        disabled={resend.isPending}
+      >
+        Resend email
+      </button>
+      <button
+        type="button"
+        className="shrink-0 underline-offset-2 hover:underline"
+        onClick={() => setDismissed(true)}
+      >
+        Dismiss
+      </button>
+    </div>
   );
 }
 
@@ -256,6 +289,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <NotificationBell />
         </header>
+        {!session.data.user.email_verified ? (
+          <VerifyEmailBanner email={session.data.user.email} />
+        ) : null}
         {testMode ? (
           <div
             className="bg-warning-soft px-4 py-2 text-center text-sm text-warning"
