@@ -1,20 +1,22 @@
 """Separate customer and platform-operator billing boundaries."""
 
 import hashlib
-from datetime import UTC, datetime
-from typing import Any, Literal
+from datetime import UTC, date, datetime
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Query, Request, UploadFile
+from fastapi import APIRouter, Form, HTTPException, Query, Request, UploadFile
 from fastapi.responses import HTMLResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 
 from app.ai.registry import ModelRegistry
+from app.core import rate_limit
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.pi_saas import manual_billing as manual
+from app.modules.pi_saas import pay_links, qr
 from app.modules.pi_saas.billing import subscription_for
 from app.modules.pi_saas.models import PiBusinessAccount, PiPlatformInvoice
 from app.modules.pi_saas.operator import Operator, account_for, visible_tenants
@@ -23,6 +25,16 @@ from app.shared.errors import BusinessRuleViolation, PermissionDenied, ResourceN
 
 client_router = APIRouter(prefix="/billing", tags=["pi-payments"])
 operator_router = APIRouter(prefix="/operator/pi/billing", tags=["pi-operator-billing"])
+# Public, token-authenticated: the token itself is the credential, so these carry no
+# Scope/auth dependency at all (see app/modules/pi_saas/pay_links.py).
+public_router = APIRouter(prefix="/pay", tags=["pi-pay-link"])
+
+MANUAL_PAYMENT_LIVE = frozenset({"awaiting_payment", "submitted"})
+
+
+def _pay_url(request: Request, token: str) -> str:
+    base = request.app.state.settings.pi_app_public_url.rstrip("/")
+    return f"{base}/pay/{token}"
 
 
 async def client_account(
@@ -107,17 +119,9 @@ async def cancel_payment(payment_id: UUID, scope: Scope, session: Session) -> di
     return manual.payment_view(row)
 
 
-@client_router.post("/payments/{payment_id}/proof")
-async def upload_proof(
-    payment_id: UUID, file: UploadFile, scope: Scope, session: Session
-) -> dict[str, Any]:
-    await client_account(scope, session, "pi.billing.manage", mutation=True)
-    await subscription_for(session, scope.tenant_id)
-    row = await manual.payment_for(session, scope.tenant_id, payment_id, lock=True)
-    if row.status != "awaiting_payment":
-        raise BusinessRuleViolation(
-            "PAYMENT_CLOSED", "Receipts cannot be changed after submission", 409
-        )
+async def read_proof_upload(file: UploadFile) -> tuple[bytes, str, str]:
+    """Validated receipt upload: a size cap plus magic-byte sniffing (never trusting the
+    browser-supplied content type). Shared by the authenticated and public-link routes."""
     try:
         data = await file.read(5 * 1024 * 1024 + 1)
     finally:
@@ -135,11 +139,47 @@ async def upload_proof(
     )
     if mime is None:
         raise BusinessRuleViolation("INVALID_FILE", "Upload a PDF, PNG or JPEG bank receipt", 415)
-    row.proof, row.proof_type, row.proof_sha256 = data, mime, hashlib.sha256(data).hexdigest()
+    return data, mime, hashlib.sha256(data).hexdigest()
+
+
+@client_router.post("/payments/{payment_id}/proof")
+async def upload_proof(
+    payment_id: UUID, file: UploadFile, scope: Scope, session: Session
+) -> dict[str, Any]:
+    await client_account(scope, session, "pi.billing.manage", mutation=True)
+    await subscription_for(session, scope.tenant_id)
+    row = await manual.payment_for(session, scope.tenant_id, payment_id, lock=True)
+    if row.status != "awaiting_payment":
+        raise BusinessRuleViolation(
+            "PAYMENT_CLOSED", "Receipts cannot be changed after submission", 409
+        )
+    data, mime, sha256 = await read_proof_upload(file)
+    row.proof, row.proof_type, row.proof_sha256 = data, mime, sha256
     assert scope.user_id is not None
     await manual.audit(session, row, scope.user_id, "proof_uploaded", sha256=row.proof_sha256)
     await session.commit()
     return manual.payment_view(row)
+
+
+@client_router.post("/payments/{payment_id}/link")
+async def create_payment_link(
+    payment_id: UUID, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Issue (or rotate) the public pay-by-link/QR token for this payment. Replaces any
+    previous token: an old link/QR stops working the moment a new one is issued."""
+    await client_account(scope, session, "pi.billing.manage", mutation=True)
+    row = await manual.payment_for(session, scope.tenant_id, payment_id, lock=True)
+    if row.status not in MANUAL_PAYMENT_LIVE:
+        raise BusinessRuleViolation("PAYMENT_CLOSED", "This payment can no longer be paid", 409)
+    token = pay_links.issue(row)
+    assert scope.user_id is not None
+    await manual.audit(session, row, scope.user_id, "link_issued")
+    await session.commit()
+    return {
+        "token": token,
+        "url": _pay_url(request, token),
+        "expires_at": row.link_expires_at,
+    }
 
 
 async def proof_response(session: Session, row: PiManualPayment) -> Response:
@@ -368,7 +408,12 @@ class ReviewInput(BaseModel):
 
 @operator_router.post("/accounts/{tenant_id}/payments/{payment_id}/review")
 async def review_payment(
-    tenant_id: UUID, payment_id: UUID, data: ReviewInput, operator: Operator, session: Session
+    tenant_id: UUID,
+    payment_id: UUID,
+    data: ReviewInput,
+    request: Request,
+    operator: Operator,
+    session: Session,
 ) -> dict[str, Any]:
     operator.require("operator.billing.manage")
     await account_for(session, operator, tenant_id)
@@ -377,10 +422,36 @@ async def review_payment(
             "VERIFY_RECEIPT", "Confirm that the exact payment was received before approving"
         )
     row = await manual.decide_payment(
-        session, tenant_id, payment_id, operator.user_id, data.action, data.note
+        session,
+        tenant_id,
+        payment_id,
+        operator.user_id,
+        data.action,
+        data.note,
+        settings=request.app.state.settings,
+        http=request.app.state.http,
     )
     await session.commit()
     return manual.payment_view(row)
+
+
+@operator_router.post("/accounts/{tenant_id}/payments/{payment_id}/link")
+async def operator_create_payment_link(
+    tenant_id: UUID, payment_id: UUID, request: Request, operator: Operator, session: Session
+) -> dict[str, Any]:
+    operator.require("operator.billing.manage")
+    await account_for(session, operator, tenant_id)
+    row = await manual.payment_for(session, tenant_id, payment_id, lock=True)
+    if row.status not in MANUAL_PAYMENT_LIVE:
+        raise BusinessRuleViolation("PAYMENT_CLOSED", "This payment can no longer be paid", 409)
+    token = pay_links.issue(row)
+    await manual.audit(session, row, operator.user_id, "link_issued")
+    await session.commit()
+    return {
+        "token": token,
+        "url": _pay_url(request, token),
+        "expires_at": row.link_expires_at,
+    }
 
 
 class CashRecord(manual.PaymentChoice, manual.PaymentSubmission):
@@ -390,7 +461,7 @@ class CashRecord(manual.PaymentChoice, manual.PaymentSubmission):
 
 @operator_router.post("/accounts/{tenant_id}/cash", status_code=201)
 async def record_cash(
-    tenant_id: UUID, data: CashRecord, operator: Operator, session: Session
+    tenant_id: UUID, data: CashRecord, request: Request, operator: Operator, session: Session
 ) -> dict[str, Any]:
     operator.require("operator.billing.manage")
     account = await account_for(session, operator, tenant_id)
@@ -421,6 +492,8 @@ async def record_cash(
         operator.user_id,
         "approve",
         data.note or "Cash received by billing operator",
+        settings=request.app.state.settings,
+        http=request.app.state.http,
     )
     await session.commit()
     return manual.payment_view(row)
@@ -469,3 +542,73 @@ async def operator_receipt(
     operator.require("operator.billing.read")
     account = await account_for(session, operator, tenant_id)
     return receipt_response(await manual.payment_for(session, tenant_id, payment_id), account.name)
+
+
+# --- Public, token-authenticated pay-by-link/QR (no Scope/auth dependency: possessing
+# the raw token is the only credential) -------------------------------------------------
+
+
+@public_router.get("/{token}")
+async def public_pay_view(token: str, request: Request, session: Session) -> dict[str, Any]:
+    ip = rate_limit.client_ip(request)
+    if not await rate_limit.hit(request, "pay-link-view", f"{token}:{ip}", 30, 3600):
+        raise HTTPException(status_code=429)
+    row = await pay_links.resolve(
+        session, PiManualPayment, token, live_statuses=MANUAL_PAYMENT_LIVE
+    )
+    if row is None:
+        raise ResourceNotFound
+    business = await session.scalar(
+        select(PiBusinessAccount.name).where(PiBusinessAccount.tenant_id == row.tenant_id)
+    )
+    view = manual.payment_view(row)
+    view["business_name"] = business or ""
+    return view
+
+
+@public_router.post("/{token}/proof")
+async def public_submit_proof(
+    token: str,
+    request: Request,
+    session: Session,
+    file: UploadFile,
+    payer_name: Annotated[str, Form(min_length=2, max_length=160)],
+    paid_on: Annotated[date, Form()],
+    reference: Annotated[str, Form(max_length=120)] = "",
+    note: Annotated[str, Form(max_length=500)] = "",
+) -> dict[str, Any]:
+    ip = rate_limit.client_ip(request)
+    if not await rate_limit.hit(request, "pay-link-proof", f"{token}:{ip}", 10, 3600):
+        raise HTTPException(status_code=429)
+    row = await pay_links.resolve(
+        session, PiManualPayment, token, live_statuses=MANUAL_PAYMENT_LIVE, lock=True
+    )
+    if row is None:
+        raise ResourceNotFound
+    if row.status != "awaiting_payment":
+        raise BusinessRuleViolation(
+            "PAYMENT_CLOSED", "Receipts cannot be changed after submission", 409
+        )
+    data, mime, sha256 = await read_proof_upload(file)
+    row.proof, row.proof_type, row.proof_sha256 = data, mime, sha256
+    await manual.audit(session, row, None, "proof_uploaded", sha256=sha256, via="pay_link", ip=ip)
+    submission = manual.PaymentSubmission(
+        payer_name=payer_name, reference=reference, paid_on=paid_on, note=note
+    )
+    updated = await manual.submit_payment(session, row.tenant_id, row.id, None, submission)
+    await session.commit()
+    return manual.payment_view(updated)
+
+
+@public_router.get("/{token}/qr.png")
+async def public_pay_qr(token: str, request: Request, session: Session) -> Response:
+    ip = rate_limit.client_ip(request)
+    if not await rate_limit.hit(request, "pay-link-qr", f"{token}:{ip}", 30, 3600):
+        raise HTTPException(status_code=429)
+    row = await pay_links.resolve(
+        session, PiManualPayment, token, live_statuses=MANUAL_PAYMENT_LIVE
+    )
+    if row is None:
+        raise ResourceNotFound
+    png = qr.png(_pay_url(request, token))
+    return Response(png, media_type="image/png", headers={"Cache-Control": "no-store"})

@@ -65,6 +65,7 @@ class PiPaymentRequest(WorkspaceRow):
         UniqueConstraint(
             "tenant_id", "environment_id", "idempotency_key", name="uq_pi_payment_requests_key"
         ),
+        UniqueConstraint("link_token_hash", name="uq_pi_payment_requests_link_token"),
         CheckConstraint(_in("method", METHODS), name="method"),
         CheckConstraint(_in("status", REQUEST_STATES), name="status"),
         CheckConstraint("amount > 0", name="amount_positive"),
@@ -89,3 +90,7 @@ class PiPaymentRequest(WorkspaceRow):
     idempotency_key: Mapped[str] = mapped_column(String(200))
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_by_label: Mapped[str] = mapped_column(String(80), default="", server_default="")
+    # Public pay-by-link/QR access: only the digest is stored, same pattern as
+    # auth_sessions.token_hash / password_reset_tokens.token_hash.
+    link_token_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    link_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

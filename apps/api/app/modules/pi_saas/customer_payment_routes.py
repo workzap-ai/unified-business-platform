@@ -4,23 +4,39 @@ Mounted for the Owner OS workspace and the Pi app. Viewing needs ``billing.read`
 changing settings, creating, verifying or cancelling requests needs ``billing.write``.
 """
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Form, HTTPException, Query, Request, UploadFile
+from fastapi.responses import Response
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.core import rate_limit
 from app.integrations import business
 from app.integrations.http import OutboundClient
 from app.modules.access.dependencies import Scope, Session
+from app.modules.audit.service import record
 from app.modules.billing.models import Invoice
 from app.modules.pi.service import PiService, require_pi
 from app.modules.pi_saas import customer_payments as cp
+from app.modules.pi_saas import pay_links, qr
 from app.modules.pi_saas.customer_payment_models import PiPaymentRequest
-from app.shared.errors import BusinessRuleViolation
+from app.modules.pi_saas.payment_routes import read_proof_upload
+from app.shared.errors import BusinessRuleViolation, ResourceNotFound
+from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
 
 router = APIRouter(prefix="/pi", tags=["pi-customer-payments"])
+# Public, token-authenticated: the token itself is the credential, so these carry no
+# Scope/auth dependency at all (see app/modules/pi_saas/pay_links.py).
+public_router = APIRouter(prefix="/pay/request", tags=["pi-pay-link"])
+
+PAYMENT_REQUEST_LIVE = frozenset(cp.OPEN)  # ("open", "awaiting_verification")
+
+
+def _pay_request_url(request: Request, token: str) -> str:
+    base = request.app.state.settings.pi_app_public_url.rstrip("/")
+    return f"{base}/pay/request/{token}"
 
 
 def checkout_for(request: Request, session: Session) -> Any:
@@ -218,18 +234,127 @@ async def cancel_payment(request_id: UUID, scope: Scope, session: Session) -> di
 async def send_payment_message(
     request_id: UUID, request: Request, scope: Scope, session: Session
 ) -> dict[str, Any]:
-    """Send the payment instructions in the customer's conversation (team reply)."""
+    """Send the payment instructions in the customer's conversation (team reply).
+
+    Non-card requests get a fresh pay-by-link/QR token on every send: this is the
+    "regenerate" case the token pattern expects, so a resend always carries a live
+    link and the previous one (if any) stops working.
+    """
     await require_pi(session, scope, "billing.write")
     row = await WorkspaceRepository(session, PiPaymentRequest, scope).get(request_id)
     if row.conversation_id is None:
         raise BusinessRuleViolation("NO_CONVERSATION", "Open a conversation with this customer")
+    text = cp.customer_message(row)
+    if row.method != "stripe":
+        token = pay_links.issue(row)
+        text = f"{text}\nPay online: {_pay_request_url(request, token)}"
     service = PiService(session, scope)
     conversation = await service.conversations.get(row.conversation_id)
     if conversation.mode != "human":
         await service.mode(conversation.id, "takeover")
-    message = await service.human_message(conversation.id, cp.customer_message(row))
+    message = await service.human_message(conversation.id, text)
     await session.commit()
     await request.app.state.queue.enqueue(
         "send_pi_message", str(message.id), job_id=f"send:{message.id}"
     )
     return {"message_id": message.id, "status": message.status}
+
+
+@router.post("/payment-requests/{request_id}/link")
+async def create_payment_request_link(
+    request_id: UUID, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Issue (or rotate) the public pay-by-link/QR token without sending a message —
+    for "Copy payment link" / "Download QR" actions on a request."""
+    await require_pi(session, scope, "billing.write")
+    row = await WorkspaceRepository(session, PiPaymentRequest, scope).get(
+        request_id, for_update=True
+    )
+    if row.status not in cp.OPEN:
+        raise BusinessRuleViolation("REQUEST_CLOSED", "This payment request is closed", 409)
+    token = pay_links.issue(row)
+    await session.commit()
+    return {
+        "token": token,
+        "url": _pay_request_url(request, token),
+        "expires_at": row.link_expires_at,
+    }
+
+
+# --- Public, token-authenticated pay-by-link/QR (no Scope/auth dependency: possessing
+# the raw token is the only credential) -------------------------------------------------
+
+
+@public_router.get("/{token}")
+async def public_request_view(token: str, request: Request, session: Session) -> dict[str, Any]:
+    ip = rate_limit.client_ip(request)
+    if not await rate_limit.hit(request, "pay-request-link-view", f"{token}:{ip}", 30, 3600):
+        raise HTTPException(status_code=429)
+    row = await pay_links.resolve(
+        session, PiPaymentRequest, token, live_statuses=PAYMENT_REQUEST_LIVE
+    )
+    if row is None:
+        raise ResourceNotFound
+    return cp.view(row)
+
+
+@public_router.post("/{token}/proof")
+async def public_request_proof(
+    token: str,
+    request: Request,
+    session: Session,
+    note: Annotated[str, Form(max_length=2000)] = "",
+    reference: Annotated[str, Form(max_length=120)] = "",
+    file: UploadFile | None = None,
+) -> dict[str, Any]:
+    ip = rate_limit.client_ip(request)
+    if not await rate_limit.hit(request, "pay-request-link-proof", f"{token}:{ip}", 10, 3600):
+        raise HTTPException(status_code=429)
+    row = await pay_links.resolve(
+        session, PiPaymentRequest, token, live_statuses=PAYMENT_REQUEST_LIVE, lock=True
+    )
+    if row is None:
+        raise ResourceNotFound
+    if row.method == "stripe":
+        raise BusinessRuleViolation(
+            "STRIPE_AUTOMATIC", "Card payments are confirmed automatically by Stripe", 409
+        )
+    parts = [note.strip()]
+    if reference.strip():
+        parts.append(f"Reference: {reference.strip()}")
+    if file is not None:
+        # PiPaymentRequest has no binary proof column (WhatsApp proof images live on
+        # the PiMessage they arrived as); validate the upload the same way, but only
+        # its hash is kept, as a record that something was attached.
+        _, _, sha256 = await read_proof_upload(file)
+        parts.append(f"[receipt uploaded, sha256:{sha256[:16]}]")
+    scope = WorkspaceScope.system(row.tenant_id, row.environment_id, frozenset(), "PayLink")
+    updated = await cp.mark_submitted(
+        session, scope, row.id, note="\n".join(p for p in parts if p) or "[submitted via pay link]"
+    )
+    await record(
+        session,
+        "pi.payment_proof_submitted_via_link",
+        tenant_id=row.tenant_id,
+        environment_id=row.environment_id,
+        actor_user_id=None,
+        entity_type="pi_payment_request",
+        entity_id=row.id,
+        details={"ip": ip},
+    )
+    await session.commit()
+    return cp.view(updated)
+
+
+@public_router.get("/{token}/qr.png")
+async def public_request_qr(token: str, request: Request, session: Session) -> Response:
+    ip = rate_limit.client_ip(request)
+    if not await rate_limit.hit(request, "pay-request-link-qr", f"{token}:{ip}", 30, 3600):
+        raise HTTPException(status_code=429)
+    row = await pay_links.resolve(
+        session, PiPaymentRequest, token, live_statuses=PAYMENT_REQUEST_LIVE
+    )
+    if row is None:
+        raise ResourceNotFound
+    png = qr.png(_pay_request_url(request, token))
+    return Response(png, media_type="image/png", headers={"Cache-Control": "no-store"})

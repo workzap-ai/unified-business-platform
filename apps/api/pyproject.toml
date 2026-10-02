@@ -17,6 +17,8 @@ dependencies = [
   "tzdata>=2024.1",
   # Text extraction for "Teach Pi" PDF uploads (pure Python, no native dependencies).
   "pypdf>=5,<7",
+  # QR codes for the pay-by-link flow (encodes the pay-page URL, never raw payment data).
+  "qrcode>=7.4,<9", "pillow>=11,<12",
 ]
 
 [project.optional-dependencies]
@@ -50,4 +52,8 @@ plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 module = ["arq.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["qrcode.*"]
 ignore_missing_imports = true

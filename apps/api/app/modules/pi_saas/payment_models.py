@@ -37,6 +37,7 @@ class PiManualPayment(TenantRow):
         UniqueConstraint("tenant_id", "request_key", name="uq_pi_manual_payment_request"),
         UniqueConstraint("reference_key", name="uq_pi_manual_payment_reference"),
         UniqueConstraint("receipt_number", name="uq_pi_manual_payment_receipt"),
+        UniqueConstraint("link_token_hash", name="uq_pi_manual_payment_link_token"),
         CheckConstraint("amount > 0 AND currency = 'PKR'", name="amount_currency"),
         CheckConstraint("months IN (1, 3, 6, 12)", name="months"),
         CheckConstraint("method IN ('bank_transfer', 'cash')", name="method"),
@@ -80,6 +81,10 @@ class PiManualPayment(TenantRow):
     refunded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     refund_reference: Mapped[str | None] = mapped_column(String(120), nullable=True)
     refund_reason: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    # Public pay-by-link/QR access: only the digest is stored, same pattern as
+    # auth_sessions.token_hash / password_reset_tokens.token_hash.
+    link_token_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    link_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class PiCheckoutAttempt(TenantRow):

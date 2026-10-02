@@ -49,6 +49,7 @@ from app.modules.pi_saas.app_routes import router as pi_app_router
 from app.modules.pi_saas.campaign_routes import router as pi_campaign_router
 from app.modules.pi_saas.connector_routes import router as pi_connector_router
 from app.modules.pi_saas.connector_routes import web_router as pi_connector_web_router
+from app.modules.pi_saas.customer_payment_routes import public_router as pi_customer_pay_link_router
 from app.modules.pi_saas.customer_payment_routes import router as pi_customer_payment_router
 from app.modules.pi_saas.digest_routes import operator_router as pi_operator_digest_router
 from app.modules.pi_saas.digest_routes import router as pi_digest_router
@@ -58,6 +59,7 @@ from app.modules.pi_saas.operator_system_routes import router as pi_operator_sys
 from app.modules.pi_saas.operator_workspace_routes import router as operator_workspace_router
 from app.modules.pi_saas.payment_routes import client_router as pi_payment_router
 from app.modules.pi_saas.payment_routes import operator_router as pi_payment_operator_router
+from app.modules.pi_saas.payment_routes import public_router as pi_pay_link_router
 from app.modules.pi_saas.platform_config_routes import router as pi_platform_config_router
 from app.modules.pi_saas.review_routes import operator_router as pi_operator_review_router
 from app.modules.pi_saas.review_routes import router as pi_review_router
@@ -136,6 +138,11 @@ ROUTERS = [
 # such as members, reports or finance are deliberately not mounted for that audience.
 PI_APP_ROUTERS = [
     pi_payment_router,
+    # Public, token-authenticated pay-by-link/QR (no session): /pay/{token}...
+    # (PiManualPayment) and /pay/request/{token}... (PiPaymentRequest) — the token
+    # itself is the credential.
+    pi_pay_link_router,
+    pi_customer_pay_link_router,
     pi_app_router,
     pi_read_router,
     pi_analytics_router,
