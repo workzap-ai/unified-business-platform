@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 // pi content document. The owner supplies the final company wording.
 const products = [
   {
-    name: "WorkZap for retail",
-    line: "The AI Operating System for Retail.",
+    name: "nori",
+    line: "The daily read for the shop.",
     detail:
-      "Plugs into your POS and sales data and works like an AI management team — what happened, why, what matters, and what to do next.",
-    href: "/retail",
-    cta: "See WorkZap for retail",
+      "nori reads your shop’s sales and stock and picks out the one thing worth looking at today.",
+    href: "/nori",
+    cta: "See nori",
   },
   {
     name: "pi",

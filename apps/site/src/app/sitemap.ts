@@ -15,5 +15,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...(PI.live.dashboard ? ["/dashboard"] : []),
     ...(PI.live.solutions ? ["/solutions"] : []),
   ].map((p) => `${PI.siteUrl}${PI.base}${p}`);
-  return [PI.siteUrl, `${PI.siteUrl}/retail`, ...pi].map((url) => ({ url }));
+  return [PI.siteUrl, `${PI.siteUrl}/nori`, ...pi].map((url) => ({ url }));
 }

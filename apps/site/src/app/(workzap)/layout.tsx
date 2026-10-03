@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
-import "@/features/retail/retail.css";
+import "@/features/workzap/workzap.css";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -15,9 +15,8 @@ const jbmono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://workzap.ai"),
-  title: "WorkZap — The AI Operating System for Retail",
-  description:
-    "WorkZap plugs into your POS and sales data and works like an AI management team — what happened, why, what matters, and what to do next. A decision engine for your whole retail business.",
+  title: "Workzap",
+  description: "Workzap products: nori and pi.",
 };
 
 export const viewport: Viewport = {

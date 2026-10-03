@@ -46,7 +46,7 @@ export default function PiLayout({
         <div className="pi-bar">
           <div className="pi-wrap">
             <Link href="/">Workzap</Link>
-            <Link href="/retail">WorkZap for retail</Link>
+            <Link href="/nori">nori by Workzap</Link>
           </div>
         </div>
         <header className="pi-header">

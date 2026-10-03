@@ -27,11 +27,11 @@ export function ModuleExplorer() {
   }
 
   return (
-    <div className="wzx">
+    <div className="nxe">
       <div
-        className="wzx-tabs"
+        className="nxe-tabs"
         role="tablist"
-        aria-label="Retail OS modules"
+        aria-label="What nori covers"
         onKeyDown={onKeyDown}
       >
         {MODULE_TABS.map((t) => (
@@ -42,11 +42,11 @@ export function ModuleExplorer() {
             }}
             type="button"
             role="tab"
-            id={`wzx-tab-${t.id}`}
+            id={`nxe-tab-${t.id}`}
             aria-selected={t.id === active}
-            aria-controls={`wzx-panel-${t.id}`}
+            aria-controls={`nxe-panel-${t.id}`}
             tabIndex={t.id === active ? 0 : -1}
-            className="wzx-tab"
+            className="nxe-tab"
             onClick={() => setActive(t.id)}
           >
             {t.label}
@@ -56,15 +56,15 @@ export function ModuleExplorer() {
       <div
         key={tab.id}
         role="tabpanel"
-        id={`wzx-panel-${tab.id}`}
-        aria-labelledby={`wzx-tab-${tab.id}`}
+        id={`nxe-panel-${tab.id}`}
+        aria-labelledby={`nxe-tab-${tab.id}`}
         tabIndex={0}
-        className="wzx-panel"
+        className="nxe-panel"
       >
-        <div className="wzx-copy">
+        <div className="nxe-copy">
           <h3>{tab.headline}</h3>
-          <p className="wzx-summary">{tab.summary}</p>
-          <ul className="wzx-features">
+          <p className="nxe-summary">{tab.summary}</p>
+          <ul className="nxe-features">
             {tab.features.map((f) => (
               <li key={f.title}>
                 <strong>{f.title}</strong>
