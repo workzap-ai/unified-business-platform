@@ -12,9 +12,9 @@
 .statusActive {
   position: relative;
   overflow: hidden;
-  border-color: #295f4b;
-  background: #183f32;
-  color: #f0f5e6;
+  border-color: #30295f;
+  background: #1d183f;
+  color: #e8e6f5;
   border-radius: 20px;
 }
 .statusActive::after {
@@ -24,7 +24,7 @@
   width: 270px;
   height: 270px;
   content: "";
-  border: 50px solid #c7ddb30b;
+  border: 50px solid #b9b3dd0b;
   border-radius: 50%;
   pointer-events: none;
 }
@@ -40,13 +40,13 @@
   width: 43px;
   height: 43px;
   padding: 10px;
-  border: 1px solid #dcecc633;
+  border: 1px solid #cbc6ec33;
   border-radius: 13px;
-  background: #d7ebbb15;
-  color: #d0e5b3;
+  background: #c1bbeb15;
+  color: #bab3e5;
 }
 .activeContent h2 {
-  color: #eff6e5;
+  color: #e7e5f6;
   font-size: 23px;
   font-weight: 500;
   letter-spacing: -0.6px;
@@ -54,7 +54,7 @@
 .activeContent p {
   margin-top: 7px;
   max-width: 530px;
-  color: #c2d2c1;
+  color: #c3c1d2;
   font-size: 14px;
   line-height: 1.8;
 }

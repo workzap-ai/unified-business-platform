@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { PiFace } from "@/components/brand";
 import { ErrorState, LoadingBlock } from "@/components/ui";
 import { LANGUAGES, MODE_LABEL, useAccount } from "@/features/setup";
 import { errorText } from "@/lib/api";
@@ -30,8 +31,8 @@ const SECTIONS = [
     title: "Business knowledge",
     label: "THE FOUNDATION",
     description:
-      "Your services, your story, the little details. Give Pi the knowledge to answer with confidence.",
-    action: "Shape what Pi knows",
+      "Your services, your story, the little details. Give pi the knowledge to answer with confidence.",
+    action: "Shape what pi knows",
     href: "/my-pi/knowledge",
     icon: BookOpenText,
     tone: "lavender",
@@ -50,7 +51,7 @@ const SECTIONS = [
     title: "Tools & actions",
     label: "THE HELPING HAND",
     description:
-      "From remembering customers to looking up orders. Choose how Pi can lend a hand.",
+      "From remembering customers to looking up orders. Choose how pi can lend a hand.",
     action: "Explore your tools",
     href: "/my-pi/tools",
     icon: PlugZap,
@@ -78,7 +79,7 @@ const CONNECTION_LABEL: Record<Account["whatsapp"]["status"], string> = {
 
 export function PiStudio() {
   const account = useAccount();
-  if (account.isPending) return <LoadingBlock label="Opening My Pi" />;
+  if (account.isPending) return <LoadingBlock label="Opening My pi" />;
   if (account.isError)
     return (
       <ErrorState
@@ -104,12 +105,12 @@ function Studio({ account }: { account: Account }) {
       <div className={s.breadcrumb}>
         <Link href="/home">Workspace</Link>
         <ChevronRight size={12} aria-hidden />
-        <span>My Pi</span>
+        <span>My pi</span>
       </div>
       <header className={s.header}>
         <div>
           <h1>
-            Make Pi your own<span>.</span>
+            Make pi your own<span>.</span>
           </h1>
           <p>A little of your knowledge. A lot of your personality.</p>
         </div>
@@ -127,7 +128,7 @@ function Studio({ account }: { account: Account }) {
           <h2 id="pi-studio-hero">
             Your business.
             <br />
-            <em>Your voice.</em> Your Pi.
+            <em>Your voice.</em> Your pi.
           </h2>
           <p>
             Turn what makes your business special into conversations that feel a
@@ -147,10 +148,8 @@ function Studio({ account }: { account: Account }) {
           <span className={s.artSparkOne}>✦</span>
           <span className={s.artSparkTwo}>✧</span>
           <div className={s.piTile}>
-            <span>
-              Pi<span className={s.piDot}>.</span>
-            </span>
-            <div className={s.tileShine} />
+            {/* eslint-disable-next-line @next/next/no-img-element -- static brand SVG */}
+            <img src="/brand/pi/pi-rest-dark.svg" alt="" draggable={false} />
           </div>
           <div className={s.artSignature}>
             <Sparkles size={14} />
@@ -168,7 +167,7 @@ function Studio({ account }: { account: Account }) {
           <div className={s.sectionHeading}>
             <div>
               <span className={s.eyebrow}>THE DETAILS MAKE THE DIFFERENCE</span>
-              <h2 id="pi-personalize">A Pi that feels like you</h2>
+              <h2 id="pi-personalize">A pi that feels like you</h2>
             </div>
             <span className={s.sectionCount}>04 essentials</span>
           </div>
@@ -203,7 +202,7 @@ function Studio({ account }: { account: Account }) {
           </div>
         </section>
 
-        <aside className={s.aside} aria-label="Your Pi overview">
+        <aside className={s.aside} aria-label="Your pi overview">
           <section className={s.profile} aria-labelledby="pi-profile-title">
             <div className={s.profileHeading}>
               <span className={s.eyebrow}>YOUR ASSISTANT</span>
@@ -215,9 +214,7 @@ function Studio({ account }: { account: Account }) {
               </Link>
             </div>
             <div className={s.profileIdentity}>
-              <span className={s.avatar} aria-hidden>
-                Pi
-              </span>
+              <PiFace size={44} decorative />
               <div>
                 <h2 id="pi-profile-title">{account.name || "Your business"}</h2>
                 <span
@@ -276,7 +273,7 @@ function Studio({ account }: { account: Account }) {
           {account.setup_state !== "active" && (
             <section className={s.setupCard} aria-label="Setup progress">
               <div className={s.setupTitle}>
-                <h2>A strong start for Pi</h2>
+                <h2>A strong start for pi</h2>
                 {total > 0 && (
                   <span>
                     {completed}/{total}
@@ -314,11 +311,11 @@ function Studio({ account }: { account: Account }) {
               start with <em>your story.</em>
             </h2>
             <p>
-              Add the questions customers ask most. A little context helps Pi
+              Add the questions customers ask most. A little context helps pi
               make a better first impression.
             </p>
             <Link href="/my-pi/knowledge">
-              Give Pi something to learn
+              Give pi something to learn
               <ArrowRight size={15} aria-hidden />
             </Link>
           </section>

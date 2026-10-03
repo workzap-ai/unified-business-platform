@@ -70,7 +70,7 @@ export function BusinessReviewPage() {
   return (
     <Shell
       title="Business review"
-      description="Tell us about your business. The Pi team approves it before your WhatsApp number goes live."
+      description="Tell us about your business. The pi team approves it before your WhatsApp number goes live."
     >
       <BusinessReview />
     </Shell>
@@ -81,7 +81,7 @@ export function NotificationSettingsPage() {
   return (
     <Shell
       title="Notifications"
-      description="What Pi tells you about, and what also comes by email."
+      description="What pi tells you about, and what also comes by email."
     >
       <NotificationSettings />
     </Shell>
@@ -92,7 +92,7 @@ export function SetupCenterPage() {
   return (
     <Shell
       title="Setup"
-      description="Every tool Pi can use, what's ready, and where to fix what isn't."
+      description="Every tool pi can use, what's ready, and where to fix what isn't."
     >
       <SetupCenter />
     </Shell>
@@ -134,7 +134,7 @@ export function SettingsOverview() {
       href: "/settings/business-review",
       icon: ShieldCheck,
       title: "Business review",
-      body: "Approval by the Pi team before WhatsApp goes live.",
+      body: "Approval by the pi team before WhatsApp goes live.",
     },
     {
       href: "/settings/whatsapp",
@@ -164,14 +164,14 @@ export function SettingsOverview() {
       href: "/settings/business",
       icon: Building2,
       title: "Business",
-      body: "Name, hours and pausing Pi.",
+      body: "Name, hours and pausing pi.",
     },
   ];
   return (
     <div>
       <PageHeader
         title="Everything in its place"
-        description="Your connections, your people and the details that keep Pi running."
+        description="Your connections, your people and the details that keep pi running."
       />
       <div className={`grid gap-4 sm:grid-cols-2 ${product.overviewCards}`}>
         {cards.map(({ href, icon: Icon, title, body }) => (
@@ -235,12 +235,12 @@ export function WhatsAppPage() {
       }),
     {
       invalidate: [["whatsapp"], ["account"], ["home"]],
-      success: "Disconnected. Pi has stopped replying.",
+      success: "Disconnected. pi has stopped replying.",
       onSuccess: () => setConfirmOpen(false),
     },
   );
   return (
-    <Shell title="WhatsApp" description="The number Pi replies from.">
+    <Shell title="WhatsApp" description="The number pi replies from.">
       {account.isPending || status.isPending ? (
         <LoadingBlock rows={2} />
       ) : account.isError ? (
@@ -334,7 +334,7 @@ export function WhatsAppPage() {
           <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
             <DialogContent
               title="Disconnect WhatsApp?"
-              description="Pi will stop replying on this number straight away. Your conversations and customers are kept, and you can reconnect later."
+              description="pi will stop replying on this number straight away. Your conversations and customers are kept, and you can reconnect later."
             >
               <div className="flex justify-end gap-2">
                 <Button variant="ghost" onClick={() => setConfirmOpen(false)}>
@@ -527,7 +527,7 @@ function InviteDialog({ roles }: { roles: TeamView["roles"] }) {
       ) : (
         <DialogContent
           title="Add someone to your team"
-          description="Invite them by email. If they already have a Pi account, they're added right away."
+          description="Invite them by email. If they already have a pi account, they're added right away."
         >
           <div className="space-y-4">
             <Field label="Name" htmlFor="inv-name">
@@ -945,7 +945,7 @@ export function BillingPage() {
   );
   if (!can("pi.billing.read")) {
     return (
-      <Shell title="Plan and billing" description="Your Pi plan.">
+      <Shell title="Plan and billing" description="Your pi plan.">
         <Notice tone="info">Ask your business owner for billing access.</Notice>
       </Shell>
     );
@@ -953,7 +953,7 @@ export function BillingPage() {
   return (
     <Shell
       title="Plan and billing"
-      description="Your Pi plan, this month's usage and invoices."
+      description="Your pi plan, this month's usage and invoices."
     >
       {params.get("checkout") === "success" ? (
         <div className="mb-4">
@@ -1034,7 +1034,7 @@ export function BillingPage() {
                     Usage for {date(b.usage.period)} onwards, production only.
                     Test mode: {count(b.usage.test_messages_sent)} messages (not
                     counted). Plans don&apos;t include unlimited use; when an
-                    allowance is used up Pi hands new messages to your team.
+                    allowance is used up pi hands new messages to your team.
                   </p>
                   {can("pi.billing.manage") ? (
                     <div className="flex flex-wrap gap-2">
@@ -1127,7 +1127,7 @@ export function BillingPage() {
                   <CardSection className="space-y-3">
                     <h2 className="font-semibold">Spend limit</h2>
                     <p className="text-sm text-muted-foreground">
-                      Pi stops using AI for new messages this month once
+                      pi stops using AI for new messages this month once
                       estimated AI costs reach this amount.{" "}
                       {s.spend_limit
                         ? `Current limit: ${s.spend_limit} USD.`
@@ -1214,8 +1214,8 @@ export function BillingPage() {
                   title="Cancel your plan?"
                   description={
                     s.status === "trialing"
-                      ? "Your trial ends now and Pi stops replying. Your customers and conversations are kept."
-                      : "Your plan stays active until the end of the paid period. Then Pi stops replying. Your data is kept."
+                      ? "Your trial ends now and pi stops replying. Your customers and conversations are kept."
+                      : "Your plan stays active until the end of the paid period. Then pi stops replying. Your data is kept."
                   }
                 >
                   <div className="flex justify-end gap-2">
@@ -1249,16 +1249,16 @@ export function BusinessPage() {
   const [reason, setReason] = React.useState("");
   const pause = useAction(() => post("/account/pause", { reason }), {
     invalidate: [["account"], ["home"]],
-    success: "Pi is paused. Your team handles all messages.",
+    success: "pi is paused. Your team handles all messages.",
   });
   const resume = useAction(() => post("/account/launch"), {
     invalidate: [["account"], ["home"]],
-    success: "Pi is replying again",
+    success: "pi is replying again",
   });
   return (
     <Shell
       title="Business"
-      description="Your business details and whether Pi is replying."
+      description="Your business details and whether pi is replying."
     >
       {account.isPending ? (
         <LoadingBlock rows={2} />
@@ -1272,7 +1272,7 @@ export function BusinessPage() {
           <Card>
             <CardSection className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-semibold">Pi status</h2>
+                <h2 className="font-semibold">pi status</h2>
                 <Badge tone={STATE_LABEL[account.data.setup_state]?.tone}>
                   {STATE_LABEL[account.data.setup_state]?.label}
                 </Badge>
@@ -1293,7 +1293,7 @@ export function BusinessPage() {
                     loading={pause.isPending}
                     onClick={() => pause.mutate(undefined)}
                   >
-                    <Pause className="size-4" aria-hidden /> Pause Pi
+                    <Pause className="size-4" aria-hidden /> Pause pi
                   </Button>
                 </div>
               ) : null}
@@ -1310,7 +1310,7 @@ export function BusinessPage() {
                     loading={resume.isPending}
                     onClick={() => resume.mutate(undefined)}
                   >
-                    <Play className="size-4" aria-hidden /> Resume Pi
+                    <Play className="size-4" aria-hidden /> Resume pi
                   </Button>
                 </div>
               ) : null}

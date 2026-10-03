@@ -249,14 +249,14 @@ export function BusinessReview() {
           <Badge tone={state.tone}>{state.label}</Badge>
           <p className="min-w-0 flex-1 basis-56 text-sm text-muted-foreground">
             {data.status === "not_started"
-              ? "The Pi team checks every business before its WhatsApp number goes live. It usually takes one working day."
+              ? "The pi team checks every business before its WhatsApp number goes live. It usually takes one working day."
               : data.status === "submitted"
                 ? `Sent ${data.submitted_at ? dateTime(data.submitted_at) : ""}. You'll get a notification when it's reviewed.`
                 : data.status === "approved"
                   ? "Your business is approved. Next: choose a plan and your WhatsApp number."
                   : data.status === "changes_requested"
                     ? "Please update the details below and send them again."
-                    : "Contact the Pi team if you think this is a mistake."}
+                    : "Contact the pi team if you think this is a mistake."}
           </p>
           {data.status === "approved" ? (
             <Button asChild size="sm">
@@ -268,7 +268,7 @@ export function BusinessReview() {
           <CardSection className="border-t border-border">
             <Notice
               tone={data.status === "rejected" ? "danger" : "warning"}
-              title="Note from the Pi team"
+              title="Note from the pi team"
             >
               {data.note}
             </Notice>

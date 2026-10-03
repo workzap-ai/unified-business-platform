@@ -12,7 +12,7 @@ export default function PublicLayout({
   return (
     <div className={s.publicShell}>
       <header className={s.publicHeader}>
-        <Link href="/" aria-label="Pi home">
+        <Link href="/" aria-label="pi home">
           <Wordmark />
         </Link>
         <nav aria-label="Account" className={s.publicNav}>
@@ -36,11 +36,11 @@ export default function PublicLayout({
       </main>
       <footer className={s.publicFooter}>
         <p>
-          Pi works with WhatsApp through official business APIs. WhatsApp is a
+          pi works with WhatsApp through official business APIs. WhatsApp is a
           trademark of its owner.
         </p>
         <nav aria-label="Footer" className={s.footerLinks}>
-          <Link href="/#how-it-works">Meet Pi</Link>
+          <Link href="/#how-it-works">Meet pi</Link>
           <Link href="/#pricing">Plans</Link>
           <Link href="/sign-in">Your workspace</Link>
         </nav>

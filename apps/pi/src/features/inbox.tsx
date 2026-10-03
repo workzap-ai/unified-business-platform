@@ -338,7 +338,7 @@ function ConversationList({
                     </Badge>
                   ) : (
                     <Badge tone="accent">
-                      <Bot className="size-3" aria-hidden /> Pi
+                      <Bot className="size-3" aria-hidden /> pi
                     </Badge>
                   )}
                   {c.assigned_label ? <Badge>{c.assigned_label}</Badge> : null}
@@ -401,7 +401,7 @@ function ApprovalList({ onOpen }: { onOpen: (id: string) => void }) {
         icon={<Check className="size-6" aria-hidden />}
         title="Nothing to approve"
       >
-        Replies Pi drafts for your approval appear here.
+        Replies pi drafts for your approval appear here.
       </EmptyState>
     );
   }
@@ -454,7 +454,7 @@ function QuestionList({ onOpen }: { onOpen: (id: string) => void }) {
         icon={<MessageCircleQuestion className="size-6" aria-hidden />}
         title="No open questions"
       >
-        When Pi doesn&apos;t know an answer, it asks you here.
+        When pi doesn&apos;t know an answer, it asks you here.
       </EmptyState>
     );
   }
@@ -503,7 +503,7 @@ function AnswerDialog({
       invalidate: [["questions"], ["home"], ["conversations"]],
       success:
         mode === "reusable"
-          ? "Sent, and Pi will remember this answer"
+          ? "Sent, and pi will remember this answer"
           : "Reply sent to the customer",
       onSuccess: () => {
         setAnswer("");
@@ -547,7 +547,7 @@ function AnswerDialog({
                 checked={mode === "reusable"}
                 onChange={() => setMode("reusable")}
               />
-              Save it so Pi can answer this itself
+              Save it so pi can answer this itself
             </label>
           </fieldset>
           <Button
@@ -614,7 +614,7 @@ function StatusIcon({ message }: { message: Message }) {
 
 function senderLabel(message: Message): string {
   if (message.sender_type === "customer") return "Customer";
-  if (message.sender_type === "ai") return "Pi";
+  if (message.sender_type === "ai") return "pi";
   if (message.sender_type === "human")
     return message.sent_by_label || "Your team";
   return "Notice";
@@ -717,7 +717,7 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
             <p className="truncate text-xs text-muted-foreground">
               {c.mode === "human"
                 ? "A person is handling this"
-                : "Pi is handling this"}
+                : "pi is handling this"}
               {c.assigned_label ? ` · ${c.assigned_label}` : ""}
             </p>
           </div>
@@ -903,14 +903,14 @@ function OwnershipButtons({ conversation }: { conversation: Conversation }) {
     () => post(`/pi/conversations/${conversation.id}/actions/takeover`),
     {
       invalidate: [["context", conversation.id], ["conversations"]],
-      success: "You're handling this conversation. Pi won't reply.",
+      success: "You're handling this conversation. pi won't reply.",
     },
   );
   const resume = useAction(
     () => post(`/pi/conversations/${conversation.id}/actions/return-to-ai`),
     {
       invalidate: [["context", conversation.id], ["conversations"]],
-      success: "Pi is handling this conversation again",
+      success: "pi is handling this conversation again",
     },
   );
   if (!can("pi.inbox.reply") || conversation.status !== "open") return null;
@@ -930,7 +930,7 @@ function OwnershipButtons({ conversation }: { conversation: Conversation }) {
       loading={resume.isPending}
       onClick={() => resume.mutate(undefined)}
     >
-      <Bot className="size-4" aria-hidden /> Hand back to Pi
+      <Bot className="size-4" aria-hidden /> Hand back to pi
     </Button>
   );
 }
@@ -970,7 +970,7 @@ function Composer({ conversation }: { conversation: Conversation }) {
   if (conversation.mode !== "human") {
     return (
       <p className="border-t border-border px-4 py-3 text-sm text-muted-foreground">
-        Pi is replying here. Take over to write to the customer yourself.
+        pi is replying here. Take over to write to the customer yourself.
       </p>
     );
   }
@@ -1290,7 +1290,7 @@ function CustomerPanel({
       ) : null}
       {conversation.mode === "human" && conversation.handoff_status ? (
         <Notice tone="info">
-          Pi handed this to your team. Hand it back when you&apos;re done.
+          pi handed this to your team. Hand it back when you&apos;re done.
         </Notice>
       ) : null}
     </div>

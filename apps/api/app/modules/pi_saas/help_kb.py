@@ -1,4 +1,4 @@
-"""Pi product help: setup guides the Pi Assistant answers from, managed by the operator.
+"""pi product help: setup guides the pi Assistant answers from, managed by the operator.
 
 Built-in guides ship with the code. Operators can edit any guide (an override with the
 same id), add their own, or hide one, from the Owner OS console. Their changes live in
@@ -79,7 +79,7 @@ BUILTIN: tuple[Article, ...] = (
         "Connect your WhatsApp number",
         "/settings/whatsapp",
         "whatsapp number connect kapso setup pool",
-        """Pi answers your customers on WhatsApp, so a connected number comes first. Open
+        """pi answers your customers on WhatsApp, so a connected number comes first. Open
         Settings → WhatsApp. You can connect your own WhatsApp Business number through the
         guided Meta sign-up, or pick a ready number from the list we offer. When the number
         shows as connected, send it a test message from another phone. If the page says your
@@ -90,7 +90,7 @@ BUILTIN: tuple[Article, ...] = (
         "Business review and approval",
         "/settings/business-review",
         "review approval verify business pending",
-        """Before Pi can message customers, we review your business details. Open Settings →
+        """Before pi can message customers, we review your business details. Open Settings →
         Business review, complete every field and submit. You'll be notified when it's
         approved; until then WhatsApp sending stays off. If something was rejected, the page
         shows the reason so you can fix it and submit again.""",
@@ -100,38 +100,38 @@ BUILTIN: tuple[Article, ...] = (
         "Your setup checklist",
         "/settings/setup",
         "setup checklist start onboarding ready",
-        """Settings → Setup lists everything Pi needs and what is still missing: WhatsApp
+        """Settings → Setup lists everything pi needs and what is still missing: WhatsApp
         number, business details, what you sell, knowledge, and optional tools like
-        calendars or payments. Each item links to the page that fixes it. Pi goes live once
+        calendars or payments. Each item links to the page that fixes it. pi goes live once
         the required items are done. Use 'Help me set up' if you'd like our team to assist.""",
     ),
     _builtin(
         "teach-pi",
-        "Teach Pi about your business",
+        "Teach pi about your business",
         "/my-pi/knowledge",
         "knowledge teach train faq documents upload files prices",
-        """Pi only answers from what you teach it. Open My Pi → Knowledge to add answers,
+        """pi only answers from what you teach it. Open My pi → Knowledge to add answers,
         policies, prices and opening hours, or upload documents such as a price list or menu.
-        Keep each entry short and specific. When a customer asks something Pi doesn't know,
+        Keep each entry short and specific. When a customer asks something pi doesn't know,
         it hands the chat to your team instead of guessing, and the question shows up so you
         can teach the answer.""",
     ),
     _builtin(
         "test-pi",
-        "Test Pi before customers see it",
+        "Test pi before customers see it",
         "/my-pi/test",
         "test playground try preview",
-        """My Pi → Test lets you chat with Pi as a customer would, using your real knowledge
+        """My pi → Test lets you chat with pi as a customer would, using your real knowledge
         and settings, without sending anything on WhatsApp. Try common questions, prices and
         a booking request, then adjust knowledge or behaviour and test again.""",
     ),
     _builtin(
         "pi-behaviour",
-        "Change how Pi talks and when it hands over",
+        "Change how pi talks and when it hands over",
         "/my-pi/behaviour",
         "behaviour tone language handoff approval rules hours",
-        """My Pi → Behaviour controls Pi's tone, languages, business hours and when it should
-        hand a chat to a person. You can require approval before Pi sends certain replies;
+        """My pi → Behaviour controls pi's tone, languages, business hours and when it should
+        hand a chat to a person. You can require approval before pi sends certain replies;
         those drafts wait in the Inbox for a team member to approve or edit.""",
     ),
     _builtin(
@@ -139,8 +139,8 @@ BUILTIN: tuple[Article, ...] = (
         "Inbox, handoffs and approvals",
         "/inbox",
         "inbox chats conversations handoff takeover approve reply assign",
-        """The Inbox shows every WhatsApp conversation you're allowed to see. When Pi hands a
-        chat over, it appears as waiting for the team: open it, read Pi's summary, and reply
+        """The Inbox shows every WhatsApp conversation you're allowed to see. When pi hands a
+        chat over, it appears as waiting for the team: open it, read pi's summary, and reply
         or take over. Drafts that need approval are listed there too. Owners and managers can
         assign chats to team members; members only see chats assigned to them.""",
     ),
@@ -159,7 +159,7 @@ BUILTIN: tuple[Article, ...] = (
         "Connect calendars, stores and other tools",
         "/my-pi/tools",
         "tools connect google calendar shopify booking store integration",
-        """My Pi → Tools connects Pi to your other systems, for example Google Calendar so Pi
+        """My pi → Tools connects pi to your other systems, for example Google Calendar so pi
         can offer real booking slots, or your Shopify store so it can answer about products
         and orders. Each business connects its own accounts; you can disconnect at any time.""",
     ),
@@ -168,8 +168,8 @@ BUILTIN: tuple[Article, ...] = (
         "Automatic follow-ups",
         "/my-pi/follow-ups",
         "follow up reminder remarketing nudge",
-        """My Pi → Follow-ups lets Pi check back with customers who went quiet, for example
-        after a quote. Choose when follow-ups are sent and what they say. Pi respects
+        """My pi → Follow-ups lets pi check back with customers who went quiet, for example
+        after a quote. Choose when follow-ups are sent and what they say. pi respects
         WhatsApp's messaging window and your customers' consent.""",
     ),
     _builtin(
@@ -186,9 +186,9 @@ BUILTIN: tuple[Article, ...] = (
         "Take payments from customers",
         "/settings/payments",
         "payments paid card bank transfer wallet cash jazzcash easypaisa stripe link",
-        """Settings → Payments lets Pi send payment requests. Card payments use your connected
+        """Settings → Payments lets pi send payment requests. Card payments use your connected
         Stripe account. Bank transfer, mobile wallet and cash payments are marked paid only
-        after someone on your team checks the proof; Pi never confirms those on its own.""",
+        after someone on your team checks the proof; pi never confirms those on its own.""",
     ),
     _builtin(
         "plan-billing",
@@ -206,7 +206,7 @@ BUILTIN: tuple[Article, ...] = (
         "notifications alerts email weekly digest summary",
         """Settings → Notifications chooses which alerts you get, such as chats waiting for
         the team or payments to verify, and whether you get the weekly summary email with
-        conversations, enquiries and how much Pi handled on its own.""",
+        conversations, enquiries and how much pi handled on its own.""",
     ),
     _builtin(
         "customer-portal",
@@ -255,7 +255,7 @@ async def articles(session: AsyncSession, *, include_hidden: bool = False) -> li
 
 def _check_page(page: str | None) -> str | None:
     if page and page not in PI_PAGES:
-        raise BusinessRuleViolation("INVALID_PAGE", "Choose a page from the Pi app list")
+        raise BusinessRuleViolation("INVALID_PAGE", "Choose a page from the pi app list")
     return page
 
 

@@ -42,8 +42,8 @@ const STEPS = [
   { n: 1, title: "Your business" },
   { n: 2, title: "What you offer" },
   { n: 3, title: "Connect WhatsApp" },
-  { n: 4, title: "How Pi should help" },
-  { n: 5, title: "Try Pi and launch" },
+  { n: 4, title: "How pi should help" },
+  { n: 5, title: "Try pi and launch" },
 ];
 
 export const LANGUAGES: [string, string][] = [
@@ -243,7 +243,7 @@ function BusinessStep({
   return (
     <StepCard
       title="Tell us about your business"
-      description="Pi uses this to introduce itself and to know when you're open."
+      description="pi uses this to introduce itself and to know when you're open."
       footer={
         <>
           <SavedState dirty={dirty} />
@@ -289,7 +289,7 @@ function BusinessStep({
         <Field
           label="Your team's language"
           htmlFor="b-lang"
-          hint="Summaries for your team use this language. Pi replies to customers in theirs."
+          hint="Summaries for your team use this language. pi replies to customers in theirs."
         >
           <Select
             id="b-lang"
@@ -332,7 +332,7 @@ function BusinessStep({
         label="Website"
         htmlFor="b-web"
         optional
-        hint="We can read your homepage to get Pi started."
+        hint="We can read your homepage to get pi started."
       >
         <Input
           id="b-web"
@@ -380,14 +380,14 @@ function OfferStep({ account, next }: { account: Account; next: () => void }) {
     (url: string) => post<Draft>("/knowledge/website", { url }),
     {
       invalidate: [["drafts"]],
-      success: "We read your website. Check what Pi learned below.",
+      success: "We read your website. Check what pi learned below.",
     },
   );
   const publish = useAction(
     (id: string) => post<Draft>(`/knowledge/drafts/${id}/publish`),
     {
       invalidate: [["drafts"], ["account"]],
-      success: "Published. Pi can use this now.",
+      success: "Published. pi can use this now.",
     },
   );
   const save = useSaveStep(2, next);
@@ -545,8 +545,8 @@ function OfferStep({ account, next }: { account: Account; next: () => void }) {
         </Button>
         {priced ? (
           <p className="text-sm text-muted-foreground">
-            Only prices you enter here become prices Pi may share. You choose
-            how Pi talks about prices in step 4.
+            Only prices you enter here become prices pi may share. You choose
+            how pi talks about prices in step 4.
           </p>
         ) : null}
       </div>
@@ -567,7 +567,7 @@ function OfferStep({ account, next }: { account: Account; next: () => void }) {
             </Button>
           }
         >
-          Pi reads one page and shows you what it learned. Nothing is used until
+          pi reads one page and shows you what it learned. Nothing is used until
           you publish it.
         </Notice>
       ) : null}
@@ -601,7 +601,7 @@ function OfferStep({ account, next }: { account: Account; next: () => void }) {
           <p className="text-sm text-muted-foreground">
             Edit drafts anytime in{" "}
             <Link className="text-accent underline" href="/my-pi/knowledge">
-              My Pi → Business knowledge
+              My pi → Business knowledge
             </Link>
             .
           </p>
@@ -680,7 +680,7 @@ export function WhatsAppConnect({
         title="WhatsApp is connected"
         action={onDone ? <Button onClick={onDone}>Continue</Button> : null}
       >
-        {connection.display_phone_number} is linked to Pi.
+        {connection.display_phone_number} is linked to pi.
       </Notice>
     );
   }
@@ -697,13 +697,13 @@ export function WhatsAppConnect({
       {connection.status === "disconnected" ||
       connection.status === "action_required" ? (
         <Notice tone="danger" title="Your number needs to be reconnected">
-          Pi stopped replying on this number. Reconnect it below; your
+          pi stopped replying on this number. Reconnect it below; your
           conversations are kept.
         </Notice>
       ) : null}
       <fieldset>
         <legend className="mb-2 text-sm font-medium">
-          Which number should Pi use?
+          Which number should pi use?
         </legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {(
@@ -758,7 +758,7 @@ export function WhatsAppConnect({
               I want to keep using the WhatsApp Business app on my phone too.
               <span className="block text-muted-foreground">
                 Messages from before the connection may not all be available in
-                Pi.
+                pi.
               </span>
             </span>
           </label>
@@ -904,7 +904,7 @@ export const TOOL_LABEL: Record<string, [string, string]> = {
   tickets: ["Support tickets", "Log issues for your team"],
   forms: [
     "WhatsApp forms",
-    "Send your lead, booking or feedback form (set up in My Pi → Follow-ups)",
+    "Send your lead, booking or feedback form (set up in My pi → Follow-ups)",
   ],
   payments: [
     "Payments",
@@ -915,20 +915,20 @@ export const PRICE_LABEL: Record<string, [string, string]> = {
   exact: ["Share exact prices", "Only prices you've approved in your catalog"],
   starting: ["Share starting prices", '"From …" prices you\'ve approved'],
   quote: ["Prepare a quote", "Collect details; your team sends the price"],
-  ask_team: ["Ask my team", "Pi says a team member will share pricing"],
-  hidden: ["Never discuss prices", "Pi politely declines price questions"],
+  ask_team: ["Ask my team", "pi says a team member will share pricing"],
+  hidden: ["Never discuss prices", "pi politely declines price questions"],
 };
 export const MODE_LABEL: Record<string, [string, string]> = {
   human_approved: [
     "I approve every reply",
-    "Pi drafts, you send. Best for your first days.",
+    "pi drafts, you send. Best for your first days.",
   ],
   mixed: [
     "I approve actions",
-    "Pi answers questions; orders, bookings and quotes wait for you.",
+    "pi answers questions; orders, bookings and quotes wait for you.",
   ],
   ai_led: [
-    "Pi replies on its own",
+    "pi replies on its own",
     "You can take over any conversation at any time.",
   ],
 };
@@ -957,7 +957,7 @@ export function HelpForm({
     <div className="space-y-6">
       <fieldset>
         <legend className="mb-2 text-sm font-medium">
-          What should Pi help with?
+          What should pi help with?
         </legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {account.goals_available.map((goal) => (
@@ -977,21 +977,21 @@ export function HelpForm({
         </div>
       </fieldset>
       <RadioCards
-        legend="How much should Pi do on its own?"
+        legend="How much should pi do on its own?"
         name="mode"
         value={mode}
         options={MODE_LABEL}
         onChange={(v) => setMode(v as Account["automation_mode"])}
       />
       <RadioCards
-        legend="How should Pi talk about prices?"
+        legend="How should pi talk about prices?"
         name="price"
         value={price}
         options={PRICE_LABEL}
         onChange={(v) => setPrice(v as Account["price_disclosure"])}
       />
       <fieldset>
-        <legend className="mb-2 text-sm font-medium">What may Pi use?</legend>
+        <legend className="mb-2 text-sm font-medium">What may pi use?</legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {account.tool_groups.map((group) => {
             const available = AVAILABLE_TOOL_GROUPS.has(group);
@@ -1029,7 +1029,7 @@ export function HelpForm({
         </div>
         <p className="mt-2 text-sm text-muted-foreground">
           Some tools also need a connection, like your calendar. Set those up in
-          My Pi → Tools.
+          My pi → Tools.
         </p>
       </fieldset>
       <div className="flex justify-end">
@@ -1099,7 +1099,7 @@ function LaunchStep({ account }: { account: Account }) {
   const router = useRouter();
   const launch = useAction(() => post<Account>("/account/launch"), {
     invalidate: [["account"], ["home"]],
-    success: "Pi is live. It will now reply to your customers.",
+    success: "pi is live. It will now reply to your customers.",
     onSuccess: () => router.push("/home"),
   });
   const missing = account.readiness.filter((i) => !i.done);
@@ -1108,7 +1108,7 @@ function LaunchStep({ account }: { account: Account }) {
       <Card>
         <CardSection>
           <h2 className="text-xl font-semibold">
-            Try Pi before your customers do
+            Try pi before your customers do
           </h2>
           <p className="mt-1 text-[15px] text-muted-foreground">
             Send a message the way a customer would. Nothing is sent to WhatsApp
@@ -1161,7 +1161,7 @@ function LaunchStep({ account }: { account: Account }) {
             ))}
           </ul>
           {account.setup_state === "active" ? (
-            <Notice tone="success" title="Pi is live">
+            <Notice tone="success" title="pi is live">
               Manage it from your Home page.
             </Notice>
           ) : (
@@ -1172,7 +1172,7 @@ function LaunchStep({ account }: { account: Account }) {
                 loading={launch.isPending}
                 onClick={() => launch.mutate(undefined)}
               >
-                <Rocket className="size-5" aria-hidden /> Launch Pi
+                <Rocket className="size-5" aria-hidden /> Launch pi
               </Button>
               {missing.length > 0 ? (
                 <p className="text-sm text-muted-foreground">
@@ -1181,7 +1181,7 @@ function LaunchStep({ account }: { account: Account }) {
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  You can pause Pi anytime.
+                  You can pause pi anytime.
                 </p>
               )}
             </div>
@@ -1245,7 +1245,7 @@ export function SetupWizard() {
     <div className={cn("mx-auto min-w-0 max-w-3xl", product.setup)}>
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1 basis-56">
-          <h1 className="text-2xl font-semibold tracking-tight">Set up Pi</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Set up pi</h1>
           <p className="text-[15px] text-muted-foreground">
             Five short steps. Your progress is saved as you go.
           </p>
@@ -1264,7 +1264,7 @@ export function SetupWizard() {
       {step === 3 ? (
         <StepCard
           title="Connect WhatsApp"
-          description="Pi replies from your business WhatsApp number."
+          description="pi replies from your business WhatsApp number."
           footer={
             <Button variant="secondary" onClick={() => go(4)}>
               {data.whatsapp.status === "connected"
@@ -1279,7 +1279,7 @@ export function SetupWizard() {
       {step === 4 ? (
         <Card className="animate-rise">
           <CardSection>
-            <h2 className="text-xl font-semibold">How should Pi help?</h2>
+            <h2 className="text-xl font-semibold">How should pi help?</h2>
             <p className="mb-6 mt-1 text-[15px] text-muted-foreground">
               You can change all of this later.
             </p>

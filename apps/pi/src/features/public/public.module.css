@@ -92,7 +92,6 @@
   line-height: 1.1;
 }
 .hero h1 em {
-  font-family: Georgia, "Times New Roman", serif;
   font-weight: 400;
   color: var(--accent);
 }
@@ -128,11 +127,11 @@
 .example {
   position: relative;
   padding: 34px 28px 26px;
-  border: 1px solid #254d3d;
+  border: 1px solid #2a254d;
   border-radius: 29px;
-  background: radial-gradient(ellipse at 85% 10%, #376746, #163d31 70%);
-  box-shadow: 0 25px 50px -34px #1b4c36aa;
-  color: #ecf3e0;
+  background: radial-gradient(ellipse at 85% 10%, #3d3767, #1b163d 70%);
+  box-shadow: 0 25px 50px -34px #221b4caa;
+  color: #e3e0f3;
   transform: rotate(2deg);
 }
 .exampleHeader {
@@ -147,13 +146,10 @@
   width: 48px;
   height: 49px;
   flex-shrink: 0;
-  border: 1px solid #dfedc890;
+  border: 1px solid #cdc8ed90;
   border-radius: 15px 15px 15px 4px;
-  background: linear-gradient(140deg, #e3ecc4, #b3cba4);
-  color: #214933;
-  font:
-    600 28px Georgia,
-    serif;
+  background: linear-gradient(140deg, #c9c4ec, #a9a4cb);
+  color: #262149;
   letter-spacing: -1px;
 }
 .exampleHeader strong {
@@ -165,11 +161,11 @@
   display: block;
   margin-top: 4px;
   font-size: 10px;
-  color: #b8cdb4;
+  color: #b7b4cd;
 }
 .exampleHeader > svg {
   margin-left: auto;
-  color: #d7e8bd;
+  color: #c3bde8;
 }
 .chat {
   display: flex;
@@ -184,17 +180,17 @@
   border: 1px solid #ffffff18;
   border-radius: 18px 18px 5px 18px;
   background: #ffffff0d;
-  color: #e0e9da;
+  color: #dcdae9;
   font-size: 13px;
   line-height: 1.9;
 }
 .chat > div {
   max-width: 90%;
   padding: 19px;
-  border: 1px solid #e1eccc;
+  border: 1px solid #d0ccec;
   border-radius: 17px 17px 17px 5px;
-  background: #edf2de;
-  color: #344b36;
+  background: #e1def2;
+  color: #37344b;
 }
 .chat > div > span {
   display: flex;
@@ -203,7 +199,7 @@
   margin-bottom: 8px;
   font-size: 10px;
   font-weight: 600;
-  color: #5e7856;
+  color: #5b5678;
 }
 .chat > div > p {
   font-size: 13px;
@@ -216,8 +212,8 @@
   gap: 10px;
   margin-top: 25px;
   padding-top: 16px;
-  border-top: 1px solid #dfeaca23;
-  color: #bacbb3;
+  border-top: 1px solid #cecaea23;
+  color: #b6b3cb;
   font-size: 10px;
 }
 .exampleCaption > span {
@@ -277,7 +273,6 @@
   letter-spacing: -1.1px;
 }
 .sectionTitle h2 em {
-  font-family: Georgia, "Times New Roman", serif;
   font-weight: 400;
   color: var(--accent);
 }
@@ -298,7 +293,6 @@
   border-top: 1px solid var(--border-strong);
 }
 .step > span {
-  font-family: Georgia, "Times New Roman", serif;
   font-size: 30px;
   color: var(--accent);
 }
@@ -378,22 +372,10 @@
   align-self: stretch;
   min-height: 540px;
   padding: 45px;
-  border: 1px solid #345741;
+  border: 1px solid #393457;
   border-radius: 25px;
-  background: radial-gradient(ellipse at 20% 0, #385d3b, #173d31 60%);
-  color: #edf2df;
-}
-.authStory::after {
-  content: "Pi.";
-  position: absolute;
-  right: -20px;
-  bottom: -45px;
-  transform: rotate(-10deg);
-  font:
-    300px Georgia,
-    serif;
-  color: #d8e8ad09;
-  pointer-events: none;
+  background: radial-gradient(ellipse at 20% 0, #3d385d, #1c173d 60%);
+  color: #e2dff2;
 }
 .authStory .exampleMark {
   width: 65px;
@@ -409,23 +391,22 @@
   letter-spacing: -1.35px;
 }
 .authStory h2 em {
-  font-family: Georgia, "Times New Roman", serif;
   font-weight: 400;
-  color: #d6e5b8;
+  color: #beb8e5;
 }
 .authStory > p {
   position: relative;
   margin-top: 20px;
   font-size: 14px;
   line-height: 1.9;
-  color: #c4d3bd;
+  color: #c0bdd3;
 }
 .authPromises {
   position: relative;
   display: grid;
   gap: 16px;
   margin-top: 30px;
-  color: #d7e5c9;
+  color: #cdc9e5;
   font-size: 12px;
 }
 .authPromises > span {

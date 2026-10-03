@@ -1,4 +1,4 @@
-"""Pi Assistant API: chat for business teams (pi-app) and help-guide management (operator)."""
+"""pi Assistant API: chat for business teams (pi-app) and help-guide management (operator)."""
 
 import asyncio
 from typing import Any

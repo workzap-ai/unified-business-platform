@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { PiFace } from "@/components/brand";
 import {
   Button,
   Card,
@@ -30,7 +31,7 @@ const FEATURES = [
   {
     icon: MessageCircle,
     title: "Answers from what you approve",
-    body: "Pi replies in your customer's language using only the information you've published.",
+    body: "pi replies in your customer's language using only the information you've published.",
   },
   {
     icon: UsersRound,
@@ -40,7 +41,7 @@ const FEATURES = [
   {
     icon: Hand,
     title: "Your team stays in control",
-    body: "Approve replies first, or let Pi handle simple questions. Take over any conversation instantly.",
+    body: "Approve replies first, or let pi handle simple questions. Take over any conversation instantly.",
   },
   {
     icon: CalendarCheck,
@@ -122,13 +123,13 @@ export function LandingPage() {
             <em>More possibilities.</em>
           </h1>
           <p>
-            Meet Pi. Your business knowledge, your personality and a helping
+            Meet pi. Your business knowledge, your personality and a helping
             hand for every customer conversation.
           </p>
           <div className={s.heroActions}>
             <Button asChild size="lg">
               <Link href="/sign-up">
-                Set up Pi
+                Set up pi
                 <ArrowUpRight size={17} aria-hidden />
               </Link>
             </Button>
@@ -141,7 +142,7 @@ export function LandingPage() {
           </div>
           <p className={s.heroPromise}>
             <ShieldCheck className="size-4" aria-hidden />
-            Pi never replies to customers until you choose to launch.
+            pi never replies to customers until you choose to launch.
           </p>
         </div>
         <div
@@ -149,9 +150,7 @@ export function LandingPage() {
           aria-label="Example conversation, illustrative only"
         >
           <div className={s.exampleHeader}>
-            <span className={s.exampleMark} aria-hidden>
-              Pi
-            </span>
+            <PiFace size={48} decorative />
             <div>
               <strong>A little more personal.</strong>
               <small>Your business assistant on WhatsApp</small>
@@ -163,7 +162,7 @@ export function LandingPage() {
             <div>
               <span>
                 <Sparkles size={12} aria-hidden />
-                Pi
+                pi
               </span>
               <p>
                 Of course. Tell me what you have in mind, and I’ll help you find
@@ -184,7 +183,7 @@ export function LandingPage() {
       <section aria-labelledby="features" className={s.features}>
         <div className={s.featureGrid}>
           <h2 id="features" className="sr-only">
-            What Pi does
+            What pi does
           </h2>
           {FEATURES.map(({ icon: Icon, title, body }) => (
             <div key={title}>
@@ -214,17 +213,17 @@ export function LandingPage() {
         <div className={s.steps}>
           <div className={s.step}>
             <span>01</span>
-            <h3>Tell Pi your story</h3>
+            <h3>Tell pi your story</h3>
             <p>
               Add your services, products and the questions customers ask.
-              Review what Pi learns before publishing it.
+              Review what pi learns before publishing it.
             </p>
           </div>
           <div className={s.step}>
             <span>02</span>
             <h3>Make the introduction</h3>
             <p>
-              Connect your WhatsApp number and choose how much Pi handles, with
+              Connect your WhatsApp number and choose how much pi handles, with
               your team always in control.
             </p>
           </div>
@@ -272,11 +271,11 @@ export function LandingPage() {
       <section className={s.closing}>
         <div>
           <h2>Let’s make a good first impression.</h2>
-          <p>Bring your business to Pi, one conversation at a time.</p>
+          <p>Bring your business to pi, one conversation at a time.</p>
         </div>
         <Button asChild size="lg">
           <Link href="/sign-up">
-            Make Pi yours
+            Make pi yours
             <ArrowUpRight size={17} aria-hidden />
           </Link>
         </Button>

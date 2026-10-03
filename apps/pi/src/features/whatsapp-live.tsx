@@ -38,8 +38,8 @@ export function WhatsAppLiveCard({
           </span>{" "}
           now.{" "}
           {live
-            ? "Pi answers them. To test it, send “Salam” from a different phone."
-            : "Their messages wait in your inbox until you launch Pi."}
+            ? "pi answers them. To test it, send “Salam” from a different phone."
+            : "Their messages wait in your inbox until you launch pi."}
         </p>
         <div className="flex flex-wrap gap-2">
           <Button asChild>
@@ -50,7 +50,7 @@ export function WhatsAppLiveCard({
           </Button>
           {!live ? (
             <Button asChild variant="secondary">
-              <Link href="/setup">Launch Pi</Link>
+              <Link href="/setup">Launch pi</Link>
             </Button>
           ) : null}
           <Button

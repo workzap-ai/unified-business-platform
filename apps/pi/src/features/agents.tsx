@@ -106,7 +106,7 @@ const SECTIONS = [
   { href: "/my-pi/agents", label: "Agents" },
   { href: "/my-pi/tools", label: "Tools" },
   { href: "/my-pi/follow-ups", label: "Follow-ups" },
-  { href: "/my-pi/test", label: "Test Pi" },
+  { href: "/my-pi/test", label: "Test pi" },
 ];
 
 const PERMISSION = "pi.agents.manage";
@@ -119,7 +119,7 @@ const FRIENDLY: Record<string, { name: string; role: string }> = {
   },
   customer_memory: {
     name: "Customer memory",
-    role: "Remembers what customers tell Pi, like names and preferences.",
+    role: "Remembers what customers tell pi, like names and preferences.",
   },
   support: {
     name: "Customer help",
@@ -210,7 +210,7 @@ function Shell({
           children
         ) : (
           <Notice tone="warning" title="You can't manage agents">
-            Ask your business owner to give you access to Pi&apos;s agents.
+            Ask your business owner to give you access to pi&apos;s agents.
           </Notice>
         )}
       </div>
@@ -224,7 +224,7 @@ export function AgentsPage() {
   return (
     <Shell
       title="Agents"
-      description="Pi is a small team of helpers. Each one handles a part of the conversation."
+      description="pi is a small team of helpers. Each one handles a part of the conversation."
     >
       <AgentList />
     </Shell>
@@ -252,7 +252,7 @@ function AgentList() {
           icon={<Bot className="size-6" aria-hidden />}
           title="No agents yet"
         >
-          Pi sets up its helpers the first time you open this page. Try again in
+          pi sets up its helpers the first time you open this page. Try again in
           a moment.
         </EmptyState>
       </Card>
@@ -367,7 +367,7 @@ export function AgentDetailPage({ id }: { id: string }) {
   const title = agent.data ? friendly(agent.data).name : "Agent";
   const description = agent.data
     ? friendly(agent.data).role
-    : "One of Pi's helpers.";
+    : "One of pi's helpers.";
   return (
     <Shell
       title={title}
@@ -417,7 +417,7 @@ function AgentDetail({ agent }: { agent: Agent }) {
     <div className="min-w-0 space-y-5">
       {!agent.enabled ? (
         <Notice tone="warning" title="This helper is off">
-          Pi won&apos;t use it until you switch it back on from the Agents list.
+          pi won&apos;t use it until you switch it back on from the Agents list.
         </Notice>
       ) : null}
       <div
@@ -521,7 +521,7 @@ function InstructionsEditor({
         note: note.trim(),
       }),
     {
-      success: (v) => `Saved as version ${v.version}. Pi uses it now.`,
+      success: (v) => `Saved as version ${v.version}. pi uses it now.`,
       invalidate: [["agents"]],
       onSuccess: () => setNote(""),
     },
@@ -540,7 +540,7 @@ function InstructionsEditor({
           <Field
             label="Instructions"
             htmlFor={`${id}-instructions`}
-            hint="Tell this helper what to do in plain words. Saving makes a new version that Pi uses straight away."
+            hint="Tell this helper what to do in plain words. Saving makes a new version that pi uses straight away."
             error={
               tooLong
                 ? `Please keep it under ${MAX_INSTRUCTIONS} characters.`
@@ -670,7 +670,7 @@ function ToolsTab({ agent }: { agent: Agent }) {
     return (
       <Card>
         <EmptyState title="No tools available">
-          Pi doesn&apos;t have any tools to use yet.
+          pi doesn&apos;t have any tools to use yet.
         </EmptyState>
       </Card>
     );
@@ -680,7 +680,7 @@ function ToolsTab({ agent }: { agent: Agent }) {
         Choose what this helper may do. Tools switched off for the whole
         business in{" "}
         <Link href="/my-pi/tools" className="text-accent underline">
-          My Pi Tools
+          My pi Tools
         </Link>{" "}
         stay off here too.
       </p>
@@ -724,7 +724,7 @@ function ToolRow({ agent, tool }: { agent: Agent; tool: ToolDefinition }) {
         <p className="text-sm text-muted-foreground">{tool.description}</p>
         {tool.requires_confirmation ? (
           <p className="text-xs text-warning">
-            Needs confirmation: Pi asks the customer or your team before this
+            Needs confirmation: pi asks the customer or your team before this
             happens.
           </p>
         ) : null}
@@ -795,13 +795,13 @@ function LineDiff({ before, after }: { before: string; after: string }) {
   if (!lines.some((l) => l.kind !== "same"))
     return (
       <p className="text-sm text-muted-foreground">
-        Same instructions as the version Pi uses now.
+        Same instructions as the version pi uses now.
       </p>
     );
   return (
     <div className="min-w-0 space-y-2">
       <p className="text-xs text-muted-foreground">
-        Compared with the version Pi uses now:{" "}
+        Compared with the version pi uses now:{" "}
         <span className="text-success">+ in this version</span>,{" "}
         <span className="text-danger">- only in the current one</span>.
       </p>
@@ -946,7 +946,7 @@ function RollbackButton({
       </Button>
       <DialogContent
         title={`Go back to version ${version.version}?`}
-        description="Pi will start using these instructions straight away. Nothing is deleted: this is saved as a new version, so you can switch again later."
+        description="pi will start using these instructions straight away. Nothing is deleted: this is saved as a new version, so you can switch again later."
       >
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <DialogClose asChild>
@@ -999,7 +999,7 @@ function TestTab({ agent }: { agent: Agent }) {
             <Field
               label="Try a customer message"
               htmlFor={id}
-              hint="See which helper Pi would pick. Nothing is sent and no records are created."
+              hint="See which helper pi would pick. Nothing is sent and no records are created."
             >
               <Textarea
                 id={id}
@@ -1026,7 +1026,7 @@ function TestTab({ agent }: { agent: Agent }) {
         <CardSection aria-live="polite">
           {!result ? (
             <p className="text-sm text-muted-foreground">
-              The result shows here: what Pi thinks the customer wants, which
+              The result shows here: what pi thinks the customer wants, which
               helpers handle it, and how long it took.
             </p>
           ) : (

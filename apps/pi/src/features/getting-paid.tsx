@@ -168,7 +168,7 @@ function StripeConnect({ connected }: { connected: boolean }) {
       {result?.webhook_url ? (
         <Notice tone="info" title="One more step in Stripe">
           Add this webhook endpoint in Stripe (event:
-          checkout.session.completed), so Pi only marks payments as paid when
+          checkout.session.completed), so pi only marks payments as paid when
           Stripe confirms them:
           <code className="mt-1 block break-all rounded bg-surface px-2 py-1 text-xs">
             {result.webhook_url}
@@ -692,7 +692,7 @@ function RequestsQueue() {
           />
         ) : !list.data.length ? (
           <EmptyState title="Nothing here">
-            Requests appear when you or Pi send payment details.
+            Requests appear when you or pi send payment details.
           </EmptyState>
         ) : (
           <ul className="divide-y divide-border">
@@ -803,7 +803,7 @@ export function GettingPaid() {
   return (
     <div className="space-y-6">
       <Notice tone="info" title="How getting paid works">
-        When a customer asks how to pay an invoice, Pi sends the exact amount,
+        When a customer asks how to pay an invoice, pi sends the exact amount,
         your details and a payment reference. Cards are confirmed by Stripe
         automatically; bank, wallet and cash payments count once you confirm
         them.

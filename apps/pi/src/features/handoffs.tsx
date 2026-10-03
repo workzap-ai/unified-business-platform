@@ -90,7 +90,7 @@ const STATUS_META: Record<
 
 const REASON_LABEL: Record<string, string> = {
   customer_request: "Customer asked for a person",
-  low_confidence: "Pi wasn't sure of the answer",
+  low_confidence: "pi wasn't sure of the answer",
   provider_failure: "AI was unavailable",
   policy: "Needs your approval",
   tool_failure: "An action didn't work",
@@ -120,7 +120,7 @@ const ACTION_META: Record<
   start: {
     label: "Take over",
     icon: UserRound,
-    help: "Pi stops replying and you (or the person chosen) handle the chat.",
+    help: "pi stops replying and you (or the person chosen) handle the chat.",
   },
   resolve: {
     label: "Resolve",
@@ -407,7 +407,7 @@ export function HandoffsPage() {
     <div className="min-w-0">
       <PageHeader
         title="Handovers"
-        description="Conversations Pi passed to your team. Pick one up, sort it out and mark it resolved."
+        description="Conversations pi passed to your team. Pick one up, sort it out and mark it resolved."
         action={
           <Button asChild variant="secondary">
             <Link href="/inbox">Back to inbox</Link>
@@ -477,8 +477,8 @@ export function HandoffsPage() {
                 }
               >
                 {status === "open"
-                  ? "Pi is handling every conversation on its own right now."
-                  : "When Pi needs a person, the conversation shows up here."}
+                  ? "pi is handling every conversation on its own right now."
+                  : "When pi needs a person, the conversation shows up here."}
               </EmptyState>
             </Card>
           ) : (

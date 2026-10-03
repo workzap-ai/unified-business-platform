@@ -30,7 +30,7 @@ const SECTIONS = [
   { href: "/my-pi/tools", label: "Tools" },
   { href: "/my-pi/follow-ups", label: "Follow-ups" },
   { href: "/my-pi/advanced", label: "Advanced" },
-  { href: "/my-pi/test", label: "Test Pi" },
+  { href: "/my-pi/test", label: "Test pi" },
 ];
 
 interface AiConfig {
@@ -129,7 +129,7 @@ function SectionCard({
             <h2 className="text-lg font-semibold">{title}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{description}</p>
           </div>
-          {readOnly ? <Badge tone="neutral">Managed by Pi</Badge> : null}
+          {readOnly ? <Badge tone="neutral">Managed by pi</Badge> : null}
         </div>
         {children}
         {onSave ? (
@@ -188,15 +188,15 @@ function AutoReplyCard({ enabled }: { enabled: boolean }) {
   return (
     <SectionCard
       title="Automatic replies"
-      description="Turn Pi's replies to customers on or off. When off, every message waits for your team."
+      description="Turn pi's replies to customers on or off. When off, every message waits for your team."
     >
       <ToggleRow
         id="auto-reply"
-        label="Pi replies to customers"
+        label="pi replies to customers"
         hint={
           enabled
-            ? "Pi answers new WhatsApp messages on its own."
-            : "Pi is quiet. Your team replies to every message."
+            ? "pi answers new WhatsApp messages on its own."
+            : "pi is quiet. Your team replies to every message."
         }
         checked={enabled}
         disabled={save.isPending}
@@ -224,7 +224,7 @@ function AiCard({ value }: { value: AiConfig }) {
   return (
     <SectionCard
       title="AI configuration"
-      description="How Pi thinks before it answers."
+      description="How pi thinks before it answers."
       dirty={dirty}
       saving={save.isPending}
       onSave={() => {
@@ -290,7 +290,7 @@ function AiCard({ value }: { value: AiConfig }) {
         <Field
           label="Clarifying questions before handing over"
           htmlFor="ai-clarify"
-          hint="How many times Pi may ask the customer to explain (0 to 3)."
+          hint="How many times pi may ask the customer to explain (0 to 3)."
           error={clarify === null ? "Enter a whole number from 0 to 3." : null}
         >
           <Input
@@ -320,7 +320,7 @@ function ProvidersCard({ value }: { value: ProviderConfig }) {
   return (
     <SectionCard
       title="AI providers"
-      description="Pi tries these providers in order and moves to the next one if a provider is down."
+      description="pi tries these providers in order and moves to the next one if a provider is down."
       readOnly
     >
       <ol className="space-y-2">
@@ -360,7 +360,7 @@ function ProvidersCard({ value }: { value: ProviderConfig }) {
         </div>
       </dl>
       <p className="text-[13px] text-muted-foreground">
-        Providers are set up for every business by the Pi team, so they
+        Providers are set up for every business by the pi team, so they
         can&apos;t be changed here.
       </p>
     </SectionCard>
@@ -469,7 +469,7 @@ function HandoffCard({ value }: { value: HandoffRules }) {
   return (
     <SectionCard
       title="Handing over to your team"
-      description="When Pi stops and passes the conversation to a person."
+      description="When pi stops and passes the conversation to a person."
       dirty={dirty}
       saving={save.isPending}
       onSave={() => {
@@ -486,7 +486,7 @@ function HandoffCard({ value }: { value: HandoffRules }) {
       <Field
         label="Words that ask for a person"
         htmlFor="handoff-keyword"
-        hint="If a customer writes one of these, Pi hands over straight away (up to 30)."
+        hint="If a customer writes one of these, pi hands over straight away (up to 30)."
       >
         <KeywordEditor
           id="handoff-keyword"
@@ -498,7 +498,7 @@ function HandoffCard({ value }: { value: HandoffRules }) {
         <Field
           label="Minimum confidence to reply"
           htmlFor="handoff-threshold"
-          hint="Below this (0 to 1), Pi hands over instead of guessing."
+          hint="Below this (0 to 1), pi hands over instead of guessing."
           error={thresholdValue === null ? "Enter a number from 0 to 1." : null}
         >
           <Input
@@ -516,7 +516,7 @@ function HandoffCard({ value }: { value: HandoffRules }) {
         <Field
           label="Failed tries before handing over"
           htmlFor="handoff-turns"
-          hint="Replies in a row Pi can't answer before it asks for help (1 to 5)."
+          hint="Replies in a row pi can't answer before it asks for help (1 to 5)."
           error={
             turnsValue === null ? "Enter a whole number from 1 to 5." : null
           }
@@ -592,7 +592,7 @@ function KnowledgeCard({ value }: { value: KnowledgeConfig }) {
   return (
     <SectionCard
       title="Knowledge search"
-      description="How Pi looks things up in your business knowledge."
+      description="How pi looks things up in your business knowledge."
       dirty={dirty}
       saving={save.isPending}
       onSave={() => {
@@ -609,7 +609,7 @@ function KnowledgeCard({ value }: { value: KnowledgeConfig }) {
         <Field
           label="Pieces of knowledge to read"
           htmlFor="kn-topk"
-          hint="How many matching notes Pi reads before replying (1 to 10)."
+          hint="How many matching notes pi reads before replying (1 to 10)."
           error={
             topKValue === null ? "Enter a whole number from 1 to 10." : null
           }
@@ -655,7 +655,7 @@ function KnowledgeCard({ value }: { value: KnowledgeConfig }) {
       <ToggleRow
         id="kn-cite"
         label="Show sources to your team"
-        hint="Your team sees which notes Pi used for each reply."
+        hint="Your team sees which notes pi used for each reply."
         checked={cite}
         onChange={setCite}
       />
@@ -678,8 +678,8 @@ function ToolsCard({ value }: { value: Record<string, boolean> }) {
   const dirty = known.some((k) => (map[k] !== false) !== (value[k] !== false));
   return (
     <SectionCard
-      title="What Pi is allowed to do"
-      description="Switch off any action you don't want Pi to take on its own."
+      title="What pi is allowed to do"
+      description="Switch off any action you don't want pi to take on its own."
       dirty={dirty}
       saving={save.isPending}
       onSave={() =>
@@ -742,13 +742,13 @@ export function AdvancedSettingsPage() {
     <div className="min-w-0">
       <PageHeader
         title="Advanced"
-        description="Fine-tune how Pi thinks, when it hands over and what it may do. The defaults work well for most businesses."
+        description="Fine-tune how pi thinks, when it hands over and what it may do. The defaults work well for most businesses."
       />
       <SubNav items={SECTIONS} />
       <div className="mt-6 space-y-5">
         {!allowed ? (
           <Notice tone="warning" title="Only admins can change these">
-            Ask your business owner for access to Pi settings.
+            Ask your business owner for access to pi settings.
           </Notice>
         ) : settings.isLoading ? (
           <LoadingBlock rows={5} label="Loading settings" />

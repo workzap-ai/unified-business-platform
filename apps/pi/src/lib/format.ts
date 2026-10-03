@@ -74,20 +74,20 @@ export const STATE_LABEL: Record<
 };
 
 export const REASON_LABEL: Record<string, string> = {
-  TRIAL_ENDED: "Your free trial has ended. Choose a plan to keep Pi replying.",
+  TRIAL_ENDED: "Your free trial has ended. Choose a plan to keep pi replying.",
   PAYMENT_REQUIRED:
     "Your payment didn't go through. Update your payment details.",
   PAST_DUE_GRACE:
-    "Your last payment failed. Pi keeps working during a short grace period.",
+    "Your last payment failed. pi keeps working during a short grace period.",
   SUBSCRIPTION_CANCELED: "Your plan has ended.",
   SUBSCRIPTION_SUSPENDED:
     "Your plan is suspended. Contact us to reactivate it.",
   USAGE_LIMIT_REACHED:
-    "You've used this month's allowance. Pi will hand new messages to your team.",
+    "You've used this month's allowance. pi will hand new messages to your team.",
   SPEND_LIMIT_REACHED:
-    "Your spend limit was reached. Pi will hand new messages to your team.",
+    "Your spend limit was reached. pi will hand new messages to your team.",
   ACCOUNT_SUSPENDED: "This business is suspended. Contact support.",
-  PI_PAUSED: "Pi is paused. Your team is handling messages.",
+  PI_PAUSED: "pi is paused. Your team is handling messages.",
   RENEWAL_PENDING: "We're confirming your renewal.",
   NO_SUBSCRIPTION: "No plan is active.",
 };

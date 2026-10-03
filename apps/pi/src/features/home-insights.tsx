@@ -206,7 +206,7 @@ export function InsightKpis({ data }: { data: Insights }) {
       />
       <Kpi
         icon={Send}
-        label="Replies by Pi"
+        label="Replies by pi"
         value={count(data.daily.reduce((n, d) => n + d.pi, 0))}
         hint="delivered on WhatsApp"
         trend={data.daily.map((d) => d.pi)}
@@ -214,7 +214,7 @@ export function InsightKpis({ data }: { data: Insights }) {
       />
       <Kpi
         icon={Bot}
-        label="Handled by Pi"
+        label="Handled by pi"
         value={rate === null ? "—" : `${Math.round(rate * 100)}%`}
         hint={
           data.conversations
@@ -228,7 +228,7 @@ export function InsightKpis({ data }: { data: Insights }) {
         icon={Gauge}
         label="Reply time"
         value={seconds(data.median_reply_seconds)}
-        hint="typical time to Pi's reply"
+        hint="typical time to pi's reply"
         tone="warning"
       />
     </div>
@@ -237,7 +237,7 @@ export function InsightKpis({ data }: { data: Insights }) {
 
 const SERIES = [
   { key: "customers", label: "Customers", bar: "bg-border-strong" },
-  { key: "pi", label: "Pi", bar: "bg-accent" },
+  { key: "pi", label: "pi", bar: "bg-accent" },
   { key: "team", label: "Your team", bar: "bg-info" },
 ] as const;
 
@@ -286,7 +286,7 @@ export function ActivityChart({ data }: { data: Insights }) {
                 <div
                   className="flex w-full flex-1 items-end justify-center gap-0.5 sm:gap-1"
                   role="img"
-                  aria-label={`${label}: ${d.customers} from customers, ${d.pi} from Pi, ${d.team} from your team`}
+                  aria-label={`${label}: ${d.customers} from customers, ${d.pi} from pi, ${d.team} from your team`}
                 >
                   {SERIES.map((s) => (
                     <span
@@ -443,7 +443,7 @@ export function RecentConversations() {
                   ) : (
                     <span className="inline-flex items-center gap-1 text-[11px] font-medium text-accent">
                       <Bot className="size-3" aria-hidden />
-                      Pi
+                      pi
                     </span>
                   )}
                 </span>

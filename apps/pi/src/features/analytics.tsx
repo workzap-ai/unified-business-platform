@@ -107,7 +107,7 @@ const RANGES: AnalyticsRange[] = [7, 30, 90];
 
 const REASON: Record<string, string> = {
   customer_request: "Customer asked for a person",
-  low_confidence: "Pi wasn't sure",
+  low_confidence: "pi wasn't sure",
   provider_failure: "AI unavailable",
   policy: "Business rule",
   tool_failure: "A tool failed",
@@ -275,7 +275,7 @@ export function AnalyticsPage() {
   const header = (
     <PageHeader
       title="Analytics"
-      description="How Pi is doing with your customers: conversations, replies, speed and when your team stepped in."
+      description="How pi is doing with your customers: conversations, replies, speed and when your team stepped in."
       action={
         allowed ? <RangeControl value={range} onChange={setRange} /> : null
       }
@@ -441,7 +441,7 @@ function AnalyticsBody({
           title={`Nothing to show for the last ${range} days`}
         >
           Once customers message you on WhatsApp, you&apos;ll see how many
-          conversations Pi handled, how fast it replied and when your team
+          conversations pi handled, how fast it replied and when your team
           stepped in.
         </EmptyState>
       </Card>
@@ -510,7 +510,7 @@ function AnalyticsBody({
             icon={MessageCircle}
             label="Messages"
             value={count(t.messages)}
-            hint="from customers, Pi and your team"
+            hint="from customers, pi and your team"
             trend={messages.map(
               (d) => d.values.inbound + d.values.ai + d.values.team,
             )}
@@ -518,7 +518,7 @@ function AnalyticsBody({
           />
           <Kpi
             icon={Send}
-            label="Replies by Pi"
+            label="Replies by pi"
             value={count(t.ai_responses)}
             hint={
               t.messages
@@ -543,7 +543,7 @@ function AnalyticsBody({
             icon={Gauge}
             label="Typical reply time"
             value={duration(p50)}
-            hint="half of Pi's replies are faster"
+            hint="half of pi's replies are faster"
             tone="warning"
           />
           <Kpi
@@ -610,7 +610,7 @@ function AnalyticsBody({
 
           <ChartCard
             title="Reply speed"
-            description="How long Pi took to answer, per day"
+            description="How long pi took to answer, per day"
             legend={LATENCY_SERIES}
           >
             <LatencyChart rows={latency} />
@@ -622,7 +622,7 @@ function AnalyticsBody({
           >
             <HBars
               name="Handoffs by reason"
-              emptyText="Pi didn't hand any conversation to your team."
+              emptyText="pi didn't hand any conversation to your team."
               items={[...data.handoffs_by_reason]
                 .sort((a, b) => b.count - a.count)
                 .map((h) => ({
@@ -635,7 +635,7 @@ function AnalyticsBody({
 
           <ChartCard
             title="What customers ask about"
-            description="Most common topics Pi recognised"
+            description="Most common topics pi recognised"
           >
             <HBars
               name="Top topics"
@@ -652,8 +652,8 @@ function AnalyticsBody({
           </ChartCard>
 
           <ChartCard
-            title="Pi's work by area"
-            description="AI runs for each part of Pi, and how many failed"
+            title="pi's work by area"
+            description="AI runs for each part of pi, and how many failed"
             legend={AGENT_SERIES}
           >
             <HBars
@@ -678,13 +678,13 @@ function AnalyticsBody({
           </ChartCard>
 
           <ChartCard
-            title="Tools Pi used"
+            title="Tools pi used"
             description={`${count(t.tool_calls)} actions like looking up orders or saving details`}
             legend={TOOL_SERIES}
           >
             <HBars
               name="Tool activity"
-              emptyText="Pi didn't use any tools in this period."
+              emptyText="pi didn't use any tools in this period."
               items={[...data.tools]
                 .sort(
                   (a, b) =>
@@ -727,7 +727,7 @@ function AnalyticsBody({
 
           <ChartCard
             title="AI usage (tokens)"
-            description={`${count(t.input_tokens + t.output_tokens)} tokens: what Pi read and what it wrote`}
+            description={`${count(t.input_tokens + t.output_tokens)} tokens: what pi read and what it wrote`}
             legend={TOKEN_SERIES}
             className="lg:col-span-2"
           >
@@ -761,7 +761,7 @@ function BackupAi({ data }: { data: PiAnalytics }) {
         </Badge>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
-        When one AI is busy or down, Pi switches to another so customers still
+        When one AI is busy or down, pi switches to another so customers still
         get a reply.
       </p>
       {data.fallback_pairs.length > 0 ? (
@@ -923,7 +923,7 @@ const CONVERSATION_SERIES: Series[] = [
 ];
 const MESSAGE_SERIES: Series[] = [
   { key: "inbound", label: "Customers", bar: "bg-border-strong" },
-  { key: "ai", label: "Pi", bar: "bg-accent" },
+  { key: "ai", label: "pi", bar: "bg-accent" },
   { key: "team", label: "Your team", bar: "bg-info" },
 ];
 const PROVIDER_SERIES: Series[] = [
@@ -932,8 +932,8 @@ const PROVIDER_SERIES: Series[] = [
   { key: "groq", label: "Groq", bar: "bg-warning" },
 ];
 const TOKEN_SERIES: Series[] = [
-  { key: "input", label: "Read by Pi", bar: "bg-info" },
-  { key: "output", label: "Written by Pi", bar: "bg-accent" },
+  { key: "input", label: "Read by pi", bar: "bg-info" },
+  { key: "output", label: "Written by pi", bar: "bg-accent" },
 ];
 const LATENCY_SERIES: Series[] = [
   { key: "p50", label: "Typical", bar: "bg-accent" },

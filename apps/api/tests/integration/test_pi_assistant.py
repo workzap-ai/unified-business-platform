@@ -1,4 +1,4 @@
-"""Pi Assistant: role-scoped business answers in the Pi app and operator-managed guides."""
+"""pi Assistant: role-scoped business answers in the pi app and operator-managed guides."""
 
 from uuid import UUID
 
@@ -39,7 +39,7 @@ async def test_owner_gets_guides_and_figures_without_ai(app, api, business_db):
     assert any(g["id"] == "connect-whatsapp" for g in context["guides"])
     how = (await owner.post(CHAT, json={"message": "How do I connect my WhatsApp number?"})).json()
     assert how["guides"][0]["id"] == "connect-whatsapp"
-    assert how["message"].startswith("Pi answers your customers on WhatsApp")
+    assert how["message"].startswith("pi answers your customers on WhatsApp")
     assert how["mode"] == "tools" and "AI answers" in how["notice"]
     week = (await owner.post(CHAT, json={"message": "Is hafte ka summary do"})).json()
     titles = [c["title"] for c in week["cards"]]
@@ -51,7 +51,7 @@ async def test_owner_gets_guides_and_figures_without_ai(app, api, business_db):
     assert plan["guides"] == []  # a figures question doesn't drag in setup guides
     report = (await owner.post(CHAT, json={"message": "Report for the last 30 days"})).json()
     metrics = next(c for c in report["cards"] if c["title"].startswith("Report"))["metrics"]
-    assert set(metrics) == {"Conversations", "Messages", "Answered by Pi", "Handed to your team"}
+    assert set(metrics) == {"Conversations", "Messages", "Answered by pi", "Handed to your team"}
     await owner.aclose()
 
 
@@ -121,7 +121,7 @@ async def test_operator_edits_guides_every_business_sees(app, api, business_db):
         base,
         json={
             "title": "Ramadan opening hours",
-            "body": "Update your hours in My Pi → Behaviour so Pi tells customers the new times.",
+            "body": "Update your hours in My pi → Behaviour so pi tells customers the new times.",
             "tags": ["ramadan", "hours"],
             "page": "/my-pi/behaviour",
         },
@@ -143,7 +143,7 @@ async def test_operator_edits_guides_every_business_sees(app, api, business_db):
 
     assert (await api.delete(f"{base}/connect-whatsapp")).status_code == 200
     reset = (await business.get("/api/v1/pi-app/assistant/guides/connect-whatsapp")).json()
-    assert reset["body"].startswith("Pi answers your customers")
+    assert reset["body"].startswith("pi answers your customers")
     assert (await api.delete(f"{base}/ramadan-opening-hours")).status_code == 200
     gone = await business.get("/api/v1/pi-app/assistant/guides/ramadan-opening-hours")
     assert gone.status_code == 404

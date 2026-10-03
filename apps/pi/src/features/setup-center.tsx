@@ -46,7 +46,7 @@ const STATE: Record<
   [string, "success" | "neutral" | "warning" | "info"]
 > = {
   connected: ["Connected", "success"],
-  platform: ["Provided by Pi", "info"],
+  platform: ["Provided by pi", "info"],
   not_connected: ["Not connected", "neutral"],
   needs_attention: ["Needs attention", "warning"],
 };
@@ -87,12 +87,12 @@ export function SetupCenter() {
           <div className="min-w-0 flex-1 basis-48">
             <p className="font-semibold">
               {s.ready
-                ? "Pi has everything it needs"
+                ? "pi has everything it needs"
                 : "A few things are missing"}
             </p>
             <p className="text-sm text-muted-foreground">
               {s.connected} of {s.total} tools ready. Optional tools add more
-              things Pi can do.
+              things pi can do.
             </p>
           </div>
           {can("integrations.operate") ? (

@@ -72,11 +72,11 @@ const ERROR_TEXT: Record<string, string> = {
   RECIPIENT_UNAVAILABLE:
     "The customer can't receive messages right now (not on WhatsApp, or more than 24 hours since they last wrote).",
   SIGNATURE_INVALID:
-    "A message arrived that WhatsApp didn't sign, so Pi ignored it.",
+    "A message arrived that WhatsApp didn't sign, so pi ignored it.",
   TOKEN_INVALID: "WhatsApp rejected the connection. Reconnect your number.",
   TOKEN_EXPIRED: "The WhatsApp connection expired. Reconnect your number.",
   RATE_LIMITED:
-    "WhatsApp is slowing down messages from this number. Pi will retry.",
+    "WhatsApp is slowing down messages from this number. pi will retry.",
   MEDIA_TOO_LARGE: "A file was larger than the allowed size.",
   PROCESSING_TIMEOUT: "Handling a message took too long. Try it again.",
   rate_limit: "The AI service was busy.",
@@ -278,7 +278,7 @@ function ReplayButton({ event }: { event: WebhookEvent }) {
       </DialogTrigger>
       <DialogContent
         title="Try this again?"
-        description="Pi will handle this WhatsApp event again. Pi never sends the same reply twice for one message."
+        description="pi will handle this WhatsApp event again. pi never sends the same reply twice for one message."
       >
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <DialogClose asChild>
@@ -419,7 +419,7 @@ export function WhatsAppActivityPage() {
                 Events from WhatsApp
               </h2>
               <p className="text-sm text-muted-foreground">
-                Every message and delivery update WhatsApp sent to Pi. Repeats
+                Every message and delivery update WhatsApp sent to pi. Repeats
                 are kept once, so a customer never gets a second reply.
               </p>
             </div>

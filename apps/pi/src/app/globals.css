@@ -1,27 +1,34 @@
 @import "tailwindcss";
 
 /*
- * Pi design tokens. Warm neutral surfaces, readable charcoal text and one restrained
- * emerald accent. Contrast: text on surfaces >= 7:1, muted text >= 4.5:1, accent text on
- * accent-soft >= 4.5:1 (checked in both themes). Components use tokens only.
+ * pi brand tokens (brand guide v1.1): Ink #15132B text, Violet #5A47F5 for actions,
+ * Lilac #8E80FF on dark grounds, Spark #FFB020 only as a fill. Never WhatsApp green.
+ * Contrast: text on surfaces >= 7:1, muted text >= 4.5:1, accent text >= 4.5:1, both themes.
  */
 :root {
   color-scheme: light;
-  --background: #f7f5f1;
+  --pi-ink: #15132b;
+  --pi-violet: #5a47f5;
+  --pi-lilac: #8e80ff;
+  --pi-spark: #ffb020;
+  --pi-violet-50: #eeebfe;
+  --pi-violet-100: #dad5fc;
+  --background: #f6f6fb;
   --surface: #ffffff;
-  --surface-muted: #f1eee8;
-  --surface-sunken: #ebe7df;
-  --foreground: #1f2320;
-  --foreground-secondary: #3c423d;
-  --muted-foreground: #5e645f;
-  --border: #e3ded4;
-  --border-strong: #cfc8bb;
-  --ring: #0f766e;
-  --accent: #245d49;
-  --accent-hover: #194734;
+  --surface-muted: #f0eff8;
+  --surface-sunken: #e8e6f3;
+  --foreground: #15132b;
+  --foreground-secondary: #3a3a52;
+  --muted-foreground: #5f6075;
+  --border: #e5e4f0;
+  --border-strong: #cdcbe0;
+  --ring: #5a47f5;
+  --accent: #5a47f5;
+  --accent-hover: #4a37e0;
   --accent-foreground: #ffffff;
-  --accent-soft: #e8efdf;
-  --accent-soft-foreground: #2d523b;
+  --accent-soft: #eeebfe;
+  --accent-soft-foreground: #3d2cc4;
+  --spark: #ffb020;
   --success: #15803d;
   --success-soft: #e6f4ea;
   --warning: #9a5b00;
@@ -31,30 +38,31 @@
   --info: #1d5fa7;
   --info-soft: #e7f0fa;
   --bubble-customer: #ffffff;
-  --bubble-pi: #e8efdf;
+  --bubble-pi: #eeebfe;
   --bubble-team: #eef0f6;
-  --shadow-sm: 0 3px 12px -8px rgb(31 53 38 / 0.15);
-  --shadow-md: 0 12px 30px -12px rgb(31 53 38 / 0.18);
+  --shadow-sm: 0 3px 12px -8px rgb(21 19 43 / 0.16);
+  --shadow-md: 0 12px 30px -12px rgb(21 19 43 / 0.2);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --background: #151816;
-    --surface: #1c201d;
-    --surface-muted: #232824;
-    --surface-sunken: #121412;
-    --foreground: #eef0ec;
-    --foreground-secondary: #d3d8d2;
-    --muted-foreground: #a3aaa3;
-    --border: #2e342f;
-    --border-strong: #3d453f;
-    --ring: #5eead4;
-    --accent: #bbd7a4;
-    --accent-hover: #d4e8c4;
-    --accent-foreground: #0b1f1d;
-    --accent-soft: #283d2c;
-    --accent-soft-foreground: #d1e5bf;
+    --background: #15132b;
+    --surface: #1c1a36;
+    --surface-muted: #242242;
+    --surface-sunken: #100e22;
+    --foreground: #f2f1fa;
+    --foreground-secondary: #d6d4e8;
+    --muted-foreground: #aaa8c4;
+    --border: #2e2b50;
+    --border-strong: #3e3a66;
+    --ring: #8e80ff;
+    --accent: #8e80ff;
+    --accent-hover: #a79cff;
+    --accent-foreground: #15132b;
+    --accent-soft: #2b2658;
+    --accent-soft-foreground: #d2ccff;
+    --spark: #ffb020;
     --success: #4ade80;
     --success-soft: #16301f;
     --warning: #fbbf24;
@@ -63,11 +71,11 @@
     --danger-soft: #3a1716;
     --info: #7cb4f5;
     --info-soft: #152538;
-    --bubble-customer: #232824;
-    --bubble-pi: #283d2c;
+    --bubble-customer: #242242;
+    --bubble-pi: #2b2658;
     --bubble-team: #20263a;
-    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-    --shadow-md: 0 6px 20px -8px rgb(0 0 0 / 0.6);
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.45);
+    --shadow-md: 0 6px 20px -8px rgb(0 0 0 / 0.65);
   }
 }
 
@@ -98,9 +106,15 @@
   --color-bubble-customer: var(--bubble-customer);
   --color-bubble-pi: var(--bubble-pi);
   --color-bubble-team: var(--bubble-team);
+  --color-spark: var(--spark);
+  --color-pi-ink: var(--pi-ink);
+  --color-pi-violet: var(--pi-violet);
+  --color-pi-lilac: var(--pi-lilac);
+  --color-pi-violet-50: var(--pi-violet-50);
   --font-sans:
-    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans",
-    "Noto Naskh Arabic", "Noto Nastaliq Urdu", Arial, sans-serif;
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Noto Sans", "Noto Naskh Arabic", "Noto Nastaliq Urdu", Arial,
+    sans-serif;
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
   --radius-md: 0.75rem;

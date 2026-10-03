@@ -107,7 +107,7 @@ export function RemindersAndForms() {
         <div>
           <h2 className="font-semibold">Quiet hours</h2>
           <p className="text-sm text-muted-foreground">
-            Pi never sends reminders during these hours (your time zone). Choose
+            pi never sends reminders during these hours (your time zone). Choose
             the same time twice to turn quiet hours off.
           </p>
           <div className="mt-3 grid max-w-md grid-cols-2 gap-3">
@@ -142,8 +142,8 @@ export function RemindersAndForms() {
           </h2>
           <p className="text-sm text-muted-foreground">
             Build and publish a form (Flow) in your WhatsApp Manager, then add
-            it here. Pi sends it only while a customer is chatting, and only if
-            you turn on WhatsApp forms in My Pi → Tools.
+            it here. pi sends it only while a customer is chatting, and only if
+            you turn on WhatsApp forms in My pi → Tools.
           </p>
           <div className="mt-3 space-y-3">
             {PURPOSES.map(([purpose, title, hint]) => {

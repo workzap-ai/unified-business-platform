@@ -29,7 +29,7 @@ export function TeachFromFile() {
     ({ file, name }: { file: Blob; name: string }) => upload(file, name),
     {
       invalidate: [["drafts"]],
-      success: "Pi read it. Review the draft below, then publish.",
+      success: "pi read it. Review the draft below, then publish.",
     },
   );
   return (
@@ -41,7 +41,7 @@ export function TeachFromFile() {
         </h2>
         <p className="text-sm text-muted-foreground">
           Upload a price list, menu, brochure or policy (PDF, Word, text or a
-          photo), or just say it. You check the draft before Pi uses it.
+          photo), or just say it. You check the draft before pi uses it.
         </p>
         <div className="flex flex-wrap items-center gap-2">
           <input

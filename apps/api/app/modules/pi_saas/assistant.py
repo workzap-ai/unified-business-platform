@@ -1,10 +1,10 @@
-"""Pi Assistant: the in-app helper for a business's own team in the Pi app.
+"""pi Assistant: the in-app helper for a business's own team in the pi app.
 
 Two kinds of answers:
 - product help ("how do I connect WhatsApp?") from the operator-managed guides in
   ``help_kb`` (same for every business, never business data), and
 - the business's own numbers (overview, conversations, enquiries and leads, reports,
-  bookings and tasks, campaigns, plan and usage) from the same functions the Pi app's
+  bookings and tasks, campaigns, plan and usage) from the same functions the pi app's
   pages use, called with the member's own scope, so each role sees exactly what its
   pages would show and nothing more.
 
@@ -96,13 +96,13 @@ class Assistant:
         tools = [
             ToolDefinition(
                 "help",
-                "Search the Pi product guides (setup, WhatsApp, knowledge, team, payments, "
+                "Search the pi product guides (setup, WhatsApp, knowledge, team, payments, "
                 "billing...). Answer how-to questions ONLY from what this returns.",
                 HelpInput.model_json_schema(),
             ),
             ToolDefinition(
                 "setup_status",
-                "What this business still needs to finish setting up Pi, with the page "
+                "What this business still needs to finish setting up pi, with the page "
                 "for each step.",
             ),
         ]
@@ -110,7 +110,7 @@ class Assistant:
             tools += [
                 ToolDefinition(
                     "overview",
-                    "This week's exact numbers: conversations, Pi replies, enquiries, chats "
+                    "This week's exact numbers: conversations, pi replies, enquiries, chats "
                     "waiting for the team, approvals, open questions, unread, next actions.",
                 ),
                 ToolDefinition(
@@ -122,7 +122,7 @@ class Assistant:
                 ),
                 ToolDefinition(
                     "enquiries",
-                    "Enquiries Pi detected (requirements, quotes, orders, pricing, bookings) "
+                    "Enquiries pi detected (requirements, quotes, orders, pricing, bookings) "
                     "by type, and sales leads when the member may read sales.",
                     DaysInput.model_json_schema(),
                 ),
@@ -132,7 +132,7 @@ class Assistant:
                 ToolDefinition(
                     "report",
                     "Report for 7, 30 or 90 days: conversations started/resolved per day, "
-                    "messages, how many Pi answered, top intents, handoff reasons.",
+                    "messages, how many pi answered, top intents, handoff reasons.",
                     DaysInput.model_json_schema(),
                 )
             )
@@ -208,11 +208,11 @@ class Assistant:
         data = await home(self.scope, self.session)
         labels = {
             "conversations_7d": "Conversations (7 days)",
-            "pi_replies_7d": "Pi replies",
+            "pi_replies_7d": "pi replies",
             "enquiries_7d": "Enquiries",
             "waiting_for_team": "Waiting for your team",
             "pending_approval": "Replies to approve",
-            "open_questions": "Questions Pi couldn't answer",
+            "open_questions": "Questions pi couldn't answer",
             "unread": "Unread",
         }
         self.cards.append(
@@ -344,7 +344,7 @@ class Assistant:
                     for key, label in (
                         ("conversations", "Conversations"),
                         ("messages", "Messages"),
-                        ("ai_responses", "Answered by Pi"),
+                        ("ai_responses", "Answered by pi"),
                         ("handoffs", "Handed to your team"),
                     )
                 },
@@ -449,7 +449,7 @@ class Assistant:
             return {"error": exc.message}
 
 
-SYSTEM = """You are pi (always lowercase), an AI assistant by Workzap inside the Pi app,
+SYSTEM = """You are pi (always lowercase), an AI assistant by Workzap inside the pi app,
 helping this business's own team (not the WhatsApp agent that talks to their customers).
 Voice (pi brand guide): steady, plain, honest. Answer first, then the next step. Short
 sentences, one idea at a time, active voice with "I" and "you". Reply in the user's language

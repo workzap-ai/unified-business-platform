@@ -1,5 +1,5 @@
 .studio {
-  --studio-green: #176052;
+  --studio-green: #211760;
   --studio-muted: var(--muted-foreground);
   padding: 7px 0 0;
   animation: studio-enter 0.45s ease-out both;
@@ -57,7 +57,7 @@
   border-radius: 9px;
   color: var(--foreground-secondary);
   background: var(--surface);
-  box-shadow: 0 2px 3px #24392e03;
+  box-shadow: 0 2px 3px #27243903;
   font-size: 12px;
   font-weight: 500;
   transition:
@@ -74,10 +74,10 @@
   min-height: 310px;
   overflow: hidden;
   isolation: isolate;
-  border: 1px solid #245b4b;
+  border: 1px solid #2b245b;
   border-radius: 22px;
-  background: #153e33;
-  box-shadow: 0 10px 28px -20px #143c35a0;
+  background: #1a153e;
+  box-shadow: 0 10px 28px -20px #19143ca0;
   color: #fff;
 }
 .hero::before {
@@ -86,8 +86,8 @@
   inset: 0;
   content: "";
   background:
-    radial-gradient(ellipse at 87% 75%, #3b806459, transparent 55%),
-    linear-gradient(120deg, #163e34, #14382f);
+    radial-gradient(ellipse at 87% 75%, #443b8059, transparent 55%),
+    linear-gradient(120deg, #1b163e, #191438);
 }
 .hero::after {
   position: absolute;
@@ -107,28 +107,27 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #bed6bc;
+  color: #bfbcd6;
   font-size: 9px;
   letter-spacing: 1.5px;
   font-weight: 500;
 }
 .heroContent h2 {
   margin-top: 17px;
-  color: #f7fbef;
+  color: #f1effb;
   font-size: clamp(30px, 3vw, 43px);
   line-height: 1.13;
   font-weight: 450;
   letter-spacing: -1.6px;
 }
 .heroContent h2 em {
-  color: #d6e8af;
-  font-family: Georgia, "Times New Roman", serif;
+  color: #b7afe8;
   font-weight: 400;
 }
 .heroContent > p {
   max-width: 350px;
   margin-top: 14px;
-  color: #c0d1c8;
+  color: #c2c0d1;
   font-size: 12px;
   line-height: 1.8;
 }
@@ -140,11 +139,11 @@
   min-height: 40px;
   margin-top: 22px;
   padding: 0 15px;
-  border: 1px solid #e2edc6;
+  border: 1px solid #cbc6ed;
   border-radius: 8px;
-  background: #e4eec8;
-  color: #213c2b;
-  box-shadow: 0 3px 8px #001d1a15;
+  background: #cdc8ee;
+  color: #25213c;
+  box-shadow: 0 3px 8px #04001d15;
   font-size: 12px;
   font-weight: 600;
   transition:
@@ -152,7 +151,7 @@
     background 0.2s;
 }
 .heroButton:hover {
-  background: #f2f7df;
+  background: #e2dff7;
   transform: translateY(-2px);
 }
 .heroButton > svg:last-child {
@@ -161,7 +160,7 @@
 .heroHint {
   display: block;
   margin-top: 10px;
-  color: #b2c9bc;
+  color: #b5b2c9;
   font-size: 10px;
 }
 .heroArt {
@@ -179,61 +178,31 @@
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    #b8d6b730 0%,
-    #699a6020 35%,
+    #bbb7d630 0%,
+    #68609a20 35%,
     transparent 66%
   );
 }
+/* The pi character (brand guide): never tilted, outlined, shadowed or retyped. On the
+   Ink hero it uses the lilac "dark" version. */
 .piTile {
   position: absolute;
   left: 45%;
   top: 45%;
-  display: grid;
-  place-items: center;
   width: 158px;
-  height: 162px;
-  transform: translate(-50%, -50%) rotate(-9deg);
-  border: 1px solid #e4f4ca8a;
-  border-radius: 37px 37px 37px 10px;
-  background: linear-gradient(145deg, #e8f0c9, #b5cfa7 57%, #90b996);
-  color: #234c39;
-  box-shadow:
-    10px 22px 44px #061f2266,
-    inset 2px 2px 3px #ffffff90,
-    inset -3px -4px 3px #527b6540;
+  height: 158px;
+  transform: translate(-50%, -50%);
 }
-.piTile::after {
-  position: absolute;
-  bottom: -8px;
-  left: 8px;
-  width: 29px;
-  height: 33px;
-  background: #abc9a4;
-  clip-path: polygon(0 0, 100% 0, 0 100%);
-  content: "";
-}
-.piTile > span {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 77px;
-  letter-spacing: -7px;
-  line-height: 1;
-  transform: rotate(9deg) translateX(-3px);
-}
-.piDot {
-  color: #66865a;
-}
-.tileShine {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: inherit;
-  background: linear-gradient(135deg, #fff6, transparent 45%);
+.piTile > img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 .artSparkOne {
   position: absolute;
   top: 43px;
   right: 56px;
-  color: #dbe9ac;
+  color: #b4ace9;
   font-size: 39px;
   transform: rotate(12deg);
 }
@@ -241,7 +210,7 @@
   position: absolute;
   left: 12px;
   top: 170px;
-  color: #a8c7b1;
+  color: #aca8c7;
   font-size: 31px;
 }
 .artSignature {
@@ -254,12 +223,12 @@
   width: max-content;
   padding: 12px 17px;
   transform: translate(-50%, -50%) rotate(-3deg);
-  border: 1px solid #c3d9bc38;
+  border: 1px solid #c0bcd938;
   border-radius: 11px;
   background: #ffffff0b;
-  color: #ccdcbf;
+  color: #c3bfdc;
   backdrop-filter: blur(12px);
-  box-shadow: 0 8px 20px #00211616;
+  box-shadow: 0 8px 20px #04002116;
 }
 .artSignature > span {
   font-size: 10px;
@@ -267,7 +236,7 @@
   letter-spacing: 0.2px;
 }
 .artSignature strong {
-  color: #edf3df;
+  color: #e2dff3;
   font-weight: 500;
 }
 .mainGrid {
@@ -319,7 +288,7 @@
   border: 1px solid var(--border);
   border-radius: 15px;
   background: var(--surface);
-  box-shadow: 0 3px 5px #24392e02;
+  box-shadow: 0 3px 5px #27243902;
   transition:
     transform 0.22s,
     box-shadow 0.22s,
@@ -330,8 +299,8 @@
   --card-soft: #f8ece5;
 }
 .featureCard[data-tone="sage"] {
-  --card-color: #427560;
-  --card-soft: #e9f1e9;
+  --card-color: #494275;
+  --card-soft: #eae9f1;
 }
 .featureCard[data-tone="sand"] {
   --card-color: #8a6c39;
@@ -453,7 +422,6 @@
   border-radius: 12px 12px 12px 4px;
   background: var(--accent-soft);
   color: var(--accent-soft-foreground);
-  font-family: Georgia, "Times New Roman", serif;
   font-size: 23px;
   font-weight: 600;
   letter-spacing: -1px;
@@ -543,10 +511,10 @@
 .noteCard {
   position: relative;
   padding: 23px;
-  border: 1px solid #e4e8d7;
+  border: 1px solid #d9d7e8;
   border-radius: 15px;
-  background: #eef0e3;
-  color: #3e513b;
+  background: #e5e3f0;
+  color: #3e3b51;
 }
 .noteIcon {
   display: grid;
@@ -554,13 +522,13 @@
   width: 34px;
   height: 34px;
   margin-bottom: 20px;
-  border: 1px solid #d9dfc9;
+  border: 1px solid #ccc9df;
   border-radius: 50%;
-  background: #f7f8ec;
-  color: #758161;
+  background: #eeecf8;
+  color: #656181;
 }
 .noteCard .eyebrow {
-  color: #61705a;
+  color: #5d5a70;
   font-size: 7px;
 }
 .noteCard h2 {
@@ -571,14 +539,13 @@
   letter-spacing: -0.55px;
 }
 .noteCard h2 em {
-  font-family: Georgia, "Times New Roman", serif;
   font-weight: 400;
 }
 .noteCard > p {
   margin-top: 12px;
   font-size: 11px;
   line-height: 1.85;
-  color: #5c6a54;
+  color: #57546a;
 }
 .noteCard > a {
   display: flex;
@@ -588,7 +555,7 @@
   margin-top: 18px;
   font-size: 10px;
   font-weight: 550;
-  color: #415c3c;
+  color: #403c5c;
 }
 .noteCard > a:hover {
   text-decoration: underline;
@@ -719,11 +686,7 @@
   }
   .piTile {
     width: 130px;
-    height: 135px;
-    border-radius: 29px 29px 29px 8px;
-  }
-  .piTile > span {
-    font-size: 65px;
+    height: 130px;
   }
   .artSparkOne {
     right: 27px;
@@ -755,7 +718,7 @@
   .piTile {
     left: 32%;
     width: 113px;
-    height: 121px;
+    height: 113px;
   }
   .artSignature {
     display: none;
@@ -844,11 +807,7 @@
   .piTile {
     top: 52%;
     width: 155px;
-    height: 168px;
-    transform: translate(-50%, -50%) rotate(-15deg);
-  }
-  .piTile > span {
-    font-size: 82px;
+    height: 155px;
   }
   .artSignature,
   .artSparkOne,
@@ -1003,29 +962,29 @@
     --card-soft: #3b2e29;
   }
   .featureCard[data-tone="sage"] {
-    --card-color: #a1cbb5;
-    --card-soft: #26392d;
+    --card-color: #a7a1cb;
+    --card-soft: #292639;
   }
   .featureCard[data-tone="sand"] {
     --card-color: #d9c28f;
     --card-soft: #393226;
   }
   .noteCard {
-    background: #293426;
-    border-color: #3e4a35;
-    color: #d9e4ca;
+    background: #282634;
+    border-color: #38354a;
+    color: #cdcae4;
   }
   .noteIcon {
-    background: #35402e;
-    border-color: #526045;
-    color: #c1d2a9;
+    background: #302e40;
+    border-color: #494560;
+    color: #aea9d2;
   }
   .noteCard .eyebrow,
   .noteCard > p {
-    color: #b1c09f;
+    color: #a39fc0;
   }
   .noteCard > a {
-    color: #d0e1b7;
+    color: #bdb7e1;
   }
 }
 @media (prefers-reduced-motion: reduce) {

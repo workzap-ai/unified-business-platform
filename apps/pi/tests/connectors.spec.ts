@@ -83,7 +83,7 @@ test("an owner connects Google Calendar and returns to a clear result", async ({
     .getByRole("button", { name: "Connect Google Calendar" })
     .click();
   await expect(
-    page.getByText("Google Calendar is connected. Pi will use it from now on."),
+    page.getByText("Google Calendar is connected. pi will use it from now on."),
   ).toBeVisible();
   await expect(page).toHaveURL(/\/my-pi\/tools$/);
   await expect(

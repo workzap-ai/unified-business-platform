@@ -41,7 +41,7 @@ async function publicApi<T = unknown>(
     throw new ApiError(
       0,
       "NETWORK",
-      "We couldn't reach Pi. Check your connection and try again.",
+      "We couldn't reach pi. Check your connection and try again.",
     );
   } finally {
     clearTimeout(timeout);
@@ -76,6 +76,6 @@ function friendly(status: number, message?: string): string {
   return message || "Something went wrong. Please try again.";
 }
 
-export const publicGet = <T,>(path: string) => publicApi<T>("GET", path);
-export const publicPost = <T,>(path: string, body?: unknown) =>
+export const publicGet = <T>(path: string) => publicApi<T>("GET", path);
+export const publicPost = <T>(path: string, body?: unknown) =>
   publicApi<T>("POST", path, body ?? {});

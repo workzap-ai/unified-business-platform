@@ -59,7 +59,7 @@ const SECTIONS = [
   { href: "/my-pi/tools", label: "Tools" },
   { href: "/my-pi/follow-ups", label: "Follow-ups" },
   { href: "/my-pi/advanced", label: "Advanced" },
-  { href: "/my-pi/test", label: "Test Pi" },
+  { href: "/my-pi/test", label: "Test pi" },
 ];
 
 function Shell({
@@ -86,25 +86,25 @@ export function MyPiOverview() {
       href: "/my-pi/knowledge",
       icon: BookOpenText,
       title: "Business knowledge",
-      body: "What Pi knows and may tell customers. Teach Pi something new.",
+      body: "What pi knows and may tell customers. Teach pi something new.",
     },
     {
       href: "/my-pi/behaviour",
       icon: SlidersHorizontal,
       title: "Behaviour",
-      body: "Tone, prices, approvals and when Pi hands over to your team.",
+      body: "Tone, prices, approvals and when pi hands over to your team.",
     },
     {
       href: "/my-pi/agents",
       icon: Bot,
       title: "Agents",
-      body: "The specialists inside Pi: their instructions, tools and versions.",
+      body: "The specialists inside pi: their instructions, tools and versions.",
     },
     {
       href: "/my-pi/tools",
       icon: PlugZap,
       title: "Tools",
-      body: "What Pi may do: look up orders, book times, collect enquiries.",
+      body: "What pi may do: look up orders, book times, collect enquiries.",
     },
     {
       href: "/my-pi/follow-ups",
@@ -121,15 +121,15 @@ export function MyPiOverview() {
     {
       href: "/my-pi/test",
       icon: FlaskConical,
-      title: "Test Pi",
-      body: "Chat with Pi as a customer. Nothing is sent.",
+      title: "Test pi",
+      body: "Chat with pi as a customer. Nothing is sent.",
     },
   ];
   return (
     <div>
       <PageHeader
-        title="My Pi"
-        description="Shape how Pi talks to your customers. No technical setup needed."
+        title="My pi"
+        description="Shape how pi talks to your customers. No technical setup needed."
       />
       <div
         className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-3 ${product.overviewCards}`}
@@ -180,7 +180,7 @@ function DraftCard({ draft }: { draft: Draft }) {
     {
       invalidate: [["drafts"], ["documents"], ["account"]],
       success: visible
-        ? "Published. Pi can use this now."
+        ? "Published. pi can use this now."
         : "Saved for your team only.",
     },
   );
@@ -221,7 +221,7 @@ function DraftCard({ draft }: { draft: Draft }) {
                 maxLength={200}
               />
             </Field>
-            <Field label="What Pi should know" htmlFor={`c-${draft.id}`}>
+            <Field label="What pi should know" htmlFor={`c-${draft.id}`}>
               <Textarea
                 id={`c-${draft.id}`}
                 value={content}
@@ -349,27 +349,27 @@ export function KnowledgePage() {
     () => post<Draft>("/knowledge/teach", { text: note }),
     {
       invalidate: [["drafts"]],
-      success: "Pi drafted this. Review it below, then publish.",
+      success: "pi drafted this. Review it below, then publish.",
       onSuccess: () => setNote(""),
     },
   );
   const website = useAction(() => post<Draft>("/knowledge/website", { url }), {
     invalidate: [["drafts"]],
-    success: "We read the page. Review what Pi learned below.",
+    success: "We read the page. Review what pi learned below.",
     onSuccess: () => setUrl(null),
   });
   const remove = useAction(
     (id: string) => del(`/pi/knowledge/documents/${id}`),
     {
       invalidate: [["documents"], ["account"]],
-      success: "Removed. Pi won't use this anymore.",
+      success: "Removed. pi won't use this anymore.",
     },
   );
   if (!can("pi.knowledge.manage")) {
     return (
       <Shell
         title="Business knowledge"
-        description="What Pi knows about your business."
+        description="What pi knows about your business."
       >
         <Notice tone="info">
           Ask your business owner to give you access to knowledge.
@@ -380,20 +380,20 @@ export function KnowledgePage() {
   return (
     <Shell
       title="Business knowledge"
-      description="Pi only tells customers what you've published here."
+      description="pi only tells customers what you've published here."
     >
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardSection className="space-y-3">
             <h2 className="flex items-center gap-2 font-semibold">
-              <Sparkles className="size-4 text-accent" aria-hidden /> Teach Pi
+              <Sparkles className="size-4 text-accent" aria-hidden /> Teach pi
             </h2>
             <p className="text-sm text-muted-foreground">
-              Write it the way you&apos;d tell a new employee. Pi turns it into
+              Write it the way you&apos;d tell a new employee. pi turns it into
               a draft for you to check.
             </p>
             <label htmlFor="teach" className="sr-only">
-              What should Pi know?
+              What should pi know?
             </label>
             <Textarea
               id="teach"
@@ -419,7 +419,7 @@ export function KnowledgePage() {
               web page
             </h2>
             <p className="text-sm text-muted-foreground">
-              Pi reads one public page. You review everything before it&apos;s
+              pi reads one public page. You review everything before it&apos;s
               used.
             </p>
             <label htmlFor="page-url" className="sr-only">
@@ -465,7 +465,7 @@ export function KnowledgePage() {
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">
-            No drafts. Anything you teach Pi appears here first.
+            No drafts. Anything you teach pi appears here first.
           </p>
         )}
       </section>
@@ -535,7 +535,7 @@ export function KnowledgePage() {
               icon={<MessageSquareText className="size-6" aria-hidden />}
               title="Nothing published yet"
             >
-              Publish a draft so Pi can answer questions.
+              Publish a draft so pi can answer questions.
             </EmptyState>
           </Card>
         )}
@@ -634,7 +634,7 @@ function VoiceCard({ settings }: { settings: PiSettings }) {
         <Field
           label="Greeting"
           htmlFor="greeting"
-          hint="Pi replies in the customer's own language."
+          hint="pi replies in the customer's own language."
         >
           <Textarea
             id="greeting"
@@ -664,7 +664,7 @@ function HoursCard({ settings }: { settings: PiSettings }) {
           <div>
             <h2 className="font-semibold">Opening hours</h2>
             <p className="text-sm text-muted-foreground">
-              What Pi does when your team is away.
+              What pi does when your team is away.
             </p>
           </div>
           <Switch
@@ -744,12 +744,12 @@ function HoursCard({ settings }: { settings: PiSettings }) {
                   setHours((h) => ({ ...h, outside_hours: e.target.value }))
                 }
               >
-                <option value="reply">Pi replies as usual</option>
+                <option value="reply">pi replies as usual</option>
                 <option value="reply_with_notice">
-                  Pi replies and mentions your hours
+                  pi replies and mentions your hours
                 </option>
                 <option value="handoff_only">
-                  Pi tells customers your team will reply
+                  pi tells customers your team will reply
                 </option>
               </Select>
             </Field>
@@ -782,9 +782,9 @@ export function BehaviourPage() {
   const can = useCan();
   if (!can("pi.settings.manage")) {
     return (
-      <Shell title="Behaviour" description="How Pi talks and acts.">
+      <Shell title="Behaviour" description="How pi talks and acts.">
         <Notice tone="info">
-          Only owners and admins can change how Pi behaves.
+          Only owners and admins can change how pi behaves.
         </Notice>
       </Shell>
     );
@@ -792,7 +792,7 @@ export function BehaviourPage() {
   return (
     <Shell
       title="Behaviour"
-      description="How Pi talks, what it may share and when your team steps in."
+      description="How pi talks, what it may share and when your team steps in."
     >
       {account.isPending || settings.isPending ? (
         <LoadingBlock rows={3} />
@@ -880,7 +880,7 @@ function BookingsManager() {
       }),
     {
       invalidate: [["bookable-services"]],
-      success: "Service added. Pi can now offer these times.",
+      success: "Service added. pi can now offer these times.",
       onSuccess: () => setName(""),
     },
   );
@@ -897,13 +897,13 @@ function BookingsManager() {
         <div>
           <h2 className="font-semibold">Bookings</h2>
           <p className="text-sm text-muted-foreground">
-            Pi offers free times from your working hours and books only a time
+            pi offers free times from your working hours and books only a time
             the customer clearly agrees to. Times are rechecked before booking,
             so double bookings can&apos;t happen.{" "}
             {calendar?.state === "connected"
               ? "Busy times in your Google Calendar are skipped, and confirmed bookings are added to it."
               : calendar?.state === "action_required"
-                ? "Your Google Calendar needs reconnecting; until then Pi can't offer times."
+                ? "Your Google Calendar needs reconnecting; until then pi can't offer times."
                 : "No calendar is connected, so keep these hours up to date."}
           </p>
         </div>
@@ -1051,7 +1051,7 @@ export function ToolsPage() {
   return (
     <Shell
       title="Tools"
-      description="What Pi may do for customers. Each tool follows your approval rules."
+      description="What pi may do for customers. Each tool follows your approval rules."
     >
       {account.isPending ? (
         <LoadingBlock rows={3} />
@@ -1084,7 +1084,7 @@ export function ToolsPage() {
                   <p className="text-sm text-muted-foreground">{body}</p>
                   {!available ? (
                     <p className="text-sm text-muted-foreground">
-                      This tool isn&apos;t switched on for Pi yet. Pi will hand
+                      This tool isn&apos;t switched on for pi yet. pi will hand
                       these requests to your team.
                     </p>
                   ) : (
@@ -1098,7 +1098,7 @@ export function ToolsPage() {
                             : group === "tickets"
                               ? "Problems are logged with a priority and a response target for your team."
                               : group === "tasks"
-                                ? "Pi creates follow-up tasks; customers only see the status you mark as shareable."
+                                ? "pi creates follow-up tasks; customers only see the status you mark as shareable."
                                 : "Only the current customer's own records are used."}
                     </p>
                   )}
@@ -1109,7 +1109,7 @@ export function ToolsPage() {
           <ConnectorsSection />
           {account.data.tools.includes("bookings") ? <BookingsManager /> : null}
           <Notice tone="info" title="Turn tools on or off">
-            Choose which tools Pi may use in{" "}
+            Choose which tools pi may use in{" "}
             <Link className="text-accent underline" href="/my-pi/behaviour">
               Behaviour
             </Link>
@@ -1126,7 +1126,7 @@ export function FollowUpsPage() {
   return (
     <Shell
       title="Follow-ups"
-      description="Pi can remind a customer once if they went quiet — only if they agreed."
+      description="pi can remind a customer once if they went quiet — only if they agreed."
     >
       {settings.isPending ? (
         <LoadingBlock rows={2} />
@@ -1186,7 +1186,7 @@ function FollowUpsForm({
             <Field
               label="Remind after"
               htmlFor="after"
-              hint="Days after Pi's last message without a reply."
+              hint="Days after pi's last message without a reply."
             >
               <Select
                 id="after"
@@ -1323,8 +1323,8 @@ function FollowUpsForm({
 export function TestPiPage() {
   return (
     <Shell
-      title="Test Pi"
-      description="Chat with Pi the way a customer would. Nothing is sent and nothing is saved."
+      title="Test pi"
+      description="Chat with pi the way a customer would. Nothing is sent and nothing is saved."
     >
       <TestConversation includeDraftsToggle />
     </Shell>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 
+import { PiFace } from "@/components/brand";
 import {
   Button,
   Card,
@@ -38,10 +39,8 @@ function AuthCard({
 }) {
   return (
     <div className={s.authLayout}>
-      <aside className={s.authStory} aria-label="Meet Pi">
-        <span className={s.exampleMark} aria-hidden>
-          Pi
-        </span>
+      <aside className={s.authStory} aria-label="Meet pi">
+        <PiFace size={48} decorative />
         <h2>
           A little intelligence.
           <br />
@@ -174,7 +173,7 @@ export function SignInForm() {
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        New to Pi?{" "}
+        New to pi?{" "}
         <Link
           href="/sign-up"
           className="font-medium text-accent hover:underline"
@@ -234,8 +233,8 @@ export function SignUpForm() {
 
   return (
     <AuthCard
-      title="Set up Pi for your business"
-      subtitle="It takes a few minutes. Pi won't message anyone until you launch it."
+      title="Set up pi for your business"
+      subtitle="It takes a few minutes. pi won't message anyone until you launch it."
     >
       <form onSubmit={submit} className="space-y-4" noValidate>
         {error ? <Notice tone="danger">{error}</Notice> : null}
@@ -287,7 +286,7 @@ export function SignUpForm() {
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        Already using Pi?{" "}
+        Already using pi?{" "}
         <Link
           href="/sign-in"
           className="font-medium text-accent hover:underline"
@@ -349,14 +348,23 @@ export function ForgotPasswordForm() {
       <form onSubmit={submit} className="space-y-4" noValidate>
         {error ? <Notice tone="danger">{error}</Notice> : null}
         <Field label="Email" htmlFor="email">
-          <Input id="email" name="email" type="email" autoComplete="email" required />
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+          />
         </Field>
         <Button type="submit" className="w-full" loading={busy}>
           Send reset link
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        <Link href="/sign-in" className="font-medium text-accent hover:underline">
+        <Link
+          href="/sign-in"
+          className="font-medium text-accent hover:underline"
+        >
           Back to sign in
         </Link>
       </p>
@@ -434,7 +442,11 @@ export function ResetPasswordForm() {
             </Link>
           </div>
         ) : null}
-        <Field label="New password" htmlFor="password" hint="At least 12 characters.">
+        <Field
+          label="New password"
+          htmlFor="password"
+          hint="At least 12 characters."
+        >
           <PasswordInput autoComplete="new-password" minLength={12} />
         </Field>
         <Field label="Confirm new password" htmlFor="confirm">
@@ -466,11 +478,14 @@ export function AcceptInviteForm() {
     return (
       <AuthCard title="Invalid invitation link" subtitle="">
         <Notice tone="danger">
-          This link is missing its token. Ask whoever invited you to send a
-          new one.
+          This link is missing its token. Ask whoever invited you to send a new
+          one.
         </Notice>
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          <Link href="/sign-in" className="font-medium text-accent hover:underline">
+          <Link
+            href="/sign-in"
+            className="font-medium text-accent hover:underline"
+          >
             Go to sign in
           </Link>
         </p>
@@ -514,11 +529,15 @@ export function AcceptInviteForm() {
   return (
     <AuthCard
       title="Choose your password"
-      subtitle="You've been invited to a Pi workspace. Set a password to finish joining."
+      subtitle="You've been invited to a pi workspace. Set a password to finish joining."
     >
       <form onSubmit={submit} className="space-y-4" noValidate>
         {error ? <Notice tone="danger">{error}</Notice> : null}
-        <Field label="Password" htmlFor="password" hint="At least 12 characters.">
+        <Field
+          label="Password"
+          htmlFor="password"
+          hint="At least 12 characters."
+        >
           <PasswordInput autoComplete="new-password" minLength={12} />
         </Field>
         <Field label="Confirm password" htmlFor="confirm">
@@ -587,7 +606,7 @@ export function VerifyEmailForm() {
           href={session.data ? "/home" : "/sign-in"}
           className="font-medium text-accent hover:underline"
         >
-          {session.data ? "Continue to Pi" : "Go to sign in"}
+          {session.data ? "Continue to pi" : "Go to sign in"}
         </Link>
       </p>
     </AuthCard>

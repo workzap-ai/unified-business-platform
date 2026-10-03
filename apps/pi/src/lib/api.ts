@@ -69,7 +69,7 @@ export async function api<T = unknown>(
     throw new ApiError(
       0,
       "NETWORK",
-      "We couldn't reach Pi. Check your connection and try again.",
+      "We couldn't reach pi. Check your connection and try again.",
     );
   } finally {
     clearTimeout(timeout);

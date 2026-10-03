@@ -48,7 +48,7 @@ const NAV: {
   // Desktop sidebar only, like Analytics: phones reach it from the inbox.
   { href: "/problems", label: "Problems", icon: Layers, mobile: false },
   { href: "/customers", label: "Customers", icon: Users },
-  { href: "/my-pi", label: "My Pi", icon: Bot },
+  { href: "/my-pi", label: "My pi", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -191,7 +191,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (session.isPending || session.data === null) {
     return (
       <div className="flex min-h-dvh items-center justify-center">
-        <Spinner label="Opening Pi" />
+        <Spinner label="Opening pi" />
       </div>
     );
   }
@@ -216,13 +216,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           s.sidebar,
         )}
       >
-        <Link href="/home" className={s.brand} aria-label="Pi home">
-          <Wordmark />
-          <span className={s.brandCaption}>
-            YOUR BUSINESS
-            <br />
-            ASSISTANT
-          </span>
+        <Link href="/home" className={s.brand} aria-label="pi home">
+          <Wordmark className="h-12" />
         </Link>
         <div className={s.business}>
           <BusinessMenu />
@@ -250,7 +245,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               {STATE_LABEL[business.setup_state]?.label}
             </Badge>
             <p className="mt-2 text-muted-foreground">
-              Pi isn&apos;t replying to customers yet.
+              pi isn&apos;t replying to customers yet.
             </p>
             <Button
               asChild
@@ -267,11 +262,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Sparkles size={18} aria-hidden />
             <h2>A little more you.</h2>
             <p>
-              Give Pi the knowledge and personality that make your business
+              Give pi the knowledge and personality that make your business
               yours.
             </p>
             <Link href="/my-pi">
-              Personalize your Pi
+              Personalize your pi
               <ArrowUpRight size={15} aria-hidden />
             </Link>
           </div>
@@ -288,14 +283,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 ? "Getting started"
                 : pathname.startsWith("/notifications")
                   ? "Notifications"
-                  : (NAV.find((item) => active(item.href))?.label ?? "Pi")}
+                  : (NAV.find((item) => active(item.href))?.label ?? "pi")}
             </strong>
           </div>
           <div className="flex items-center gap-2">
             <NotificationBell />
             <Link href="/my-pi/test" className={s.tryLink}>
               <Sparkles size={14} aria-hidden />
-              Try your Pi
+              Try your pi
               <ArrowUpRight size={13} aria-hidden />
             </Link>
           </div>

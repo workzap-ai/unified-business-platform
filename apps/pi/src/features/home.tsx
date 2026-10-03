@@ -62,10 +62,10 @@ function StatusCard({ data }: { data: HomeView }) {
           />
           <div>
             <h2 className="text-lg font-semibold">
-              Pi is on, but couldn&apos;t reply recently
+              pi is on, but couldn&apos;t reply recently
             </h2>
             <p className="text-sm text-muted-foreground">
-              Pi&apos;s AI service wasn&apos;t available, so those conversations
+              pi&apos;s AI service wasn&apos;t available, so those conversations
               were handed to your team and the customers were told a person will
               reply.
             </p>
@@ -84,7 +84,7 @@ function StatusCard({ data }: { data: HomeView }) {
           />
           <div>
             <h2 className="text-lg font-semibold">
-              Pi is answering your customers
+              pi is answering your customers
             </h2>
             <p className="text-sm text-muted-foreground">
               It hands conversations to your team whenever a person is needed.
@@ -102,14 +102,14 @@ function StatusCard({ data }: { data: HomeView }) {
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-lg font-semibold">
-              Pi isn&apos;t replying to customers
+              pi isn&apos;t replying to customers
             </h2>
             <Badge tone={state?.tone}>{state?.label}</Badge>
           </div>
           <p className="text-sm text-muted-foreground">
             {reason ??
               (data.setup_state === "paused"
-                ? "You paused Pi. Your team is handling all messages."
+                ? "You paused pi. Your team is handling all messages."
                 : "Finish setting up and launch when you're ready. Nothing is sent before that.")}
           </p>
         </div>
@@ -216,7 +216,7 @@ function TeamCard({ data }: { data: HomeView }) {
       icon: UserRoundCheck,
     },
     {
-      label: "Questions Pi asked you",
+      label: "Questions pi asked you",
       value: m.open_questions,
       href: "/inbox",
       icon: MessageCircleQuestion,
@@ -309,7 +309,7 @@ export function HomePage() {
                 }
                 aria-hidden
               />
-              {home.data.active ? "Pi is live" : "Pi is off"}
+              {home.data.active ? "pi is live" : "pi is off"}
             </Badge>
           </div>
         </div>
@@ -365,8 +365,8 @@ export function HomePage() {
         <Link href="/my-pi">
           <Sparkles size={23} aria-hidden />
           <div>
-            <strong>A Pi that sounds like you</strong>
-            <p>Refine your knowledge, your tone and the ways Pi helps.</p>
+            <strong>A pi that sounds like you</strong>
+            <p>Refine your knowledge, your tone and the ways pi helps.</p>
           </div>
           <ArrowUpRight size={18} aria-hidden />
         </Link>

@@ -56,7 +56,7 @@ export function DigestCard() {
       <CardSection className="space-y-3">
         <h2 className="flex items-center gap-2 font-semibold">
           <CalendarDays className="size-4 text-accent" aria-hidden /> Your week
-          with Pi
+          with pi
         </h2>
         {latest ? (
           <>
@@ -74,7 +74,7 @@ export function DigestCard() {
           </>
         ) : (
           <p className="text-sm text-muted-foreground">
-            Every Monday morning Pi sums up your week here: customers, replies,
+            Every Monday morning pi sums up your week here: customers, replies,
             bookings and payments.
           </p>
         )}

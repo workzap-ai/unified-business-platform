@@ -1,21 +1,29 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 
 import { Providers } from "@/lib/session";
 
 import "./globals.css";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: { default: "Pi — your WhatsApp assistant", template: "%s · Pi" },
+  title: { default: "pi by Workzap", template: "%s · pi" },
+  applicationName: "pi",
   description:
-    "Pi answers your customers on WhatsApp, captures enquiries and hands over to your team.",
+    "pi answers your customers on WhatsApp, openly as an AI, notes their problems and hands over to your team.",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f5f1" },
-    { media: "(prefers-color-scheme: dark)", color: "#151816" },
+    { media: "(prefers-color-scheme: light)", color: "#f6f6fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#15132b" },
   ],
 };
 
@@ -25,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" dir="ltr">
+    <html lang="en" dir="ltr" className={inter.variable}>
       <body className="min-h-dvh">
         <a
           href="#main"

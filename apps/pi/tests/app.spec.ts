@@ -23,7 +23,7 @@ test("home shows honest status and next actions", async ({ page }) => {
   await mockApi(page, OWNER);
   await page.goto("/home");
   await expect(
-    page.getByRole("heading", { name: "Pi is answering your customers" }),
+    page.getByRole("heading", { name: "pi is answering your customers" }),
   ).toBeVisible();
   await expect(
     page.getByRole("link", { name: /1 replies to approve/ }),
@@ -53,7 +53,7 @@ test("an AI outage is shown instead of 'active'", async ({ page }) => {
   await page.goto("/home");
   await expect(
     page.getByRole("heading", {
-      name: "Pi is on, but couldn't reply recently",
+      name: "pi is on, but couldn't reply recently",
     }),
   ).toBeVisible();
 });

@@ -39,7 +39,7 @@ export type Connector = {
 
 const ICON = { google_calendar: CalendarDays, shopify: ShoppingBag };
 const RETURNED: Record<string, string> = {
-  connected: "is connected. Pi will use it from now on.",
+  connected: "is connected. pi will use it from now on.",
   failed: "wasn't connected. Nothing was changed; you can try again.",
 };
 
@@ -134,7 +134,7 @@ function ConnectorCard({ item }: { item: Connector }) {
         <p className="text-sm text-muted-foreground">{item.description}</p>
         {!item.available ? (
           <p className="text-sm text-muted-foreground">
-            {item.name} can&apos;t be connected on this Pi server yet. Pi keeps
+            {item.name} can&apos;t be connected on this pi server yet. pi keeps
             working without it
             {item.key === "google_calendar"
               ? " and offers times from your working hours."
@@ -220,7 +220,7 @@ function ConnectorCard({ item }: { item: Connector }) {
                 aria-label={`Disconnect ${item.name}`}
               >
                 <p>
-                  Pi will stop using {item.name}.{" "}
+                  pi will stop using {item.name}.{" "}
                   {item.key === "shopify"
                     ? "To remove access completely, also uninstall the app in your Shopify admin."
                     : "Existing calendar events stay in your calendar."}

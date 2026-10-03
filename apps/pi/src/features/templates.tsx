@@ -77,7 +77,7 @@ export function TemplatesCard() {
         </h2>
         <p className="text-sm text-muted-foreground">
           Messages sent outside a live chat (reminders, campaigns) must use a
-          template Meta approved. Pi can send plain-text templates without
+          template Meta approved. pi can send plain-text templates without
           variables or buttons.
         </p>
         {list.isPending ? (
@@ -99,7 +99,7 @@ export function TemplatesCard() {
                     {t.status.toLowerCase()}
                   </Badge>
                   {!t.sendable ? (
-                    <Badge tone="neutral">Pi can&apos;t send this one</Badge>
+                    <Badge tone="neutral">pi can&apos;t send this one</Badge>
                   ) : null}
                 </div>
                 <p className="text-sm text-muted-foreground" data-user-text>

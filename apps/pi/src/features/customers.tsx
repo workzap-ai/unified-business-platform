@@ -114,7 +114,7 @@ export function CustomersPage() {
     <div>
       <PageHeader
         title="Customers"
-        description="Everyone who has talked to Pi, and what Pi remembers about them."
+        description="Everyone who has talked to pi, and what pi remembers about them."
         action={
           <>
             {list.data ? (
@@ -245,7 +245,7 @@ function MemoryItem({
   );
   const forget = useAction(() => del(`/pi/memory/${item.id}`), {
     invalidate: [["profile", customerId]],
-    success: "Pi has forgotten this",
+    success: "pi has forgotten this",
   });
   return (
     <li className="rounded-lg border border-border p-3">
@@ -368,7 +368,7 @@ export function CustomerProfilePage({ id }: { id: string }) {
         <div className="space-y-6">
           <Card>
             <CardSection>
-              <h2 className="text-base font-semibold">What Pi remembers</h2>
+              <h2 className="text-base font-semibold">What pi remembers</h2>
               <p className="mb-4 text-sm text-muted-foreground">
                 Facts from this customer&apos;s own conversations. They are
                 never used for anyone else.
@@ -528,7 +528,7 @@ export function CustomerProfilePage({ id }: { id: string }) {
       >
         <DialogContent
           title="Export ready"
-          description="This file contains the customer's messages and what Pi remembers. Share it only with the customer."
+          description="This file contains the customer's messages and what pi remembers. Share it only with the customer."
         >
           <Button asChild className="w-full">
             <a href={exportData ?? "#"} download={`customer-${id}.json`}>

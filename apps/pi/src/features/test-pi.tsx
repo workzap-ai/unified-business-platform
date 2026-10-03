@@ -27,13 +27,13 @@ interface Turn {
 
 const BLOCKED: Record<string, string> = {
   SERVICE_PRICE_BLOCKED:
-    "Pi's reply mentioned a price, which your price rules don't allow, so it would go to your team instead.",
+    "pi's reply mentioned a price, which your price rules don't allow, so it would go to your team instead.",
   PRICE_POLICY_BLOCKED:
-    "Pi's reply mentioned a price, which your price rules don't allow, so it would go to your team instead.",
+    "pi's reply mentioned a price, which your price rules don't allow, so it would go to your team instead.",
   UNVERIFIABLE_AMOUNT:
-    "Pi's reply had an amount it couldn't check against your catalog, so it would go to your team.",
+    "pi's reply had an amount it couldn't check against your catalog, so it would go to your team.",
   UNSUPPORTED_FACT:
-    "Pi's reply had a figure that isn't in your approved information, so it would go to your team.",
+    "pi's reply had a figure that isn't in your approved information, so it would go to your team.",
   LEAK_BLOCKED: "The reply was blocked by a safety check.",
 };
 
@@ -148,7 +148,7 @@ export function TestConversation({
           </div>
         ))}
         {busy ? (
-          <p className="text-sm text-muted-foreground">Pi is thinking…</p>
+          <p className="text-sm text-muted-foreground">pi is thinking…</p>
         ) : null}
         <div ref={endRef} />
       </div>
@@ -198,7 +198,7 @@ function ResultDetails({ result }: { result: PreviewResult }) {
     <div className="space-y-2 text-sm">
       {result.status === "ai_unavailable" ? (
         <Notice tone="warning">
-          Pi&apos;s AI isn&apos;t available right now, so a real customer would
+          pi&apos;s AI isn&apos;t available right now, so a real customer would
           be handed to your team.
         </Notice>
       ) : null}
@@ -213,7 +213,7 @@ function ResultDetails({ result }: { result: PreviewResult }) {
       ) : null}
       {result.status === "handoff" ? (
         <p className="text-muted-foreground">
-          Pi doesn&apos;t know this yet. It would ask you and tell the customer
+          pi doesn&apos;t know this yet. It would ask you and tell the customer
           your team will reply.
         </p>
       ) : null}

@@ -3,11 +3,11 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight, BookOpen, Send, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
 
+import { PiFace } from "@/components/brand";
 import { Button, cn } from "@/components/ui";
 import { errorText, get, post } from "@/lib/api";
 import { useBusinessKey, useSession } from "@/lib/session";
@@ -44,44 +44,6 @@ type Context = {
   guides: { id: string; title: string; page: string | null }[];
 };
 type Turn = { id: number; question?: string; reply?: Reply; error?: string };
-
-// pi's expressions (brand guide v1.1). The face follows what pi is doing, never a
-// guess about the reader's mood; the words always say what the face says.
-type FaceName = "resting" | "greeting" | "thinking" | "sorry" | "not-sure";
-const FACE_ALT: Record<FaceName, string> = {
-  resting:
-    "pi, a violet speech-bubble character with a small amber spark on its head, looking attentive with a gentle smile",
-  greeting:
-    "pi, the speech-bubble character, with an open smile, greeting someone at the start of a conversation",
-  thinking:
-    "pi, the speech-bubble character, showing three typing dots while it works on something",
-  sorry:
-    "pi, the speech-bubble character, with raised worried brows and a small downturned mouth, apologising",
-  "not-sure":
-    "pi, the speech-bubble character, with one raised brow and a wavy mouth, unsure what was meant and asking",
-};
-
-function Face({
-  name,
-  size = 32,
-  className,
-}: {
-  name: FaceName;
-  size?: number;
-  className?: string;
-}) {
-  return (
-    <Image
-      src={`/brand/pi/${name}.webp`}
-      width={size}
-      height={size}
-      alt={FACE_ALT[name]}
-      unoptimized
-      className={cn("shrink-0 select-none", className)}
-      draggable={false}
-    />
-  );
-}
 
 const value = (v: unknown) =>
   v === null || v === undefined || v === ""
@@ -276,7 +238,7 @@ function Chat() {
         {!turns.length ? (
           <div>
             <div className="flex items-start gap-3">
-              <Face name="greeting" size={44} />
+              <PiFace expression="greet" size={44} />
               <div className="min-w-0 text-sm">
                 <p className="font-semibold">
                   Hi, I&apos;m pi, an AI assistant.
@@ -333,20 +295,20 @@ function Chat() {
             </p>
           ) : turn.error ? (
             <div key={turn.id} className="flex items-start gap-2.5">
-              <Face name="sorry" size={28} />
+              <PiFace expression="sorry" size={32} />
               <p role="alert" className="min-w-0 pt-1 text-sm text-danger">
                 I couldn&apos;t finish that. {turn.error}
               </p>
             </div>
           ) : turn.reply ? (
             <div key={turn.id} className="flex items-start gap-2.5">
-              <Face
-                name={
+              <PiFace
+                expression={
                   turn.reply.cards.length || turn.reply.guides.length
-                    ? "resting"
-                    : "not-sure"
+                    ? "rest"
+                    : "unsure"
                 }
-                size={28}
+                size={32}
               />
               <div className="min-w-0 flex-1 space-y-2.5">
                 <p
@@ -370,7 +332,7 @@ function Chat() {
         )}
         {busy ? (
           <div role="status" className="flex items-center gap-2.5">
-            <Face name="thinking" size={28} />
+            <PiFace expression="think" size={32} />
             <span className="text-sm text-muted-foreground">
               pi is checking…
             </span>
@@ -513,7 +475,7 @@ export function PiAssistant() {
             bottom: `calc(${base + lift}px + env(safe-area-inset-bottom))`,
           }}
         >
-          <Face name="resting" size={36} />
+          <PiFace expression="rest" size={36} />
           <span className="hidden sm:inline">Ask pi</span>
         </button>
       </DialogPrimitive.Trigger>
@@ -526,7 +488,7 @@ export function PiAssistant() {
         >
           <header className="flex items-center justify-between gap-3 border-b border-border bg-surface px-4 py-3">
             <div className="flex min-w-0 items-center gap-3">
-              <Face name="resting" size={40} />
+              <PiFace expression="rest" size={40} />
               <div className="min-w-0">
                 <DialogPrimitive.Title className="text-base font-semibold">
                   pi
