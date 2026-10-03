@@ -178,7 +178,17 @@ async def persist_inbound(
             message_type=payload["message_type"],
             body=payload["body"],
             media=(
-                {"provider_media_id": payload["media_id"]}
+                {
+                    "provider_media_id": payload["media_id"],
+                    # Kapso's own download URL, file type and voice transcript, if sent.
+                    **({"media_url": payload["media_url"]} if payload.get("media_url") else {}),
+                    **({"mime_type": payload["media_mime"]} if payload.get("media_mime") else {}),
+                    **(
+                        {"provider_transcript": payload["transcript"]}
+                        if payload.get("transcript")
+                        else {}
+                    ),
+                }
                 if payload.get("media_id")
                 else {"form_response": payload["form"]}
                 if isinstance(payload.get("form"), dict)

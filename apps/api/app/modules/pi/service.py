@@ -326,8 +326,22 @@ class PiService:
                 PiHandoff.status.in_(ACTIVE_HANDOFF),
             )
             if open_handoff:
-                raise BusinessRuleViolation(
-                    "HANDOFF_OPEN", "Resolve the handoff before returning to AI"
+                if not self.scope.can("pi.handoffs.manage"):
+                    raise BusinessRuleViolation(
+                        "HANDOFF_OPEN", "Resolve the handoff before returning to AI"
+                    )
+                # Handing the conversation back to Pi settles the open handoff in the
+                # same step (one click), recorded like any other resolution.
+                open_handoff.status = "resolved"
+                open_handoff.resolved_at = datetime.now(UTC)
+                open_handoff.resolution_note = open_handoff.resolution_note or "Returned to Pi"
+                await record(
+                    self.session,
+                    "pi.handoff_resolve",
+                    scope=self.scope,
+                    entity_type="pi_handoff",
+                    entity_id=open_handoff.id,
+                    details={"via": "return-to-ai"},
                 )
             conversation.mode = "ai"
             conversation.assigned_user_id = None

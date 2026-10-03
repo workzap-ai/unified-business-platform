@@ -10,7 +10,7 @@ from test_pi_pipeline import pi_workspace
 from test_service_lifecycle import create, register
 
 from app.modules.audit.models import AuditEvent
-from app.modules.pi.models import PiMessage
+from app.modules.pi.models import PiHandoff, PiMessage
 from app.modules.pi.runtime import send_pi_message
 from app.modules.products.models import EnvironmentProductInstallation
 
@@ -155,10 +155,16 @@ async def test_handoff_state_machine_and_explicit_return_to_ai(
     assert back.status_code == 200 and back.json()["mode"] == "ai"
     assert await audit_count(business_db, pi.tenant_id, "pi.return-to-ai") == 1
     assert await audit_count(business_db, pi.tenant_id, "pi.handoff_resolve") == 1
-    # A new active handoff blocks return-to-AI until handled.
+    # Returning to AI with an active handoff settles it in the same click (audited).
     second = await create(api, f"pi/conversations/{conversation.id}/handoff", {"summary": "Again"})
-    blocked = await api.post(f"/api/v1/pi/conversations/{conversation.id}/actions/return-to-ai")
-    assert code(blocked) == "HANDOFF_OPEN"
+    back = await api.post(f"/api/v1/pi/conversations/{conversation.id}/actions/return-to-ai")
+    assert back.status_code == 200 and back.json()["mode"] == "ai"
+    settled = await business_db.get(PiHandoff, UUID(second["id"]))
+    await business_db.refresh(settled)
+    assert settled.status == "resolved" and settled.resolution_note == "Returned to Pi"
+    assert await audit_count(business_db, pi.tenant_id, "pi.handoff_resolve") == 2
+    # An active handoff still blocks reopening another one.
+    await create(api, f"pi/conversations/{conversation.id}/handoff", {"summary": "Third"})
     reopened = await api.post(
         f"/api/v1/pi/handoffs/{handoff['id']}/actions", json={"action": "reopen"}
     )

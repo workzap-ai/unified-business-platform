@@ -81,7 +81,7 @@ export function TakeoverDialog({
       consequences={[
         "PI replies to the customer's next message automatically.",
         "You can take over again at any time.",
-        "Resolve any open handoff separately if the issue is settled.",
+        "Any open handoff is marked resolved (\"Returned to Pi\").",
       ]}
       confirmLabel="Return to PI"
       loading={loading}

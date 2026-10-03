@@ -600,12 +600,31 @@ def _redact(event: dict[str, Any]) -> dict[str, Any]:
                 if isinstance(s, dict)
             ],
             "kapso_status": str(as_dict(message.get("kapso")).get("status") or "")[:16],
+            **_kapso_media(message),
             **({"interactive": _interactive(message)} if message.get("interactive") else {}),
         }
         if message
         else {},
         "profile_name": str(as_dict(event.get("conversation")).get("contact_name", ""))[:160],
     }
+
+
+def _kapso_media(message: dict[str, Any]) -> dict[str, str]:
+    """What Kapso already did for a media message: its own download URL, the file type
+    and, for voice notes, a transcript. Saves downloading and re-transcribing."""
+    kapso = as_dict(message.get("kapso"))
+    data = as_dict(kapso.get("media_data"))
+    url = str(kapso.get("media_url") or data.get("url") or "")
+    out: dict[str, str] = {}
+    if url.startswith("https://") and len(url) <= 1000:
+        out["media_url"] = url
+    mime = str(data.get("content_type") or "")
+    if re.fullmatch(r"[a-z]+/[a-z0-9.+-]+(;.*)?", mime):
+        out["media_mime"] = mime[:80]
+    transcript = as_dict(kapso.get("transcript")).get("text")
+    if isinstance(transcript, str) and transcript.strip():
+        out["transcript"] = transcript.strip()[:4000]
+    return out
 
 
 def _media(message: dict[str, Any]) -> dict[str, str]:
@@ -744,6 +763,11 @@ async def _message_event(
             "media_id": message.get("media_id") or None
             if kind in {"audio", "image", "video"}
             else None,
+            **(
+                {k: message[k] for k in ("media_url", "media_mime", "transcript") if message.get(k)}
+                if kind in {"audio", "image", "video"}
+                else {}
+            ),
         }
     else:
         state = row.event_type.rsplit(".", 1)[-1]
