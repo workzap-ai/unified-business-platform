@@ -19,7 +19,7 @@ import secrets
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from typing import Any
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 
 from sqlalchemy import case, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -69,11 +69,21 @@ def server_ready(settings: Settings, key: str) -> bool:
     return bool(settings.shopify_client_id and settings.shopify_client_secret)
 
 
+def _origin(url: str) -> str:
+    parts = urlsplit(url.strip())
+    return f"{parts.scheme}://{parts.netloc}" if parts.scheme and parts.netloc else ""
+
+
 def callback_uri(settings: Settings, key: str, app: str = "pi") -> str:
     """Where the provider sends the browser back: the Pi app, or the Owner OS web app
     (both must be registered as redirect URIs in the Google/Shopify app)."""
     if app == "web":
-        base = (settings.cors_origins[0] if settings.cors_origins else "").rstrip("/")
+        # The operator-set return address wins (only its scheme and host are used, so a
+        # full URL pasted there still works); the first allowed origin can be a Vercel
+        # preview URL that changes with every deploy.
+        base = _origin(settings.oauth_redirect_base_url or "") or (
+            settings.cors_origins[0] if settings.cors_origins else ""
+        ).rstrip("/")
         if not base:
             raise BusinessRuleViolation(
                 "APP_URL_REQUIRED", "The app address is not configured on this server", 503
