@@ -3,6 +3,7 @@
 All provider traffic goes through httpx.MockTransport; no real provider is called.
 """
 
+import json
 from uuid import uuid4
 
 import httpx
@@ -184,3 +185,18 @@ async def test_probe_without_key_or_model(settings):
 async def test_probe_never_returns_the_key(settings):
     result = await probe(probe_settings(settings), mock(Router(openai=BAD_KEY)), "openai")
     assert GEMINI_KEY not in str(result) and "sk-openai" not in str(result)
+
+
+async def test_probe_leaves_room_for_models_that_think_first(settings):
+    # Gemini 3.x spends a tiny output budget on thinking and returns no text, which
+    # the test button used to report as "Failed (invalid_output)".
+    bodies = []
+
+    def handler(request):
+        bodies.append(json.loads(request.content))
+        return openai_ok("ok")
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        result = await probe(probe_settings(settings), client, "openai")
+    assert result["ok"]
+    assert all(body["max_completion_tokens"] >= 128 for body in bodies)

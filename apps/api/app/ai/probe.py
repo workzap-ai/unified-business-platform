@@ -24,6 +24,10 @@ if TYPE_CHECKING:
 
 CHAT_ALIASES = ("router", "agent", "summarize")
 PROMPT = [Message.system("Reply with the single word: ok"), Message.user("ping")]
+# Room for models that think before answering (Gemini 3.x): with only a few tokens
+# they spend them all thinking, return no text and the test wrongly reports a failure.
+# The answer itself is still one word.
+MAX_TOKENS = 256
 
 STATUS: dict[ErrorKind, tuple[str, str]] = {
     ErrorKind.AUTH: ("bad_key", "The key was refused. Paste a valid key and save again."),
@@ -57,7 +61,7 @@ async def _one(adapter: Any, model: str, seconds: float) -> dict[str, Any]:
     started = time.perf_counter()
     try:
         await adapter.complete(
-            LLMRequest(model=model, messages=PROMPT, max_tokens=5, timeout=seconds)
+            LLMRequest(model=model, messages=PROMPT, max_tokens=MAX_TOKENS, timeout=seconds)
         )
         status, message = "ok", "Working"
     except ProviderError as exc:

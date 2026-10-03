@@ -401,7 +401,7 @@ async def compose_service_turn(
         purpose="pi_service",
         messages=[Message.system(SYSTEM), Message.user(json.dumps(context, ensure_ascii=False))],
         temperature=float(policy.ai_config.get("temperature", "0.20")),
-        max_tokens=2200,
+        max_tokens=4096,  # thinking models (Gemini 3.x) count their thinking here too
         conversation_id=conversation.id,
     )
     turn = result.value
