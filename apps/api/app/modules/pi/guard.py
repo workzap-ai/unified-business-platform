@@ -154,10 +154,29 @@ class ReplyRejected(Exception):
         self.code = code
 
 
+def _bold(match: re.Match[str]) -> str:
+    return f"*{match.group(1) or match.group(2)}*"
+
+
+def whatsapp_text(text: str) -> str:
+    """Markdown a model may still write, in WhatsApp's own formatting: **bold** and
+    headings become *bold*, "-"/"*" list items become "•" lines, blank runs collapse."""
+    lines = []
+    for line in text.strip().splitlines():
+        line = line.rstrip()
+        heading = re.match(r"^\s{0,3}#{1,6}\s+(.+?)\s*#*$", line)
+        if heading:
+            line = f"*{heading.group(1).strip('*_ ')}*"
+        line = re.sub(r"^(\s*)[-*+]\s+", r"\1• ", line)
+        line = re.sub(r"\*\*(.+?)\*\*|__(.+?)__", _bold, line)
+        lines.append(line)
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+
+
 def validate_reply(text: str, facts: list[str], max_chars: int) -> str:
     """Return the reply to send, or raise ReplyRejected. ``facts`` are serialized tool
     results and approved texts; any amount or stock figure must appear in them."""
-    reply = text.strip()
+    reply = whatsapp_text(text)
     if not reply:
         raise ReplyRejected("EMPTY_REPLY")
     for pattern in LEAK_PATTERNS:

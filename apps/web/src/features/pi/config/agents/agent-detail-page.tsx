@@ -77,6 +77,20 @@ const TABS = [
   ["history", "History"],
 ] as const;
 
+/** A short, sectioned shape that models follow well. */
+const INSTRUCTIONS_PLACEHOLDER = `Role: What this agent does for the business, in one line.
+
+Goals:
+• What to find out or help with
+• What a good outcome is
+
+Style:
+• Short WhatsApp replies; one question at a time
+• Offer 2-4 options to make answering easy
+
+Hand to the team when:
+• Prices, complaints, or anything you are unsure about`;
+
 export function AgentDetailPage({ id }: { id: string }) {
   return (
     <RequirePermission permission="pi.agents.manage" area="PI agents">
@@ -202,7 +216,7 @@ function AgentDetail({ id }: { id: string }) {
                       onRetry={() => void versions.refetch()}
                     />
                   ) : active?.instructions ? (
-                    <pre className="scrollbar-thin max-h-[480px] overflow-auto rounded-lg border border-border bg-surface-muted/50 p-3 font-mono text-xs leading-5 whitespace-pre-wrap">
+                    <pre className="scrollbar-thin max-h-[480px] overflow-auto rounded-lg border border-border bg-surface-muted/50 p-4 font-sans text-[13px] leading-6 break-words whitespace-pre-wrap">
                       {active.instructions}
                     </pre>
                   ) : (
@@ -410,7 +424,8 @@ function EditInstructionsDialog({
                 id="edit-instructions"
                 rows={12}
                 maxLength={4000}
-                className="font-mono text-[13px]"
+                className="text-[13px] leading-6"
+                placeholder={INSTRUCTIONS_PLACEHOLDER}
                 {...form.register("instructions")}
               />
             </FormField>

@@ -87,8 +87,11 @@ export function MessageItem({
           )}
         >
           <MediaBlock message={message} />
-          {message.body && (
-            <p className="break-words whitespace-pre-wrap">{message.body}</p>
+          {visibleBody(message) && (
+            <FormattedText
+              text={visibleBody(message)}
+              className="break-words whitespace-pre-wrap"
+            />
           )}
           {message.confirmation && (
             <ConfirmationCard confirmation={message.confirmation} />
@@ -122,6 +125,55 @@ export function MessageItem({
         )}
       </div>
     </li>
+  );
+}
+
+/** For a media message Pi's reading of the file is shown in the media card, so the
+ * bubble shows only the customer's own caption. */
+function visibleBody(message: Message) {
+  const media = message.media;
+  if (message.message_type === "text" || !media) return message.body;
+  const caption = /^Customer caption: ([\s\S]*?)\nAttachment: /.exec(
+    message.body,
+  );
+  if (caption) return caption[1];
+  const reading = media.transcript ?? media.description;
+  return reading && message.body.trim() === reading.trim() ? "" : message.body;
+}
+
+/** Older readings may hold Markdown; show them as clean lines. */
+function tidy(text: string) {
+  return text
+    .replace(/\s+-\s+(?=\*\*)/g, "\n• ")
+    .replace(/^\s*[-*]\s+/gm, "• ")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\*\*(.+?)\*\*/g, "*$1*");
+}
+
+/** WhatsApp formatting (*bold*, _italic_, ~strike~) as the customer sees it. */
+function FormattedText({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) {
+  const parts = tidy(text).split(
+    /((?<!\w)(?:\*[^*\n]+\*|_[^_\n]+_|~[^~\n]+~)(?!\w))/g,
+  );
+  return (
+    <p className={className}>
+      {parts.map((part, i) => {
+        const inner = part.slice(1, -1);
+        if (part.length > 2 && part.startsWith("*") && part.endsWith("*"))
+          return <strong key={i}>{inner}</strong>;
+        if (part.length > 2 && part.startsWith("_") && part.endsWith("_"))
+          return <em key={i}>{inner}</em>;
+        if (part.length > 2 && part.startsWith("~") && part.endsWith("~"))
+          return <s key={i}>{inner}</s>;
+        return part;
+      })}
+    </p>
   );
 }
 
@@ -287,9 +339,10 @@ function MediaBlock({ message }: { message: Message }) {
             <p className="text-2xs font-semibold tracking-wide text-pi uppercase">
               PI saw:
             </p>
-            <p className="mt-0.5 text-[13px] break-words">
-              {media.description}
-            </p>
+            <FormattedText
+              text={media.description}
+              className="mt-0.5 text-[13px] break-words whitespace-pre-wrap"
+            />
           </div>
         )}
       </div>
