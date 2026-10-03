@@ -36,7 +36,7 @@ export function ModulesSection() {
             margin: "16px 0 8px",
           }}
         >
-          Start with the core. Switch on what you need.
+          Everything in one platform.
         </h2>
         <p
           style={{
@@ -46,8 +46,8 @@ export function ModulesSection() {
             maxWidth: 580,
           }}
         >
-          The Retail OS Core runs your whole business out of the box. Add
-          modules as you grow — like apps on your phone.
+          The Retail OS Core and every module below come with every plan. Vision
+          (CCTV) is coming soon.
         </p>
       </div>
       <ModuleExplorer />

@@ -1179,7 +1179,7 @@ export function RetailPage() {
                 margin: "16px 0 8px",
               }}
             >
-              One core platform. Pay for the modules you use.
+              One platform. Every module included.
             </h2>
             <p
               style={{
@@ -1190,7 +1190,7 @@ export function RetailPage() {
               }}
             >
               A one-time setup to connect your data, then a simple monthly
-              subscription. Add or remove modules anytime.
+              subscription. Every plan includes every module.
             </p>
           </div>
           <div
@@ -1273,7 +1273,7 @@ export function RetailPage() {
                   >
                     ✓
                   </span>
-                  1 add-on module
+                  Every module (Vision coming soon)
                 </li>
                 <li
                   style={{
@@ -1403,7 +1403,7 @@ export function RetailPage() {
                   >
                     ✓
                   </span>
-                  Finance + Planning + Marketing
+                  Every module (Vision coming soon)
                 </li>
                 <li
                   style={{
@@ -1522,23 +1522,6 @@ export function RetailPage() {
                     ✓
                   </span>
                   Everything in Growth
-                </li>
-                <li
-                  style={{
-                    display: "flex",
-                    gap: "9px",
-                    fontSize: "13.5px",
-                    color: "var(--text-secondary)",
-                    lineHeight: "1.5",
-                  }}
-                >
-                  <span
-                    style={{ color: "var(--accent-strong)", fontWeight: "800" }}
-                    aria-hidden="true"
-                  >
-                    ✓
-                  </span>
-                  Vision (CCTV, coming soon) + E-commerce + HR
                 </li>
                 <li
                   style={{
