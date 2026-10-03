@@ -114,6 +114,11 @@ const NAV = [
     cap: "operator.accounts.read",
   },
   {
+    href: "/operator/help",
+    label: "Pi help guides",
+    cap: "operator.onboarding.assist",
+  },
+  {
     href: "/settings/pi-billing",
     label: "Subscription payments",
     cap: "operator.billing.read",

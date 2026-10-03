@@ -47,6 +47,8 @@ from app.modules.pi.routes import router as pi_router
 from app.modules.pi.routes import webhook_router
 from app.modules.pi_customer.routes import router as pi_customer_router
 from app.modules.pi_saas.app_routes import router as pi_app_router
+from app.modules.pi_saas.assistant_routes import operator_router as pi_operator_help_router
+from app.modules.pi_saas.assistant_routes import router as pi_assistant_router
 from app.modules.pi_saas.campaign_routes import router as pi_campaign_router
 from app.modules.pi_saas.connector_routes import router as pi_connector_router
 from app.modules.pi_saas.connector_routes import web_router as pi_connector_web_router
@@ -98,6 +100,7 @@ ROUTERS = [
     pi_whatsapp_tools_router,
     pi_operator_setup_router,
     operator_workspace_router,
+    pi_operator_help_router,
     pi_saas_webhook_router,
     pi_read_router,
     pi_analytics_router,
@@ -158,6 +161,8 @@ PI_APP_ROUTERS = [
     pi_campaign_router,
     pi_digest_router,
     pi_insights_router,
+    # Pi Assistant: in-app help and the business's own numbers, by role.
+    pi_assistant_router,
     pi_setup_router,
     pi_review_router,
     pi_whatsapp_tools_router,
