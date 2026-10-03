@@ -50,6 +50,43 @@ def _fit(value: Any, limit: int) -> Any:
     return value[:limit] if isinstance(value, str) else value
 
 
+def _text(value: Any, limit: int) -> str:
+    """A text field as the model sent it: null is empty, numbers and lists become text."""
+    if value is None:
+        return ""
+    if isinstance(value, list):
+        value = ", ".join(str(item) for item in value if item is not None)
+    elif isinstance(value, dict):
+        value = json.dumps(value, ensure_ascii=False)
+    return str(value).strip()[:limit]
+
+
+def _flag(value: Any) -> bool:
+    if isinstance(value, str):
+        return value.strip().lower() in {"true", "yes", "1"}
+    return bool(value)
+
+
+# Fixed choices: anything else a model writes falls back to the safe first value, so
+# an unexpected word never fails the turn and never triggers an action.
+CHOICES: dict[str, tuple[str, ...]] = {
+    "consent": ("unchanged", "granted", "declined"),
+    "action": ("none", "ticket", "task", "booking", "cancel_booking", "payment"),
+    "payment_method": ("none", "stripe", "bank_transfer", "mobile_wallet", "cash"),
+    "action_priority": ("normal", "low", "high", "urgent"),
+}
+TEXT_LIMITS = {
+    "reply": 4000,
+    "summary": 4000,
+    "consent_evidence": 500,
+    "action_subject": 200,
+    "booking_service_id": 40,
+    "booking_start": 40,
+    "booking_id": 40,
+    "action_evidence": 500,
+}
+
+
 class Requirements(BaseModel):
     # Unknown keys a model adds are ignored rather than failing the whole reply.
     model_config = ConfigDict(extra="ignore")
@@ -59,6 +96,18 @@ class Requirements(BaseModel):
     existing_assets: str = Field(default="", max_length=1000)
     customer_budget: str = Field(default="", max_length=300)
     target_date: str = Field(default="", max_length=300)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _tolerate(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return {}
+        limits = {"service": 300, "scope": 2000, "audience": 500, "existing_assets": 1000}
+        return {
+            key: _text(data.get(key), limits.get(key, 300))
+            for key in cls.model_fields
+            if key in data
+        }
 
 
 class ServiceTurn(BaseModel):
@@ -80,7 +129,8 @@ class ServiceTurn(BaseModel):
     request_human: bool = False
     # A business action for the application to perform through controlled tools.
     action: Literal["none", "ticket", "task", "booking", "cancel_booking", "payment"] = "none"
-    payment_method: Literal["", "stripe", "bank_transfer", "mobile_wallet", "cash"] = ""
+    # "none", not "": Gemini refuses a schema whose choices include an empty string.
+    payment_method: Literal["none", "stripe", "bank_transfer", "mobile_wallet", "cash"] = "none"
     action_subject: str = Field(default="", max_length=200)
     action_priority: Literal["low", "normal", "high", "urgent"] = "normal"
     booking_service_id: str = Field(default="", max_length=40)
@@ -93,19 +143,30 @@ class ServiceTurn(BaseModel):
     def _tolerate(cls, data: Any) -> Any:
         if not isinstance(data, dict):
             return data
-        data = dict(data)
+        # A null means "not set": use the field's default.
+        data = {key: value for key, value in data.items() if value is not None}
         language = str(data.get("language") or "en").strip()
         language = LANGUAGE_NAMES.get(language.lower(), language)
         data["language"] = language if re.fullmatch(LANGUAGE, language) else "en"
-        for key, limit in (("reply", 4000), ("summary", 4000), ("consent_evidence", 500)):
-            data[key] = _fit(data.get(key, ""), limit)
-        data["action_subject"] = _fit(data.get("action_subject", ""), 200)
-        data["action_evidence"] = _fit(data.get("action_evidence", ""), 500)
+        for key, limit in TEXT_LIMITS.items():
+            if key in data:
+                data[key] = _text(data[key], limit)
+        if not data.get("summary") and data.get("reply"):
+            # The summary is never left empty; the next turn rewrites it in full.
+            data["summary"] = "Conversation in progress. Pi replied: " + data["reply"][:300]
+        for key, allowed in CHOICES.items():
+            value = str(data.get(key, allowed[0])).strip().lower()
+            data[key] = value if value in allowed else allowed[0]
+        for key in ("awaiting_customer", "ready_for_team", "request_human"):
+            if key in data:
+                data[key] = _flag(data[key])
         missing = data.get("missing")
+        if isinstance(missing, str):
+            missing = [missing] if missing.strip() else []
         if isinstance(missing, list):
-            data["missing"] = [str(m)[:200] for m in missing][:12]
-        elif missing is not None:
-            data["missing"] = []
+            data["missing"] = [str(m)[:200] for m in missing if m][:12]
+        else:
+            data.pop("missing", None)
         if not isinstance(data.get("requirements"), (dict, Requirements)):
             data.pop("requirements", None)
         return data
@@ -489,7 +550,8 @@ async def run_service_action(
         return None, "The requested time could not be booked; please offer the customer another."
     if turn.action == "payment":
         methods = context.get("payment_methods", [])
-        method = turn.payment_method or (methods[0] if methods else "")
+        chosen = "" if turn.payment_method == "none" else turn.payment_method
+        method = chosen or (methods[0] if methods else "")
         if "request_payment" not in context.get("work_tools", []) or method not in methods:
             return None, None
         result = await agent_ctx.tool("requirement", "request_payment", {"method": method})

@@ -36,6 +36,52 @@ def test_reply_is_still_required():
         ServiceTurn.model_validate({"summary": "no reply"})
 
 
-def test_actions_stay_limited():
-    with pytest.raises(ValidationError):
-        ServiceTurn.model_validate({"reply": "ok", "summary": "s", "action": "refund_everything"})
+def test_unknown_choices_fall_back_to_safe_values():
+    turn = ServiceTurn.model_validate(
+        {
+            "reply": "ok",
+            "summary": "s",
+            "action": "refund_everything",
+            "consent": "maybe",
+            "action_priority": "ASAP",
+            "payment_method": "crypto",
+        }
+    )
+    assert turn.action == "none" and turn.consent == "unchanged"
+    assert turn.action_priority == "normal" and turn.payment_method == "none"
+
+
+def test_nulls_numbers_and_lists_are_tolerated():
+    turn = ServiceTurn.model_validate(
+        {
+            "reply": "Ji zaroor, website ke liye kuch sawal.",
+            "summary": None,
+            "language": None,
+            "requirements": {
+                "service": "Website",
+                "customer_budget": 50000,
+                "scope": ["shop", "blog"],
+                "audience": None,
+            },
+            "missing": "audience",
+            "awaiting_customer": "true",
+            "ready_for_team": None,
+            "consent_evidence": None,
+            "action": None,
+            "booking_start": None,
+        }
+    )
+    assert turn.requirements.customer_budget == "50000"
+    assert turn.requirements.scope == "shop, blog" and turn.requirements.audience == ""
+    assert turn.missing == ["audience"] and turn.awaiting_customer is True
+    assert turn.ready_for_team is False and turn.action == "none"
+    assert turn.summary.startswith("Conversation in progress")
+
+
+def test_schema_is_accepted_by_gemini():
+    # Gemini refuses a response schema whose choices include an empty string.
+    from app.ai.providers.gemini import to_gemini_schema
+
+    schema = to_gemini_schema(ServiceTurn.model_json_schema())
+    for field in schema["properties"].values():
+        assert "" not in field.get("enum", [])
