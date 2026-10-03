@@ -227,15 +227,83 @@ function AgentSession({ children }: { children: ReactNode }) {
   );
 }
 
+const LAUNCHER_GAP = 20;
+const INTERACTIVE =
+  "button, a[href], input, select, textarea, [role='button'], [role='link']";
+
+/**
+ * Pixels to raise the floating launcher so it never covers a control underneath it
+ * (sticky form actions, wizard "Continue" buttons, toasts with buttons). Re-measured
+ * on scroll, resize and DOM changes, at most once per animation frame.
+ */
+function useLauncherLift() {
+  const [lift, setLift] = useState(0);
+  useEffect(() => {
+    let frame = 0;
+    const measure = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const launcher = document.querySelector<HTMLElement>(
+          "[data-agent-launcher]",
+        );
+        if (!launcher) return;
+        const own = launcher.getBoundingClientRect();
+        const bottom = window.innerHeight - LAUNCHER_GAP;
+        const area = {
+          left: own.left - 8,
+          right: own.right + 8,
+          top: bottom - own.height - 8,
+          bottom: bottom + 8,
+        };
+        let highest = Infinity;
+        document.querySelectorAll<HTMLElement>(INTERACTIVE).forEach((node) => {
+          if (launcher.contains(node) || node.closest("[data-agent-launcher]"))
+            return;
+          const r = node.getBoundingClientRect();
+          if (!r.width || !r.height) return;
+          if (
+            r.right < area.left ||
+            r.left > area.right ||
+            r.bottom < area.top ||
+            r.top > area.bottom
+          )
+            return;
+          highest = Math.min(highest, r.top);
+        });
+        const next =
+          highest === Infinity
+            ? 0
+            : Math.max(0, window.innerHeight - highest + 12 - LAUNCHER_GAP);
+        setLift((current) => (Math.abs(current - next) < 1 ? current : next));
+      });
+    };
+    measure();
+    const observer = new MutationObserver(measure);
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener("scroll", measure, true);
+    window.addEventListener("resize", measure);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("scroll", measure, true);
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+  return lift;
+}
+
 function AgentLauncher() {
   const { open, setOpen } = useAgent();
   const pathname = usePathname();
+  const lift = useLauncherLift();
   if (pathname === "/workspace-agent") return null;
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
         <Button
-          className="fixed right-5 bottom-5 z-40 gap-2 rounded-full shadow-lg"
+          data-agent-launcher=""
+          className="fixed right-5 z-40 gap-2 rounded-full shadow-lg transition-[bottom] duration-150"
+          style={{ bottom: LAUNCHER_GAP + lift }}
           aria-label="Open Pi Agent Beta"
         >
           <Bot className="size-4" />
