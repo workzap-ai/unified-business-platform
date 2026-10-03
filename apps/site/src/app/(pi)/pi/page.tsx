@@ -12,6 +12,7 @@ import {
   Points,
   Section,
   Slot,
+  Thread,
 } from "@/features/pi/ui";
 
 export const metadata = piMetadata({
@@ -109,46 +110,66 @@ export default function PiLanding() {
             [
               "pi",
               "Hi, I’m pi, an AI from Workzap. Tell me what’s going wrong in your business and I’ll start on it.",
+              "greet",
             ],
             ["you", "We keep running out of our best-selling items."],
             [
               "pi",
               "That’s a real problem. Is it happening in every shop, or only some?",
+              "rest",
             ],
             ["you", "Two of the four."],
             [
               "pi",
               "Thanks. I’ve noted it: best-sellers running out, in two of four shops. Anything else getting in the way?",
+              "noted",
             ],
           ]}
         />
       </Section>
 
       <Section title="Your chats, your say">
-        <p>
+        <p className="pi-big">
           You choose what to tell pi. See how to stop, and what pi never asks
           for.
         </p>
         <p>
-          <Link href={`${PI.base}/trust`}>Read how we treat your chats →</Link>
+          <Link className="pi-arrow" href={`${PI.base}/trust`}>
+            Read how we treat your chats →
+          </Link>
         </p>
       </Section>
 
-      <Section title="pi is straight with you" tone="soft">
-        <Points
-          items={[
-            {
-              lead: "pi is an AI, not a person.",
-              text: "It says so in its first message, and again whenever you ask.",
-            },
-            {
-              lead: "pi puts your problem first.",
-              text: "Nothing gets suggested while you’re still explaining what’s wrong.",
-            },
-            {
-              lead: "pi says what it can’t do.",
-              text: "And what happens next.",
-            },
+      <Section title="pi is straight with you" tone="tint">
+        <Thread
+          lines={[
+            ["you", "Am I talking to a person?"],
+            [
+              "pi",
+              <>
+                <strong>pi is an AI, not a person.</strong> It says so in its
+                first message, and again whenever you ask.
+              </>,
+              "rest",
+            ],
+            ["you", "What if I’m still explaining the problem?"],
+            [
+              "pi",
+              <>
+                <strong>pi puts your problem first.</strong> Nothing gets
+                suggested while you’re still explaining what’s wrong.
+              </>,
+              "rest",
+            ],
+            ["you", "And if you can’t do what I ask?"],
+            [
+              "pi",
+              <>
+                <strong>pi says what it can’t do.</strong> And what happens
+                next.
+              </>,
+              "heads",
+            ],
           ]}
         />
       </Section>
@@ -200,27 +221,35 @@ export default function PiLanding() {
         </Section>
       </Gate>
 
-      <Section title="Quick answers" tone="soft">
-        <div className="pi-faq">
-          <h3>Is pi a real person?</h3>
-          <p>No. pi is an AI, and it says so in its first message.</p>
-          <h3 style={{ marginTop: 18 }}>Will pi try to sell me something?</h3>
-          <p>
-            {PI.live.solutions
-              ? "Not while you’re describing a problem. When your problems are sorted, pi asks whether you’d like a solution document and a quote. You can say no."
-              : "Not while you’re describing a problem."}
-          </p>
-          <h3 style={{ marginTop: 18 }}>Can I make pi stop?</h3>
-          <p>
-            Yes.{" "}
-            <Slot kind="PRODUCT">
-              one fixed word that is always recognised, and what happens next
-            </Slot>
-          </p>
-          <p>
-            <Link href={`${PI.base}/faq`}>All questions →</Link>
-          </p>
+      <Section title="Quick answers" tone="soft" layout="stack">
+        <div className="pi-qa">
+          <div className="pi-qa-item">
+            <h3>Is pi a real person?</h3>
+            <p>No. pi is an AI, and it says so in its first message.</p>
+          </div>
+          <div className="pi-qa-item">
+            <h3>Will pi try to sell me something?</h3>
+            <p>
+              {PI.live.solutions
+                ? "Not while you’re describing a problem. When your problems are sorted, pi asks whether you’d like a solution document and a quote. You can say no."
+                : "Not while you’re describing a problem."}
+            </p>
+          </div>
+          <div className="pi-qa-item">
+            <h3>Can I make pi stop?</h3>
+            <p>
+              Yes.{" "}
+              <Slot kind="PRODUCT">
+                one fixed word that is always recognised, and what happens next
+              </Slot>
+            </p>
+          </div>
         </div>
+        <p className="pi-qa-more">
+          <Link className="pi-arrow" href={`${PI.base}/faq`}>
+            All questions →
+          </Link>
+        </p>
       </Section>
 
       <CtaBlock page="landing" pos="closing" heading="Start with one problem.">

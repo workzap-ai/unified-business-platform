@@ -53,7 +53,6 @@ export default function HowItWorks() {
             pi notes and sorts
           </li>
         </ul>
-        <div style={{ height: 24 }} />
         <Points
           numbered
           items={[

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -11,7 +12,11 @@ export const metadata: Metadata = {
 // pi content document. The owner supplies the final company wording.
 const products = [
   {
-    name: "nori",
+    key: "nori",
+    name: "nori by Workzap",
+    logo: "/nori-brand/nori-lockup-horizontal-color.svg",
+    width: 300.77,
+    height: 103.1,
     line: "The daily read for the shop.",
     detail:
       "nori reads your shop’s sales and stock and picks out the one thing worth looking at today.",
@@ -19,7 +24,11 @@ const products = [
     cta: "See nori",
   },
   {
-    name: "pi",
+    key: "pi",
+    name: "pi by Workzap",
+    logo: "/pi-brand/pi-lockup-horizontal-color.svg",
+    width: 285.8,
+    height: 149.8,
     line: "Workzap's WhatsApp agent.",
     detail:
       "Chat about the problems in your business. pi notes each one and sorts them. pi is an AI.",
@@ -30,100 +39,54 @@ const products = [
 
 export default function Home() {
   return (
-    <div
-      style={{
-        background: "var(--bg-app)",
-        color: "var(--text-primary)",
-        minHeight: "100vh",
-      }}
-    >
-      <header
-        style={{
-          borderBottom: "1px solid var(--border)",
-          background: "var(--bg-app)",
-        }}
-      >
-        <nav
-          style={{
-            maxWidth: 1080,
-            margin: "0 auto",
-            padding: "0 24px",
-            display: "flex",
-            alignItems: "center",
-            height: 62,
-          }}
-        >
-          <Link
-            href="/"
-            aria-label="Workzap home"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              textDecoration: "none",
-              color: "inherit",
-            }}
-          >
-            <div className="wz-logo">W</div>
-            <div style={{ fontWeight: 800, fontSize: 16 }}>Workzap</div>
+    <div className="hm-page">
+      <header className="hm-header">
+        <nav className="hm-wrap hm-nav" aria-label="Workzap">
+          <Link href="/" aria-label="Workzap home" className="hm-brand">
+            <div className="hm-logo">W</div>
+            <div className="hm-brand-name">Workzap</div>
           </Link>
         </nav>
       </header>
-      <main style={{ maxWidth: 1080, margin: "0 auto", padding: "72px 24px" }}>
-        <h1
-          style={{
-            fontSize: "clamp(32px, 5vw, 48px)",
-            fontWeight: 800,
-            letterSpacing: "-0.03em",
-            margin: 0,
-          }}
-        >
-          Workzap products
-        </h1>
-        <ul
-          style={{
-            listStyle: "none",
-            padding: 0,
-            margin: "40px 0 0",
-            display: "grid",
-            gap: 20,
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          }}
-        >
-          {products.map((p) => (
-            <li key={p.name} className="wz-card" style={{ padding: 28 }}>
-              <h2 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>
-                {p.name}
-              </h2>
-              <p
-                style={{
-                  margin: "6px 0 0",
-                  fontWeight: 700,
-                  color: "var(--accent-strong)",
-                }}
-              >
-                {p.line}
-              </p>
-              <p
-                style={{
-                  margin: "12px 0 24px",
-                  color: "var(--text-secondary)",
-                }}
-              >
-                {p.detail}
-              </p>
-              {p.href ? (
-                <Link href={p.href} className="wz-btn wz-btn-primary">
-                  {p.cta}
-                </Link>
-              ) : (
-                <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>
-                  {p.cta}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
+      <main className="hm-main">
+        <div className="hm-wrap">
+          <div className="hm-statement">
+            <h1>Workzap products</h1>
+            <p className="hm-lead">Two products from Workzap: nori and pi.</p>
+          </div>
+          <ul className="hm-cards">
+            {products.map((p) => (
+              <li key={p.key} className={`hm-card hm-${p.key}`}>
+                <h2>
+                  <span className="hm-logo-wrap">
+                    <Image
+                      src={p.logo}
+                      alt={p.name}
+                      width={p.width}
+                      height={p.height}
+                      priority
+                      unoptimized
+                    />
+                    {p.key === "pi" ? (
+                      <span className="hm-pi-chip" title="pi is an AI">
+                        AI
+                      </span>
+                    ) : null}
+                  </span>
+                </h2>
+                <p className="hm-line">{p.line}</p>
+                <p className="hm-detail">{p.detail}</p>
+                {p.href ? (
+                  <Link href={p.href} className="hm-action">
+                    {p.cta}
+                  </Link>
+                ) : (
+                  <span className="hm-action hm-status">{p.cta}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       </main>
     </div>
   );

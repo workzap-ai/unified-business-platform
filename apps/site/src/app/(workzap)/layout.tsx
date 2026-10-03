@@ -1,15 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
-import "@/features/workzap/workzap.css";
+import { Inter } from "next/font/google";
+import "@/features/workzap/home.css";
 
-const jakarta = Plus_Jakarta_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-jakarta",
-  display: "swap",
-});
-const jbmono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jbmono",
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -27,11 +22,7 @@ export default function WorkzapLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      data-theme="light"
-      className={`${jakarta.variable} ${jbmono.variable}`}
-    >
+    <html lang="en" className={inter.variable}>
       <body>{children}</body>
     </html>
   );

@@ -33,7 +33,7 @@ export default function Trust() {
           <Slot kind="PRODUCT">the exact words, and what happens next</Slot>
         </p>
       </Section>
-      <Section title="What pi never asks for">
+      <Section title="What pi never asks for" tone="tint">
         <p>
           Card numbers, passwords, other people’s personal details, or payment
           inside the chat. If you send them, pi will ask you not to.
@@ -68,7 +68,7 @@ export default function Trust() {
           trademark of Meta. pi isn’t made, run or endorsed by WhatsApp or Meta.
         </p>
       </Section>
-      <Section title="Something not right?">
+      <Section title="Something not right?" tone="tint">
         <p>
           Tell pi in the chat.{" "}
           <Slot kind="CONFIRM">
