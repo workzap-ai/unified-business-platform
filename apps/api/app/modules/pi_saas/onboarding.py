@@ -352,7 +352,7 @@ async def readiness(session: AsyncSession, account: PiBusinessAccount) -> list[d
             "label": "WhatsApp number connected",
             "done": connection is not None and connection.status == "connected",
         },
-        {"key": "behaviour", "label": "How Pi should help", "done": bool(done.get("4"))},
+        {"key": "behaviour", "label": "How pi should help", "done": bool(done.get("4"))},
         {"key": "plan", "label": "Active plan", "done": plan.sending, "reason": plan.reason},
     ]
 
