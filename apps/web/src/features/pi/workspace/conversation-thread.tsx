@@ -135,10 +135,11 @@ export function ConversationThread({
   const lastId = useRef<string | null>(null);
   // Set just before older messages are prepended, so the reader's position is kept.
   const anchor = useRef<{ height: number; top: number } | null>(null);
-  const count = messageList?.length ?? 0;
+  // Runs whenever the messages change, not only their count: the latest window holds
+  // a fixed number of messages, and a file grows its bubble after it arrives.
   useLayoutEffect(() => {
     const el = scroller.current;
-    if (!el || !count) return;
+    if (!el || !messageList?.length) return;
     if (anchor.current) {
       el.scrollTop =
         anchor.current.top + (el.scrollHeight - anchor.current.height);
@@ -146,7 +147,20 @@ export function ConversationThread({
     } else if (lastId.current !== conversationId || stick.current)
       el.scrollTop = el.scrollHeight;
     lastId.current = conversationId;
-  }, [count, conversationId]);
+  }, [messageList, conversationId]);
+  // Content that grows later (a transcript, an opened image or voice note) keeps the
+  // reader at the bottom if they were there; someone reading older messages stays put.
+  const content = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = scroller.current;
+    const inner = content.current;
+    if (!el || !inner || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => {
+      if (stick.current && !anchor.current) el.scrollTop = el.scrollHeight;
+    });
+    observer.observe(inner);
+    return () => observer.disconnect();
+  }, []);
 
   const loadOlder = useScopedMutation(
     () => {
@@ -346,72 +360,74 @@ export function ConversationThread({
         aria-live="polite"
         aria-relevant="additions"
       >
-        {latest.isError ? (
-          <ErrorState
-            error={latest.error}
-            onRetry={() => void latest.refetch()}
-          />
-        ) : latest.isPending || !messageList ? (
-          <ul className="space-y-4" aria-hidden="true">
-            {Array.from({ length: 6 }, (_, i) => (
-              <li key={i} className={i % 2 ? "flex justify-end" : "flex"}>
-                <Skeleton
-                  className="h-14 rounded-2xl"
-                  style={{ width: `${38 + ((i * 19) % 30)}%` }}
-                />
-              </li>
-            ))}
-          </ul>
-        ) : messageList.length === 0 ? (
-          <EmptyState
-            compact
-            icon={MessageSquareOff}
-            title="No messages yet"
-            description="Messages in this conversation will appear here."
-          />
-        ) : (
-          <>
-            {hasOlder && (
-              <div className="mb-3 flex justify-center">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => loadOlder.mutate(undefined)}
-                  loading={loadOlder.isPending}
-                >
-                  Load older messages
-                </Button>
-              </div>
-            )}
-            <ol className="mx-auto max-w-3xl space-y-3" aria-label="Messages">
-              {messageList.map((m, i) => {
-                const prev = messageList[i - 1];
-                const newDay =
-                  !prev ||
-                  new Date(prev.created_at).toDateString() !==
-                    new Date(m.created_at).toDateString();
-                return (
-                  <Fragment key={m.id}>
-                    {newDay && (
-                      <li
-                        className="flex items-center gap-3 py-1"
-                        role="separator"
-                        aria-label={dayLabel(m.created_at)}
-                      >
-                        <span className="h-px flex-1 bg-border" />
-                        <span className="text-2xs font-medium text-muted-foreground">
-                          {dayLabel(m.created_at)}
-                        </span>
-                        <span className="h-px flex-1 bg-border" />
-                      </li>
-                    )}
-                    <MessageItem message={m} names={names} />
-                  </Fragment>
-                );
-              })}
-            </ol>
-          </>
-        )}
+        <div ref={content}>
+          {latest.isError ? (
+            <ErrorState
+              error={latest.error}
+              onRetry={() => void latest.refetch()}
+            />
+          ) : latest.isPending || !messageList ? (
+            <ul className="space-y-4" aria-hidden="true">
+              {Array.from({ length: 6 }, (_, i) => (
+                <li key={i} className={i % 2 ? "flex justify-end" : "flex"}>
+                  <Skeleton
+                    className="h-14 rounded-2xl"
+                    style={{ width: `${38 + ((i * 19) % 30)}%` }}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : messageList.length === 0 ? (
+            <EmptyState
+              compact
+              icon={MessageSquareOff}
+              title="No messages yet"
+              description="Messages in this conversation will appear here."
+            />
+          ) : (
+            <>
+              {hasOlder && (
+                <div className="mb-3 flex justify-center">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => loadOlder.mutate(undefined)}
+                    loading={loadOlder.isPending}
+                  >
+                    Load older messages
+                  </Button>
+                </div>
+              )}
+              <ol className="mx-auto max-w-3xl space-y-3" aria-label="Messages">
+                {messageList.map((m, i) => {
+                  const prev = messageList[i - 1];
+                  const newDay =
+                    !prev ||
+                    new Date(prev.created_at).toDateString() !==
+                      new Date(m.created_at).toDateString();
+                  return (
+                    <Fragment key={m.id}>
+                      {newDay && (
+                        <li
+                          className="flex items-center gap-3 py-1"
+                          role="separator"
+                          aria-label={dayLabel(m.created_at)}
+                        >
+                          <span className="h-px flex-1 bg-border" />
+                          <span className="text-2xs font-medium text-muted-foreground">
+                            {dayLabel(m.created_at)}
+                          </span>
+                          <span className="h-px flex-1 bg-border" />
+                        </li>
+                      )}
+                      <MessageItem message={m} names={names} />
+                    </Fragment>
+                  );
+                })}
+              </ol>
+            </>
+          )}
+        </div>
       </div>
 
       {conversation && (

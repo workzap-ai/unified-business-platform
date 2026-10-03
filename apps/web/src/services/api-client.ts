@@ -141,6 +141,30 @@ export async function apiRequest<T>(
   return schema ? schema.parse(body) : (body as T);
 }
 
+/** A file (voice note, image) from a GET endpoint, with the same session and
+ * workspace headers as JSON requests. */
+export async function apiBlob(path: string, signal?: AbortSignal) {
+  const headers: Record<string, string> = {};
+  if (expectedWorkspace) {
+    headers["X-Workspace-Tenant"] = expectedWorkspace.tenant;
+    headers["X-Workspace-Environment"] = expectedWorkspace.environment;
+  }
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${buildPath(path)}`, {
+      credentials: "include",
+      headers,
+      signal: signal
+        ? AbortSignal.any([signal, AbortSignal.timeout(60_000)])
+        : AbortSignal.timeout(60_000),
+    });
+  } catch {
+    throw new ApiError(0, "NETWORK_UNAVAILABLE");
+  }
+  if (!response.ok) throw new ApiError(response.status, "REQUEST_FAILED");
+  return response.blob();
+}
+
 export function apiGet<T>(
   path: string,
   schema: z.ZodType<T>,

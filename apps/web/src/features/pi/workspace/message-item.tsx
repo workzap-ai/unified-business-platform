@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertCircle,
   AudioLines,
@@ -9,11 +9,14 @@ import {
   ChevronRight,
   Clock,
   ImageIcon,
+  Loader2,
   PackageCheck,
+  Play,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDateTime, formatMoney, formatTime } from "@/lib/format";
 import { Tooltip } from "@/components/ui/overlays";
+import { apiBlob } from "@/services/api-client";
 import { StatusBadge } from "@/components/app/status-badge";
 import type { Message, ToolEvent } from "../types";
 import { agentLabel, toolLabel } from "./lib";
@@ -122,8 +125,66 @@ export function MessageItem({
   );
 }
 
+/** Loads the customer's file only when asked (each view fetches it from WhatsApp). */
+function useMediaFile(message: Message) {
+  const [state, setState] = useState<
+    | { status: "idle" }
+    | { status: "loading" }
+    | { status: "ready"; url: string }
+    | { status: "failed" }
+  >({ status: "idle" });
+  const url = state.status === "ready" ? state.url : null;
+  useEffect(
+    () => () => {
+      if (url) URL.revokeObjectURL(url);
+    },
+    [url],
+  );
+  async function load() {
+    if (state.status === "loading" || state.status === "ready") return;
+    setState({ status: "loading" });
+    try {
+      const blob = await apiBlob(
+        `/pi/conversations/${message.conversation_id}/messages/${message.id}/media`,
+      );
+      setState({ status: "ready", url: URL.createObjectURL(blob) });
+    } catch {
+      setState({ status: "failed" });
+    }
+  }
+  return { state, load };
+}
+
+function MediaButton({
+  label,
+  loading,
+  onClick,
+}: {
+  label: string;
+  loading: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={loading}
+      className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-medium hover:bg-surface-sunken disabled:opacity-60"
+    >
+      {loading ? (
+        <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+      ) : (
+        <Play className="size-3.5" aria-hidden="true" />
+      )}
+      {label}
+    </button>
+  );
+}
+
 function MediaBlock({ message }: { message: Message }) {
   const media = message.media;
+  const { state, load } = useMediaFile(message);
+  const canFetch = message.direction === "inbound";
   if (message.message_type === "audio") {
     const seconds = media?.duration_s ?? 0;
     return (
@@ -133,11 +194,36 @@ function MediaBlock({ message }: { message: Message }) {
             <AudioLines className="size-3.5" aria-hidden="true" />
           </span>
           Voice note
-          <span className="tabular ml-auto text-muted-foreground">
-            {Math.floor(seconds / 60)}:
-            {String(Math.round(seconds % 60)).padStart(2, "0")}
-          </span>
+          {seconds > 0 && (
+            <span className="tabular ml-auto text-muted-foreground">
+              {Math.floor(seconds / 60)}:
+              {String(Math.round(seconds % 60)).padStart(2, "0")}
+            </span>
+          )}
         </div>
+        {canFetch && (
+          <div className="mt-2">
+            {state.status === "ready" ? (
+              <audio
+                controls
+                autoPlay
+                src={state.url}
+                className="h-9 w-full max-w-72"
+              />
+            ) : (
+              <MediaButton
+                label={state.status === "failed" ? "Try again" : "Play"}
+                loading={state.status === "loading"}
+                onClick={load}
+              />
+            )}
+            {state.status === "failed" && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Couldn&apos;t load this voice note.
+              </p>
+            )}
+          </div>
+        )}
         {media?.transcript ? (
           <div className="mt-2 border-t border-border pt-2">
             <p className="text-2xs font-semibold tracking-wide text-muted-foreground uppercase">
@@ -149,25 +235,53 @@ function MediaBlock({ message }: { message: Message }) {
           </div>
         ) : (
           <p className="mt-2 text-xs text-muted-foreground">
-            No transcript available.
+            No transcript yet.
           </p>
         )}
       </div>
     );
   }
   if (message.message_type === "image" || message.message_type === "video") {
+    const video = message.message_type === "video";
     return (
       <div className="mb-1 min-w-52">
-        <div
-          className="flex h-28 items-center justify-center rounded-xl border border-border bg-surface-sunken text-muted-foreground"
-          role="img"
-          aria-label={`${message.message_type === "video" ? "Video" : "Image"} sent by the customer`}
-        >
-          <ImageIcon className="size-6" aria-hidden="true" />
-          {message.message_type === "video" && (
-            <span className="ml-2 text-xs">Video</span>
-          )}
-        </div>
+        {state.status === "ready" ? (
+          video ? (
+            <video
+              controls
+              src={state.url}
+              className="max-h-80 w-full max-w-72 rounded-xl border border-border"
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- a private blob URL
+            <img
+              src={state.url}
+              alt="Image sent by the customer"
+              className="max-h-80 w-full max-w-72 rounded-xl border border-border object-contain"
+            />
+          )
+        ) : (
+          <div
+            className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-surface-sunken text-muted-foreground"
+            role="img"
+            aria-label={`${video ? "Video" : "Image"} sent by the customer`}
+          >
+            <ImageIcon className="size-6" aria-hidden="true" />
+            {canFetch && (
+              <MediaButton
+                label={
+                  state.status === "failed"
+                    ? "Try again"
+                    : video
+                      ? "Play video"
+                      : "View image"
+                }
+                loading={state.status === "loading"}
+                onClick={load}
+              />
+            )}
+          </div>
+        )}
         {media?.description && (
           <div className="mt-2">
             <p className="text-2xs font-semibold tracking-wide text-pi uppercase">

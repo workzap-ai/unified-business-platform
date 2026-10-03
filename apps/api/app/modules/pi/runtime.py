@@ -367,15 +367,28 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 )
             )
             media_id = str(message.media.get("provider_media_id", ""))
+            # Kapso transcribes voice notes itself; that text is used when present.
+            provider_transcript = str(message.media.get("provider_transcript") or "").strip()
             await session.commit()  # No transaction is held across provider calls.
             try:
                 if not allowed:
                     raise GatewayUnavailable()
                 from app.integrations.whatsapp_bridge import token as connection_token
 
-                content, mime = await WhatsApp(
-                    ctx["settings"], ctx["http"], connection.provider
-                ).media(media_id, await connection_token(session, ctx["settings"], connection))
+                try:
+                    content, mime = await WhatsApp(
+                        ctx["settings"], ctx["http"], connection.provider
+                    ).media(
+                        media_id,
+                        await connection_token(session, ctx["settings"], connection),
+                        url=str(message.media.get("media_url") or ""),
+                        mime=str(message.media.get("mime_type") or ""),
+                    )
+                except BusinessRuleViolation:
+                    if not (audio and provider_transcript):
+                        raise
+                    # The file itself could not be fetched, but its words are known.
+                    content, mime = b"", str(message.media.get("mime_type") or "audio/ogg")
                 limit = min(
                     ctx["settings"].media_max_bytes,
                     int(policy.whatsapp_config.get("max_media_mb", 10)) * 1024 * 1024,
@@ -386,7 +399,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 mime = normalize_mime(mime)
                 if not mime.startswith(f"{message.message_type}/"):
                     raise BusinessRuleViolation("INVALID_MEDIA", "Media type does not match")
-                if audio:
+                if audio and provider_transcript:
+                    description = provider_transcript[:4000]
+                elif audio:
                     transcript = await manager.transcribe(
                         scope, content, mime, conversation_id=conversation_id
                     )

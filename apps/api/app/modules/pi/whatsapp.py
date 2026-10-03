@@ -157,6 +157,21 @@ def normalize(payload: dict[str, Any]) -> list[dict[str, Any]]:
     return events[:100]
 
 
+MEDIA_TYPES = frozenset(
+    {
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "audio/ogg",
+        "audio/mpeg",
+        "audio/mp4",
+        "audio/aac",
+        "video/mp4",
+        "video/3gpp",
+    }
+)
+
+
 class WhatsApp:
     """Meta-compatible WhatsApp messaging over a selected transport.
 
@@ -379,60 +394,75 @@ class WhatsApp:
                 "DELIVERY_UNCONFIRMED", "Message delivery could not be confirmed", 503
             ) from None
 
-    async def media(self, media_id: str, token: str) -> tuple[bytes, str]:
+    async def media(
+        self, media_id: str, token: str, *, url: str = "", mime: str = ""
+    ) -> tuple[bytes, str]:
+        """Download one inbound file. ``url``/``mime`` are what Kapso's webhook already
+        gave; they are tried first and the provider's media lookup is the fallback."""
         if not re.fullmatch(r"[0-9]{5,32}", media_id):
             raise BusinessRuleViolation("INVALID_MEDIA", "Unsupported media")
+        if self.provider == "kapso" and url and mime:
+            try:
+                return await self._download(url, normalize_mime(mime), token)
+            except BusinessRuleViolation:
+                pass
         base, headers = self._endpoint(token)
-        hosts = {"lookaside.fbsbx.com", "lookaside.facebook.com"}
-        if self.provider == "kapso":
-            hosts.add(urlparse(self.settings.kapso_base_url).hostname or "")
         try:
             metadata = await self.http.get(f"{base}/{media_id}", headers=headers, timeout=10)
             metadata.raise_for_status()
             data = metadata.json()
-            url, mime = data["url"], data["mime_type"]
-            if not isinstance(mime, str):
+            found, found_mime = data["url"], data["mime_type"]
+            if not isinstance(found, str) or not isinstance(found_mime, str):
                 raise ValueError
-            mime = normalize_mime(mime)
+            if int(data.get("file_size", 0)) > self.settings.media_max_bytes:
+                raise ValueError
+        except (httpx.HTTPError, ValueError, KeyError, TypeError):
+            raise BusinessRuleViolation("INVALID_MEDIA", "Media could not be processed") from None
+        return await self._download(found, normalize_mime(found_mime), token)
+
+    def _media_host_allowed(self, host: str) -> bool:
+        if host in {"lookaside.fbsbx.com", "lookaside.facebook.com"}:
+            return True
+        if self.provider != "kapso":
+            return False
+        # Kapso serves files from its app host (app.kapso.ai) as well as its API host.
+        kapso_host = urlparse(self.settings.kapso_base_url).hostname or ""
+        domain = ".".join(kapso_host.split(".")[-2:])
+        return bool(kapso_host) and (host == kapso_host or host.endswith("." + domain))
+
+    async def _download(self, url: str, mime: str, token: str) -> tuple[bytes, str]:
+        _, headers = self._endpoint(token)
+        try:
             parsed = urlparse(url)
             if (
                 parsed.scheme != "https"
-                or parsed.hostname not in hosts
+                or not self._media_host_allowed(parsed.hostname or "")
                 or parsed.username
                 or parsed.port not in {None, 443}
-            ):
-                raise ValueError
-            if (
-                mime
-                not in {
-                    "image/jpeg",
-                    "image/png",
-                    "image/webp",
-                    "audio/ogg",
-                    "audio/mpeg",
-                    "audio/mp4",
-                    "audio/aac",
-                    "video/mp4",
-                    "video/3gpp",
-                }
-                or int(data.get("file_size", 0)) > self.settings.media_max_bytes
+                or mime not in MEDIA_TYPES
             ):
                 raise ValueError
             chunks = bytearray()
-            async with self.http.stream(
-                "GET",
-                url,
-                headers=headers,
-                timeout=15,
-                follow_redirects=False,
-            ) as response:
-                response.raise_for_status()
-                async for chunk in response.aiter_bytes():
-                    chunks.extend(chunk)
-                    if len(chunks) > self.settings.media_max_bytes:
-                        raise ValueError
+            for _hop in range(2):
+                async with self.http.stream(
+                    "GET", url, headers=headers, timeout=15, follow_redirects=False
+                ) as response:
+                    if response.is_redirect and _hop == 0:
+                        # A file store behind the provider: follow once, without our
+                        # credentials, and only to another https address.
+                        url = str(response.headers.get("location", ""))
+                        if not url.startswith("https://"):
+                            raise ValueError
+                        headers = {}
+                        continue
+                    response.raise_for_status()
+                    async for chunk in response.aiter_bytes():
+                        chunks.extend(chunk)
+                        if len(chunks) > self.settings.media_max_bytes:
+                            raise ValueError
+                    break
             if not chunks:
                 raise ValueError
-            return bytes(chunks), str(mime)
+            return bytes(chunks), mime
         except (httpx.HTTPError, ValueError, KeyError, TypeError):
             raise BusinessRuleViolation("INVALID_MEDIA", "Media could not be processed") from None

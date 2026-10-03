@@ -6,7 +6,7 @@ from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, Response
 from sqlalchemy import and_, false, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
@@ -253,6 +253,53 @@ async def history(
         has_more=has_more,
         before=rows[0].created_at if has_more and rows else None,
         before_id=rows[0].id if has_more and rows else None,
+    )
+
+
+@router.get("/conversations/{conversation_id}/messages/{message_id}/media")
+async def message_media(
+    conversation_id: UUID, message_id: UUID, request: Request, scope: Scope, session: Session
+) -> Response:
+    """The customer's voice note, image or video, for playing in the inbox. Fetched from
+    the WhatsApp provider on demand with the server-held credentials; never stored."""
+    from app.integrations.whatsapp_bridge import token as connection_token
+    from app.modules.pi.whatsapp import WhatsApp
+
+    service = PiService(session, scope)
+    await service.require()
+    conversation = await service.conversations.get(conversation_id)
+    message = await service.messages.get(message_id)
+    media = message.media if isinstance(message.media, dict) else {}
+    media_id = str(media.get("provider_media_id") or "")
+    if (
+        message.conversation_id != conversation.id
+        or message.direction != "inbound"
+        or message.message_type not in {"audio", "image", "video"}
+        or not media_id
+    ):
+        raise HTTPException(404, "No media for this message")
+    connection = await WorkspaceRepository(session, WhatsAppConnection, scope).find(
+        WhatsAppConnection.id == conversation.connection_id
+    )
+    if connection is None:
+        raise HTTPException(404, "No media for this message")
+    settings, http = request.app.state.settings, request.app.state.http
+    try:
+        content, mime = await WhatsApp(settings, http, connection.provider).media(
+            media_id,
+            await connection_token(session, settings, connection),
+            url=str(media.get("media_url") or ""),
+            mime=str(media.get("mime_type") or ""),
+        )
+    except BusinessRuleViolation:
+        raise HTTPException(404, "This file is no longer available") from None
+    return Response(
+        content,
+        media_type=mime,
+        headers={
+            "Content-Disposition": "inline",
+            "X-Content-Type-Options": "nosniff",
+        },
     )
 
 
