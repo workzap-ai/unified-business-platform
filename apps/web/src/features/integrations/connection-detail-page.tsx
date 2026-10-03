@@ -16,6 +16,7 @@ import {
   Power,
   RefreshCw,
   SearchX,
+  Sparkles,
   Unplug,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -74,6 +75,18 @@ import type {
   IntegrationDefinition,
   TestResult,
 } from "./types";
+
+/** What Pi does with a working connection of this kind in the same workspace. */
+const PI_USE: Record<string, string> = {
+  google_calendar:
+    "Pi books customers only into free times on this calendar and adds the bookings to it.",
+  shopify:
+    "Pi tells customers on WhatsApp where their own orders are (read-only).",
+  stripe: "Pi can send customers Stripe payment links for what they owe.",
+  smtp: "Pi sends booking confirmation emails through this email account.",
+  resend: "Pi sends booking confirmation emails through this email account.",
+  sendgrid: "Pi sends booking confirmation emails through this email account.",
+};
 
 export function ConnectionDetailPage({
   connectionId,
@@ -393,6 +406,11 @@ function ConnectionDetailView({
                 {formatDateTime(c.last_failure_at)}
               </span>
             )}
+          </Notice>
+        )}
+        {PI_USE[c.integration_key] && !revoked && (
+          <Notice tone="info" icon={Sparkles} title="Also used by Pi">
+            {PI_USE[c.integration_key]}
           </Notice>
         )}
         {result && <TestResultPanel result={result} />}

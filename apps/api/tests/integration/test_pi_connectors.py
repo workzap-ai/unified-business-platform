@@ -604,3 +604,32 @@ async def test_connecting_requires_integration_management(business_db, api):
         assert created == 0 and remote.requests == []
     finally:
         await pi.close()
+
+
+async def test_a_working_calendar_is_not_hidden_by_a_newer_unfinished_attempt(
+    api, business_db
+):
+    pi, remote, _, _ = await _booking_setup(api, business_db)
+    try:
+        working = await _connection(
+            business_db,
+            pi.app,
+            pi.tenant_id,
+            pi.environment_id,
+            "google_calendar",
+            {"access_token": "ya29.ok", "refresh_token": "1//refresh"},
+        )
+        await business_db.commit()
+        # Someone starts connecting Google again from Owner OS Integrations and stops.
+        draft = await api.post(
+            "/api/v1/integrations/connections",
+            json={"integration_key": "google_calendar", "display_name": "Second try"},
+        )
+        assert draft.status_code in (200, 201), draft.text
+        chosen = await connectors.current(business_db, pi.scope(), "google_calendar")
+        assert chosen is not None and chosen.id == working.id
+        listed = (await api.get("/api/v1/pi/connectors")).json()
+        calendar = next(c for c in listed if c["key"] == "google_calendar")
+        assert calendar["state"] == "connected"
+    finally:
+        await pi.close()

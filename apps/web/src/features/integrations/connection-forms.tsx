@@ -36,6 +36,7 @@ import { InlineError, Notice } from "@/components/app/states";
 import { useScopedMutation } from "@/hooks/use-scoped";
 import { errorMessage } from "@/services/api-client";
 import { integrationsService } from "./service";
+import { ONE_CLICK, OneClickConnect } from "./one-click-connect";
 import { applyServerFieldErrors } from "./components";
 import { AUTH_LABELS, isOAuth, outboundUrlProblem } from "./lib";
 import type {
@@ -281,6 +282,18 @@ function knownKeysFor(fields: ConfigField[], extra: string[]) {
 /* Connect ------------------------------------------------------------------------ */
 
 export function ConnectDialog({
+  definition,
+  onClose,
+}: {
+  definition: IntegrationDefinition;
+  onClose: () => void;
+}) {
+  if (ONE_CLICK.has(definition.key))
+    return <OneClickConnect definition={definition} onClose={onClose} />;
+  return <ConnectForm definition={definition} onClose={onClose} />;
+}
+
+function ConnectForm({
   definition,
   onClose,
 }: {

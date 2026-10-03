@@ -21,7 +21,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from urllib.parse import urlencode
 
-from sqlalchemy import select
+from sqlalchemy import case, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.audience import PI_PREFIX
@@ -97,7 +97,13 @@ async def current(
             IntegrationConnection.integration_key == key,
             IntegrationConnection.status != "revoked",
         )
-        .order_by(IntegrationConnection.created_at.desc())
+        # A working connection wins over a newer unfinished or failed attempt (for
+        # example one started from Owner OS Integrations and abandoned), so Pi keeps
+        # using the calendar or store that works.
+        .order_by(
+            case((IntegrationConnection.status.in_(USABLE), 0), else_=1),
+            IntegrationConnection.created_at.desc(),
+        )
         .limit(1)
     )
     if for_update:
