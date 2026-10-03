@@ -1,11 +1,12 @@
 """Service discovery: conversation and an internal brief, never a quotation."""
 
 import json
+import re
 import unicodedata
 from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.manager import LLMManager
@@ -31,9 +32,27 @@ from app.modules.tenants.models import Tenant
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
 
+LANGUAGE = r"^(roman_ur|[a-z]{2,3}(?:[-_][A-Za-z0-9]{2,8})?)$"
+LANGUAGE_NAMES = {
+    "roman urdu": "roman_ur",
+    "roman-urdu": "roman_ur",
+    "roman_urdu": "roman_ur",
+    "ur-latn": "roman_ur",
+    "urdu": "ur",
+    "english": "en",
+    "arabic": "ar",
+    "hindi": "hi",
+}
+
+
+def _fit(value: Any, limit: int) -> Any:
+    """Models sometimes run past a length limit; keep the start instead of failing."""
+    return value[:limit] if isinstance(value, str) else value
+
 
 class Requirements(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    # Unknown keys a model adds are ignored rather than failing the whole reply.
+    model_config = ConfigDict(extra="ignore")
     service: str = Field(default="", max_length=300)
     scope: str = Field(default="", max_length=2000)
     audience: str = Field(default="", max_length=500)
@@ -43,15 +62,19 @@ class Requirements(BaseModel):
 
 
 class ServiceTurn(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    """One AI turn. The reply is required; everything else has a safe default, so a
+    model that leaves out or renames a minor field still answers the customer. Business
+    actions stay limited to the fixed choices below."""
+
+    model_config = ConfigDict(extra="ignore")
     _attempts: list[Attempt] = PrivateAttr(default_factory=list)
     reply: str = Field(min_length=1, max_length=4000)
-    language: str = Field(pattern=r"^(roman_ur|[a-z]{2,3}(?:[-_][A-Za-z0-9]{2,8})?)$")
+    language: str = Field(default="en", pattern=LANGUAGE)
     summary: str = Field(min_length=1, max_length=4000)
-    requirements: Requirements
-    missing: list[str] = Field(max_length=12)
-    awaiting_customer: bool
-    ready_for_team: bool
+    requirements: Requirements = Field(default_factory=Requirements)
+    missing: list[str] = Field(default_factory=list, max_length=12)
+    awaiting_customer: bool = False
+    ready_for_team: bool = False
     consent: Literal["unchanged", "granted", "declined"] = "unchanged"
     consent_evidence: str = Field(default="", max_length=500)
     request_human: bool = False
@@ -64,6 +87,28 @@ class ServiceTurn(BaseModel):
     booking_start: str = Field(default="", max_length=40)
     booking_id: str = Field(default="", max_length=40)
     action_evidence: str = Field(default="", max_length=500)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _tolerate(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+        data = dict(data)
+        language = str(data.get("language") or "en").strip()
+        language = LANGUAGE_NAMES.get(language.lower(), language)
+        data["language"] = language if re.fullmatch(LANGUAGE, language) else "en"
+        for key, limit in (("reply", 4000), ("summary", 4000), ("consent_evidence", 500)):
+            data[key] = _fit(data.get(key, ""), limit)
+        data["action_subject"] = _fit(data.get("action_subject", ""), 200)
+        data["action_evidence"] = _fit(data.get("action_evidence", ""), 500)
+        missing = data.get("missing")
+        if isinstance(missing, list):
+            data["missing"] = [str(m)[:200] for m in missing][:12]
+        elif missing is not None:
+            data["missing"] = []
+        if not isinstance(data.get("requirements"), (dict, Requirements)):
+            data.pop("requirements", None)
+        return data
 
 
 SYSTEM = """You are PI, a company's helpful service enquiry assistant.
