@@ -62,7 +62,6 @@ export function ModuleExplorer() {
         className="wzx-panel"
       >
         <div className="wzx-copy">
-          <span className="wzx-module-pill">{tab.pill}</span>
           <h3>{tab.headline}</h3>
           <p className="wzx-summary">{tab.summary}</p>
           <ul className="wzx-features">

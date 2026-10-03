@@ -1179,7 +1179,7 @@ export function RetailPage() {
                 margin: "16px 0 8px",
               }}
             >
-              One platform. Every module included.
+              The whole platform, sized to your business.
             </h2>
             <p
               style={{
@@ -1190,7 +1190,8 @@ export function RetailPage() {
               }}
             >
               A one-time setup to connect your data, then a simple monthly
-              subscription. Every plan includes every module.
+              subscription. Every plan has everything; you choose the size and
+              the support.
             </p>
           </div>
           <div
@@ -1273,7 +1274,7 @@ export function RetailPage() {
                   >
                     ✓
                   </span>
-                  Every module (Vision coming soon)
+                  Everything in the platform (Vision coming soon)
                 </li>
                 <li
                   style={{
@@ -1403,7 +1404,7 @@ export function RetailPage() {
                   >
                     ✓
                   </span>
-                  Every module (Vision coming soon)
+                  Everything in the platform (Vision coming soon)
                 </li>
                 <li
                   style={{

@@ -21,7 +21,6 @@ export interface Feature {
 export interface ModuleTab {
   id: TabId;
   label: string;
-  pill: string;
   headline: string;
   summary: string;
   features: Feature[];
@@ -31,7 +30,6 @@ export const MODULE_TABS: ModuleTab[] = [
   {
     id: "stores",
     label: "Stores & warehouse",
-    pill: "Retail OS Core",
     headline: "Every shop run from a phone. Head office sees all of them.",
     summary:
       "Store managers get a simple daily app for their own shop. Head office gets one view of the whole network, and the warehouse gets a clear list of what to move.",
@@ -65,7 +63,6 @@ export const MODULE_TABS: ModuleTab[] = [
   {
     id: "finance",
     label: "Finance",
-    pill: "Finance module",
     headline: "A finance desk that watches itself.",
     summary:
       "Sales, audited profit and loss, cash, payables and receivables in one place, with an automatic auditor that flags what looks wrong.",
@@ -103,7 +100,6 @@ export const MODULE_TABS: ModuleTab[] = [
   {
     id: "planning",
     label: "Planning & buying",
-    pill: "Planning & Buying module",
     headline: "Know what to buy, move and clear.",
     summary:
       "One cockpit for stock cover, lost sales and cash frozen in slow stock, with margin classification and transfer planning on a single shared ledger.",
@@ -141,7 +137,6 @@ export const MODULE_TABS: ModuleTab[] = [
   {
     id: "ecommerce",
     label: "E-commerce",
-    pill: "E-commerce module",
     headline: "Your online store, run from the same desk.",
     summary:
       "Orders, ads, couriers, customer service, catalogue and stock for your Shopify store, alongside your shops.",
@@ -179,7 +174,6 @@ export const MODULE_TABS: ModuleTab[] = [
   {
     id: "marketing",
     label: "Marketing & customers",
-    pill: "Marketing module",
     headline: "Know what your marketing earns. Message the right customers.",
     summary:
       "Daily ad performance, an AI queue of recommended ad actions, and customer segments built from your own sales.",
@@ -217,7 +211,6 @@ export const MODULE_TABS: ModuleTab[] = [
   {
     id: "people",
     label: "People",
-    pill: "HR & Attendance module",
     headline: "Headcount, payroll and risk, with private data kept private.",
     summary:
       "A clear picture of your workforce and what it costs, with sensitive details hidden until someone chooses to see them.",
@@ -251,7 +244,6 @@ export const MODULE_TABS: ModuleTab[] = [
   {
     id: "executive",
     label: "Executive & control",
-    pill: "Retail OS Core",
     headline:
       "The whole company at a glance, and the rules that keep it honest.",
     summary:

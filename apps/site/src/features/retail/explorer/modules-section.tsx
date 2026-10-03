@@ -26,7 +26,7 @@ export function ModulesSection() {
             borderRadius: 999,
           }}
         >
-          One platform, your modules
+          What’s inside
         </span>
         <h2
           style={{
@@ -36,7 +36,7 @@ export function ModulesSection() {
             margin: "16px 0 8px",
           }}
         >
-          Everything in one platform.
+          Your whole retail business, run from one place.
         </h2>
         <p
           style={{
@@ -46,8 +46,8 @@ export function ModulesSection() {
             maxWidth: 580,
           }}
         >
-          The Retail OS Core and every module below come with every plan. Vision
-          (CCTV) is coming soon.
+          Shops, money, stock, online, marketing and people — each with the
+          numbers, the reasons and the next step. Vision (CCTV) is coming soon.
         </p>
       </div>
       <ModuleExplorer />
@@ -88,8 +88,8 @@ export function ModulesSection() {
           marginTop: 18,
         }}
       >
-        New modules ship regularly. Your Retail OS grows without you switching
-        tools.
+        New capabilities ship regularly. Your Retail OS grows without you
+        switching tools.
       </p>
     </section>
   );
