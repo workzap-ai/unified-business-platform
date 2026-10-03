@@ -314,13 +314,21 @@ export function HomePage() {
           </div>
         </div>
         <div className="flex w-full gap-2 sm:w-auto">
-          <Button asChild variant="secondary" className="flex-1 sm:flex-none">
+          <Button
+            asChild
+            variant="secondary"
+            className="flex-1 whitespace-nowrap px-3 sm:flex-none sm:px-4"
+          >
             <Link href="/analytics">
               <BarChart3 size={16} aria-hidden />
               Analytics
             </Link>
           </Button>
-          <Button asChild variant="secondary" className="flex-1 sm:flex-none">
+          <Button
+            asChild
+            variant="secondary"
+            className="flex-1 whitespace-nowrap px-3 sm:flex-none sm:px-4"
+          >
             <Link href="/inbox">
               <Inbox size={16} aria-hidden />
               Open inbox

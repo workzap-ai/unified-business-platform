@@ -104,45 +104,48 @@ function Stepper({
   onGo: (n: number) => void;
 }) {
   return (
-    <ol
-      className="mb-6 flex min-w-0 flex-wrap gap-2"
-      aria-label="Setup progress"
-    >
-      {STEPS.map((s) => {
-        const complete = done.includes(s.n);
-        const current = s.n === step;
-        return (
-          <li key={s.n} className="shrink-0">
-            <button
-              onClick={() => onGo(s.n)}
-              aria-current={current ? "step" : undefined}
-              className={cn(
-                "flex h-10 items-center gap-2 rounded-full border px-3 text-sm",
-                current
-                  ? "border-accent bg-accent-soft font-semibold text-accent-soft-foreground"
-                  : "border-border bg-surface text-foreground-secondary hover:bg-surface-muted",
-              )}
-            >
-              <span
+    <>
+      <ol
+        className="mb-2 flex min-w-0 flex-wrap gap-1.5 sm:mb-6 sm:gap-2"
+        aria-label="Setup progress"
+      >
+        {STEPS.map((s) => {
+          const complete = done.includes(s.n);
+          const current = s.n === step;
+          return (
+            <li key={s.n} className="shrink-0">
+              <button
+                onClick={() => onGo(s.n)}
+                aria-current={current ? "step" : undefined}
                 className={cn(
-                  "flex size-6 items-center justify-center rounded-full text-xs",
-                  complete
-                    ? "bg-accent text-accent-foreground"
-                    : "bg-surface-sunken",
+                  "flex h-10 items-center gap-2 rounded-full border px-2 text-sm sm:px-3",
+                  current
+                    ? "border-accent bg-accent-soft font-semibold text-accent-soft-foreground"
+                    : "border-border bg-surface text-foreground-secondary hover:bg-surface-muted",
                 )}
-                aria-hidden
               >
-                {complete ? <Check className="size-3.5" /> : s.n}
-              </span>
-              <span className={current ? "" : "sr-only sm:not-sr-only"}>
-                {s.title}
-              </span>
-              <span className="sr-only">{complete ? "(done)" : ""}</span>
-            </button>
-          </li>
-        );
-      })}
-    </ol>
+                <span
+                  className={cn(
+                    "flex size-6 items-center justify-center rounded-full text-xs",
+                    complete
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-surface-sunken",
+                  )}
+                  aria-hidden
+                >
+                  {complete ? <Check className="size-3.5" /> : s.n}
+                </span>
+                <span className="sr-only sm:not-sr-only">{s.title}</span>
+                <span className="sr-only">{complete ? "(done)" : ""}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+      <p className="mb-6 text-sm font-medium text-foreground-secondary sm:hidden">
+        Step {step} of {STEPS.length} · {STEPS.find((s) => s.n === step)?.title}
+      </p>
+    </>
   );
 }
 
@@ -1209,6 +1212,7 @@ function HelpMeButton({ account }: { account: Account }) {
     <Button
       variant="secondary"
       size="sm"
+      className="shrink-0 whitespace-nowrap"
       loading={help.isPending}
       onClick={() => help.mutate(undefined)}
     >
@@ -1239,8 +1243,8 @@ export function SetupWizard() {
   const data = account.data;
   return (
     <div className={cn("mx-auto min-w-0 max-w-3xl", product.setup)}>
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <div>
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 flex-1 basis-56">
           <h1 className="text-2xl font-semibold tracking-tight">Set up Pi</h1>
           <p className="text-[15px] text-muted-foreground">
             Five short steps. Your progress is saved as you go.

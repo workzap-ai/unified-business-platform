@@ -84,7 +84,7 @@ export function SetupCenter() {
             className={s.ready ? "size-6 text-success" : "size-6 text-warning"}
             aria-hidden
           />
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 basis-48">
             <p className="font-semibold">
               {s.ready
                 ? "Pi has everything it needs"
@@ -145,7 +145,7 @@ export function SetupCenter() {
                   }
                   aria-hidden
                 />
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 basis-48">
                   <p className="font-medium">
                     {item.name}
                     {item.required ? (

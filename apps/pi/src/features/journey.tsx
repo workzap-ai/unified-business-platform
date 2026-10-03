@@ -247,7 +247,7 @@ export function BusinessReview() {
       <Card>
         <CardSection className="flex flex-wrap items-center gap-3">
           <Badge tone={state.tone}>{state.label}</Badge>
-          <p className="min-w-0 flex-1 text-sm text-muted-foreground">
+          <p className="min-w-0 flex-1 basis-56 text-sm text-muted-foreground">
             {data.status === "not_started"
               ? "The Pi team checks every business before its WhatsApp number goes live. It usually takes one working day."
               : data.status === "submitted"

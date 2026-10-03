@@ -2,7 +2,8 @@
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowUpRight, BookOpen, Send, Sparkles, X } from "lucide-react";
+import { ArrowUpRight, BookOpen, Send, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
@@ -43,6 +44,44 @@ type Context = {
   guides: { id: string; title: string; page: string | null }[];
 };
 type Turn = { id: number; question?: string; reply?: Reply; error?: string };
+
+// pi's expressions (brand guide v1.1). The face follows what pi is doing, never a
+// guess about the reader's mood; the words always say what the face says.
+type FaceName = "resting" | "greeting" | "thinking" | "sorry" | "not-sure";
+const FACE_ALT: Record<FaceName, string> = {
+  resting:
+    "pi, a violet speech-bubble character with a small amber spark on its head, looking attentive with a gentle smile",
+  greeting:
+    "pi, the speech-bubble character, with an open smile, greeting someone at the start of a conversation",
+  thinking:
+    "pi, the speech-bubble character, showing three typing dots while it works on something",
+  sorry:
+    "pi, the speech-bubble character, with raised worried brows and a small downturned mouth, apologising",
+  "not-sure":
+    "pi, the speech-bubble character, with one raised brow and a wavy mouth, unsure what was meant and asking",
+};
+
+function Face({
+  name,
+  size = 32,
+  className,
+}: {
+  name: FaceName;
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <Image
+      src={`/brand/pi/${name}.webp`}
+      width={size}
+      height={size}
+      alt={FACE_ALT[name]}
+      unoptimized
+      className={cn("shrink-0 select-none", className)}
+      draggable={false}
+    />
+  );
+}
 
 const value = (v: unknown) =>
   v === null || v === undefined || v === ""
@@ -231,16 +270,24 @@ function Chat() {
       <div
         className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4"
         role="log"
-        aria-label="Pi Assistant conversation"
+        aria-label="Conversation with pi"
         aria-live="polite"
       >
         {!turns.length ? (
           <div>
-            <p className="text-sm text-muted-foreground">
-              Ask how to set something up, or about your chats, enquiries and
-              reports. I only show what your role can see, and I can&apos;t
-              message customers or change settings.
-            </p>
+            <div className="flex items-start gap-3">
+              <Face name="greeting" size={44} />
+              <div className="min-w-0 text-sm">
+                <p className="font-semibold">
+                  Hi, I&apos;m pi, an AI assistant.
+                </p>
+                <p className="mt-1 text-muted-foreground">
+                  Ask how to set something up, or about your chats, enquiries
+                  and reports. I only show what your role can see. I can&apos;t
+                  message customers or change settings.
+                </p>
+              </div>
+            </div>
             <div className="mt-4 flex flex-wrap gap-2">
               {prompts(context.data).map((p) => (
                 <button
@@ -285,30 +332,49 @@ function Chat() {
               {turn.question}
             </p>
           ) : turn.error ? (
-            <p key={turn.id} role="alert" className="text-sm text-danger">
-              {turn.error}
-            </p>
-          ) : turn.reply ? (
-            <div key={turn.id} className="space-y-2.5">
-              <p className="whitespace-pre-wrap text-sm leading-6" dir="auto">
-                {turn.reply.message}
+            <div key={turn.id} className="flex items-start gap-2.5">
+              <Face name="sorry" size={28} />
+              <p role="alert" className="min-w-0 pt-1 text-sm text-danger">
+                I couldn&apos;t finish that. {turn.error}
               </p>
-              {turn.reply.notice ? (
-                <p className="text-[11px] text-muted-foreground">
-                  {turn.reply.notice}
+            </div>
+          ) : turn.reply ? (
+            <div key={turn.id} className="flex items-start gap-2.5">
+              <Face
+                name={
+                  turn.reply.cards.length || turn.reply.guides.length
+                    ? "resting"
+                    : "not-sure"
+                }
+                size={28}
+              />
+              <div className="min-w-0 flex-1 space-y-2.5">
+                <p
+                  className="whitespace-pre-wrap break-words text-sm leading-6"
+                  dir="auto"
+                >
+                  {turn.reply.message}
                 </p>
-              ) : null}
-              <GuideLinks guides={turn.reply.guides} />
-              {turn.reply.cards.map((c, i) => (
-                <ResultCard key={`${c.title}-${i}`} card={c} />
-              ))}
+                {turn.reply.notice ? (
+                  <p className="text-[11px] text-muted-foreground">
+                    {turn.reply.notice}
+                  </p>
+                ) : null}
+                <GuideLinks guides={turn.reply.guides} />
+                {turn.reply.cards.map((c, i) => (
+                  <ResultCard key={`${c.title}-${i}`} card={c} />
+                ))}
+              </div>
             </div>
           ) : null,
         )}
         {busy ? (
-          <p role="status" className="text-sm text-muted-foreground">
-            Checking your workspace…
-          </p>
+          <div role="status" className="flex items-center gap-2.5">
+            <Face name="thinking" size={28} />
+            <span className="text-sm text-muted-foreground">
+              pi is checking…
+            </span>
+          </div>
         ) : null}
         <div ref={tail} />
       </div>
@@ -320,11 +386,11 @@ function Chat() {
         }}
       >
         <textarea
-          aria-label="Ask Pi Assistant"
+          aria-label="Ask pi"
           className="max-h-32 min-h-11 w-full resize-none rounded-xl border border-border bg-surface px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring/30"
           maxLength={2000}
           rows={1}
-          placeholder="Ask anything about your Pi…"
+          placeholder="Ask pi anything…"
           value={text}
           dir="auto"
           onChange={(e) => setText(e.target.value)}
@@ -425,7 +491,7 @@ function useMobile() {
   return mobile;
 }
 
-/** Floating "Ask Pi" button and the side panel, mounted once in the app shell. */
+/** Floating "Ask pi" button and the side panel, mounted once in the app shell. */
 export function PiAssistant() {
   const session = useSession();
   const pathname = usePathname();
@@ -438,17 +504,18 @@ export function PiAssistant() {
   return (
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
       <DialogPrimitive.Trigger asChild>
-        <Button
+        <button
+          type="button"
           data-pi-assistant=""
-          aria-label="Open Pi Assistant"
-          className="fixed right-4 z-30 rounded-full shadow-md transition-[bottom] duration-150"
+          aria-label="Ask pi, the AI assistant"
+          className="fixed right-4 z-30 inline-flex items-center gap-2 rounded-full border border-border bg-surface py-1.5 pl-1.5 pr-1.5 text-sm font-semibold text-foreground shadow-md transition-[bottom,box-shadow] duration-150 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 sm:pr-4"
           style={{
             bottom: `calc(${base + lift}px + env(safe-area-inset-bottom))`,
           }}
         >
-          <Sparkles className="size-4" aria-hidden />
-          <span className="hidden sm:inline">Ask Pi</span>
-        </Button>
+          <Face name="resting" size={36} />
+          <span className="hidden sm:inline">Ask pi</span>
+        </button>
       </DialogPrimitive.Trigger>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-black/30 animate-fade-in" />
@@ -457,15 +524,17 @@ export function PiAssistant() {
             "fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l border-border bg-background shadow-md animate-rise sm:max-w-md",
           )}
         >
-          <header className="flex items-start justify-between gap-3 border-b border-border bg-surface px-4 py-3">
-            <div>
-              <DialogPrimitive.Title className="flex items-center gap-1.5 text-base font-semibold">
-                <Sparkles className="size-4 text-accent" aria-hidden />
-                Pi Assistant
-              </DialogPrimitive.Title>
-              <DialogPrimitive.Description className="text-xs text-muted-foreground">
-                Setup help and your business at a glance.
-              </DialogPrimitive.Description>
+          <header className="flex items-center justify-between gap-3 border-b border-border bg-surface px-4 py-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <Face name="resting" size={40} />
+              <div className="min-w-0">
+                <DialogPrimitive.Title className="text-base font-semibold">
+                  pi
+                </DialogPrimitive.Title>
+                <DialogPrimitive.Description className="text-xs text-muted-foreground">
+                  AI assistant · by Workzap
+                </DialogPrimitive.Description>
+              </div>
             </div>
             <DialogPrimitive.Close asChild>
               <Button variant="ghost" size="icon" aria-label="Close">
