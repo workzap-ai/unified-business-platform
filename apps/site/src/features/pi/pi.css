@@ -1,0 +1,575 @@
+/* pi section. Colours come only from pi-tokens.css (the pi brand guide v1.1).
+   The pi palette is its own: it never borrows Workzap's green, and never WhatsApp green. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  font-family:
+    var(--font-inter),
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--pi-body);
+  background: var(--pi-white);
+  -webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+h3 {
+  color: var(--pi-ink);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  margin: 0;
+}
+h1 {
+  font-size: clamp(2.5rem, 6vw, 4.25rem);
+}
+h2 {
+  font-size: clamp(1.5rem, 3vw, 1.875rem);
+  margin-bottom: 20px;
+}
+h3 {
+  font-size: 1.125rem;
+}
+p {
+  margin: 0 0 12px;
+}
+a {
+  color: var(--pi-violet);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+a:hover {
+  color: var(--pi-ink);
+}
+:focus-visible {
+  outline: 3px solid var(--pi-violet);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.pi-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.pi-skip {
+  position: absolute;
+  left: -999px;
+  top: 8px;
+  background: var(--pi-ink);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  z-index: 100;
+}
+.pi-skip:focus {
+  left: 8px;
+}
+.pi-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.pi-small {
+  font-size: 14px;
+  color: var(--pi-grey);
+  font-weight: 500;
+  margin: 10px 0 0;
+}
+
+/* Workzap bar + pi header */
+.pi-bar {
+  background: var(--pi-ink);
+  color: #fff;
+  font-size: 14px;
+}
+.pi-bar .pi-wrap {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  min-height: 38px;
+}
+.pi-bar a {
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+.pi-bar a:hover {
+  color: var(--pi-violet-100);
+}
+.pi-bar a:focus-visible {
+  outline-color: var(--pi-lilac);
+}
+.pi-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--pi-line);
+}
+.pi-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 68px;
+}
+.pi-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pi-brand img {
+  display: block;
+  height: 40px;
+  width: auto;
+}
+.pi-links {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.pi-links a {
+  color: var(--pi-body);
+  text-decoration: none;
+  font-size: 15px;
+}
+.pi-links a:hover,
+.pi-links a[aria-current="page"] {
+  color: var(--pi-violet);
+}
+.pi-menu {
+  display: none;
+}
+@media (max-width: 880px) {
+  .pi-links {
+    display: none;
+  }
+  .pi-menu {
+    display: block;
+    position: relative;
+  }
+  .pi-menu summary {
+    list-style: none;
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--pi-ink);
+    padding: 10px 14px;
+    border: 1px solid var(--pi-line);
+    border-radius: 999px;
+  }
+  .pi-menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .pi-menu nav {
+    position: absolute;
+    right: 0;
+    top: 52px;
+    background: #fff;
+    border: 1px solid var(--pi-line);
+    border-radius: 14px;
+    padding: 10px;
+    min-width: 230px;
+    display: grid;
+    box-shadow: 0 12px 30px rgba(21, 19, 43, 0.12);
+  }
+  .pi-menu nav a {
+    padding: 11px 12px;
+    text-decoration: none;
+    color: var(--pi-ink);
+  }
+  .pi-header .pi-btn {
+    display: none;
+  }
+}
+
+/* buttons */
+.pi-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 16px;
+  text-decoration: none;
+  border: 2px solid var(--pi-violet);
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.pi-btn-primary {
+  background: var(--pi-violet);
+  color: #fff;
+}
+.pi-btn-primary:hover {
+  background: color-mix(in srgb, var(--pi-violet) 86%, var(--pi-ink));
+  color: #fff;
+}
+.pi-btn-secondary {
+  background: #fff;
+  color: var(--pi-violet);
+}
+.pi-btn-secondary:hover {
+  background: var(--pi-violet-50);
+  color: var(--pi-violet);
+}
+.pi-header .pi-btn {
+  min-height: 42px;
+  padding: 8px 18px;
+  font-size: 15px;
+}
+.pi-ai-chip {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--pi-violet);
+  background: var(--pi-violet-50);
+  border: 1px solid var(--pi-violet-100);
+  border-radius: 999px;
+  padding: 1px 8px;
+  vertical-align: middle;
+}
+
+/* hero + intro */
+.pi-hero {
+  background: var(--pi-violet-50);
+  padding: 64px 0 72px;
+}
+.pi-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 40px;
+  align-items: center;
+}
+.pi-lead {
+  font-size: clamp(1.0625rem, 2vw, 1.25rem);
+  color: var(--pi-body);
+  max-width: 640px;
+  margin: 18px 0 26px;
+}
+.pi-cta-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pi-hero-visual {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+}
+.pi-hero-face {
+  position: relative;
+}
+.pi-hero-face .pi-ai-chip {
+  position: absolute;
+  top: 6px;
+  right: -6px;
+}
+@media (max-width: 880px) {
+  .pi-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.pi-intro {
+  background: var(--pi-violet-50);
+  padding: 56px 0 48px;
+}
+.pi-intro .pi-lead {
+  margin-bottom: 0;
+}
+
+/* sections */
+.pi-section {
+  padding: 56px 0;
+}
+.pi-section-soft {
+  background: var(--pi-soft);
+}
+.pi-section-tint {
+  background: var(--pi-violet-50);
+}
+.pi-points {
+  display: grid;
+  gap: 14px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  max-width: 760px;
+}
+ol.pi-points {
+  counter-reset: p;
+}
+ol.pi-points > li {
+  counter-increment: p;
+  padding-left: 46px;
+  position: relative;
+}
+ol.pi-points > li::before {
+  content: counter(p);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--pi-violet);
+  color: #fff;
+  font-weight: 800;
+  font-size: 15px;
+}
+ul.pi-points > li {
+  padding-left: 18px;
+  border-left: 3px solid var(--pi-violet-100);
+}
+.pi-points strong {
+  color: var(--pi-ink);
+}
+.pi-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  align-items: start;
+}
+@media (max-width: 880px) {
+  .pi-two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.pi-card {
+  background: #fff;
+  border: 1px solid var(--pi-line);
+  border-radius: 16px;
+  padding: 22px;
+}
+.pi-card h3 {
+  margin-bottom: 8px;
+}
+
+/* chat */
+.pi-chat {
+  margin: 0;
+  background: var(--pi-violet-50);
+  border: 1px solid var(--pi-violet-100);
+  border-radius: 20px;
+  overflow: hidden;
+  max-width: 520px;
+}
+.pi-chat-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid var(--pi-line);
+  color: var(--pi-ink);
+}
+.pi-chat-sub {
+  display: block;
+  font-size: 13px;
+  color: var(--pi-grey);
+}
+.pi-chat-body {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+.pi-bubble {
+  margin: 0;
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid var(--pi-line);
+  color: var(--pi-ink);
+  font-size: 15px;
+}
+.pi-bubble-you {
+  justify-self: end;
+  background: var(--pi-violet-100);
+  border-color: var(--pi-violet-100);
+}
+.pi-chat figcaption {
+  font-size: 14px;
+  color: var(--pi-grey);
+  padding: 0 16px 14px;
+}
+
+/* faq */
+.pi-faq {
+  max-width: 800px;
+}
+.pi-faq-item {
+  border-bottom: 1px solid var(--pi-line);
+}
+.pi-faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 16px 28px 16px 0;
+  position: relative;
+}
+.pi-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+.pi-faq-item summary::after {
+  content: "+";
+  position: absolute;
+  right: 4px;
+  top: 14px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--pi-violet);
+}
+.pi-faq-item[open] summary::after {
+  content: "–";
+}
+.pi-faq-answer {
+  padding: 0 0 16px;
+  max-width: 680px;
+}
+
+/* call to action + footer */
+.pi-cta {
+  background: var(--pi-violet-50);
+  padding: 56px 0;
+}
+.pi-cta h2 {
+  margin-bottom: 18px;
+}
+.pi-footer {
+  background: var(--pi-soft);
+  border-top: 1px solid var(--pi-line);
+  padding: 36px 0;
+  font-size: 14px;
+  color: var(--pi-grey);
+}
+.pi-footer .pi-wrap {
+  display: grid;
+  gap: 14px;
+}
+.pi-footer-links {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.pi-footer a {
+  font-size: 15px;
+}
+
+/* unfinished markers (previews only) */
+.pi-slot {
+  display: inline-block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--pi-ink);
+  background: var(--pi-violet-50);
+  border: 1.5px dashed var(--pi-violet);
+  border-radius: 8px;
+  padding: 1px 8px;
+  margin: 2px 0;
+}
+.pi-slot b {
+  font-weight: 800;
+  color: var(--pi-violet);
+}
+
+/* dashboard mock + solution ribbon */
+.pi-mock {
+  background: #fff;
+  border: 1px solid var(--pi-line);
+  border-radius: 18px;
+  overflow: hidden;
+  max-width: 560px;
+}
+.pi-mock-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--pi-line);
+}
+.pi-mock-tabs {
+  display: flex;
+  gap: 16px;
+  font-weight: 700;
+  font-size: 15px;
+}
+.pi-mock-tabs span:first-child {
+  color: var(--pi-violet);
+  border-bottom: 2px solid var(--pi-violet);
+}
+.pi-mock-body {
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+}
+.pi-mock-card {
+  text-align: center;
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid var(--pi-line);
+}
+.pi-mock-card.is-working {
+  background: var(--pi-violet-50);
+  border: 1px dashed var(--pi-violet-100);
+}
+.pi-mock-card img {
+  display: block;
+  margin: 0 auto 8px;
+}
+.pi-mock-card strong {
+  display: block;
+  color: var(--pi-ink);
+}
+.pi-mock-card span {
+  font-size: 14px;
+  color: var(--pi-grey);
+}
+.pi-ribbon {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 24px 0 0;
+}
+.pi-ribbon li {
+  text-align: center;
+  font-size: 14px;
+  color: var(--pi-ink);
+  font-weight: 700;
+}
+.pi-ribbon img {
+  display: block;
+  margin: 0 auto 6px;
+}
+.pi-qr {
+  display: grid;
+  place-items: center;
+  width: 240px;
+  height: 240px;
+  border: 2px dashed var(--pi-violet);
+  border-radius: 16px;
+  background: var(--pi-violet-50);
+  text-align: center;
+  padding: 16px;
+}
