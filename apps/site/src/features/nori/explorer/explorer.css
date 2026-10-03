@@ -281,12 +281,25 @@
   aspect-ratio: 1.45;
   border: 1px solid var(--nori-line);
   border-radius: var(--nx-r-card);
-  background:
-    linear-gradient(var(--nori-line), var(--nori-line)) center / 1px 100%
-      no-repeat,
-    linear-gradient(var(--nori-line), var(--nori-line)) center / 100% 1px
-      no-repeat,
-    var(--nori-white);
+  background: var(--nori-white);
+}
+.nxe-matrix::before,
+.nxe-matrix::after {
+  content: "";
+  position: absolute;
+  background: var(--nori-line);
+}
+.nxe-matrix::before {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+.nxe-matrix::after {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
 }
 .nxe-q {
   position: absolute;

@@ -48,6 +48,7 @@ h3 {
   letter-spacing: -0.02em;
 }
 h2 {
+  text-wrap: balance;
   font-size: clamp(28px, 4vw, 38px);
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -265,9 +266,10 @@ a:hover {
   flex-wrap: wrap;
 }
 
-/* hero + today card */
+/* hero + today card (an Ink card: paper text, mint labels, one coral bar) */
 .nx-hero {
-  padding: 48px 0;
+  padding: 48px 0 0;
+  overflow: hidden;
 }
 .nx-hero-grid {
   display: grid;
@@ -287,12 +289,20 @@ a:hover {
   margin-top: 32px;
 }
 .nx-dash {
-  background: var(--nori-white);
-  border: 1px solid var(--nori-line);
+  background: var(--nori-ink);
+  color: var(--nori-paper);
   border-radius: var(--nx-r-card);
-  padding: 16px;
+  padding: 24px;
   display: grid;
-  gap: 16px;
+  gap: 24px;
+}
+@media (max-width: 560px) {
+  .nx-dash {
+    padding: 16px;
+  }
+}
+.nx-dash .nx-label {
+  color: var(--nori-mint);
 }
 .nx-dash-head {
   display: flex;
@@ -305,12 +315,13 @@ a:hover {
   display: flex;
   gap: 16px;
   font-size: 13px;
+  line-height: 19px;
   font-weight: 700;
-  color: var(--nori-ink-2);
+  color: var(--nori-paper);
 }
 .nx-dash-tabs span:first-child {
-  color: var(--nori-green);
-  border-bottom: 2px solid var(--nori-green);
+  color: var(--nori-mint);
+  border-bottom: 2px solid var(--nori-mint);
 }
 .nx-tag {
   font-size: 11px;
@@ -322,21 +333,13 @@ a:hover {
   border-radius: 999px;
   padding: 0 8px;
 }
-.nx-tiles {
-  display: grid;
-  gap: 8px;
+.nx-dash .nx-tag {
+  color: var(--nori-paper);
+  border-color: var(--nori-paper);
 }
-.nx-tile {
-  background: var(--nori-paper);
-  border: 1px solid var(--nori-line);
-  border-radius: var(--nx-r-card);
-  padding: 16px;
+.nx-dash-main {
   display: grid;
   gap: 4px;
-}
-.nx-tile-look {
-  background: var(--nori-white);
-  border-color: var(--nori-coral);
 }
 .nx-figure {
   font-family: var(--font-jost), sans-serif;
@@ -346,14 +349,89 @@ a:hover {
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
-.nx-tile ul {
+.nx-dash .nx-figure {
+  font-size: clamp(40px, 6vw, 56px);
+  line-height: 1.07;
+  color: var(--nori-paper);
+}
+.nx-dash-sub {
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--nori-paper);
+}
+
+/* the sales chart: paper bars on ink, one coral bar */
+.nx-chart {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.nx-chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 128px;
+  border-bottom: 1px solid var(--nori-green);
+  padding-bottom: 0;
+}
+.nx-chart-bars span {
+  flex: 1;
+  min-width: 0;
+  background: var(--nori-paper);
+  border-radius: var(--nx-r-bar);
+}
+.nx-chart-bars span.is-look {
+  background: var(--nori-coral);
+}
+.nx-chart-days {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 19px;
+  font-weight: 700;
+}
+.nx-chart-days span {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+.nx-chart figcaption {
+  font-size: 13px;
+  line-height: 19px;
+}
+.nx-dash-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 560px) {
+  .nx-dash-tiles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-dash-tile {
+  border: 1px solid var(--nori-green);
+  border-radius: var(--nx-r-card);
+  padding: 16px;
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+.nx-dash-tile ul {
   list-style: none;
   padding: 0;
   margin: 0;
   font-size: 14px;
+  line-height: 20px;
   font-weight: 700;
   display: grid;
   gap: 4px;
+}
+.nx-dash-look {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
 }
 .nx-look {
   display: flex;
@@ -371,6 +449,22 @@ a:hover {
   top: 1px;
 }
 
+/* decorative barcode strip: ink bars of varying width, a chart device */
+.nx-strip {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 4px;
+  height: 24px;
+  margin-top: 48px;
+  overflow: hidden;
+}
+.nx-strip span {
+  flex: none;
+  background: var(--nori-ink);
+  border-radius: var(--nx-r-bar);
+}
+
 /* sections */
 .nx-section {
   padding: 48px 0;
@@ -380,11 +474,68 @@ a:hover {
   border-top: 1px solid var(--nori-line);
   border-bottom: 1px solid var(--nori-line);
 }
+.nx-hero + .nx-white {
+  border-top: 0;
+}
 .nx-head {
   display: grid;
   gap: 8px;
   margin-bottom: 32px;
   max-width: 720px;
+}
+.nx-split {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 48px;
+  align-items: start;
+}
+.nx-split > .nx-head {
+  margin-bottom: 0;
+}
+@media (max-width: 880px) {
+  .nx-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* the problems: a ruled list, not a row of cards */
+.nx-problems {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.nx-problems li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 24px;
+  padding: 24px 0;
+  border-top: 1px solid var(--nori-line);
+}
+.nx-problems li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.nx-problems p {
+  color: var(--nori-ink-2);
+}
+@media (max-width: 560px) {
+  .nx-problems li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+}
+
+/* full-width ink band: the four reads */
+.nx-band {
+  background: var(--nori-ink);
+  color: var(--nori-paper);
+}
+.nx-band h2,
+.nx-band h3 {
+  color: var(--nori-paper);
+}
+.nx-band .nx-label {
+  color: var(--nori-mint);
 }
 .nx-cards {
   display: grid;
@@ -402,70 +553,166 @@ a:hover {
   }
 }
 .nx-card {
-  background: var(--nori-white);
-  border: 1px solid var(--nori-line);
+  border: 1px solid var(--nori-green);
   border-radius: var(--nx-r-card);
   padding: 24px;
   display: grid;
   gap: 8px;
   align-content: start;
 }
-.nx-white .nx-card {
-  background: var(--nori-paper);
+.nx-card-num {
+  font-family: var(--font-jost), sans-serif;
+  font-weight: 600;
+  font-size: 56px;
+  line-height: 60px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--nori-mint);
 }
 .nx-card p {
-  color: var(--nori-ink-2);
+  color: var(--nori-paper);
   font-size: 14px;
   line-height: 20px;
 }
 
-/* steps */
+/* steps: a big numeral beside a barcode-style progress device (three bars, filled to the step) */
 .nx-steps {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
+  gap: 32px;
   counter-reset: s;
 }
 .nx-steps li {
   counter-increment: s;
-  background: var(--nori-white);
-  border: 1px solid var(--nori-line);
-  border-radius: var(--nx-r-card);
-  padding: 24px;
+  border-top: 1px solid var(--nori-ink);
+  padding-top: 24px;
   display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
+  align-content: start;
 }
 .nx-steps li::before {
   content: counter(s);
   font-family: var(--font-jost), sans-serif;
   font-weight: 600;
-  font-size: 22px;
+  font-size: 56px;
+  line-height: 60px;
+  letter-spacing: -0.02em;
   color: var(--nori-green);
+}
+.nx-stepbars {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  height: 60px;
+}
+.nx-stepbars i {
+  display: block;
+  background: var(--nori-line);
+  border-radius: var(--nx-r-bar);
+}
+.nx-stepbars i:nth-child(1) {
+  width: 16px;
+}
+.nx-stepbars i:nth-child(2) {
+  width: 8px;
+}
+.nx-stepbars i:nth-child(3) {
+  width: 16px;
+}
+.nx-stepbars i.on {
+  background: var(--nori-ink);
+}
+.nx-steps h3,
+.nx-steps p {
+  grid-column: 1 / -1;
+}
+.nx-steps h3 {
+  margin-top: 8px;
 }
 .nx-steps p {
   color: var(--nori-ink-2);
-  font-size: 14px;
-  line-height: 20px;
 }
 
-/* questions */
+/* questions + the sample answer */
 .nx-questions {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
 }
 .nx-questions li {
+  padding: 16px 0;
+  border-top: 1px solid var(--nori-line);
+  font-weight: 700;
+}
+.nx-questions li:last-child {
+  border-bottom: 1px solid var(--nori-line);
+}
+.nx-questions .nx-small {
+  display: block;
+  font-weight: 500;
+}
+.nx-ask {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+@media (max-width: 880px) {
+  .nx-ask {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-msg {
   background: var(--nori-white);
   border: 1px solid var(--nori-line);
   border-radius: var(--nx-r-card);
-  padding: 16px 24px;
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+}
+@media (max-width: 560px) {
+  .nx-msg {
+    padding: 16px;
+  }
+}
+.nx-msg-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.nx-msg-name {
+  font-size: 14px;
+  line-height: 20px;
   font-weight: 700;
+}
+.nx-msg-name span {
+  font-weight: 500;
+  color: var(--nori-ink-2);
+}
+.nx-msg-q {
+  justify-self: end;
+  max-width: 85%;
+  padding: 8px 16px;
+  border: 1px solid var(--nori-green);
+  border-radius: var(--nx-r-card);
+  font-weight: 700;
+}
+.nx-msg-a {
+  background: var(--nori-paper);
+  border: 1px solid var(--nori-line);
+  border-radius: var(--nx-r-card);
+  padding: 16px 24px;
+  display: grid;
+  gap: 16px;
+}
+@media (max-width: 560px) {
+  .nx-msg-a {
+    padding: 16px;
+  }
 }
 
 /* plans */
@@ -475,12 +722,15 @@ a:hover {
   gap: 16px;
 }
 .nx-plan {
-  background: var(--nori-white);
+  background: var(--nori-paper);
   border: 1px solid var(--nori-line);
   border-radius: var(--nx-r-card);
   padding: 24px;
   display: grid;
+  grid-template-rows: auto 1fr auto;
   gap: 16px;
+}
+.nx-plan ul {
   align-content: start;
 }
 .nx-plan ul {
@@ -507,6 +757,17 @@ a:hover {
   color: var(--nori-paper);
   padding: 48px 0;
 }
+.nx-cta-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 48px;
+  align-items: center;
+}
+@media (max-width: 880px) {
+  .nx-cta-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .nx-cta h2 {
   color: var(--nori-paper);
 }
@@ -514,6 +775,32 @@ a:hover {
   color: var(--nori-paper);
   margin: 16px 0 32px;
   max-width: 560px;
+}
+.nx-cta-chart {
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+.nx-cta-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 192px;
+  border-bottom: 1px solid var(--nori-green);
+}
+.nx-cta-bars span {
+  flex: 1;
+  min-width: 0;
+  background: var(--nori-paper);
+  border-radius: var(--nx-r-bar);
+}
+.nx-cta-bars span.is-look {
+  background: var(--nori-coral);
+}
+.nx-cta-chart figcaption {
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--nori-paper);
 }
 .nx-footer {
   background: var(--nori-ink);

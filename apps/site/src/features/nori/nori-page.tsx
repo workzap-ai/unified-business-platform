@@ -58,6 +58,39 @@ function Header() {
   );
 }
 
+// Seven made-up days of sales, in rupees. The last one is yesterday (Tuesday) and carries
+// the single coral bar. It is also named in words, never by colour alone.
+const WEEK = [
+  { day: "Wed", value: 41800, look: false },
+  { day: "Thu", value: 44300, look: false },
+  { day: "Fri", value: 49600, look: false },
+  { day: "Sat", value: 58100, look: false },
+  { day: "Sun", value: 55200, look: false },
+  { day: "Mon", value: 46900, look: false },
+  { day: "Tue", value: 52400, look: true },
+];
+const WEEK_MAX = 60000;
+const WEEK_LABEL = `Sales per day for the last 7 days, in rupees. ${WEEK.map(
+  (d) =>
+    `${d.day} ${d.value.toLocaleString("en-US")}${d.look ? ", yesterday, marked" : ""}`,
+).join(". ")}.`;
+
+// Decorative barcode strip: a chart device, not the mark. Widths only, ink on paper.
+const STRIP = [
+  8, 4, 16, 4, 4, 8, 16, 4, 8, 4, 4, 16, 8, 4, 8, 16, 4, 4, 8, 4, 16, 8, 4, 4,
+  16, 8, 4, 8, 4, 16, 4, 8, 8, 4, 16, 4, 4, 8, 16, 4,
+];
+
+function BarcodeStrip() {
+  return (
+    <div className="nx-strip" aria-hidden="true">
+      {[...STRIP, ...STRIP, ...STRIP].map((w, i) => (
+        <span key={i} style={{ width: w }} />
+      ))}
+    </div>
+  );
+}
+
 function Hero() {
   return (
     <section className="nx-hero">
@@ -79,7 +112,7 @@ function Hero() {
           </div>
         </div>
         <div
-          className="nx-dash"
+          className="nx-dash nx-on-ink"
           role="group"
           aria-label="A sample nori screen (illustrative)"
         >
@@ -92,15 +125,36 @@ function Hero() {
             </div>
             <span className="nx-tag">Illustrative</span>
           </div>
-          <div className="nx-tiles">
-            <div className="nx-tile">
-              <span className="nx-label">Yesterday</span>
-              <span className="nx-figure">Rs 52,400</span>
-              <span className="nx-small">
-                71 sales · Rs 4,600 more than last Tuesday
-              </span>
+          <div className="nx-dash-main">
+            <span className="nx-label">Yesterday</span>
+            <span className="nx-figure">Rs 52,400</span>
+            <span className="nx-dash-sub">
+              71 sales · Rs 4,600 more than last Tuesday
+            </span>
+          </div>
+          <figure className="nx-chart">
+            <div className="nx-chart-plot" role="img" aria-label={WEEK_LABEL}>
+              <div className="nx-chart-bars" aria-hidden="true">
+                {WEEK.map((d) => (
+                  <span
+                    key={d.day}
+                    className={d.look ? "is-look" : undefined}
+                    style={{ height: `${(d.value / WEEK_MAX) * 100}%` }}
+                  />
+                ))}
+              </div>
+              <div className="nx-chart-days" aria-hidden="true">
+                {WEEK.map((d) => (
+                  <span key={d.day}>{d.day}</span>
+                ))}
+              </div>
             </div>
-            <div className="nx-tile">
+            <figcaption>
+              Sales per day, last 7 days. The coral bar is yesterday, Tuesday.
+            </figcaption>
+          </figure>
+          <div className="nx-dash-tiles">
+            <div className="nx-dash-tile">
               <span className="nx-label">Running low</span>
               <ul>
                 <li>Detergent 1 kg · 2 days</li>
@@ -108,19 +162,19 @@ function Hero() {
                 <li>Rice 5 kg · 5 days</li>
               </ul>
             </div>
-            <div className="nx-tile nx-tile-look">
+            <div className="nx-dash-tile">
               <span className="nx-label">Look at this</span>
-              <span className="nx-look">
-                <span className="nx-coral-mark" aria-hidden="true" />
+              <span className="nx-dash-look">
                 Shop D is behind target this week
               </span>
-              <span className="nx-small">
+              <span className="nx-dash-sub">
                 A suggestion is ready when you want it.
               </span>
             </div>
           </div>
         </div>
       </div>
+      <BarcodeStrip />
     </section>
   );
 }
@@ -146,8 +200,8 @@ const PROBLEMS = [
 
 function Problems() {
   return (
-    <section className="nx-section">
-      <div className="nx-wrap">
+    <section className="nx-section nx-white">
+      <div className="nx-wrap nx-split">
         <div className="nx-head">
           <span className="nx-label">Why nori</span>
           <h2>A shop has more numbers than time.</h2>
@@ -155,14 +209,14 @@ function Problems() {
             You have more data than ever and less time to read it.
           </p>
         </div>
-        <div className="nx-cards">
+        <ul className="nx-problems">
           {PROBLEMS.map((p) => (
-            <div key={p.title} className="nx-card">
+            <li key={p.title}>
               <h3>{p.title}</h3>
               <p>{p.text}</p>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );
@@ -189,15 +243,19 @@ const READS = [
 
 function Reads() {
   return (
-    <section className="nx-section">
+    <section className="nx-section nx-band nx-on-ink">
       <div className="nx-wrap">
         <div className="nx-head">
           <span className="nx-label">How nori reads</span>
           <h2>A number, why it moved, and what to look at.</h2>
         </div>
         <div className="nx-cards">
-          {READS.map((r) => (
+          {READS.map((r, i) => (
             <div key={r.title} className="nx-card">
+              <span
+                className="nx-card-num"
+                aria-hidden="true"
+              >{`0${i + 1}`}</span>
               <h3>{r.title}</h3>
               <p>{r.text}</p>
             </div>
@@ -225,15 +283,21 @@ const STEPS = [
 
 function How() {
   return (
-    <section id="how" className="nx-section">
+    <section id="how" className="nx-section nx-white">
       <div className="nx-wrap">
         <div className="nx-head">
           <span className="nx-label">How it works</span>
           <h2>From your data to a decision in three steps.</h2>
         </div>
         <ol className="nx-steps">
-          {STEPS.map((s) => (
+          {STEPS.map((s, i) => (
             <li key={s.title}>
+              <span className="nx-stepbars" aria-hidden="true">
+                {[0, 1, 2].map((n) => (
+                  <i key={n} className={n <= i ? "on" : undefined} />
+                ))}
+              </span>
+              <span className="nx-sr">{`Step ${i + 1} of ${STEPS.length}`}</span>
               <h3>{s.title}</h3>
               <p>{s.text}</p>
             </li>
@@ -255,22 +319,57 @@ const QUESTIONS = [
 
 function Questions() {
   return (
-    <section className="nx-section nx-white">
-      <div className="nx-wrap">
-        <div className="nx-head">
-          <span className="nx-label">Ask in plain words</span>
-          <h2>
-            The questions you already ask, answered from your own numbers.
-          </h2>
-          <p className="nx-lead">
-            Each answer comes with the figure and what it is compared with.
-          </p>
+    <section className="nx-section">
+      <div className="nx-wrap nx-split nx-ask">
+        <div>
+          <div className="nx-head">
+            <span className="nx-label">Ask in plain words</span>
+            <h2>
+              The questions you already ask, answered from your own numbers.
+            </h2>
+            <p className="nx-lead">
+              Each answer comes with the figure and what it is compared with.
+            </p>
+          </div>
+          <ul className="nx-questions">
+            {QUESTIONS.map((q, i) => (
+              <li key={q}>
+                “{q}”
+                {i === 0 ? (
+                  <span className="nx-small"> Example answer shown.</span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
         </div>
-        <ul className="nx-questions">
-          {QUESTIONS.map((q) => (
-            <li key={q}>“{q}”</li>
-          ))}
-        </ul>
+        <div
+          className="nx-msg"
+          role="group"
+          aria-label="A sample answer from nori (illustrative)"
+        >
+          <div className="nx-msg-head">
+            <span className="nx-msg-name">
+              nori <span>· by Workzap</span>
+            </span>
+            <span className="nx-tag">Illustrative</span>
+          </div>
+          <p className="nx-msg-q">Which shop is behind target, and why?</p>
+          <div className="nx-msg-a">
+            <p>
+              <b>Shop D</b> has sold <b className="nx-num">Rs 96,000</b> this
+              week against a target of Rs 140,000. That is Rs 44,000 short with
+              two days left.
+            </p>
+            <p className="nx-look">
+              <span className="nx-coral-mark" aria-hidden="true" />
+              <span>
+                <b>Look at this:</b> Thursday and Friday had 22 fewer sales than
+                the same days last week.
+              </span>
+            </p>
+            <p>A suggestion is ready when you want it.</p>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -310,7 +409,7 @@ const PLANS = [
 
 function Pricing() {
   return (
-    <section id="pricing" className="nx-section">
+    <section id="pricing" className="nx-section nx-white">
       <div className="nx-wrap">
         <div className="nx-head">
           <span className="nx-label">Pricing</span>
@@ -344,22 +443,39 @@ function Pricing() {
   );
 }
 
+// Decorative chart: seven bars, one coral. Not the mark, and it carries no data.
+const CLOSE_BARS = [35, 55, 45, 70, 60, 100, 50];
+
 function Closing() {
   return (
     <section className="nx-cta nx-on-ink">
-      <div className="nx-wrap">
-        <h2>See nori on your own numbers.</h2>
-        <p>
-          Create your workspace, upload a sales file, and get your first read.
-        </p>
-        <div className="nx-btn-row">
-          <a className="nx-btn nx-btn-primary" href={APP}>
-            Get started
-          </a>
-          <Link className="nx-btn nx-btn-secondary" href={PI_CONTACT}>
-            Book a demo
-          </Link>
+      <div className="nx-wrap nx-cta-grid">
+        <div>
+          <h2>See nori on your own numbers.</h2>
+          <p>
+            Create your workspace, upload a sales file, and get your first read.
+          </p>
+          <div className="nx-btn-row">
+            <a className="nx-btn nx-btn-primary" href={APP}>
+              Get started
+            </a>
+            <Link className="nx-btn nx-btn-secondary" href={PI_CONTACT}>
+              Book a demo
+            </Link>
+          </div>
         </div>
+        <figure className="nx-cta-chart">
+          <div className="nx-cta-bars" aria-hidden="true">
+            {CLOSE_BARS.map((h, i) => (
+              <span
+                key={i}
+                className={i === 5 ? "is-look" : undefined}
+                style={{ height: `${h}%` }}
+              />
+            ))}
+          </div>
+          <figcaption>Seven days. One bar to look at.</figcaption>
+        </figure>
       </div>
     </section>
   );

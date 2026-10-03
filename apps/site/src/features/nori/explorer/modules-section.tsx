@@ -2,7 +2,7 @@ import { ModuleExplorer } from "./module-explorer";
 
 export function ModulesSection() {
   return (
-    <section id="inside" className="nx-section nx-white">
+    <section id="inside" className="nx-section">
       <div className="nx-wrap">
         <div className="nx-head">
           <span className="nx-label">What’s inside</span>
