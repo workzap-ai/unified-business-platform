@@ -86,7 +86,9 @@ class MessageView(BaseModel):
     @field_validator("media", mode="before")
     @classmethod
     def public_media(cls, value: Any) -> dict[str, Any] | None:
-        if not isinstance(value, dict) or not value.get("mime_type"):
+        # Only media Pi actually processed (it then knows the size); a provider's file
+        # type alone, stored on arrival, is not shown.
+        if not isinstance(value, dict) or not value.get("mime_type") or "size" not in value:
             return None
         return {
             key: value[key]

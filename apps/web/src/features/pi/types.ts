@@ -61,7 +61,7 @@ export type Message = {
   body: string;
   media: {
     mime_type: string;
-    size: number;
+    size?: number;
     duration_s?: number;
     transcript?: string;
     description?: string;

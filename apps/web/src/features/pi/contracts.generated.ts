@@ -101,7 +101,7 @@ export const MessageSchema: z.ZodType<Pi.Message> = z.object({
     z.null(),
     z.object({
       mime_type: z.string(),
-      size: z.number(),
+      size: z.union([z.undefined(), z.number()]).optional(),
       duration_s: z.union([z.undefined(), z.number()]).optional(),
       transcript: z.union([z.undefined(), z.string()]).optional(),
       description: z.union([z.undefined(), z.string()]).optional(),
