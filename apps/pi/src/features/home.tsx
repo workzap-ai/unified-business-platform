@@ -8,8 +8,6 @@ import {
   CircleAlert,
   CirclePause,
   Inbox,
-  MessageCircle,
-  Send,
   Users,
   MessageCircleQuestion,
   Sparkles,
@@ -24,50 +22,23 @@ import {
   CardSection,
   ErrorState,
   LoadingBlock,
-  PageHeader,
 } from "@/components/ui";
 import { DigestCard } from "@/features/digest-card";
+import {
+  ActivityChart,
+  InsightKpis,
+  InsightsSkeleton,
+  RecentConversations,
+  TopicsCard,
+  useInsights,
+} from "@/features/home-insights";
 import { useAccount } from "@/features/setup";
 import { WhatsAppLiveCard } from "@/features/whatsapp-live";
 import { errorText, get } from "@/lib/api";
 import { REASON_LABEL, STATE_LABEL, count } from "@/lib/format";
-import { useBusinessKey } from "@/lib/session";
+import { useBusinessKey, useSession } from "@/lib/session";
 import type { HomeView } from "@/lib/types";
 import s from "./home.module.css";
-
-function Metric({
-  label,
-  value,
-  hint,
-}: {
-  label: string;
-  value: number;
-  hint: string;
-}) {
-  const Icon =
-    (
-      {
-        Conversations: MessageCircle,
-        "Replies sent by Pi": Send,
-        Enquiries: Sparkles,
-        "With your team": Users,
-      } as Record<string, typeof Inbox>
-    )[label] ?? Inbox;
-  return (
-    <Card className={s.metric}>
-      <CardSection className="p-4 sm:p-5">
-        <div className={s.metricTop}>
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <span className={s.metricIcon}>
-            <Icon size={16} aria-hidden />
-          </span>
-        </div>
-        <p className={s.metricValue}>{count(value)}</p>
-        <p className={s.metricHint}>{hint}</p>
-      </CardSection>
-    </Card>
-  );
-}
 
 const ACTION_ICON: Record<string, typeof Inbox> = {
   approvals: UserRoundCheck,
@@ -171,13 +142,140 @@ function HomeWhatsApp() {
   );
 }
 
+function greeting() {
+  const hour = new Date().getHours();
+  return hour < 12
+    ? "Good morning"
+    : hour < 17
+      ? "Good afternoon"
+      : "Good evening";
+}
+
+function NeedsYou({ data }: { data: HomeView }) {
+  return (
+    <section aria-labelledby="needs-you">
+      <div className="mb-3 flex items-center gap-2">
+        <h2 id="needs-you" className="text-base font-semibold">
+          Needs your attention
+        </h2>
+        {data.next_actions.length > 0 && (
+          <Badge tone="warning">{data.next_actions.length}</Badge>
+        )}
+      </div>
+      {data.next_actions.length === 0 ? (
+        <Card>
+          <CardSection className="flex items-center gap-3 text-sm text-muted-foreground">
+            <CheckCircle2 className="size-5 text-success" aria-hidden />
+            You&apos;re all caught up.
+          </CardSection>
+        </Card>
+      ) : (
+        <Card>
+          <ul className="divide-y divide-border">
+            {data.next_actions.map((action) => {
+              const Icon = ACTION_ICON[action.kind] ?? ArrowRight;
+              return (
+                <li key={action.kind + action.label}>
+                  <Link
+                    href={action.href}
+                    className="flex min-h-14 items-center gap-3 px-4 py-3 text-[15px] hover:bg-surface-muted active:bg-surface-muted sm:px-5"
+                  >
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
+                      <Icon className="size-4" aria-hidden />
+                    </span>
+                    <span className="flex-1">{action.label}</span>
+                    <ArrowRight
+                      className="size-4 text-muted-foreground rtl:rotate-180"
+                      aria-hidden
+                    />
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+      )}
+    </section>
+  );
+}
+
+function TeamCard({ data }: { data: HomeView }) {
+  const m = data.metrics;
+  const rows = [
+    {
+      label: "Waiting for a person",
+      value: m.waiting_for_team,
+      href: "/inbox?mode=human",
+      icon: Users,
+    },
+    {
+      label: "Replies to approve",
+      value: m.awaiting_approval,
+      href: "/inbox",
+      icon: UserRoundCheck,
+    },
+    {
+      label: "Questions Pi asked you",
+      value: m.open_questions,
+      href: "/inbox",
+      icon: MessageCircleQuestion,
+    },
+    {
+      label: "Unread messages",
+      value: m.unread,
+      href: "/inbox?filter=unread",
+      icon: Inbox,
+    },
+    {
+      label: "Enquiries this week",
+      value: m.enquiries_7d,
+      href: "/customers",
+      icon: Sparkles,
+    },
+  ];
+  return (
+    <Card className="overflow-hidden">
+      <div className="border-b border-border px-4 py-3.5 sm:px-5">
+        <h2 className="font-semibold">For your team</h2>
+      </div>
+      <ul className="divide-y divide-border">
+        {rows.map(({ label, value, href, icon: Icon }) => (
+          <li key={label}>
+            <Link
+              href={href}
+              className="flex min-h-12 items-center gap-3 px-4 py-2.5 text-sm hover:bg-surface-muted active:bg-surface-muted sm:px-5"
+            >
+              <Icon
+                className="size-4 shrink-0 text-muted-foreground"
+                aria-hidden
+              />
+              <span className="flex-1">{label}</span>
+              <span
+                className={
+                  value > 0
+                    ? "rounded-full bg-accent px-2 text-xs font-semibold tabular-nums text-accent-foreground"
+                    : "text-xs tabular-nums text-muted-foreground"
+                }
+              >
+                {count(value)}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
 export function HomePage() {
   const key = useBusinessKey();
+  const session = useSession();
   const home = useQuery({
     queryKey: key(["home"]),
     queryFn: () => get<HomeView>("/home"),
     refetchInterval: 60_000,
   });
+  const insights = useInsights();
   if (home.isPending)
     return <LoadingBlock rows={4} label="Loading your overview" />;
   if (home.isError)
@@ -187,95 +285,64 @@ export function HomePage() {
         onRetry={() => home.refetch()}
       />
     );
-  const { metrics } = home.data;
+  const firstName = session.data?.user.display_name.split(" ")[0];
+  const unread = home.data.metrics.unread;
   return (
     <div className={s.home}>
-      <div>
-        <p className={s.eyebrow}>YOUR BUSINESS AT A GLANCE</p>
-        <PageHeader
-          title={home.data.name}
-          description="What Pi has done this week and what needs you."
-          action={
-            <Button asChild variant="secondary">
-              <Link href="/inbox">
-                <Inbox size={16} aria-hidden />
-                Open inbox
-                <ArrowUpRight size={15} aria-hidden />
-              </Link>
-            </Button>
-          }
-        />
-      </div>
-      <StatusCard data={home.data} />
-      <HomeWhatsApp />
-      <section aria-labelledby="needs-you">
-        <h2 id="needs-you" className="mb-3 text-base font-semibold">
-          Needs your attention
-        </h2>
-        {home.data.next_actions.length === 0 ? (
-          <Card>
-            <CardSection className="flex items-center gap-3 text-sm text-muted-foreground">
-              <CheckCircle2 className="size-5 text-success" aria-hidden />
-              You&apos;re all caught up.
-            </CardSection>
-          </Card>
-        ) : (
-          <Card>
-            <ul className="divide-y divide-border">
-              {home.data.next_actions.map((action) => {
-                const Icon = ACTION_ICON[action.kind] ?? ArrowRight;
-                return (
-                  <li key={action.kind + action.label}>
-                    <Link
-                      href={action.href}
-                      className="flex min-h-14 items-center gap-3 px-5 py-3 text-[15px] hover:bg-surface-muted"
-                    >
-                      <Icon
-                        className="size-5 shrink-0 text-accent"
-                        aria-hidden
-                      />
-                      <span className="flex-1">{action.label}</span>
-                      <ArrowRight
-                        className="size-4 text-muted-foreground rtl:rotate-180"
-                        aria-hidden
-                      />
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </Card>
-        )}
-      </section>
-      <section aria-labelledby="this-week">
-        <h2 id="this-week" className="mb-3 text-base font-semibold">
-          Last 7 days
-        </h2>
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Metric
-            label="Conversations"
-            value={metrics.conversations_7d}
-            hint="with new messages"
-          />
-          <Metric
-            label="Replies sent by Pi"
-            value={metrics.pi_replies_7d}
-            hint="delivered to WhatsApp"
-          />
-          <Metric
-            label="Enquiries"
-            value={metrics.enquiries_7d}
-            hint="requirements, quotes or orders"
-          />
-          <Metric
-            label="With your team"
-            value={metrics.waiting_for_team}
-            hint="waiting for a person now"
-          />
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-sm text-muted-foreground">
+            {greeting()}
+            {firstName ? `, ${firstName}` : ""}
+          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <h1 className="truncate text-2xl font-semibold tracking-tight sm:text-3xl">
+              {home.data.name}
+            </h1>
+            <Badge tone={home.data.active ? "success" : "warning"}>
+              <span
+                className={
+                  home.data.active
+                    ? "size-1.5 rounded-full bg-success"
+                    : "size-1.5 rounded-full bg-warning"
+                }
+                aria-hidden
+              />
+              {home.data.active ? "Pi is live" : "Pi is off"}
+            </Badge>
+          </div>
         </div>
-      </section>
-      <div className="mt-6">
-        <DigestCard />
+        <Button asChild variant="secondary" className="w-full sm:w-auto">
+          <Link href="/inbox">
+            <Inbox size={16} aria-hidden />
+            Open inbox
+            {unread > 0 && (
+              <span className="rounded-full bg-accent px-1.5 text-xs text-accent-foreground">
+                {count(unread)}
+              </span>
+            )}
+            <ArrowUpRight size={15} aria-hidden />
+          </Link>
+        </Button>
+      </header>
+      <StatusCard data={home.data} />
+      {insights.data ? (
+        <InsightKpis data={insights.data} />
+      ) : (
+        <InsightsSkeleton />
+      )}
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="min-w-0 space-y-6">
+          {insights.data ? <ActivityChart data={insights.data} /> : null}
+          <NeedsYou data={home.data} />
+          <RecentConversations />
+        </div>
+        <div className="min-w-0 space-y-6">
+          <HomeWhatsApp />
+          {insights.data ? <TopicsCard data={insights.data} /> : null}
+          <TeamCard data={home.data} />
+          <DigestCard />
+        </div>
       </div>
       <div className={s.quickLinks}>
         <Link href="/my-pi">
