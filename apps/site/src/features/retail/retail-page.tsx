@@ -1538,7 +1538,7 @@ export function RetailPage() {
                   >
                     ✓
                   </span>
-                  Vision (CCTV) + E-commerce + HR
+                  Vision (CCTV, coming soon) + E-commerce + HR
                 </li>
                 <li
                   style={{

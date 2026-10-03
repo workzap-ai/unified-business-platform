@@ -65,7 +65,7 @@ export function ModulesSection() {
         >
           <span style={{ fontSize: 15, fontWeight: 750 }}>Vision (CCTV)</span>
           <span style={{ fontSize: "12.5px", color: "var(--text-muted)" }}>
-            Add-on module
+            Coming soon
           </span>
         </div>
         <p
