@@ -71,7 +71,7 @@ export function SignIn() {
           className="pointer-events-none absolute -bottom-32 -left-20 size-96 rounded-full bg-accent-foreground/5"
         />
         <div className="relative">
-          <p className="text-sm font-medium opacity-80">PI Customer</p>
+          <p className="text-sm font-medium opacity-80">pi Customer</p>
           <h1 className="mt-3 text-[2.5rem] font-semibold leading-[1.15] tracking-tight">
             All your WhatsApp chats with businesses, in one place.
           </h1>
@@ -86,7 +86,7 @@ export function SignIn() {
             {
               icon: ListChecks,
               title: "Every request, tracked",
-              text: "Pi lists what you asked for and whether it's sorted or with the team.",
+              text: "pi lists what you asked for and whether it's sorted or with the team.",
             },
             {
               icon: ShieldCheck,
@@ -110,7 +110,7 @@ export function SignIn() {
       <Card className="flex flex-col justify-center">
         <CardSection className="space-y-6 p-5 sm:p-10">
           <div className="lg:hidden">
-            <p className="text-sm font-medium text-accent">PI Customer</p>
+            <p className="text-sm font-medium text-accent">pi Customer</p>
             <h1 className="mt-1 text-2xl font-semibold tracking-tight">
               Your chats with businesses, in one place
             </h1>

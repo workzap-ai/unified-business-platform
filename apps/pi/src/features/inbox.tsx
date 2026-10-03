@@ -124,8 +124,14 @@ export function InboxPage() {
             <div className={product.inboxHeading}>
               <h1>Inbox</h1>
               <Link
+                href="/problems"
+                className="ms-auto inline-flex min-h-9 items-center rounded-full border border-border px-3 text-xs font-medium text-foreground-secondary hover:bg-surface-muted"
+              >
+                Problems
+              </Link>
+              <Link
                 href="/inbox/handoffs"
-                className="ms-auto me-2 inline-flex min-h-9 items-center rounded-full border border-border px-3 text-xs font-medium text-foreground-secondary hover:bg-surface-muted"
+                className="me-2 ms-1 inline-flex min-h-9 items-center rounded-full border border-border px-3 text-xs font-medium text-foreground-secondary hover:bg-surface-muted"
               >
                 Handoffs
               </Link>

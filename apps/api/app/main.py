@@ -65,6 +65,7 @@ from app.modules.pi_saas.payment_routes import client_router as pi_payment_route
 from app.modules.pi_saas.payment_routes import operator_router as pi_payment_operator_router
 from app.modules.pi_saas.payment_routes import public_router as pi_pay_link_router
 from app.modules.pi_saas.platform_config_routes import router as pi_platform_config_router
+from app.modules.pi_saas.problems_routes import router as pi_problems_router
 from app.modules.pi_saas.review_routes import operator_router as pi_operator_review_router
 from app.modules.pi_saas.review_routes import router as pi_review_router
 from app.modules.pi_saas.setup_routes import operator_router as pi_operator_setup_router
@@ -161,6 +162,7 @@ PI_APP_ROUTERS = [
     pi_campaign_router,
     pi_digest_router,
     pi_insights_router,
+    pi_problems_router,
     # Pi Assistant: in-app help and the business's own numbers, by role.
     pi_assistant_router,
     pi_setup_router,

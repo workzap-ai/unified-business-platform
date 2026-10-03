@@ -3,16 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  Building2,
-  ChevronRight,
-  CircleCheck,
-  Inbox,
-  ListChecks,
-  LogOut,
-  Search,
-  UserRound,
-} from "lucide-react";
+import { ChevronRight, Inbox, LogOut, Search } from "lucide-react";
 
 import { errorText } from "@/lib/api";
 import {
@@ -35,10 +26,10 @@ import { Avatar, CATEGORY, LIST, ME, STATUS, ago } from "./shared";
 type Filter = "all" | "open" | "team" | "sorted";
 
 const FILTERS: { key: Filter; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "open", label: "Open requests" },
-  { key: "team", label: "With a team" },
-  { key: "sorted", label: "All sorted" },
+  { key: "all", label: "All chats" },
+  { key: "open", label: "In progress" },
+  { key: "team", label: "With the team" },
+  { key: "sorted", label: "Sorted" },
 ];
 
 function matches(c: CustomerConversationItem, filter: Filter) {
@@ -83,10 +74,6 @@ export function Dashboard({ me }: { me: CustomerMe }) {
       .map((i) => ({ ...i, conversation: c })),
   );
   const businesses = new Set(items.map((c) => c.business)).size;
-  const sorted = items.reduce(
-    (n, c) => n + (c.issues_total - c.issues_open),
-    0,
-  );
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6">
@@ -112,27 +99,7 @@ export function Dashboard({ me }: { me: CustomerMe }) {
         </Button>
       </header>
 
-      <div className="grid grid-cols-4 gap-2 sm:gap-3">
-        <Stat
-          icon={Building2}
-          label="Businesses"
-          value={businesses}
-          tone="accent"
-        />
-        <Stat
-          icon={ListChecks}
-          label="Open requests"
-          value={openRequests.length}
-          tone="warning"
-        />
-        <Stat
-          icon={UserRound}
-          label="With a team"
-          value={items.filter((c) => c.with_team).length}
-          tone="info"
-        />
-        <Stat icon={CircleCheck} label="Sorted" value={sorted} tone="success" />
-      </div>
+      <RequestsOverview items={items} businesses={businesses} />
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <section aria-label="Conversations" className="min-w-0 space-y-4">
@@ -206,7 +173,7 @@ export function Dashboard({ me }: { me: CustomerMe }) {
                 icon={<Inbox className="size-6" aria-hidden />}
                 title="No conversations yet"
               >
-                Your chats appear here when you message a business that uses Pi
+                Your chats appear here when you message a business that uses pi
                 on WhatsApp.
               </EmptyState>
             </Card>
@@ -245,14 +212,14 @@ export function Dashboard({ me }: { me: CustomerMe }) {
         <aside className="space-y-4 lg:sticky lg:top-6">
           <Card>
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
-              <h2 className="font-semibold">Open requests</h2>
+              <h2 className="font-semibold">Open requests by department</h2>
               <Badge tone={openRequests.length ? "warning" : "success"}>
                 {openRequests.length || "None"}
               </Badge>
             </div>
             {openRequests.length === 0 ? (
               <p className="px-5 py-6 text-sm text-muted-foreground">
-                Nothing waiting. Open a conversation to see what Pi found in it.
+                Nothing waiting. Open a conversation to see what pi found in it.
               </p>
             ) : (
               <ul className="divide-y divide-border">
@@ -272,7 +239,9 @@ export function Dashboard({ me }: { me: CustomerMe }) {
                             {r.title}
                           </span>
                           <span className="block truncate text-xs text-muted-foreground">
-                            {r.conversation.business}
+                            {r.department_name
+                              ? `${r.department_name} · ${r.conversation.business}`
+                              : r.conversation.business}
                           </span>
                         </span>
                         <span className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -293,7 +262,7 @@ export function Dashboard({ me }: { me: CustomerMe }) {
             )}
           </Card>
           <p className="hidden px-1 text-xs text-muted-foreground sm:block">
-            Pi organises your requests when you open a conversation, and keeps
+            pi organises your requests when you open a conversation, and keeps
             them up to date as you chat.
           </p>
         </aside>
@@ -302,43 +271,96 @@ export function Dashboard({ me }: { me: CustomerMe }) {
   );
 }
 
-const STAT_TONES = {
-  accent: "bg-accent-soft text-accent-soft-foreground",
-  warning: "bg-warning-soft text-warning",
-  info: "bg-info-soft text-info",
-  success: "bg-success-soft text-success",
-};
-
-function Stat({
-  icon: Icon,
-  label,
-  value,
-  tone,
+/** Every request the customer raised, by where it stands: one bar, three parts. */
+function RequestsOverview({
+  items,
+  businesses,
 }: {
-  icon: typeof Inbox;
-  label: string;
-  value: number;
-  tone: keyof typeof STAT_TONES;
+  items: CustomerConversationItem[];
+  businesses: number;
 }) {
+  const totals = items.reduce(
+    (t, c) => ({
+      open: t.open + (c.issues_by_status?.open ?? 0),
+      with_team: t.with_team + (c.issues_by_status?.with_team ?? 0),
+      resolved: t.resolved + (c.issues_by_status?.resolved ?? 0),
+    }),
+    { open: 0, with_team: 0, resolved: 0 },
+  );
+  const total = totals.open + totals.with_team + totals.resolved;
+  const parts = [
+    {
+      key: "open",
+      label: "In progress",
+      value: totals.open,
+      bar: "bg-warning",
+    },
+    {
+      key: "with_team",
+      label: "With the team",
+      value: totals.with_team,
+      bar: "bg-info",
+    },
+    {
+      key: "resolved",
+      label: "Sorted",
+      value: totals.resolved,
+      bar: "bg-success",
+    },
+  ] as const;
   return (
-    <div className="flex min-w-0 flex-col items-center gap-1.5 rounded-2xl border border-border bg-surface px-1.5 py-3 text-center shadow-sm sm:flex-row sm:gap-3 sm:p-4 sm:text-left">
-      <span
-        className={cn(
-          "flex size-8 shrink-0 items-center justify-center rounded-lg sm:size-10 sm:rounded-xl",
-          STAT_TONES[tone],
+    <Card className="p-4 sm:p-5">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h2 className="font-semibold">Your requests</h2>
+          <p className="text-xs text-muted-foreground">
+            {total
+              ? `${total} ${total === 1 ? "request" : "requests"} with ${businesses} ${businesses === 1 ? "business" : "businesses"}`
+              : "Open a chat and pi lists what you asked for here."}
+          </p>
+        </div>
+        {total > 0 && (
+          <p className="text-sm font-medium">
+            {Math.round((totals.resolved / total) * 100)}% sorted
+          </p>
         )}
+      </div>
+      <div
+        className="mt-3 flex h-3 overflow-hidden rounded-full bg-surface-muted"
+        role="img"
+        aria-label={parts.map((p) => `${p.label}: ${p.value}`).join(", ")}
       >
-        <Icon className="size-4 sm:size-5" aria-hidden />
-      </span>
-      <span className="min-w-0">
-        <span className="block text-xl font-semibold leading-none tabular-nums sm:text-2xl">
-          {value}
-        </span>
-        <span className="mt-1 block text-[11px] leading-tight text-muted-foreground sm:text-xs">
-          {label}
-        </span>
-      </span>
-    </div>
+        {total > 0 &&
+          parts.map((p) =>
+            p.value ? (
+              <span
+                key={p.key}
+                className={cn("h-full", p.bar)}
+                style={{ width: `${(p.value / total) * 100}%` }}
+              />
+            ) : null,
+          )}
+      </div>
+      <ul className="mt-3 grid grid-cols-3 gap-2">
+        {parts.map((p) => (
+          <li
+            key={p.key}
+            className="min-w-0 rounded-xl bg-surface-muted/60 px-2 py-2.5 text-center sm:px-3 sm:text-left"
+          >
+            <span className="block text-xl font-semibold tabular-nums">
+              {p.value}
+            </span>
+            <span className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground sm:justify-start sm:text-xs">
+              <span
+                className={cn("size-2 shrink-0 rounded-full", p.bar)}
+                aria-hidden
+              />
+              <span className="truncate">{p.label}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 }
 
@@ -375,6 +397,11 @@ function ConversationCard({ c }: { c: CustomerConversationItem }) {
                     aria-hidden
                   />
                   <span className="truncate">{i.title}</span>
+                  {i.department_name && (
+                    <span className="shrink-0 text-muted-foreground">
+                      · {i.department_name}
+                    </span>
+                  )}
                   <span className="sr-only">({STATUS[i.status].label})</span>
                 </li>
               ))}

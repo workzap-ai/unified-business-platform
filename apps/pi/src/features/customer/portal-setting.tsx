@@ -9,7 +9,7 @@ import { useAction, useBusinessKey, useCan } from "@/lib/session";
 
 type Settings = { whatsapp_config: Record<string, unknown> };
 
-/** Lets the business decide whether its customers can see their own chats in PI Customer. */
+/** Lets the business decide whether its customers can see their own chats in pi Customer. */
 export function CustomerPortalCard() {
   const can = useCan();
   const key = useBusinessKey();
@@ -26,8 +26,8 @@ export function CustomerPortalCard() {
     {
       success: (s) =>
         s.whatsapp_config.customer_portal === false
-          ? "PI Customer is off for your chats"
-          : "Customers can now see their chats in PI Customer",
+          ? "pi Customer is off for your chats"
+          : "Customers can now see their chats in pi Customer",
       onSuccess: (s) => client.setQueryData(key(["settings"]), s),
     },
   );
@@ -42,7 +42,7 @@ export function CustomerPortalCard() {
               <UsersRound className="size-5" aria-hidden />
             </span>
             <div>
-              <h2 className="font-semibold">PI Customer</h2>
+              <h2 className="font-semibold">pi Customer</h2>
               <p className="text-sm text-muted-foreground">
                 Your customers can sign in with their WhatsApp number to see
                 their conversations with you and where each request stands. They
@@ -64,7 +64,7 @@ export function CustomerPortalCard() {
           rel="noreferrer"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-accent"
         >
-          Open PI Customer
+          Open pi Customer
           <ExternalLink className="size-3.5" aria-hidden />
         </a>
       </CardSection>

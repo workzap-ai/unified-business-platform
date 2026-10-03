@@ -73,6 +73,46 @@ DEFAULTS: dict[str, Any] = {
         "max_failed_turns": 2,
         "handoff_on_complaint": True,
         "notify_roles": ["owner", "support"],
+        # Where each customer problem belongs. Pi sorts problems into these; the team
+        # can move one, and those moves become examples Pi learns from.
+        "departments": [
+            {
+                "key": "sales",
+                "name": "Sales",
+                "description": "New enquiries, quotes, prices and orders not yet placed.",
+            },
+            {
+                "key": "customer_support",
+                "name": "Customer support",
+                "description": "Help with a product or service the customer already has.",
+            },
+            {
+                "key": "finance",
+                "name": "Finance",
+                "description": "Payments, invoices, refunds, balances and billing problems.",
+            },
+            {
+                "key": "delivery",
+                "name": "Delivery",
+                "description": "Shipping, delivery dates, tracking and returns.",
+            },
+            {
+                "key": "operations",
+                "name": "Operations / Manufacturing",
+                "description": "Production, quality, stock, materials and custom work.",
+            },
+            {
+                "key": "it",
+                "name": "IT / Technical",
+                "description": "Websites, apps, software, logins and technical faults.",
+            },
+            {
+                "key": "hr",
+                "name": "HR",
+                "description": "Jobs, hiring, staff and workplace questions.",
+            },
+        ],
+        "department_examples": [],
     },
     "knowledge_config": {
         "top_k": 5,
@@ -164,10 +204,14 @@ async def update_settings(
     default = DEFAULTS[section]
     if type(value) is not type(default):
         raise BusinessRuleViolation("INVALID_SETTING", "Invalid setting value")
+    row = await settings_row(session, scope)
     if isinstance(value, dict):
         if set(value) - set(default):
             raise BusinessRuleViolation("INVALID_SETTING", "Unknown setting fields")
-        value = {**default, **value}
+        # Fields a form didn't send keep their saved value (not the default), so a
+        # screen that edits part of a section never wipes the rest.
+        saved = getattr(row, section, None)
+        value = {**default, **(saved if isinstance(saved, dict) else {}), **value}
         for key, item in value.items():
             if type(item) is not type(default[key]):
                 raise BusinessRuleViolation("INVALID_SETTING", "Invalid setting value")
@@ -180,10 +224,17 @@ async def update_settings(
             raise BusinessRuleViolation("INVALID_TIMEZONE", "Choose a valid timezone") from None
     if section == "response_rules" and not 100 <= value["max_reply_chars"] <= 4000:
         raise BusinessRuleViolation("INVALID_SETTING", "Reply limit must be between 100 and 4000")
+    if section == "handoff_rules":
+        # Examples taught for a department that was removed are dropped with it.
+        keys = {d.get("key") for d in value.get("departments", []) if isinstance(d, dict)}
+        value["department_examples"] = [
+            e
+            for e in value.get("department_examples", [])
+            if isinstance(e, dict) and e.get("department") in keys
+        ]
     from app.modules.pi.policy import validate_section
 
     validate_section(section, value)
-    row = await settings_row(session, scope)
     setattr(row, section, value)
     await session.flush()
     await record(

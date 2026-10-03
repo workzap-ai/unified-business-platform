@@ -48,6 +48,21 @@ def _digits(raw: str) -> str:
     return phone[1:]
 
 
+async def _with_departments(
+    session: Any, conversation: Any, issues: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Each issue with the business's department name (and the team's own moves)."""
+    departments, _ = await service.departments_for(
+        session, conversation.tenant_id, conversation.environment_id
+    )
+    overrides = (conversation.service_brief or {}).get("issue_departments") or {}
+    names = {d["key"]: d["name"] for d in departments}
+    return [
+        {**i, "department_name": names.get(i["department"], "")}
+        for i in service.place(issues, departments, overrides)
+    ]
+
+
 def _wa_link(display_phone: str) -> str:
     digits = "".join(ch for ch in display_phone if ch.isdigit())
     return f"https://wa.me/{digits}" if digits else ""
@@ -149,6 +164,7 @@ async def list_conversations(customer: Customer, session: Session) -> list[dict[
     for conversation, connection, business in items:
         cached = (conversation.service_brief or {}).get("customer_issues")
         issues = cached.get("issues", []) if isinstance(cached, dict) else []
+        issues = await _with_departments(session, conversation, issues)
         out.append(
             {
                 "id": conversation.id,
@@ -161,12 +177,17 @@ async def list_conversations(customer: Customer, session: Session) -> list[dict[
                 "with_team": conversation.mode == "human",
                 "issues_open": sum(1 for i in issues if i.get("status") != "resolved"),
                 "issues_total": len(issues),
+                "issues_by_status": {
+                    status: sum(1 for i in issues if i.get("status") == status)
+                    for status in ("open", "with_team", "resolved")
+                },
                 # Open matters first, for the dashboard's request overview.
                 "issues_preview": [
                     {
                         "title": i.get("title", ""),
                         "status": i.get("status", "open"),
                         "category": i.get("category", "other"),
+                        "department_name": i.get("department_name", ""),
                     }
                     for i in sorted(issues, key=lambda i: i.get("status") == "resolved")[:3]
                 ],
@@ -205,7 +226,11 @@ async def conversation_detail(
             service.message_view(m) for m in await service.messages(session, conversation)
         ],
         "requests": await service.open_requests(session, conversation),
-        "issues": cached if fresh else None,
+        "issues": (
+            {**cached, "issues": await _with_departments(session, conversation, cached["issues"])}
+            if fresh and isinstance(cached, dict)
+            else None
+        ),
     }
 
 
@@ -229,7 +254,11 @@ async def conversation_issues(
     )
     if report is None:
         return {"available": False, "issues": [], "at": None}
-    return {"available": True, **report}
+    return {
+        "available": True,
+        **report,
+        "issues": await _with_departments(session, conversation, report.get("issues", [])),
+    }
 
 
 @router.get("/conversations/{conversation_id}/messages/{message_id}/media")

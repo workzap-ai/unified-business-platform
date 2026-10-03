@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { Wordmark } from "@/components/brand";
 
 export const metadata = {
-  title: { default: "PI Customer", template: "%s · PI Customer" },
+  title: { default: "pi Customer", template: "%s · pi Customer" },
   robots: { index: false },
 };
 
@@ -27,7 +27,7 @@ export default function CustomerLayout({
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:h-16">
           <Link
             href="/customer"
-            aria-label="PI Customer home"
+            aria-label="pi Customer home"
             className="flex min-h-11 items-center gap-2"
           >
             <Wordmark />
@@ -44,7 +44,7 @@ export default function CustomerLayout({
         <Suspense>{children}</Suspense>
       </main>
       <footer className="hidden px-4 pb-8 text-center text-xs text-muted-foreground sm:block">
-        Your conversations are private. Businesses can turn PI Customer off for
+        Your conversations are private. Businesses can turn pi Customer off for
         their chats.
       </footer>
     </div>

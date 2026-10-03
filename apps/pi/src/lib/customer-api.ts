@@ -89,7 +89,11 @@ export type CustomerConversationItem = {
   with_team: boolean;
   issues_open: number;
   issues_total: number;
-  issues_preview: Pick<CustomerIssue, "title" | "status" | "category">[];
+  issues_by_status?: { open: number; with_team: number; resolved: number };
+  issues_preview: Pick<
+    CustomerIssue,
+    "title" | "status" | "category" | "department_name"
+  >[];
 };
 
 export type CustomerMessage = {
@@ -116,6 +120,8 @@ export type CustomerIssue = {
   status: "open" | "with_team" | "resolved";
   summary: string;
   next_step: string;
+  /** The business department handling it, e.g. "Finance". */
+  department_name?: string;
 };
 
 export type CustomerRequest = {

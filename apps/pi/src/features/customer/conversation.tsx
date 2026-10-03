@@ -248,7 +248,7 @@ function BackLink() {
 
 const SENDER: Record<CustomerMessage["from"], string> = {
   you: "You",
-  assistant: "Pi assistant",
+  assistant: "pi assistant",
   team: "Team",
   business: "",
 };
@@ -508,7 +508,7 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
             <h2 className="font-semibold">Your requests</h2>
             <Badge tone="accent">
               <Sparkles className="size-3" aria-hidden />
-              Organised by Pi
+              Organised by pi
             </Badge>
           </div>
           {list.length > 0 && (
@@ -538,13 +538,13 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
         <div className="p-4">
           {issues.isPending ? (
             <div className="space-y-3 py-2">
-              <Spinner label="Pi is reading your conversation…" />
+              <Spinner label="pi is reading your conversation…" />
               <Skeleton className="h-20 w-full rounded-xl" />
               <Skeleton className="h-20 w-full rounded-xl" />
             </div>
           ) : issues.isError || !issues.data?.available ? (
             <p className="py-3 text-sm text-muted-foreground">
-              Pi can&apos;t organise your requests right now. Your full
+              pi can&apos;t organise your requests right now. Your full
               conversation is still here.
             </p>
           ) : list.length === 0 ? (
@@ -569,6 +569,11 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
                       <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                         <Icon className="size-3.5" aria-hidden />
                         {category.label}
+                        {issue.department_name && (
+                          <span className="truncate">
+                            · {issue.department_name}
+                          </span>
+                        )}
                       </span>
                       <Badge tone={status.tone}>
                         {issue.status === "resolved" && (

@@ -55,6 +55,22 @@ def validate_section(section: str, value: Any) -> None:
                 len(value["notify_roles"]) <= 20
                 and all(isinstance(x, str) and len(x) <= 60 for x in value["notify_roles"])
             )
+            departments = value.get("departments", [])
+            ensure(1 <= len(departments) <= 20)
+            keys = []
+            for item in departments:
+                ensure(isinstance(item, dict) and set(item) == {"key", "name", "description"})
+                ensure(bool(re.fullmatch(r"[a-z0-9_]{2,40}", str(item["key"]))))
+                ensure(isinstance(item["name"], str) and 1 <= len(item["name"].strip()) <= 60)
+                ensure(isinstance(item["description"], str) and len(item["description"]) <= 300)
+                keys.append(item["key"])
+            ensure(len(set(keys)) == len(keys))
+            examples = value.get("department_examples", [])
+            ensure(len(examples) <= 40)
+            for item in examples:
+                ensure(isinstance(item, dict) and set(item) == {"text", "department"})
+                ensure(isinstance(item["text"], str) and 1 <= len(item["text"]) <= 400)
+                ensure(item["department"] in keys)
         if section == "knowledge_config":
             ensure(1 <= value["top_k"] <= 10 and 0 <= Decimal(value["min_score"]) <= 1)
         if section == "whatsapp_config":

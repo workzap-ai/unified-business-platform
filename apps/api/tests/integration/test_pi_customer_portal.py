@@ -201,8 +201,14 @@ async def test_ai_lists_the_customers_requests_once_per_new_message(
     assert again["issues"] == first["issues"] and calls == [1]  # cached until a new message
     listed = (await customer.get(f"{PORTAL}/conversations")).json()[0]
     assert listed["issues_open"] == 1
+    assert listed["issues_by_status"] == {"open": 1, "with_team": 0, "resolved": 0}
     assert listed["issues_preview"] == [
-        {"title": "Website banwana", "status": "open", "category": "inquiry"}
+        {
+            "title": "Website banwana",
+            "status": "open",
+            "category": "inquiry",
+            "department_name": "Customer support",
+        }
     ]
     conversation = await business_db.get(PiConversation, conversation_id)
     await business_db.refresh(conversation)

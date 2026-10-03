@@ -3,6 +3,7 @@
 import * as Menu from "@radix-ui/react-dropdown-menu";
 import {
   BarChart3,
+  Layers,
   Bot,
   ArrowUpRight,
   Check,
@@ -44,6 +45,8 @@ const NAV: {
   { href: "/inbox", label: "Inbox", icon: Inbox },
   // Desktop sidebar only: phones reach it from Home (the bottom bar keeps five items).
   { href: "/analytics", label: "Analytics", icon: BarChart3, mobile: false },
+  // Desktop sidebar only, like Analytics: phones reach it from the inbox.
+  { href: "/problems", label: "Problems", icon: Layers, mobile: false },
   { href: "/customers", label: "Customers", icon: Users },
   { href: "/my-pi", label: "My Pi", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
