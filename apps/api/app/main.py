@@ -45,6 +45,7 @@ from app.modules.pi.kapso_routes import router as pi_kapso_router
 from app.modules.pi.read_routes import router as pi_read_router
 from app.modules.pi.routes import router as pi_router
 from app.modules.pi.routes import webhook_router
+from app.modules.pi_customer.routes import router as pi_customer_router
 from app.modules.pi_saas.app_routes import router as pi_app_router
 from app.modules.pi_saas.campaign_routes import router as pi_campaign_router
 from app.modules.pi_saas.connector_routes import router as pi_connector_router
@@ -161,6 +162,9 @@ PI_APP_ROUTERS = [
     notifications_router,
     # Core invoicing for the business's own customers (billing.read / billing.write).
     billing_router,
+    # PI Customer: end customers see their own conversations (signed customer cookie,
+    # never a business session): /customer-portal/...
+    pi_customer_router,
 ]
 
 

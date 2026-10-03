@@ -95,6 +95,8 @@ DEFAULTS: dict[str, Any] = {
         "quiet_end": 9,
         # WhatsApp Flows the business published: {"lead": {"flow_id", "cta", "screen"}}.
         "flows": {},
+        # PI Customer: customers can see their own conversations with this business.
+        "customer_portal": True,
     },
 }
 

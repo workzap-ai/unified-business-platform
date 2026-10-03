@@ -37,6 +37,7 @@ import {
 } from "@/components/ui";
 import { BusinessReview, NotificationSettings } from "@/features/journey";
 import { WhatsAppLiveCard } from "@/features/whatsapp-live";
+import { CustomerPortalCard } from "@/features/customer/portal-setting";
 import { SetupCenter } from "@/features/setup-center";
 import { WhatsAppConnect, useAccount } from "@/features/setup";
 import { GettingPaid } from "@/features/getting-paid";
@@ -324,6 +325,7 @@ export function WhatsAppPage() {
               )}
             </CardSection>
           </Card>
+          <CustomerPortalCard />
           <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
             <DialogContent
               title="Disconnect WhatsApp?"
@@ -474,7 +476,8 @@ function InviteDialog({ roles }: { roles: TeamView["roles"] }) {
     link: string | null;
   } | null>(null);
   const invite = useAction(
-    () => post<{ display_name: string; invite_link: string | null }>("/team", form),
+    () =>
+      post<{ display_name: string; invite_link: string | null }>("/team", form),
     {
       invalidate: [["team"]],
       onSuccess: (member) => {
