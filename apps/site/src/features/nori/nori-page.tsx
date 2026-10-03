@@ -7,12 +7,12 @@ const APP = "https://app.workzap.ai";
 const PI_CONTACT = "/pi/talk-to-pi";
 
 const NAV = [
-  { href: "#inside", label: "What’s inside" },
-  { href: "#how", label: "How it works" },
-  { href: "#pricing", label: "Pricing" },
+  { href: "/nori/whats-inside", label: "What’s inside" },
+  { href: "/nori/how-it-works", label: "How it works" },
+  { href: "/nori/pricing", label: "Pricing" },
 ];
 
-function Header() {
+function Header({ current }: { current?: string }) {
   return (
     <header className="nx-header">
       <div className="nx-wrap nx-nav">
@@ -32,9 +32,13 @@ function Header() {
         </Link>
         <nav className="nx-links" aria-label="nori">
           {NAV.map((l) => (
-            <a key={l.href} href={l.href}>
+            <Link
+              key={l.href}
+              href={l.href}
+              aria-current={l.href === current ? "page" : undefined}
+            >
               {l.label}
-            </a>
+            </Link>
           ))}
           <a href={APP}>Sign in</a>
         </nav>
@@ -45,9 +49,13 @@ function Header() {
           <summary>Menu</summary>
           <nav aria-label="nori, menu">
             {NAV.map((l) => (
-              <a key={l.href} href={l.href}>
+              <Link
+                key={l.href}
+                href={l.href}
+                aria-current={l.href === current ? "page" : undefined}
+              >
                 {l.label}
-              </a>
+              </Link>
             ))}
             <a href={APP}>Sign in</a>
             <a href={APP}>Get started</a>
@@ -283,12 +291,8 @@ const STEPS = [
 
 function How() {
   return (
-    <section id="how" className="nx-section nx-white">
+    <section className="nx-section nx-white">
       <div className="nx-wrap">
-        <div className="nx-head">
-          <span className="nx-label">How it works</span>
-          <h2>From your data to a decision in three steps.</h2>
-        </div>
         <ol className="nx-steps">
           {STEPS.map((s, i) => (
             <li key={s.title}>
@@ -409,17 +413,8 @@ const PLANS = [
 
 function Pricing() {
   return (
-    <section id="pricing" className="nx-section nx-white">
+    <section className="nx-section nx-white">
       <div className="nx-wrap">
-        <div className="nx-head">
-          <span className="nx-label">Pricing</span>
-          <h2>The whole platform, sized to your business.</h2>
-          <p className="nx-lead">
-            A one-time setup to connect your data, then a simple monthly
-            subscription. Every plan has everything. You choose the size and the
-            support.
-          </p>
-        </div>
         <div className="nx-plans">
           {PLANS.map((p) => (
             <div key={p.name} className="nx-plan">
@@ -481,12 +476,83 @@ function Closing() {
   );
 }
 
+function PageHead({
+  label,
+  title,
+  lead,
+}: {
+  label: string;
+  title: string;
+  lead: string;
+}) {
+  return (
+    <section className="nx-pagehead">
+      <div className="nx-wrap">
+        <nav className="nx-crumb" aria-label="Breadcrumb">
+          <Link href="/nori">nori</Link>
+          <span aria-hidden="true">/</span>
+          <span>{label}</span>
+        </nav>
+        <h1 className="nx-display">{title}</h1>
+        <p className="nx-lead">{lead}</p>
+      </div>
+    </section>
+  );
+}
+
+const EXPLORE = [
+  {
+    href: "/nori/whats-inside",
+    title: "What’s inside",
+    text: "Shops, money, stock, online, marketing and people. Seven areas, each with the numbers and the next step.",
+  },
+  {
+    href: "/nori/how-it-works",
+    title: "How it works",
+    text: "Connect your data, let nori read it, and get a short read each morning.",
+  },
+  {
+    href: "/nori/pricing",
+    title: "Pricing",
+    text: "One setup, then a simple monthly plan. Every plan has everything. You choose the size and the support.",
+  },
+];
+
+function Explore() {
+  return (
+    <section className="nx-section">
+      <div className="nx-wrap">
+        <div className="nx-head">
+          <span className="nx-label">Look around</span>
+          <h2>Where to next.</h2>
+        </div>
+        <ul className="nx-explore">
+          {EXPLORE.map((e) => (
+            <li key={e.href}>
+              <Link href={e.href} className="nx-explore-card">
+                <h3>{e.title}</h3>
+                <p>{e.text}</p>
+                <span className="nx-explore-go">Open →</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 function Footer() {
   return (
     <footer className="nx-footer nx-on-ink">
       <div className="nx-wrap">
         <span>nori by Workzap · © 2026 Workzap</span>
         <div className="nx-footer-links">
+          {NAV.map((l) => (
+            <Link key={l.href} href={l.href}>
+              {l.label}
+            </Link>
+          ))}
           <a href={APP}>Sign in</a>
           <Link href={PI_CONTACT}>Contact</Link>
           <Link href="/">Workzap</Link>
@@ -496,24 +562,76 @@ function Footer() {
   );
 }
 
-export function NoriPage() {
+function Shell({
+  current,
+  children,
+}: {
+  current?: string;
+  children: React.ReactNode;
+}) {
   return (
     <>
       <a className="nx-skip" href="#main">
         Skip to content
       </a>
-      <Header />
-      <main id="main">
-        <Hero />
-        <Problems />
-        <Reads />
-        <ModulesSection />
-        <How />
-        <Questions />
-        <Pricing />
-        <Closing />
-      </main>
+      <Header current={current} />
+      <main id="main">{children}</main>
       <Footer />
     </>
+  );
+}
+
+export function NoriHome() {
+  return (
+    <Shell>
+      <Hero />
+      <Problems />
+      <Reads />
+      <Explore />
+      <Closing />
+    </Shell>
+  );
+}
+
+export function NoriInside() {
+  return (
+    <Shell current="/nori/whats-inside">
+      <PageHead
+        label="What’s inside"
+        title="Your whole retail business, run from one place."
+        lead="Shops, money, stock, online, marketing and people. Each comes with the numbers, the reasons and the next step."
+      />
+      <ModulesSection />
+      <Closing />
+    </Shell>
+  );
+}
+
+export function NoriHow() {
+  return (
+    <Shell current="/nori/how-it-works">
+      <PageHead
+        label="How it works"
+        title="From your data to a decision in three steps."
+        lead="Connect your data once. nori does the reading and brings you the one thing worth looking at."
+      />
+      <How />
+      <Questions />
+      <Closing />
+    </Shell>
+  );
+}
+
+export function NoriPricing() {
+  return (
+    <Shell current="/nori/pricing">
+      <PageHead
+        label="Pricing"
+        title="The whole platform, sized to your business."
+        lead="A one-time setup to connect your data, then a simple monthly subscription. Every plan has everything. You choose the size and the support."
+      />
+      <Pricing />
+      <Closing />
+    </Shell>
   );
 }

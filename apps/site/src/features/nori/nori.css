@@ -826,3 +826,77 @@ a:hover {
   gap: 24px;
   flex-wrap: wrap;
 }
+
+/* inner pages: a plain page head, a breadcrumb, the current link marked */
+.nx-links a[aria-current="page"],
+.nx-menu a[aria-current="page"] {
+  color: var(--nori-green);
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
+}
+.nx-pagehead {
+  padding: 48px 0 40px;
+  border-bottom: 1px solid var(--nori-line);
+}
+.nx-pagehead .nx-display {
+  margin: 16px 0 16px;
+  max-width: 800px;
+}
+.nx-crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--nori-ink-2);
+}
+.nx-crumb a {
+  color: var(--nori-ink-2);
+  text-underline-offset: 3px;
+}
+.nx-crumb a:hover {
+  color: var(--nori-green);
+}
+
+/* the three doors on the nori home page */
+.nx-explore {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 880px) {
+  .nx-explore {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-explore-card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  height: 100%;
+  padding: 24px;
+  background: var(--nori-white);
+  border: 1px solid var(--nori-line);
+  border-radius: var(--nx-r-card);
+  color: var(--nori-ink);
+  text-decoration: none;
+}
+.nx-explore-card:hover {
+  border-color: var(--nori-ink);
+}
+.nx-explore-card p {
+  color: var(--nori-ink-2);
+}
+.nx-explore-go {
+  margin-top: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--nori-green);
+}
+.nx-explore-card p {
+  font-weight: 400;
+}
