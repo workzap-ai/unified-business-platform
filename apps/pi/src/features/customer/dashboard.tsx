@@ -90,27 +90,29 @@ export function Dashboard({ me }: { me: CustomerMe }) {
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm text-muted-foreground">
+      <header className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-sm text-muted-foreground">
             Signed in as <span className="font-medium">{me.phone}</span>
           </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight">
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
             Your conversations
           </h1>
         </div>
         <Button
           variant="secondary"
           size="sm"
+          className="min-h-11 shrink-0 sm:min-h-10"
+          aria-label="Sign out"
           onClick={() => signOut.mutate()}
           loading={signOut.isPending}
         >
           <LogOut className="size-4" aria-hidden />
-          Sign out
+          <span className="hidden sm:inline">Sign out</span>
         </Button>
       </header>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="grid grid-cols-4 gap-2 sm:gap-3">
         <Stat
           icon={Building2}
           label="Businesses"
@@ -146,12 +148,12 @@ export function Dashboard({ me }: { me: CustomerMe }) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search businesses or requests"
-                className="h-11 w-full rounded-xl border border-border-strong bg-surface pl-10 pr-3.5 text-[15px] placeholder:text-muted-foreground/70 focus-visible:outline-2 focus-visible:outline-ring"
+                className="h-12 w-full rounded-xl border border-border-strong bg-surface pl-10 pr-3.5 text-base placeholder:text-muted-foreground/70 focus-visible:outline-2 focus-visible:outline-ring sm:h-11 sm:text-[15px]"
               />
             </label>
           </div>
           <div
-            className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
+            className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
             role="tablist"
             aria-label="Filter conversations"
           >
@@ -165,7 +167,7 @@ export function Dashboard({ me }: { me: CustomerMe }) {
                   aria-selected={filter === f.key}
                   onClick={() => setFilter(f.key)}
                   className={cn(
-                    "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
+                    "inline-flex min-h-10 shrink-0 snap-start items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors sm:min-h-9",
                     filter === f.key
                       ? "border-accent bg-accent text-accent-foreground"
                       : "border-border bg-surface text-foreground-secondary hover:bg-surface-muted",
@@ -260,7 +262,7 @@ export function Dashboard({ me }: { me: CustomerMe }) {
                     <li key={i}>
                       <Link
                         href={`/customer/c/${r.conversation.id}`}
-                        className="flex items-start gap-3 px-5 py-3.5 hover:bg-surface-muted"
+                        className="flex min-h-14 items-start gap-3 px-4 py-3.5 hover:bg-surface-muted active:bg-surface-muted sm:px-5"
                       >
                         <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface-muted text-foreground-secondary">
                           <Icon className="size-4" aria-hidden />
@@ -290,7 +292,7 @@ export function Dashboard({ me }: { me: CustomerMe }) {
               </ul>
             )}
           </Card>
-          <p className="px-1 text-xs text-muted-foreground">
+          <p className="hidden px-1 text-xs text-muted-foreground sm:block">
             Pi organises your requests when you open a conversation, and keeps
             them up to date as you chat.
           </p>
@@ -319,20 +321,20 @@ function Stat({
   tone: keyof typeof STAT_TONES;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm">
+    <div className="flex min-w-0 flex-col items-center gap-1.5 rounded-2xl border border-border bg-surface px-1.5 py-3 text-center shadow-sm sm:flex-row sm:gap-3 sm:p-4 sm:text-left">
       <span
         className={cn(
-          "flex size-10 shrink-0 items-center justify-center rounded-xl",
+          "flex size-8 shrink-0 items-center justify-center rounded-lg sm:size-10 sm:rounded-xl",
           STAT_TONES[tone],
         )}
       >
-        <Icon className="size-5" aria-hidden />
+        <Icon className="size-4 sm:size-5" aria-hidden />
       </span>
-      <span>
-        <span className="block text-2xl font-semibold leading-none tabular-nums">
+      <span className="min-w-0">
+        <span className="block text-xl font-semibold leading-none tabular-nums sm:text-2xl">
           {value}
         </span>
-        <span className="mt-1 block text-xs text-muted-foreground">
+        <span className="mt-1 block text-[11px] leading-tight text-muted-foreground sm:text-xs">
           {label}
         </span>
       </span>
@@ -344,9 +346,9 @@ function ConversationCard({ c }: { c: CustomerConversationItem }) {
   return (
     <Link
       href={`/customer/c/${c.id}`}
-      className="group block rounded-2xl border border-border bg-surface p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md focus-visible:outline-2 focus-visible:outline-ring sm:p-5"
+      className="group block rounded-2xl border border-border bg-surface p-4 shadow-sm transition-all hover:border-accent/40 hover:shadow-md focus-visible:outline-2 focus-visible:outline-ring active:scale-[0.99] active:bg-surface-muted/60 sm:p-5 sm:hover:-translate-y-0.5"
     >
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-3 sm:gap-4">
         <Avatar name={c.business} />
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-3">
@@ -390,7 +392,7 @@ function ConversationCard({ c }: { c: CustomerConversationItem }) {
               <Badge tone="success">All sorted</Badge>
             )}
             {c.status === "closed" && <Badge>Closed</Badge>}
-            <span className="ml-auto inline-flex items-center gap-1 text-xs font-medium text-accent opacity-0 transition-opacity group-hover:opacity-100">
+            <span className="ml-auto hidden items-center gap-1 text-xs font-medium text-accent opacity-0 transition-opacity group-hover:opacity-100 sm:inline-flex">
               Open
               <ChevronRight className="size-3.5" aria-hidden />
             </span>

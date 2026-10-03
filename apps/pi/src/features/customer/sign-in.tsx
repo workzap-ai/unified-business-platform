@@ -60,7 +60,7 @@ export function SignIn() {
   });
 
   return (
-    <div className="mx-auto grid w-full max-w-5xl items-stretch gap-6 lg:grid-cols-[1.05fr_1fr]">
+    <div className="mx-auto grid w-full max-w-5xl grid-cols-1 items-stretch gap-6 lg:grid-cols-[1.05fr_1fr]">
       <aside className="relative hidden min-h-[560px] overflow-hidden rounded-3xl bg-accent p-10 text-accent-foreground lg:flex lg:flex-col lg:justify-between lg:gap-10">
         <div
           aria-hidden
@@ -108,7 +108,7 @@ export function SignIn() {
       </aside>
 
       <Card className="flex flex-col justify-center">
-        <CardSection className="space-y-6 sm:p-10">
+        <CardSection className="space-y-6 p-5 sm:p-10">
           <div className="lg:hidden">
             <p className="text-sm font-medium text-accent">PI Customer</p>
             <h1 className="mt-1 text-2xl font-semibold tracking-tight">
@@ -140,7 +140,7 @@ export function SignIn() {
                     aria-label="Country code"
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
-                    className="h-12 rounded-xl border border-border-strong bg-surface px-2.5 text-[15px] focus-visible:outline-2 focus-visible:outline-ring"
+                    className="h-12 shrink-0 rounded-xl border border-border-strong bg-surface px-2.5 text-base focus-visible:outline-2 focus-visible:outline-ring sm:text-[15px]"
                   >
                     {COUNTRIES.map((c) => (
                       <option key={c.code} value={c.code}>
@@ -156,7 +156,7 @@ export function SignIn() {
                     placeholder="300 1234567"
                     value={typed}
                     onChange={(e) => setTyped(e.target.value)}
-                    className="h-12 min-w-0 flex-1 rounded-xl border border-border-strong bg-surface px-3.5 text-[15px] placeholder:text-muted-foreground/70 focus-visible:outline-2 focus-visible:outline-ring"
+                    className="h-12 min-w-0 flex-1 rounded-xl border border-border-strong bg-surface px-3.5 text-base placeholder:text-muted-foreground/70 focus-visible:outline-2 focus-visible:outline-ring sm:text-[15px]"
                     required
                   />
                 </div>
@@ -250,7 +250,7 @@ function Steps({ step }: { step: "phone" | "code" }) {
   return (
     <ol className="flex items-center gap-3" aria-label="Sign-in steps">
       {items.map((item, i) => (
-        <li key={item.key} className="flex flex-1 items-center gap-2">
+        <li key={item.key} className="flex min-w-0 flex-1 items-center gap-2">
           <span
             className={cn(
               "flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
@@ -266,14 +266,14 @@ function Steps({ step }: { step: "phone" | "code" }) {
           </span>
           <span
             className={cn(
-              "text-sm",
+              "truncate text-[13px] sm:text-sm",
               i === at ? "font-medium" : "text-muted-foreground",
             )}
           >
             {item.label}
           </span>
           {i < items.length - 1 && (
-            <span className="h-px flex-1 bg-border" aria-hidden />
+            <span className="h-px min-w-3 flex-1 bg-border" aria-hidden />
           )}
         </li>
       ))}
@@ -343,7 +343,7 @@ function CodeInput({
             }
           }}
           className={cn(
-            "h-14 w-full min-w-0 rounded-xl border bg-surface text-center text-2xl font-semibold tabular-nums focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60",
+            "h-14 w-full min-w-0 rounded-xl border bg-surface text-center text-2xl caret-accent font-semibold tabular-nums focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60",
             error
               ? "border-danger"
               : d

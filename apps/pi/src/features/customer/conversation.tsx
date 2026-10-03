@@ -86,53 +86,67 @@ export function ConversationView({ id }: { id: string }) {
 
   const c = detail.data;
   const withTeam = c.with_team || team.isSuccess;
+  const openRequests = (c.issues?.issues ?? []).filter(
+    (i) => i.status !== "resolved",
+  ).length;
+  const whatsapp = c.whatsapp_link ? (
+    <Button asChild className="min-h-12 flex-1 sm:min-h-10 sm:flex-none">
+      <a href={c.whatsapp_link} target="_blank" rel="noreferrer">
+        <MessageCircle className="size-4" aria-hidden />
+        <span className="sm:hidden">WhatsApp</span>
+        <span className="hidden sm:inline">Continue on WhatsApp</span>
+      </a>
+    </Button>
+  ) : null;
+  const person = withTeam ? (
+    <span className="inline-flex min-h-12 flex-1 items-center justify-center gap-1.5 rounded-xl bg-info-soft px-3 text-sm font-medium text-info sm:min-h-10 sm:flex-none">
+      <UserRound className="size-4 shrink-0" aria-hidden />
+      <span className="sm:hidden">Team will reply</span>
+      <span className="hidden sm:inline">
+        A person from the team will reply
+      </span>
+    </span>
+  ) : (
+    <Button
+      variant="secondary"
+      className="min-h-12 flex-1 sm:min-h-10 sm:flex-none"
+      loading={team.isPending}
+      onClick={() => team.mutate()}
+    >
+      <UserRound className="size-4" aria-hidden />
+      Talk to a person
+    </Button>
+  );
+
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-5">
+    <div className="mx-auto w-full max-w-6xl space-y-4 pb-28 sm:space-y-5 sm:pb-0">
       <BackLink />
       <Card className="p-4 sm:p-5">
-        <div className="flex flex-wrap items-center gap-4">
-          <Avatar name={c.business} size="lg" />
+        <div className="flex items-center gap-3 sm:gap-4">
+          <span className="sm:hidden">
+            <Avatar name={c.business} />
+          </span>
+          <span className="hidden sm:block">
+            <Avatar name={c.business} size="lg" />
+          </span>
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-xl font-semibold sm:text-2xl">
+            <h1 className="truncate text-lg font-semibold sm:text-2xl">
               {c.business}
             </h1>
-            <p className="flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground">
-              <span>{c.business_phone}</span>
-              <span aria-hidden>·</span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="relative flex size-2">
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
-                  <span className="relative inline-flex size-2 rounded-full bg-success" />
-                </span>
-                Live · last message {ago(c.last_message_at)}
+            <p className="truncate text-sm text-muted-foreground">
+              {c.business_phone}
+            </p>
+            <p className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
+                <span className="relative inline-flex size-2 rounded-full bg-success" />
               </span>
+              Live · last message {ago(c.last_message_at)}
             </p>
           </div>
-          <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-            {c.whatsapp_link && (
-              <Button asChild className="flex-1 sm:flex-none">
-                <a href={c.whatsapp_link} target="_blank" rel="noreferrer">
-                  <MessageCircle className="size-4" aria-hidden />
-                  Continue on WhatsApp
-                </a>
-              </Button>
-            )}
-            {withTeam ? (
-              <span className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-info-soft px-3.5 py-2 text-sm font-medium text-info sm:flex-none">
-                <UserRound className="size-4" aria-hidden />A person from the
-                team will reply
-              </span>
-            ) : (
-              <Button
-                variant="secondary"
-                className="flex-1 sm:flex-none"
-                loading={team.isPending}
-                onClick={() => team.mutate()}
-              >
-                <UserRound className="size-4" aria-hidden />
-                Talk to a person
-              </Button>
-            )}
+          <div className="hidden shrink-0 gap-2 sm:flex">
+            {whatsapp}
+            {person}
           </div>
         </div>
         {team.isError && (
@@ -142,38 +156,55 @@ export function ConversationView({ id }: { id: string }) {
         )}
       </Card>
 
-      <div
-        className="grid grid-cols-2 gap-1 rounded-xl bg-surface-muted p-1 lg:hidden"
-        role="tablist"
-        aria-label="Conversation sections"
-      >
-        {(
-          [
-            ["chat", "Chat", MessageCircle],
-            ["requests", "Requests", ClipboardList],
-          ] as const
-        ).map(([key, label, Icon]) => (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={tab === key}
-            onClick={() => setTab(key)}
-            className={cn(
-              "inline-flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium",
-              tab === key
-                ? "bg-surface text-foreground shadow-sm"
-                : "text-muted-foreground",
-            )}
-          >
-            <Icon className="size-4" aria-hidden />
-            {label}
-          </button>
-        ))}
+      <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-20 -mx-4 bg-background/95 px-4 py-2 backdrop-blur sm:top-[calc(4rem+env(safe-area-inset-top))] sm:mx-0 sm:px-0 lg:hidden">
+        <div
+          className="grid grid-cols-2 gap-1 rounded-xl bg-surface-muted p-1"
+          role="tablist"
+          aria-label="Conversation sections"
+        >
+          {(
+            [
+              ["chat", "Chat", MessageCircle, c.messages.length],
+              ["requests", "Requests", ClipboardList, openRequests],
+            ] as const
+          ).map(([key, label, Icon, count]) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={tab === key}
+              onClick={() => {
+                setTab(key);
+                if (key === "requests") window.scrollTo({ top: 0 });
+              }}
+              className={cn(
+                "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg text-sm font-medium transition-colors",
+                tab === key
+                  ? "bg-surface text-foreground shadow-sm"
+                  : "text-muted-foreground",
+              )}
+            >
+              <Icon className="size-4" aria-hidden />
+              {label}
+              {count > 0 && (
+                <span
+                  className={cn(
+                    "rounded-full px-1.5 text-xs tabular-nums",
+                    key === "requests"
+                      ? "bg-warning-soft text-warning"
+                      : "bg-surface-muted",
+                  )}
+                >
+                  {count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className={cn(tab !== "chat" && "hidden lg:block")}>
+        <div className={cn("min-w-0", tab !== "chat" && "hidden lg:block")}>
           <Chat
             messages={c.messages}
             conversationId={id}
@@ -182,11 +213,19 @@ export function ConversationView({ id }: { id: string }) {
         </div>
         <div
           className={cn(
-            "lg:sticky lg:top-6",
+            "min-w-0 lg:sticky lg:top-24",
             tab !== "requests" && "hidden lg:block",
           )}
         >
           <Requests detail={c} />
+        </div>
+      </div>
+
+      {/* Phones: the two actions stay in reach of the thumb. */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur sm:hidden">
+        <div className="flex gap-2">
+          {whatsapp}
+          {person}
         </div>
       </div>
     </div>
@@ -224,14 +263,26 @@ function Chat({
   business: string;
 }) {
   const scroller = useRef<HTMLDivElement>(null);
+  const first = useRef(true);
   const last = messages.at(-1)?.id;
   useEffect(() => {
     const el = scroller.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (el && getComputedStyle(el).overflowY === "auto") {
+      // Desktop: the chat scrolls inside its card.
+      el.scrollTop = el.scrollHeight;
+    } else {
+      // Phones: the page scrolls. Open at the latest message, and follow new ones
+      // only if the reader is already near the end.
+      const page = document.documentElement;
+      const nearEnd =
+        window.innerHeight + window.scrollY >= page.scrollHeight - 240;
+      if (first.current || nearEnd) window.scrollTo({ top: page.scrollHeight });
+    }
+    first.current = false;
   }, [last]);
   return (
     <Card className="overflow-hidden">
-      <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
+      <div className="flex items-center justify-between border-b border-border px-4 py-3 sm:px-5 sm:py-3.5">
         <h2 className="font-semibold">Conversation</h2>
         <span className="text-xs text-muted-foreground">
           {messages.length} {messages.length === 1 ? "message" : "messages"}
@@ -239,7 +290,7 @@ function Chat({
       </div>
       <div
         ref={scroller}
-        className="max-h-[68vh] min-h-72 overflow-y-auto bg-surface-muted/40 px-3 py-4 sm:px-5"
+        className="min-h-48 bg-surface-muted/40 px-3 py-4 sm:px-5 lg:max-h-[68vh] lg:min-h-72 lg:overflow-y-auto"
       >
         {messages.length === 0 ? (
           <p className="py-10 text-center text-sm text-muted-foreground">
@@ -452,7 +503,7 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
   return (
     <div className="space-y-4">
       <Card className="overflow-hidden">
-        <div className="border-b border-border px-5 py-4">
+        <div className="border-b border-border px-4 py-4 sm:px-5">
           <div className="flex items-center justify-between gap-2">
             <h2 className="font-semibold">Your requests</h2>
             <Badge tone="accent">
@@ -550,14 +601,14 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
 
       {detail.requests.length > 0 && (
         <Card>
-          <div className="border-b border-border px-5 py-3.5">
+          <div className="border-b border-border px-4 py-3.5 sm:px-5">
             <h2 className="font-semibold">Opened by the team</h2>
           </div>
           <ul className="divide-y divide-border">
             {detail.requests.map((r, i) => (
               <li
                 key={i}
-                className="flex items-start justify-between gap-3 px-5 py-3 text-sm"
+                className="flex items-start justify-between gap-3 px-4 py-3 text-sm sm:px-5"
               >
                 <span className="min-w-0">
                   <span className="block font-medium">{r.title}</span>
