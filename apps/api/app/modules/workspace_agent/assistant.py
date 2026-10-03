@@ -11,12 +11,16 @@ from app.ai.manager import LLMManager
 from app.ai.types import Message, ToolDefinition
 from app.ai.usage import SqlUsageStore, UsageRecord
 from app.modules.customers.schemas import CustomerCreate, CustomerUpdate
+from app.modules.finance.service import ExpenseCreate
 from app.modules.hr.service import EmployeeCreate, EmployeeUpdate
+from app.modules.sales.schemas import LeadCreate
 from app.modules.workspace_agent.analytics import Analytics, AnalyticsInput
 from app.modules.workspace_agent.insights import CRM_PERMISSIONS, Insights, WhatsAppInput
 from app.modules.workspace_agent.schemas import (
     ChatInput,
     Delegation,
+    LeadChange,
+    NoteDraft,
     Plan,
     ReadInput,
     TaskCreate,
@@ -29,6 +33,13 @@ from app.modules.workspace_agent.service import (
     AgentService,
 )
 from app.modules.workspace_agent.team import Team, TeamInput
+from app.modules.workspace_agent.toolkit import (
+    ActivityInput,
+    Customer360Input,
+    SearchInput,
+    Toolkit,
+    WhatIfInput,
+)
 from app.shared.errors import BusinessRuleViolation, PermissionDenied, ResourceNotFound
 
 
@@ -112,6 +123,56 @@ def tools_for(service: AgentService) -> list[ToolDefinition]:
             TeamInput.model_json_schema(),
         ),
     ]
+    result.append(
+        ToolDefinition(
+            "search",
+            (
+                "Search everything the user may read at once: customers (name, company, "
+                "email, phone), leads, quotes, orders and invoices by number, products and "
+                "employees. Use first when the user names a person, company or document."
+            ),
+            SearchInput.model_json_schema(),
+        )
+    )
+    if service.scope.can("customers.read"):
+        result.append(
+            ToolDefinition(
+                "customer_360",
+                (
+                    "Everything about ONE customer: profile, recent orders, open quotes, unpaid "
+                    "invoices (overdue flagged), leads, notes, timeline and WhatsApp summary, "
+                    "each only if the user may read that area. Pass customer_id from a result, "
+                    "or a name (ambiguous names return candidates to ask about)."
+                ),
+                Customer360Input.model_json_schema(),
+            )
+        )
+    if service.scope.can("billing.read"):
+        result.append(
+            ToolDefinition(
+                "what_if",
+                (
+                    "Scenario simulator for decisions: change revenue or spending by a percent, "
+                    "add a monthly cost (e.g. a hire's salary) or income, or a one-time cost, "
+                    "and see month-by-month cumulative net cash vs today's pace, payback and "
+                    "the month cash would go negative. Based on the last 3 complete months; "
+                    "it's a projection with stated assumptions, not a promise."
+                ),
+                WhatIfInput.model_json_schema(),
+            )
+        )
+    if service.scope.can("audit.read"):
+        result.append(
+            ToolDefinition(
+                "activity",
+                (
+                    "Who did what in the workspace recently (audit log): events by person and "
+                    "action, and the latest 20 events. Use for 'what happened today', 'who "
+                    "changed X' and team accountability."
+                ),
+                ActivityInput.model_json_schema(),
+            )
+        )
     if any(service.scope.can(p) for p in CRM_PERMISSIONS):
         result.append(
             ToolDefinition(
@@ -190,6 +251,10 @@ def tools_for(service: AgentService) -> list[ToolDefinition]:
         },
         "tasks.create": TaskCreate.model_json_schema(),
         "tasks.update": TaskUpdate.model_json_schema(),
+        "leads.create": LeadCreate.model_json_schema(),
+        "leads.update": LeadChange.model_json_schema(),
+        "customer_notes.create": NoteDraft.model_json_schema(),
+        "expenses.create": ExpenseCreate.model_json_schema(),
     }
     for operation, permissions in WRITE_PERMISSIONS.items():
         if all(service.scope.can(p) for p in permissions):
@@ -214,8 +279,12 @@ and say what to do. Capabilities: analytics for trends, KPIs, forecasts and grap
 (the app renders its charts; never draw text charts or tables of the same numbers); consult_team
 for decisions, strategy and "should I" questions (parallel specialists plus a strategist);
 monitor for workspace health and alerts; crm_overview for CRM/pipeline/receivables;
-whatsapp to summarize customer conversations (inbox-wide or one thread); read/navigate for
-records; summary for a broad overview. Forecasts are estimates: give the expected value, the
+whatsapp to summarize customer conversations (inbox-wide or one thread); search to find any
+person, company or document; customer_360 for everything about one customer; what_if to
+simulate a decision (hire, price change, new cost) before advising; activity for who did what;
+read/navigate for records; summary for a broad overview. You can PREVIEW new leads, lead
+updates and stage moves, customer notes and expenses as well as tasks, customers and employees.
+Forecasts are estimates: give the expected value, the
 likely range and the basis (method, months of history); say plainly when history is too thin.
 Compare against last month or the previous three months when you cite a figure. For a
 decision brief, lead with the recommendation, then the reason, then the next step.
@@ -339,6 +408,25 @@ async def chat(
                     elif call.name == "monitor":
                         output = await insights.monitor()
                         signals[:] = output["signals"]
+                    elif call.name in {"search", "customer_360", "activity"}:
+                        kit = Toolkit(service)
+                        if call.name == "search":
+                            output = await kit.search(SearchInput.model_validate(call.arguments))
+                        elif call.name == "customer_360":
+                            output = await kit.customer_360(
+                                Customer360Input.model_validate(call.arguments)
+                            )
+                        else:
+                            output = await kit.activity(
+                                ActivityInput.model_validate(call.arguments)
+                            )
+                        results.extend(output["results"])
+                    elif call.name == "what_if":
+                        block = await Toolkit(service).what_if(
+                            WhatIfInput.model_validate(call.arguments)
+                        )
+                        analytics.append(block)
+                        output = for_model(block)
                     elif call.name == "analytics":
                         request = AnalyticsInput.model_validate(call.arguments)
                         block = await Analytics(service, request.months).run(request.topic)
@@ -470,6 +558,19 @@ TOPIC_WORDS = (
 )
 
 
+ACTIVITY_WORDS = ("activity", "audit", "who changed", "who did", "kisne")
+SEARCH_PREFIX = re.compile(
+    r"^\s*(?:search|find|look\s*up|dhundo|talash)\s*(?:for\s+)?[:\-]?\s*(.{2,100})$",
+    re.IGNORECASE,
+)
+
+
+def search_query(message: str) -> str | None:
+    """'search Acme' / 'find INV-001' / 'dhundo Ali' -> the query text."""
+    match = SEARCH_PREFIX.match(message)
+    return match.group(1).strip(" ?.") if match else None
+
+
 def has(text: str, words: tuple[str, ...]) -> bool:
     """Whole-word (prefix) match, so "plan" doesn't fire on "explain"."""
     return any(re.search(r"\b" + re.escape(w), text) for w in words)
@@ -516,6 +617,17 @@ async def fallback(service: AgentService, data: ChatInput) -> dict[str, Any]:
             f"{identity['name']} — roles: {', '.join(identity['roles'])}. "
             f"Permissions: {', '.join(identity['permissions'])}."
         )
+    elif (query := search_query(data.message)) is not None:
+        found = await Toolkit(service).search(SearchInput(query=query))
+        results = found["results"]
+        message = (
+            f"Found matches for “{query}” in: {', '.join(found['found_in'])}."
+            if results
+            else f"Nothing you can access matches “{query}”."
+        )
+    elif has(text, ACTIVITY_WORDS) and service.scope.can("audit.read"):
+        results = (await Toolkit(service).activity(ActivityInput()))["results"]
+        message = "Recent workspace activity (last 7 days)."
     elif has(text, TEAM_WORDS):
         team = await Team(service, None, False).consult(TeamInput(question=data.message[:1000]))
         message = (

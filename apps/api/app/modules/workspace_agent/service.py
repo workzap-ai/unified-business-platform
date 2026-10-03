@@ -2,7 +2,7 @@
 
 import hashlib
 import json
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any, cast
 from uuid import UUID
 
@@ -20,6 +20,7 @@ from app.modules.customers.models import Customer
 from app.modules.customers.schemas import CustomerCreate, CustomerUpdate
 from app.modules.customers.service import CustomerService
 from app.modules.finance.models import Expense
+from app.modules.finance.service import ExpenseCreate, FinanceService
 from app.modules.hr.models import Employee
 from app.modules.hr.service import EmployeeCreate, EmployeeUpdate, HRService
 from app.modules.inventory.models import StockLevel
@@ -27,10 +28,18 @@ from app.modules.memberships.models import Membership
 from app.modules.orders.models import Order
 from app.modules.quotes.models import Quote
 from app.modules.sales.models import SalesLead
+from app.modules.sales.schemas import LeadCreate, LeadUpdate
+from app.modules.sales.service import LEAD_STAGES, SalesService
 from app.modules.tenants.context import require_active_scope
 from app.modules.users.models import PlatformUser
 from app.modules.workspace_agent.models import WorkspaceAgentAction, WorkspaceTask
-from app.modules.workspace_agent.schemas import ReadInput, TaskCreate, TaskUpdate
+from app.modules.workspace_agent.schemas import (
+    LeadChange,
+    NoteDraft,
+    ReadInput,
+    TaskCreate,
+    TaskUpdate,
+)
 from app.shared.errors import BusinessRuleViolation, PermissionDenied, ResourceNotFound
 from app.shared.models import WorkspaceRow
 from app.shared.scope import WorkspaceScope
@@ -100,6 +109,10 @@ WRITE_PERMISSIONS = {
     "customers.update": ("customers.read", "customers.write"),
     "tasks.create": ("tasks.read", "tasks.write"),
     "tasks.update": ("tasks.read", "tasks.write"),
+    "leads.create": ("sales.read", "sales.write"),
+    "leads.update": ("sales.read", "sales.write"),
+    "customer_notes.create": ("customers.read", "customers.write"),
+    "expenses.create": ("finance.read", "finance.write"),
 }
 
 
@@ -339,6 +352,49 @@ class AgentService:
             payload = {"id": str(row_id), "changes": changes, "version": str(row.updated_at)}
         elif operation == "customers.create":
             payload = CustomerCreate.model_validate(arguments).model_dump(mode="json")
+        elif operation == "leads.create":
+            lead_data = LeadCreate.model_validate(arguments)
+            if lead_data.customer_id:
+                await WorkspaceRepository(self.session, Customer, self.scope).get(
+                    lead_data.customer_id
+                )
+            payload = lead_data.model_dump(mode="json")
+        elif operation == "leads.update":
+            lead_change = LeadChange.model_validate(arguments)
+            lead = await WorkspaceRepository(self.session, SalesLead, self.scope).get(
+                lead_change.id
+            )
+            if lead_change.changes is None and lead_change.stage is None:
+                raise invalid("Provide a lead change or a new stage.")
+            if lead_change.changes and lead_change.changes.customer_id:
+                await WorkspaceRepository(self.session, Customer, self.scope).get(
+                    lead_change.changes.customer_id
+                )
+            if lead_change.stage is not None and lead_change.stage != lead.stage:
+                LEAD_STAGES.ensure(lead.stage, lead_change.stage)
+            payload = {
+                "id": str(lead.id),
+                "title": lead.title,
+                "changes": (
+                    lead_change.changes.model_dump(mode="json", exclude_unset=True)
+                    if lead_change.changes
+                    else {}
+                ),
+                "stage": lead_change.stage,
+                "from_stage": lead.stage,
+                "version": str(lead.updated_at),
+            }
+        elif operation == "customer_notes.create":
+            note = NoteDraft.model_validate(arguments)
+            customer = await WorkspaceRepository(self.session, Customer, self.scope).get(
+                note.customer_id
+            )
+            payload = {**note.model_dump(mode="json"), "customer": customer.name}
+        elif operation == "expenses.create":
+            expense = ExpenseCreate.model_validate(arguments)
+            if expense.incurred_on > date.today():
+                raise invalid("Expenses cannot be dated in the future.")
+            payload = expense.model_dump(mode="json")
         elif operation == "tasks.create":
             task = TaskCreate.model_validate(arguments)
             if task.assignee_id is None:
@@ -508,6 +564,38 @@ class AgentService:
                     CustomerCreate.model_validate(payload)
                 )
                 ids.append(str(customer.id))
+            elif operation == "leads.create":
+                lead = await SalesService(self.session, self.scope).create(
+                    LeadCreate.model_validate(payload)
+                )
+                ids.append(str(lead.id))
+            elif operation == "leads.update":
+                lead_id = UUID(payload["id"])
+                sales = SalesService(self.session, self.scope)
+                current_lead = await WorkspaceRepository(self.session, SalesLead, self.scope).get(
+                    lead_id, for_update=True
+                )
+                if str(current_lead.updated_at) != payload["version"]:
+                    raise BusinessRuleViolation(
+                        "AGENT_RECORD_CHANGED",
+                        "This record changed after the preview. Create a fresh preview.",
+                        409,
+                    )
+                if payload["changes"]:
+                    await sales.update(lead_id, LeadUpdate.model_validate(payload["changes"]))
+                if payload["stage"] and payload["stage"] != current_lead.stage:
+                    await sales.move(lead_id, payload["stage"])
+                ids.append(str(lead_id))
+            elif operation == "customer_notes.create":
+                created_note = await CustomerService(self.session, self.scope).add_note(
+                    UUID(payload["customer_id"]), payload["body"]
+                )
+                ids.append(str(created_note.id))
+            elif operation == "expenses.create":
+                recorded = await FinanceService(self.session, self.scope).create_expense(
+                    ExpenseCreate.model_validate(payload)
+                )
+                ids.append(str(recorded.id))
             elif operation == "tasks.create":
                 task_data = TaskCreate.model_validate(payload)
                 await self._assignee(task_data.assignee_id)

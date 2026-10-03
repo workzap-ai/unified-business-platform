@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
+from app.modules.sales.schemas import LeadUpdate
+
 Text = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=4000)]
 Specialist = Literal["operations", "hr", "finance", "crm"]
 
@@ -31,6 +33,19 @@ class TaskUpdate(StrictInput):
     priority: Literal["low", "normal", "high"] | None = None
     assignee_id: UUID | None = None
     due_date: date | None = None
+
+
+class LeadChange(StrictInput):
+    """Lead edits and/or a stage move (the stage machine is checked on preview and apply)."""
+
+    id: UUID
+    changes: LeadUpdate | None = None
+    stage: Literal["new", "qualified", "proposal", "won", "lost"] | None = None
+
+
+class NoteDraft(StrictInput):
+    customer_id: UUID
+    body: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=4000)]
 
 
 class ReadInput(StrictInput):
@@ -87,6 +102,10 @@ class ProposalInput(StrictInput):
         "customers.update",
         "tasks.create",
         "tasks.update",
+        "leads.create",
+        "leads.update",
+        "customer_notes.create",
+        "expenses.create",
     ]
     arguments: dict[str, Any]
 
