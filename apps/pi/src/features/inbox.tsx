@@ -123,6 +123,12 @@ export function InboxPage() {
           <div className="space-y-3 border-b border-border p-3">
             <div className={product.inboxHeading}>
               <h1>Inbox</h1>
+              <Link
+                href="/inbox/handoffs"
+                className="ms-auto me-2 inline-flex min-h-9 items-center rounded-full border border-border px-3 text-xs font-medium text-foreground-secondary hover:bg-surface-muted"
+              >
+                Handoffs
+              </Link>
               <span>
                 <InboxIcon size={17} aria-hidden />
               </span>

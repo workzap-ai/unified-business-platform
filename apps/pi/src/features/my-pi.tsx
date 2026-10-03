@@ -11,6 +11,8 @@ import {
   SlidersHorizontal,
   Sparkles,
   Trash2,
+  Bot,
+  Settings2,
 } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
@@ -53,8 +55,10 @@ import type { Draft } from "@/lib/types";
 const SECTIONS = [
   { href: "/my-pi/knowledge", label: "Business knowledge" },
   { href: "/my-pi/behaviour", label: "Behaviour" },
+  { href: "/my-pi/agents", label: "Agents" },
   { href: "/my-pi/tools", label: "Tools" },
   { href: "/my-pi/follow-ups", label: "Follow-ups" },
+  { href: "/my-pi/advanced", label: "Advanced" },
   { href: "/my-pi/test", label: "Test Pi" },
 ];
 
@@ -91,6 +95,12 @@ export function MyPiOverview() {
       body: "Tone, prices, approvals and when Pi hands over to your team.",
     },
     {
+      href: "/my-pi/agents",
+      icon: Bot,
+      title: "Agents",
+      body: "The specialists inside Pi: their instructions, tools and versions.",
+    },
+    {
       href: "/my-pi/tools",
       icon: PlugZap,
       title: "Tools",
@@ -101,6 +111,12 @@ export function MyPiOverview() {
       icon: BellRing,
       title: "Follow-ups",
       body: "Friendly reminders for customers who agreed to them.",
+    },
+    {
+      href: "/my-pi/advanced",
+      icon: Settings2,
+      title: "Advanced",
+      body: "AI providers, handoff rules, knowledge search and tool permissions.",
     },
     {
       href: "/my-pi/test",

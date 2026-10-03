@@ -307,6 +307,11 @@ export function WhatsAppPage() {
                         <HeartPulse className="size-4" aria-hidden /> Check
                         health
                       </Button>
+                      <Button asChild variant="secondary">
+                        <Link href="/settings/whatsapp/activity">
+                          Messages &amp; events
+                        </Link>
+                      </Button>
                       <Button
                         variant="danger"
                         onClick={() => setConfirmOpen(true)}

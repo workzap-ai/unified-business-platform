@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   ArrowUpRight,
+  BarChart3,
   CheckCircle2,
   CircleAlert,
   CirclePause,
@@ -312,18 +313,26 @@ export function HomePage() {
             </Badge>
           </div>
         </div>
-        <Button asChild variant="secondary" className="w-full sm:w-auto">
-          <Link href="/inbox">
-            <Inbox size={16} aria-hidden />
-            Open inbox
-            {unread > 0 && (
-              <span className="rounded-full bg-accent px-1.5 text-xs text-accent-foreground">
-                {count(unread)}
-              </span>
-            )}
-            <ArrowUpRight size={15} aria-hidden />
-          </Link>
-        </Button>
+        <div className="flex w-full gap-2 sm:w-auto">
+          <Button asChild variant="secondary" className="flex-1 sm:flex-none">
+            <Link href="/analytics">
+              <BarChart3 size={16} aria-hidden />
+              Analytics
+            </Link>
+          </Button>
+          <Button asChild variant="secondary" className="flex-1 sm:flex-none">
+            <Link href="/inbox">
+              <Inbox size={16} aria-hidden />
+              Open inbox
+              {unread > 0 && (
+                <span className="rounded-full bg-accent px-1.5 text-xs text-accent-foreground">
+                  {count(unread)}
+                </span>
+              )}
+              <ArrowUpRight size={15} aria-hidden />
+            </Link>
+          </Button>
+        </div>
       </header>
       <StatusCard data={home.data} />
       {insights.data ? (

@@ -2,6 +2,7 @@
 
 import * as Menu from "@radix-ui/react-dropdown-menu";
 import {
+  BarChart3,
   Bot,
   ArrowUpRight,
   Check,
@@ -20,16 +21,29 @@ import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
 
 import { Wordmark } from "@/components/brand";
+import { PiAssistant } from "@/features/assistant";
 import { NotificationBell } from "@/features/journey";
 import { Badge, Button, ErrorState, Spinner, cn } from "@/components/ui";
 import { errorText, post } from "@/lib/api";
 import { STATE_LABEL } from "@/lib/format";
-import { useAction, useSession, useSignOut, useSwitchBusiness } from "@/lib/session";
+import {
+  useAction,
+  useSession,
+  useSignOut,
+  useSwitchBusiness,
+} from "@/lib/session";
 import s from "./product.module.css";
 
-const NAV = [
+const NAV: {
+  href: string;
+  label: string;
+  icon: typeof Home;
+  mobile?: boolean;
+}[] = [
   { href: "/home", label: "Home", icon: Home },
   { href: "/inbox", label: "Inbox", icon: Inbox },
+  // Desktop sidebar only: phones reach it from Home (the bottom bar keeps five items).
+  { href: "/analytics", label: "Analytics", icon: BarChart3, mobile: false },
   { href: "/customers", label: "Customers", icon: Users },
   { href: "/my-pi", label: "My Pi", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
@@ -311,21 +325,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           aria-label="Main"
           className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] md:hidden"
         >
-          {NAV.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              aria-current={active(href) ? "page" : undefined}
-              className={cn(
-                "flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-muted-foreground",
-                active(href) && "text-accent",
-              )}
-            >
-              <Icon className="size-5" aria-hidden />
-              {label}
-            </Link>
-          ))}
+          {NAV.filter((item) => item.mobile !== false).map(
+            ({ href, label, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                aria-current={active(href) ? "page" : undefined}
+                className={cn(
+                  "flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-muted-foreground",
+                  active(href) && "text-accent",
+                )}
+              >
+                <Icon className="size-5" aria-hidden />
+                {label}
+              </Link>
+            ),
+          )}
         </nav>
+        <PiAssistant />
       </div>
     </div>
   );
