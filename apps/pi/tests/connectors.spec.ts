@@ -40,8 +40,8 @@ const connector = (
   name: key === "shopify" ? "Shopify" : "Google Calendar",
   description:
     key === "shopify"
-      ? "Pi can tell customers where their Shopify order is. It cannot change orders."
-      : "Pi checks your free times and adds confirmed bookings to your calendar.",
+      ? "pi can tell customers where their Shopify order is. It cannot change orders."
+      : "pi checks your free times and adds confirmed bookings to your calendar.",
   available: true,
   state,
   detail: "",

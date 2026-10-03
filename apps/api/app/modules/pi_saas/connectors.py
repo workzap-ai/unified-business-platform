@@ -50,11 +50,11 @@ USABLE = ("connected", "degraded")
 PLAIN = {
     "google_calendar": (
         "Google Calendar",
-        "Pi checks your free times and adds confirmed bookings to your calendar.",
+        "pi checks your free times and adds confirmed bookings to your calendar.",
     ),
     "shopify": (
         "Shopify",
-        "Pi can tell customers where their Shopify order is. It cannot change orders.",
+        "pi can tell customers where their Shopify order is. It cannot change orders.",
     ),
 }
 
