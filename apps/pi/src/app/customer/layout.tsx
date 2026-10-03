@@ -16,7 +16,7 @@ export default function CustomerLayout({
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <header className="border-b border-border bg-surface/80 backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-2xl items-center justify-between px-4">
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
           <Link
             href="/customer"
             aria-label="PI Customer home"
@@ -29,7 +29,7 @@ export default function CustomerLayout({
           </Link>
         </div>
       </header>
-      <main id="main" className="flex-1 px-4 py-8 sm:py-10">
+      <main id="main" className="flex-1 px-4 py-6 sm:py-10">
         <Suspense>{children}</Suspense>
       </main>
       <footer className="px-4 pb-8 text-center text-xs text-muted-foreground">

@@ -201,6 +201,9 @@ async def test_ai_lists_the_customers_requests_once_per_new_message(
     assert again["issues"] == first["issues"] and calls == [1]  # cached until a new message
     listed = (await customer.get(f"{PORTAL}/conversations")).json()[0]
     assert listed["issues_open"] == 1
+    assert listed["issues_preview"] == [
+        {"title": "Website banwana", "status": "open", "category": "inquiry"}
+    ]
     conversation = await business_db.get(PiConversation, conversation_id)
     await business_db.refresh(conversation)
     # Pi's own brief keys are kept beside the cached list.

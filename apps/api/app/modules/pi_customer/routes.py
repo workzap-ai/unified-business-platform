@@ -161,6 +161,15 @@ async def list_conversations(customer: Customer, session: Session) -> list[dict[
                 "with_team": conversation.mode == "human",
                 "issues_open": sum(1 for i in issues if i.get("status") != "resolved"),
                 "issues_total": len(issues),
+                # Open matters first, for the dashboard's request overview.
+                "issues_preview": [
+                    {
+                        "title": i.get("title", ""),
+                        "status": i.get("status", "open"),
+                        "category": i.get("category", "other"),
+                    }
+                    for i in sorted(issues, key=lambda i: i.get("status") == "resolved")[:3]
+                ],
             }
         )
     return out

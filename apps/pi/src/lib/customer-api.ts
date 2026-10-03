@@ -89,6 +89,7 @@ export type CustomerConversationItem = {
   with_team: boolean;
   issues_open: number;
   issues_total: number;
+  issues_preview: Pick<CustomerIssue, "title" | "status" | "category">[];
 };
 
 export type CustomerMessage = {
