@@ -253,6 +253,85 @@ export function Section({
   );
 }
 
+/**
+ * A made-up solution document and quote, shown beside the steps so people can see what
+ * "a solution" means. Labelled Illustrative; no price, time or result is promised.
+ */
+export function SolutionPreview() {
+  return (
+    <figure className="pi-solve">
+      <div className="pi-solve-grid">
+        <article className="pi-doc" aria-label="Example solution document">
+          <header>
+            <span className="pi-doc-kind">Solution document</span>
+            <span className="pi-doc-tag">Illustrative</span>
+          </header>
+          <h3>Best-sellers running out</h3>
+          <dl>
+            <div>
+              <dt>Your problem, in your words</dt>
+              <dd>
+                “We keep running out of our best-selling items.” Two of the four
+                shops.
+              </dd>
+            </div>
+            <div>
+              <dt>What Workzap would build</dt>
+              <dd>
+                A stock check that tells each shop when a best-seller is getting
+                low.
+              </dd>
+            </div>
+            <div>
+              <dt>What it covers</dt>
+              <dd>Stock in the two shops where it happens.</dd>
+            </div>
+            <div>
+              <dt>What it won’t do</dt>
+              <dd>Change how you order from your suppliers.</dd>
+            </div>
+          </dl>
+        </article>
+        <article className="pi-doc" aria-label="Example quote">
+          <header>
+            <span className="pi-doc-kind">Quote</span>
+            <span className="pi-doc-tag">Illustrative</span>
+          </header>
+          <h3>For the stock check</h3>
+          <dl>
+            <div>
+              <dt>What’s included</dt>
+              <dd>
+                The stock check for two shops, set-up, and a kickoff call.
+              </dd>
+            </div>
+            <div>
+              <dt>Cost and time</dt>
+              <dd>Written on your quote, before you decide.</dd>
+            </div>
+            <div>
+              <dt>How you pay</dt>
+              <dd>
+                Bank transfer or a secure card page. Never inside the chat.
+              </dd>
+            </div>
+          </dl>
+          <p className="pi-doc-foot">A quote is an offer. It isn’t a charge.</p>
+          <ul className="pi-doc-choices" aria-label="Your choices">
+            <li>Approve</li>
+            <li>Ask for changes</li>
+            <li>Say no</li>
+          </ul>
+        </article>
+      </div>
+      <figcaption>
+        Illustrative. A real document and quote are written from what you told
+        pi.
+      </figcaption>
+    </figure>
+  );
+}
+
 /** Bold lead + sentence rows, used for most lists. */
 export function Points({
   items,

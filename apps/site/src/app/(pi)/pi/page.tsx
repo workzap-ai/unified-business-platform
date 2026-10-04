@@ -12,15 +12,18 @@ import {
   Points,
   Section,
   Slot,
+  SolutionPreview,
   Thread,
 } from "@/features/pi/ui";
 
 export const metadata = piMetadata({
   path: "",
   title: "pi by Workzap: talk about your problems on WhatsApp",
-  description: PI.live.dashboard
-    ? "Chat with pi on WhatsApp about the problems in your business. pi, an AI from Workzap, notes each one, sorts them and shows you everything in one place."
-    : "Chat with pi on WhatsApp about the problems in your business. pi, an AI from Workzap, notes each one and sorts them.",
+  description: PI.live.solutions
+    ? "Tell pi, an AI from Workzap, what is going wrong in your business on WhatsApp. pi sorts your problems, then you can get a solution document and a quote, and Workzap builds it."
+    : PI.live.dashboard
+      ? "Chat with pi on WhatsApp about the problems in your business. pi, an AI from Workzap, notes each one, sorts them and shows you everything in one place."
+      : "Chat with pi on WhatsApp about the problems in your business. pi, an AI from Workzap, notes each one and sorts them.",
 });
 
 export default function PiLanding() {
@@ -30,13 +33,20 @@ export default function PiLanding() {
       <section className="pi-hero">
         <div className="pi-wrap pi-hero-grid">
           <div>
-            <h1>Tell pi what’s going wrong. pi keeps track.</h1>
+            <h1>
+              {PI.live.solutions
+                ? "Tell pi what’s going wrong. Workzap builds the solution."
+                : "Tell pi what’s going wrong. pi keeps track."}
+            </h1>
             <p className="pi-lead">
               pi is Workzap’s WhatsApp agent. Chat about the problems in your
               business the way you’d tell a colleague. pi notes each one
               {PI.live.dashboard
                 ? ", sorts them, and shows you everything in one place."
                 : " and sorts them."}
+              {PI.live.solutions
+                ? " When you’re ready, you get a solution document and a quote. You decide whether Workzap builds it."
+                : null}
             </p>
             <div className="pi-cta-row">
               <WhatsAppButton page="landing" pos="hero" />
@@ -128,6 +138,69 @@ export default function PiLanding() {
         />
       </Section>
 
+      <Gate name="solutions">
+        <Section title="From problem to solution" tone="tint" layout="stack">
+          <p className="pi-big">
+            Sorting is the start. Once your problems are sorted and you’re
+            ready, you can have a solution built for them.
+          </p>
+          <ul className="pi-ribbon" aria-label="From problem to solution">
+            <li>
+              <Face name="noted" size={88} />
+              pi sorts your problems
+            </li>
+            <li>
+              <Face name="think" size={88} />
+              You get a solution document
+            </li>
+            <li>
+              <Face name="heads" size={88} />
+              You get a quote
+            </li>
+            <li>
+              <Face name="rest" size={88} />
+              You decide
+            </li>
+            <li>
+              <Face name="done" size={88} />
+              Workzap builds it
+            </li>
+          </ul>
+          <SolutionPreview />
+          <Points
+            items={[
+              {
+                lead: "A solution made for your problems.",
+                text: "The document starts from what you told pi, in your words, so you can check it’s right.",
+              },
+              {
+                lead: "A quote before anything else.",
+                text: "What’s included, what it costs, how long it takes. An offer, not a charge.",
+              },
+              {
+                lead: "You stay in charge.",
+                text: "pi won’t send a document or a quote unless you say yes. Nothing is charged until you approve, and you can stop at any point before paying.",
+              },
+              {
+                lead: "Then Workzap builds.",
+                text: "Once your payment is confirmed, Workzap begins your project with a kickoff.",
+              },
+            ]}
+          />
+          <p>
+            <Slot kind="PRODUCT">
+              whether a person at Workzap checks each quote before it is sent
+            </Slot>{" "}
+            <Slot kind="WORKZAP">how Workzap describes what it builds</Slot>
+          </p>
+          <p>
+            <Link className="pi-arrow" href={`${PI.base}/solutions`}>
+              How the document, the quote and payment work →
+            </Link>
+          </p>
+        </Section>
+      </Gate>
+
       <Section title="Your chats, your say">
         <p className="pi-big">
           You choose what to tell pi. See how to stop, and what pi never asks
@@ -173,53 +246,6 @@ export default function PiLanding() {
           ]}
         />
       </Section>
-
-      <Gate name="solutions">
-        <Section title="From sorted problems to a solution built for you">
-          <p>
-            When your problems are sorted and you’re ready, pi prepares a
-            solution document and a quote. You read them, ask questions, and
-            decide. If you approve and pay, Workzap starts building. You can say
-            no at any point.
-          </p>
-          <Points
-            numbered
-            items={[
-              {
-                lead: "Sort your problems.",
-                text: "Tell pi what’s wrong and see it sorted.",
-              },
-              {
-                lead: "Get a solution document.",
-                text: "Only if you ask for one.",
-              },
-              {
-                lead: "Get a quote.",
-                text: "Written, with what’s included. An offer, not a charge.",
-              },
-              {
-                lead: "Approve and pay.",
-                text: "By bank transfer or secure card payment — never inside the chat.",
-              },
-              {
-                lead: "Workzap begins the build.",
-                text: "Once your payment is confirmed, starting with a kickoff.",
-              },
-            ]}
-          />
-          <p>
-            <Slot kind="PRODUCT">
-              whether a person at Workzap checks each quote before it is sent
-            </Slot>{" "}
-            <Slot kind="WORKZAP">how Workzap describes what it builds</Slot>
-          </p>
-          <p>
-            <Link href={`${PI.base}/solutions`}>
-              How quotes and payment work →
-            </Link>
-          </p>
-        </Section>
-      </Gate>
 
       <Section title="Quick answers" tone="soft" layout="stack">
         <div className="pi-qa">
