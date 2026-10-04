@@ -62,7 +62,9 @@ def build(app: Literal["pi", "web"]) -> APIRouter:
     @router.post("/google_calendar/start")
     async def start_google(request: Request, scope: Scope, session: Session) -> dict[str, str]:
         await require_pi(session, scope, "integrations.manage")
-        url = await connectors.start_google(session, scope, _runtime(request), app)
+        url = await connectors.start_google(
+            session, scope, _runtime(request), app, request.headers.get("origin")
+        )
         await session.commit()
         return {"authorization_url": url}
 
@@ -71,7 +73,9 @@ def build(app: Literal["pi", "web"]) -> APIRouter:
         data: ShopifyStart, request: Request, scope: Scope, session: Session
     ) -> dict[str, str]:
         await require_pi(session, scope, "integrations.manage")
-        url = await connectors.start_shopify(session, scope, _runtime(request), data.shop, app)
+        url = await connectors.start_shopify(
+            session, scope, _runtime(request), data.shop, app, request.headers.get("origin")
+        )
         await session.commit()
         return {"authorization_url": url}
 

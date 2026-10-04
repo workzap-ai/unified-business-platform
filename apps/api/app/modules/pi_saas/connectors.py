@@ -74,9 +74,26 @@ def _origin(url: str) -> str:
     return f"{parts.scheme}://{parts.netloc}" if parts.scheme and parts.netloc else ""
 
 
-def callback_uri(settings: Settings, key: str, app: str = "pi") -> str:
-    """Where the provider sends the browser back: the Pi app, or the Owner OS web app
-    (both must be registered as redirect URIs in the Google/Shopify app)."""
+def trusted_origin(settings: Settings, app: str, origin: str | None) -> str:
+    """The address the person clicked Connect on, if it is one of this app's allowed
+    addresses. Returning there keeps their sign-in, whichever domain they use."""
+    candidate = _origin(origin or "")
+    if not candidate:
+        return ""
+    if app == "web":
+        allowed = [*settings.cors_origins, settings.oauth_redirect_base_url or ""]
+    else:
+        allowed = [*settings.pi_app_origins, settings.pi_app_public_url or ""]
+    return candidate if candidate in {_origin(a) for a in allowed if a} else ""
+
+
+def callback_uri(settings: Settings, key: str, app: str = "pi", origin: str | None = None) -> str:
+    """Where the provider sends the browser back: the Pi app, or the Owner OS web app.
+    Every address used must be registered as a redirect URI in the Google/Shopify app."""
+    path = f"/api/v1/pi/connectors/{key}/callback" if app == "web" else CALLBACK[key]
+    here = trusted_origin(settings, app, origin)
+    if here:
+        return here + path
     if app == "web":
         # The operator-set return address wins (only its scheme and host are used, so a
         # full URL pasted there still works); the first allowed origin can be a Vercel
@@ -182,7 +199,11 @@ async def _connection(
 
 
 async def start_google(
-    session: AsyncSession, scope: WorkspaceScope, rt: Runtime, app: str = "pi"
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    rt: Runtime,
+    app: str = "pi",
+    origin: str | None = None,
 ) -> str:
     scope.require("integrations.manage")
     if not server_ready(rt.settings, "google_calendar"):
@@ -198,7 +219,7 @@ async def start_google(
         scope,
         connection,
         definition,
-        callback_uri=callback_uri(rt.settings, "google_calendar", app),
+        callback_uri=callback_uri(rt.settings, "google_calendar", app, origin),
     )
     await record(
         session,
@@ -259,7 +280,12 @@ def shopify_hmac_valid(params: Mapping[str, str], secret: str) -> bool:
 
 
 async def start_shopify(
-    session: AsyncSession, scope: WorkspaceScope, rt: Runtime, shop_input: str, app: str = "pi"
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    rt: Runtime,
+    shop_input: str,
+    app: str = "pi",
+    origin: str | None = None,
 ) -> str:
     scope.require("integrations.manage")
     settings = rt.settings
@@ -275,7 +301,7 @@ async def start_shopify(
         raise BusinessRuleViolation("INVALID_SHOP", exc.message, 422) from None
     connection = await _connection(session, scope, rt, "shopify", {"shop_domain": shop})
     state = secrets.token_urlsafe(32)
-    uri = callback_uri(settings, "shopify", app)
+    uri = callback_uri(settings, "shopify", app, origin)
     session.add(
         OAuthState(
             tenant_id=scope.tenant_id,

@@ -33,3 +33,25 @@ def test_without_the_setting_the_first_allowed_origin_is_used():
     assert callback_uri(settings, "google_calendar", "web") == (
         "https://owner.example.com/api/v1/pi/connectors/google_calendar/callback"
     )
+
+
+def test_the_return_address_follows_the_domain_connect_was_clicked_on():
+    settings = _settings(
+        cors_origins=["https://owner-a.example.com", "https://owner-b.example.com"],
+        pi_app_origins=["https://pi-a.example.com", "https://pi-b.example.com"],
+        pi_app_public_url="https://pi-a.example.com",
+        oauth_redirect_base_url="https://owner-a.example.com",
+    )
+    assert callback_uri(settings, "google_calendar", "pi", "https://pi-b.example.com") == (
+        "https://pi-b.example.com/api/v1/pi-app/pi/connectors/google_calendar/callback"
+    )
+    assert callback_uri(settings, "google_calendar", "web", "https://owner-b.example.com") == (
+        "https://owner-b.example.com/api/v1/pi/connectors/google_calendar/callback"
+    )
+    # An address that isn't allowed for that app is ignored.
+    assert callback_uri(settings, "shopify", "pi", "https://evil.example.com") == (
+        "https://pi-a.example.com/api/v1/pi-app/pi/connectors/shopify/callback"
+    )
+    assert callback_uri(settings, "shopify", "pi", "https://owner-b.example.com") == (
+        "https://pi-a.example.com/api/v1/pi-app/pi/connectors/shopify/callback"
+    )
