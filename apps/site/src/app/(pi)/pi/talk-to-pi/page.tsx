@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { PI } from "@/features/pi/config";
 import { TrackOnMount, WhatsAppButton } from "@/features/pi/client";
@@ -31,24 +32,24 @@ export default function TalkToPi() {
         <p className="pi-small">
           WhatsApp opens with “Hi pi” ready to send. Just tap send.
         </p>
-        {PI.whatsappNumber ? null : (
+        {PI.whatsappNumber ? (
           <p>
-            <Slot kind="PRODUCT">
-              pi’s real WhatsApp number or link, registered under Workzap’s own
-              Meta Business account — never publish a test provider’s number
-            </Slot>
+            Or message pi directly on WhatsApp at{" "}
+            <strong>{PI.displayNumber}</strong>.
           </p>
-        )}
+        ) : null}
       </Section>
 
       <Section title="On a computer" tone="soft">
         <p>Scan this code with your phone’s camera.</p>
-        <div className="pi-qr">
-          <Slot kind="PRODUCT">
-            QR code for the real WhatsApp link, 240 px, with the pi Resting
-            avatar small in the corner only if the code still scans
-          </Slot>
-        </div>
+        <Image
+          className="pi-qr-img"
+          src="/pi-brand/pi-whatsapp-qr.svg"
+          alt={`QR code that opens a WhatsApp chat with pi at ${PI.displayNumber}`}
+          width={240}
+          height={240}
+          unoptimized
+        />
       </Section>
 
       <Section title="What pi says first">

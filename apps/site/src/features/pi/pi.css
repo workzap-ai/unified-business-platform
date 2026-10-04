@@ -1049,3 +1049,12 @@ ul.pi-points > li {
     padding: 22px;
   }
 }
+
+/* the real QR code on the start page */
+.pi-qr-img {
+  display: block;
+  width: 240px;
+  height: 240px;
+  border: 1px solid var(--pi-line);
+  border-radius: 16px;
+}

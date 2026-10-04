@@ -5,7 +5,11 @@ export const PI = {
   // WhatsApp number for pi, digits only with the country code (no "+").
   // Must be a number registered under Workzap's own Meta Business account — never a
   // test provider's number. Until it is set, every button opens /pi/talk-to-pi.
-  whatsappNumber: null as string | null,
+  // Set on 4 Oct 2026 from the owner: +1 (201) 471-3467. If it ever changes, also
+  // regenerate public/pi-brand/pi-whatsapp-qr.svg (a QR for wa.me/<number>?text=Hi%20pi).
+  whatsappNumber: "12014713467" as string | null,
+  // The same number as people read it.
+  displayNumber: "+1 201 471 3467",
   whatsappText: "Hi pi",
   // Pages that are written but must stay hidden until the product behind them exists.
   // solutions: opened on 4 Oct 2026 at the owner's request. "How pi solves your problem"

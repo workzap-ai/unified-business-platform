@@ -1,4 +1,5 @@
 import { Breadcrumbs, piMetadata } from "@/features/pi/meta";
+import { PI } from "@/features/pi/config";
 import { PageIntro, Points, Section, Slot } from "@/features/pi/ui";
 
 export const metadata = piMetadata({
@@ -28,8 +29,8 @@ export default function Help() {
               lead: "Message pi directly.",
               text: (
                 <>
-                  Save <Slot kind="PRODUCT">pi’s number</Slot> in your contacts
-                  as “pi” and send “Hi pi”.
+                  Save <strong>{PI.displayNumber}</strong> in your contacts as
+                  “pi” and send “Hi pi”.
                 </>
               ),
             },
