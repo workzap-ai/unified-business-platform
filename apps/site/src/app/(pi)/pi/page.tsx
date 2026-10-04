@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { PI } from "@/features/pi/config";
 import { WhatsAppButton } from "@/features/pi/client";
-import { Breadcrumbs, piMetadata } from "@/features/pi/meta";
+import { Breadcrumbs, JsonLd, piMetadata } from "@/features/pi/meta";
+import { ORG_ID, SITE_URL } from "@/lib/seo";
 import {
   AiChip,
   Chat,
@@ -28,6 +29,22 @@ export default function PiLanding() {
   return (
     <>
       <Breadcrumbs path="" />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": `${SITE_URL}/pi#software`,
+          name: "pi",
+          alternateName: "pi by Workzap",
+          url: `${SITE_URL}/pi`,
+          description:
+            "pi is Workzap’s WhatsApp agent. You tell pi what is going wrong in your business, pi notes and sorts the problems, and when you are ready you can get a solution document and a quote.",
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "WhatsApp",
+          inLanguage: "en",
+          publisher: { "@id": ORG_ID },
+        }}
+      />
       <section className="pi-hero">
         <div className="pi-wrap pi-hero-grid">
           <div>

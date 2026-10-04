@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import { pageMetadata } from "@/lib/seo";
+import { JsonLd, ORGANIZATION, WEBSITE, pageMetadata } from "@/lib/seo";
 import { PiLauncher } from "@/components/pi-launcher";
 import { SiteNav } from "@/features/workzap/client";
 import { Logo, SiteFooter } from "@/features/workzap/ui";
@@ -41,6 +41,12 @@ export default function WorkzapLayout({
           {children}
         </main>
         <SiteFooter />
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@graph": [ORGANIZATION, WEBSITE],
+          }}
+        />
         <PiLauncher />
       </body>
     </html>

@@ -28,8 +28,16 @@ export const ORGANIZATION = {
   "@id": ORG_ID,
   name: "Workzap",
   url: SITE_URL,
+  logo: `${SITE_URL}/workzap-brand/workzap-logo.svg`,
   description:
     "Workzap makes nori, a daily read for the shop, and pi, a WhatsApp agent.",
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    telephone: "+1-201-471-3467",
+    url: "https://wa.me/12014713467?text=Hi%20pi",
+    availableLanguage: "English",
+  },
 };
 
 export const WEBSITE = {

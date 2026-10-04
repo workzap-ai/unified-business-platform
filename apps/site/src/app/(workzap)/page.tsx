@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { JsonLd, ORGANIZATION, WEBSITE, pageMetadata } from "@/lib/seo";
+import { pageMetadata } from "@/lib/seo";
 import { AREAS, PRODUCTS, TALK } from "@/features/workzap/data";
 import {
   ArrowLink,
@@ -56,13 +56,6 @@ const steps = [
 export default function Home() {
   return (
     <>
-      <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@graph": [ORGANIZATION, WEBSITE],
-        }}
-      />
-
       <section className="wz-hero">
         <div className="wz-wrap wz-hero-grid">
           <div>
