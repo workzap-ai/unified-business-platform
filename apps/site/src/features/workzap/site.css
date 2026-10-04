@@ -1677,3 +1677,22 @@ main:focus {
     display: none;
   }
 }
+
+.wz-card .wz-contact-number {
+  margin: 12px 0 0;
+  font-size: 1.375rem;
+  line-height: 1.3;
+  color: var(--wz-ink);
+}
+.wz-contact-qr {
+  margin-top: 32px;
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+.wz-contact-qr img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--wz-line);
+  border-radius: 16px;
+}

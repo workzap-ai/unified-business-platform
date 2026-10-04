@@ -2,14 +2,14 @@ import Link from "next/link";
 import { PI } from "@/features/pi/config";
 import { TrackOnMount } from "@/features/pi/client";
 import { Breadcrumbs, piMetadata } from "@/features/pi/meta";
-import { CtaBlock, Gate, PageIntro, Section, Slot } from "@/features/pi/ui";
+import { CtaBlock, Gate, PageIntro, Section } from "@/features/pi/ui";
 
 export const metadata = piMetadata({
   path: "/trust",
   title: "Your chats, your say: how pi treats what you tell it",
   description: PI.live.solutions
-    ? "pi is an AI and says so. See how to stop, what pi never asks for, and how quotes and payment work. Plain answers about your chats."
-    : "pi is an AI and says so. See how to stop, what pi never asks for, and what to share. Plain answers about your chats.",
+    ? "pi is an AI and says so. See what pi never asks for, what to share, and how quotes and payment work. Plain answers about your chats."
+    : "pi is an AI and says so. See what pi never asks for and what to share. Plain answers about your chats.",
 });
 
 export default function Trust() {
@@ -27,12 +27,6 @@ export default function Trust() {
           whenever you ask. It has no human name and no human photo.
         </p>
       </Section>
-      <Section title="Stopping" tone="soft">
-        <p>
-          You can ask pi to stop at any time.{" "}
-          <Slot kind="PRODUCT">the exact words, and what happens next</Slot>
-        </p>
-      </Section>
       <Section title="What pi never asks for" tone="tint">
         <p>
           Card numbers, passwords, other people’s personal details, or payment
@@ -43,16 +37,8 @@ export default function Trust() {
         <Section title="Quotes and payment" tone="soft">
           <p>
             A quote from Workzap is an offer. Nothing is charged until you
-            approve it. You pay by bank transfer or on a secure card page —
-            never inside the chat — and pi never asks for card numbers.{" "}
-            <Slot kind="CONFIRM">
-              payment methods and that this matches Workzap’s process
-            </Slot>
-          </p>
-          <p>
-            Check the details before you pay: they should match those on your
-            Workzap dashboard. Workzap will never change its bank details by
-            message. <Slot kind="CONFIRM">that Workzap commits to this</Slot>
+            approve it. You pay by bank transfer, never inside the chat, and pi
+            never asks for card numbers.
           </p>
         </Section>
       </Gate>
@@ -69,13 +55,7 @@ export default function Trust() {
         </p>
       </Section>
       <Section title="Something not right?" tone="tint">
-        <p>
-          Tell pi in the chat.{" "}
-          <Slot kind="CONFIRM">
-            pi passes complaints on to a person at Workzap — build the hand-off
-            before this line goes live
-          </Slot>
-        </p>
+        <p>Tell pi in the chat.</p>
       </Section>
       <CtaBlock page="trust" pos="closing" />
     </>

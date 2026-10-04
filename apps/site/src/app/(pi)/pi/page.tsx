@@ -8,10 +8,8 @@ import {
   CtaBlock,
   Face,
   Gate,
-  PersonLine,
   Points,
   Section,
-  Slot,
   SolutionPreview,
   Thread,
 } from "@/features/pi/ui";
@@ -87,15 +85,7 @@ export default function PiLanding() {
           items={[
             {
               lead: "No forms. Just chat.",
-              text: (
-                <>
-                  Describe a problem in your own words, on the app you already
-                  use.{" "}
-                  <Slot kind="CONFIRM">
-                    voice notes and photos — say so only if they work at launch
-                  </Slot>
-                </>
-              ),
+              text: "Describe a problem in your own words, on the app you already use.",
             },
             {
               lead: "Nothing gets lost.",
@@ -188,12 +178,6 @@ export default function PiLanding() {
             ]}
           />
           <p>
-            <Slot kind="PRODUCT">
-              whether a person at Workzap checks each quote before it is sent
-            </Slot>{" "}
-            <Slot kind="WORKZAP">how Workzap describes what it builds</Slot>
-          </p>
-          <p>
             <Link className="pi-arrow" href={`${PI.base}/solutions`}>
               How the document, the quote and payment work →
             </Link>
@@ -203,8 +187,8 @@ export default function PiLanding() {
 
       <Section title="Your chats, your say">
         <p className="pi-big">
-          You choose what to tell pi. See how to stop, and what pi never asks
-          for.
+          You choose what to tell pi. See what pi never asks for, and what to
+          share.
         </p>
         <p>
           <Link className="pi-arrow" href={`${PI.base}/trust`}>
@@ -261,15 +245,6 @@ export default function PiLanding() {
                 : "Not while you’re describing a problem."}
             </p>
           </div>
-          <div className="pi-qa-item">
-            <h3>Can I make pi stop?</h3>
-            <p>
-              Yes.{" "}
-              <Slot kind="PRODUCT">
-                one fixed word that is always recognised, and what happens next
-              </Slot>
-            </p>
-          </div>
         </div>
         <p className="pi-qa-more">
           <Link className="pi-arrow" href={`${PI.base}/faq`}>
@@ -278,9 +253,11 @@ export default function PiLanding() {
         </p>
       </Section>
 
-      <CtaBlock page="landing" pos="closing" heading="Start with one problem.">
-        <PersonLine />
-      </CtaBlock>
+      <CtaBlock
+        page="landing"
+        pos="closing"
+        heading="Start with one problem."
+      />
     </>
   );
 }

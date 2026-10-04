@@ -83,7 +83,7 @@ export default function Home() {
               </Button>
             </div>
             <p className="wz-hero-note">
-              pi is an AI and says so. pi is coming soon.
+              pi is an AI and says so. pi is live on WhatsApp now.
             </p>
           </div>
 
@@ -111,7 +111,7 @@ export default function Home() {
                   </span>
                   <span>
                     <strong>pi</strong>
-                    <small>{PRODUCTS.pi.line} Coming soon.</small>
+                    <small>{PRODUCTS.pi.line} Live on WhatsApp.</small>
                   </span>
                   <span className="wz-arrow" aria-hidden="true">
                     →
@@ -173,7 +173,7 @@ export default function Home() {
                 <h3>
                   <Lockup product={PRODUCTS.pi} height={64} />
                 </h3>
-                <span className="wz-tag">Coming soon</span>
+                <span className="wz-tag">Live on WhatsApp</span>
               </div>
               <p className="wz-panel-line">
                 Tell pi what is going wrong. Workzap builds the solution.
@@ -318,7 +318,7 @@ export default function Home() {
 
       <CtaBand
         title="Tell pi what is going wrong."
-        sub="Start a chat on WhatsApp. pi is an AI and says so in its first message. pi is coming soon."
+        sub="Start a chat on WhatsApp. pi is an AI and says so in its first message."
       />
     </>
   );

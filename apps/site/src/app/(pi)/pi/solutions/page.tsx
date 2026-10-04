@@ -1,14 +1,7 @@
 import { notFound } from "next/navigation";
 import { PI } from "@/features/pi/config";
 import { Breadcrumbs, piMetadata } from "@/features/pi/meta";
-import {
-  CtaBlock,
-  Face,
-  PageIntro,
-  Points,
-  Section,
-  Slot,
-} from "@/features/pi/ui";
+import { CtaBlock, Face, PageIntro, Points, Section } from "@/features/pi/ui";
 
 export const metadata = piMetadata({
   path: "/solutions",
@@ -30,8 +23,7 @@ export default function Solutions() {
       >
         <p className="pi-small">
           Payment never happens inside the chat, and pi never asks for card
-          numbers. Workzap will never change its bank details by message.
-          “Sorted” means noted and grouped. It doesn’t mean solved.
+          numbers. “Sorted” means noted and grouped. It doesn’t mean solved.
         </p>
       </PageIntro>
 
@@ -41,7 +33,7 @@ export default function Solutions() {
           items={[
             {
               lead: "Your problems are sorted.",
-              text: "You’ve told pi what’s going wrong and seen it on your dashboard.",
+              text: "You’ve told pi what’s going wrong and seen what it has noted.",
             },
             {
               lead: "pi asks if you’d like a solution.",
@@ -49,14 +41,7 @@ export default function Solutions() {
             },
             {
               lead: "You get a solution document and a quote.",
-              text: (
-                <>
-                  Shared in the chat and on your dashboard.{" "}
-                  <Slot kind="PRODUCT">
-                    whether a person at Workzap checks them before they’re sent
-                  </Slot>
-                </>
-              ),
+              text: "Shared in the chat.",
             },
             {
               lead: "You review, ask, and decide.",
@@ -105,26 +90,11 @@ export default function Solutions() {
             },
             {
               lead: "What Workzap would build.",
-              text: (
-                <>
-                  The solution, described simply.{" "}
-                  <Slot kind="WORKZAP">
-                    how Workzap describes its solutions — existing modules,
-                    custom builds, or both
-                  </Slot>
-                </>
-              ),
+              text: "The solution, described simply.",
             },
             {
               lead: "What it covers.",
-              text: (
-                <>
-                  The parts of your business it touches.{" "}
-                  <Slot kind="CONFIRM">
-                    only claims Workzap can stand behind — no promised results
-                  </Slot>
-                </>
-              ),
+              text: "The parts of your business it touches.",
             },
             {
               lead: "What it won’t do.",
@@ -132,101 +102,43 @@ export default function Solutions() {
             },
           ]}
         />
-        <p>
-          <Slot kind="PRODUCT">
-            format — for example a PDF in the chat and on your dashboard
-          </Slot>
-        </p>
       </Section>
 
       <Section title="Your quote">
         <p>
           A written quote for building the solution: what’s included, what it
-          costs, how long it takes, and how payment works.{" "}
-          <Slot kind="WORKZAP">pricing model</Slot>{" "}
-          <Slot kind="PRODUCT">what the quote contains</Slot>
-        </p>
-        <p>
-          The quote shows Workzap’s company name and the exact account name, so
-          your bank can confirm who you’re paying.{" "}
-          <Slot kind="PRODUCT">confirm what the quote shows</Slot>
+          costs, how long it takes, and how payment works.
         </p>
         <p className="pi-small">A quote is an offer. It isn’t a charge.</p>
       </Section>
 
       <Section title="Check it, change it, or say no" tone="soft">
         <p>
-          Read both on your phone or computer. Ask pi questions, or ask for a
-          person.{" "}
-          <Slot kind="PRODUCT">how a person joins the conversation</Slot> You
-          can ask for changes to the quote. Saying no is fine, and nothing is
-          charged.{" "}
-          <Slot kind="PRODUCT">
-            what happens to your sorted problems if you say no
-          </Slot>
+          Read both on your phone or computer. Ask pi questions. You can ask for
+          changes to the quote. Saying no is fine, and nothing is charged.
         </p>
       </Section>
 
       <Section title="Approve and pay">
-        <p>
-          When you’re happy, you approve the quote.{" "}
-          <Slot kind="PRODUCT">
-            how you approve — in the chat, on the dashboard, or by signing
-          </Slot>
-        </p>
+        <p>When you’re happy, you approve the quote.</p>
         <Points
           items={[
             {
               lead: "Bank transfer.",
-              text: (
-                <>
-                  The bank details are on your approved quote. Workzap confirms
-                  when the transfer arrives.{" "}
-                  <Slot kind="PRODUCT">
-                    how a transfer is confirmed, and any deposit or milestone
-                    payments
-                  </Slot>
-                </>
-              ),
-            },
-            {
-              lead: "Card, on a secure payment page.",
-              text: (
-                <>
-                  You’re sent to a secure Stripe page to pay.{" "}
-                  <Slot kind="CONFIRM">
-                    Stripe availability depends on where Workzap’s company is
-                    registered, and which currencies it can take
-                  </Slot>
-                </>
-              ),
+              text: "The bank details are on your approved quote. Workzap confirms when the transfer arrives.",
             },
           ]}
         />
         <p style={{ marginTop: 14 }}>
-          Either way, payment never happens inside the chat, and pi never asks
-          for card numbers. Before you pay, check that the bank details match
-          those on your Workzap dashboard.{" "}
-          <Slot kind="PRODUCT">
-            the dashboard shows the quote and the bank details
-          </Slot>{" "}
-          <Slot kind="CONFIRM">that Workzap commits to this</Slot>{" "}
-          <Slot kind="PRODUCT">
-            terms for deposits, refunds and cancellation — state them plainly on
-            the quote
-          </Slot>
+          Payment never happens inside the chat, and pi never asks for card
+          numbers.
         </p>
       </Section>
 
       <Section title="Then Workzap builds" tone="soft">
         <p>
           Once your payment is confirmed, Workzap begins your project, starting
-          with a kickoff to agree the details.{" "}
-          <Slot kind="PRODUCT">
-            what Workzap needs from you, when work begins, how you’ll be kept
-            updated, and who your contact is; and who owns and may use what’s
-            built — state it plainly on the quote
-          </Slot>
+          with a kickoff to agree the details.
         </p>
       </Section>
 
@@ -235,25 +147,11 @@ export default function Solutions() {
           items={[
             {
               lead: "Nothing is charged until you approve.",
-              text: (
-                <>
-                  Not for the quote, and not for choosing to look.{" "}
-                  <Slot kind="CONFIRM">
-                    that this matches Workzap’s process, including whether the
-                    solution document itself is free
-                  </Slot>
-                </>
-              ),
+              text: "A quote is an offer, not a charge.",
             },
             {
               lead: "You can stop at any point before paying.",
               text: "No reason needed.",
-            },
-            {
-              lead: "You can ask pi to stop.",
-              text: (
-                <Slot kind="PRODUCT">how, and what happens to your chats</Slot>
-              ),
             },
           ]}
         />

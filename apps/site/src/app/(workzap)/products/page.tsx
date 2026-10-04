@@ -6,7 +6,7 @@ export const metadata = pageMetadata({
   path: "/products",
   title: "Products: nori and pi | Workzap",
   description:
-    "Compare Workzap's two products. nori reads your sales and stock each morning. pi is a WhatsApp agent for the problems in your business, coming soon.",
+    "Compare Workzap's two products. nori reads your sales and stock each morning. pi is a WhatsApp agent for the problems in your business, available now.",
   siteName: "Workzap",
   brand: "workzap",
 });
@@ -45,7 +45,7 @@ export default function Products() {
                 <th scope="col">
                   <span className="wz-col-head wz-col-pi">
                     <Lockup product={PRODUCTS.pi} height={56} />
-                    <p>{PRODUCTS.pi.line} Coming soon.</p>
+                    <p>{PRODUCTS.pi.line} Live on WhatsApp.</p>
                   </span>
                 </th>
               </tr>
@@ -97,7 +97,7 @@ export default function Products() {
                   </p>
                 </td>
                 <td data-label="pi">
-                  <p>Start a chat on WhatsApp. pi is not launched yet.</p>
+                  <p>Start a chat on WhatsApp. pi is available now.</p>
                   <p>
                     <ArrowLink href={TALK}>Talk to pi</ArrowLink>
                   </p>
@@ -119,12 +119,12 @@ export default function Products() {
                 </td>
               </tr>
               <tr>
-                <th scope="row">Coming next</th>
+                <th scope="row">Status</th>
                 <td data-label="nori">
                   <p>Vision (CCTV) is coming soon.</p>
                 </td>
                 <td data-label="pi">
-                  <p>pi itself is coming soon.</p>
+                  <p>Available on WhatsApp now.</p>
                 </td>
               </tr>
               <tr>
@@ -190,7 +190,7 @@ export default function Products() {
 
       <CtaBand
         title="Not sure where to start?"
-        sub="Tell pi what is going wrong on WhatsApp. pi is an AI and says so in its first message. pi is coming soon."
+        sub="Tell pi what is going wrong on WhatsApp. pi is an AI and says so in its first message."
         secondary={null}
       />
     </>

@@ -1,11 +1,11 @@
 import { Breadcrumbs, piMetadata } from "@/features/pi/meta";
-import { PageIntro, Section, Slot } from "@/features/pi/ui";
+import { PageIntro, Points, Section } from "@/features/pi/ui";
 
 export const metadata = piMetadata({
   path: "/privacy",
   title: "Privacy notice for pi | pi by Workzap",
   description:
-    "The privacy notice for pi, Workzap’s WhatsApp agent: how Workzap handles what you tell pi on WhatsApp.",
+    "What to know about your chats with pi, Workzap’s WhatsApp agent: what to share, what pi never asks for, and how pi reaches you through WhatsApp.",
 });
 
 export default function Privacy() {
@@ -14,23 +14,29 @@ export default function Privacy() {
       <Breadcrumbs path="/privacy" name="Privacy notice" />
       <PageIntro
         title="Privacy notice for pi"
-        sub="A short summary in plain English, and a link to Workzap’s full privacy notice."
+        sub="What to know before you tell pi about your business."
       />
       <Section>
-        <p>
-          <Slot kind="PRODUCT">
-            the plain-English summary of how pi uses what you tell it: what is
-            kept, who can see it, how long, and how to ask for it to be deleted
-          </Slot>
-        </p>
-        <p>
-          <Slot kind="WORKZAP">link to Workzap’s full privacy policy</Slot>
-        </p>
-        <p>
-          <Slot kind="WORKZAP">
-            Workzap’s company name, and a legal contact for data requests
-          </Slot>
-        </p>
+        <Points
+          items={[
+            {
+              lead: "You choose what to tell pi.",
+              text: "Share what you’re comfortable with.",
+            },
+            {
+              lead: "What pi never asks for.",
+              text: "Card numbers, passwords or other people’s personal details. Please don’t send them. pi never needs them.",
+            },
+            {
+              lead: "What pi remembers.",
+              text: "pi keeps what you’ve told it so you don’t have to say it twice.",
+            },
+            {
+              lead: "WhatsApp.",
+              text: "pi chats with you through WhatsApp’s business platform. WhatsApp is a trademark of Meta. pi isn’t made, run or endorsed by WhatsApp or Meta.",
+            },
+          ]}
+        />
       </Section>
     </>
   );

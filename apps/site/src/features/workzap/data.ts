@@ -22,7 +22,7 @@ export const PRODUCTS = {
     width: 285.8,
     height: 149.8,
     line: "Workzap’s WhatsApp agent.",
-    menu: "Tell pi what is going wrong. Coming soon.",
+    menu: "Tell pi what is going wrong. Live on WhatsApp.",
   },
 } as const;
 
@@ -55,7 +55,7 @@ export const PRINCIPLES = [
   },
   {
     lead: "We say what is not ready.",
-    text: "pi and Vision (CCTV) are coming soon, and our pages say so.",
+    text: "Vision (CCTV) in nori is coming soon, and our pages say so.",
   },
   {
     lead: "One way to reach us.",

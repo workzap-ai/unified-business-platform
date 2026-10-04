@@ -8,7 +8,6 @@ import {
   PageIntro,
   Points,
   Section,
-  Slot,
 } from "@/features/pi/ui";
 
 export const metadata = piMetadata({
@@ -62,16 +61,7 @@ export default function HowItWorks() {
             },
             {
               lead: "Tell pi what’s going wrong.",
-              text: (
-                <>
-                  Write in your own words. pi asks one question at a time and
-                  doesn’t rush you.{" "}
-                  <Slot kind="CONFIRM">
-                    voice notes, photos and video — list only what works at
-                    launch
-                  </Slot>
-                </>
-              ),
+              text: "Write in your own words. pi asks one question at a time and doesn’t rush you.",
             },
             {
               lead: "pi notes and sorts.",
@@ -81,14 +71,7 @@ export default function HowItWorks() {
               ? [
                   {
                     lead: "See it in one place.",
-                    text: (
-                      <>
-                        Your problems appear on your dashboard, sorted by type.{" "}
-                        <Slot kind="PRODUCT">
-                          how you sign in, and when the dashboard is available
-                        </Slot>
-                      </>
-                    ),
+                    text: "Your problems appear on your dashboard, sorted by type.",
                   },
                 ]
               : []),
@@ -111,45 +94,19 @@ export default function HowItWorks() {
               },
               {
                 lead: "You get a solution document.",
-                text: (
-                  <>
-                    A plain-language document: your problems, what Workzap would
-                    build, and what it won’t do.{" "}
-                    <Slot kind="PRODUCT">format</Slot>
-                  </>
-                ),
+                text: "A plain-language document: your problems, what Workzap would build, and what it won’t do.",
               },
               {
                 lead: "You get a quote.",
-                text: (
-                  <>
-                    What’s included, what it costs, how long it takes, how
-                    payment works. A quote is an offer, not a charge.{" "}
-                    <Slot kind="WORKZAP">pricing model</Slot>
-                  </>
-                ),
+                text: "What’s included, what it costs, how long it takes, how payment works. A quote is an offer, not a charge.",
               },
               {
                 lead: "You review, then approve — or don’t.",
-                text: (
-                  <>
-                    Ask questions, ask for changes, or say no. Nothing is
-                    charged until you approve.{" "}
-                    <Slot kind="PRODUCT">how you approve</Slot>
-                  </>
-                ),
+                text: "Ask questions, ask for changes, or say no. Nothing is charged until you approve.",
               },
               {
                 lead: "You pay, then Workzap begins.",
-                text: (
-                  <>
-                    Payment details come with your approved quote — by bank
-                    transfer or a secure card page, never in the chat. Check
-                    them against your dashboard. Once your payment is confirmed,
-                    Workzap begins your project with a kickoff.{" "}
-                    <Slot kind="PRODUCT">timeline</Slot>
-                  </>
-                ),
+                text: "Payment details come with your approved quote, by bank transfer and never in the chat. Once your payment is confirmed, Workzap begins your project with a kickoff.",
               },
             ]}
           />
@@ -176,15 +133,6 @@ export default function HowItWorks() {
             {
               lead: "It can’t promise a result.",
               text: "It notes, sorts and shows. It doesn’t decide for you.",
-            },
-            {
-              lead: "It can’t see your business data unless you tell it.",
-              text: (
-                <Slot kind="CONFIRM">
-                  say whether pi can ever access connected data. If not, keep
-                  this line.
-                </Slot>
-              ),
             },
           ]}
         />

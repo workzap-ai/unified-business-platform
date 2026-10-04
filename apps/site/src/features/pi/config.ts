@@ -13,8 +13,7 @@ export const PI = {
   whatsappText: "Hi pi",
   // Pages that are written but must stay hidden until the product behind them exists.
   // solutions: opened on 4 Oct 2026 at the owner's request. "How pi solves your problem"
-  // is half of the sales pitch, so it is public. The unfinished answers inside it are
-  // still Slot markers, so a production deploy stays blocked until they are resolved.
+  // is half of the sales pitch, so it is public.
   live: {
     dashboard: false as boolean,
     solutions: true as boolean,

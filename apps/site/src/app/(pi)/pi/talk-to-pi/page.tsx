@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PI } from "@/features/pi/config";
 import { TrackOnMount, WhatsAppButton } from "@/features/pi/client";
 import { Breadcrumbs, piMetadata } from "@/features/pi/meta";
-import { Chat, PageIntro, Points, Section, Slot } from "@/features/pi/ui";
+import { Chat, PageIntro, Points, Section } from "@/features/pi/ui";
 
 export const metadata = piMetadata({
   path: "/talk-to-pi",
@@ -78,19 +78,6 @@ export default function TalkToPi() {
               lead: "pi notes and sorts it.",
               text: "And tells you what it has noted.",
             },
-            ...(PI.live.dashboard
-              ? [
-                  {
-                    lead: "You see it in one place.",
-                    text: (
-                      <Slot kind="PRODUCT">
-                        when and how the dashboard link reaches you, and whether
-                        you need an account first
-                      </Slot>
-                    ),
-                  },
-                ]
-              : []),
           ]}
         />
       </Section>
@@ -106,20 +93,6 @@ export default function TalkToPi() {
               lead: "Keep some things out of the chat.",
               text: "Please don’t send card numbers, passwords or other people’s personal details. pi never needs them.",
             },
-            {
-              lead: "You can stop any time.",
-              text: (
-                <Slot kind="PRODUCT">
-                  the words to send, and what happens next
-                </Slot>
-              ),
-            },
-            {
-              lead: "One-to-one chats only, for now.",
-              text: (
-                <Slot kind="CONFIRM">whether pi can be added to a group</Slot>
-              ),
-            },
           ]}
         />
         <p className="pi-small">
@@ -132,7 +105,7 @@ export default function TalkToPi() {
       <Section title="WhatsApp didn’t open?" tone="soft">
         <p>
           Install WhatsApp from your phone’s app store, or open WhatsApp Web,
-          then message <Slot kind="PRODUCT">pi’s number</Slot>.
+          then message pi at <strong>{PI.displayNumber}</strong>.
         </p>
         <p>
           <Link href={`${PI.base}/talk-to-pi/help`}>More help →</Link>

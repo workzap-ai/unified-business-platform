@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { IS_PRODUCTION, PI } from "./config";
 import { WhatsAppButton } from "./client";
@@ -311,9 +310,7 @@ export function SolutionPreview() {
             </div>
             <div>
               <dt>How you pay</dt>
-              <dd>
-                Bank transfer or a secure card page. Never inside the chat.
-              </dd>
+              <dd>Bank transfer. Never inside the chat.</dd>
             </div>
           </dl>
           <p className="pi-doc-foot">A quote is an offer. It isn’t a charge.</p>
@@ -391,18 +388,5 @@ export function CtaBlock({
         </div>
       </div>
     </section>
-  );
-}
-
-export function PersonLine() {
-  return (
-    <p className="pi-small">
-      Prefer to talk to a person?{" "}
-      <Slot kind="CONFIRM">
-        pi can bring a person into the chat — build the hand-off before this
-        line goes live
-      </Slot>{" "}
-      <Link href={`${PI.base}/talk-to-pi`}>Ask pi to bring one in.</Link>
-    </p>
   );
 }

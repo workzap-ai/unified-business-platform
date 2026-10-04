@@ -196,7 +196,7 @@ export function SiteNav({ logo }: { logo: React.ReactNode }) {
             <li>
               <Link href="/pi">
                 <strong>pi</strong>
-                <span>{PRODUCTS.pi.line} Coming soon.</span>
+                <span>{PRODUCTS.pi.line} Live on WhatsApp.</span>
               </Link>
             </li>
             <li>

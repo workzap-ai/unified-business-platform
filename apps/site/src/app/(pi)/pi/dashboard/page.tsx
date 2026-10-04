@@ -1,14 +1,13 @@
 import { notFound } from "next/navigation";
 import { PI } from "@/features/pi/config";
-import { WhatsAppButton } from "@/features/pi/client";
 import { Breadcrumbs, piMetadata } from "@/features/pi/meta";
 import {
   AiChip,
+  CtaBlock,
   Face,
   PageIntro,
   Points,
   Section,
-  Slot,
 } from "@/features/pi/ui";
 import Image from "next/image";
 
@@ -44,35 +43,6 @@ export default function Dashboard() {
               {
                 lead: "Exactly what you said.",
                 text: "Each note sits next to your original message, so you can check pi got it right and correct it.",
-              },
-              {
-                lead: "What keeps coming up.",
-                text: (
-                  <>
-                    Patterns over time, so you can see which problems matter
-                    most. <Slot kind="PRODUCT">confirm this view exists</Slot>
-                  </>
-                ),
-              },
-              {
-                lead: "Your solution and quote.",
-                text: (
-                  <>
-                    If you ask for them, they sit here too, with their status.{" "}
-                    <Slot kind="PRODUCT">
-                      confirm they live on the dashboard
-                    </Slot>
-                  </>
-                ),
-              },
-              {
-                lead: "Yours to control.",
-                text: (
-                  <Slot kind="PRODUCT">
-                    whether you can edit, export or delete what pi has noted,
-                    and how
-                  </Slot>
-                ),
               },
             ]}
           />
@@ -115,18 +85,7 @@ export default function Dashboard() {
           </div>
         </div>
       </Section>
-      <Section title="Signing in" tone="soft">
-        <p>
-          <Slot kind="PRODUCT">
-            how a customer signs in — for example with the WhatsApp number they
-            chat from — and the sign-in link, which today would sit on the
-            Workzap app
-          </Slot>
-        </p>
-        <div className="pi-cta-row">
-          <WhatsAppButton page="dashboard" pos="closing" variant="secondary" />
-        </div>
-      </Section>
+      <CtaBlock page="dashboard" pos="closing" />
     </>
   );
 }

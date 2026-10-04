@@ -1,4 +1,5 @@
 import { SITE_URL } from "@/lib/seo";
+import { PI } from "@/features/pi/config";
 
 // A plain-text map of the site for AI assistants (the llms.txt convention). It lists
 // only pages that exist and only what those pages already say.
@@ -6,7 +7,7 @@ export const dynamic = "force-static";
 
 const BODY = `# Workzap
 
-> Workzap makes nori, a daily read for the shop, and pi, a WhatsApp agent. This site describes both. pi has not launched yet.
+> Workzap makes nori, a daily read for the shop, and pi, a WhatsApp agent. This site describes both. pi is available on WhatsApp at ${PI.displayNumber}.
 
 ## Workzap
 
@@ -26,7 +27,7 @@ nori reads a shop's sales and stock and picks out the one thing worth looking at
 
 ## pi
 
-pi is Workzap's WhatsApp agent. People tell pi what is going wrong in their business, and pi notes each problem and sorts them. When they are ready they can get a solution document and a quote, and decide whether Workzap builds the solution. pi is an AI and says so in its first message. pi is not launched yet.
+pi is Workzap's WhatsApp agent. People tell pi what is going wrong in their business, and pi notes each problem and sorts them. When they are ready they can get a solution document and a quote, and decide whether Workzap builds the solution. pi is an AI and says so in its first message. pi is available on WhatsApp at ${PI.displayNumber}.
 
 - [pi home](${SITE_URL}/pi): what pi is.
 - [How pi works](${SITE_URL}/pi/how-it-works)

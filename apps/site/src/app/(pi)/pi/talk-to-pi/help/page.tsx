@@ -1,6 +1,6 @@
 import { Breadcrumbs, piMetadata } from "@/features/pi/meta";
 import { PI } from "@/features/pi/config";
-import { PageIntro, Points, Section, Slot } from "@/features/pi/ui";
+import { PageIntro, Points, Section } from "@/features/pi/ui";
 
 export const metadata = piMetadata({
   path: "/talk-to-pi/help",
@@ -36,14 +36,6 @@ export default function Help() {
             },
           ]}
         />
-        <p style={{ marginTop: 18 }}>
-          Still stuck?{" "}
-          <Slot kind="WORKZAP">
-            a way to reach Workzap for someone who cannot use WhatsApp at all.
-            All contact currently goes through pi, which needs WhatsApp, so this
-            page would be a dead end
-          </Slot>
-        </p>
       </Section>
     </>
   );

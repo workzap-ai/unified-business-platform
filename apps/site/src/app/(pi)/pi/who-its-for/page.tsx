@@ -1,5 +1,5 @@
 import { Breadcrumbs, piMetadata } from "@/features/pi/meta";
-import { CtaBlock, PageIntro, Points, Section, Slot } from "@/features/pi/ui";
+import { CtaBlock, PageIntro, Points, Section } from "@/features/pi/ui";
 
 export const metadata = piMetadata({
   path: "/who-its-for",
@@ -27,36 +27,12 @@ export default function WhoItsFor() {
               lead: "Teams",
               text: "where everyone sees a different problem and nothing gets collected in one place.",
             },
-            {
-              lead: "Organisations with many voices",
-              text: (
-                <>
-                  where lots of people raise problems. pi sorts them, so you can
-                  see which matter most.{" "}
-                  <Slot kind="CONFIRM">multi-person use</Slot>
-                </>
-              ),
-            },
-            {
-              lead: "Retailers",
-              text: (
-                <Slot kind="WORKZAP">
-                  one short paragraph for retailers — supplied once Workzap’s
-                  positioning is final
-                </Slot>
-              ),
-            },
           ]}
         />
       </Section>
       <Section title="Who it isn’t for" tone="soft">
         <p>
           pi isn’t built for emergencies, and it won’t make decisions for you.
-          If you need an answer from a person right now, ask pi to bring one in.{" "}
-          <Slot kind="CONFIRM">
-            pi can hand a chat to a person at Workzap — build the hand-off
-            before this line goes live
-          </Slot>
         </p>
       </Section>
       <CtaBlock page="who-its-for" pos="closing" />

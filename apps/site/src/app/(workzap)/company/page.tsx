@@ -7,7 +7,6 @@ import {
   PageHero,
   Principles,
   SectionHead,
-  Slot,
 } from "@/features/workzap/ui";
 import Link from "next/link";
 
@@ -54,13 +53,6 @@ export default function Company() {
               Both are for the person who decides what happens next: the owner,
               the head of operations, the head of finance.
             </p>
-            <p>
-              <Slot kind="WORKZAP">
-                Company story, leadership and locations. Add only what the owner
-                confirms (when Workzap started, who runs it, where it works).
-                Left out until then.
-              </Slot>
-            </p>
           </div>
         </div>
       </section>
@@ -90,8 +82,8 @@ export default function Company() {
               </div>
               <h3 className="wz-h3">pi</h3>
               <p>
-                Workzap’s WhatsApp agent. Tell pi what is going wrong. pi is an
-                AI and is coming soon.
+                Workzap’s WhatsApp agent. Tell pi what is going wrong on
+                WhatsApp. pi is an AI and says so in its first message.
               </p>
               <ArrowLink href="/pi">Learn about pi</ArrowLink>
             </li>
@@ -144,7 +136,6 @@ export default function Company() {
             </li>
           </ul>
           <p className="wz-cap" style={{ marginTop: 20 }}>
-            pi is not launched yet.{" "}
             <Link href="/pi/trust">How pi treats your chats</Link>.
           </p>
         </div>
