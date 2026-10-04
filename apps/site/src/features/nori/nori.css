@@ -1018,3 +1018,16 @@ a.nx-area:hover {
 .nx-plans-note {
   margin-top: 16px;
 }
+
+/* room under the footer so the floating pi button never covers a footer link */
+.nx-footer {
+  padding-bottom: 104px;
+}
+/* breadcrumb link: big enough to tap */
+.nx-crumb a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 4px;
+  margin: 0 -4px;
+}

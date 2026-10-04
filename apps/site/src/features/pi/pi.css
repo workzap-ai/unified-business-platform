@@ -1058,3 +1058,17 @@ ul.pi-points > li {
   border: 1px solid var(--pi-line);
   border-radius: 16px;
 }
+
+/* room under the footer so the floating pi button never covers a footer link */
+.pi-footer {
+  padding-bottom: 104px;
+}
+/* the two links in the top bar: a comfortable tap size on a phone */
+.pi-bar a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.pi-bar .pi-wrap {
+  min-height: 44px;
+}
