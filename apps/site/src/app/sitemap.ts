@@ -18,5 +18,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const nori = ["", "/whats-inside", "/how-it-works", "/pricing", "/faq"].map(
     (p) => `${PI.siteUrl}/nori${p}`,
   );
-  return [PI.siteUrl, ...nori, ...pi].map((url) => ({ url }));
+  const workzap = ["", "/products", "/company", "/contact"].map(
+    (p) => `${PI.siteUrl}${p}`,
+  );
+  return [...workzap, ...nori, ...pi].map((url) => ({ url }));
 }

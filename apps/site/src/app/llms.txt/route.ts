@@ -8,6 +8,12 @@ const BODY = `# Workzap
 
 > Workzap makes nori, a daily read for the shop, and pi, a WhatsApp agent. This site describes both. pi has not launched yet.
 
+## Workzap
+
+- [Products](${SITE_URL}/products): nori and pi compared: who each is for, what it does, how you start.
+- [About Workzap](${SITE_URL}/company): what the company does and makes, how it works with customers, and its principles.
+- [Contact](${SITE_URL}/contact): the one way to reach Workzap is to talk to pi on WhatsApp.
+
 ## nori
 
 nori reads a shop's sales and stock and picks out the one thing worth looking at today. It gives a short read each morning from the shop's own numbers.
@@ -20,7 +26,7 @@ nori reads a shop's sales and stock and picks out the one thing worth looking at
 
 ## pi
 
-pi is Workzap's WhatsApp agent. People tell pi what is going wrong in their business, and pi notes each problem and sorts them. pi is an AI and says so in its first message. pi is not launched yet.
+pi is Workzap's WhatsApp agent. People tell pi what is going wrong in their business, and pi notes each problem and sorts them. When they are ready they can get a solution document and a quote, and decide whether Workzap builds the solution. pi is an AI and says so in its first message. pi is not launched yet.
 
 - [pi home](${SITE_URL}/pi): what pi is.
 - [How pi works](${SITE_URL}/pi/how-it-works)

@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { pageMetadata } from "@/lib/seo";
-import "@/features/workzap/home.css";
+import { PiLauncher } from "@/components/pi-launcher";
+import { SiteNav } from "@/features/workzap/client";
+import { Logo, SiteFooter } from "@/features/workzap/ui";
+import "@/features/workzap/site.css";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#00a86b",
+  themeColor: "#ffffff",
 };
 
 export default function WorkzapLayout({
@@ -29,7 +32,17 @@ export default function WorkzapLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body>{children}</body>
+      <body className="wz">
+        <a className="wz-skip" href="#main">
+          Skip to content
+        </a>
+        <SiteNav logo={<Logo />} />
+        <main id="main" tabIndex={-1}>
+          {children}
+        </main>
+        <SiteFooter />
+        <PiLauncher />
+      </body>
     </html>
   );
 }

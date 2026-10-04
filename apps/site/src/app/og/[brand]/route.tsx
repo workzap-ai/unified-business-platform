@@ -89,7 +89,7 @@ export async function GET(
         <div style={{ fontSize: 84, fontWeight: 800 }}>Workzap</div>
       </div>
       <div style={{ marginTop: 40, fontSize: 44, color: "#3A4A52" }}>
-        Two products: nori and pi.
+        Software that shows what is going wrong. nori and pi.
       </div>
     </div>,
     SIZE,
