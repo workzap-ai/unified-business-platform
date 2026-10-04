@@ -15,7 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...(PI.live.dashboard ? ["/dashboard"] : []),
     ...(PI.live.solutions ? ["/solutions"] : []),
   ].map((p) => `${PI.siteUrl}${PI.base}${p}`);
-  const nori = ["", "/whats-inside", "/how-it-works", "/pricing"].map(
+  const nori = ["", "/whats-inside", "/how-it-works", "/pricing", "/faq"].map(
     (p) => `${PI.siteUrl}/nori${p}`,
   );
   return [PI.siteUrl, ...nori, ...pi].map((url) => ({ url }));

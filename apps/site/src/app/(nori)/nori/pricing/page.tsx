@@ -1,13 +1,25 @@
-import type { Metadata } from "next";
 import { NoriPricing } from "@/features/nori/nori-page";
+import { noriMetadata } from "@/features/nori/meta";
+import { JsonLd, breadcrumbs } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "nori pricing | nori by Workzap",
+export const metadata = noriMetadata({
+  path: "/pricing",
+  title: "nori plans: Starter, Growth and Enterprise",
   description:
     "A one-time setup, then a simple monthly plan. Every plan has everything. You choose the size and the support.",
-  alternates: { canonical: "/nori/pricing" },
-};
+});
 
 export default function Page() {
-  return <NoriPricing />;
+  return (
+    <>
+      <JsonLd
+        data={breadcrumbs([
+          { name: "Workzap", path: "/" },
+          { name: "nori", path: "/nori" },
+          { name: "Pricing", path: "/nori/pricing" },
+        ])}
+      />
+      <NoriPricing />
+    </>
+  );
 }

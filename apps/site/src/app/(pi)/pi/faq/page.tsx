@@ -268,6 +268,7 @@ export default function Faq() {
       />
       <Section>
         <div className="pi-faq">
+          <h2 className="pi-sr">All questions</h2>
           {visible.map((i) => (
             <FaqItem key={i.q} question={i.q}>
               <p>{i.a}</p>

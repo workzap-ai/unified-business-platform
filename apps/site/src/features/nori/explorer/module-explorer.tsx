@@ -11,7 +11,6 @@ export function ModuleExplorer() {
   const refs = useRef<Partial<Record<TabId, HTMLButtonElement | null>>>({});
   const count = MODULE_TABS.length;
   const index = MODULE_TABS.findIndex((t) => t.id === active);
-  const tab = MODULE_TABS[index];
 
   function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     let next = index;
@@ -53,28 +52,31 @@ export function ModuleExplorer() {
           </button>
         ))}
       </div>
-      <div
-        key={tab.id}
-        role="tabpanel"
-        id={`nxe-panel-${tab.id}`}
-        aria-labelledby={`nxe-tab-${tab.id}`}
-        tabIndex={0}
-        className="nxe-panel"
-      >
-        <div className="nxe-copy">
-          <h3>{tab.headline}</h3>
-          <p className="nxe-summary">{tab.summary}</p>
-          <ul className="nxe-features">
-            {tab.features.map((f) => (
-              <li key={f.title}>
-                <strong>{f.title}</strong>
-                <span>{f.text}</span>
-              </li>
-            ))}
-          </ul>
+      {MODULE_TABS.map((t) => (
+        <div
+          key={t.id}
+          role="tabpanel"
+          id={`nxe-panel-${t.id}`}
+          aria-labelledby={`nxe-tab-${t.id}`}
+          tabIndex={0}
+          hidden={t.id !== active}
+          className="nxe-panel"
+        >
+          <div className="nxe-copy">
+            <h3>{t.headline}</h3>
+            <p className="nxe-summary">{t.summary}</p>
+            <ul className="nxe-features">
+              {t.features.map((f) => (
+                <li key={f.title}>
+                  <strong>{f.title}</strong>
+                  <span>{f.text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <ModuleVisual id={t.id} />
         </div>
-        <ModuleVisual id={tab.id} />
-      </div>
+      ))}
     </div>
   );
 }

@@ -10,17 +10,14 @@ const NAV = [
   { href: "/nori/whats-inside", label: "What’s inside" },
   { href: "/nori/how-it-works", label: "How it works" },
   { href: "/nori/pricing", label: "Pricing" },
+  { href: "/nori/faq", label: "FAQ" },
 ];
 
 function Header({ current }: { current?: string }) {
   return (
     <header className="nx-header">
       <div className="nx-wrap nx-nav">
-        <Link
-          href="/nori"
-          className="nx-brand"
-          aria-label="nori by Workzap, home"
-        >
+        <Link href="/nori" className="nx-brand">
           <Image
             src="/nori-brand/nori-lockup-horizontal-color.svg"
             alt="nori by Workzap"
@@ -293,6 +290,7 @@ function How() {
   return (
     <section className="nx-section nx-white">
       <div className="nx-wrap">
+        <h2 className="nx-sr">Three steps</h2>
         <ol className="nx-steps">
           {STEPS.map((s, i) => (
             <li key={s.title}>
@@ -415,6 +413,7 @@ function Pricing() {
   return (
     <section className="nx-section nx-white">
       <div className="nx-wrap">
+        <h2 className="nx-sr">Plans</h2>
         <div className="nx-plans">
           {PLANS.map((p) => (
             <div key={p.name} className="nx-plan">
@@ -562,6 +561,69 @@ function Footer() {
   );
 }
 
+// Every answer restates what the nori pages already say. Nothing new is claimed here.
+export const NORI_FAQ = [
+  {
+    question: "What is nori?",
+    answer:
+      "nori reads your shop’s sales and stock and picks out the one thing worth looking at today. You get a short read each morning.",
+  },
+  {
+    question: "What does nori read?",
+    answer:
+      "Every figure for every shop and channel, checked against your own system and refreshed nightly. It picks out margin leaks, shops behind target, dead stock and odd figures.",
+  },
+  {
+    question: "How do I get my data into nori?",
+    answer:
+      "Upload a sales file, or connect your till system so it syncs every night. nori matches the columns for you.",
+  },
+  {
+    question: "Who decides what to do?",
+    answer:
+      "You do. nori gives a suggestion you can take or leave. The owner decides.",
+  },
+  {
+    question: "What areas of the business does nori cover?",
+    answer:
+      "Stores and warehouse, finance, planning and buying, e-commerce, marketing and customers, people, and executive and control. Vision (CCTV) is coming soon.",
+  },
+  {
+    question: "Does every plan include every area?",
+    answer:
+      "Yes, except Vision (CCTV), which is coming soon. Plans differ by size and support: Starter for a single store, Growth for up to 10 outlets, and Enterprise for chains and groups.",
+  },
+  {
+    question: "Are the charts and chats on this site real?",
+    answer:
+      "No. They are made-up examples and are labelled Illustrative. They show what a read looks like, not a real shop.",
+  },
+  {
+    question: "How do I try nori?",
+    answer:
+      "Create a workspace, upload a sales file and get your first read. Use the Book a demo button on any page if you would like to talk first.",
+  },
+];
+
+function Faq() {
+  return (
+    <section className="nx-section nx-white">
+      <div className="nx-wrap">
+        <dl className="nx-faq">
+          {NORI_FAQ.map((q) => (
+            <div key={q.question} className="nx-faq-item">
+              <dt>
+                <h2>{q.question}</h2>
+              </dt>
+              <dd>{q.answer}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  );
+}
+
 function Shell({
   current,
   children,
@@ -631,6 +693,20 @@ export function NoriPricing() {
         lead="A one-time setup to connect your data, then a simple monthly subscription. Every plan has everything. You choose the size and the support."
       />
       <Pricing />
+      <Closing />
+    </Shell>
+  );
+}
+
+export function NoriFaq() {
+  return (
+    <Shell current="/nori/faq">
+      <PageHead
+        label="FAQ"
+        title="Questions about nori, answered."
+        lead="The short answers to what shop owners ask first."
+      />
+      <Faq />
       <Closing />
     </Shell>
   );

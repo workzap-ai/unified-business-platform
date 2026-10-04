@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Jost } from "next/font/google";
+import { JsonLd, ORGANIZATION, WEBSITE } from "@/lib/seo";
 import "@/features/nori/nori-tokens.css";
 import "@/features/nori/nori.css";
 
@@ -32,7 +33,15 @@ export default function NoriLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${jost.variable} ${inter.variable}`}>
-      <body>{children}</body>
+      <body>
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@graph": [ORGANIZATION, WEBSITE],
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

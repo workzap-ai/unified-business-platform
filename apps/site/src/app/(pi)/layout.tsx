@@ -51,11 +51,7 @@ export default function PiLayout({
         </div>
         <header className="pi-header">
           <div className="pi-wrap pi-nav">
-            <Link
-              href={PI.base}
-              className="pi-brand"
-              aria-label="pi by Workzap, home"
-            >
+            <Link href={PI.base} className="pi-brand">
               <Image
                 src="/pi-brand/pi-lockup-horizontal-color.svg"
                 alt="pi by Workzap"

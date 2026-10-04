@@ -4,6 +4,7 @@ export function ModulesSection() {
   return (
     <section className="nx-section">
       <div className="nx-wrap">
+        <h2 className="nx-sr">The seven areas nori covers</h2>
         <ModuleExplorer />
         <div className="nxe-soon">
           <strong>Vision (CCTV)</strong>

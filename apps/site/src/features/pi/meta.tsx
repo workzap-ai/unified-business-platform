@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { IS_PRODUCTION, PI } from "./config";
+import { ORGANIZATION, WEBSITE, pageMetadata } from "@/lib/seo";
+import { PI } from "./config";
 
 export function piMetadata({
   path,
@@ -10,22 +11,13 @@ export function piMetadata({
   title: string;
   description: string;
 }): Metadata {
-  const url = `${PI.base}${path}`;
-  return {
-    metadataBase: new URL(PI.siteUrl),
-    title: { absolute: title },
+  return pageMetadata({
+    path: `${PI.base}${path}`,
+    title,
     description,
-    alternates: { canonical: url },
-    // Previews and staging must never be indexed; only a production deploy is.
-    robots: IS_PRODUCTION ? undefined : { index: false, follow: false },
-    openGraph: {
-      title,
-      description,
-      url,
-      siteName: "pi by Workzap",
-      type: "website",
-    },
-  };
+    siteName: "pi by Workzap",
+    brand: "pi",
+  });
 }
 
 export function JsonLd({ data }: { data: unknown }) {
@@ -41,9 +33,7 @@ export function JsonLd({ data }: { data: unknown }) {
 
 export const ORGANIZATION_LD = {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "Workzap",
-  url: PI.siteUrl,
+  "@graph": [ORGANIZATION, WEBSITE],
 };
 
 export function Breadcrumbs({ path, name }: { path: string; name?: string }) {

@@ -4,7 +4,8 @@ import { PageIntro, Section, Slot } from "@/features/pi/ui";
 export const metadata = piMetadata({
   path: "/terms",
   title: "Terms for pi | pi by Workzap",
-  description: "The terms for using pi, Workzap’s WhatsApp agent.",
+  description:
+    "The terms for using pi, Workzap’s WhatsApp agent. Read them before you start a chat with pi.",
 });
 
 export default function Terms() {

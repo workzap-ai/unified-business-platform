@@ -4,7 +4,8 @@ import { PageIntro, Section, Slot } from "@/features/pi/ui";
 export const metadata = piMetadata({
   path: "/privacy",
   title: "Privacy notice for pi | pi by Workzap",
-  description: "How Workzap handles what you tell pi on WhatsApp.",
+  description:
+    "The privacy notice for pi, Workzap’s WhatsApp agent: how Workzap handles what you tell pi on WhatsApp.",
 });
 
 export default function Privacy() {

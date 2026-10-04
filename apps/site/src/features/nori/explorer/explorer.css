@@ -467,3 +467,8 @@
 .nxe-soon .nx-label {
   color: var(--nori-ink-2);
 }
+
+/* every panel is in the page for search and AI readers; only the active one shows */
+.nxe-panel[hidden] {
+  display: none;
+}
