@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Inter } from "next/font/google";
 import { PI, assertReadyToPublish } from "@/features/pi/config";
+import { PiLauncher } from "@/components/pi-launcher";
 import { WhatsAppButton } from "@/features/pi/client";
 import { AiChip } from "@/features/pi/ui";
 import { JsonLd, ORGANIZATION_LD } from "@/features/pi/meta";
@@ -99,6 +100,7 @@ export default function PiLayout({
           </div>
         </footer>
         <JsonLd data={ORGANIZATION_LD} />
+        <PiLauncher />
       </body>
     </html>
   );

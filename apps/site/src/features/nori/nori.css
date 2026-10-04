@@ -449,22 +449,6 @@ a:hover {
   top: 1px;
 }
 
-/* decorative barcode strip: ink bars of varying width, a chart device */
-.nx-strip {
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  gap: 4px;
-  height: 24px;
-  margin-top: 48px;
-  overflow: hidden;
-}
-.nx-strip span {
-  flex: none;
-  background: var(--nori-ink);
-  border-radius: var(--nx-r-bar);
-}
-
 /* sections */
 .nx-section {
   padding: 48px 0;
@@ -921,4 +905,116 @@ a:hover {
 .nx-faq dd {
   margin: 8px 0 0;
   color: var(--nori-ink-2);
+}
+
+/* hero audience line */
+.nx-audience {
+  margin: 16px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+  color: var(--nori-green);
+}
+
+/* who it is for: three roles */
+.nx-roles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+@media (max-width: 880px) {
+  .nx-roles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-role {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 24px 0 0;
+  border-top: 2px solid var(--nori-ink);
+}
+.nx-role h3 {
+  font-size: 22px;
+  line-height: 28px;
+}
+.nx-role ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: grid;
+  gap: 12px;
+}
+.nx-role li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--nori-ink-2);
+}
+.nx-role li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 8px;
+  height: 2px;
+  background: var(--nori-green);
+}
+.nx-roles-more {
+  margin: 32px 0 0;
+  font-weight: 700;
+}
+.nx-roles-more a {
+  color: var(--nori-green);
+  text-underline-offset: 4px;
+}
+
+/* seven areas at a glance */
+.nx-areas {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 1000px) {
+  .nx-areas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .nx-areas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-area {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  height: 100%;
+  padding: 20px;
+  background: var(--nori-paper);
+  border: 1px solid var(--nori-line);
+  border-radius: var(--nx-r-card);
+  color: var(--nori-ink);
+  text-decoration: none;
+}
+a.nx-area:hover {
+  border-color: var(--nori-ink);
+}
+.nx-area h3 {
+  font-size: 18px;
+  line-height: 24px;
+}
+.nx-area p {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--nori-ink-2);
+}
+.nx-area-soon {
+  background: transparent;
+  border-style: dashed;
+}
+.nx-plans-note {
+  margin-top: 16px;
 }

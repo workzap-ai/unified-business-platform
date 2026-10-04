@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ModulesSection } from "./explorer/modules-section";
+import { MODULE_TABS } from "./explorer/data";
 
 const APP = "https://app.workzap.ai";
 // Every contact touch point goes to pi (owner decision, 3 Oct 2026).
@@ -63,38 +64,23 @@ function Header({ current }: { current?: string }) {
   );
 }
 
-// Seven made-up days of sales, in rupees. The last one is yesterday (Tuesday) and carries
-// the single coral bar. It is also named in words, never by colour alone.
+// Seven made-up days of sales for a made-up group of six shops, in rupees. The last one
+// is yesterday (Tuesday) and carries the single coral bar. It is also named in words,
+// never by colour alone.
 const WEEK = [
-  { day: "Wed", value: 41800, look: false },
-  { day: "Thu", value: 44300, look: false },
-  { day: "Fri", value: 49600, look: false },
-  { day: "Sat", value: 58100, look: false },
-  { day: "Sun", value: 55200, look: false },
-  { day: "Mon", value: 46900, look: false },
-  { day: "Tue", value: 52400, look: true },
+  { day: "Wed", value: 248000, look: false },
+  { day: "Thu", value: 262500, look: false },
+  { day: "Fri", value: 296800, look: false },
+  { day: "Sat", value: 349200, look: false },
+  { day: "Sun", value: 331600, look: false },
+  { day: "Mon", value: 281400, look: false },
+  { day: "Tue", value: 312400, look: true },
 ];
-const WEEK_MAX = 60000;
-const WEEK_LABEL = `Sales per day for the last 7 days, in rupees. ${WEEK.map(
+const WEEK_MAX = 360000;
+const WEEK_LABEL = `Sales per day for the last 7 days, all six shops together, in rupees. ${WEEK.map(
   (d) =>
     `${d.day} ${d.value.toLocaleString("en-US")}${d.look ? ", yesterday, marked" : ""}`,
 ).join(". ")}.`;
-
-// Decorative barcode strip: a chart device, not the mark. Widths only, ink on paper.
-const STRIP = [
-  8, 4, 16, 4, 4, 8, 16, 4, 8, 4, 4, 16, 8, 4, 8, 16, 4, 4, 8, 4, 16, 8, 4, 4,
-  16, 8, 4, 8, 4, 16, 4, 8, 8, 4, 16, 4, 4, 8, 16, 4,
-];
-
-function BarcodeStrip() {
-  return (
-    <div className="nx-strip" aria-hidden="true">
-      {[...STRIP, ...STRIP, ...STRIP].map((w, i) => (
-        <span key={i} style={{ width: w }} />
-      ))}
-    </div>
-  );
-}
 
 function Hero() {
   return (
@@ -102,14 +88,19 @@ function Hero() {
       <div className="nx-wrap nx-hero-grid">
         <div>
           <span className="nx-label">The daily read for the shop</span>
-          <h1 className="nx-display">One thing worth looking at.</h1>
+          <h1 className="nx-display">
+            Know which shop is slipping before the week ends.
+          </h1>
           <p className="nx-lead">
-            A shop throws off more numbers than anyone can read. nori reads them
-            all and picks out the one that matters today.
+            nori reads sales and stock from every shop each night and gives you
+            one short morning read: what changed, why, and what to look at.
+          </p>
+          <p className="nx-audience">
+            For owners and department heads of shops and retail chains.
           </p>
           <div className="nx-btn-row">
             <a className="nx-btn nx-btn-primary" href={APP}>
-              Get started
+              See it on your numbers
             </a>
             <Link className="nx-btn nx-btn-secondary" href={PI_CONTACT}>
               Book a demo
@@ -131,10 +122,10 @@ function Hero() {
             <span className="nx-tag">Illustrative</span>
           </div>
           <div className="nx-dash-main">
-            <span className="nx-label">Yesterday</span>
-            <span className="nx-figure">Rs 52,400</span>
+            <span className="nx-label">Yesterday · all six shops</span>
+            <span className="nx-figure">Rs 312,400</span>
             <span className="nx-dash-sub">
-              71 sales · Rs 4,600 more than last Tuesday
+              428 sales · Rs 18,200 more than last Tuesday
             </span>
           </div>
           <figure className="nx-chart">
@@ -155,7 +146,8 @@ function Hero() {
               </div>
             </div>
             <figcaption>
-              Sales per day, last 7 days. The coral bar is yesterday, Tuesday.
+              Sales per day, all shops, last 7 days. The coral bar is yesterday,
+              Tuesday.
             </figcaption>
           </figure>
           <div className="nx-dash-tiles">
@@ -179,7 +171,6 @@ function Hero() {
           </div>
         </div>
       </div>
-      <BarcodeStrip />
     </section>
   );
 }
@@ -197,19 +188,15 @@ const PROBLEMS = [
     title: "Margin is hard to see.",
     text: "Sales are easy to see. Margin after discounts, tax and cost is harder, and rarely live.",
   },
-  {
-    title: "Decisions rest on a feeling.",
-    text: "Which shop to push, what to reorder and where margin leaks are mostly guesses.",
-  },
 ];
 
 function Problems() {
   return (
-    <section className="nx-section nx-white">
+    <section className="nx-section">
       <div className="nx-wrap nx-split">
         <div className="nx-head">
           <span className="nx-label">Why nori</span>
-          <h2>A shop has more numbers than time.</h2>
+          <h2>Decisions rest on a feeling when the numbers arrive late.</h2>
           <p className="nx-lead">
             You have more data than ever and less time to read it.
           </p>
@@ -246,21 +233,110 @@ const READS = [
   },
 ];
 
+const ROLES = [
+  {
+    who: "Owner",
+    title: "See every shop in one place, each morning.",
+    points: [
+      "A short read each morning, from your own numbers.",
+      "Sales against target for every shop, compared with last year, last month and last week.",
+      "A suggestion you can take or leave. The owner decides.",
+    ],
+  },
+  {
+    who: "Head of operations",
+    title: "Know the checks were done and where stock is stuck.",
+    points: [
+      "Daily stock counts and store walks, done by phone with photos and location.",
+      "A defect stays open until a photo shows it fixed.",
+      "Transfers sent but never received are flagged when stuck.",
+    ],
+  },
+  {
+    who: "Head of finance",
+    title: "Know the margin and that the cash balances.",
+    points: [
+      "Gross margin for any period, with profit by shop.",
+      "Cash collected compared with cash deposited, by shop.",
+      "Who applied which discount, returns by shop, and dead stock at risk of markdown.",
+    ],
+  },
+];
+
+function Roles() {
+  return (
+    <section className="nx-section nx-white">
+      <div className="nx-wrap">
+        <div className="nx-head">
+          <span className="nx-label">Made for the people who decide</span>
+          <h2>Each of you gets the part of the numbers you answer for.</h2>
+          <p className="nx-lead">
+            Every figure is checked against your own system and refreshed
+            nightly.
+          </p>
+        </div>
+        <div className="nx-roles">
+          {ROLES.map((r) => (
+            <article key={r.who} className="nx-role">
+              <span className="nx-label">{r.who}</span>
+              <h3>{r.title}</h3>
+              <ul>
+                {r.points.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+        <p className="nx-roles-more">
+          <Link href="/nori/whats-inside">
+            See everything nori covers
+            <span aria-hidden="true"> →</span>
+          </Link>
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function Areas() {
+  return (
+    <section className="nx-section nx-white">
+      <div className="nx-wrap">
+        <div className="nx-head">
+          <span className="nx-label">Seven areas, one place</span>
+          <h2>Your whole retail business, run from one place.</h2>
+        </div>
+        <ul className="nx-areas">
+          {MODULE_TABS.map((t) => (
+            <li key={t.id}>
+              <Link href="/nori/whats-inside" className="nx-area">
+                <h3>{t.label}</h3>
+                <p>{t.headline}</p>
+              </Link>
+            </li>
+          ))}
+          <li className="nx-area nx-area-soon">
+            <h3>Vision (CCTV)</h3>
+            <p>Coming soon.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 function Reads() {
   return (
     <section className="nx-section nx-band nx-on-ink">
       <div className="nx-wrap">
         <div className="nx-head">
-          <span className="nx-label">How nori reads</span>
+          <span className="nx-label">Inside every read</span>
           <h2>A number, why it moved, and what to look at.</h2>
         </div>
         <div className="nx-cards">
-          {READS.map((r, i) => (
+          {READS.map((r) => (
             <div key={r.title} className="nx-card">
-              <span
-                className="nx-card-num"
-                aria-hidden="true"
-              >{`0${i + 1}`}</span>
               <h3>{r.title}</h3>
               <p>{r.text}</p>
             </div>
@@ -393,7 +469,6 @@ const PLANS = [
     items: [
       "Everything in nori (Vision coming soon)",
       "Up to 10 outlets",
-      "Questions in plain words, without a limit",
       "Priority support",
     ],
   },
@@ -432,6 +507,9 @@ function Pricing() {
             </div>
           ))}
         </div>
+        <p className="nx-small nx-plans-note">
+          Growth covers up to 10 outlets. For more, choose Enterprise.
+        </p>
       </div>
     </section>
   );
@@ -499,48 +577,6 @@ function PageHead({
   );
 }
 
-const EXPLORE = [
-  {
-    href: "/nori/whats-inside",
-    title: "What’s inside",
-    text: "Shops, money, stock, online, marketing and people. Seven areas, each with the numbers and the next step.",
-  },
-  {
-    href: "/nori/how-it-works",
-    title: "How it works",
-    text: "Connect your data, let nori read it, and get a short read each morning.",
-  },
-  {
-    href: "/nori/pricing",
-    title: "Pricing",
-    text: "One setup, then a simple monthly plan. Every plan has everything. You choose the size and the support.",
-  },
-];
-
-function Explore() {
-  return (
-    <section className="nx-section">
-      <div className="nx-wrap">
-        <div className="nx-head">
-          <span className="nx-label">Look around</span>
-          <h2>Where to next.</h2>
-        </div>
-        <ul className="nx-explore">
-          {EXPLORE.map((e) => (
-            <li key={e.href}>
-              <Link href={e.href} className="nx-explore-card">
-                <h3>{e.title}</h3>
-                <p>{e.text}</p>
-                <span className="nx-explore-go">Open →</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
 function Footer() {
   return (
     <footer className="nx-footer nx-on-ink">
@@ -563,6 +599,11 @@ function Footer() {
 
 // Every answer restates what the nori pages already say. Nothing new is claimed here.
 export const NORI_FAQ = [
+  {
+    question: "Who is nori for?",
+    answer:
+      "Owners and department heads of shops and retail chains. Owners see which shop is behind and why. Heads of operations see stock, daily checks and transfers. Heads of finance see margin and cash.",
+  },
   {
     question: "What is nori?",
     answer:
@@ -647,9 +688,10 @@ export function NoriHome() {
   return (
     <Shell>
       <Hero />
+      <Roles />
       <Problems />
       <Reads />
-      <Explore />
+      <Areas />
       <Closing />
     </Shell>
   );
@@ -664,7 +706,6 @@ export function NoriInside() {
         lead="Shops, money, stock, online, marketing and people. Each comes with the numbers, the reasons and the next step."
       />
       <ModulesSection />
-      <Closing />
     </Shell>
   );
 }
@@ -707,7 +748,6 @@ export function NoriFaq() {
         lead="The short answers to what shop owners ask first."
       />
       <Faq />
-      <Closing />
     </Shell>
   );
 }

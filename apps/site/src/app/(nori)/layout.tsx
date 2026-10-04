@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Jost } from "next/font/google";
+import { PiLauncher } from "@/components/pi-launcher";
 import { JsonLd, ORGANIZATION, WEBSITE } from "@/lib/seo";
 import "@/features/nori/nori-tokens.css";
 import "@/features/nori/nori.css";
@@ -41,6 +42,7 @@ export default function NoriLayout({
           }}
         />
         {children}
+        <PiLauncher />
       </body>
     </html>
   );

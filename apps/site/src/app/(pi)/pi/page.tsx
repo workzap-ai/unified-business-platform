@@ -20,7 +20,7 @@ export const metadata = piMetadata({
   path: "",
   title: "pi by Workzap: talk about your problems on WhatsApp",
   description: PI.live.solutions
-    ? "Tell pi, an AI from Workzap, what is going wrong in your business on WhatsApp. pi sorts your problems, then you can get a solution document and a quote, and Workzap builds it."
+    ? "Tell pi, an AI from Workzap, what is going wrong in your business on WhatsApp. pi sorts it, then you can get a solution and a quote."
     : PI.live.dashboard
       ? "Chat with pi on WhatsApp about the problems in your business. pi, an AI from Workzap, notes each one, sorts them and shows you everything in one place."
       : "Chat with pi on WhatsApp about the problems in your business. pi, an AI from Workzap, notes each one and sorts them.",
