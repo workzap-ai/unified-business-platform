@@ -1,0 +1,1020 @@
+/* nori by Workzap. Brand guide v1.0 (3 Oct 2026).
+   Palette: ink, paper, green, mint, coral. Coral is a fill, once per screen, never text on white.
+   Type: Jost 600 for names and headings, Inter for reading. Spacing 4 8 16 24 32 48 only.
+   Radius 3 / 8 / 14 / full. 1px lines, no shadows, no motion. */
+:root {
+  --nori-line: #e3e1d8;
+  --nori-white: #ffffff;
+  /* Secondary text: ink lightened until it still passes AAA (8.35 on white, 7.43 on paper). */
+  --nori-ink-2: #3d524e;
+  --nx-r-bar: 3px;
+  --nx-r-field: 8px;
+  --nx-r-card: 14px;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: auto;
+}
+body {
+  margin: 0;
+  background: var(--nori-paper);
+  color: var(--nori-ink);
+  font-family:
+    var(--font-inter),
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  -webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-jost), "Jost", sans-serif;
+  font-weight: 600;
+  color: var(--nori-ink);
+  margin: 0;
+}
+.nx-display {
+  font-size: clamp(40px, 6vw, 56px);
+  line-height: 1.07;
+  letter-spacing: -0.02em;
+}
+h2 {
+  text-wrap: balance;
+  font-size: clamp(28px, 4vw, 38px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-size: 22px;
+  line-height: 26px;
+}
+p {
+  margin: 0;
+}
+a {
+  color: var(--nori-green);
+  font-weight: 700;
+  text-underline-offset: 4px;
+}
+a:hover {
+  color: var(--nori-ink);
+}
+:focus-visible {
+  outline: 2px solid var(--nori-green);
+  outline-offset: 2px;
+  border-radius: var(--nx-r-bar);
+}
+.nx-on-ink :focus-visible {
+  outline-color: var(--nori-mint);
+}
+.nx-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.nx-skip {
+  position: absolute;
+  left: -999px;
+  top: 8px;
+  background: var(--nori-ink);
+  color: var(--nori-paper);
+  padding: 8px 16px;
+  border-radius: var(--nx-r-field);
+  z-index: 100;
+}
+.nx-skip:focus {
+  left: 8px;
+}
+.nx-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.nx-label {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--nori-green);
+}
+.nx-small {
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--nori-ink-2);
+}
+.nx-lead {
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--nori-ink-2);
+  max-width: 560px;
+}
+.nx-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* header */
+.nx-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--nori-paper);
+  border-bottom: 1px solid var(--nori-line);
+}
+.nx-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 80px;
+}
+.nx-brand img {
+  display: block;
+  height: 56px;
+  width: auto;
+}
+.nx-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.nx-links a {
+  color: var(--nori-ink);
+  text-decoration: none;
+  font-size: 14px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.nx-links a:hover {
+  color: var(--nori-green);
+}
+.nx-menu {
+  display: none;
+}
+@media (max-width: 880px) {
+  .nx-links {
+    display: none;
+  }
+  .nx-menu {
+    display: block;
+    position: relative;
+  }
+  .nx-menu summary {
+    list-style: none;
+    cursor: pointer;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 16px;
+    border: 1px solid var(--nori-ink);
+    border-radius: var(--nx-r-field);
+    font-weight: 700;
+  }
+  .nx-menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .nx-menu nav {
+    position: absolute;
+    right: 0;
+    top: 48px;
+    background: var(--nori-white);
+    border: 1px solid var(--nori-line);
+    border-radius: var(--nx-r-card);
+    padding: 8px;
+    min-width: 224px;
+    display: grid;
+  }
+  .nx-menu nav a {
+    padding: 8px 16px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--nori-ink);
+  }
+  .nx-header .nx-btn {
+    display: none;
+  }
+}
+
+/* buttons */
+.nx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 24px;
+  border-radius: var(--nx-r-field);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid var(--nori-green);
+}
+.nx-btn-primary {
+  background: var(--nori-green);
+  color: var(--nori-white);
+}
+.nx-btn-primary:hover {
+  background: var(--nori-ink);
+  border-color: var(--nori-ink);
+  color: var(--nori-white);
+}
+.nx-btn-secondary {
+  background: transparent;
+  color: var(--nori-ink);
+  border-color: var(--nori-ink);
+}
+.nx-btn-secondary:hover {
+  background: var(--nori-ink);
+  color: var(--nori-paper);
+}
+.nx-on-ink .nx-btn-primary {
+  background: var(--nori-mint);
+  border-color: var(--nori-mint);
+  color: var(--nori-ink);
+}
+.nx-on-ink .nx-btn-primary:hover {
+  background: var(--nori-paper);
+  border-color: var(--nori-paper);
+  color: var(--nori-ink);
+}
+.nx-on-ink .nx-btn-secondary {
+  color: var(--nori-paper);
+  border-color: var(--nori-paper);
+}
+.nx-on-ink .nx-btn-secondary:hover {
+  background: var(--nori-paper);
+  color: var(--nori-ink);
+}
+.nx-btn-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* hero + today card (an Ink card: paper text, mint labels, one coral bar) */
+.nx-hero {
+  padding: 48px 0 0;
+  overflow: hidden;
+}
+.nx-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 48px;
+  align-items: center;
+}
+@media (max-width: 880px) {
+  .nx-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-hero .nx-display {
+  margin: 16px 0 24px;
+}
+.nx-hero .nx-btn-row {
+  margin-top: 32px;
+}
+.nx-dash {
+  background: var(--nori-ink);
+  color: var(--nori-paper);
+  border-radius: var(--nx-r-card);
+  padding: 24px;
+  display: grid;
+  gap: 24px;
+}
+@media (max-width: 560px) {
+  .nx-dash {
+    padding: 16px;
+  }
+}
+.nx-dash .nx-label {
+  color: var(--nori-mint);
+}
+.nx-dash-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.nx-dash-tabs {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  line-height: 19px;
+  font-weight: 700;
+  color: var(--nori-paper);
+}
+.nx-dash-tabs span:first-child {
+  color: var(--nori-mint);
+  border-bottom: 2px solid var(--nori-mint);
+}
+.nx-tag {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--nori-ink-2);
+  border: 1px dashed var(--nori-ink-2);
+  border-radius: 999px;
+  padding: 0 8px;
+}
+.nx-dash .nx-tag {
+  color: var(--nori-paper);
+  border-color: var(--nori-paper);
+}
+.nx-dash-main {
+  display: grid;
+  gap: 4px;
+}
+.nx-figure {
+  font-family: var(--font-jost), sans-serif;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 36px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.nx-dash .nx-figure {
+  font-size: clamp(40px, 6vw, 56px);
+  line-height: 1.07;
+  color: var(--nori-paper);
+}
+.nx-dash-sub {
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--nori-paper);
+}
+
+/* the sales chart: paper bars on ink, one coral bar */
+.nx-chart {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.nx-chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 128px;
+  border-bottom: 1px solid var(--nori-green);
+  padding-bottom: 0;
+}
+.nx-chart-bars span {
+  flex: 1;
+  min-width: 0;
+  background: var(--nori-paper);
+  border-radius: var(--nx-r-bar);
+}
+.nx-chart-bars span.is-look {
+  background: var(--nori-coral);
+}
+.nx-chart-days {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 19px;
+  font-weight: 700;
+}
+.nx-chart-days span {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+.nx-chart figcaption {
+  font-size: 13px;
+  line-height: 19px;
+}
+.nx-dash-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 560px) {
+  .nx-dash-tiles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-dash-tile {
+  border: 1px solid var(--nori-green);
+  border-radius: var(--nx-r-card);
+  padding: 16px;
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+.nx-dash-tile ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+  display: grid;
+  gap: 4px;
+}
+.nx-dash-look {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+}
+.nx-look {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-weight: 700;
+}
+.nx-coral-mark {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--nx-r-bar);
+  background: var(--nori-coral);
+  position: relative;
+  top: 1px;
+}
+
+/* sections */
+.nx-section {
+  padding: 48px 0;
+}
+.nx-white {
+  background: var(--nori-white);
+  border-top: 1px solid var(--nori-line);
+  border-bottom: 1px solid var(--nori-line);
+}
+.nx-hero + .nx-white {
+  border-top: 0;
+}
+.nx-head {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 32px;
+  max-width: 720px;
+}
+.nx-split {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 48px;
+  align-items: start;
+}
+.nx-split > .nx-head {
+  margin-bottom: 0;
+}
+@media (max-width: 880px) {
+  .nx-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* the problems: a ruled list, not a row of cards */
+.nx-problems {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.nx-problems li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 24px;
+  padding: 24px 0;
+  border-top: 1px solid var(--nori-line);
+}
+.nx-problems li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.nx-problems p {
+  color: var(--nori-ink-2);
+}
+@media (max-width: 560px) {
+  .nx-problems li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+}
+
+/* full-width ink band: the four reads */
+.nx-band {
+  background: var(--nori-ink);
+  color: var(--nori-paper);
+}
+.nx-band h2,
+.nx-band h3 {
+  color: var(--nori-paper);
+}
+.nx-band .nx-label {
+  color: var(--nori-mint);
+}
+.nx-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 1000px) {
+  .nx-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .nx-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-card {
+  border: 1px solid var(--nori-green);
+  border-radius: var(--nx-r-card);
+  padding: 24px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.nx-card-num {
+  font-family: var(--font-jost), sans-serif;
+  font-weight: 600;
+  font-size: 56px;
+  line-height: 60px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--nori-mint);
+}
+.nx-card p {
+  color: var(--nori-paper);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* steps: a big numeral beside a barcode-style progress device (three bars, filled to the step) */
+.nx-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 32px;
+  counter-reset: s;
+}
+.nx-steps li {
+  counter-increment: s;
+  border-top: 1px solid var(--nori-ink);
+  padding-top: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-content: start;
+}
+.nx-steps li::before {
+  content: counter(s);
+  font-family: var(--font-jost), sans-serif;
+  font-weight: 600;
+  font-size: 56px;
+  line-height: 60px;
+  letter-spacing: -0.02em;
+  color: var(--nori-green);
+}
+.nx-stepbars {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  height: 60px;
+}
+.nx-stepbars i {
+  display: block;
+  background: var(--nori-line);
+  border-radius: var(--nx-r-bar);
+}
+.nx-stepbars i:nth-child(1) {
+  width: 16px;
+}
+.nx-stepbars i:nth-child(2) {
+  width: 8px;
+}
+.nx-stepbars i:nth-child(3) {
+  width: 16px;
+}
+.nx-stepbars i.on {
+  background: var(--nori-ink);
+}
+.nx-steps h3,
+.nx-steps p {
+  grid-column: 1 / -1;
+}
+.nx-steps h3 {
+  margin-top: 8px;
+}
+.nx-steps p {
+  color: var(--nori-ink-2);
+}
+
+/* questions + the sample answer */
+.nx-questions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.nx-questions li {
+  padding: 16px 0;
+  border-top: 1px solid var(--nori-line);
+  font-weight: 700;
+}
+.nx-questions li:last-child {
+  border-bottom: 1px solid var(--nori-line);
+}
+.nx-questions .nx-small {
+  display: block;
+  font-weight: 500;
+}
+.nx-ask {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+@media (max-width: 880px) {
+  .nx-ask {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-msg {
+  background: var(--nori-white);
+  border: 1px solid var(--nori-line);
+  border-radius: var(--nx-r-card);
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+}
+@media (max-width: 560px) {
+  .nx-msg {
+    padding: 16px;
+  }
+}
+.nx-msg-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.nx-msg-name {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+}
+.nx-msg-name span {
+  font-weight: 500;
+  color: var(--nori-ink-2);
+}
+.nx-msg-q {
+  justify-self: end;
+  max-width: 85%;
+  padding: 8px 16px;
+  border: 1px solid var(--nori-green);
+  border-radius: var(--nx-r-card);
+  font-weight: 700;
+}
+.nx-msg-a {
+  background: var(--nori-paper);
+  border: 1px solid var(--nori-line);
+  border-radius: var(--nx-r-card);
+  padding: 16px 24px;
+  display: grid;
+  gap: 16px;
+}
+@media (max-width: 560px) {
+  .nx-msg-a {
+    padding: 16px;
+  }
+}
+
+/* plans */
+.nx-plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(224px, 1fr));
+  gap: 16px;
+}
+.nx-plan {
+  background: var(--nori-paper);
+  border: 1px solid var(--nori-line);
+  border-radius: var(--nx-r-card);
+  padding: 24px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 16px;
+}
+.nx-plan ul {
+  align-content: start;
+}
+.nx-plan ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+}
+.nx-plan li {
+  display: flex;
+  gap: 8px;
+}
+.nx-plan li::before {
+  content: "✓";
+  color: var(--nori-green);
+  font-weight: 800;
+}
+
+/* closing band + footer */
+.nx-cta {
+  background: var(--nori-ink);
+  color: var(--nori-paper);
+  padding: 48px 0;
+}
+.nx-cta-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 48px;
+  align-items: center;
+}
+@media (max-width: 880px) {
+  .nx-cta-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-cta h2 {
+  color: var(--nori-paper);
+}
+.nx-cta p {
+  color: var(--nori-paper);
+  margin: 16px 0 32px;
+  max-width: 560px;
+}
+.nx-cta-chart {
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+.nx-cta-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 192px;
+  border-bottom: 1px solid var(--nori-green);
+}
+.nx-cta-bars span {
+  flex: 1;
+  min-width: 0;
+  background: var(--nori-paper);
+  border-radius: var(--nx-r-bar);
+}
+.nx-cta-bars span.is-look {
+  background: var(--nori-coral);
+}
+.nx-cta-chart figcaption {
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--nori-paper);
+}
+.nx-footer {
+  background: var(--nori-ink);
+  color: var(--nori-paper);
+  border-top: 1px solid var(--nori-green);
+  padding: 32px 0;
+  font-size: 14px;
+}
+.nx-footer .nx-wrap {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.nx-footer a {
+  color: var(--nori-mint);
+}
+.nx-footer a:hover {
+  color: var(--nori-paper);
+}
+.nx-footer-links {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* inner pages: a plain page head, a breadcrumb, the current link marked */
+.nx-links a[aria-current="page"],
+.nx-menu a[aria-current="page"] {
+  color: var(--nori-green);
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
+}
+.nx-pagehead {
+  padding: 48px 0 40px;
+  border-bottom: 1px solid var(--nori-line);
+}
+.nx-pagehead .nx-display {
+  margin: 16px 0 16px;
+  max-width: 800px;
+}
+.nx-crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--nori-ink-2);
+}
+.nx-crumb a {
+  color: var(--nori-ink-2);
+  text-underline-offset: 3px;
+}
+.nx-crumb a:hover {
+  color: var(--nori-green);
+}
+
+/* the three doors on the nori home page */
+.nx-explore {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 880px) {
+  .nx-explore {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-explore-card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  height: 100%;
+  padding: 24px;
+  background: var(--nori-white);
+  border: 1px solid var(--nori-line);
+  border-radius: var(--nx-r-card);
+  color: var(--nori-ink);
+  text-decoration: none;
+}
+.nx-explore-card:hover {
+  border-color: var(--nori-ink);
+}
+.nx-explore-card p {
+  color: var(--nori-ink-2);
+}
+.nx-explore-go {
+  margin-top: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--nori-green);
+}
+.nx-explore-card p {
+  font-weight: 400;
+}
+
+/* FAQ: a ruled list of questions and answers */
+.nx-faq {
+  margin: 0;
+  max-width: 760px;
+}
+.nx-faq-item {
+  padding: 24px 0;
+  border-top: 1px solid var(--nori-line);
+}
+.nx-faq-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.nx-faq dt h2 {
+  font-size: 22px;
+  line-height: 28px;
+}
+.nx-faq dd {
+  margin: 8px 0 0;
+  color: var(--nori-ink-2);
+}
+
+/* hero audience line */
+.nx-audience {
+  margin: 16px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+  color: var(--nori-green);
+}
+
+/* who it is for: three roles */
+.nx-roles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+@media (max-width: 880px) {
+  .nx-roles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-role {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 24px 0 0;
+  border-top: 2px solid var(--nori-ink);
+}
+.nx-role h3 {
+  font-size: 22px;
+  line-height: 28px;
+}
+.nx-role ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: grid;
+  gap: 12px;
+}
+.nx-role li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--nori-ink-2);
+}
+.nx-role li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 8px;
+  height: 2px;
+  background: var(--nori-green);
+}
+.nx-roles-more {
+  margin: 32px 0 0;
+  font-weight: 700;
+}
+.nx-roles-more a {
+  color: var(--nori-green);
+  text-underline-offset: 4px;
+}
+
+/* seven areas at a glance */
+.nx-areas {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 1000px) {
+  .nx-areas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .nx-areas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.nx-area {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  height: 100%;
+  padding: 20px;
+  background: var(--nori-paper);
+  border: 1px solid var(--nori-line);
+  border-radius: var(--nx-r-card);
+  color: var(--nori-ink);
+  text-decoration: none;
+}
+a.nx-area:hover {
+  border-color: var(--nori-ink);
+}
+.nx-area h3 {
+  font-size: 18px;
+  line-height: 24px;
+}
+.nx-area p {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--nori-ink-2);
+}
+.nx-area-soon {
+  background: transparent;
+  border-style: dashed;
+}
+.nx-plans-note {
+  margin-top: 16px;
+}

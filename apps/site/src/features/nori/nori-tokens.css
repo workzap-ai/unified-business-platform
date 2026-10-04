@@ -1,0 +1,12 @@
+:root {
+  --nori-ink: #0b2623;
+  --nori-green: #14705a;
+  --nori-mint: #5fd0a5;
+  --nori-coral: #ff6a3d;
+  --nori-coral-deep: #d2431c;
+  --nori-paper: #f7f1e6;
+  --nori-font-display:
+    "Jost", sans-serif; /* wordmark and display headings, weight 600 */
+  --nori-font-text: "Inter", system-ui, sans-serif;
+  --nori-clear-space: 16; /* in mark units: the width of the widest bar */
+}

@@ -1,0 +1,263 @@
+import Link from "next/link";
+import { PI } from "@/features/pi/config";
+import { WhatsAppButton } from "@/features/pi/client";
+import { Breadcrumbs, piMetadata } from "@/features/pi/meta";
+import {
+  AiChip,
+  Chat,
+  CtaBlock,
+  Face,
+  Gate,
+  Points,
+  Section,
+  SolutionPreview,
+  Thread,
+} from "@/features/pi/ui";
+
+export const metadata = piMetadata({
+  path: "",
+  title: "pi by Workzap: talk about your problems on WhatsApp",
+  description: PI.live.solutions
+    ? "Tell pi, an AI from Workzap, what is going wrong in your business on WhatsApp. pi sorts it, then you can get a solution and a quote."
+    : PI.live.dashboard
+      ? "Chat with pi on WhatsApp about the problems in your business. pi, an AI from Workzap, notes each one, sorts them and shows you everything in one place."
+      : "Chat with pi on WhatsApp about the problems in your business. pi, an AI from Workzap, notes each one and sorts them.",
+});
+
+export default function PiLanding() {
+  return (
+    <>
+      <Breadcrumbs path="" />
+      <section className="pi-hero">
+        <div className="pi-wrap pi-hero-grid">
+          <div>
+            <h1>
+              {PI.live.solutions
+                ? "Tell pi what’s going wrong. Workzap builds the solution."
+                : "Tell pi what’s going wrong. pi keeps track."}
+            </h1>
+            <p className="pi-lead">
+              pi is Workzap’s WhatsApp agent. Chat about the problems in your
+              business the way you’d tell a colleague. pi notes each one
+              {PI.live.dashboard
+                ? ", sorts them, and shows you everything in one place."
+                : " and sorts them."}
+              {PI.live.solutions
+                ? " When you’re ready, you get a solution document and a quote. You decide whether Workzap builds it."
+                : null}
+            </p>
+            <div className="pi-cta-row">
+              <WhatsAppButton page="landing" pos="hero" />
+              <Link
+                className="pi-btn pi-btn-secondary"
+                href={`${PI.base}/how-it-works`}
+              >
+                See how pi works
+              </Link>
+            </div>
+            <p className="pi-small">
+              pi is an AI. It says so in its first message.
+            </p>
+            <p className="pi-small">
+              <Link href={`${PI.base}/trust`}>How we treat your chats</Link> →
+            </p>
+          </div>
+          <div className="pi-hero-visual">
+            <div className="pi-hero-face">
+              <Face name="rest" size={240} />
+              <AiChip />
+            </div>
+            <Chat
+              lines={[
+                [
+                  "pi",
+                  "Hi, I’m pi, an AI from Workzap. Tell me what’s going wrong in your business and I’ll start on it.",
+                ],
+                ["you", "We keep running out of our best-selling items."],
+              ]}
+            />
+          </div>
+        </div>
+      </section>
+
+      <Section title="Talk first. Sort it out later.">
+        <Points
+          items={[
+            {
+              lead: "No forms. Just chat.",
+              text: "Describe a problem in your own words, on the app you already use.",
+            },
+            {
+              lead: "Nothing gets lost.",
+              text: "pi notes the problems you describe and sorts them by type, so you don’t have to explain the same thing twice.",
+            },
+            ...(PI.live.dashboard
+              ? [
+                  {
+                    lead: "Everything in one place.",
+                    text: "See your problems, sorted, on your own dashboard.",
+                  },
+                ]
+              : []),
+          ]}
+        />
+      </Section>
+
+      <Section title="This is what a chat looks like" tone="soft">
+        <Chat
+          note="Illustrative conversation. pi’s real questions are set by Workzap."
+          lines={[
+            [
+              "pi",
+              "Hi, I’m pi, an AI from Workzap. Tell me what’s going wrong in your business and I’ll start on it.",
+              "greet",
+            ],
+            ["you", "We keep running out of our best-selling items."],
+            [
+              "pi",
+              "That’s a real problem. Is it happening in every shop, or only some?",
+              "rest",
+            ],
+            ["you", "Two of the four."],
+            [
+              "pi",
+              "Thanks. I’ve noted it: best-sellers running out, in two of four shops. Anything else getting in the way?",
+              "noted",
+            ],
+          ]}
+        />
+      </Section>
+
+      <Gate name="solutions">
+        <Section title="From problem to solution" tone="tint" layout="stack">
+          <p className="pi-big">
+            Sorting is the start. Once your problems are sorted and you’re
+            ready, you can have a solution built for them.
+          </p>
+          <ul className="pi-ribbon" aria-label="From problem to solution">
+            <li>
+              <Face name="noted" size={88} />
+              pi sorts your problems
+            </li>
+            <li>
+              <Face name="think" size={88} />
+              You get a solution document
+            </li>
+            <li>
+              <Face name="heads" size={88} />
+              You get a quote
+            </li>
+            <li>
+              <Face name="rest" size={88} />
+              You decide
+            </li>
+            <li>
+              <Face name="done" size={88} />
+              Workzap builds it
+            </li>
+          </ul>
+          <SolutionPreview />
+          <Points
+            items={[
+              {
+                lead: "A solution made for your problems.",
+                text: "The document starts from what you told pi, in your words, so you can check it’s right.",
+              },
+              {
+                lead: "A quote before anything else.",
+                text: "What’s included, what it costs, how long it takes. An offer, not a charge.",
+              },
+              {
+                lead: "You stay in charge.",
+                text: "pi won’t send a document or a quote unless you say yes. Nothing is charged until you approve, and you can stop at any point before paying.",
+              },
+              {
+                lead: "Then Workzap builds.",
+                text: "Once your payment is confirmed, Workzap begins your project with a kickoff.",
+              },
+            ]}
+          />
+          <p>
+            <Link className="pi-arrow" href={`${PI.base}/solutions`}>
+              How the document, the quote and payment work →
+            </Link>
+          </p>
+        </Section>
+      </Gate>
+
+      <Section title="Your chats, your say">
+        <p className="pi-big">
+          You choose what to tell pi. See what pi never asks for, and what to
+          share.
+        </p>
+        <p>
+          <Link className="pi-arrow" href={`${PI.base}/trust`}>
+            Read how we treat your chats →
+          </Link>
+        </p>
+      </Section>
+
+      <Section title="pi is straight with you" tone="tint">
+        <Thread
+          lines={[
+            ["you", "Am I talking to a person?"],
+            [
+              "pi",
+              <>
+                <strong>pi is an AI, not a person.</strong> It says so in its
+                first message, and again whenever you ask.
+              </>,
+              "rest",
+            ],
+            ["you", "What if I’m still explaining the problem?"],
+            [
+              "pi",
+              <>
+                <strong>pi puts your problem first.</strong> Nothing gets
+                suggested while you’re still explaining what’s wrong.
+              </>,
+              "rest",
+            ],
+            ["you", "And if you can’t do what I ask?"],
+            [
+              "pi",
+              <>
+                <strong>pi says what it can’t do.</strong> And what happens
+                next.
+              </>,
+              "heads",
+            ],
+          ]}
+        />
+      </Section>
+
+      <Section title="Quick answers" tone="soft" layout="stack">
+        <div className="pi-qa">
+          <div className="pi-qa-item">
+            <h3>Is pi a real person?</h3>
+            <p>No. pi is an AI, and it says so in its first message.</p>
+          </div>
+          <div className="pi-qa-item">
+            <h3>Will pi try to sell me something?</h3>
+            <p>
+              {PI.live.solutions
+                ? "Not while you’re describing a problem. When your problems are sorted, pi asks whether you’d like a solution document and a quote. You can say no."
+                : "Not while you’re describing a problem."}
+            </p>
+          </div>
+        </div>
+        <p className="pi-qa-more">
+          <Link className="pi-arrow" href={`${PI.base}/faq`}>
+            All questions →
+          </Link>
+        </p>
+      </Section>
+
+      <CtaBlock
+        page="landing"
+        pos="closing"
+        heading="Start with one problem."
+      />
+    </>
+  );
+}
