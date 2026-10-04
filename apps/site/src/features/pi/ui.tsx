@@ -89,6 +89,8 @@ export function Face({
       height={size}
       className={className}
       unoptimized
+      // tiny SVG faces: load at once so a face is never missing from a section
+      loading="eager"
     />
   );
 }
