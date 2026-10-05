@@ -6,6 +6,7 @@ inbox/knowledge/settings routers are mounted under the same prefix so both editi
 one implementation. Customers never see tenant, environment or provider identifiers.
 """
 
+import asyncio
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Annotated, Any, Literal
@@ -51,7 +52,7 @@ from app.modules.business_settings.models import BusinessSettings
 from app.modules.memberships.models import Membership
 from app.modules.pi.models import PiAgentRun, PiConversation, PiHandoff, PiMessage
 from app.modules.pi.service import ACTIVE_HANDOFF, PiService
-from app.modules.pi_saas import billing, connections, onboarding, teach
+from app.modules.pi_saas import billing, connections, onboarding, teach, website_kb
 from app.modules.pi_saas.entitlement import entitlement, month, storage_used_mb, usage_for
 from app.modules.pi_saas.models import (
     PiKnowledgeDraft,
@@ -67,7 +68,12 @@ from app.modules.pi_saas.provisioning import provision_business
 from app.modules.tenants.context import active_memberships
 from app.modules.tenants.models import Tenant
 from app.modules.users.models import PlatformUser
-from app.shared.errors import BusinessRuleViolation, Conflict, Unauthenticated
+from app.shared.errors import (
+    BusinessRuleViolation,
+    Conflict,
+    ResourceNotFound,
+    Unauthenticated,
+)
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
 
@@ -580,8 +586,6 @@ async def decide_support_access(
         .with_for_update()
     )
     if grant is None:
-        from app.shared.errors import ResourceNotFound
-
         raise ResourceNotFound
     if action == "approve":
         if grant.status != "requested":
@@ -1232,6 +1236,76 @@ async def website(
     )
     await session.commit()
     return _draft_view(draft)
+
+
+@router.post("/knowledge/website/crawl", status_code=201)
+async def learn_website(
+    data: website_kb.CrawlInput, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Read the business's website (sitemap and links, same site only), extract each page
+    and draft one knowledge entry per page. Nothing is used until the owner publishes."""
+    scope.require("pi.knowledge.manage")
+    if not await hit(request, "pi-website-crawl", str(scope.tenant_id), 6, 3600):
+        raise BusinessRuleViolation(
+            "RATE_LIMITED", "You've read your website a few times this hour. Try later.", 429
+        )
+    from app.ai.manager import build_llm_manager
+
+    settings = request.app.state.settings
+    ai = any(getattr(settings, f"{p}_api_key", None) for p in settings.provider_order())
+    manager = (
+        build_llm_manager(settings, request.app.state.http, request.app.state.sessions)
+        if ai
+        else None
+    )
+    try:
+        async with asyncio.timeout(150):
+            result = await website_kb.learn_website(
+                session,
+                scope,
+                OutboundClient(
+                    settings,
+                    request.app.state.http,
+                    resolver=getattr(request.app.state, "integration_resolver", None),
+                ),
+                manager,
+                data,
+            )
+    except TimeoutError:
+        raise BusinessRuleViolation(
+            "WEBSITE_TIMEOUT", "Your website took too long to read. Try fewer pages.", 503
+        ) from None
+    await session.commit()
+    return {
+        "site": result["site"],
+        "drafts": [_draft_view(d) for d in result["drafts"]],
+        "skipped": result["skipped"],
+    }
+
+
+class PublishMany(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    ids: list[UUID] = Field(min_length=1, max_length=50)
+
+
+@router.post("/knowledge/drafts/publish")
+async def publish_drafts(
+    data: PublishMany, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Publish several reviewed drafts at once; each becomes a knowledge document."""
+    published, failed = 0, []
+    limit = request.app.state.settings.knowledge_upload_max_bytes
+    for draft_id in dict.fromkeys(data.ids):
+        try:
+            async with session.begin_nested():
+                await teach.publish_draft(session, scope, draft_id, limit)
+            published += 1
+        except (BusinessRuleViolation, ResourceNotFound) as exc:
+            failed.append(
+                {"id": str(draft_id), "message": getattr(exc, "message", "Draft not found")}
+            )
+    await session.commit()
+    return {"published": published, "failed": failed}
 
 
 @router.get("/staff-requests")

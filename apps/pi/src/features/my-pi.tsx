@@ -47,7 +47,7 @@ import {
 import { ConnectorsSection, useConnectors } from "@/features/connectors";
 import { TestConversation } from "@/features/test-pi";
 import product from "@/components/product.module.css";
-import { del, errorText, get, patch, post } from "@/lib/api";
+import { api, del, errorText, get, patch, post } from "@/lib/api";
 import { date } from "@/lib/format";
 import { useAction, useBusinessKey, useCan } from "@/lib/session";
 import type { Draft } from "@/lib/types";
@@ -318,6 +318,12 @@ function DraftCard({ draft }: { draft: Draft }) {
   );
 }
 
+type WebsiteResult = {
+  site: string;
+  drafts: Draft[];
+  skipped: { url: string; reason: string }[];
+};
+
 export function KnowledgePage() {
   const key = useBusinessKey();
   const can = useCan();
@@ -353,11 +359,44 @@ export function KnowledgePage() {
       onSuccess: () => setNote(""),
     },
   );
-  const website = useAction(() => post<Draft>("/knowledge/website", { url }), {
-    invalidate: [["drafts"]],
-    success: "We read the page. Review what pi learned below.",
-    onSuccess: () => setUrl(null),
-  });
+  const [pages, setPages] = React.useState("12");
+  const [learned, setLearned] = React.useState<WebsiteResult | null>(null);
+  const website = useAction(
+    () =>
+      api<WebsiteResult>(
+        "POST",
+        "/knowledge/website/crawl",
+        { url, max_pages: Number(pages) },
+        // Reading a whole site (and drafting each page) can take a minute or two.
+        { timeoutMs: 170_000 },
+      ),
+    {
+      invalidate: [["drafts"]],
+      success: (r) =>
+        `pi read ${r.drafts.length} ${r.drafts.length === 1 ? "page" : "pages"} from ${r.site}. Review them below.`,
+      onSuccess: (r) => {
+        setLearned(r);
+        setUrl(null);
+      },
+    },
+  );
+  const websiteDrafts = (drafts.data ?? []).filter(
+    (d) => d.origin === "website",
+  );
+  const publishAll = useAction(
+    () =>
+      post<{ published: number; failed: { id: string; message: string }[] }>(
+        "/knowledge/drafts/publish",
+        { ids: websiteDrafts.map((d) => d.id).slice(0, 50) },
+      ),
+    {
+      invalidate: [["drafts"], ["documents"], ["account"]],
+      success: (r) =>
+        r.failed.length
+          ? `Published ${r.published}. ${r.failed.length} couldn't be published: ${r.failed[0].message}`
+          : `Published ${r.published} ${r.published === 1 ? "page" : "pages"}. pi can use them now.`,
+    },
+  );
   const remove = useAction(
     (id: string) => del(`/pi/knowledge/documents/${id}`),
     {
@@ -415,41 +454,99 @@ export function KnowledgePage() {
         <Card>
           <CardSection className="space-y-3">
             <h2 className="flex items-center gap-2 font-semibold">
-              <Globe className="size-4 text-accent" aria-hidden /> Learn from a
-              web page
+              <Globe className="size-4 text-accent" aria-hidden /> Learn from
+              your website
             </h2>
             <p className="text-sm text-muted-foreground">
-              pi reads one public page. You review everything before it&apos;s
-              used.
+              pi reads your website (about, services, prices, FAQ, contact) and
+              turns each page into a draft. Menus and footers are left out.
+              Nothing is used until you publish.
             </p>
             <label htmlFor="page-url" className="sr-only">
-              Page address
+              Website address
             </label>
             <Input
               id="page-url"
               type="url"
               inputMode="url"
-              placeholder="https://"
+              placeholder="https://yourbusiness.com"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
             />
+            <div className="flex flex-wrap items-center gap-2">
+              <label htmlFor="page-count" className="text-sm">
+                Read
+              </label>
+              <Select
+                id="page-count"
+                value={pages}
+                onChange={(e) => setPages(e.target.value)}
+                className="w-auto"
+              >
+                <option value="1">just this page</option>
+                <option value="6">up to 6 pages</option>
+                <option value="12">up to 12 pages</option>
+                <option value="20">up to 20 pages</option>
+                <option value="30">up to 30 pages</option>
+              </Select>
+            </div>
             <Button
               variant="secondary"
               loading={website.isPending}
               disabled={!url.startsWith("https://")}
               onClick={() => website.mutate(undefined)}
             >
-              Read page
+              {website.isPending ? "Reading your website…" : "Read website"}
             </Button>
+            {website.isPending ? (
+              <p className="text-xs text-muted-foreground" role="status">
+                This can take a minute for bigger websites.
+              </p>
+            ) : null}
+            {learned ? (
+              <div className="rounded-lg bg-surface-muted p-3 text-sm">
+                <p>
+                  Read {learned.drafts.length}{" "}
+                  {learned.drafts.length === 1 ? "page" : "pages"} from{" "}
+                  <span className="font-medium">{learned.site}</span>. Each is a
+                  draft below.
+                </p>
+                {learned.skipped.length ? (
+                  <details className="mt-1 text-xs text-muted-foreground">
+                    <summary className="cursor-pointer">
+                      {learned.skipped.length} skipped
+                    </summary>
+                    <ul className="mt-1 space-y-0.5">
+                      {learned.skipped.map((s) => (
+                        <li key={s.url} className="break-all">
+                          {s.url} · {s.reason}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : null}
+              </div>
+            ) : null}
           </CardSection>
         </Card>
         <TeachFromFile />
       </div>
 
       <section className="mt-8" aria-labelledby="drafts-title">
-        <h2 id="drafts-title" className="mb-3 text-base font-semibold">
-          Waiting for review
-        </h2>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h2 id="drafts-title" className="text-base font-semibold">
+            Waiting for review
+          </h2>
+          {websiteDrafts.length > 1 && can("pi.knowledge.publish") ? (
+            <Button
+              size="sm"
+              loading={publishAll.isPending}
+              onClick={() => publishAll.mutate(undefined)}
+            >
+              Publish all {Math.min(websiteDrafts.length, 50)} website pages
+            </Button>
+          ) : null}
+        </div>
         {drafts.isPending ? (
           <LoadingBlock rows={2} />
         ) : drafts.isError ? (
@@ -491,11 +588,18 @@ export function KnowledgePage() {
                 >
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{doc.title}</p>
+                    {doc.body.startsWith("Source: ") ? (
+                      <p className="truncate text-xs text-accent">
+                        {doc.body.slice(8, doc.body.indexOf("\n"))}
+                      </p>
+                    ) : null}
                     <p
                       className="line-clamp-2 text-sm text-muted-foreground"
                       data-user-text
                     >
-                      {doc.body}
+                      {doc.body.startsWith("Source: ")
+                        ? doc.body.slice(doc.body.indexOf("\n") + 1).trim()
+                        : doc.body}
                     </p>
                     <div className="mt-1 flex flex-wrap gap-2">
                       <Badge
@@ -507,6 +611,9 @@ export function KnowledgePage() {
                           ? "Team only"
                           : "Customers may be told"}
                       </Badge>
+                      {doc.source_name === "Website" ? (
+                        <Badge>From your website</Badge>
+                      ) : null}
                       {doc.status !== "ready" ? (
                         <Badge tone="warning">
                           {doc.status === "failed"
