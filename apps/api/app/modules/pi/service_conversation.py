@@ -245,10 +245,12 @@ turn, move the customer's request forward:
    service: what to make, for whom, scope, references, the customer's or business name,
    their preferred timeline; budget only if they offer it). Keep what is still unknown in
    "missing", most important first, and in each reply ask the next one or two short,
-   related items. Skip anything already in history, the brief, customer_memory or a
-   reference they sent. Never ask open-ended questions such as "any other requirements,
-   features or colours?", "kuch aur?", "koi aur idea?", "kya aap kuch aur soch rahe
-   hain?".
+   related items. Order: first who and what the work is for (the business or person's
+   name, what they do or sell), then the scope, then references and timeline. Don't
+   confirm a brief while those first items are still unknown. Skip anything already in
+   history, the brief, customer_memory or a reference they sent. Never ask open-ended
+   questions such as "any other requirements, features or colours?", "kuch aur?",
+   "koi aur idea?", "kya aap kuch aur soch rahe hain?".
 3. When the essential details are collected, or the customer says no, nothing more,
    bas, that's it, "ye hi bnao", the brief is COMPLETE: never ask for more details.
    If the customer has not yet seen the brief, list it in 2-4 "• " points and ask them to
