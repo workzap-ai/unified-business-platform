@@ -134,6 +134,9 @@ class ServiceTurn(BaseModel):
     # (the team is told, so they can teach pi).
     mood: Literal["calm", "confused", "frustrated", "urgent"] = "calm"
     knowledge_gaps: list[str] = Field(default_factory=list, max_length=5)
+    # The customer asked for a meeting, call or visit. Booked from offered slots when the
+    # company has them; otherwise the team takes over and the admins are told.
+    meeting_requested: bool = False
     awaiting_customer: bool = False
     ready_for_team: bool = False
     consent: Literal["unchanged", "granted", "declined"] = "unchanged"
@@ -169,7 +172,7 @@ class ServiceTurn(BaseModel):
         for key, allowed in CHOICES.items():
             value = str(data.get(key, allowed[0])).strip().lower()
             data[key] = value if value in allowed else allowed[0]
-        for key in ("awaiting_customer", "ready_for_team", "request_human"):
+        for key in ("awaiting_customer", "ready_for_team", "request_human", "meeting_requested"):
             if key in data:
                 data[key] = _flag(data[key])
         gaps = data.get("knowledge_gaps")
@@ -237,13 +240,22 @@ turn, move the customer's request forward:
    as a reference ("aisa chahiye", "like this"), say in a few words what you see that
    matters for the work (style, colours, mood, layout) so they know you understood, and
    treat "make it like this" as a clear brief, not a reason for more questions.
-2. Ask ONLY what is needed to start the work, most important first, one at a time (for
-   a logo, the business or brand name to put on it; for a booking, the day). Never ask
-   open-ended questions such as "any other requirements, features or colours?", "kuch
-   aur?", "koi aur idea?", "kya aap kuch aur soch rahe hain?".
-3. When the customer says no, nothing more, bas, that's it, "ye hi bnao", or the needed
-   details are already in history, the brief is COMPLETE: never ask again. Confirm the
-   brief in 2-4 "• " points, say clearly what happens next (from approved_knowledge:
+2. Qualify the lead. From approved_knowledge, offerings and operator_guidance, work out
+   what this company's team needs to start THIS kind of work (it differs by field and
+   service: what to make, for whom, scope, references, the customer's or business name,
+   their preferred timeline; budget only if they offer it). Keep what is still unknown in
+   "missing", most important first, and in each reply ask the next one or two short,
+   related items. Skip anything already in history, the brief, customer_memory or a
+   reference they sent. Never ask open-ended questions such as "any other requirements,
+   features or colours?", "kuch aur?", "koi aur idea?", "kya aap kuch aur soch rahe
+   hain?".
+3. When the essential details are collected, or the customer says no, nothing more,
+   bas, that's it, "ye hi bnao", the brief is COMPLETE: never ask for more details.
+   If the customer has not yet seen the brief, list it in 2-4 "• " points and ask them to
+   confirm in one short question (e.g. "Ye theek hai? Main team ko bhej doon?"), with
+   ready_for_team=false and awaiting_customer=true. When they confirm (yes, haan, ji,
+   theek hai, "ye hi bnao") or had already said "make it like this", say clearly what
+   happens next (from approved_knowledge:
    process, what's included, how long, e.g. "pehle teen concepts, teen se paanch working days mein";
    otherwise "our team will review it and reply here"), set ready_for_team=true and
    awaiting_customer=false. Confirm a brief ONCE: after that, if the customer only says
@@ -259,6 +271,16 @@ turn, move the customer's request forward:
    pehle concepts teen se paanch working days mein yahin share honge."
    After a confirmed brief, "no", "nh chahiye", "bas" mean "nothing more needed", never
    a cancellation: reply in one short line, no question.
+Ideas: when the customer asks for ideas, suggestions or options ("idea do", "kya
+   suggest karenge"), give two to four concrete ideas that fit their brief, each in a
+   few words on its own "• " line, built ONLY from what the company does (offerings,
+   approved_knowledge: its services, styles, packages, process). Never invent a service,
+   price or promise. Then ask which one they like.
+Meetings: when the customer asks for a meeting, call, visit or appointment, set
+   meeting_requested=true. If bookable_services has slots, offer up to three slot labels
+   verbatim and book with action="booking" only when they pick one. If there are no
+   slots, set request_human=true and say the meeting request has been passed to the team,
+   who will confirm a time here. Never invent a time or say it is booked.
 4. Share facts from approved_knowledge that answer the customer's obvious next worry
    (what's included, how long, how they'll receive it) without being asked. Never invent
    them, and never promise a price or a date.
@@ -301,7 +323,7 @@ example from approved_knowledge); "frustrated" when they are annoyed, complain o
 themselves (apologise once, then give the answer or the next step, no question);
 "urgent" for pain, an emergency, a deadline or time pressure (set action_priority high,
 lead with the fastest option approved_knowledge offers for that case, and say what
-happens next right away); otherwise "calm". Ask at most ONE question per reply.
+happens next right away); otherwise "calm". Ask at most two short, related questions per reply.
 Introduce yourself only in your first message. When you set request_human=true, say a
 person from the team will reply here; don't ask whether they want one.
 If the enquiry is outside those offerings or needs judgement, request human review.
@@ -586,8 +608,8 @@ def needless_question(reply: str, context: dict[str, Any]) -> str | None:
         for earlier in asked[-2:]:
             if sum(line.strip() in earlier for line in bullets) >= max(1, len(bullets) // 2):
                 return "you already confirmed this brief; don't repeat the list"
-    if reply.count("?") >= 2:
-        return "it asks more than one question; keep only the most important one"
+    if reply.count("?") >= 3:
+        return "it asks more than two questions; keep only the one or two most important"
     if "?" not in reply:
         return None
     words = _words(reply.split("?")[-2] if reply.count("?") else reply)
@@ -668,6 +690,9 @@ async def compose_service_turn(
         turn._attempts = [*result.response.attempts, *retry.response.attempts]
     if turn.mood == "frustrated" and (context.get("brief") or {}).get("mood") == "frustrated":
         turn.request_human = True  # Still upset after pi's last answer: a person takes over.
+    slots = any(service.get("slots") for service in context.get("bookable_services", []))
+    if turn.meeting_requested and not slots and turn.action != "booking":
+        turn.request_human = True  # Nothing pi can book: a person arranges the meeting.
     if turn.mood == "urgent" and turn.action_priority in ("low", "normal"):
         turn.action_priority = "high"
     if context.get("operator_review_required"):
@@ -710,6 +735,7 @@ async def save_service_turn(
         "reminder_consent": consent,
         "source_message_id": str(message.id),
         "mood": turn.mood,
+        "meeting_requested": turn.meeting_requested or bool(previous.get("meeting_requested")),
     }
     known = list(previous.get("knowledge_gaps") or [])
     new_gaps = [g for g in dict.fromkeys(turn.knowledge_gaps) if g not in known]
@@ -746,6 +772,18 @@ async def save_service_turn(
         )
         # Replace the extracted snapshot, including explicit corrections/removals.
         lead.requirements = requirements
+    if turn.meeting_requested and not previous.get("meeting_requested"):
+        await notify(
+            session,
+            scope,
+            "pi.meeting_request",
+            "A customer wants a meeting",
+            turn.summary,
+            link=f"/pi/inbox?conversation={conversation.id}",
+            permission="pi.read",
+            severity="warning",
+            dedupe_key=f"pi-meeting:{conversation.id}",
+        )
     for gap in new_gaps:
         digest = hashlib.sha256(gap.lower().encode()).hexdigest()[:16]
         await notify(

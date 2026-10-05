@@ -548,3 +548,28 @@ async def test_unknown_answers_reach_the_team_and_a_frustrated_customer_gets_a_p
     await pi.deliver_all()
     assert (await pi.conversation()).mode == "human"  # still upset: a person takes over
     await pi.close()
+
+
+async def test_meeting_without_bookable_times_goes_to_the_team_and_tells_the_admins(
+    api, business_db, monkeypatch
+):
+    mock_turns(
+        monkeypatch,
+        turn(
+            reply="Meeting ki request team ko bhej di hai; woh yahin time confirm karenge.",
+            meeting_requested=True,
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("Kya hum kal meeting kar sakte hain?", "meet-1")
+    await pi.deliver_all()
+    conversation = await pi.conversation()
+    assert conversation.mode == "human"  # pi has no times to offer: a person arranges it
+    assert conversation.service_brief["meeting_requested"] is True
+    kinds = set(
+        await business_db.scalars(
+            select(Notification.kind).where(Notification.tenant_id == conversation.tenant_id)
+        )
+    )
+    assert {"pi.meeting_request", "pi.handoff"} <= kinds
+    await pi.close()
