@@ -8,7 +8,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.manager import LLMManager
@@ -115,6 +115,39 @@ class Requirements(BaseModel):
         }
 
 
+PROJECT_STATUS = ("collecting", "awaiting_confirmation", "confirmed", "with_team")
+
+
+class Project(BaseModel):
+    """One piece of work the customer raised in this chat; a chat can hold several."""
+
+    model_config = ConfigDict(extra="ignore")
+    title: str = Field(default="", max_length=120)
+    service: str = Field(default="", max_length=300)
+    details: str = Field(default="", max_length=1500)
+    status: Literal["collecting", "awaiting_confirmation", "confirmed", "with_team"] = "collecting"
+    missing: list[str] = Field(default_factory=list, max_length=12)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _tolerate(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return {}
+        data = {key: value for key, value in data.items() if value is not None}
+        for key, limit in (("title", 120), ("service", 300), ("details", 1500)):
+            if key in data:
+                data[key] = _text(data[key], limit)
+        status = str(data.get("status", "collecting")).strip().lower()
+        data["status"] = status if status in PROJECT_STATUS else "collecting"
+        missing = data.get("missing")
+        if isinstance(missing, str):
+            missing = [missing] if missing.strip() else []
+        data["missing"] = (
+            [str(m)[:200] for m in missing if m][:12] if isinstance(missing, list) else []
+        )
+        return data
+
+
 class ServiceTurn(BaseModel):
     """One AI turn. The reply is required; everything else has a safe default, so a
     model that leaves out or renames a minor field still answers the customer. Business
@@ -127,7 +160,12 @@ class ServiceTurn(BaseModel):
     understanding: str = Field(default="", max_length=600)
     reply: str = Field(min_length=1, max_length=4000)
     language: str = Field(default="en", pattern=LANGUAGE)
-    summary: str = Field(min_length=1, max_length=4000)
+    # Internal team summary; when the model leaves it out the application writes one
+    # from the projects (never from the reply text).
+    summary: str = Field(default="", max_length=4000)
+    # Every project raised in this chat so far, earlier ones included; requirements and
+    # missing describe the one being discussed now.
+    projects: list[Project] = Field(default_factory=list, max_length=10)
     requirements: Requirements = Field(default_factory=Requirements)
     missing: list[str] = Field(default_factory=list, max_length=12)
     # Internal: how the customer feels, and what they asked that knowledge can't answer
@@ -166,9 +204,13 @@ class ServiceTurn(BaseModel):
         for key, limit in TEXT_LIMITS.items():
             if key in data:
                 data[key] = _text(data[key], limit)
-        if not data.get("summary") and data.get("reply"):
-            # The summary is never left empty; the next turn rewrites it in full.
-            data["summary"] = "Conversation in progress. Pi replied: " + data["reply"][:300]
+        projects = data.get("projects")
+        if isinstance(projects, dict):
+            projects = [projects]
+        if isinstance(projects, list):
+            data["projects"] = [p for p in projects if isinstance(p, dict | Project)][:10]
+        else:
+            data.pop("projects", None)
         for key, allowed in CHOICES.items():
             value = str(data.get(key, allowed[0])).strip().lower()
             data[key] = value if value in allowed else allowed[0]
@@ -330,9 +372,24 @@ Introduce yourself only in your first message. When you set request_human=true, 
 person from the team will reply here; don't ask whether they want one.
 If the enquiry is outside those offerings or needs judgement, request human review.
 Do not claim a meeting was booked, message was sent, order placed or quote issued.
-The application saves your summary for the team. Write that internal summary in English:
-customer objective, confirmed requirements, customer-stated budget/timeline, open
-questions, and recommended next step. Distinguish customer wishes from commitments.
+Projects: a customer may bring several projects in one chat (a logo, then a website,
+then packaging). "projects" must list EVERY project raised in this conversation so far,
+including earlier ones from brief.projects and conversation_summary, each with a short
+English title, service, the details agreed so far (customer's words, references,
+choices they liked), status (collecting, awaiting_confirmation = brief shown and waiting
+for their yes, confirmed = they said yes, with_team = handed to the team) and what is
+still missing. A new request is a NEW project; never merge it into an earlier one or
+drop an earlier one. requirements and missing describe the project being discussed now.
+Remember the whole conversation: conversation_summary and brief carry what happened
+before the recent history; never ask again for anything recorded there.
+The application saves your summary for the team. Write that internal summary in English
+as short lines, facts only, never your reply text:
+"Customer: <who they are / their business>"
+"Wants: <each project in a few words, with its status>"
+"Agreed: <key details and choices>"
+"Still needed: <missing items, or none>"
+"Next step: <what the team or pi should do next>".
+Distinguish customer wishes from commitments.
 Extract requirements ONLY from customer statements; unknown fields stay empty.
 Set ready_for_team when useful scope is collected or the customer wants the team.
 Continue talking unless the customer requests a human or the matter needs human review.
@@ -541,6 +598,7 @@ async def prepare_context(
         "approved_knowledge": knowledge,
         "operator_guidance": version.instructions if version else "",
         "brief": conversation.service_brief,
+        "conversation_summary": conversation.summary or "",
         "history": [
             {
                 "role": m.sender_type,
@@ -636,6 +694,76 @@ def needless_question(reply: str, context: dict[str, Any]) -> str | None:
     return None
 
 
+def merge_projects(previous: Any, turn: ServiceTurn) -> list[Project]:
+    """Earlier projects are never lost: the model's list updates them by title and adds
+    new ones; one it forgot keeps its last known state."""
+    known: dict[str, Project] = {}
+    for item in previous or []:
+        try:
+            project = Project.model_validate(item)
+        except ValueError:
+            continue
+        if project.title:
+            known[project.title.casefold()] = project
+    for project in turn.projects:
+        if project.title:
+            known[project.title.casefold()] = project
+    req = turn.requirements
+    current = (req.service or req.scope[:80]).strip()
+    covered = any(
+        current.casefold() in (p.title.casefold(), p.service.casefold()) for p in known.values()
+    )
+    if current and not turn.projects and not covered:
+        # A model that left out projects still records the one being discussed.
+        details = "; ".join(v for v in (req.scope, req.audience, req.existing_assets) if v)
+        status = "confirmed" if turn.ready_for_team else "collecting"
+        known[current.casefold()] = Project(
+            title=current[:120],
+            service=req.service,
+            details=details[:1500],
+            status=status,
+            missing=turn.missing,
+        )
+    return list(known.values())[-10:]
+
+
+STATUS_LABEL = {
+    "collecting": "collecting details",
+    "awaiting_confirmation": "waiting for the customer's yes",
+    "confirmed": "confirmed",
+    "with_team": "with the team",
+}
+
+
+def team_summary(turn: ServiceTurn) -> str:
+    """The team's summary written from the structured brief, for when the model gave none."""
+    req = turn.requirements
+    lines = []
+    if req.audience:
+        lines.append(f"Customer: {req.audience}")
+    if turn.projects:
+        lines.append(
+            "Wants: " + "; ".join(f"{p.title} ({STATUS_LABEL[p.status]})" for p in turn.projects)
+        )
+        agreed = [f"{p.title}: {p.details}" for p in turn.projects if p.details]
+        if agreed:
+            lines.append("Agreed: " + " | ".join(agreed))
+    elif req.service or req.scope:
+        lines.append(f"Wants: {req.service or req.scope}")
+    for label, value in (("Timeline", req.target_date), ("Budget", req.customer_budget)):
+        if value:
+            lines.append(f"{label}: {value} (customer's words)")
+    lines.append("Still needed: " + (", ".join(turn.missing) if turn.missing else "none"))
+    if turn.request_human:
+        step = "A team member should reply to the customer."
+    elif turn.ready_for_team:
+        step = "Team to review the confirmed brief and prepare a proposal."
+    else:
+        step = "pi is collecting the remaining details."
+    lines.append(f"Next step: {step}")
+    return "\n".join(lines)[:4000]
+
+
 async def compose_service_turn(
     manager: LLMManager,
     scope: WorkspaceScope,
@@ -700,6 +828,9 @@ async def compose_service_turn(
     if context.get("operator_review_required"):
         turn.request_human = True
         turn.awaiting_customer = False
+    turn.projects = merge_projects((context.get("brief") or {}).get("projects"), turn)
+    if not turn.summary.strip() or turn.summary.startswith("Conversation in progress"):
+        turn.summary = team_summary(turn)
     # WhatsApp shows a list only when each point starts its own line.
     turn.reply = re.sub(r"[ \t]+•[ \t]*", "\n• ", turn.reply).strip()
     turn.reply = validate_service_reply(
@@ -737,6 +868,7 @@ async def save_service_turn(
         "reminder_consent": consent,
         "source_message_id": str(message.id),
         "mood": turn.mood,
+        "projects": [project.model_dump() for project in turn.projects],
         "meeting_requested": turn.meeting_requested or bool(previous.get("meeting_requested")),
     }
     known = list(previous.get("knowledge_gaps") or [])
@@ -763,8 +895,9 @@ async def save_service_turn(
     conversation.language = turn.language
     conversation.followup_due_at = None  # Scheduled only once the reply is actually sent.
     requirements = turn.requirements.model_dump()
+    if turn.projects:
+        await remember_projects(session, scope, conversation, turn.projects, message.id)
     if requirements["service"] or requirements["scope"]:
-        await remember(session, scope, conversation.customer_id, turn.summary, message.id)
         lead = await SalesService(session, scope).upsert_requirement(
             conversation.customer_id,
             conversation.id,
@@ -774,6 +907,10 @@ async def save_service_turn(
         )
         # Replace the extracted snapshot, including explicit corrections/removals.
         lead.requirements = requirements
+        if lead.stage == "new" and any(
+            p.status in ("confirmed", "with_team") for p in turn.projects
+        ):
+            lead.stage = "qualified"  # The customer confirmed the brief: ready for a proposal.
     if turn.meeting_requested and not previous.get("meeting_requested"):
         await notify(
             session,
@@ -809,6 +946,38 @@ async def save_service_turn(
             permission="pi.read",
             dedupe_key=f"pi-brief:{conversation.id}:{'ready' if turn.ready_for_team else 'new'}",
         )
+
+
+async def remember_projects(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    projects: list[Project],
+    message_id: Any,
+) -> None:
+    """One up-to-date memory per project, instead of a new note on every turn: the
+    requirement notes this chat wrote before are replaced."""
+    scope.require("sales.write")
+    await session.execute(
+        delete(PiMemory).where(
+            PiMemory.tenant_id == scope.tenant_id,
+            PiMemory.environment_id == scope.environment_id,
+            PiMemory.customer_id == conversation.customer_id,
+            PiMemory.kind == "requirement",
+            PiMemory.source_message_id.in_(
+                select(PiMessage.id).where(
+                    PiMessage.tenant_id == scope.tenant_id,
+                    PiMessage.environment_id == scope.environment_id,
+                    PiMessage.conversation_id == conversation.id,
+                )
+            ),
+        )
+    )
+    for project in projects:
+        note = f"{project.title} ({STATUS_LABEL[project.status]})"
+        if project.details:
+            note += f": {project.details}"
+        await remember(session, scope, conversation.customer_id, note[:500], message_id)
 
 
 def schedule_followup(conversation: PiConversation, policy: PiSettings) -> None:

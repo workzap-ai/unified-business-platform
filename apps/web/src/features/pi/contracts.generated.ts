@@ -253,6 +253,32 @@ export const ConversationContextSchema: z.ZodType<Pi.ConversationContext> =
           awaiting_customer: z
             .union([z.undefined(), z.literal(false), z.literal(true)])
             .optional(),
+          projects: z
+            .union([
+              z.undefined(),
+              z.array(
+                z.object({
+                  title: z.string(),
+                  service: z.string(),
+                  details: z.string(),
+                  status: z.union([
+                    z.literal("confirmed"),
+                    z.literal("collecting"),
+                    z.literal("awaiting_confirmation"),
+                    z.literal("with_team"),
+                  ]),
+                  missing: z.array(z.string()),
+                }),
+              ),
+            ])
+            .optional(),
+          mood: z.union([z.undefined(), z.string()]).optional(),
+          meeting_requested: z
+            .union([z.undefined(), z.literal(false), z.literal(true)])
+            .optional(),
+          knowledge_gaps: z
+            .union([z.undefined(), z.array(z.string())])
+            .optional(),
         }),
       ])
       .optional(),

@@ -14,9 +14,9 @@ from app.ai.manager import LLMManager
 from app.modules.notifications.models import Notification
 from app.modules.orders.models import Order
 from app.modules.pi.followups import sweep_followups
-from app.modules.pi.models import PiMessage, PiSettings, WhatsAppConnection
+from app.modules.pi.models import PiMemory, PiMessage, PiSettings, WhatsAppConnection
 from app.modules.pi.runtime import send_pi_message
-from app.modules.pi.service_conversation import Requirements, ServiceTurn
+from app.modules.pi.service_conversation import Project, Requirements, ServiceTurn
 from app.modules.quotes.models import Quote
 from app.modules.sales.models import SalesLead
 
@@ -572,4 +572,54 @@ async def test_meeting_without_bookable_times_goes_to_the_team_and_tells_the_adm
         )
     )
     assert {"pi.meeting_request", "pi.handoff"} <= kinds
+    await pi.close()
+
+
+async def test_one_chat_keeps_every_project_one_memory_each_and_a_real_summary(
+    api, business_db, monkeypatch
+):
+    logo = Project(title="Logo", service="Logo design", details="Bird logo, gradient colours")
+    mock_turns(
+        monkeypatch,
+        turn(summary="", projects=[logo], requirements=Requirements(service="Logo design")),
+        turn(summary="", projects=[logo], requirements=Requirements(service="Logo design")),
+        # The model forgets the logo while talking about the new website.
+        turn(
+            summary="",
+            projects=[
+                Project(
+                    title="Furniture website",
+                    service="Website",
+                    details="Categories, cart, payment gateway",
+                    status="confirmed",
+                )
+            ],
+            requirements=Requirements(service="Website", scope="Furniture e-commerce"),
+            missing=[],
+            ready_for_team=True,
+            awaiting_customer=False,
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    for i, text in enumerate(["Logo chahiye", "bird jaisa", "ab furniture website bhi"]):
+        await pi.process(text, f"proj-{i}")
+        await pi.deliver_all()
+    conversation = await pi.conversation()
+    titles = [p["title"] for p in conversation.service_brief["projects"]]
+    assert titles == ["Logo", "Furniture website"]  # the earlier project is not lost
+    summary = conversation.summary
+    assert "Wants: Logo" in summary and "Furniture website (confirmed)" in summary
+    assert "Next step:" in summary and "Pi replied" not in summary
+    notes = list(
+        await business_db.scalars(
+            select(PiMemory.content).where(
+                PiMemory.tenant_id == conversation.tenant_id, PiMemory.kind == "requirement"
+            )
+        )
+    )
+    assert len(notes) == 2  # one per project, not one per message
+    lead = await business_db.scalar(
+        select(SalesLead).where(SalesLead.tenant_id == conversation.tenant_id)
+    )
+    assert lead.stage == "qualified"
     await pi.close()

@@ -37,6 +37,15 @@ const MEMORY_TONES = {
   requirement: "info",
   context: "neutral",
 } as const;
+const PROJECT_STATUS = {
+  collecting: { label: "Collecting details", tone: "neutral" },
+  awaiting_confirmation: {
+    label: "Waiting for customer's yes",
+    tone: "warning",
+  },
+  confirmed: { label: "Confirmed", tone: "success" },
+  with_team: { label: "With the team", tone: "info" },
+} as const;
 
 export function useConversationContext(id: string) {
   return useScopedQuery<ConversationContext>(
@@ -147,6 +156,47 @@ export function ContextPanel({ conversationId }: { conversationId: string }) {
           </p>
         )}
       </section>
+
+      {!!ctx.service_brief?.projects?.length && (
+        <section className="p-4" aria-labelledby="ctx-projects">
+          <SectionLabel>
+            <span id="ctx-projects">
+              Projects in this chat ({ctx.service_brief.projects.length})
+            </span>
+          </SectionLabel>
+          <ul className="mt-2 space-y-3">
+            {ctx.service_brief.projects.map((p) => (
+              <li key={p.title} className="text-xs">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="font-semibold text-[13px]">{p.title}</span>
+                  <Badge tone={PROJECT_STATUS[p.status]?.tone ?? "neutral"}>
+                    {PROJECT_STATUS[p.status]?.label ?? humanize(p.status)}
+                  </Badge>
+                </div>
+                {p.details && (
+                  <p className="mt-1 whitespace-pre-wrap break-words text-muted-foreground">
+                    {p.details}
+                  </p>
+                )}
+                {!!p.missing.length && (
+                  <p className="mt-1">Still needed: {p.missing.join(", ")}</p>
+                )}
+              </li>
+            ))}
+          </ul>
+          {ctx.service_brief.meeting_requested && (
+            <p className="mt-3 text-xs">
+              <Badge tone="warning">Meeting requested</Badge>
+            </p>
+          )}
+          {!!ctx.service_brief.knowledge_gaps?.length && (
+            <p className="mt-3 text-xs">
+              PI couldn&apos;t answer:{" "}
+              {ctx.service_brief.knowledge_gaps.join("; ")}
+            </p>
+          )}
+        </section>
+      )}
 
       {ctx.service_brief?.requirements && (
         <section className="p-4" aria-label="Service brief">

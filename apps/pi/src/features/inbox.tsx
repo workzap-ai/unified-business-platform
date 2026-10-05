@@ -1031,6 +1031,13 @@ function Composer({ conversation }: { conversation: Conversation }) {
   );
 }
 
+const PROJECT_STATUS: Record<string, string> = {
+  collecting: "collecting details",
+  awaiting_confirmation: "waiting for their yes",
+  confirmed: "confirmed",
+  with_team: "with the team",
+};
+
 function CustomerPanel({
   conversation,
   brief,
@@ -1101,6 +1108,14 @@ function CustomerPanel({
   );
   const requirements = (brief?.requirements ?? {}) as Record<string, string>;
   const filled = Object.entries(requirements).filter(([, v]) => v);
+  const projects = Array.isArray(brief?.projects)
+    ? (brief.projects as {
+        title: string;
+        details?: string;
+        status?: string;
+        missing?: string[];
+      }[])
+    : [];
   return (
     <div className="space-y-6 p-4">
       <div>
@@ -1127,6 +1142,40 @@ function CustomerPanel({
           <p className="whitespace-pre-line text-sm" data-user-text>
             {conversation.summary}
           </p>
+        </section>
+      ) : null}
+      {projects.length ? (
+        <section>
+          <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Projects in this chat ({projects.length})
+          </h3>
+          <ul className="space-y-2 text-sm">
+            {projects.map((p) => (
+              <li key={p.title}>
+                <p className="font-medium" data-user-text>
+                  {p.title}{" "}
+                  <span className="text-xs font-normal text-muted-foreground">
+                    · {PROJECT_STATUS[p.status ?? ""] ?? "In progress"}
+                  </span>
+                </p>
+                {p.details ? (
+                  <p className="text-muted-foreground" data-user-text>
+                    {p.details}
+                  </p>
+                ) : null}
+                {p.missing?.length ? (
+                  <p className="text-xs">
+                    Still needed: {p.missing.join(", ")}
+                  </p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+          {brief?.meeting_requested ? (
+            <p className="mt-2 text-xs font-medium text-accent">
+              The customer asked for a meeting.
+            </p>
+          ) : null}
         </section>
       ) : null}
       {filled.length ? (

@@ -115,6 +115,18 @@ export type ConversationContext = {
     reminder_consent?: string;
     ready_for_team?: boolean;
     awaiting_customer?: boolean;
+    // Every piece of work the customer raised in this chat.
+    projects?: {
+      title: string;
+      service: string;
+      details: string;
+      status:
+        "collecting" | "awaiting_confirmation" | "confirmed" | "with_team";
+      missing: string[];
+    }[];
+    mood?: string;
+    meeting_requested?: boolean;
+    knowledge_gaps?: string[];
   };
   followup_due_at?: string | null;
   memory: {
