@@ -148,3 +148,72 @@ async def test_operator_edits_guides_every_business_sees(app, api, business_db):
     gone = await business.get("/api/v1/pi-app/assistant/guides/ramadan-opening-hours")
     assert gone.status_code == 404
     await business.aclose()
+
+
+async def test_assistant_remembers_the_chat_and_streams_its_steps(
+    app, api, business_db, monkeypatch
+):
+    import json
+
+    import app.modules.pi_saas.assistant_routes as routes
+
+    seen: list[list[tuple[str, str]]] = []
+
+    class FakeManager:
+        def __init__(self):
+            self.turn = 0
+
+        async def complete(self, scope, **kwargs):
+            self.turn += 1
+            seen.append([(m.role, m.text()) for m in kwargs["messages"]])
+            if self.turn == 1:
+                return LLMResponse(
+                    "", "test", "test", tool_calls=[ToolCall("1", "enquiries", {"days": 7})]
+                )
+            return LLMResponse(
+                "You had **0** enquiries this week.\n\n- Connect WhatsApp first\n"
+                ">> Show recent leads | Report for the last 30 days",
+                "test",
+                "test",
+            )
+
+    owner = pi_client(app)
+    await pi_register(owner, "Echo Studio")
+    monkeypatch.setattr(routes, "ai_enabled", lambda request: True)
+    monkeypatch.setattr(routes, "build_llm_manager", lambda *a, **k: FakeManager())
+    history = [
+        {"role": "user", "content": "How did this week go?"},
+        {"role": "assistant", "content": "You had 12 chats this week."},
+        "an older client sent questions as plain strings",
+    ]
+    response = await owner.post(
+        CHAT + "/stream", json={"message": "aur enquiries?", "history": history}
+    )
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("application/x-ndjson")
+    events = [json.loads(line) for line in response.text.splitlines() if line.strip()]
+
+    # The model saw the earlier turns as real, alternating messages before the question.
+    roles = [role for role, _ in seen[0]]
+    assert roles == ["system", "user", "assistant", "user", "assistant", "user"]
+    assert seen[0][2][1] == "You had 12 chats this week."
+    assert seen[0][-1][1] == "aur enquiries?"
+    assert "Today is" in seen[0][0][1] and "/settings/whatsapp" in seen[0][0][1]
+
+    kinds = [e["type"] for e in events]
+    assert kinds[0] == "thinking" and kinds[-1] == "reply"
+    step = next(e for e in events if e["type"] == "step")
+    assert step["tool"] == "enquiries" and step["label"] == "Counting enquiries and leads"
+    assert any(e["type"] == "step_done" and e["ok"] for e in events)
+    reply = events[-1]["reply"]
+    assert reply["mode"] == "ai" and ">>" not in reply["message"]
+    assert reply["message"].startswith("You had **0** enquiries")
+    assert reply["follow_ups"] == ["Show recent leads", "Report for the last 30 days"]
+    assert [c["title"] for c in reply["cards"]] == ["Enquiries · last 7 days"]
+
+    # Without AI the stream still answers, with suggested next questions.
+    monkeypatch.setattr(routes, "ai_enabled", lambda request: False)
+    plain = await owner.post(CHAT + "/stream", json={"message": "How did this week go?"})
+    last = json.loads(plain.text.strip().splitlines()[-1])
+    assert last["type"] == "reply" and last["reply"]["follow_ups"]
+    await owner.aclose()

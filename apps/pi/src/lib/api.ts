@@ -123,3 +123,63 @@ export const put = <T>(path: string, body?: unknown) =>
 export const patch = <T>(path: string, body?: unknown) =>
   api<T>("PATCH", path, body ?? {});
 export const del = <T>(path: string) => api<T>("DELETE", path);
+
+/**
+ * POST that answers with newline-delimited JSON events (the assistant's live steps).
+ * Calls `onEvent` for each event as it arrives and resolves when the body ends.
+ */
+export async function streamEvents<E>(
+  path: string,
+  body: unknown,
+  onEvent: (event: E) => void,
+  signal?: AbortSignal,
+): Promise<void> {
+  let response: Response;
+  try {
+    response = await fetch(BASE + path, {
+      method: "POST",
+      headers: {
+        Accept: "application/x-ndjson",
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrf(),
+      },
+      credentials: "same-origin",
+      body: JSON.stringify(body),
+      signal,
+    });
+  } catch (error) {
+    if (signal?.aborted) throw error;
+    throw new ApiError(
+      0,
+      "NETWORK",
+      "We couldn't reach pi. Check your connection and try again.",
+    );
+  }
+  if (!response.ok || !response.body) {
+    let data: unknown = null;
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
+    const error = (
+      data as { error?: { code?: string; message?: string } } | null
+    )?.error;
+    throw new ApiError(
+      response.status,
+      error?.code ?? "ERROR",
+      friendly(response.status, error?.message),
+    );
+  }
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    buffer += decoder.decode(value, { stream: !done });
+    const lines = buffer.split("\n");
+    buffer = done ? "" : (lines.pop() ?? "");
+    for (const line of lines) if (line.trim()) onEvent(JSON.parse(line) as E);
+    if (done) return;
+  }
+}
