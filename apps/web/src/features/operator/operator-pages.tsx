@@ -11,6 +11,7 @@ import {
   LifeBuoy,
   Pause,
   Play,
+  Plus,
   RefreshCw,
   ShieldCheck,
   Sparkles,
@@ -33,6 +34,7 @@ import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { cn } from "@/lib/utils";
 import { ApiError, apiRequest } from "@/services/api-client";
 import { NeedsYouCard, PlansManager } from "./control-pages";
+import { NewWorkspaceDialog } from "./workspace-admin";
 import {
   PlatformChecklistCard,
   WhatsAppUsageCard,
@@ -44,6 +46,7 @@ import {
   type BusinessDetail,
   type OperatorMe,
   type Plan,
+  type TeamView,
 } from "./service";
 
 const STATE_TONE: Record<
@@ -76,7 +79,7 @@ const quantity = (value: string | number) => {
   return n.toLocaleString(undefined, { maximumFractionDigits: 4 });
 };
 
-function StateBadge({ value }: { value: string | null | undefined }) {
+export function StateBadge({ value }: { value: string | null | undefined }) {
   return (
     <Badge tone={STATE_TONE[value ?? ""] ?? "neutral"}>{label(value)}</Badge>
   );
@@ -131,7 +134,7 @@ const NAV = [
   },
   {
     href: "/operator/team",
-    label: "Operator team",
+    label: "Admins & operators",
     cap: "operator.team.manage",
   },
   {
@@ -160,7 +163,7 @@ function useOperator() {
   return useScopedQuery(["operator", "me"], api.me, { retry: false });
 }
 
-/** Only the Pi operator team sees the console; the API enforces every capability. */
+/** Super admins, admins and operators see the console; the API enforces every capability. */
 export function OperatorShell({
   title,
   description,
@@ -189,8 +192,8 @@ export function OperatorShell({
         {denied ? (
           <EmptyState
             icon={ShieldCheck}
-            title="Operator console"
-            description="Only members of the Pi operator team can open this. An operator owner can add you."
+            title="Admin console"
+            description="Only super admins, admins and operators can open this. A super admin can add you."
           />
         ) : (
           <ErrorState error={me.error} onRetry={() => me.refetch()} />
@@ -202,7 +205,11 @@ export function OperatorShell({
   return (
     <PageShell>
       <PageHeader
-        eyebrow={`Pi operator · ${me.data.role_name}`}
+        eyebrow={
+          me.data.tier === "operator"
+            ? `Admin console · Operator · ${me.data.role_name}`
+            : `Admin console · ${me.data.role_name}`
+        }
         title={title}
         description={description}
         actions={actions}
@@ -263,7 +270,7 @@ function Stat({
   );
 }
 
-function Loading() {
+export function Loading() {
   return (
     <div className="space-y-2">
       {[0, 1, 2].map((i) => (
@@ -682,7 +689,7 @@ export function OperatorBusinessesPage() {
   );
 }
 
-function ReasonDialog({
+export function ReasonDialog({
   open,
   onOpenChange,
   title,
@@ -1397,7 +1404,7 @@ export function OperatorWorkspacesPage() {
   return (
     <OperatorShell
       title="Workspaces"
-      description="Every Owner OS workspace, including Pi businesses. Operational details only."
+      description="Every Owner OS workspace, including Pi businesses. Manage members and access; no business records or customer content."
     >
       {(me) => <Workspaces me={me} />}
     </OperatorShell>
@@ -1406,6 +1413,7 @@ export function OperatorWorkspacesPage() {
 
 function Workspaces({ me }: { me: OperatorMe }) {
   const canManage = me.capabilities.includes("operator.workspaces.manage");
+  const [creating, setCreating] = React.useState(false);
   const [kind, setKind] = React.useState("all");
   const [search, setSearch] = React.useState("");
   const [page, setPage] = React.useState(1);
@@ -1471,6 +1479,11 @@ function Workspaces({ me }: { me: OperatorMe }) {
           <option value="owner_os">Owner OS workspaces</option>
           <option value="pi">Pi businesses</option>
         </NativeSelect>
+        {canManage ? (
+          <Button className="sm:ml-auto" onClick={() => setCreating(true)}>
+            <Plus aria-hidden /> New workspace
+          </Button>
+        ) : null}
       </div>
       {list.isPending ? (
         <Loading />
@@ -1492,16 +1505,12 @@ function Workspaces({ me }: { me: OperatorMe }) {
               >
                 <div className="min-w-0 flex-1">
                   <p className="font-medium">
-                    {w.kind === "pi" ? (
-                      <Link
-                        href={`/operator/businesses/${w.id}`}
-                        className="hover:text-primary"
-                      >
-                        {w.name}
-                      </Link>
-                    ) : (
-                      w.name
-                    )}
+                    <Link
+                      href={`/operator/workspaces/${w.id}`}
+                      className="hover:text-primary"
+                    >
+                      {w.name}
+                    </Link>
                   </p>
                   <p className="text-[12px] text-muted-foreground">
                     {w.members} member{w.members === 1 ? "" : "s"} · since{" "}
@@ -1511,11 +1520,16 @@ function Workspaces({ me }: { me: OperatorMe }) {
                       : "no products"}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Badge tone={w.kind === "pi" ? "pi" : "outline"}>
                     {w.kind === "pi" ? "Pi business" : "Owner OS"}
                   </Badge>
                   <StateBadge value={w.status} />
+                  <Button size="xs" variant="secondary" asChild>
+                    <Link href={`/operator/workspaces/${w.id}`}>
+                      {canManage ? "Manage" : "Open"}
+                    </Link>
+                  </Button>
                   <Button
                     size="xs"
                     variant="secondary"
@@ -1598,6 +1612,7 @@ function Workspaces({ me }: { me: OperatorMe }) {
         tenant={whatsapp}
         onOpenChange={(open) => !open && setWhatsapp(null)}
       />
+      <NewWorkspaceDialog open={creating} onOpenChange={setCreating} />
     </div>
   );
 }
@@ -1674,16 +1689,45 @@ function Events({ me }: { me: OperatorMe }) {
 export function OperatorTeamPage() {
   return (
     <OperatorShell
-      title="Operator team"
-      description="Who runs Pi for customers. Roles never include customer conversations by default."
+      title="Admins & operators"
+      description="Super admins run everything, admins manage every workspace and user, operators help Pi businesses. No role includes customer conversations by default."
     >
-      {() => <Team />}
+      {(me) => <Team me={me} />}
     </OperatorShell>
   );
 }
 
-function Team() {
+const TIER_ORDER = [
+  ["super_admin", "Super admin"],
+  ["admin", "Admin"],
+  ["operator", "Operators"],
+] as const;
+
+function RoleOptions({ roles }: { roles: TeamView["roles"] }) {
+  return (
+    <>
+      {TIER_ORDER.map(([tier, title]) => {
+        const items = Object.entries(roles).filter(([, r]) => r.tier === tier);
+        return items.length ? (
+          <optgroup key={tier} label={title}>
+            {items.map(([key, r]) => (
+              <option key={key} value={key}>
+                {r.name}
+              </option>
+            ))}
+          </optgroup>
+        ) : null;
+      })}
+    </>
+  );
+}
+
+function Team({ me }: { me: OperatorMe }) {
   const team = useScopedQuery(["operator", "team"], api.team);
+  const change = useScopedMutation(
+    (body: { email: string; role: string }) => api.addOperator(body),
+    { invalidate: [["operator", "team"]], success: "Role changed" },
+  );
   const [email, setEmail] = React.useState("");
   const [role, setRole] = React.useState("support");
   const add = useScopedMutation(() => api.addOperator({ email, role }), {
@@ -1701,7 +1745,7 @@ function Team() {
   return (
     <div className="space-y-4">
       <Card className="p-4">
-        <h3 className="mb-2 font-semibold">Add an operator</h3>
+        <h3 className="mb-2 font-semibold">Add an admin or operator</h3>
         <Notice tone="info">The person needs an Owner OS account first.</Notice>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <Input
@@ -1716,11 +1760,7 @@ function Team() {
             onChange={(e) => setRole(e.target.value)}
             className="sm:w-60"
           >
-            {Object.entries(team.data.roles).map(([key, r]) => (
-              <option key={key} value={key}>
-                {r.name}
-              </option>
-            ))}
+            <RoleOptions roles={team.data.roles} />
           </NativeSelect>
           <Button
             disabled={!email.includes("@")}
@@ -1745,11 +1785,33 @@ function Team() {
                 <p className="font-medium">{m.name}</p>
                 <p className="text-[12px] text-muted-foreground">{m.email}</p>
               </div>
-              <Badge tone="outline">
-                {team.data.roles[m.role]?.name ?? m.role}
-              </Badge>
+              {m.status === "active" &&
+              m.id !== me.member_id &&
+              (me.role === "owner" || m.role !== "owner") ? (
+                <NativeSelect
+                  aria-label={`Role for ${m.name}`}
+                  value={m.role}
+                  disabled={change.isPending}
+                  onChange={(e) =>
+                    change.mutate({ email: m.email, role: e.target.value })
+                  }
+                  className="sm:w-52"
+                >
+                  <RoleOptions roles={team.data.roles} />
+                </NativeSelect>
+              ) : (
+                <Badge
+                  tone={
+                    team.data.roles[m.role]?.tier === "operator"
+                      ? "outline"
+                      : "info"
+                  }
+                >
+                  {team.data.roles[m.role]?.name ?? m.role}
+                </Badge>
+              )}
               <StateBadge value={m.status} />
-              {m.status === "active" ? (
+              {m.status === "active" && m.id !== me.member_id ? (
                 <Button
                   size="xs"
                   variant="ghost"

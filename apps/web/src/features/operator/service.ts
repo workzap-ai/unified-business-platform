@@ -6,10 +6,47 @@ import { apiRequest } from "@/services/api-client";
  * sample-data adapter because operator data is cross-business by nature.
  */
 
+/** Super admin > Admin > Operator (stored roles: owner, operations_admin, the rest). */
+export type OperatorTier = "super_admin" | "admin" | "operator";
+
 export interface OperatorMe {
+  member_id: string;
   role: string;
   role_name: string;
+  tier: OperatorTier;
+  tier_name: string;
   capabilities: string[];
+}
+
+export interface WorkspaceMember {
+  id: string;
+  user_id: string;
+  name: string;
+  email: string;
+  status: string;
+  account_status: string;
+  roles: string[];
+  joined_at: string;
+  last_seen_at: string | null;
+  is_you: boolean;
+}
+
+export interface WorkspaceMembers {
+  members: WorkspaceMember[];
+  roles: { key: string; name: string; description: string }[];
+  can_manage: boolean;
+  can_manage_owners: boolean;
+}
+
+export interface WorkspaceDetail {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+  created_at: string;
+  members: number;
+  environments: { key: string; name: string; kind: string; status: string }[];
+  pi_business: { setup_state: string; status: string } | null;
 }
 
 export interface BusinessRow {
@@ -156,7 +193,12 @@ export interface TeamView {
   }[];
   roles: Record<
     string,
-    { name: string; description: string; capabilities: string[] }
+    {
+      name: string;
+      description: string;
+      tier: OperatorTier;
+      capabilities: string[];
+    }
   >;
   capabilities: string[];
 }
@@ -276,4 +318,47 @@ export const operatorService = {
     apiRequest("POST", `/operator/workspaces/${id}/status`, null, {
       body: { status, reason },
     }),
+  workspace: (id: string) =>
+    apiRequest<WorkspaceDetail>("GET", `/operator/workspaces/${id}`, null),
+  createWorkspace: (body: {
+    name: string;
+    owner_email: string;
+    owner_name?: string;
+    business_type?: string;
+  }) =>
+    apiRequest<{ id: string; name: string; invite_link: string | null }>(
+      "POST",
+      "/operator/workspaces",
+      null,
+      { body },
+    ),
+  workspaceMembers: (id: string) =>
+    apiRequest<WorkspaceMembers>(
+      "GET",
+      `/operator/workspaces/${id}/members`,
+      null,
+    ),
+  addWorkspaceMember: (
+    id: string,
+    body: { email: string; display_name?: string; role: string },
+  ) =>
+    apiRequest<{ id: string; role: string; invite_link: string | null }>(
+      "POST",
+      `/operator/workspaces/${id}/members`,
+      null,
+      { body },
+    ),
+  workspaceMemberRole: (id: string, membershipId: string, role: string) =>
+    apiRequest(
+      "POST",
+      `/operator/workspaces/${id}/members/${membershipId}/role`,
+      null,
+      { body: { role } },
+    ),
+  removeWorkspaceMember: (id: string, membershipId: string) =>
+    apiRequest(
+      "DELETE",
+      `/operator/workspaces/${id}/members/${membershipId}`,
+      null,
+    ),
 };

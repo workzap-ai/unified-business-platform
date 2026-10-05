@@ -55,10 +55,16 @@ CAPABILITIES = (
     "operator.settings.manage",  # platform API keys, AI models, sign-up settings
 )
 ROLE_PRESETS: dict[str, tuple[str, str, frozenset[str]]] = {
-    "owner": ("Owner", "Everything, including the operator team", frozenset(CAPABILITIES)),
+    # The stored keys stay as they are (database check constraint); the names are what
+    # people see: Super admin > Admin > the operator roles.
+    "owner": (
+        "Super admin",
+        "Everything: workspaces, users, Pi businesses, operator team, plans and platform keys",
+        frozenset(CAPABILITIES),
+    ),
     "operations_admin": (
-        "Operations admin",
-        "Runs day-to-day operations for every business",
+        "Admin",
+        "Manages every workspace, user and Pi business; no operator team, plans or keys",
         frozenset(CAPABILITIES)
         - {"operator.team.manage", "operator.plans.manage", "operator.settings.manage"},
     ),
@@ -112,6 +118,17 @@ ROLE_PRESETS: dict[str, tuple[str, str, frozenset[str]]] = {
         ),
     ),
 }
+
+# Super admin > Admin > Operator: shown in the console and used to group the roles.
+TIERS: dict[str, str] = {
+    "owner": "super_admin",
+    "operations_admin": "admin",
+    "onboarding_specialist": "operator",
+    "support": "operator",
+    "billing": "operator",
+    "analyst": "operator",
+}
+TIER_NAMES = {"super_admin": "Super admin", "admin": "Admin", "operator": "Operator"}
 
 
 @dataclass(frozen=True)

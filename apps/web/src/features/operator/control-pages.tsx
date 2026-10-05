@@ -119,7 +119,7 @@ function PlatformKeys({ me }: { me: OperatorMe }) {
       <EmptyState
         icon={KeyRound}
         title="Owners only"
-        description="Only an operator owner can see and change platform keys."
+        description="Only a super admin can see and change platform keys."
       />
     );
   if (listing.isPending) return <Skeleton className="h-64 w-full" />;

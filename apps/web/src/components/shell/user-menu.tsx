@@ -9,6 +9,7 @@ import {
   LogOut,
   Moon,
   Plus,
+  ShieldCheck,
   Sun,
   UserRound,
 } from "lucide-react";
@@ -27,6 +28,7 @@ import {
 } from "@/components/ui/overlays";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/features/auth/session-provider";
+import { useAdminAccess } from "@/features/operator/admin-access";
 import { MODULE_MANIFESTS } from "@/features/modules/manifests";
 import { demoRoles } from "@/demo/workspace";
 import { isDemo } from "@/lib/data-mode";
@@ -38,6 +40,7 @@ export function UserMenu() {
   const { theme, setTheme } = useTheme();
   const { open } = useCommandMenu();
   const router = useRouter();
+  const admin = useAdminAccess();
   if (!session) return null;
   const name = session.user.display_name;
 
@@ -68,6 +71,16 @@ export function UserMenu() {
             <UserRound /> Account & security
           </Link>
         </DropdownMenuItem>
+        {admin ? (
+          <DropdownMenuItem asChild>
+            <Link href="/operator">
+              <ShieldCheck /> Admin console
+              <span className="ml-auto text-2xs text-muted-foreground">
+                {admin.role_name}
+              </span>
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuItem
           onSelect={() => setTheme(theme === "dark" ? "light" : "dark")}
         >

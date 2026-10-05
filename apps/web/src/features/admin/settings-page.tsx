@@ -561,9 +561,9 @@ function WhereThingsLive() {
     permission: string;
   }[] = [
     {
-      label: "Pi operator console",
+      label: "Admin console",
       description:
-        "Pi businesses, all workspaces, plans, support access and platform health",
+        "Super admins, admins and operators: every workspace, user, Pi business, plan and platform health",
       href: "/operator",
       icon: ShieldCheck,
       permission: "settings.manage",
