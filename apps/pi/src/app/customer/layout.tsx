@@ -3,10 +3,19 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { Wordmark } from "@/components/brand";
+import { InstallPrompt } from "@/features/pwa";
 
 export const metadata = {
   title: { default: "pi Customer", template: "%s · pi Customer" },
   robots: { index: false },
+  // Installs as its own app ("pi Customer"), separate from the business pi app.
+  manifest: "/customer/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "pi Customer",
+    statusBarStyle: "default" as const,
+  },
+  icons: { apple: "/icons/customer-apple-180.png" },
 };
 
 // Edge to edge on phones with a notch; the bottom action bar pads for the home bar.
@@ -43,6 +52,7 @@ export default function CustomerLayout({
       >
         <Suspense>{children}</Suspense>
       </main>
+      <InstallPrompt appName="pi Customer" />
       <footer className="hidden px-4 pb-8 text-center text-xs text-muted-foreground sm:block">
         Your conversations are private. Businesses can turn pi Customer off for
         their chats.
