@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { FileText, Globe, Plus, Upload } from "lucide-react";
+import { FileText, Globe, Pencil, Plus, Trash2, Upload } from "lucide-react";
 import { formatDateTime, formatNumber, relativeTime } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +30,7 @@ import {
 } from "@/components/app/page";
 import { DataTable, type Column } from "@/components/app/data-table";
 import { FilterBar, FilterSelect, SearchInput } from "@/components/app/filters";
-import { FormField } from "@/components/app/forms";
+import { ConfirmDialog, FormField } from "@/components/app/forms";
 import { PropertyList } from "@/components/app/record";
 import { EmptyState, ErrorState, Notice } from "@/components/app/states";
 import { StatusBadge } from "@/components/app/status-badge";
@@ -247,13 +247,55 @@ function Documents() {
         open={Boolean(openId)}
         onOpenChange={(o) => !o && setOpenId(null)}
       >
-        {openId && <DocumentSheet id={openId} />}
+        {openId && (
+          <DocumentSheet id={openId} onDeleted={() => setOpenId(null)} />
+        )}
       </Dialog>
     </PageShell>
   );
 }
 
-function DocumentSheet({ id }: { id: string }) {
+function DocumentSheet({
+  id,
+  onDeleted,
+}: {
+  id: string;
+  onDeleted: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const refresh = [
+    [...piKeys.documents],
+    [...piKeys.sources],
+    [...piKeys.overview],
+    [...piKeys.document(id)],
+  ];
+  const save = useScopedMutation(
+    () =>
+      piService.updateDocument(id, {
+        ...(title.trim() !== doc.data?.title ? { title: title.trim() } : {}),
+        ...(body !== doc.data?.body ? { body } : {}),
+      }),
+    {
+      invalidate: refresh,
+      success: (d) => `${d.title} saved. PI uses the new text now.`,
+      onSuccess: () => setEditing(false),
+    },
+  );
+  const remove = useScopedMutation(() => piService.deleteDocument(id), {
+    invalidate: [
+      [...piKeys.documents],
+      [...piKeys.sources],
+      [...piKeys.overview],
+    ],
+    success: "Deleted. PI no longer uses this document.",
+    onSuccess: () => {
+      setConfirming(false);
+      onDeleted();
+    },
+  });
   const doc = useScopedQuery(
     piKeys.document(id),
     () => piService.document(id),
@@ -271,7 +313,81 @@ function DocumentSheet({ id }: { id: string }) {
         title={d?.title ?? "Document"}
         description={d ? d.source_name : undefined}
       />
+      {d && !editing && (
+        <div className="flex gap-2 border-b border-border px-5 py-3">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => {
+              setTitle(d.title);
+              setBody(d.body ?? "");
+              setEditing(true);
+            }}
+          >
+            <Pencil /> Edit
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="text-danger"
+            onClick={() => setConfirming(true)}
+          >
+            <Trash2 /> Delete
+          </Button>
+        </div>
+      )}
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-4">
+        {d && editing && (
+          <form
+            className="space-y-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              save.mutate(undefined);
+            }}
+          >
+            <FormField label="Title" htmlFor="doc-title">
+              <Input
+                id="doc-title"
+                value={title}
+                maxLength={200}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </FormField>
+            <FormField
+              label="Text"
+              htmlFor="doc-body"
+              help="PI answers only from what's written here. Saving re-reads the text."
+            >
+              <Textarea
+                id="doc-body"
+                rows={16}
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                className="font-mono text-xs"
+              />
+            </FormField>
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setEditing(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                loading={save.isPending}
+                disabled={
+                  !title.trim() ||
+                  !body.trim() ||
+                  (title.trim() === d.title && body === (d.body ?? ""))
+                }
+              >
+                Save changes
+              </Button>
+            </div>
+          </form>
+        )}
         {doc.isError ? (
           <ErrorState
             compact
@@ -280,7 +396,7 @@ function DocumentSheet({ id }: { id: string }) {
           />
         ) : !d ? (
           <Skeleton className="h-60" />
-        ) : (
+        ) : editing ? null : (
           <>
             {d.status === "failed" && (
               <Notice tone="danger" title="Processing failed">
@@ -321,6 +437,19 @@ function DocumentSheet({ id }: { id: string }) {
           </>
         )}
       </div>
+      <ConfirmDialog
+        open={confirming}
+        onOpenChange={setConfirming}
+        title={`Delete ${d?.title ?? "this document"}?`}
+        description="PI stops using this document in answers right away."
+        consequences={[
+          "The document and its passages are removed from PI's knowledge.",
+          "This can't be undone. Add it again if you need it later.",
+        ]}
+        confirmLabel="Delete document"
+        loading={remove.isPending}
+        onConfirm={() => remove.mutate(undefined)}
+      />
     </SheetContent>
   );
 }

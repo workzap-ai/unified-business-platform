@@ -151,6 +151,18 @@ export interface PiService {
     search?: string;
   }): Promise<KnowledgeDocument[]>;
   document(id: string): Promise<KnowledgeDocument>;
+  /** Rename and/or rewrite a document; new text is re-indexed. */
+  updateDocument(
+    id: string,
+    input: { title?: string; body?: string },
+  ): Promise<KnowledgeDocument>;
+  deleteDocument(id: string): Promise<void>;
+  updateSource(
+    id: string,
+    input: { name?: string; description?: string },
+  ): Promise<KnowledgeSource>;
+  /** Deletes the source and every document in it. */
+  deleteSource(id: string): Promise<{ deleted_documents: number }>;
   addDocument(input: {
     source_id: string;
     title: string;
@@ -867,6 +879,45 @@ const demo: PiService = {
           (!search || matches(d.title, search)),
       )
       .map((d) => ({ ...d }));
+  },
+  async updateDocument(id, input) {
+    await demoDelay(300);
+    const pi = demoPi();
+    const d = pi.documents.find((x) => x.id === id);
+    if (!d) throw new ApiError(404, "RESOURCE_NOT_FOUND");
+    if (input.title !== undefined) d.title = input.title;
+    if (input.body !== undefined) {
+      d.body = input.body;
+      d.byte_size = new Blob([input.body]).size;
+    }
+    return { ...d };
+  },
+  async deleteDocument(id) {
+    await demoDelay(300);
+    const pi = demoPi();
+    const index = pi.documents.findIndex((x) => x.id === id);
+    if (index < 0) throw new ApiError(404, "RESOURCE_NOT_FOUND");
+    const [doc] = pi.documents.splice(index, 1);
+    const source = pi.sources.find((s) => s.id === doc.source_id);
+    if (source) source.documents = Math.max(0, source.documents - 1);
+  },
+  async updateSource(id, input) {
+    await demoDelay(300);
+    const s = demoPi().sources.find((x) => x.id === id);
+    if (!s) throw new ApiError(404, "RESOURCE_NOT_FOUND");
+    if (input.name !== undefined) s.name = input.name;
+    if (input.description !== undefined) s.description = input.description;
+    return { ...s };
+  },
+  async deleteSource(id) {
+    await demoDelay(300);
+    const pi = demoPi();
+    const index = pi.sources.findIndex((x) => x.id === id);
+    if (index < 0) throw new ApiError(404, "RESOURCE_NOT_FOUND");
+    pi.sources.splice(index, 1);
+    const before = pi.documents.length;
+    pi.documents = pi.documents.filter((d) => d.source_id !== id);
+    return { deleted_documents: before - pi.documents.length };
   },
   async document(id) {
     await demoDelay(100);

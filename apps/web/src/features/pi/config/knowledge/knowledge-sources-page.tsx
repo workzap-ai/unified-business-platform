@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Layers, Plus } from "lucide-react";
+import { Layers, Pencil, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatNumber, relativeTime } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,23 @@ function Sources() {
   const [open, setOpen] = useState(params.get("new") === "1");
   const [disableTarget, setDisableTarget] = useState<KnowledgeSource | null>(
     null,
+  );
+  const [editTarget, setEditTarget] = useState<KnowledgeSource | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<KnowledgeSource | null>(
+    null,
+  );
+  const remove = useScopedMutation(
+    (s: KnowledgeSource) => piService.deleteSource(s.id),
+    {
+      invalidate: [
+        [...piKeys.sources],
+        [...piKeys.documents],
+        [...piKeys.overview],
+      ],
+      success: (r) =>
+        `Source deleted${r.deleted_documents ? ` with ${r.deleted_documents} ${r.deleted_documents === 1 ? "document" : "documents"}` : ""}.`,
+      onSuccess: () => setDeleteTarget(null),
+    },
   );
   const sources = useScopedQuery(piKeys.sources, () => piService.sources());
   const setStatus = useScopedMutation(
@@ -156,12 +173,32 @@ function Sources() {
                     <span className="text-muted-foreground">
                       Updated {relativeTime(s.updated_at)}
                     </span>
-                    <Link
-                      href={`/pi/knowledge/documents?source=${s.id}`}
-                      className="font-medium text-primary hover:underline"
-                    >
-                      Documents
-                    </Link>
+                    <span className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-surface-muted hover:text-foreground"
+                        aria-label={`Edit ${s.name}`}
+                        title="Edit"
+                        onClick={() => setEditTarget(s)}
+                      >
+                        <Pencil className="size-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-surface-muted hover:text-danger"
+                        aria-label={`Delete ${s.name}`}
+                        title="Delete"
+                        onClick={() => setDeleteTarget(s)}
+                      >
+                        <Trash2 className="size-3.5" />
+                      </button>
+                      <Link
+                        href={`/pi/knowledge/documents?source=${s.id}`}
+                        className="ml-1 font-medium text-primary hover:underline"
+                      >
+                        Documents
+                      </Link>
+                    </span>
                   </div>
                 </Card>
               </li>
@@ -170,6 +207,27 @@ function Sources() {
         </ul>
       )}
       <NewSourceDialog open={open} onOpenChange={setOpen} />
+      {editTarget && (
+        <EditSourceDialog
+          source={editTarget}
+          onClose={() => setEditTarget(null)}
+        />
+      )}
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(o) => !o && setDeleteTarget(null)}
+        title={`Delete ${deleteTarget?.name ?? "source"}?`}
+        description="PI stops using everything in this source right away."
+        consequences={[
+          deleteTarget?.documents
+            ? `${deleteTarget.documents} ${deleteTarget.documents === 1 ? "document is" : "documents are"} deleted with it.`
+            : "The source has no documents.",
+          "This can't be undone. To pause a source instead, switch it off.",
+        ]}
+        confirmLabel="Delete source"
+        loading={remove.isPending}
+        onConfirm={() => deleteTarget && remove.mutate(deleteTarget)}
+      />
       <ConfirmDialog
         open={Boolean(disableTarget)}
         onOpenChange={(o) => !o && setDisableTarget(null)}
@@ -187,6 +245,79 @@ function Sources() {
         }
       />
     </PageShell>
+  );
+}
+
+function EditSourceDialog({
+  source,
+  onClose,
+}: {
+  source: KnowledgeSource;
+  onClose: () => void;
+}) {
+  const [name, setName] = useState(source.name);
+  const [description, setDescription] = useState(source.description ?? "");
+  const save = useScopedMutation(
+    () =>
+      piService.updateSource(source.id, {
+        name: name.trim(),
+        description: description.trim(),
+      }),
+    {
+      invalidate: [[...piKeys.sources], [...piKeys.documents]],
+      success: (s) => `${s.name} saved`,
+      onSuccess: onClose,
+    },
+  );
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent>
+        <form
+          noValidate
+          onSubmit={(e) => {
+            e.preventDefault();
+            save.mutate(undefined);
+          }}
+        >
+          <DialogHeader title="Edit source" />
+          <DialogBody className="space-y-4">
+            <FormField label="Name" htmlFor="edit-source-name" required>
+              <Input
+                id="edit-source-name"
+                value={name}
+                maxLength={120}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </FormField>
+            <FormField
+              label="Description"
+              htmlFor="edit-source-description"
+              optional
+            >
+              <Textarea
+                id="edit-source-description"
+                rows={3}
+                maxLength={300}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </FormField>
+          </DialogBody>
+          <DialogFooter>
+            <Button type="button" variant="secondary" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              loading={save.isPending}
+              disabled={name.trim().length < 2}
+            >
+              Save
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 

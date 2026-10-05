@@ -190,6 +190,57 @@ class KnowledgeService:
             details={"chunks": doc.chunk_count},
         )
 
+    async def update_document(
+        self, document_id: UUID, title: str | None, body: str | None, max_bytes: int
+    ) -> KnowledgeDocument:
+        """Rename and/or rewrite a document. New text is re-split into passages (large
+        documents are left "pending" for the background indexer)."""
+        self.scope.require("pi.knowledge.manage")
+        doc = await self.documents.get(document_id, for_update=True)
+        if title is not None:
+            doc.title = title
+        if body is not None and body != doc.body:
+            encoded = body.encode("utf-8")
+            sniff_text(encoded, max_bytes)
+            doc.body = body
+            doc.byte_size = len(encoded)
+            doc.content_hash = hashlib.sha256(encoded).hexdigest()
+            doc.status = "processing"
+            await self.reindex(doc)
+        await record(
+            self.session,
+            "pi.knowledge_updated",
+            scope=self.scope,
+            entity_type="knowledge_document",
+            entity_id=doc.id,
+            details={"title": title is not None, "text": body is not None},
+        )
+        return doc
+
+    async def delete_source(self, source_id: UUID) -> int:
+        """Delete a source and every document (and passage) in it."""
+        self.scope.require("pi.knowledge.manage")
+        source = await self.sources.get(source_id, for_update=True)
+        ids = list(
+            await self.session.scalars(
+                self.documents.select()
+                .with_only_columns(KnowledgeDocument.id)
+                .where(KnowledgeDocument.source_id == source_id)
+            )
+        )
+        for document_id in ids:
+            await self.delete_document(document_id)
+        await self.sources.delete(source)
+        await record(
+            self.session,
+            "pi.knowledge_source_deleted",
+            scope=self.scope,
+            entity_type="knowledge_source",
+            entity_id=source_id,
+            details={"documents": len(ids), "name": source.name},
+        )
+        return len(ids)
+
     async def delete_document(self, document_id: UUID) -> None:
         self.scope.require("pi.knowledge.manage")
         doc = await self.documents.get(document_id, for_update=True)

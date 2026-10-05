@@ -410,6 +410,58 @@ async def source_status(
     return next(x for x in await sources(scope, session) if x["id"] == row.id)
 
 
+class SourceUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    name: str | None = Field(default=None, min_length=1, max_length=120)
+    description: str | None = Field(default=None, max_length=300)
+
+
+@router.patch("/knowledge/sources/{source_id}")
+async def update_source(
+    source_id: UUID, data: SourceUpdate, scope: Scope, session: Session
+) -> dict[str, Any]:
+    await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
+    row = await KnowledgeService(session, scope).sources.get(source_id, for_update=True)
+    for key, value in data.model_dump(exclude_none=True).items():
+        setattr(row, key, value)
+    await session.commit()
+    return next(x for x in await sources(scope, session) if x["id"] == row.id)
+
+
+@router.delete("/knowledge/sources/{source_id}")
+async def delete_source(source_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+    """Delete a source with all its documents. PI stops using them at once."""
+    await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
+    removed = await KnowledgeService(session, scope).delete_source(source_id)
+    await session.commit()
+    return {"deleted_documents": removed}
+
+
+class DocumentUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    body: str | None = Field(default=None, min_length=1, max_length=10 * 1024 * 1024)
+
+
+@router.patch("/knowledge/documents/{document_id}")
+async def update_document(
+    document_id: UUID, data: DocumentUpdate, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
+    title = data.title.strip() if data.title else None
+    if data.title is not None and not title:
+        raise BusinessRuleViolation("INVALID_TITLE", "Give the document a title")
+    row = await KnowledgeService(session, scope).update_document(
+        document_id, title, data.body, request.app.state.settings.knowledge_upload_max_bytes
+    )
+    await session.commit()
+    if row.status == "pending":
+        await request.app.state.queue.enqueue(
+            "index_document", str(row.id), job_id=f"index:{row.id}:{row.content_hash[:12]}"
+        )
+    return await document_view(row, scope, session)
+
+
 async def document_view(row: KnowledgeDocument, scope: Scope, session: Session) -> dict[str, Any]:
     source = await KnowledgeService(session, scope).sources.get(row.source_id)
     return {

@@ -187,6 +187,28 @@ export const piLive: PiService = {
       z.array(schema.KnowledgeDocumentSchema),
       { query: { ...params, source_id: sourceId } },
     ),
+  updateDocument: (id, input) =>
+    apiRequest(
+      "PATCH",
+      `/pi/knowledge/documents/${id}`,
+      schema.KnowledgeDocumentSchema,
+      { body: input, timeoutMs: 60_000 },
+    ),
+  deleteDocument: (id) =>
+    apiRequest("DELETE", `/pi/knowledge/documents/${id}`, null),
+  updateSource: (id, input) =>
+    apiRequest(
+      "PATCH",
+      `/pi/knowledge/sources/${id}`,
+      schema.KnowledgeSourceSchema,
+      { body: input },
+    ),
+  deleteSource: (id) =>
+    apiRequest(
+      "DELETE",
+      `/pi/knowledge/sources/${id}`,
+      z.object({ deleted_documents: z.number() }),
+    ),
   document: (id) =>
     apiRequest(
       "GET",
