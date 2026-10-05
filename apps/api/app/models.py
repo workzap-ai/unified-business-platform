@@ -4,7 +4,7 @@ from app.ai.models import AIUsageEvent
 from app.integrations.workflow_models import IntegrationOperation, IntegrationWorkflow
 from app.modules.access.models import MembershipRole, Role, RolePermission
 from app.modules.audit.models import AuditEvent
-from app.modules.auth.models import AuthSession, UserCredential
+from app.modules.auth.models import AuthSession, UserCredential, UserFace, UserPasskey
 from app.modules.billing.models import Invoice, InvoiceLine, Payment
 from app.modules.branches.models import Branch
 from app.modules.business_settings.models import BusinessSettings
@@ -38,6 +38,7 @@ from app.modules.pi.models import (
     WhatsAppConnection,
     WhatsAppWebhookEvent,
 )
+from app.modules.pi_customer.models import CustomerPasskey
 from app.modules.pi_saas.customer_payment_models import (
     PiCustomerPaymentSettings,
     PiPaymentRequest,
@@ -91,6 +92,9 @@ from app.shared.sequences import DocumentSequence
 from app.workflows.models import WorkflowRun
 
 __all__ = [
+    "CustomerPasskey",
+    "UserFace",
+    "UserPasskey",
     "WorkspaceAgentAction",
     "WorkspaceTask",
     "PiCustomerPaymentSettings",

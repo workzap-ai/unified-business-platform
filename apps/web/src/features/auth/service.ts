@@ -21,17 +21,21 @@ import {
   type Environment,
   type LoginInput,
   type RegisterInput,
+  type SecondStep,
   type Session,
   type Tenant,
 } from "./types";
 import { clearAgentHistory } from "@/features/workspace-agent/agent-history";
-import { passkeySignIn } from "./passkey";
+import { fingerprintStep } from "./passkey";
 
 export interface AuthService {
   session(): Promise<Session>;
-  login(input: LoginInput): Promise<Session>;
-  /** Face ID / Touch ID / Windows Hello / fingerprint, via a passkey. */
-  loginWithPasskey(): Promise<Session>;
+  /** The password step. People with a saved face or fingerprint get a second step. */
+  login(input: LoginInput): Promise<Session | SecondStep>;
+  /** Second step: three camera frames of the person's face. */
+  signInWithFace(ticket: string, frames: string[]): Promise<Session>;
+  /** Optional second step: the fingerprint (passkey) on this device. */
+  signInWithFingerprint(ticket: string): Promise<Session>;
   register(input: RegisterInput): Promise<Session>;
   createWorkspace(
     name: string,
@@ -53,10 +57,25 @@ export interface AuthService {
 const live: AuthService = {
   session: () =>
     apiRequest("GET", "/auth/session", sessionSchema).then(bindSession),
-  login: (input) =>
-    apiRequest("POST", "/auth/login", sessionSchema, { body: input }).then(
-      bindSession,
-    ),
+  login: async (input) => {
+    const answer = await apiRequest<Record<string, unknown>>(
+      "POST",
+      "/auth/login",
+      null,
+      { body: input },
+    );
+    if (answer && answer.mfa_required === true)
+      return answer as unknown as SecondStep;
+    return bindSession(sessionSchema.parse(answer));
+  },
+  signInWithFace: (ticket, frames) =>
+    apiRequest("POST", "/auth/mfa/face", sessionSchema, {
+      body: { ticket, frames },
+    }).then(bindSession),
+  signInWithFingerprint: (ticket) =>
+    fingerprintStep(ticket, (body) =>
+      apiRequest("POST", "/auth/mfa/fingerprint", sessionSchema, { body }),
+    ).then(bindSession),
   register: (input) =>
     apiRequest("POST", "/auth/register", sessionSchema, {
       body: input,
@@ -104,12 +123,6 @@ const live: AuthService = {
     apiRequest("POST", "/auth/accept-invite", sessionSchema, {
       body: { token, new_password },
     }).then(bindSession),
-  loginWithPasskey: () =>
-    passkeySignIn((body) =>
-      apiRequest("POST", "/auth/passkeys/login/verify", sessionSchema, {
-        body,
-      }),
-    ).then(bindSession),
 };
 
 function bindSession(session: Session): Session {
@@ -200,9 +213,13 @@ const demo: AuthService = {
   async resendVerification() {
     await demoDelay(200);
   },
-  async loginWithPasskey() {
+  async signInWithFace() {
     await demoDelay(200);
-    throw new DemoError("Passkeys need a live API connection.");
+    throw new DemoError("Face sign-in needs a live API connection.");
+  },
+  async signInWithFingerprint() {
+    await demoDelay(200);
+    throw new DemoError("Fingerprint sign-in needs a live API connection.");
   },
   async acceptInvite() {
     await demoDelay(300);

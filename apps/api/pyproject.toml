@@ -19,6 +19,7 @@ dependencies = [
   "pypdf>=5,<7",
   # QR codes for the pay-by-link flow (encodes the pay-page URL, never raw payment data).
   "qrcode>=7.4,<9", "pillow>=11,<12", "webauthn>=2.2,<3",
+  "opencv-python-headless>=4.10,<5",
 ]
 
 [project.optional-dependencies]

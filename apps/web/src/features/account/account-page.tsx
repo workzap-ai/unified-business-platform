@@ -24,6 +24,7 @@ import { useScopedMutation } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
 import { authService } from "@/features/auth/service";
 import { ApiError, errorMessage } from "@/services/api-client";
+import { FaceIdCard } from "./face-id-card";
 import { PasskeysCard } from "./passkeys-card";
 
 const passwordSchema = z
@@ -54,7 +55,7 @@ export function AccountPage() {
     <PageShell width="default">
       <PageHeader
         title="Account & security"
-        description="Your profile, Face ID and passkeys, password and signed-in devices."
+        description="Your profile, Face ID, fingerprint lock, password and signed-in devices."
       />
       <div className="grid gap-4 lg:grid-cols-[340px_minmax(0,1fr)]">
         <Card className="h-fit">
@@ -102,6 +103,7 @@ export function AccountPage() {
           </CardBody>
         </Card>
         <div className="space-y-4">
+          <FaceIdCard />
           <PasskeysCard />
           <ChangePasswordCard />
           <SignOutEverywhereCard />

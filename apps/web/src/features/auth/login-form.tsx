@@ -6,7 +6,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, FlaskConical, ScanFace } from "lucide-react";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  FlaskConical,
+  Fingerprint,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/app/forms";
@@ -14,7 +20,10 @@ import { InlineError, Notice } from "@/components/app/states";
 import { ApiError, errorMessage } from "@/services/api-client";
 import { isDemo } from "@/lib/data-mode";
 import { useSession } from "./session-provider";
+import { authService } from "./service";
+import { FaceCamera } from "./face-camera";
 import { passkeyError, passkeysAvailable, unlockName } from "./passkey";
+import type { SecondStep } from "./types";
 
 const schema = z.object({
   email: z
@@ -34,12 +43,8 @@ function safeNext(value: string | null) {
 }
 
 export function LoginForm() {
-  const { login, loginWithPasskey, status } = useSession();
-  const [passkey, setPasskey] = useState<{ ok: boolean; name: string }>({
-    ok: false,
-    name: "Face ID",
-  });
-  const [usingPasskey, setUsingPasskey] = useState(false);
+  const { login, finishSignIn, status } = useSession();
+  const [step, setStep] = useState<SecondStep | null>(null);
   const router = useRouter();
   const params = useSearchParams();
   const next = safeNext(params.get("next"));
@@ -58,38 +63,14 @@ export function LoginForm() {
     if (status === "ready") router.replace(next);
   }, [status, router, next]);
 
-  useEffect(() => {
-    // Read the browser's capabilities after mount so server and client HTML match.
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time capability probe
-    setPasskey({ ok: !isDemo && passkeysAvailable(), name: unlockName() });
-  }, []);
-
-  async function signInWithPasskey() {
-    setError(null);
-    setUsingPasskey(true);
-    try {
-      await loginWithPasskey();
-      router.replace(next);
-    } catch (e) {
-      if (e instanceof ApiError) {
-        setError(
-          e.status === 401
-            ? "That passkey isn't linked to an active account. Sign in with your password, then add it in Account & security."
-            : errorMessage(e, "Sign-in failed. Please try again."),
-        );
-      } else {
-        const message = passkeyError(e);
-        if (message) setError(message);
-      }
-    } finally {
-      setUsingPasskey(false);
-    }
-  }
-
   async function onSubmit(values: Values) {
     setError(null);
     try {
-      await login(values);
+      const result = await login(values);
+      if ("mfa_required" in result) {
+        setStep(result); // password was right; now the face or fingerprint
+        return;
+      }
       router.replace(next);
     } catch (e) {
       setError(
@@ -99,6 +80,21 @@ export function LoginForm() {
       );
     }
   }
+
+  if (step)
+    return (
+      <SecondStepForm
+        step={step}
+        onBack={() => {
+          setStep(null);
+          form.setValue("password", "");
+        }}
+        onDone={async (session) => {
+          await finishSignIn(session);
+          router.replace(next);
+        }}
+      />
+    );
 
   return (
     <div>
@@ -179,29 +175,6 @@ export function LoginForm() {
           Sign in
         </Button>
       </form>
-      {passkey.ok && (
-        <>
-          <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="h-px flex-1 bg-border" />
-            or
-            <span className="h-px flex-1 bg-border" />
-          </div>
-          <Button
-            type="button"
-            variant="secondary"
-            size="lg"
-            className="w-full"
-            loading={usingPasskey}
-            onClick={() => void signInWithPasskey()}
-          >
-            <ScanFace aria-hidden /> Sign in with {passkey.name}
-          </Button>
-          <p className="mt-2 text-center text-xs text-muted-foreground">
-            Uses a passkey on this device. Your face or fingerprint never leaves
-            it.
-          </p>
-        </>
-      )}
       <p className="mt-6 text-center text-sm text-muted-foreground">
         New here?{" "}
         <Link
@@ -221,6 +194,123 @@ export function LoginForm() {
         </Link>
         .
       </p>
+    </div>
+  );
+}
+
+/** Step two: the person's face on the camera, or their fingerprint if they prefer. */
+function SecondStepForm({
+  step,
+  onBack,
+  onDone,
+}: {
+  step: SecondStep;
+  onBack: () => void;
+  onDone: (
+    session: Awaited<ReturnType<typeof authService.signInWithFace>>,
+  ) => Promise<void>;
+}) {
+  const hasFace = step.methods.includes("face");
+  const hasFingerprint = step.methods.includes("fingerprint");
+  const [mode, setMode] = useState<"face" | "fingerprint">(
+    hasFace ? "face" : "fingerprint",
+  );
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [unlock, setUnlock] = useState("fingerprint");
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time capability probe
+    setUnlock(passkeysAvailable() ? unlockName() : "fingerprint");
+  }, []);
+
+  function explain(e: unknown, fallback: string): string {
+    if (e instanceof ApiError && e.code === "SIGN_IN_EXPIRED") {
+      onBack();
+      return "";
+    }
+    return errorMessage(e, fallback);
+  }
+
+  async function withFingerprint() {
+    setError(null);
+    setBusy(true);
+    try {
+      await onDone(await authService.signInWithFingerprint(step.ticket));
+    } catch (e) {
+      const message =
+        e instanceof ApiError
+          ? explain(e, "That fingerprint didn't work.")
+          : passkeyError(e);
+      if (message) setError(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={onBack}
+        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="size-4" aria-hidden /> Back
+      </button>
+      <h1 className="text-2xl font-semibold tracking-tight">
+        {mode === "face" ? "Show your face" : `Use your ${unlock}`}
+      </h1>
+      <p className="mt-1.5 text-sm text-muted-foreground">
+        Hi {step.name}. Your password was right; one more check keeps your
+        account safe.
+      </p>
+      <div className="mt-6">
+        {mode === "face" ? (
+          <FaceCamera
+            autoStart
+            action="Check my face"
+            onFrames={async (frames) => {
+              try {
+                await onDone(
+                  await authService.signInWithFace(step.ticket, frames),
+                );
+              } catch (e) {
+                const message = explain(e, "We couldn't check your face.");
+                throw new Error(message || "Enter your password again.");
+              }
+            }}
+          />
+        ) : (
+          <div className="space-y-3 text-center">
+            <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-primary-soft text-primary">
+              <Fingerprint className="size-10" aria-hidden />
+            </div>
+            {error ? <InlineError message={error} /> : null}
+            <Button
+              size="lg"
+              className="w-full"
+              loading={busy}
+              onClick={() => void withFingerprint()}
+            >
+              <Fingerprint aria-hidden /> Use {unlock}
+            </Button>
+          </div>
+        )}
+      </div>
+      {hasFace && hasFingerprint ? (
+        <p className="mt-5 text-center text-sm">
+          <button
+            type="button"
+            className="font-medium text-primary hover:underline"
+            onClick={() => {
+              setError(null);
+              setMode(mode === "face" ? "fingerprint" : "face");
+            }}
+          >
+            {mode === "face" ? `Use ${unlock} instead` : "Use my face instead"}
+          </button>
+        </p>
+      ) : null}
     </div>
   );
 }

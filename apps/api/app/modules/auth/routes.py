@@ -1,6 +1,7 @@
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -175,10 +176,10 @@ async def accept_invite(
     return await session_view(session, context)
 
 
-@router.post("/login", response_model=SessionView)
+@router.post("/login", response_model=None)
 async def login(
     data: LoginRequest, request: Request, response: Response, session: Session
-) -> SessionView:
+) -> SessionView | JSONResponse:
     settings = request.app.state.settings
     limit = settings.rate_limit_login_per_minute
     if not await hit(request, "login-ip", client_ip(request), limit, 60) or not await hit(
@@ -187,12 +188,20 @@ async def login(
         raise HTTPException(status_code=429)
     service = AuthService(session, settings)
     try:
-        issued = await service.login(
-            data.email, data.password, request.headers.get("user-agent", "")
-        )
+        user = await service.check_password(data.email, data.password)
     except Unauthenticated:
         await session.commit()  # persist failure counters, lockout and audit
         raise
+    # Saved a face or a fingerprint? Then the password alone isn't enough.
+    from app.modules.auth.mfa import methods_for, open_ticket
+
+    methods = await methods_for(session, user.id)
+    if methods:
+        await session.commit()
+        return JSONResponse(content=await open_ticket(request, user, methods))
+    issued = await service.finish_login(
+        user, request.headers.get("user-agent", ""), "owner_os", "password"
+    )
     await session.commit()
     set_cookies(response, settings, issued)
     context = await service.resolve(issued.token)

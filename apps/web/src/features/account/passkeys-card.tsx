@@ -65,7 +65,7 @@ export function PasskeysCard() {
   async function remove(item: Passkey) {
     try {
       await passkeyApi.remove(item.id);
-      toast.success("Passkey removed");
+      toast.success("Fingerprint removed");
       await client.invalidateQueries({ queryKey: key });
     } catch (e) {
       toast.error(errorMessage(e, "Couldn't remove the passkey"));
@@ -77,8 +77,8 @@ export function PasskeysCard() {
   return (
     <Card>
       <CardHeader
-        title="Face ID & passkeys"
-        description="Sign in with your face or fingerprint instead of typing a password. It's faster and phishing-proof."
+        title="Fingerprint lock (optional)"
+        description="Use this device's fingerprint (or Windows Hello / Touch ID) as the check after your password, instead of your face."
       />
       <CardBody className="space-y-3">
         {isDemo ? (
@@ -125,18 +125,19 @@ export function PasskeysCard() {
           </ul>
         ) : list.isSuccess ? (
           <p className="text-[13px] text-muted-foreground">
-            No passkeys yet. Add one on each phone or computer you use.
+            No fingerprint added. Optional: add one on each phone or computer
+            you use.
           </p>
         ) : null}
         {support.browser && !isDemo ? (
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <Button onClick={() => setAdding(true)}>
               <ScanFace aria-hidden />
-              {support.unlock ? `Add ${support.name}` : "Add a passkey"}
+              {support.unlock ? `Add ${support.name}` : "Add a security key"}
             </Button>
             <p className="text-xs text-muted-foreground">
-              Your face or fingerprint stays on this device; Owner OS only keeps
-              a public key.
+              Your fingerprint stays on this device; Owner OS only keeps a
+              public key.
             </p>
           </div>
         ) : null}
@@ -150,8 +151,8 @@ export function PasskeysCard() {
       <ConfirmDialog
         open={Boolean(removing)}
         onOpenChange={(v) => (!v ? setRemoving(null) : undefined)}
-        title={`Remove ${removing?.name ?? "this passkey"}?`}
-        description="You won't be able to sign in with it any more. You can add it again later."
+        title={`Remove ${removing?.name ?? "this fingerprint"}?`}
+        description="It won't be offered after your password any more. You can add it again later."
         confirmLabel="Remove"
         destructive
         onConfirm={() => removing && remove(removing)}
@@ -190,7 +191,9 @@ function AddPasskeyDialog({
     setBusy(true);
     try {
       await passkeyApi.add(password, name.trim());
-      toast.success(`${unlock} is ready. Use it next time you sign in.`);
+      toast.success(
+        `${unlock} is ready. It will be offered after your password.`,
+      );
       onAdded();
       close(false);
     } catch (e) {
@@ -214,7 +217,7 @@ function AddPasskeyDialog({
       <DialogContent>
         <DialogHeader
           title={`Add ${unlock}`}
-          description="Confirm your password, then your device will ask for your face, fingerprint or PIN."
+          description="Confirm your own password, then your device will ask for your fingerprint."
         />
         <DialogBody className="space-y-3">
           {error ? <InlineError message={error} /> : null}

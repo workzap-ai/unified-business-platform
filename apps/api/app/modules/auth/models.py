@@ -11,6 +11,7 @@ from sqlalchemy import (
     Integer,
     LargeBinary,
     String,
+    Text,
     Uuid,
 )
 from sqlalchemy.orm import Mapped, mapped_column
@@ -30,6 +31,11 @@ class UserCredential(Record, Base):
     failed_attempts: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     password_changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    # Second sign-in step (face or fingerprint): wrong tries in a row, and the lock.
+    second_factor_failures: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    second_factor_locked_until: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
 
 class PasswordResetToken(Record, Base):
@@ -117,4 +123,16 @@ class UserPasskey(Record, Base):
     name: Mapped[str] = mapped_column(String(80))
     transports: Mapped[str] = mapped_column(String(120), default="", server_default="")
     backed_up: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class UserFace(Record, Base):
+    """A saved face for the second sign-in step (up to three per person). Only an
+    encrypted face code (embedding) is kept, never a photo."""
+
+    __tablename__ = "user_faces"
+    __table_args__ = (Index("ix_user_faces_user", "user_id"),)
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("platform_users.id", ondelete="CASCADE"))
+    name: Mapped[str] = mapped_column(String(80))
+    code_encrypted: Mapped[str] = mapped_column(Text)
     last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

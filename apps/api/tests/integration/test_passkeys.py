@@ -127,16 +127,30 @@ async def _add(api, device: Authenticator) -> dict:
     return added.json()
 
 
-async def _login(client: httpx.AsyncClient, device: Authenticator, **kw):
-    started = (await client.post("/api/v1/auth/passkeys/login/options")).json()
-    assert started["options"]["userVerification"] == "required"
+async def _ticket(client: httpx.AsyncClient, email: str) -> str:
+    step = await client.post("/api/v1/auth/login", json={"email": email, "password": PASSWORD})
+    assert step.status_code == 200 and step.json()["mfa_required"], step.text
+    return step.json()["ticket"]
+
+
+async def _challenge(client: httpx.AsyncClient, ticket: str) -> dict:
+    options = await client.post("/api/v1/auth/mfa/fingerprint/options", json={"ticket": ticket})
+    assert options.status_code == 200, options.text
+    return options.json()["options"]
+
+
+async def _login(client: httpx.AsyncClient, email: str, device: Authenticator, **kw):
+    """Owner OS: the password first, then the fingerprint (passkey) as the second step."""
+    ticket = await _ticket(client, email)
+    options = await _challenge(client, ticket)
+    assert options["userVerification"] == "required"
     return await client.post(
-        "/api/v1/auth/passkeys/login/verify",
-        json={"flow": started["flow"], "credential": device.get(started["options"], **kw)},
+        "/api/v1/auth/mfa/fingerprint",
+        json={"ticket": ticket, "credential": device.get(options, **kw)},
     )
 
 
-async def test_add_passkey_then_sign_in_with_face_id(api, business_db):
+async def test_add_passkey_then_sign_in_with_password_and_fingerprint(api, business_db):
     me = await register(api)
     wrong = await api.post(
         "/api/v1/auth/passkeys/register/options", json={"password": "not-my-password"}
@@ -164,7 +178,7 @@ async def test_add_passkey_then_sign_in_with_face_id(api, business_db):
     assert [p["name"] for p in listed] == ["Sana's iPhone"]
 
     browser = _anon(api)
-    signed_in = await _login(browser, device)
+    signed_in = await _login(browser, me["user"]["email"], device)
     assert signed_in.status_code == 200, signed_in.text
     assert signed_in.json()["user"]["email"] == me["user"]["email"]
     assert (await browser.get("/api/v1/auth/session")).status_code == 200
@@ -176,52 +190,49 @@ async def test_add_passkey_then_sign_in_with_face_id(api, business_db):
         .where(AuditEvent.action.in_(["auth.passkey_added", "auth.login"]))
         .where(AuditEvent.actor_user_id == UUID(me["user"]["id"]))
     )
-    assert audited == 2  # passkey added, then the passkey sign-in
+    assert audited == 2  # passkey added, then the password + fingerprint sign-in
     await browser.aclose()
 
 
-async def test_refuses_other_sites_replays_and_unverified_faces(api):
-    await register(api)
+async def test_refuses_other_sites_replays_and_unverified_fingerprints(api):
+    me = await register(api)
+    email = me["user"]["email"]
     device = Authenticator()
     await _add(api, device)
 
-    elsewhere = _anon(api, "https://evil.example")
-    assert (await elsewhere.post("/api/v1/auth/passkeys/login/options")).status_code == 403
-    await elsewhere.aclose()
-
     browser = _anon(api)
     # A response signed for another website is rejected even with a valid challenge.
-    started = (await browser.post("/api/v1/auth/passkeys/login/options")).json()
+    ticket = await _ticket(browser, email)
     phished = await browser.post(
-        "/api/v1/auth/passkeys/login/verify",
+        "/api/v1/auth/mfa/fingerprint",
         json={
-            "flow": started["flow"],
-            "credential": device.get(started["options"], origin="https://evil.example"),
+            "ticket": ticket,
+            "credential": device.get(
+                await _challenge(browser, ticket), origin="https://evil.example"
+            ),
         },
     )
     assert phished.status_code == 401
-    # The face/PIN wasn't checked: refused.
-    assert (await _login(browser, device, verified=False)).status_code == 401
-    # Replaying an old flow fails.
-    started = (await browser.post("/api/v1/auth/passkeys/login/options")).json()
-    credential = device.get(started["options"])
+    # The fingerprint/PIN wasn't checked by the device: refused.
+    assert (await _login(browser, email, device, verified=False)).status_code == 401
+    # Replaying a used sign-in fails.
+    ticket = await _ticket(browser, email)
+    credential = device.get(await _challenge(browser, ticket))
     ok = await browser.post(
-        "/api/v1/auth/passkeys/login/verify",
-        json={"flow": started["flow"], "credential": credential},
+        "/api/v1/auth/mfa/fingerprint", json={"ticket": ticket, "credential": credential}
     )
     assert ok.status_code == 200
     replay = await browser.post(
-        "/api/v1/auth/passkeys/login/verify",
-        json={"flow": started["flow"], "credential": credential},
+        "/api/v1/auth/mfa/fingerprint", json={"ticket": ticket, "credential": credential}
     )
     assert replay.status_code == 422
-    # A different device (unknown passkey) can't sign in.
-    assert (await _login(browser, Authenticator())).status_code == 401
+    # A different device (unknown passkey) can't finish the sign-in.
+    assert (await _login(browser, email, Authenticator())).status_code == 401
     await browser.aclose()
 
 
 async def test_remove_and_rename_only_your_own(api):
-    await register(api)
+    me = await register(api)
     device = Authenticator()
     mine = await _add(api, device)
     renamed = await api.patch(f"/api/v1/auth/passkeys/{mine['id']}", json={"name": "Work Mac"})
@@ -232,7 +243,37 @@ async def test_remove_and_rename_only_your_own(api):
     assert (await other.delete(f"/api/v1/auth/passkeys/{mine['id']}")).status_code == 404
     assert (await api.delete(f"/api/v1/auth/passkeys/{mine['id']}")).status_code == 204
     assert (await api.get("/api/v1/auth/passkeys")).json() == []
+    # With nothing saved, the password signs in on its own again.
     browser = _anon(api)
-    assert (await _login(browser, device)).status_code == 401  # removed passkeys stop working
+    plain = await browser.post(
+        "/api/v1/auth/login", json={"email": me["user"]["email"], "password": PASSWORD}
+    )
+    assert plain.status_code == 200 and "mfa_required" not in plain.json()
     await other.aclose()
     await browser.aclose()
+
+
+# ---- pi app ---------------------------------------------------------------------------
+
+
+PI_ORIGIN = "http://localhost:3200"
+
+
+async def test_pi_app_adds_a_passkey_but_never_signs_in_with_it_alone(api):
+    from pi_saas_support import PASSWORD as PI_PASSWORD
+    from pi_saas_support import pi_client, pi_register
+
+    client = pi_client(api._transport.app)  # type: ignore[attr-defined]
+    await pi_register(client)
+    client.headers["x-csrf-token"] = client.cookies["pi_csrf"]
+    base = "/api/v1/pi-app/auth/passkeys"
+    options = (await client.post(f"{base}/register/options", json={"password": PI_PASSWORD})).json()
+    assert options["rp"]["name"] == "pi"
+    added = await client.post(
+        f"{base}/register/verify",
+        json={"credential": Authenticator().create(options, origin=PI_ORIGIN)},
+    )
+    assert added.status_code == 201, added.text
+    alone = await _anon(api, PI_ORIGIN).post(f"{base}/login/options")
+    assert alone.status_code in (404, 405)  # a passkey is never a sign-in on its own
+    await client.aclose()

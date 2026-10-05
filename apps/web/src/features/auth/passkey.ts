@@ -1,9 +1,10 @@
 "use client";
 
 /**
- * Passkeys in the browser: Face ID, Touch ID, Windows Hello, an Android fingerprint
- * or a security key. The browser and the device do the face/fingerprint check; the
- * server only ever sees a signature from a key that never leaves the device.
+ * Fingerprint sign-in (passkeys): Touch ID, Windows Hello, an Android fingerprint or
+ * a security key, used as the optional second step after the password. The device does
+ * the fingerprint check; the server only ever sees a signature from a key that never
+ * leaves the device.
  */
 import { apiRequest } from "@/services/api-client";
 
@@ -171,19 +172,23 @@ export const passkeyApi = {
   },
 };
 
-/** Runs the sign-in ceremony and returns the raw session payload from the API. */
-export async function passkeySignIn<T>(
-  verify: (body: { flow: string; credential: Json }) => Promise<T>,
+/**
+ * The optional fingerprint step after the password: the device signs a challenge for
+ * this sign-in only (the ticket from the password step), with one of your passkeys.
+ */
+export async function fingerprintStep<T>(
+  ticket: string,
+  verify: (body: { ticket: string; credential: Json }) => Promise<T>,
 ): Promise<T> {
-  const started = await apiRequest<{ flow: string; options: Json }>(
+  const started = await apiRequest<{ options: Json }>(
     "POST",
-    "/auth/passkeys/login/options",
+    "/auth/mfa/fingerprint/options",
     null,
-    { body: {} },
+    { body: { ticket } },
   );
   const credential = (await navigator.credentials.get({
     publicKey: requestOptions(started.options),
   })) as PublicKeyCredential | null;
   if (!credential) throw new DOMException("Cancelled", "NotAllowedError");
-  return verify({ flow: started.flow, credential: assertionJson(credential) });
+  return verify({ ticket, credential: assertionJson(credential) });
 }

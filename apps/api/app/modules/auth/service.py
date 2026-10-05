@@ -138,6 +138,25 @@ class AuthService:
     async def login(
         self, email: str, password: str, user_agent: str, audience: Audience = "owner_os"
     ) -> IssuedSession:
+        user = await self.check_password(email, password)
+        return await self.finish_login(user, user_agent, audience, "password")
+
+    async def finish_login(
+        self, user: PlatformUser, user_agent: str, audience: Audience, method: str
+    ) -> IssuedSession:
+        """Issues the session once every sign-in step has passed."""
+        issued = await self._issue(user, user_agent, audience)
+        await record(
+            self.session,
+            "auth.login",
+            actor_user_id=user.id,
+            entity_type="user",
+            details={"audience": audience, "method": method},
+        )
+        return issued
+
+    async def check_password(self, email: str, password: str) -> PlatformUser:
+        """Step one of signing in: the email and password, with lockout. Issues nothing."""
         row = (
             await self.session.execute(
                 select(PlatformUser, UserCredential)
@@ -167,15 +186,8 @@ class AuthService:
         credential.locked_until = None
         if needs_rehash(credential.password_hash):
             credential.password_hash = hash_password(password)
-        issued = await self._issue(user, user_agent, audience)
-        await record(
-            self.session,
-            "auth.login",
-            actor_user_id=user.id,
-            entity_type="user",
-            details={"audience": audience},
-        )
-        return issued
+        signed_in: PlatformUser = user
+        return signed_in
 
     async def _failed(self, user: PlatformUser | None, reason: str) -> None:
         await record(
@@ -316,11 +328,7 @@ class AuthService:
             .where(PasswordResetToken.token_hash == digest(token))
             .with_for_update()
         )
-        if (
-            reset is None
-            or reset.used_at is not None
-            or reset.expires_at <= current
-        ):
+        if reset is None or reset.used_at is not None or reset.expires_at <= current:
             raise BusinessRuleViolation(
                 "INVALID_RESET_TOKEN", "This reset link is invalid or has expired"
             )

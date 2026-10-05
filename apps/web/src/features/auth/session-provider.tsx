@@ -6,7 +6,7 @@ import { ApiError } from "@/services/api-client";
 import { isDemo } from "@/lib/data-mode";
 import { writeDemoState } from "@/demo/workspace";
 import { authService } from "./service";
-import type { LoginInput, RegisterInput, Session } from "./types";
+import type { LoginInput, RegisterInput, SecondStep, Session } from "./types";
 
 type SessionStatus = "loading" | "anonymous" | "ready" | "error";
 
@@ -17,8 +17,10 @@ type SessionContextValue = {
   can: (permission: string) => boolean;
   canAny: (...permissions: string[]) => boolean;
   scopeKey: readonly [string, string, string];
-  login: (input: LoginInput) => Promise<Session>;
-  loginWithPasskey: () => Promise<Session>;
+  /** Signs in, or returns the second step (face or fingerprint) still needed. */
+  login: (input: LoginInput) => Promise<Session | SecondStep>;
+  /** Adopts the session once the second step has passed. */
+  finishSignIn: (session: Session) => Promise<void>;
   register: (input: RegisterInput) => Promise<Session>;
   logout: () => Promise<void>;
   switchWorkspace: (tenantId: string, environmentId?: string) => Promise<void>;
@@ -80,14 +82,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     ] as const,
     login: async (input) => {
       const next = await authService.login(input);
+      if ("mfa_required" in next) return next;
       await adopt(next);
       return next;
     },
-    loginWithPasskey: async () => {
-      const next = await authService.loginWithPasskey();
-      await adopt(next);
-      return next;
-    },
+    finishSignIn: adopt,
     register: async (input) => {
       const next = await authService.register(input);
       await adopt(next);

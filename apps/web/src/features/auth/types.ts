@@ -42,6 +42,15 @@ export type Tenant = z.infer<typeof tenantSchema>;
 export type Environment = z.infer<typeof environmentSchema>;
 
 export type LoginInput = { email: string; password: string };
+
+/** The password was right, and this person also saved a face or a fingerprint. */
+export type SecondStep = {
+  mfa_required: true;
+  ticket: string;
+  methods: ("face" | "fingerprint")[];
+  frames: number;
+  name: string;
+};
 export type RegisterInput = {
   email: string;
   password: string;
