@@ -14,6 +14,9 @@ function csrf(): string {
   return match ? decodeURIComponent(match[1]) : "";
 }
 
+const SIGN_IN_CODES =
+  /^(SECOND_STEP_|SIGN_IN_|FACE_|TOO_MANY_|NO_FINGERPRINT|PASSKEY_)/;
+
 function friendly(status: number, message?: string): string {
   if (status === 401) return "Please sign in again.";
   if (status === 403) return "Please refresh the page and try again.";
@@ -26,7 +29,7 @@ function friendly(status: number, message?: string): string {
 }
 
 async function request(
-  method: "GET" | "POST",
+  method: "GET" | "POST" | "DELETE",
   path: string,
   body?: unknown,
 ): Promise<Response> {
@@ -54,15 +57,24 @@ async function json<T>(response: Response): Promise<T> {
   if (response.status === 204) return undefined as T;
   const data: unknown = await response.json().catch(() => null);
   if (!response.ok) {
-    const detail = (data as { error?: { message?: string } } | null)?.error;
+    const detail = (
+      data as { error?: { code?: string; message?: string } } | null
+    )?.error;
+    // Sign-in steps explain themselves (tries left, sign in again): keep their words.
+    const own = detail?.code && SIGN_IN_CODES.test(detail.code);
     throw new ApiError(
       response.status,
-      response.status === 401 ? "UNAUTHENTICATED" : "ERROR",
-      friendly(response.status, detail?.message),
+      detail?.code ?? (response.status === 401 ? "UNAUTHENTICATED" : "ERROR"),
+      own && detail?.message
+        ? detail.message
+        : friendly(response.status, detail?.message),
     );
   }
   return data as T;
 }
+
+export const customerDelete = async (path: string) =>
+  json<void>(await request("DELETE", path));
 
 export const customerGet = async <T>(path: string) =>
   json<T>(await request("GET", path));

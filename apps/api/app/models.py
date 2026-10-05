@@ -38,7 +38,7 @@ from app.modules.pi.models import (
     WhatsAppConnection,
     WhatsAppWebhookEvent,
 )
-from app.modules.pi_customer.models import CustomerPasskey
+from app.modules.pi_customer.models import CustomerFace, CustomerPasskey, CustomerSignInLock
 from app.modules.pi_saas.customer_payment_models import (
     PiCustomerPaymentSettings,
     PiPaymentRequest,
@@ -92,7 +92,9 @@ from app.shared.sequences import DocumentSequence
 from app.workflows.models import WorkflowRun
 
 __all__ = [
+    "CustomerFace",
     "CustomerPasskey",
+    "CustomerSignInLock",
     "UserFace",
     "UserPasskey",
     "WorkspaceAgentAction",

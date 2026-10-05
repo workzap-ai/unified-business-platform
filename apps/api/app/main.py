@@ -50,6 +50,7 @@ from app.modules.pi.read_routes import router as pi_read_router
 from app.modules.pi.routes import router as pi_router
 from app.modules.pi.routes import webhook_router
 from app.modules.pi_customer.routes import router as pi_customer_router
+from app.modules.pi_customer.second_step import router as pi_customer_second_step_router
 from app.modules.pi_saas.app_routes import router as pi_app_router
 from app.modules.pi_saas.assistant_routes import operator_router as pi_operator_help_router
 from app.modules.pi_saas.assistant_routes import router as pi_assistant_router
@@ -180,6 +181,7 @@ PI_APP_ROUTERS = [
     # PI Customer: end customers see their own conversations (signed customer cookie,
     # never a business session): /customer-portal/...
     pi_customer_router,
+    pi_customer_second_step_router,
     pi_passkeys_router,
     pi_mfa_router,
 ]

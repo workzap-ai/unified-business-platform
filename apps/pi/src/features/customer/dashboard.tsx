@@ -21,6 +21,7 @@ import {
   ErrorState,
   Skeleton,
 } from "@/components/ui";
+import { CustomerSecurityCard } from "./security";
 import { Avatar, CATEGORY, LIST, ME, STATUS, ago } from "./shared";
 
 type Filter = "all" | "open" | "team" | "sorted";
@@ -265,6 +266,7 @@ export function Dashboard({ me }: { me: CustomerMe }) {
             pi organises your requests when you open a conversation, and keeps
             them up to date as you chat.
           </p>
+          <CustomerSecurityCard />
         </aside>
       </div>
     </div>

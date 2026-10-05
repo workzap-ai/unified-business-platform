@@ -12,6 +12,7 @@ import {
 
 import { errorText } from "@/lib/api";
 import { customerPost, type CustomerMe } from "@/lib/customer-api";
+import { CustomerSecondStepForm, type CustomerSecondStep } from "./security";
 import { cn } from "@/lib/cn";
 import { Button, Card, CardSection, Notice } from "@/components/ui";
 import { ME } from "./shared";
@@ -53,10 +54,15 @@ export function SignIn() {
       setWait(60);
     },
   });
+  const [second, setSecond] = useState<CustomerSecondStep | null>(null);
   const verify = useMutation({
     mutationFn: (code: string) =>
-      customerPost<CustomerMe>("/verify", { phone, code }),
-    onSuccess: (me) => client.setQueryData(ME, me),
+      customerPost<CustomerMe | CustomerSecondStep>("/verify", { phone, code }),
+    onSuccess: (answer) => {
+      // A saved face or fingerprint: the code alone isn't enough.
+      if ("mfa_required" in answer) setSecond(answer);
+      else client.setQueryData(ME, answer);
+    },
   });
 
   return (
@@ -180,6 +186,16 @@ export function SignIn() {
                 Send code on WhatsApp
               </Button>
             </form>
+          ) : second ? (
+            <CustomerSecondStepForm
+              step={second}
+              onBack={() => {
+                setSecond(null);
+                setStep("phone");
+                verify.reset();
+              }}
+              onDone={(me) => client.setQueryData(ME, me)}
+            />
           ) : (
             <div className="space-y-5">
               <button

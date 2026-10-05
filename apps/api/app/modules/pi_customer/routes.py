@@ -113,7 +113,9 @@ async def send_code(body: PhoneInput, request: Request, session: Session) -> dic
 
 
 @router.post("/verify")
-async def verify(body: VerifyInput, request: Request, response: Response) -> dict[str, Any]:
+async def verify(
+    body: VerifyInput, request: Request, response: Response, session: Session
+) -> dict[str, Any]:
     phone = _digits(body.phone)
     if not await hit(request, "pi-customer-verify-ip", client_ip(request), 30, 3600):
         raise HTTPException(429, "Too many attempts. Please wait a few minutes.")
@@ -140,6 +142,12 @@ async def verify(body: VerifyInput, request: Request, response: Response) -> dic
     except Exception:  # noqa: BLE001 - no code store: fail closed
         logger.warning("pi_customer_code_store_unavailable")
         raise HTTPException(503, "Sign-in is unavailable right now") from None
+    # Saved a face or a fingerprint? Then the code alone isn't enough.
+    from app.modules.pi_customer.second_step import second_step
+
+    step = await second_step(request, session, phone)
+    if step is not None:
+        return step
     access.issue(response, settings, phone)
     logger.info("pi_customer_signed_in")
     return {"phone": access.mask(phone)}
