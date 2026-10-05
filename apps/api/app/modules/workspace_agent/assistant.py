@@ -2,6 +2,8 @@
 
 import json
 import re
+from collections.abc import Awaitable, Callable
+from datetime import UTC, datetime
 from typing import Any
 
 from pydantic import ValidationError
@@ -313,32 +315,167 @@ total, distinguish a sample/page from all records, keep each currency separate. 
 financial totals from incomplete samples. Use plain text, no HTML. Cite source area names.
 Never invent page URLs. With unsupported work explain the limit and suggest the authorized page
 or a tracked task.
-Use at most 10 tools; keep answers focused and skimmable (short paragraphs or bullets).
-Current-page context is only a hint; not an authorization grant."""
+Keep answers focused and skimmable.
+Current-page context is only a hint; not an authorization grant.
+
+How you work (you are an agent that plans, checks and recommends):
+- Use the conversation so far: resolve "it", "that", "uska", "wo", "same for last month"
+  from earlier turns and never ask again for something already said. Earlier assistant
+  answers are context, not verified facts: call the tool again for any figure you state.
+- For multi-step work, start with ONE short line saying what you will check, then call the
+  tools. Call independent tools together in the same turn. Broad questions ("business kaisa
+  chal raha hai", "what should I focus on") deserve several tools: monitor, analytics and
+  crm_overview or whatsapp, and consult_team for decisions.
+- Cross-check: when two sources disagree or a figure is zero, say why it may be so.
+- Finish with what to do: up to 3 actions, each with its page, and offer a task PREVIEW
+  when the user can create tasks.
+
+Formatting (the app renders a small Markdown subset; never HTML):
+- Short paragraphs. **bold** only for key numbers and the one action that matters most.
+- "- " bullets or "1. " steps, at most 6 items. No tables, headings, code blocks or emoji;
+  the app already draws charts, tables, cards and drafts from tool results.
+- Link pages as [Page name](/path) using only these paths: {pages}.
+- After the answer add one final line that starts with ">> " followed by up to 3 short
+  follow-up requests the user might send next, separated by " | ", in the user's language."""
 
 
-MAX_TOOL_CALLS = 10
+MAX_TOOL_CALLS = 16
+MAX_ROUNDS = 8
+HISTORY_TURNS = 16
+HISTORY_CHARS = 16000
+LINK_PAGES = (
+    "/customers",
+    "/catalog",
+    "/inventory",
+    "/sales",
+    "/quotes",
+    "/orders",
+    "/billing",
+    "/finance",
+    "/hr",
+    "/settings/members",
+    "/settings/integrations",
+    "/workspace-agent",
+    "/pi/inbox",
+    "/pi/handoffs",
+    "/pi/whatsapp",
+)
+
+Emit = Callable[[dict[str, Any]], Awaitable[None]]
+
+TOOL_LABELS = {
+    "identity": "Checking your role and access",
+    "summary": "Reading the workspace summary",
+    "monitor": "Checking workspace health",
+    "consult_team": "Convening the advisory team",
+    "customer_360": "Pulling the full customer view",
+    "what_if": "Simulating the scenario",
+    "activity": "Reading recent activity",
+    "crm_overview": "Totalling CRM, pipeline and receivables",
+    "whatsapp": "Reading WhatsApp conversations",
+}
+
+
+def step_label(name: str, arguments: dict[str, Any]) -> str:
+    """What the app shows while a tool runs: the real work, in plain words."""
+    if name == "delegate":
+        return f"Asking the {arguments.get('specialist', 'domain')} specialist"
+    if name == "analytics":
+        return f"Analysing {arguments.get('topic') or 'the business'}"
+    if name == "search":
+        return f"Searching for “{str(arguments.get('query', ''))[:40]}”"
+    if name in {"read", "navigate"}:
+        verb = "Opening" if name == "navigate" else "Reading"
+        return f"{verb} {str(arguments.get('area', 'records')).replace('_', ' ')}"
+    if name in TOOL_LABELS:
+        return TOOL_LABELS[name]
+    operation = name.replace("_", " ", 1).replace("_", " ")
+    return f"Drafting {operation} for your review"
+
+
+FOLLOW_LINE = re.compile(r"(?:^|\n)[ \t]*>>[ \t]*([^\n]+?)[ \t]*$")
+
+
+def split_follow_ups(text: str) -> tuple[str, list[str]]:
+    """Take the model's trailing '>> q1 | q2 | q3' line off the answer."""
+    text = text.rstrip()
+    match = FOLLOW_LINE.search(text)
+    if not match:
+        return text.strip(), []
+    questions = [q.strip().strip("\"'") for q in match.group(1).split("|")]
+    return text[: match.start()].rstrip(), [q for q in questions if 2 < len(q) <= 140][:3]
+
+
+def default_follow_ups(answer: dict[str, Any]) -> list[str]:
+    """Next requests that fit what was just shown (no-AI mode, or when the model gave none)."""
+    out: list[str] = []
+    if answer.get("analytics"):
+        out += ["Forecast the next 3 months", "What should I focus on this week?"]
+    if answer.get("team"):
+        out += ["Draft tasks for the next steps", "What are the biggest risks?"]
+    if answer.get("signals"):
+        out += ["Which of these is most urgent?", "Draft a task for the top item"]
+    if answer.get("proposals"):
+        out += ["What else should I set up?"]
+    if any(r.get("area") == "whatsapp" for r in answer.get("results", [])):
+        out += ["Which chats need a reply first?"]
+    out += ["Give me a business health check", "Report for this month"]
+    seen: list[str] = []
+    for q in out:
+        if q not in seen:
+            seen.append(q)
+    return seen[:3]
+
+
+def conversation(data: ChatInput) -> list[Message]:
+    """Earlier turns as real user/assistant messages: newest kept, roles alternate."""
+    budget, kept = HISTORY_CHARS, []
+    for turn in reversed(data.turns()[-HISTORY_TURNS:]):
+        text = redact(turn.content)[: 1500 if turn.role == "user" else 3000]
+        if len(text) > budget:
+            break
+        budget -= len(text)
+        kept.append((turn.role, text))
+    kept.reverse()
+    merged: list[tuple[str, str]] = []
+    for role, text in kept:
+        if not merged and role == "assistant":
+            continue  # a chat starts with the user
+        if merged and merged[-1][0] == role:
+            merged[-1] = (role, merged[-1][1] + "\n\n" + text)
+        else:
+            merged.append((role, text))
+    if merged and merged[-1][0] == "user":
+        merged.append(("assistant", "(no answer was given)"))
+    return [
+        Message.user(text) if role == "user" else Message.assistant(text) for role, text in merged
+    ]
 
 
 async def chat(
-    service: AgentService, manager: LLMManager, data: ChatInput, enabled: bool
+    service: AgentService,
+    manager: LLMManager,
+    data: ChatInput,
+    enabled: bool,
+    emit: Emit | None = None,
 ) -> dict[str, Any]:
     context = await service.identity()
     if not enabled:
-        return await fallback(service, data)
+        answer = await fallback(service, data, emit)
+        answer["follow_ups"] = default_follow_ups(answer)
+        return answer
     catalog = tools_for(service)
     allowed = {tool.name for tool in catalog}
+    today = datetime.now(UTC).strftime("%A %d %B %Y")
     messages = [
-        Message.system(SYSTEM + "\nVerified context: " + json.dumps(context)),
-        Message.user(
-            json.dumps(
-                {
-                    "previous_user_requests": [redact(v) for v in data.history],
-                    "current_page": data.current_page,
-                    "request": redact(data.message),
-                }
-            )
+        Message.system(
+            SYSTEM.replace("{pages}", ", ".join(LINK_PAGES))
+            + f"\nToday is {today} (UTC). The user is on page {data.current_page!r}."
+            + "\nVerified context: "
+            + json.dumps(context)
         ),
+        *conversation(data),
+        Message.user(redact(data.message)),
     ]
     results: list[dict[str, Any]] = []
     proposals: list[dict[str, Any]] = []
@@ -350,7 +487,11 @@ async def chat(
     calls = 0
     delegations = 0
     memo: dict[str, Any] = {}
-    for _ in range(5):
+    for round_no in range(MAX_ROUNDS):
+        if round_no == MAX_ROUNDS - 1:
+            messages.append(Message.user("Answer now with what you have. Don't call more tools."))
+        if emit:
+            await emit({"type": "thinking"})
         try:
             response = await manager.complete(
                 service.scope,
@@ -362,7 +503,8 @@ async def chat(
             )
         except GatewayUnavailable:
             if not results and not proposals:
-                answer = await fallback(service, data)
+                answer = await fallback(service, data, emit)
+                answer["follow_ups"] = default_follow_ups(answer)
                 answer["notice"] = (
                     "AI is temporarily unavailable; permission-checked workspace tools"
                     " remain available."
@@ -370,8 +512,9 @@ async def chat(
                 return answer
             break
         if not response.tool_calls:
-            return {
-                "message": redact(response.text)[:6000],
+            body, follow_ups = split_follow_ups(redact(response.text)[:7000])
+            answer = {
+                "message": body[:6000],
                 "results": results,
                 "proposals": proposals,
                 "signals": signals,
@@ -380,10 +523,24 @@ async def chat(
                 "navigate": navigation,
                 "mode": "ai",
             }
-        messages.append(Message.assistant(tool_calls=response.tool_calls))
+            answer["follow_ups"] = follow_ups or default_follow_ups(answer)
+            return answer
+        if emit and response.text.strip():
+            # The model's own short plan ("I'll check revenue, then the pipeline").
+            await emit({"type": "note", "text": redact(response.text.strip())[:300]})
+        messages.append(Message.assistant(response.text or "", tool_calls=response.tool_calls))
         for call in response.tool_calls:
             calls += 1
             output: Any
+            live = emit is not None and calls <= MAX_TOOL_CALLS and call.name in allowed
+            if live and emit:
+                await emit(
+                    {
+                        "type": "step",
+                        "tool": call.name,
+                        "label": step_label(call.name, dict(call.arguments)),
+                    }
+                )
             if calls > MAX_TOOL_CALLS:
                 output = {"error": "Tool limit reached. Ask the user to continue."}
             elif call.name not in allowed:
@@ -437,7 +594,7 @@ async def chat(
                             output = {"error": "The team already answered this request."}
                         else:
                             team = await Team(service, manager, True).consult(
-                                TeamInput.model_validate(call.arguments)
+                                TeamInput.model_validate(call.arguments), emit
                             )
                             output = {k: team[k] for k in ("brief", "specialists", "mode")}
                     elif call.name == "crm_overview":
@@ -472,10 +629,13 @@ async def chat(
                     }
                 except BusinessRuleViolation as exc:
                     output = {"error": exc.message}
+            if live and emit:
+                ok = not (isinstance(output, dict) and "error" in output)
+                await emit({"type": "step_done", "tool": call.name, "ok": ok})
             messages.append(Message.tool(call.id, call.name, output))
         if calls >= MAX_TOOL_CALLS:
             break
-    return {
+    answer = {
         "message": (
             "The available results and drafts are below. Review each draft "
             "before confirming. You can ask a follow-up to continue."
@@ -488,6 +648,8 @@ async def chat(
         "navigate": navigation,
         "mode": "tools",
     }
+    answer["follow_ups"] = default_follow_ups(answer)
+    return answer
 
 
 def for_model(block: dict[str, Any]) -> dict[str, Any]:
@@ -588,8 +750,12 @@ def topic_for(text: str, default: str) -> str:
 MONITOR_WORDS = ("monitor", "health", "alert", "attention", "issue", "problem")
 
 
-async def fallback(service: AgentService, data: ChatInput) -> dict[str, Any]:
+async def fallback(
+    service: AgentService, data: ChatInput, emit: Emit | None = None
+) -> dict[str, Any]:
     """Honest tools-only mode; never manufactures people or claims an AI answer."""
+    if emit:
+        await emit({"type": "step", "tool": "workspace", "label": "Checking your workspace"})
     text = data.message.lower()
     results: list[dict[str, Any]] = []
     proposals: list[dict[str, Any]] = []
@@ -629,7 +795,9 @@ async def fallback(service: AgentService, data: ChatInput) -> dict[str, Any]:
         results = (await Toolkit(service).activity(ActivityInput()))["results"]
         message = "Recent workspace activity (last 7 days)."
     elif has(text, TEAM_WORDS):
-        team = await Team(service, None, False).consult(TeamInput(question=data.message[:1000]))
+        team = await Team(service, None, False).consult(
+            TeamInput(question=data.message[:1000]), emit
+        )
         message = (
             "Rule-based decision brief from your workspace data (AI chat is not "
             "configured, so the specialists' written views are not available)."
@@ -695,6 +863,8 @@ async def fallback(service: AgentService, data: ChatInput) -> dict[str, Any]:
                     if any(w in text for w in ("open", "visit", "kholo")):
                         navigation = ROUTES[area]
                 break
+    if emit:
+        await emit({"type": "step_done", "tool": "workspace", "ok": True})
     return {
         "message": message,
         "results": results,

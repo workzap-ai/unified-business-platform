@@ -1,8 +1,11 @@
 import asyncio
+import json
+import logging
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, Form, Query, Request, UploadFile
+from fastapi.responses import StreamingResponse
 from starlette.concurrency import run_in_threadpool
 
 from app.ai.manager import LLMManager
@@ -16,6 +19,8 @@ from app.modules.workspace_agent.schemas import ChatInput, Decision, ProposalInp
 from app.modules.workspace_agent.service import AgentService
 from app.modules.workspace_agent.team import Team, TeamInput
 from app.shared.errors import BusinessRuleViolation
+
+logger = logging.getLogger("platform")
 
 
 async def bound_workspace(request: Request, scope: Scope) -> None:
@@ -71,6 +76,62 @@ async def ask(data: ChatInput, request: Request, scope: Scope, session: Session)
         ) from None
     await session.commit()
     return result
+
+
+@router.post("/chat/stream")
+async def ask_stream(
+    data: ChatInput, request: Request, scope: Scope, session: Session
+) -> StreamingResponse:
+    """The same agent, streamed as NDJSON while it works.
+
+    Events: {"type": "thinking"}, {"type": "note", "text"} (the agent's short plan),
+    {"type": "step", "tool", "label"}, {"type": "step_done", "tool", "ok"} (team advisors
+    appear as "team.<role>" steps), then {"type": "reply", "reply"} or
+    {"type": "error", "message"}. The request's session stays open until the response has
+    been sent (FastAPI's default request scope), so the agent can use it while streaming.
+    """
+    await limited(request, scope)
+    llm = manager(request)
+    enabled = ai_enabled(request)
+    queue: asyncio.Queue[dict[str, Any] | None] = asyncio.Queue()
+
+    async def emit(event: dict[str, Any]) -> None:
+        await queue.put(event)
+
+    async def work() -> None:
+        try:
+            async with asyncio.timeout(110):
+                result = await chat(AgentService(session, scope), llm, data, enabled, emit)
+            await session.commit()
+            await queue.put({"type": "reply", "reply": result})
+        except TimeoutError:
+            await queue.put(
+                {"type": "error", "message": "This request took too long. Try a smaller one."}
+            )
+        except BusinessRuleViolation as exc:
+            await queue.put({"type": "error", "message": exc.message})
+        except Exception:  # the stream must always end with a clear message
+            logger.exception("workspace agent stream failed")
+            await queue.put(
+                {"type": "error", "message": "Something went wrong on our side. Please try again."}
+            )
+        finally:
+            await queue.put(None)
+
+    async def stream() -> Any:
+        task = asyncio.create_task(work())
+        try:
+            while (event := await queue.get()) is not None:
+                yield json.dumps(event, default=str) + "\n"
+        finally:
+            if not task.done():  # the person stopped the answer or left
+                task.cancel()
+
+    return StreamingResponse(
+        stream(),
+        media_type="application/x-ndjson",
+        headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"},
+    )
 
 
 @router.post("/read")

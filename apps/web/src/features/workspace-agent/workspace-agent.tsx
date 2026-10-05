@@ -13,15 +13,24 @@ import { usePathname, useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
   Activity,
+  ArrowLeft,
   Bot,
   Check,
   ChevronRight,
+  CircleAlert,
+  Copy,
+  Download,
   FileUp,
+  History,
   Loader2,
   MessageSquare,
   RefreshCw,
+  Search,
   Send,
   ShieldCheck,
+  Square,
+  SquarePen,
+  Trash2,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -39,20 +48,42 @@ import {
   type ToolResult,
 } from "./service";
 import { AnalyticsView, BriefCard, InsightsBoard } from "./insights";
+import { AgentText, chatAsMarkdown } from "./agent-text";
+import {
+  type Step,
+  type Thread,
+  type Turn,
+  historyFor,
+  historyKey,
+  newId,
+  titleFor,
+  useThreads,
+  when,
+} from "./agent-history";
 
-type Turn = { id: number; user?: string; reply?: Reply };
 type AgentState = {
   context?: AgentContext;
   turns: Turn[];
+  threads: Thread[];
+  active: Thread | null;
+  view: "chat" | "history";
+  setView: (view: "chat" | "history") => void;
   busy: boolean;
   error: string;
   open: boolean;
   setOpen: (open: boolean) => void;
   send: (message: string) => Promise<void>;
+  stop: () => void;
+  startNew: () => void;
+  openThread: (id: string) => void;
+  removeThread: (id: string) => void;
+  clearThreads: () => void;
   upload: (file: File, purpose: "summary" | "employees") => Promise<void>;
   addReply: (reply: Reply) => void;
   setError: (error: string) => void;
 };
+/** A message the agent itself ended the stream with (shown as-is). */
+class AgentFailure extends Error {}
 const AgentContextValue = createContext<AgentState | null>(null);
 const fieldClass =
   "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30";
@@ -88,6 +119,7 @@ const emptyReply = (message: string): Reply => ({
   analytics: [],
   team: null,
   mode: "tools",
+  follow_ups: [],
 });
 // Defense in depth: navigation is limited to registered application paths, never model URLs.
 const safeRoutes = new Set([
@@ -143,7 +175,19 @@ function AgentSession({ children }: { children: ReactNode }) {
     agentService.context,
     { enabled: !isDemo, retry: false },
   );
-  const [turns, setTurns] = useState<Turn[]>([]);
+  const { session, scopeKey } = useSession();
+  const storageKey = isDemo
+    ? ""
+    : historyKey(
+        session?.tenant?.id,
+        session?.environment?.id,
+        session?.user.id,
+        session?.permissions ?? [],
+      );
+  const { threads, update } = useThreads(storageKey);
+  // undefined until the person picks a chat or starts a new one
+  const [chosen, setChosen] = useState<string | null | undefined>(undefined);
+  const [view, setView] = useState<"chat" | "history">("chat");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
@@ -152,68 +196,201 @@ function AgentSession({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const client = useQueryClient();
-  const { scopeKey } = useSession();
   useEffect(() => {
     mounted.current = true;
     return () => {
       mounted.current = false;
-      controller.current?.abort();
+      controller.current?.abort("left");
     };
   }, []);
+  // After a reload the latest chat reopens if it was used in the last 12 hours.
+  const latest = threads.reduce<(typeof threads)[number] | null>(
+    (best, t) => (!best || t.updatedAt > best.updatedAt ? t : best),
+    null,
+  );
+  const activeId =
+    chosen !== undefined
+      ? chosen
+      : latest && Date.now() - latest.updatedAt < 43_200_000
+        ? latest.id
+        : null;
+  const active = threads.find((t) => t.id === activeId) ?? null;
+  const turns = active?.turns ?? [];
+
+  const patchTurn = (
+    threadId: string,
+    turnId: string,
+    change: (turn: Turn) => Turn,
+  ) =>
+    update((all) =>
+      all.map((t) =>
+        t.id === threadId
+          ? {
+              ...t,
+              updatedAt: Date.now(),
+              turns: t.turns.map((x) => (x.id === turnId ? change(x) : x)),
+            }
+          : t,
+      ),
+    );
+  /** Append turns to the open chat, or start a new chat titled by the first one. */
+  const append = (title: string, added: Turn[]) => {
+    const threadId = active?.id ?? newId();
+    const now = Date.now();
+    update((all) =>
+      all.some((t) => t.id === threadId)
+        ? all.map((t) =>
+            t.id === threadId
+              ? { ...t, updatedAt: now, turns: [...t.turns, ...added] }
+              : t,
+          )
+        : [
+            {
+              id: threadId,
+              title: titleFor(title),
+              createdAt: now,
+              updatedAt: now,
+              turns: added,
+            },
+            ...all,
+          ],
+    );
+    setChosen(threadId);
+    return threadId;
+  };
+  const refreshDrafts = () =>
+    client.invalidateQueries({
+      queryKey: [...scopeKey, "workspace-agent", "proposals"],
+    });
   const addReply = (reply: Reply) => {
     if (!mounted.current) return;
-    setTurns((t) => [...t.slice(-39), { id: Date.now(), reply }]);
-    if (reply.proposals.length)
-      void client.invalidateQueries({
-        queryKey: [...scopeKey, "workspace-agent", "proposals"],
-      });
+    append(reply.message, [{ id: newId(), reply }]);
+    if (reply.proposals.length) void refreshDrafts();
   };
+
   const run = async (
     user: string,
-    request: (signal: AbortSignal) => Promise<Reply>,
+    request: (
+      signal: AbortSignal,
+      onStep: (change: (turn: Turn) => Turn) => void,
+    ) => Promise<Reply>,
   ) => {
     if (controller.current || isDemo) return;
-    const active = new AbortController();
-    controller.current = active;
+    const abort = new AbortController();
+    controller.current = abort;
     setBusy(true);
     setError("");
-    setTurns((t) => [...t.slice(-39), { id: Date.now(), user }]);
+    setView("chat");
+    const turnId = newId();
+    const threadId = append(user, [
+      { id: newId(), user },
+      { id: turnId, steps: [], notes: [] },
+    ]);
+    const timer = setTimeout(() => abort.abort("timeout"), 130_000);
     try {
-      const reply = await request(active.signal);
+      const reply = await request(abort.signal, (change) =>
+        patchTurn(threadId, turnId, change),
+      );
+      patchTurn(threadId, turnId, (t) => ({ ...t, reply }));
       if (!mounted.current) return;
-      addReply(reply);
-      await client.invalidateQueries({
-        queryKey: [...scopeKey, "workspace-agent", "proposals"],
-      });
+      await refreshDrafts();
       if (reply.navigate && safeRoutes.has(reply.navigate))
         router.push(reply.navigate);
     } catch (e) {
-      if (mounted.current && !active.signal.aborted) setError(serviceError(e));
+      const stopped = abort.signal.aborted && abort.signal.reason !== "timeout";
+      patchTurn(threadId, turnId, (t) =>
+        stopped
+          ? { ...t, stopped: true }
+          : {
+              ...t,
+              error: abort.signal.aborted
+                ? "This took too long. Try a smaller request."
+                : e instanceof AgentFailure
+                  ? e.message
+                  : serviceError(e),
+            },
+      );
     } finally {
-      if (mounted.current) setBusy(false);
+      clearTimeout(timer);
       controller.current = null;
+      if (mounted.current) setBusy(false);
     }
   };
+
+  const send = (message: string) =>
+    run(message, async (signal, onStep) => {
+      let reply: Reply | null = null;
+      let failure = "";
+      await agentService.chatStream(
+        message,
+        historyFor(turns),
+        pathname,
+        (event) => {
+          if (event.type === "reply") reply = event.reply;
+          else if (event.type === "error") failure = event.message;
+          else if (event.type === "note")
+            onStep((t) => ({ ...t, notes: [...(t.notes ?? []), event.text] }));
+          else if (event.type === "step")
+            onStep((t) => ({
+              ...t,
+              steps: [
+                ...(t.steps ?? []),
+                { tool: event.tool, label: event.label, done: false, ok: true },
+              ],
+            }));
+          else if (event.type === "step_done")
+            onStep((t) => {
+              const steps = [...(t.steps ?? [])];
+              const i = steps.findLastIndex(
+                (x) => x.tool === event.tool && !x.done,
+              );
+              if (i >= 0) steps[i] = { ...steps[i], done: true, ok: event.ok };
+              return { ...t, steps };
+            });
+        },
+        signal,
+      );
+      if (failure) throw new AgentFailure(failure);
+      if (!reply)
+        throw new AgentFailure("The answer was cut off. Please try again.");
+      return reply;
+    });
+
   return (
     <AgentContextValue.Provider
       value={{
         context: context.data,
         turns,
+        threads,
+        active,
+        view,
+        setView,
         busy,
         open,
         setOpen,
         error: error || (context.error ? serviceError(context.error) : ""),
         setError,
         addReply,
-        send: (message) =>
-          run(message, (signal) =>
-            agentService.chat(
-              message,
-              turns.flatMap((t) => (t.user ? [t.user] : [])).slice(-8),
-              pathname,
-              signal,
-            ),
-          ),
+        send,
+        stop: () => controller.current?.abort("stopped"),
+        startNew: () => {
+          if (busy) return;
+          setChosen(null);
+          setView("chat");
+        },
+        openThread: (id) => {
+          if (busy) return;
+          setChosen(id);
+          setView("chat");
+        },
+        removeThread: (id) => {
+          update((all) => all.filter((t) => t.id !== id));
+          if (id === activeId) setChosen(null);
+        },
+        clearThreads: () => {
+          update(() => []);
+          setChosen(null);
+        },
         upload: (file, purpose) =>
           run(
             `${purpose === "employees" ? "Import employees" : "Summarize document"}: ${file.name}`,
@@ -293,7 +470,7 @@ function useLauncherLift() {
 }
 
 function AgentLauncher() {
-  const { open, setOpen } = useAgent();
+  const { open, setOpen, busy } = useAgent();
   const pathname = usePathname();
   const lift = useLauncherLift();
   if (pathname === "/workspace-agent") return null;
@@ -306,8 +483,14 @@ function AgentLauncher() {
           style={{ bottom: LAUNCHER_GAP + lift }}
           aria-label="Open Pi Agent Beta"
         >
-          <Bot className="size-4" />
-          <span className="hidden sm:inline">Pi Agent</span>
+          {busy ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Bot className="size-4" />
+          )}
+          <span className="hidden sm:inline">
+            {busy ? "Working…" : "Pi Agent"}
+          </span>
           <span className="rounded-full bg-white/15 px-1.5 text-[10px]">
             BETA
           </span>
@@ -407,9 +590,12 @@ function AgentPanel({ compact = false }: { compact?: boolean }) {
           ),
         )}
         {!compact && (
-          <span className="ml-auto hidden self-center text-xs text-muted-foreground md:inline">
+          <span className="ml-auto hidden self-center text-xs text-muted-foreground lg:inline">
             Operations · HR · Finance · CRM · WhatsApp
           </span>
+        )}
+        {tab === "chat" && !isDemo && (
+          <ChatToolbar className={compact ? "ml-auto" : "ml-auto lg:ml-3"} />
         )}
       </div>
       {isDemo ? (
@@ -439,10 +625,14 @@ function AgentPanel({ compact = false }: { compact?: boolean }) {
             </div>
           )}
           {tab === "chat" ? (
-            <>
-              <ChatHistory />
-              <Composer />
-            </>
+            agent.view === "history" ? (
+              <ThreadList />
+            ) : (
+              <>
+                <ChatHistory />
+                <Composer />
+              </>
+            )
           ) : (
             <div className="min-h-0 flex-1 overflow-y-auto p-5">
               {tab === "insights" ? (
@@ -486,12 +676,288 @@ function AgentPanel({ compact = false }: { compact?: boolean }) {
   );
 }
 
+function ChatToolbar({ className = "" }: { className?: string }) {
+  const agent = useAgent();
+  const exportChat = () => {
+    if (!agent.active) return;
+    const blob = new Blob(
+      [chatAsMarkdown(agent.active.title, agent.active.turns)],
+      { type: "text/markdown" },
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pi-agent-${new Date().toISOString().slice(0, 10)}.md`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  const button =
+    "inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-surface-muted hover:text-foreground disabled:opacity-40";
+  return (
+    <div className={`flex shrink-0 items-center gap-0.5 ${className}`}>
+      {agent.view === "history" ? (
+        <button
+          type="button"
+          className={button}
+          aria-label="Back to the chat"
+          title="Back to the chat"
+          onClick={() => agent.setView("chat")}
+        >
+          <ArrowLeft className="size-4" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          className={button}
+          aria-label="Chat history"
+          title="Chat history"
+          onClick={() => agent.setView("history")}
+        >
+          <History className="size-4" />
+        </button>
+      )}
+      <button
+        type="button"
+        className={button}
+        aria-label="Export this chat"
+        title="Export this chat (Markdown)"
+        disabled={!agent.active?.turns.length}
+        onClick={exportChat}
+      >
+        <Download className="size-4" />
+      </button>
+      <button
+        type="button"
+        className={button}
+        aria-label="New chat"
+        title="New chat"
+        disabled={agent.busy}
+        onClick={agent.startNew}
+      >
+        <SquarePen className="size-4" />
+      </button>
+    </div>
+  );
+}
+
+function ThreadList() {
+  const agent = useAgent();
+  const [query, setQuery] = useState("");
+  const [confirming, setConfirming] = useState(false);
+  const q = query.trim().toLowerCase();
+  const shown = q
+    ? agent.threads.filter(
+        (t) =>
+          t.title.toLowerCase().includes(q) ||
+          t.turns.some(
+            (x) =>
+              x.user?.toLowerCase().includes(q) ||
+              x.reply?.message.toLowerCase().includes(q),
+          ),
+      )
+    : agent.threads;
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="border-b border-border p-4">
+        <label className="relative block">
+          <span className="sr-only">Search your chats</span>
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            className={`${fieldClass} pl-9`}
+            placeholder="Search your chats…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+      </div>
+      {!agent.threads.length ? (
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
+          <MessageSquare className="size-8 text-primary" />
+          <p className="font-medium">No chats yet</p>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            Your chats are kept in this browser for you only, and removed when
+            you sign out or your access changes.
+          </p>
+        </div>
+      ) : (
+        <ul className="min-h-0 flex-1 divide-y divide-border overflow-y-auto">
+          {shown.map((t) => {
+            const asked = t.turns.filter((x) => x.user).length;
+            const drafts = t.turns.reduce(
+              (n, x) => n + (x.reply?.proposals.length ?? 0),
+              0,
+            );
+            return (
+              <li key={t.id} className="flex items-center gap-1 pr-3">
+                <button
+                  type="button"
+                  disabled={agent.busy}
+                  onClick={() => agent.openThread(t.id)}
+                  className={`min-w-0 flex-1 px-5 py-3 text-left hover:bg-surface-muted disabled:opacity-60 ${agent.active?.id === t.id ? "bg-primary/5" : ""}`}
+                >
+                  <span
+                    className="block truncate text-sm font-medium"
+                    dir="auto"
+                  >
+                    {t.title}
+                  </span>
+                  <span className="block text-xs text-muted-foreground">
+                    {when(t.updatedAt)} · {asked}{" "}
+                    {asked === 1 ? "question" : "questions"}
+                    {drafts
+                      ? ` · ${drafts} draft${drafts === 1 ? "" : "s"}`
+                      : ""}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-surface-muted hover:text-danger"
+                  aria-label={`Delete chat: ${t.title}`}
+                  onClick={() => agent.removeThread(t.id)}
+                >
+                  <Trash2 className="size-4" />
+                </button>
+              </li>
+            );
+          })}
+          {!shown.length && (
+            <li className="p-5 text-sm text-muted-foreground">
+              No chats match “{query}”.
+            </li>
+          )}
+        </ul>
+      )}
+      {!!agent.threads.length && (
+        <div className="flex items-center justify-between gap-2 border-t border-border p-4 text-xs text-muted-foreground">
+          <span>
+            {agent.threads.length} saved in this browser, for you only.
+          </span>
+          {confirming ? (
+            <span className="flex gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => setConfirming(false)}
+              >
+                Keep
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => {
+                  agent.clearThreads();
+                  setConfirming(false);
+                }}
+              >
+                Delete all
+              </Button>
+            </span>
+          ) : (
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={agent.busy}
+              onClick={() => setConfirming(true)}
+            >
+              Clear history
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** The real steps the agent took (or is taking), with each outcome. */
+function StepList({ steps, live }: { steps: Step[]; live: boolean }) {
+  if (!steps.length) return null;
+  return (
+    <ul className="space-y-1" aria-label="What the agent checked">
+      {steps.map((s, i) => (
+        <li
+          key={`${s.tool}-${i}`}
+          className={`flex items-center gap-2 text-xs text-muted-foreground ${s.tool.startsWith("team.") && s.tool !== "team.strategist" ? "pl-5" : ""}`}
+        >
+          {!s.done && live ? (
+            <Loader2 className="size-3.5 animate-spin text-primary" />
+          ) : s.ok ? (
+            <Check className="size-3.5 text-success" />
+          ) : (
+            <CircleAlert className="size-3.5 text-warning" />
+          )}
+          <span>
+            {s.label}
+            {s.done && !s.ok ? " · couldn't check this" : ""}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(text);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500);
+        } catch {
+          // clipboard blocked
+        }
+      }}
+      className="inline-flex h-8 items-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-surface-muted hover:text-foreground"
+    >
+      {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+      {copied ? "Copied" : "Copy"}
+    </button>
+  );
+}
+
+function FollowUps({
+  items,
+  onPick,
+}: {
+  items: string[];
+  onPick: (q: string) => void;
+}) {
+  if (!items.length) return null;
+  return (
+    <div className="flex flex-wrap gap-2" aria-label="Suggested next questions">
+      {items.map((q) => (
+        <button
+          key={q}
+          type="button"
+          dir="auto"
+          onClick={() => onPick(q)}
+          className="rounded-full border border-border bg-surface px-3 py-1.5 text-left text-xs text-foreground hover:border-primary hover:bg-primary/5 hover:text-primary"
+        >
+          {q}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function ChatHistory() {
   const agent = useAgent();
   const tail = useRef<HTMLDivElement>(null);
+  const last = agent.turns[agent.turns.length - 1];
   useEffect(() => {
     tail.current?.scrollIntoView({ block: "nearest" });
-  }, [agent.turns, agent.busy]);
+  }, [
+    agent.turns.length,
+    last?.steps?.length,
+    last?.notes?.length,
+    last?.reply,
+    agent.busy,
+  ]);
+  const closeOnPhone = () => {
+    if (window.matchMedia("(max-width: 767px)").matches) agent.setOpen(false);
+  };
+  const lastQuestion = agent.turns.findLast((t) => t.user)?.user;
   return (
     <div
       className="min-h-0 flex-1 space-y-5 overflow-y-auto p-5"
@@ -504,9 +970,10 @@ function ChatHistory() {
           <MessageSquare className="mb-4 size-8 text-primary" />
           <h2 className="text-xl font-semibold">What needs doing today?</h2>
           <p className="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-            Ask in your language. I can monitor your workspace, summarize CRM
-            and WhatsApp conversations, suggest next steps, look up permitted
-            records, prepare employee imports and manage your team’s tasks.
+            Ask in your language. I plan, check your live workspace step by step
+            and recommend what to do: monitoring, CRM and WhatsApp summaries,
+            forecasts, decisions with my advisory team, record lookups, task and
+            employee drafts. I remember this chat.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             {starterPrompts(agent.context?.permissions ?? []).map((prompt) => (
@@ -523,66 +990,181 @@ function ChatHistory() {
             ))}
           </div>
           <p className="mt-4 text-xs text-muted-foreground">
-            Changes appear as drafts for your review. Chat clears on sign-out,
-            workspace or role changes.
+            Type <kbd className="rounded border border-border px-1">/</kbd> for
+            quick commands. Changes appear as drafts for your review. Chats are
+            kept in this browser for you, and removed on sign-out or when your
+            access changes.
           </p>
           <QuickCreate />
         </div>
       )}
-      {agent.turns.map((turn) => (
-        <div key={turn.id}>
-          {turn.user ? (
+      {agent.turns.map((turn, index) => {
+        const isLast = index === agent.turns.length - 1;
+        if (turn.user)
+          return (
             <div
-              className="ml-auto max-w-[90%] whitespace-pre-wrap rounded-2xl rounded-tr-sm bg-primary/10 px-4 py-3 text-sm"
+              key={turn.id}
+              className="ml-auto max-w-[90%] whitespace-pre-wrap break-words rounded-2xl rounded-tr-sm bg-primary/10 px-4 py-3 text-sm"
               dir="auto"
             >
               {turn.user}
             </div>
-          ) : (
-            turn.reply && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-xs font-medium text-primary">
-                  <Bot className="size-4" />
-                  Pi Agent Beta
-                </div>
-                <p className="whitespace-pre-wrap text-sm leading-6" dir="auto">
-                  {turn.reply.message}
-                </p>
-                {turn.reply.notice && (
-                  <p className="text-xs text-muted-foreground">
-                    {turn.reply.notice}
-                  </p>
-                )}
-                {turn.reply.team && <BriefCard team={turn.reply.team} />}
-                {turn.reply.analytics.map((block, i) => (
-                  <AnalyticsView key={`${block.topic}-${i}`} block={block} />
-                ))}
-                {!!turn.reply.signals.length && (
-                  <SignalList signals={turn.reply.signals} />
-                )}
-                {turn.reply.results.map((result, i) => (
-                  <ResultsCard key={`${result.area}-${i}`} result={result} />
-                ))}
-                {turn.reply.proposals.map((p) => (
-                  <ProposalCard key={p.id} proposal={p} />
-                ))}
+          );
+        const steps = turn.steps ?? [];
+        const notes = turn.notes ?? [];
+        if (turn.reply)
+          return (
+            <div key={turn.id} className="space-y-3">
+              <div className="flex items-center gap-2 text-xs font-medium text-primary">
+                <Bot className="size-4" />
+                Pi Agent Beta
               </div>
-            )
-          )}
-        </div>
-      ))}
-      {agent.busy && (
-        <div
-          role="status"
-          className="flex items-center gap-2 text-sm text-muted-foreground"
-        >
-          <Loader2 className="size-4 animate-spin" />
-          Checking your workspace…
-        </div>
-      )}
+              {!!(steps.length || notes.length) && (
+                <details className="rounded-lg border border-border bg-surface-muted/50 px-3 py-2 text-xs text-muted-foreground">
+                  <summary className="cursor-pointer select-none">
+                    Worked through {steps.length}{" "}
+                    {steps.length === 1 ? "step" : "steps"}
+                  </summary>
+                  <div className="mt-2 space-y-2">
+                    {notes.map((n, i) => (
+                      <p key={i} className="italic" dir="auto">
+                        {n}
+                      </p>
+                    ))}
+                    <StepList steps={steps} live={false} />
+                  </div>
+                </details>
+              )}
+              <AgentText text={turn.reply.message} onNavigate={closeOnPhone} />
+              {turn.reply.notice && (
+                <p className="text-xs text-muted-foreground">
+                  {turn.reply.notice}
+                </p>
+              )}
+              {turn.reply.team && <BriefCard team={turn.reply.team} />}
+              {turn.reply.analytics.map((block, i) => (
+                <AnalyticsView key={`${block.topic}-${i}`} block={block} />
+              ))}
+              {!!turn.reply.signals.length && (
+                <SignalList signals={turn.reply.signals} />
+              )}
+              {turn.reply.results.map((result, i) => (
+                <ResultsCard key={`${result.area}-${i}`} result={result} />
+              ))}
+              {turn.reply.proposals.map((p) => (
+                <ProposalCard key={p.id} proposal={p} />
+              ))}
+              <div className="-ml-2 flex items-center">
+                <CopyButton text={turn.reply.message} />
+              </div>
+              {isLast && !agent.busy && (
+                <FollowUps
+                  items={turn.reply.follow_ups}
+                  onPick={(q) => void agent.send(q)}
+                />
+              )}
+            </div>
+          );
+        if (turn.error || turn.stopped)
+          return (
+            <div key={turn.id} className="space-y-2">
+              <StepList steps={steps} live={false} />
+              {turn.stopped ? (
+                <p className="text-sm text-muted-foreground">
+                  You stopped this answer.
+                </p>
+              ) : (
+                <p
+                  role="alert"
+                  className="rounded-lg border border-danger/30 bg-danger/5 p-3 text-sm"
+                >
+                  {turn.error}
+                </p>
+              )}
+              {isLast && lastQuestion && !agent.busy && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => void agent.send(lastQuestion)}
+                >
+                  <RefreshCw className="mr-1 size-3.5" />
+                  Try again
+                </Button>
+              )}
+            </div>
+          );
+        return agent.busy && isLast ? (
+          <div
+            key={turn.id}
+            role="status"
+            className="space-y-2 rounded-xl border border-border bg-surface-muted/40 p-3"
+          >
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin text-primary" />
+              {steps.length ? "Working on it…" : "Planning…"}
+            </div>
+            {notes.map((n, i) => (
+              <p
+                key={i}
+                className="text-xs italic text-muted-foreground"
+                dir="auto"
+              >
+                {n}
+              </p>
+            ))}
+            <StepList steps={steps} live />
+          </div>
+        ) : (
+          <p key={turn.id} className="text-sm text-muted-foreground">
+            This answer didn&apos;t finish.
+          </p>
+        );
+      })}
       <div ref={tail} />
     </div>
   );
+}
+
+const COMMANDS = [
+  {
+    name: "/report",
+    hint: "Full business report with forecast",
+    prompt: () => "Full business report with forecasts and what to do next",
+  },
+  {
+    name: "/health",
+    hint: "What needs attention right now",
+    prompt: () => "Run a business health check: what needs my attention now?",
+  },
+  {
+    name: "/team",
+    hint: "Ask the advisory team a decision",
+    prompt: (rest: string) =>
+      `Ask the advisory team: ${rest || "what should I focus on this month?"}`,
+  },
+  {
+    name: "/whatsapp",
+    hint: "Chats that need a reply",
+    prompt: () =>
+      "Summarize WhatsApp chats that need a reply, most urgent first",
+  },
+  {
+    name: "/search",
+    hint: "Find a person, company or document",
+    prompt: (rest: string) => `search ${rest}`,
+  },
+  {
+    name: "/task",
+    hint: "Draft a task",
+    prompt: (rest: string) => `/task ${rest}`,
+  },
+] as const;
+
+/** "/team should I hire?" -> the prompt that command stands for. */
+function expandCommand(text: string): string {
+  const match = text.match(/^(\/[a-z]+)\s*([\s\S]*)$/);
+  const command = match && COMMANDS.find((c) => c.name === match[1]);
+  return command ? command.prompt(match[2].trim()) : text;
 }
 
 function Composer() {
@@ -590,17 +1172,47 @@ function Composer() {
   const [message, setMessage] = useState("");
   const [purpose, setPurpose] = useState<"summary" | "employees">("summary");
   const input = useRef<HTMLInputElement>(null);
+  const box = useRef<HTMLTextAreaElement>(null);
+  const commands =
+    message.startsWith("/") && !message.includes(" ")
+      ? COMMANDS.filter((c) => c.name.startsWith(message.toLowerCase()))
+      : [];
+  const submit = () => {
+    const text = message.trim();
+    if (!text || agent.busy) return;
+    void agent.send(expandCommand(text));
+    setMessage("");
+  };
   return (
     <form
-      className="border-t border-border p-4"
+      className="relative border-t border-border p-4"
       onSubmit={(e) => {
         e.preventDefault();
-        if (message.trim()) {
-          void agent.send(message.trim());
-          setMessage("");
-        }
+        submit();
       }}
     >
+      {!!commands.length && (
+        <ul
+          className="absolute bottom-full left-4 right-4 mb-2 overflow-hidden rounded-xl border border-border bg-surface shadow-lg"
+          aria-label="Quick commands"
+        >
+          {commands.map((c) => (
+            <li key={c.name}>
+              <button
+                type="button"
+                className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-surface-muted"
+                onClick={() => {
+                  setMessage(`${c.name} `);
+                  box.current?.focus();
+                }}
+              >
+                <span className="font-mono text-primary">{c.name}</span>
+                <span className="text-muted-foreground">{c.hint}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
       <div className="mb-2 flex flex-wrap items-center gap-2">
         <select
           aria-label="Upload purpose"
@@ -648,11 +1260,17 @@ function Composer() {
       />
       <div className="flex items-end gap-2">
         <textarea
+          ref={box}
           className={`${fieldClass} min-h-20 resize-y`}
           maxLength={4000}
           aria-label="Message Pi Agent"
-          placeholder="Ask, find a record, or describe a task…"
+          placeholder={
+            agent.turns.length
+              ? "Ask a follow-up, or type / for commands…"
+              : "Ask, find a record, or describe a task… (type / for commands)"
+          }
           value={message}
+          dir="auto"
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => {
             if (
@@ -661,21 +1279,34 @@ function Composer() {
               !e.nativeEvent.isComposing
             ) {
               e.preventDefault();
-              if (message.trim() && !agent.busy) {
-                void agent.send(message.trim());
-                setMessage("");
+              if (commands.length === 1 && message.trim() === message) {
+                setMessage(`${commands[0].name} `);
+                return;
               }
+              submit();
             }
           }}
         />
-        <Button
-          type="submit"
-          size="icon"
-          disabled={agent.busy || !message.trim()}
-          aria-label="Send message"
-        >
-          <Send className="size-4" />
-        </Button>
+        {agent.busy ? (
+          <Button
+            type="button"
+            size="icon"
+            variant="secondary"
+            onClick={agent.stop}
+            aria-label="Stop the answer"
+          >
+            <Square className="size-3.5 fill-current" />
+          </Button>
+        ) : (
+          <Button
+            type="submit"
+            size="icon"
+            disabled={!message.trim()}
+            aria-label="Send message"
+          >
+            <Send className="size-4" />
+          </Button>
+        )}
       </div>
       <p className="mt-2 text-[11px] text-muted-foreground">
         CSV, TXT, MD, DOCX or text PDF · 2 MB max · Keep passwords and API keys

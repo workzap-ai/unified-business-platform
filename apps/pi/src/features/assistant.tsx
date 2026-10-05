@@ -89,9 +89,23 @@ function useAssistant() {
     session.data?.business?.id,
     session.data?.user.id,
   );
-  const [activeId, setActiveId] = React.useState<string | null>(null);
+  // undefined until the person picks a chat or starts a new one
+  const [chosen, setChosen] = React.useState<string | null | undefined>(
+    undefined,
+  );
   const [busy, setBusy] = React.useState(false);
   const controller = React.useRef<AbortController | null>(null);
+  // After a reload the latest chat reopens if it was used in the last 12 hours.
+  const latest = threads.reduce<(typeof threads)[number] | null>(
+    (best, t) => (!best || t.updatedAt > best.updatedAt ? t : best),
+    null,
+  );
+  const activeId =
+    chosen !== undefined
+      ? chosen
+      : latest && Date.now() - latest.updatedAt < 43_200_000
+        ? latest.id
+        : null;
   const active = threads.find((t) => t.id === activeId) ?? null;
 
   const patchTurn = React.useCallback(
@@ -138,7 +152,7 @@ function useAssistant() {
               ...all,
             ],
       );
-      setActiveId(threadId);
+      setChosen(threadId);
       setBusy(true);
       const abort = new AbortController();
       controller.current = abort;
@@ -221,24 +235,24 @@ function useAssistant() {
     [],
   );
   const startNew = React.useCallback(() => {
-    if (!busy) setActiveId(null);
+    if (!busy) setChosen(null);
   }, [busy]);
   const open = React.useCallback(
     (id: string) => {
-      if (!busy) setActiveId(id);
+      if (!busy) setChosen(id);
     },
     [busy],
   );
   const remove = React.useCallback(
     (id: string) => {
       update((all) => all.filter((t) => t.id !== id));
-      setActiveId((current) => (current === id ? null : current));
+      if (id === activeId) setChosen(null);
     },
-    [update],
+    [activeId, update],
   );
   const clear = React.useCallback(() => {
     update(() => []);
-    setActiveId(null);
+    setChosen(null);
   }, [update]);
 
   return { threads, active, busy, send, stop, startNew, open, remove, clear };

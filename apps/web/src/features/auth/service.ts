@@ -24,6 +24,7 @@ import {
   type Session,
   type Tenant,
 } from "./types";
+import { clearAgentHistory } from "@/features/workspace-agent/agent-history";
 
 export interface AuthService {
   session(): Promise<Session>;
@@ -63,8 +64,13 @@ const live: AuthService = {
       body: { name, business_type },
       timeoutMs: 90_000,
     }),
-  logout: () => apiRequest("POST", "/auth/logout", null),
-  logoutAll: () => apiRequest("POST", "/auth/logout-all", null),
+  // Agent Beta chats are kept per person in this browser; sign-out removes them.
+  logout: () =>
+    apiRequest<void>("POST", "/auth/logout", null).finally(clearAgentHistory),
+  logoutAll: () =>
+    apiRequest<void>("POST", "/auth/logout-all", null).finally(
+      clearAgentHistory,
+    ),
   selectWorkspace: (tenant_id, environment_id) =>
     apiRequest("PUT", "/auth/session/workspace", sessionSchema, {
       body: { tenant_id, environment_id: environment_id ?? null },
