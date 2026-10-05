@@ -29,6 +29,8 @@ export const ORGANIZATION = {
   name: "Workzap",
   url: SITE_URL,
   logo: `${SITE_URL}/workzap-brand/workzap-logo.svg`,
+  // The same company in the public knowledge graph.
+  sameAs: ["https://www.wikidata.org/wiki/Q141644273"],
   description:
     "Workzap makes nori, a daily read for the shop, and pi, a WhatsApp agent.",
   contactPoint: {

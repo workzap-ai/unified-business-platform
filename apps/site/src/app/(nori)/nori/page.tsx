@@ -26,6 +26,7 @@ export default function Page() {
           operatingSystem: "Web",
           inLanguage: "en",
           publisher: { "@id": ORG_ID },
+          sameAs: ["https://www.wikidata.org/wiki/Q141644274"],
         }}
       />
       <JsonLd

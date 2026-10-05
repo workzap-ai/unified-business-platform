@@ -43,6 +43,7 @@ export default function PiLanding() {
           operatingSystem: "WhatsApp",
           inLanguage: "en",
           publisher: { "@id": ORG_ID },
+          sameAs: ["https://www.wikidata.org/wiki/Q141644275"],
         }}
       />
       <section className="pi-hero">
