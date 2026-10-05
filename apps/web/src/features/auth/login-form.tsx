@@ -22,6 +22,7 @@ import { isDemo } from "@/lib/data-mode";
 import { useSession } from "./session-provider";
 import { authService } from "./service";
 import { FaceCamera } from "./face-camera";
+import { probeFace } from "./passkey";
 import { passkeyError, passkeysAvailable, unlockName } from "./passkey";
 import type { SecondStep } from "./types";
 
@@ -212,8 +213,9 @@ function SecondStepForm({
 }) {
   const hasFace = step.methods.includes("face");
   const hasFingerprint = step.methods.includes("fingerprint");
+  // The phone's own lock first (one touch, like banking apps); the camera otherwise.
   const [mode, setMode] = useState<"face" | "fingerprint">(
-    hasFace ? "face" : "fingerprint",
+    hasFingerprint ? "fingerprint" : "face",
   );
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -267,6 +269,7 @@ function SecondStepForm({
       <div className="mt-6">
         {mode === "face" ? (
           <FaceCamera
+            probe={(frame) => probeFace(step.ticket, frame)}
             autoStart
             action="Check my face"
             onFrames={async (frames) => {
@@ -307,7 +310,9 @@ function SecondStepForm({
               setMode(mode === "face" ? "fingerprint" : "face");
             }}
           >
-            {mode === "face" ? `Use ${unlock} instead` : "Use my face instead"}
+            {mode === "face"
+              ? `Use your phone lock (${unlock}) instead`
+              : "Use the camera face check instead"}
           </button>
         </p>
       ) : null}

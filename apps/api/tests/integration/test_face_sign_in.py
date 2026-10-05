@@ -323,3 +323,117 @@ async def test_sign_in_still_works_before_the_face_migrations_run(api, business_
     assert "mfa_required" not in signed_in.json()
     assert (await browser.get("/api/v1/auth/session")).status_code == 200
     await browser.aclose()
+
+
+async def test_live_guidance_probe_needs_a_ticket_and_finds_the_face(api):
+    me = await register(api)
+    started = (await api.post("/api/v1/auth/faces/start", json={"password": PASSWORD})).json()
+    nobody = await api.post(
+        "/api/v1/auth/face/probe", json={"ticket": "x" * 32, "frame": frames()[0]}
+    )
+    assert nobody.status_code == 422  # no sign-in, add-a-face or enrollment going on
+    seen = (
+        await api.post(
+            "/api/v1/auth/face/probe", json={"ticket": started["ticket"], "frame": frames()[0]}
+        )
+    ).json()
+    assert seen["faces"] == 1 and 0.2 < seen["size"] < 0.6 and abs(seen["x"]) < 0.2
+    empty = (
+        await api.post(
+            "/api/v1/auth/face/probe",
+            json={"ticket": started["ticket"], "frame": frames("no-face.jpg")[0]},
+        )
+    ).json()
+    assert empty == {"faces": 0}
+    assert me
+
+
+async def test_enrollment_link_adds_someone_elses_face_with_email_and_password_only(api):
+    me = await register(api)
+    made = await api.post("/api/v1/auth/enroll-links")
+    assert made.status_code == 201, made.text
+    link = made.json()["link"]
+    token = link.rsplit("/", 1)[1]
+    assert link.startswith("http") and "/enroll/" in link
+
+    phone = _browser(api)  # the other person's phone: not signed in
+    wrong = await phone.post(
+        "/api/v1/auth/enroll/start",
+        json={"token": token, "email": me["user"]["email"], "password": "not-it"},
+    )
+    assert wrong.status_code == 403
+    other = _browser(api)
+    stranger = await register(other)  # a real account, but not this link's
+    mismatch = await phone.post(
+        "/api/v1/auth/enroll/start",
+        json={"token": token, "email": stranger["user"]["email"], "password": PASSWORD},
+    )
+    assert mismatch.status_code == 403
+    started = await phone.post(
+        "/api/v1/auth/enroll/start",
+        json={"token": token, "email": me["user"]["email"], "password": PASSWORD},
+    )
+    assert started.status_code == 200, started.text
+    ticket = started.json()["ticket"]
+    assert started.json()["faces_left"] == 3
+    again = await phone.post(
+        "/api/v1/auth/enroll/start",
+        json={"token": token, "email": me["user"]["email"], "password": PASSWORD},
+    )
+    assert again.status_code == 422  # the link works once
+    assert (await phone.get("/api/v1/auth/session")).status_code == 401  # never a sign-in
+    probe = await phone.post(
+        "/api/v1/auth/face/probe", json={"ticket": ticket, "frame": frames()[0]}
+    )
+    assert probe.json()["faces"] == 1
+    added = await phone.post(
+        "/api/v1/auth/enroll/face", json={"ticket": ticket, "name": "Sara", "frames": frames()}
+    )
+    assert added.status_code == 201, added.text
+    assert [f["name"] for f in (await api.get("/api/v1/auth/faces")).json()["faces"]] == ["Sara"]
+    reused = await phone.post(
+        "/api/v1/auth/enroll/face", json={"ticket": ticket, "frames": frames()}
+    )
+    assert reused.status_code == 422
+    for c in (phone, other):
+        await c.aclose()
+
+
+async def test_enrollment_link_can_add_a_phone_lock_and_it_is_the_devices_own(api):
+    me = await register(api)
+    own = (
+        await api.post("/api/v1/auth/passkeys/register/options", json={"password": PASSWORD})
+    ).json()
+    assert own["authenticatorSelection"]["authenticatorAttachment"] == "platform"
+    token = (await api.post("/api/v1/auth/enroll-links")).json()["link"].rsplit("/", 1)[1]
+    phone = _browser(api)
+    ticket = (
+        await phone.post(
+            "/api/v1/auth/enroll/start",
+            json={"token": token, "email": me["user"]["email"], "password": PASSWORD},
+        )
+    ).json()["ticket"]
+    options = (
+        await phone.post("/api/v1/auth/enroll/fingerprint/options", json={"ticket": ticket})
+    ).json()
+    assert options["authenticatorSelection"]["authenticatorAttachment"] == "platform"
+    device = Authenticator()
+    added = await phone.post(
+        "/api/v1/auth/enroll/fingerprint",
+        json={"ticket": ticket, "name": "Sara's phone", "credential": device.create(options)},
+    )
+    assert added.status_code == 201, added.text
+    # Now the password plus that phone's lock signs in to this account.
+    browser = _browser(api)
+    step = await _password(browser, me["user"]["email"])
+    assert step["methods"] == ["fingerprint"]
+    challenge = (
+        await browser.post("/api/v1/auth/mfa/fingerprint/options", json={"ticket": step["ticket"]})
+    ).json()["options"]
+    signed_in = await browser.post(
+        "/api/v1/auth/mfa/fingerprint",
+        json={"ticket": step["ticket"], "credential": device.get(challenge)},
+    )
+    assert signed_in.status_code == 200, signed_in.text
+    for c in (phone, browser):
+        await c.aclose()

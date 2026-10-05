@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button, Card, CardSection, Notice } from "@/components/ui";
-import { FaceCamera } from "@/features/face-camera";
+import { FaceCamera, type FaceProbe } from "@/features/face-camera";
 import { ApiError, errorText } from "@/lib/api";
 import {
   customerDelete,
@@ -37,6 +37,10 @@ export interface CustomerSecondStep {
 
 const KEY = ["pi-customer", "security"] as const;
 
+/** Live camera guidance during a sign-in or while adding a face. */
+const probe = (ticket: string, frame: string) =>
+  customerPost<FaceProbe>("/face/probe", { ticket, frame });
+
 function useUnlock(): { ok: boolean; name: string } {
   const [state, setState] = useState({ ok: false, name: "fingerprint" });
   useEffect(() => {
@@ -59,7 +63,8 @@ export function CustomerSecondStepForm({
   const hasFace = step.methods.includes("face");
   const hasFingerprint = step.methods.includes("fingerprint");
   const [mode, setMode] = useState<"face" | "fingerprint">(
-    hasFace ? "face" : "fingerprint",
+    // The phone's own lock first (one touch, like banking apps); the camera otherwise.
+    hasFingerprint ? "fingerprint" : "face",
   );
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -102,6 +107,7 @@ export function CustomerSecondStepForm({
       </div>
       {mode === "face" ? (
         <FaceCamera
+          probe={(frame) => probe(step.ticket, frame)}
           autoStart
           action="Check my face"
           onFrames={async (frames) => {
@@ -144,8 +150,8 @@ export function CustomerSecondStepForm({
             }}
           >
             {mode === "face"
-              ? `Use ${unlock.name} instead`
-              : "Use my face instead"}
+              ? `Use your phone lock (${unlock.name}) instead`
+              : "Use the camera face check instead"}
           </button>
         </p>
       ) : null}
@@ -218,11 +224,12 @@ export function CustomerSecurityCard() {
       <CardSection className="space-y-3">
         <div>
           <h2 className="flex items-center gap-2 font-semibold">
-            <ScanFace className="size-4 text-accent" aria-hidden /> Face ID
+            <ScanFace className="size-4 text-accent" aria-hidden /> Lock your
+            chats
           </h2>
           <p className="text-sm text-muted-foreground">
-            After your WhatsApp code, check your face too, so only you can open
-            your chats.
+            After your WhatsApp code, also ask for this phone&apos;s fingerprint
+            or face unlock (recommended), or a camera face check.
           </p>
         </div>
         {error ? <Notice tone="danger">{error}</Notice> : null}
@@ -234,7 +241,8 @@ export function CustomerSecurityCard() {
         ) : null}
         {scanning ? (
           <FaceCamera
-            action="Scan and save"
+            probe={(frame) => probe(scanning, frame)}
+            action="Start face scan"
             onFrames={async (frames) => {
               try {
                 await customerPost("/faces", { ticket: scanning, frames });
@@ -281,24 +289,24 @@ export function CustomerSecurityCard() {
         ) : null}
         {view && !scanning ? (
           <div className="flex flex-col gap-2">
-            <Button
-              onClick={() => void startFace()}
-              disabled={!view.fresh || view.faces.length >= view.max}
-            >
-              <ScanFace className="size-4" aria-hidden /> Add a face (
-              {view.faces.length}/{view.max})
-            </Button>
             {unlock.ok ? (
               <Button
-                variant="secondary"
                 loading={busy}
                 disabled={!view.fresh}
                 onClick={() => void addFingerprint()}
               >
-                <Fingerprint className="size-4" aria-hidden /> Add {unlock.name}{" "}
-                (optional)
+                <Fingerprint className="size-4" aria-hidden /> Use this
+                phone&apos;s {unlock.name}
               </Button>
             ) : null}
+            <Button
+              variant={unlock.ok ? "secondary" : "primary"}
+              onClick={() => void startFace()}
+              disabled={!view.fresh || view.faces.length >= view.max}
+            >
+              <ScanFace className="size-4" aria-hidden /> Add a camera face (
+              {view.faces.length}/{view.max})
+            </Button>
             <p className="text-xs text-muted-foreground">
               Only an encrypted face code is kept, never a photo.
             </p>

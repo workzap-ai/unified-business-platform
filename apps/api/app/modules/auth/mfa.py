@@ -49,13 +49,17 @@ from app.modules.auth.passkeys import (
     _store,
     check_login,
     credential_id_of,
+    device_name,
+    finish_registration,
     origin_for,
+    start_registration,
     take_login,
+    transports_of,
 )
 from app.modules.auth.routes import Session, session_view, set_cookies
 from app.modules.auth.service import AuthService
 from app.modules.users.models import PlatformUser
-from app.shared.errors import BusinessRuleViolation, ResourceNotFound
+from app.shared.errors import BusinessRuleViolation, ResourceNotFound, Unauthenticated
 
 logger = logging.getLogger("platform")
 # The lock columns are deferred on the model; load them where this step needs them.
@@ -288,6 +292,83 @@ async def _mine(session: AsyncSession, user_id: UUID, face_id: UUID) -> UserFace
     return found
 
 
+# ---- Live camera guidance and enrollment links ---------------------------------------
+
+ENROLL_LINK_SECONDS = 30 * 60
+ENROLL_SECONDS = 10 * 60
+
+
+class Probe(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    ticket: str = Field(min_length=16, max_length=64)
+    frame: str = Field(min_length=10, max_length=700_000)
+
+
+class EnrollStart(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    token: str = Field(min_length=16, max_length=64)
+    email: str = Field(min_length=3, max_length=254)
+    password: str = Field(min_length=1, max_length=256)
+
+
+class EnrollFace(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    ticket: str = Field(min_length=16, max_length=64)
+    name: str = Field("", max_length=80)
+    frames: list[str] = Field(min_length=face.FRAMES, max_length=face.FRAMES)
+
+
+class EnrollFingerprint(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    ticket: str = Field(min_length=16, max_length=64)
+    name: str = Field("", max_length=80)
+    credential: dict[str, Any]
+
+
+async def _any_ticket(request: Request, ticket: str) -> bool:
+    """The camera guidance only runs inside a sign-in, an add-a-face or an enrollment."""
+    store = _store(request)
+    for prefix in ("mfa", "face-add", "enroll"):
+        if await store.get(f"{prefix}:{ticket}") is not None:
+            return True
+    return False
+
+
+async def _save_face(
+    session: AsyncSession,
+    crypto: CredentialManager,
+    user_id: UUID,
+    found: list[face.FaceFrame],
+    name: str,
+    via: str,
+) -> UserFace:
+    count = int(
+        await session.scalar(
+            select(func.count()).select_from(UserFace).where(UserFace.user_id == user_id)
+        )
+        or 0
+    )
+    if count >= MAX_FACES:
+        raise BusinessRuleViolation("TOO_MANY_FACES", f"You can save up to {MAX_FACES} faces.")
+    saved = UserFace(
+        user_id=user_id,
+        name=(name.strip() or f"Face {count + 1}")[:80],
+        code_encrypted=crypto.encrypt(face.pack(face.face_code(found))),
+    )
+    session.add(saved)
+    await session.flush()
+    await record(
+        session,
+        "auth.face_added",
+        actor_user_id=user_id,
+        entity_type="user_face",
+        entity_id=saved.id,
+        details={"via": via},
+        include_environment=False,
+    )
+    return saved
+
+
 def second_step_router(audience: Audience, site: Site) -> APIRouter:
     """The second step and face management for one app (Owner OS or the pi app). Both
     mount it at /auth under their own prefix, so each uses its own session cookie."""
@@ -479,6 +560,173 @@ def second_step_router(audience: Audience, site: Site) -> APIRouter:
         )
         await session.commit()
         return Response(status_code=204)
+
+    @router.post("/face/probe")
+    async def face_probe(data: Probe, request: Request) -> dict[str, Any]:
+        """Is the face in view, how big and where: lets the camera screen guide the
+        person ("move closer", "move back") and take the pictures at the right moment."""
+        if not await hit(request, "face-probe", client_ip(request), 240, 60):
+            raise HTTPException(status_code=429)
+        if not await _any_ticket(request, data.ticket):
+            raise BusinessRuleViolation("SIGN_IN_EXPIRED", "That took too long. Start again.")
+        try:
+            frame = face.decode_frame(data.frame)
+        except face.FaceError as error:
+            raise BusinessRuleViolation(error.code, error.message) from None
+        return await asyncio.to_thread(face.probe, frame)
+
+    @router.post("/enroll-links", status_code=201)
+    async def create_enroll_link(request: Request, auth: Auth, session: Session) -> dict[str, Any]:
+        """A one-time link (30 minutes) to add a face or a phone lock from another person's
+        phone. Only someone already signed in (both steps) can make one; whoever opens it
+        must still enter this account's email and password."""
+        if not await hit(request, "enroll-link", str(auth.user.id), 10, 3600):
+            raise HTTPException(status_code=429)
+        token = secrets.token_urlsafe(24)
+        await _store(request).put(
+            f"enroll-link:{token}", {"user": str(auth.user.id)}, ENROLL_LINK_SECONDS
+        )
+        await record(
+            session,
+            "auth.enroll_link_created",
+            actor_user_id=auth.user.id,
+            entity_type="user",
+            entity_id=auth.user.id,
+            details={"audience": audience},
+            include_environment=False,
+        )
+        await session.commit()
+        settings = request.app.state.settings
+        base = settings.pi_app_public_url if audience == "pi" else settings.web_public_url
+        origin = request.headers.get("origin", "").rstrip("/")
+        if origin and origin in {o.rstrip("/") for o in site.origins(settings)}:
+            base = origin  # the same address the person is using now
+        return {
+            "link": f"{base}/enroll/{token}",
+            "expires_in": ENROLL_LINK_SECONDS,
+        }
+
+    @router.post("/enroll/start")
+    async def start_enroll(data: EnrollStart, request: Request, session: Session) -> dict[str, Any]:
+        """The link page: only the account's email and password, then the next step."""
+        settings = request.app.state.settings
+        limit = settings.rate_limit_login_per_minute
+        if not await hit(request, "login-ip", client_ip(request), limit, 60):
+            raise HTTPException(status_code=429)
+        store = _store(request)
+        link = await store.get(f"enroll-link:{data.token}")
+        if link is None:
+            raise BusinessRuleViolation(
+                "ENROLL_LINK_INVALID",
+                "This link has expired or was already used. Ask for a new one.",
+            )
+        try:
+            user = await AuthService(session, settings).check_password(
+                data.email.strip().lower(), data.password
+            )
+        except Unauthenticated:
+            await session.commit()  # wrong tries still count towards the password lock
+            raise BusinessRuleViolation(
+                "PASSWORD_INCORRECT", "That email and password don't match this link.", 403
+            ) from None
+        if str(user.id) != link.get("user"):
+            await session.commit()
+            raise BusinessRuleViolation(
+                "PASSWORD_INCORRECT", "That email and password don't match this link.", 403
+            )
+        await store.delete(f"enroll-link:{data.token}")  # one use only
+        ticket = secrets.token_urlsafe(24)
+        await store.put(f"enroll:{ticket}", {"user": str(user.id)}, ENROLL_SECONDS)
+        faces_saved = int(
+            await session.scalar(
+                select(func.count()).select_from(UserFace).where(UserFace.user_id == user.id)
+            )
+            or 0
+        )
+        await session.commit()
+        return {
+            "ticket": ticket,
+            "name": user.display_name,
+            "faces_left": max(0, MAX_FACES - faces_saved),
+            "frames": face.FRAMES,
+        }
+
+    async def _enroll_user(request: Request, ticket: str) -> UUID:
+        found = await _store(request).get(f"enroll:{ticket}")
+        if found is None:
+            raise BusinessRuleViolation(
+                "ENROLL_LINK_INVALID", "That took too long. Ask for a new link."
+            )
+        return UUID(found["user"])
+
+    @router.post("/enroll/face", status_code=201)
+    async def enroll_face(data: EnrollFace, request: Request, session: Session) -> dict[str, Any]:
+        user_id = await _enroll_user(request, data.ticket)
+        crypto = _crypto(request)
+        found = await _read(data.frames)
+        saved = await _save_face(session, crypto, user_id, found, data.name, "link")
+        await _store(request).delete(f"enroll:{data.ticket}")
+        await session.commit()
+        return _view(saved)
+
+    @router.post("/enroll/fingerprint/options")
+    async def enroll_fingerprint_options(
+        data: TicketOnly, request: Request, session: Session
+    ) -> dict[str, Any]:
+        user_id = await _enroll_user(request, data.ticket)
+        user = await session.get(PlatformUser, user_id)
+        if user is None:
+            raise BusinessRuleViolation("ENROLL_LINK_INVALID", "Ask for a new link.")
+        existing = list(
+            await session.scalars(
+                select(UserPasskey.credential_id).where(UserPasskey.user_id == user_id)
+            )
+        )
+        return await start_registration(
+            request,
+            site,
+            f"enroll:{user_id}",
+            user_handle=user_id.bytes,
+            user_name=user.email,
+            display_name=user.display_name,
+            existing=existing,
+        )
+
+    @router.post("/enroll/fingerprint", status_code=201)
+    async def enroll_fingerprint(
+        data: EnrollFingerprint, request: Request, session: Session
+    ) -> dict[str, Any]:
+        user_id = await _enroll_user(request, data.ticket)
+        verified = await finish_registration(request, site, f"enroll:{user_id}", data.credential)
+        credential_id = bytes_to_base64url(verified.credential_id)
+        if await session.scalar(
+            select(UserPasskey.id).where(UserPasskey.credential_id == credential_id)
+        ):
+            raise BusinessRuleViolation("PASSKEY_EXISTS", "This phone lock is already added")
+        passkey = UserPasskey(
+            user_id=user_id,
+            credential_id=credential_id,
+            public_key=verified.credential_public_key,
+            sign_count=verified.sign_count,
+            name=(data.name.strip() or device_name(request.headers.get("user-agent", "")))[:80],
+            transports=transports_of(data.credential),
+            backed_up=bool(verified.credential_backed_up),
+            rp_id=origin_for(request, site)[1],
+        )
+        session.add(passkey)
+        await session.flush()
+        await record(
+            session,
+            "auth.passkey_added",
+            actor_user_id=user_id,
+            entity_type="user_passkey",
+            entity_id=passkey.id,
+            details={"via": "link", "audience": audience},
+            include_environment=False,
+        )
+        await _store(request).delete(f"enroll:{data.ticket}")
+        await session.commit()
+        return {"id": passkey.id, "name": passkey.name}
 
     return router
 

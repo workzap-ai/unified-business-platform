@@ -6,7 +6,17 @@
  * to three faces (with your own password) and an optional fingerprint lock.
  */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Fingerprint, Lock, ScanFace, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Copy,
+  Fingerprint,
+  Link2,
+  Lock,
+  MessageCircle,
+  ScanFace,
+  Trash2,
+  Users,
+} from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
@@ -21,7 +31,7 @@ import {
   Input,
   Notice,
 } from "@/components/ui";
-import { FaceCamera } from "@/features/face-camera";
+import { FaceCamera, type FaceProbe } from "@/features/face-camera";
 import { ApiError, del, errorText, get, post } from "@/lib/api";
 import {
   addPasskey,
@@ -73,7 +83,8 @@ export function SecondStepForm({
   const hasFace = step.methods.includes("face");
   const hasFingerprint = step.methods.includes("fingerprint");
   const [mode, setMode] = React.useState<"face" | "fingerprint">(
-    hasFace ? "face" : "fingerprint",
+    // The phone's own lock first (one touch, like banking apps); the camera otherwise.
+    hasFingerprint ? "fingerprint" : "face",
   );
   const [error, setError] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
@@ -121,6 +132,7 @@ export function SecondStepForm({
       <div className="mt-5">
         {mode === "face" ? (
           <FaceCamera
+            probe={(frame) => probeFace(step.ticket, frame)}
             autoStart
             action="Check my face"
             onFrames={async (frames) => {
@@ -162,7 +174,9 @@ export function SecondStepForm({
               setMode(mode === "face" ? "fingerprint" : "face");
             }}
           >
-            {mode === "face" ? `Use ${unlock} instead` : "Use my face instead"}
+            {mode === "face"
+              ? `Use your phone lock (${unlock}) instead`
+              : "Use the camera face check instead"}
           </button>
         </p>
       ) : null}
@@ -181,8 +195,9 @@ interface SavedFace {
 export function SignInSecurity() {
   return (
     <div className="space-y-4">
-      <FacesCard />
       <FingerprintCard />
+      <FacesCard />
+      <EnrollLinkCard />
     </div>
   );
 }
@@ -202,10 +217,11 @@ function FacesCard() {
   return (
     <Card>
       <CardSection>
-        <h2 className="font-semibold">Face ID</h2>
+        <h2 className="font-semibold">Camera face check</h2>
         <p className="text-sm text-muted-foreground">
-          After your password, pi checks your face on the camera. Save up to 3
-          faces (for example with and without glasses).
+          For phones and computers without a fingerprint: after your password,
+          the camera checks your face live. Save up to 3 faces (yours, with
+          glasses, or a colleague&apos;s).
         </p>
         <div className="mt-4 space-y-3">
           {faces.isError ? (
@@ -335,7 +351,8 @@ function AddFaceDialog({
       >
         {ticket ? (
           <FaceCamera
-            action="Scan and save"
+            probe={(frame) => probeFace(ticket, frame)}
+            action="Start face scan"
             onFrames={async (frames) => {
               try {
                 await post("/auth/faces", {
@@ -445,11 +462,12 @@ function FingerprintCard() {
     <Card>
       <CardSection>
         <h2 className="flex items-center gap-2 font-semibold">
-          <Lock className="size-4" aria-hidden /> Fingerprint lock (optional)
+          <Lock className="size-4" aria-hidden /> Phone lock (recommended)
         </h2>
         <p className="text-sm text-muted-foreground">
-          Use this device&apos;s fingerprint (or Windows Hello / Touch ID) as
-          the check after your password, instead of your face.
+          After your password, unlock with the fingerprint or face unlock
+          already set up on this phone (Face ID, Touch ID, Windows Hello). One
+          touch, like banking apps.
         </p>
         <div className="mt-4 space-y-3">
           {!supported ? (
@@ -544,6 +562,95 @@ function FingerprintCard() {
           </div>
         </DialogContent>
       </Dialog>
+    </Card>
+  );
+}
+
+/** Live camera guidance during a sign-in, an add-a-face or an enrollment link. */
+export function probeFace(ticket: string, frame: string) {
+  return post<FaceProbe>("/auth/face/probe", { ticket, frame });
+}
+
+/** A one-time link for someone else (or another phone) to add a face or phone lock. */
+function EnrollLinkCard() {
+  const [link, setLink] = React.useState<string | null>(null);
+  const [busy, setBusy] = React.useState(false);
+  async function create() {
+    setBusy(true);
+    try {
+      setLink((await post<{ link: string }>("/auth/enroll-links")).link);
+    } catch (e) {
+      toast.error(errorText(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+  const message = link
+    ? `Open this link to add your face or phone lock to our pi account (works once, for 30 minutes): ${link}`
+    : "";
+  return (
+    <Card>
+      <CardSection className="space-y-3">
+        <div>
+          <h2 className="flex items-center gap-2 font-semibold">
+            <Users className="size-4" aria-hidden /> Add someone else, or
+            another phone
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Make a one-time link. Whoever opens it enters this account&apos;s
+            email and password, then scans their face or uses their phone&apos;s
+            fingerprint.
+          </p>
+        </div>
+        {link ? (
+          <>
+            <div className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-surface-muted px-3 py-2">
+              <Link2
+                className="size-4 shrink-0 text-muted-foreground"
+                aria-hidden
+              />
+              <code className="min-w-0 flex-1 truncate text-xs">{link}</code>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  void navigator.clipboard
+                    .writeText(link)
+                    .then(() => toast.success("Link copied"))
+                }
+              >
+                <Copy className="size-4" aria-hidden /> Copy link
+              </Button>
+              <Button variant="secondary" asChild>
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(message)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <MessageCircle className="size-4" aria-hidden /> Share on
+                  WhatsApp
+                </a>
+              </Button>
+              <Button
+                variant="ghost"
+                loading={busy}
+                onClick={() => void create()}
+              >
+                New link
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Works once and for 30 minutes. Only share it with someone you
+              trust: they will be able to sign in to this account.
+            </p>
+          </>
+        ) : (
+          <Button loading={busy} onClick={() => void create()}>
+            <Users className="size-4" aria-hidden /> Make a link
+          </Button>
+        )}
+      </CardSection>
     </Card>
   );
 }

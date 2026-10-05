@@ -77,8 +77,8 @@ export function PasskeysCard() {
   return (
     <Card>
       <CardHeader
-        title="Fingerprint lock (optional)"
-        description="Use this device's fingerprint (or Windows Hello / Touch ID) as the check after your password, instead of your face."
+        title="Phone lock (recommended)"
+        description="After your password, unlock with the fingerprint or face unlock already set up on this phone (Face ID, Touch ID, Windows Hello). One touch, like banking apps."
       />
       <CardBody className="space-y-3">
         {isDemo ? (
@@ -125,18 +125,19 @@ export function PasskeysCard() {
           </ul>
         ) : list.isSuccess ? (
           <p className="text-[13px] text-muted-foreground">
-            No fingerprint added. Optional: add one on each phone or computer
-            you use.
+            Not added yet. Add it on each phone or computer you use.
           </p>
         ) : null}
         {support.browser && !isDemo ? (
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <Button onClick={() => setAdding(true)}>
+            <Button onClick={() => setAdding(true)} disabled={!support.unlock}>
               <ScanFace aria-hidden />
-              {support.unlock ? `Add ${support.name}` : "Add a security key"}
+              {support.unlock
+                ? `Use this phone's ${support.name}`
+                : "This device has no fingerprint or face unlock"}
             </Button>
             <p className="text-xs text-muted-foreground">
-              Your fingerprint stays on this device; Owner OS only keeps a
+              Your fingerprint or face stays on the phone; Owner OS only keeps a
               public key.
             </p>
           </div>
@@ -151,7 +152,7 @@ export function PasskeysCard() {
       <ConfirmDialog
         open={Boolean(removing)}
         onOpenChange={(v) => (!v ? setRemoving(null) : undefined)}
-        title={`Remove ${removing?.name ?? "this fingerprint"}?`}
+        title={`Remove ${removing?.name ?? "this phone lock"}?`}
         description="It won't be offered after your password any more. You can add it again later."
         confirmLabel="Remove"
         destructive
@@ -217,7 +218,7 @@ function AddPasskeyDialog({
       <DialogContent>
         <DialogHeader
           title={`Add ${unlock}`}
-          description="Confirm your own password, then your device will ask for your fingerprint."
+          description="Confirm your own password, then the phone asks for its fingerprint or face unlock."
         />
         <DialogBody className="space-y-3">
           {error ? <InlineError message={error} /> : null}

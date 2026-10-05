@@ -295,6 +295,31 @@ async def sign_in_with_fingerprint(
     return await _success(request, response, session, lock, data.ticket, phone, "fingerprint")
 
 
+class Probe(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    ticket: str = Field(min_length=16, max_length=64)
+    frame: str = Field(min_length=10, max_length=700_000)
+
+
+@router.post("/face/probe")
+async def face_probe(data: Probe, request: Request) -> dict[str, Any]:
+    """Live camera guidance (is the face in view, how big, where) during a sign-in or
+    while adding a face. Nothing is recognised or kept."""
+    if not await hit(request, "customer-face-probe", client_ip(request), 240, 60):
+        raise HTTPException(status_code=429)
+    store = _store(request)
+    if (
+        await store.get(f"customer-mfa:{data.ticket}") is None
+        and await store.get(f"customer-face-add:{data.ticket}") is None
+    ):
+        raise BusinessRuleViolation("SIGN_IN_EXPIRED", "That took too long. Start again.")
+    try:
+        frame = face.decode_frame(data.frame)
+    except face.FaceError as error:
+        raise BusinessRuleViolation(error.code, error.message) from None
+    return await asyncio.to_thread(face.probe, frame)
+
+
 # ---- Saved faces (a fresh sign-in needed to add one) ---------------------------------
 
 

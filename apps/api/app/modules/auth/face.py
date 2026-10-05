@@ -96,6 +96,38 @@ class _Engine:
 ENGINE = _Engine()
 
 
+def probe(data: bytes) -> dict[str, object]:
+    """Live guidance for the camera screen (no recognition, nothing stored): is there one
+    face, how big is it in the picture (0-1 of the width) and how far from the centre."""
+    if not data or len(data) > MAX_FRAME_BYTES:
+        return {"faces": 0}
+    image = cv2.imdecode(np.frombuffer(data, dtype=np.uint8), cv2.IMREAD_COLOR)
+    if image is None:
+        return {"faces": 0}
+    height, width = image.shape[:2]
+    with ENGINE._lock:
+        detector, _ = ENGINE._load()
+        detector.setInputSize((width, height))
+        _, faces = detector.detect(image)
+    if faces is None or len(faces) == 0:
+        return {"faces": 0}
+    face = faces[0]
+    return {
+        "faces": int(len(faces)),
+        "size": round(float(face[2]) / width, 3),
+        "x": round(float(face[0] + face[2] / 2) / width - 0.5, 3),
+        "y": round(float(face[1] + face[3] / 2) / height - 0.5, 3),
+    }
+
+
+def decode_frame(item: str) -> bytes:
+    raw = item.split(",", 1)[1] if item.startswith("data:") else item
+    try:
+        return base64.b64decode(raw, validate=True)
+    except ValueError:
+        raise FaceError("FACE_FRAME_INVALID", "The camera picture couldn't be read.") from None
+
+
 def decode_frames(frames: list[str]) -> list[bytes]:
     if len(frames) != FRAMES:
         raise FaceError("FACE_FRAMES", "Please try again.")

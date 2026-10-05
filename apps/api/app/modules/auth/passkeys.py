@@ -44,6 +44,7 @@ from webauthn.helpers.exceptions import (
     InvalidRegistrationResponse,
 )
 from webauthn.helpers.structs import (
+    AuthenticatorAttachment,
     AuthenticatorSelectionCriteria,
     PublicKeyCredentialDescriptor,
     ResidentKeyRequirement,
@@ -151,6 +152,9 @@ async def start_registration(
         user_name=user_name,
         user_display_name=display_name,
         authenticator_selection=AuthenticatorSelectionCriteria(
+            # The phone's or laptop's own lock (fingerprint, face unlock, Face ID,
+            # Windows Hello), like banking apps: not a separate key or another phone.
+            authenticator_attachment=AuthenticatorAttachment.PLATFORM,
             resident_key=ResidentKeyRequirement.REQUIRED,
             user_verification=UserVerificationRequirement.REQUIRED,
         ),

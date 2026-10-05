@@ -170,3 +170,21 @@ async def test_optional_fingerprint_after_the_code(app):
     assert (await browser.get(f"{PORTAL}/me")).status_code == 200
     for c in (customer, browser):
         await c.aclose()
+
+
+async def test_live_guidance_for_customers_needs_their_ticket(app):
+    customer = _signed_in(app, "15550007105")
+    started = (await customer.post(f"{PORTAL}/faces/start")).json()
+    browser = _client(app)
+    refused = await browser.post(
+        f"{PORTAL}/face/probe", json={"ticket": "y" * 32, "frame": frames()[0]}
+    )
+    assert refused.status_code == 422
+    seen = (
+        await browser.post(
+            f"{PORTAL}/face/probe", json={"ticket": started["ticket"], "frame": frames()[0]}
+        )
+    ).json()
+    assert seen["faces"] == 1
+    for c in (customer, browser):
+        await c.aclose()

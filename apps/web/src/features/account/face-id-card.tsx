@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/overlays";
 import { useSession } from "@/features/auth/session-provider";
 import { FaceCamera } from "@/features/auth/face-camera";
+import { probeFace } from "@/features/auth/passkey";
 import { isDemo } from "@/lib/data-mode";
 import { ApiError, apiRequest, errorMessage } from "@/services/api-client";
 
@@ -61,8 +62,8 @@ export function FaceIdCard() {
   return (
     <Card>
       <CardHeader
-        title="Face ID"
-        description="After your password, Owner OS checks your face on the camera. Save up to 3 faces (for example with and without glasses)."
+        title="Camera face check"
+        description="For phones and computers without a fingerprint: after your password, the camera checks your face live. Save up to 3 faces (yours, with glasses, or a colleague's)."
       />
       <CardBody className="space-y-3">
         {isDemo ? (
@@ -216,7 +217,8 @@ function AddFaceDialog({
         <DialogBody className="space-y-3">
           {ticket ? (
             <FaceCamera
-              action="Scan and save"
+              probe={(frame) => probeFace(ticket, frame)}
+              action="Start face scan"
               onFrames={async (frames) => {
                 try {
                   await apiRequest("POST", "/auth/faces", null, {

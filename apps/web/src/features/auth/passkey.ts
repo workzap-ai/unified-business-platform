@@ -7,6 +7,7 @@
  * leaves the device.
  */
 import { apiRequest } from "@/services/api-client";
+import type { FaceProbe } from "./face-camera";
 
 type Json = Record<string, unknown>;
 
@@ -191,4 +192,31 @@ export async function fingerprintStep<T>(
   })) as PublicKeyCredential | null;
   if (!credential) throw new DOMException("Cancelled", "NotAllowedError");
   return verify({ ticket, credential: assertionJson(credential) });
+}
+
+/** Live camera guidance during a sign-in, an add-a-face or an enrollment (ticket). */
+export function probeFace(ticket: string, frame: string) {
+  return apiRequest<FaceProbe>("POST", "/auth/face/probe", null, {
+    body: { ticket, frame },
+  });
+}
+
+/** Enrollment link: this phone's own lock (fingerprint / Face ID) for that account. */
+export async function enrollPhoneLock(ticket: string, name: string) {
+  const options = await apiRequest<Json>(
+    "POST",
+    "/auth/enroll/fingerprint/options",
+    null,
+    { body: { ticket } },
+  );
+  const credential = (await navigator.credentials.create({
+    publicKey: creationOptions(options),
+  })) as PublicKeyCredential | null;
+  if (!credential) throw new DOMException("Cancelled", "NotAllowedError");
+  return apiRequest<{ id: string; name: string }>(
+    "POST",
+    "/auth/enroll/fingerprint",
+    null,
+    { body: { ticket, name, credential: registrationJson(credential) } },
+  );
 }

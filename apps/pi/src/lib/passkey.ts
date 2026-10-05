@@ -46,7 +46,7 @@ export function unlockName(): string {
   if (/iphone|ipad/.test(ua)) return "Face ID / Touch ID";
   if (ua.includes("macintosh")) return "Touch ID";
   if (ua.includes("windows")) return "Windows Hello";
-  if (ua.includes("android")) return "fingerprint";
+  if (ua.includes("android")) return "fingerprint or face unlock";
   return "fingerprint";
 }
 
@@ -158,4 +158,44 @@ export async function fingerprintStep<T>(
       clientExtensionResults: credential.getClientExtensionResults(),
     },
   });
+}
+
+/** Has the device create a passkey from server options; returns it for the server. */
+export async function createCredential(o: Json): Promise<Json> {
+  const user = o.user as Json;
+  const credential = (await navigator.credentials.create({
+    publicKey: {
+      ...(o as unknown as PublicKeyCredentialCreationOptions),
+      challenge: toBytes(String(o.challenge)),
+      user: {
+        id: toBytes(String(user.id)),
+        name: String(user.name),
+        displayName: String(user.displayName),
+      },
+      excludeCredentials: descriptors(o.excludeCredentials),
+    },
+  })) as PublicKeyCredential | null;
+  if (!credential) throw new DOMException("Cancelled", "NotAllowedError");
+  const response = credential.response as AuthenticatorAttestationResponse;
+  return {
+    id: credential.id,
+    rawId: toText(credential.rawId),
+    type: credential.type,
+    response: {
+      clientDataJSON: toText(response.clientDataJSON),
+      attestationObject: toText(response.attestationObject),
+      transports: response.getTransports?.() ?? [],
+    },
+    clientExtensionResults: credential.getClientExtensionResults(),
+  };
+}
+
+/** True when this device has its own fingerprint, face unlock or Windows Hello. */
+export async function deviceUnlockAvailable(): Promise<boolean> {
+  if (!passkeysAvailable()) return false;
+  try {
+    return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  } catch {
+    return false;
+  }
 }

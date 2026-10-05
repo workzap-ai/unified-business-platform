@@ -173,12 +173,18 @@ export function apiGet<T>(
   return apiRequest("GET", path, schema, { signal });
 }
 
+const SIGN_IN_CODES =
+  /^(SECOND_STEP_|PASSWORD_INCORRECT|FACE_|SIGN_IN_|TOO_MANY_FACES|NO_FINGERPRINT|PASSKEY_|ENROLL_LINK_)/;
+
 /** Operator-safe message: fixed server messages for business rules, generic otherwise. */
 export function errorMessage(
   error: unknown,
   fallback = "Something went wrong. Please try again.",
 ) {
   if (error instanceof ApiError) {
+    // Sign-in steps explain themselves ("4 tries left", "locked for 15 minutes").
+    if (error.serverMessage && SIGN_IN_CODES.test(error.code))
+      return error.serverMessage;
     if (error.code === "NETWORK_UNAVAILABLE")
       return "We couldn’t connect to the service. Check your connection and try again.";
     if (error.code === "REQUEST_TIMEOUT")
