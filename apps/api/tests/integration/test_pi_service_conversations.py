@@ -41,10 +41,16 @@ def mock_turns(monkeypatch, *turns):
     replies = iter(turns)
     contexts = []
 
+    last: list = []
+
     async def complete(self, scope, output, **kwargs):
         assert scope is not None and kwargs["purpose"] == "pi_service"
+        if kwargs["messages"][-1].text().startswith("Don't send that draft"):
+            # pi's self-check asked for a rewrite: these tests script one reply per turn.
+            return SimpleNamespace(value=last[-1], response=SimpleNamespace(attempts=[]))
         contexts.append(kwargs["messages"][-1].text())
         value = next(replies)
+        last.append(value)
         if isinstance(value, Exception):
             raise value
         return SimpleNamespace(value=value, response=SimpleNamespace(attempts=[]))
@@ -507,4 +513,38 @@ async def test_reply_sees_the_whole_conversation_and_matching_knowledge(
     assert ("customer", "text") in kinds and ("ai", "text") in kinds
     assert all(len(h["at"]) == 16 for h in second["history"])
     assert second["hours_since_previous_message"] is not None
+    await pi.close()
+
+
+async def test_unknown_answers_reach_the_team_and_a_frustrated_customer_gets_a_person(
+    api, business_db, monkeypatch
+):
+    gap = "Do you design packaging?"
+    mock_turns(
+        monkeypatch,
+        turn(reply="Team is par confirm karke yahin batayegi.", knowledge_gaps=[gap]),
+        turn(reply="Maazrat, team confirm karegi.", knowledge_gaps=[gap], mood="frustrated"),
+        turn(reply="Maazrat, team ka banda abhi baat karega.", mood="frustrated"),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("Packaging design bhi karte ho?", "gap-1")
+    await pi.deliver_all()
+    await pi.process("bataya nahi abhi tak", "gap-2")
+    await pi.deliver_all()
+    conversation = await pi.conversation()
+    assert conversation.service_brief["knowledge_gaps"] == [gap]  # asked twice, kept once
+    assert conversation.service_brief["mood"] == "frustrated"
+    assert conversation.mode != "human"  # one frustrated message is answered by pi
+    gaps = await business_db.scalar(
+        select(func.count())
+        .select_from(Notification)
+        .where(
+            Notification.kind == "pi.knowledge_gap",
+            Notification.tenant_id == conversation.tenant_id,
+        )
+    )
+    assert gaps == 1
+    await pi.process("ye kya mazaak hai", "gap-3")
+    await pi.deliver_all()
+    assert (await pi.conversation()).mode == "human"  # still upset: a person takes over
     await pi.close()
