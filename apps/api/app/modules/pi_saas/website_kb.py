@@ -20,6 +20,7 @@ from datetime import UTC, datetime
 from html.parser import HTMLParser
 from typing import Any
 from urllib.parse import urljoin, urlsplit, urlunsplit
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -326,6 +327,80 @@ async def structure(manager: Any, scope: WorkspaceScope, page: dict[str, Any]) -
         return title, text
 
 
+async def read_website(
+    scope: WorkspaceScope, outbound: Any, manager: Any, data: CrawlInput
+) -> dict[str, Any]:
+    """Crawl and extract: one {url, title, content} per page, nothing saved."""
+    result = await crawl(outbound, data.url, data.max_pages)
+    limit = asyncio.Semaphore(3)
+
+    async def one(page: dict[str, Any]) -> tuple[str, str]:
+        async with limit:
+            return await structure(manager, scope, page)
+
+    entries = await asyncio.gather(*(one(p) for p in result["pages"]))
+    return {
+        "site": result["site"],
+        "pages": [
+            {"url": page["url"], "title": title or result["site"], "content": content[:20_000]}
+            for page, (title, content) in zip(result["pages"], entries, strict=True)
+        ],
+        "skipped": result["skipped"],
+    }
+
+
+class SavedPage(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    url: str = Field(min_length=10, max_length=400)
+    title: str = Field(min_length=1, max_length=200)
+    content: str = Field(min_length=1, max_length=20_000)
+
+
+class SaveInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    source_id: UUID
+    pages: list[SavedPage] = Field(min_length=1, max_length=MAX_PAGES + 1)
+
+
+async def save_pages(
+    session: AsyncSession, scope: WorkspaceScope, data: SaveInput, max_bytes: int
+) -> list[Any]:
+    """Each reviewed page becomes a document in the chosen source; a page saved again
+    replaces its earlier version (matched by its "Source: <url>" first line)."""
+    from app.modules.pi.knowledge import DocumentInput, KnowledgeService
+    from app.modules.pi.models import KnowledgeDocument
+    from app.shared.workspace_repository import WorkspaceRepository
+
+    knowledge = KnowledgeService(session, scope)
+    await knowledge.sources.get(data.source_id)
+    documents = []
+    for page in data.pages:
+        if urlsplit(page.url).scheme != "https":
+            raise BusinessRuleViolation("INVALID_URL", "Pages must come from an https:// website")
+        header = f"Source: {page.url}\n\n"
+        for old in await session.scalars(
+            WorkspaceRepository(session, KnowledgeDocument, scope)
+            .select()
+            .where(
+                KnowledgeDocument.source_id == data.source_id,
+                KnowledgeDocument.body.startswith(header, autoescape=True),
+            )
+        ):
+            await knowledge.delete_document(old.id)
+        documents.append(
+            await knowledge.ingest(
+                DocumentInput(
+                    source_id=data.source_id,
+                    title=page.title,
+                    body=header + page.content,
+                    mime_type="text/markdown",
+                ),
+                max_bytes,
+            )
+        )
+    return documents
+
+
 async def learn_website(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -335,17 +410,11 @@ async def learn_website(
 ) -> dict[str, Any]:
     """Crawl, extract and draft. Returns the drafts (one per page) and what was skipped."""
     scope.require("pi.knowledge.manage")
-    result = await crawl(outbound, data.url, data.max_pages)
-    limit = asyncio.Semaphore(3)
-
-    async def one(page: dict[str, Any]) -> tuple[str, str]:
-        async with limit:
-            return await structure(manager, scope, page)
-
-    entries = await asyncio.gather(*(one(p) for p in result["pages"]))
+    result = await read_website(scope, outbound, manager, data)
     today = f"{datetime.now(UTC):%Y-%m-%d}"
     drafts: list[PiKnowledgeDraft] = []
-    for page, (title, content) in zip(result["pages"], entries, strict=True):
+    for page in result["pages"]:
+        title, content = page["title"], page["content"]
         drafts.append(
             await teach.create_draft(
                 session,

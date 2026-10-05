@@ -7,12 +7,14 @@ from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.manager import LLMManager
 from app.ai.types import Attempt, Message
 from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.models import CatalogProduct
+from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
 from app.modules.pi import price_policy
 from app.modules.pi.guard import ReplyRejected, validate_reply
@@ -29,6 +31,7 @@ from app.modules.pi.tools.registry import ToolRegistry
 from app.modules.products.service import enabled_products
 from app.modules.sales.service import SalesService
 from app.modules.tenants.models import Tenant
+from app.modules.users.models import PlatformUser
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
 
@@ -117,6 +120,9 @@ class ServiceTurn(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
     _attempts: list[Attempt] = PrivateAttr(default_factory=list)
+    # Filled FIRST (field order guides the model): what the customer wants right now and
+    # who the message is for. Internal; it makes the reply answer the actual request.
+    understanding: str = Field(default="", max_length=600)
     reply: str = Field(min_length=1, max_length=4000)
     language: str = Field(default="en", pattern=LANGUAGE)
     summary: str = Field(min_length=1, max_length=4000)
@@ -206,6 +212,18 @@ Reply style (pi brand: steady, plain, honest; WhatsApp, easy to read):
   each). Use *bold* (single asterisks) only for the one thing they must act on.
   Never use Markdown headings, tables, links in brackets or **double asterisks**.
 Use recent history and the brief; never ask again for something already answered.
+Understanding (fill the "understanding" field FIRST, in English, one or two sentences):
+what the customer wants RIGHT NOW, in their own terms; who the latest message is for
+(pi, or a named person in team_members); and what has already been said or asked. Then
+write the reply so it serves exactly that.
+- history items carry "kind" (text, audio = voice note transcript, image or video =
+  description of what was sent) and "at"; "hours_since_previous_message" tells you when
+  a conversation resumes after a break. A greeting is only for a new conversation.
+- team_members are the company's people; a message that names one of them is meant for
+  them (see the rule above).
+- approved_knowledge holds the passages that matched this conversation. Use only what
+  answers the customer's request; never introduce other products or services from it,
+  and never treat it as a script.
 Understand what the customer wants, intended audience, features/scope, existing assets,
 their preferred timeline and (optionally) THEIR budget. Never push for a budget.
 NEVER quote, estimate, suggest, repeat or promise a service price, rate, discount,
@@ -311,7 +329,8 @@ async def prepare_context(
             .where(
                 PiMessage.conversation_id == conversation.id,
                 PiMessage.id != message.id,
-                PiMessage.status.in_(["processed", "sent", "delivered", "read"]),
+                # "queued": pi's own reply that is still being sent is part of the chat.
+                PiMessage.status.in_(["processed", "queued", "sent", "delivered", "read"]),
             )
             .order_by(PiMessage.created_at.desc(), PiMessage.id.desc())
             .limit(20)
@@ -349,9 +368,27 @@ async def prepare_context(
     knowledge = []
     features = (await enabled_products(session, scope)).get("pi", set())
     if "search_knowledge_base" in tools and "knowledge" in features:
+        # Match on the conversation, not only the latest line: a short follow-up ("aur
+        # price?") still finds what the earlier messages were about.
+        recent = [m.body[:400] for m in rows if m.sender_type == "customer"][:2]
+        brief = json.dumps(conversation.service_brief or {}, ensure_ascii=False)[:300]
+        query = " ".join([message.body[:600], *recent, brief])
         knowledge = await KnowledgeService(session, scope).search(
-            message.body[:500], int(policy.knowledge_config.get("top_k", 5))
+            query, int(policy.knowledge_config.get("top_k", 5))
         )
+    # First names of the company's people, so a message addressed to one is recognised.
+    team = sorted(
+        {
+            (name or "").split()[0]
+            for name in await session.scalars(
+                select(PlatformUser.display_name)
+                .join(Membership, Membership.user_id == PlatformUser.id)
+                .where(Membership.tenant_id == scope.tenant_id, Membership.status == "active")
+                .limit(40)
+            )
+            if (name or "").strip()
+        }
+    )
     agent = await WorkspaceRepository(session, PiAgent, scope).find(PiAgent.key == "requirement")
     version = (
         await WorkspaceRepository(session, PiAgentVersion, scope).find(
@@ -410,7 +447,22 @@ async def prepare_context(
         "approved_knowledge": knowledge,
         "operator_guidance": version.instructions if version else "",
         "brief": conversation.service_brief,
-        "history": [{"role": m.sender_type, "text": m.body[:1000]} for m in reversed(rows)],
+        "history": [
+            {
+                "role": m.sender_type,
+                "kind": m.message_type,
+                "at": f"{m.created_at:%Y-%m-%d %H:%M}",
+                "text": m.body[:1500],
+            }
+            for m in reversed(rows)
+        ],
+        "hours_since_previous_message": (
+            round((message.created_at - rows[0].created_at).total_seconds() / 3600, 1)
+            if rows and message.created_at and rows[0].created_at
+            else None
+        ),
+        "latest_message_kind": message.message_type,
+        "team_members": team,
         "latest_customer_message": message.body[:4000],
         "tone": policy.response_rules.get("tone", "friendly"),
         "followups_enabled": policy.whatsapp_config.get("reminder_enabled", True),

@@ -170,3 +170,47 @@ async def test_unreachable_website_is_a_clear_error(app):
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "WEBSITE_UNREACHABLE"
     await owner.aclose()
+
+
+async def test_owner_os_previews_a_website_and_saves_chosen_pages(api, business_db):
+    from test_pi_pipeline import pi_workspace
+    from test_service_lifecycle import create
+
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    app = api._transport.app  # type: ignore[attr-defined]
+    site = Site()
+    app.state.http = httpx.AsyncClient(transport=httpx.MockTransport(site))
+    app.state.integration_resolver = public
+
+    preview = await api.post(
+        "/api/v1/pi/knowledge/website/preview",
+        json={"url": "https://lagoonhc.example", "max_pages": 6},
+    )
+    assert preview.status_code == 200, preview.text
+    pages = preview.json()["pages"]
+    assert {"About us", "Services", "FAQ", "Contact details"} <= {p["title"] for p in pages}
+    assert (await api.get("/api/v1/pi/knowledge/documents")).json() == []  # nothing saved
+
+    source = await create(api, "pi/knowledge/sources", {"name": "Website", "kind": "company_info"})
+    chosen = [p for p in pages if p["title"] in {"About us", "FAQ"}]
+    saved = await api.post(
+        "/api/v1/pi/knowledge/website/save", json={"source_id": source["id"], "pages": chosen}
+    )
+    assert saved.status_code == 201, saved.text
+    assert saved.json()["saved"] == 2
+    docs = (await api.get("/api/v1/pi/knowledge/documents")).json()
+    assert sorted(d["title"] for d in docs) == ["About us", "FAQ"]
+
+    # Saving the same page again (edited) replaces it.
+    faq = next(p for p in chosen if p["title"] == "FAQ")
+    again = await api.post(
+        "/api/v1/pi/knowledge/website/save",
+        json={"source_id": source["id"], "pages": [{**faq, "content": "We ship to Doha weekly."}]},
+    )
+    assert again.status_code == 201, again.text
+    docs = (await api.get("/api/v1/pi/knowledge/documents")).json()
+    assert len(docs) == 2
+    faq_doc = next(d for d in docs if d["title"] == "FAQ")
+    detail = (await api.get(f"/api/v1/pi/knowledge/documents/{faq_doc['id']}")).json()
+    assert "We ship to Doha weekly." in str(detail)
+    await pi.close()

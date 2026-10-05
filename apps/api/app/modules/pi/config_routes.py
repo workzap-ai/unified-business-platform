@@ -36,6 +36,7 @@ from app.modules.pi.models import (
 from app.modules.pi.schemas import BodyInput
 from app.modules.pi.service import PiService
 from app.modules.pi.tools.catalog import TOOL_CATALOG
+from app.modules.pi_saas import website_kb
 from app.shared.errors import BusinessRuleViolation
 from app.shared.workspace_repository import WorkspaceRepository
 
@@ -456,6 +457,57 @@ async def documents(
         await session.scalars(query.order_by(KnowledgeDocument.created_at.desc()).limit(100))
     )
     return [await document_view(row, scope, session) for row in rows]
+
+
+def _website_tools(request: Request) -> tuple[Any, Any]:
+    from app.ai.manager import build_llm_manager
+    from app.integrations.http import OutboundClient
+
+    state = request.app.state
+    settings = state.settings
+    ai = any(getattr(settings, f"{p}_api_key", None) for p in settings.provider_order())
+    outbound = OutboundClient(
+        settings, state.http, resolver=getattr(state, "integration_resolver", None)
+    )
+    return outbound, build_llm_manager(settings, state.http, state.sessions) if ai else None
+
+
+@router.post("/knowledge/website/preview")
+async def preview_website(
+    data: website_kb.CrawlInput, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Read a website (same site only, sitemap and links) and return each page's
+    extracted knowledge for review. Nothing is saved."""
+    import asyncio
+
+    from app.core.rate_limit import hit
+
+    await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
+    if not await hit(request, "pi-website-preview", str(scope.tenant_id), 10, 3600):
+        raise BusinessRuleViolation(
+            "RATE_LIMITED", "You've read websites a few times this hour. Try later.", 429
+        )
+    outbound, manager = _website_tools(request)
+    try:
+        async with asyncio.timeout(150):
+            return await website_kb.read_website(scope, outbound, manager, data)
+    except TimeoutError:
+        raise BusinessRuleViolation(
+            "WEBSITE_TIMEOUT", "The website took too long to read. Try fewer pages.", 503
+        ) from None
+
+
+@router.post("/knowledge/website/save", status_code=201)
+async def save_website(
+    data: website_kb.SaveInput, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Save reviewed pages as documents; re-saving a page replaces its earlier version."""
+    await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
+    rows = await website_kb.save_pages(
+        session, scope, data, request.app.state.settings.knowledge_upload_max_bytes
+    )
+    await session.commit()
+    return {"saved": len(rows), "documents": [await document_view(r, scope, session) for r in rows]}
 
 
 @router.get("/knowledge/documents/{document_id}")

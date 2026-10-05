@@ -459,3 +459,52 @@ async def test_service_uses_approved_knowledge_and_respects_tool_switch(
 
     assert json.loads(contexts[1])["approved_knowledge"] == []
     await pi.close()
+
+
+async def test_reply_sees_the_whole_conversation_and_matching_knowledge(
+    api, business_db, monkeypatch
+):
+    import json
+
+    contexts = mock_turns(
+        monkeypatch,
+        turn(understanding="Customer asks if hotel towels ship to Doha."),
+        turn(understanding="Follow-up: delivery time to Doha."),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    source = await create(api, "pi/knowledge/sources", {"name": "Website", "kind": "company_info"})
+    await create(
+        api,
+        "pi/knowledge/documents",
+        {
+            "source_id": source["id"],
+            "title": "Shipping",
+            "body": "We ship hotel towels to Doha with door delivery in 7 working days.",
+        },
+    )
+    await create(
+        api,
+        "pi/knowledge/documents",
+        {
+            "source_id": source["id"],
+            "title": "Retail AI",
+            "body": "Our retail analytics connects POS and ERP data.",
+        },
+    )
+    # A long Roman Urdu / English line: not every word is in the passage, it still matches.
+    await pi.process("Salam, kya aap hotel ke liye towels Doha bhej sakte hain?", "k-1")
+    first = json.loads(contexts[0])
+    titles = [k["title"] for k in first["approved_knowledge"]]
+    assert titles == ["Shipping"]  # the unrelated retail passage is not offered
+    assert first["latest_message_kind"] == "text"
+    assert first["team_members"] and all(" " not in n for n in first["team_members"])
+
+    # A short follow-up still finds what the conversation is about.
+    await pi.process("aur kitne din lagenge?", "k-2")
+    second = json.loads(contexts[1])
+    assert [k["title"] for k in second["approved_knowledge"]] == ["Shipping"]
+    kinds = {(h["role"], h["kind"]) for h in second["history"]}
+    assert ("customer", "text") in kinds and ("ai", "text") in kinds
+    assert all(len(h["at"]) == 16 for h in second["history"])
+    assert second["hours_since_previous_message"] is not None
+    await pi.close()

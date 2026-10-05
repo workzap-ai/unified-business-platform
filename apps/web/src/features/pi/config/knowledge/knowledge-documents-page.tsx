@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { FileText, Plus, Upload } from "lucide-react";
+import { FileText, Globe, Plus, Upload } from "lucide-react";
 import { formatDateTime, formatNumber, relativeTime } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +36,7 @@ import { EmptyState, ErrorState, Notice } from "@/components/app/states";
 import { StatusBadge } from "@/components/app/status-badge";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { useUrlState } from "@/hooks/use-url-state";
-import { piService } from "../../service";
+import { piService, type WebsitePreview } from "../../service";
 import type { KnowledgeDocument, KnowledgeSource } from "../../types";
 import { formatBytesKb, humanizeError, piKeys } from "../shared";
 import {
@@ -57,6 +57,7 @@ function Documents() {
   const params = useSearchParams();
   const [state, set, reset] = useUrlState({ source: "", status: "", q: "" });
   const [adding, setAdding] = useState(params.get("add") === "1");
+  const [fromWebsite, setFromWebsite] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const sources = useScopedQuery(piKeys.sources, () => piService.sources());
   const documents = useScopedQuery(
@@ -147,12 +148,21 @@ function Documents() {
       <PageHeader
         {...KNOWLEDGE_HEADER}
         actions={
-          <Button
-            onClick={() => setAdding(true)}
-            disabled={!sources.data?.length}
-          >
-            <Plus /> Add document
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => setFromWebsite(true)}
+              disabled={!sources.data?.length}
+            >
+              <Globe /> From website
+            </Button>
+            <Button
+              onClick={() => setAdding(true)}
+              disabled={!sources.data?.length}
+            >
+              <Plus /> Add document
+            </Button>
+          </div>
         }
       />
       <KnowledgeNav />
@@ -217,6 +227,14 @@ function Documents() {
           />
         }
       />
+      {sources.data && (
+        <WebsiteDialog
+          open={fromWebsite}
+          onOpenChange={setFromWebsite}
+          sources={sources.data}
+          defaultSource={state.source}
+        />
+      )}
       {sources.data && (
         <AddDocumentDialog
           open={adding}
@@ -322,6 +340,213 @@ const schema = z.object({
   mime_type: z.enum(["text/plain", "text/markdown"]),
 });
 type Values = z.infer<typeof schema>;
+
+/** Read a website, review each extracted page, save the chosen ones as documents. */
+function WebsiteDialog({
+  open,
+  onOpenChange,
+  sources,
+  defaultSource,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  sources: KnowledgeSource[];
+  defaultSource: string;
+}) {
+  const activeSources = sources.filter((s) => s.status === "active");
+  const [url, setUrl] = useState("https://");
+  const [pages, setPages] = useState("12");
+  const [sourceId, setSourceId] = useState(
+    defaultSource || activeSources[0]?.id || "",
+  );
+  const [result, setResult] = useState<WebsitePreview | null>(null);
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const read = useScopedMutation(
+    () => piService.previewWebsite({ url, max_pages: Number(pages) }),
+    {
+      success: (r) =>
+        `Read ${r.pages.length} ${r.pages.length === 1 ? "page" : "pages"} from ${r.site}`,
+      onSuccess: (r) => {
+        setResult(r);
+        setPicked(new Set(r.pages.map((p) => p.url)));
+      },
+    },
+  );
+  const save = useScopedMutation(
+    () =>
+      piService.saveWebsitePages({
+        source_id: sourceId,
+        pages: (result?.pages ?? []).filter((p) => picked.has(p.url)),
+      }),
+    {
+      invalidate: [
+        [...piKeys.documents],
+        [...piKeys.sources],
+        [...piKeys.overview],
+      ],
+      success: (r) =>
+        `Saved ${r.saved} ${r.saved === 1 ? "page" : "pages"} as documents`,
+      onSuccess: () => {
+        setResult(null);
+        onOpenChange(false);
+      },
+    },
+  );
+  const toggle = (key: string) =>
+    setPicked((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent size="lg">
+        <DialogHeader
+          title="Learn from a website"
+          description="PI reads the site (same website only: sitemap and links, most useful pages first), leaves out menus and footers, and extracts each page. Review, then save the pages you want."
+        />
+        <DialogBody className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+            <FormField label="Website address" htmlFor="website-url">
+              <Input
+                id="website-url"
+                type="url"
+                inputMode="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://yourbusiness.com"
+              />
+            </FormField>
+            <FormField label="Pages" htmlFor="website-pages">
+              <NativeSelect
+                id="website-pages"
+                value={pages}
+                onChange={(e) => setPages(e.target.value)}
+              >
+                <option value="1">Just this page</option>
+                <option value="6">Up to 6</option>
+                <option value="12">Up to 12</option>
+                <option value="20">Up to 20</option>
+                <option value="30">Up to 30</option>
+              </NativeSelect>
+            </FormField>
+          </div>
+          <Button
+            variant="secondary"
+            loading={read.isPending}
+            disabled={!/^https:\/\/[^/\s]+\.[^\s]+/.test(url)}
+            onClick={() => read.mutate(undefined)}
+          >
+            <Globe /> {read.isPending ? "Reading the website…" : "Read website"}
+          </Button>
+          {read.isPending && (
+            <p className="text-xs text-muted-foreground" role="status">
+              This can take a minute for bigger websites.
+            </p>
+          )}
+          {result && (
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                <span>
+                  {result.pages.length}{" "}
+                  {result.pages.length === 1 ? "page" : "pages"} from{" "}
+                  <span className="font-medium">{result.site}</span> ·{" "}
+                  {picked.size} selected
+                </span>
+                <button
+                  type="button"
+                  className="text-xs text-primary underline"
+                  onClick={() =>
+                    setPicked(
+                      picked.size === result.pages.length
+                        ? new Set()
+                        : new Set(result.pages.map((p) => p.url)),
+                    )
+                  }
+                >
+                  {picked.size === result.pages.length
+                    ? "Select none"
+                    : "Select all"}
+                </button>
+              </div>
+              <ul className="max-h-80 space-y-2 overflow-y-auto pr-1">
+                {result.pages.map((p) => (
+                  <li
+                    key={p.url}
+                    className="rounded-lg border border-border p-3 text-sm"
+                  >
+                    <label className="flex items-start gap-2">
+                      <input
+                        type="checkbox"
+                        className="mt-1"
+                        checked={picked.has(p.url)}
+                        onChange={() => toggle(p.url)}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-medium">{p.title}</span>
+                        <span className="block truncate text-xs text-primary">
+                          {p.url}
+                        </span>
+                      </span>
+                    </label>
+                    <details className="mt-1 pl-6">
+                      <summary className="cursor-pointer text-xs text-muted-foreground">
+                        Preview
+                      </summary>
+                      <pre className="mt-1 max-h-48 overflow-auto whitespace-pre-wrap rounded bg-surface-muted p-2 text-xs">
+                        {p.content}
+                      </pre>
+                    </details>
+                  </li>
+                ))}
+              </ul>
+              {result.skipped.length > 0 && (
+                <details className="text-xs text-muted-foreground">
+                  <summary className="cursor-pointer">
+                    {result.skipped.length} skipped
+                  </summary>
+                  <ul className="mt-1 space-y-0.5">
+                    {result.skipped.map((s) => (
+                      <li key={s.url} className="break-all">
+                        {s.url} · {s.reason}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+              <FormField label="Save to source" htmlFor="website-source">
+                <NativeSelect
+                  id="website-source"
+                  value={sourceId}
+                  onChange={(e) => setSourceId(e.target.value)}
+                >
+                  {activeSources.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </FormField>
+            </div>
+          )}
+        </DialogBody>
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            loading={save.isPending}
+            disabled={!result || !picked.size || !sourceId}
+            onClick={() => save.mutate(undefined)}
+          >
+            Save {picked.size || ""} {picked.size === 1 ? "page" : "pages"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 function AddDocumentDialog({
   open,

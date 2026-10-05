@@ -1,4 +1,5 @@
 import hashlib
+import re
 from datetime import UTC, datetime
 from uuid import UUID
 
@@ -12,6 +13,28 @@ from app.modules.pi.models import KnowledgeChunk, KnowledgeDocument, KnowledgeSo
 from app.shared.errors import BusinessRuleViolation
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
+
+STOP_WORDS = frozenset(
+    """the and for you your are was were with this that from have has had not but can will
+    what when where which who how why our out all any about into than then them they their
+    there here just also very more most some such only own same too does did doing would
+    could should please thanks thank hello dear okay yes kya hai hain hy hai hun hoon tha
+    thi the aur bhi koi kuch yeh woh wo yeh isko usko iska uska mujhe hum aap ap apna
+    apni mera meri mere tum tera teri kar karo kro karna karein krna raha rahi rahe ke ki
+    ko se mein mai main par pe ne nahi nhi na ji acha achha theek thik bas abhi""".split()
+)
+
+
+def search_terms(text: str, limit: int = 16) -> str:
+    """A to_tsquery expression: up to `limit` distinct words, OR-ed, each as a prefix.
+    Only letters and digits survive, so the expression is always valid."""
+    seen: list[str] = []
+    for word in re.findall(r"[^\W_]{3,}", text.lower()):
+        if word not in STOP_WORDS and word not in seen:
+            seen.append(word)
+        if len(seen) >= limit:
+            break
+    return " | ".join(f"{w}:*" for w in seen)
 
 
 class DocumentInput(BaseModel):
@@ -185,8 +208,17 @@ class KnowledgeService:
         )
 
     async def search(self, query: str, limit: int = 5) -> list[dict[str, str]]:
+        """Passages that share meaningful words with the query, best match first.
+
+        Any word may match (a long voice-note transcript or a Roman Urdu message rarely
+        contains every word of a passage), word prefixes count ("towel" finds "towels"),
+        and common English and Roman Urdu filler words are ignored. Passages matching
+        more of the words rank higher."""
         self.scope.require("pi.read")
-        terms = func.websearch_to_tsquery("simple", query[:500])
+        expression = search_terms(query)
+        if not expression:
+            return []
+        terms = func.to_tsquery("simple", expression)
         statement = (
             select(KnowledgeChunk.content, KnowledgeDocument.title, KnowledgeSource.name)
             .join(KnowledgeDocument, KnowledgeDocument.id == KnowledgeChunk.document_id)

@@ -158,6 +158,16 @@ export interface PiService {
     mime_type: string;
   }): Promise<KnowledgeDocument>;
   retryDocument(id: string): Promise<KnowledgeDocument>;
+  /** Read a website (same site only) and return each page's extracted knowledge. */
+  previewWebsite(input: {
+    url: string;
+    max_pages: number;
+  }): Promise<WebsitePreview>;
+  /** Save reviewed pages as documents; a page saved again replaces its old version. */
+  saveWebsitePages(input: {
+    source_id: string;
+    pages: WebsitePage[];
+  }): Promise<{ saved: number }>;
   analytics(range: AnalyticsRange): Promise<PiAnalytics>;
   settings(): Promise<PiSettings>;
   updateSettings<K extends keyof PiSettings>(
@@ -169,6 +179,13 @@ export interface PiService {
 /* Live: every method calls the PI API (see ./live.ts). States that need a connected
    WhatsApp number or AI providers (delivery, automated replies) come from the backend as
    explicit statuses and error codes; nothing is simulated in live mode. */
+export type WebsitePage = { url: string; title: string; content: string };
+export type WebsitePreview = {
+  site: string;
+  pages: WebsitePage[];
+  skipped: { url: string; reason: string }[];
+};
+
 const live = piLive;
 
 /* Demo --------------------------------------------------------------------------------- */
@@ -856,6 +873,12 @@ const demo: PiService = {
     const d = demoPi().documents.find((x) => x.id === id);
     if (!d) throw new ApiError(404, "RESOURCE_NOT_FOUND");
     return { ...d };
+  },
+  async previewWebsite() {
+    throw new DemoError("Reading a website needs a live workspace.");
+  },
+  async saveWebsitePages() {
+    throw new DemoError("Saving website pages needs a live workspace.");
   },
   async addDocument(input) {
     await demoDelay(400);
