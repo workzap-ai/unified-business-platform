@@ -25,10 +25,13 @@ import {
   type Tenant,
 } from "./types";
 import { clearAgentHistory } from "@/features/workspace-agent/agent-history";
+import { passkeySignIn } from "./passkey";
 
 export interface AuthService {
   session(): Promise<Session>;
   login(input: LoginInput): Promise<Session>;
+  /** Face ID / Touch ID / Windows Hello / fingerprint, via a passkey. */
+  loginWithPasskey(): Promise<Session>;
   register(input: RegisterInput): Promise<Session>;
   createWorkspace(
     name: string,
@@ -101,6 +104,12 @@ const live: AuthService = {
     apiRequest("POST", "/auth/accept-invite", sessionSchema, {
       body: { token, new_password },
     }).then(bindSession),
+  loginWithPasskey: () =>
+    passkeySignIn((body) =>
+      apiRequest("POST", "/auth/passkeys/login/verify", sessionSchema, {
+        body,
+      }),
+    ).then(bindSession),
 };
 
 function bindSession(session: Session): Session {
@@ -190,6 +199,10 @@ const demo: AuthService = {
   },
   async resendVerification() {
     await demoDelay(200);
+  },
+  async loginWithPasskey() {
+    await demoDelay(200);
+    throw new DemoError("Passkeys need a live API connection.");
   },
   async acceptInvite() {
     await demoDelay(300);

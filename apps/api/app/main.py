@@ -20,6 +20,7 @@ from app.health import router
 from app.integrations.http_errors import install_integration_handlers
 from app.modules.access.routes import router as access_router
 from app.modules.audit.routes import router as audit_router
+from app.modules.auth.passkeys import router as passkeys_router
 from app.modules.auth.routes import router as auth_router
 from app.modules.billing.routes import router as billing_router
 from app.modules.business_settings.routes import router as business_settings_router
@@ -111,6 +112,7 @@ ROUTERS = [
     workflows_router,
     router,
     auth_router,
+    passkeys_router,
     tenant_router,
     organization_router,
     environments_router,

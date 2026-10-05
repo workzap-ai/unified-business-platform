@@ -18,6 +18,7 @@ type SessionContextValue = {
   canAny: (...permissions: string[]) => boolean;
   scopeKey: readonly [string, string, string];
   login: (input: LoginInput) => Promise<Session>;
+  loginWithPasskey: () => Promise<Session>;
   register: (input: RegisterInput) => Promise<Session>;
   logout: () => Promise<void>;
   switchWorkspace: (tenantId: string, environmentId?: string) => Promise<void>;
@@ -82,6 +83,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       await adopt(next);
       return next;
     },
+    loginWithPasskey: async () => {
+      const next = await authService.loginWithPasskey();
+      await adopt(next);
+      return next;
+    },
     register: async (input) => {
       const next = await authService.register(input);
       await adopt(next);
@@ -92,9 +98,13 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         await authService.logout();
       } finally {
         await purgeWorkspaceData();
-        client.removeQueries();
-        client.setQueryData(SESSION_KEY, undefined);
-        await client.invalidateQueries({ queryKey: SESSION_KEY });
+        client.removeQueries({
+          predicate: (q) => q.queryKey[0] !== SESSION_KEY[0],
+        });
+        // Reset (not just invalidate) so the signed-out state is fetched fresh; a
+        // removed or undefined-set session query kept showing the old session, and
+        // /login bounced straight back into the app.
+        await client.resetQueries({ queryKey: SESSION_KEY });
       }
     },
     switchWorkspace: async (tenantId, environmentId) => {

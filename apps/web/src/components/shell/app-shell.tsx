@@ -20,6 +20,7 @@ import { QuickCreate, UserMenu } from "./user-menu";
 import { EnvironmentSwitcher } from "./workspace-switcher";
 import { useAdminAccess } from "@/features/operator/admin-access";
 import { WorkspaceAgentProvider } from "@/features/workspace-agent/workspace-agent";
+import { InstallPrompt } from "@/features/pwa/pwa";
 
 const COLLAPSE_KEY = "platform.sidebar.collapsed";
 
@@ -78,6 +79,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <UserMenu />
             </header>
             <main id="main">{children}</main>
+            <InstallPrompt />
           </BreadcrumbProvider>
         </CommandMenuProvider>
       );
@@ -180,6 +182,7 @@ function ShellFrame({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+      <InstallPrompt />
     </div>
   );
 }

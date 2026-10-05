@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, FlaskConical } from "lucide-react";
+import { Eye, EyeOff, FlaskConical, ScanFace } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/app/forms";
@@ -14,6 +14,7 @@ import { InlineError, Notice } from "@/components/app/states";
 import { ApiError, errorMessage } from "@/services/api-client";
 import { isDemo } from "@/lib/data-mode";
 import { useSession } from "./session-provider";
+import { passkeyError, passkeysAvailable, unlockName } from "./passkey";
 
 const schema = z.object({
   email: z
@@ -33,7 +34,12 @@ function safeNext(value: string | null) {
 }
 
 export function LoginForm() {
-  const { login, status } = useSession();
+  const { login, loginWithPasskey, status } = useSession();
+  const [passkey, setPasskey] = useState<{ ok: boolean; name: string }>({
+    ok: false,
+    name: "Face ID",
+  });
+  const [usingPasskey, setUsingPasskey] = useState(false);
   const router = useRouter();
   const params = useSearchParams();
   const next = safeNext(params.get("next"));
@@ -51,6 +57,34 @@ export function LoginForm() {
   useEffect(() => {
     if (status === "ready") router.replace(next);
   }, [status, router, next]);
+
+  useEffect(() => {
+    // Read the browser's capabilities after mount so server and client HTML match.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time capability probe
+    setPasskey({ ok: !isDemo && passkeysAvailable(), name: unlockName() });
+  }, []);
+
+  async function signInWithPasskey() {
+    setError(null);
+    setUsingPasskey(true);
+    try {
+      await loginWithPasskey();
+      router.replace(next);
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setError(
+          e.status === 401
+            ? "That passkey isn't linked to an active account. Sign in with your password, then add it in Account & security."
+            : errorMessage(e, "Sign-in failed. Please try again."),
+        );
+      } else {
+        const message = passkeyError(e);
+        if (message) setError(message);
+      }
+    } finally {
+      setUsingPasskey(false);
+    }
+  }
 
   async function onSubmit(values: Values) {
     setError(null);
@@ -145,6 +179,29 @@ export function LoginForm() {
           Sign in
         </Button>
       </form>
+      {passkey.ok && (
+        <>
+          <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="h-px flex-1 bg-border" />
+            or
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="lg"
+            className="w-full"
+            loading={usingPasskey}
+            onClick={() => void signInWithPasskey()}
+          >
+            <ScanFace aria-hidden /> Sign in with {passkey.name}
+          </Button>
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Uses a passkey on this device. Your face or fingerprint never leaves
+            it.
+          </p>
+        </>
+      )}
       <p className="mt-6 text-center text-sm text-muted-foreground">
         New here?{" "}
         <Link

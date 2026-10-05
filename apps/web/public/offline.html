@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#1c6653" />
+    <title>You're offline · Owner OS</title>
+    <style>
+      :root {
+        --bg: #f5f6f3;
+        --fg: #15201c;
+        --muted: #66736d;
+        --accent: #1c6653;
+        --accent-fg: #ffffff;
+        --surface: #ffffff;
+        --border: #e1e5e0;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0c1512;
+          --fg: #e6ede9;
+          --muted: #8da098;
+          --accent: #3aa283;
+          --accent-fg: #04120d;
+          --surface: #121d19;
+          --border: #22322d;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--bg);
+        color: var(--fg);
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+      }
+      main {
+        width: 100%;
+        max-width: 380px;
+        padding: 32px 24px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface);
+        text-align: center;
+      }
+      img {
+        width: 64px;
+        height: 64px;
+      }
+      h1 {
+        margin: 16px 0 8px;
+        font-size: 20px;
+        letter-spacing: -0.01em;
+      }
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.55;
+        font-size: 15px;
+      }
+      button {
+        margin-top: 24px;
+        width: 100%;
+        min-height: 44px;
+        border: 0;
+        border-radius: 10px;
+        background: var(--accent);
+        color: var(--accent-fg);
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .hint {
+        margin-top: 12px;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/icons/owner-os.svg" alt="" />
+      <h1>You're offline</h1>
+      <p>
+        Owner OS needs the internet to show your workspace. Your data is safe;
+        we'll reconnect as soon as you're back online.
+      </p>
+      <button type="button" onclick="location.reload()">Try again</button>
+      <p class="hint">
+        This page reloads by itself when the connection returns.
+      </p>
+    </main>
+    <script>
+      window.addEventListener("online", () => location.reload());
+    </script>
+  </body>
+</html>

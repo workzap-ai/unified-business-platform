@@ -1,7 +1,18 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Integer, String, Uuid
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    LargeBinary,
+    String,
+    Uuid,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -90,3 +101,20 @@ class AuthSession(Record, Base):
     )
     active_environment_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     active_branch_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+
+
+class UserPasskey(Record, Base):
+    """A passkey (WebAuthn credential): Face ID, Touch ID, Windows Hello, an Android
+    fingerprint or a security key. The face or fingerprint never leaves the device;
+    only the credential's public key is stored here."""
+
+    __tablename__ = "user_passkeys"
+    __table_args__ = (Index("ix_user_passkeys_user", "user_id"),)
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("platform_users.id", ondelete="CASCADE"))
+    credential_id: Mapped[str] = mapped_column(String(1400), unique=True)  # base64url
+    public_key: Mapped[bytes] = mapped_column(LargeBinary)
+    sign_count: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    name: Mapped[str] = mapped_column(String(80))
+    transports: Mapped[str] = mapped_column(String(120), default="", server_default="")
+    backed_up: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
