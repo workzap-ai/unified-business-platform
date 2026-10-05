@@ -20,6 +20,7 @@ from app.health import router
 from app.integrations.http_errors import install_integration_handlers
 from app.modules.access.routes import router as access_router
 from app.modules.audit.routes import router as audit_router
+from app.modules.auth.mfa import pi_router as pi_mfa_router
 from app.modules.auth.mfa import router as mfa_router
 from app.modules.auth.passkeys import pi_router as pi_passkeys_router
 from app.modules.auth.passkeys import router as passkeys_router
@@ -180,6 +181,7 @@ PI_APP_ROUTERS = [
     # never a business session): /customer-portal/...
     pi_customer_router,
     pi_passkeys_router,
+    pi_mfa_router,
 ]
 
 

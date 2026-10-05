@@ -246,3 +246,47 @@ async def test_people_without_a_face_or_fingerprint_sign_in_as_before(api):
     )
     assert plain.status_code == 200 and plain.json()["user"]["email"] == me["user"]["email"]
     await browser.aclose()
+
+
+async def test_pi_app_uses_the_same_two_steps_with_its_own_session(api):
+    from pi_saas_support import PASSWORD as PI_PASSWORD
+    from pi_saas_support import PI_ORIGIN, pi_client, pi_register
+
+    app = api._transport.app  # type: ignore[attr-defined]
+    client = pi_client(app)
+    view = await pi_register(client)
+    client.headers["x-csrf-token"] = client.cookies["pi_csrf"]
+    base = "/api/v1/pi-app/auth"
+    started = await client.post(f"{base}/faces/start", json={"password": PI_PASSWORD})
+    assert started.status_code == 200, started.text
+    added = await client.post(
+        f"{base}/faces", json={"ticket": started.json()["ticket"], "frames": frames()}
+    )
+    assert added.status_code == 201, added.text
+
+    browser = httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app),
+        base_url="http://testserver",
+        headers={"origin": PI_ORIGIN},
+    )
+    email = view["user"]["email"]
+    step = (
+        await browser.post(f"{base}/login", json={"email": email, "password": PI_PASSWORD})
+    ).json()
+    assert step["mfa_required"] is True and step["methods"] == ["face"]
+    assert (await browser.get(f"{base}/session")).status_code == 401
+    # A pi ticket can't finish an Owner OS sign-in.
+    owner = _browser(api)
+    crossed = await owner.post(
+        "/api/v1/auth/mfa/face", json={"ticket": step["ticket"], "frames": frames()}
+    )
+    assert crossed.status_code == 422
+    signed_in = await browser.post(
+        f"{base}/mfa/face", json={"ticket": step["ticket"], "frames": frames()}
+    )
+    assert signed_in.status_code == 200, signed_in.text
+    assert signed_in.json()["business"] is not None
+    assert "pi_session" in browser.cookies and "platform_session" not in browser.cookies
+    assert (await browser.get(f"{base}/session")).status_code == 200
+    for c in (client, browser, owner):
+        await c.aclose()

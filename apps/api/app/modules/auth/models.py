@@ -124,6 +124,8 @@ class UserPasskey(Record, Base):
     transports: Mapped[str] = mapped_column(String(120), default="", server_default="")
     backed_up: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # The website it was made on (Owner OS or the pi app); passkeys only work there.
+    rp_id: Mapped[str] = mapped_column(String(255), default="", server_default="")
 
 
 class UserFace(Record, Base):

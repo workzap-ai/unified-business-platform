@@ -281,12 +281,20 @@ async def login(
         raise HTTPException(status_code=429)
     service = AuthService(session, settings)
     try:
-        issued = await service.login(
-            data.email, data.password, request.headers.get("user-agent", ""), "pi"
-        )
+        user = await service.check_password(data.email, data.password)
     except Unauthenticated:
         await session.commit()
         raise
+    # Saved a face or a fingerprint? Then the password alone isn't enough.
+    from app.modules.auth.mfa import second_step
+
+    step = await second_step(request, session, user, "pi")
+    if step is not None:
+        await session.commit()
+        return step
+    issued = await service.finish_login(
+        user, request.headers.get("user-agent", ""), "pi", "password"
+    )
     await session.commit()
     _set_cookies(response, request, issued)
     context = await service.resolve(issued.token, "pi")

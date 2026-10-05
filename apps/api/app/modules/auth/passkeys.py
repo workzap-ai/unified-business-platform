@@ -314,10 +314,11 @@ def account_router(prefix: str, site: Site, audience: Audience, *, passwordless:
         return passkey
 
     @router.get("")
-    async def passkeys(auth: Auth, session: Session) -> list[dict[str, Any]]:
+    async def passkeys(request: Request, auth: Auth, session: Session) -> list[dict[str, Any]]:
+        rp_id = urlparse(request.headers.get("origin", "")).hostname or ""
         rows = await session.scalars(
             select(UserPasskey)
-            .where(UserPasskey.user_id == auth.user.id)
+            .where(UserPasskey.user_id == auth.user.id, UserPasskey.rp_id.in_([rp_id, ""]))
             .order_by(UserPasskey.created_at)
         )
         return [view(p) for p in rows]
@@ -369,6 +370,7 @@ def account_router(prefix: str, site: Site, audience: Audience, *, passwordless:
             name=(data.name.strip() or device_name(request.headers.get("user-agent", "")))[:80],
             transports=transports_of(data.credential),
             backed_up=bool(verified.credential_backed_up),
+            rp_id=origin_for(request, site)[1],
         )
         session.add(passkey)
         await session.flush()

@@ -88,11 +88,17 @@ export async function api<T = unknown>(
     throw new ApiError(
       response.status,
       error?.code ?? (response.status === 401 ? "UNAUTHENTICATED" : "ERROR"),
-      friendly(response.status, error?.message),
+      // Sign-in steps explain themselves (tries left, wrong password): keep their words.
+      error?.code && SIGN_IN_CODES.test(error.code) && error.message
+        ? error.message
+        : friendly(response.status, error?.message),
     );
   }
   return data as T;
 }
+
+const SIGN_IN_CODES =
+  /^(SECOND_STEP_|PASSWORD_INCORRECT|FACE_|SIGN_IN_|TOO_MANY_FACES|NO_FINGERPRINT|PASSKEY_)/;
 
 function friendly(status: number, message?: string): string {
   if (status === 401) return "Please sign in again.";

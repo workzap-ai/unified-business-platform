@@ -10,6 +10,7 @@ import {
   MessageCircle,
   Pause,
   Play,
+  ScanFace,
   ShieldCheck,
   UserPlus,
   Users,
@@ -38,6 +39,7 @@ import {
 import { BusinessReview, NotificationSettings } from "@/features/journey";
 import { WhatsAppLiveCard } from "@/features/whatsapp-live";
 import { CustomerPortalCard } from "@/features/customer/portal-setting";
+import { SignInSecurity } from "@/features/security";
 import { SetupCenter } from "@/features/setup-center";
 import { WhatsAppConnect, useAccount } from "@/features/setup";
 import { GettingPaid } from "@/features/getting-paid";
@@ -64,7 +66,19 @@ const SECTIONS = [
   { href: "/settings/payments", label: "Getting paid" },
   { href: "/settings/business", label: "Business" },
   { href: "/settings/notifications", label: "Notifications" },
+  { href: "/settings/security", label: "Sign-in & security" },
 ];
+
+export function SecuritySettingsPage() {
+  return (
+    <Shell
+      title="Sign-in & security"
+      description="After your password, pi can check your face on the camera or your fingerprint."
+    >
+      <SignInSecurity />
+    </Shell>
+  );
+}
 
 export function BusinessReviewPage() {
   return (
@@ -165,6 +179,12 @@ export function SettingsOverview() {
       icon: Building2,
       title: "Business",
       body: "Name, hours and pausing pi.",
+    },
+    {
+      href: "/settings/security",
+      icon: ScanFace,
+      title: "Sign-in & security",
+      body: "Face ID and fingerprint after your password.",
     },
   ];
   return (

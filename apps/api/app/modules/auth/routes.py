@@ -193,12 +193,12 @@ async def login(
         await session.commit()  # persist failure counters, lockout and audit
         raise
     # Saved a face or a fingerprint? Then the password alone isn't enough.
-    from app.modules.auth.mfa import methods_for, open_ticket
+    from app.modules.auth.mfa import second_step
 
-    methods = await methods_for(session, user.id)
-    if methods:
+    step = await second_step(request, session, user, "owner_os")
+    if step is not None:
         await session.commit()
-        return JSONResponse(content=await open_ticket(request, user, methods))
+        return JSONResponse(content=step)
     issued = await service.finish_login(
         user, request.headers.get("user-agent", ""), "owner_os", "password"
     )
