@@ -15,6 +15,7 @@ password first.
 
 import asyncio
 import json
+import logging
 import secrets
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -25,7 +26,9 @@ from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import undefer
 from webauthn import generate_authentication_options, options_to_json
 from webauthn.helpers import base64url_to_bytes, bytes_to_base64url
 from webauthn.helpers.structs import PublicKeyCredentialDescriptor, UserVerificationRequirement
@@ -53,6 +56,13 @@ from app.modules.auth.routes import Session, session_view, set_cookies
 from app.modules.auth.service import AuthService
 from app.modules.users.models import PlatformUser
 from app.shared.errors import BusinessRuleViolation, ResourceNotFound
+
+logger = logging.getLogger("platform")
+# The lock columns are deferred on the model; load them where this step needs them.
+_LOCK_COLUMNS = (
+    undefer(UserCredential.second_factor_failures),
+    undefer(UserCredential.second_factor_locked_until),
+)
 
 TICKET_SECONDS = 300
 MAX_FAILURES = 5
@@ -98,7 +108,14 @@ async def second_step(
 ) -> dict[str, Any] | None:
     """After a correct password: the ticket for the second step, or None if this person
     hasn't saved a face or a fingerprint (then the password alone signs in)."""
-    methods = await methods_for(session, user.id, rp_id_of(request))
+    try:
+        # A savepoint: if this database hasn't got the sign-in tables yet (a deploy ran
+        # ahead of its migration), the password still signs people in as before.
+        async with session.begin_nested():
+            methods = await methods_for(session, user.id, rp_id_of(request))
+    except ProgrammingError:
+        logger.warning("second_step_tables_missing")
+        return None
     return await open_ticket(request, user, methods, audience) if methods else None
 
 
@@ -132,7 +149,10 @@ async def _ticket(request: Request, ticket: str, audience: Audience) -> UUID:
 
 async def _credential(session: AsyncSession, user_id: UUID) -> UserCredential:
     credential: UserCredential | None = await session.scalar(
-        select(UserCredential).where(UserCredential.user_id == user_id).with_for_update()
+        select(UserCredential)
+        .options(*_LOCK_COLUMNS)
+        .where(UserCredential.user_id == user_id)
+        .with_for_update()
     )
     if credential is None:
         raise BusinessRuleViolation(
@@ -367,7 +387,9 @@ def second_step_router(audience: Audience, site: Site) -> APIRouter:
             select(UserFace).where(UserFace.user_id == auth.user.id).order_by(UserFace.created_at)
         )
         credential = await session.scalar(
-            select(UserCredential).where(UserCredential.user_id == auth.user.id)
+            select(UserCredential)
+            .options(*_LOCK_COLUMNS)
+            .where(UserCredential.user_id == auth.user.id)
         )
         locked = credential.second_factor_locked_until if credential else None
         return {

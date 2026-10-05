@@ -24,6 +24,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 from webauthn import generate_authentication_options, options_to_json
 from webauthn.helpers import base64url_to_bytes, bytes_to_base64url
@@ -102,12 +103,20 @@ def _fresh(customer: CustomerSession) -> None:
 async def second_step(request: Request, session: AsyncSession, phone: str) -> dict[str, Any] | None:
     """Called once the WhatsApp code is right. None means no face or fingerprint is saved,
     so the code alone signs in."""
-    faces = await session.scalar(
-        select(func.count()).select_from(CustomerFace).where(CustomerFace.phone == phone)
-    )
-    keys = await session.scalar(
-        select(func.count()).select_from(CustomerPasskey).where(CustomerPasskey.phone == phone)
-    )
+    try:
+        # A savepoint: before migration 0023 the code alone keeps signing people in.
+        async with session.begin_nested():
+            faces = await session.scalar(
+                select(func.count()).select_from(CustomerFace).where(CustomerFace.phone == phone)
+            )
+            keys = await session.scalar(
+                select(func.count())
+                .select_from(CustomerPasskey)
+                .where(CustomerPasskey.phone == phone)
+            )
+    except ProgrammingError:
+        logger.warning("customer_second_step_tables_missing")
+        return None
     methods = [m for m, n in (("face", faces), ("fingerprint", keys)) if n]
     if not methods:
         return None

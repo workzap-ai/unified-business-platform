@@ -15,6 +15,7 @@ from sqlalchemy import (
     Uuid,
 )
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.sql import text
 
 from app.core.database import Base
 from app.shared.models import Record
@@ -23,6 +24,7 @@ from app.shared.models import Record
 class UserCredential(Record, Base):
     """Password verifier only (Argon2id). Plaintext is never stored or logged."""
 
+    __mapper_args__ = {"eager_defaults": False}
     __tablename__ = "user_credentials"
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("platform_users.id", ondelete="CASCADE"), unique=True
@@ -32,9 +34,13 @@ class UserCredential(Record, Base):
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     password_changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     # Second sign-in step (face or fingerprint): wrong tries in a row, and the lock.
-    second_factor_failures: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    # Deferred, filled by the database default, and never fetched back after an insert
+    # (eager_defaults off), so ordinary sign-ins and sign-ups never read, write or
+    # RETURN these columns: safe while a deploy runs ahead of migration 0021. mfa.py
+    # loads them with undefer().
+    second_factor_failures: Mapped[int] = mapped_column(Integer, server_default="0", deferred=True)
     second_factor_locked_until: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
+        DateTime(timezone=True), nullable=True, server_default=text("NULL"), deferred=True
     )
 
 

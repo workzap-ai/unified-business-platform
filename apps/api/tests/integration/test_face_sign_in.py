@@ -15,6 +15,7 @@ import pytest
 from cryptography.fernet import Fernet
 from pydantic import SecretStr
 from sqlalchemy import select, update
+from sqlalchemy.orm import undefer
 from test_passkeys import Authenticator
 from test_service_lifecycle import register
 
@@ -150,7 +151,12 @@ async def test_wrong_faces_lock_the_step_and_success_resets_the_count(
     )
     assert nobody.status_code == 422 and nobody.json()["error"]["code"] == "FACE_NOT_FOUND"
     credential = await business_db.scalar(
-        select(UserCredential).where(UserCredential.user_id == user_id)
+        select(UserCredential)
+        .options(
+            undefer(UserCredential.second_factor_failures),
+            undefer(UserCredential.second_factor_locked_until),
+        )
+        .where(UserCredential.user_id == user_id)
     )
     assert credential.second_factor_failures == 0
 
@@ -171,7 +177,7 @@ async def test_wrong_faces_lock_the_step_and_success_resets_the_count(
         "/api/v1/auth/mfa/face", json={"ticket": step["ticket"], "frames": frames()}
     )
     assert locked.status_code == 423
-    await business_db.refresh(credential)
+    await business_db.refresh(credential, ["second_factor_failures", "second_factor_locked_until"])
     assert credential.second_factor_locked_until is not None
     assert credential.second_factor_failures == 0  # counted in the database, then reset
 
@@ -192,7 +198,7 @@ async def test_wrong_faces_lock_the_step_and_success_resets_the_count(
         "/api/v1/auth/mfa/face", json={"ticket": step["ticket"], "frames": frames()}
     )
     assert ok.status_code == 200, ok.text
-    await business_db.refresh(credential)
+    await business_db.refresh(credential, ["second_factor_failures", "second_factor_locked_until"])
     assert credential.second_factor_failures == 0
     assert credential.second_factor_locked_until is None
     await browser.aclose()
@@ -290,3 +296,30 @@ async def test_pi_app_uses_the_same_two_steps_with_its_own_session(api):
     assert (await browser.get(f"{base}/session")).status_code == 200
     for c in (client, browser, owner):
         await c.aclose()
+
+
+async def test_sign_in_still_works_before_the_face_migrations_run(api, business_db):
+    """A deploy can go live before `alembic upgrade head`: without the new columns and
+    tables, sign-up and the password sign-in must keep working (inside this test's
+    rolled-back transaction the schema is put back to before 0019)."""
+    from sqlalchemy import text
+
+    for statement in (
+        "DROP TABLE user_faces",
+        "DROP TABLE user_passkeys",
+        "DROP TABLE customer_faces",
+        "DROP TABLE customer_sign_in_locks",
+        "DROP TABLE customer_passkeys",
+        "ALTER TABLE user_credentials DROP COLUMN second_factor_failures",
+        "ALTER TABLE user_credentials DROP COLUMN second_factor_locked_until",
+    ):
+        await business_db.execute(text(statement))
+    me = await register(api)  # sign-up inserts a credential without the new columns
+    browser = _browser(api)
+    signed_in = await browser.post(
+        "/api/v1/auth/login", json={"email": me["user"]["email"], "password": PASSWORD}
+    )
+    assert signed_in.status_code == 200, signed_in.text
+    assert "mfa_required" not in signed_in.json()
+    assert (await browser.get("/api/v1/auth/session")).status_code == 200
+    await browser.aclose()
