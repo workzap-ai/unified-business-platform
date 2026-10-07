@@ -274,7 +274,7 @@ async def test_every_number_counts_requests_by_whose_turn_it_is(
     assert site["ball_with"] == "team" and site["open_question"] == ""
     assert site["next_update_by"] and site["status"] == "with_team"  # board still works
     assert pdf["status"] == "resolved" and pdf["journey_steps"] == 7
-    assert erp["journey_steps"] == 2 and site["journey_steps"] == 3
+    assert erp["journey_steps"] == 1 and site["journey_steps"] == 3
     await business.aclose()
     await customer.aclose()
 

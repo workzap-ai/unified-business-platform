@@ -37,6 +37,22 @@ const MEMORY_TONES = {
   requirement: "info",
   context: "neutral",
 } as const;
+const CUSTOMER_STAGE: Record<
+  string,
+  {
+    label: string;
+    tone: "neutral" | "warning" | "info" | "success" | "primary";
+  }
+> = {
+  noted: { label: "Noted", tone: "primary" },
+  need_answer: { label: "Needs customer's answer", tone: "warning" },
+  on_it: { label: "Team's turn", tone: "info" },
+  solution_ready: { label: "Solution ready", tone: "success" },
+  building: { label: "Building", tone: "info" },
+  live: { label: "Live", tone: "success" },
+  paused: { label: "Paused", tone: "neutral" },
+  closed: { label: "Closed", tone: "neutral" },
+};
 const PROJECT_STATUS = {
   collecting: { label: "Collecting details", tone: "neutral" },
   awaiting_confirmation: {
@@ -156,6 +172,51 @@ export function ContextPanel({ conversationId }: { conversationId: string }) {
           </p>
         )}
       </section>
+
+      {!!ctx.service_brief?.customer_issues?.issues?.length && (
+        <section className="p-4" aria-labelledby="ctx-customer-view">
+          <SectionLabel>
+            <span id="ctx-customer-view">What the customer sees</span>
+          </SectionLabel>
+          <ul className="mt-2 space-y-2.5">
+            {ctx.service_brief.customer_issues.issues.map((i) => (
+              <li key={i.title} className="text-xs">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[13px] font-semibold">{i.title}</span>
+                  <Badge
+                    tone={CUSTOMER_STAGE[i.stage ?? ""]?.tone ?? "neutral"}
+                  >
+                    {CUSTOMER_STAGE[i.stage ?? ""]?.label ??
+                      humanize(i.stage ?? "noted")}
+                  </Badge>
+                  {!!i.linked && (
+                    <Badge tone="info">Linked to {i.linked}</Badge>
+                  )}
+                </div>
+                {i.ball_with === "client" && i.open_question ? (
+                  <p className="mt-1">
+                    Waiting on the customer: {i.open_question}
+                  </p>
+                ) : i.next_step ? (
+                  <p className="mt-1 text-muted-foreground">{i.next_step}</p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+          {!!ctx.service_brief.customer_issues.links?.length && (
+            <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
+              {ctx.service_brief.customer_issues.links.map((l) => (
+                <li key={`${l.a_title}-${l.b_title}`}>
+                  {l.a_title} + {l.b_title} · {humanize(l.type)}
+                  {l.status === "pending_review"
+                    ? " · needs a check in pi"
+                    : ""}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       {!!ctx.service_brief?.projects?.length && (
         <section className="p-4" aria-labelledby="ctx-projects">

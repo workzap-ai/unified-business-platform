@@ -50,7 +50,9 @@ import {
   shortDay,
   turnOf,
   useLang,
+  usePrefs,
 } from "./shared";
+import { ActivityTimeline, SolutionFlow, type TimelineEvent } from "./visuals";
 
 export function ConversationView({ id }: { id: string }) {
   const client = useQueryClient();
@@ -602,6 +604,13 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
       void client.invalidateQueries({ queryKey: ["pi-customer"] }),
   });
   const list = issues.data?.issues ?? [];
+  const links = issues.data?.links ?? detail.issues?.links ?? [];
+  const prefs = usePrefs();
+  const activity = useQuery({
+    queryKey: ["pi-customer", "timeline", detail.id, detail.last_message_at],
+    queryFn: () =>
+      customerGet<TimelineEvent[]>(`/conversations/${detail.id}/timeline`),
+  });
   const pct = journeyPercent(list);
   const yours = list.some((i) => i.ball_with === "client");
   const pausedUntil = detail.waiting_on_other_until;
@@ -757,6 +766,21 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
                       </p>
                     )}
                     <JourneySteps issue={issue} lang={lang} />
+                    <details className="group mt-2">
+                      <summary className="cursor-pointer list-none text-xs font-medium text-accent">
+                        {lang === "ur"
+                          ? "Hum ise kaise hal karenge"
+                          : "How we'd solve it"}
+                      </summary>
+                      <div className="mt-2">
+                        <SolutionFlow
+                          issue={issue}
+                          issues={list}
+                          links={links}
+                          lang={lang}
+                        />
+                      </div>
+                    </details>
                     {next && turn !== "done" && (
                       <p
                         className={cn(
@@ -789,6 +813,21 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
             </ul>
           )}
         </div>
+      </Card>
+
+      <Card className="p-4 sm:p-5">
+        <h2 className="mb-1 font-semibold">
+          {lang === "ur" ? "Kya hua · naya pehle" : "Activity · newest first"}
+        </h2>
+        {activity.isPending ? (
+          <Skeleton className="h-24 w-full rounded-xl" />
+        ) : (
+          <ActivityTimeline
+            events={activity.data ?? []}
+            lang={lang}
+            lastSeen={prefs.data?.last_seen_at}
+          />
+        )}
       </Card>
 
       {detail.requests.length > 0 && (

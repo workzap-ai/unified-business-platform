@@ -368,6 +368,35 @@ class WhatsApp:
             return False
         return response.status_code < 400
 
+    async def send_image(
+        self, number: str, recipient: str, link: str, caption: str, token: str
+    ) -> str:
+        """Send an image by public link with a caption (pi's visual cards). Session
+        messages only: the caller checks the 24-hour window."""
+        base, headers = self._endpoint(token)
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "image",
+                    "image": {"link": link, "caption": caption[:1024]},
+                },
+                timeout=20,
+                follow_redirects=False,
+            )
+            check_sent(response)
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Image delivery could not be confirmed", 503
+            ) from None
+
     async def send(self, number: str, recipient: str, body: str, token: str) -> str:
         base, headers = self._endpoint(token)
         try:

@@ -899,6 +899,8 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
         policy = await settings_row(session, scope)
         reminder = message.media.get("reminder")
         campaign = message.media.get("campaign")
+        # pi Customer's follow-up ladder: an approved template after the 24-hour window.
+        ladder = message.media.get("ladder")
         from app.modules.pi.followups import reminder_allowed
 
         campaign_block = None
@@ -936,6 +938,7 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             else "MESSAGE_WINDOW_CLOSED"
             if not reminder
             and not campaign
+            and not ladder
             and (
                 not conversation.last_inbound_at
                 or conversation.last_inbound_at < datetime.now(UTC) - timedelta(hours=24)
@@ -967,12 +970,12 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             from app.integrations.whatsapp_bridge import token as connection_token
 
             token = await connection_token(session, ctx["settings"], connection)
-            if reminder or campaign:
+            if reminder or campaign or ladder:
                 message.provider_message_id, message.body = await whatsapp.send_template(
                     connection.phone_number_id,
                     connection.business_account_id,
                     conversation.contact_wa_id,
-                    (reminder or campaign or {})["template"],
+                    (reminder or campaign or ladder or {})["template"],
                     token,
                 )
                 if reminder:
@@ -980,6 +983,15 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                         **conversation.service_brief,
                         "reminded_source_id": reminder["source_message_id"],
                     }
+            elif message.media.get("image"):
+                # pi Customer's visual card: a PNG link with a short caption.
+                message.provider_message_id = await whatsapp.send_image(
+                    connection.phone_number_id,
+                    conversation.contact_wa_id,
+                    str(message.media["image"]),
+                    message.body,
+                    token,
+                )
             elif message.media.get("flow"):
                 form = message.media["flow"]
                 message.provider_message_id = await whatsapp.send_flow(

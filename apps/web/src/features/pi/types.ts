@@ -127,6 +127,25 @@ export type ConversationContext = {
     mood?: string;
     meeting_requested?: boolean;
     knowledge_gaps?: string[];
+    // What the customer sees in pi Customer: their requests, whose turn, and links.
+    customer_issues?: {
+      at?: string;
+      issues?: {
+        title: string;
+        stage?: string;
+        ball_with?: string;
+        open_question?: string;
+        next_step?: string;
+        linked?: number;
+      }[];
+      links?: {
+        a_title: string;
+        b_title: string;
+        type: string;
+        reason?: string;
+        status?: string;
+      }[];
+    };
   };
   followup_due_at?: string | null;
   memory: {

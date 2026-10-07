@@ -71,6 +71,19 @@ interface Board {
   examples_learned: number;
   window_days: number;
   analysed?: number;
+  /** Links pi was unsure about (confidence 0.5-0.8): the team approves or rejects. */
+  pending_links?: PendingLink[];
+}
+
+interface PendingLink {
+  conversation_id: string;
+  customer_name: string;
+  a_title: string;
+  b_title: string;
+  type: string;
+  reason: string;
+  benefit: string;
+  confidence: number;
 }
 
 const STATUS: Record<
@@ -117,6 +130,20 @@ export function ProblemsPage() {
       }),
     {
       success: "Moved. pi will sort problems like this the same way.",
+      onSuccess: (b) => client.setQueryData(key(["problems"]), b),
+    },
+  );
+
+  const review = useAction(
+    (args: { link: PendingLink; action: "confirm" | "reject" }) =>
+      post<Board>("/problems/links", {
+        conversation_id: args.link.conversation_id,
+        a_title: args.link.a_title,
+        b_title: args.link.b_title,
+        action: args.action,
+      }),
+    {
+      success: "Saved. pi will remember this for these two requests.",
       onSuccess: (b) => client.setQueryData(key(["problems"]), b),
     },
   );
@@ -181,6 +208,55 @@ export function ProblemsPage() {
         />
       ) : data ? (
         <>
+          {!!data.pending_links?.length && can("pi.handoffs.manage") && (
+            <Card className="p-4 sm:p-5">
+              <h2 className="font-semibold">Links to check</h2>
+              <p className="text-xs text-muted-foreground">
+                pi thinks these requests are connected but isn&apos;t sure.
+                Confirmed links show on the customer&apos;s map.
+              </p>
+              <ul className="mt-3 divide-y divide-border">
+                {data.pending_links.map((link) => (
+                  <li
+                    key={`${link.conversation_id}-${link.a_title}-${link.b_title}`}
+                    className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm"
+                  >
+                    <span className="min-w-0">
+                      <span className="block font-medium">
+                        {link.a_title} + {link.b_title}
+                      </span>
+                      <span className="block text-xs text-muted-foreground">
+                        {link.customer_name} · {link.type.replace("_", " ")} ·{" "}
+                        {Math.round(link.confidence * 100)}%
+                        {link.benefit ? ` · ${link.benefit}` : ""}
+                      </span>
+                    </span>
+                    <span className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          review.mutate({ link, action: "confirm" })
+                        }
+                        loading={review.isPending}
+                      >
+                        Confirm
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() =>
+                          review.mutate({ link, action: "reject" })
+                        }
+                        disabled={review.isPending}
+                      >
+                        Not related
+                      </Button>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
           <Card className="p-4 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="min-w-0">

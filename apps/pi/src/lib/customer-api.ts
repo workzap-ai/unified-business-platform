@@ -111,6 +111,7 @@ export type CustomerConversationItem = {
   counts: RequestCounts;
   waiting_on_other_until: string | null;
   issues: CustomerIssue[];
+  links: IssueLink[];
 };
 
 /** Every number on the dashboard counts requests, in these buckets. */
@@ -172,6 +173,29 @@ export type CustomerIssue = {
   journey_steps: number | null;
   /** The business department handling it, e.g. "Finance". */
   department_name?: string;
+  area?: string;
+  data_objects?: string[];
+  urgency?: number;
+  impact?: number;
+  root_cause?: string;
+  solution_outline?: string;
+  outcome?: string;
+  /** Requests sharing one id would be solved by one system. */
+  solution_id?: string;
+  /** How many other requests it is linked to. */
+  linked?: number;
+};
+
+/** A real connection pi found between two of the customer's requests. */
+export type IssueLink = {
+  a: number;
+  b: number;
+  a_title: string;
+  b_title: string;
+  type: "shared_data" | "same_cause" | "depends_on" | "part_of";
+  reason: string;
+  benefit: string;
+  confidence: number;
 };
 
 export type CustomerPrefs = {
@@ -193,6 +217,7 @@ export type SharedView = {
   businesses: {
     business: string;
     counts: RequestCounts;
+    links?: IssueLink[];
     issues: Pick<
       CustomerIssue,
       | "title"
@@ -206,6 +231,11 @@ export type SharedView = {
       | "next_update_by"
       | "waiting_on_other_until"
       | "journey_steps"
+      | "area"
+      | "urgency"
+      | "impact"
+      | "solution_id"
+      | "linked"
     >[];
   }[];
 };
@@ -229,7 +259,12 @@ export type CustomerConversationDetail = {
   messages: CustomerMessage[];
   requests: CustomerRequest[];
   waiting_on_other_until: string | null;
-  issues: { at: string; headline?: string; issues: CustomerIssue[] } | null;
+  issues: {
+    at: string;
+    headline?: string;
+    issues: CustomerIssue[];
+    links?: IssueLink[];
+  } | null;
 };
 
 export type CustomerIssues = {
@@ -237,4 +272,5 @@ export type CustomerIssues = {
   at: string | null;
   headline?: string;
   issues: CustomerIssue[];
+  links?: IssueLink[];
 };

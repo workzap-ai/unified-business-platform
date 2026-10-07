@@ -115,6 +115,20 @@ async def _views(
     ]
 
 
+LINK_FIELDS = ("a", "b", "a_title", "b_title", "type", "reason", "benefit", "confidence")
+
+
+def _links(report: Any) -> list[dict[str, Any]]:
+    """Links the customer may see: automatic or team-confirmed, never ones under review."""
+    if not isinstance(report, dict):
+        return []
+    return [
+        {key: link.get(key) for key in LINK_FIELDS}
+        for link in report.get("links") or []
+        if isinstance(link, dict) and link.get("status") in ("auto", "confirmed")
+    ]
+
+
 def _counts(issues: list[dict[str, Any]]) -> dict[str, int]:
     """Every number on the dashboard counts requests, in the same four buckets."""
     out = {"waiting_on_you": 0, "waiting_on_other": 0, "waiting_on_us": 0, "done": 0, "paused": 0}
@@ -267,6 +281,7 @@ async def list_conversations(customer: Customer, session: Session) -> list[dict[
                 "waiting_on_other_until": _waiting_until(conversation),
                 # Every request, so the dashboard's numbers always add up.
                 "issues": issues,
+                "links": _links(cached),
             }
         )
     return out
@@ -306,7 +321,11 @@ async def conversation_detail(
         "requests": await service.open_requests(session, conversation),
         "waiting_on_other_until": _waiting_until(conversation),
         "issues": (
-            {**cached, "issues": await _views(session, conversation, cached)}
+            {
+                **cached,
+                "issues": await _views(session, conversation, cached),
+                "links": _links(cached),
+            }
             if fresh and isinstance(cached, dict)
             else None
         ),
@@ -334,10 +353,12 @@ async def conversation_issues(
     )
     if report is None:
         return {"available": False, "issues": [], "at": None}
+    report.pop("new_events", None)
     return {
         "available": True,
         **report,
         "issues": await _views(session, conversation, report),
+        "links": _links(report),
     }
 
 
@@ -498,6 +519,7 @@ async def open_share(token: str, request: Request, session: Session) -> dict[str
             {
                 "business": business,
                 "counts": _counts(issues),
+                "links": _links(cached),
                 "issues": [
                     {
                         key: i.get(key)
@@ -513,6 +535,11 @@ async def open_share(token: str, request: Request, session: Session) -> dict[str
                             "next_update_by",
                             "waiting_on_other_until",
                             "journey_steps",
+                            "area",
+                            "urgency",
+                            "impact",
+                            "solution_id",
+                            "linked",
                         )
                     }
                     for i in issues
@@ -580,3 +607,157 @@ async def ask_for_team(
     if notice:
         await request.app.state.queue.enqueue("send_pi_message", notice, job_id=f"send:{notice}")
     return {"status": "with_team"}
+
+
+class NotRelatedInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    a_title: str = Field(min_length=1, max_length=120)
+    b_title: str = Field(min_length=1, max_length=120)
+
+
+@router.get("/conversations/{conversation_id}/timeline")
+async def conversation_timeline(
+    conversation_id: UUID, customer: Customer, session: Session
+) -> list[dict[str, Any]]:
+    conversation, _, _ = await _owned(session, customer, conversation_id)
+    return await service.timeline(session, conversation)
+
+
+@router.post("/conversations/{conversation_id}/links/not-related")
+async def not_related(
+    conversation_id: UUID, body: NotRelatedInput, customer: Customer, session: Session
+) -> dict[str, Any]:
+    """The customer says two requests aren't connected: the line goes and pi never links
+    that pair again (the team sees it, to tune what pi links)."""
+    from sqlalchemy import cast, func, update
+    from sqlalchemy.dialects.postgresql import JSONB
+
+    from app.modules.pi.models import PiConversation
+
+    conversation, _, _ = await _owned(session, customer, conversation_id)
+    brief = dict(conversation.service_brief or {})
+    key = service.pair_key(body.a_title, body.b_title)
+    feedback = {**(brief.get("link_feedback") or {}), key: "rejected"}
+    report = brief.get("customer_issues")
+    patch: dict[str, Any] = {"link_feedback": feedback}
+    if isinstance(report, dict):
+        links = [
+            x
+            for x in report.get("links") or []
+            if service.pair_key(x.get("a_title", ""), x.get("b_title", "")) != key
+        ]
+        base = [
+            {k: v for k, v in i.items() if k not in ("solution_id", "linked")}
+            for i in report.get("issues", [])
+        ]
+        patch["customer_issues"] = {
+            **report,
+            "links": links,
+            "issues": service.with_solutions(base, links),
+        }
+    await session.execute(
+        update(PiConversation)
+        .where(
+            PiConversation.tenant_id == conversation.tenant_id,
+            PiConversation.id == conversation.id,
+        )
+        .values(
+            service_brief=func.coalesce(PiConversation.service_brief, cast({}, JSONB)).op("||")(
+                cast(patch, JSONB)
+            )
+        )
+        .execution_options(synchronize_session=False)
+    )
+    await session.commit()
+    await session.refresh(conversation)
+    return {"removed": key}
+
+
+@router.get("/stream")
+async def stream(customer: Customer, request: Request) -> Any:
+    """Server-sent events: "update" whenever any of the customer's chats changes (a new
+    message, or pi's map of their requests), so an open dashboard redraws within
+    seconds. Each stream ends after five minutes; the browser reconnects."""
+    import asyncio
+
+    from fastapi.responses import StreamingResponse
+
+    sessions = request.app.state.sessions
+    phone = customer.phone
+
+    async def signature() -> str:
+        async with sessions() as db:
+            items = await service.conversations(db, phone)
+        parts = []
+        for conversation, _, _ in items:
+            cached = (conversation.service_brief or {}).get("customer_issues")
+            stamp = cached.get("at") if isinstance(cached, dict) else ""
+            parts.append(f"{conversation.id}:{conversation.last_message_at}:{stamp}")
+        return "|".join(parts)
+
+    async def events() -> Any:
+        last = await signature()
+        yield "retry: 5000\n\n"
+        for tick in range(100):  # about five minutes
+            if await request.is_disconnected():
+                return
+            await asyncio.sleep(3)
+            try:
+                now = await signature()
+            except Exception:  # noqa: BLE001 - the browser falls back to polling
+                return
+            if now != last:
+                last = now
+                yield "event: update\ndata: {}\n\n"
+            elif tick % 5 == 4:
+                yield ": keep-alive\n\n"
+
+    return StreamingResponse(
+        events(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@router.get("/card/{token}")
+async def card_data(token: str, request: Request, session: Session) -> dict[str, Any]:
+    """What a WhatsApp card shows, for the pi app that draws it. The signed token is the
+    only key; it names one chat and expires in seven days. No chat text, no number."""
+    from app.modules.pi_customer.cards import read_card
+
+    claims = read_card(request.app.state.settings, token)
+    if claims is None:
+        raise HTTPException(404, "This card has expired.")
+    from app.modules.pi.models import PiConversation
+
+    conversation = await session.scalar(
+        select(PiConversation).where(PiConversation.id == claims["conversation_id"])
+    )
+    if conversation is None:
+        raise HTTPException(404, "This card has expired.")
+    cached = (conversation.service_brief or {}).get("customer_issues")
+    issues = await _views(session, conversation, cached)
+    keep = (
+        "title",
+        "stage",
+        "ball_with",
+        "area",
+        "urgency",
+        "impact",
+        "open_question",
+        "next_step",
+        "next_update_by",
+        "journey_steps",
+        "root_cause",
+        "solution_outline",
+        "outcome",
+        "solution_id",
+        "linked",
+    )
+    return {
+        "kind": claims["kind"],
+        "index": claims["index"],
+        "language": (cached or {}).get("language", "auto") if isinstance(cached, dict) else "auto",
+        "issues": [{k: i.get(k) for k in keep} for i in issues],
+        "links": _links(cached),
+    }

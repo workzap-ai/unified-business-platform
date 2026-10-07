@@ -279,6 +279,49 @@ export const ConversationContextSchema: z.ZodType<Pi.ConversationContext> =
           knowledge_gaps: z
             .union([z.undefined(), z.array(z.string())])
             .optional(),
+          customer_issues: z
+            .union([
+              z.undefined(),
+              z.object({
+                at: z.union([z.undefined(), z.string()]).optional(),
+                issues: z
+                  .union([
+                    z.undefined(),
+                    z.array(
+                      z.object({
+                        title: z.string(),
+                        stage: z.union([z.undefined(), z.string()]).optional(),
+                        ball_with: z
+                          .union([z.undefined(), z.string()])
+                          .optional(),
+                        open_question: z
+                          .union([z.undefined(), z.string()])
+                          .optional(),
+                        next_step: z
+                          .union([z.undefined(), z.string()])
+                          .optional(),
+                        linked: z.union([z.undefined(), z.number()]).optional(),
+                      }),
+                    ),
+                  ])
+                  .optional(),
+                links: z
+                  .union([
+                    z.undefined(),
+                    z.array(
+                      z.object({
+                        a_title: z.string(),
+                        b_title: z.string(),
+                        type: z.string(),
+                        reason: z.union([z.undefined(), z.string()]).optional(),
+                        status: z.union([z.undefined(), z.string()]).optional(),
+                      }),
+                    ),
+                  ])
+                  .optional(),
+              }),
+            ])
+            .optional(),
         }),
       ])
       .optional(),

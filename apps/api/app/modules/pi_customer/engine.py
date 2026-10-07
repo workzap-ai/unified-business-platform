@@ -1,0 +1,511 @@
+"""pi Customer's live engine (runs every minute from the worker sweep).
+
+1. Reads a chat about two minutes after the customer stops typing, so the dashboard map
+   is current and nothing is sent mid-explanation.
+2. Sends one visual card when something meaningful changed (a real link, or a request
+   whose turn moved), at most one per chat every two hours, inside the 24-hour window.
+3. Never lets a conversation go cold: when it is the customer's turn, a nudge quoting
+   the exact open question at about 20 hours (still free-form), then the business's
+   approved templates on days 3, 7 and 14; when it is the team's turn, alerts to the
+   team at 12, 24 and 48 hours and one status line to the customer.
+
+Quiet hours, Friday prayers, "waiting on someone else", STOP and a person having just
+replied all stop pi. Everything it does is logged on the brief ("nudges").
+"""
+
+import logging
+import re
+from datetime import UTC, datetime, timedelta
+from typing import Any
+
+from sqlalchemy import select
+
+from app.modules.notifications.service import notify
+from app.modules.pi.configuration import settings_row
+from app.modules.pi.followups import quiet_until
+from app.modules.pi.models import PiConversation, PiMessage, WhatsAppConnection
+from app.modules.pi.service import PiService
+from app.modules.pi_customer import service
+from app.modules.pi_customer.cards import card_token, card_url
+
+logger = logging.getLogger("platform")
+
+READ_AFTER = timedelta(minutes=2)
+READ_WITHIN = timedelta(minutes=45)
+CARD_GAP = timedelta(hours=2)
+NUDGE_AT, WINDOW = timedelta(hours=20), timedelta(hours=23, minutes=30)
+LADDER = (("day3", timedelta(days=3)), ("day7", timedelta(days=7)), ("day14", timedelta(days=14)))
+TEMPLATE_GAP = timedelta(hours=72)
+MAX_TOUCHES = 4
+HUMAN_QUIET = timedelta(hours=12)
+SLA_HOURS = ((12, "info"), (24, "warning"), (48, "critical"))
+STOP = re.compile(
+    r"\b(?:stop|unsubscribe|band karo|band kar do|band kardo|mat bhejo|mat bhejna|"
+    r"no more messages|don'?t message)\b",
+    re.IGNORECASE,
+)
+
+
+def urdu(language: str) -> bool:
+    return language in {"roman_ur", "ur", "hi"}
+
+
+def prayer_or_quiet(policy: Any, now: datetime | None = None) -> bool:
+    """No sends at night (business quiet hours) or during Friday prayers (12:30-14:30)."""
+    from app.modules.pi.policy import zone
+
+    config = policy.whatsapp_config or {}
+    if quiet_until(
+        policy.timezone, int(config.get("quiet_start", 21)), int(config.get("quiet_end", 9)), now
+    ):
+        return True
+    local = (now or datetime.now(UTC)).astimezone(zone(policy.timezone))
+    minutes = local.hour * 60 + local.minute
+    return local.weekday() == 4 and 12 * 60 + 30 <= minutes < 14 * 60 + 30
+
+
+async def sweep_customer_journeys(ctx: dict[str, Any]) -> None:
+    from app.modules.pi.runtime import enqueue_sends
+
+    outgoing: list[str] = []
+    try:
+        outgoing += await read_quiet_chats(ctx)
+    except Exception:  # noqa: BLE001 - one bad chat must not stop the ladder
+        logger.warning("pi_customer_read_failed")
+    try:
+        outgoing += await run_ladder(ctx)
+    except Exception:  # noqa: BLE001
+        logger.warning("pi_customer_ladder_failed")
+    await enqueue_sends(ctx, outgoing)
+
+
+# --------------------------------------------------------------------------- reading
+
+
+async def read_quiet_chats(ctx: dict[str, Any]) -> list[str]:
+    """Chats whose customer stopped writing 2-45 minutes ago and pi hasn't read since."""
+    from app.modules.pi.runtime import system_scope
+    from app.modules.pi_customer.models import CustomerPrefs
+
+    now = datetime.now(UTC)
+    outgoing: list[str] = []
+    async with ctx["sessions"]() as session:
+        rows = await session.execute(
+            select(PiConversation, WhatsAppConnection)
+            .join(
+                WhatsAppConnection,
+                (WhatsAppConnection.id == PiConversation.connection_id)
+                & (WhatsAppConnection.tenant_id == PiConversation.tenant_id),
+            )
+            .where(
+                PiConversation.status == "open",
+                PiConversation.last_inbound_at <= now - READ_AFTER,
+                PiConversation.last_inbound_at >= now - READ_WITHIN,
+            )
+            .order_by(PiConversation.last_inbound_at)
+            .limit(20)
+        )
+        done = 0
+        for conversation, connection in rows.all():
+            if done >= 4:
+                break
+            cached = (conversation.service_brief or {}).get("customer_issues")
+            if isinstance(cached, dict) and cached.get("at") == (
+                conversation.last_message_at.isoformat()
+            ):
+                continue
+            scope = await system_scope(session, connection)
+            if scope is None:
+                continue
+            policy = await settings_row(session, scope)
+            if not service.portal_on(policy.whatsapp_config):
+                continue
+            prefs = await session.scalar(
+                select(CustomerPrefs).where(CustomerPrefs.phone == conversation.contact_wa_id)
+            )
+            report = await service.analyse(
+                session,
+                ctx["settings"],
+                ctx["http"],
+                ctx.get("sessions"),
+                conversation,
+                connection,
+                (connection.display_name or "").strip() or "the business",
+                prefs.language if prefs else "auto",
+            )
+            done += 1
+            if report and report.get("new_events"):
+                await session.refresh(conversation)
+                card = await queue_card(session, scope, policy, conversation, report)
+                if card:
+                    outgoing.append(card)
+        await session.commit()
+    return outgoing
+
+
+def pick_card(report: dict[str, Any]) -> tuple[str, int, str] | None:
+    """(kind, request index, caption) for the most useful card, or None.
+    A real link with a saving beats a turn change. A map needs a link (a lone dot or
+    two says nothing); "noted" alone never gets a card."""
+    events = report.get("new_events") or []
+    issues = report.get("issues") or []
+    language = str(report.get("language") or "auto")
+    links = [x for x in report.get("links") or [] if x.get("status") in ("auto", "confirmed")]
+    announced = [e for e in events if e.get("kind") == "link.found" and e.get("announce")]
+    if announced and links:
+        reason = str(announced[-1].get("detail") or "")
+        n = len(links)
+        if urdu(language):
+            caption = f"pi ne aap ke requests mein {n} connection dhoonde. {reason}."
+        else:
+            caption = f"pi found {n} connection{'s' if n != 1 else ''}. {reason}."
+        return "map", 0, caption.replace("..", ".")
+    for event in reversed(events):
+        if event.get("kind") != "stage.changed" or event.get("to") in ("noted", "live", "closed"):
+            continue
+        index = next(
+            (
+                i
+                for i, issue in enumerate(issues)
+                if service.norm_title(issue["title"]) == service.norm_title(event["title"])
+            ),
+            None,
+        )
+        if index is None:
+            continue
+        issue = issues[index]
+        if issue["ball_with"] == "client" and issue.get("open_question"):
+            what = issue["open_question"]
+            who = "Aap: " if urdu(language) else "You: "
+        else:
+            what = str(issue.get("next_step") or "")
+            who = "Agla qadam: " if urdu(language) else "Next: "
+        return "journey", index, f'"{issue["title"]}"\n{who}{what}'.strip()
+    return None
+
+
+async def queue_card(
+    session: Any, scope: Any, policy: Any, conversation: PiConversation, report: dict[str, Any]
+) -> str | None:
+    config = policy.whatsapp_config or {}
+    brief = conversation.service_brief or {}
+    now = datetime.now(UTC)
+    last = brief.get("cards_last_at")
+    if (
+        config.get("visual_cards", True) is False
+        or conversation.mode != "ai"
+        or not conversation.last_inbound_at
+        or now - conversation.last_inbound_at > timedelta(hours=23)
+        or (last and now - datetime.fromisoformat(last) < CARD_GAP)
+        or prayer_or_quiet(policy, now)
+    ):
+        return None
+    choice = pick_card(report)
+    if choice is None:
+        return None
+    kind, index, caption = choice
+    from app.core.config import get_settings
+
+    settings = get_settings()
+    link = card_url(settings, card_token(settings, conversation.id, kind, index))
+    dashboard = f"{settings.pi_app_public_url.rstrip('/')}/customer"
+    caption = f"{caption}\n{dashboard}"
+    pi = PiService(session, scope)
+    key = f"pi-card:{conversation.id}:{report['at']}"
+    if await pi.messages.find(PiMessage.idempotency_key == key):
+        return None
+    message = await pi.messages.add(
+        pi.messages.new(
+            conversation_id=conversation.id,
+            direction="outbound",
+            sender_type="ai",
+            agent_key="requirement",
+            body=caption[:1000],
+            status="queued",
+            idempotency_key=key,
+            media={"image": link, "card": kind},
+        )
+    )
+    conversation.service_brief = {**brief, "cards_last_at": now.isoformat()}
+    return str(message.id)
+
+
+# ---------------------------------------------------------------------------- ladder
+
+
+def _log(conversation: PiConversation, entry: dict[str, Any]) -> None:
+    brief = dict(conversation.service_brief or {})
+    brief["nudges"] = [*(brief.get("nudges") or []), entry][-40:]
+    conversation.service_brief = brief
+
+
+def _sent(brief: dict[str, Any], since: str, step: str) -> bool:
+    return any(n.get("since") == since and n.get("step") == step for n in brief.get("nudges") or [])
+
+
+async def run_ladder(ctx: dict[str, Any]) -> list[str]:
+    from app.modules.pi.runtime import system_scope
+
+    now = datetime.now(UTC)
+    outgoing: list[str] = []
+    async with ctx["sessions"]() as session:
+        conversations = await session.scalars(
+            select(PiConversation)
+            .where(
+                PiConversation.status == "open",
+                PiConversation.last_message_at >= now - timedelta(days=16),
+            )
+            .order_by(PiConversation.last_message_at.desc())
+            .limit(300)
+        )
+        for conversation in list(conversations):
+            brief = conversation.service_brief or {}
+            report = brief.get("customer_issues")
+            if not isinstance(report, dict) or not report.get("issues"):
+                continue
+            connection = await session.get(WhatsAppConnection, conversation.connection_id)
+            scope = await system_scope(session, connection) if connection else None
+            if scope is None:
+                continue
+            policy = await settings_row(session, scope)
+            if (
+                not service.portal_on(policy.whatsapp_config)
+                or (policy.whatsapp_config or {}).get("follow_up_ladder", True) is False
+            ):
+                continue
+            issues = report["issues"]
+            waiting = report.get("waiting") or {}
+            client = [
+                i for i in issues if i.get("ball_with") == "client" and i.get("open_question")
+            ]
+            team = [i for i in issues if i.get("ball_with") == "team"]
+            if client and waiting.get("client"):
+                queued = await nudge_customer(
+                    session, scope, policy, conversation, client[0], waiting["client"], now
+                )
+                if queued:
+                    outgoing.append(queued)
+            if team and waiting.get("team"):
+                queued = await alert_team(
+                    session, scope, policy, conversation, team[0], waiting["team"], now
+                )
+                if queued:
+                    outgoing.append(queued)
+        await session.commit()
+    return outgoing
+
+
+async def _human_recently(session: Any, conversation: PiConversation, now: datetime) -> bool:
+    last = await session.scalar(
+        select(PiMessage.created_at)
+        .where(
+            PiMessage.tenant_id == conversation.tenant_id,
+            PiMessage.environment_id == conversation.environment_id,
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.sender_type == "human",
+        )
+        .order_by(PiMessage.created_at.desc())
+        .limit(1)
+    )
+    return bool(last and now - last < HUMAN_QUIET)
+
+
+async def _last_inbound_text(session: Any, conversation: PiConversation) -> str:
+    body = await session.scalar(
+        select(PiMessage.body)
+        .where(
+            PiMessage.tenant_id == conversation.tenant_id,
+            PiMessage.environment_id == conversation.environment_id,
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.direction == "inbound",
+        )
+        .order_by(PiMessage.created_at.desc())
+        .limit(1)
+    )
+    return body or ""
+
+
+async def nudge_customer(
+    session: Any,
+    scope: Any,
+    policy: Any,
+    conversation: PiConversation,
+    issue: dict[str, Any],
+    since_raw: str,
+    now: datetime,
+) -> str | None:
+    """The customer's turn: one nudge at ~20h (free-form, quoting the open question),
+    then the business's approved templates on days 3, 7 and 14. Four touches at most."""
+    brief = conversation.service_brief or {}
+    since = datetime.fromisoformat(since_raw)
+    waited = now - since
+    paused = brief.get("customer_waiting_until")
+    if (
+        conversation.mode != "ai"
+        or brief.get("reminder_consent") == "declined"
+        or (paused and datetime.fromisoformat(paused) > now)
+        or waited < NUDGE_AT
+        or sum(1 for n in brief.get("nudges") or [] if n.get("since") == since_raw) >= MAX_TOUCHES
+    ):
+        return None
+    if STOP.search(await _last_inbound_text(session, conversation)):
+        conversation.service_brief = {**brief, "reminder_consent": "declined"}
+        return None
+    if prayer_or_quiet(policy, now) or await _human_recently(session, conversation, now):
+        return None
+    language = str((brief.get("customer_issues") or {}).get("language") or conversation.language)
+    language = (conversation.language or "en") if language == "auto" else language
+    pi = PiService(session, scope)
+    window_open = bool(conversation.last_inbound_at and now - conversation.last_inbound_at < WINDOW)
+    if waited < WINDOW and window_open and not _sent(brief, since_raw, "nudge1"):
+        title, question = issue["title"], issue["open_question"]
+        body = (
+            f'Ek chhota sa sawal "{title}" ke baare mein: {question}'
+            if urdu(language)
+            else f'Quick one on "{title}": {question}'
+        )
+        key = f"pi-nudge:{conversation.id}:{since_raw}:1"
+        if await pi.messages.find(PiMessage.idempotency_key == key):
+            return None
+        message = await pi.messages.add(
+            pi.messages.new(
+                conversation_id=conversation.id,
+                direction="outbound",
+                sender_type="ai",
+                agent_key="requirement",
+                body=body,
+                status="queued",
+                idempotency_key=key,
+                media={"nudge": "nudge1"},
+            )
+        )
+        _log(conversation, {"at": now.isoformat(), "since": since_raw, "step": "nudge1"})
+        return str(message.id)
+    # After the window: approved templates only, with consent, one per 72 hours.
+    step = next(
+        (
+            name
+            for name, after in reversed(LADDER)
+            if waited >= after and not _sent(brief, since_raw, name)
+        ),
+        None,
+    )
+    if step is None or brief.get("reminder_consent") != "granted":
+        return None
+    last_template = max(
+        (n["at"] for n in brief.get("nudges") or [] if n.get("step", "").startswith("day")),
+        default=None,
+    )
+    if last_template and now - datetime.fromisoformat(last_template) < TEMPLATE_GAP:
+        return None
+    templates = (policy.whatsapp_config or {}).get("ladder_templates", {}).get(
+        language or "en"
+    ) or {}
+    template = templates.get(step)
+    if not template:
+        await notify(
+            session,
+            scope,
+            "pi.ladder_template_missing",
+            "pi needs an approved WhatsApp template for follow-ups",
+            f"Add a {language or 'en'} '{step}' template under pi's follow-up settings.",
+            permission="pi.read",
+            dedupe_key=f"pi-ladder-missing:{scope.tenant_id}:{language}:{step}",
+        )
+        _log(
+            conversation,
+            {"at": now.isoformat(), "since": since_raw, "step": step, "status": "no_template"},
+        )
+        return None
+    key = f"pi-nudge:{conversation.id}:{since_raw}:{step}"
+    if await pi.messages.find(PiMessage.idempotency_key == key):
+        return None
+    message = await pi.messages.add(
+        pi.messages.new(
+            conversation_id=conversation.id,
+            direction="outbound",
+            sender_type="ai",
+            agent_key="requirement",
+            body=f"Follow-up template queued: {template.get('name', step)}",
+            status="queued",
+            idempotency_key=key,
+            media={"ladder": {"template": template, "step": step}},
+        )
+    )
+    _log(conversation, {"at": now.isoformat(), "since": since_raw, "step": step})
+    return str(message.id)
+
+
+async def alert_team(
+    session: Any,
+    scope: Any,
+    policy: Any,
+    conversation: PiConversation,
+    issue: dict[str, Any],
+    since_raw: str,
+    now: datetime,
+) -> str | None:
+    """The team's turn: alerts at 12, 24 and 48 hours without a reply from a person, and
+    at 12 hours one status line to the customer so they never feel ignored."""
+    since = datetime.fromisoformat(since_raw)
+    replied = await session.scalar(
+        select(PiMessage.id).where(
+            PiMessage.tenant_id == conversation.tenant_id,
+            PiMessage.environment_id == conversation.environment_id,
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.sender_type == "human",
+            PiMessage.created_at > since,
+        )
+    )
+    if replied:
+        return None
+    waited = now - since
+    for hours, severity in SLA_HOURS:
+        if waited >= timedelta(hours=hours):
+            await notify(
+                session,
+                scope,
+                "pi.team_sla",
+                f"A customer has waited {hours}h for the team",
+                f'"{issue["title"]}": {issue.get("next_step") or "the team owes an update"}.',
+                link=f"/pi/inbox?conversation={conversation.id}",
+                permission="pi.handoffs.manage",
+                severity=severity,
+                dedupe_key=f"pi-sla:{conversation.id}:{since_raw}:{hours}",
+            )
+    brief = conversation.service_brief or {}
+    if (
+        waited < timedelta(hours=12)
+        or _sent(brief, since_raw, "status")
+        or not conversation.last_inbound_at
+        or now - conversation.last_inbound_at > WINDOW
+        or brief.get("reminder_consent") == "declined"
+        or prayer_or_quiet(policy, now)
+    ):
+        return None
+    hours = await service.team_update_hours(session, conversation)
+    due = service.next_update_by(since, hours).strftime("%a %d %b")
+    language = str((brief.get("customer_issues") or {}).get("language") or conversation.language)
+    body = (
+        f'"{issue["title"]}" pe team kaam kar rahi hai. Update {due} tak yahin milega.'
+        if urdu(language)
+        else f'The team is working on "{issue["title"]}". You\'ll get an update here by {due}.'
+    )
+    pi = PiService(session, scope)
+    key = f"pi-status:{conversation.id}:{since_raw}"
+    if await pi.messages.find(PiMessage.idempotency_key == key):
+        return None
+    message = await pi.messages.add(
+        pi.messages.new(
+            conversation_id=conversation.id,
+            direction="outbound",
+            sender_type="ai",
+            agent_key="requirement",
+            body=body,
+            status="queued",
+            idempotency_key=key,
+            media={"nudge": "status"},
+        )
+    )
+    _log(conversation, {"at": now.isoformat(), "since": since_raw, "step": "status"})
+    return str(message.id)

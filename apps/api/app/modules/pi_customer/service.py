@@ -231,7 +231,9 @@ BALL = {
 OWNER = {"client": "you", "team": "team", "pi": "pi", "none": "none"}
 # Journey steps done out of seven (Noted, Understood, Linked, Solution ready, Your
 # decision, Building, Live). "Linked" never blocks: it counts as done once understood.
-JOURNEY = {"noted": 1, "need_answer": 2, "on_it": 3, "solution_ready": 4, "building": 6, "live": 7}
+# Steps done; the next step is the current one. A question waiting on the customer sits
+# at "Understood"; once the team works on it, "Linked" counts as done.
+JOURNEY = {"noted": 1, "need_answer": 1, "on_it": 3, "solution_ready": 4, "building": 5, "live": 7}
 LEGACY_STAGE = {"open": "noted", "with_team": "on_it", "resolved": "live"}
 
 
@@ -262,6 +264,14 @@ class Issue(BaseModel):
     # The customer's own words for it (the title is pi's clean version).
     original_words: str = Field(default="", max_length=300)
     next_step_owner: Literal["you", "team", "pi", "none"] = "pi"
+    # For the Problem Map, priority chart and Problem -> Solution flow.
+    area: str = Field(default="", max_length=40)
+    data_objects: list[str] = Field(default_factory=list, max_length=6)
+    urgency: int = Field(default=3, ge=1, le=5)
+    impact: int = Field(default=3, ge=1, le=5)
+    root_cause: str = Field(default="", max_length=160)
+    solution_outline: str = Field(default="", max_length=200)
+    outcome: str = Field(default="", max_length=160)
 
     @model_validator(mode="before")
     @classmethod
@@ -277,11 +287,28 @@ class Issue(BaseModel):
             ("next_step", 240),
             ("open_question", 240),
             ("original_words", 300),
+            ("area", 40),
+            ("root_cause", 160),
+            ("solution_outline", 200),
+            ("outcome", 160),
         ):
             if key in data:
                 data[key] = str(data[key]).strip()[:limit]
         category = str(data.get("category", "other")).strip().lower()
         data["category"] = category if category in CATEGORIES else "other"
+        for key in ("urgency", "impact"):
+            try:
+                data[key] = min(5, max(1, int(data.get(key, 3))))
+            except (TypeError, ValueError):
+                data[key] = 3
+        objects = data.get("data_objects")
+        if isinstance(objects, str):
+            objects = [o for o in objects.split(",")]
+        data["data_objects"] = (
+            [str(o).strip().lower()[:30] for o in objects if str(o).strip()][:6]
+            if isinstance(objects, list)
+            else []
+        )
         status = str(data.get("status", "open")).strip().lower().replace(" ", "_")
         status = status if status in STATUSES else "open"
         stage = str(data.get("stage") or LEGACY_STAGE[status]).strip().lower()
@@ -299,11 +326,49 @@ class Issue(BaseModel):
         return data
 
 
+LINK_TYPES = ("shared_data", "same_cause", "depends_on", "part_of")
+# Links that put requests into one solution (a "depends on" link orders work, it
+# doesn't merge it).
+MERGING = frozenset({"shared_data", "same_cause", "part_of"})
+
+
+class IssueLink(BaseModel):
+    """A real connection between two of the customer's requests (by list position)."""
+
+    model_config = ConfigDict(extra="ignore")
+    a: int = Field(ge=0, le=5)
+    b: int = Field(ge=0, le=5)
+    type: Literal["shared_data", "same_cause", "depends_on", "part_of"] = "shared_data"
+    confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    # Short line for the customer, in their language (shown on the map's line).
+    reason: str = Field(default="", max_length=60)
+    # The concrete saving (money, time, duplicate work). Empty: link quietly.
+    benefit: str = Field(default="", max_length=140)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _tolerate(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+        data = {k: v for k, v in data.items() if v is not None}
+        kind = str(data.get("type", "shared_data")).strip().lower().replace(" ", "_")
+        data["type"] = kind if kind in LINK_TYPES else "shared_data"
+        try:
+            data["confidence"] = min(1.0, max(0.0, float(data.get("confidence", 0))))
+        except (TypeError, ValueError):
+            data["confidence"] = 0.0
+        for key, limit in (("reason", 60), ("benefit", 140)):
+            if key in data:
+                data[key] = str(data[key]).strip()[:limit]
+        return data
+
+
 class IssueReport(BaseModel):
     model_config = ConfigDict(extra="ignore")
     # One line for the chat list: what is waiting on the customer, or where things stand.
     headline: str = Field(default="", max_length=160)
     issues: list[Issue] = Field(default_factory=list, max_length=6)
+    links: list[IssueLink] = Field(default_factory=list, max_length=10)
 
     @model_validator(mode="before")
     @classmethod
@@ -312,6 +377,11 @@ class IssueReport(BaseModel):
             data = {
                 **data,
                 "issues": [i for i in data["issues"] if isinstance(i, (dict, Issue))][:6],
+            }
+        if isinstance(data, dict) and isinstance(data.get("links"), list):
+            data = {
+                **data,
+                "links": [x for x in data["links"] if isinstance(x, (dict, IssueLink))][:10],
             }
         if isinstance(data, dict) and "headline" in data:
             data = {**data, "headline": str(data["headline"] or "").strip()[:160]}
@@ -346,6 +416,24 @@ For each item:
 - department: the key of the ONE business department in `departments` that should
   handle it. Follow `team_examples` first: they are the business's own past decisions.
   When unsure, pick the closest match by the department descriptions.
+- area: the business area it belongs to, one or two words (e.g. "Sales",
+  "Operations", "Marketing", "Finance", "Design").
+- data_objects: the things it works on, lowercase single words (e.g. "products",
+  "stock", "orders", "customers", "staff", "brand").
+- urgency 1-5 (how soon it hurts the customer) and impact 1-5 (how much it matters to
+  their business), from what they said. 3 when unclear.
+- root_cause: in a few words, why the problem exists (empty if unknown).
+- solution_outline: in a few words, what the business would build or do, ONLY from
+  what the business offers in the transcript (empty if not discussed).
+- outcome: in a few words, what changes for the customer when it's solved.
+Keep root_cause, solution_outline and outcome short (max about 18 words each).
+links: real connections BETWEEN the items above (a and b are their positions, from 0):
+  "shared_data" (both need the same products, stock, orders, customers...),
+  "same_cause" (both come from one underlying issue), "depends_on" (a needs b done
+  first), "part_of" (a is a piece of b). confidence 0-1. reason: max 6 words in the
+  customer's language. benefit: the concrete saving of solving them together (money,
+  time, duplicate work), or empty if there is none. Never link an obvious or weak
+  pair; fewer, truer links are better than many.
 Also return headline: ONE line (max 12 words) for their chat list: the question
 waiting for them if any, otherwise where things stand now.
 Language: if `language` is "auto", write titles, summaries, questions, next steps and the
@@ -522,13 +610,23 @@ async def analyse(
     except GatewayUnavailable:
         logger.info("pi_customer_issues_unavailable")
         return cached if isinstance(cached, dict) else None
+    issues = place([i.model_dump() for i in result.value.issues], departments, overrides)
+    feedback = brief.get("link_feedback")
+    links = judge_links(
+        [link.model_dump() for link in result.value.links],
+        issues,
+        feedback if isinstance(feedback, dict) else {},
+    )
     report = {
         "at": stamp,
         "language": language,
         "headline": result.value.headline,
         "waiting": waiting_since(rows),
-        "issues": place([i.model_dump() for i in result.value.issues], departments, overrides),
+        "issues": with_solutions(issues, links),
+        "links": links,
     }
+    events = changes(cached if isinstance(cached, dict) else None, report)
+    log = [*(brief.get("customer_events") or []), *events][-EVENT_LIMIT:]
     # Merged in the database: Pi may have updated the brief while this ran.
     await session.execute(
         update(PiConversation)
@@ -538,13 +636,128 @@ async def analyse(
         )
         .values(
             service_brief=func.coalesce(PiConversation.service_brief, cast({}, JSONB)).op("||")(
-                cast({"customer_issues": report}, JSONB)
+                cast({"customer_issues": report, "customer_events": log}, JSONB)
             )
         )
         .execution_options(synchronize_session=False)
     )
     await session.commit()
+    report["new_events"] = events
     return report
+
+
+EVENT_LIMIT = 80
+AUTO_LINK, REVIEW_LINK = 0.8, 0.5
+
+
+def pair_key(first: str, second: str) -> str:
+    """The same key whichever way round the two titles are."""
+    return "|".join(sorted((norm_title(first), norm_title(second))))
+
+
+def judge_links(
+    raw: list[dict[str, Any]], issues: list[dict[str, Any]], feedback: dict[str, str]
+) -> list[dict[str, Any]]:
+    """Keep real links only. 0.8+ links automatically, 0.5-0.8 waits for the team, below
+    that nothing. A pair the customer called "not related" never comes back; one the team
+    confirmed stays confirmed. A link with no concrete saving is drawn but not announced."""
+    out: dict[str, dict[str, Any]] = {}
+    for link in raw:
+        a, b = int(link["a"]), int(link["b"])
+        if a == b or a >= len(issues) or b >= len(issues):
+            continue
+        key = pair_key(issues[a]["title"], issues[b]["title"])
+        verdict = feedback.get(key)
+        if verdict == "rejected":
+            continue
+        confidence = float(link["confidence"])
+        if verdict == "confirmed":
+            status = "confirmed"
+        elif confidence >= AUTO_LINK:
+            status = "auto"
+        elif confidence >= REVIEW_LINK:
+            status = "pending_review"
+        else:
+            continue
+        if key in out and out[key]["confidence"] >= confidence:
+            continue
+        out[key] = {
+            **link,
+            "a": a,
+            "b": b,
+            "a_title": issues[a]["title"],
+            "b_title": issues[b]["title"],
+            "status": status,
+            "announce": status in ("auto", "confirmed") and bool(link["benefit"]),
+        }
+    return list(out.values())
+
+
+def with_solutions(
+    issues: list[dict[str, Any]], links: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Requests joined by shared data, one cause or "part of" share one solution: each
+    gets that group's id (s1, s2 ...) and how many other requests it is linked to."""
+    parent = list(range(len(issues)))
+
+    def root(i: int) -> int:
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    live = [x for x in links if x["status"] in ("auto", "confirmed")]
+    for link in live:
+        if link["type"] in MERGING:
+            parent[root(link["a"])] = root(link["b"])
+    groups: dict[int, str] = {}
+    out = []
+    for index, issue in enumerate(issues):
+        group = groups.setdefault(root(index), f"s{len(groups) + 1}")
+        linked = sum(1 for x in live if index in (x["a"], x["b"]))
+        out.append({**issue, "solution_id": group, "linked": linked})
+    return out
+
+
+def changes(old: dict[str, Any] | None, new: dict[str, Any]) -> list[dict[str, Any]]:
+    """What pi noticed since the last reading, for the activity timeline and WhatsApp
+    cards: new requests, stage changes and newly found links."""
+    now = datetime.now(UTC).isoformat()
+    before = {norm_title(i["title"]): i for i in (old or {}).get("issues", [])}
+    events: list[dict[str, Any]] = []
+    for issue in new["issues"]:
+        previous = before.get(norm_title(issue["title"]))
+        if previous is None:
+            events.append(
+                {"at": now, "actor": "pi", "kind": "problem.noted", "title": issue["title"]}
+            )
+        elif previous.get("stage") != issue["stage"]:
+            events.append(
+                {
+                    "at": now,
+                    "actor": "pi",
+                    "kind": "stage.changed",
+                    "title": issue["title"],
+                    "from": previous.get("stage", ""),
+                    "to": issue["stage"],
+                }
+            )
+    known = {pair_key(x["a_title"], x["b_title"]) for x in (old or {}).get("links", [])}
+    for link in new["links"]:
+        if link["status"] in ("auto", "confirmed") and (
+            pair_key(link["a_title"], link["b_title"]) not in known
+        ):
+            events.append(
+                {
+                    "at": now,
+                    "actor": "pi",
+                    "kind": "link.found",
+                    "title": f"{link['a_title']} + {link['b_title']}",
+                    "detail": link["reason"],
+                    "announce": link["announce"],
+                }
+            )
+    return events
 
 
 async def team_update_hours(session: AsyncSession, conversation: PiConversation) -> int:
@@ -561,3 +774,41 @@ async def team_update_hours(session: AsyncSession, conversation: PiConversation)
     except (TypeError, ValueError):
         hours = 24
     return max(1, min(hours, 24 * 14))
+
+
+async def timeline(session: AsyncSession, conversation: PiConversation) -> list[dict[str, Any]]:
+    """Activity, newest first: what pi noticed (from its readings), what the customer
+    and the team did (from the chat and handoffs). Never internal notes or staff names."""
+    events: list[dict[str, Any]] = [
+        e
+        for e in (conversation.service_brief or {}).get("customer_events") or []
+        if isinstance(e, dict) and e.get("at")
+    ]
+    seen_days: set[str] = set()
+    for m in await messages(session, conversation):
+        at = m.created_at.isoformat()
+        day = m.created_at.date().isoformat()
+        if m.direction == "inbound":
+            if day not in seen_days:  # one "you wrote" per day is enough
+                seen_days.add(day)
+                events.append({"at": at, "actor": "you", "kind": "client.wrote", "title": ""})
+        elif m.sender_type == "human":
+            events.append({"at": at, "actor": "team", "kind": "team.replied", "title": ""})
+        elif m.sender_type == "ai" and "?" in m.body:
+            question = next(
+                (line.strip() for line in reversed(m.body.splitlines()) if "?" in line), ""
+            )
+            events.append({"at": at, "actor": "pi", "kind": "pi.asked", "title": question[:160]})
+    handoffs = await session.scalars(
+        select(PiHandoff).where(
+            PiHandoff.tenant_id == conversation.tenant_id,
+            PiHandoff.environment_id == conversation.environment_id,
+            PiHandoff.conversation_id == conversation.id,
+        )
+    )
+    for h in handoffs:
+        events.append(
+            {"at": h.created_at.isoformat(), "actor": "team", "kind": "team.picked_up", "title": ""}
+        )
+    events.sort(key=lambda e: str(e["at"]), reverse=True)
+    return events[:60]

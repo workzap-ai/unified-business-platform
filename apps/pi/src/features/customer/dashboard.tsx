@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -27,6 +28,7 @@ import {
   type CustomerMe,
   type CustomerPrefs,
   type CustomerShareLink,
+  type IssueLink,
 } from "@/lib/customer-api";
 import { cn } from "@/lib/cn";
 import {
@@ -38,6 +40,7 @@ import {
   Skeleton,
 } from "@/components/ui";
 import { CustomerSecurityCard } from "./security";
+import { PriorityChart, ProblemMap } from "./visuals";
 import {
   Avatar,
   CATEGORY,
@@ -88,6 +91,8 @@ export function Dashboard({ me }: { me: CustomerMe }) {
   });
   useCatchUp(list.data);
   useMarkSeen();
+  useLiveUpdates();
+  const router = useRouter();
 
   const items = useMemo(() => list.data ?? [], [list.data]);
   // Every request across every chat: all numbers on this page count these.
@@ -109,6 +114,22 @@ export function Dashboard({ me }: { me: CustomerMe }) {
     );
   }, [rows, query, filter]);
   const reading = items.some((c) => !c.issues_fresh);
+  const links: (IssueLink & { conversation: string })[] = useMemo(
+    () =>
+      items.flatMap((c) =>
+        (c.links ?? []).map((l) => ({ ...l, conversation: c.id })),
+      ),
+    [items],
+  );
+  const notRelated = useMutation({
+    mutationFn: (link: IssueLink & { conversation: string }) =>
+      customerPost(`/conversations/${link.conversation}/links/not-related`, {
+        a_title: link.a_title,
+        b_title: link.b_title,
+      }),
+    onSuccess: () =>
+      void client.invalidateQueries({ queryKey: ["pi-customer"] }),
+  });
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-5 sm:space-y-6">
@@ -171,6 +192,38 @@ export function Dashboard({ me }: { me: CustomerMe }) {
             lang={lang}
             reading={reading}
           />
+
+          {rows.length > 0 && (
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+              <Card className="p-4 sm:p-5">
+                <h2 className="mb-2 font-semibold">
+                  {lang === "ur"
+                    ? "Aap ke maslon ka naqsha"
+                    : "Your Problem Map"}
+                </h2>
+                <ProblemMap
+                  issues={rows}
+                  links={links}
+                  lang={lang}
+                  onNotRelated={(link) =>
+                    notRelated.mutate(
+                      link as IssueLink & { conversation: string },
+                    )
+                  }
+                  onOpen={(issue) => {
+                    const row = rows.find((r) => r.title === issue.title);
+                    if (row) router.push(`/customer/c/${row.conversation.id}`);
+                  }}
+                />
+              </Card>
+              <Card className="p-4 sm:p-5">
+                <h2 className="mb-2 font-semibold">
+                  {lang === "ur" ? "Kahan se shuru karein" : "Where to start"}
+                </h2>
+                <PriorityChart issues={rows} links={links} lang={lang} />
+              </Card>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
             <section aria-label="Requests" className="min-w-0 space-y-3">
@@ -335,6 +388,22 @@ function useCatchUp(items: CustomerConversationItem[] | undefined) {
       void client.invalidateQueries({ queryKey: LIST });
     })();
   }, [items, client]);
+}
+
+/** Server-sent events: redraw the moment pi or the team changes something. The
+ * 20-second polling stays as the fallback when the stream can't connect. */
+function useLiveUpdates() {
+  const client = useQueryClient();
+  useEffect(() => {
+    if (typeof EventSource === "undefined") return;
+    const source = new EventSource("/api/v1/pi-app/customer-portal/stream", {
+      withCredentials: true,
+    });
+    source.addEventListener("update", () => {
+      void client.invalidateQueries({ queryKey: ["pi-customer"] });
+    });
+    return () => source.close();
+  }, [client]);
 }
 
 function useMarkSeen() {
@@ -566,6 +635,13 @@ function RequestRow({ row, lang }: { row: Row; lang: "en" | "ur" }) {
               />
               {stage[lang]}
             </Badge>
+            {!!row.linked && (
+              <Badge tone="accent">
+                {lang === "ur"
+                  ? `${row.linked} se juda`
+                  : `Linked to ${row.linked}`}
+              </Badge>
+            )}
           </div>
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
             {row.conversation.business}
