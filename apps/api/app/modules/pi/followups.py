@@ -11,6 +11,15 @@ from app.modules.pi.models import PiConversation, PiMessage, WhatsAppConnection
 from app.modules.pi.service import PiService
 
 
+def _waiting_until(brief: dict[str, Any]) -> datetime | None:
+    """Until when the customer said they are waiting on someone else (pi Customer)."""
+    raw = brief.get("customer_waiting_until")
+    try:
+        return datetime.fromisoformat(raw) if isinstance(raw, str) and raw else None
+    except ValueError:
+        return None
+
+
 def quiet_until(
     timezone: str, start: int = 21, end: int = 9, now: datetime | None = None
 ) -> datetime | None:
@@ -52,6 +61,12 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
             policy = await settings_row(session, scope)
             brief = conversation.service_brief or {}
             source = brief.get("source_message_id")
+            waiting = _waiting_until(brief)
+            if waiting is not None and waiting > datetime.now(UTC):
+                # The customer is waiting on someone else (a boss, a partner): don't
+                # nudge them until the pause they chose is over.
+                conversation.followup_due_at = waiting
+                continue
             if (
                 conversation.mode != "ai"
                 or conversation.status != "open"

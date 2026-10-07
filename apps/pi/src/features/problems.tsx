@@ -32,6 +32,8 @@ import {
 import { cn } from "@/lib/cn";
 import { errorText, get, patch, post } from "@/lib/api";
 import { useAction, useBusinessKey, useCan } from "@/lib/session";
+import type { Stage } from "@/lib/customer-api";
+import { STAGE } from "./customer/shared";
 
 type Status = "open" | "with_team" | "resolved";
 
@@ -56,6 +58,10 @@ interface Problem {
   department: string;
   moved_by_team: boolean;
   last_message_at: string;
+  /** The shared status vocabulary (older lists have only `status`). */
+  stage?: Stage;
+  ball_with?: "client" | "team" | "pi" | "none";
+  open_question?: string;
 }
 
 interface Board {
@@ -418,9 +424,22 @@ function ProblemCard({
               {ago(problem.last_message_at)}
             </span>
           </span>
-          <Badge tone={status.tone}>{status.label}</Badge>
+          <span className="flex flex-wrap gap-1.5">
+            {problem.stage && (
+              <Badge tone={STAGE[problem.stage].tone}>
+                {STAGE[problem.stage].en}
+              </Badge>
+            )}
+            <Badge tone={status.tone}>{status.label}</Badge>
+          </span>
         </div>
         <p className="font-semibold leading-snug">{problem.title}</p>
+        {problem.ball_with === "client" && problem.open_question && (
+          <p className="rounded-lg bg-warning-soft/60 px-3 py-2 text-[13px]">
+            <span className="font-medium">Waiting on the customer: </span>
+            {problem.open_question}
+          </p>
+        )}
         {problem.summary && (
           <p className="text-sm text-foreground-secondary">{problem.summary}</p>
         )}

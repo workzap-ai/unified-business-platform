@@ -29,7 +29,7 @@ function friendly(status: number, message?: string): string {
 }
 
 async function request(
-  method: "GET" | "POST" | "DELETE",
+  method: "GET" | "POST" | "PUT" | "DELETE",
   path: string,
   body?: unknown,
 ): Promise<Response> {
@@ -82,6 +82,9 @@ export const customerGet = async <T>(path: string) =>
 export const customerPost = async <T>(path: string, body?: unknown) =>
   json<T>(await request("POST", path, body ?? {}));
 
+export const customerPut = async <T>(path: string, body: unknown) =>
+  json<T>(await request("PUT", path, body));
+
 export async function customerFile(path: string): Promise<Blob> {
   const response = await request("GET", path);
   if (!response.ok) await json(response);
@@ -97,16 +100,37 @@ export type CustomerConversationItem = {
   whatsapp_link: string;
   status: "open" | "closed";
   last_message_at: string;
+  /** pi's one line about where things stand (better than the last raw message). */
+  headline: string;
   preview: string;
   with_team: boolean;
+  /** False until pi has read the newest messages in this chat. */
+  issues_fresh: boolean;
   issues_open: number;
   issues_total: number;
-  issues_by_status?: { open: number; with_team: number; resolved: number };
-  issues_preview: Pick<
-    CustomerIssue,
-    "title" | "status" | "category" | "department_name"
-  >[];
+  counts: RequestCounts;
+  waiting_on_other_until: string | null;
+  issues: CustomerIssue[];
 };
+
+/** Every number on the dashboard counts requests, in these buckets. */
+export type RequestCounts = {
+  waiting_on_you: number;
+  waiting_on_other: number;
+  waiting_on_us: number;
+  done: number;
+  paused: number;
+};
+
+export type Stage =
+  | "noted"
+  | "need_answer"
+  | "on_it"
+  | "solution_ready"
+  | "building"
+  | "live"
+  | "paused"
+  | "closed";
 
 export type CustomerMessage = {
   id: string;
@@ -130,10 +154,60 @@ export type CustomerIssue = {
     | "support"
     | "other";
   status: "open" | "with_team" | "resolved";
+  stage: Stage;
+  ball_with: "client" | "team" | "pi" | "none";
+  /** The one question waiting for the customer, when it's their turn. */
+  open_question: string;
+  /** The customer's own words; the title is pi's clean version. */
+  original_words: string;
   summary: string;
   next_step: string;
+  next_step_owner: "you" | "team" | "pi" | "none";
+  waiting_since: string | null;
+  waiting_on_other_until: string | null;
+  /** When the team said it would update, if it's their turn. */
+  next_update_by: string | null;
+  overdue: boolean;
+  /** Journey steps done out of 7; null when paused or closed. */
+  journey_steps: number | null;
   /** The business department handling it, e.g. "Finance". */
   department_name?: string;
+};
+
+export type CustomerPrefs = {
+  language: "auto" | "en" | "roman_ur" | "ur" | "ar";
+  last_seen_at: string | null;
+};
+
+export type CustomerShareLink = {
+  id: string;
+  conversation_id: string | null;
+  expires_at: string;
+  views: number;
+  created_at: string;
+  token?: string;
+};
+
+export type SharedView = {
+  expires_at: string;
+  businesses: {
+    business: string;
+    counts: RequestCounts;
+    issues: Pick<
+      CustomerIssue,
+      | "title"
+      | "category"
+      | "stage"
+      | "ball_with"
+      | "summary"
+      | "next_step"
+      | "next_step_owner"
+      | "open_question"
+      | "next_update_by"
+      | "waiting_on_other_until"
+      | "journey_steps"
+    >[];
+  }[];
 };
 
 export type CustomerRequest = {
@@ -154,11 +228,13 @@ export type CustomerConversationDetail = {
   last_message_at: string;
   messages: CustomerMessage[];
   requests: CustomerRequest[];
-  issues: { at: string; issues: CustomerIssue[] } | null;
+  waiting_on_other_until: string | null;
+  issues: { at: string; headline?: string; issues: CustomerIssue[] } | null;
 };
 
 export type CustomerIssues = {
   available: boolean;
   at: string | null;
+  headline?: string;
   issues: CustomerIssue[];
 };

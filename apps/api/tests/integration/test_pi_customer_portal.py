@@ -200,19 +200,172 @@ async def test_ai_lists_the_customers_requests_once_per_new_message(
     again = (await customer.get(path)).json()
     assert again["issues"] == first["issues"] and calls == [1]  # cached until a new message
     listed = (await customer.get(f"{PORTAL}/conversations")).json()[0]
-    assert listed["issues_open"] == 1
-    assert listed["issues_by_status"] == {"open": 1, "with_team": 0, "resolved": 0}
-    assert listed["issues_preview"] == [
-        {
-            "title": "Website banwana",
-            "status": "open",
-            "category": "inquiry",
-            "department_name": "Customer support",
-        }
-    ]
+    assert listed["issues_open"] == 1 and listed["issues_fresh"] is True
+    assert listed["counts"]["waiting_on_us"] == 1  # "noted": pi's turn, not the customer's
+    [issue] = listed["issues"]
+    assert issue["title"] == "Website banwana" and issue["stage"] == "noted"
+    assert issue["department_name"] == "Customer support"
     conversation = await business_db.get(PiConversation, conversation_id)
     await business_db.refresh(conversation)
     # Pi's own brief keys are kept beside the cached list.
     assert "customer_issues" in conversation.service_brief
     await business.aclose()
     await customer.aclose()
+
+
+def _mock_issues(monkeypatch, *reports: IssueReport) -> list[dict]:
+    """Scripted request lists; returns the context pi was given each time."""
+    seen: list[dict] = []
+    queue = list(reports)
+
+    async def complete(self, scope, output, **kwargs):
+        assert output is IssueReport
+        seen.append(json.loads(kwargs["messages"][-1].text()))
+        report = queue.pop(0) if len(queue) > 1 else queue[0]
+        return SimpleNamespace(value=report, response=SimpleNamespace(attempts=[]))
+
+    monkeypatch.setattr(LLMManager, "complete_structured", complete)
+    return seen
+
+
+THREE = IssueReport(
+    headline="Kitne staff ERP app use karenge?",
+    issues=[
+        Issue(
+            title="Mobile ERP app",
+            stage="need_answer",
+            open_question="Kitne staff ERP app use karenge?",
+            original_words="mujhe erp chahiye mobile pe",
+            next_step="You: staff ki tadaad batayein",
+        ),
+        Issue(
+            title="Furniture website",
+            stage="on_it",
+            # A question on the team's turn is not the customer's to answer.
+            open_question="Should we use Shopify?",
+            next_step="Team: scope bana rahi hai",
+        ),
+        Issue(title="Features PDF", stage="live", summary="PDF bhej di gayi."),
+    ],
+)
+
+
+async def test_every_number_counts_requests_by_whose_turn_it_is(
+    app, provider, business_db, monkeypatch
+):
+    business = await _business_with_chat(app, provider, business_db, monkeypatch)
+    customer = await _sign_in(app, provider)
+    conversation_id = (await customer.get(f"{PORTAL}/conversations")).json()[0]["id"]
+    _mock_issues(monkeypatch, THREE)
+    await customer.get(f"{PORTAL}/conversations/{conversation_id}/issues")
+    listed = (await customer.get(f"{PORTAL}/conversations")).json()[0]
+    assert listed["headline"] == "Kitne staff ERP app use karenge?"
+    assert listed["issues_total"] == 3 and len(listed["issues"]) == 3
+    assert listed["counts"] == {
+        "waiting_on_you": 1,
+        "waiting_on_other": 0,
+        "waiting_on_us": 1,
+        "done": 1,
+        "paused": 0,
+    }
+    erp, site, pdf = listed["issues"]
+    assert erp["ball_with"] == "client" and erp["next_step_owner"] == "you"
+    assert erp["open_question"] and erp["original_words"] == "mujhe erp chahiye mobile pe"
+    assert site["ball_with"] == "team" and site["open_question"] == ""
+    assert site["next_update_by"] and site["status"] == "with_team"  # board still works
+    assert pdf["status"] == "resolved" and pdf["journey_steps"] == 7
+    assert erp["journey_steps"] == 2 and site["journey_steps"] == 3
+    await business.aclose()
+    await customer.aclose()
+
+
+async def test_waiting_on_someone_else_pauses_reminders_and_can_be_undone(
+    app, provider, business_db, monkeypatch
+):
+    from app.modules.pi.followups import _waiting_until
+
+    business = await _business_with_chat(app, provider, business_db, monkeypatch)
+    customer = await _sign_in(app, provider)
+    conversation_id = (await customer.get(f"{PORTAL}/conversations")).json()[0]["id"]
+    _mock_issues(monkeypatch, THREE)
+    await customer.get(f"{PORTAL}/conversations/{conversation_id}/issues")
+    headers = {"x-csrf-token": customer.cookies[CSRF_COOKIE]}
+    path = f"{PORTAL}/conversations/{conversation_id}/waiting"
+    paused = await customer.post(path, json={"days": 5}, headers=headers)
+    assert paused.status_code == 200 and paused.json()["waiting_on_other_until"]
+    listed = (await customer.get(f"{PORTAL}/conversations")).json()[0]
+    assert listed["counts"]["waiting_on_other"] == 1 and listed["counts"]["waiting_on_you"] == 0
+    conversation = await business_db.get(PiConversation, conversation_id)
+    await business_db.refresh(conversation)
+    assert _waiting_until(conversation.service_brief) is not None  # reminders skip it
+    assert "customer_issues" in conversation.service_brief  # other brief keys kept
+    resumed = await customer.post(path, json={"days": 0}, headers=headers)
+    assert resumed.status_code == 200, resumed.text
+    listed = (await customer.get(f"{PORTAL}/conversations")).json()[0]
+    assert listed["counts"]["waiting_on_you"] == 1, listed
+    await business.aclose()
+    await customer.aclose()
+
+
+async def test_language_choice_rewrites_the_request_list(app, provider, business_db, monkeypatch):
+    business = await _business_with_chat(app, provider, business_db, monkeypatch)
+    customer = await _sign_in(app, provider)
+    conversation_id = (await customer.get(f"{PORTAL}/conversations")).json()[0]["id"]
+    seen = _mock_issues(monkeypatch, THREE)
+    path = f"{PORTAL}/conversations/{conversation_id}/issues"
+    await customer.get(path)
+    assert seen[-1]["language"] == "auto"
+    headers = {"x-csrf-token": customer.cookies[CSRF_COOKIE]}
+    saved = await customer.put(f"{PORTAL}/prefs", json={"language": "en"}, headers=headers)
+    assert saved.status_code == 200 and saved.json()["language"] == "en"
+    await customer.get(path)
+    assert len(seen) == 2 and seen[-1]["language"] == "en"
+    await customer.get(path)
+    assert len(seen) == 2  # cached again for the chosen language
+    bad = await customer.put(f"{PORTAL}/prefs", json={"language": "xx"}, headers=headers)
+    assert bad.status_code == 422
+    first = (await customer.post(f"{PORTAL}/seen", headers=headers)).json()
+    second = (await customer.post(f"{PORTAL}/seen", headers=headers)).json()
+    assert first["previous"] is None and second["previous"] is not None
+    await business.aclose()
+    await customer.aclose()
+
+
+async def test_a_shared_link_shows_requests_only_and_can_be_turned_off(
+    app, provider, business_db, monkeypatch
+):
+    from datetime import UTC, datetime, timedelta
+
+    from app.modules.pi_customer.models import CustomerShareLink
+
+    business = await _business_with_chat(app, provider, business_db, monkeypatch)
+    customer = await _sign_in(app, provider)
+    conversation_id = (await customer.get(f"{PORTAL}/conversations")).json()[0]["id"]
+    _mock_issues(monkeypatch, THREE)
+    await customer.get(f"{PORTAL}/conversations/{conversation_id}/issues")
+    headers = {"x-csrf-token": customer.cookies[CSRF_COOKIE]}
+    assert (await customer.post(f"{PORTAL}/share", json={})).status_code == 403  # CSRF
+    made = await customer.post(f"{PORTAL}/share", json={}, headers=headers)
+    assert made.status_code == 201
+    token, link_id = made.json()["token"], made.json()["id"]
+    boss = pi_client(app)  # not signed in
+    shown = await boss.get(f"{PORTAL}/shared/{token}")
+    assert shown.status_code == 200
+    flat = json.dumps(shown.json())
+    assert "Mobile ERP app" in flat and "Kitne staff" in flat
+    # No chat, no customer number, no customer's own words.
+    assert "Website chahiye" not in flat and CUSTOMER not in flat
+    assert "original_words" not in flat and "mujhe erp" not in flat
+    assert [s["id"] for s in (await customer.get(f"{PORTAL}/share")).json()] == [link_id]
+    revoked = await customer.delete(f"{PORTAL}/share/{link_id}", headers=headers)
+    assert revoked.status_code == 204
+    assert (await boss.get(f"{PORTAL}/shared/{token}")).status_code == 404
+    # An expired link stops working too.
+    again = (await customer.post(f"{PORTAL}/share", json={}, headers=headers)).json()
+    link = await business_db.get(CustomerShareLink, again["id"])
+    link.expires_at = datetime.now(UTC) - timedelta(minutes=1)
+    await business_db.commit()
+    assert (await boss.get(f"{PORTAL}/shared/{again['token']}")).status_code == 404
+    assert (await boss.get(f"{PORTAL}/shared/not-a-real-token")).status_code == 404
+    for client in (business, customer, boss):
+        await client.aclose()

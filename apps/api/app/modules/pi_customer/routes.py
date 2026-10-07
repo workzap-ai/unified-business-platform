@@ -1,14 +1,18 @@
 """PI Customer API, mounted at /api/v1/pi-app/customer-portal (the Pi app's origin and
 proxy). It never uses business sessions: only the signed customer cookie from access.py."""
 
+import hashlib
 import hmac
 import logging
+import secrets
 import time
-from typing import Annotated, Any
+from datetime import UTC, datetime, timedelta
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import select
 
 from app.core.rate_limit import client_ip, hit
 from app.modules.access.dependencies import Session
@@ -16,6 +20,7 @@ from app.modules.customers.schemas import normalize_phone
 from app.modules.pi.whatsapp import WhatsApp
 from app.modules.pi_customer import access, service
 from app.modules.pi_customer.access import CustomerSession
+from app.modules.pi_customer.models import CustomerPrefs, CustomerShareLink
 from app.shared.errors import BusinessRuleViolation
 
 logger = logging.getLogger("platform")
@@ -48,19 +53,88 @@ def _digits(raw: str) -> str:
     return phone[1:]
 
 
-async def _with_departments(
-    session: Any, conversation: Any, issues: list[dict[str, Any]]
+LANGUAGES = ("auto", "en", "roman_ur", "ur", "ar")
+SHARE_DAYS = 7
+
+
+class WaitingInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    # 0 clears it: "I'm back, carry on".
+    days: int = Field(default=5, ge=0, le=14)
+
+
+class PrefsInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    language: Literal["auto", "en", "roman_ur", "ur", "ar"]
+
+
+class ShareInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    conversation_id: UUID | None = None
+
+
+async def _prefs(session: Any, phone: str) -> CustomerPrefs | None:
+    prefs: CustomerPrefs | None = await session.scalar(
+        select(CustomerPrefs).where(CustomerPrefs.phone == phone)
+    )
+    return prefs
+
+
+async def _language(session: Any, phone: str) -> str:
+    prefs = await _prefs(session, phone)
+    return prefs.language if prefs and prefs.language in LANGUAGES else "auto"
+
+
+def _waiting_until(conversation: Any) -> datetime | None:
+    raw = (conversation.service_brief or {}).get("customer_waiting_until")
+    try:
+        return datetime.fromisoformat(raw) if raw else None
+    except ValueError:
+        return None
+
+
+async def _views(
+    session: Any, conversation: Any, report: dict[str, Any] | None
 ) -> list[dict[str, Any]]:
-    """Each issue with the business's department name (and the team's own moves)."""
+    """Each issue as the customer sees it, with the business's department name (and the
+    team's own moves), whose turn it is and when the team's next update is due."""
+    if not isinstance(report, dict):
+        return []
     departments, _ = await service.departments_for(
         session, conversation.tenant_id, conversation.environment_id
     )
     overrides = (conversation.service_brief or {}).get("issue_departments") or {}
     names = {d["key"]: d["name"] for d in departments}
+    hours = await service.team_update_hours(session, conversation)
+    until = _waiting_until(conversation)
     return [
-        {**i, "department_name": names.get(i["department"], "")}
-        for i in service.place(issues, departments, overrides)
+        service.issue_view(
+            {**i, "department_name": names.get(i["department"], "")}, report, until, hours
+        )
+        for i in service.place(report.get("issues", []), departments, overrides)
     ]
+
+
+def _counts(issues: list[dict[str, Any]]) -> dict[str, int]:
+    """Every number on the dashboard counts requests, in the same four buckets."""
+    out = {"waiting_on_you": 0, "waiting_on_other": 0, "waiting_on_us": 0, "done": 0, "paused": 0}
+    for i in issues:
+        if i["stage"] in ("live", "closed"):
+            out["done"] += 1
+        elif i["stage"] == "paused":
+            out["paused"] += 1
+        elif i["waiting_on_other_until"]:
+            out["waiting_on_other"] += 1
+        elif i["ball_with"] == "client":
+            out["waiting_on_you"] += 1
+        else:
+            out["waiting_on_us"] += 1
+    return out
+
+
+def _fresh(conversation: Any) -> bool:
+    cached = (conversation.service_brief or {}).get("customer_issues")
+    return isinstance(cached, dict) and cached.get("at") == conversation.last_message_at.isoformat()
 
 
 def _wa_link(display_phone: str) -> str:
@@ -171,8 +245,9 @@ async def list_conversations(customer: Customer, session: Session) -> list[dict[
     out = []
     for conversation, connection, business in items:
         cached = (conversation.service_brief or {}).get("customer_issues")
-        issues = cached.get("issues", []) if isinstance(cached, dict) else []
-        issues = await _with_departments(session, conversation, issues)
+        issues = await _views(session, conversation, cached)
+        counts = _counts(issues)
+        headline = cached.get("headline", "") if isinstance(cached, dict) else ""
         out.append(
             {
                 "id": conversation.id,
@@ -181,24 +256,17 @@ async def list_conversations(customer: Customer, session: Session) -> list[dict[
                 "whatsapp_link": _wa_link(connection.display_phone_number),
                 "status": conversation.status,
                 "last_message_at": conversation.last_message_at,
+                # pi's one line about where things stand, not the last raw message.
+                "headline": headline,
                 "preview": conversation.last_message_preview,
                 "with_team": conversation.mode == "human",
-                "issues_open": sum(1 for i in issues if i.get("status") != "resolved"),
+                "issues_fresh": _fresh(conversation),
                 "issues_total": len(issues),
-                "issues_by_status": {
-                    status: sum(1 for i in issues if i.get("status") == status)
-                    for status in ("open", "with_team", "resolved")
-                },
-                # Open matters first, for the dashboard's request overview.
-                "issues_preview": [
-                    {
-                        "title": i.get("title", ""),
-                        "status": i.get("status", "open"),
-                        "category": i.get("category", "other"),
-                        "department_name": i.get("department_name", ""),
-                    }
-                    for i in sorted(issues, key=lambda i: i.get("status") == "resolved")[:3]
-                ],
+                "issues_open": len(issues) - counts["done"],
+                "counts": counts,
+                "waiting_on_other_until": _waiting_until(conversation),
+                # Every request, so the dashboard's numbers always add up.
+                "issues": issues,
             }
         )
     return out
@@ -219,8 +287,10 @@ async def conversation_detail(
 ) -> dict[str, Any]:
     conversation, connection, business = await _owned(session, customer, conversation_id)
     cached = (conversation.service_brief or {}).get("customer_issues")
-    fresh = isinstance(cached, dict) and cached.get("at") == (
-        conversation.last_message_at.isoformat()
+    fresh = (
+        _fresh(conversation)
+        and isinstance(cached, dict)
+        and cached.get("language", "auto") == await _language(session, customer.phone)
     )
     return {
         "id": conversation.id,
@@ -234,8 +304,9 @@ async def conversation_detail(
             service.message_view(m) for m in await service.messages(session, conversation)
         ],
         "requests": await service.open_requests(session, conversation),
+        "waiting_on_other_until": _waiting_until(conversation),
         "issues": (
-            {**cached, "issues": await _with_departments(session, conversation, cached["issues"])}
+            {**cached, "issues": await _views(session, conversation, cached)}
             if fresh and isinstance(cached, dict)
             else None
         ),
@@ -259,14 +330,197 @@ async def conversation_issues(
         conversation,
         connection,
         business,
+        await _language(session, customer.phone),
     )
     if report is None:
         return {"available": False, "issues": [], "at": None}
     return {
         "available": True,
         **report,
-        "issues": await _with_departments(session, conversation, report.get("issues", [])),
+        "issues": await _views(session, conversation, report),
     }
+
+
+@router.post("/conversations/{conversation_id}/waiting")
+async def waiting_on_someone(
+    conversation_id: UUID, body: WaitingInput, customer: Customer, session: Session
+) -> dict[str, Any]:
+    """ "I'm waiting on someone else" (a boss, a partner): pi stops reminding them about
+    this chat for a few days. days=0 means they are back."""
+    from sqlalchemy import cast, func, update
+    from sqlalchemy.dialects.postgresql import JSONB
+
+    from app.modules.pi.models import PiConversation
+
+    conversation, _, _ = await _owned(session, customer, conversation_id)
+    until = datetime.now(UTC) + timedelta(days=body.days) if body.days else None
+    await session.execute(
+        update(PiConversation)
+        .where(
+            PiConversation.tenant_id == conversation.tenant_id,
+            PiConversation.id == conversation.id,
+        )
+        .values(
+            service_brief=func.coalesce(PiConversation.service_brief, cast({}, JSONB)).op("||")(
+                cast({"customer_waiting_until": until.isoformat() if until else None}, JSONB)
+            )
+        )
+        .execution_options(synchronize_session=False)
+    )
+    await session.commit()
+    await session.refresh(conversation)  # later reads in this session see the change
+    return {"waiting_on_other_until": until}
+
+
+@router.get("/prefs")
+async def get_prefs(customer: Customer, session: Session) -> dict[str, Any]:
+    prefs = await _prefs(session, customer.phone)
+    return {
+        "language": prefs.language if prefs else "auto",
+        "last_seen_at": prefs.last_seen_at if prefs else None,
+    }
+
+
+@router.put("/prefs")
+async def put_prefs(body: PrefsInput, customer: Customer, session: Session) -> dict[str, Any]:
+    prefs = await _prefs(session, customer.phone)
+    if prefs is None:
+        prefs = CustomerPrefs(phone=customer.phone)
+        session.add(prefs)
+    prefs.language = body.language
+    await session.commit()
+    return {"language": prefs.language, "last_seen_at": prefs.last_seen_at}
+
+
+@router.post("/seen")
+async def seen(customer: Customer, session: Session) -> dict[str, Any]:
+    """Marks the dashboard as looked at; returns the previous time, for "since you last
+    looked"."""
+    prefs = await _prefs(session, customer.phone)
+    if prefs is None:
+        prefs = CustomerPrefs(phone=customer.phone)
+        session.add(prefs)
+    previous = prefs.last_seen_at
+    prefs.last_seen_at = datetime.now(UTC)
+    await session.commit()
+    return {"previous": previous}
+
+
+def _token_hash(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def _share_view(link: CustomerShareLink) -> dict[str, Any]:
+    return {
+        "id": link.id,
+        "conversation_id": link.conversation_id,
+        "expires_at": link.expires_at,
+        "views": link.views,
+        "created_at": link.created_at,
+    }
+
+
+@router.post("/share", status_code=201)
+async def create_share(
+    body: ShareInput, customer: Customer, request: Request, session: Session
+) -> dict[str, Any]:
+    """A view-only link to forward (to a boss, a partner): requests and next steps only,
+    no chat, files or prices. It opens without signing in and expires in seven days."""
+    if not await hit(request, "pi-customer-share", customer.phone, 20, 3600):
+        raise HTTPException(429, "Too many links. Please wait a little.")
+    if body.conversation_id is not None:
+        await _owned(session, customer, body.conversation_id)
+    token = secrets.token_urlsafe(24)
+    link = CustomerShareLink(
+        phone=customer.phone,
+        token_hash=_token_hash(token),
+        conversation_id=body.conversation_id,
+        expires_at=datetime.now(UTC) + timedelta(days=SHARE_DAYS),
+    )
+    session.add(link)
+    await session.commit()
+    await session.refresh(link)
+    return {**_share_view(link), "token": token}
+
+
+@router.get("/share")
+async def list_shares(customer: Customer, session: Session) -> list[dict[str, Any]]:
+    rows = await session.scalars(
+        select(CustomerShareLink)
+        .where(
+            CustomerShareLink.phone == customer.phone,
+            CustomerShareLink.revoked_at.is_(None),
+            CustomerShareLink.expires_at > datetime.now(UTC),
+        )
+        .order_by(CustomerShareLink.created_at.desc())
+        .limit(20)
+    )
+    return [_share_view(link) for link in rows]
+
+
+@router.delete("/share/{link_id}", status_code=204)
+async def revoke_share(link_id: UUID, customer: Customer, session: Session) -> Response:
+    link = await session.scalar(
+        select(CustomerShareLink).where(
+            CustomerShareLink.id == link_id, CustomerShareLink.phone == customer.phone
+        )
+    )
+    if link is None:
+        raise HTTPException(404, "Link not found")
+    link.revoked_at = datetime.now(UTC)
+    await session.commit()
+    return Response(status_code=204)
+
+
+@router.get("/shared/{token}")
+async def open_share(token: str, request: Request, session: Session) -> dict[str, Any]:
+    """What a shared link shows: each business, its requests, whose turn and next step.
+    Never the chat, files, prices or the customer's number."""
+    if not await hit(request, "pi-customer-shared-ip", client_ip(request), 60, 3600):
+        raise HTTPException(429, "Please wait a moment and try again.")
+    link = await session.scalar(
+        select(CustomerShareLink).where(CustomerShareLink.token_hash == _token_hash(token[:64]))
+    )
+    now = datetime.now(UTC)
+    if link is None or link.revoked_at is not None or link.expires_at <= now:
+        raise HTTPException(404, "This link has expired or was turned off.")
+    link.views += 1
+    items = await service.conversations(session, link.phone)
+    if link.conversation_id is not None:
+        items = [item for item in items if item[0].id == link.conversation_id]
+    out = []
+    for conversation, _, business in items:
+        cached = (conversation.service_brief or {}).get("customer_issues")
+        issues = await _views(session, conversation, cached)
+        if not issues:
+            continue
+        out.append(
+            {
+                "business": business,
+                "counts": _counts(issues),
+                "issues": [
+                    {
+                        key: i.get(key)
+                        for key in (
+                            "title",
+                            "category",
+                            "stage",
+                            "ball_with",
+                            "summary",
+                            "next_step",
+                            "next_step_owner",
+                            "open_question",
+                            "next_update_by",
+                            "waiting_on_other_until",
+                            "journey_steps",
+                        )
+                    }
+                    for i in issues
+                ],
+            }
+        )
+    await session.commit()
+    return {"expires_at": link.expires_at, "businesses": out}
 
 
 @router.get("/conversations/{conversation_id}/messages/{message_id}/media")

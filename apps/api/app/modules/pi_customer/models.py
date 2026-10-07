@@ -1,6 +1,17 @@
 from datetime import datetime
+from uuid import UUID
 
-from sqlalchemy import BigInteger, Boolean, DateTime, Index, Integer, LargeBinary, String, Text
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    DateTime,
+    Index,
+    Integer,
+    LargeBinary,
+    String,
+    Text,
+    Uuid,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -43,3 +54,29 @@ class CustomerSignInLock(Record, Base):
     phone: Mapped[str] = mapped_column(String(20), unique=True)
     failures: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class CustomerShareLink(Record, Base):
+    """A view-only link a customer makes to show their requests to someone else (a boss,
+    a partner). It shows requests and next steps only: no chat, no files, no quotes.
+    Only a hash of the token is stored; it expires after seven days."""
+
+    __tablename__ = "customer_share_links"
+    __table_args__ = (Index("ix_customer_share_links_phone", "phone"),)
+    phone: Mapped[str] = mapped_column(String(20))
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    # One conversation, or all of the customer's conversations when empty.
+    conversation_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    views: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+
+
+class CustomerPrefs(Record, Base):
+    """A customer's own settings for pi Customer, by WhatsApp number."""
+
+    __tablename__ = "customer_prefs"
+    phone: Mapped[str] = mapped_column(String(20), unique=True)
+    # "auto" mirrors the language of the customer's last message.
+    language: Mapped[str] = mapped_column(String(16), default="auto", server_default="auto")
+    last_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

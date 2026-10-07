@@ -8,6 +8,7 @@ import {
   AudioLines,
   CircleCheck,
   ClipboardList,
+  Hourglass,
   ImageIcon,
   MessageCircle,
   Play,
@@ -22,6 +23,7 @@ import {
   customerGet,
   customerPost,
   type CustomerConversationDetail,
+  type CustomerIssue,
   type CustomerIssues,
   type CustomerMessage,
 } from "@/lib/customer-api";
@@ -38,10 +40,16 @@ import {
   Avatar,
   CATEGORY,
   Formatted,
-  STATUS,
+  STAGE,
+  TURN,
   ago,
   clock,
   dayLabel,
+  journeyPercent,
+  nextStepLine,
+  shortDay,
+  turnOf,
+  useLang,
 } from "./shared";
 
 export function ConversationView({ id }: { id: string }) {
@@ -87,7 +95,7 @@ export function ConversationView({ id }: { id: string }) {
   const c = detail.data;
   const withTeam = c.with_team || team.isSuccess;
   const openRequests = (c.issues?.issues ?? []).filter(
-    (i) => i.status !== "resolved",
+    (i) => turnOf(i) === "you",
   ).length;
   const whatsapp = c.whatsapp_link ? (
     <Button asChild className="min-h-12 flex-1 sm:min-h-10 sm:flex-none">
@@ -486,7 +494,98 @@ function MediaPart({
 
 /* ------------------------------------------------------------- requests */
 
+const STEPS = {
+  en: [
+    "Noted",
+    "Understood",
+    "Linked",
+    "Solution ready",
+    "Your decision",
+    "Building",
+    "Live",
+  ],
+  ur: [
+    "Note hua",
+    "Samjha gaya",
+    "Juda hua",
+    "Hal tayyar",
+    "Aap ka faisla",
+    "Ban raha",
+    "Mukammal",
+  ],
+};
+
+/** Seven fixed steps: done ones ticked, the current one coloured by whose turn it is. */
+function JourneySteps({
+  issue,
+  lang,
+}: {
+  issue: CustomerIssue;
+  lang: "en" | "ur";
+}) {
+  const done = issue.journey_steps;
+  if (done === null) return null;
+  const turn = turnOf(issue);
+  const current = Math.min(done + 1, 7);
+  const currentLabel = STEPS[lang][current - 1];
+  return (
+    <div className="mt-3">
+      <ol
+        className="flex items-center gap-1"
+        aria-label={`${done} of 7 steps done. Now: ${currentLabel}`}
+      >
+        {STEPS[lang].map((label, i) => {
+          const step = i + 1;
+          const isDone = step <= done;
+          const isNow = step === current && done < 7;
+          return (
+            <li key={label} className="flex flex-1 items-center gap-1">
+              <span
+                title={label}
+                className={cn(
+                  "flex size-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold",
+                  isDone && "border-accent bg-accent text-accent-foreground",
+                  isNow &&
+                    cn(
+                      "size-6 ring-2 ring-offset-1 ring-offset-surface",
+                      turn === "you"
+                        ? "border-warning bg-warning text-foreground ring-warning/40"
+                        : turn === "other"
+                          ? "border-border-strong bg-surface-muted ring-border"
+                          : "border-info bg-info text-white ring-info/40",
+                    ),
+                  !isDone &&
+                    !isNow &&
+                    "border-border bg-surface text-muted-foreground",
+                )}
+              >
+                {isDone ? <CircleCheck className="size-3" aria-hidden /> : step}
+              </span>
+              {step < 7 && (
+                <span
+                  className={cn(
+                    "h-0.5 flex-1 rounded-full",
+                    step < done + 1 ? "bg-accent" : "bg-border",
+                  )}
+                  aria-hidden
+                />
+              )}
+            </li>
+          );
+        })}
+      </ol>
+      <p className="mt-1.5 text-xs text-muted-foreground">
+        {done < 7
+          ? `${lang === "ur" ? "Ab" : "Now"}: ${currentLabel} · ${TURN[turn][lang]}`
+          : STEPS[lang][6]}
+      </p>
+    </div>
+  );
+}
+
 function Requests({ detail }: { detail: CustomerConversationDetail }) {
+  const client = useQueryClient();
+  const lang = useLang();
   const issues = useQuery({
     queryKey: ["pi-customer", "issues", detail.id, detail.last_message_at],
     queryFn: () =>
@@ -496,26 +595,38 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
       : undefined,
     staleTime: Infinity,
   });
+  const waiting = useMutation({
+    mutationFn: (days: number) =>
+      customerPost(`/conversations/${detail.id}/waiting`, { days }),
+    onSuccess: () =>
+      void client.invalidateQueries({ queryKey: ["pi-customer"] }),
+  });
   const list = issues.data?.issues ?? [];
-  const done = list.filter((i) => i.status === "resolved").length;
-  const pct = list.length ? Math.round((done / list.length) * 100) : 0;
+  const pct = journeyPercent(list);
+  const yours = list.some((i) => i.ball_with === "client");
+  const pausedUntil = detail.waiting_on_other_until;
+  const paused = Boolean(pausedUntil && new Date(pausedUntil) > new Date());
 
   return (
     <div className="space-y-4">
       <Card className="overflow-hidden">
         <div className="border-b border-border px-4 py-4 sm:px-5">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="font-semibold">Your requests</h2>
+            <h2 className="font-semibold">
+              {lang === "ur" ? "Aap ke requests" : "Your requests"}
+            </h2>
             <Badge tone="accent">
               <Sparkles className="size-3" aria-hidden />
-              Organised by pi
+              {lang === "ur" ? "pi ne tarteeb di" : "Organised by pi"}
             </Badge>
           </div>
-          {list.length > 0 && (
+          {pct !== null && (
             <div className="mt-3">
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>
-                  {done} of {list.length} sorted
+                  {lang === "ur"
+                    ? `${list.length} requests ka safar`
+                    : `Journey across ${list.length} ${list.length === 1 ? "request" : "requests"}`}
                 </span>
                 <span className="tabular-nums">{pct}%</span>
               </div>
@@ -525,13 +636,57 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
                 aria-valuenow={pct}
                 aria-valuemin={0}
                 aria-valuemax={100}
-                aria-label="Requests sorted"
+                aria-label="Journey progress"
               >
                 <div
-                  className="h-full rounded-full bg-success transition-all"
+                  className="h-full rounded-full bg-accent transition-all"
                   style={{ width: `${pct}%` }}
                 />
               </div>
+            </div>
+          )}
+          {(yours || paused) && (
+            <div className="mt-3 rounded-xl bg-surface-muted/70 p-3 text-sm">
+              {paused ? (
+                <>
+                  <p>
+                    {lang === "ur"
+                      ? `Aap kisi aur ka intezar kar rahe hain. ${shortDay(pausedUntil as string)} tak reminders band hain.`
+                      : `You're waiting on someone else. No reminders until ${shortDay(pausedUntil as string)}.`}
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="mt-2"
+                    loading={waiting.isPending}
+                    onClick={() => waiting.mutate(0)}
+                  >
+                    {lang === "ur"
+                      ? "Main wapas aa gaya"
+                      : "I'm ready to continue"}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <p className="text-muted-foreground">
+                    {lang === "ur"
+                      ? "Boss, partner ya accountant ka intezar hai? pi 5 din reminder nahi bhejega."
+                      : "Waiting on your boss, a partner or accountant? pi won't remind you for 5 days."}
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="mt-2"
+                    loading={waiting.isPending}
+                    onClick={() => waiting.mutate(5)}
+                  >
+                    <Hourglass className="size-4" aria-hidden />
+                    {lang === "ur"
+                      ? "Kisi aur ka intezar hai"
+                      : "I'm waiting on someone else"}
+                  </Button>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -549,25 +704,29 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
             </p>
           ) : list.length === 0 ? (
             <p className="py-3 text-sm text-muted-foreground">
-              No requests in this conversation yet.
+              {lang === "ur"
+                ? "Is chat mein abhi koi request nahi."
+                : "No requests in this conversation yet."}
             </p>
           ) : (
             <ul className="space-y-3">
               {list.map((issue, i) => {
                 const category = CATEGORY[issue.category];
-                const status = STATUS[issue.status];
+                const stage = STAGE[issue.stage];
+                const turn = turnOf(issue);
+                const next = nextStepLine(issue, lang);
                 const Icon = category.icon;
                 return (
                   <li
                     key={i}
                     className={cn(
                       "rounded-xl border border-border border-l-4 bg-surface p-3.5",
-                      status.bar,
+                      stage.bar,
                     )}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                        <Icon className="size-3.5" aria-hidden />
+                      <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                        <Icon className="size-3.5 shrink-0" aria-hidden />
                         {category.label}
                         {issue.department_name && (
                           <span className="truncate">
@@ -575,11 +734,12 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
                           </span>
                         )}
                       </span>
-                      <Badge tone={status.tone}>
-                        {issue.status === "resolved" && (
-                          <CircleCheck className="size-3" aria-hidden />
-                        )}
-                        {status.label}
+                      <Badge tone={stage.tone}>
+                        <span
+                          className={cn("size-2 rounded-full", stage.dot)}
+                          aria-hidden
+                        />
+                        {stage[lang]}
                       </Badge>
                     </div>
                     <p className="mt-1.5 font-semibold leading-snug">
@@ -590,10 +750,37 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
                         {issue.summary}
                       </p>
                     )}
-                    {issue.next_step && issue.status !== "resolved" && (
-                      <p className="mt-2 rounded-lg bg-surface-muted px-3 py-2 text-[13px]">
-                        <span className="font-medium">Next: </span>
-                        {issue.next_step}
+                    {issue.original_words && (
+                      <p className="mt-1.5 text-xs italic text-muted-foreground">
+                        {lang === "ur" ? "Aap ke alfaaz: " : "Your words: "}“
+                        {issue.original_words}”
+                      </p>
+                    )}
+                    <JourneySteps issue={issue} lang={lang} />
+                    {next && turn !== "done" && (
+                      <p
+                        className={cn(
+                          "mt-2 rounded-lg px-3 py-2 text-[13px]",
+                          turn === "you"
+                            ? "bg-warning-soft/60"
+                            : "bg-surface-muted",
+                        )}
+                      >
+                        <span className="font-medium">
+                          {turn === "you"
+                            ? lang === "ur"
+                              ? "Aap: "
+                              : "You: "
+                            : lang === "ur"
+                              ? "Agla qadam: "
+                              : "Next: "}
+                        </span>
+                        {next}
+                        {issue.overdue && (
+                          <span className="ml-1 font-medium text-danger">
+                            {lang === "ur" ? "(der ho gayi)" : "(overdue)"}
+                          </span>
+                        )}
                       </p>
                     )}
                   </li>
@@ -607,7 +794,9 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
       {detail.requests.length > 0 && (
         <Card>
           <div className="border-b border-border px-4 py-3.5 sm:px-5">
-            <h2 className="font-semibold">Opened by the team</h2>
+            <h2 className="font-semibold">
+              {lang === "ur" ? "Team ne khola" : "Opened by the team"}
+            </h2>
           </div>
           <ul className="divide-y divide-border">
             {detail.requests.map((r, i) => (
@@ -627,7 +816,7 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
                   </span>
                 </span>
                 <Badge tone={r.status === "resolved" ? "success" : "info"}>
-                  {r.status === "resolved" ? "Done" : "With the team"}
+                  {r.status === "resolved" ? TURN.done[lang] : TURN.us[lang]}
                 </Badge>
               </li>
             ))}
