@@ -623,3 +623,36 @@ async def test_one_chat_keeps_every_project_one_memory_each_and_a_real_summary(
     )
     assert lead.stage == "qualified"
     await pi.close()
+
+
+async def test_a_repeated_customer_date_is_dropped_instead_of_stopping_pi(
+    api, business_db, monkeypatch
+):
+    # The customer gave a target date earlier; the model echoes it back. The blocked
+    # sentence is removed and the rest is sent, so pi doesn't hand off every message.
+    mock_turns(
+        monkeypatch,
+        turn(
+            reply="Note kar liya. Aap ka target 15 Oct 2026 hai. Team yahin update degi.",
+            ready_for_team=True,
+            awaiting_customer=False,
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("Hi", "date-1")
+    await pi.deliver_all()
+    conversation = await pi.conversation()
+    assert conversation.mode == "ai"  # no handoff
+    [reply] = await pi.outbound()
+    assert reply.body == "Note kar liya. Team yahin update degi."
+    await pi.close()
+
+
+async def test_a_real_price_still_goes_to_the_team(api, business_db, monkeypatch):
+    mock_turns(monkeypatch, turn(reply="Website 5000 rupay ki hai."))
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("Website kitne ki?", "price-1")
+    await pi.deliver_all()
+    assert (await pi.conversation()).mode == "human"
+    assert all("5000" not in m.body for m in await pi.outbound())
+    await pi.close()
