@@ -162,6 +162,37 @@ TEMPLATES: dict[str, EmailTemplate] = {
         variables=frozenset({"name", "business", "amount", "link", "workspace"}),
         links=frozenset({"link"}),
     ),
+    # Staged dunning reminders sent between the first past_due notice (pi_billing_past_due,
+    # sent once right when the status flips) and the hard cutover to suspended at
+    # grace_ends_at. Escalating urgency; same account-level recipients and transport.
+    "pi_billing_dunning_3d": EmailTemplate(
+        subject="$days_left days left to update your Pi payment details",
+        text="Hello $name,\n\nWe still haven't been able to charge your card for "
+        "$business. Pi will stop replying to your customers in $days_left days unless "
+        "you update your payment details: $link\n\n"
+        "If you already paid, you can ignore this message.",
+        html="<p>Hello $name,</p><p>We still haven't been able to charge your card for "
+        "<b>$business</b>. Pi will stop replying to your customers in <b>$days_left "
+        "days</b> unless you update your payment details.</p>"
+        '<p><a href="$link">Update payment details</a></p>'
+        "<p>If you already paid, you can ignore this message.</p>",
+        variables=frozenset({"name", "business", "days_left", "link", "workspace"}),
+        links=frozenset({"link"}),
+    ),
+    "pi_billing_dunning_1d": EmailTemplate(
+        subject="Urgent: Pi stops replying tomorrow without payment",
+        text="Hello $name,\n\nThis is a final reminder: we still haven't been able to "
+        "charge your card for $business. Pi will stop replying to your customers "
+        "tomorrow unless you update your payment details right now: $link\n\n"
+        "If you already paid, you can ignore this message.",
+        html="<p>Hello $name,</p><p>This is a <b>final reminder</b>: we still haven't "
+        "been able to charge your card for <b>$business</b>. Pi will stop replying to "
+        "your customers tomorrow unless you update your payment details right now.</p>"
+        '<p><a href="$link">Update payment details</a></p>'
+        "<p>If you already paid, you can ignore this message.</p>",
+        variables=frozenset({"name", "business", "days_left", "link", "workspace"}),
+        links=frozenset({"link"}),
+    ),
 }
 
 
