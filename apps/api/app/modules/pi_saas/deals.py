@@ -18,6 +18,7 @@ Reaching the customer on WhatsApp follows Meta's rules:
 A business can start a deal from just a WhatsApp number, with no chat yet.
 """
 
+import logging
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from typing import Any
@@ -25,6 +26,7 @@ from urllib.parse import quote as url_quote
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings
@@ -55,6 +57,7 @@ from app.shared.errors import BusinessRuleViolation, ResourceNotFound
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
 
+logger = logging.getLogger(__name__)
 LINK_DAYS = 30
 WINDOW = timedelta(hours=24)
 # Lead stages in order; moving forward walks through the allowed steps.
@@ -268,6 +271,20 @@ async def release_waiting(
     invoice link that was waiting for them. Returns message ids to enqueue."""
     if message.direction != "inbound":
         return []
+    try:
+        # A savepoint: this runs inside every inbound message's transaction, so a
+        # database without the deal tables yet (migration pending) must never stop
+        # customer messages from being saved and answered.
+        async with session.begin_nested():
+            return await _release_waiting(session, scope, message)
+    except DBAPIError:
+        logger.warning("deal_release_skipped", exc_info=True)
+        return []
+
+
+async def _release_waiting(
+    session: AsyncSession, scope: WorkspaceScope, message: PiMessage
+) -> list[str]:
     conversation = await WorkspaceRepository(session, PiConversation, scope).find(
         PiConversation.id == message.conversation_id
     )
