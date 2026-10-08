@@ -34,6 +34,8 @@ from app.modules.auth.crypto import digest, new_token
 from app.modules.billing.models import Invoice, InvoiceLine
 from app.modules.billing.service import BillingService
 from app.modules.business_settings.capabilities import business_permissions
+from app.modules.business_settings.service import get_settings_row
+from app.modules.catalog.models import CatalogProduct, CatalogVariant
 from app.modules.customers.models import Customer
 from app.modules.customers.service import CustomerService
 from app.modules.notifications.service import notify
@@ -59,6 +61,13 @@ from app.shared.workspace_repository import WorkspaceRepository
 
 logger = logging.getLogger(__name__)
 LINK_DAYS = 30
+HOW = {
+    "pending": "prepared",
+    "sent": "sent on WhatsApp",
+    "waiting": "announced on WhatsApp; the link follows their reply",
+    "manual": "ready to share by hand (no open WhatsApp chat)",
+    "failed": "could not be sent",
+}
 WINDOW = timedelta(hours=24)
 # Lead stages in order; moving forward walks through the allowed steps.
 _FORWARD = ("new", "qualified", "proposal", "won")
@@ -77,6 +86,7 @@ async def deal_settings(session: AsyncSession, scope: WorkspaceScope) -> PiDealS
 
 def settings_view(row: PiDealSettings) -> dict[str, Any]:
     return {
+        "auto_proposal": row.auto_proposal,
         "auto_order": row.auto_order,
         "auto_invoice": row.auto_invoice,
         "auto_payment_request": row.auto_payment_request,
@@ -124,6 +134,16 @@ async def system_scope_for(
 async def _business_name(session: AsyncSession, scope: WorkspaceScope) -> str:
     name = await session.scalar(select(Tenant.name).where(Tenant.id == scope.tenant_id))
     return name or "us"
+
+
+async def note_lead(
+    session: AsyncSession, scope: WorkspaceScope, lead_id: UUID | None, text: str
+) -> None:
+    if lead_id is None:
+        return
+    lead = await WorkspaceRepository(session, SalesLead, scope).find(SalesLead.id == lead_id)
+    if lead is not None:
+        add_note(lead, text)
 
 
 async def move_lead(session: AsyncSession, scope: WorkspaceScope, lead_id: UUID, to: str) -> None:
@@ -335,35 +355,165 @@ async def proposal_from_lead(session: AsyncSession, scope: WorkspaceScope, lead_
             PiConversation.id == lead.conversation_id
         )
         brief = dict(conversation.service_brief or {}) if conversation else {}
-    lines: list[QuoteLineInput] = []
+    wanted: list[tuple[str, str]] = []
     for project in brief.get("projects") or []:
         if not isinstance(project, dict) or project.get("status") == "dropped":
             continue
         title = str(project.get("title") or project.get("service") or "").strip()
         details = str(project.get("details") or "").strip()
         if title:
-            text = f"{title}: {details}" if details else title
-            lines.append(
-                QuoteLineInput(description=text[:300], quantity=Decimal(1), unit_price=Decimal(0))
-            )
-    if not lines:
+            wanted.append((title, f"{title}: {details}" if details else title))
+    if not wanted:
         requirements = lead.requirements or {}
         title = str(requirements.get("service") or lead.title or "Service").strip()
         scope_text = str(requirements.get("scope") or "").strip()
-        text = f"{title}: {scope_text}" if scope_text else title
-        lines.append(
-            QuoteLineInput(description=text[:300], quantity=Decimal(1), unit_price=Decimal(0))
-        )
+        wanted.append((title, f"{title}: {scope_text}" if scope_text else title))
+    prices = await _catalog_prices(session, scope)
+    lines: list[QuoteLineInput] = []
+    for title, text in wanted:
+        variant = _price_for(prices, title)
+        if variant is not None:
+            # The business's own catalog price: the only price pi may ever put in.
+            lines.append(
+                QuoteLineInput(variant_id=variant, description=text[:300], quantity=Decimal(1))
+            )
+        else:
+            lines.append(
+                QuoteLineInput(description=text[:300], quantity=Decimal(1), unit_price=Decimal(0))
+            )
+    # No notes: lead notes are internal and quote notes show on the customer's page.
     quote = await QuoteService(session, scope).create(
         QuoteCreate(
             customer_id=lead.customer_id,
             lead_id=lead.id,
-            notes=(lead.notes or "")[:4000],
+            notes="",
             lines=lines[:100],
         ),
         source="manual",
     )
     return quote
+
+
+async def _catalog_prices(session: AsyncSession, scope: WorkspaceScope) -> list[tuple[str, UUID]]:
+    """(product name, variant id) for every offering with exactly one active price in
+    the business's currency: the prices pi can put on a proposal by itself."""
+    currency = (await get_settings_row(session, scope)).default_currency
+    rows = await session.execute(
+        select(CatalogProduct.name, CatalogVariant.id, CatalogVariant.product_id)
+        .join(CatalogVariant, CatalogVariant.product_id == CatalogProduct.id)
+        .where(
+            CatalogProduct.tenant_id == scope.tenant_id,
+            CatalogProduct.environment_id == scope.environment_id,
+            CatalogProduct.status == "active",
+            CatalogVariant.status == "active",
+            CatalogVariant.currency == currency,
+        )
+    )
+    by_product: dict[UUID, list[tuple[str, UUID]]] = {}
+    for name, variant_id, product_id in rows:
+        by_product.setdefault(product_id, []).append((name, variant_id))
+    return [found[0] for found in by_product.values() if len(found) == 1]
+
+
+def _price_for(prices: list[tuple[str, UUID]], title: str) -> UUID | None:
+    """The catalog price for a project, when one offering's name clearly matches it."""
+    wanted = title.casefold().strip()
+    matches = [
+        (len(name), variant)
+        for name, variant in prices
+        if len(name.strip()) >= 3
+        and (name.casefold().strip() in wanted or wanted in name.casefold().strip())
+    ]
+    if not matches:
+        return None
+    matches.sort(reverse=True)
+    if len(matches) > 1 and matches[0][0] == matches[1][0]:
+        return None  # Two offerings fit equally well: a person picks.
+    return matches[0][1]
+
+
+def add_note(lead: SalesLead, text: str) -> None:
+    """A dated line in the lead's notes, so the team sees what pi did and when."""
+    line = f"• {datetime.now(UTC):%d %b %H:%M} UTC · pi: {text}"
+    notes = f"{lead.notes.rstrip()}\n{line}" if lead.notes.strip() else line
+    lead.notes = notes[-5000:]
+
+
+async def auto_proposal(
+    session: AsyncSession, scope: WorkspaceScope, settings: Settings, lead_id: UUID
+) -> list[str]:
+    """The customer confirmed the brief: make the proposal with catalog prices and send
+    it on WhatsApp. When a line has no catalog price, the draft waits for the team (they
+    get a notification). Never fails the conversation: errors only skip this step."""
+    try:
+        async with session.begin_nested():
+            return await _auto_proposal(session, scope, settings, lead_id)
+    except (DBAPIError, BusinessRuleViolation, ResourceNotFound):
+        logger.warning("deal_auto_proposal_skipped", exc_info=True)
+        return []
+
+
+async def _auto_proposal(
+    session: AsyncSession, scope: WorkspaceScope, settings: Settings, lead_id: UUID
+) -> list[str]:
+    if not (await deal_settings(session, scope)).auto_proposal:
+        return []
+    lead = await WorkspaceRepository(session, SalesLead, scope).get(lead_id)
+    if lead.customer_id is None:
+        return []
+    existing = await session.scalar(
+        WorkspaceRepository(session, Quote, scope)
+        .select()
+        .where(Quote.lead_id == lead.id, Quote.status.not_in(["cancelled", "expired"]))
+        .limit(1)
+    )
+    if existing is not None:
+        return []
+    quote = await proposal_from_lead(session, scope, lead.id)
+    lines = list(
+        await session.scalars(
+            WorkspaceRepository(session, QuoteLine, scope)
+            .select()
+            .where(QuoteLine.quote_id == quote.id)
+        )
+    )
+    priced = bool(lines) and all(line.unit_price > 0 for line in lines)
+    if priced:
+        try:
+            async with session.begin_nested():
+                _, ids = await send_proposal(session, scope, settings, quote.id)
+        except BusinessRuleViolation as exc:
+            if exc.code != "QUOTE_NEEDS_APPROVAL":
+                raise
+            add_note(lead, f"proposal {quote.number} made from catalog prices; needs approval")
+            await notify(
+                session,
+                scope,
+                "pi.deal",
+                f"Approve proposal {quote.number}",
+                "pi made it from the confirmed brief with your catalog prices. Approve it "
+                "and pi sends it on WhatsApp.",
+                link=f"/quotes/{quote.id}",
+                permission="quotes.read",
+                severity="info",
+                dedupe_key=f"pi-auto-proposal:{quote.id}",
+            )
+            return []
+        return ids
+    add_note(lead, f"draft proposal {quote.number} made from the brief; add prices to send it")
+    await notify(
+        session,
+        scope,
+        "pi.deal",
+        f"Price proposal {quote.number}",
+        "The customer confirmed their brief. pi made the proposal; add the prices that "
+        "aren't in your catalog and send it.",
+        link=f"/quotes/{quote.id}/edit",
+        permission="quotes.read",
+        severity="info",
+        dedupe_key=f"pi-auto-proposal:{quote.id}",
+    )
+    return []
 
 
 async def send_proposal(
@@ -400,6 +550,12 @@ async def send_proposal(
         f"Valid until {quote.valid_until:%d %b %Y}.\nView and accept: {url}"
     )
     ids = await deliver(session, scope, doc, customer, text)
+    await note_lead(
+        session,
+        scope,
+        quote.lead_id,
+        f"proposal {quote.number} ({money(quote.total, quote.currency)}) {HOW[doc.delivery]}",
+    )
     return delivery_view(doc, customer, url), ids
 
 
@@ -533,17 +689,27 @@ async def respond(
         await quotes.transition(quote.id, "accept")
         if quote.lead_id:
             await move_lead(session, scope, quote.lead_id, "won")
+        await note_lead(session, scope, quote.lead_id, f"customer accepted {quote.number}")
         ids = await after_accept(session, scope, settings, quote)
         title = f"Proposal {quote.number} accepted"
     elif action == "changes":
         await quotes.transition(quote.id, "reject")
         if quote.lead_id:
             await move_lead(session, scope, quote.lead_id, "qualified")
+        await note_lead(
+            session,
+            scope,
+            quote.lead_id,
+            f"customer asked for changes on {quote.number}: {note[:300] or 'no details'}",
+        )
         title = f"Changes asked on proposal {quote.number}"
     else:
         await quotes.transition(quote.id, "reject")
         if quote.lead_id:
             await move_lead(session, scope, quote.lead_id, "lost")
+        await note_lead(
+            session, scope, quote.lead_id, f"customer declined {quote.number}: {note[:300]}"
+        )
         title = f"Proposal {quote.number} declined"
     await notify(
         session,
@@ -631,6 +797,13 @@ async def after_accept(
             )
         )
         invoice = await BillingService(session, scope).create_from_order(order, lines)
+    await note_lead(
+        session,
+        scope,
+        quote.lead_id,
+        f"order {order.number} confirmed"
+        + (f", invoice {invoice.number} issued" if invoice is not None else ""),
+    )
     if invoice is None or not deals.auto_payment_request:
         return []
     doc, text, customer = await invoice_message(
@@ -673,6 +846,7 @@ async def after_paid(session: AsyncSession, scope: WorkspaceScope, invoice: Invo
         quote = await WorkspaceRepository(session, Quote, scope).find(Quote.id == order.quote_id)
         if quote is not None and quote.lead_id:
             await move_lead(session, scope, quote.lead_id, "won")
+            await note_lead(session, scope, quote.lead_id, f"invoice {invoice.number} paid")
     deals = await deal_settings(session, scope)
     if not deals.thank_you_on_paid:
         return []

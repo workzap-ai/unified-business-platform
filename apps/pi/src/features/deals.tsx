@@ -101,6 +101,7 @@ interface QuoteDetail {
 }
 
 interface DealSettings {
+  auto_proposal: boolean;
   auto_order: boolean;
   auto_invoice: boolean;
   auto_payment_request: boolean;
@@ -779,7 +780,18 @@ function SettingsDialog({
   const [draft, setDraft] = React.useState<DealSettings | null>(null);
   const value = draft ?? current.data ?? null;
   const save = useAction(
-    (body: DealSettings) => put("/pi/deals/settings", body),
+    // Only the saved fields: the settings read also lists the payment methods.
+    (body: DealSettings) =>
+      put("/pi/deals/settings", {
+        auto_proposal: body.auto_proposal ?? true,
+        auto_order: body.auto_order,
+        auto_invoice: body.auto_invoice,
+        auto_payment_request: body.auto_payment_request,
+        thank_you_on_paid: body.thank_you_on_paid,
+        payment_method: body.payment_method,
+        template_name: body.template_name,
+        template_language: body.template_language,
+      }),
     {
       success: "Automation saved",
       invalidate: [["deals"]],
@@ -795,12 +807,22 @@ function SettingsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         title="Automation"
-        description="What pi does by itself when a customer accepts a proposal."
+        description="What pi does by itself, from the confirmed brief to the payment."
       >
         {!value ? (
           <Skeleton className="h-48 w-full" />
         ) : (
           <div className="space-y-4">
+            <Switch
+              id="auto-proposal"
+              label="Make and send the proposal when they confirm the brief"
+              checked={value.auto_proposal ?? true}
+              onCheckedChange={(v) => set("auto_proposal", v)}
+            />
+            <p className="-mt-2 text-xs text-muted-foreground">
+              pi uses your catalog prices. Anything without a price waits for
+              you.
+            </p>
             <Switch
               id="auto-order"
               label="Confirm the order when they accept"

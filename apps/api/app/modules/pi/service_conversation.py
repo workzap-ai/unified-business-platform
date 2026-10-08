@@ -1052,6 +1052,14 @@ async def save_service_turn(
             p.status in ("confirmed", "with_team") for p in turn.projects
         ):
             lead.stage = "qualified"  # The customer confirmed the brief: ready for a proposal.
+            from app.core.config import get_settings
+            from app.modules.pi_saas.deals import add_note, auto_proposal
+
+            if not lead.notes.strip() and conversation.summary:
+                lead.notes = f"From the WhatsApp chat (written by pi):\n{conversation.summary}"
+            add_note(lead, "customer confirmed the brief")
+            # Proposal with catalog prices, sent on WhatsApp (queued; the sender picks it up).
+            await auto_proposal(session, scope, get_settings(), lead.id)
     if turn.meeting_requested and not previous.get("meeting_requested"):
         await notify(
             session,

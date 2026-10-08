@@ -15,6 +15,7 @@ from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.billing.models import Invoice
 from app.modules.customers.models import Customer
+from app.modules.orders.models import Order
 from app.modules.pi.service import require_pi
 from app.modules.pi_saas import deals
 from app.modules.pi_saas.deal_models import PAYMENT_DEFAULTS, PiDocument
@@ -39,6 +40,7 @@ async def _enqueue(request: Request, ids: list[str]) -> None:
 
 class DealSettingsInput(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    auto_proposal: bool = True
     auto_order: bool
     auto_invoice: bool
     auto_payment_request: bool
@@ -287,6 +289,223 @@ def _next_step(stage: str, quote: Quote | None, invoice: Invoice | None) -> str:
     }.get(quote.status, "Prepare a proposal")
 
 
+# ---- One deal, step by step -----------------------------------------------------------
+
+
+def _step(key: str, label: str, at: Any, done: bool, detail: str = "") -> dict[str, Any]:
+    return {"key": key, "label": label, "at": at, "done": done, "detail": detail}
+
+
+@router.get("/leads/{lead_id}/journey")
+async def journey(lead_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+    """Every step of one deal, from the enquiry to the payment, plus the one thing the
+    team should do next (or that pi is doing on its own)."""
+    await require_pi(session, scope, "sales.read")
+    lead = await WorkspaceRepository(session, SalesLead, scope).get(lead_id)
+    settings = deals.settings_view(await deals.deal_settings(session, scope))
+    quote = await session.scalar(
+        WorkspaceRepository(session, Quote, scope)
+        .select()
+        .where(Quote.lead_id == lead.id)
+        .order_by(Quote.created_at.desc())
+        .limit(1)
+    )
+    doc = (
+        await session.scalar(
+            WorkspaceRepository(session, PiDocument, scope)
+            .select()
+            .where(PiDocument.quote_id == quote.id)
+            .order_by(PiDocument.created_at.desc())
+            .limit(1)
+        )
+        if quote
+        else None
+    )
+    order = (
+        await WorkspaceRepository(session, Order, scope).find(Order.id == quote.order_id)
+        if quote and quote.order_id
+        else None
+    )
+    invoice = (
+        await session.scalar(
+            WorkspaceRepository(session, Invoice, scope)
+            .select()
+            .where(Invoice.order_id == order.id, Invoice.status != "void")
+            .limit(1)
+        )
+        if order
+        else None
+    )
+    briefed = lead.stage != "new" or quote is not None
+    steps = [
+        _step(
+            "enquiry",
+            "Enquiry on WhatsApp" if lead.source == "pi" else "Lead created",
+            lead.created_at,
+            True,
+            lead.title,
+        ),
+        _step("brief", "Brief confirmed", None, briefed),
+        _step(
+            "proposal",
+            f"Proposal {quote.number}" if quote else "Proposal",
+            quote.created_at if quote else None,
+            bool(quote and quote.total > 0),
+            deals.money(quote.total, quote.currency) if quote and quote.total > 0 else "",
+        ),
+        _step(
+            "sent",
+            "Sent to the customer",
+            quote.sent_at if quote else None,
+            bool(doc and doc.delivery in {"sent", "waiting", "manual"}),
+            deals.HOW.get(doc.delivery, "") if doc else "",
+        ),
+        _step(
+            "opened",
+            "Customer opened it",
+            doc.viewed_at if doc else None,
+            bool(doc and doc.viewed_at),
+        ),
+        _step(
+            "answer",
+            {
+                "accepted": "Customer accepted",
+                "changes": "Customer asked for changes",
+                "rejected": "Customer declined",
+            }.get(doc.response or "", "Customer's answer")
+            if doc
+            else "Customer's answer",
+            doc.responded_at if doc else None,
+            bool(doc and doc.response == "accepted"),
+            (doc.response_note or "") if doc else "",
+        ),
+        _step(
+            "order",
+            f"Order {order.number}" if order else "Order confirmed",
+            order.confirmed_at if order else None,
+            bool(order and order.confirmed_at),
+        ),
+        _step(
+            "invoice",
+            f"Invoice {invoice.number}" if invoice else "Invoice sent",
+            invoice.issue_date if invoice else None,
+            bool(invoice and invoice.status != "draft"),
+            deals.money(invoice.total, invoice.currency) if invoice else "",
+        ),
+        _step(
+            "paid",
+            "Paid",
+            invoice.updated_at if invoice and invoice.status == "paid" else None,
+            bool(invoice and invoice.status == "paid"),
+        ),
+    ]
+    return {
+        "lead_id": lead.id,
+        "stage": lead.stage,
+        "steps": steps,
+        "next": _guide(lead, quote, doc, invoice, settings),
+        "quote_id": quote.id if quote else None,
+        "invoice_id": invoice.id if invoice else None,
+        "order_id": order.id if order else None,
+        "automation": settings,
+    }
+
+
+def _guide(
+    lead: SalesLead,
+    quote: Quote | None,
+    doc: PiDocument | None,
+    invoice: Invoice | None,
+    settings: dict[str, Any],
+) -> dict[str, Any]:
+    """The next step in plain words. ``action`` is a button the page can run; ``href``
+    opens the page where the team does it; ``auto`` says pi handles it alone."""
+
+    def step(
+        title: str, detail: str, action: str = "", href: str = "", auto: bool = False
+    ) -> dict[str, Any]:
+        return {"title": title, "detail": detail, "action": action, "href": href, "auto": auto}
+
+    if lead.stage == "lost":
+        return step("Closed", "This deal was lost. Reopen the lead to try again.")
+    if invoice is not None:
+        if invoice.status == "paid":
+            return step(
+                "Paid", "The customer paid. Deliver the work.", href=f"/invoices/{invoice.id}"
+            )
+        return step(
+            "Waiting for payment",
+            "The invoice and payment link are with the customer. When they pay online it "
+            "updates by itself; record a bank or cash payment on the invoice.",
+            action="send_invoice",
+            href=f"/invoices/{invoice.id}",
+        )
+    if lead.customer_id is None:
+        return step("Link a customer", "Add the customer so pi can reach them on WhatsApp.", "edit")
+    if quote is None:
+        if lead.stage == "new" and lead.source == "pi":
+            return step(
+                "pi is collecting the brief",
+                "pi asks the customer what they need. When they confirm, pi makes the proposal"
+                + (" by itself." if settings["auto_proposal"] else "."),
+                action="proposal_from_brief",
+                auto=True,
+            )
+        return step(
+            "Make the proposal",
+            "Create it from the brief, add prices, and pi sends it on WhatsApp.",
+            "proposal_from_brief",
+        )
+    status = quote.status
+    if status == "draft":
+        if quote.total <= 0:
+            return step(
+                "Add prices",
+                "The draft proposal is ready. Add the prices that aren't in your catalog, "
+                "then send it.",
+                href=f"/quotes/{quote.id}/edit",
+            )
+        return step("Send the proposal", "pi sends the link on WhatsApp.", "send_proposal")
+    if status == "pending_approval":
+        return step(
+            "Approve the proposal",
+            "A manager approves it, then send it.",
+            href=f"/quotes/{quote.id}",
+        )
+    if status == "approved":
+        return step("Send the proposal", "pi sends the link on WhatsApp.", "send_proposal")
+    if status == "sent":
+        if doc is not None and doc.delivery == "manual":
+            return step(
+                "Share the proposal",
+                "There's no open WhatsApp chat with this customer. Share the link yourself.",
+                "send_proposal",
+            )
+        return step(
+            "Waiting for the customer",
+            ("They opened it. " if doc and doc.viewed_at else "Not opened yet. ")
+            + "When they accept, pi confirms the order and sends the invoice"
+            + (" by itself." if settings["auto_order"] else "."),
+            action="send_proposal",
+            auto=True,
+        )
+    if status == "accepted":
+        return step(
+            "Confirm the order and invoice",
+            "The customer accepted. Turn on the automation to do this by itself.",
+            href=f"/quotes/{quote.id}",
+        )
+    if status == "rejected":
+        return step(
+            "Send a revised proposal",
+            "The customer asked for changes"
+            + (f': "{doc.response_note[:200]}"' if doc and doc.response_note else "")
+            + ". Make a new proposal.",
+            "proposal_from_brief",
+        )
+    return step("Make a new proposal", "This one expired.", "proposal_from_brief")
+
+
 # ---- The customer's page --------------------------------------------------------------
 
 
@@ -304,6 +523,9 @@ async def public_document(token: str, request: Request, session: Session) -> dic
     doc = await deals.document_for(session, token, lock=True)
     if doc.viewed_at is None:
         doc.viewed_at = datetime.now(UTC)
+        if doc.kind == "proposal":
+            system = await deals.system_scope_for(session, doc.tenant_id, doc.environment_id)
+            await deals.note_lead(session, system, doc.lead_id, "customer opened the proposal")
     view = await deals.public_view(session, request.app.state.settings, doc)
     await session.commit()
     return view

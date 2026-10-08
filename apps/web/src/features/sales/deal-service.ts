@@ -32,6 +32,7 @@ export const DEAL_PAYMENT_METHOD_LABELS: Record<DealPaymentMethod, string> = {
 };
 
 const settingsFields = {
+  auto_proposal: z.boolean().catch(true),
   auto_order: z.boolean(),
   auto_invoice: z.boolean(),
   auto_payment_request: z.boolean(),
@@ -138,6 +139,41 @@ export const dealBoardSchema = z.object({
 });
 export type DealBoard = z.infer<typeof dealBoardSchema>;
 
+export const JOURNEY_ACTIONS = [
+  "",
+  "edit",
+  "proposal_from_brief",
+  "send_proposal",
+  "send_invoice",
+] as const;
+export type JourneyAction = (typeof JOURNEY_ACTIONS)[number];
+
+export const journeyStepSchema = z.object({
+  key: z.string(),
+  label: z.string(),
+  at: z.string().nullable(),
+  done: z.boolean(),
+  detail: z.string().catch(""),
+});
+export type JourneyStep = z.infer<typeof journeyStepSchema>;
+
+export const dealJourneySchema = z.object({
+  lead_id: z.string(),
+  stage: z.string(),
+  steps: z.array(journeyStepSchema),
+  next: z.object({
+    title: z.string(),
+    detail: z.string(),
+    action: z.enum(JOURNEY_ACTIONS).catch(""),
+    href: z.string().catch(""),
+    auto: z.boolean().catch(false),
+  }),
+  quote_id: z.string().nullable(),
+  invoice_id: z.string().nullable(),
+  order_id: z.string().nullable(),
+});
+export type DealJourney = z.infer<typeof dealJourneySchema>;
+
 export interface DealService {
   settings(): Promise<DealSettings>;
   saveSettings(input: DealSettingsInput): Promise<DealSettingsInput>;
@@ -149,6 +185,7 @@ export interface DealService {
     filter: { quote_id: string } | { invoice_id: string },
   ): Promise<DealDocument[]>;
   board(): Promise<DealBoard>;
+  journey(leadId: string): Promise<DealJourney>;
 }
 
 const live: DealService = {
@@ -182,6 +219,8 @@ const live: DealService = {
       query: filter,
     }),
   board: () => apiRequest("GET", "/pi/deals/board", dealBoardSchema),
+  journey: (leadId) =>
+    apiRequest("GET", `/pi/deals/leads/${leadId}/journey`, dealJourneySchema),
 };
 
 function notConnected(): never {
@@ -198,6 +237,7 @@ const demo: DealService = {
   start: async () => notConnected(),
   documents: async () => [],
   board: async () => notConnected(),
+  journey: async () => notConnected(),
 };
 
 export const dealService = select<DealService>({ demo, live });

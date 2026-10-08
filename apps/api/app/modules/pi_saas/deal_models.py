@@ -73,6 +73,8 @@ class PiDealSettings(WorkspaceRow):
         UniqueConstraint("tenant_id", "environment_id", name="uq_pi_deal_settings_scope"),
         CheckConstraint(_in("payment_method", PAYMENT_DEFAULTS), name="payment_method"),
     )
+    # Brief confirmed in the chat → proposal made (catalog prices) → sent when fully priced.
+    auto_proposal: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     # Proposal accepted → order confirmed → invoice issued → payment link sent.
     auto_order: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     auto_invoice: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
