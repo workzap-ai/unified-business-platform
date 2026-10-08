@@ -33,6 +33,7 @@ from app.modules.pi.agents import AgentContext, run_specialists
 from app.modules.pi.configuration import seed_agents, settings_row
 from app.modules.pi.graph import AGENTS, RouteState, keyword_intent, route_message
 from app.modules.pi.guard import ReplyRejected, rate_limited, validate_reply
+from app.modules.pi.language import HANDOFF_NOTICES, MEDIA_NOTICES, detect_language, notice_in
 from app.modules.pi.models import (
     PiAgent,
     PiAgentRun,
@@ -75,7 +76,12 @@ CLARIFY_REPLY = (
     "Sorry, I didn't quite understand. Could you tell me a little more? For example, "
     "which product or service you're asking about, or your order reference."
 )
-MEDIA_NOTICE = "Thanks for the attachment. A member of our team will review it and reply here."
+MEDIA_NOTICE = MEDIA_NOTICES["en"]
+
+
+def _localized(notices: dict[str, str], body: str | None, known: str | None) -> str:
+    """A fixed notice in the language of the customer's message (or the chat's last one)."""
+    return notice_in(notices, detect_language(body) or known)
 
 
 async def system_scope(
@@ -465,7 +471,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     conversation_id,
                     "low_confidence",
                     "Media requires operator review.",
-                    notice=MEDIA_NOTICE,
+                    notice=_localized(MEDIA_NOTICES, None, conversation.language),
                 )
                 outbound += [notice] if notice else []
                 message.status, event.status = "processed", "processed"
@@ -480,7 +486,10 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 conversation_id,
                 "policy",
                 "Message received outside business hours.",
-                notice=str(policy.business_hours.get("notice") or HANDOFF_NOTICE),
+                notice=str(
+                    policy.business_hours.get("notice")
+                    or _localized(HANDOFF_NOTICES, body, conversation.language)
+                ),
             )
             outbound += [notice] if notice else []
             message.status, event.status = "processed", "processed"
@@ -796,7 +805,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 conversation.id,
                 handoff_reason,
                 handoff_summary,
-                notice=None if outbound else HANDOFF_NOTICE,
+                notice=None
+                if outbound
+                else _localized(HANDOFF_NOTICES, message.body, conversation.language),
                 run=run,
             )
             outbound += [notice] if notice else []

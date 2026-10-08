@@ -20,6 +20,7 @@ from app.modules.notifications.service import notify
 from app.modules.pi import price_policy
 from app.modules.pi.guard import ReplyRejected, validate_reply
 from app.modules.pi.knowledge import KnowledgeService, remember
+from app.modules.pi.language import NAMES, clearly_other, detect_language
 from app.modules.pi.models import (
     PiAgent,
     PiAgentVersion,
@@ -238,8 +239,12 @@ class ServiceTurn(BaseModel):
 
 SYSTEM = """You are pi (always lowercase), a company's AI assistant on WhatsApp. You help
 the company's customers with what THEY bring up and keep track of it for the team.
-Language: reply in the customer's CURRENT language and writing style, including English,
-Roman Urdu, code switching and any other language. When the customer writes Urdu or
+Language (strict): when the context has reply_language, write the WHOLE reply in
+reply_language_name and set language to reply_language. The system detected it from the
+customer's own latest words; it overrides earlier messages, the conversation summary, the
+business's language and knowledge passages. Without it, reply in the customer's CURRENT
+language and writing style, including English, Roman Urdu, code switching and any other
+language. When the customer writes Urdu or
 Hindi in Urdu (Arabic) or Devanagari script, reply in Roman Urdu/Hindi written in
 English letters (e.g. "Ji bilkul, main note kar leta hoon.") and set
 language="roman_ur". Use simple everyday words they would use themselves.
@@ -656,9 +661,26 @@ async def prepare_context(
         "latest_message_kind": message.message_type,
         "team_members": team,
         "latest_customer_message": message.body[:4000],
+        **reply_language(conversation, message, rows),
         "tone": policy.response_rules.get("tone", "friendly"),
         "followups_enabled": policy.whatsapp_config.get("reminder_enabled", True),
     }
+
+
+def reply_language(
+    conversation: PiConversation, message: PiMessage, rows: list[PiMessage]
+) -> dict[str, str]:
+    """The language pi must answer in, from the customer's own latest words. Image and
+    file descriptions are system English, so those fall back to the customer's last text."""
+    texts = [message.body] if message.message_type in ("text", "audio") else []
+    if texts and not detect_language(texts[0]) and len(re.findall(r"\w{2,}", texts[0])) >= 3:
+        return {}  # A real message in another language (e.g. Spanish): the model matches it.
+    texts += [m.body for m in rows if m.sender_type == "customer" and m.message_type == "text"]
+    language = next(
+        (found for found in map(detect_language, texts[:3]) if found),
+        conversation.language if conversation.language in NAMES else None,
+    )
+    return {"reply_language": language, "reply_language_name": NAMES[language]} if language else {}
 
 
 CLOSING = re.compile(
@@ -852,6 +874,14 @@ async def compose_service_turn(
     turn.reply = tidy_list_numbers(turn.reply)
     mode = price_policy.price_mode(policy.response_rules, service=True)
     problem = needless_question(turn.reply, context)
+    expected = context.get("reply_language")
+    wrong = clearly_other(turn.reply, str(expected or ""))
+    if wrong:
+        problem = (
+            f"it is written in {NAMES[wrong]} but the customer wrote in "
+            f"{NAMES[str(expected)]}; write the whole reply in {NAMES[str(expected)]}"
+            + (f", and also: {problem}" if problem else "")
+        )
     try:
         validate_service_reply(turn.reply, 100_000, mode, offered_labels(context))
     except ReplyRejected:
@@ -889,6 +919,8 @@ async def compose_service_turn(
         turn = retry.value
         turn._attempts = [*result.response.attempts, *retry.response.attempts]
         turn.reply = tidy_list_numbers(turn.reply)
+    if expected:
+        turn.language = str(expected)  # The conversation follows the customer's language.
     if turn.mood == "frustrated" and (context.get("brief") or {}).get("mood") == "frustrated":
         turn.request_human = True  # Still upset after pi's last answer: a person takes over.
     slots = any(service.get("slots") for service in context.get("bookable_services", []))
