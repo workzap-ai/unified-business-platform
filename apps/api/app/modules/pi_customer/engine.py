@@ -33,6 +33,15 @@ logger = logging.getLogger("platform")
 READ_AFTER = timedelta(minutes=2)
 READ_WITHIN = timedelta(minutes=45)
 CARD_GAP = timedelta(hours=2)
+# The customer asked for their map: answered at once, at most every 10 minutes.
+ASKED_GAP = timedelta(minutes=10)
+MAP_ASK = re.compile(
+    r"\b(?:problem\s*map|my\s+map|the\s+map|map\s+(?:dikhao|dikha\s*do|bhejo|bhej\s*do|send|show)"
+    r"|naqsh[ae]?|naksh[ae]?)\b"
+    r"|\b(?:progress|status|journey|safar)\b.{0,24}\b(?:dikhao|dikha\s*do|bhejo|bhej\s*do|show|send)\b"
+    r"|\b(?:show|send)\b.{0,24}\b(?:progress|status|journey|map)\b",
+    re.IGNORECASE,
+)
 NUDGE_AT, WINDOW = timedelta(hours=20), timedelta(hours=23, minutes=30)
 LADDER = (("day3", timedelta(days=3)), ("day7", timedelta(days=7)), ("day14", timedelta(days=14)))
 TEMPLATE_GAP = timedelta(hours=72)
@@ -83,7 +92,8 @@ async def sweep_customer_journeys(ctx: dict[str, Any]) -> None:
 
 
 async def read_quiet_chats(ctx: dict[str, Any]) -> list[str]:
-    """Chats whose customer stopped writing 2-45 minutes ago and pi hasn't read since."""
+    """Chats whose customer stopped writing 2-45 minutes ago and pi hasn't read since,
+    plus any chat whose customer just asked to see their map (answered within a minute)."""
     from app.modules.pi.runtime import system_scope
     from app.modules.pi_customer.models import CustomerPrefs
 
@@ -99,7 +109,6 @@ async def read_quiet_chats(ctx: dict[str, Any]) -> list[str]:
             )
             .where(
                 PiConversation.status == "open",
-                PiConversation.last_inbound_at <= now - READ_AFTER,
                 PiConversation.last_inbound_at >= now - READ_WITHIN,
             )
             .order_by(PiConversation.last_inbound_at)
@@ -109,10 +118,19 @@ async def read_quiet_chats(ctx: dict[str, Any]) -> list[str]:
         for conversation, connection in rows.all():
             if done >= 4:
                 break
-            cached = (conversation.service_brief or {}).get("customer_issues")
-            if isinstance(cached, dict) and cached.get("at") == (
+            brief = conversation.service_brief or {}
+            inbound_at = conversation.last_inbound_at.isoformat()
+            asked = brief.get("map_answered_for") != inbound_at and bool(
+                MAP_ASK.search(await _last_inbound_text(session, conversation))
+            )
+            quiet = conversation.last_inbound_at <= now - READ_AFTER
+            if not quiet and not asked:
+                continue  # never mid-explanation
+            cached = brief.get("customer_issues")
+            fresh = isinstance(cached, dict) and cached.get("at") == (
                 conversation.last_message_at.isoformat()
-            ):
+            )
+            if fresh and not asked:
                 continue
             scope = await system_scope(session, connection)
             if scope is None:
@@ -123,43 +141,96 @@ async def read_quiet_chats(ctx: dict[str, Any]) -> list[str]:
             prefs = await session.scalar(
                 select(CustomerPrefs).where(CustomerPrefs.phone == conversation.contact_wa_id)
             )
-            report = await service.analyse(
-                session,
-                ctx["settings"],
-                ctx["http"],
-                ctx.get("sessions"),
-                conversation,
-                connection,
-                (connection.display_name or "").strip() or "the business",
-                prefs.language if prefs else "auto",
+            report = (
+                cached
+                if fresh and isinstance(cached, dict)
+                else await service.analyse(
+                    session,
+                    ctx["settings"],
+                    ctx["http"],
+                    ctx.get("sessions"),
+                    conversation,
+                    connection,
+                    (connection.display_name or "").strip() or "the business",
+                    prefs.language if prefs else "auto",
+                )
             )
             done += 1
-            if report and report.get("new_events"):
+            if report and (asked or report.get("new_events")):
                 await session.refresh(conversation)
-                card = await queue_card(session, scope, policy, conversation, report)
+                card = await queue_card(
+                    session,
+                    scope,
+                    policy,
+                    conversation,
+                    report,
+                    settings=ctx["settings"],
+                    asked=asked,
+                )
                 if card:
                     outgoing.append(card)
+                if asked:
+                    conversation.service_brief = {
+                        **(conversation.service_brief or {}),
+                        "map_answered_for": inbound_at,
+                    }
         await session.commit()
     return outgoing
 
 
-def pick_card(report: dict[str, Any]) -> tuple[str, int, str] | None:
+def _open(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [i for i in issues if i.get("stage") not in ("live", "closed", "paused")]
+
+
+def _map_caption(report: dict[str, Any], lead: str = "") -> str:
+    issues = _open(report.get("issues") or []) or list(report.get("issues") or [])
+    links = [x for x in report.get("links") or [] if x.get("status") in ("auto", "confirmed")]
+    n, m = len(issues), len(links)
+    if urdu(str(report.get("language") or "")):
+        line = f"Aap ke {n} masle ek nazar mein" + (f", {m} aapas mein jude hue." if m else ".")
+    else:
+        line = f"Your {n} request{'s' if n != 1 else ''} at a glance" + (
+            f", {m} connected." if m else "."
+        )
+    return f"{lead} {line}".strip()
+
+
+def _journey_caption(issue: dict[str, Any], ur: bool) -> str:
+    if issue.get("ball_with") == "client" and issue.get("open_question"):
+        what = issue["open_question"]
+        who = "Aap: " if ur else "You: "
+    else:
+        what = str(issue.get("next_step") or "")
+        who = "Agla qadam: " if ur else "Next: "
+    return f'"{issue["title"]}"\n{who}{what}'.strip()
+
+
+def pick_card(report: dict[str, Any], asked: bool = False) -> tuple[str, int, str] | None:
     """(kind, request index, caption) for the most useful card, or None.
-    A real link with a saving beats a turn change. A map needs a link (a lone dot or
-    two says nothing); "noted" alone never gets a card."""
+
+    - The customer asked for their map: the map (or the journey, with one request).
+    - A real link with a saving: the map, with the reason.
+    - A request moved on: its journey card (the brief's "first card to send").
+    - A new request when three or more are open: the map, so they see the whole picture.
+    "Noted" alone, or a map of one or two dots, never gets a card on its own."""
     events = report.get("new_events") or []
     issues = report.get("issues") or []
-    language = str(report.get("language") or "auto")
+    ur = urdu(str(report.get("language") or "auto"))
     links = [x for x in report.get("links") or [] if x.get("status") in ("auto", "confirmed")]
+    if asked and issues:
+        if len(issues) == 1:
+            return "journey", 0, _journey_caption(issues[0], ur)
+        lead = "Yeh raha aap ka problem map." if ur else "Here is your problem map."
+        return "map", 0, _map_caption(report, lead)
     announced = [e for e in events if e.get("kind") == "link.found" and e.get("announce")]
     if announced and links:
-        reason = str(announced[-1].get("detail") or "")
+        reason = str(announced[-1].get("detail") or "").rstrip(".")
         n = len(links)
-        if urdu(language):
+        if ur:
             caption = f"pi ne aap ke requests mein {n} connection dhoonde. {reason}."
         else:
             caption = f"pi found {n} connection{'s' if n != 1 else ''}. {reason}."
-        return "map", 0, caption.replace("..", ".")
+        return "map", 0, caption.replace(" .", "").strip()
     for event in reversed(events):
         if event.get("kind") != "stage.changed" or event.get("to") in ("noted", "live", "closed"):
             continue
@@ -171,47 +242,65 @@ def pick_card(report: dict[str, Any]) -> tuple[str, int, str] | None:
             ),
             None,
         )
-        if index is None:
-            continue
-        issue = issues[index]
-        if issue["ball_with"] == "client" and issue.get("open_question"):
-            what = issue["open_question"]
-            who = "Aap: " if urdu(language) else "You: "
-        else:
-            what = str(issue.get("next_step") or "")
-            who = "Agla qadam: " if urdu(language) else "Next: "
-        return "journey", index, f'"{issue["title"]}"\n{who}{what}'.strip()
+        if index is not None:
+            return "journey", index, _journey_caption(issues[index], ur)
+    noted = [e for e in events if e.get("kind") == "problem.noted"]
+    if noted and len(_open(issues)) >= 3:
+        title = str(noted[-1].get("title") or "")
+        lead = f'pi ne note kiya: "{title}".' if ur else f'pi noted "{title}".'
+        return "map", 0, _map_caption(report, lead)
     return None
 
 
 async def queue_card(
-    session: Any, scope: Any, policy: Any, conversation: PiConversation, report: dict[str, Any]
+    session: Any,
+    scope: Any,
+    policy: Any,
+    conversation: PiConversation,
+    report: dict[str, Any],
+    *,
+    settings: Any = None,
+    asked: bool = False,
 ) -> str | None:
+    """Queue one card image (inside the 24-hour window). An asked-for map goes out at
+    once (they are writing right now); others wait two hours between cards and respect
+    quiet hours and Friday prayers."""
+    if settings is None:  # the worker passes its own settings
+        from app.core.config import get_settings
+
+        settings = get_settings()
+    if not settings.pi_app_public_url.startswith("http"):
+        # WhatsApp fetches the picture from the pi app: without its public address
+        # there is nothing it could open.
+        logger.warning("pi_customer_card_no_public_url")
+        return None
     config = policy.whatsapp_config or {}
     brief = conversation.service_brief or {}
     now = datetime.now(UTC)
     last = brief.get("cards_last_at")
+    gap = ASKED_GAP if asked else CARD_GAP
     if (
         config.get("visual_cards", True) is False
         or conversation.mode != "ai"
         or not conversation.last_inbound_at
         or now - conversation.last_inbound_at > timedelta(hours=23)
-        or (last and now - datetime.fromisoformat(last) < CARD_GAP)
-        or prayer_or_quiet(policy, now)
+        or (last and now - datetime.fromisoformat(last) < gap)
+        or (not asked and prayer_or_quiet(policy, now))
     ):
         return None
-    choice = pick_card(report)
+    choice = pick_card(report, asked=asked)
     if choice is None:
         return None
     kind, index, caption = choice
-    from app.core.config import get_settings
-
-    settings = get_settings()
     link = card_url(settings, card_token(settings, conversation.id, kind, index))
     dashboard = f"{settings.pi_app_public_url.rstrip('/')}/customer"
     caption = f"{caption}\n{dashboard}"
     pi = PiService(session, scope)
-    key = f"pi-card:{conversation.id}:{report['at']}"
+    key = (
+        f"pi-card:{conversation.id}:ask:{conversation.last_inbound_at.isoformat()}"
+        if asked
+        else f"pi-card:{conversation.id}:{report['at']}"
+    )
     if await pi.messages.find(PiMessage.idempotency_key == key):
         return None
     message = await pi.messages.add(

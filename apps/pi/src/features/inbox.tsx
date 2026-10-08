@@ -830,12 +830,29 @@ function MessageBubble({
               maxLength={4000}
             />
           ) : (
-            <p className="whitespace-pre-line" data-user-text>
-              {message.body ||
-                (message.message_type !== "text"
-                  ? `[${message.message_type}]`
-                  : "")}
-            </p>
+            <>
+              {message.card && (
+                <a href={message.card.image} target="_blank" rel="noreferrer">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- signed external card */}
+                  <img
+                    src={message.card.image}
+                    alt={
+                      message.card.kind === "map"
+                        ? "Problem map sent on WhatsApp"
+                        : "Journey card sent on WhatsApp"
+                    }
+                    loading="lazy"
+                    className="mb-1.5 block w-full max-w-[260px] rounded-xl border border-border"
+                  />
+                </a>
+              )}
+              <p className="whitespace-pre-line" data-user-text>
+                {message.body ||
+                  (message.message_type !== "text"
+                    ? `[${message.message_type}]`
+                    : "")}
+              </p>
+            </>
           )}
           <p className="mt-1 flex items-center justify-end gap-1.5 text-[11px] text-muted-foreground">
             {dateTime(message.created_at)} <StatusIcon message={message} />

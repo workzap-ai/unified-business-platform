@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator, model_validator
 
 
 class Input(BaseModel):
@@ -82,6 +82,24 @@ class MessageView(BaseModel):
     created_at: datetime
     tool_events: list[dict[str, Any]] = Field(default_factory=list)
     confirmation: dict[str, Any] | None = None
+    # A picture pi sent (pi Customer's problem map or journey card): the team sees the
+    # same image the customer got, not only its caption.
+    card: dict[str, str] | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def sent_card(cls, data: Any) -> Any:
+        media = data.get("media") if isinstance(data, dict) else getattr(data, "media", None)
+        if not isinstance(media, dict) or not media.get("card") or not media.get("image"):
+            return data
+        image = str(media["image"])
+        if not image.startswith("http"):
+            return data
+        card = {"kind": str(media["card"]), "image": image}
+        if isinstance(data, dict):
+            return {**data, "card": card}
+        fields = {name: getattr(data, name) for name in cls.model_fields if hasattr(data, name)}
+        return {**fields, "card": card}
 
     @field_validator("media", mode="before")
     @classmethod

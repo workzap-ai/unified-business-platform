@@ -87,6 +87,21 @@ export function MessageItem({
           )}
         >
           <MediaBlock message={message} />
+          {message.card && (
+            <a href={message.card.image} target="_blank" rel="noreferrer">
+              {/* eslint-disable-next-line @next/next/no-img-element -- signed external card */}
+              <img
+                src={message.card.image}
+                alt={
+                  message.card.kind === "map"
+                    ? "Problem map sent on WhatsApp"
+                    : "Journey card sent on WhatsApp"
+                }
+                loading="lazy"
+                className="mb-1.5 block w-full max-w-[260px] rounded-xl border border-border"
+              />
+            </a>
+          )}
           {visibleBody(message) && (
             <FormattedText
               text={visibleBody(message)}

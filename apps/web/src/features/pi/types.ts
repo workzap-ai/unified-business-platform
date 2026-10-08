@@ -81,6 +81,8 @@ export type Message = {
   sent_by_label: string | null;
   created_at: string;
   tool_events: ToolEvent[];
+  /** A problem map or journey card pi sent the customer on WhatsApp. */
+  card?: { kind: string; image: string } | null;
   confirmation: {
     kind: "order_summary";
     status: "pending" | "confirmed" | "cancelled" | "expired";

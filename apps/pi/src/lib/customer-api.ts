@@ -140,6 +140,8 @@ export type CustomerMessage = {
   body: string;
   transcript: string | null;
   has_media: boolean;
+  /** The map or journey card pi sent on WhatsApp. */
+  card_image?: string | null;
   status: string | null;
   at: string;
 };

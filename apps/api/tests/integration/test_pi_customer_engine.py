@@ -302,3 +302,83 @@ async def test_the_team_is_alerted_when_a_customer_waits_on_it(
     assert any("Furniture website" in m.body and "update" in m.body for m in statuses)
     await business.aclose()
     await customer.aclose()
+
+
+def test_asking_for_the_map_and_a_third_request_get_the_map():
+    issues = [
+        {"title": "Website", "stage": "on_it", "ball_with": "team", "next_step": "Team: x"},
+        {"title": "ERP", "stage": "need_answer", "ball_with": "client", "open_question": "Q?"},
+        {"title": "PDF", "stage": "noted", "ball_with": "pi", "next_step": ""},
+    ]
+    report = {"language": "en", "issues": issues, "links": [], "new_events": []}
+    kind, _, caption = engine.pick_card(report, asked=True)
+    assert kind == "map" and "3 requests" in caption
+    report["new_events"] = [{"kind": "problem.noted", "title": "PDF"}]
+    kind, _, caption = engine.pick_card(report)
+    assert kind == "map" and '"PDF"' in caption
+    # One request asked for: its journey, not a lone dot.
+    one = {"language": "roman_ur", "issues": issues[1:2], "links": [], "new_events": []}
+    kind, index, caption = engine.pick_card(one, asked=True)
+    assert (kind, index) == ("journey", 0) and "Aap: Q?" in caption
+    for text, hit in [
+        ("map dikhao", True),
+        ("mera naqsha bhejo", True),
+        ("show my map", True),
+        ("progress dikhao please", True),
+        ("I want a website", False),
+        ("sitemap banana hai", False),
+    ]:
+        assert bool(engine.MAP_ASK.search(text)) is hit, text
+
+
+async def test_a_customer_who_asks_for_the_map_gets_it_within_a_minute(
+    app, provider, business_db, monkeypatch
+):
+    business, customer, conversation_id = await _linked_chat(
+        app, provider, business_db, monkeypatch
+    )
+    ctx = worker_ctx(app, business_db)
+    conversation = await business_db.get(PiConversation, conversation_id)
+    await business_db.refresh(conversation)
+    inbound = await business_db.scalar(
+        select(PiMessage)
+        .where(PiMessage.conversation_id == conversation_id, PiMessage.direction == "inbound")
+        .order_by(PiMessage.created_at.desc())
+    )
+    inbound.body = "Mera problem map dikhao"
+    conversation.last_inbound_at = datetime.now(UTC)  # still typing: no quiet wait
+    await business_db.commit()
+    [queued] = await engine.read_quiet_chats(ctx)
+    card = await business_db.get(PiMessage, queued)
+    assert card.media["card"] == "map" and card.media["image"].endswith("/card.png")
+    assert "/customer/card/" in card.media["image"] and "map" in card.body.lower()
+    assert await engine.read_quiet_chats(ctx) == []  # answered once per message
+    # Once WhatsApp has it, the customer's own chat shows the same picture.
+    card.status = "sent"
+    await business_db.commit()
+    detail = (await customer.get(f"{PORTAL}/conversations/{conversation_id}")).json()
+    assert [m["card_image"] for m in detail["messages"] if m.get("card_image")] == [
+        card.media["image"]
+    ]
+    await business.aclose()
+    await customer.aclose()
+
+
+async def test_no_public_address_means_no_card(app, provider, business_db, monkeypatch):
+    business, customer, conversation_id = await _linked_chat(
+        app, provider, business_db, monkeypatch
+    )
+    settings = app.state.settings.model_copy(update={"pi_app_public_url": ""})
+    conversation = await business_db.get(PiConversation, conversation_id)
+    await business_db.refresh(conversation)
+    report = {**conversation.service_brief["customer_issues"], "new_events": []}
+    scope = SimpleNamespace(tenant_id=conversation.tenant_id)
+    policy = SimpleNamespace(whatsapp_config={}, timezone="UTC")
+    assert (
+        await engine.queue_card(
+            business_db, scope, policy, conversation, report, settings=settings, asked=True
+        )
+        is None
+    )
+    await business.aclose()
+    await customer.aclose()

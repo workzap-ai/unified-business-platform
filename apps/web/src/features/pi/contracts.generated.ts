@@ -142,6 +142,13 @@ export const MessageSchema: z.ZodType<Pi.Message> = z.object({
       summary: z.string(),
     }),
   ),
+  card: z
+    .union([
+      z.undefined(),
+      z.null(),
+      z.object({ kind: z.string(), image: z.string() }),
+    ])
+    .optional(),
   confirmation: z.union([
     z.null(),
     z.object({

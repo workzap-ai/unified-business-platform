@@ -52,7 +52,12 @@ import {
   useLang,
   usePrefs,
 } from "./shared";
-import { ActivityTimeline, SolutionFlow, type TimelineEvent } from "./visuals";
+import {
+  ActivityTimeline,
+  ProblemMap,
+  SolutionFlow,
+  type TimelineEvent,
+} from "./visuals";
 
 export function ConversationView({ id }: { id: string }) {
   const client = useQueryClient();
@@ -396,6 +401,15 @@ function Bubble({
             mine={mine}
           />
         )}
+        {message.card_image && (
+          // eslint-disable-next-line @next/next/no-img-element -- signed card from pi
+          <img
+            src={message.card_image}
+            alt="Your problem map"
+            loading="lazy"
+            className="mb-1.5 block w-full max-w-[260px] rounded-xl border border-border"
+          />
+        )}
         {message.body && <Formatted text={message.body} />}
         <p className="mt-1 text-right text-[11px] opacity-70">
           {clock(message.at)}
@@ -611,6 +625,15 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
     queryFn: () =>
       customerGet<TimelineEvent[]>(`/conversations/${detail.id}/timeline`),
   });
+  const notRelated = useMutation({
+    mutationFn: (link: { a_title: string; b_title: string }) =>
+      customerPost(`/conversations/${detail.id}/links/not-related`, {
+        a_title: link.a_title,
+        b_title: link.b_title,
+      }),
+    onSuccess: () =>
+      void client.invalidateQueries({ queryKey: ["pi-customer"] }),
+  });
   const pct = journeyPercent(list);
   const yours = list.some((i) => i.ball_with === "client");
   const pausedUntil = detail.waiting_on_other_until;
@@ -618,6 +641,20 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
 
   return (
     <div className="space-y-4">
+      {/* The same map pi sends on WhatsApp, live for this chat. */}
+      {list.length >= 2 && (
+        <Card className="p-4">
+          <h2 className="mb-2 font-semibold">
+            {lang === "ur" ? "Is chat ka naqsha" : "Problem map"}
+          </h2>
+          <ProblemMap
+            issues={list}
+            links={links}
+            lang={lang}
+            onNotRelated={(link) => notRelated.mutate(link)}
+          />
+        </Card>
+      )}
       <Card className="overflow-hidden">
         <div className="border-b border-border px-4 py-4 sm:px-5">
           <div className="flex items-center justify-between gap-2">

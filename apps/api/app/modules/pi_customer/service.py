@@ -197,6 +197,10 @@ def message_view(message: PiMessage) -> dict[str, Any]:
         "has_media": inbound
         and message.message_type in {"audio", "image", "video"}
         and bool(media.get("provider_media_id")),
+        # The map or journey card pi sent on WhatsApp, as the customer saw it.
+        "card_image": media.get("image")
+        if not inbound and media.get("card") and str(media.get("image", "")).startswith("http")
+        else None,
         "status": None if inbound else message.status,
         "at": message.created_at,
     }

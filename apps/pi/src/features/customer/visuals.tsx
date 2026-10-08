@@ -123,8 +123,8 @@ function ViewToggle({
 /* --------------------------------------------------------- problem map */
 
 const MAP_CSS = `
-@keyframes pimap-pop { from { opacity: 0; transform: scale(.82) } to { opacity: 1; transform: none } }
-@keyframes pimap-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes pimap-pop { from { transform: scale(.86) } to { transform: none } }
+@keyframes pimap-fade { from { opacity: .35 } to { opacity: 1 } }
 @keyframes pimap-pulse { 0% { transform: scale(1); opacity: .75 } 70%, 100% { transform: scale(1.32); opacity: 0 } }
 .pimap-pulse { animation: pimap-pulse 2.4s ease-out infinite }
 .pimap-node { animation: pimap-pop .45s cubic-bezier(.2,.8,.2,1) both }
@@ -198,7 +198,7 @@ const ROW = 204;
 function mapHeight(n: number, w: number) {
   return w < NARROW
     ? Math.max(260, n * ROW + 40)
-    : Math.round(Math.max(w * 0.78, 400));
+    : Math.round(Math.max(w * 0.7, 400));
 }
 
 function mapPoints(n: number, w: number, h: number, d: (k: number) => number) {
@@ -690,23 +690,31 @@ export function ProblemMap({
 /* ------------------------------------------------------ complete journey */
 
 /** Every request on the same seven-step road: where it is, whose turn, what's next. */
-export function JourneyRoad({
+export function JourneyRoad<T extends CustomerIssue>({
   issues,
   lang,
   onOpen,
+  subtitle,
+  keepOrder = false,
 }: {
-  issues: CustomerIssue[];
+  issues: T[];
   lang: Lang;
-  onOpen?: (issue: CustomerIssue) => void;
+  onOpen?: (issue: T) => void;
+  /** Extra line under the title, e.g. the business name. */
+  subtitle?: (issue: T) => string;
+  /** Keep the caller's order (it already sorts and filters). */
+  keepOrder?: boolean;
 }) {
   const ur = lang === "ur";
   const labels = JOURNEY_LABELS[ur ? "ur" : "en"];
   if (!issues.length) return null;
-  const order = [...issues].sort(
-    (a, b) =>
-      Number(b.ball_with === "client") - Number(a.ball_with === "client") ||
-      (b.journey_steps ?? 0) - (a.journey_steps ?? 0),
-  );
+  const order = keepOrder
+    ? issues
+    : [...issues].sort(
+        (a, b) =>
+          Number(b.ball_with === "client") - Number(a.ball_with === "client") ||
+          (b.journey_steps ?? 0) - (a.journey_steps ?? 0),
+      );
   return (
     <div className="space-y-1">
       <div className="hidden grid-cols-[minmax(0,15rem)_minmax(0,1fr)] gap-4 pb-1 md:grid">
@@ -726,7 +734,7 @@ export function JourneyRoad({
         </div>
       </div>
       <ul className="divide-y divide-border">
-        {order.map((issue) => {
+        {order.map((issue, n) => {
           const stopped = ["paused", "closed"].includes(issue.stage);
           const done = stopped
             ? 0
@@ -740,7 +748,7 @@ export function JourneyRoad({
               ? `${ur ? "Aap" : "You"}: ${issue.open_question}`
               : issue.next_step?.replace(/^(team|pi|you)\s*:\s*/i, "") || "";
           return (
-            <li key={issue.title} className="py-3">
+            <li key={`${n}-${issue.title}`} className="py-3">
               <button
                 type="button"
                 onClick={() => onOpen?.(issue)}
@@ -751,6 +759,7 @@ export function JourneyRoad({
                     {issue.title}
                   </span>
                   <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+                    {subtitle && <span>{subtitle(issue)} ·</span>}
                     <span>
                       {stopped
                         ? STAGE[issue.stage][lang]

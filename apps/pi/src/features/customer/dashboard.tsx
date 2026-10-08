@@ -32,7 +32,6 @@ import {
 } from "@/lib/customer-api";
 import { cn } from "@/lib/cn";
 import {
-  Badge,
   Button,
   Card,
   EmptyState,
@@ -43,11 +42,9 @@ import { CustomerSecurityCard } from "./security";
 import { JourneyRoad, PriorityChart, ProblemMap } from "./visuals";
 import {
   Avatar,
-  CATEGORY,
   LIST,
   ME,
   PREFS,
-  STAGE,
   TURN,
   ago,
   journeyPercent,
@@ -186,193 +183,152 @@ export function Dashboard({ me }: { me: CustomerMe }) {
       ) : (
         <>
           <TurnBanner rows={rows} lang={lang} />
-          <Journey
-            rows={rows}
-            businesses={items.length}
-            lang={lang}
-            reading={reading}
-          />
 
-          {rows.length > 0 && (
-            <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-              <Card className="p-4 sm:p-5">
-                <h2 className="mb-2 font-semibold">
-                  {lang === "ur"
-                    ? "Aap ke maslon ka naqsha"
-                    : "Your Problem Map"}
-                </h2>
-                <ProblemMap
-                  issues={rows}
-                  links={links}
-                  lang={lang}
-                  onNotRelated={(link) =>
-                    notRelated.mutate(
-                      link as IssueLink & { conversation: string },
-                    )
-                  }
-                  onOpen={(issue) => {
-                    const row = rows.find((r) => r.title === issue.title);
-                    if (row) router.push(`/customer/c/${row.conversation.id}`);
-                  }}
-                />
-              </Card>
-              <Card className="p-4 sm:p-5">
-                <h2 className="mb-2 font-semibold">
-                  {lang === "ur" ? "Kahan se shuru karein" : "Where to start"}
-                </h2>
-                <PriorityChart issues={rows} links={links} lang={lang} />
-              </Card>
-            </div>
-          )}
-
-          {rows.length > 0 && (
-            <Card className="p-4 sm:p-5">
-              <h2 className="font-semibold">
-                {lang === "ur" ? "Poora safar" : "The complete journey"}
-              </h2>
-              <p className="mb-3 text-xs text-muted-foreground">
-                {lang === "ur"
-                  ? "Har request 7 qadam ke raste pe: kahan hai, kis ki baari, agla qadam."
-                  : "Every request on the same 7-step road: where it is, whose turn, what's next."}
-              </p>
-              <JourneyRoad
-                issues={rows}
-                lang={lang}
-                onOpen={(issue) => {
-                  const row = rows.find((r) => r.title === issue.title);
-                  if (row) router.push(`/customer/c/${row.conversation.id}`);
-                }}
-              />
-            </Card>
+          {rows.length >= 2 && (
+            <BigPicture
+              rows={rows}
+              links={links}
+              lang={lang}
+              onNotRelated={(link) =>
+                notRelated.mutate(link as IssueLink & { conversation: string })
+              }
+              onOpen={(issue) => {
+                const row = rows.find((r) => r.title === issue.title);
+                if (row) router.push(`/customer/c/${row.conversation.id}`);
+              }}
+            />
           )}
 
           <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-            <section aria-label="Requests" className="min-w-0 space-y-3">
-              <label className="relative block">
-                <span className="sr-only">Search requests</span>
-                <Search
-                  className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-                  aria-hidden
-                />
-                <input
-                  type="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={
-                    lang === "ur"
-                      ? "Request ya business dhoondein"
-                      : "Search requests or businesses"
-                  }
-                  className="h-12 w-full rounded-xl border border-border-strong bg-surface pl-10 pr-3.5 text-base placeholder:text-muted-foreground/70 focus-visible:outline-2 focus-visible:outline-ring sm:h-11 sm:text-[15px]"
-                />
-              </label>
-              <div
-                className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
-                role="tablist"
-                aria-label="Filter requests"
-              >
-                {FILTERS.map((f) => {
-                  const count =
-                    f.key === "all"
-                      ? rows.length
-                      : rows.filter((r) => turnOf(r) === f.key).length;
-                  if (f.key === "other" && count === 0) return null;
-                  return (
-                    <button
-                      key={f.key}
-                      type="button"
-                      role="tab"
-                      aria-selected={filter === f.key}
-                      onClick={() => setFilter(f.key)}
-                      className={cn(
-                        "inline-flex min-h-10 shrink-0 snap-start items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors sm:min-h-9",
-                        filter === f.key
-                          ? "border-accent bg-accent text-accent-foreground"
-                          : "border-border bg-surface text-foreground-secondary hover:bg-surface-muted",
-                      )}
-                    >
-                      {f.key !== "all" && (
-                        <span
+            <section aria-label="Requests" className="min-w-0 space-y-4">
+              <Card className="p-4 sm:p-5">
+                <Progress rows={rows} lang={lang} reading={reading} />
+                {rows.length > 0 && (
+                  <div
+                    className="-mx-4 mt-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
+                    role="tablist"
+                    aria-label="Filter requests"
+                  >
+                    {FILTERS.map((f) => {
+                      const count =
+                        f.key === "all"
+                          ? rows.length
+                          : rows.filter((r) => turnOf(r) === f.key).length;
+                      if (f.key !== "all" && count === 0) return null;
+                      return (
+                        <button
+                          key={f.key}
+                          type="button"
+                          role="tab"
+                          aria-selected={filter === f.key}
+                          onClick={() => setFilter(f.key)}
                           className={cn(
-                            "size-2 shrink-0 rounded-full",
-                            TURN[f.key].dot,
+                            "inline-flex min-h-10 shrink-0 snap-start items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors sm:min-h-9",
+                            filter === f.key
+                              ? "border-accent bg-accent text-accent-foreground"
+                              : "border-border bg-surface text-foreground-secondary hover:bg-surface-muted",
                           )}
-                          aria-hidden
-                        />
-                      )}
-                      {f[lang]}
-                      <span
-                        className={cn(
-                          "rounded-full px-1.5 text-xs tabular-nums",
-                          filter === f.key
-                            ? "bg-accent-foreground/20"
-                            : "bg-surface-muted",
-                        )}
-                      >
-                        {count}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {shown.length === 0 ? (
-                <Card>
+                        >
+                          {f.key !== "all" && (
+                            <span
+                              className={cn(
+                                "size-2 shrink-0 rounded-full",
+                                TURN[f.key].dot,
+                              )}
+                              aria-hidden
+                            />
+                          )}
+                          {f[lang]}
+                          <span
+                            className={cn(
+                              "rounded-full px-1.5 text-xs tabular-nums",
+                              filter === f.key
+                                ? "bg-accent-foreground/20"
+                                : "bg-surface-muted",
+                            )}
+                          >
+                            {count}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                {rows.length > 6 && (
+                  <label className="relative mt-3 block">
+                    <span className="sr-only">Search requests</span>
+                    <Search
+                      className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                      aria-hidden
+                    />
+                    <input
+                      type="search"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder={
+                        lang === "ur"
+                          ? "Request ya business dhoondein"
+                          : "Search requests or businesses"
+                      }
+                      className="h-11 w-full rounded-xl border border-border-strong bg-surface pl-10 pr-3.5 text-base placeholder:text-muted-foreground/70 focus-visible:outline-2 focus-visible:outline-ring sm:text-[15px]"
+                    />
+                  </label>
+                )}
+                {rows.length > 0 && shown.length === 0 ? (
                   <EmptyState
                     icon={<Search className="size-6" aria-hidden />}
-                    title={
-                      rows.length === 0
-                        ? lang === "ur"
-                          ? "pi aap ki chats parh raha hai"
-                          : "pi is reading your chats"
-                        : lang === "ur"
-                          ? "Kuch nahi mila"
-                          : "Nothing matches"
-                    }
+                    title={lang === "ur" ? "Kuch nahi mila" : "Nothing matches"}
                     action={
-                      rows.length > 0 ? (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => {
-                            setQuery("");
-                            setFilter("all");
-                          }}
-                        >
-                          {lang === "ur" ? "Sab dikhayein" : "Show everything"}
-                        </Button>
-                      ) : undefined
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => {
+                          setQuery("");
+                          setFilter("all");
+                        }}
+                      >
+                        {lang === "ur" ? "Sab dikhayein" : "Show everything"}
+                      </Button>
                     }
                   >
-                    {rows.length === 0
-                      ? lang === "ur"
-                        ? "Aap ke requests thori dair mein yahan aa jayenge."
-                        : "Your requests will appear here in a moment."
-                      : lang === "ur"
-                        ? "Koi aur search ya filter try karein."
-                        : "Try another search or filter."}
+                    {lang === "ur"
+                      ? "Koi aur search ya filter try karein."
+                      : "Try another search or filter."}
                   </EmptyState>
-                </Card>
-              ) : (
-                <ul className="space-y-2.5">
-                  {shown.map((r, n) => (
-                    <li key={`${r.conversation.id}-${n}`}>
-                      <RequestRow row={r} lang={lang} />
-                    </li>
-                  ))}
-                </ul>
-              )}
+                ) : (
+                  <div className="mt-2">
+                    <JourneyRoad
+                      issues={shown}
+                      lang={lang}
+                      keepOrder
+                      subtitle={
+                        items.length > 1
+                          ? (r) => r.conversation.business
+                          : undefined
+                      }
+                      onOpen={(r) =>
+                        router.push(`/customer/c/${r.conversation.id}`)
+                      }
+                    />
+                  </div>
+                )}
+              </Card>
 
-              <h2 className="pt-4 text-sm font-semibold text-muted-foreground">
-                {lang === "ur" ? "Chats" : "Chats"} ({items.length})
-              </h2>
-              <ul className="space-y-2.5">
-                {items.map((c) => (
-                  <li key={c.id}>
-                    <ChatCard c={c} lang={lang} />
-                  </li>
-                ))}
-              </ul>
+              {/* With one business every request already opens its chat. */}
+              {items.length > 1 && (
+                <>
+                  <h2 className="text-sm font-semibold text-muted-foreground">
+                    Chats ({items.length})
+                  </h2>
+                  <ul className="space-y-2.5">
+                    {items.map((c) => (
+                      <li key={c.id}>
+                        <ChatCard c={c} />
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </section>
 
             <aside className="space-y-4 lg:sticky lg:top-6">
@@ -539,182 +495,130 @@ function TurnBanner({ rows, lang }: { rows: Row[]; lang: "en" | "ur" }) {
   );
 }
 
-/** Progress is how far each request has come on its journey, not "% finished". */
-function Journey({
+/** One line: how many requests, how far they have come (journey, not "% finished"). */
+function Progress({
   rows,
-  businesses,
   lang,
   reading,
 }: {
   rows: Row[];
-  businesses: number;
   lang: "en" | "ur";
   reading: boolean;
 }) {
   const pct = journeyPercent(rows);
-  const parts = (["you", "us", "other", "done"] as const).map((key) => ({
-    key,
-    value: rows.filter((r) => turnOf(r) === key).length,
-  }));
   const total = rows.length;
   return (
-    <Card className="p-4 sm:p-5">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <h2 className="font-semibold">
-            {lang === "ur"
-              ? "Kaam kahan tak pahuncha"
-              : "How far things have come"}
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            {total
+    <div>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="text-sm text-muted-foreground">
+          {total
+            ? lang === "ur"
+              ? `${total} requests`
+              : `${total} ${total === 1 ? "request" : "requests"}`
+            : reading
               ? lang === "ur"
-                ? `${total} requests, ${businesses} ${businesses === 1 ? "business" : "businesses"}`
-                : `${total} ${total === 1 ? "request" : "requests"} with ${businesses} ${businesses === 1 ? "business" : "businesses"}`
-              : reading
-                ? lang === "ur"
-                  ? "pi aap ki chats parh raha hai…"
-                  : "pi is reading your chats…"
-                : lang === "ur"
-                  ? "Abhi koi request nahi."
-                  : "No requests yet."}
-          </p>
-        </div>
+                ? "pi aap ki chats parh raha hai…"
+                : "pi is reading your chats…"
+              : lang === "ur"
+                ? "Abhi koi request nahi."
+                : "No requests yet."}
+        </p>
         {pct !== null && (
           <p className="text-sm font-medium tabular-nums">
             {lang === "ur" ? `Safar ${pct}%` : `Journey ${pct}%`}
           </p>
         )}
       </div>
-      <div
-        className="mt-3 h-2.5 overflow-hidden rounded-full bg-surface-muted"
-        role="progressbar"
-        aria-valuenow={pct ?? 0}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="Journey progress across your requests"
-      >
+      {pct !== null && (
         <div
-          className="h-full rounded-full bg-accent transition-all"
-          style={{ width: `${pct ?? 0}%` }}
-        />
+          className="mt-2 h-2 overflow-hidden rounded-full bg-surface-muted"
+          role="progressbar"
+          aria-valuenow={pct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Journey progress across your requests"
+        >
+          <div
+            className="h-full rounded-full bg-accent transition-all"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** The map and "where to start" share one card: one picture at a time. */
+function BigPicture({
+  rows,
+  links,
+  lang,
+  onNotRelated,
+  onOpen,
+}: {
+  rows: Row[];
+  links: IssueLink[];
+  lang: "en" | "ur";
+  onNotRelated: (link: IssueLink) => void;
+  onOpen: (issue: CustomerIssue) => void;
+}) {
+  const [view, setView] = useState<"map" | "start">("map");
+  const tabs = [
+    { key: "map", en: "Problem map", ur: "Naqsha" },
+    { key: "start", en: "Where to start", ur: "Kahan se shuru" },
+  ] as const;
+  return (
+    <Card className="p-4 sm:p-5">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="font-semibold">
+          {lang === "ur" ? "Poori tasveer" : "The big picture"}
+        </h2>
+        <div
+          role="tablist"
+          aria-label="Choose a view"
+          className="inline-flex rounded-xl bg-surface-muted p-1"
+        >
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              role="tab"
+              aria-selected={view === t.key}
+              onClick={() => setView(t.key)}
+              className={cn(
+                "min-h-9 rounded-lg px-3 text-sm font-medium transition-colors",
+                view === t.key
+                  ? "bg-surface text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {t[lang]}
+            </button>
+          ))}
+        </div>
       </div>
-      {total > 0 && (
-        <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {parts
-            .filter((p) => p.key !== "other" || p.value > 0)
-            .map((p) => (
-              <li
-                key={p.key}
-                className="min-w-0 rounded-xl bg-surface-muted/60 px-3 py-2.5"
-              >
-                <span className="block text-xl font-semibold tabular-nums">
-                  {p.value}
-                </span>
-                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <span
-                    className={cn(
-                      "size-2 shrink-0 rounded-full",
-                      TURN[p.key].dot,
-                    )}
-                    aria-hidden
-                  />
-                  <span className="truncate">{TURN[p.key][lang]}</span>
-                </span>
-              </li>
-            ))}
-        </ul>
+      {view === "map" ? (
+        <ProblemMap
+          issues={rows}
+          links={links}
+          lang={lang}
+          onNotRelated={onNotRelated}
+          onOpen={onOpen}
+        />
+      ) : (
+        <div className="mx-auto max-w-xl">
+          <PriorityChart issues={rows} links={links} lang={lang} />
+        </div>
       )}
     </Card>
   );
 }
 
-function RequestRow({ row, lang }: { row: Row; lang: "en" | "ur" }) {
-  const stage = STAGE[row.stage];
-  const turn = turnOf(row);
-  const Icon = CATEGORY[row.category].icon;
-  const next = nextStepLine(row, lang);
-  return (
-    <Link
-      href={`/customer/c/${row.conversation.id}`}
-      className={cn(
-        "block rounded-2xl border border-border border-l-4 bg-surface p-3.5 shadow-sm transition-colors hover:bg-surface-muted/60 focus-visible:outline-2 focus-visible:outline-ring sm:p-4",
-        stage.bar,
-      )}
-    >
-      <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface-muted text-foreground-secondary">
-          <Icon className="size-4" aria-hidden />
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <p className="min-w-0 font-semibold leading-snug">{row.title}</p>
-            <Badge tone={stage.tone}>
-              <span
-                className={cn("size-2 rounded-full", stage.dot)}
-                aria-hidden
-              />
-              {stage[lang]}
-            </Badge>
-            {!!row.linked && (
-              <Badge tone="accent">
-                {lang === "ur"
-                  ? `${row.linked} se juda`
-                  : `Linked to ${row.linked}`}
-              </Badge>
-            )}
-          </div>
-          <p className="mt-0.5 truncate text-xs text-muted-foreground">
-            {row.conversation.business}
-            {row.department_name ? ` · ${row.department_name}` : ""}
-          </p>
-          {next && turn !== "done" && (
-            <p
-              className={cn(
-                "mt-2 rounded-lg px-3 py-2 text-[13px]",
-                turn === "you" ? "bg-warning-soft/60" : "bg-surface-muted",
-              )}
-            >
-              <span className="font-medium">
-                {turn === "you"
-                  ? lang === "ur"
-                    ? "Aap: "
-                    : "You: "
-                  : turn === "other"
-                    ? ""
-                    : lang === "ur"
-                      ? "Agla qadam: "
-                      : "Next: "}
-              </span>
-              {next}
-              {row.overdue && (
-                <span className="ml-1 font-medium text-danger">
-                  {lang === "ur" ? "(der ho gayi)" : "(overdue)"}
-                </span>
-              )}
-            </p>
-          )}
-        </div>
-        <ChevronRight
-          className="mt-1 size-4 shrink-0 text-muted-foreground"
-          aria-hidden
-        />
-      </div>
-    </Link>
-  );
-}
-
-function ChatCard({
-  c,
-  lang,
-}: {
-  c: CustomerConversationItem;
-  lang: "en" | "ur";
-}) {
+function ChatCard({ c }: { c: CustomerConversationItem }) {
   return (
     <Link
       href={`/customer/c/${c.id}`}
-      className="group flex items-start gap-3 rounded-2xl border border-border bg-surface p-3.5 transition-colors hover:bg-surface-muted/60 focus-visible:outline-2 focus-visible:outline-ring sm:p-4"
+      className="group flex items-center gap-3 rounded-2xl border border-border bg-surface p-3.5 transition-colors hover:bg-surface-muted/60 focus-visible:outline-2 focus-visible:outline-ring"
     >
       <Avatar name={c.business} />
       <div className="min-w-0 flex-1">
@@ -724,28 +628,14 @@ function ChatCard({
             {ago(c.last_message_at)}
           </span>
         </div>
-        <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">
+        <p className="mt-0.5 truncate text-sm text-muted-foreground">
           {c.headline || c.preview || "Conversation"}
         </p>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {c.issues_total > 0 && (
-            <Badge>
-              {c.issues_total}{" "}
-              {lang === "ur"
-                ? "requests"
-                : c.issues_total === 1
-                  ? "request"
-                  : "requests"}
-            </Badge>
-          )}
-          {c.counts.waiting_on_you > 0 && (
-            <Badge tone="warning">
-              {c.counts.waiting_on_you} · {TURN.you[lang]}
-            </Badge>
-          )}
-          {c.status === "closed" && <Badge>Closed</Badge>}
-        </div>
       </div>
+      <ChevronRight
+        className="size-4 shrink-0 text-muted-foreground"
+        aria-hidden
+      />
     </Link>
   );
 }
