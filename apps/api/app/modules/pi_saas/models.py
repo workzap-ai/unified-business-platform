@@ -199,6 +199,11 @@ class PiSubscription(TenantRow):
     spend_limit: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)
     currency: Mapped[str] = mapped_column(String(3), default="USD", server_default="USD")
     last_event_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Staged dunning reminders while past_due (0 = none sent yet; see billing.DUNNING_STAGES).
+    dunning_stage: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    dunning_last_sent_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
 
 class PiPlatformInvoice(TenantRow):
@@ -220,6 +225,7 @@ class PiPlatformInvoice(TenantRow):
     period_end: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     external_id: Mapped[str | None] = mapped_column(String(120), nullable=True)
     hosted_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    pdf_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     last_event_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
