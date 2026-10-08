@@ -211,6 +211,9 @@ class Settings(BaseSettings):
     # Platform billing for Pi subscriptions (separate from any business's own Stripe).
     pi_billing_stripe_secret_key: SecretStr | None = None
     pi_billing_stripe_webhook_secret: SecretStr | None = None
+    # Stripe Tax requires registrations set up in the user's own Stripe Dashboard first;
+    # keep checkout behavior unchanged (no tax fields sent) until this is explicitly on.
+    pi_billing_stripe_tax_enabled: bool = False
 
     @property
     def secure_cookies(self) -> bool:

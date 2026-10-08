@@ -91,6 +91,17 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
         await expire_requests(session)
         await billing.sweep_lifecycle(session)
         await session.commit()
+    # Staged dunning reminders (own session/commit: a mail-transport failure here must
+    # never roll back the lifecycle sweep above or block the rest of the sweep).
+    async with ctx["sessions"]() as session:
+        try:
+            sent = await billing.send_dunning_reminders(session, ctx["settings"], ctx["http"])
+            await session.commit()
+            if sent:
+                logger.info("pi_dunning_reminders_sent", extra={"count": sent})
+        except Exception:  # noqa: BLE001 - retried on the next sweep
+            await session.rollback()
+            logger.warning("pi_dunning_sweep_failed")
     # Business journey: notifications, held numbers connecting once allowed, expiring holds.
     async with ctx["sessions"]() as session:
         from app.modules.pi_saas import lifecycle_notify

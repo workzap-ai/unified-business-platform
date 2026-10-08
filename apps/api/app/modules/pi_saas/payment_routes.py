@@ -17,7 +17,7 @@ from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.pi_saas import manual_billing as manual
 from app.modules.pi_saas import pay_links, qr
-from app.modules.pi_saas.billing import subscription_for
+from app.modules.pi_saas.billing import change_plan, preview_change_plan, subscription_for
 from app.modules.pi_saas.models import PiBusinessAccount, PiPlatformInvoice
 from app.modules.pi_saas.operator import Operator, account_for, visible_tenants
 from app.modules.pi_saas.payment_models import PiCollectionSettings, PiManualPayment
@@ -62,6 +62,44 @@ async def payment_methods(scope: Scope, session: Session) -> dict[str, Any]:
         "bank_transfer": config.bank_enabled,
         "cash": config.cash_enabled,
         "support_email": config.support_email,
+    }
+
+
+@client_router.get("/change-plan/preview")
+async def change_plan_preview(
+    request: Request,
+    scope: Scope,
+    session: Session,
+    plan: str = Query(pattern=r"^[a-z0-9_-]{1,32}$"),
+) -> dict[str, Any]:
+    """The prorated "you'll be charged $X now" preview before confirming a plan change
+    on the existing Stripe subscription. Read-only: calls Stripe but changes nothing."""
+    account = await client_account(scope, session, "pi.billing.manage")
+    return await preview_change_plan(
+        session, request.app.state.settings, request.app.state.http, scope, account, plan
+    )
+
+
+class PlanChange(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    plan: str = Field(pattern=r"^[a-z0-9_-]{1,32}$")
+
+
+@client_router.post("/change-plan")
+async def change_plan_commit(
+    data: PlanChange, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Switch the existing Stripe subscription to a new plan (saved card, no new
+    checkout). Applied optimistically; confirmed by the subscription-updated webhook."""
+    account = await client_account(scope, session, "pi.billing.manage", mutation=True)
+    subscription = await change_plan(
+        session, request.app.state.settings, request.app.state.http, scope, account, data.plan
+    )
+    await session.commit()
+    return {
+        "plan": subscription.plan_key,
+        "pending_plan": subscription.pending_plan_key,
+        "status": subscription.status,
     }
 
 

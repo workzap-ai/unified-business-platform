@@ -923,6 +923,7 @@ async def billing_view(request: Request, scope: Scope, session: Session) -> dict
                 "period_start": i.period_start,
                 "period_end": i.period_end,
                 "url": i.hosted_url,
+                "pdf_url": i.pdf_url,
             }
             for i in invoices
         ],
