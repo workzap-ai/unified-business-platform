@@ -19,8 +19,10 @@ import {
   ArrowRightLeft,
   GripVertical,
   Info,
+  MessageCirclePlus,
   MoreHorizontal,
   Plus,
+  Settings2,
   SquareArrowOutUpRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -55,6 +57,8 @@ import {
   STAGES,
 } from "./lib";
 import { useMoveLead } from "./components/use-move-lead";
+import { DealStartDialog } from "./deal-start-dialog";
+import { DealSettingsDialog } from "./deal-settings-dialog";
 
 const COLUMN_LIMIT = 100;
 
@@ -85,6 +89,11 @@ function PipelineBoard() {
   });
 
   const [active, setActive] = useState<Lead | null>(null);
+  const [dealDialog, setDealDialog] = useState<"start" | "settings" | null>(
+    null,
+  );
+  const usesPi = can("pi.read");
+  const canStartDeal = usesPi && canWrite && can("customers.write");
   const { move, dialog, isPending, variables } = useMoveLead();
   const movingId = isPending ? variables?.lead.id : undefined;
 
@@ -122,15 +131,45 @@ function PipelineBoard() {
         title="Pipeline"
         description="Drag a lead to its next stage, or use a card's menu to move it. Only valid next stages accept a drop."
         actions={
-          canWrite && (
-            <Button asChild>
-              <Link href="/sales/leads?new=1">
-                <Plus /> New lead
-              </Link>
-            </Button>
-          )
+          <>
+            {usesPi && (
+              <Button
+                variant="secondary"
+                onClick={() => setDealDialog("settings")}
+              >
+                <Settings2 /> Deal automation
+              </Button>
+            )}
+            {canStartDeal && (
+              <Button
+                variant="secondary"
+                onClick={() => setDealDialog("start")}
+              >
+                <MessageCirclePlus /> New deal from WhatsApp number
+              </Button>
+            )}
+            {canWrite && (
+              <Button asChild>
+                <Link href="/sales/leads?new=1">
+                  <Plus /> New lead
+                </Link>
+              </Button>
+            )}
+          </>
         }
       />
+      {canStartDeal && (
+        <DealStartDialog
+          open={dealDialog === "start"}
+          onOpenChange={(open) => setDealDialog(open ? "start" : null)}
+        />
+      )}
+      {usesPi && (
+        <DealSettingsDialog
+          open={dealDialog === "settings"}
+          onOpenChange={(open) => setDealDialog(open ? "settings" : null)}
+        />
+      )}
       <ModuleNav moduleKey="sales" />
 
       {failed ? (

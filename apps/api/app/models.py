@@ -49,6 +49,7 @@ from app.modules.pi_saas.customer_payment_models import (
     PiCustomerPaymentSettings,
     PiPaymentRequest,
 )
+from app.modules.pi_saas.deal_models import PiDealSettings, PiDocument
 from app.modules.pi_saas.models import (
     PiBillingEvent,
     PiBookableService,
@@ -98,6 +99,8 @@ from app.shared.sequences import DocumentSequence
 from app.workflows.models import WorkflowRun
 
 __all__ = [
+    "PiDealSettings",
+    "PiDocument",
     "CustomerFace",
     "CustomerPasskey",
     "CustomerPrefs",

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,6 +14,7 @@ import {
   FileText,
   MessageSquare,
   Pencil,
+  Sparkles,
   Target,
 } from "lucide-react";
 import {
@@ -44,6 +47,7 @@ import {
 } from "./lib";
 import { LeadFormDialog } from "./components/lead-form-dialog";
 import { useMoveLead } from "./components/use-move-lead";
+import { dealErrorMessage, dealService } from "./deal-service";
 
 export function LeadDetailPage({ id }: { id: string }) {
   return (
@@ -108,6 +112,18 @@ function LeadRecord({ lead }: { lead: Lead }) {
   const targets = lead.next_stages.filter(isStage);
   const requirements = requirementEntries(lead.requirements);
   const fromPi = lead.source === "pi";
+  const router = useRouter();
+  const canQuote =
+    can("quotes.write") && Boolean(lead.customer_id) && lead.stage !== "lost";
+  const proposal = useScopedMutation(
+    () => dealService.proposalFromLead(lead.id),
+    {
+      invalidate: [["quotes"], ["leads"], ["deals"]],
+      toastErrors: false,
+      success: (r) => `Draft proposal ${r.number} created. Add the prices.`,
+      onSuccess: (r) => router.push(`/quotes/${r.quote_id}/edit`),
+    },
+  );
 
   const actions = (
     <>
@@ -131,7 +147,27 @@ function LeadRecord({ lead }: { lead: Lead }) {
             {STAGE_BUTTON_LABELS[stage] ?? STAGE_LABELS[stage]}
           </Button>
         ))}
-      {can("quotes.write") && lead.customer_id && lead.stage !== "lost" && (
+      {canQuote && lead.stage !== "won" && can("pi.read") && (
+        <Button
+          size="sm"
+          onClick={() =>
+            proposal.mutate(undefined, {
+              onError: (e) =>
+                toast.error(
+                  dealErrorMessage(
+                    e,
+                    "The proposal couldn't be created. Please try again.",
+                  ),
+                ),
+            })
+          }
+          loading={proposal.isPending}
+          disabled={proposal.isPending}
+        >
+          <Sparkles /> Proposal from brief
+        </Button>
+      )}
+      {canQuote && (
         <Button size="sm" variant="secondary" asChild>
           <Link href={`/quotes/new?customer=${lead.customer_id}`}>
             <FileText /> Create quote

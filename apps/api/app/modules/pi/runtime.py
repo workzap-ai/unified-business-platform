@@ -295,6 +295,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         event.attempts += 1
         message = await persist_inbound(session, event, connection, scope)
         event.status = "queued" if message else "processed"
+        released: list[str] = []
         if message is not None:
             await meter(session, scope.tenant_id, scope.environment_id, "messages_in")
             # Payment proof reaches the staff "to verify" queue even with automation off.
@@ -306,7 +307,13 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
 
             await note_form_reply(session, ctx["settings"], scope, message)
             await note_opt_out(session, scope, message)  # "STOP" withdraws consent at once
+            # They wrote, so the 24-hour window is open: send proposal/invoice links that
+            # were waiting for it.
+            from app.modules.pi_saas.deals import release_waiting
+
+            released = await release_waiting(session, scope, message)
         await session.commit()
+        await enqueue_sends(ctx, released)
         if message is None:
             return
         service = PiService(session, scope)
@@ -901,6 +908,8 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
         campaign = message.media.get("campaign")
         # pi Customer's follow-up ladder: an approved template after the 24-hour window.
         ladder = message.media.get("ladder")
+        # Deal flow: "your document is ready, reply to see it" outside the window.
+        document_notice = message.media.get("document_notice")
         from app.modules.pi.followups import reminder_allowed
 
         campaign_block = None
@@ -939,6 +948,7 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             if not reminder
             and not campaign
             and not ladder
+            and not document_notice
             and (
                 not conversation.last_inbound_at
                 or conversation.last_inbound_at < datetime.now(UTC) - timedelta(hours=24)
@@ -970,12 +980,12 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             from app.integrations.whatsapp_bridge import token as connection_token
 
             token = await connection_token(session, ctx["settings"], connection)
-            if reminder or campaign or ladder:
+            if reminder or campaign or ladder or document_notice:
                 message.provider_message_id, message.body = await whatsapp.send_template(
                     connection.phone_number_id,
                     connection.business_account_id,
                     conversation.contact_wa_id,
-                    (reminder or campaign or ladder or {})["template"],
+                    (reminder or campaign or ladder or document_notice or {})["template"],
                     token,
                 )
                 if reminder:

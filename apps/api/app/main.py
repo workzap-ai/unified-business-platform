@@ -59,6 +59,8 @@ from app.modules.pi_saas.connector_routes import router as pi_connector_router
 from app.modules.pi_saas.connector_routes import web_router as pi_connector_web_router
 from app.modules.pi_saas.customer_payment_routes import public_router as pi_customer_pay_link_router
 from app.modules.pi_saas.customer_payment_routes import router as pi_customer_payment_router
+from app.modules.pi_saas.deal_routes import public_router as pi_documents_router
+from app.modules.pi_saas.deal_routes import router as pi_deals_router
 from app.modules.pi_saas.digest_routes import operator_router as pi_operator_digest_router
 from app.modules.pi_saas.digest_routes import router as pi_digest_router
 from app.modules.pi_saas.insights_routes import router as pi_insights_router
@@ -94,6 +96,7 @@ ROUTERS = [
     pi_inbox_router,
     pi_work_router,
     pi_customer_payment_router,
+    pi_deals_router,
     pi_operator_router,
     pi_operator_digest_router,
     pi_operator_number_router,
@@ -164,6 +167,12 @@ PI_APP_ROUTERS = [
     pi_inbox_router,
     pi_work_router,
     pi_customer_payment_router,
+    pi_deals_router,
+    pi_documents_router,
+    # The deal flow in the pi app: leads, proposals and orders (core modules, pi session).
+    sales_router,
+    quotes_router,
+    orders_router,
     # Business-owned Google Calendar / Shopify connections (Pi app only).
     pi_connector_router,
     pi_campaign_router,

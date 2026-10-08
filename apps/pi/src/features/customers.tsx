@@ -120,6 +120,14 @@ export function CustomersPage() {
             {list.data ? (
               <Badge tone="accent">{list.data.total} customers</Badge>
             ) : null}
+            {can("sales.read") ? (
+              <Link
+                href="/deals"
+                className="text-sm font-medium text-accent underline"
+              >
+                Deals
+              </Link>
+            ) : null}
             {can("pi.campaigns.read") ? (
               <Link
                 href="/customers/campaigns"

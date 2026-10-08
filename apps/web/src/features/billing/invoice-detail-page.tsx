@@ -42,6 +42,9 @@ import { billingService } from "./service";
 import { InvoiceStatus } from "./invoice-bits";
 import { RecordPaymentSheet } from "./record-payment-sheet";
 import { dueHint, formatDay, methodLabel } from "./utils";
+import { dealService } from "@/features/sales/deal-service";
+import { SendOnWhatsAppButton } from "@/features/sales/deal-delivery-dialog";
+import { DealDocumentsCard } from "@/features/sales/deal-documents-card";
 
 export function InvoiceDetailPage({ id }: { id: string }) {
   return (
@@ -110,6 +113,9 @@ function InvoiceDetailView({ id }: { id: string }) {
   const actions = canWrite ? invoice.next_actions : [];
   const hint = dueHint(invoice);
   const paidSomething = toCents(invoice.amount_paid) > BigInt(0);
+  const usesPi = can("pi.read");
+  const canSendWhatsApp =
+    canWrite && usesPi && ["issued", "partially_paid"].includes(invoice.status);
 
   return (
     <PageShell>
@@ -154,8 +160,17 @@ function InvoiceDetailView({ id }: { id: string }) {
           </>
         }
         actions={
-          actions.length > 0 ? (
+          actions.length > 0 || canSendWhatsApp ? (
             <>
+              {canSendWhatsApp && (
+                <SendOnWhatsAppButton
+                  noun="invoice"
+                  size="default"
+                  variant="secondary"
+                  send={() => dealService.sendInvoice(invoice.id)}
+                  invalidate={[["invoices"], ["deals"]]}
+                />
+              )}
               {actions.includes("void") && (
                 <Button
                   variant="danger-outline"
@@ -204,7 +219,7 @@ function InvoiceDetailView({ id }: { id: string }) {
         </Notice>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
         <InvoiceDocument invoice={invoice} />
 
         <div className="flex min-w-0 flex-col gap-4">
@@ -212,6 +227,9 @@ function InvoiceDetailView({ id }: { id: string }) {
             id={id}
             open={["issued", "partially_paid"].includes(invoice.status)}
           />
+          {usesPi && can("sales.read") && invoice.status !== "draft" && (
+            <DealDocumentsCard filter={{ invoice_id: invoice.id }} />
+          )}
           <RecordAttachments
             type="invoice"
             id={id}
@@ -637,7 +655,7 @@ function DetailSkeleton() {
     <PageShell>
       <RecordHeader title="" loading />
       <div
-        className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]"
+        className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_340px]"
         aria-busy="true"
         aria-label="Loading invoice"
       >

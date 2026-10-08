@@ -9,6 +9,7 @@ import {
   Check,
   ChevronRight,
   ChevronsUpDown,
+  Handshake,
   Home,
   Inbox,
   LogOut,
@@ -47,6 +48,8 @@ const NAV: {
   { href: "/analytics", label: "Analytics", icon: BarChart3, mobile: false },
   // Desktop sidebar only, like Analytics: phones reach it from the inbox.
   { href: "/problems", label: "Problems", icon: Layers, mobile: false },
+  // Desktop sidebar; phones reach Deals from Customers.
+  { href: "/deals", label: "Deals", icon: Handshake, mobile: false },
   { href: "/customers", label: "Customers", icon: Users },
   { href: "/my-pi", label: "My pi", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
