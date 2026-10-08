@@ -97,3 +97,44 @@ async def test_another_language_is_left_to_the_model(api, business_db, monkeypat
     assert len(prompts) == 2  # no rewrite forced into Roman Urdu
     assert (await pi.conversation()).language == "es"
     await pi.close()
+
+
+async def test_a_youtube_link_is_read_before_pi_answers(api, business_db, monkeypatch):
+    from app.modules.pi import links
+
+    async def fake_get(outbound, url, accept):
+        if "oembed" in url:
+            body = '{"title": "Flight booking app demo", "author_name": "Travel Tech"}'
+            return url, "application/json", body
+        page = '<meta name="description" content="A flight search and booking app walkthrough.">'
+        return url, "text/html", page
+
+    async def fake_summary(manager, scope, alias, found, conversation):
+        return "A demo of a flight booking app: search, seat choice, payment."
+
+    monkeypatch.setattr(links, "_get", fake_get)
+    monkeypatch.setattr(links, "_summary", fake_summary)
+    prompts = scripted(
+        monkeypatch,
+        # Drafts the old mistakes: "I heard" for a typed message, and a promise to look later.
+        turn(
+            reply='I heard: "here you go". Please give me a moment to review the video, '
+            "and I will provide feedback shortly.",
+            language="en",
+        ),
+        turn(
+            reply='I heard: "here you go". Got it: a flight booking app like this demo, with '
+            "search, seat choice and payment. Is it for your own agency?",
+            language="en",
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("https://www.youtube.com/shorts/TuLe2t8h1KI here you go", "link-1")
+    await pi.deliver_all()
+    context = json.loads(prompts[0])
+    [link] = context["shared_links"]
+    assert link["title"] == "Flight booking app demo" and link["kind"] == "video"
+    assert prompts[1].startswith("Don't send that draft: it promises to watch or review")
+    [reply] = [m.body for m in await pi.outbound()]
+    assert reply.startswith("Got it: a flight booking app")  # "I heard" removed
+    await pi.close()

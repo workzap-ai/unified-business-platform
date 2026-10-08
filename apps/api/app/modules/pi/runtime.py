@@ -528,6 +528,25 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         fast_intent = keyword_intent(body)
         # Service messages retain language-aware discovery; injection never reaches this model.
         service_discovery = service_discovery and not (fast_intent and fast_intent[2])
+        if service_discovery and message.message_type == "text" and "links" not in message.media:
+            # Links the customer sent (a YouTube video, a website): read them first so
+            # pi answers about what they show instead of promising to look later.
+            from app.integrations.http import OutboundClient
+            from app.modules.pi.links import links_in, read_links
+
+            if links_in(body):
+                links = await read_links(
+                    OutboundClient(
+                        ctx["settings"], ctx["http"], resolver=ctx.get("integration_resolver")
+                    ),
+                    build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"]),
+                    scope,
+                    body,
+                    conversation_id,
+                    alias=str(policy.ai_config.get("router_alias", "fast")),
+                )
+                message.media = {**message.media, "links": links}
+                await session.commit()
         service_context = (
             await prepare_context(session, scope, conversation, message, policy)
             if service_discovery
