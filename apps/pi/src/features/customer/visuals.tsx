@@ -7,13 +7,13 @@
  * ring, every mark has text, and every chart has a "View as list" table.
  */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { List, Network, Unlink } from "lucide-react";
 
 import type { CustomerIssue, IssueLink } from "@/lib/customer-api";
 import { cn } from "@/lib/cn";
 import { STAGE, TURN, shortDay } from "./shared";
-import { MARK, layoutMap, markOf, shortTitle } from "./layout";
+import { MARK, markOf, shortTitle } from "./layout";
 
 export { MARK, layoutMap, markOf } from "./layout";
 
@@ -121,6 +121,116 @@ function ViewToggle({
 }
 
 /* --------------------------------------------------------- problem map */
+
+const MAP_CSS = `
+@keyframes pimap-pop { from { opacity: 0; transform: scale(.82) } to { opacity: 1; transform: none } }
+@keyframes pimap-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes pimap-pulse { 0% { transform: scale(1); opacity: .75 } 70%, 100% { transform: scale(1.32); opacity: 0 } }
+.pimap-pulse { animation: pimap-pulse 2.4s ease-out infinite }
+.pimap-node { animation: pimap-pop .45s cubic-bezier(.2,.8,.2,1) both }
+.pimap-line { animation: pimap-fade .6s ease-out both }
+@media (prefers-reduced-motion: reduce) { .pimap-node, .pimap-line, .pimap-pulse { animation: none } }
+`;
+
+const JOURNEY_LABELS = {
+  en: [
+    "Noted",
+    "Understood",
+    "Linked",
+    "Solution ready",
+    "Your decision",
+    "Building",
+    "Live",
+  ],
+  ur: [
+    "Note hua",
+    "Samjha gaya",
+    "Juda hua",
+    "Hal tayyar",
+    "Aap ka faisla",
+    "Ban raha",
+    "Mukammal",
+  ],
+};
+
+function useWidth() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) =>
+      setWidth(entry.contentRect.width),
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, width] as const;
+}
+
+/** Requests one solution would fix sit next to each other, the most connected in the
+ * middle of its group, so lines stay short and never cross the map. */
+function mapOrder(issues: CustomerIssue[]) {
+  const groups = new Map<string, CustomerIssue[]>();
+  for (const issue of issues) {
+    const key = issue.solution_id || issue.title;
+    groups.set(key, [...(groups.get(key) ?? []), issue]);
+  }
+  return [...groups.values()]
+    .sort((a, b) => b.length - a.length)
+    .flatMap((group) => {
+      const sorted = [...group].sort(
+        (a, b) => (b.linked ?? 0) - (a.linked ?? 0),
+      );
+      const out: CustomerIssue[] = [];
+      sorted.forEach((issue, k) =>
+        k % 2 ? out.unshift(issue) : out.push(issue),
+      );
+      return out;
+    });
+}
+
+const CARD_W = 136;
+
+const NARROW = 520;
+const ROW = 204;
+
+function mapHeight(n: number, w: number) {
+  return w < NARROW
+    ? Math.max(260, n * ROW + 40)
+    : Math.round(Math.max(w * 0.78, 400));
+}
+
+function mapPoints(n: number, w: number, h: number, d: (k: number) => number) {
+  const cx = w / 2;
+  const cy = h / 2 - 10;
+  const raw =
+    w < NARROW && n > 1
+      ? Array.from({ length: n }, (_, k) => ({
+          x: k % 2 ? w * 0.68 : w * 0.32,
+          y: 70 + k * ROW,
+        }))
+      : n === 1
+        ? [{ x: cx, y: cy }]
+        : n === 2
+          ? [
+              { x: w * 0.26, y: cy },
+              { x: w * 0.74, y: cy },
+            ]
+          : Array.from({ length: n }, (_, k) => {
+              const angle = -Math.PI / 2 + (2 * Math.PI * k) / n;
+              return {
+                x: cx + w * 0.36 * Math.cos(angle),
+                y: cy + h * 0.34 * Math.sin(angle),
+              };
+            });
+  // Keep every card (circle + two-line title) inside the map.
+  return raw.map((p, k) => ({
+    x: Math.min(Math.max(p.x, CARD_W / 2 + 6), w - CARD_W / 2 - 6),
+    y: Math.min(Math.max(p.y, d(k) / 2 + 10), h - d(k) / 2 - 62),
+  }));
+}
+
 export function ProblemMap({
   issues,
   links,
@@ -136,38 +246,104 @@ export function ProblemMap({
 }) {
   const [asList, setAsList] = useState(false);
   const [picked, setPicked] = useState<IssueLink | null>(null);
+  const [hover, setHover] = useState<string | null>(null);
+  const [box, width] = useWidth();
+  const ur = lang === "ur";
+
   const open = issues.filter((i) => !["live", "closed"].includes(i.stage));
-  const shown = open.length ? open : issues;
-  const groups = new Map<string, number>();
-  shown.forEach((i) =>
-    groups.set(i.solution_id ?? "", (groups.get(i.solution_id ?? "") ?? 0) + 1),
+  const shown = mapOrder((open.length ? open : issues).slice(0, 8));
+  const titles = new Set(shown.map((i) => i.title));
+  const visible = links.filter(
+    (l) => titles.has(l.a_title) && titles.has(l.b_title),
   );
-  const merged = Math.max(0, ...groups.values());
+  const groups = new Map<string, CustomerIssue[]>();
+  shown.forEach((i) => {
+    const key = i.solution_id ?? "";
+    groups.set(key, [...(groups.get(key) ?? []), i]);
+  });
+  const biggest =
+    [...groups.values()].sort((a, b) => b.length - a.length)[0] ?? [];
+  const merged = visible.length ? biggest.length : 0;
 
   if (!issues.length)
     return (
-      <div className="flex flex-col items-center gap-3 py-8 text-center">
+      <div className="flex flex-col items-center gap-3 rounded-2xl bg-[#1b1830] px-4 py-12 text-center">
         <span
           aria-hidden
-          className="size-16 rounded-full border-2 border-dashed border-border-strong"
+          className="size-16 rounded-full border-2 border-dashed border-[#5A47F5]"
         />
-        <p className="text-sm text-muted-foreground">
-          {lang === "ur"
+        <p className="max-w-xs text-sm text-[#cfcae8]">
+          {ur
             ? "pi ko koi masla batayein, woh yahan nazar aayega."
             : "Tell pi about a problem and it appears here."}
         </p>
       </div>
     );
 
-  const { nodes, regions, width, height } = layoutMap(shown);
-  const at = (title: string) => nodes.find((n) => n.issue.title === title);
-  const visible = links.filter((l) => at(l.a_title) && at(l.b_title));
+  const w = width || 640;
+  const narrow = w < NARROW;
+  const h = mapHeight(shown.length, w);
+  const size = (i: CustomerIssue) =>
+    50 + 6 * Math.min(5, Math.max(1, i.impact ?? 3));
+  const points = mapPoints(shown.length, w, h, (k) => size(shown[k]));
+  const nodes = shown.map((issue, k) => ({
+    issue,
+    ...points[k],
+    d: size(issue),
+  }));
+  const at = (title: string) => nodes.find((n) => n.issue.title === title)!;
+  const center = { x: w / 2, y: h / 2 - 10 };
+  const hub = !narrow && shown.length >= 3 && merged >= 2;
+  const related = (title: string) =>
+    !hover ||
+    title === hover ||
+    visible.some(
+      (l) =>
+        (l.a_title === hover && l.b_title === title) ||
+        (l.b_title === hover && l.a_title === title),
+    );
+  const curve = (link: IssueLink) => {
+    const a = at(link.a_title);
+    const b = at(link.b_title);
+    const mx = (a.x + b.x) / 2;
+    const my = (a.y + b.y) / 2;
+    // Arcs bow away from the middle (where the solution hub sits).
+    const pull = shown.length >= 3 ? 0.42 : 0;
+    const cx = narrow
+      ? mx + (Math.abs(a.x - b.x) < 20 ? (mx < w / 2 ? -70 : 70) : 34)
+      : shown.length === 2
+        ? mx
+        : mx + (mx - center.x) * pull;
+    const cy = narrow
+      ? my
+      : shown.length === 2
+        ? my - 46
+        : my + (my - center.y) * pull;
+    return {
+      d: `M ${a.x} ${a.y} Q ${cx} ${cy} ${b.x} ${b.y}`,
+      // On a phone the label sits in the gap between rows, clear of the titles.
+      label: narrow
+        ? {
+            x: Math.min(
+              Math.max(0.25 * a.x + 0.5 * cx + 0.25 * b.x, 82),
+              w - 82,
+            ),
+            y: (a.y + b.y) / 2 + (Math.abs(a.x - b.x) < 20 ? 0 : 34),
+          }
+        : {
+            x: 0.25 * a.x + 0.5 * cx + 0.25 * b.x,
+            y: 0.25 * a.y + 0.5 * cy + 0.25 * b.y,
+          },
+    };
+  };
+  const outline = biggest.map((i) => i.solution_outline).find(Boolean);
 
   return (
     <div className="space-y-3">
+      <style>{MAP_CSS}</style>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">
-          {lang === "ur"
+          {ur
             ? `${shown.length} masle · pi ne ${visible.length} connection dhoonde`
             : `${shown.length} ${shown.length === 1 ? "problem" : "problems"} · ${visible.length} ${visible.length === 1 ? "connection" : "connections"} found by pi`}
         </p>
@@ -179,13 +355,13 @@ export function ProblemMap({
           <thead className="text-xs text-muted-foreground">
             <tr>
               <th className="py-1.5 pr-2 font-medium">
-                {lang === "ur" ? "Masla" : "Problem"}
+                {ur ? "Masla" : "Problem"}
               </th>
               <th className="py-1.5 pr-2 font-medium">
-                {lang === "ur" ? "Halat" : "Status"}
+                {ur ? "Halat" : "Status"}
               </th>
               <th className="py-1.5 font-medium">
-                {lang === "ur" ? "Juda hua" : "Linked to"}
+                {ur ? "Juda hua" : "Linked to"}
               </th>
             </tr>
           </thead>
@@ -214,122 +390,259 @@ export function ProblemMap({
           </tbody>
         </table>
       ) : (
-        <div className="-mx-1 overflow-x-auto rounded-xl bg-[#1b1830] p-1 [scrollbar-width:thin]">
+        <div
+          ref={box}
+          className="relative overflow-hidden rounded-2xl"
+          style={{
+            height: h,
+            background:
+              "radial-gradient(120% 90% at 50% 45%, #2c2655 0%, #1f1b3a 55%, #171430 100%)",
+          }}
+          onMouseLeave={() => setHover(null)}
+        >
           <svg
-            viewBox={`0 0 ${width} ${height}`}
-            className="h-auto min-w-[340px] w-full"
+            width={w}
+            height={h}
+            className="absolute inset-0"
             role="img"
             aria-label={`Problem map: ${shown.map((i) => i.title).join(", ")}`}
           >
-            {regions.map((region) => (
-              <g key={region.name}>
-                <rect
-                  x={region.x}
-                  y={region.y}
-                  width={region.w}
-                  height={region.h}
-                  rx="14"
-                  fill="#26223f"
+            <defs>
+              <pattern
+                id="pimap-dots"
+                width="22"
+                height="22"
+                patternUnits="userSpaceOnUse"
+              >
+                <circle
+                  cx="1.5"
+                  cy="1.5"
+                  r="1.1"
+                  fill="#ffffff"
+                  opacity="0.07"
                 />
-                <text
-                  x={region.x + 14}
-                  y={region.y + 22}
-                  fill="#a9a4c7"
-                  fontSize="11"
-                  fontWeight="600"
-                  letterSpacing="0.06em"
-                >
-                  {region.name.toUpperCase()}
-                </text>
-              </g>
-            ))}
-            {visible.map((link) => {
-              const a = at(link.a_title)!;
-              const b = at(link.b_title)!;
-              const mx = (a.x + b.x) / 2;
-              const my = (a.y + b.y) / 2;
-              const label = shortTitle(link.reason || "", 28);
+              </pattern>
+              <radialGradient id="pimap-hub" cx="50%" cy="40%" r="70%">
+                <stop offset="0%" stopColor="#7b6bff" />
+                <stop offset="100%" stopColor="#4a36e0" />
+              </radialGradient>
+            </defs>
+            <rect width={w} height={h} fill="url(#pimap-dots)" />
+            {/* One soft halo per group of requests one solution would fix. */}
+            {[...groups.values()]
+              .filter((g) => g.length >= 2 && visible.length)
+              .map((g) => (
+                <path
+                  key={g[0].title}
+                  className="pimap-line"
+                  d={g
+                    .map(
+                      (i, k) =>
+                        `${k ? "L" : "M"} ${at(i.title).x} ${at(i.title).y}`,
+                    )
+                    .join(" ")}
+                  stroke="#8b7cff"
+                  strokeOpacity="0.10"
+                  strokeWidth={Math.min(130, w * 0.22)}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              ))}
+            {hub &&
+              biggest.map((i) => (
+                <line
+                  key={`spoke-${i.title}`}
+                  className="pimap-line"
+                  x1={at(i.title).x}
+                  y1={at(i.title).y}
+                  x2={center.x}
+                  y2={center.y}
+                  stroke="#b3a8ff"
+                  strokeOpacity={related(i.title) ? 0.35 : 0.1}
+                  strokeWidth="1.5"
+                  strokeDasharray="2 5"
+                />
+              ))}
+            {visible.map((link, k) => {
+              const { d } = curve(link);
+              const lit = related(link.a_title) && related(link.b_title);
               return (
-                <g
-                  key={`${link.a_title}-${link.b_title}`}
-                  className="cursor-pointer"
-                  onClick={() => setPicked(link)}
-                >
-                  <line
-                    x1={a.x}
-                    y1={a.y}
-                    x2={b.x}
-                    y2={b.y}
-                    stroke="#8b7cff"
+                <g key={`${link.a_title}-${link.b_title}`}>
+                  <path
+                    d={d}
+                    className="pimap-line"
+                    style={{ animationDelay: `${200 + k * 120}ms` }}
+                    fill="none"
+                    stroke="#a99cff"
+                    strokeOpacity={lit ? 0.95 : 0.2}
                     strokeWidth={
-                      2 + Math.round(((link.confidence ?? 0.8) - 0.8) * 10)
+                      2 +
+                      Math.max(
+                        0,
+                        Math.round(((link.confidence ?? 0.8) - 0.8) * 10),
+                      )
                     }
-                    strokeDasharray={DASHED.has(link.type) ? "6 5" : undefined}
+                    strokeLinecap="round"
+                    strokeDasharray={DASHED.has(link.type) ? "7 6" : undefined}
                   />
-                  {/* 24px hit area */}
-                  <line
-                    x1={a.x}
-                    y1={a.y}
-                    x2={b.x}
-                    y2={b.y}
+                  <path
+                    d={d}
+                    fill="none"
                     stroke="transparent"
                     strokeWidth="24"
+                    className="cursor-pointer"
+                    onClick={() => setPicked(link)}
                   />
-                  {label && (
-                    <g>
-                      <rect
-                        x={mx - label.length * 3.4 - 8}
-                        y={my - 11}
-                        width={label.length * 6.8 + 16}
-                        height="22"
-                        rx="11"
-                        fill="#332e55"
-                      />
-                      <text
-                        x={mx}
-                        y={my + 4}
-                        textAnchor="middle"
-                        fill="#e6e3f5"
-                        fontSize="11"
-                      >
-                        {label}
-                      </text>
-                    </g>
-                  )}
-                </g>
-              );
-            })}
-            {nodes.map((node) => {
-              const mark = markOf(node.issue);
-              return (
-                <g
-                  key={node.index}
-                  className={onOpen ? "cursor-pointer" : undefined}
-                  onClick={() => onOpen?.(node.issue)}
-                >
-                  <circle
-                    cx={node.x}
-                    cy={node.y}
-                    r={node.r}
-                    fill={mark.hollow ? "#1b1830" : mark.fill}
-                    stroke={mark.hollow ? mark.stroke : "#ffffff"}
-                    strokeWidth={mark.hollow ? 3 : 2}
-                  />
-                  <text
-                    x={node.x}
-                    y={node.y + node.r + 18}
-                    textAnchor="middle"
-                    fill="#ffffff"
-                    fontSize="12"
-                    fontWeight="600"
-                  >
-                    {shortTitle(node.issue.title)}
-                  </text>
-                  <title>{`${node.issue.title} · ${STAGE[node.issue.stage].en}`}</title>
                 </g>
               );
             })}
           </svg>
+
+          {hub && (
+            <div
+              className="pimap-node absolute flex flex-col items-center justify-center rounded-full text-center text-white shadow-[0_0_40px_rgba(123,107,255,0.45)]"
+              style={{
+                left: center.x - 54,
+                top: center.y - 54,
+                width: 108,
+                height: 108,
+                background:
+                  "radial-gradient(circle at 50% 35%, #7b6bff, #4a36e0)",
+                animationDelay: "350ms",
+              }}
+              title={outline || undefined}
+            >
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-white/75">
+                {ur ? "Ek hal" : "One solution"}
+              </span>
+              <span className="text-[13px] font-bold leading-tight">
+                {ur ? `${merged} masle` : `fixes ${merged}`}
+              </span>
+            </div>
+          )}
+
+          {visible.map((link) => {
+            const { label } = curve(link);
+            const text = link.reason || (ur ? "juda hua" : "linked");
+            return (
+              <button
+                key={`pill-${link.a_title}-${link.b_title}`}
+                type="button"
+                onClick={() => setPicked(link)}
+                title={link.benefit || link.reason}
+                className={cn(
+                  "pimap-line absolute line-clamp-2 max-w-[150px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 bg-[#332e5c]/95 px-2.5 py-1 text-center text-[11px] font-medium leading-tight text-[#ece9ff] shadow-lg transition-opacity hover:bg-[#433b78]",
+                  !(related(link.a_title) && related(link.b_title)) &&
+                    "opacity-30",
+                )}
+                style={{ left: label.x, top: label.y }}
+              >
+                {text}
+              </button>
+            );
+          })}
+
+          {nodes.map((node, k) => {
+            const { issue, d } = node;
+            const mark = markOf(issue);
+            const steps = Math.min(7, Math.max(0, issue.journey_steps ?? 0));
+            const r = d / 2 - 3;
+            const around = 2 * Math.PI * r;
+            const yourTurn =
+              issue.ball_with === "client" && !issue.waiting_on_other_until;
+            return (
+              <button
+                key={issue.title}
+                type="button"
+                className={cn(
+                  "pimap-node absolute flex flex-col items-center text-center transition-opacity duration-200 focus:outline-none",
+                  !related(issue.title) && "opacity-30",
+                )}
+                style={{
+                  left: node.x - CARD_W / 2,
+                  top: node.y - d / 2,
+                  width: CARD_W,
+                  animationDelay: `${k * 90}ms`,
+                }}
+                onMouseEnter={() => setHover(issue.title)}
+                onFocus={() => setHover(issue.title)}
+                onBlur={() => setHover(null)}
+                onClick={() => onOpen?.(issue)}
+                aria-label={`${issue.title}: ${STAGE[issue.stage][lang]}, ${steps} of 7 steps`}
+              >
+                <span
+                  className="relative block"
+                  style={{ width: d, height: d }}
+                >
+                  {yourTurn && (
+                    <span
+                      aria-hidden
+                      className="pimap-pulse absolute inset-0 rounded-full border-[3px] border-[#f5a524]"
+                    />
+                  )}
+                  <svg
+                    width={d}
+                    height={d}
+                    className="absolute inset-0 -rotate-90"
+                  >
+                    <circle
+                      cx={d / 2}
+                      cy={d / 2}
+                      r={r}
+                      fill="none"
+                      stroke="#ffffff"
+                      strokeOpacity="0.14"
+                      strokeWidth="4"
+                    />
+                    <circle
+                      cx={d / 2}
+                      cy={d / 2}
+                      r={r}
+                      fill="none"
+                      stroke="#c4bbff"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeDasharray={`${(around * steps) / 7} ${around}`}
+                    />
+                  </svg>
+                  <span
+                    className="absolute flex items-center justify-center rounded-full text-[13px] font-bold tabular-nums shadow-[inset_0_-6px_12px_rgba(0,0,0,0.18)] transition-transform hover:scale-105"
+                    style={{
+                      inset: 8,
+                      background: mark.hollow ? "#1f1b3a" : mark.fill,
+                      border: mark.hollow
+                        ? `3px solid ${mark.stroke}`
+                        : "2px solid rgba(255,255,255,0.9)",
+                      color: mark.fill === MARK.you ? "#1b1830" : "#ffffff",
+                    }}
+                  >
+                    {steps}/7
+                  </span>
+                </span>
+                {issue.area && (
+                  <span className="mt-1.5 text-[9.5px] font-semibold uppercase tracking-wider text-[#a9a4c7]">
+                    {issue.area}
+                  </span>
+                )}
+                <span className="line-clamp-2 text-[13px] font-semibold leading-snug text-white">
+                  {issue.title}
+                </span>
+                <span className="mt-1 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-white/10 px-2 py-0.5 text-[10.5px] font-medium text-[#ddd9f5]">
+                  <span
+                    aria-hidden
+                    className="size-1.5 rounded-full"
+                    style={
+                      mark.hollow
+                        ? { border: `1.5px solid ${mark.stroke}` }
+                        : { background: mark.fill }
+                    }
+                  />
+                  {yourTurn ? TURN.you[lang] : STAGE[issue.stage][lang]}
+                </span>
+              </button>
+            );
+          })}
         </div>
       )}
       {picked && (
@@ -357,7 +670,7 @@ export function ProblemMap({
               }}
             >
               <Unlink className="size-3.5" aria-hidden />
-              {lang === "ur" ? "Juda hua nahi" : "Not related"}
+              {ur ? "Juda hua nahi" : "Not related"}
             </button>
           )}
         </div>
@@ -365,11 +678,194 @@ export function ProblemMap({
       <Legend lang={lang} />
       {merged >= 2 && (
         <p className="rounded-xl bg-accent px-3 py-2 text-sm font-medium text-accent-foreground">
-          {lang === "ur"
-            ? `Ek hi system ${merged} masle hal kar sakta hai →`
-            : `One system can fix ${merged === 3 ? "all three" : `${merged} of these`} →`}
+          {ur
+            ? `Ek hi system ${merged} masle hal kar sakta hai${outline ? `: ${outline}` : ""}`
+            : `One system can fix ${merged === 3 ? "all three" : `${merged} of these`}${outline ? `: ${outline}` : ""}`}
         </p>
       )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------ complete journey */
+
+/** Every request on the same seven-step road: where it is, whose turn, what's next. */
+export function JourneyRoad({
+  issues,
+  lang,
+  onOpen,
+}: {
+  issues: CustomerIssue[];
+  lang: Lang;
+  onOpen?: (issue: CustomerIssue) => void;
+}) {
+  const ur = lang === "ur";
+  const labels = JOURNEY_LABELS[ur ? "ur" : "en"];
+  if (!issues.length) return null;
+  const order = [...issues].sort(
+    (a, b) =>
+      Number(b.ball_with === "client") - Number(a.ball_with === "client") ||
+      (b.journey_steps ?? 0) - (a.journey_steps ?? 0),
+  );
+  return (
+    <div className="space-y-1">
+      <div className="hidden grid-cols-[minmax(0,15rem)_minmax(0,1fr)] gap-4 pb-1 md:grid">
+        <span />
+        <div className="grid grid-cols-7">
+          {labels.map((label, k) => (
+            <span
+              key={label}
+              className="text-center text-[11px] font-medium text-muted-foreground"
+            >
+              <span className="block tabular-nums text-muted-foreground/70">
+                {k + 1}
+              </span>
+              {label}
+            </span>
+          ))}
+        </div>
+      </div>
+      <ul className="divide-y divide-border">
+        {order.map((issue) => {
+          const stopped = ["paused", "closed"].includes(issue.stage);
+          const done = stopped
+            ? 0
+            : Math.min(7, Math.max(0, issue.journey_steps ?? 0));
+          const current = done >= 7 ? -1 : done; // index of the step in progress
+          const mark = markOf(issue);
+          const yourTurn =
+            issue.ball_with === "client" && !issue.waiting_on_other_until;
+          const next =
+            yourTurn && issue.open_question
+              ? `${ur ? "Aap" : "You"}: ${issue.open_question}`
+              : issue.next_step?.replace(/^(team|pi|you)\s*:\s*/i, "") || "";
+          return (
+            <li key={issue.title} className="py-3">
+              <button
+                type="button"
+                onClick={() => onOpen?.(issue)}
+                className="grid w-full grid-cols-1 items-center gap-2 rounded-xl text-left md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] md:gap-4"
+              >
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold">
+                    {issue.title}
+                  </span>
+                  <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+                    <span>
+                      {stopped
+                        ? STAGE[issue.stage][lang]
+                        : `${done}/7 · ${STAGE[issue.stage][lang]}`}
+                    </span>
+                    {!!issue.linked && (
+                      <span>
+                        ·{" "}
+                        {ur
+                          ? `${issue.linked} se juda`
+                          : `linked to ${issue.linked}`}
+                      </span>
+                    )}
+                  </span>
+                </span>
+                <span className="block">
+                  <span className="relative grid grid-cols-7 items-center">
+                    {/* the road */}
+                    <span
+                      aria-hidden
+                      className="absolute left-[7%] right-[7%] top-1/2 h-0.5 -translate-y-1/2 rounded bg-border"
+                    />
+                    <span
+                      aria-hidden
+                      className="absolute left-[7%] top-1/2 h-1 -translate-y-1/2 rounded bg-[#5A47F5] transition-[width] duration-700"
+                      style={{
+                        width: `${(Math.max(0, Math.min(done, 7) - 1) / 6) * 86}%`,
+                      }}
+                    />
+                    {labels.map((label, k) => {
+                      const isDone = k < done;
+                      const isNow = k === current && !stopped;
+                      return (
+                        <span
+                          key={label}
+                          className="relative flex justify-center"
+                          title={label}
+                        >
+                          {isNow ? (
+                            <span className="relative flex size-7 items-center justify-center">
+                              {yourTurn && (
+                                <span
+                                  aria-hidden
+                                  className="absolute inset-0 rounded-full bg-[#f5a524]/50 motion-safe:animate-ping"
+                                  style={{ animationDuration: "2.2s" }}
+                                />
+                              )}
+                              <span
+                                className="relative flex size-7 items-center justify-center rounded-full text-[11px] font-bold ring-4 ring-background"
+                                style={{
+                                  background: mark.hollow
+                                    ? "transparent"
+                                    : mark.fill,
+                                  border: mark.hollow
+                                    ? `2px solid ${mark.stroke}`
+                                    : undefined,
+                                  color:
+                                    mark.fill === MARK.you
+                                      ? "#1b1830"
+                                      : mark.hollow
+                                        ? mark.stroke
+                                        : "#fff",
+                                }}
+                              >
+                                {k + 1}
+                              </span>
+                            </span>
+                          ) : isDone ? (
+                            <span className="relative flex size-4 items-center justify-center rounded-full bg-[#5A47F5] ring-4 ring-background">
+                              <svg
+                                viewBox="0 0 24 24"
+                                className="size-2.5"
+                                aria-hidden
+                              >
+                                <path
+                                  d="M5 12.5l4.5 4.5L19 7.5"
+                                  fill="none"
+                                  stroke="#fff"
+                                  strokeWidth="3.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </span>
+                          ) : (
+                            <span className="relative size-3 rounded-full border-2 border-border-strong bg-background ring-4 ring-background" />
+                          )}
+                        </span>
+                      );
+                    })}
+                  </span>
+                  {next && !stopped && done < 7 && (
+                    <span
+                      className={cn(
+                        "mt-2 block truncate rounded-lg px-2.5 py-1 text-xs",
+                        yourTurn
+                          ? "bg-warning-soft text-foreground"
+                          : "bg-surface-muted text-foreground-secondary",
+                      )}
+                    >
+                      <span className="font-medium">
+                        {ur ? "Agla qadam: " : "Next: "}
+                      </span>
+                      {next}
+                      {!yourTurn && issue.next_update_by
+                        ? ` · ${ur ? "update" : "update by"} ${shortDay(issue.next_update_by)}`
+                        : ""}
+                    </span>
+                  )}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
@@ -453,14 +949,25 @@ export function PriorityChart({
     const key = `${issue.urgency}-${issue.impact}`;
     const n = seen.get(key) ?? 0;
     seen.set(key, n + 1);
-    const offset = (n % 2 ? 1 : -1) * 0.18 * Math.ceil(n / 2) * cell;
-    return {
-      issue,
-      x: pos(issue.urgency ?? 3) + offset,
-      y: size - pos(issue.impact ?? 3) + offset,
-      r: Math.min(28, 11 * Math.sqrt(1 + (issue.linked ?? 0))),
-    };
+    // Requests with the same scores fan out around their cell instead of stacking.
+    const angle = (n * 2 * Math.PI) / 3 + Math.PI / 4;
+    const spread = n ? 0.28 * cell : 0;
+    const r = Math.min(24, 10 * Math.sqrt(1 + (issue.linked ?? 0)));
+    const x = pos(issue.urgency ?? 3) + spread * Math.cos(angle);
+    const y = size - pos(issue.impact ?? 3) + spread * Math.sin(angle);
+    // Label beside the bubble, on the side with more room.
+    const right = x < size / 2 + 20;
+    return { issue, x, y, r, right, ly: y + 3.5 };
   });
+  // Labels on the same side never overlap: push them apart (12px apart at least).
+  for (const side of [true, false]) {
+    const same = marks
+      .filter((m) => m.right === side)
+      .sort((a, b) => a.ly - b.ly);
+    same.forEach((m, k) => {
+      if (k && m.ly - same[k - 1].ly < 12) m.ly = same[k - 1].ly + 12;
+    });
+  }
   const mid = pos(3.5);
   return (
     <div className="space-y-3">
@@ -556,7 +1063,7 @@ export function PriorityChart({
             {lang === "ur" ? "BAAD MEIN" : "LATER"}
           </text>
         </g>
-        {marks.map(({ issue, x, y, r }) => {
+        {marks.map(({ issue, x, y, r, right, ly }) => {
           const mark = markOf(issue);
           return (
             <g key={issue.title}>
@@ -569,15 +1076,18 @@ export function PriorityChart({
                 strokeWidth="2"
               />
               <text
-                x={x}
-                y={y - r - 5}
-                textAnchor="middle"
+                x={right ? x + r + 5 : x - r - 5}
+                y={ly}
+                textAnchor={right ? "start" : "end"}
                 fontSize="10"
                 fontWeight="600"
                 fill="currentColor"
                 className="text-foreground"
+                stroke="var(--surface, #fff)"
+                strokeWidth="3"
+                paintOrder="stroke"
               >
-                {shortTitle(issue.title, 16)}
+                {shortTitle(issue.title, 20)}
               </text>
               <title>{`${issue.title}: urgency ${issue.urgency}, impact ${issue.impact}, ${issue.linked ?? 0} links`}</title>
             </g>

@@ -40,7 +40,7 @@ import {
   Skeleton,
 } from "@/components/ui";
 import { CustomerSecurityCard } from "./security";
-import { PriorityChart, ProblemMap } from "./visuals";
+import { JourneyRoad, PriorityChart, ProblemMap } from "./visuals";
 import {
   Avatar,
   CATEGORY,
@@ -223,6 +223,27 @@ export function Dashboard({ me }: { me: CustomerMe }) {
                 <PriorityChart issues={rows} links={links} lang={lang} />
               </Card>
             </div>
+          )}
+
+          {rows.length > 0 && (
+            <Card className="p-4 sm:p-5">
+              <h2 className="font-semibold">
+                {lang === "ur" ? "Poora safar" : "The complete journey"}
+              </h2>
+              <p className="mb-3 text-xs text-muted-foreground">
+                {lang === "ur"
+                  ? "Har request 7 qadam ke raste pe: kahan hai, kis ki baari, agla qadam."
+                  : "Every request on the same 7-step road: where it is, whose turn, what's next."}
+              </p>
+              <JourneyRoad
+                issues={rows}
+                lang={lang}
+                onOpen={(issue) => {
+                  const row = rows.find((r) => r.title === issue.title);
+                  if (row) router.push(`/customer/c/${row.conversation.id}`);
+                }}
+              />
+            </Card>
           )}
 
           <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
