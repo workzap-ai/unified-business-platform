@@ -106,7 +106,11 @@ async def test_receipt_options_are_respected(api, business_db):
     [receipt] = (await api.get(f"/api/v1/billing/invoices/{invoice['id']}/receipts")).json()
     text = _text((await api.get(f"/api/v1/customer-files/{receipt['id']}/download")).content)
     assert "Ayesha Khan" not in text and "NTN 1234567" in text
-    doc = await pi.db.scalar(select(PiDocument).where(PiDocument.kind == "receipt"))
+    doc = await pi.db.scalar(
+        select(PiDocument).where(
+            PiDocument.kind == "receipt", PiDocument.tenant_id == UUID(pi.tenant_id)
+        )
+    )
     assert doc is not None and doc.delivery == "manual"  # not sent on WhatsApp
 
     # Switched off: no receipt at all.
@@ -116,7 +120,14 @@ async def test_receipt_options_are_respected(api, business_db):
     await _pay(api, second["id"], "10000", "CASH-2")
     assert (await api.get(f"/api/v1/billing/invoices/{second['id']}/receipts")).json() == []
     count = len(
-        list(await pi.db.scalars(select(CustomerFile).where(CustomerFile.source == "receipt")))
+        list(
+            await pi.db.scalars(
+                select(CustomerFile).where(
+                    CustomerFile.source == "receipt",
+                    CustomerFile.tenant_id == UUID(pi.tenant_id),
+                )
+            )
+        )
     )
     assert count == 1
     await pi.close()
