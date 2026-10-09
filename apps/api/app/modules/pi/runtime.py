@@ -49,8 +49,8 @@ from app.modules.pi.policy import outside_hours
 from app.modules.pi.service import HANDOFF_NOTICE, PiService
 from app.modules.pi.service_conversation import (
     ServiceTurn,
+    allowed_text,
     compose_service_turn,
-    offered_labels,
     prepare_context,
     run_service_action,
     save_service_turn,
@@ -815,7 +815,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 mode = price_policy.price_mode(policy.response_rules, service_turn is not None)
                 if service_turn is not None:
                     reply = validate_service_reply(
-                        reply, max_chars, mode, offered_labels(service_context)
+                        reply, max_chars, mode, allowed_text(service_context)
                     )
                 elif (code := price_policy.check(reply, mode)) is not None:
                     raise ReplyRejected(code)

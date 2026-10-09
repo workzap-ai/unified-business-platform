@@ -99,3 +99,38 @@ async def test_a_scanned_pdf_still_goes_to_a_person(api, business_db):
     await pi.process("", "wamid.doc-2", kind="document", media_id="555666777")
     assert (await pi.conversation()).mode == "human"
     await pi.close()
+
+
+async def test_figures_from_the_document_can_be_repeated_but_not_its_prices(
+    api, business_db, monkeypatch
+):
+    """The real case: a 26-page brief with 100,000 feeds, October 2026 and $1.30 per
+    camera. The reply may repeat the customer's own counts and dates; the price sentence
+    is dropped; the chat stays with pi."""
+
+    async def complete(self, scope, **kwargs):
+        return SimpleNamespace(
+            text="Product brief: analytics for 100,000 camera feeds, live October 2026, "
+            "budget $1.30 per camera.",
+            attempts=[],
+        )
+
+    monkeypatch.setattr(LLMManager, "complete", complete)
+    mock_turns(
+        monkeypatch,
+        turn(
+            reply="Thanks, I'm pi, the company's AI assistant. I read your brief: analytics "
+            "for 100,000 camera feeds, going live in October 2026. You mentioned $1.30 per "
+            "camera. Which part should the team look at first?",
+            language="en",
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    _serve(pi, make_pdf(["Product brief DRAFT 2", "100,000 feeds", "October 2026"]))
+    await pi.process("", "wamid.doc-3", kind="document", media_id="555666777")
+    await pi.deliver_all()
+    assert (await pi.conversation()).mode == "ai"
+    [reply] = [m.body for m in await pi.outbound()]
+    assert "100,000 camera feeds" in reply and "October 2026" in reply
+    assert "$" not in reply and "1.30" not in reply
+    await pi.close()

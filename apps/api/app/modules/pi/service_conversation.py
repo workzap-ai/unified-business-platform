@@ -504,6 +504,41 @@ def offered_labels(context: dict[str, Any] | None) -> list[str]:
     return labels + [b["label"] for b in context.get("customer_bookings", [])]
 
 
+_FIGURE = re.compile(r"\d[\d,.:/]*\d|\d")
+_CLAUSE_END = re.compile(r"[,;\n]\s|[.!?](?:\s|$)|\n")
+
+
+def customer_figures(context: dict[str, Any] | None) -> list[str]:
+    """Numbers the customer wrote themselves (their message, a document or link summary,
+    their earlier messages) that aren't money: "100,000 feeds", "October 2026",
+    "26 pages". pi may repeat these. A figure the customer wrote next to a currency or a
+    price word ("$1.30 per camera") is never on the list, and a currency word or sign in
+    the reply is still refused, so no amount ever goes out."""
+    if not context:
+        return []
+    texts = [str(context.get("latest_customer_message", ""))]
+    texts += [
+        str(h.get("text", "")) for h in context.get("history", []) if h.get("role") == "customer"
+    ]
+    safe: set[str] = set()
+    money: set[str] = set()
+    for text in texts:
+        for match in _FIGURE.finditer(text):
+            # The figure's own clause: a few words either side, never past a comma,
+            # semicolon, line break or sentence end.
+            before = _CLAUSE_END.split(text[max(0, match.start() - 20) : match.start()])[-1]
+            after = _CLAUSE_END.split(text[match.end() : match.end() + 20])[0]
+            clause = f"{before}{match.group(0)}{after}"
+            (money if price_policy.disclosures(clause) else safe).add(match.group(0))
+    return sorted(safe - money, key=len, reverse=True)  # longest first: "100,000" before "100"
+
+
+def allowed_text(context: dict[str, Any] | None) -> list[str]:
+    """Text a service reply may repeat verbatim: offered booking labels and the customer's
+    own (non-money) figures."""
+    return offered_labels(context) + customer_figures(context)
+
+
 # "1. Logo", "2) Website": list numbering, not an amount. WhatsApp shows bullets better.
 _LINE_NUMBER = re.compile(r"(?m)^([ \t]*)\(?\d{1,2}[.)][ \t]+")
 _INLINE_NUMBER = re.compile(r"(?<=\s)\(?\d{1,2}\)[ \t]+")
@@ -548,7 +583,8 @@ def validate_service_reply(
         raise ReplyRejected("SERVICE_PRICE_BLOCKED")
     if (code := price_policy.check(checked, mode)) is not None:
         raise ReplyRejected("SERVICE_PRICE_BLOCKED" if mode in price_policy.NO_DISCLOSURE else code)
-    return validate_reply(reply, [], max_chars)
+    # Allowed text (offered labels, the customer's own figures) is the only evidence.
+    return validate_reply(reply, list(allowed or []), max_chars)
 
 
 async def prepare_context(
@@ -951,9 +987,9 @@ async def compose_service_turn(
             + (f", and also: {problem}" if problem else "")
         )
     try:
-        validate_service_reply(turn.reply, 100_000, mode, offered_labels(context))
+        validate_service_reply(turn.reply, 100_000, mode, allowed_text(context))
     except ReplyRejected:
-        pieces = "; ".join(f'"{p}"' for p in digit_fragments(turn.reply, offered_labels(context)))
+        pieces = "; ".join(f'"{p}"' for p in digit_fragments(turn.reply, allowed_text(context)))
         problem = problem or (
             f"it contains digits or an amount ({pieces}). Rewrite those parts with no "
             "digits at all: write counts in words in the customer's language (e.g. "
@@ -1007,7 +1043,7 @@ async def compose_service_turn(
         turn.summary = team_summary(turn)
     # WhatsApp shows a list only when each point starts its own line.
     turn.reply = re.sub(r"[ \t]+•[ \t]*", "\n• ", turn.reply).strip()
-    allowed = offered_labels(context)
+    allowed = allowed_text(context)
     turn.reply = validate_service_reply(
         without_blocked_lines(turn.reply, mode, allowed),
         int(policy.response_rules.get("max_reply_chars", 4000)),
