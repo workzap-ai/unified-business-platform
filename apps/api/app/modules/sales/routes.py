@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Query, status
 
 from app.core.pagination import Page, Pagination
 from app.modules.access.dependencies import Session, require
+from app.modules.customers.models import Customer
 from app.modules.sales.schemas import (
     LeadCreate,
     LeadListItem,
@@ -16,6 +17,7 @@ from app.modules.sales.schemas import (
 )
 from app.modules.sales.service import LEAD_STAGES, SalesService
 from app.shared.scope import WorkspaceScope
+from app.shared.workspace_repository import WorkspaceRepository
 
 router = APIRouter(prefix="/sales", tags=["sales"])
 Read = Annotated[WorkspaceScope, Depends(require("sales.read"))]
@@ -49,9 +51,14 @@ async def create_lead(data: LeadCreate, scope: Write, session: Session) -> LeadV
 @router.get("/leads/{lead_id}", response_model=LeadListItem)
 async def lead(lead_id: UUID, scope: Read, session: Session) -> LeadListItem:
     row = await SalesService(session, scope).get(lead_id)
+    customer = (
+        await WorkspaceRepository(session, Customer, scope).find(Customer.id == row.customer_id)
+        if row.customer_id
+        else None
+    )
     return LeadListItem(
         **LeadView.model_validate(row).model_dump(),
-        customer_name=None,
+        customer_name=customer.name if customer else None,
         next_stages=LEAD_STAGES.next_states(row.stage),
     )
 

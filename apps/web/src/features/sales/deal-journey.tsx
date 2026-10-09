@@ -13,7 +13,7 @@ import {
   Route,
   Sparkles,
 } from "lucide-react";
-import { formatDateTime } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge, Card, CardBody, CardHeader } from "@/components/ui/display";
@@ -204,7 +204,9 @@ export function JourneyCard({ journey }: { journey: DealJourney }) {
             <Bot className="size-3.5 text-pi" aria-hidden="true" />
             Next reminder from pi:{" "}
             {REMINDERS[journey.reminder.kind] ?? "a follow-up"},{" "}
-            {formatDateTime(journey.reminder.at)}
+            {journey.reminder.at.length === 10
+              ? formatDate(journey.reminder.at)
+              : formatDateTime(journey.reminder.at)}
           </p>
         )}
       </CardBody>
