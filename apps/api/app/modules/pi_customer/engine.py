@@ -55,6 +55,28 @@ STOP = re.compile(
 )
 
 
+MAP_NOTE = (
+    "The customer is asking for their Problem Map: pi's picture of all their requests "
+    "and how they connect (NOT a geographic map or a location). pi sends it as an image "
+    "in this chat within a minute. Reply with ONE short line in their language saying it "
+    "is on its way. Do not ask about any location, area or address."
+)
+
+
+def map_request_note(whatsapp_config: dict[str, Any] | None, settings: Any, text: str) -> str:
+    """What pi's reply needs to know when the customer asks for their map, or ""."""
+    config = whatsapp_config or {}
+    if (
+        not text
+        or not MAP_ASK.search(text)
+        or not service.portal_on(config)
+        or config.get("visual_cards", True) is False
+        or not str(getattr(settings, "pi_app_public_url", "")).startswith("http")
+    ):
+        return ""
+    return MAP_NOTE
+
+
 def urdu(language: str) -> bool:
     return language in {"roman_ur", "ur", "hi"}
 

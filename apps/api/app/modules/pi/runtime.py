@@ -561,6 +561,10 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             service_context["operator_review_required"] = bool(
                 keyword_handoff or (fast_intent and fast_intent[0] in review_intents)
             )
+            from app.modules.pi_customer.engine import map_request_note
+
+            if note := map_request_note(policy.whatsapp_config, ctx["settings"], body):
+                service_context["problem_map_request"] = note
         inbound_snapshot = conversation.last_inbound_at
         await session.commit()
         gateway = Gateway(ctx["settings"], ctx["http"])

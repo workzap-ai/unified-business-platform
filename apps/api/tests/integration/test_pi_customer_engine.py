@@ -382,3 +382,12 @@ async def test_no_public_address_means_no_card(app, provider, business_db, monke
     )
     await business.aclose()
     await customer.aclose()
+
+
+def test_asking_for_the_map_tells_pis_reply_what_the_map_is():
+    settings = SimpleNamespace(pi_app_public_url="https://pi.example.com")
+    note = engine.map_request_note({"customer_portal": True}, settings, "Show my map")
+    assert "Problem Map" in note and "location" in note
+    assert engine.map_request_note({}, settings, "I need a website") == ""
+    assert engine.map_request_note({"customer_portal": False}, settings, "map dikhao") == ""
+    assert engine.map_request_note({}, SimpleNamespace(pi_app_public_url=""), "map dikhao") == ""
