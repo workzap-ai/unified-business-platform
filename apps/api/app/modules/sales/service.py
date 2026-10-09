@@ -166,21 +166,41 @@ class SalesService:
         title: str,
         requirements: dict[str, Any],
         missing: list[str],
+        project: str | None = None,
     ) -> SalesLead:
-        """PI's structured requirement capture: one open lead per conversation."""
+        """PI's structured requirement capture. With ``project``, one open lead per project
+        in the conversation (its key is kept as ``requirements["_project"]``); without it,
+        one open lead per conversation (the original behaviour)."""
         self.scope.require("sales.write")
         await self.customers.get(customer_id)
-        lead = await self.session.scalar(
+        # A lead with a proposal out is still that deal: answering it or asking for
+        # changes must not open a second lead. Won or lost deals are never reused.
+        open_leads = (
             self.leads.select()
             .where(
                 SalesLead.conversation_id == conversation_id,
                 SalesLead.source == "pi",
-                # A lead with a proposal out is still this chat's deal: answering it or
-                # asking for changes must not open a second lead.
                 SalesLead.stage.in_(["new", "qualified", "proposal"]),
             )
             .with_for_update()
         )
+        key = (project or "").strip().casefold()[:120]
+        if not key:
+            lead = await self.session.scalar(open_leads)
+        else:
+            lead = await self.session.scalar(
+                open_leads.where(SalesLead.requirements["_project"].astext == key)
+            )
+            if lead is None:
+                # An older lead of this chat (from before leads were per project) belongs
+                # to the project with its name; any other project gets its own lead.
+                lead = await self.session.scalar(
+                    open_leads.where(
+                        SalesLead.requirements["_project"].astext.is_(None),
+                        func.lower(SalesLead.title) == key,
+                    )
+                )
+            requirements = {**requirements, "_project": key}
         if lead is None:
             currency = (await get_settings_row(self.session, self.scope)).default_currency
             lead = await self.leads.add(

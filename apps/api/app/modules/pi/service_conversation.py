@@ -465,6 +465,11 @@ Actions (only when the matching data is present in the context):
 - action="cancel_booking" ONLY when the latest message explicitly asks to cancel one of
   customer_bookings; copy its booking_id and the exact words into action_evidence.
 Proposals:
+- project_deals lists each project of this chat (each is its own deal) with its real
+  next step. Your "what happens next" line must come from it, per project when there
+  are several ("Website: the proposal is being prepared and comes here; AI system:
+  still collecting details"). Never a generic "the team will review it" when
+  project_deals says something more specific.
 - When auto_proposal is true and you confirm a brief, say in the "what happens next"
   line that their proposal will be shared here (never a price, date or amount).
 - open_proposal is a proposal the customer has and hasn't answered yet. If their LATEST
@@ -1089,8 +1094,8 @@ async def save_service_turn(
     message: PiMessage,
     policy: PiSettings,
     turn: ServiceTurn,
-) -> UUID | None:
-    """Save the turn. Returns the lead pi should now write a proposal for (the caller
+) -> list[UUID]:
+    """Save the turn. Returns the leads pi should now write a proposal for (the caller
     queues it after commit, so the model call never runs under these row locks)."""
     previous = conversation.service_brief or {}
     consent = previous.get("reminder_consent", "unknown")
@@ -1135,8 +1140,26 @@ async def save_service_turn(
     if turn.projects:
         await remember_projects(session, scope, conversation, turn.projects, message.id)
         await log_request_changes(session, scope, conversation, previous, turn.projects)
-    proposal_for: UUID | None = None
-    if requirements["service"] or requirements["scope"]:
+    proposals_due: list[UUID] = []
+    projects = [p for p in turn.projects if p.title.strip()]
+    if projects:
+        # One deal per project: each gets its own lead, brief and proposal.
+        for project in projects:
+            fields = project_requirements(project, requirements, len(projects) == 1)
+            lead = await SalesService(session, scope).upsert_requirement(
+                conversation.customer_id,
+                conversation.id,
+                project.title,
+                fields,
+                project.missing or turn.missing,
+                project=project.title,
+            )
+            # Replace the snapshot, including explicit corrections/removals.
+            lead.requirements = {**fields, "_project": project.title.strip().casefold()[:120]}
+            due = await _follow_deal(session, scope, conversation, lead, previous, turn, project)
+            if due is not None:
+                proposals_due.append(due)
+    elif requirements["service"] or requirements["scope"]:
         lead = await SalesService(session, scope).upsert_requirement(
             conversation.customer_id,
             conversation.id,
@@ -1146,7 +1169,9 @@ async def save_service_turn(
         )
         # Replace the extracted snapshot, including explicit corrections/removals.
         lead.requirements = requirements
-        proposal_for = await _follow_deal(session, scope, conversation, lead, previous, turn)
+        due = await _follow_deal(session, scope, conversation, lead, previous, turn)
+        if due is not None:
+            proposals_due.append(due)
     if turn.meeting_requested and not previous.get("meeting_requested"):
         await notify(
             session,
@@ -1182,7 +1207,24 @@ async def save_service_turn(
             permission="pi.read",
             dedupe_key=f"pi-brief:{conversation.id}:{'ready' if turn.ready_for_team else 'new'}",
         )
-    return proposal_for
+    return proposals_due
+
+
+def project_requirements(
+    project: Project, requirements: dict[str, Any], only: bool
+) -> dict[str, Any]:
+    """One project's brief for its own lead: its service and details, plus the turn's
+    other fields (audience, budget, dates) when they are about this project."""
+    current = str(requirements.get("service") or "").strip().casefold()
+    mine = only or current in {project.title.casefold(), project.service.casefold()}
+    fields: dict[str, Any] = dict(requirements) if mine else {}
+    fields["service"] = project.service or project.title
+    details = project.details.strip()
+    if details:
+        fields["scope"] = details
+    elif not mine:
+        fields["scope"] = ""
+    return fields
 
 
 def newly_confirmed(previous: Any, projects: list[Project]) -> bool:
@@ -1203,6 +1245,7 @@ async def _follow_deal(
     lead: Any,
     previous: dict[str, Any],
     turn: ServiceTurn,
+    project: Project | None = None,
 ) -> UUID | None:
     """Keep the lead in step with the chat: pi's notes, "qualified" on a confirmed brief,
     and whether a (revised) proposal is due. Deal tables may not be migrated yet: then
@@ -1216,7 +1259,8 @@ async def _follow_deal(
         )
         brief["lead_notes"] = "pi" if kept else "removed"
     due: UUID | None = None
-    if newly_confirmed(previous.get("projects"), turn.projects) and lead.stage in (
+    confirmed_now = [project] if project is not None else turn.projects
+    if newly_confirmed(previous.get("projects"), confirmed_now) and lead.stage in (
         "new",
         "qualified",
         "proposal",
@@ -1254,7 +1298,78 @@ async def _deal_context(
             auto = (await deals.deal_settings(session, scope)).auto_proposal
     except DBAPIError:
         auto = False
-    return {"open_proposal": found, "auto_proposal": auto}
+    try:
+        async with session.begin_nested():
+            steps = await project_deals(session, scope, conversation, auto)
+    except DBAPIError:
+        steps = []
+    return {"open_proposal": found, "auto_proposal": auto, "project_deals": steps}
+
+
+async def project_deals(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation, auto: bool
+) -> list[dict[str, str]]:
+    """Where each project of this chat stands and what really happens next, in plain
+    words for pi's "what happens next" line (no prices)."""
+    from app.modules.quotes.models import Quote
+    from app.modules.sales.models import SalesLead
+
+    leads = list(
+        await session.scalars(
+            WorkspaceRepository(session, SalesLead, scope)
+            .select()
+            .where(SalesLead.conversation_id == conversation.id, SalesLead.source == "pi")
+            .order_by(SalesLead.created_at)
+            .limit(10)
+        )
+    )
+    steps: list[dict[str, str]] = []
+    for lead in leads:
+        quote = await session.scalar(
+            WorkspaceRepository(session, Quote, scope)
+            .select()
+            .where(Quote.lead_id == lead.id, Quote.status != "cancelled")
+            .order_by(Quote.created_at.desc())
+            .limit(1)
+        )
+        steps.append(
+            {"project": lead.title, "stage": lead.stage, "next": next_for(lead.stage, quote, auto)}
+        )
+    return steps
+
+
+def next_for(stage: str, quote: Any, auto: bool) -> str:
+    """The honest next step of one project's deal."""
+    if stage == "won":
+        return "agreed; the team is working on it and updates come here"
+    if stage == "lost":
+        return "closed"
+    if quote is None:
+        if stage == "new":
+            return "still collecting the details"
+        return (
+            "pi is preparing the proposal; it will be shared here in this chat"
+            if auto
+            else "the team is preparing the proposal; it will be shared here"
+        )
+    status = str(quote.status)
+    if status == "draft":
+        return (
+            f"proposal {quote.number} is drafted; the team is adding prices and then "
+            "it is shared here"
+        )
+    if status == "pending_approval":
+        return f"proposal {quote.number} is waiting for a manager's approval, then shared here"
+    if status in {"approved", "sent"}:
+        return (
+            f"proposal {quote.number} is shared; they can accept it or ask for changes by "
+            "replying here or on its page"
+        )
+    if status == "accepted":
+        return "accepted; the order confirmation and invoice with the payment link come here"
+    if status == "rejected":
+        return "changes were asked; a revised proposal follows here once confirmed"
+    return "a fresh proposal will be shared here"
 
 
 CONFIRMED = ("confirmed", "with_team")

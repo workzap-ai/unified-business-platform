@@ -618,10 +618,18 @@ async def test_one_chat_keeps_every_project_one_memory_each_and_a_real_summary(
         )
     )
     assert len(notes) == 2  # one per project, not one per message
-    lead = await business_db.scalar(
-        select(SalesLead).where(SalesLead.tenant_id == conversation.tenant_id)
-    )
-    assert lead.stage == "qualified"
+    # One deal per project: the confirmed website is ready for a proposal, the logo
+    # is still being discussed.
+    leads = {
+        lead.title: lead
+        for lead in await business_db.scalars(
+            select(SalesLead).where(SalesLead.tenant_id == conversation.tenant_id)
+        )
+    }
+    assert set(leads) == {"Logo", "Furniture website"}
+    assert leads["Furniture website"].stage == "qualified"
+    assert leads["Logo"].stage == "new"
+    assert leads["Furniture website"].requirements["scope"] == "Categories, cart, payment gateway"
     await pi.close()
 
 

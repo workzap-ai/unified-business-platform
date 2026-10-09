@@ -335,7 +335,7 @@ def _show_typing(
 
 async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
     outbound: list[str] = []
-    proposal_for: UUID | None = None  # A lead pi writes a proposal for, after commit.
+    proposals_for: list[UUID] = []  # Leads pi writes a proposal for, after commit.
     async with ctx["sessions"]() as session:
         event = await session.scalar(
             select(WhatsAppWebhookEvent)
@@ -797,7 +797,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 if agent is not None and not agent.enabled:
                     handoff_reason = "policy"
                 else:
-                    proposal_for = await save_service_turn(
+                    proposals_for = await save_service_turn(
                         session, scope, conversation, message, policy, service_turn
                     )
                     run.agent_path = ["router", "requirement"]
@@ -952,10 +952,11 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         outbound += [str(f) for f in forms]
         await session.commit()
     await enqueue_sends(ctx, outbound)
-    if proposal_for is not None:
+    if proposals_for:
         from app.modules.pi_saas.jobs import enqueue_proposal
 
-        await enqueue_proposal(ctx, proposal_for)
+        for lead_id in proposals_for:
+            await enqueue_proposal(ctx, lead_id)
 
 
 def _record_usage(
