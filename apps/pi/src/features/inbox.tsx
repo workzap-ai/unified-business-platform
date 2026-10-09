@@ -2,6 +2,7 @@
 
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
+  FileText,
   ArrowLeft,
   Bot,
   Check,
@@ -846,6 +847,18 @@ function MessageBubble({
                   />
                 </a>
               )}
+              {message.media?.file_kind === "document" &&
+                typeof message.media.file_id === "string" && (
+                  <a
+                    href={`/api/v1/pi-app/customer-files/${message.media.file_id}/download`}
+                    className="mb-1.5 flex items-center gap-2 rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm font-medium text-primary hover:underline"
+                  >
+                    <FileText className="size-4 shrink-0" aria-hidden />
+                    <span className="min-w-0 truncate">
+                      {String(message.media.filename || "Document")}
+                    </span>
+                  </a>
+                )}
               <p className="whitespace-pre-line" data-user-text>
                 {message.body ||
                   (message.message_type !== "text"

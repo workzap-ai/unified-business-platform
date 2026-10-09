@@ -166,10 +166,13 @@ export function RecordAttachments({
   type,
   id,
   permission,
+  onlyWithStorage = false,
 }: {
   type: "invoice" | "customer" | "order";
   id: string;
   permission: string;
+  /** Hidden unless S3 is connected or S3 files exist (a page with its own files card). */
+  onlyWithStorage?: boolean;
 }) {
   const { can } = useSession();
   const capabilities = useScopedQuery(
@@ -205,10 +208,12 @@ export function RecordAttachments({
       onSuccess: () => setDeleting(null),
     },
   );
+  if (onlyWithStorage && !capabilities.data?.storage && !files.data?.length)
+    return null;
   return (
     <Card>
       <CardHeader
-        title="Attachments"
+        title={onlyWithStorage ? "S3 attachments" : "Attachments"}
         description="Files stored in this workspace's connected S3 storage."
       />
       <CardBody className="space-y-3">

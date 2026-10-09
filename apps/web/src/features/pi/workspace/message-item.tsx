@@ -8,6 +8,8 @@ import {
   CheckCheck,
   ChevronRight,
   Clock,
+  Download,
+  FileText,
   ImageIcon,
   Loader2,
   PackageCheck,
@@ -16,7 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import { formatDateTime, formatMoney, formatTime } from "@/lib/format";
 import { Tooltip } from "@/components/ui/overlays";
-import { apiBlob } from "@/services/api-client";
+import { API_BASE, apiBlob } from "@/services/api-client";
 import { StatusBadge } from "@/components/app/status-badge";
 import type { Message, ToolEvent } from "../types";
 import { agentLabel, toolLabel } from "./lib";
@@ -353,6 +355,49 @@ function MediaBlock({ message }: { message: Message }) {
           <div className="mt-2">
             <p className="text-2xs font-semibold tracking-wide text-pi uppercase">
               PI saw:
+            </p>
+            <FormattedText
+              text={media.description}
+              className="mt-0.5 text-[13px] break-words whitespace-pre-wrap"
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+  if (media?.file_kind === "document") {
+    const name = media.filename || "Document";
+    return (
+      <div className="mb-1 min-w-52 rounded-xl border border-border bg-surface px-3 py-2">
+        <div className="flex items-center gap-2 text-xs font-medium">
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-surface-muted text-muted-foreground">
+            <FileText className="size-3.5" aria-hidden="true" />
+          </span>
+          {media.file_id ? (
+            <a
+              href={`${API_BASE}/customer-files/${media.file_id}/download`}
+              className="min-w-0 truncate text-primary hover:underline"
+              title={`Download ${name}`}
+            >
+              {name}
+            </a>
+          ) : (
+            <span className="min-w-0 truncate">{name}</span>
+          )}
+          {media.file_id && (
+            <a
+              href={`${API_BASE}/customer-files/${media.file_id}/download`}
+              aria-label={`Download ${name}`}
+              className="ml-auto text-muted-foreground hover:text-foreground"
+            >
+              <Download className="size-3.5" aria-hidden="true" />
+            </a>
+          )}
+        </div>
+        {media.description && (
+          <div className="mt-2">
+            <p className="text-2xs font-semibold tracking-wide text-pi uppercase">
+              PI read:
             </p>
             <FormattedText
               text={media.description}

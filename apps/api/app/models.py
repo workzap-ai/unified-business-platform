@@ -9,7 +9,11 @@ from app.modules.billing.models import Invoice, InvoiceLine, Payment
 from app.modules.branches.models import Branch
 from app.modules.business_settings.models import BusinessSettings
 from app.modules.catalog.models import CatalogCategory, CatalogProduct, CatalogVariant
-from app.modules.customers.models import Customer, CustomerActivity, CustomerNote
+from app.modules.customers.models import (
+    Customer,
+    CustomerActivity,
+    CustomerNote,
+)
 from app.modules.departments.models import Department
 from app.modules.environments.models import Environment
 from app.modules.finance.models import Expense
@@ -156,6 +160,7 @@ __all__ = [
     "CatalogVariant",
     "Customer",
     "CustomerActivity",
+    "CustomerFile",
     "CustomerNote",
     "Department",
     "DocumentSequence",

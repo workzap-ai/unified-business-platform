@@ -65,6 +65,10 @@ export type Message = {
     duration_s?: number;
     transcript?: string;
     description?: string;
+    /** A document (PDF, Word…) the customer sent, kept in their files. */
+    file_kind?: "document";
+    file_id?: string;
+    filename?: string;
   } | null;
   status:
     | "received"

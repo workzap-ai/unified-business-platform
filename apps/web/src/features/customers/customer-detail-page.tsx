@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { RecordAttachments } from "@/features/integrations/business-panels";
+import { CustomerFiles } from "./components/customer-files";
 import Link from "next/link";
 import {
   Archive,
@@ -308,11 +309,15 @@ function CustomerRecord({ customer }: { customer: CustomerDetail }) {
           <NotesTab customerId={customer.id} />
         </TabsContent>
       </Tabs>
-      <RecordAttachments
-        type="customer"
-        id={customer.id}
-        permission="customers.write"
-      />
+      <div className="space-y-4">
+        <CustomerFiles customerId={customer.id} />
+        <RecordAttachments
+          type="customer"
+          id={customer.id}
+          permission="customers.write"
+          onlyWithStorage
+        />
+      </div>
 
       {canWrite && (
         <CustomerEditDialog

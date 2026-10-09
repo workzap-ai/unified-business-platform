@@ -12,12 +12,14 @@ External delivery uncertainty never triggers a blind resend.
 """
 
 import asyncio
+import logging
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.gateway import Gateway, GatewayUnavailable
@@ -76,6 +78,7 @@ CLARIFY_REPLY = (
     "Sorry, I didn't quite understand. Could you tell me a little more? For example, "
     "which product or service you're asking about, or your order reference."
 )
+logger = logging.getLogger(__name__)
 MEDIA_NOTICE = MEDIA_NOTICES["en"]
 
 
@@ -208,6 +211,57 @@ async def persist_inbound(
             provider_message_id=payload["message_id"],
             status="received",
         )
+    )
+
+
+async def _keep_file(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    message: PiMessage,
+    content: bytes,
+    document: bool,
+) -> None:
+    """Save a WhatsApp document or photo to the customer's files; the timeline says so
+    once (a message processed again never adds a second file or entry)."""
+    from app.modules.customers.files import save_from_message
+    from app.modules.customers.models import CustomerFile
+    from app.modules.customers.service import log_activity
+
+    assert conversation.customer_id is not None
+    try:
+        # A savepoint: a database without the files table yet (migration pending) must
+        # never stop a customer's message from being read and answered.
+        async with session.begin_nested():
+            existing = await WorkspaceRepository(session, CustomerFile, scope).find(
+                CustomerFile.message_id == message.id
+            )
+    except DBAPIError:
+        logger.warning("customer_files_unavailable", exc_info=True)
+        return
+    if existing is not None:
+        return
+    name = str(message.media.get("filename") or "") or ("document" if document else "photo")
+    saved = await save_from_message(
+        session,
+        scope,
+        conversation.customer_id,
+        content,
+        name,
+        conversation_id=conversation.id,
+        message_id=message.id,
+    )
+    if saved is None:
+        return
+    message.media = {**message.media, "file_id": str(saved.id)}
+    await log_activity(
+        session,
+        scope,
+        conversation.customer_id,
+        "conversation.document",
+        f"{'Document' if document else 'Photo'} received on WhatsApp: {saved.name}",
+        "conversation",
+        conversation.id,
     )
 
 
@@ -421,6 +475,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 mime = mime if document else normalize_mime(mime)
                 if not document and not mime.startswith(f"{message.message_type}/"):
                     raise BusinessRuleViolation("INVALID_MEDIA", "Media type does not match")
+                if (document or message.message_type == "image") and conversation.customer_id:
+                    # Kept on the customer's profile (Attachments), once per message.
+                    await _keep_file(session, scope, conversation, message, content, document)
                 if document:
                     from app.modules.pi.documents import read_document
 
@@ -432,19 +489,6 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                         conversation_id,
                         alias=str(policy.ai_config.get("router_alias", "fast")),
                     )
-                    if conversation.customer_id is not None:
-                        from app.modules.customers.service import log_activity
-
-                        name = str(message.media.get("filename") or "a document")
-                        await log_activity(
-                            session,
-                            scope,
-                            conversation.customer_id,
-                            "conversation.document",
-                            f"Document received on WhatsApp: {name}",
-                            "conversation",
-                            conversation.id,
-                        )
                 elif audio and provider_transcript:
                     description = provider_transcript[:4000]
                 elif audio:
