@@ -4,9 +4,10 @@ page in the pi app (/api/v1/pi-app/docs/{token}). See ``deals`` for the flow."""
 
 from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
+from urllib.parse import quote as quote_name
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import or_
 
@@ -44,6 +45,13 @@ class DealSettingsInput(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     auto_proposal: bool = True
     auto_followups: bool = True
+    auto_receipt: bool = True
+    receipt_whatsapp: bool = True
+    receipt_email: bool = True
+    receipt_customer_details: bool = True
+    receipt_project_details: bool = True
+    receipt_line_items: bool = True
+    receipt_footer: str = Field("", max_length=500)
     auto_order: bool
     auto_invoice: bool
     auto_payment_request: bool
@@ -558,6 +566,34 @@ async def public_document(token: str, request: Request, session: Session) -> dic
     view = await deals.public_view(session, request.app.state.settings, doc)
     await session.commit()
     return view
+
+
+@public_router.get("/{token}/file")
+async def public_document_file(token: str, request: Request, session: Session) -> Response:
+    """A receipt's PDF from its link (the link is the customer's access)."""
+    from app.modules.customers import files
+    from app.modules.customers.models import CustomerFile
+
+    ip = rate_limit.client_ip(request)
+    if not await rate_limit.hit(request, "pi-doc-file", f"{token[:16]}:{ip}", 30, 3600):
+        raise HTTPException(status_code=429)
+    doc = await deals.document_for(session, token)
+    if doc.kind != "receipt" or doc.file_id is None:
+        raise HTTPException(status_code=404)
+    saved = await session.get(CustomerFile, doc.file_id)
+    if saved is None or saved.tenant_id != doc.tenant_id:
+        raise HTTPException(status_code=404)
+    data = await files.file_bytes(session, saved)
+    return Response(
+        data,
+        media_type=saved.mime,
+        headers={
+            "Content-Disposition": f"attachment; filename*=UTF-8''{quote_name(saved.name)}",
+            "Cache-Control": "private, no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Content-Security-Policy": "default-src 'none'; sandbox",
+        },
+    )
 
 
 @public_router.post("/{token}/respond")

@@ -25,6 +25,7 @@ from app.modules.auth.mfa import router as mfa_router
 from app.modules.auth.passkeys import pi_router as pi_passkeys_router
 from app.modules.auth.passkeys import router as passkeys_router
 from app.modules.auth.routes import router as auth_router
+from app.modules.billing.receipts import router as receipts_router
 from app.modules.billing.routes import router as billing_router
 from app.modules.business_settings.routes import router as business_settings_router
 from app.modules.catalog.routes import router as catalog_router
@@ -103,6 +104,7 @@ ROUTERS = [
     payment_link_router,
     customer_files_router,
     pi_requests_router,
+    receipts_router,
     pi_operator_router,
     pi_operator_digest_router,
     pi_operator_number_router,
@@ -177,6 +179,7 @@ PI_APP_ROUTERS = [
     payment_link_router,
     customer_files_router,
     pi_requests_router,
+    receipts_router,
     pi_documents_router,
     # The deal flow in the pi app: leads, proposals and orders (core modules, pi session).
     sales_router,

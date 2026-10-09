@@ -32,6 +32,13 @@ const settingsSchema = z
   .object({
     auto_proposal: z.boolean(),
     auto_followups: z.boolean(),
+    auto_receipt: z.boolean(),
+    receipt_whatsapp: z.boolean(),
+    receipt_email: z.boolean(),
+    receipt_customer_details: z.boolean(),
+    receipt_project_details: z.boolean(),
+    receipt_line_items: z.boolean(),
+    receipt_footer: z.string().trim().max(500, "Keep it under 500 characters"),
     auto_order: z.boolean(),
     auto_invoice: z.boolean(),
     auto_payment_request: z.boolean(),
@@ -116,10 +123,60 @@ const TOGGLES: {
   },
 ];
 
+const RECEIPT_TOGGLES: {
+  key:
+    | "auto_receipt"
+    | "receipt_whatsapp"
+    | "receipt_email"
+    | "receipt_customer_details"
+    | "receipt_project_details"
+    | "receipt_line_items";
+  label: string;
+  help: string;
+}[] = [
+  {
+    key: "auto_receipt",
+    label: "Make a PDF receipt for every payment",
+    help: "Kept on the customer's files and the invoice.",
+  },
+  {
+    key: "receipt_whatsapp",
+    label: "Send it on WhatsApp",
+    help: "A link to the receipt, with a thank-you.",
+  },
+  {
+    key: "receipt_email",
+    label: "Email it",
+    help: "When the customer has an email address and email is connected.",
+  },
+  {
+    key: "receipt_customer_details",
+    label: "Show the customer's details",
+    help: "Name, phone and email on the receipt.",
+  },
+  {
+    key: "receipt_project_details",
+    label: "Show the project",
+    help: "What the customer asked for: title, scope and timeline.",
+  },
+  {
+    key: "receipt_line_items",
+    label: "Show the line items",
+    help: "Each item of the invoice with its amount.",
+  },
+];
+
 function toForm(s: DealSettings): SettingsValues {
   return {
     auto_proposal: s.auto_proposal,
     auto_followups: s.auto_followups,
+    auto_receipt: s.auto_receipt,
+    receipt_whatsapp: s.receipt_whatsapp,
+    receipt_email: s.receipt_email,
+    receipt_customer_details: s.receipt_customer_details,
+    receipt_project_details: s.receipt_project_details,
+    receipt_line_items: s.receipt_line_items,
+    receipt_footer: s.receipt_footer,
     auto_order: s.auto_order,
     auto_invoice: s.auto_invoice,
     auto_payment_request: s.auto_payment_request,
@@ -150,6 +207,13 @@ export function DealSettingsDialog({
     defaultValues: {
       auto_proposal: true,
       auto_followups: true,
+      auto_receipt: true,
+      receipt_whatsapp: true,
+      receipt_email: true,
+      receipt_customer_details: true,
+      receipt_project_details: true,
+      receipt_line_items: true,
+      receipt_footer: "",
       auto_order: true,
       auto_invoice: true,
       auto_payment_request: true,
@@ -183,6 +247,7 @@ export function DealSettingsDialog({
 
   const onSubmit = form.handleSubmit((v) => save.mutate(v));
   const autoOrder = useWatch({ control: form.control, name: "auto_order" });
+  const receipts = useWatch({ control: form.control, name: "auto_receipt" });
   const saving = save.isPending;
 
   return (
@@ -281,6 +346,61 @@ export function DealSettingsDialog({
                     ))}
                   </NativeSelect>
                 </FormField>
+
+                <fieldset className="space-y-3" disabled={!canWrite}>
+                  <legend className="text-[13px] font-medium">Receipts</legend>
+                  {RECEIPT_TOGGLES.map((t) => {
+                    const id = `deal-${t.key}`;
+                    const blocked = t.key !== "auto_receipt" && !receipts;
+                    return (
+                      <div
+                        key={t.key}
+                        className={
+                          t.key === "auto_receipt"
+                            ? "flex items-start justify-between gap-4"
+                            : "flex items-start justify-between gap-4 border-l-2 border-border pl-3"
+                        }
+                      >
+                        <div className="min-w-0">
+                          <Label htmlFor={id}>{t.label}</Label>
+                          <p
+                            id={`${id}-help`}
+                            className="mt-0.5 text-xs text-muted-foreground"
+                          >
+                            {t.help}
+                          </p>
+                        </div>
+                        <Controller
+                          control={form.control}
+                          name={t.key}
+                          render={({ field }) => (
+                            <Switch
+                              id={id}
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={!canWrite || blocked}
+                              aria-describedby={`${id}-help`}
+                            />
+                          )}
+                        />
+                      </div>
+                    );
+                  })}
+                  <FormField
+                    label="Footer line"
+                    htmlFor="deal-receipt-footer"
+                    error={errors.receipt_footer}
+                    help="Optional: your address, tax number or bank details."
+                  >
+                    <Input
+                      id="deal-receipt-footer"
+                      maxLength={500}
+                      disabled={!canWrite || !receipts}
+                      placeholder="e.g. NTN 1234567 · 12 Main Boulevard, Lahore"
+                      {...form.register("receipt_footer")}
+                    />
+                  </FormField>
+                </fieldset>
 
                 <fieldset className="space-y-3" disabled={!canWrite}>
                   <legend className="text-[13px] font-medium">

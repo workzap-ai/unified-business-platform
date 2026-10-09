@@ -39,6 +39,7 @@ import {
 } from "@/features/integrations/business-panels";
 import type { InvoiceDetail } from "@/features/business/types";
 import { billingService } from "./service";
+import { InvoiceReceipts } from "./invoice-receipts";
 import { InvoiceStatus } from "./invoice-bits";
 import { RecordPaymentSheet } from "./record-payment-sheet";
 import { dueHint, formatDay, methodLabel } from "./utils";
@@ -231,6 +232,7 @@ function InvoiceDetailView({ id }: { id: string }) {
           {usesPi && can("sales.read") && invoice.status !== "draft" && (
             <DealDocumentsCard filter={{ invoice_id: invoice.id }} />
           )}
+          <InvoiceReceipts invoiceId={invoice.id} />
           <RecordAttachments
             type="invoice"
             id={id}

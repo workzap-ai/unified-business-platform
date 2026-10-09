@@ -34,6 +34,13 @@ export const DEAL_PAYMENT_METHOD_LABELS: Record<DealPaymentMethod, string> = {
 const settingsFields = {
   auto_proposal: z.boolean().catch(true),
   auto_followups: z.boolean().catch(true),
+  auto_receipt: z.boolean().catch(true),
+  receipt_whatsapp: z.boolean().catch(true),
+  receipt_email: z.boolean().catch(true),
+  receipt_customer_details: z.boolean().catch(true),
+  receipt_project_details: z.boolean().catch(true),
+  receipt_line_items: z.boolean().catch(true),
+  receipt_footer: z.string().catch(""),
   auto_order: z.boolean(),
   auto_invoice: z.boolean(),
   auto_payment_request: z.boolean(),

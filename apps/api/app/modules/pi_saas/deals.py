@@ -89,6 +89,13 @@ def settings_view(row: PiDealSettings) -> dict[str, Any]:
     return {
         "auto_proposal": row.auto_proposal,
         "auto_followups": row.auto_followups,
+        "auto_receipt": row.auto_receipt,
+        "receipt_whatsapp": row.receipt_whatsapp,
+        "receipt_email": row.receipt_email,
+        "receipt_customer_details": row.receipt_customer_details,
+        "receipt_project_details": row.receipt_project_details,
+        "receipt_line_items": row.receipt_line_items,
+        "receipt_footer": row.receipt_footer,
         "auto_order": row.auto_order,
         "auto_invoice": row.auto_invoice,
         "auto_payment_request": row.auto_payment_request,
@@ -809,8 +816,18 @@ async def public_view(session: AsyncSession, settings: Settings, doc: PiDocument
         .where(InvoiceLine.invoice_id == invoice.id)
         .order_by(InvoiceLine.position)
     )
+    receipt: dict[str, Any] | None = None
+    if doc.kind == "receipt" and doc.file_id is not None:
+        from app.modules.customers.models import CustomerFile
+
+        saved = await WorkspaceRepository(session, CustomerFile, scope).find(
+            CustomerFile.id == doc.file_id
+        )
+        if saved is not None:
+            receipt = {"name": saved.name, "size": saved.size}
     return {
         **base,
+        "receipt": receipt,
         "number": invoice.number,
         "status": invoice.status,
         "currency": invoice.currency,
@@ -823,7 +840,9 @@ async def public_view(session: AsyncSession, settings: Settings, doc: PiDocument
         "issue_date": invoice.issue_date,
         "due_date": invoice.due_date,
         "notes": invoice.notes,
-        "pay_link": await _open_pay_link(session, scope, settings, invoice),
+        "pay_link": None
+        if doc.kind == "receipt"
+        else await _open_pay_link(session, scope, settings, invoice),
         "can_respond": False,
     }
 
@@ -1238,6 +1257,11 @@ async def after_paid(session: AsyncSession, scope: WorkspaceScope, invoice: Invo
     deals = await deal_settings(session, scope)
     if not deals.thank_you_on_paid:
         return []
+    receipt = await WorkspaceRepository(session, PiDocument, scope).find(
+        PiDocument.kind == "receipt", PiDocument.invoice_id == invoice.id
+    )
+    if receipt is not None and receipt.delivery in {"sent", "waiting"}:
+        return []  # The receipt message already thanked them.
     customer = await WorkspaceRepository(session, Customer, scope).find(
         Customer.id == invoice.customer_id
     )

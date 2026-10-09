@@ -103,6 +103,13 @@ interface QuoteDetail {
 interface DealSettings {
   auto_proposal: boolean;
   auto_followups: boolean;
+  auto_receipt?: boolean;
+  receipt_whatsapp?: boolean;
+  receipt_email?: boolean;
+  receipt_customer_details?: boolean;
+  receipt_project_details?: boolean;
+  receipt_line_items?: boolean;
+  receipt_footer?: string;
   auto_order: boolean;
   auto_invoice: boolean;
   auto_payment_request: boolean;
@@ -786,6 +793,13 @@ function SettingsDialog({
       put("/pi/deals/settings", {
         auto_proposal: body.auto_proposal ?? true,
         auto_followups: body.auto_followups ?? true,
+        auto_receipt: body.auto_receipt ?? true,
+        receipt_whatsapp: body.receipt_whatsapp ?? true,
+        receipt_email: body.receipt_email ?? true,
+        receipt_customer_details: body.receipt_customer_details ?? true,
+        receipt_project_details: body.receipt_project_details ?? true,
+        receipt_line_items: body.receipt_line_items ?? true,
+        receipt_footer: body.receipt_footer ?? "",
         auto_order: body.auto_order,
         auto_invoice: body.auto_invoice,
         auto_payment_request: body.auto_payment_request,
@@ -861,6 +875,57 @@ function SettingsDialog({
               checked={value.thank_you_on_paid}
               onCheckedChange={(v) => set("thank_you_on_paid", v)}
             />
+            <div className="space-y-3 rounded-lg border border-border p-3">
+              <p className="text-sm font-medium">Receipts</p>
+              <Switch
+                id="auto-receipt"
+                label="Make a PDF receipt for every payment"
+                checked={value.auto_receipt ?? true}
+                onCheckedChange={(v) => set("auto_receipt", v)}
+              />
+              <Switch
+                id="receipt-whatsapp"
+                label="Send it on WhatsApp"
+                checked={value.receipt_whatsapp ?? true}
+                disabled={!(value.auto_receipt ?? true)}
+                onCheckedChange={(v) => set("receipt_whatsapp", v)}
+              />
+              <Switch
+                id="receipt-email"
+                label="Email it"
+                checked={value.receipt_email ?? true}
+                disabled={!(value.auto_receipt ?? true)}
+                onCheckedChange={(v) => set("receipt_email", v)}
+              />
+              <Switch
+                id="receipt-customer"
+                label="Show the customer's details"
+                checked={value.receipt_customer_details ?? true}
+                disabled={!(value.auto_receipt ?? true)}
+                onCheckedChange={(v) => set("receipt_customer_details", v)}
+              />
+              <Switch
+                id="receipt-project"
+                label="Show the project they asked for"
+                checked={value.receipt_project_details ?? true}
+                disabled={!(value.auto_receipt ?? true)}
+                onCheckedChange={(v) => set("receipt_project_details", v)}
+              />
+              <Switch
+                id="receipt-lines"
+                label="Show the line items"
+                checked={value.receipt_line_items ?? true}
+                disabled={!(value.auto_receipt ?? true)}
+                onCheckedChange={(v) => set("receipt_line_items", v)}
+              />
+              <Input
+                aria-label="Receipt footer line"
+                placeholder="Footer: address, tax number or bank details"
+                maxLength={500}
+                value={value.receipt_footer ?? ""}
+                onChange={(e) => set("receipt_footer", e.target.value)}
+              />
+            </div>
             <Field label="Payment method in the link" htmlFor="pay-method">
               <Select
                 id="pay-method"

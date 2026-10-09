@@ -60,6 +60,20 @@ async def _deal_paid(session: AsyncSession, scope: WorkspaceScope, invoice: Invo
         logger.warning("deal_paid_hook_failed", extra={"invoice_id": str(invoice.id)})
 
 
+async def _receipt(
+    session: AsyncSession, scope: WorkspaceScope, invoice: Invoice, payment: Payment
+) -> None:
+    """A PDF receipt for this payment, kept and sent (billing/receipts.py). Best effort:
+    the payment is recorded whatever happens here (savepoint)."""
+    from app.modules.billing.receipts import issue
+
+    try:
+        async with session.begin_nested():
+            await issue(session, scope, invoice, payment)
+    except Exception:  # noqa: BLE001 - a receipt problem never undoes the payment
+        logger.warning("receipt_failed", extra={"payment_id": str(payment.id)}, exc_info=True)
+
+
 def balance(invoice: Invoice) -> Decimal:
     return quantize(invoice.total - invoice.amount_paid)
 
@@ -371,6 +385,7 @@ class BillingService:
             },
             EntityRef("payment", payment.id),
         )
+        await _receipt(self.session, self.scope, invoice, payment)
         if invoice.status == "paid":
             await emit(
                 self.session,

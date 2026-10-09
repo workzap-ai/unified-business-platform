@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CheckCircle2,
   CreditCard,
+  Download,
   FileText,
   MessageSquare,
   XCircle,
@@ -40,7 +41,9 @@ interface Line {
 }
 
 interface DocumentView {
-  kind: "proposal" | "invoice";
+  kind: "proposal" | "invoice" | "receipt";
+  /** A receipt's PDF (kind "receipt"). */
+  receipt?: { name: string; size: number } | null;
   business: string;
   customer: string;
   number: string;
@@ -96,16 +99,26 @@ export function DocumentPage({ token }: { token: string }) {
       ) : doc.isError ? (
         <ErrorState message="This link isn't available. It may have expired: ask the business on WhatsApp for a new one." />
       ) : (
-        <Document
-          view={doc.data}
-          mode={mode}
-          setMode={setMode}
-          note={note}
-          setNote={setNote}
-          answer={(action) => answer.mutate(action)}
-          busy={answer.isPending}
-          error={answer.isError ? errorText(answer.error) : null}
-        />
+        <>
+          {doc.data.kind === "receipt" && doc.data.receipt ? (
+            <Button asChild size="lg" className="w-full">
+              <a href={`/api/v1/pi-app/docs/${token}/file`}>
+                <Download className="size-5" aria-hidden /> Download receipt
+                (PDF)
+              </a>
+            </Button>
+          ) : null}
+          <Document
+            view={doc.data}
+            mode={mode}
+            setMode={setMode}
+            note={note}
+            setNote={setNote}
+            answer={(action) => answer.mutate(action)}
+            busy={answer.isPending}
+            error={answer.isError ? errorText(answer.error) : null}
+          />
+        </>
       )}
     </div>
   );
@@ -140,7 +153,12 @@ function Document({
       <Card>
         <CardSection className="space-y-1">
           <p className="text-sm text-muted-foreground">
-            {proposal ? "Proposal" : "Invoice"} from
+            {proposal
+              ? "Proposal"
+              : view.kind === "receipt"
+                ? "Payment receipt"
+                : "Invoice"}{" "}
+            from
           </p>
           <h1 className="text-2xl font-semibold">{view.business}</h1>
           <div className="flex flex-wrap items-center gap-2 pt-1 text-sm text-muted-foreground">
@@ -313,7 +331,7 @@ function Document({
 
 function StatusBadge({ view }: { view: DocumentView }) {
   const label =
-    view.kind === "invoice"
+    view.kind !== "proposal"
       ? {
           issued: "Unpaid",
           partially_paid: "Part paid",

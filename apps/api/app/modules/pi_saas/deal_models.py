@@ -27,7 +27,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.shared.models import WorkspaceRow, workspace_args
 
-DOCUMENT_KINDS = ("proposal", "invoice")
+DOCUMENT_KINDS = ("proposal", "invoice", "receipt")
 DELIVERIES = ("pending", "sent", "waiting", "manual", "failed")
 RESPONSES = ("accepted", "changes", "rejected")
 PAYMENT_DEFAULTS = ("auto", "stripe", "bank_transfer", "mobile_wallet", "cash")
@@ -51,6 +51,8 @@ class PiDocument(WorkspaceRow):
     kind: Mapped[str] = mapped_column(String(16))
     quote_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     invoice_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    # A receipt's PDF (customer_files): what its page offers to download.
+    file_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     customer_id: Mapped[UUID] = mapped_column(Uuid)
     lead_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     conversation_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
@@ -78,6 +80,19 @@ class PiDealSettings(WorkspaceRow):
     # Quiet deal → pi reminds the customer (deal_followups): proposal unopened/unanswered,
     # invoice due/overdue.
     auto_followups: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    # Receipts (billing/receipts.py): a PDF bill for every payment, kept on the customer's
+    # files and sent to them; what it shows is the business's choice.
+    auto_receipt: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    receipt_whatsapp: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    receipt_email: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    receipt_customer_details: Mapped[bool] = mapped_column(
+        Boolean, default=True, server_default="true"
+    )
+    receipt_project_details: Mapped[bool] = mapped_column(
+        Boolean, default=True, server_default="true"
+    )
+    receipt_line_items: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    receipt_footer: Mapped[str] = mapped_column(String(500), default="", server_default="")
     # Proposal accepted → order confirmed → invoice issued → payment link sent.
     auto_order: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     auto_invoice: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")

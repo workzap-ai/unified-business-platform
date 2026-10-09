@@ -184,7 +184,9 @@ async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db):
     )
     assert payment.status_code == 201, payment.text
     texts = await _send(pi)
-    assert texts[-1].startswith("Payment received for invoice")
+    # Paid in full: the receipt message is the thank-you (with the receipt's link).
+    assert texts[-1].startswith("Thank you! We received your payment")
+    assert "is paid in full" in texts[-1] and "Your receipt RCPT-" in texts[-1]
     board = (await api.get(f"{DEALS}/board")).json()
     assert next(i for i in board["items"] if i["id"] == lead_id)["next"] == "Paid: deliver the work"
     await public.aclose()
