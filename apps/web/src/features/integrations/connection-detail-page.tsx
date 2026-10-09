@@ -601,6 +601,7 @@ function ConnectionDetailView({
         </div>
 
         <div className="space-y-4">
+          {d?.webhook_support && <WebhookAddress connection={c} />}
           <Card>
             <CardHeader title="Scope" />
             <CardBody>
@@ -851,5 +852,75 @@ function RunSyncDialog({
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+/** Where the provider sends its events (for Stripe: payments that mark invoices paid). */
+function WebhookAddress({
+  connection,
+}: {
+  connection: { integration_key: string; webhook_url?: string | null };
+}) {
+  const url = connection.webhook_url;
+  const stripe = connection.integration_key === "stripe";
+  return (
+    <Card>
+      <CardHeader
+        title="Webhook address"
+        description={
+          stripe
+            ? "Stripe tells Owner OS here when a customer pays"
+            : "Where this provider sends its events"
+        }
+      />
+      <CardBody className="space-y-3 text-[13px]">
+        {url ? (
+          <>
+            <p className="rounded-md border border-border bg-surface-sunken p-2 font-mono text-xs break-all">
+              {url}
+            </p>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() =>
+                void navigator.clipboard
+                  .writeText(url)
+                  .then(() => toast.success("Webhook address copied"))
+              }
+            >
+              Copy address
+            </Button>
+            {stripe && (
+              <ol className="list-decimal space-y-1 pl-4 text-muted-foreground">
+                <li>
+                  In Stripe, open Developers → Webhooks → Add endpoint and paste
+                  this address.
+                </li>
+                <li>
+                  Choose the event <code>checkout.session.completed</code>.
+                </li>
+                <li>
+                  Copy the endpoint&apos;s signing secret (whsec_…) into this
+                  connection&apos;s Webhook signing secret.
+                </li>
+              </ol>
+            )}
+            {stripe && (
+              <p className="text-muted-foreground">
+                Without this, payments go through on Stripe but invoices stay
+                unpaid here.
+              </p>
+            )}
+          </>
+        ) : (
+          <p className="text-muted-foreground">
+            The webhook address isn&apos;t available: the server&apos;s public
+            URL (INTEGRATIONS_PUBLIC_BASE_URL) isn&apos;t set, or this
+            connection was made before webhooks were turned on. Reconnect it
+            after the URL is set.
+          </p>
+        )}
+      </CardBody>
+    </Card>
   );
 }

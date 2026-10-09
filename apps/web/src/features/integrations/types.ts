@@ -159,6 +159,8 @@ export const connectionDetailSchema = connectionSchema.extend({
     rate_limited_until: tsNullable,
   }),
   recent_activity: z.array(activitySchema),
+  // Where to point the provider's webhook; null when it has none.
+  webhook_url: z.string().nullable().optional().catch(null),
 });
 
 export const testResultSchema = z.object({
