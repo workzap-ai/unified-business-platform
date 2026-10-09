@@ -1,6 +1,7 @@
 """A customer sends a PDF on WhatsApp: pi reads it and answers about it, instead of
 handing it to the team. A scanned PDF with no text still goes to a person."""
 
+import json
 from types import SimpleNamespace
 
 import httpx
@@ -133,4 +134,32 @@ async def test_figures_from_the_document_can_be_repeated_but_not_its_prices(
     [reply] = [m.body for m in await pi.outbound()]
     assert "100,000 camera feeds" in reply and "October 2026" in reply
     assert "$" not in reply and "1.30" not in reply
+    await pi.close()
+
+
+async def test_a_later_its_in_the_document_gets_the_document(api, business_db, monkeypatch):
+    async def complete(self, scope, **kwargs):
+        return SimpleNamespace(
+            text="Product brief VISION: camera analytics subscription.\n• Store traffic\n"
+            "• Theft alerts",
+            attempts=[],
+        )
+
+    monkeypatch.setattr(LLMManager, "complete", complete)
+    contexts = mock_turns(
+        monkeypatch,
+        turn(reply="Thanks, I'm pi, the company's AI assistant. I read your brief.", language="en"),
+        turn(
+            reply="From your brief: store traffic and theft alerts. Anything to add?", language="en"
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    _serve(pi, make_pdf(["Product brief VISION", "Store traffic analytics"]))
+    await pi.process("", "wamid.doc-4", kind="document", media_id="555666777")
+    await pi.deliver_all()
+    await pi.process("I have mentioned it already in documents", "wamid.doc-5")
+    await pi.deliver_all()
+    later = json.loads(contexts[1])
+    [document] = later["shared_documents"]
+    assert "camera analytics subscription" in document and "Theft alerts" in document
     await pi.close()

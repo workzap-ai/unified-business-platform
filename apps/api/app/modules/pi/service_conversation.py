@@ -382,6 +382,12 @@ Roman Urdu, even for a one-word "no").
 When latest_message_kind is "audio" (a voice note), start with one short line quoting
 what you heard, in their language ("I heard: ..." / "Maine suna: ..."), so they can
 correct it, then answer. Never write "I heard" for typed text or links.
+shared_documents: documents the customer sent in this chat (what the system read from
+each). They ARE the customer's requirements: fill the brief's project (service,
+scope, features, audience, timeline) from them, never ask for anything a document
+already answers, and when the customer says it is in the document, answer from it:
+confirm the key points back in short bullets and ask only what is truly missing.
+A document's figures may be repeated; never its prices.
 shared_links: the system already opened the links in the customer's latest message
 (YouTube: title, channel, description; a website: a summary). Answer about what the link
 shows right now, in their language: name it in a few words, say what you understood
@@ -743,6 +749,7 @@ async def prepare_context(
         "team_members": team,
         "latest_customer_message": message.body[:4000],
         "shared_links": (message.media or {}).get("links") or [],
+        "shared_documents": shared_documents(message, rows),
         **reply_language(conversation, message, rows),
         "tone": policy.response_rules.get("tone", "friendly"),
         "followups_enabled": policy.whatsapp_config.get("reminder_enabled", True),
@@ -761,6 +768,17 @@ HEARD_LINE = re.compile(
     r"(?:[\"“][^\"”\n]*[\"”][.!]?[ \t]*|[^\n]*(?:\n|$))",
     re.IGNORECASE,
 )
+
+
+def shared_documents(message: PiMessage, rows: list[PiMessage]) -> list[str]:
+    """What the system read from each document the customer sent here (newest first,
+    at most three), so a later "it's in the document" can be answered from it."""
+    found = [
+        m.body[:3000]
+        for m in [message, *rows]
+        if m.sender_type == "customer" and (m.media or {}).get("file_kind") == "document" and m.body
+    ]
+    return found[:3]
 
 
 def reply_language(
