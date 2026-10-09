@@ -131,3 +131,31 @@ async def test_an_older_lead_belongs_to_the_project_with_its_name(api, business_
     assert leads["Furniture website"].id == old.id  # adopted, not duplicated
     assert "AI system for employees" in leads and len(leads) == 2
     await pi.close()
+
+
+async def test_each_project_keeps_its_own_proposal_state(api, business_db, monkeypatch):
+    """Making the first project's proposal must not mark the second one as done."""
+    from app.modules.pi_saas.jobs import _mark_proposal, _proposal_state, _proposals_due
+
+    mock_turns(monkeypatch, _both())
+    _record_proposals(monkeypatch)
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("both confirmed", "pd-6")
+    await pi.deliver_all()
+    leads = await _leads(pi)
+    website, ai = leads["Furniture website"], leads["AI system for employees"]
+    assert await _proposal_state(pi.db, website) == "due"
+    assert await _proposal_state(pi.db, ai) == "due"
+    await _mark_proposal(pi.db, website, "made")
+    await pi.db.commit()
+    assert await _proposal_state(pi.db, website) == "made"
+    assert await _proposal_state(pi.db, ai) == "due"
+    # A lost job is retried for the lead still due only.
+    from datetime import UTC, datetime, timedelta
+
+    conversation = await pi.conversation()
+    conversation.updated_at = datetime.now(UTC) - timedelta(minutes=5)
+    await pi.db.commit()
+    assert str(ai.id) in await _proposals_due(pi.db)
+    assert str(website.id) not in await _proposals_due(pi.db)
+    await pi.close()

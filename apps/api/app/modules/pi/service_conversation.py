@@ -1276,11 +1276,15 @@ async def _follow_deal(
             async with session.begin_nested():
                 if await deals.proposal_due(session, scope, lead.id):
                     due = lead.id
-                    brief["proposal"] = {
+                    state = {
                         "status": "due",
                         "lead_id": str(lead.id),
                         "at": datetime.now(UTC).isoformat(),
                     }
+                    # One state per lead (one deal per project); "proposal" keeps the
+                    # latest for older readers.
+                    brief["proposals"] = {**(brief.get("proposals") or {}), str(lead.id): state}
+                    brief["proposal"] = state
         except DBAPIError:
             logger.warning("deal_proposal_check_skipped", exc_info=True)
     conversation.service_brief = brief

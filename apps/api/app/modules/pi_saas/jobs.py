@@ -11,7 +11,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 from app.modules.pi_saas import billing, connections
 from app.modules.pi_saas.models import PiBillingEvent, PiProviderEvent
@@ -214,7 +214,13 @@ async def _proposal_state(session: Any, lead: Any) -> str | None:
     if lead.conversation_id is None:
         return None
     conversation = await session.get(PiConversation, lead.conversation_id)
-    state = (conversation.service_brief or {}).get("proposal") if conversation else None
+    brief = (conversation.service_brief or {}) if conversation else {}
+    state = (brief.get("proposals") or {}).get(str(lead.id))
+    if state is None:
+        legacy = brief.get("proposal")
+        # Before per-lead states: the single state applies only to its own lead.
+        if isinstance(legacy, dict) and legacy.get("lead_id") in (None, str(lead.id)):
+            state = legacy
     return str(state.get("status")) if isinstance(state, dict) else None
 
 
@@ -227,10 +233,20 @@ async def _mark_proposal(session: Any, lead: Any, status: str, *, failed: bool =
     if conversation is None:
         return
     brief = dict(conversation.service_brief or {})
-    state = dict(brief.get("proposal") or {})
+    states = dict(brief.get("proposals") or {})
+    legacy = dict(brief.get("proposal") or {})
+    state = dict(
+        states.get(str(lead.id))
+        or (legacy if legacy.get("lead_id") in (None, str(lead.id)) else {})
+    )
     attempts = int(state.get("attempts", 0)) + (1 if failed else 0)
-    state.update(status="failed" if attempts >= 3 else status, attempts=attempts)
-    brief["proposal"] = state
+    state.update(
+        status="failed" if attempts >= 3 else status, attempts=attempts, lead_id=str(lead.id)
+    )
+    states[str(lead.id)] = state
+    brief["proposals"] = states
+    if legacy.get("lead_id") in (None, str(lead.id)):
+        brief["proposal"] = state
     if status == "made":
         brief.pop("proposal_changes", None)  # The revision is out; the changes are in it.
     conversation.service_brief = brief
@@ -244,12 +260,22 @@ async def _proposals_due(session: Any) -> list[str]:
     briefs = await session.scalars(
         select(PiConversation.service_brief)
         .where(
-            PiConversation.service_brief["proposal"]["status"].astext == "due",
+            or_(
+                PiConversation.service_brief["proposal"]["status"].astext == "due",
+                PiConversation.service_brief.has_key("proposals"),
+            ),
             PiConversation.updated_at < stale,
         )
-        .limit(20)
+        .limit(50)
     )
-    return [str(b["proposal"]["lead_id"]) for b in briefs if b["proposal"].get("lead_id")]
+    due: list[str] = []
+    for brief in briefs:
+        states = dict(brief.get("proposals") or {})
+        legacy = brief.get("proposal") or {}
+        if legacy.get("lead_id") and str(legacy["lead_id"]) not in states:
+            states[str(legacy["lead_id"])] = legacy
+        due += [lead for lead, state in states.items() if state.get("status") == "due"]
+    return list(dict.fromkeys(due))[:20]
 
 
 async def _enqueue(ctx: dict[str, Any], name: str, arg: str, job_id: str) -> None:
