@@ -30,6 +30,7 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings
+from app.integrations.http import OutboundClient
 from app.modules.auth.crypto import digest, new_token
 from app.modules.billing.models import Invoice, InvoiceLine
 from app.modules.billing.service import BillingService
@@ -134,6 +135,50 @@ async def system_scope_for(
 async def _business_name(session: AsyncSession, scope: WorkspaceScope) -> str:
     name = await session.scalar(select(Tenant.name).where(Tenant.id == scope.tenant_id))
     return name or "us"
+
+
+# What pi sends with a document, in the customer's language (the chat's language; other
+# languages get English, the links and amounts carry the meaning).
+TEXTS: dict[str, dict[str, str]] = {
+    "proposal": {
+        "en": "Hi{hi}, here is your proposal {number} from {business}.\nTotal: {total}\n"
+        "Valid until {until}.\nView and accept: {url}\n"
+        "You can also reply here to accept it or to ask for changes.",
+        "roman_ur": "Assalam o alaikum{hi}, {business} ki taraf se aap ka proposal {number}.\n"
+        "Total: {total}\nValid: {until} tak.\nDekhein aur accept karein: {url}\n"
+        "Aap yahin reply kar ke bhi accept kar sakte hain ya changes bata sakte hain.",
+    },
+    "accepted": {
+        "en": "Thank you! Your order {number} is confirmed.",
+        "roman_ur": "Shukriya! Aap ka order {number} confirm ho gaya hai.",
+    },
+    "invoice": {
+        "en": "Here is your invoice from {business}.",
+        "roman_ur": "{business} ki taraf se aap ki invoice.",
+    },
+    "paid": {
+        "en": "Payment received for invoice {number}. Thank you!",
+        "roman_ur": "Invoice {number} ki payment mil gayi hai. Shukriya!",
+    },
+}
+
+
+def say(key: str, language: str, **values: str) -> str:
+    texts = TEXTS[key]
+    return texts.get(language, texts["en"]).format(**values)
+
+
+async def customer_language(session: AsyncSession, scope: WorkspaceScope, customer_id: UUID) -> str:
+    """The language of the customer's latest chat with pi ("en" when unknown)."""
+    language = await session.scalar(
+        WorkspaceRepository(session, PiConversation, scope)
+        .select()
+        .with_only_columns(PiConversation.language)
+        .where(PiConversation.customer_id == customer_id)
+        .order_by(PiConversation.last_message_at.desc().nulls_last())
+        .limit(1)
+    )
+    return str(language or "en")
 
 
 async def note_lead(
@@ -343,12 +388,48 @@ def delivery_view(doc: PiDocument, customer: Customer, url: str) -> dict[str, An
 # ---- Proposals ------------------------------------------------------------------------
 
 
-async def proposal_from_lead(session: AsyncSession, scope: WorkspaceScope, lead_id: UUID) -> Quote:
-    """A draft proposal with one line per project in the confirmed brief, at zero: the
-    team sets the prices (pi never invents one)."""
+async def write_proposal(
+    session: AsyncSession, scope: WorkspaceScope, manager: Any, lead_id: UUID
+) -> tuple[list[QuoteLineInput], str] | None:
+    """pi's written proposal (lines + scope text) for the lead, or None to use the plain
+    one. The model call happens with no row locks held; see ``proposal_writer``."""
+    from app.modules.pi_saas import proposal_writer
+
+    lead = await WorkspaceRepository(session, SalesLead, scope).get(lead_id)
+    data = await proposal_writer.gather(session, scope, lead)
+    await session.commit()
+    draft = await proposal_writer.compose(manager, scope, data)
+    if draft is None:
+        return None
+    lines, notes = proposal_writer.to_quote(draft, data)
+    return (lines, notes) if lines else None
+
+
+async def proposal_from_lead(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    lead_id: UUID,
+    written: tuple[list[QuoteLineInput], str] | None = None,
+) -> Quote:
+    """A draft proposal for the confirmed brief. ``written`` is pi's draft (lines and the
+    scope text the customer sees); without it, one line per project. Prices only come
+    from catalog options; other lines stay at zero for the team (pi never invents one)."""
     lead = await WorkspaceRepository(session, SalesLead, scope).get(lead_id)
     if lead.customer_id is None:
         raise BusinessRuleViolation("LEAD_HAS_NO_CUSTOMER", "Link this lead to a customer first")
+    if written is not None:
+        quote = await QuoteService(session, scope).create(
+            QuoteCreate(
+                customer_id=lead.customer_id,
+                lead_id=lead.id,
+                notes=written[1],
+                lines=written[0][:100],
+            ),
+            source="manual",
+        )
+        if quote.total > 0:
+            lead.estimated_value = quote.total
+        return quote
     brief: dict[str, Any] = {}
     if lead.conversation_id:
         conversation = await WorkspaceRepository(session, PiConversation, scope).find(
@@ -391,6 +472,8 @@ async def proposal_from_lead(session: AsyncSession, scope: WorkspaceScope, lead_
         ),
         source="manual",
     )
+    if quote.total > 0:
+        lead.estimated_value = quote.total
     return quote
 
 
@@ -439,37 +522,89 @@ def add_note(lead: SalesLead, text: str) -> None:
     lead.notes = notes[-5000:]
 
 
+# pi's own part of the lead notes: rewritten from the chat on every turn. The team writes
+# anywhere outside it; deleting the whole block stops pi from writing it again.
+NOTES_START = "── pi's notes (updated from the chat) ──"
+NOTES_END = "── end of pi's notes ──"
+
+
+def write_pi_notes(lead: SalesLead, body: str, *, written_before: bool) -> bool:
+    """Put ``body`` in pi's block of the lead notes. Returns False when the team removed
+    the block (pi leaves their notes alone from then on)."""
+    body = body.strip()
+    if not body:
+        return written_before
+    block = f"{NOTES_START}\n{body[:3000]}\n{NOTES_END}"
+    notes = lead.notes or ""
+    start, end = notes.find(NOTES_START), notes.find(NOTES_END)
+    if start != -1 and end > start:
+        lead.notes = (notes[:start] + block + notes[end + len(NOTES_END) :])[-5000:]
+        return True
+    if written_before:
+        return False  # The team deleted pi's block: their notes, their call.
+    lead.notes = f"{block}\n\n{notes.strip()}".strip()[-5000:]
+    return True
+
+
+# A quote that is still in play for a lead; a rejected one (changes asked) or a dead one
+# makes room for a revised proposal.
+OPEN_QUOTE = ("draft", "pending_approval", "approved", "sent", "accepted")
+
+
+async def proposal_due(session: AsyncSession, scope: WorkspaceScope, lead_id: UUID) -> bool:
+    """Should pi write a proposal for this lead now?"""
+    if not (await deal_settings(session, scope)).auto_proposal:
+        return False
+    lead = await WorkspaceRepository(session, SalesLead, scope).find(SalesLead.id == lead_id)
+    if lead is None or lead.customer_id is None or lead.stage in {"won", "lost"}:
+        return False
+    existing = await session.scalar(
+        WorkspaceRepository(session, Quote, scope)
+        .select()
+        .where(Quote.lead_id == lead.id, Quote.status.in_(OPEN_QUOTE))
+        .limit(1)
+    )
+    return existing is None
+
+
 async def auto_proposal(
-    session: AsyncSession, scope: WorkspaceScope, settings: Settings, lead_id: UUID
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    settings: Settings,
+    lead_id: UUID,
+    written: tuple[list[QuoteLineInput], str] | None = None,
 ) -> list[str]:
-    """The customer confirmed the brief: make the proposal with catalog prices and send
-    it on WhatsApp. When a line has no catalog price, the draft waits for the team (they
-    get a notification). Never fails the conversation: errors only skip this step."""
+    """The customer confirmed the brief: make the proposal (pi's written draft when
+    given) with catalog prices and send it on WhatsApp. When a line has no catalog price,
+    the draft waits for the team (they get a notification). Never fails the
+    conversation: errors only skip this step."""
     try:
         async with session.begin_nested():
-            return await _auto_proposal(session, scope, settings, lead_id)
+            return await _auto_proposal(session, scope, settings, lead_id, written)
     except (DBAPIError, BusinessRuleViolation, ResourceNotFound):
         logger.warning("deal_auto_proposal_skipped", exc_info=True)
         return []
 
 
 async def _auto_proposal(
-    session: AsyncSession, scope: WorkspaceScope, settings: Settings, lead_id: UUID
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    settings: Settings,
+    lead_id: UUID,
+    written: tuple[list[QuoteLineInput], str] | None,
 ) -> list[str]:
-    if not (await deal_settings(session, scope)).auto_proposal:
+    if not await proposal_due(session, scope, lead_id):
         return []
     lead = await WorkspaceRepository(session, SalesLead, scope).get(lead_id)
-    if lead.customer_id is None:
-        return []
-    existing = await session.scalar(
+    revised = await session.scalar(
         WorkspaceRepository(session, Quote, scope)
         .select()
-        .where(Quote.lead_id == lead.id, Quote.status.not_in(["cancelled", "expired"]))
+        .where(Quote.lead_id == lead.id, Quote.status == "rejected")
         .limit(1)
     )
-    if existing is not None:
-        return []
-    quote = await proposal_from_lead(session, scope, lead.id)
+    quote = await proposal_from_lead(session, scope, lead.id, written)
+    if revised is not None:
+        add_note(lead, f"revised proposal {quote.number} made after the requested changes")
     lines = list(
         await session.scalars(
             WorkspaceRepository(session, QuoteLine, scope)
@@ -544,10 +679,15 @@ async def send_proposal(
     url = document_url(settings, token)
     business = await _business_name(session, scope)
     first = "" if customer.name.startswith("WhatsApp") else customer.name.split(" ")[0]
-    text = (
-        f"Hi{(' ' + first) if first else ''}, here is your proposal {quote.number} from "
-        f"{business}.\nTotal: {money(quote.total, quote.currency)}\n"
-        f"Valid until {quote.valid_until:%d %b %Y}.\nView and accept: {url}"
+    text = say(
+        "proposal",
+        await customer_language(session, scope, customer.id),
+        hi=f" {first}" if first else "",
+        number=quote.number,
+        business=business,
+        total=money(quote.total, quote.currency),
+        until=f"{quote.valid_until:%d %b %Y}",
+        url=url,
     )
     ids = await deliver(session, scope, doc, customer, text)
     await note_lead(
@@ -669,14 +809,118 @@ async def _open_pay_link(
 
 
 async def respond(
-    session: AsyncSession, settings: Settings, token: str, action: str, note: str
+    session: AsyncSession,
+    settings: Settings,
+    token: str,
+    action: str,
+    note: str,
+    *,
+    http: OutboundClient | None = None,
 ) -> tuple[dict[str, Any], list[str]]:
     doc = await document_for(session, token, lock=True)
+    scope = await system_scope_for(session, doc.tenant_id, doc.environment_id)
+    ids = await answer(session, scope, settings, doc, action, note, via="page", http=http)
+    return await public_view(session, settings, doc), ids
+
+
+async def open_proposal(
+    session: AsyncSession, scope: WorkspaceScope, customer_id: UUID | None, *, lock: bool = False
+) -> tuple[PiDocument, Quote] | None:
+    """The proposal this customer has in hand and hasn't answered yet (latest first)."""
+    if customer_id is None:
+        return None
+    query = (
+        WorkspaceRepository(session, PiDocument, scope)
+        .select()
+        .join(Quote, Quote.id == PiDocument.quote_id)
+        .where(
+            PiDocument.customer_id == customer_id,
+            PiDocument.kind == "proposal",
+            PiDocument.response.is_(None),
+            PiDocument.delivery.in_(["sent", "waiting", "manual"]),
+            PiDocument.expires_at > datetime.now(UTC),
+            Quote.status == "sent",
+        )
+        .order_by(PiDocument.created_at.desc())
+        .limit(1)
+    )
+    doc = await session.scalar(query.with_for_update(of=PiDocument) if lock else query)
+    if doc is None or doc.quote_id is None:
+        return None
+    quote = await WorkspaceRepository(session, Quote, scope).get(doc.quote_id)
+    return doc, quote
+
+
+async def proposal_context(
+    session: AsyncSession, scope: WorkspaceScope, customer_id: UUID | None
+) -> dict[str, Any] | None:
+    """What pi needs to know about an unanswered proposal in the chat (no prices)."""
+    try:
+        async with session.begin_nested():
+            found = await open_proposal(session, scope, customer_id)
+    except DBAPIError:  # Deal tables not migrated yet: no proposal to talk about.
+        return None
+    if found is None:
+        return None
+    doc, quote = found
+    lines = await session.scalars(
+        WorkspaceRepository(session, QuoteLine, scope)
+        .select()
+        .with_only_columns(QuoteLine.description)
+        .where(QuoteLine.quote_id == quote.id)
+        .limit(10)
+    )
+    return {
+        "number": quote.number,
+        "sent_on": f"{quote.sent_at or doc.created_at:%Y-%m-%d}",
+        "covers": [str(d)[:120] for d in lines],
+        "opened": doc.viewed_at is not None,
+    }
+
+
+async def answer_in_chat(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    settings: Settings,
+    customer_id: UUID | None,
+    action: str,
+    note: str,
+    *,
+    http: OutboundClient | None = None,
+) -> list[str]:
+    """The customer answered the proposal in the chat ("haan, accept hai"): the same
+    steps as the page's buttons. Returns message ids to enqueue; [] when there was
+    nothing open to answer or a step failed (the team is told by the usual notices)."""
+    try:
+        async with session.begin_nested():
+            found = await open_proposal(session, scope, customer_id, lock=True)
+            if found is None:
+                return []
+            return await answer(
+                session, scope, settings, found[0], action, note, via="chat", http=http
+            )
+    except (DBAPIError, BusinessRuleViolation, ResourceNotFound):
+        logger.warning("deal_chat_answer_skipped", exc_info=True)
+        return []
+
+
+async def answer(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    settings: Settings,
+    doc: PiDocument,
+    action: str,
+    note: str,
+    *,
+    via: str,
+    http: OutboundClient | None = None,
+) -> list[str]:
+    """Accept / ask for changes / decline a proposal, from its page or from the chat."""
     if doc.kind != "proposal" or doc.quote_id is None:
         raise BusinessRuleViolation("NOT_A_PROPOSAL", "Only a proposal can be answered")
     if doc.response is not None:
         raise BusinessRuleViolation("ALREADY_ANSWERED", "You already answered this proposal")
-    scope = await system_scope_for(session, doc.tenant_id, doc.environment_id)
+    where = "in the WhatsApp chat" if via == "chat" else "on the proposal page"
     quotes = QuoteService(session, scope)
     quote = await WorkspaceRepository(session, Quote, scope).get(doc.quote_id)
     if quote.status != "sent":
@@ -689,8 +933,8 @@ async def respond(
         await quotes.transition(quote.id, "accept")
         if quote.lead_id:
             await move_lead(session, scope, quote.lead_id, "won")
-        await note_lead(session, scope, quote.lead_id, f"customer accepted {quote.number}")
-        ids = await after_accept(session, scope, settings, quote)
+        await note_lead(session, scope, quote.lead_id, f"customer accepted {quote.number} {where}")
+        ids = await after_accept(session, scope, settings, quote, http=http)
         title = f"Proposal {quote.number} accepted"
     elif action == "changes":
         await quotes.transition(quote.id, "reject")
@@ -700,15 +944,16 @@ async def respond(
             session,
             scope,
             quote.lead_id,
-            f"customer asked for changes on {quote.number}: {note[:300] or 'no details'}",
+            f"customer asked for changes on {quote.number} {where}: {note[:300] or 'no details'}",
         )
+        await reopen_brief(session, scope, quote.lead_id, note)
         title = f"Changes asked on proposal {quote.number}"
     else:
         await quotes.transition(quote.id, "reject")
         if quote.lead_id:
             await move_lead(session, scope, quote.lead_id, "lost")
         await note_lead(
-            session, scope, quote.lead_id, f"customer declined {quote.number}: {note[:300]}"
+            session, scope, quote.lead_id, f"customer declined {quote.number} {where}: {note[:300]}"
         )
         title = f"Proposal {quote.number} declined"
     await notify(
@@ -716,13 +961,43 @@ async def respond(
         scope,
         "pi.deal",
         title,
-        note[:500] or "The customer answered on the proposal page.",
+        note[:500] or f"The customer answered {where}.",
         link=f"/quotes/{quote.id}",
         permission="quotes.read",
         severity="info" if action == "accepted" else "warning",
         dedupe_key=f"pi-deal:{doc.id}",
     )
-    return await public_view(session, settings, doc), ids
+    return ids
+
+
+async def reopen_brief(
+    session: AsyncSession, scope: WorkspaceScope, lead_id: UUID | None, note: str
+) -> None:
+    """Changes were asked: the chat's brief goes back to "waiting for the customer's yes"
+    with the change request in it, so pi confirms the updated brief and, on their yes,
+    writes the revised proposal."""
+    lead = (
+        await WorkspaceRepository(session, SalesLead, scope).find(SalesLead.id == lead_id)
+        if lead_id
+        else None
+    )
+    if lead is None or lead.conversation_id is None:
+        return
+    conversation = await WorkspaceRepository(session, PiConversation, scope).find(
+        PiConversation.id == lead.conversation_id
+    )
+    if conversation is None:
+        return
+    brief = dict(conversation.service_brief or {})
+    brief["projects"] = [
+        {**p, "status": "awaiting_confirmation"}
+        if isinstance(p, dict) and p.get("status") in {"confirmed", "with_team"}
+        else p
+        for p in brief.get("projects") or []
+    ]
+    brief["ready_for_team"] = False
+    brief["proposal_changes"] = note[:1000] or "The customer asked for changes."
+    conversation.service_brief = brief
 
 
 def _method(row: Any, preferred: str, stripe_ready: bool) -> str | None:
@@ -772,10 +1047,17 @@ async def invoice_message(
 
 
 async def after_accept(
-    session: AsyncSession, scope: WorkspaceScope, settings: Settings, quote: Quote
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    settings: Settings,
+    quote: Quote,
+    *,
+    http: OutboundClient | None = None,
 ) -> list[str]:
     """Accepted: confirm the order, issue the invoice and send the payment link, each
-    step only if the business switched it on."""
+    step only if the business switched it on. With ``http``, a business without pi's
+    payment methods still gets a pay link from its Stripe integration; the customer is
+    also emailed (best effort; the integrations sweep delivers it)."""
     deals = await deal_settings(session, scope)
     if not deals.auto_order:
         return []
@@ -811,9 +1093,55 @@ async def after_accept(
         scope,
         settings,
         invoice,
-        intro=f"Thank you! Your order {order.number} is confirmed.",
+        intro=say(
+            "accepted",
+            await customer_language(session, scope, quote.customer_id),
+            number=order.number,
+        ),
     )
-    return await deliver(session, scope, doc, customer, text)
+    invoice_url = text.rsplit("Invoice: ", 1)[-1]
+    text = await _with_card_link(session, settings, scope, invoice, text, http)
+    ids = await deliver(session, scope, doc, customer, text)
+    await _email_pay_link(session, scope, invoice, text, invoice_url)
+    return ids
+
+
+async def _with_card_link(
+    session: AsyncSession,
+    settings: Settings,
+    scope: WorkspaceScope,
+    invoice: Invoice,
+    text: str,
+    http: OutboundClient | None,
+) -> str:
+    """No pay link from pi's payment methods: add one from the Stripe integration."""
+    from app.modules.pi_saas import payment_link
+
+    if http is None or payment_link.pay_link_in(text):
+        return text
+    try:
+        async with session.begin_nested():
+            url = await payment_link.stripe_link(session, settings, http, scope, invoice)
+    except Exception:  # noqa: BLE001 - the invoice still goes out without a card link
+        logger.warning("deal_card_link_skipped", exc_info=True)
+        return text
+    return f"{text}\nPay by card: {url}" if url else text
+
+
+async def _email_pay_link(
+    session: AsyncSession, scope: WorkspaceScope, invoice: Invoice, text: str, invoice_url: str
+) -> None:
+    """The same pay link by email, when the customer has an address and the business
+    an email integration. Queued; the integrations sweep sends it."""
+    from app.modules.pi_saas import payment_link
+
+    try:
+        async with session.begin_nested():
+            await payment_link.email_link(
+                session, scope, invoice, payment_link.pay_link_in(text), invoice_url
+            )
+    except Exception:  # noqa: BLE001 - no email address or integration: WhatsApp only
+        logger.info("deal_pay_link_email_skipped", exc_info=True)
 
 
 async def send_invoice(
@@ -828,7 +1156,15 @@ async def send_invoice(
         )
     business = await _business_name(session, scope)
     doc, text, customer = await invoice_message(
-        session, scope, settings, invoice, intro=f"Here is your invoice from {business}."
+        session,
+        scope,
+        settings,
+        invoice,
+        intro=say(
+            "invoice",
+            await customer_language(session, scope, invoice.customer_id),
+            business=business,
+        ),
     )
     ids = await deliver(session, scope, doc, customer, text)
     url = text.rsplit("Invoice: ", 1)[-1]
@@ -861,7 +1197,7 @@ async def after_paid(session: AsyncSession, scope: WorkspaceScope, invoice: Invo
         return []
     if conversation.last_inbound_at < datetime.now(UTC) - WINDOW:
         return []  # Outside the window a thank-you isn't worth a template.
-    text = f"Payment received for invoice {invoice.number}. Thank you!"
+    text = say("paid", conversation.language or "en", number=invoice.number)
     return [await _queue(session, scope, conversation, text, f"pi-paid:{invoice.id}")]
 
 

@@ -175,7 +175,9 @@ class SalesService:
             .where(
                 SalesLead.conversation_id == conversation_id,
                 SalesLead.source == "pi",
-                SalesLead.stage.in_(["new", "qualified"]),
+                # A lead with a proposal out is still this chat's deal: answering it or
+                # asking for changes must not open a second lead.
+                SalesLead.stage.in_(["new", "qualified", "proposal"]),
             )
             .with_for_update()
         )

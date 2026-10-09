@@ -91,6 +91,15 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
         await expire_requests(session)
         await billing.sweep_lifecycle(session)
         await session.commit()
+    # Proposals pi owes a customer whose job never ran or failed.
+    async with ctx["sessions"]() as session:
+        try:
+            proposals = await _proposals_due(session)
+        except Exception:  # noqa: BLE001 - retried on the next sweep
+            proposals = []
+            logger.warning("pi_proposal_sweep_failed")
+    for lead_id in proposals:
+        await enqueue_proposal(ctx, UUID(lead_id))
     # Staged dunning reminders (own session/commit: a mail-transport failure here must
     # never roll back the lifecycle sweep above or block the rest of the sweep).
     async with ctx["sessions"]() as session:
@@ -132,6 +141,104 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
         await _enqueue(ctx, "process_pi_billing_event", str(event_id), f"pi-billing:{event_id}")
 
 
+async def enqueue_proposal(ctx: dict[str, Any], lead_id: UUID) -> None:
+    # A job id per minute: arq keeps finished ids for an hour, and a revised proposal
+    # (changes asked, brief confirmed again) must still run. The lead lock and
+    # ``proposal_due`` keep two runs from making two proposals.
+    minute = int(datetime.now(UTC).timestamp() // 60)
+    await _enqueue(ctx, "draft_pi_proposal", str(lead_id), f"pi-proposal:{lead_id}:{minute}")
+
+
+async def draft_pi_proposal(ctx: dict[str, Any], lead_id: str) -> None:
+    """The customer confirmed the brief: pi writes the proposal (model call with no
+    transaction held), creates it under a lead lock and sends it on WhatsApp."""
+    from app.ai.manager import build_llm_manager
+    from app.modules.pi.runtime import enqueue_sends
+    from app.modules.pi_saas import deals
+    from app.modules.sales.models import SalesLead
+
+    ids: list[str] = []
+    async with ctx["sessions"]() as session:
+        lead = await session.get(SalesLead, UUID(lead_id))
+        if lead is None:
+            return
+        scope = await deals.system_scope_for(session, lead.tenant_id, lead.environment_id)
+        if await _proposal_state(session, lead) != "due":
+            return  # Already handled, or the chat never asked for one.
+        try:
+            if not await deals.proposal_due(session, scope, lead.id):
+                await _mark_proposal(session, lead, "skipped")
+                await session.commit()
+                return
+            written = await deals.write_proposal(
+                session,
+                scope,
+                build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"]),
+                lead.id,
+            )
+            # One writer per lead: a second run waits here, then finds the proposal made.
+            await session.execute(
+                select(SalesLead.id).where(SalesLead.id == lead.id).with_for_update()
+            )
+            ids = await deals.auto_proposal(session, scope, ctx["settings"], lead.id, written)
+            await _mark_proposal(session, lead, "made")
+            await session.commit()
+        except Exception:  # noqa: BLE001 - left "due": the sweep retries a few times
+            await session.rollback()
+            logger.warning("pi_proposal_job_failed", exc_info=True)
+            async with ctx["sessions"]() as retry:
+                found = await retry.get(SalesLead, UUID(lead_id))
+                if found is not None:
+                    await _mark_proposal(retry, found, "due", failed=True)
+                    await retry.commit()
+            return
+    await enqueue_sends(ctx, ids)
+
+
+async def _proposal_state(session: Any, lead: Any) -> str | None:
+    from app.modules.pi.models import PiConversation
+
+    if lead.conversation_id is None:
+        return None
+    conversation = await session.get(PiConversation, lead.conversation_id)
+    state = (conversation.service_brief or {}).get("proposal") if conversation else None
+    return str(state.get("status")) if isinstance(state, dict) else None
+
+
+async def _mark_proposal(session: Any, lead: Any, status: str, *, failed: bool = False) -> None:
+    from app.modules.pi.models import PiConversation
+
+    if lead.conversation_id is None:
+        return
+    conversation = await session.get(PiConversation, lead.conversation_id)
+    if conversation is None:
+        return
+    brief = dict(conversation.service_brief or {})
+    state = dict(brief.get("proposal") or {})
+    attempts = int(state.get("attempts", 0)) + (1 if failed else 0)
+    state.update(status="failed" if attempts >= 3 else status, attempts=attempts)
+    brief["proposal"] = state
+    if status == "made":
+        brief.pop("proposal_changes", None)  # The revision is out; the changes are in it.
+    conversation.service_brief = brief
+
+
+async def _proposals_due(session: Any) -> list[str]:
+    """Leads whose proposal job was lost (worker restart) or failed: retried."""
+    from app.modules.pi.models import PiConversation
+
+    stale = datetime.now(UTC) - timedelta(minutes=2)
+    briefs = await session.scalars(
+        select(PiConversation.service_brief)
+        .where(
+            PiConversation.service_brief["proposal"]["status"].astext == "due",
+            PiConversation.updated_at < stale,
+        )
+        .limit(20)
+    )
+    return [str(b["proposal"]["lead_id"]) for b in briefs if b["proposal"].get("lead_id")]
+
+
 async def _enqueue(ctx: dict[str, Any], name: str, arg: str, job_id: str) -> None:
     if ctx.get("redis"):
         await ctx["redis"].enqueue_job(name, arg, _job_id=job_id)
@@ -143,4 +250,5 @@ JOBS: dict[str, Callable[..., Awaitable[Any]]] = {
     "process_pi_provider_event": process_pi_provider_event,
     "process_pi_billing_event": process_pi_billing_event,
     "sweep_pi_saas": sweep_pi_saas,
+    "draft_pi_proposal": draft_pi_proposal,
 }

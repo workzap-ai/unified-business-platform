@@ -276,6 +276,7 @@ def _show_typing(
 
 async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
     outbound: list[str] = []
+    proposal_for: UUID | None = None  # A lead pi writes a proposal for, after commit.
     async with ctx["sessions"]() as session:
         event = await session.scalar(
             select(WhatsAppWebhookEvent)
@@ -720,7 +721,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 if agent is not None and not agent.enabled:
                     handoff_reason = "policy"
                 else:
-                    await save_service_turn(
+                    proposal_for = await save_service_turn(
                         session, scope, conversation, message, policy, service_turn
                     )
                     run.agent_path = ["router", "requirement"]
@@ -821,6 +822,21 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 run.error_code = exc.code
                 handoff_reason = handoff_reason or "policy"
                 handoff_summary = "A generated reply failed validation and was not sent."
+        if service_turn is not None and service_turn.proposal_answer != "none" and outbound:
+            # They answered the proposal in the chat: the same steps as its page's buttons
+            # (accepted → order, invoice and payment link, sent after pi's reply).
+            from app.integrations.http import OutboundClient
+            from app.modules.pi_saas.deals import answer_in_chat
+
+            outbound += await answer_in_chat(
+                session,
+                scope,
+                ctx["settings"],
+                conversation.customer_id,
+                service_turn.proposal_answer,
+                service_turn.proposal_evidence,
+                http=OutboundClient(ctx["settings"], ctx["http"]),
+            )
         if handoff_reason is not None:
             notice = await hand_off(
                 session,
@@ -860,6 +876,10 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         outbound += [str(f) for f in forms]
         await session.commit()
     await enqueue_sends(ctx, outbound)
+    if proposal_for is not None:
+        from app.modules.pi_saas.jobs import enqueue_proposal
+
+        await enqueue_proposal(ctx, proposal_for)
 
 
 def _record_usage(

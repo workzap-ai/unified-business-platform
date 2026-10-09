@@ -10,7 +10,9 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import or_
 
+from app.ai.manager import build_llm_manager
 from app.core import rate_limit
+from app.integrations.http import OutboundClient
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.billing.models import Invoice
@@ -84,9 +86,16 @@ async def put_settings(data: DealSettingsInput, scope: Scope, session: Session) 
 
 
 @router.post("/leads/{lead_id}/proposal", status_code=201)
-async def proposal_from_lead(lead_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+async def proposal_from_lead(
+    lead_id: UUID, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
     await require_pi(session, scope, "quotes.write")
-    quote = await deals.proposal_from_lead(session, scope, lead_id)
+    state = request.app.state
+    # pi writes it (scope, deliverables, catalog prices); the plain draft if it can't.
+    written = await deals.write_proposal(
+        session, scope, build_llm_manager(state.settings, state.http, state.sessions), lead_id
+    )
+    quote = await deals.proposal_from_lead(session, scope, lead_id, written)
     await session.commit()
     return {"quote_id": quote.id, "number": quote.number}
 
@@ -451,6 +460,14 @@ def _guide(
                 action="proposal_from_brief",
                 auto=True,
             )
+        if lead.stage == "qualified" and lead.source == "pi" and settings["auto_proposal"]:
+            return step(
+                "pi is writing the proposal",
+                "The customer confirmed the brief. pi writes the proposal with your catalog "
+                "prices and sends it on WhatsApp; this takes a minute.",
+                action="proposal_from_brief",
+                auto=True,
+            )
         return step(
             "Make the proposal",
             "Create it from the brief, add prices, and pi sends it on WhatsApp.",
@@ -500,8 +517,14 @@ def _guide(
             "Send a revised proposal",
             "The customer asked for changes"
             + (f': "{doc.response_note[:200]}"' if doc and doc.response_note else "")
-            + ". Make a new proposal.",
+            + (
+                ". pi confirms the changes with them and sends the revised proposal by "
+                "itself; or make it now."
+                if settings["auto_proposal"] and lead.source == "pi"
+                else ". Make a new proposal."
+            ),
             "proposal_from_brief",
+            auto=bool(settings["auto_proposal"] and lead.source == "pi"),
         )
     return step("Make a new proposal", "This one expired.", "proposal_from_brief")
 
@@ -540,8 +563,16 @@ async def public_respond(
         raise HTTPException(status_code=429)
     if data.action == "changes" and not data.note:
         raise BusinessRuleViolation("NOTE_REQUIRED", "Tell us what you'd like changed")
+    state = request.app.state
     view, ids = await deals.respond(
-        session, request.app.state.settings, token, data.action, data.note
+        session,
+        state.settings,
+        token,
+        data.action,
+        data.note,
+        http=OutboundClient(
+            state.settings, state.http, resolver=getattr(state, "integration_resolver", None)
+        ),
     )
     await session.commit()
     await _enqueue(request, ids)
