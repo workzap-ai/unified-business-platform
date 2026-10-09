@@ -170,6 +170,13 @@ export function NextStepCard({
   );
 }
 
+const REMINDERS: Record<string, string> = {
+  proposal_unopened: "proposal not opened yet",
+  proposal_unanswered: "proposal opened, no answer yet",
+  invoice_due: "invoice due tomorrow",
+  invoice_overdue: "invoice overdue",
+};
+
 /** "Journey": every step from the enquiry to the payment, with when it happened. */
 export function JourneyCard({ journey }: { journey: DealJourney }) {
   const current = journey.steps.findIndex((s) => !s.done);
@@ -192,6 +199,14 @@ export function JourneyCard({ journey }: { journey: DealJourney }) {
             />
           ))}
         </ol>
+        {journey.reminder && (
+          <p className="mt-3 flex items-center gap-1.5 border-t border-border pt-3 text-xs text-muted-foreground">
+            <Bot className="size-3.5 text-pi" aria-hidden="true" />
+            Next reminder from pi:{" "}
+            {REMINDERS[journey.reminder.kind] ?? "a follow-up"},{" "}
+            {formatDateTime(journey.reminder.at)}
+          </p>
+        )}
       </CardBody>
     </Card>
   );

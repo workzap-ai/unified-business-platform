@@ -33,6 +33,7 @@ export const DEAL_PAYMENT_METHOD_LABELS: Record<DealPaymentMethod, string> = {
 
 const settingsFields = {
   auto_proposal: z.boolean().catch(true),
+  auto_followups: z.boolean().catch(true),
   auto_order: z.boolean(),
   auto_invoice: z.boolean(),
   auto_payment_request: z.boolean(),
@@ -171,6 +172,11 @@ export const dealJourneySchema = z.object({
   quote_id: z.string().nullable(),
   invoice_id: z.string().nullable(),
   order_id: z.string().nullable(),
+  reminder: z
+    .object({ kind: z.string(), at: z.string() })
+    .nullable()
+    .optional()
+    .catch(null),
 });
 export type DealJourney = z.infer<typeof dealJourneySchema>;
 

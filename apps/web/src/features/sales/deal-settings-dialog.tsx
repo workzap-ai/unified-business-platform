@@ -31,6 +31,7 @@ import {
 const settingsSchema = z
   .object({
     auto_proposal: z.boolean(),
+    auto_followups: z.boolean(),
     auto_order: z.boolean(),
     auto_invoice: z.boolean(),
     auto_payment_request: z.boolean(),
@@ -71,6 +72,7 @@ type SettingsValues = z.infer<typeof settingsSchema>;
 const TOGGLES: {
   key:
     | "auto_proposal"
+    | "auto_followups"
     | "auto_order"
     | "auto_invoice"
     | "auto_payment_request"
@@ -84,6 +86,11 @@ const TOGGLES: {
     key: "auto_proposal",
     label: "Make the proposal when the customer confirms the brief",
     help: "pi makes it with your catalog prices and sends it on WhatsApp. Lines without a catalog price wait for you.",
+  },
+  {
+    key: "auto_followups",
+    label: "Remind the customer when a deal goes quiet",
+    help: "Proposal unopened after 2 days or unanswered after 3; invoice due tomorrow or 3 days overdue. Once each, on WhatsApp.",
   },
   {
     key: "auto_order",
@@ -112,6 +119,7 @@ const TOGGLES: {
 function toForm(s: DealSettings): SettingsValues {
   return {
     auto_proposal: s.auto_proposal,
+    auto_followups: s.auto_followups,
     auto_order: s.auto_order,
     auto_invoice: s.auto_invoice,
     auto_payment_request: s.auto_payment_request,
@@ -141,6 +149,7 @@ export function DealSettingsDialog({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       auto_proposal: true,
+      auto_followups: true,
       auto_order: true,
       auto_invoice: true,
       auto_payment_request: true,

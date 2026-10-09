@@ -88,6 +88,7 @@ async def deal_settings(session: AsyncSession, scope: WorkspaceScope) -> PiDealS
 def settings_view(row: PiDealSettings) -> dict[str, Any]:
     return {
         "auto_proposal": row.auto_proposal,
+        "auto_followups": row.auto_followups,
         "auto_order": row.auto_order,
         "auto_invoice": row.auto_invoice,
         "auto_payment_request": row.auto_payment_request,

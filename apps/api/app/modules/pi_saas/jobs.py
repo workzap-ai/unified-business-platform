@@ -100,6 +100,19 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
             logger.warning("pi_proposal_sweep_failed")
     for lead_id in proposals:
         await enqueue_proposal(ctx, UUID(lead_id))
+    # Quiet deals: pi reminds the customer (proposal unopened/unanswered, invoice due).
+    from app.modules.pi_saas import deal_followups
+
+    nudges: list[str] = []
+    async with ctx["sessions"]() as session:
+        try:
+            nudges = await deal_followups.sweep(session, ctx["settings"])
+            await session.commit()
+        except Exception:  # noqa: BLE001 - retried on the next sweep
+            nudges = []
+            logger.warning("pi_deal_followups_failed", exc_info=True)
+    for message_id in nudges:
+        await _enqueue(ctx, "send_pi_message", message_id, f"send:{message_id}")
     # Staged dunning reminders (own session/commit: a mail-transport failure here must
     # never roll back the lifecycle sweep above or block the rest of the sweep).
     async with ctx["sessions"]() as session:

@@ -102,6 +102,7 @@ interface QuoteDetail {
 
 interface DealSettings {
   auto_proposal: boolean;
+  auto_followups: boolean;
   auto_order: boolean;
   auto_invoice: boolean;
   auto_payment_request: boolean;
@@ -784,6 +785,7 @@ function SettingsDialog({
     (body: DealSettings) =>
       put("/pi/deals/settings", {
         auto_proposal: body.auto_proposal ?? true,
+        auto_followups: body.auto_followups ?? true,
         auto_order: body.auto_order,
         auto_invoice: body.auto_invoice,
         auto_payment_request: body.auto_payment_request,
@@ -822,6 +824,16 @@ function SettingsDialog({
             <p className="-mt-2 text-xs text-muted-foreground">
               pi uses your catalog prices. Anything without a price waits for
               you.
+            </p>
+            <Switch
+              id="auto-followups"
+              label="Remind the customer when a deal goes quiet"
+              checked={value.auto_followups ?? true}
+              onCheckedChange={(v) => set("auto_followups", v)}
+            />
+            <p className="-mt-2 text-xs text-muted-foreground">
+              Proposal unopened (2 days) or unanswered (3 days), invoice due
+              tomorrow or overdue. Once each.
             </p>
             <Switch
               id="auto-order"

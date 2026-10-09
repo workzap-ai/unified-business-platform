@@ -75,6 +75,9 @@ class PiDealSettings(WorkspaceRow):
     )
     # Brief confirmed in the chat → proposal made (catalog prices) → sent when fully priced.
     auto_proposal: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    # Quiet deal → pi reminds the customer (deal_followups): proposal unopened/unanswered,
+    # invoice due/overdue.
+    auto_followups: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     # Proposal accepted → order confirmed → invoice issued → payment link sent.
     auto_order: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     auto_invoice: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")

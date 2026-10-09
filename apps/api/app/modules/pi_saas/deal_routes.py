@@ -19,7 +19,7 @@ from app.modules.billing.models import Invoice
 from app.modules.customers.models import Customer
 from app.modules.orders.models import Order
 from app.modules.pi.service import require_pi
-from app.modules.pi_saas import deals
+from app.modules.pi_saas import deal_followups, deals
 from app.modules.pi_saas.deal_models import PAYMENT_DEFAULTS, PiDocument
 from app.modules.quotes.models import Quote
 from app.modules.sales.models import SalesLead
@@ -43,6 +43,7 @@ async def _enqueue(request: Request, ids: list[str]) -> None:
 class DealSettingsInput(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     auto_proposal: bool = True
+    auto_followups: bool = True
     auto_order: bool
     auto_invoice: bool
     auto_payment_request: bool
@@ -413,6 +414,11 @@ async def journey(lead_id: UUID, scope: Scope, session: Session) -> dict[str, An
         "stage": lead.stage,
         "steps": steps,
         "next": _guide(lead, quote, doc, invoice, settings),
+        "reminder": (
+            deal_followups.next_reminder(doc, quote, invoice, datetime.now(UTC))
+            if settings["auto_followups"] and lead.stage != "lost"
+            else None
+        ),
         "quote_id": quote.id if quote else None,
         "invoice_id": invoice.id if invoice else None,
         "order_id": order.id if order else None,
