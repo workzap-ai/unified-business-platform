@@ -432,6 +432,19 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                         conversation_id,
                         alias=str(policy.ai_config.get("router_alias", "fast")),
                     )
+                    if conversation.customer_id is not None:
+                        from app.modules.customers.service import log_activity
+
+                        name = str(message.media.get("filename") or "a document")
+                        await log_activity(
+                            session,
+                            scope,
+                            conversation.customer_id,
+                            "conversation.document",
+                            f"Document received on WhatsApp: {name}",
+                            "conversation",
+                            conversation.id,
+                        )
                 elif audio and provider_transcript:
                     description = provider_transcript[:4000]
                 elif audio:

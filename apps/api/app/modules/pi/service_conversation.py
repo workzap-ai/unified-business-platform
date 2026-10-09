@@ -1134,6 +1134,7 @@ async def save_service_turn(
     requirements = turn.requirements.model_dump()
     if turn.projects:
         await remember_projects(session, scope, conversation, turn.projects, message.id)
+        await log_request_changes(session, scope, conversation, previous, turn.projects)
     proposal_for: UUID | None = None
     if requirements["service"] or requirements["scope"]:
         lead = await SalesService(session, scope).upsert_requirement(
@@ -1254,6 +1255,47 @@ async def _deal_context(
     except DBAPIError:
         auto = False
     return {"open_proposal": found, "auto_proposal": auto}
+
+
+CONFIRMED = ("confirmed", "with_team")
+
+
+async def log_request_changes(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    previous: dict[str, Any],
+    projects: list[Project],
+) -> None:
+    """The customer's timeline (profile → Activity) shows each request pi picks up and
+    when the customer confirms it. Only changes are written, never every chat turn."""
+    if conversation.customer_id is None:
+        return
+    from app.modules.customers.service import log_activity
+
+    before = {
+        str(p.get("title", "")).casefold(): str(p.get("status", ""))
+        for p in previous.get("projects") or []
+        if isinstance(p, dict)
+    }
+    for project in projects:
+        title = project.title.strip()
+        if not title:
+            continue
+        was = before.get(title.casefold())
+        detail = f": {project.details.strip()[:120]}" if project.details.strip() else ""
+        if was is None:
+            if not before:
+                continue  # The chat's first request: the lead's "Requirement captured" says it.
+            text = f"New request from WhatsApp: {title}{detail}"
+        elif project.status in CONFIRMED and was not in CONFIRMED:
+            text = f"Request confirmed: {title}{detail}"
+        else:
+            continue
+        customer_id = conversation.customer_id
+        await log_activity(
+            session, scope, customer_id, "lead", text, "conversation", conversation.id
+        )
 
 
 async def remember_projects(
