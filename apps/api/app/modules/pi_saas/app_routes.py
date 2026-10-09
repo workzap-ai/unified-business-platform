@@ -1353,14 +1353,19 @@ async def answer_staff_request(
     if staff_request is not None:
         # Visibility follows the conversation (members see only assigned ones).
         await PiService(session, scope).conversations.get(staff_request.conversation_id)
-    row = await teach.answer_request(
-        session, scope, request_id, data, request.app.state.settings.knowledge_upload_max_bytes
+    # pi replies to the customer itself, using the answer (the request desk).
+    from app.modules.pi_saas import requests as desk
+
+    row = await desk.answer(
+        session,
+        scope,
+        request_id,
+        data.answer,
+        save_as_knowledge=data.mode == "reusable",
+        max_bytes=request.app.state.settings.knowledge_upload_max_bytes,
     )
     await session.commit()
-    if row.reply_message_id:
-        await request.app.state.queue.enqueue(
-            "send_pi_message", str(row.reply_message_id), job_id=f"send:{row.reply_message_id}"
-        )
+    await desk.enqueue_reply(request, row.id)
     return {"id": row.id, "status": row.status}
 
 

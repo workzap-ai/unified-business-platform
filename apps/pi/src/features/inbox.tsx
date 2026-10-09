@@ -504,8 +504,8 @@ function AnswerDialog({
       invalidate: [["questions"], ["home"], ["conversations"]],
       success:
         mode === "reusable"
-          ? "Sent, and pi will remember this answer"
-          : "Reply sent to the customer",
+          ? "pi will reply to the customer and remember this answer"
+          : "pi will reply to the customer using your answer",
       onSuccess: () => {
         setAnswer("");
         onClose();
@@ -518,8 +518,12 @@ function AnswerDialog({
       onOpenChange={(open) => (!open ? onClose() : null)}
     >
       <DialogContent
-        title="Answer the customer"
-        description={request?.question}
+        title="Answer for pi"
+        description={
+          request?.question
+            ? `${request.question} · pi writes the reply to the customer from your answer, in their language.`
+            : undefined
+        }
       >
         <div className="space-y-4">
           <Field label="Your answer" htmlFor="answer">

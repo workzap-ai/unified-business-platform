@@ -278,6 +278,13 @@ async def _proposals_due(session: Any) -> list[str]:
     return list(dict.fromkeys(due))[:20]
 
 
+async def pi_reply_with_team_answer(ctx: dict[str, Any], request_id: str) -> None:
+    """The team answered pi's request: pi replies to the customer using it."""
+    from app.modules.pi_saas.requests import reply_with_answer
+
+    await reply_with_answer(ctx, request_id)
+
+
 async def _enqueue(ctx: dict[str, Any], name: str, arg: str, job_id: str) -> None:
     if ctx.get("redis"):
         await ctx["redis"].enqueue_job(name, arg, _job_id=job_id)
@@ -286,6 +293,7 @@ async def _enqueue(ctx: dict[str, Any], name: str, arg: str, job_id: str) -> Non
 
 
 JOBS: dict[str, Callable[..., Awaitable[Any]]] = {
+    "pi_reply_with_team_answer": pi_reply_with_team_answer,
     "process_pi_provider_event": process_pi_provider_event,
     "process_pi_billing_event": process_pi_billing_event,
     "sweep_pi_saas": sweep_pi_saas,

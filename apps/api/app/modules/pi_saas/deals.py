@@ -622,34 +622,77 @@ async def _auto_proposal(
             if exc.code != "QUOTE_NEEDS_APPROVAL":
                 raise
             add_note(lead, f"proposal {quote.number} made from catalog prices; needs approval")
-            await notify(
+            await _desk_request(
                 session,
                 scope,
-                "pi.deal",
+                lead,
+                quote,
+                "approve",
                 f"Approve proposal {quote.number}",
                 "pi made it from the confirmed brief with your catalog prices. Approve it "
                 "and pi sends it on WhatsApp.",
-                link=f"/quotes/{quote.id}",
-                permission="quotes.read",
-                severity="info",
-                dedupe_key=f"pi-auto-proposal:{quote.id}",
+                f"/quotes/{quote.id}",
             )
             return []
         return ids
     add_note(lead, f"draft proposal {quote.number} made from the brief; add prices to send it")
+    await _desk_request(
+        session,
+        scope,
+        lead,
+        quote,
+        "price",
+        f"Price proposal {quote.number}",
+        "The customer confirmed their brief. pi made the proposal; add the prices that "
+        "aren't in your catalog and send it.",
+        f"/quotes/{quote.id}/edit",
+    )
+    return []
+
+
+async def _desk_request(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    lead: SalesLead,
+    quote: Quote,
+    kind: str,
+    title: str,
+    question: str,
+    link: str,
+) -> None:
+    """A request on the team's desk (closes itself when the proposal is sent). Without
+    the desk (migration pending, or no chat) it is a plain notification, as before."""
+    if lead.conversation_id is not None and lead.customer_id is not None:
+        from app.modules.pi_saas.requests import raise_request
+
+        try:
+            async with session.begin_nested():
+                await raise_request(
+                    session,
+                    scope,
+                    conversation_id=lead.conversation_id,
+                    customer_id=lead.customer_id,
+                    kind=kind,
+                    question=f"{lead.title}: {question}",
+                    title=title,
+                    lead_id=lead.id,
+                    quote_id=quote.id,
+                    link=link,
+                )
+            return
+        except DBAPIError:
+            logger.warning("deal_desk_request_skipped", exc_info=True)
     await notify(
         session,
         scope,
         "pi.deal",
-        f"Price proposal {quote.number}",
-        "The customer confirmed their brief. pi made the proposal; add the prices that "
-        "aren't in your catalog and send it.",
-        link=f"/quotes/{quote.id}/edit",
+        title,
+        question,
+        link=link,
         permission="quotes.read",
         severity="info",
         dedupe_key=f"pi-auto-proposal:{quote.id}",
     )
-    return []
 
 
 async def send_proposal(
@@ -697,6 +740,14 @@ async def send_proposal(
         quote.lead_id,
         f"proposal {quote.number} ({money(quote.total, quote.currency)}) {HOW[doc.delivery]}",
     )
+    # Its "price" / "approve" requests on the team's desk are done.
+    from app.modules.pi_saas.requests import resolve_for_quote
+
+    try:
+        async with session.begin_nested():
+            await resolve_for_quote(session, scope, quote.id, f"Proposal {quote.number} sent")
+    except DBAPIError:
+        logger.warning("deal_desk_resolve_skipped", exc_info=True)
     return delivery_view(doc, customer, url), ids
 
 

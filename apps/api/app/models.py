@@ -12,6 +12,7 @@ from app.modules.catalog.models import CatalogCategory, CatalogProduct, CatalogV
 from app.modules.customers.models import (
     Customer,
     CustomerActivity,
+    CustomerFile,
     CustomerNote,
 )
 from app.modules.departments.models import Department

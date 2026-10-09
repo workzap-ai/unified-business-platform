@@ -1266,6 +1266,30 @@
     "visible": true
   },
   {
+    "analytics_id": "nav.pi.requests",
+    "any_permissions": [
+      "pi.inbox.reply"
+    ],
+    "badge": null,
+    "description": "",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "message-circle-question",
+    "key": "pi-requests",
+    "keywords": [],
+    "label": "Requests",
+    "parent": "pi",
+    "required_feature": null,
+    "required_permissions": [],
+    "required_product": "pi",
+    "required_roles": [],
+    "route": "/pi/requests",
+    "section": "main",
+    "sort_order": 65,
+    "type": "page",
+    "visible": true
+  },
+  {
     "analytics_id": "nav.pi.settings",
     "any_permissions": [],
     "badge": null,

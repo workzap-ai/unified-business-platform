@@ -75,6 +75,7 @@ from app.modules.pi_saas.payment_routes import operator_router as pi_payment_ope
 from app.modules.pi_saas.payment_routes import public_router as pi_pay_link_router
 from app.modules.pi_saas.platform_config_routes import router as pi_platform_config_router
 from app.modules.pi_saas.problems_routes import router as pi_problems_router
+from app.modules.pi_saas.requests import router as pi_requests_router
 from app.modules.pi_saas.review_routes import operator_router as pi_operator_review_router
 from app.modules.pi_saas.review_routes import router as pi_review_router
 from app.modules.pi_saas.setup_routes import operator_router as pi_operator_setup_router
@@ -101,6 +102,7 @@ ROUTERS = [
     pi_deals_router,
     payment_link_router,
     customer_files_router,
+    pi_requests_router,
     pi_operator_router,
     pi_operator_digest_router,
     pi_operator_number_router,
@@ -174,6 +176,7 @@ PI_APP_ROUTERS = [
     pi_deals_router,
     payment_link_router,
     customer_files_router,
+    pi_requests_router,
     pi_documents_router,
     # The deal flow in the pi app: leads, proposals and orders (core modules, pi session).
     sales_router,

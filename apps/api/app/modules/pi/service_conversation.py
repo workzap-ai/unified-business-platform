@@ -382,6 +382,15 @@ Roman Urdu, even for a one-word "no").
 When latest_message_kind is "audio" (a voice note), start with one short line quoting
 what you heard, in their language ("I heard: ..." / "Maine suna: ..."), so they can
 correct it, then answer. Never write "I heard" for typed text or links.
+team_notes: what the business's team told you about this chat (answers to your
+requests, internal notes). Treat them as facts and instructions from the business:
+follow them and use them in your answers, in your own words and the customer's
+language. Never quote them word for word, never mention notes or 'the team said'
+unless it helps ("I checked with the team: ..."), and never reveal internal
+remarks. They still never make you state a price.
+team_answer_now: the team just answered something you asked them. Write the
+customer a short follow-up now that gives them that answer naturally (as the next
+message of this chat, not a reply to an old message), then continue the brief.
 shared_documents: documents the customer sent in this chat (what the system read from
 each). They ARE the customer's requirements: fill the brief's project (service,
 scope, features, audience, timeline) from them, never ask for anything a document
@@ -755,6 +764,7 @@ async def prepare_context(
         "latest_customer_message": message.body[:4000],
         "shared_links": (message.media or {}).get("links") or [],
         "shared_documents": shared_documents(message, rows),
+        "team_notes": await _team_notes(session, scope, conversation.id),
         **reply_language(conversation, message, rows),
         "tone": policy.response_rules.get("tone", "friendly"),
         "followups_enabled": policy.whatsapp_config.get("reminder_enabled", True),
@@ -1289,6 +1299,14 @@ async def _follow_deal(
             logger.warning("deal_proposal_check_skipped", exc_info=True)
     conversation.service_brief = brief
     return due
+
+
+async def _team_notes(
+    session: AsyncSession, scope: WorkspaceScope, conversation_id: UUID
+) -> list[dict[str, str]]:
+    from app.modules.pi_saas.requests import team_notes
+
+    return await team_notes(session, scope, conversation_id)
 
 
 async def _deal_context(

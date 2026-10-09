@@ -399,17 +399,23 @@ class PiSupportGrant(TenantRow):
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
+REQUEST_KINDS = ("question", "price", "review_document", "approve", "meeting", "other")
+REQUEST_STATUSES = ("open", "answered", "published", "resolved", "dismissed")
+
+
 class PiStaffRequest(WorkspaceRow):
-    """ "Ask Owner": a question PI could not answer, routed to the business with context.
-    The owner replies once, or approves the answer as reusable knowledge (draft first)."""
+    """A request pi raises for the team (the request desk): a question it can't answer,
+    a proposal to price or approve, a document to review, a meeting to arrange. The team
+    answers with a note for pi; pi then replies to the customer itself, in their
+    language. "Ask Owner" questions are the ``question`` kind."""
 
     __tablename__ = "pi_staff_requests"
     __table_args__ = workspace_args(
         "pi_staff_requests",
         scoped_fk("pi_staff_requests", "conversation_id", "pi_conversations"),
-        CheckConstraint(
-            _in("status", ("open", "answered", "published", "dismissed")), name="status"
-        ),
+        CheckConstraint(_in("status", REQUEST_STATUSES), name="status"),
+        CheckConstraint(_in("kind", REQUEST_KINDS), name="kind"),
+        CheckConstraint(_in("priority", ("normal", "high")), name="priority"),
         Index("ix_pi_staff_requests_open", "tenant_id", "environment_id", "status"),
     )
     conversation_id: Mapped[UUID] = mapped_column(Uuid)
@@ -421,6 +427,12 @@ class PiStaffRequest(WorkspaceRow):
     answered_by_user_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     reply_message_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     knowledge_document_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    kind: Mapped[str] = mapped_column(String(24), default="question", server_default="question")
+    priority: Mapped[str] = mapped_column(String(8), default="normal", server_default="normal")
+    lead_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    quote_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    file_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class PiKnowledgeDraft(WorkspaceRow):
