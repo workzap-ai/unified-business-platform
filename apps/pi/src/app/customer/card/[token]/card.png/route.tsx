@@ -189,9 +189,13 @@ function MapCard({ data, urdu }: { data: CardData; urdu: boolean }) {
       ? urdu
         ? `Ek system ${merged} masle hal kar sakta hai.`
         : `One system can fix ${merged === 3 ? "all three" : `${merged} of them`}.`
-      : urdu
-        ? `pi ne ${links.length} connection dhoonde.`
-        : `pi found ${links.length} connection${links.length === 1 ? "" : "s"}.`;
+      : links.length === 0
+        ? urdu
+          ? `Aap ke ${shown.length} masle ek nazar mein.`
+          : `Your ${shown.length} requests at a glance.`
+        : urdu
+          ? `pi ne ${links.length} connection dhoonde.`
+          : `pi found ${links.length} connection${links.length === 1 ? "" : "s"}.`;
   const more = data.issues.length - shown.length;
   const boxW = 900;
   const boxH = 840;

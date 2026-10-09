@@ -299,7 +299,7 @@ async def test_the_team_is_alerted_when_a_customer_waits_on_it(
         ("A customer has waited 24h for the team", "warning"),
     ]
     statuses = [await business_db.get(PiMessage, q) for q in queued]
-    assert any("Furniture website" in m.body and "update" in m.body for m in statuses)
+    assert any("Furniture website" in m.body and "update" in m.body.lower() for m in statuses)
     await business.aclose()
     await customer.aclose()
 
@@ -391,3 +391,34 @@ def test_asking_for_the_map_tells_pis_reply_what_the_map_is():
     assert engine.map_request_note({}, settings, "I need a website") == ""
     assert engine.map_request_note({"customer_portal": False}, settings, "map dikhao") == ""
     assert engine.map_request_note({}, SimpleNamespace(pi_app_public_url=""), "map dikhao") == ""
+
+
+def test_pis_own_whatsapp_lines_follow_the_customers_latest_language():
+    chat = SimpleNamespace(language="roman_ur")
+    assert engine.wa_language("Show my map", chat) == "en"
+    assert engine.wa_language("mujhe map dikhao", SimpleNamespace(language="en")) == "roman_ur"
+    assert engine.wa_language("أرني الخريطة", chat) == "ar"
+    assert engine.wa_language("👍", chat) == "roman_ur"  # unclear: the chat's language
+    report = {
+        "language": "auto",
+        "issues": [
+            {"title": "Site", "stage": "on_it", "ball_with": "team", "next_step": "x"},
+            {"title": "ERP", "stage": "need_answer", "ball_with": "client", "open_question": "Q?"},
+        ],
+        "links": [],
+    }
+    assert engine.pick_card(report, asked=True, language="en")[2].startswith("Here is your")
+    assert engine.pick_card(report, asked=True, language="roman_ur")[2].startswith("Yeh raha")
+    assert engine.pick_card(report, asked=True, language="ar")[2].startswith("هذه")
+    for lang in ("en", "roman_ur", "ar"):
+        assert "Q?" in engine.TEXT[lang]["nudge"]("ERP", "Q?")
+        assert "Site" in engine.TEXT[lang]["status"]("Site", "Fri 10 Oct")
+
+
+def test_the_card_carries_the_customers_language(app, provider):
+    from uuid import uuid4
+
+    settings = app.state.settings
+    token = card_token(settings, uuid4(), "map", 0, "roman_ur")
+    assert read_card(settings, token)["language"] == "roman_ur"
+    assert read_card(settings, card_token(settings, uuid4(), "map"))["language"] == ""

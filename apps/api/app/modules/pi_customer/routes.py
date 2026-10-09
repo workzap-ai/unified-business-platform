@@ -757,7 +757,8 @@ async def card_data(token: str, request: Request, session: Session) -> dict[str,
     return {
         "kind": claims["kind"],
         "index": claims["index"],
-        "language": (cached or {}).get("language", "auto") if isinstance(cached, dict) else "auto",
+        "language": claims["language"]
+        or ((cached or {}).get("language", "auto") if isinstance(cached, dict) else "auto"),
         "issues": [{k: i.get(k) for k in keep} for i in issues],
         "links": _links(cached),
     }

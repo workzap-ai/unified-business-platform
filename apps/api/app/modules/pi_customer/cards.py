@@ -16,9 +16,17 @@ CARD_SECONDS = 7 * 86400
 KINDS = ("map", "journey", "flow")
 
 
-def card_token(settings: Settings, conversation_id: UUID, kind: str, index: int = 0) -> str:
+def card_token(
+    settings: Settings, conversation_id: UUID, kind: str, index: int = 0, language: str = ""
+) -> str:
     data = json.dumps(
-        {"c": str(conversation_id), "k": kind, "i": index, "e": int(time.time()) + CARD_SECONDS},
+        {
+            "c": str(conversation_id),
+            "k": kind,
+            "i": index,
+            "l": language,  # the customer's language: the card's words match the chat
+            "e": int(time.time()) + CARD_SECONDS,
+        },
         separators=(",", ":"),
     ).encode()
     body = base64.urlsafe_b64encode(data).decode().rstrip("=")
@@ -39,6 +47,7 @@ def read_card(settings: Settings, token: str) -> dict[str, Any] | None:
             "conversation_id": UUID(claims["c"]),
             "kind": claims["k"],
             "index": int(claims["i"]),
+            "language": str(claims.get("l") or ""),
         }
     except (ValueError, KeyError, TypeError):
         return None

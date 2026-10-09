@@ -81,6 +81,67 @@ def urdu(language: str) -> bool:
     return language in {"roman_ur", "ur", "hi"}
 
 
+def norm_language(language: str | None) -> str:
+    """The three languages pi's own WhatsApp lines are written in."""
+    if urdu(str(language or "")):
+        return "roman_ur"
+    return "ar" if language == "ar" else "en"
+
+
+def wa_language(latest: str, conversation: PiConversation) -> str:
+    """Strictly the language of the customer's latest WhatsApp message (the same
+    detector pi's replies use); the chat's last known language when it is unclear."""
+    from app.modules.pi.language import detect_language
+
+    return norm_language(detect_language(latest) or conversation.language)
+
+
+def _plural(n: int, word: str) -> str:
+    return f"{n} {word}{'s' if n != 1 else ''}"
+
+
+TEXT: dict[str, dict[str, Any]] = {
+    "en": {
+        "here": "Here is your problem map.",
+        "glance": lambda n, m: (
+            f"Your {_plural(n, 'request')} at a glance" + (f", {m} connected." if m else ".")
+        ),
+        "found": lambda n, reason: f"pi found {_plural(n, 'connection')}. {reason}.",
+        "noted": lambda title: f'pi noted "{title}".',
+        "you": "You: ",
+        "next": "Next: ",
+        "nudge": lambda title, q: f'Quick one on "{title}": {q}',
+        "status": lambda title, due: (
+            f'The team is working on "{title}". You\'ll get an update here by {due}.'
+        ),
+    },
+    "roman_ur": {
+        "here": "Yeh raha aap ka problem map.",
+        "glance": lambda n, m: (
+            f"Aap ke {n} masle ek nazar mein" + (f", {m} aapas mein jude hue." if m else ".")
+        ),
+        "found": lambda n, reason: f"pi ne aap ke requests mein {n} connection dhoonde. {reason}.",
+        "noted": lambda title: f'pi ne note kiya: "{title}".',
+        "you": "Aap: ",
+        "next": "Agla qadam: ",
+        "nudge": lambda title, q: f'Ek chhota sa sawal "{title}" ke baare mein: {q}',
+        "status": lambda title, due: (
+            f'"{title}" pe team kaam kar rahi hai. Update {due} tak yahin milega.'
+        ),
+    },
+    "ar": {
+        "here": "هذه خريطة طلباتك.",
+        "glance": lambda n, m: f"{n} طلبات في لمحة" + (f"، {m} مترابطة." if m else "."),
+        "found": lambda n, reason: f"وجد pi {n} روابط. {reason}.",
+        "noted": lambda title: f'سجّل pi: "{title}".',
+        "you": "أنت: ",
+        "next": "الخطوة التالية: ",
+        "nudge": lambda title, q: f'سؤال سريع حول "{title}": {q}',
+        "status": lambda title, due: f'الفريق يعمل على "{title}". ستصلك تحديثات هنا بحلول {due}.',
+    },
+}
+
+
 def prayer_or_quiet(policy: Any, now: datetime | None = None) -> bool:
     """No sends at night (business quiet hours) or during Friday prayers (12:30-14:30)."""
     from app.modules.pi.policy import zone
@@ -142,9 +203,8 @@ async def read_quiet_chats(ctx: dict[str, Any]) -> list[str]:
                 break
             brief = conversation.service_brief or {}
             inbound_at = conversation.last_inbound_at.isoformat()
-            asked = brief.get("map_answered_for") != inbound_at and bool(
-                MAP_ASK.search(await _last_inbound_text(session, conversation))
-            )
+            latest = await _last_inbound_text(session, conversation)
+            asked = brief.get("map_answered_for") != inbound_at and bool(MAP_ASK.search(latest))
             quiet = conversation.last_inbound_at <= now - READ_AFTER
             if not quiet and not asked:
                 continue  # never mid-explanation
@@ -188,6 +248,7 @@ async def read_quiet_chats(ctx: dict[str, Any]) -> list[str]:
                     report,
                     settings=ctx["settings"],
                     asked=asked,
+                    language=wa_language(latest, conversation),
                 )
                 if card:
                     outgoing.append(card)
@@ -204,31 +265,25 @@ def _open(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [i for i in issues if i.get("stage") not in ("live", "closed", "paused")]
 
 
-def _map_caption(report: dict[str, Any], lead: str = "") -> str:
+def _map_caption(report: dict[str, Any], lang: str, lead: str = "") -> str:
     issues = _open(report.get("issues") or []) or list(report.get("issues") or [])
     links = [x for x in report.get("links") or [] if x.get("status") in ("auto", "confirmed")]
-    n, m = len(issues), len(links)
-    if urdu(str(report.get("language") or "")):
-        line = f"Aap ke {n} masle ek nazar mein" + (f", {m} aapas mein jude hue." if m else ".")
-    else:
-        line = f"Your {n} request{'s' if n != 1 else ''} at a glance" + (
-            f", {m} connected." if m else "."
-        )
-    return f"{lead} {line}".strip()
+    return f"{lead} {TEXT[lang]['glance'](len(issues), len(links))}".strip()
 
 
-def _journey_caption(issue: dict[str, Any], ur: bool) -> str:
+def _journey_caption(issue: dict[str, Any], lang: str) -> str:
     if issue.get("ball_with") == "client" and issue.get("open_question"):
-        what = issue["open_question"]
-        who = "Aap: " if ur else "You: "
+        what, who = issue["open_question"], TEXT[lang]["you"]
     else:
-        what = str(issue.get("next_step") or "")
-        who = "Agla qadam: " if ur else "Next: "
+        what, who = str(issue.get("next_step") or ""), TEXT[lang]["next"]
     return f'"{issue["title"]}"\n{who}{what}'.strip()
 
 
-def pick_card(report: dict[str, Any], asked: bool = False) -> tuple[str, int, str] | None:
-    """(kind, request index, caption) for the most useful card, or None.
+def pick_card(
+    report: dict[str, Any], asked: bool = False, language: str | None = None
+) -> tuple[str, int, str] | None:
+    """(kind, request index, caption) for the most useful card, or None. The caption is
+    in ``language`` (the customer's latest message), else the report's language.
 
     - The customer asked for their map: the map (or the journey, with one request).
     - A real link with a saving: the map, with the reason.
@@ -237,22 +292,17 @@ def pick_card(report: dict[str, Any], asked: bool = False) -> tuple[str, int, st
     "Noted" alone, or a map of one or two dots, never gets a card on its own."""
     events = report.get("new_events") or []
     issues = report.get("issues") or []
-    ur = urdu(str(report.get("language") or "auto"))
+    lang = norm_language(language or str(report.get("language") or ""))
+    words = TEXT[lang]
     links = [x for x in report.get("links") or [] if x.get("status") in ("auto", "confirmed")]
     if asked and issues:
         if len(issues) == 1:
-            return "journey", 0, _journey_caption(issues[0], ur)
-        lead = "Yeh raha aap ka problem map." if ur else "Here is your problem map."
-        return "map", 0, _map_caption(report, lead)
+            return "journey", 0, _journey_caption(issues[0], lang)
+        return "map", 0, _map_caption(report, lang, words["here"])
     announced = [e for e in events if e.get("kind") == "link.found" and e.get("announce")]
     if announced and links:
         reason = str(announced[-1].get("detail") or "").rstrip(".")
-        n = len(links)
-        if ur:
-            caption = f"pi ne aap ke requests mein {n} connection dhoonde. {reason}."
-        else:
-            caption = f"pi found {n} connection{'s' if n != 1 else ''}. {reason}."
-        return "map", 0, caption.replace(" .", "").strip()
+        return "map", 0, words["found"](len(links), reason).replace(" .", "").strip()
     for event in reversed(events):
         if event.get("kind") != "stage.changed" or event.get("to") in ("noted", "live", "closed"):
             continue
@@ -265,12 +315,11 @@ def pick_card(report: dict[str, Any], asked: bool = False) -> tuple[str, int, st
             None,
         )
         if index is not None:
-            return "journey", index, _journey_caption(issues[index], ur)
+            return "journey", index, _journey_caption(issues[index], lang)
     noted = [e for e in events if e.get("kind") == "problem.noted"]
     if noted and len(_open(issues)) >= 3:
-        title = str(noted[-1].get("title") or "")
-        lead = f'pi ne note kiya: "{title}".' if ur else f'pi noted "{title}".'
-        return "map", 0, _map_caption(report, lead)
+        lead = words["noted"](str(noted[-1].get("title") or ""))
+        return "map", 0, _map_caption(report, lang, lead)
     return None
 
 
@@ -283,6 +332,7 @@ async def queue_card(
     *,
     settings: Any = None,
     asked: bool = False,
+    language: str | None = None,
 ) -> str | None:
     """Queue one card image (inside the 24-hour window). An asked-for map goes out at
     once (they are writing right now); others wait two hours between cards and respect
@@ -310,11 +360,12 @@ async def queue_card(
         or (not asked and prayer_or_quiet(policy, now))
     ):
         return None
-    choice = pick_card(report, asked=asked)
+    lang = norm_language(language or str(report.get("language") or ""))
+    choice = pick_card(report, asked=asked, language=lang)
     if choice is None:
         return None
     kind, index, caption = choice
-    link = card_url(settings, card_token(settings, conversation.id, kind, index))
+    link = card_url(settings, card_token(settings, conversation.id, kind, index, lang))
     dashboard = f"{settings.pi_app_public_url.rstrip('/')}/customer"
     caption = f"{caption}\n{dashboard}"
     pi = PiService(session, scope)
@@ -459,22 +510,18 @@ async def nudge_customer(
         or sum(1 for n in brief.get("nudges") or [] if n.get("since") == since_raw) >= MAX_TOUCHES
     ):
         return None
-    if STOP.search(await _last_inbound_text(session, conversation)):
+    latest = await _last_inbound_text(session, conversation)
+    if STOP.search(latest):
         conversation.service_brief = {**brief, "reminder_consent": "declined"}
         return None
     if prayer_or_quiet(policy, now) or await _human_recently(session, conversation, now):
         return None
-    language = str((brief.get("customer_issues") or {}).get("language") or conversation.language)
-    language = (conversation.language or "en") if language == "auto" else language
+    language = wa_language(latest, conversation)
     pi = PiService(session, scope)
     window_open = bool(conversation.last_inbound_at and now - conversation.last_inbound_at < WINDOW)
     if waited < WINDOW and window_open and not _sent(brief, since_raw, "nudge1"):
         title, question = issue["title"], issue["open_question"]
-        body = (
-            f'Ek chhota sa sawal "{title}" ke baare mein: {question}'
-            if urdu(language)
-            else f'Quick one on "{title}": {question}'
-        )
+        body = TEXT[language]["nudge"](title, question)
         key = f"pi-nudge:{conversation.id}:{since_raw}:1"
         if await pi.messages.find(PiMessage.idempotency_key == key):
             return None
@@ -596,12 +643,8 @@ async def alert_team(
         return None
     hours = await service.team_update_hours(session, conversation)
     due = service.next_update_by(since, hours).strftime("%a %d %b")
-    language = str((brief.get("customer_issues") or {}).get("language") or conversation.language)
-    body = (
-        f'"{issue["title"]}" pe team kaam kar rahi hai. Update {due} tak yahin milega.'
-        if urdu(language)
-        else f'The team is working on "{issue["title"]}". You\'ll get an update here by {due}.'
-    )
+    language = wa_language(await _last_inbound_text(session, conversation), conversation)
+    body = TEXT[language]["status"](issue["title"], due)
     pi = PiService(session, scope)
     key = f"pi-status:{conversation.id}:{since_raw}"
     if await pi.messages.find(PiMessage.idempotency_key == key):
