@@ -4,6 +4,7 @@ import hashlib
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
+from urllib.parse import quote as url_quote
 from urllib.parse import urlsplit
 from uuid import UUID
 
@@ -159,8 +160,15 @@ async def checkout(
             "WEBHOOK_REQUIRED",
             "Configure the Stripe webhook signing secret before accepting payments",
         )
-    base = (settings.integrations_public_base_url or settings.cors_origins[0]).rstrip("/")
-    if settings.app_env == "production" and not base.startswith("https://"):
+    # The payer is the customer: Stripe sends them back to the pi app's public
+    # "payment received" page. integrations_public_base_url is the API host (webhooks),
+    # never a page a person should land on. Without the pi app, the Owner OS web app.
+    customer_page = (settings.pi_app_public_url or "").rstrip("/")
+    if customer_page:
+        return_url = f"{customer_page}/paid?invoice={url_quote(invoice.number)}"
+    else:
+        return_url = f"{settings.cors_origins[0].rstrip('/')}/billing/invoices/{invoice.id}"
+    if settings.app_env == "production" and not return_url.startswith("https://"):
         raise BusinessRuleViolation("PUBLIC_URL_REQUIRED", "Configure an HTTPS application URL")
     key = f"checkout:{invoice.id}:{connection.id}:{invoice.amount_paid}:{balance}"
     if request_key:
@@ -178,7 +186,7 @@ async def checkout(
             "amount_minor": amount,
             "currency": invoice.currency,
             "number": invoice.number,
-            "return_url": f"{base}/billing/invoices/{invoice.id}",
+            "return_url": return_url,
         },
     )
     if op.status == "succeeded":
@@ -192,7 +200,9 @@ async def checkout(
     data = op.input
     form = {
         "mode": "payment",
-        "success_url": data["return_url"] + "?payment=returned",
+        "success_url": data["return_url"]
+        + ("&" if "?" in data["return_url"] else "?")
+        + "payment=returned",
         "cancel_url": data["return_url"],
         "client_reference_id": str(op.id),
         "line_items[0][quantity]": "1",
