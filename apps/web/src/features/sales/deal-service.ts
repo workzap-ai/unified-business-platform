@@ -174,6 +174,14 @@ export const dealJourneySchema = z.object({
 });
 export type DealJourney = z.infer<typeof dealJourneySchema>;
 
+export const paymentLinkSentSchema = z.object({
+  whatsapp: deliveryResultSchema.nullable(),
+  pay_link: z.string().nullable().catch(null),
+  email: z.string().nullable().catch(null),
+  email_error: z.string().nullable().catch(null),
+});
+export type PaymentLinkSent = z.infer<typeof paymentLinkSentSchema>;
+
 export interface DealService {
   settings(): Promise<DealSettings>;
   saveSettings(input: DealSettingsInput): Promise<DealSettingsInput>;
@@ -186,6 +194,10 @@ export interface DealService {
   ): Promise<DealDocument[]>;
   board(): Promise<DealBoard>;
   journey(leadId: string): Promise<DealJourney>;
+  sendPaymentLink(
+    invoiceId: string,
+    channels?: { whatsapp?: boolean; email?: boolean },
+  ): Promise<PaymentLinkSent>;
 }
 
 const live: DealService = {
@@ -221,6 +233,13 @@ const live: DealService = {
   board: () => apiRequest("GET", "/pi/deals/board", dealBoardSchema),
   journey: (leadId) =>
     apiRequest("GET", `/pi/deals/leads/${leadId}/journey`, dealJourneySchema),
+  sendPaymentLink: (invoiceId, channels = {}) =>
+    apiRequest(
+      "POST",
+      `/billing/invoices/${invoiceId}/payment-link/send`,
+      paymentLinkSentSchema,
+      { body: channels },
+    ),
 };
 
 function notConnected(): never {
@@ -238,6 +257,7 @@ const demo: DealService = {
   documents: async () => [],
   board: async () => notConnected(),
   journey: async () => notConnected(),
+  sendPaymentLink: async () => notConnected(),
 };
 
 export const dealService = select<DealService>({ demo, live });

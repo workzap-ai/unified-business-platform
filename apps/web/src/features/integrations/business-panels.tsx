@@ -7,13 +7,24 @@ import { ErrorState, Notice } from "@/components/app/states";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
 import { workflowService } from "./workflow-service";
+import { toast } from "sonner";
+import { MessageCircle } from "lucide-react";
+import { DealDeliveryDialog } from "@/features/sales/deal-delivery-dialog";
+import {
+  dealErrorMessage,
+  dealService,
+  type DeliveryResult,
+} from "@/features/sales/deal-service";
 
 export function InvoiceIntegrationActions({
   id,
   open,
+  draft = false,
 }: {
   id: string;
   open: boolean;
+  /** A draft can only be issued and sent in one step from here. */
+  draft?: boolean;
 }) {
   const { can } = useSession();
   const capabilities = useScopedQuery(
@@ -36,12 +47,34 @@ export function InvoiceIntegrationActions({
       },
     },
   );
+  // One step: issue if needed, then the pay link on WhatsApp and by email.
+  const [delivered, setDelivered] = useState<DeliveryResult | null>(null);
+  const sendLink = useScopedMutation(() => dealService.sendPaymentLink(id), {
+    invalidate: [["invoices"], ["deals"], ["integrations"], ["billing"]],
+    toastErrors: false,
+    onSuccess: (r) => {
+      if (r.pay_link) setUrl(r.pay_link);
+      const parts = [
+        r.whatsapp ? "WhatsApp" : null,
+        r.email ? "email" : null,
+      ].filter(Boolean);
+      if (parts.length)
+        toast.success(`Payment link sent by ${parts.join(" and ")}`);
+      if (r.email_error) toast.message(`Email not sent: ${r.email_error}`);
+      if (!r.pay_link)
+        toast.message(
+          "No online payment is set up, so the invoice went without a pay link.",
+        );
+      if (r.whatsapp && r.whatsapp.delivery !== "sent")
+        setDelivered(r.whatsapp);
+    },
+  });
   const checkout = useScopedMutation(() => workflowService.checkout(id), {
     invalidate: [["integrations"]],
     onSuccess: (r) =>
       setUrl(typeof r.output.url === "string" ? r.output.url : null),
   });
-  if (!can("billing.write") || !open) return null;
+  if (!can("billing.write") || !(open || draft)) return null;
   return (
     <Card>
       <CardHeader title="Email and online payment" />
@@ -54,15 +87,31 @@ export function InvoiceIntegrationActions({
         )}
         <div className="flex flex-wrap gap-2">
           <Button
+            loading={sendLink.isPending}
+            disabled={sendLink.isPending}
+            onClick={() =>
+              sendLink.mutate(undefined, {
+                onError: (e) =>
+                  toast.error(
+                    dealErrorMessage(e, "The payment link couldn't be sent."),
+                  ),
+              })
+            }
+          >
+            <MessageCircle />{" "}
+            {draft ? "Issue and send payment link" : "Send payment link"}
+          </Button>
+          <Button
             variant="secondary"
-            disabled={!capabilities.data?.email}
+            disabled={draft || !capabilities.data?.email}
             loading={email.isPending}
             onClick={() => email.mutate(undefined)}
           >
             Email invoice
           </Button>
           <Button
-            disabled={!capabilities.data?.payments}
+            variant="secondary"
+            disabled={draft || !capabilities.data?.payments}
             loading={checkout.isPending}
             onClick={() => checkout.mutate(undefined)}
           >
@@ -70,7 +119,8 @@ export function InvoiceIntegrationActions({
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Email goes to the customer&apos;s saved address. A verified Stripe
+          Send payment link issues a draft invoice, then sends the invoice and
+          its pay link on WhatsApp and to the customer&apos;s email. A verified
           payment updates this invoice automatically.
         </p>
         {(!capabilities.data?.email || !capabilities.data?.payments) && (
@@ -100,6 +150,11 @@ export function InvoiceIntegrationActions({
             </Button>
           </Notice>
         )}
+        <DealDeliveryDialog
+          result={delivered}
+          noun="invoice"
+          onOpenChange={(open) => !open && setDelivered(null)}
+        />
         {email.isError && <ErrorState error={email.error} />}
         {checkout.isError && <ErrorState error={checkout.error} />}
       </CardBody>

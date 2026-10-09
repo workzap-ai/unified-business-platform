@@ -226,6 +226,7 @@ function InvoiceDetailView({ id }: { id: string }) {
           <InvoiceIntegrationActions
             id={id}
             open={["issued", "partially_paid"].includes(invoice.status)}
+            draft={invoice.status === "draft"}
           />
           {usesPi && can("sales.read") && invoice.status !== "draft" && (
             <DealDocumentsCard filter={{ invoice_id: invoice.id }} />
