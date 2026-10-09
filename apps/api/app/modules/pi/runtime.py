@@ -194,6 +194,11 @@ async def persist_inbound(
                         if payload.get("transcript")
                         else {}
                     ),
+                    **(
+                        {"file_kind": "document", "filename": payload.get("filename") or ""}
+                        if payload.get("file_kind") == "document"
+                        else {}
+                    ),
                 }
                 if payload.get("media_id")
                 else {"form_response": payload["form"]}
@@ -367,7 +372,10 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         if message.message_type not in {"text", "interactive"}:
             features = (await enabled_products(session, scope)).get("pi", set())
             audio = message.message_type == "audio"
-            allowed = (
+            # PDFs and Word files are read locally (no vision feature needed); a business
+            # can switch it off with whatsapp_config.media_documents.
+            document = message.media.get("file_kind") == "document"
+            allowed = (document and bool(policy.whatsapp_config.get("media_documents", True))) or (
                 message.message_type in {"audio", "image", "video"}
                 and ("voice" if audio else "vision") in features
                 and bool(
@@ -410,10 +418,21 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 if len(content) > limit:
                     raise BusinessRuleViolation("INVALID_MEDIA", "Media is too large")
                 manager = build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"])
-                mime = normalize_mime(mime)
-                if not mime.startswith(f"{message.message_type}/"):
+                mime = mime if document else normalize_mime(mime)
+                if not document and not mime.startswith(f"{message.message_type}/"):
                     raise BusinessRuleViolation("INVALID_MEDIA", "Media type does not match")
-                if audio and provider_transcript:
+                if document:
+                    from app.modules.pi.documents import read_document
+
+                    description = await read_document(
+                        manager,
+                        scope,
+                        content,
+                        str(message.media.get("filename") or ""),
+                        conversation_id,
+                        alias=str(policy.ai_config.get("router_alias", "fast")),
+                    )
+                elif audio and provider_transcript:
                     description = provider_transcript[:4000]
                 elif audio:
                     transcript = await manager.transcribe(

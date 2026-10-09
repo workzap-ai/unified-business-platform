@@ -134,8 +134,17 @@ def normalize(payload: dict[str, Any]) -> list[dict[str, Any]]:
                         else "other",
                         "body": str(body)[:4000],
                         "media_id": str(message.get(kind, {}).get("id", ""))[:160]
-                        if kind in {"audio", "image", "video"}
+                        if kind in {"audio", "image", "video", "document"}
                         else None,
+                        # A document is stored as "other" but keeps its file for pi to read.
+                        **(
+                            {
+                                "file_kind": "document",
+                                "filename": str(message.get(kind, {}).get("filename", ""))[:200],
+                            }
+                            if kind == "document"
+                            else {}
+                        ),
                     }
                 )
             for status in value.get("statuses", [])[:100]:
@@ -168,6 +177,10 @@ MEDIA_TYPES = frozenset(
         "audio/aac",
         "video/mp4",
         "video/3gpp",
+        # Documents pi reads (pi.documents checks the real type from the content).
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "text/plain",
     }
 )
 

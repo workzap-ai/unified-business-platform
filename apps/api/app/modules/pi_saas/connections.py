@@ -594,6 +594,7 @@ def _redact(event: dict[str, Any]) -> dict[str, Any]:
             "text": str(as_dict(message.get("text")).get("body") or "")[:4096],
             "caption": _media(message).get("caption", ""),
             "media_id": _media(message).get("id", ""),
+            "filename": _media(message).get("filename", ""),
             "statuses": [
                 {"status": str(s.get("status") or "")[:16]}
                 for s in as_list(message.get("statuses"))[:10]
@@ -633,6 +634,7 @@ def _media(message: dict[str, Any]) -> dict[str, str]:
     return {
         "id": str(part.get("id") or "")[:64],
         "caption": str(part.get("caption") or "")[:1024],
+        "filename": str(part.get("filename") or "")[:200],
     }
 
 
@@ -745,7 +747,10 @@ async def _message_event(
             from app.modules.pi_saas.flows import interactive_reply
 
             kind, text, form = interactive_reply(message)
+        # A document (PDF, Word…) is stored as "other" but keeps its file for pi to read.
+        document = kind == "document"
         kind = kind if kind in {"text", "interactive", *MEDIA} else "other"
+        has_file = kind in MEDIA or document
         payload = {
             "key": f"{number}:{mid}",
             "kind": "message",
@@ -760,12 +765,15 @@ async def _message_event(
             if kind == "text"
             else message.get("caption", ""),
             "form": form,
-            "media_id": message.get("media_id") or None
-            if kind in {"audio", "image", "video"}
-            else None,
+            "media_id": message.get("media_id") or None if has_file else None,
             **(
                 {k: message[k] for k in ("media_url", "media_mime", "transcript") if message.get(k)}
-                if kind in {"audio", "image", "video"}
+                if has_file
+                else {}
+            ),
+            **(
+                {"file_kind": "document", "filename": str(message.get("filename") or "")[:200]}
+                if document
                 else {}
             ),
         }
