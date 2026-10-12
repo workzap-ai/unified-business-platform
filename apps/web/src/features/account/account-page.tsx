@@ -27,6 +27,7 @@ import { ApiError, errorMessage } from "@/services/api-client";
 import { EnrollLinkCard } from "./enroll-link-card";
 import { FaceIdCard } from "./face-id-card";
 import { PasskeysCard } from "./passkeys-card";
+import { PinCard } from "./pin-card";
 
 const passwordSchema = z
   .object({
@@ -105,6 +106,7 @@ export function AccountPage() {
         </Card>
         <div className="space-y-4">
           <PasskeysCard />
+          <PinCard />
           <FaceIdCard />
           <EnrollLinkCard />
           <ChangePasswordCard />

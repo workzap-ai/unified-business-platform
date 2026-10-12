@@ -42,6 +42,11 @@ class UserCredential(Record, Base):
     second_factor_locked_until: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True, server_default=text("NULL"), deferred=True
     )
+    # Optional sign-in PIN (Argon2id hash), the second step on any computer. Deferred
+    # like the columns above: safe while a deploy runs ahead of migration 0032.
+    second_factor_pin_hash: Mapped[str | None] = mapped_column(
+        String(255), nullable=True, server_default=text("NULL"), deferred=True
+    )
 
 
 class PasswordResetToken(Record, Base):

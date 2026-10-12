@@ -42,7 +42,7 @@ from app.integrations.errors import IntegrationError
 from app.integrations.http import OutboundClient
 from app.modules.audit.service import record
 from app.modules.auth import face
-from app.modules.auth.crypto import verify_password
+from app.modules.auth.crypto import hash_password, verify_password
 from app.modules.auth.dependencies import Auth
 from app.modules.auth.models import UserCredential, UserFace, UserPasskey
 from app.modules.auth.passkeys import (
@@ -105,7 +105,33 @@ async def methods_for(session: AsyncSession, user_id: UUID, rp_id: str) -> list[
         .select_from(UserPasskey)
         .where(UserPasskey.user_id == user_id, UserPasskey.rp_id.in_([rp_id, ""]))
     )
-    return [m for m, n in (("face", faces), ("fingerprint", keys)) if n]
+    methods = [m for m, n in (("face", faces), ("fingerprint", keys)) if n]
+    if await _has_pin(session, user_id):
+        methods.append("pin")
+    return methods
+
+
+async def _has_pin(session: AsyncSession, user_id: UUID) -> bool:
+    """A saved sign-in PIN. Its own savepoint: before migration 0032 there is none,
+    and the face/fingerprint steps must still be asked for."""
+    try:
+        async with session.begin_nested():
+            found = await session.scalar(
+                select(UserCredential.second_factor_pin_hash).where(
+                    UserCredential.user_id == user_id
+                )
+            )
+    except ProgrammingError:
+        return False
+    return bool(found)
+
+
+WEAK_PINS = frozenset({"123456", "654321", "123123", "112233", "121212", "696969"})
+
+
+def _weak_pin(pin: str) -> bool:
+    steps = {int(b) - int(a) for a, b in zip(pin, pin[1:], strict=False)}
+    return pin in WEAK_PINS or len(set(pin)) == 1 or steps in ({1}, {-1})
 
 
 def rp_id_of(request: Request) -> str:
@@ -123,10 +149,25 @@ async def second_step(
         # ahead of its migration), the password still signs people in as before.
         async with session.begin_nested():
             methods = await methods_for(session, user.id, rp_id_of(request))
+            # Where the fingerprint keys were saved ("Android phone"), so the sign-in
+            # screen can say "your key is on your phone" when this computer has none.
+            devices = list(
+                await session.scalars(
+                    select(UserPasskey.name)
+                    .where(
+                        UserPasskey.user_id == user.id,
+                        UserPasskey.rp_id.in_([rp_id_of(request), ""]),
+                    )
+                    .order_by(UserPasskey.created_at)
+                    .limit(5)
+                )
+            )
     except ProgrammingError:
         logger.warning("second_step_tables_missing")
         return None
-    return await open_ticket(request, user, methods, audience) if methods else None
+    if not methods:
+        return None
+    return {**await open_ticket(request, user, methods, audience), "devices": devices}
 
 
 def email_ready(request: Request) -> bool:
@@ -216,6 +257,7 @@ async def _failed(
     what = {
         "face": "That doesn't look like you",
         "email": "That code didn't work",
+        "pin": "That PIN isn't right",
     }.get(method, "That fingerprint didn't work")
     return BusinessRuleViolation(
         "SECOND_STEP_FAILED", f"{what}. {left} {'try' if left == 1 else 'tries'} left.", 401
@@ -272,6 +314,16 @@ async def _read(frames: list[str]) -> list[face.FaceFrame]:
 class TicketOnly(BaseModel):
     model_config = ConfigDict(extra="forbid")
     ticket: str = Field(min_length=16, max_length=64)
+
+
+class PinCheck(TicketOnly):
+    pin: str = Field(pattern=r"^\d{6}$")
+
+
+class PinSet(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    password: str = Field(min_length=1, max_length=256)
+    pin: str = Field(pattern=r"^\d{6}$")
 
 
 class EmailCode(TicketOnly):
@@ -538,6 +590,74 @@ def second_step_router(audience: Audience, site: Site) -> APIRouter:
                 "EMAIL_FAILED", "We couldn't send the email. Try again in a minute.", 503
             ) from None
         return {"sent_to": _masked(user.email), "minutes": CODE_SECONDS // 60}
+
+    @router.post("/mfa/pin")
+    async def sign_in_with_pin(
+        data: PinCheck, request: Request, response: Response, session: Session
+    ) -> Any:
+        user_id = await _ticket(request, data.ticket, audience)
+        credential = await _credential(session, user_id)
+        saved = await session.scalar(
+            select(UserCredential.second_factor_pin_hash).where(UserCredential.user_id == user_id)
+        )
+        if not saved or not verify_password(saved, data.pin):
+            raise await _failed(request, session, credential, data.ticket, "pin")
+        return await _success(request, response, session, credential, data.ticket, "pin", audience)
+
+    @router.get("/pin")
+    async def pin_status(auth: Auth, session: Session) -> dict[str, bool]:
+        return {"set": await _has_pin(session, auth.user.id)}
+
+    @router.put("/pin")
+    async def set_pin(
+        data: PinSet, request: Request, auth: Auth, session: Session
+    ) -> dict[str, bool]:
+        """Only the signed-in person's own password sets or changes the PIN."""
+        if not await hit(request, "pin-set", str(auth.user.id), 10, 600):
+            raise HTTPException(status_code=429)
+        credential = await session.scalar(
+            select(UserCredential).where(UserCredential.user_id == auth.user.id)
+        )
+        if credential is None or not verify_password(credential.password_hash, data.password):
+            raise BusinessRuleViolation("PASSWORD_INCORRECT", "That password isn't right", 403)
+        if _weak_pin(data.pin):
+            raise BusinessRuleViolation(
+                "PIN_TOO_SIMPLE", "Choose a PIN that isn't a run or a repeat, like 123456.", 422
+            )
+        credential.second_factor_pin_hash = hash_password(data.pin)
+        await record(
+            session,
+            "auth.pin_set",
+            actor_user_id=auth.user.id,
+            entity_type="user",
+            entity_id=auth.user.id,
+            include_environment=False,
+        )
+        await session.commit()
+        return {"set": True}
+
+    @router.post("/pin/remove")
+    async def remove_pin(
+        data: Password, request: Request, auth: Auth, session: Session
+    ) -> dict[str, bool]:
+        if not await hit(request, "pin-set", str(auth.user.id), 10, 600):
+            raise HTTPException(status_code=429)
+        credential = await session.scalar(
+            select(UserCredential).where(UserCredential.user_id == auth.user.id)
+        )
+        if credential is None or not verify_password(credential.password_hash, data.password):
+            raise BusinessRuleViolation("PASSWORD_INCORRECT", "That password isn't right", 403)
+        credential.second_factor_pin_hash = None
+        await record(
+            session,
+            "auth.pin_removed",
+            actor_user_id=auth.user.id,
+            entity_type="user",
+            entity_id=auth.user.id,
+            include_environment=False,
+        )
+        await session.commit()
+        return {"set": False}
 
     @router.post("/mfa/email")
     async def sign_in_with_email_code(

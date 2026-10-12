@@ -47,9 +47,11 @@ export type LoginInput = { email: string; password: string };
 export type SecondStep = {
   mfa_required: true;
   ticket: string;
-  methods: ("face" | "fingerprint" | "email")[];
+  methods: ("face" | "fingerprint" | "email" | "pin")[];
   frames: number;
   name: string;
+  /** Where the fingerprint keys were saved ("Android phone"). */
+  devices?: string[];
 };
 export type RegisterInput = {
   email: string;

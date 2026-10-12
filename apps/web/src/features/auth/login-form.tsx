@@ -219,9 +219,16 @@ function SecondStepForm({
   const hasFace = step.methods.includes("face");
   const hasFingerprint = step.methods.includes("fingerprint");
   const hasEmail = step.methods.includes("email");
+  const hasPin = step.methods.includes("pin");
   // The phone's own lock first (one touch, like banking apps); the camera otherwise.
   const [mode, setMode] = useState<Mode>(
-    hasFingerprint ? "fingerprint" : hasFace ? "face" : "email",
+    hasFingerprint
+      ? "fingerprint"
+      : hasFace
+        ? "face"
+        : hasPin
+          ? "pin"
+          : "email",
   );
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -237,9 +244,10 @@ function SecondStepForm({
       setNoDeviceLock(true);
       // The camera or an email code work on any computer.
       if (hasFace) setMode("face");
+      else if (hasPin) setMode("pin");
       else if (hasEmail) setMode("email");
     });
-  }, [hasFace, hasEmail]);
+  }, [hasFace, hasPin, hasEmail]);
 
   function explain(e: unknown, fallback: string): string {
     if (e instanceof ApiError && e.code === "SIGN_IN_EXPIRED") {
@@ -260,7 +268,7 @@ function SecondStepForm({
         if (message) setError(message);
       } else {
         // Never silent: a cancelled or failed check says what to do next.
-        setError(passkeyError(e) ?? unlockFailed(unlock, hasFace));
+        setError(passkeyError(e) ?? unlockFailed(unlock, step, e));
       }
     } finally {
       setBusy(false);
@@ -281,14 +289,22 @@ function SecondStepForm({
           ? "Show your face"
           : mode === "email"
             ? "Enter the code from your email"
-            : `Use your ${unlock}`}
+            : mode === "pin"
+              ? "Enter your PIN"
+              : `Use your ${unlock}`}
       </h1>
       <p className="mt-1.5 text-sm text-muted-foreground">
         Hi {step.name}. Your password was right; one more check keeps your
         account safe.
       </p>
       <div className="mt-6">
-        {mode === "email" ? (
+        {mode === "pin" ? (
+          <PinForm
+            onSubmit={(pin) => authService.signInWithPin(step.ticket, pin)}
+            onDone={onDone}
+            explain={(e) => explain(e, "That PIN isn't right.")}
+          />
+        ) : mode === "email" ? (
           <EmailCodeForm
             ticket={step.ticket}
             onDone={onDone}
@@ -343,6 +359,7 @@ function SecondStepForm({
               `Use your phone lock (${unlock}) instead`,
             ],
             ["face", hasFace, "Use the camera face check instead"],
+            ["pin", hasPin, "Use my PIN instead"],
             ["email", hasEmail, "Email me a code instead"],
           ] as const
         )
@@ -365,7 +382,69 @@ function SecondStepForm({
   );
 }
 
-type Mode = "face" | "fingerprint" | "email";
+type Mode = "face" | "fingerprint" | "email" | "pin";
+
+/** The second step on any computer: the person's own 6-digit PIN. */
+function PinForm({
+  onSubmit,
+  onDone,
+  explain,
+}: {
+  onSubmit: (pin: string) => ReturnType<typeof authService.signInWithPin>;
+  onDone: (
+    session: Awaited<ReturnType<typeof authService.signInWithPin>>,
+  ) => Promise<void>;
+  explain: (e: unknown) => string;
+}) {
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  return (
+    <form
+      className="space-y-3"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setError(null);
+        setBusy(true);
+        try {
+          await onDone(await onSubmit(pin));
+        } catch (err) {
+          setPin("");
+          const message = explain(err);
+          if (message) setError(message);
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      <FormField
+        label="Your 6-digit PIN"
+        htmlFor="sign-in-pin"
+        error={error ?? undefined}
+      >
+        <Input
+          id="sign-in-pin"
+          type="password"
+          inputMode="numeric"
+          autoComplete="off"
+          maxLength={6}
+          value={pin}
+          onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+          autoFocus
+        />
+      </FormField>
+      <Button
+        type="submit"
+        size="lg"
+        className="w-full"
+        loading={busy}
+        disabled={pin.length !== 6}
+      >
+        Sign in
+      </Button>
+    </form>
+  );
+}
 
 /** The second step on any computer: a 6-digit code sent to the account's email. */
 function EmailCodeForm({
@@ -475,12 +554,23 @@ function EmailCodeForm({
 }
 
 /** What to say when the device check closed without signing in. */
-function unlockFailed(unlock: string, hasFace: boolean): string {
-  return (
-    `${unlock} didn't finish. Try again` +
-    (hasFace ? ", or use the camera face check below" : "") +
-    ". If this computer has no " +
-    unlock +
-    ", choose “Use a phone or tablet” in the window and scan the QR code with your phone."
-  );
+function unlockFailed(
+  unlock: string,
+  step: { methods: string[]; devices?: string[] },
+  error: unknown,
+): string {
+  const devices = step.devices ?? [];
+  const why =
+    error instanceof Error && error.name && error.name !== "Error"
+      ? ` (${error.name})`
+      : "";
+  const where = devices.length
+    ? ` Your fingerprint key was saved on: ${devices.join(", ")}. If that isn't this computer, ${unlock} here can't use it.`
+    : "";
+  const next = step.methods.includes("email")
+    ? " Use “Email me a code” below, then add this computer in your security settings so it works next time."
+    : step.methods.includes("face")
+      ? " Use the camera face check below."
+      : " Choose “Use a phone or tablet” in the window and scan the QR code with that phone.";
+  return `${unlock} couldn't find your key on this computer${why}.${where}${next}`;
 }
