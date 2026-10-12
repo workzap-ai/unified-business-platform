@@ -11,6 +11,7 @@ the reply guard only lets through links the team gave it.
 
 import logging
 import re
+import secrets
 from datetime import datetime, timedelta
 from types import SimpleNamespace
 from typing import Any, Literal
@@ -42,7 +43,9 @@ class MeetingInput(BaseModel):
     # Local date and time at the business ("2026-10-12T17:00").
     starts_at: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$")
     duration_minutes: int = Field(default=30, ge=10, le=480)
-    how: Literal["google_meet", "link", "in_person"] = "google_meet"
+    # google_meet: from the connected calendar; video: a link pi makes itself (Jitsi Meet,
+    # no account needed); link: their own Zoom / Teams link; in_person: a place.
+    how: Literal["google_meet", "video", "link", "in_person"] = "google_meet"
     link: str = Field(default="", max_length=500)  # their own Zoom / Teams link
     place: str = Field(default="", max_length=300)  # for in person
     note: str = Field(default="", max_length=1000)  # anything else pi should tell them
@@ -178,21 +181,33 @@ async def arrange(
         Customer.id == row.customer_id
     )
     when = f"{start:%A %d %B, %I:%M %p} ({zone}), {data.duration_minutes} minutes"
-    if data.how == "google_meet":
-        link, _ = await _google_meet(session, scope, runtime, row, customer, start, end, zone)
-        where = f"on Google Meet: {link}"
-    elif data.how == "link":
+    how = data.how
+    if how == "google_meet":
+        try:
+            link, _ = await _google_meet(session, scope, runtime, row, customer, start, end, zone)
+            where = f"on Google Meet: {link}"
+        except BusinessRuleViolation as error:
+            if error.code not in CALENDAR_PROBLEMS:
+                raise
+            # Never stuck on the calendar: pi makes a video-call link itself instead.
+            logger.warning("pi_meet_fell_back_to_video", extra={"code": error.code})
+            if error.code == "CALENDAR_RECONNECT":
+                await _expire_calendar(session, scope)
+            how = "video"
+    if how == "video":
+        where = f"on a video call (opens in the browser, no sign-up): {video_link()}"
+    elif how == "link":
         if not data.link.startswith(("https://", "http://")):
             raise BusinessRuleViolation("LINK_INVALID", "Paste the meeting link (https://…)")
         where = f"online: {data.link}"
-    else:
+    elif how == "in_person":
         if not data.place:
             raise BusinessRuleViolation("PLACE_REQUIRED", "Say where you'll meet")
         where = f"in person at {data.place}"
     text = f"Meeting confirmed by the team: {when}, {where}."
     if data.note:
         text += f" {data.note}"
-    if customer is not None and customer.email and data.how == "google_meet":
+    if customer is not None and customer.email and how == "google_meet":
         text += " A calendar invitation was also emailed to them."
     return await answer(session, scope, row.id, text, save_as_knowledge=False, max_bytes=max_bytes)
 
@@ -242,24 +257,28 @@ async def auto_arrange(
         return None  # An old time: the team should pick one in the meeting dialog.
     data = MeetingInput(
         starts_at=starts_at,
-        how="link" if link else "google_meet",
+        how="link" if link else "google_meet",  # falls back to pi's own video link
         link=link.group(0).rstrip(".,)") if link else "",
         note="" if link else LINK.sub("", text).strip()[:300],
     )
-    try:
-        return await arrange(
-            session, scope, runtime, row.id, data, max_bytes=max_bytes, any_kind=True
-        )
-    except BusinessRuleViolation as error:
-        if error.code in {"CALENDAR_NOT_CONNECTED", "CALENDAR_RECONNECT", "MEET_FAILED"}:
-            raise BusinessRuleViolation(
-                "MEETING_NEEDS_LINK",
-                f"pi can't confirm the {start:%I:%M %p} meeting without a link: "
-                + error.message
-                + ' Or open "Arrange the meeting" and paste your Zoom / Meet link.',
-                409,
-            ) from None
-        raise
+    return await arrange(session, scope, runtime, row.id, data, max_bytes=max_bytes, any_kind=True)
+
+
+CALENDAR_PROBLEMS = {"CALENDAR_NOT_CONNECTED", "CALENDAR_RECONNECT", "MEET_FAILED"}
+
+
+def video_link() -> str:
+    """A private video-call room pi makes itself (Jitsi Meet: free, opens in the browser,
+    no account). Unguessable, so only people with the link can join."""
+    return f"https://meet.jit.si/pi-meeting-{secrets.token_hex(8)}"
+
+
+async def _expire_calendar(session: AsyncSession, scope: WorkspaceScope) -> None:
+    connection = await connectors.current(session, scope, "google_calendar")
+    if connection is not None and connection.status in connectors.USABLE:
+        connection.status, connection.health = "expired", "failing"
+        connection.last_error = "Google sign-in expired; reconnect Google Calendar"
+        connection.last_error_code = "RECONNECT_REQUIRED"
 
 
 def runtime_for(request: Any) -> Any:
@@ -329,7 +348,11 @@ async def book_for_customer(ctx: dict[str, Any], conversation_id: str) -> str | 
             return None
         meeting = dict((conversation.service_brief or {}).get("meeting") or {})
         starts_at, how = str(meeting.get("starts_at") or ""), str(meeting.get("how") or "")
-        if not starts_at or how not in ("", "google_meet") or meeting.get("booked") == starts_at:
+        if (
+            not starts_at
+            or how in ("phone", "in_person")  # the team calls them or picks the place
+            or meeting.get("booked") == starts_at
+        ):
             return None
         try:
             start = _local(starts_at, policy.timezone)
@@ -337,8 +360,6 @@ async def book_for_customer(ctx: dict[str, Any], conversation_id: str) -> str | 
             return None
         now = datetime.now(start.tzinfo)
         if not now + AHEAD <= start <= now + HORIZON:
-            return None
-        if not await calendar_ready(session, scope):
             return None
         row = await raise_request(
             session,

@@ -52,7 +52,7 @@ async def test_a_meeting_with_their_own_link_goes_to_pi(api, business_db):
     await pi.close()
 
 
-async def test_in_person_needs_a_place_and_meet_needs_a_calendar(api, business_db):
+async def test_in_person_needs_a_place_and_no_calendar_still_gets_a_link(api, business_db):
     pi = await pi_workspace(api, business_db, business_type="service_business")
     request_id = await _meeting_request(pi)
     no_place = await api.post(
@@ -64,10 +64,9 @@ async def test_in_person_needs_a_place_and_meet_needs_a_calendar(api, business_d
         f"{DESK}/{request_id}/meeting",
         json={"starts_at": "2026-10-20T17:00", "how": "google_meet"},
     )
-    assert no_calendar.status_code == 409
-    assert "Google Calendar" in no_calendar.json()["error"]["message"]
-    row = await business_db.get(PiStaffRequest, UUID(request_id))
-    assert row.status == "open"  # nothing was answered
+    # No calendar connected: pi makes a video-call link itself, nobody pastes anything.
+    assert no_calendar.status_code == 200, no_calendar.text
+    assert "https://meet.jit.si/pi-meeting-" in no_calendar.json()["answer"]
     await pi.close()
 
 
@@ -102,16 +101,15 @@ async def test_the_teams_yes_with_a_link_arranges_the_time_the_customer_asked_fo
     await pi.close()
 
 
-async def test_a_bare_yes_without_a_calendar_asks_for_a_link_and_pi_never_confirms(
-    api, business_db
-):
+async def test_a_bare_yes_without_a_calendar_makes_a_video_link(api, business_db):
     pi = await pi_workspace(api, business_db, business_type="service_business")
     request_id = await _meeting_request(pi)
     await _asked_for(pi, request_id, "2026-10-20T17:00")
     yes = await api.post(f"{DESK}/{request_id}/answer", json={"answer": "Yes, do confirmed"})
-    assert yes.status_code == 409
-    assert "link" in yes.json()["error"]["message"]
-    assert (await business_db_row(pi, request_id)).status == "open"
+    assert yes.status_code == 200, yes.text
+    answer = yes.json()["answer"]
+    assert answer.startswith("Meeting confirmed by the team:") and "05:00 PM" in answer
+    assert "https://meet.jit.si/pi-meeting-" in answer
     # A plain team note is not a meeting: pi can't call it confirmed.
     context = {"team_answer_now": {"answer": "Yes, do confirmed"}}
     assert invented("Your meeting is confirmed for 5 PM on Google Meet.", context)
@@ -210,7 +208,7 @@ async def test_pi_books_the_google_meet_itself_and_sends_the_link(api, business_
     await pi.close()
 
 
-async def test_an_expired_google_sign_in_says_reconnect_not_temporarily_unavailable(
+async def test_an_expired_google_sign_in_still_gets_the_customer_a_link(
     api, business_db, monkeypatch
 ):
     from types import SimpleNamespace
@@ -230,17 +228,17 @@ async def test_an_expired_google_sign_in_says_reconnect_not_temporarily_unavaila
     monkeypatch.setattr(meetings.connectors, "fresh", expired)
     pi = await pi_workspace(api, business_db, business_type="service_business")
     request_id = await _meeting_request(pi, calendar=True)
-    failed = await api.post(
-        f"{DESK}/{request_id}/meeting",
-        json={"starts_at": "2026-12-20T17:00", "how": "google_meet"},
-    )
-    assert failed.status_code == 409, failed.text
-    error = failed.json()["error"]
-    assert error["code"] == "CALENDAR_RECONNECT" and "reconnect" in error["message"]
-    assert calendar.status == "expired"  # Tools shows Reconnect; pi stops promising links
     past = await api.post(
         f"{DESK}/{request_id}/meeting",
         json={"starts_at": "2026-01-01T10:00", "how": "link", "link": "https://zoom.us/j/1"},
     )
     assert past.status_code == 422 and past.json()["error"]["code"] == "MEETING_IN_PAST"
+    done = await api.post(
+        f"{DESK}/{request_id}/meeting",
+        json={"starts_at": "2026-12-20T17:00", "how": "google_meet"},
+    )
+    # Google's sign-in expired: still arranged, with pi's own video link.
+    assert done.status_code == 200, done.text
+    assert "https://meet.jit.si/pi-meeting-" in done.json()["answer"]
+    assert calendar.status == "expired"  # Tools shows Reconnect
     await pi.close()

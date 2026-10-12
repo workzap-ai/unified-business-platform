@@ -14,7 +14,7 @@ import {
 import { useScopedMutation } from "@/hooks/use-scoped";
 import { piRequestsService, type PiRequest } from "../requests-service";
 
-type How = "google_meet" | "link" | "in_person";
+type How = "google_meet" | "video" | "link" | "in_person";
 
 function tomorrow(): string {
   const d = new Date(Date.now() + 86_400_000);
@@ -34,7 +34,7 @@ export function MeetingDialog({
   const [date, setDate] = useState(tomorrow());
   const [time, setTime] = useState("17:00");
   const [duration, setDuration] = useState("30");
-  const [how, setHow] = useState<How>(googleMeet ? "google_meet" : "link");
+  const [how, setHow] = useState<How>(googleMeet ? "google_meet" : "video");
   const [link, setLink] = useState("");
   const [place, setPlace] = useState("");
   const [note, setNote] = useState("");
@@ -58,6 +58,7 @@ export function MeetingDialog({
   const ready =
     Boolean(date && time) &&
     (how === "google_meet" ||
+      how === "video" ||
       (how === "link" && /^https?:\/\//.test(link.trim())) ||
       (how === "in_person" && place.trim().length > 1));
   return (
@@ -120,6 +121,9 @@ export function MeetingDialog({
               <option value="google_meet" disabled={!googleMeet}>
                 Google Meet (link made for you)
                 {googleMeet ? "" : " · connect Google Calendar first"}
+              </option>
+              <option value="video">
+                Video call (link made for you, no sign-up)
               </option>
               <option value="link">My own link (Zoom, Teams…)</option>
               <option value="in_person">In person</option>

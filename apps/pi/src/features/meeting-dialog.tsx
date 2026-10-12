@@ -20,7 +20,7 @@ import {
 import { post } from "@/lib/api";
 import { useAction } from "@/lib/session";
 
-type How = "google_meet" | "link" | "in_person";
+type How = "google_meet" | "video" | "link" | "in_person";
 
 function tomorrow(): string {
   return new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
@@ -41,7 +41,7 @@ export function MeetingDialog({
   const [time, setTime] = React.useState("17:00");
   const [duration, setDuration] = React.useState("30");
   const [how, setHow] = React.useState<How>(
-    googleMeet ? "google_meet" : "link",
+    googleMeet ? "google_meet" : "video",
   );
   const [link, setLink] = React.useState("");
   const [place, setPlace] = React.useState("");
@@ -66,6 +66,7 @@ export function MeetingDialog({
   const ready =
     Boolean(date && time) &&
     (how === "google_meet" ||
+      how === "video" ||
       (how === "link" && /^https?:\/\//.test(link.trim())) ||
       (how === "in_person" && place.trim().length > 1));
   return (
@@ -132,6 +133,9 @@ export function MeetingDialog({
               <option value="google_meet" disabled={!googleMeet}>
                 Google Meet (link made for you)
                 {googleMeet ? "" : " · connect Google Calendar first"}
+              </option>
+              <option value="video">
+                Video call (link made for you, no sign-up)
               </option>
               <option value="link">My own link (Zoom, Teams…)</option>
               <option value="in_person">In person</option>

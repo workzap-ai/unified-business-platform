@@ -54,7 +54,7 @@ const listSchema = z.object({
 export type MeetingInput = {
   starts_at: string;
   duration_minutes: number;
-  how: "google_meet" | "link" | "in_person";
+  how: "google_meet" | "video" | "link" | "in_person";
   link: string;
   place: string;
   note: string;
