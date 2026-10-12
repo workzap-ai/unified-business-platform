@@ -638,7 +638,27 @@ async def _smtp(settings: Settings, http: httpx.AsyncClient) -> dict[str, Any]:
     import smtplib
     import ssl
 
+    from app.integrations.email import platform_resend_key
     from app.integrations.providers.smtp import check_smtp_host
+
+    if (key := platform_resend_key(settings)) is not None:
+        # Resend is used through its HTTPS API (SMTP ports are often blocked).
+        try:
+            response = await http.get(
+                "https://api.resend.com/domains",
+                headers={"authorization": f"Bearer {key}"},
+                timeout=10,
+            )
+        except httpx.HTTPError:
+            return {"ok": False, "message": "Couldn't reach Resend"}
+        body = response.json() if response.content else {}
+        if response.status_code == 200 or (
+            response.status_code == 401
+            and isinstance(body, dict)
+            and body.get("name") == "restricted_api_key"
+        ):
+            return {"ok": True, "message": "Resend key works (sending through its API)"}
+        return {"ok": False, "message": "Resend refused the API key"}
 
     host = (settings.platform_smtp_host or "").strip().lower()
     port, security = settings.platform_smtp_port, settings.platform_smtp_security

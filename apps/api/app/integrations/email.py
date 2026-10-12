@@ -12,7 +12,8 @@ settings (PLATFORM_SMTP_*). Without either, sending fails with EMAIL_NOT_CONFIGU
 import html
 import re
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from email.utils import parseaddr
 from string import Template
 from typing import Any
 
@@ -22,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import Settings
 from app.integrations.catalog import REGISTRY
 from app.integrations.http import CallContext, OutboundClient
+from app.integrations.providers.resend import ResendProvider
 from app.integrations.providers.smtp import SmtpProvider
 from app.integrations.registry import (
     EmailAttachment,
@@ -255,6 +257,41 @@ def platform_smtp_context(
     )
 
 
+def platform_resend_key(settings: Settings) -> str | None:
+    """Resend's own key in the platform SMTP settings (server smtp.resend.com,
+    password re_...). Then mail goes through Resend's HTTPS API: hosts like Railway
+    block outbound SMTP ports, HTTPS always works."""
+    host = (settings.platform_smtp_host or "").strip().lower()
+    secret = settings.platform_smtp_password
+    key = secret.get_secret_value() if secret else ""
+    return key if "resend" in host and key.startswith("re_") else None
+
+
+async def send_platform_email(
+    settings: Settings,
+    http: OutboundClient,
+    message: EmailMessage,
+    request_id: str | None = None,
+) -> SendResult:
+    """The platform's own email: Resend's API when its key is set, SMTP otherwise."""
+    key = platform_resend_key(settings)
+    if key is None:
+        return await SmtpProvider().send_email(
+            platform_smtp_context(settings, http, request_id), message
+        )
+    _, address = parseaddr(settings.platform_smtp_from or "")
+    if not address:
+        raise BusinessRuleViolation("EMAIL_NOT_CONFIGURED", "Email sending is not configured", 503)
+    ctx = ProviderContext(
+        settings=settings,
+        http=http,
+        config={"from_address": address},
+        credentials={"api_key": key},
+        call=CallContext(request_id=request_id),
+    )
+    return await ResendProvider().send_email(ctx, replace(message, from_address=address))
+
+
 async def send_platform_template(
     settings: Settings,
     http: OutboundClient,
@@ -271,8 +308,7 @@ async def send_platform_template(
     message = EmailMessage(
         to=list(to), subject=rendered.subject, text=rendered.text, html=rendered.html
     )
-    ctx = platform_smtp_context(settings, http, request_id)
-    return await SmtpProvider().send_email(ctx, message)
+    return await send_platform_email(settings, http, message, request_id)
 
 
 class EmailService:
@@ -324,7 +360,7 @@ class EmailService:
                     call=CallContext(request_id=self.scope.request_id),
                 )
                 return result
-        return await SmtpProvider().send_email(self._platform_context(), message)
+        return await send_platform_email(self.settings, self.http, message, self.scope.request_id)
 
     async def send_template(
         self,
