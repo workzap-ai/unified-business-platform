@@ -70,12 +70,10 @@ async def test_a_request_for_work_always_stays_on_the_map(app, provider, busines
         headline="Waiting on the team",
         issues=[
             # The model wrongly marks the customer's own request as a service matter.
-            Issue(
-                title="ERP System Requirements",
-                category="inquiry",
-                about_service=True,
-                solution_outline="ERP for sales tracking and daily reports",
-            ),
+            # Early: no solution outline yet, and the model wrongly marks it.
+            Issue(title="ERP System Requirements", category="inquiry", about_service=True),
+            # Filed as an inquiry, but it's about paying: stays off.
+            Issue(title="Payment Method Inquiry", category="inquiry", about_service=True),
             Issue(title="Invoice download issue", category="support", about_service=True),
             # A question about a meeting is not a problem of theirs.
             Issue(title="Meeting link request", category="booking", about_service=True),

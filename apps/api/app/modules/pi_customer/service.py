@@ -575,6 +575,17 @@ def _transcript(rows: list[PiMessage]) -> list[dict[str, str]]:
 REPORT_VERSION = 3
 
 
+# Dealing with the business, not a problem of the customer's: these stay off the map
+# even when the model files them as an inquiry.
+SERVICE_MATTER = re.compile(
+    r"\b(?:meetings?|meet link|zoom|invoices?|receipts?|payment methods?|payment links?|"
+    r"how to pay|bank details|bank transfer|"
+    r"card payment|credit card|stripe|status|update on|progress|meeting link|the link|"
+    r"download|login|password|dashboard|privacy|trust)\b",
+    re.IGNORECASE,
+)
+
+
 def report_current(conversation: PiConversation, language: str = "auto") -> bool:
     cached = (conversation.service_brief or {}).get("customer_issues")
     return (
@@ -648,7 +659,9 @@ async def analyse(
     # the customer's business problems: they stay off the map and charts, listed apart.
     for item in found:
         # A request for work is the customer's own matter, whatever the model said.
-        if item.get("category") in ("inquiry", "order") and item.get("solution_outline"):
+        if item.get("category") in ("inquiry", "order") and not SERVICE_MATTER.search(
+            f"{item.get('title', '')} {item.get('summary', '')}"
+        ):
             item["about_service"] = False
     keep = [n for n, i in enumerate(found) if not i.get("about_service")]
     position = {old: new for new, old in enumerate(keep)}

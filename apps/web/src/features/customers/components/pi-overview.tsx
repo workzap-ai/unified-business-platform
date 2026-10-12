@@ -300,6 +300,7 @@ function ProblemMap({
   links: Overview["links"];
 }) {
   const [active, setActive] = useState<number | null>(null);
+  const [asList, setAsList] = useState(false);
   const [activeLink, setActiveLink] = useState<number | null>(null);
   // Open problems first (pi's pick and its linked ones together), done ones last.
   const shown = order(issues).slice(0, 8);
@@ -383,7 +384,10 @@ function ProblemMap({
     <figure className="w-full">
       <Insight issues={shown} links={visible} />
       <style>{MAP_MOTION}</style>
-      <div className="mb-3 flex flex-wrap gap-2" aria-label="At a glance">
+      <div
+        className="mb-3 flex flex-wrap items-center gap-2"
+        aria-label="At a glance"
+      >
         {summary.map(({ label, count, sample }) => (
           <span
             key={label}
@@ -398,9 +402,17 @@ function ProblemMap({
             Start with: {shown[startHere].title}
           </span>
         )}
+        <button
+          type="button"
+          onClick={() => setAsList((v) => !v)}
+          className="ml-auto hidden rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground sm:inline-flex"
+          aria-pressed={asList}
+        >
+          {asList ? "View as map" : "View as list"}
+        </button>
       </div>
       {/* Phone: a simple list, each request with its status and connections. */}
-      <ul className="space-y-2 sm:hidden">
+      <ul className={cn("space-y-2", !asList && "sm:hidden")}>
         {shown.map((issue, i) => {
           const t = tone(issue);
           const linked = visible.filter((l) => l.a === i || l.b === i).length;
@@ -411,6 +423,17 @@ function ProblemMap({
               style={{ animationDelay: `${i * 60}ms` }}
             >
               <p className="text-sm font-medium">{issue.title}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground">Problem: </span>
+                {issue.root_cause ||
+                  issue.summary ||
+                  issue.original_words ||
+                  "—"}
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground">Next: </span>
+                {nextLine(issue)}
+              </p>
               <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                 <StatusDot issue={issue} /> {t.label}
                 {linked ? ` · linked to ${linked}` : ""}
@@ -420,7 +443,10 @@ function ProblemMap({
         })}
       </ul>
       <div
-        className="relative mx-auto hidden w-full max-w-3xl sm:block"
+        className={cn(
+          "relative mx-auto hidden w-full max-w-3xl",
+          !asList && "sm:block",
+        )}
         style={{ aspectRatio: `${W} / ${H}` }}
         onMouseLeave={() => {
           setActive(null);
