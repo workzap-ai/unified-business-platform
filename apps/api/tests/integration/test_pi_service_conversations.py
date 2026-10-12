@@ -89,7 +89,9 @@ async def test_service_discovers_without_prices_and_saves_team_brief(api, busine
     )
     await pi.process("Website ki price kya hai?", "svc-one")
     await pi.deliver_all()
-    await pi.process("Necesito una tienda online, mi presupuesto es 5000 USD", "svc-two")
+    await pi.process(
+        "Necesito una tienda online, mi presupuesto es 5000 USD. Sí, envíalo.", "svc-two"
+    )
     await pi.deliver_all()
     conversation = await pi.conversation()
     assert conversation.language == "es" and "5000 USD" in conversation.summary
@@ -666,8 +668,9 @@ async def test_a_repeated_customer_date_is_dropped_instead_of_stopping_pi(
     conversation = await pi.conversation()
     assert conversation.mode == "ai"  # no handoff
     [reply] = await pi.outbound()
-    # The repeated date is dropped; pi then asks once whether it may follow up here.
-    assert reply.body.startswith("Note kar liya. Team yahin update degi.\n\nKya main aap ko")
+    # The repeated date is dropped. The customer only asked a question, so the brief
+    # isn't sent to the team (nor the follow-up question that comes with it).
+    assert reply.body == "Note kar liya. Team yahin update degi."
     await pi.close()
 
 

@@ -149,3 +149,73 @@ def test_what_would_you_like_to_discuss_is_open_ended():
     from app.modules.pi.service_conversation import OPEN_ENDED
 
     assert OPEN_ENDED.search("Sure, let's continue. Do you want to discuss any specific project?")
+
+
+# From a real chat (2026-10-12): "Sorry tomorrow" answered pi's meeting question, and
+# pi sent an unagreed brief to the team in Roman Urdu instead.
+MEETING_CHAT = {
+    "brief": {},
+    "latest_customer_message": "Sorry tomorrow",
+    "latest_message_kind": "text",
+    "history": [
+        {"role": "customer", "text": "Yesterday 10am"},
+        {"role": "ai", "text": "Please let me know which day and time works best for you."},
+    ],
+}
+
+
+def test_a_brief_goes_to_the_team_only_when_the_customer_agrees():
+    from app.modules.pi.service_conversation import ServiceTurn, unconfirmed_brief
+
+    turn = ServiceTurn(reply="Sent to the team.", ready_for_team=True)
+    assert unconfirmed_brief(turn, MEETING_CHAT)
+    for yes in ("yes send it", "haan theek hai", "ok", "that's all", "ye hi bnao"):
+        assert unconfirmed_brief(turn, {**MEETING_CHAT, "latest_customer_message": yes}) is None
+    already = {**MEETING_CHAT, "brief": {"ready_for_team": True}}
+    assert unconfirmed_brief(turn, already) is None
+
+
+def test_an_answer_to_the_meeting_question_is_never_ignored():
+    from app.modules.pi.service_conversation import ServiceTurn, meeting_answer_missed
+
+    assert meeting_answer_missed(ServiceTurn(reply="Brief noted."), MEETING_CHAT)
+    booked = ServiceTurn(reply="Booked.", meeting_time="2026-10-13T10:00")
+    assert meeting_answer_missed(booked, MEETING_CHAT) is None
+    other = {**MEETING_CHAT, "latest_customer_message": "I also want a logo"}
+    assert meeting_answer_missed(ServiceTurn(reply="Noted."), other) is None
+
+
+def test_a_short_question_about_the_company_gets_a_full_answer():
+    from app.modules.pi.service_conversation import too_long
+
+    services = (
+        "Artwing Studios is a creative agency.\n• Branding\n• Video\n• SEO\nWhat do you need?"
+    )
+    ask = {"latest_customer_message": "Tell me your services", "latest_message_kind": "text"}
+    assert too_long(services, ask) is None
+    thanks = {"latest_customer_message": "ok thanks", "latest_message_kind": "text"}
+    assert too_long(services, thanks)
+
+
+def test_replies_are_polished_and_a_filler_only_reply_is_caught():
+    from app.modules.pi.service_conversation import polished, says_nothing
+
+    assert (
+        polished(
+            "Hi Muhammad! Your Google Meet link is: https://meet.jit.si/pi-meeting-1. **Done**"
+        )
+        == "Hi Muhammad. Your video call link is: https://meet.jit.si/pi-meeting-1. *Done*"
+    )
+    assert polished("Link: https://meet.google.com/abc!x") == "Link: https://meet.google.com/abc!x"
+    assert says_nothing("If you need any further assistance, feel free to ask.")
+    assert says_nothing("The team replies here.") is None
+
+
+def test_the_knowledge_search_understands_what_is_asked():
+    from app.modules.pi.knowledge import search_terms
+    from app.modules.pi.service_conversation import brief_words
+
+    assert search_terms("aap kya kaam karte ho").startswith("services:* | offer:*")
+    assert "price:*" in search_terms("iski qeemat kitni hai")
+    words = brief_words({"projects": [{"title": "Logo", "status": "collecting"}], "mood": "calm"})
+    assert words == "Logo"  # never the JSON field names ("status", "mood", ...)

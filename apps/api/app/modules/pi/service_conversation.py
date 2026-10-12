@@ -504,6 +504,12 @@ use the language of the customer's own words in history.
 Read an attachment in the light of the conversation so far: during design work, a
 document or photo usually shows where or how the design is used, not a new request.
 Answer the customer's own question first, from approved_knowledge, before anything else.
+Asked what the company does or offers ("tell me your services", "aap kya karte ho"):
+one short line on what the company is, then its main services from approved_knowledge
+(and offerings) as three to six "• " points of a few words each, then one short question
+about what they need. Use the company's own words; never answer with a single vague line.
+The example replies in these rules are in Roman Urdu or English only as examples: always
+write every line in reply_language, including "the brief is with the team" lines.
 If approved_knowledge doesn't answer it, never guess: say the team will confirm it here,
 and add the question (short, in English) to knowledge_gaps so the company can teach you.
 mood (internal): "confused" when they don't follow you (explain more simply, with an
@@ -768,6 +774,18 @@ def digit_fragments(reply: str, allowed: list[str] | None = None, limit: int = 3
     return found
 
 
+def brief_words(brief: dict[str, Any] | None) -> str:
+    """What the brief is about, in words (project titles, services, details): never its
+    JSON, whose field names ("status", "missing", "mood") would crowd out the search."""
+    words: list[str] = []
+    for project in (brief or {}).get("projects") or []:
+        if isinstance(project, dict):
+            words += [str(project.get(k) or "") for k in ("title", "service", "details")]
+    for key in ("service", "scope"):
+        words.append(str((brief or {}).get(key) or ""))
+    return " ".join(w for w in words if w)[:300]
+
+
 def validate_service_reply(
     reply: str, max_chars: int = 4000, mode: str = "quote", allowed: list[str] | None = None
 ) -> str:
@@ -845,11 +863,13 @@ async def prepare_context(
         # Match on the conversation, not only the latest line: a short follow-up ("aur
         # price?") still finds what the earlier messages were about.
         recent = [m.body[:400] for m in rows if m.sender_type == "customer"][:2]
-        brief = json.dumps(conversation.service_brief or {}, ensure_ascii=False)[:300]
-        query = " ".join([message.body[:600], *recent, brief])
-        knowledge = await KnowledgeService(session, scope).search(
-            query, int(policy.knowledge_config.get("top_k", 5))
-        )
+        query = " ".join([message.body[:600], *recent, brief_words(conversation.service_brief)])
+        library = KnowledgeService(session, scope)
+        knowledge = await library.search(query, int(policy.knowledge_config.get("top_k", 5)))
+        if len(knowledge) < 2:
+            # Nothing matched well: pi still knows what the company is and does.
+            seen = {k["snippet"] for k in knowledge}
+            knowledge += [k for k in await library.overview(2) if k["snippet"] not in seen]
     # First names of the company's people, so a message addressed to one is recognised.
     team = sorted(
         {
@@ -1134,9 +1154,9 @@ AI_DISCLOSED = re.compile(r"\b(?:AI|A\.I\.|artificial intelligence|bot)\b", re.I
 
 CONSENT_QUESTION = {
     "en": "Can I message you here when there's an update, or if we need anything from you?",
-    "roman_ur": "Kya main aap ko yahan message kar sakta hoon jab koi update ho, ya hamein "
+    "roman_ur": "Kya hum aap ko yahan message kar sakte hain jab koi update ho, ya hamein "
     "aap se kuch chahiye ho?",
-    "ur": "کیا میں آپ کو یہاں پیغام بھیج سکتا ہوں جب کوئی اپڈیٹ ہو، یا ہمیں آپ سے کچھ چاہیے ہو؟",
+    "ur": "کیا ہم آپ کو یہاں پیغام بھیج سکتے ہیں جب کوئی اپڈیٹ ہو، یا ہمیں آپ سے کچھ چاہیے ہو؟",
     "ar": "هل يمكنني مراسلتك هنا عند وجود تحديث، أو إذا احتجنا منك شيئًا؟",
 }
 
@@ -1156,8 +1176,8 @@ def with_consent_question(turn: ServiceTurn, context: dict[str, Any]) -> str:
         or "?" in turn.reply
     ):
         return turn.reply
-    # In the language of the reply it's added to.
-    language = detect_language(turn.reply) or turn.language
+    # In the customer's language (a half-Roman-Urdu draft must not decide it).
+    language = turn.language or detect_language(turn.reply)
     question = CONSENT_QUESTION.get(language, CONSENT_QUESTION["en"])
     return f"{turn.reply.rstrip()}\n\n{question}"
 
@@ -1267,6 +1287,39 @@ def without_filler(reply: str) -> str:
     return trimmed if len(trimmed) >= 6 else reply
 
 
+def says_nothing(reply: str) -> str | None:
+    """A reply that is only a closing line ("If you need any further assistance, feel
+    free to ask.") answers nothing."""
+    if reply.strip() and not FILLER_TAIL.sub("", reply).strip():
+        return (
+            "it only says something like 'feel free to ask' and answers nothing; answer the "
+            "customer's latest message (or say plainly what happens next)"
+        )
+    return None
+
+
+# A video-call link pi made itself is never a Google Meet link.
+OWN_VIDEO_LINK = re.compile(r"https://meet\.jit\.si/\S+")
+GOOGLE_MEET_WORDS = re.compile(r"\bGoogle Meet(?: meeting)?(?= link| meeting|\b)", re.IGNORECASE)
+URL_PART = re.compile(r"https?://\S+")
+
+
+def polished(reply: str) -> str:
+    """WhatsApp-ready wording that never depends on the model getting it right: no
+    exclamation marks (pi's tone is steady), no Markdown double asterisks, and a
+    meet.jit.si link called a video call, never Google Meet."""
+    if OWN_VIDEO_LINK.search(reply) and "meet.google.com" not in reply:
+        reply = GOOGLE_MEET_WORDS.sub("video call", reply)
+    reply = reply.replace("**", "*")
+    links = URL_PART.findall(reply)
+    text = URL_PART.sub("\x00", reply)
+    text = re.sub(r"!+(?=\s|$)", ".", text)
+    text = re.sub(r"\.{2,}(?=\s|$)", ".", text)
+    for link in links:
+        text = text.replace("\x00", link, 1)
+    return text
+
+
 FILLER_HINT = re.compile(
     r"feel free to|don'?t hesitate|let me know if|if you (?:have|need) any|"
     r"zaroor batay|madad chahiye ho|bila jhijhak",
@@ -1275,6 +1328,108 @@ FILLER_HINT = re.compile(
 
 
 SIMPLE_ASK = 8  # words: "ok", "thanks", "send link?", "kab milega?"
+# A short message that asks about the company or the work deserves a real answer.
+INFO_QUESTION = re.compile(
+    r"\b(?:services?|what (?:do|can) you|tell me|show me|how (?:does|do|can|long)|which|"
+    r"process|portfolio|packages?|features?|kya (?:kya|karte|kaam)|kaise|kaun|kitne din|"
+    r"about (?:you|your company))\b",
+    re.IGNORECASE,
+)
+
+# The customer agreeing to the brief pi showed them (or saying there's nothing more).
+AGREES = re.compile(
+    r"\b(?:yes|yeah|yep|yup|sure|haan|han|ji|jee|g|ok|okay|alright|theek|thik|"
+    r"correct|right|perfect|confirm(?:ed)?|go ahead|proceed|send(?: it)?|bhej(?: do| dein| den)?|"
+    r"kar do|karo|done|like this|aisa hi|aise hi|ye ?hi|yehi|make it|bana do|banao|"
+    r"s[ií]|oui|ja)\b|نعم|ہاں|جی|ٹھیک",
+    re.IGNORECASE,
+)
+
+
+async def in_one_language(
+    manager: Any,
+    scope: WorkspaceScope,
+    policy: Any,
+    conversation: PiConversation,
+    reply: str,
+    expected: str,
+) -> str:
+    """The same reply written entirely in the customer's language (a draft that mixed
+    an English chat with a Roman Urdu line, or the other way round). Unchanged when the
+    model can't do it."""
+    try:
+        response = await manager.complete(
+            scope,
+            alias=policy.ai_config.get("reply_alias", "balanced"),
+            purpose="pi_service_language",
+            messages=[
+                Message.system(
+                    f"Rewrite this WhatsApp reply entirely in {NAMES[expected]}. Keep its "
+                    "meaning, line breaks, '• ' points, links and names exactly; add nothing. "
+                    "Reply with the rewritten text only."
+                ),
+                Message.user(reply),
+            ],
+            max_tokens=1200,
+            conversation_id=conversation.id,
+        )
+    except Exception:  # noqa: BLE001 - the checks below still guard the reply
+        return reply
+    fixed = str(response.text or "").strip()
+    return fixed if fixed and not mixed_line(fixed, expected) else reply
+
+
+def unconfirmed_brief(turn: "ServiceTurn", context: dict[str, Any]) -> str | None:
+    """A brief sent to the team although the customer never agreed to it: their latest
+    message is about something else ("Sorry tomorrow", "tell me your services")."""
+    brief = context.get("brief") or {}
+    if not turn.ready_for_team or brief.get("ready_for_team"):
+        return None
+    if context.get("check_in_now") or context.get("team_answer_now"):
+        return None
+    latest = str(context.get("latest_customer_message", ""))
+    if context.get("latest_message_kind") not in (None, "text", "audio"):
+        return None  # A document or picture brief: pi lists it and asks first anyway.
+    if AGREES.search(latest) or CLOSING.search(latest):
+        return None
+    return (
+        "the customer did not agree to the brief in their latest message, so it must not "
+        "go to the team yet: answer what they actually wrote, keep ready_for_team=false, "
+        "and never say the brief was sent"
+    )
+
+
+# pi asked which day and time suits them for a meeting...
+ASKED_WHEN = re.compile(
+    r"\b(?:what|which) (?:day|date|time)|day and time|kis din|kab (?:mil|free|available)|"
+    r"kaunsa din|time (?:suit|work)s?\b",
+    re.IGNORECASE,
+)
+# ...and their answer names a day or a time.
+SAYS_WHEN = re.compile(
+    r"\b(?:today|tomorrow|tmrw|tonight|aaj|kal|parso|parson|monday|tuesday|wednesday|"
+    r"thursday|friday|saturday|sunday|morning|afternoon|evening|subah|dopahar|shaam|"
+    r"next week|\d{1,2}(?::\d{2})? ?(?:am|pm)|\d{1,2} ?baje)\b",
+    re.IGNORECASE,
+)
+
+
+def meeting_answer_missed(turn: "ServiceTurn", context: dict[str, Any]) -> str | None:
+    """The customer answered pi's "which day and time?" and the draft ignored it."""
+    asked = [h for h in context.get("history") or [] if h.get("role") == "ai"]
+    latest = str(context.get("latest_customer_message", ""))
+    if not asked or not ASKED_WHEN.search(str(asked[-1].get("text", ""))):
+        return None
+    if not SAYS_WHEN.search(latest) or turn.meeting_time or turn.action == "booking":
+        return None
+    return (
+        f'the customer is answering your meeting question ("{latest[:80]}"): handle the '
+        "meeting now. Set meeting_requested=true; when you have a day and a time (use the "
+        "time they gave earlier if they only changed the day), set meeting_time from "
+        "now_local; if a time is missing, ask only for it. A day that has already passed "
+        "can't be booked: say so and ask for another. Don't confirm or send the brief in "
+        "this reply"
+    )
 
 
 def too_long(reply: str, context: dict[str, Any]) -> str | None:
@@ -1290,6 +1445,8 @@ def too_long(reply: str, context: dict[str, Any]) -> str | None:
         return None
     if re.search(r"\b(?:ideas?|list|options?|summary|brief|details?|explain)\b", latest, re.I):
         return None  # A short request can explicitly ask for a detailed answer.
+    if INFO_QUESTION.search(latest):
+        return None  # "Tell me your services", "how does it work?": answer it properly.
     bullets = sum(1 for line in reply.splitlines() if line.strip().startswith("•"))
     if len(reply) > 320 or (
         bullets >= 2 and not re.search(r"\b(?:idea|list|options?|summary|brief)\b", latest, re.I)
@@ -1543,6 +1700,8 @@ async def compose_service_turn(
         problem = f"{later}, and also: {problem}" if problem else later
     if made_up := invented(turn.reply, context, turn.action == "booking"):
         problem = f"{made_up}, and also: {problem}" if problem else made_up
+    if empty := says_nothing(turn.reply):
+        problem = f"{empty}, and also: {problem}" if problem else empty
     turn.reply = without_filler(turn.reply)
     if long := too_long(turn.reply, context):
         problem = f"{long}, and also: {problem}" if problem else long
@@ -1550,6 +1709,10 @@ async def compose_service_turn(
         problem = f"{gap}, and also: {problem}" if problem else gap
     if odd := contradicts_itself(turn.reply, context):
         problem = f"{odd}, and also: {problem}" if problem else odd
+    if early := unconfirmed_brief(turn, context):
+        problem = f"{early}, and also: {problem}" if problem else early
+    if missed := meeting_answer_missed(turn, context):
+        problem = f"{missed}, and also: {problem}" if problem else missed
     expected = context.get("reply_language")
     wrong = clearly_other(turn.reply, str(expected or "")) or mixed_line(
         turn.reply, str(expected or "")
@@ -1600,6 +1763,14 @@ async def compose_service_turn(
         if invented(turn.reply, context, turn.action == "booking"):
             # Still made up after the rewrite: never sent (pi asks the team instead).
             raise ReplyRejected("INVENTED_DETAIL")
+        if unconfirmed_brief(turn, context):
+            # Still sending an unagreed brief: hold it and only ask (never claim sent).
+            turn.ready_for_team = False
+            turn.awaiting_customer = True
+    if expected in NAMES and mixed_line(turn.reply, str(expected)):
+        turn.reply = await in_one_language(
+            manager, scope, policy, conversation, turn.reply, str(expected)
+        )
     latest_language = detect_language(str(context.get("latest_customer_message", "")))
     if latest_language == expected and (
         clearly_other(turn.reply, str(expected or ""))
@@ -1632,7 +1803,7 @@ async def compose_service_turn(
     if not turn.summary.strip() or turn.summary.startswith("Conversation in progress"):
         turn.summary = team_summary(turn)
     # WhatsApp shows a list only when each point starts its own line.
-    turn.reply = re.sub(r"[ \t]+•[ \t]*", "\n• ", turn.reply).strip()
+    turn.reply = polished(re.sub(r"[ \t]+•[ \t]*", "\n• ", turn.reply).strip())
     allowed = allowed_text(context)
     turn.reply = validate_service_reply(
         without_blocked_lines(turn.reply, mode, allowed),

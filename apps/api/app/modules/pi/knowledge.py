@@ -25,11 +25,55 @@ STOP_WORDS = frozenset(
 )
 
 
+# What a customer asks in everyday or Roman Urdu words, in the words a business's
+# English knowledge base uses ("aap kya kaam karte ho" finds the Services page).
+ASKS_ABOUT = (
+    (
+        re.compile(
+            r"\b(?:kaam|kam|karte|services?|offer|provide|what do you do|kya karte)\b", re.I
+        ),
+        "services offer",
+    ),
+    (
+        re.compile(r"\b(?:qeemat|keemat|kitne ka|kitna|kitni|rate|price|cost|charges?)\b", re.I),
+        "price pricing package",
+    ),
+    (
+        re.compile(r"\b(?:kitne din|kab tak|kitna time|how long|timeline|turnaround)\b", re.I),
+        "timeline delivery days process",
+    ),
+    (
+        re.compile(r"\b(?:kahan|kidhar|address|location|office|where are you)\b", re.I),
+        "address location office",
+    ),
+    (
+        re.compile(r"\b(?:number|contact|rabta|email|phone)\b", re.I),
+        "contact phone email",
+    ),
+    (
+        re.compile(r"\b(?:kaise|tareeqa|process|steps|how does it work)\b", re.I),
+        "process steps",
+    ),
+    (
+        re.compile(
+            r"\b(?:portfolio|samples?|examples?|pehle ka kaam|kaam dikhao|clients?)\b", re.I
+        ),
+        "portfolio projects clients",
+    ),
+)
+
+
+def with_meaning(text: str) -> str:
+    """The text with the knowledge-base words for what it asks about added in front."""
+    extra = [words for pattern, words in ASKS_ABOUT if pattern.search(text)]
+    return " ".join([*extra, text])
+
+
 def search_terms(text: str, limit: int = 16) -> str:
     """A to_tsquery expression: up to `limit` distinct words, OR-ed, each as a prefix.
     Only letters and digits survive, so the expression is always valid."""
     seen: list[str] = []
-    for word in re.findall(r"[^\W_]{3,}", text.lower()):
+    for word in re.findall(r"[^\W_]{3,}", with_meaning(text).lower()):
         if word not in STOP_WORDS and word not in seen:
             seen.append(word)
         if len(seen) >= limit:
@@ -107,6 +151,9 @@ def sniff_text(raw: bytes, max_bytes: int) -> str:
             "UNSUPPORTED_DOCUMENT_TYPE", "Upload plain text or Markdown content", 415
         )
     return text
+
+
+OVERVIEW_TITLE = r"\m(about|overview|services|who we are|what we do|company)\M"
 
 
 class KnowledgeService:
@@ -284,6 +331,31 @@ class KnowledgeService:
             )
             .order_by(func.ts_rank(KnowledgeChunk.search_vector, terms).desc())
             .limit(min(max(limit, 1), 10))
+        )
+        rows = await self.session.execute(statement)
+        return [
+            {"snippet": content, "title": title, "source": source}
+            for content, title, source in rows
+        ]
+
+    async def overview(self, limit: int = 2) -> list[dict[str, str]]:
+        """The business's own "About" / "Services" passages: what pi always knows about
+        the company, even when a message shares no words with the knowledge base."""
+        self.scope.require("pi.read")
+        statement = (
+            select(KnowledgeChunk.content, KnowledgeDocument.title, KnowledgeSource.name)
+            .join(KnowledgeDocument, KnowledgeDocument.id == KnowledgeChunk.document_id)
+            .join(KnowledgeSource, KnowledgeSource.id == KnowledgeChunk.source_id)
+            .where(
+                self.chunks.predicate(),
+                self.documents.predicate(),
+                self.sources.predicate(),
+                KnowledgeDocument.status == "ready",
+                KnowledgeSource.status == "active",
+                KnowledgeDocument.title.op("~*")(OVERVIEW_TITLE),
+            )
+            .order_by(KnowledgeDocument.created_at, KnowledgeChunk.ordinal)
+            .limit(min(max(limit, 1), 4))
         )
         rows = await self.session.execute(statement)
         return [
