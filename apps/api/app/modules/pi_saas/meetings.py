@@ -112,12 +112,23 @@ async def _google_meet(
             connection, create, kind="calendar_meet"
         )
     except IntegrationError as error:
-        logger.warning("pi_meet_failed", exc_info=True)
+        logger.warning(
+            "pi_meet_failed", extra={"code": error.code, "kind": error.kind}, exc_info=True
+        )
+        if error.kind in ("auth", "configuration"):
+            raise BusinessRuleViolation(
+                "CALENDAR_RECONNECT",
+                "Google Calendar needs to be connected again (its sign-in expired). Open "
+                'My pi → Tools → Google Calendar and reconnect, or choose "My own link" '
+                "and paste a Zoom / Meet link.",
+                409,
+            ) from None
+        # 409, not 502: the team must see Google's reason, not "temporarily unavailable".
         raise BusinessRuleViolation(
             "MEET_FAILED",
-            f"Google Calendar didn't create the meeting ({error.message}). Try again or "
-            "paste a link.",
-            502,
+            f"Google Calendar didn't create the meeting: {error.message}. Try again, or "
+            'choose "My own link" and paste a Zoom / Meet link.',
+            409,
         ) from None
     link = str(event.get("hangoutLink") or "")
     if not link:
@@ -127,7 +138,10 @@ async def _google_meet(
                 break
     if not link:
         raise BusinessRuleViolation(
-            "MEET_FAILED", "The event was created but Google gave no Meet link.", 502
+            "MEET_FAILED",
+            "The event was created in Google Calendar but Google gave no Meet link. Turn on "
+            "Google Meet for the calendar's account, or paste a link.",
+            409,
         )
     return link, str(event.get("id") or "")
 
@@ -155,6 +169,10 @@ async def arrange(
     settings_row = await WorkspaceRepository(session, PiSettings, scope).find()
     zone = settings_row.timezone if settings_row else "UTC"
     start = _local(data.starts_at, zone)
+    if start < datetime.now(start.tzinfo) - timedelta(minutes=5):
+        raise BusinessRuleViolation(
+            "MEETING_IN_PAST", f"That time has already passed ({zone}). Pick a later time."
+        )
     end = start + timedelta(minutes=data.duration_minutes)
     customer = await WorkspaceRepository(session, Customer, scope).find(
         Customer.id == row.customer_id
@@ -233,7 +251,7 @@ async def auto_arrange(
             session, scope, runtime, row.id, data, max_bytes=max_bytes, any_kind=True
         )
     except BusinessRuleViolation as error:
-        if error.code in {"CALENDAR_NOT_CONNECTED", "MEET_FAILED"}:
+        if error.code in {"CALENDAR_NOT_CONNECTED", "CALENDAR_RECONNECT", "MEET_FAILED"}:
             raise BusinessRuleViolation(
                 "MEETING_NEEDS_LINK",
                 f"pi can't confirm the {start:%I:%M %p} meeting without a link: "
@@ -271,6 +289,18 @@ __all__ = [
 
 AHEAD = timedelta(minutes=5)
 HORIZON = timedelta(days=90)
+
+
+async def mark_reconnect(session: AsyncSession, scope: WorkspaceScope) -> None:
+    """Google's sign-in expired: save that (after the failed attempt was rolled back), so
+    Tools shows Reconnect and pi stops promising Meet links it can't make."""
+    await session.rollback()
+    connection = await connectors.current(session, scope, "google_calendar")
+    if connection is not None and connection.status in connectors.USABLE:
+        connection.status, connection.health = "expired", "failing"
+        connection.last_error = "Google sign-in expired; reconnect Google Calendar"
+        connection.last_error_code = "RECONNECT_REQUIRED"
+        await session.commit()
 
 
 async def calendar_ready(session: AsyncSession, scope: WorkspaceScope) -> bool:
@@ -333,8 +363,12 @@ async def book_for_customer(ctx: dict[str, Any], conversation_id: str) -> str | 
                     max_bytes=ctx["settings"].knowledge_upload_max_bytes,
                     any_kind=True,
                 )
-        except BusinessRuleViolation:
+        except BusinessRuleViolation as error:
             logger.warning("pi_auto_meeting_failed", exc_info=True)
+            if error.code == "CALENDAR_RECONNECT":
+                connection = await connectors.current(session, scope, "google_calendar")
+                if connection is not None and connection.status in connectors.USABLE:
+                    connection.status, connection.health = "expired", "failing"
             await session.commit()  # The request stays open on the desk for the team.
             return str(row.id)
         conversation.service_brief = {

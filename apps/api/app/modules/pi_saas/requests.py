@@ -377,13 +377,20 @@ async def answer_request(
     row = await WorkspaceRepository(session, PiStaffRequest, scope).get(request_id)
     await PiService(session, scope).conversations.get(row.conversation_id)  # visibility
     max_bytes = request.app.state.settings.knowledge_upload_max_bytes
-    arranged = (
-        await auto_arrange(
-            session, scope, runtime_for(request), row, data.answer, max_bytes=max_bytes
+    try:
+        arranged = (
+            await auto_arrange(
+                session, scope, runtime_for(request), row, data.answer, max_bytes=max_bytes
+            )
+            if row.status == "open"
+            else None
         )
-        if row.status == "open"
-        else None
-    )
+    except BusinessRuleViolation as error:
+        if error.code == "CALENDAR_RECONNECT":
+            from app.modules.pi_saas.meetings import mark_reconnect
+
+            await mark_reconnect(session, scope)
+        raise
     row = arranged or await answer(
         session,
         scope,
@@ -403,18 +410,23 @@ async def arrange_meeting(
 ) -> dict[str, Any]:
     """Book the meeting (Google Meet, a link or a place); pi tells the customer."""
     from app.modules.pi.service import PiService
-    from app.modules.pi_saas.meetings import arrange, runtime_for
+    from app.modules.pi_saas.meetings import arrange, mark_reconnect, runtime_for
 
     row = await WorkspaceRepository(session, PiStaffRequest, scope).get(request_id)
     await PiService(session, scope).conversations.get(row.conversation_id)  # visibility
-    row = await arrange(
-        session,
-        scope,
-        runtime_for(request),
-        request_id,
-        data,
-        max_bytes=request.app.state.settings.knowledge_upload_max_bytes,
-    )
+    try:
+        row = await arrange(
+            session,
+            scope,
+            runtime_for(request),
+            request_id,
+            data,
+            max_bytes=request.app.state.settings.knowledge_upload_max_bytes,
+        )
+    except BusinessRuleViolation as error:
+        if error.code == "CALENDAR_RECONNECT":
+            await mark_reconnect(session, scope)
+        raise
     await session.commit()
     await enqueue_reply(request, row.id)
     return (await view(session, scope, [row]))[0]

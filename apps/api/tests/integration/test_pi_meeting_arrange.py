@@ -15,7 +15,7 @@ pytestmark = pytest.mark.integration
 DESK = "/api/v1/pi/requests"
 
 
-async def _meeting_request(pi) -> str:
+async def _meeting_request(pi, calendar: bool = False) -> str:
     _, conversation = await _customer_in_chat(pi)
     scope = WorkspaceScope.system(
         UUID(pi.tenant_id), UUID(pi.environment_id), frozenset({"pi.read"}), "PI"
@@ -24,7 +24,7 @@ async def _meeting_request(pi) -> str:
     await pi.db.commit()
     desk = (await pi.api.get(DESK)).json()
     [request] = [r for r in desk["items"] if r["kind"] == "meeting"]
-    assert desk["google_meet"] is False  # no calendar connected here
+    assert desk["google_meet"] is calendar  # no calendar connected here unless stubbed
     return request["id"]
 
 
@@ -207,4 +207,40 @@ async def test_pi_books_the_google_meet_itself_and_sends_the_link(api, business_
     assert [m.body for m in sent] == [f"Your meeting is confirmed. Join here: {link}"]
     # Booked once: running the job again makes nothing new.
     assert await meetings.book_for_customer(pi.ctx, str(conversation.id)) is None
+    await pi.close()
+
+
+async def test_an_expired_google_sign_in_says_reconnect_not_temporarily_unavailable(
+    api, business_db, monkeypatch
+):
+    from types import SimpleNamespace
+
+    from app.integrations.errors import IntegrationError
+    from app.modules.pi_saas import meetings
+
+    calendar = SimpleNamespace(status="connected", health="healthy")
+
+    async def current(*args, **kwargs):
+        return calendar
+
+    async def expired(*args, **kwargs):
+        raise IntegrationError("RECONNECT_REQUIRED", "The connection expired", kind="auth")
+
+    monkeypatch.setattr(meetings.connectors, "current", current)
+    monkeypatch.setattr(meetings.connectors, "fresh", expired)
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    request_id = await _meeting_request(pi, calendar=True)
+    failed = await api.post(
+        f"{DESK}/{request_id}/meeting",
+        json={"starts_at": "2026-12-20T17:00", "how": "google_meet"},
+    )
+    assert failed.status_code == 409, failed.text
+    error = failed.json()["error"]
+    assert error["code"] == "CALENDAR_RECONNECT" and "reconnect" in error["message"]
+    assert calendar.status == "expired"  # Tools shows Reconnect; pi stops promising links
+    past = await api.post(
+        f"{DESK}/{request_id}/meeting",
+        json={"starts_at": "2026-01-01T10:00", "how": "link", "link": "https://zoom.us/j/1"},
+    )
+    assert past.status_code == 422 and past.json()["error"]["code"] == "MEETING_IN_PAST"
     await pi.close()
