@@ -130,6 +130,13 @@ DEFAULTS: dict[str, Any] = {
         "reminder_enabled": True,
         "reminder_after_days": 7,
         "reminder_templates": {},
+        # Follow-up ladder after the 24-hour window: {"en": {"day3": {name, language}, ...}}.
+        "ladder_templates": {},
+        "follow_up_ladder": True,
+        # pi's picture cards (Problem Map, journey) on WhatsApp.
+        "visual_cards": True,
+        # PDFs, Word, Excel and PowerPoint files pi reads.
+        "media_documents": True,
         # No reminders between these local hours (start == end turns quiet hours off).
         "quiet_start": 21,
         "quiet_end": 9,
@@ -212,8 +219,10 @@ async def update_settings(
         # screen that edits part of a section never wipes the rest.
         saved = getattr(row, section, None)
         value = {**default, **(saved if isinstance(saved, dict) else {}), **value}
+        # A field saved before it had a default (an older or newer screen) never breaks
+        # a save; fields with a default must keep its type.
         for key, item in value.items():
-            if type(item) is not type(default[key]):
+            if key in default and type(item) is not type(default[key]):
                 raise BusinessRuleViolation("INVALID_SETTING", "Invalid setting value")
     if section == "timezone":
         from zoneinfo import ZoneInfo, ZoneInfoNotFoundError

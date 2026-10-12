@@ -57,6 +57,20 @@ async def test_pi_creates_and_saves_its_follow_up_templates(app, provider, busin
     assert config["reminder_templates"]["en"] == {"name": "pi_reminder_en", "language": "en_US"}
     assert config["ladder_templates"]["roman_ur"]["day7"]["name"] == "pi_followup_day7_ru"
 
+    # Saving the settings form afterwards keeps working (the ladder is a known field).
+    view = (await client.get("/api/v1/pi-app/pi/settings")).json()
+    form = {**view["whatsapp_config"], "reminder_after_days": 5}
+    saved = await client.patch("/api/v1/pi-app/pi/settings/whatsapp_config", json={"value": form})
+    assert saved.status_code == 200, saved.text
+    partial = await client.patch(
+        "/api/v1/pi-app/pi/settings/whatsapp_config",
+        json={"value": {"reminder_enabled": True, "reminder_after_days": 7}},
+    )
+    assert partial.status_code == 200, partial.text
+    assert partial.json()["whatsapp_config"]["ladder_templates"]["en"]["day3"]["name"] == (
+        "pi_followup_day3_en"
+    )
+
     count = len(provider.templates)
     again = await client.post(AUTO)
     assert again.status_code == 200
