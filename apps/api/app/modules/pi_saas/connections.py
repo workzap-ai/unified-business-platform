@@ -27,6 +27,7 @@ from app.core.config import Settings
 from app.modules.audit.service import record
 from app.modules.notifications.service import notify
 from app.modules.pi.models import WhatsAppConnection, WhatsAppWebhookEvent
+from app.modules.pi.whatsapp import other_text
 from app.modules.pi_saas.json_util import as_dict, as_list
 from app.modules.pi_saas.kapso import PHONE_NUMBER_ID, Kapso, PhoneNumber
 from app.modules.pi_saas.models import PiBusinessAccount, PiProviderConnection, PiProviderEvent
@@ -763,7 +764,7 @@ async def _message_event(
             if text is not None
             else message.get("text")
             if kind == "text"
-            else message.get("caption", ""),
+            else other_text(str(message.get("type") or ""), message) or message.get("caption", ""),
             "form": form,
             "media_id": message.get("media_id") or None if has_file else None,
             **(

@@ -80,7 +80,9 @@ async def test_configuration_knowledge_analytics_and_policy(api, business_db, mo
     assert response.status_code == 200 and "search_products" not in response.json()["tools"]
     await webhook(api, app, "website pricing")
     await process_pi_event(ctx, *app.state.queue.jobs[-1][1])
-    assert (await api.get("/api/v1/pi/handoffs")).json()[0]["reason"] == "tool_failure"
+    # pi asked the team on the desk and kept the chat.
+    desk = (await api.get("/api/v1/pi/requests")).json()["items"]
+    assert "tool_failure" in desk[0]["context"]
     conversations = (await api.get("/api/v1/pi/conversations")).json()["items"]
     cid = conversations[0]["id"]
     context = await api.get(f"/api/v1/pi/conversations/{cid}/context")
@@ -90,7 +92,7 @@ async def test_configuration_knowledge_analytics_and_policy(api, business_db, mo
     assert messages[0]["media"] is None
     analytics = (await api.get("/api/v1/pi/analytics?range=7")).json()
     assert analytics["totals"]["conversations"] == 1
-    assert analytics["totals"]["handoffs"] == 1
+    assert analytics["totals"]["handoffs"] == 0  # pi kept the chat (desk request)
     assert analytics["cost_estimate"] is None
     event = (await api.get("/api/v1/pi/whatsapp/events")).json()["items"][0]
     assert (await api.post(f"/api/v1/pi/whatsapp/events/{event['id']}/replay")).status_code == 422

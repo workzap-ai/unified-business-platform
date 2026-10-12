@@ -444,20 +444,17 @@ async def test_all_providers_fail_hands_off_with_safe_message(
     scripted_gateway(monkeypatch, lambda text: GatewayUnavailable())
     await pi.process("Can someone explain what happened with my delivery man", "wamid.fail-1")
     conversation = await pi.conversation()
-    assert conversation.mode == "human"
-    handoff = await business_db.scalar(
-        select(PiHandoff).where(PiHandoff.conversation_id == conversation.id)
-    )
-    assert handoff.reason == "provider_failure" and handoff.status == "open"
+    assert conversation.mode == "ai"  # nothing invented: the team is asked, pi keeps it
     replies = await pi.outbound()
-    assert len(replies) == 1 and replies[0].sender_type == "system"
-    assert "team will reply" in replies[0].body
+    assert len(replies) == 1 and "checking this with the team" in replies[0].body
     await pi.deliver_all()
     assert (await pi.outbound())[0].status == "sent"
     run = await business_db.scalar(
         select(PiAgentRun).where(PiAgentRun.conversation_id == conversation.id)
     )
-    assert run.status == "handoff" and run.fallback_used and run.provider is None
+    assert run.status == "completed" and run.fallback_used and run.provider is None
+    assert run.error_code == "provider_failure"
+    assert (await api.get("/api/v1/pi/requests")).json()["items"]
     await pi.close()
 
 
@@ -467,10 +464,8 @@ async def test_unconfigured_providers_also_hand_off(
     pi = await pi_workspace(api, business_db)
     await pi.process("Can someone explain what happened with my delivery man", "wamid.none-1")
     conversation = await pi.conversation()
-    handoff = await business_db.scalar(
-        select(PiHandoff).where(PiHandoff.conversation_id == conversation.id)
-    )
-    assert conversation.mode == "human" and handoff.reason == "provider_failure"
+    assert conversation.mode == "ai"
+    assert "checking this with the team" in (await pi.outbound())[0].body
     await pi.close()
 
 
@@ -527,10 +522,8 @@ async def test_low_confidence_clarifies_once_then_hands_off(
     assert "tell me a little more" in (await pi.outbound())[0].body
     await pi.process("the thing, you know", "wamid.lc-2")
     await business_db.refresh(conversation)
-    handoff = await business_db.scalar(
-        select(PiHandoff).where(PiHandoff.conversation_id == conversation.id)
-    )
-    assert conversation.mode == "human" and handoff.reason == "low_confidence"
+    assert conversation.mode == "ai"  # still unclear: the team is asked on the desk
+    assert (await api.get("/api/v1/pi/requests")).json()["items"]
     await pi.close()
 
 
@@ -561,7 +554,7 @@ async def test_rate_limit_pauses_automation(
     )
     assert message.status == "skipped" and message.error_code == "RATE_LIMIT_CONVERSATION"
     await business_db.refresh(conversation)
-    assert conversation.mode == "human"
+    assert conversation.mode == "ai"  # a burst waits for pi's next reply, no handoff
     runs = await business_db.scalar(
         select(func.count()).select_from(PiAgentRun).where(PiAgentRun.message_id == message.id)
     )
@@ -576,9 +569,10 @@ async def test_voice_note_disabled_hands_off_without_provider_calls(
     calls = scripted_gateway(monkeypatch, lambda text: intent("greeting", 1.0))
     await pi.process("", "wamid.voice-1", kind="audio", media_id="987654321")
     conversation = await pi.conversation()
-    assert conversation.mode == "human" and calls == []
+    assert conversation.mode == "ai" and calls == []
     replies = await pi.outbound()
     assert len(replies) == 1 and replies[0].sender_type == "system"
+    assert "couldn't open that file" in replies[0].body
     await pi.close()
 
 
@@ -614,7 +608,7 @@ async def test_voice_note_rejects_spoofed_media(
     inbound = await business_db.scalar(
         select(PiMessage).where(PiMessage.provider_message_id == "wamid.voice-2")
     )
-    assert conversation.mode == "human" and inbound.body == ""
+    assert conversation.mode == "ai" and inbound.body == ""  # the fake file is refused
     await pi.close()
 
 

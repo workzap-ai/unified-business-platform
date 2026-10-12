@@ -35,7 +35,9 @@ async def test_written_service_price_never_reaches_whatsapp(api, business_db, mo
         await pi.deliver_all()
         assert all(reply not in m.body for m in await pi.outbound())
         assert all(reply not in str(sent) for sent in pi.sent)
-        assert (await pi.conversation()).mode == "human"  # Refused replies go to a person.
+        # A refused reply is never sent; pi keeps the chat and the team is asked.
+        assert (await pi.conversation()).mode == "ai"
+        assert (await api.get("/api/v1/pi/requests")).json()["items"]
     finally:
         await pi.close()
 

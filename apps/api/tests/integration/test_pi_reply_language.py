@@ -76,9 +76,9 @@ async def test_team_notice_is_in_the_customers_language(api, business_db, monkey
     pi = await pi_workspace(api, business_db, business_type="service_business")
     await pi.process("Mujhe website chahiye, kitne din lagenge?", "notice-1")
     await pi.deliver_all()
-    assert (await pi.conversation()).mode == "human"
+    assert (await pi.conversation()).mode == "ai"
     [notice] = await pi.outbound()
-    assert notice.body.startswith("Aap ke message ka shukriya")
+    assert notice.body.startswith("Noted. Main team se confirm")
     await pi.close()
 
 

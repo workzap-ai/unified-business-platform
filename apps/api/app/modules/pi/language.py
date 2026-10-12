@@ -109,6 +109,21 @@ MEDIA_NOTICES = {
     "roman_ur": "Attachment bhejne ka shukriya. Hamari team ise dekh kar yahan jawab degi.",
     "ar": "شكرًا على المرفق. سيراجعه أحد أعضاء فريقنا ويرد عليك هنا.",
 }
+# pi keeps the chat while the team checks something (no handoff).
+TEAM_CHECK_NOTICES = {
+    "en": "Noted. I'm checking this with the team and will confirm here shortly.",
+    "roman_ur": "Noted. Main team se confirm kar ke yahin jaldi batata hoon.",
+    "ar": "تم. سأتحقق من ذلك مع الفريق وأؤكد لك هنا قريبًا.",
+}
+# A file pi couldn't open: ask for another way, keep the chat.
+MEDIA_UNREADABLE_NOTICES = {
+    "en": "Thanks! I couldn't open that file here. Could you describe it in a few words, "
+    "or send it as a PDF or a screenshot? I've also passed it to the team.",
+    "roman_ur": "Shukriya! Main yeh file yahan open nahi kar saka. Kya aap thora sa likh kar "
+    "bata sakte hain, ya PDF/screenshot bhej dein? Maine team ko bhi bhej di hai.",
+    "ar": "شكرًا! لم أتمكن من فتح هذا الملف هنا. هل يمكنك وصفه باختصار أو إرساله كملف PDF "
+    "أو لقطة شاشة؟ لقد أرسلته أيضًا إلى الفريق.",
+}
 MEETING_NOTICES = {
     "en": "Happy to set up a meeting. Which days and times suit you? "
     "Our team will confirm a time here.",

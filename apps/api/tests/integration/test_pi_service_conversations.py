@@ -135,8 +135,9 @@ async def test_service_price_output_is_never_sent(api, business_db, monkeypatch,
     mock_turns(monkeypatch, turn(reply=reply))
     pi = await pi_workspace(api, business_db, business_type="service_business")
     await pi.process("Website price?", "bad-price")
-    assert (await pi.conversation()).mode == "human"
+    assert (await pi.conversation()).mode == "ai"  # never sent; the team is asked
     assert all(reply != m.body for m in await pi.outbound())
+    assert (await api.get("/api/v1/pi/requests")).json()["items"]
     await pi.close()
 
 
@@ -296,8 +297,11 @@ async def test_provider_failure_does_not_invent_a_reply(api, business_db, monkey
     mock_turns(monkeypatch, GatewayUnavailable())
     pi = await pi_workspace(api, business_db, business_type="service_business")
     await pi.process("Website chahiye", "provider-down")
-    assert (await pi.conversation()).mode == "human"
-    assert (await api.get("/api/v1/pi/handoffs")).json()[0]["reason"] == "provider_failure"
+    assert (await pi.conversation()).mode == "ai"  # nothing invented; the team is asked
+    [notice] = await pi.outbound()
+    assert notice.body.startswith("Noted. Main team se confirm")  # in their language
+    desk = (await api.get("/api/v1/pi/requests")).json()["items"]
+    assert "provider_failure" in desk[0]["context"]
     await pi.close()
 
 
@@ -671,6 +675,7 @@ async def test_a_real_price_still_goes_to_the_team(api, business_db, monkeypatch
     pi = await pi_workspace(api, business_db, business_type="service_business")
     await pi.process("Website kitne ki?", "price-1")
     await pi.deliver_all()
-    assert (await pi.conversation()).mode == "human"
+    assert (await pi.conversation()).mode == "ai"  # the team prices it on the desk
     assert all("5000" not in m.body for m in await pi.outbound())
+    assert (await api.get("/api/v1/pi/requests")).json()["items"]
     await pi.close()

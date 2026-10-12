@@ -42,7 +42,7 @@ DEFAULTS: dict[str, Any] = {
             day: {"open": True, "start": "09:00", "end": "17:00"}
             for day in ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
         },
-        "outside_hours": "handoff_only",
+        "outside_hours": "reply_with_notice",
         "notice": "Our team will follow up during business hours.",
     },
     "response_rules": {

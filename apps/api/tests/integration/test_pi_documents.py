@@ -1,5 +1,6 @@
 """A customer sends a PDF on WhatsApp: pi reads it and answers about it, instead of
-handing it to the team. A scanned PDF with no text still goes to a person."""
+handing it to the team. A file pi can't read gets a polite ask and a request for the
+team; a contract, proposal, quotation or RFP goes on the team's review desk."""
 
 import json
 from types import SimpleNamespace
@@ -14,6 +15,7 @@ from test_pi_teach_files import make_docx, make_pdf
 from app.ai.manager import LLMManager
 from app.modules.pi.documents import document_text
 from app.modules.pi.models import PiMessage
+from app.modules.pi_saas.models import PiStaffRequest
 from app.shared.errors import BusinessRuleViolation
 
 pytestmark = pytest.mark.integration
@@ -94,11 +96,55 @@ async def test_a_pdf_proposal_is_read_and_answered(api, business_db, monkeypatch
     await pi.close()
 
 
-async def test_a_scanned_pdf_still_goes_to_a_person(api, business_db):
+async def test_a_pdf_pi_cannot_read_keeps_the_chat(api, business_db):
     pi = await pi_workspace(api, business_db, business_type="service_business")
-    _serve(pi, make_pdf([]))
+    _serve(pi, make_pdf([]))  # no text layer and no page pictures
     await pi.process("", "wamid.doc-2", kind="document", media_id="555666777")
-    assert (await pi.conversation()).mode == "human"
+    conversation = await pi.conversation()
+    assert conversation.mode == "ai"
+    assert any("couldn't open that file" in m.body for m in await pi.outbound())
+    kinds = list(
+        await business_db.scalars(
+            select(PiStaffRequest.kind).where(PiStaffRequest.conversation_id == conversation.id)
+        )
+    )
+    assert kinds == ["review_document"]
+    await pi.close()
+
+
+async def test_a_contract_goes_on_the_review_desk(api, business_db, monkeypatch):
+    async def complete(self, scope, **kwargs):
+        return SimpleNamespace(
+            text="Kind: contract\nService agreement between the customer and the company.\n"
+            "• Twelve month term • Payment terms net thirty",
+            attempts=[],
+        )
+
+    monkeypatch.setattr(LLMManager, "complete", complete)
+    mock_turns(
+        monkeypatch,
+        turn(
+            reply="Thanks, I read the service agreement: a twelve month term. The team is "
+            "reviewing it and will reply here.",
+            language="en",
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    _serve(pi, make_pdf(["Service agreement", "Payment terms: net 30, balance on delivery"]))
+    await pi.process("please sign this", "wamid.doc-3", kind="document", media_id="555666777")
+    conversation = await pi.conversation()
+    assert conversation.mode == "ai"  # "payment" and "balance" in the file don't hand off
+    [request] = list(
+        await business_db.scalars(
+            select(PiStaffRequest).where(PiStaffRequest.conversation_id == conversation.id)
+        )
+    )
+    assert request.kind == "review_document" and request.priority == "high"
+    assert request.file_id is not None and "contract" in request.question
+    inbound = await business_db.scalar(
+        select(PiMessage).where(PiMessage.provider_message_id == "wamid.doc-3")
+    )
+    assert inbound.media["doc_kind"] == "contract"
     await pi.close()
 
 

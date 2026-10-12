@@ -347,9 +347,11 @@ Meetings: when the customer asks for a meeting, call, visit or appointment, set
    meeting_requested=true. If bookable_services has slots, offer up to three slot labels
    verbatim and book with action="booking" only when they pick one. If there are no
    slots, keep the chat (request_human stays false): ask which days and times suit them
-   if they haven't said, and say the team will propose a time here. Never invent a time
-   or say it is booked. A team answer about the meeting (team_answer_now / team_notes)
-   is the time to confirm to them.
+   if they haven't said, and say the team will confirm the time and send the meeting
+   link here. Never say a meeting is confirmed, booked, scheduled or arranged, and never
+   write a meeting link or a placeholder such as [link] or [Google Meet Link]: only the
+   team (team_answer_now / team_notes) or a booking confirms it. A team answer about
+   the meeting (team_answer_now / team_notes) is the time and link to confirm to them.
 4. Share facts from approved_knowledge that answer the customer's obvious next worry
    (what's included, how long, how they'll receive it) without being asked. Never invent
    them, and never promise a price or a date.
@@ -400,7 +402,10 @@ each). They ARE the customer's requirements: fill the brief's project (service,
 scope, features, audience, timeline) from them, never ask for anything a document
 already answers, and when the customer says it is in the document, answer from it:
 confirm the key points back in short bullets and ask only what is truly missing.
-A document's figures may be repeated; never its prices.
+A document's figures may be repeated; never its prices. When its first line says
+"Kind: contract", "Kind: proposal", "Kind: quotation" or "Kind: rfp", it is on the
+team's review desk: confirm its key points back briefly, say the team is reviewing it
+and will reply here, and never accept, sign or agree to its terms, prices or dates.
 shared_links: the system already opened the links in the customer's latest message
 (YouTube: title, channel, description; a website: a summary). Answer about what the link
 shows right now, in their language: name it in a few words, say what you understood
@@ -783,6 +788,43 @@ LATER_PROMISE = re.compile(
     r"(?:dekh|check) (?:kar|kr)\w* (?:ke|kay|k) (?:batata|batati|bataen|batayen|jawab))",
     re.IGNORECASE,
 )
+# "[Google Meet Link]", "[date]", "[your name]": a template hole, never sent.
+PLACEHOLDER = re.compile(r"\[[^\]\n]{1,60}\]|\{\{[^}\n]{1,60}\}\}|<(?:link|url|date|time)>", re.I)
+URL = re.compile(r"https?://[^\s)\]>]+|\b(?:meet\.google\.com|zoom\.us)/[^\s)\]>]*", re.I)
+CONFIRMED_MEETING = re.compile(
+    r"\b(?:meeting|appointment|call|demo|visit|mulaqat)\b[^.!?\n]{0,60}"
+    r"\b(?:is |has been |)(?:confirmed|booked|scheduled|fixed|set up|arranged)\b"
+    r"|\b(?:confirmed|booked|scheduled)\b[^.!?\n]{0,30}\b(?:meeting|appointment|call)\b"
+    r"|\b(?:will|I'll)\s+(?:arrange|book|schedule|set up|fix)\b[^.!?\n]{0,40}"
+    r"\b(?:meeting|appointment|call)\b[^.!?\n]{0,25}\b(?:for|at|on)\b",
+    re.I,
+)
+
+
+def invented(reply: str, context: dict[str, Any], booked: bool = False) -> str:
+    """What in a draft pi made up: a placeholder, a link nobody gave it, or a meeting it
+    says is confirmed when no booking or team answer says so. "" when nothing."""
+    if PLACEHOLDER.search(reply):
+        return (
+            "it contains a placeholder in brackets; never write placeholders, and never "
+            "write a link or detail you were not given"
+        )
+    known = json.dumps(context, ensure_ascii=False)
+    for link in URL.findall(reply):
+        if link.rstrip(".,") not in known:
+            return "it contains a link nobody gave you; never make up links"
+    team_said = bool(context.get("team_answer_now")) or any(
+        re.search(r"meet|zoom|call|\d", str(n.get("note", "")), re.I)
+        for n in context.get("team_notes") or []
+    )
+    if CONFIRMED_MEETING.search(reply) and not (booked or team_said):
+        return (
+            "it says the meeting is confirmed or booked, but nothing booked it and the team "
+            "has not sent a time; say the team will confirm the time and send the link here"
+        )
+    return ""
+
+
 HEARD_LINE = re.compile(
     r"^\s*(?:I heard|Maine suna|Main ne suna|Mainay suna)\s*:\s*"
     r"(?:[\"“][^\"”\n]*[\"”][.!]?[ \t]*|[^\n]*(?:\n|$))",
@@ -1018,6 +1060,8 @@ async def compose_service_turn(
             "what it shows: answer about it now"
         )
         problem = f"{later}, and also: {problem}" if problem else later
+    if made_up := invented(turn.reply, context, turn.action == "booking"):
+        problem = f"{made_up}, and also: {problem}" if problem else made_up
     expected = context.get("reply_language")
     wrong = clearly_other(turn.reply, str(expected or ""))
     if wrong:
@@ -1063,6 +1107,9 @@ async def compose_service_turn(
         turn = retry.value
         turn._attempts = [*result.response.attempts, *retry.response.attempts]
         turn.reply = tidy_list_numbers(turn.reply)
+        if invented(turn.reply, context, turn.action == "booking"):
+            # Still made up after the rewrite: never sent (pi asks the team instead).
+            raise ReplyRejected("INVENTED_DETAIL")
     if expected:
         turn.language = str(expected)  # The conversation follows the customer's language.
     if context.get("latest_message_kind") != "audio":
@@ -1311,9 +1358,13 @@ def needs_person(turn: ServiceTurn, context: dict[str, Any]) -> bool:
     payment issue, is still upset, or a review policy says so."""
     from app.modules.pi.graph import keyword_intent
 
-    if context.get("operator_review_required") or turn.mood == "frustrated":
+    still_upset = (
+        turn.mood == "frustrated" and (context.get("brief") or {}).get("mood") == "frustrated"
+    )
+    if context.get("operator_review_required") or still_upset:
         return True
-    latest = str(context.get("latest_customer_message", ""))
+    # Only what the customer typed or said, never words inside a document they sent.
+    latest = str(context.get("typed_message", context.get("latest_customer_message", "")))
     if PERSON_WORDS.search(latest):
         return True
     fast = keyword_intent(latest)

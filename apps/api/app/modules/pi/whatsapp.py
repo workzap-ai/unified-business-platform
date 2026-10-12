@@ -96,6 +96,33 @@ def verify_signature(body: bytes, signature: str, settings: Settings) -> bool:
     return hmac.compare_digest(expected, signature)
 
 
+def other_text(kind: str, message: dict[str, Any]) -> str:
+    """Words for messages that aren't text or media: a template button tap is what it
+    says; a location or contact card becomes a line pi can read. Stickers and reactions
+    stay empty (pi skips them quietly)."""
+    part = message.get(kind)
+    part = part if isinstance(part, dict) else {}
+    if kind == "button":
+        return str(part.get("text") or part.get("payload") or "")[:1000]
+    if kind == "location":
+        place = ", ".join(str(part.get(k)) for k in ("name", "address") if part.get(k))
+        where = f"{part.get('latitude')}, {part.get('longitude')}"
+        return f"Location shared: {place} ({where})".replace(":  (", ": (")[:1000]
+    if kind == "contacts":
+        cards = message.get("contacts") if isinstance(message.get("contacts"), list) else []
+        lines = []
+        for card in cards[:5]:
+            if not isinstance(card, dict):
+                continue
+            name = (card.get("name") or {}).get("formatted_name", "")
+            phones = ", ".join(
+                str(p.get("phone")) for p in card.get("phones") or [] if isinstance(p, dict)
+            )
+            lines.append(f"{name} {phones}".strip())
+        return ("Contact card shared: " + "; ".join(lines))[:1000] if lines else ""
+    return ""
+
+
 def normalize(payload: dict[str, Any]) -> list[dict[str, Any]]:
     events = []
     for entry in payload.get("entry", [])[:100]:
@@ -119,7 +146,11 @@ def normalize(payload: dict[str, Any]) -> list[dict[str, Any]]:
                 body = (
                     message.get("text", {}).get("body", "")
                     if kind == "text"
-                    else message.get(kind, {}).get("caption", "")
+                    else other_text(kind, message)
+                    if kind in {"button", "location", "contacts"}
+                    else (message.get(kind) or {}).get("caption", "")
+                    if isinstance(message.get(kind), dict)
+                    else ""
                 )
                 events.append(
                     {
@@ -180,7 +211,11 @@ MEDIA_TYPES = frozenset(
         # Documents pi reads (pi.documents checks the real type from the content).
         "application/pdf",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         "text/plain",
+        "text/csv",
+        "audio/amr",
     }
 )
 
