@@ -89,3 +89,61 @@ async def add_consent_buttons(
             media: dict[str, Any] = dict(row.media or {})
             media["buttons"] = buttons
             row.media = media
+
+
+# Buttons on pi's picture cards (the Problem Map and the journey card).
+CARD = {
+    "map": {
+        "en": ["Makes sense", "Not related", "Show solution"],
+        "roman_ur": ["Theek hai", "Ye jure nahi", "Hal dikhao"],
+        "ar": ["منطقي", "غير مرتبطين", "أرني الحل"],
+    },
+    "journey": {
+        "en": ["See details", "Ask a question"],
+        "roman_ur": ["Tafseel dikhao", "Sawal poochna hai"],
+        "ar": ["التفاصيل", "لدي سؤال"],
+    },
+}
+NOT_RELATED = {titles[1].casefold() for titles in CARD["map"].values()}
+assert all(len(t) <= 20 for kind in CARD.values() for v in kind.values() for t in v)
+
+
+def card_buttons(kind: str, language: str | None) -> list[str]:
+    options = CARD.get(kind) or {}
+    return options.get(language or "en") or options.get("en") or []
+
+
+async def note_not_related(
+    session: AsyncSession, scope: WorkspaceScope, message: PiMessage
+) -> bool:
+    """The customer tapped "Not related" under a map card: the connection pi announced
+    last is removed and never drawn again (the same as the dashboard's button)."""
+    from app.modules.pi_customer import service as portal
+
+    if message.direction != "inbound" or (message.body or "").strip().casefold() not in (
+        NOT_RELATED
+    ):
+        return False
+    conversation = await WorkspaceRepository(session, PiConversation, scope).get(
+        message.conversation_id
+    )
+    # The connection the latest map card announced (kept on that card message), not
+    # whatever was found since.
+    card = await session.scalar(
+        WorkspaceRepository(session, PiMessage, scope)
+        .select()
+        .where(
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.direction == "outbound",
+            PiMessage.media["link_pair"].is_not(None),
+        )
+        .order_by(PiMessage.created_at.desc())
+        .limit(1)
+    )
+    pair = (card.media or {}).get("link_pair") if card is not None else None
+    if not isinstance(pair, list) or len(pair) != 2:
+        return False
+    brief = dict(conversation.service_brief or {})
+    brief.update(portal.reject_link_patch(brief, str(pair[0]), str(pair[1])))
+    conversation.service_brief = brief
+    return True

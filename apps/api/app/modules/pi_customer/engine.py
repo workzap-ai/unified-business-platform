@@ -21,7 +21,7 @@ from typing import Any
 from sqlalchemy import select
 
 from app.modules.notifications.service import notify
-from app.modules.pi.buttons import FOLLOW_UP
+from app.modules.pi.buttons import CARD, FOLLOW_UP
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.followups import quiet_until
 from app.modules.pi.models import PiConversation, PiMessage, WhatsAppConnection
@@ -113,6 +113,10 @@ TEXT: dict[str, dict[str, Any]] = {
         "next": "Next: ",
         "nudge": lambda title, q: f'Quick one on "{title}": {q}',
         "buttons": FOLLOW_UP["en"],
+        "card_buttons": {kind: titles["en"] for kind, titles in CARD.items()},
+        "snapshot": "Here's where we got to today:",
+        "snapshot_noted": "Noted: ",
+        "snapshot_linked": "Connected: ",
         "status": lambda title, due: (
             f'The team is working on "{title}". You\'ll get an update here by {due}.'
         ),
@@ -128,6 +132,10 @@ TEXT: dict[str, dict[str, Any]] = {
         "next": "Agla qadam: ",
         "nudge": lambda title, q: f'Ek chhota sa sawal "{title}" ke baare mein: {q}',
         "buttons": FOLLOW_UP["roman_ur"],
+        "card_buttons": {kind: titles["roman_ur"] for kind, titles in CARD.items()},
+        "snapshot": "Aaj hum yahan tak pohanche:",
+        "snapshot_noted": "Note kiya: ",
+        "snapshot_linked": "Jure hue: ",
         "status": lambda title, due: (
             f'"{title}" pe team kaam kar rahi hai. Update {due} tak yahin milega.'
         ),
@@ -141,6 +149,10 @@ TEXT: dict[str, dict[str, Any]] = {
         "next": "الخطوة التالية: ",
         "nudge": lambda title, q: f'سؤال سريع حول "{title}": {q}',
         "buttons": FOLLOW_UP["ar"],
+        "card_buttons": {kind: titles["ar"] for kind, titles in CARD.items()},
+        "snapshot": "هذا ما وصلنا إليه اليوم:",
+        "snapshot_noted": "تم تسجيل: ",
+        "snapshot_linked": "مترابطة: ",
         "status": lambda title, due: f'الفريق يعمل على "{title}". ستصلك تحديثات هنا بحلول {due}.',
     },
 }
@@ -372,6 +384,14 @@ async def queue_card(
     if choice is None:
         return None
     kind, index, caption = choice
+    announced = next(
+        (
+            [str(x.get("a_title", "")), str(x.get("b_title", ""))]
+            for x in reversed(report.get("links") or [])
+            if x.get("announce") and x.get("status") in ("auto", "confirmed")
+        ),
+        None,
+    )
     link = card_url(settings, card_token(settings, conversation.id, kind, index, lang))
     dashboard = f"{settings.pi_app_public_url.rstrip('/')}/customer"
     caption = f"{caption}\n{dashboard}"
@@ -392,7 +412,14 @@ async def queue_card(
             body=caption[:1000],
             status="queued",
             idempotency_key=key,
-            media={"image": link, "card": kind},
+            # A picture with one-tap answers (WhatsApp: image header + buttons). A map
+            # card keeps the connection it announced, for a "Not related" tap.
+            media={
+                "image": link,
+                "card": kind,
+                "buttons": TEXT[lang]["card_buttons"].get(kind, []),
+                **({"link_pair": announced} if kind == "map" and announced else {}),
+            },
         )
     )
     conversation.service_brief = {**brief, "cards_last_at": now.isoformat()}

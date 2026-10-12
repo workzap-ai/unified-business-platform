@@ -734,6 +734,29 @@ def pair_key(first: str, second: str) -> str:
     return "|".join(sorted((norm_title(first), norm_title(second))))
 
 
+def reject_link_patch(brief: dict[str, Any], a_title: str, b_title: str) -> dict[str, Any]:
+    """What changes on the brief when the customer says two requests aren't connected:
+    the pair is remembered as rejected (pi never links it again), the line goes, and the
+    shared solutions are worked out again. Used by the dashboard and the WhatsApp tap."""
+    key = pair_key(a_title, b_title)
+    patch: dict[str, Any] = {
+        "link_feedback": {**(brief.get("link_feedback") or {}), key: "rejected"}
+    }
+    report = brief.get("customer_issues")
+    if isinstance(report, dict):
+        links = [
+            x
+            for x in report.get("links") or []
+            if pair_key(x.get("a_title", ""), x.get("b_title", "")) != key
+        ]
+        base = [
+            {k: v for k, v in i.items() if k not in ("solution_id", "linked")}
+            for i in report.get("issues", [])
+        ]
+        patch["customer_issues"] = {**report, "links": links, "issues": with_solutions(base, links)}
+    return patch
+
+
 def judge_links(
     raw: list[dict[str, Any]], issues: list[dict[str, Any]], feedback: dict[str, str]
 ) -> list[dict[str, Any]]:

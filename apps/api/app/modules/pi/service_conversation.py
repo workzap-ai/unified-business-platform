@@ -556,6 +556,12 @@ Copy exact consent_evidence from that message.
 If they say stop/unsubscribe/do not remind (in ANY language), consent='declined'.
 Button taps arrive as their title: "Yes, message me" / "Haan, message karein" grant
 consent (copy it as consent_evidence), "No thanks" / "Nahi shukriya" decline it.
+Under a picture card: "Not related" / "Ye jure nahi" = say in one line you've removed
+that connection; "Makes sense" / "Theek hai" = a short thanks and the next step; "Show
+solution" / "Hal dikhao" = what would be built for those connected requests, from
+brief.customer_issues (solution_outline, outcome), in two or three short lines, never a
+price; "See details" = where that request stands and its next step; "Ask a question" =
+invite their question in one line.
 "Remind me later" / "Baad mein yaad dilao": reply in one short line that you'll check
 back in two days, nothing else. "Let's continue" / "Aage barhein": carry on with the
 open question.

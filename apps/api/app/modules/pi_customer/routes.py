@@ -635,26 +635,10 @@ async def not_related(
     from app.modules.pi.models import PiConversation
 
     conversation, _, _ = await _owned(session, customer, conversation_id)
-    brief = dict(conversation.service_brief or {})
     key = service.pair_key(body.a_title, body.b_title)
-    feedback = {**(brief.get("link_feedback") or {}), key: "rejected"}
-    report = brief.get("customer_issues")
-    patch: dict[str, Any] = {"link_feedback": feedback}
-    if isinstance(report, dict):
-        links = [
-            x
-            for x in report.get("links") or []
-            if service.pair_key(x.get("a_title", ""), x.get("b_title", "")) != key
-        ]
-        base = [
-            {k: v for k, v in i.items() if k not in ("solution_id", "linked")}
-            for i in report.get("issues", [])
-        ]
-        patch["customer_issues"] = {
-            **report,
-            "links": links,
-            "issues": service.with_solutions(base, links),
-        }
+    patch = service.reject_link_patch(
+        dict(conversation.service_brief or {}), body.a_title, body.b_title
+    )
     await session.execute(
         update(PiConversation)
         .where(

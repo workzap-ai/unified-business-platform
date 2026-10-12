@@ -472,9 +472,10 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
 
             await note_form_reply(session, ctx["settings"], scope, message)
             await note_opt_out(session, scope, message)  # "STOP" withdraws consent at once
-            from app.modules.pi.buttons import note_remind_later
+            from app.modules.pi.buttons import note_not_related, note_remind_later
 
             await note_remind_later(session, scope, message)  # "Remind me later": 2 days
+            await note_not_related(session, scope, message)  # "Not related" under a map
             # They wrote, so the 24-hour window is open: send proposal/invoice links that
             # were waiting for it.
             from app.modules.pi_saas.deals import release_waiting
@@ -1356,7 +1357,9 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             # reported to the team; the chat is never handed off for it (that would stop
             # every later follow-up).
             automatic = bool(
-                reminder or ladder or any(k in message.media for k in ("nudge", "check_in", "card"))
+                reminder
+                or ladder
+                or any(k in message.media for k in ("nudge", "check_in", "card", "snapshot"))
             )
             if automatic:
                 from app.modules.notifications.service import notify

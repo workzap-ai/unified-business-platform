@@ -30,7 +30,7 @@ WINDOW = timedelta(hours=23)  # Leaves time for the send before WhatsApp's windo
 MISSED_AFTER = timedelta(minutes=10)
 HUMAN_QUIET = timedelta(hours=12)
 PER_DAY = 2
-FOLLOW_UP_MEDIA = ("nudge", "ladder", "reminder", "check_in")
+FOLLOW_UP_MEDIA = ("nudge", "ladder", "reminder", "check_in", "snapshot")
 PROFILE_FIELDS = (
     ("name", "their name"),
     ("business_name", "their business name"),
