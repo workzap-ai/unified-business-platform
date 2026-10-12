@@ -1335,7 +1335,13 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             conversation.last_message_preview = message.body[:200]
         except BusinessRuleViolation as exc:
             message.status, message.error_code = "failed", exc.code[:64]
-            if reminder:
+            # pi's own follow-ups (reminder, ladder, nudge, check-in, card): a failed one is
+            # reported to the team; the chat is never handed off for it (that would stop
+            # every later follow-up).
+            automatic = bool(
+                reminder or ladder or any(k in message.media for k in ("nudge", "check_in", "card"))
+            )
+            if automatic:
                 from app.modules.notifications.service import notify
 
                 await notify(
@@ -1349,7 +1355,7 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                     dedupe_key=f"pi-reminder-failed:{message.id}",
                 )
             connection.last_error_code, connection.last_error_at = exc.code[:64], datetime.now(UTC)
-            if not campaign:  # A failed broadcast is reported in its results, not handed off.
+            if not campaign and not automatic:  # A failed broadcast is in its results.
                 await service.handoff(
                     conversation.id,
                     "tool_failure",

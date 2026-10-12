@@ -276,6 +276,9 @@ class Issue(BaseModel):
     root_cause: str = Field(default="", max_length=160)
     solution_outline: str = Field(default="", max_length=200)
     outcome: str = Field(default="", max_length=160)
+    # About this business's own service or tools (an invoice download, a payment link,
+    # pi's wording), not a problem of the customer's business: kept off the map.
+    about_service: bool = False
 
     @model_validator(mode="before")
     @classmethod
@@ -283,6 +286,12 @@ class Issue(BaseModel):
         if not isinstance(data, dict):
             return data
         data = {k: v for k, v in data.items() if v is not None}
+        if "about_service" in data and not isinstance(data["about_service"], bool):
+            data["about_service"] = str(data["about_service"]).strip().lower() in (
+                "true",
+                "yes",
+                "1",
+            )
         if "department" in data:
             data["department"] = str(data["department"]).strip().lower()[:40]
         for key, limit in (
@@ -401,6 +410,11 @@ For each item:
   features PDF", not "Mendies features PDF"). Never a raw quote.
 - original_words: the customer's own words for it, quoted briefly from the transcript.
 - category: inquiry, order, booking, payment, complaint, support or other.
+- about_service: true when the matter is about how THIS business's own service or tools
+  work for the customer, not a need or problem of the customer's own business: getting
+  or downloading an invoice, receipt or document, a payment link, bank details or card
+  payment missing, a link that doesn't open, pi's replies or wording, the dashboard or
+  app. Otherwise false. Never link an about_service item to anything.
 - stage, using ONLY these:
   "noted" = pi captured it and is still understanding it;
   "need_answer" = the business or pi asked the customer something and is waiting;
@@ -614,13 +628,29 @@ async def analyse(
     except GatewayUnavailable:
         logger.info("pi_customer_issues_unavailable")
         return cached if isinstance(cached, dict) else None
-    issues = place([i.model_dump() for i in result.value.issues], departments, overrides)
+    found = [i.model_dump() for i in result.value.issues]
+    # Service matters (an invoice download, a missing payment link, pi's wording) are not
+    # the customer's business problems: they stay off the map and charts, listed apart.
+    keep = [n for n, i in enumerate(found) if not i.get("about_service")]
+    position = {old: new for new, old in enumerate(keep)}
+    raw_links = [
+        {**link, "a": position[link["a"]], "b": position[link["b"]]}
+        for link in (x.model_dump() for x in result.value.links)
+        if link.get("a") in position and link.get("b") in position
+    ]
+    service_issues = [
+        {
+            "title": i["title"],
+            "summary": i.get("summary", ""),
+            "stage": i.get("stage", "noted"),
+            "original_words": i.get("original_words", ""),
+        }
+        for i in found
+        if i.get("about_service")
+    ]
+    issues = place([found[n] for n in keep], departments, overrides)
     feedback = brief.get("link_feedback")
-    links = judge_links(
-        [link.model_dump() for link in result.value.links],
-        issues,
-        feedback if isinstance(feedback, dict) else {},
-    )
+    links = judge_links(raw_links, issues, feedback if isinstance(feedback, dict) else {})
     report = {
         "at": stamp,
         "language": language,
@@ -628,6 +658,7 @@ async def analyse(
         "waiting": waiting_since(rows),
         "issues": with_solutions(issues, links),
         "links": links,
+        "service_issues": service_issues,
     }
     events = changes(cached if isinstance(cached, dict) else None, report)
     log = [*(brief.get("customer_events") or []), *events][-EVENT_LIMIT:]

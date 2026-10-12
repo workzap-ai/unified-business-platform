@@ -187,7 +187,6 @@ def test_pi_asks_once_for_reminder_permission_when_a_brief_is_confirmed():
     for brief in (
         {"consent_asked": "2026-10-12"},
         {"reminder_consent": "granted"},
-        {"ready_for_team": True},  # confirmed earlier: asked then
     ):
         context = {"followups_enabled": True, "brief": brief}
         assert with_consent_question(confirmed, context) == confirmed.reply

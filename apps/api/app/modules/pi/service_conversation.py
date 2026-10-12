@@ -1058,26 +1058,30 @@ CONSENT_QUESTION = {
     "en": "Can I message you here when there's an update, or if we need anything from you?",
     "roman_ur": "Kya main aap ko yahan message kar sakta hoon jab koi update ho, ya hamein "
     "aap se kuch chahiye ho?",
+    "ur": "کیا میں آپ کو یہاں پیغام بھیج سکتا ہوں جب کوئی اپڈیٹ ہو، یا ہمیں آپ سے کچھ چاہیے ہو؟",
+    "ar": "هل يمكنني مراسلتك هنا عند وجود تحديث، أو إذا احتجنا منك شيئًا؟",
 }
 
 
 def with_consent_question(turn: ServiceTurn, context: dict[str, Any]) -> str:
-    """Right after a brief is first confirmed, pi asks once (in fixed words) whether it
-    may follow up here: without that yes, no reminder can go out after 24 hours."""
+    """Once a brief is confirmed, pi asks once (in fixed words) whether it may follow up
+    here: without that yes, no reminder can go out after 24 hours. Asked on a later
+    confirmed turn too, until it has gone out once."""
     brief = context.get("brief") or {}
     if (
         not context.get("followups_enabled")
         or brief.get("reminder_consent") in ("granted", "declined")
         or brief.get("consent_asked")
         or not turn.ready_for_team
-        or brief.get("ready_for_team")
         or turn.mood in ("frustrated", "urgent")
         or turn.request_human
         or "?" in turn.reply
     ):
         return turn.reply
-    language = "roman_ur" if turn.language == "roman_ur" else "en"
-    return f"{turn.reply.rstrip()}\n\n{CONSENT_QUESTION[language]}"
+    # In the language of the reply it's added to.
+    language = detect_language(turn.reply) or turn.language
+    question = CONSENT_QUESTION.get(language, CONSENT_QUESTION["en"])
+    return f"{turn.reply.rstrip()}\n\n{question}"
 
 
 def unknown_customer(turn: ServiceTurn, context: dict[str, Any]) -> str | None:
@@ -1332,7 +1336,6 @@ async def compose_service_turn(
     turn.reply = without_filler(turn.reply)
     if long := too_long(turn.reply, context):
         problem = f"{long}, and also: {problem}" if problem else long
-    turn.reply = with_consent_question(turn, context)
     if gap := unknown_customer(turn, context):
         problem = f"{gap}, and also: {problem}" if problem else gap
     expected = context.get("reply_language")
@@ -1400,6 +1403,8 @@ async def compose_service_turn(
         # answer goes on the team's request desk (the answer comes back through pi).
         turn.request_human = False
         turn._ask_team = True
+    # Added last, so a rewrite above can never drop it.
+    turn.reply = with_consent_question(turn, context)
     turn.projects = merge_projects((context.get("brief") or {}).get("projects"), turn)
     if not turn.summary.strip() or turn.summary.startswith("Conversation in progress"):
         turn.summary = team_summary(turn)

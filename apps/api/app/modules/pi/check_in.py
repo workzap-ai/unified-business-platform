@@ -84,6 +84,74 @@ async def sweep_check_ins(ctx: dict[str, Any]) -> None:
             await check_in(ctx, conversation_id, now)
         except Exception:  # noqa: BLE001 - one conversation never stops the others
             logger.warning("pi_check_in_failed", exc_info=True)
+    try:
+        await tell_team_window_closed(ctx, now)
+    except Exception:  # noqa: BLE001
+        logger.warning("pi_window_closed_notice_failed", exc_info=True)
+
+
+async def _skip(ctx: dict[str, Any], conversation_id: UUID, since: str, now: datetime) -> None:
+    """Remember a check-in that couldn't be written, so it isn't retried every sweep."""
+    async with ctx["sessions"]() as session:
+        conversation = await session.get(PiConversation, conversation_id)
+        if conversation is None:
+            return
+        brief = dict(conversation.service_brief or {})
+        brief["check_ins"] = [
+            *(brief.get("check_ins") or []),
+            {"since": since, "at": now.isoformat(), "kind": "skipped"},
+        ][-20:]
+        conversation.service_brief = brief
+        await session.commit()
+
+
+async def tell_team_window_closed(ctx: dict[str, Any], now: datetime) -> None:
+    """A customer left mid-conversation, WhatsApp's 24-hour window just closed and they
+    never agreed to reminders: pi can't write to them any more. The team is told once,
+    so a person can call or message them."""
+    from app.modules.notifications.service import notify
+    from app.modules.pi.runtime import system_scope
+
+    async with ctx["sessions"]() as session:
+        rows = list(
+            await session.scalars(
+                select(PiConversation)
+                .where(
+                    PiConversation.status == "open",
+                    PiConversation.mode == "ai",
+                    PiConversation.last_inbound_at < now - timedelta(hours=24),
+                    PiConversation.last_inbound_at >= now - timedelta(hours=26),
+                )
+                .limit(200)
+            )
+        )
+        for conversation in rows:
+            brief = conversation.service_brief or {}
+            if brief.get("reminder_consent") == "granted" or not (
+                brief.get("awaiting_customer")
+                or any(
+                    p.get("status") in (None, "", "collecting") for p in brief.get("projects") or []
+                )
+            ):
+                continue
+            connection = await session.get(WhatsAppConnection, conversation.connection_id)
+            scope = await system_scope(session, connection) if connection else None
+            if scope is None:
+                continue
+            stamp = conversation.last_inbound_at.isoformat() if conversation.last_inbound_at else ""
+            await notify(
+                session,
+                scope,
+                "pi.customer_went_quiet",
+                "A customer went quiet before finishing",
+                "WhatsApp's 24-hour window has closed and they haven't agreed to reminders, "
+                "so pi can't message them now. A call or a message from your team can bring "
+                "them back.",
+                link=f"/pi/inbox?conversation={conversation.id}",
+                permission="pi.read",
+                dedupe_key=f"pi-went-quiet:{conversation.id}:{stamp}",
+            )
+        await session.commit()
 
 
 async def check_in(ctx: dict[str, Any], conversation_id: UUID, now: datetime) -> str | None:
@@ -182,9 +250,11 @@ async def check_in(ctx: dict[str, Any], conversation_id: UUID, now: datetime) ->
         turn = await compose_service_turn(manager, scope, conversation, policy, context)
     except Exception:  # noqa: BLE001 - nothing is sent rather than a generic message
         logger.warning("pi_check_in_compose_failed", exc_info=True)
+        await _skip(ctx, conversation_id, str(last.id), now)
         return None
     body = turn.reply.strip()
     if not body or turn.request_human:
+        await _skip(ctx, conversation_id, str(last.id), now)
         return None
 
     async with ctx["sessions"]() as session:
