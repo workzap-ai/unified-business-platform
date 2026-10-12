@@ -213,8 +213,11 @@ async def read_quiet_chats(ctx: dict[str, Any]) -> list[str]:
             if not quiet and not asked:
                 continue  # never mid-explanation
             cached = brief.get("customer_issues")
-            fresh = isinstance(cached, dict) and cached.get("at") == (
-                conversation.last_message_at.isoformat()
+            # Same check as the portal's cache: a report from older rules is read again.
+            fresh = (
+                isinstance(cached, dict)
+                and cached.get("at") == conversation.last_message_at.isoformat()
+                and cached.get("v") == service.REPORT_VERSION
             )
             if fresh and not asked:
                 continue
