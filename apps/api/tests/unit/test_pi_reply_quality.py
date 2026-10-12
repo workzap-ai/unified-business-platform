@@ -123,3 +123,29 @@ def test_a_status_line_never_replaces_what_the_customer_wants():
     [project] = merge_projects(before, turn)
     assert project.details == "Online store for 200 products with card payment"
     assert project.status == "confirmed"  # never goes back to collecting
+
+
+def test_a_meeting_that_already_happened_is_never_sent_again():
+    from datetime import UTC, datetime
+
+    from app.modules.pi.service_conversation import arranged_meeting, meeting_over
+
+    note = (
+        "Meeting confirmed by the team: Monday 12 October, 06:00 PM (Asia/Karachi), "
+        "30 minutes, on a video call (opens in the browser, no sign-up): "
+        "https://meet.jit.si/pi-meeting-43ada63cddd3d2a1."
+    )
+    notes = [{"kind": "answer", "note": note}]
+    before = datetime(2026, 10, 12, 12, 0, tzinfo=UTC)  # 5:00 PM in Karachi
+    after = datetime(2026, 10, 12, 15, 32, tzinfo=UTC)  # 8:32 PM in Karachi
+    assert meeting_over({}, notes, "Asia/Karachi", before) is None
+    assert meeting_over({}, notes, "Asia/Karachi", after) == "Monday 12 October, 06:00 PM"
+    upcoming = {"team_notes": notes, "brief": {}}
+    assert arranged_meeting(upcoming)["link"].startswith("https://meet.jit.si/")
+    assert arranged_meeting({**upcoming, "meeting_over": "Monday 12 October, 06:00 PM"}) == {}
+
+
+def test_what_would_you_like_to_discuss_is_open_ended():
+    from app.modules.pi.service_conversation import OPEN_ENDED
+
+    assert OPEN_ENDED.search("Sure, let's continue. Do you want to discuss any specific project?")
