@@ -169,6 +169,11 @@ async def check_in(ctx: dict[str, Any], conversation_id: UUID, now: datetime) ->
             "hours_quiet": round((now - last.created_at).total_seconds() / 3600, 1),
             "missing_profile": missing,
             "your_last_message": "" if missed else (last.body or "")[:1500],
+            "open_projects": [
+                p.get("title")
+                for p in brief.get("projects") or []
+                if p.get("status") in (None, "", "collecting") and p.get("title")
+            ][:3],
         }
         await session.commit()  # No transaction is held across the model call.
 

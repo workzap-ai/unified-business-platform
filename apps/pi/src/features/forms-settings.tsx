@@ -15,7 +15,7 @@ import {
 import { get, patch } from "@/lib/api";
 import { useAction, useBusinessKey, useCan } from "@/lib/session";
 
-type Purpose = "lead" | "booking" | "feedback";
+type Purpose = "lead" | "booking" | "feedback" | "business";
 interface Flow {
   flow_id: string;
   cta: string;
@@ -38,6 +38,11 @@ const PURPOSES: [Purpose, string, string][] = [
   ],
   ["booking", "Booking request", "Preferred service, day and time"],
   ["feedback", "Feedback", "A quick rating after a job is done"],
+  [
+    "business",
+    "Business details",
+    "Name, business and what it does: pi sends it if the customer doesn't say in the chat",
+  ],
 ];
 const EMPTY: Flow = { flow_id: "", cta: "", screen: "" };
 

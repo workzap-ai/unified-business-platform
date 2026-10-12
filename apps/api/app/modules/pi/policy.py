@@ -78,6 +78,7 @@ def validate_section(section: str, value: Any) -> None:
             ensure(1 <= value["reminder_after_days"] <= 30)
             ensure(isinstance(value.get("check_in_enabled", True), bool))
             ensure(1 <= int(value.get("check_in_after_hours", 2)) <= 12)
+            ensure(isinstance(value.get("business_form", True), bool))
             ensure(0 <= int(value.get("quiet_start", 21)) <= 23)
             ensure(0 <= int(value.get("quiet_end", 9)) <= 23)
             from app.modules.pi_saas.flows import valid_config

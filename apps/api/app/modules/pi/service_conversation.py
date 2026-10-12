@@ -293,6 +293,11 @@ language="roman_ur". Use simple everyday words they would use themselves.
 Reply style (pi brand: steady, plain, honest; WhatsApp, easy to read):
 - Answer first: deal with the customer's LATEST message. Use their own words for their
   request. Usually 1-4 short sentences; longer only when they ask for detail.
+- Match their length: a short or simple message (hi, ok, thanks, yes/no, one quick
+  question, "send link") gets a short, simple answer: one or two sentences, no list,
+  no recap of the brief or projects. Never end with "if you have any other questions,
+  feel free to ask" or "let me know if you need anything else" (or the same in Roman
+  Urdu): end when the answer or the next step is said.
 - Work out what this customer actually wants from the whole conversation (messages,
   voice-note transcripts, image and document descriptions) and respond to THAT. Never
   steer them to a topic they did not raise, and never pitch the company's services while
@@ -458,7 +463,9 @@ exactly where you were (their project in their own words), never "just checking 
 Then ONE thing, in this order: if check_in_now.missing_profile lists what you don't
 know about them yet (their name, business name, what the business does), ask for it in
 one friendly question so the team can prepare properly; otherwise repeat the one
-question still open in a few words; otherwise (nothing open) say what happens next.
+question still open in a few words; otherwise, if check_in_now.open_projects lists
+projects not yet confirmed, take the first: its points in 2-3 "• " lines and "Shall I
+send this to the team?"; otherwise (nothing open) say what happens next.
 Never repeat a list you already sent, never apologise for writing, no new topics.
 check_in_now.missed=true means their last message (latest_customer_message) never
 got an answer: answer it now as the next message of the chat (a brief "sorry for the
@@ -525,10 +532,16 @@ Set ready_for_team when useful scope is collected or the customer wants the team
 Continue talking unless the customer requests a human or the matter needs human review.
 Set request_human=true for complaints, payment disputes or requests for a person,
 regardless of their language. Do not resolve sensitive account matters yourself.
-If followups are enabled and consent is unknown, naturally ask permission to follow up
-here after a week of no reply. Explicit permission is required: consent='granted' only
-when the LATEST customer message explicitly agrees to reminders, including an answer
-to your previous permission question. Copy exact consent_evidence from that message.
+Projects still "collecting" in brief.projects: never leave them there. Once the
+customer's current question is handled (and they are not upset), move the oldest one
+forward: if its details are known, list them in 2-4 "• " points and ask them to confirm
+so the team can prepare its proposal ("Shall I send this to the team?"); if one detail
+is missing, ask only for that. One project per reply.
+If followups are enabled and consent is unknown, the application asks permission to
+follow up after a brief is confirmed; don't ask it yourself. Explicit permission is
+required: consent='granted' only when the LATEST customer message explicitly agrees to
+reminders, including an answer to that permission question (yes, ji, haan, theek hai).
+Copy exact consent_evidence from that message.
 If they say stop/unsubscribe/do not remind (in ANY language), consent='declined'.
 Never infer consent from a greeting, purchase interest, a budget or silence.
 Set awaiting_customer=false if the enquiry is finished or handed to the team.
@@ -1041,6 +1054,32 @@ GENDERED_SELF = re.compile(
 AI_DISCLOSED = re.compile(r"\b(?:AI|A\.I\.|artificial intelligence|bot)\b", re.IGNORECASE)
 
 
+CONSENT_QUESTION = {
+    "en": "Can I message you here when there's an update, or if we need anything from you?",
+    "roman_ur": "Kya main aap ko yahan message kar sakta hoon jab koi update ho, ya hamein "
+    "aap se kuch chahiye ho?",
+}
+
+
+def with_consent_question(turn: ServiceTurn, context: dict[str, Any]) -> str:
+    """Right after a brief is first confirmed, pi asks once (in fixed words) whether it
+    may follow up here: without that yes, no reminder can go out after 24 hours."""
+    brief = context.get("brief") or {}
+    if (
+        not context.get("followups_enabled")
+        or brief.get("reminder_consent") in ("granted", "declined")
+        or brief.get("consent_asked")
+        or not turn.ready_for_team
+        or brief.get("ready_for_team")
+        or turn.mood in ("frustrated", "urgent")
+        or turn.request_human
+        or "?" in turn.reply
+    ):
+        return turn.reply
+    language = "roman_ur" if turn.language == "roman_ur" else "en"
+    return f"{turn.reply.rstrip()}\n\n{CONSENT_QUESTION[language]}"
+
+
 def unknown_customer(turn: ServiceTurn, context: dict[str, Any]) -> str | None:
     """A new customer's brief is never sent to the team before pi knows whose business
     it is: the team can't prepare a proposal for an unknown business."""
@@ -1065,6 +1104,49 @@ def unknown_customer(turn: ServiceTurn, context: dict[str, Any]) -> str | None:
         "keep ready_for_team=false and awaiting_customer=true, list the brief and ask in "
         "one short question for their business name and what it does"
     )
+
+
+# "If you have any other questions, feel free to ask." adds nothing; pi ends when done.
+FILLER_TAIL = re.compile(
+    r"(?:^|(?<=[.!?\n]))\s*(?:"
+    r"(?:if|in case) you (?:have|need) (?:any )?(?:other|more|further|additional)?\s*"
+    r"(?:questions?|help|assistance|queries)[^.!?\n]*[.!?]?"
+    r"|(?:please )?(?:feel free to|don'?t hesitate to) (?:ask|reach out|let me know)[^.!?\n]*[.!?]?"
+    r"|let me know if (?:you need|there'?s) anything (?:else|more)[^.!?\n]*[.!?]?"
+    r"|agar aap ?ko (?:aur |koi )+(?:madad|sawal|cheez)[^.!?\n]*[.!?]?"
+    r")\s*$",
+    re.IGNORECASE,
+)
+
+
+def without_filler(reply: str) -> str:
+    """The reply without a generic closing line (when something else is left)."""
+    trimmed = FILLER_TAIL.sub("", reply).rstrip()
+    return trimmed if len(trimmed) >= 6 else reply
+
+
+SIMPLE_ASK = 8  # words: "ok", "thanks", "send link?", "kab milega?"
+
+
+def too_long(reply: str, context: dict[str, Any]) -> str | None:
+    """A long answer (or a list) to a short, simple message."""
+    latest = str(context.get("latest_customer_message", ""))
+    if context.get("latest_message_kind") not in (None, "text") or not latest.strip():
+        return None
+    if len(latest.split()) > SIMPLE_ASK or context.get("check_in_now"):
+        return None
+    brief = context.get("brief") or {}
+    if not (context.get("history") and (brief.get("projects") or brief.get("ready_for_team"))):
+        return None  # early in a chat a short "hi" may need the intro and a question
+    bullets = sum(1 for line in reply.splitlines() if line.strip().startswith("•"))
+    if len(reply) > 320 or (
+        bullets >= 2 and not re.search(r"\b(?:idea|list|options?|summary|brief)\b", latest, re.I)
+    ):
+        return (
+            "the customer wrote a short, simple message and your reply is long; answer it "
+            "in one or two short sentences, no list and no recap of the brief or projects"
+        )
+    return None
 
 
 def needless_question(reply: str, context: dict[str, Any]) -> str | None:
@@ -1247,6 +1329,10 @@ async def compose_service_turn(
         problem = f"{later}, and also: {problem}" if problem else later
     if made_up := invented(turn.reply, context, turn.action == "booking"):
         problem = f"{made_up}, and also: {problem}" if problem else made_up
+    turn.reply = without_filler(turn.reply)
+    if long := too_long(turn.reply, context):
+        problem = f"{long}, and also: {problem}" if problem else long
+    turn.reply = with_consent_question(turn, context)
     if gap := unknown_customer(turn, context):
         problem = f"{gap}, and also: {problem}" if problem else gap
     expected = context.get("reply_language")
@@ -1293,7 +1379,7 @@ async def compose_service_turn(
         )
         turn = retry.value
         turn._attempts = [*result.response.attempts, *retry.response.attempts]
-        turn.reply = tidy_list_numbers(turn.reply)
+        turn.reply = without_filler(tidy_list_numbers(turn.reply))
         if invented(turn.reply, context, turn.action == "booking"):
             # Still made up after the rewrite: never sent (pi asks the team instead).
             raise ReplyRejected("INVENTED_DETAIL")
@@ -1365,6 +1451,12 @@ async def save_service_turn(
         "awaiting_customer": turn.awaiting_customer and not turn.request_human,
         "ready_for_team": turn.ready_for_team,
         "reminder_consent": consent,
+        "consent_asked": previous.get("consent_asked")
+        or (
+            datetime.now(UTC).isoformat()
+            if any(q in turn.reply for q in CONSENT_QUESTION.values())
+            else None
+        ),
         "source_message_id": str(message.id),
         "mood": turn.mood,
         "projects": [project.model_dump() for project in turn.projects],
@@ -1397,6 +1489,9 @@ async def save_service_turn(
                 message.id,
             )
     conversation.service_brief = brief
+    from app.modules.pi.business_form import after_turn
+
+    await after_turn(session, scope, conversation, message, policy, turn.reply, turn.mood)
     conversation.summary = turn.summary
     conversation.summary_message_count += 1
     conversation.language = turn.language

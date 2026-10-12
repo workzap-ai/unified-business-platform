@@ -13,11 +13,12 @@ DEFAULT_BODY = {
     "lead": "Please share a few details so we can help you properly.",
     "booking": "Choose a time that suits you and we'll confirm it.",
     "feedback": "How did we do? It takes less than a minute.",
+    "business": "To save typing, you can fill in your business details here.",
 }
 
 
 class FormInput(ToolInput):
-    purpose: Literal["lead", "booking", "feedback"]
+    purpose: Literal["lead", "booking", "feedback", "business"]
     message: str = Field(default="", max_length=300)
 
 

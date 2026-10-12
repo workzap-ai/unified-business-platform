@@ -132,6 +132,8 @@ DEFAULTS: dict[str, Any] = {
         # A free-form check-in when a customer goes quiet mid-conversation (24h window).
         "check_in_enabled": True,
         "check_in_after_hours": 2,
+        # After asking once in the chat, pi sends the Business details form.
+        "business_form": True,
         "reminder_templates": {},
         # Follow-up ladder after the 24-hour window: {"en": {"day3": {name, language}, ...}}.
         "ladder_templates": {},

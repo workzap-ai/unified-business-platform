@@ -666,7 +666,8 @@ async def test_a_repeated_customer_date_is_dropped_instead_of_stopping_pi(
     conversation = await pi.conversation()
     assert conversation.mode == "ai"  # no handoff
     [reply] = await pi.outbound()
-    assert reply.body == "Note kar liya. Team yahin update degi."
+    # The repeated date is dropped; pi then asks once whether it may follow up here.
+    assert reply.body.startswith("Note kar liya. Team yahin update degi.\n\nKya main aap ko")
     await pi.close()
 
 

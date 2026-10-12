@@ -174,3 +174,22 @@ def test_saying_the_link_was_sent_without_a_link_is_refused():
     assert invented("Aapka Google Meet meeting link abhi bhej diya gaya hai.", {})
     assert invented("Your meeting link has been sent.", {})
     assert not invented("I've asked the team for the link again; it will come here.", {})
+
+
+def test_pi_asks_once_for_reminder_permission_when_a_brief_is_confirmed():
+    from app.modules.pi.service_conversation import CONSENT_QUESTION, with_consent_question
+
+    confirmed = turn(
+        reply="Sent to the team; the proposal comes here.", ready_for_team=True, language="en"
+    )
+    asks = with_consent_question(confirmed, {"followups_enabled": True, "brief": {}})
+    assert asks.endswith(CONSENT_QUESTION["en"])
+    for brief in (
+        {"consent_asked": "2026-10-12"},
+        {"reminder_consent": "granted"},
+        {"ready_for_team": True},  # confirmed earlier: asked then
+    ):
+        context = {"followups_enabled": True, "brief": brief}
+        assert with_consent_question(confirmed, context) == confirmed.reply
+    upset = turn(reply="Sorry about that.", ready_for_team=True, mood="frustrated")
+    assert with_consent_question(upset, {"followups_enabled": True, "brief": {}}) == upset.reply

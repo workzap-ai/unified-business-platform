@@ -27,8 +27,13 @@ from app.modules.pi.models import PiConversation, PiMessage
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
 
-PURPOSES = ("lead", "booking", "feedback")
-LABEL = {"lead": "Your details", "booking": "Booking request", "feedback": "Your feedback"}
+PURPOSES = ("lead", "booking", "feedback", "business")
+LABEL = {
+    "lead": "Your details",
+    "booking": "Booking request",
+    "feedback": "Your feedback",
+    "business": "Business details",
+}
 MAX_FIELDS = 30
 MAX_VALUE = 500
 MAX_RESPONSE_BYTES = 16 * 1024
@@ -71,7 +76,9 @@ def token(settings: Settings, conversation_id: UUID, purpose: str) -> str | None
 
 def verify(settings: Settings, value: str, conversation_id: UUID) -> str | None:
     """The purpose when the token is ours and for this conversation, else None."""
-    match = re.fullmatch(r"pi\.(lead|booking|feedback)\.([0-9a-f-]{36})\.([0-9a-f]{32})", value)
+    match = re.fullmatch(
+        r"pi\.(lead|booking|feedback|business)\.([0-9a-f-]{36})\.([0-9a-f]{32})", value
+    )
     if not match or match.group(2) != str(conversation_id):
         return None
     expected = token(settings, conversation_id, match.group(1))
@@ -155,6 +162,10 @@ async def note_form_reply(
     forms[purpose] = {"fields": fields, "message_id": str(message.id)}
     brief["forms"] = forms
     conversation.service_brief = brief
+    if purpose == "business":
+        from app.modules.pi.business_form import save_answers
+
+        await save_answers(session, scope, conversation, fields)
     if conversation.customer_id is not None and fields:
         from app.modules.pi.knowledge import remember
 

@@ -27,7 +27,7 @@ from app.modules.pi_saas.kapso import Kapso
 from app.shared.errors import BusinessRuleViolation
 from app.shared.workspace_repository import WorkspaceRepository
 
-Purpose = Literal["lead", "booking", "feedback"]
+Purpose = Literal["lead", "booking", "feedback", "business"]
 
 FORMS: dict[str, dict[str, Any]] = {
     "lead": {
@@ -50,6 +50,18 @@ FORMS: dict[str, dict[str, Any]] = {
             ("preferred_day", "Preferred day", "text", True),
             ("preferred_time", "Preferred time", "text", False),
             ("notes", "Anything else?", "text", False),
+        ],
+    },
+    "business": {
+        "name": "Business details",
+        "cta": "Share details",
+        "title": "About your business",
+        "fields": [
+            ("name", "Your name", "text", True),
+            ("business_name", "Business name", "text", True),
+            ("business_type", "What does your business do?", "text", True),
+            ("city", "City", "text", False),
+            ("role", "Your role (e.g. owner, manager)", "text", False),
         ],
     },
     "feedback": {
