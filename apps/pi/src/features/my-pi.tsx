@@ -662,6 +662,8 @@ interface PiSettings {
   whatsapp_config: Record<string, unknown> & {
     reminder_enabled: boolean;
     reminder_after_days: number;
+    check_in_enabled?: boolean;
+    check_in_after_hours?: number;
     reminder_templates: Record<string, { name: string; language: string }>;
   };
 }
@@ -1309,6 +1311,51 @@ function FollowUpsForm({
                 {[1, 2, 3, 5, 7, 10, 14, 21, 30].map((d) => (
                   <option key={d} value={d}>
                     {d} day{d === 1 ? "" : "s"}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <div className="flex items-center justify-between gap-4 border-t border-border pt-4">
+              <div>
+                <h3 className="text-sm font-medium">
+                  Pick up unfinished chats
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  When a customer goes quiet mid-conversation, pi writes once,
+                  remembering where you were: it asks for business details it
+                  doesn&apos;t know yet, repeats the open question, or says what
+                  happens next. It also answers messages that were missed.
+                </p>
+              </div>
+              <Switch
+                id="check-in"
+                checked={config.check_in_enabled ?? true}
+                disabled={!can("pi.settings.manage")}
+                onCheckedChange={(v) =>
+                  setConfig((c) => ({ ...c, check_in_enabled: v }))
+                }
+                label="Check in on quiet customers"
+              />
+            </div>
+            <Field
+              label="Check in after"
+              htmlFor="check-in-after"
+              hint="Hours without a reply, inside WhatsApp's 24-hour window."
+            >
+              <Select
+                id="check-in-after"
+                value={String(config.check_in_after_hours ?? 2)}
+                onChange={(e) =>
+                  setConfig((c) =>
+                    c
+                      ? { ...c, check_in_after_hours: Number(e.target.value) }
+                      : c,
+                  )
+                }
+              >
+                {[1, 2, 3, 4, 6, 8, 12].map((h) => (
+                  <option key={h} value={h}>
+                    {h} hour{h === 1 ? "" : "s"}
                   </option>
                 ))}
               </Select>

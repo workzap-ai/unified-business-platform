@@ -205,6 +205,11 @@ class ServiceTurn(BaseModel):
     # The customer asked for a meeting, call or visit. Booked from offered slots when the
     # company has them; otherwise the team takes over and the admins are told.
     meeting_requested: bool = False
+    # The day and time the customer asked to meet, resolved against now_local
+    # ("2026-10-12T17:00", the business's local time), and how ("google_meet", "zoom",
+    # "phone", "in_person"); empty until they say.
+    meeting_time: str = Field(default="", max_length=16)
+    meeting_how: str = Field(default="", max_length=20)
     awaiting_customer: bool = False
     ready_for_team: bool = False
     consent: Literal["unchanged", "granted", "declined"] = "unchanged"
@@ -251,6 +256,10 @@ class ServiceTurn(BaseModel):
         for key in ("awaiting_customer", "ready_for_team", "request_human", "meeting_requested"):
             if key in data:
                 data[key] = _flag(data[key])
+        when = str(data.get("meeting_time") or "").strip().replace(" ", "T")[:16]
+        data["meeting_time"] = when if re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}", when) else ""
+        how = str(data.get("meeting_how") or "").strip().lower().replace(" ", "_")
+        data["meeting_how"] = how if how in MEETING_HOW else ""
         gaps = data.get("knowledge_gaps")
         if isinstance(gaps, str):
             gaps = [gaps] if gaps.strip() else []
@@ -380,9 +389,13 @@ Meetings: when the customer asks for a meeting, call, visit or appointment, set
    verbatim and book with action="booking" only when they pick one. If there are no
    slots, keep the chat (request_human stays false): ask which days and times suit them
    if they haven't said, and say the team will confirm the time and send the meeting
-   link here. Never say a meeting is confirmed, booked, scheduled or arranged, and never
-   write a meeting link or a placeholder such as [link] or [Google Meet Link]: only the
-   team (team_answer_now / team_notes) or a booking confirms it. A team answer about
+   link here. When they say a day and time ("today 5pm", "kal 11 baje"), fill
+   meeting_time from now_local ("YYYY-MM-DDTHH:MM", their local time) and meeting_how
+   (google_meet, zoom, phone or in_person) when they say how; the team approves it and
+   pi sends the real link. Never say a meeting is confirmed, booked, scheduled or
+   arranged, and never write a meeting link or a placeholder such as [link] or
+   [Google Meet Link]: only the team (team_answer_now / team_notes) or a booking
+   confirms it. A team answer about
    the meeting (team_answer_now / team_notes) is the time and link to confirm to them.
 4. Share facts from approved_knowledge that answer the customer's obvious next worry
    (what's included, how long, how they'll receive it) without being asked. Never invent
@@ -429,6 +442,17 @@ remarks. They still never make you state a price.
 team_answer_now: the team just answered something you asked them. Write the
 customer a short follow-up now that gives them that answer naturally (as the next
 message of this chat, not a reply to an old message), then continue the brief.
+check_in_now: the customer went quiet in the middle of this conversation and you are
+writing first, a few hours later. One short, warm message that shows you remember
+exactly where you were (their project in their own words), never "just checking in".
+Then ONE thing, in this order: if check_in_now.missing_profile lists what you don't
+know about them yet (their name, business name, what the business does), ask for it in
+one friendly question so the team can prepare properly; otherwise repeat the one
+question still open in a few words; otherwise (nothing open) say what happens next.
+Never repeat a list you already sent, never apologise for writing, no new topics.
+check_in_now.missed=true means their last message (latest_customer_message) never
+got an answer: answer it now as the next message of the chat (a brief "sorry for the
+wait" is fine once), then the same ONE thing above.
 shared_documents: documents the customer sent in this chat (what the system read from
 each). They ARE the customer's requirements: fill the brief's project (service,
 scope, features, audience, timeline) from them, never ask for anything a document
@@ -812,6 +836,7 @@ async def prepare_context(
         "team_notes": await _team_notes(session, scope, conversation.id),
         **reply_language(conversation, message, rows),
         "tone": policy.response_rules.get("tone", "friendly"),
+        "now_local": _now_local(policy.timezone),
         "followups_enabled": policy.whatsapp_config.get("reminder_enabled", True),
     }
 
@@ -826,6 +851,16 @@ LATER_PROMISE = re.compile(
 # "[Google Meet Link]", "[date]", "[your name]": a template hole, never sent.
 PLACEHOLDER = re.compile(r"\[[^\]\n]{1,60}\]|\{\{[^}\n]{1,60}\}\}|<(?:link|url|date|time)>", re.I)
 URL = re.compile(r"https?://[^\s)\]>]+|\b(?:meet\.google\.com|zoom\.us)/[^\s)\]>]*", re.I)
+MEETING_HOW = ("google_meet", "zoom", "phone", "in_person")
+
+
+def _now_local(timezone: str) -> str:
+    """The business's local date and time, for resolving "today 5pm" and "kal"."""
+    from app.modules.pi.policy import zone
+
+    return f"{datetime.now(UTC).astimezone(zone(timezone)):%A %Y-%m-%d %H:%M} ({timezone})"
+
+
 CONFIRMED_MEETING = re.compile(
     r"\b(?:meeting|appointment|call|demo|visit|mulaqat)\b[^.!?\n]{0,60}"
     r"\b(?:is |has been |)(?:confirmed|booked|scheduled|fixed|set up|arranged)\b"
@@ -848,9 +883,11 @@ def invented(reply: str, context: dict[str, Any], booked: bool = False) -> str:
     for link in URL.findall(reply):
         if link.rstrip(".,") not in known:
             return "it contains a link nobody gave you; never make up links"
-    team_said = bool(context.get("team_answer_now")) or any(
-        re.search(r"meet|zoom|call|\d", str(n.get("note", "")), re.I)
-        for n in context.get("team_notes") or []
+    # Only a meeting the team really arranged (time and link) can be called confirmed;
+    # a bare "yes" from the team is not a meeting.
+    team_said = any(
+        "Meeting confirmed by the team" in str(n.get("note", n.get("answer", "")))
+        for n in [context.get("team_answer_now") or {}, *(context.get("team_notes") or [])]
     )
     if CONFIRMED_MEETING.search(reply) and not (booked or team_said):
         return (
@@ -918,6 +955,8 @@ CLOSING = re.compile(
     r"^\s*(?:no+|nope|nah|na|nahi+|nahin|nhi|nh|nai|bas|bs|that'?s (?:it|all)|nothing(?: else)?|"
     r"(?:nh|nahi|nhi|nahin) ?(?:chahiye|chaiye|chahye|chhaiye)|kuch nahi|kch nh|kuch nhi|no thanks|"
     r"ok(?:ay)?|theek hai|thik hai|done|ye ?hi|yahi|yehi|ye (?:bnao|bnwao|banao|banwao)|"
+    r"not (?:at the moment|right now|now|for now|really)|no more|nothing more|all good|"
+    r"(?:abhi|filhal|filhaal) (?:nahi|nhi|nh|nahin)|"
     r"(?:nh|nahi|no),? ye (?:bnao|bnwao|banao|banwao))\b",
     re.IGNORECASE,
 )
@@ -945,6 +984,25 @@ GENDERED_SELF = re.compile(
 AI_DISCLOSED = re.compile(r"\b(?:AI|A\.I\.|artificial intelligence|bot)\b", re.IGNORECASE)
 
 
+def unknown_customer(turn: ServiceTurn, context: dict[str, Any]) -> str | None:
+    """A new customer's brief is never sent to the team before pi knows whose business
+    it is: the team can't prepare a proposal for an unknown business."""
+    profile = merge_profile(context.get("customer_profile"), turn.customer_profile.model_dump())
+    if (
+        not turn.ready_for_team
+        or context.get("returning_customer")
+        or profile.get("business_name")
+        or profile.get("business_type")
+        or "?" in turn.reply
+    ):
+        return None
+    return (
+        "you are sending the brief to the team but don't know the customer's business yet; "
+        "keep ready_for_team=false and awaiting_customer=true, list the brief and ask in "
+        "one short question for their business name and what it does"
+    )
+
+
 def needless_question(reply: str, context: dict[str, Any]) -> str | None:
     """Why a drafted reply must not be sent as is, or None. Deterministic, so the model
     can't talk its way past it: a first reply that hides it's an AI, a brief repeated after
@@ -966,7 +1024,9 @@ def needless_question(reply: str, context: dict[str, Any]) -> str | None:
     if "?" not in reply:
         return None
     words = _words(reply.split("?")[-2] if reply.count("?") else reply)
-    for earlier in asked[-3:]:
+    check_in = context.get("check_in_now") or {}
+    for earlier in [] if check_in and not check_in.get("missed") else asked[-3:]:
+        # A check-in after the customer went quiet may repeat the open question once.
         other = _words(earlier)
         if words and other and len(words & other) / len(words | other) >= 0.45:
             return "it asks again what you already asked earlier in this chat"
@@ -1123,6 +1183,8 @@ async def compose_service_turn(
         problem = f"{later}, and also: {problem}" if problem else later
     if made_up := invented(turn.reply, context, turn.action == "booking"):
         problem = f"{made_up}, and also: {problem}" if problem else made_up
+    if gap := unknown_customer(turn, context):
+        problem = f"{gap}, and also: {problem}" if problem else gap
     expected = context.get("reply_language")
     wrong = clearly_other(turn.reply, str(expected or ""))
     if wrong:
@@ -1239,6 +1301,10 @@ async def save_service_turn(
         "mood": turn.mood,
         "projects": [project.model_dump() for project in turn.projects],
         "meeting_requested": turn.meeting_requested or bool(previous.get("meeting_requested")),
+        "meeting": {
+            "starts_at": turn.meeting_time or (previous.get("meeting") or {}).get("starts_at", ""),
+            "how": turn.meeting_how or (previous.get("meeting") or {}).get("how", ""),
+        },
         "customer_profile": merge_profile(
             previous.get("customer_profile"), turn.customer_profile.model_dump()
         ),
@@ -1303,12 +1369,19 @@ async def save_service_turn(
         due = await _follow_deal(session, scope, conversation, lead, previous, turn)
         if due is not None:
             proposals_due.append(due)
+    new_time = bool(turn.meeting_time) and turn.meeting_time != (previous.get("meeting") or {}).get(
+        "starts_at"
+    )
     if (
-        turn.meeting_requested
+        (turn.meeting_requested or new_time)
         and turn.action != "booking"
-        and (not previous.get("meeting_requested") or asks_for_meeting(message.body))
+        and (not previous.get("meeting_requested") or asks_for_meeting(message.body) or new_time)
     ):
-        await ask_for_meeting(session, scope, conversation, turn.summary, message.body)
+        said = message.body
+        if turn.meeting_time:
+            how = turn.meeting_how.replace("_", " ") or "any way"
+            said += f" (asked for {turn.meeting_time.replace('T', ' ')}, {how})"
+        await ask_for_meeting(session, scope, conversation, turn.summary, said)
     elif turn._ask_team:
         await ask_team(session, scope, conversation, turn.summary, message.body)
     for gap in new_gaps:

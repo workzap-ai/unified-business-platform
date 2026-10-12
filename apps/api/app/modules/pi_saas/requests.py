@@ -372,16 +372,25 @@ async def answer_request(
     request_id: UUID, data: AnswerInput, request: Request, scope: Scope, session: Session
 ) -> dict[str, Any]:
     from app.modules.pi.service import PiService
+    from app.modules.pi_saas.meetings import auto_arrange, runtime_for
 
     row = await WorkspaceRepository(session, PiStaffRequest, scope).get(request_id)
     await PiService(session, scope).conversations.get(row.conversation_id)  # visibility
-    row = await answer(
+    max_bytes = request.app.state.settings.knowledge_upload_max_bytes
+    arranged = (
+        await auto_arrange(
+            session, scope, runtime_for(request), row, data.answer, max_bytes=max_bytes
+        )
+        if row.status == "open"
+        else None
+    )
+    row = arranged or await answer(
         session,
         scope,
         request_id,
         data.answer,
         save_as_knowledge=data.save_as_knowledge,
-        max_bytes=request.app.state.settings.knowledge_upload_max_bytes,
+        max_bytes=max_bytes,
     )
     await session.commit()
     await enqueue_reply(request, row.id)

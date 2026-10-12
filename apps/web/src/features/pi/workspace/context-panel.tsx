@@ -17,7 +17,7 @@ import { StatusBadge } from "@/components/app/status-badge";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
 import { piService } from "../service";
-import type { AgentRun, ConversationContext } from "../types";
+import type { AgentRun, ConversationContext, ProviderName } from "../types";
 import {
   PROVIDER_LABELS,
   agentLabel,
@@ -479,7 +479,7 @@ function RunCard({
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
         {run.provider && (
           <span>
-            {PROVIDER_LABELS[run.provider] ?? run.provider}
+            {PROVIDER_LABELS[run.provider as ProviderName] ?? run.provider}
             {run.model_alias && ` · ${humanize(run.model_alias)}`}
           </span>
         )}

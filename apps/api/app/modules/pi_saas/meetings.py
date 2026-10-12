@@ -10,6 +10,7 @@ the reply guard only lets through links the team gave it.
 """
 
 import logging
+import re
 from datetime import datetime, timedelta
 from typing import Any, Literal
 from uuid import UUID
@@ -138,6 +139,7 @@ async def arrange(
     data: MeetingInput,
     *,
     max_bytes: int,
+    any_kind: bool = False,
 ) -> PiStaffRequest:
     """Book the meeting and answer the request with its time and link; the caller queues
     pi's reply to the customer."""
@@ -145,7 +147,7 @@ async def arrange(
 
     scope.require("pi.inbox.reply")
     row = await WorkspaceRepository(session, PiStaffRequest, scope).get(request_id)
-    if row.kind != "meeting":
+    if row.kind != "meeting" and not any_kind:
         raise BusinessRuleViolation("NOT_A_MEETING", "This request isn't a meeting", 422)
     if row.status != "open":
         raise BusinessRuleViolation("REQUEST_CLOSED", "This request was already answered")
@@ -176,6 +178,71 @@ async def arrange(
     return await answer(session, scope, row.id, text, save_as_knowledge=False, max_bytes=max_bytes)
 
 
+APPROVAL = re.compile(
+    r"\b(?:yes|yep|yeah|ok(?:ay)?|sure|confirm\w*|approve\w*|schedul\w*|book|arrange|"
+    r"go ahead|do it|fine|haan|han|ji|theek|thik|kar ?do|done)\b",
+    re.IGNORECASE,
+)
+LINK = re.compile(r"https?://\S+")
+MEETING_TALK = re.compile(r"\b(?:meeting|meet|call|zoom|demo|appointment|mulaqat)\b", re.I)
+
+
+async def auto_arrange(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    runtime: Any,
+    row: PiStaffRequest,
+    text: str,
+    *,
+    max_bytes: int,
+) -> PiStaffRequest | None:
+    """The team answered a meeting request in words ("yes, confirmed", "do schedule it",
+    or a pasted Zoom link). When the customer already gave a time, the meeting is made
+    for real: a Google Meet from the connected calendar, or the link they pasted. None
+    when the answer isn't an approval or no time is known (it's then a plain answer).
+    Never a confirmation without a link: without a calendar it asks for one."""
+    from app.modules.pi.models import PiConversation
+
+    if row.kind != "meeting" and not MEETING_TALK.search(row.question or ""):
+        return None
+    link = LINK.search(text)
+    if not (link or APPROVAL.search(text)):
+        return None
+    conversation = await WorkspaceRepository(session, PiConversation, scope).get(
+        row.conversation_id
+    )
+    meeting = (conversation.service_brief or {}).get("meeting") or {}
+    starts_at = str(meeting.get("starts_at") or "")
+    settings_row = await WorkspaceRepository(session, PiSettings, scope).find()
+    zone = settings_row.timezone if settings_row else "UTC"
+    try:
+        start = _local(starts_at, zone)
+    except ValueError:
+        return None
+    if start < datetime.now(start.tzinfo) - timedelta(minutes=30):
+        return None  # An old time: the team should pick one in the meeting dialog.
+    data = MeetingInput(
+        starts_at=starts_at,
+        how="link" if link else "google_meet",
+        link=link.group(0).rstrip(".,)") if link else "",
+        note="" if link else LINK.sub("", text).strip()[:300],
+    )
+    try:
+        return await arrange(
+            session, scope, runtime, row.id, data, max_bytes=max_bytes, any_kind=True
+        )
+    except BusinessRuleViolation as error:
+        if error.code in {"CALENDAR_NOT_CONNECTED", "MEET_FAILED"}:
+            raise BusinessRuleViolation(
+                "MEETING_NEEDS_LINK",
+                f"pi can't confirm the {start:%I:%M %p} meeting without a link: "
+                + error.message
+                + ' Or open "Arrange the meeting" and paste your Zoom / Meet link.',
+                409,
+            ) from None
+        raise
+
+
 def runtime_for(request: Any) -> Any:
     """What the calendar call needs from the app (settings + outbound HTTP)."""
     state = request.app.state
@@ -189,4 +256,4 @@ def runtime_for(request: Any) -> Any:
     return _Runtime()
 
 
-__all__ = ["MeetingInput", "arrange", "runtime_for"]
+__all__ = ["MeetingInput", "arrange", "auto_arrange", "runtime_for"]

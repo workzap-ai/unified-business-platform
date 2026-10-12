@@ -37,6 +37,16 @@ export const ProviderNameSchema: z.ZodType<Pi.ProviderName> = z.union([
   z.literal("gemini"),
   z.literal("groq"),
 ]);
+export const RunStepSchema: z.ZodType<Pi.RunStep> = z.union([
+  z.literal("router"),
+  z.literal("customer_memory"),
+  z.literal("support"),
+  z.literal("requirement"),
+  z.literal("sales_order"),
+  z.literal("handoff"),
+  z.literal("team_question"),
+  z.literal("meeting_request"),
+]);
 export const ConversationSchema: z.ZodType<Pi.Conversation> = z.object({
   id: z.string(),
   customer_id: z.string(),
@@ -105,6 +115,9 @@ export const MessageSchema: z.ZodType<Pi.Message> = z.object({
       duration_s: z.union([z.undefined(), z.number()]).optional(),
       transcript: z.union([z.undefined(), z.string()]).optional(),
       description: z.union([z.undefined(), z.string()]).optional(),
+      file_kind: z.union([z.undefined(), z.literal("document")]).optional(),
+      file_id: z.union([z.undefined(), z.string()]).optional(),
+      filename: z.union([z.undefined(), z.string()]).optional(),
     }),
   ]),
   status: z.union([
@@ -185,14 +198,11 @@ export const AgentRunSchema: z.ZodType<Pi.AgentRun> = z.object({
       z.literal("requirement"),
       z.literal("sales_order"),
       z.literal("handoff"),
+      z.literal("team_question"),
+      z.literal("meeting_request"),
     ]),
   ),
-  provider: z.union([
-    z.null(),
-    z.literal("openai"),
-    z.literal("gemini"),
-    z.literal("groq"),
-  ]),
+  provider: z.union([z.null(), z.string()]),
   model_alias: z.union([z.null(), z.string()]),
   fallback_used: z.boolean(),
   latency_ms: z.number(),
@@ -388,14 +398,11 @@ export const ConversationContextSchema: z.ZodType<Pi.ConversationContext> =
             z.literal("requirement"),
             z.literal("sales_order"),
             z.literal("handoff"),
+            z.literal("team_question"),
+            z.literal("meeting_request"),
           ]),
         ),
-        provider: z.union([
-          z.null(),
-          z.literal("openai"),
-          z.literal("gemini"),
-          z.literal("groq"),
-        ]),
+        provider: z.union([z.null(), z.string()]),
         model_alias: z.union([z.null(), z.string()]),
         fallback_used: z.boolean(),
         latency_ms: z.number(),
@@ -890,6 +897,10 @@ export const PiSettingsSchema: z.ZodType<Pi.PiSettings> = z.object({
     max_media_mb: z.number(),
     reminder_enabled: z.boolean(),
     reminder_after_days: z.number(),
+    check_in_enabled: z
+      .union([z.undefined(), z.literal(false), z.literal(true)])
+      .optional(),
+    check_in_after_hours: z.union([z.undefined(), z.number()]).optional(),
     reminder_templates: z.record(
       z.string(),
       z.object({ name: z.string(), language: z.string() }),

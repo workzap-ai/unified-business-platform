@@ -129,6 +129,9 @@ DEFAULTS: dict[str, Any] = {
         "max_media_mb": 10,
         "reminder_enabled": True,
         "reminder_after_days": 7,
+        # A free-form check-in when a customer goes quiet mid-conversation (24h window).
+        "check_in_enabled": True,
+        "check_in_after_hours": 2,
         "reminder_templates": {},
         # Follow-up ladder after the 24-hour window: {"en": {"day3": {name, language}, ...}}.
         "ladder_templates": {},

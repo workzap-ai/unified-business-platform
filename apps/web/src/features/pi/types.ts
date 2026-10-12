@@ -25,6 +25,8 @@ export type AgentKey =
   | "sales_order"
   | "handoff";
 export type ProviderName = "openai" | "gemini" | "groq";
+// A run's steps: the agents, plus what pi did besides replying.
+export type RunStep = AgentKey | "team_question" | "meeting_request";
 
 export type Conversation = {
   id: string;
@@ -102,8 +104,9 @@ export type AgentRun = {
   status: "running" | "completed" | "failed" | "handoff" | "skipped";
   intent: string | null;
   confidence: number | null;
-  agent_path: AgentKey[];
-  provider: ProviderName | null;
+  agent_path: RunStep[];
+  // Any provider the failover used (it can be newer than this list).
+  provider: string | null;
   model_alias: string | null;
   fallback_used: boolean;
   latency_ms: number;
@@ -439,6 +442,8 @@ export type PiSettings = {
     max_media_mb: number;
     reminder_enabled: boolean;
     reminder_after_days: number;
+    check_in_enabled?: boolean;
+    check_in_after_hours?: number;
     reminder_templates: Record<string, { name: string; language: string }>;
   };
   permissions: {

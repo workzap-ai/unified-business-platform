@@ -11,6 +11,7 @@ from app.core.config import get_settings
 from app.core.database import create_engine
 from app.integrations.jobs import JOBS as INTEGRATION_JOBS
 from app.integrations.jobs import integrations_sweep
+from app.modules.pi.check_in import sweep_check_ins
 from app.modules.pi.followups import sweep_followups
 from app.modules.pi.knowledge_jobs import index_document, sweep_knowledge
 from app.modules.pi.runtime import process_pi_event, send_pi_message, sweep_pi
@@ -37,6 +38,7 @@ JOB_FUNCTIONS: dict[str, Callable[..., Awaitable[Any]]] = {
     "send_pi_message": send_pi_message,
     "sweep_pi": sweep_pi,
     "sweep_followups": sweep_followups,
+    "sweep_check_ins": sweep_check_ins,
     "sweep_customer_journeys": sweep_customer_journeys,
     "embed_document": embed_document,
     "index_document": index_document,
@@ -86,6 +88,7 @@ class WorkerSettings:
     cron_jobs = [
         cron(sweep_pi, second={0, 30}, unique=True),
         cron(sweep_followups, minute=set(range(0, 60, 5)), second=10, unique=True),
+        cron(sweep_check_ins, minute=set(range(2, 60, 5)), second=30, unique=True),
         cron(sweep_customer_journeys, second={50}, unique=True),
         cron(sweep_knowledge, second={20, 50}, unique=True),
         cron(integrations_sweep, second={15}, unique=True),

@@ -1275,6 +1275,8 @@ const waSchema = z.object({
   media_video: z.boolean(),
   reminder_enabled: z.boolean(),
   reminder_after_days: num().int().min(1).max(30),
+  check_in_enabled: z.boolean(),
+  check_in_after_hours: num().int().min(1).max(12),
   reminder_templates: z.record(
     z.string().regex(/^(roman_ur|[a-z]{2,3}([-_][A-Za-z0-9]{2,8})?)$/),
     z.object({
@@ -1297,6 +1299,8 @@ export function WhatsAppConfigForm({ settings }: { settings: PiSettings }) {
       media_video: settings.whatsapp_config.media_video ?? true,
       reminder_enabled: settings.whatsapp_config.reminder_enabled ?? true,
       reminder_after_days: settings.whatsapp_config.reminder_after_days ?? 7,
+      check_in_enabled: settings.whatsapp_config.check_in_enabled ?? true,
+      check_in_after_hours: settings.whatsapp_config.check_in_after_hours ?? 2,
       reminder_templates: settings.whatsapp_config.reminder_templates ?? {},
     },
   });
@@ -1362,6 +1366,32 @@ export function WhatsAppConfigForm({ settings }: { settings: PiSettings }) {
             max={16}
             className="w-28"
             {...form.register("max_media_mb", { valueAsNumber: true })}
+          />
+        </FormField>
+      </FormSection>
+      <FormSection
+        title="Pick up unfinished chats"
+        description="When a customer goes quiet in the middle of a conversation, pi writes once, remembering where you were: it asks for the business details it still doesn't know, repeats the one open question, or says what happens next. It also answers any message that was missed. Only inside WhatsApp's 24-hour window, never at night or while your team is in the chat."
+      >
+        <SwitchField
+          form={form}
+          name="check_in_enabled"
+          label="Check in on quiet customers"
+          description="One message per silence, at most two a day."
+        />
+        <FormField
+          label="Hours without a reply"
+          htmlFor="wa-check-in-hours"
+          error={err.check_in_after_hours}
+          help="1–12 hours. pi's own follow-up at about 20 hours and the day 3, 7 and 14 templates still follow."
+        >
+          <Input
+            id="wa-check-in-hours"
+            type="number"
+            min={1}
+            max={12}
+            className="w-28"
+            {...form.register("check_in_after_hours", { valueAsNumber: true })}
           />
         </FormField>
       </FormSection>

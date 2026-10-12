@@ -69,3 +69,61 @@ async def test_in_person_needs_a_place_and_meet_needs_a_calendar(api, business_d
     row = await business_db.get(PiStaffRequest, UUID(request_id))
     assert row.status == "open"  # nothing was answered
     await pi.close()
+
+
+async def _asked_for(pi, request_id: str, when: str, how: str = "google_meet") -> None:
+    from app.modules.pi.models import PiConversation
+
+    row = await business_db_row(pi, request_id)
+    conversation = await pi.db.get(PiConversation, row.conversation_id)
+    conversation.service_brief = {
+        **(conversation.service_brief or {}),
+        "meeting": {"starts_at": when, "how": how},
+    }
+    await pi.db.commit()
+
+
+async def business_db_row(pi, request_id: str) -> PiStaffRequest:
+    return await pi.db.get(PiStaffRequest, UUID(request_id))
+
+
+async def test_the_teams_yes_with_a_link_arranges_the_time_the_customer_asked_for(api, business_db):
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    request_id = await _meeting_request(pi)
+    await _asked_for(pi, request_id, "2026-10-20T17:00")
+    done = await api.post(
+        f"{DESK}/{request_id}/answer",
+        json={"answer": "Yes confirmed, use https://zoom.us/j/987654321"},
+    )
+    assert done.status_code == 200, done.text
+    answer = done.json()["answer"]
+    assert answer.startswith("Meeting confirmed by the team:")
+    assert "05:00 PM" in answer and "https://zoom.us/j/987654321" in answer
+    await pi.close()
+
+
+async def test_a_bare_yes_without_a_calendar_asks_for_a_link_and_pi_never_confirms(
+    api, business_db
+):
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    request_id = await _meeting_request(pi)
+    await _asked_for(pi, request_id, "2026-10-20T17:00")
+    yes = await api.post(f"{DESK}/{request_id}/answer", json={"answer": "Yes, do confirmed"})
+    assert yes.status_code == 409
+    assert "link" in yes.json()["error"]["message"]
+    assert (await business_db_row(pi, request_id)).status == "open"
+    # A plain team note is not a meeting: pi can't call it confirmed.
+    context = {"team_answer_now": {"answer": "Yes, do confirmed"}}
+    assert invented("Your meeting is confirmed for 5 PM on Google Meet.", context)
+    await pi.close()
+
+
+async def test_without_a_time_the_answer_is_a_plain_note(api, business_db):
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    request_id = await _meeting_request(pi)
+    done = await api.post(
+        f"{DESK}/{request_id}/answer", json={"answer": "Yes, ask them which day suits"}
+    )
+    assert done.status_code == 200, done.text
+    assert done.json()["answer"] == "Yes, ask them which day suits"
+    await pi.close()
