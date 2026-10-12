@@ -189,8 +189,57 @@ async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db):
     assert "is paid in full" in texts[-1] and "Your receipt RCPT-" in texts[-1]
     board = (await api.get(f"{DEALS}/board")).json()
     assert next(i for i in board["items"] if i["id"] == lead_id)["next"] == "Paid: deliver the work"
+    path = (await api.get(f"{DEALS}/leads/{lead_id}/journey")).json()
+    assert path["next"]["title"] == "Start the work"
+    assert path["next"]["action"] == "start_work"
+    assert [s["key"] for s in path["steps"]][-3:] == ["paid", "work", "delivered"]
+
+    # After the payment the journey carries on: work started, delivered, feedback.
+    pi.sent.clear()
+    # Started from the orders page: the queued update goes out with the next send.
+    moved = await api.post(
+        f"/api/v1/orders/{order.id}/actions", json={"action": "start_processing"}
+    )
+    assert moved.status_code == 200, moved.text
+    texts = await _send(pi)
+    assert texts == [
+        "Good news Ayesha: work on Branding for Crescent Bakers has started. "
+        "We'll keep you posted here."
+    ]
+    path = (await api.get(f"{DEALS}/leads/{lead_id}/journey")).json()
+    assert path["next"]["title"] == "Deliver the work"
+    assert path["next"]["action"] == "mark_delivered"
+    # The deal's "Mark delivered" button (a service order is completed).
+    moved = await api.post(f"{DEALS}/orders/{order.id}/work", json={"step": "delivered"})
+    assert moved.status_code == 200 and moved.json()["status"] == "delivered", moved.text
+    texts = await _send(pi)
+    assert texts[-1].startswith("Branding for Crescent Bakers is delivered Ayesha. How did it go?")
+    path = (await api.get(f"{DEALS}/leads/{lead_id}/journey")).json()
+    assert all(s["done"] for s in path["steps"] if s["key"] != "meeting")
+    assert path["next"]["title"] == "Delivered: get their feedback" and path["next"]["auto"]
     await public.aclose()
     await pi.close()
+
+
+def test_pi_says_the_real_next_step_all_the_way_to_delivery():
+    from types import SimpleNamespace as N
+
+    from app.modules.pi.service_conversation import next_for
+
+    quote = N(status="accepted", number="QUO-1")
+    issued = N(status="issued", number="INV-1")
+    assert "invoice INV-1 with the payment link" in next_for("won", quote, True, invoice=issued)
+    part = N(status="partially_paid", number="INV-1")
+    assert "balance" in next_for("won", quote, True, invoice=part)
+    paid = N(status="paid", number="INV-1")
+    confirmed = N(status="confirmed", number="ORD-1")
+    assert "starting the work" in next_for("won", quote, True, invoice=paid, order=confirmed)
+    working = N(status="processing", number="ORD-1")
+    assert "working on it" in next_for("won", quote, True, invoice=paid, order=working)
+    done = N(status="delivered", number="ORD-1")
+    assert "ask how it went" in next_for("won", quote, True, invoice=paid, order=done)
+    # Before the invoice nothing changes.
+    assert "still collecting" in next_for("new", None, True)
 
 
 async def test_changes_and_decline_move_the_lead_back_or_lose_it(api, business_db):

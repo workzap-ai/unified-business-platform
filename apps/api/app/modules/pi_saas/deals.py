@@ -168,7 +168,26 @@ TEXTS: dict[str, dict[str, str]] = {
         "en": "Payment received for invoice {number}. Thank you!",
         "roman_ur": "Invoice {number} ki payment mil gayi hai. Shukriya!",
     },
+    # After the payment: the work itself (the order moving on).
+    "started": {
+        "en": "Good news{hi}: work on {project} has started. We'll keep you posted here.",
+        "roman_ur": "Khushkhabri{hi}: {project} par kaam shuru ho gaya hai. Updates yahin "
+        "milti rahengi.",
+    },
+    "shipped": {
+        "en": "Your order {number} for {project} is on its way.",
+        "roman_ur": "{project} ka order {number} raaste mein hai.",
+    },
+    "delivered": {
+        "en": "{project} is delivered{hi}. How did it go? If anything needs a change, just "
+        "reply here.",
+        "roman_ur": "{project} deliver ho gaya hai{hi}. Kaisa laga? Koi tabdeeli chahiye to "
+        "yahin bata dein.",
+    },
 }
+
+# Order moves the customer hears about, and the lead note each one leaves.
+ORDER_UPDATES = {"processing": "started", "shipped": "shipped", "delivered": "delivered"}
 
 
 def say(key: str, language: str, **values: str) -> str:
@@ -1275,6 +1294,49 @@ async def after_paid(session: AsyncSession, scope: WorkspaceScope, invoice: Invo
         return []  # Outside the window a thank-you isn't worth a template.
     text = say("paid", conversation.language or "en", number=invoice.number)
     return [await _queue(session, scope, conversation, text, f"pi-paid:{invoice.id}")]
+
+
+async def after_order_moved(
+    session: AsyncSession, scope: WorkspaceScope, order: Order, target: str
+) -> list[str]:
+    """The work on a pi deal moved on (started, shipped, delivered): a note on the deal
+    and one short update to the customer on WhatsApp, inside the 24-hour window. The
+    delivered message asks how it went, so the chat carries on to feedback."""
+    key = ORDER_UPDATES.get(target)
+    if key is None or order.quote_id is None:
+        return []
+    quote = await WorkspaceRepository(session, Quote, scope).find(Quote.id == order.quote_id)
+    if quote is None or quote.lead_id is None:
+        return []
+    lead = await WorkspaceRepository(session, SalesLead, scope).find(SalesLead.id == quote.lead_id)
+    if lead is None:
+        return []
+    sent_by_pi = await WorkspaceRepository(session, PiDocument, scope).find(
+        PiDocument.kind == "proposal", PiDocument.quote_id == quote.id
+    )
+    if sent_by_pi is None:
+        return []  # Not a deal pi ran: the team tells the customer themselves.
+    add_note(lead, f"order {order.number} {target}")
+    customer = await WorkspaceRepository(session, Customer, scope).find(
+        Customer.id == order.customer_id
+    )
+    contact = _contact(customer) if customer else None
+    conversation = (
+        await _conversation(session, scope, customer, contact) if customer and contact else None
+    )
+    if conversation is None or not conversation.last_inbound_at:
+        return []
+    if conversation.last_inbound_at < datetime.now(UTC) - WINDOW:
+        return []  # Outside the window pi's next check-in carries the news.
+    first = "" if customer.name.startswith("WhatsApp") else customer.name.split(" ")[0]
+    text = say(
+        key,
+        conversation.language or "en",
+        hi=f" {first}" if first else "",
+        project=lead.title,
+        number=order.number,
+    )
+    return [await _queue(session, scope, conversation, text, f"pi-order-{key}:{order.id}")]
 
 
 # ---- Starting from a number -----------------------------------------------------------

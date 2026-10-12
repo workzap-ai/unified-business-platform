@@ -21,6 +21,7 @@ from app.modules.audit.service import record
 from app.modules.billing.models import Invoice
 from app.modules.customers.models import Customer
 from app.modules.orders.models import Order
+from app.modules.pi.models import PiMessage
 from app.modules.pi.service import require_pi
 from app.modules.pi_saas import deal_followups, deals
 from app.modules.pi_saas.deal_models import PAYMENT_DEFAULTS, PiDocument
@@ -133,6 +134,41 @@ async def send_invoice(
     await session.commit()
     await _enqueue(request, ids)
     return view
+
+
+class WorkStep(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    step: Literal["start", "delivered"]
+
+
+@router.post("/orders/{order_id}/work")
+async def move_work(
+    order_id: UUID, data: WorkStep, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """The deal's work moved on: started, or delivered (a service is completed, a product
+    delivered once shipped). pi tells the customer straight away."""
+    from app.modules.orders.service import OrderService, action_applies
+
+    await require_pi(session, scope, "orders.write")
+    order = await WorkspaceRepository(session, Order, scope).get(order_id)
+    if data.step == "start":
+        action = "start_processing"
+    else:
+        action = next(
+            (a for a in ("complete", "deliver", "ship") if action_applies(order, a)), "complete"
+        )
+    order = await OrderService(session, scope).transition(order.id, action)
+    keys = [f"pi-order-{key}:{order.id}" for key in deals.ORDER_UPDATES.values()]
+    queued = await session.scalars(
+        WorkspaceRepository(session, PiMessage, scope)
+        .select()
+        .with_only_columns(PiMessage.id)
+        .where(PiMessage.idempotency_key.in_(keys), PiMessage.status == "queued")
+    )
+    ids = [str(x) for x in queued]
+    await session.commit()
+    await _enqueue(request, ids)
+    return {"order_id": order.id, "status": order.status}
 
 
 class StartDeal(BaseModel):
@@ -296,6 +332,8 @@ def _next_step(stage: str, quote: Quote | None, invoice: Invoice | None) -> str:
     if invoice is not None:
         if invoice.status == "paid":
             return "Paid: deliver the work"
+        if invoice.status == "partially_paid":
+            return "Part paid: collect the balance"
         return "Waiting for payment"
     if quote is None:
         return "Collect the brief" if stage == "new" else "Prepare a proposal"
@@ -474,9 +512,24 @@ async def journey(lead_id: UUID, scope: Scope, session: Session) -> dict[str, An
         ),
         _step(
             "paid",
-            "Paid",
+            "Part paid" if invoice and invoice.status == "partially_paid" else "Paid",
             invoice.updated_at if invoice and invoice.status == "paid" else None,
             bool(invoice and invoice.status == "paid"),
+            deals.money(invoice.amount_paid, invoice.currency)
+            if invoice and invoice.status == "partially_paid"
+            else "",
+        ),
+        _step(
+            "work",
+            "Work started",
+            None,
+            bool(order and order.status in {"processing", "shipped", "delivered"}),
+        ),
+        _step(
+            "delivered",
+            "Shipped" if order and order.status == "shipped" else "Delivered",
+            None,
+            bool(order and order.status == "delivered"),
         ),
     ]
     if meeting is not None:
@@ -501,7 +554,7 @@ async def journey(lead_id: UUID, scope: Scope, session: Session) -> dict[str, An
         "stage": lead.stage,
         "steps": steps,
         "meeting": meeting,
-        "next": _guide(lead, quote, doc, invoice, settings, meeting),
+        "next": _guide(lead, quote, doc, invoice, settings, meeting, order),
         "reminder": (
             deal_followups.next_reminder(doc, quote, invoice, datetime.now(UTC))
             if settings["auto_followups"] and lead.stage != "lost"
@@ -521,6 +574,7 @@ def _guide(
     invoice: Invoice | None,
     settings: dict[str, Any],
     meeting: dict[str, Any] | None = None,
+    order: Order | None = None,
 ) -> dict[str, Any]:
     """The next step in plain words. ``action`` is a button the page can run; ``href``
     opens the page where the team does it; ``auto`` says pi handles it alone."""
@@ -532,10 +586,36 @@ def _guide(
 
     if lead.stage == "lost":
         return step("Closed", "This deal was lost. Reopen the lead to try again.")
+    work = order.status if order is not None else ""
+    if work == "delivered":
+        return step(
+            "Delivered: get their feedback",
+            "pi told the customer it's delivered and asked how it went. Their answer and "
+            "any next project come back in the chat.",
+            auto=True,
+        )
     if invoice is not None:
+        if invoice.status == "paid" and work in {"processing", "shipped"}:
+            return step(
+                "Deliver the work",
+                "Mark it delivered when it's done; pi tells the customer and asks how it went.",
+                action="mark_delivered",
+            )
         if invoice.status == "paid":
             return step(
-                "Paid", "The customer paid. Deliver the work.", href=f"/invoices/{invoice.id}"
+                "Start the work",
+                "The customer paid. Start it here; pi tells them the work has started.",
+                action="start_work" if order else "",
+                href="" if order else f"/invoices/{invoice.id}",
+            )
+        if invoice.status == "partially_paid":
+            return step(
+                "Collect the balance",
+                f"Part paid ({deals.money(invoice.amount_paid, invoice.currency)} of "
+                f"{deals.money(invoice.total, invoice.currency)}). The same payment link "
+                "takes the rest; record a bank or cash payment on the invoice.",
+                action="send_invoice",
+                href=f"/invoices/{invoice.id}",
             )
         return step(
             "Waiting for payment",

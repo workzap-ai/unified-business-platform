@@ -153,6 +153,8 @@ export const JOURNEY_ACTIONS = [
   "proposal_from_brief",
   "send_proposal",
   "send_invoice",
+  "start_work",
+  "mark_delivered",
 ] as const;
 export type JourneyAction = (typeof JOURNEY_ACTIONS)[number];
 
@@ -201,6 +203,11 @@ export interface DealService {
   proposalFromLead(leadId: string): Promise<ProposalCreated>;
   sendQuote(quoteId: string): Promise<DeliveryResult>;
   sendInvoice(invoiceId: string): Promise<DeliveryResult>;
+  /** The deal's work moved on; pi tells the customer. */
+  moveWork(
+    orderId: string,
+    step: "start" | "delivered",
+  ): Promise<{ status: string }>;
   start(input: StartDealInput): Promise<DealStarted>;
   documents(
     filter: { quote_id: string } | { invoice_id: string },
@@ -237,6 +244,13 @@ const live: DealService = {
       `/pi/deals/invoices/${invoiceId}/send`,
       deliveryResultSchema,
     ),
+  moveWork: (orderId, step) =>
+    apiRequest(
+      "POST",
+      `/pi/deals/orders/${orderId}/work`,
+      z.object({ status: z.string() }),
+      { body: { step } },
+    ),
   start: (input) =>
     apiRequest("POST", "/pi/deals/start", dealStartedSchema, { body: input }),
   documents: (filter) =>
@@ -266,6 +280,7 @@ const demo: DealService = {
   proposalFromLead: async () => notConnected(),
   sendQuote: async () => notConnected(),
   sendInvoice: async () => notConnected(),
+  moveWork: async () => notConnected(),
   start: async () => notConnected(),
   documents: async () => [],
   board: async () => notConnected(),

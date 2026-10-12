@@ -118,5 +118,5 @@ async def test_a_project_document_shows_on_its_project(api, business_db):
     ]
     # Every journey step with whether it's done: the "what's been done" view.
     assert project["steps"][0]["key"] == "enquiry" and project["steps"][0]["done"]
-    assert project["steps"][-1]["key"] == "paid" and not project["steps"][-1]["done"]
+    assert project["steps"][-1]["key"] == "delivered" and not project["steps"][-1]["done"]
     await pi.close()

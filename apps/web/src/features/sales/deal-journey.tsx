@@ -9,7 +9,9 @@ import {
   Check,
   Circle,
   Compass,
+  PackageCheck,
   Pencil,
+  Play,
   Route,
   Sparkles,
 } from "lucide-react";
@@ -70,8 +72,45 @@ export function NextStepCard({
     },
   );
 
+  const work = useScopedMutation(
+    (step: "start" | "delivered") =>
+      dealService.moveWork(journey.order_id ?? "", step),
+    {
+      invalidate: [...INVALIDATE, ["orders"], ["customers"]],
+      toastErrors: false,
+      success: (r) =>
+        r.status === "delivered"
+          ? "Marked delivered. pi asked the customer how it went."
+          : r.status === "shipped"
+            ? "Marked shipped. pi told the customer."
+            : "Work started. pi told the customer.",
+    },
+  );
+
   let button: React.ReactNode = null;
-  if (next.action === "proposal_from_brief" && can("quotes.write")) {
+  if (
+    (next.action === "start_work" || next.action === "mark_delivered") &&
+    journey.order_id &&
+    can("orders.write")
+  ) {
+    const step = next.action === "start_work" ? "start" : "delivered";
+    button = (
+      <Button
+        size="sm"
+        loading={work.isPending}
+        disabled={work.isPending}
+        onClick={() =>
+          work.mutate(step, {
+            onError: (e) =>
+              toast.error(dealErrorMessage(e, "The order couldn't be moved.")),
+          })
+        }
+      >
+        {step === "start" ? <Play /> : <PackageCheck />}
+        {step === "start" ? "Start the work" : "Mark delivered"}
+      </Button>
+    );
+  } else if (next.action === "proposal_from_brief" && can("quotes.write")) {
     button = (
       <Button
         size="sm"

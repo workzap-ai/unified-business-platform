@@ -20,7 +20,9 @@ import {
   Eye,
   FileText,
   MessageCircle,
+  PackageCheck,
   Pencil,
+  Play,
   Receipt,
   Route,
   Send,
@@ -83,7 +85,13 @@ interface Lead {
 }
 
 type JourneyAction =
-  "" | "edit" | "proposal_from_brief" | "send_proposal" | "send_invoice";
+  | ""
+  | "edit"
+  | "proposal_from_brief"
+  | "send_proposal"
+  | "send_invoice"
+  | "start_work"
+  | "mark_delivered";
 
 interface JourneyStep {
   key: string;
@@ -487,8 +495,45 @@ function NextStepCard({
     { invalidate: [["deals"]], onSuccess: onDelivered },
   );
 
+  const work = useAction(
+    (step: "start" | "delivered") =>
+      post<{ status: string }>(
+        `/pi/deals/orders/${journey.order_id ?? ""}/work`,
+        { step },
+      ),
+    {
+      invalidate: [["deals"]],
+      success: (r) =>
+        r.status === "delivered"
+          ? "Marked delivered. pi asked the customer how it went."
+          : r.status === "shipped"
+            ? "Marked shipped. pi told the customer."
+            : "Work started. pi told the customer.",
+    },
+  );
+
   let button: React.ReactNode = null;
-  if (next.action === "proposal_from_brief" && can("quotes.write")) {
+  if (
+    (next.action === "start_work" || next.action === "mark_delivered") &&
+    journey.order_id &&
+    can("orders.write")
+  ) {
+    const step = next.action === "start_work" ? "start" : "delivered";
+    button = (
+      <Button
+        size="sm"
+        loading={work.isPending}
+        onClick={() => work.mutate(step)}
+      >
+        {step === "start" ? (
+          <Play className="size-4" aria-hidden />
+        ) : (
+          <PackageCheck className="size-4" aria-hidden />
+        )}
+        {step === "start" ? "Start the work" : "Mark delivered"}
+      </Button>
+    );
+  } else if (next.action === "proposal_from_brief" && can("quotes.write")) {
     button = (
       <Button
         size="sm"

@@ -2138,6 +2138,9 @@ async def project_deals(
             .limit(10)
         )
     )
+    from app.modules.billing.models import Invoice
+    from app.modules.orders.models import Order
+
     steps: list[dict[str, str]] = []
     for lead in leads:
         quote = await session.scalar(
@@ -2147,18 +2150,57 @@ async def project_deals(
             .order_by(Quote.created_at.desc())
             .limit(1)
         )
+        order = (
+            await WorkspaceRepository(session, Order, scope).find(Order.id == quote.order_id)
+            if quote is not None and quote.order_id
+            else None
+        )
+        invoice = (
+            await session.scalar(
+                WorkspaceRepository(session, Invoice, scope)
+                .select()
+                .where(Invoice.order_id == order.id, Invoice.status != "void")
+                .limit(1)
+            )
+            if order is not None
+            else None
+        )
         steps.append(
-            {"project": lead.title, "stage": lead.stage, "next": next_for(lead.stage, quote, auto)}
+            {
+                "project": lead.title,
+                "stage": lead.stage,
+                "next": next_for(lead.stage, quote, auto, invoice=invoice, order=order),
+            }
         )
     return steps
 
 
-def next_for(stage: str, quote: Any, auto: bool) -> str:
-    """The honest next step of one project's deal."""
-    if stage == "won":
-        return "agreed; the team is working on it and updates come here"
+def next_for(stage: str, quote: Any, auto: bool, *, invoice: Any = None, order: Any = None) -> str:
+    """The honest next step of one project's deal, all the way to delivery."""
     if stage == "lost":
         return "closed"
+    work = str(order.status) if order is not None else ""
+    if work == "delivered":
+        return (
+            "delivered; ask how it went and whether anything needs a change, then whether "
+            "there's a next project"
+        )
+    if work == "shipped":
+        return f"order {order.number} is on its way to them"
+    if invoice is not None and str(invoice.status) in {"issued", "partially_paid", "overdue"}:
+        if str(invoice.status) == "partially_paid":
+            return (
+                f"part of invoice {invoice.number} is paid; the balance can be paid with the "
+                "same payment link, and the work carries on"
+            )
+        return (
+            f"invoice {invoice.number} with the payment link is shared here; the work "
+            "starts once it's paid"
+        )
+    if work == "processing":
+        return "paid; the team is working on it and progress updates come here"
+    if stage == "won" or (invoice is not None and str(invoice.status) == "paid"):
+        return "paid; the team is starting the work and the first update comes here"
     if quote is None:
         if stage == "new":
             return "still collecting the details"
