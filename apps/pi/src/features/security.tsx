@@ -117,8 +117,12 @@ export function SecondStepForm({
         await fingerprintStep<SessionView>(post, "/auth", step.ticket),
       );
     } catch (e) {
-      const message = e instanceof ApiError ? explain(e) : passkeyError(e);
-      if (message) setError(message);
+      // Never silent: a cancelled or failed check says what to do next.
+      setError(
+        e instanceof ApiError
+          ? explain(e)
+          : (passkeyError(e) ?? unlockFailed(unlock, hasFace)),
+      );
     } finally {
       setBusy(false);
     }
@@ -670,5 +674,16 @@ function EnrollLinkCard() {
         )}
       </CardSection>
     </Card>
+  );
+}
+
+/** What to say when the device check closed without signing in. */
+function unlockFailed(unlock: string, hasFace: boolean): string {
+  return (
+    `${unlock} didn't finish. Try again` +
+    (hasFace ? ", or use the camera face check below" : "") +
+    ". If this computer has no " +
+    unlock +
+    ", choose “Use a phone or tablet” in the window and scan the QR code with your phone."
   );
 }

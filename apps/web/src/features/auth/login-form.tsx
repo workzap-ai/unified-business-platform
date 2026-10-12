@@ -252,11 +252,13 @@ function SecondStepForm({
     try {
       await onDone(await authService.signInWithFingerprint(step.ticket));
     } catch (e) {
-      const message =
-        e instanceof ApiError
-          ? explain(e, "That fingerprint didn't work.")
-          : passkeyError(e);
-      if (message) setError(message);
+      if (e instanceof ApiError) {
+        const message = explain(e, "That fingerprint didn't work.");
+        if (message) setError(message);
+      } else {
+        // Never silent: a cancelled or failed check says what to do next.
+        setError(passkeyError(e) ?? unlockFailed(unlock, hasFace));
+      }
     } finally {
       setBusy(false);
     }
@@ -336,5 +338,16 @@ function SecondStepForm({
         </p>
       ) : null}
     </div>
+  );
+}
+
+/** What to say when the device check closed without signing in. */
+function unlockFailed(unlock: string, hasFace: boolean): string {
+  return (
+    `${unlock} didn't finish. Try again` +
+    (hasFace ? ", or use the camera face check below" : "") +
+    ". If this computer has no " +
+    unlock +
+    ", choose “Use a phone or tablet” in the window and scan the QR code with your phone."
   );
 }

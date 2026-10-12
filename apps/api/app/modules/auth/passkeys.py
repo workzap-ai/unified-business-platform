@@ -199,21 +199,23 @@ async def finish_registration(
 # or a phone nearby": Windows then offers Windows Hello (or a phone by QR code), never
 # "insert your USB security key".
 DEVICE_TRANSPORTS = (AuthenticatorTransport.INTERNAL, AuthenticatorTransport.HYBRID)
-REQUEST_HINTS = ["client-device", "hybrid"]
 
 
 def descriptor(credential_id: str, transports: str = "") -> PublicKeyCredentialDescriptor:
+    """A saved key for the browser. "hybrid" is always allowed, so a key saved on a
+    phone still works from a computer (Windows offers "Use a phone" with a QR code)."""
     known = {t.value: t for t in AuthenticatorTransport}
     saved = [known[t] for t in transports.split(",") if t in known]
-    return PublicKeyCredentialDescriptor(
-        id=base64url_to_bytes(credential_id), transports=saved or list(DEVICE_TRANSPORTS)
-    )
+    listed = saved or list(DEVICE_TRANSPORTS)
+    if AuthenticatorTransport.HYBRID not in listed:
+        listed.append(AuthenticatorTransport.HYBRID)
+    return PublicKeyCredentialDescriptor(id=base64url_to_bytes(credential_id), transports=listed)
 
 
 def request_options_json(options: Any) -> dict[str, Any]:
-    """Sign-in options for the browser, with hints (py_webauthn doesn't set them here)."""
+    """Sign-in options for the browser. No hints: a "client-device" hint makes some
+    browsers give up at once when the key lives on the person's phone."""
     result: dict[str, Any] = json.loads(options_to_json(options))
-    result["hints"] = REQUEST_HINTS
     return result
 
 
