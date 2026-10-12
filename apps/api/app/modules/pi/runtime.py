@@ -276,6 +276,50 @@ async def _keep_file(
     )
 
 
+async def _name_project_document(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    message: PiMessage,
+    kind: str,
+    description: str,
+) -> None:
+    """A proposal, brief, RFP, quotation or contract the customer sent is kept under a
+    clear name ("Project proposal - <title>.pdf") and listed on the chat's brief, so
+    it joins its project (Owner OS shows it on the customer's Projects)."""
+    from app.modules.customers.models import CustomerFile
+    from app.modules.pi.documents import document_title, project_file_name
+
+    file_id = message.media.get("file_id")
+    name = project_file_name(kind, description, str(message.media.get("filename") or ""))
+    if not file_id or not name:
+        return
+    try:
+        async with session.begin_nested():
+            saved = await WorkspaceRepository(session, CustomerFile, scope).find(
+                CustomerFile.id == UUID(str(file_id))
+            )
+            if saved is not None:
+                saved.name = name[:200]
+    except DBAPIError:
+        logger.warning("pi_project_document_name_skipped", exc_info=True)
+        return
+    brief = dict(conversation.service_brief or {})
+    documents = [d for d in brief.get("documents") or [] if d.get("file_id") != str(file_id)]
+    documents.append(
+        {
+            "file_id": str(file_id),
+            "name": name,
+            "kind": kind,
+            "title": document_title(description),
+            "message_id": str(message.id),
+            "at": datetime.now(UTC).isoformat(),
+        }
+    )
+    brief["documents"] = documents[-20:]
+    conversation.service_brief = brief
+
+
 # Reasons pi handles itself: it keeps the chat and puts a request on the team's desk.
 SOFT_REASONS = frozenset({"low_confidence", "provider_failure", "tool_failure", "reply_rejected"})
 
@@ -615,6 +659,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
 
                     doc_kind = document_kind(description)
                     message.media = {**message.media, "doc_kind": doc_kind}
+                    await _name_project_document(
+                        session, scope, conversation, message, doc_kind, description
+                    )
                     if doc_kind in IMPORTANT_KINDS:
                         await _review_document(
                             session, scope, conversation, message, doc_kind, description

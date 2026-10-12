@@ -173,6 +173,15 @@ async def _requests(
     return issues, links, headline
 
 
+def _documents_for(title: str, documents: list[dict[str, Any]]) -> list[dict[str, str]]:
+    """The documents the customer sent for this project (by title words)."""
+    return [
+        {"file_id": str(d["file_id"]), "name": str(d.get("name") or "Document")}
+        for d in documents
+        if d.get("file_id") and (_same(title, str(d.get("title") or "")) or len(documents) == 1)
+    ][:5]
+
+
 async def _projects(session: Any, scope: Any, customer_id: UUID) -> list[dict[str, Any]]:
     """Each deal with its journey (steps done / total) and the next step."""
     from app.modules.pi_saas.deal_routes import journey
@@ -186,6 +195,16 @@ async def _projects(session: Any, scope: Any, customer_id: UUID) -> list[dict[st
             .limit(12)
         )
     )
+    from app.modules.pi.models import PiConversation as Chat
+
+    documents: list[dict[str, Any]] = []
+    for brief in await session.scalars(
+        WorkspaceRepository(session, Chat, scope)
+        .select()
+        .with_only_columns(Chat.service_brief)
+        .where(Chat.customer_id == customer_id)
+    ):
+        documents += (brief or {}).get("documents") or []
     projects = []
     for lead in leads:
         item: dict[str, Any] = {
@@ -197,6 +216,7 @@ async def _projects(session: Any, scope: Any, customer_id: UUID) -> list[dict[st
             "created_at": lead.created_at,
             "service": str((lead.requirements or {}).get("service") or ""),
             "scope": str((lead.requirements or {}).get("scope") or "")[:300],
+            "documents": _documents_for(lead.title, documents),
         }
         try:
             async with session.begin_nested():

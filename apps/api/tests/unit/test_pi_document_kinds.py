@@ -70,3 +70,18 @@ async def test_an_unknown_file_still_raises():
     manager = SimpleNamespace()
     with pytest.raises(BusinessRuleViolation):
         await read_document(manager, None, _zip({"random.txt": "x"}), "x.zip", uuid4())
+
+
+def test_project_documents_get_a_clear_name():
+    from app.modules.pi.documents import project_file_name
+
+    proposal = "Kind: proposal\nProject proposal for an AI system for visualisation\n• 3D renders"
+    assert project_file_name("proposal", proposal, "scan_001.PDF") == (
+        "Project proposal - AI system for visualisation.pdf"
+    )
+    rfp = "Kind: rfp\nA request for proposal: Furniture e-commerce website\n• 200 products"
+    assert project_file_name("rfp", rfp, "x.pdf") == (
+        "Request for proposal - Furniture e-commerce website.pdf"
+    )
+    assert project_file_name("brief", "Kind: brief\n• a:b/c", "r.docx") == "Project brief.docx"
+    assert project_file_name("invoice", proposal, "x.pdf") is None

@@ -87,3 +87,33 @@ def test_projects_from_the_brief_join_the_map_without_duplicates():
         ("AI System for Visualization", "on_it", "team"),
     ]
     assert added[1]["next_step"] == "Team: prepare the proposal"
+
+
+async def test_a_project_document_shows_on_its_project(api, business_db):
+    from uuid import uuid4
+
+    from test_pi_deals import _lead
+
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    customer_id, conversation = await _customer_in_chat(pi)
+    await _lead(pi, customer_id, conversation)  # "Branding for Crescent Bakers"
+    file_id = str(uuid4())
+    row = await pi.db.get(PiConversation, conversation.id)
+    row.service_brief = {
+        **row.service_brief,
+        "documents": [
+            {
+                "file_id": file_id,
+                "name": "Project brief - Crescent Bakers branding.pdf",
+                "kind": "brief",
+                "title": "Crescent Bakers branding",
+            }
+        ],
+    }
+    await pi.db.commit()
+    body = (await api.get(f"/api/v1/customers/{customer_id}/pi-overview")).json()
+    [project] = body["projects"]
+    assert project["documents"] == [
+        {"file_id": file_id, "name": "Project brief - Crescent Bakers branding.pdf"}
+    ]
+    await pi.close()

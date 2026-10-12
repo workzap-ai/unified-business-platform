@@ -3,13 +3,14 @@
 import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { z } from "zod";
-import { Building2, FolderKanban, Network } from "lucide-react";
+import { Building2, FileText, FolderKanban, Network } from "lucide-react";
 import { Badge, Card, CardBody, CardHeader } from "@/components/ui/display";
 import { useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
 import { apiRequest } from "@/services/api-client";
+import { customerFilesService } from "../files-service";
 
 /**
  * The team's picture of one customer from pi: who they are (what they told pi), their
@@ -51,6 +52,9 @@ const projectSchema = z.object({
   next: z
     .object({ title: z.string(), auto: z.boolean().catch(false) })
     .optional(),
+  documents: z
+    .array(z.object({ file_id: z.string(), name: z.string() }))
+    .catch([]),
 });
 const overviewSchema = z.object({
   profile: z.object({
@@ -248,6 +252,26 @@ export function CustomerPiOverview({ customerId }: { customerId: string }) {
                             </Badge>
                           )}
                         </p>
+                      )}
+                      {d.documents.length > 0 && (
+                        <ul className="mt-2 space-y-1">
+                          {d.documents.map((doc) => (
+                            <li key={doc.file_id}>
+                              <a
+                                href={customerFilesService.downloadUrl(
+                                  doc.file_id,
+                                )}
+                                className="inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline"
+                              >
+                                <FileText
+                                  className="size-3.5"
+                                  aria-hidden="true"
+                                />
+                                {doc.name}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
                       )}
                     </li>
                   );

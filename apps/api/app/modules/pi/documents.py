@@ -135,6 +135,48 @@ def pdf_pictures(raw: bytes) -> list[tuple[bytes, str]]:
     return found
 
 
+# Documents that belong to a project, and the name they're kept under.
+PROJECT_LABEL = {
+    "proposal": "Project proposal",
+    "rfp": "Request for proposal",
+    "brief": "Project brief",
+    "quotation": "Quotation",
+    "contract": "Contract",
+}
+
+
+def document_title(description: str) -> str:
+    """What the document is called, from the line after "Kind: ..." in pi's summary."""
+    lines = [x.strip() for x in description.splitlines() if x.strip()]
+    for line in lines[1:3]:
+        if line.lower().startswith("kind:") or line.startswith(("•", "-", "*")):
+            continue  # the kind line and the bullet points are not its name
+        title = re.sub(r"^(?:this is |it is |a |an |the )+", "", line, flags=re.I)
+        # "Project proposal for X" -> "X": the label is added in front anyway.
+        title = re.sub(
+            r"^(?:project |business |software )?(?:proposal|brief|request for proposal|rfp|"
+            r"quotation|quote|contract|requirements?(?: document)?)(?: document)?"
+            r"(?: for| of| about|:)?\s+",
+            "",
+            title,
+            flags=re.I,
+        )
+        title = re.sub(r"^(?:a |an |the )", "", title, flags=re.I)
+        title = re.sub(r"[\\/:*?\"<>|]+", " ", title).strip(" .")
+        return " ".join(title.split())[:60]
+    return ""
+
+
+def project_file_name(kind: str, description: str, original: str) -> str | None:
+    """ "Project proposal - AI system for visualisation.pdf" for a project document."""
+    label = PROJECT_LABEL.get(kind)
+    if label is None:
+        return None
+    title = document_title(description)
+    ext = original.rsplit(".", 1)[-1].lower() if "." in original else "pdf"
+    return f"{label} - {title}.{ext}" if title else f"{label}.{ext}"
+
+
 def document_kind(description: str) -> str:
     """The kind the summary named on its first line ("Kind: contract"), else "other"."""
     found = re.search(r"Kind:\s*([a-z]+)", description[:400], re.I)
