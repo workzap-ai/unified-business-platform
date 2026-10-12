@@ -15,6 +15,7 @@ import * as React from "react";
 
 import { MarketingConsent } from "@/features/campaigns";
 import { CustomerFiles } from "@/features/customer-files";
+import { CustomerDuplicates } from "@/features/customer-duplicates";
 import { CustomerOverview } from "@/features/customer-overview";
 
 import {
@@ -377,6 +378,7 @@ export function CustomerProfilePage({ id }: { id: string }) {
           ) : null
         }
       />
+      <CustomerDuplicates id={id} name={p.customer.name} />
       <CustomerOverview id={id} />
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <div className="space-y-6">

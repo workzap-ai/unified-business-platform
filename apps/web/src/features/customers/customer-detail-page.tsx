@@ -4,6 +4,7 @@ import { useState } from "react";
 import { RecordAttachments } from "@/features/integrations/business-panels";
 import { CustomerFiles } from "./components/customer-files";
 import { CustomerPiOverview } from "./components/pi-overview";
+import { CustomerDuplicates } from "./components/customer-duplicates";
 import Link from "next/link";
 import {
   Archive,
@@ -383,6 +384,7 @@ function OverviewTab({
 
   return (
     <div className="space-y-4">
+      <CustomerDuplicates customerId={customer.id} name={customer.name} />
       <CustomerPiOverview customerId={customer.id} />
       <MetricGrid className="xl:grid-cols-4">
         <MetricCard

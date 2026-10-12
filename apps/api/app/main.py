@@ -30,6 +30,7 @@ from app.modules.billing.routes import router as billing_router
 from app.modules.business_settings.routes import router as business_settings_router
 from app.modules.catalog.routes import router as catalog_router
 from app.modules.customers.file_routes import router as customer_files_router
+from app.modules.customers.merge import router as customer_merge_router
 from app.modules.customers.routes import router as customers_router
 from app.modules.environments.routes import router as environments_router
 from app.modules.finance.routes import router as finance_router
@@ -108,6 +109,7 @@ ROUTERS = [
     pi_requests_router,
     team_whatsapp_router,
     customer_overview_router,
+    customer_merge_router,
     receipts_router,
     pi_operator_router,
     pi_operator_digest_router,
@@ -185,6 +187,7 @@ PI_APP_ROUTERS = [
     pi_requests_router,
     team_whatsapp_router,
     customer_overview_router,
+    customer_merge_router,
     receipts_router,
     pi_documents_router,
     # The deal flow in the pi app: leads, proposals and orders (core modules, pi session).
