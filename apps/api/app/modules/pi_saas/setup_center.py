@@ -28,7 +28,7 @@ USABLE = ("connected", "degraded")
 
 LINKS: dict[str, dict[str, str]] = {
     "whatsapp": {"pi": "/settings/whatsapp", "web": "/pi/whatsapp"},
-    "email": {"pi": "", "web": "/settings/integrations"},
+    "email": {"pi": "/my-pi/tools#email", "web": "/settings/integrations"},
     "stripe": {"pi": "/settings/payments", "web": "/settings/integrations"},
     "google_calendar": {"pi": "/my-pi/tools", "web": "/pi/setup"},
     "shopify": {"pi": "/my-pi/tools", "web": "/pi/setup"},

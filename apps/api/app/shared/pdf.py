@@ -255,7 +255,7 @@ class Document:
             len(kids),
         )
         title = _escape(_clean(self.title)).encode("cp1252", errors="replace")
-        info = add(b"<< /Title (%s) /Producer (Owner OS) >>" % title)
+        info = add(b"<< /Title (%s) >>" % title)  # white-label: no product name
         out = bytearray(b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n")
         offsets = []
         for number, body in enumerate(objects, start=1):

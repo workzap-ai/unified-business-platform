@@ -12,6 +12,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import {
+  ArrowRight,
   Copy,
   ExternalLink,
   FileText,
@@ -42,13 +43,14 @@ import {
   Select,
   Skeleton,
   Switch,
+  Textarea,
 } from "@/components/ui";
 import { ApiError, errorText, get, patch, post, put } from "@/lib/api";
 import { cn } from "@/lib/cn";
 import { date, money } from "@/lib/format";
 import { useAction, useBusinessKey, useCan } from "@/lib/session";
 
-type Stage = "new" | "qualified" | "proposal" | "won" | "lost";
+export type Stage = "new" | "qualified" | "proposal" | "won" | "lost";
 
 interface Deal {
   id: string;
@@ -84,7 +86,7 @@ interface Board {
   counts: Partial<Record<Stage, number>>;
 }
 
-interface Delivery {
+export interface Delivery {
   delivery: "sent" | "waiting" | "manual" | "pending" | "failed";
   link: string;
   share: string | null;
@@ -119,7 +121,7 @@ interface DealSettings {
   template_language: string;
 }
 
-const STAGES: { key: Stage; label: string; tone: string }[] = [
+export const STAGES: { key: Stage; label: string; tone: string }[] = [
   { key: "new", label: "New", tone: "bg-info-soft text-info" },
   { key: "qualified", label: "Qualified", tone: "bg-accent-soft text-accent" },
   {
@@ -135,7 +137,7 @@ const STAGES: { key: Stage; label: string; tone: string }[] = [
   },
 ];
 
-const DELIVERY: Record<string, string> = {
+export const DELIVERY: Record<string, string> = {
   sent: "Sent on WhatsApp",
   waiting: "Waiting for their reply on WhatsApp",
   manual: "Share the link yourself",
@@ -256,6 +258,7 @@ export function DealsPage() {
               <DealCard
                 deal={deal}
                 write={write}
+                open={can("sales.read")}
                 busy={
                   (makeProposal.isPending &&
                     makeProposal.variables?.id === deal.id) ||
@@ -280,7 +283,7 @@ export function DealsPage() {
       <SettingsDialog open={settings} onOpenChange={setSettings} />
       {editing ? (
         <ProposalDialog
-          deal={editing.deal}
+          name={editing.deal.customer?.name ?? editing.deal.title}
           quoteId={editing.quoteId}
           onClose={() => setEditing(null)}
           onSent={(r) => {
@@ -329,6 +332,7 @@ function StageTile({
 function DealCard({
   deal,
   write,
+  open,
   busy,
   onPropose,
   onResend,
@@ -336,6 +340,8 @@ function DealCard({
 }: {
   deal: Deal;
   write: boolean;
+  /** Can open the deal's own page (needs sales.read). */
+  open: boolean;
   busy: boolean;
   onPropose: () => void;
   onResend: () => void;
@@ -354,7 +360,16 @@ function DealCard({
       <CardSection className="space-y-3">
         <div className="flex flex-wrap items-start gap-2">
           <div className="min-w-0 flex-1">
-            <p className="truncate font-semibold">{deal.title}</p>
+            {open ? (
+              <Link
+                href={`/deals/${deal.id}`}
+                className="block truncate font-semibold hover:text-accent hover:underline"
+              >
+                {deal.title}
+              </Link>
+            ) : (
+              <p className="truncate font-semibold">{deal.title}</p>
+            )}
             <p className="truncate text-sm text-muted-foreground">
               {deal.customer?.name ?? "No customer"}
               {deal.customer?.phone ? ` · ${deal.customer.phone}` : ""} ·{" "}
@@ -412,6 +427,13 @@ function DealCard({
             <span className="font-medium">{deal.next}</span>
           </p>
           <div className="flex flex-wrap gap-2">
+            {open ? (
+              <Button asChild variant="ghost" size="sm">
+                <Link href={`/deals/${deal.id}`}>
+                  <ArrowRight className="size-4" aria-hidden /> Open
+                </Link>
+              </Button>
+            ) : null}
             {deal.conversation_id ? (
               <Button asChild variant="ghost" size="sm">
                 <Link href={`/inbox?conversation=${deal.conversation_id}`}>
@@ -458,13 +480,14 @@ interface EditLine {
   unit_price: string;
 }
 
-function ProposalDialog({
-  deal,
+export function ProposalDialog({
+  name,
   quoteId,
   onClose,
   onSent,
 }: {
-  deal: Deal;
+  /** Who the proposal is for (the customer, or the deal's title). */
+  name: string;
   quoteId: string;
   onClose: () => void;
   onSent: (r: Delivery) => void;
@@ -534,7 +557,7 @@ function ProposalDialog({
   return (
     <Dialog open onOpenChange={(open) => (!open ? onClose() : null)}>
       <DialogContent
-        title={`Proposal for ${deal.customer?.name ?? deal.title}`}
+        title={`Proposal for ${name}`}
         description="pi filled the lines from the brief. Set the prices, then send it on WhatsApp."
       >
         {quote.isPending ? (
@@ -630,7 +653,7 @@ function ProposalDialog({
   );
 }
 
-function DeliveryDialog({
+export function DeliveryDialog({
   result,
   onClose,
 }: {
@@ -705,8 +728,15 @@ function StartDealDialog({
   const [phone, setPhone] = React.useState("");
   const [name, setName] = React.useState("");
   const [title, setTitle] = React.useState("");
+  const [notes, setNotes] = React.useState("");
   const start = useAction(
-    () => post<{ lead_id: string }>("/pi/deals/start", { phone, name, title }),
+    () =>
+      post<{ lead_id: string }>("/pi/deals/start", {
+        phone,
+        name,
+        title,
+        notes: notes.trim(),
+      }),
     {
       success: "Deal started",
       invalidate: [["deals"]],
@@ -714,6 +744,7 @@ function StartDealDialog({
         setPhone("");
         setName("");
         setTitle("");
+        setNotes("");
         onOpenChange(false);
       },
     },
@@ -752,6 +783,20 @@ function StartDealDialog({
               value={title}
               maxLength={200}
               onChange={(e) => setTitle(e.target.value)}
+            />
+          </Field>
+          <Field
+            label="Notes"
+            htmlFor="deal-notes"
+            optional
+            hint="For your team: budget, timing, anything they told you. pi doesn't send this."
+          >
+            <Textarea
+              id="deal-notes"
+              rows={3}
+              value={notes}
+              maxLength={4000}
+              onChange={(e) => setNotes(e.target.value)}
             />
           </Field>
           <div className="flex justify-end gap-2">

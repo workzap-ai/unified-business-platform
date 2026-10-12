@@ -14,6 +14,7 @@ import Link from "next/link";
 import * as React from "react";
 
 import { MarketingConsent } from "@/features/campaigns";
+import { CustomerFiles } from "@/features/customer-files";
 
 import {
   Badge,
@@ -344,7 +345,10 @@ export function CustomerProfilePage({ id }: { id: string }) {
     );
   const p = profile.data;
   const requirements = p.conversations.flatMap((c) =>
-    Object.entries(c.requirements ?? {}).filter(([, v]) => v),
+    // Keys starting with "_" are internal (e.g. "_project": which deal it is).
+    Object.entries(c.requirements ?? {}).filter(
+      ([k, v]) => v && !k.startsWith("_"),
+    ),
   );
   return (
     <div className="space-y-6">
@@ -474,6 +478,7 @@ export function CustomerProfilePage({ id }: { id: string }) {
               )}
             </CardSection>
           </Card>
+          {can("customers.read") ? <CustomerFiles customerId={id} /> : null}
           {can("billing.read") ? (
             <CustomerPayments
               customerId={id}

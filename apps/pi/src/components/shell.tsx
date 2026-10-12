@@ -13,6 +13,7 @@ import {
   Home,
   Inbox,
   LogOut,
+  MessageCircleQuestion,
   Plus,
   Settings,
   Sparkles,
@@ -25,11 +26,13 @@ import * as React from "react";
 import { Wordmark } from "@/components/brand";
 import { PiAssistant } from "@/features/assistant";
 import { NotificationBell } from "@/features/journey";
+import { useOpenRequests } from "@/features/requests";
 import { Badge, Button, ErrorState, Spinner, cn } from "@/components/ui";
 import { errorText, post } from "@/lib/api";
 import { STATE_LABEL } from "@/lib/format";
 import {
   useAction,
+  useCan,
   useSession,
   useSignOut,
   useSwitchBusiness,
@@ -41,9 +44,19 @@ const NAV: {
   label: string;
   icon: typeof Home;
   mobile?: boolean;
+  /** Shown only with this permission. */
+  permission?: string;
 }[] = [
   { href: "/home", label: "Home", icon: Home },
   { href: "/inbox", label: "Inbox", icon: Inbox },
+  // Desktop sidebar; phones reach the request desk from the inbox.
+  {
+    href: "/requests",
+    label: "Requests",
+    icon: MessageCircleQuestion,
+    mobile: false,
+    permission: "pi.read",
+  },
   // Desktop sidebar only: phones reach it from Home (the bottom bar keeps five items).
   { href: "/analytics", label: "Analytics", icon: BarChart3, mobile: false },
   // Desktop sidebar only, like Analytics: phones reach it from the inbox.
@@ -178,6 +191,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const active = useActive();
+  const can = useCan();
+  const business = session.data?.business;
+  const requests = useOpenRequests(Boolean(business) && can("pi.read"));
+  const openRequests = requests.data?.open ?? 0;
+  const nav = NAV.filter((item) => !item.permission || can(item.permission));
 
   React.useEffect(() => {
     if (session.data === null) {
@@ -208,7 +226,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  const business = session.data.business;
   const testMode = business?.environment === "test";
 
   return (
@@ -226,7 +243,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <BusinessMenu />
         </div>
         <nav aria-label="Main" className={cn("space-y-1", s.nav)}>
-          {NAV.map(({ href, label, icon: Icon }) => (
+          {nav.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
@@ -239,6 +256,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <Icon className="size-5" aria-hidden />
               {label}
+              {href === "/requests" && openRequests > 0 ? (
+                <Badge tone="warning" className="ms-auto tabular-nums">
+                  <span className="sr-only">Waiting for you: </span>
+                  {openRequests}
+                </Badge>
+              ) : null}
             </Link>
           ))}
         </nav>
@@ -326,8 +349,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           aria-label="Main"
           className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] md:hidden"
         >
-          {NAV.filter((item) => item.mobile !== false).map(
-            ({ href, label, icon: Icon }) => (
+          {nav
+            .filter((item) => item.mobile !== false)
+            .map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}
                 href={href}
@@ -340,8 +364,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Icon className="size-5" aria-hidden />
                 {label}
               </Link>
-            ),
-          )}
+            ))}
         </nav>
         <PiAssistant />
       </div>

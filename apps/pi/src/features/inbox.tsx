@@ -4,6 +4,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
   FileText,
   ArrowLeft,
+  ArrowRight,
   Bot,
   Check,
   CheckCheck,
@@ -427,6 +428,22 @@ function ApprovalList({ onOpen }: { onOpen: (id: string) => void }) {
   );
 }
 
+/** The request desk has every kind of request (prices, approvals, meetings) and history. */
+function RequestDeskLink() {
+  return (
+    <Link
+      href="/requests"
+      className="flex min-h-11 items-center gap-2 border-b border-border bg-accent-soft/50 px-3 py-2 text-sm font-medium text-accent-soft-foreground hover:bg-accent-soft"
+    >
+      <MessageCircleQuestion className="size-4 shrink-0" aria-hidden />
+      <span className="min-w-0 flex-1">
+        Open the request desk: prices, approvals, meetings and answered requests
+      </span>
+      <ArrowRight className="size-4 shrink-0 rtl:rotate-180" aria-hidden />
+    </Link>
+  );
+}
+
 function QuestionList({ onOpen }: { onOpen: (id: string) => void }) {
   const key = useBusinessKey();
   const [answering, setAnswering] = React.useState<StaffRequest | null>(null);
@@ -451,16 +468,20 @@ function QuestionList({ onOpen }: { onOpen: (id: string) => void }) {
     );
   if (!questions.data.length) {
     return (
-      <EmptyState
-        icon={<MessageCircleQuestion className="size-6" aria-hidden />}
-        title="No open questions"
-      >
-        When pi doesn&apos;t know an answer, it asks you here.
-      </EmptyState>
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <RequestDeskLink />
+        <EmptyState
+          icon={<MessageCircleQuestion className="size-6" aria-hidden />}
+          title="No open questions"
+        >
+          When pi doesn&apos;t know an answer, it asks you here.
+        </EmptyState>
+      </div>
     );
   }
   return (
     <>
+      <RequestDeskLink />
       <ul className="min-h-0 flex-1 overflow-y-auto">
         {questions.data.map((q) => (
           <li key={q.id} className="border-b border-border px-3 py-3">
@@ -501,7 +522,7 @@ function AnswerDialog({
   const submit = useAction(
     () => post(`/staff-requests/${request?.id}/answer`, { answer, mode }),
     {
-      invalidate: [["questions"], ["home"], ["conversations"]],
+      invalidate: [["questions"], ["requests"], ["home"], ["conversations"]],
       success:
         mode === "reusable"
           ? "pi will reply to the customer and remember this answer"
