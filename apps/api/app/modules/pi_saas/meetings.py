@@ -182,10 +182,11 @@ async def arrange(
     )
     when = f"{start:%A %d %B, %I:%M %p} ({zone}), {data.duration_minutes} minutes"
     how = data.how
+    joined = ""  # the link the customer joins with
     if how == "google_meet":
         try:
             link, _ = await _google_meet(session, scope, runtime, row, customer, start, end, zone)
-            where = f"on Google Meet: {link}"
+            where, joined = f"on Google Meet: {link}", link
         except BusinessRuleViolation as error:
             if error.code not in CALENDAR_PROBLEMS:
                 raise
@@ -195,11 +196,12 @@ async def arrange(
                 await _expire_calendar(session, scope)
             how = "video"
     if how == "video":
-        where = f"on a video call (opens in the browser, no sign-up): {video_link()}"
+        joined = video_link()
+        where = f"on a video call (opens in the browser, no sign-up): {joined}"
     elif how == "link":
         if not data.link.startswith(("https://", "http://")):
             raise BusinessRuleViolation("LINK_INVALID", "Paste the meeting link (https://…)")
-        where = f"online: {data.link}"
+        where, joined = f"online: {data.link}", data.link
     elif how == "in_person":
         if not data.place:
             raise BusinessRuleViolation("PLACE_REQUIRED", "Say where you'll meet")
@@ -209,7 +211,63 @@ async def arrange(
         text += f" {data.note}"
     if customer is not None and customer.email and how == "google_meet":
         text += " A calendar invitation was also emailed to them."
+    await _remember_meeting(
+        session,
+        scope,
+        row.conversation_id,
+        {
+            "starts_at": data.starts_at,
+            "how": how,
+            "booked": data.starts_at,
+            "label": f"{start:%A %d %B, %I:%M %p}",
+            "zone": zone,
+            "minutes": data.duration_minutes,
+            "link": joined,
+            "place": data.place if how == "in_person" else "",
+            "note": data.note,
+        },
+    )
     return await answer(session, scope, row.id, text, save_as_knowledge=False, max_bytes=max_bytes)
+
+
+async def _remember_meeting(
+    session: AsyncSession, scope: WorkspaceScope, conversation_id: UUID, meeting: dict[str, Any]
+) -> None:
+    """The arranged meeting on the chat's brief: pi repeats its exact time and link."""
+    from app.modules.pi.models import PiConversation
+
+    conversation = await WorkspaceRepository(session, PiConversation, scope).get(conversation_id)
+    conversation.service_brief = {**(conversation.service_brief or {}), "meeting": meeting}
+
+
+ZONE_NAMES = {"Asia/Karachi": "Pakistan time", "Asia/Dubai": "UAE time"}
+
+
+def meeting_message(meeting: dict[str, Any], language: str) -> str:
+    """The arranged meeting, told to the customer word for word (never through the
+    model, so the time and link can't be dropped or changed)."""
+    label = str(meeting.get("label") or "")
+    zone = ZONE_NAMES.get(str(meeting.get("zone") or ""), str(meeting.get("zone") or ""))
+    minutes = meeting.get("minutes") or 30
+    link, place = str(meeting.get("link") or ""), str(meeting.get("place") or "")
+    note = str(meeting.get("note") or "")
+    if language == "roman_ur":
+        text = f"Aap ki meeting confirm ho gayi hai: *{label}* ({zone}), {minutes} minute."
+        if link:
+            text += f"\nJoin karne ka link:\n{link}"
+        elif place:
+            text += f"\nJagah: {place}"
+        text += "\nWaqt par link khol lein, browser ya phone dono par chal jata hai."
+    else:
+        text = f"Your meeting is confirmed: *{label}* ({zone}), {minutes} minutes."
+        if link:
+            text += f"\nJoin here:\n{link}"
+        elif place:
+            text += f"\nPlace: {place}"
+        text += "\nOpen the link at that time; it works in a browser or on your phone."
+    if note:
+        text += f"\n{note}"
+    return text
 
 
 APPROVAL = re.compile(
@@ -392,10 +450,6 @@ async def book_for_customer(ctx: dict[str, Any], conversation_id: str) -> str | 
                     connection.status, connection.health = "expired", "failing"
             await session.commit()  # The request stays open on the desk for the team.
             return str(row.id)
-        conversation.service_brief = {
-            **(conversation.service_brief or {}),
-            "meeting": {**meeting, "booked": starts_at},
-        }
         request_id = str(row.id)
         await session.commit()
     await reply_with_answer(ctx, request_id)  # pi sends the link in the customer's language

@@ -258,6 +258,17 @@ async def reply_with_answer(ctx: dict[str, Any], request_id: str) -> None:
         if latest is None:
             return
         policy = await settings_row(session, scope)
+        meeting = (conversation.service_brief or {}).get("meeting") or {}
+        if str(row.answer).startswith("Meeting confirmed by the team") and meeting.get("label"):
+            # The time and link go out word for word: the model's reply could lose them
+            # (the price guard removes sentences with digits).
+            from app.modules.pi_saas.meetings import meeting_message
+
+            language = "roman_ur" if (conversation.language or "") == "roman_ur" else "en"
+            await _send(session, repo, conversation, row, key, meeting_message(meeting, language))
+            await session.commit()
+            await enqueue_sends(ctx, [str(row.reply_message_id)])
+            return
         context = await prepare_context(session, scope, conversation, latest, policy)
         context["team_answer_now"] = {"question": row.question[:1500], "answer": row.answer}
         await session.commit()  # No transaction is held across the model call.
@@ -288,6 +299,30 @@ async def reply_with_answer(ctx: dict[str, Any], request_id: str) -> None:
         row.reply_message_id = message.id
         await session.commit()
         await enqueue_sends(ctx, [str(message.id)])
+
+
+async def _send(
+    session: AsyncSession,
+    repo: WorkspaceRepository[PiMessage],
+    conversation: PiConversation,
+    row: PiStaffRequest,
+    key: str,
+    body: str,
+) -> None:
+    message = await repo.add(
+        repo.new(
+            conversation_id=conversation.id,
+            direction="outbound",
+            sender_type="ai",
+            agent_key="requirement",
+            body=body,
+            status="queued",
+            idempotency_key=key,
+        )
+    )
+    conversation.last_message_at = datetime.now(UTC)
+    conversation.last_message_preview = body[:200]
+    row.reply_message_id = message.id
 
 
 async def enqueue_reply(request: Request, request_id: UUID) -> None:

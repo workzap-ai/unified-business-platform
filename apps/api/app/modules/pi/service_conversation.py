@@ -632,7 +632,28 @@ def customer_figures(context: dict[str, Any] | None) -> list[str]:
 def allowed_text(context: dict[str, Any] | None) -> list[str]:
     """Text a service reply may repeat verbatim: offered booking labels and the customer's
     own (non-money) figures."""
-    return offered_labels(context) + customer_figures(context)
+    meeting = arranged_meeting(context)
+    arranged = [str(meeting[k]) for k in ("label", "link") if meeting.get(k)]
+    return offered_labels(context) + customer_figures(context) + arranged
+
+
+ARRANGED = re.compile(
+    r"Meeting confirmed by the team: (?P<label>[^(]+?) \((?P<zone>[^)]+)\)[^\n]*?"
+    r"(?P<link>https?://[^\s]+?)\.?(?:\s|$)"
+)
+
+
+def arranged_meeting(context: dict[str, Any] | None) -> dict[str, str]:
+    """The meeting the team (or pi) arranged for this chat: its time label and link, from
+    the brief, or else from the team's latest "Meeting confirmed" answer."""
+    meeting = ((context or {}).get("brief") or {}).get("meeting") or {}
+    if meeting.get("link") and meeting.get("label"):
+        return {"label": str(meeting["label"]), "link": str(meeting["link"])}
+    for note in (context or {}).get("team_notes") or []:
+        found = ARRANGED.search(str(note.get("note", "")))
+        if found:
+            return {"label": found["label"].strip(), "link": found["link"]}
+    return {}
 
 
 # "1. Logo", "2) Website": list numbering, not an amount. WhatsApp shows bullets better.
@@ -1306,6 +1327,10 @@ async def compose_service_turn(
         allowed,
     )
     latest = str(context["latest_customer_message"])
+    meeting = arranged_meeting(context)
+    if meeting.get("link") and MEETING_LINK.search(latest) and meeting["link"] not in turn.reply:
+        # They asked for the meeting link: it is always in the answer, exactly.
+        turn.reply = f"{turn.reply}\n\n*{meeting['label']}*\n{meeting['link']}".strip()
     if turn.proposal_answer != "none" and (
         not context.get("open_proposal")
         or not turn.proposal_evidence.strip()

@@ -202,7 +202,10 @@ async def test_pi_books_the_google_meet_itself_and_sends_the_link(api, business_
             )
         )
     )
-    assert [m.body for m in sent] == [f"Your meeting is confirmed. Join here: {link}"]
+    [message] = sent
+    # Word for word, never through the model: the time and link can't be dropped.
+    assert message.body.startswith("Your meeting is confirmed: *") and link in message.body
+    assert "05:00 PM" in message.body
     # Booked once: running the job again makes nothing new.
     assert await meetings.book_for_customer(pi.ctx, str(conversation.id)) is None
     await pi.close()
@@ -242,3 +245,36 @@ async def test_an_expired_google_sign_in_still_gets_the_customer_a_link(
     assert "https://meet.jit.si/pi-meeting-" in done.json()["answer"]
     assert calendar.status == "expired"  # Tools shows Reconnect
     await pi.close()
+
+
+def test_the_meeting_link_survives_the_price_guard():
+    from app.modules.pi.service_conversation import allowed_text, without_blocked_lines
+    from app.modules.pi_saas.meetings import meeting_message
+
+    meeting = {
+        "label": "Monday 12 October, 06:00 PM",
+        "zone": "Asia/Karachi",
+        "minutes": 30,
+        "link": "https://meet.jit.si/pi-meeting-43ada63cddd3d2a1",
+    }
+    text = meeting_message(meeting, "roman_ur")
+    assert "*Monday 12 October, 06:00 PM* (Pakistan time)" in text and meeting["link"] in text
+    reply = f"Your meeting is at {meeting['label']}. Join: {meeting['link']}"
+    allowed = allowed_text({"brief": {"meeting": meeting}})
+    assert without_blocked_lines(reply, "quote", allowed) == reply
+
+
+def test_an_earlier_arranged_meeting_is_read_from_the_teams_answer():
+    from app.modules.pi.service_conversation import allowed_text, arranged_meeting
+
+    note = (
+        "Meeting confirmed by the team: Monday 12 October, 06:00 PM (Asia/Karachi), "
+        "30 minutes, on a video call (opens in the browser, no sign-up): "
+        "https://meet.jit.si/pi-meeting-43ada63cddd3d2a1."
+    )
+    context = {"brief": {}, "team_notes": [{"kind": "answer", "note": note}]}
+    assert arranged_meeting(context) == {
+        "label": "Monday 12 October, 06:00 PM",
+        "link": "https://meet.jit.si/pi-meeting-43ada63cddd3d2a1",
+    }
+    assert "https://meet.jit.si/pi-meeting-43ada63cddd3d2a1" in allowed_text(context)
