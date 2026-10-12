@@ -583,6 +583,8 @@ function ProblemMap({
       </div>
       {view === "progress" ? (
         <Progress issues={issues} projects={projects} changed={changed} />
+      ) : view === "card" ? (
+        <CustomerCardView issues={issues} links={links} />
       ) : (
         <>
           {/* Phone: a simple list, each request with its status and connections. */}
@@ -1049,9 +1051,11 @@ const MAP_MOTION = `
 @keyframes pm-now { 0%, 100% { box-shadow: 0 0 0 0 rgba(90,71,245,.45); } 50% { box-shadow: 0 0 0 5px rgba(90,71,245,0); } }
 .pm-now { animation: pm-now 2s ease-in-out infinite; }
 @keyframes pm-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes pm-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+.pm-pop { transform-box: fill-box; transform-origin: center; animation: pm-pop 500ms cubic-bezier(.3,1.4,.5,1) both; }
 .pm-grow { transform-origin: left; animation: pm-grow 700ms cubic-bezier(.2,.8,.2,1) both; }
 @media (prefers-reduced-motion: reduce) {
-  .pm-in, .pm-draw, .pm-fade, .pm-pulse, .pm-hub, .pm-flash, .pm-now, .pm-grow { animation: none !important; stroke-dashoffset: 0; }
+  .pm-in, .pm-draw, .pm-fade, .pm-pulse, .pm-hub, .pm-flash, .pm-now, .pm-grow, .pm-pop { animation: none !important; stroke-dashoffset: 0; }
 }
 `;
 
@@ -1112,10 +1116,11 @@ function StageChart({
   );
 }
 
-type View = "map" | "progress" | "list";
+type View = "map" | "progress" | "card" | "list";
 const VIEWS = [
   ["map", "Map"],
   ["progress", "Progress"],
+  ["card", "Customer's view"],
   ["list", "List"],
 ] as const;
 
@@ -1399,5 +1404,240 @@ function RequestTrack({
         {nextLine(issue)}
       </p>
     </li>
+  );
+}
+
+const CARD_INK = "#1b1830";
+
+/** "Customer's view": the Problem Map card pi sends the customer on WhatsApp (same
+ * layout as the 1080 x 1350 PNG: bubbles sized by impact, zigzag down the card, pi's
+ * connections as lines, one insight line) and how it lands in the chat. */
+function CustomerCardView({
+  issues,
+  links,
+}: {
+  issues: Issue[];
+  links: Overview["links"];
+}) {
+  const calm = useReducedMotion();
+  const open = order(issues).filter(
+    (i) => !["live", "closed"].includes(i.stage),
+  );
+  const shown = (open.length ? open : issues).slice(0, 5);
+  const nodes = shown.map((issue, i) => ({
+    issue,
+    x: i % 2 ? 330 : 170,
+    y: 90 + i * 150,
+    r: 18 + 5 * Math.min(Math.max(issue.impact, 1), 5),
+  }));
+  const H = Math.max(nodes.length * 150 + 40, 420);
+  const at = (title: string) => nodes.find((n) => n.issue.title === title);
+  const lines = links.filter((l) => at(l.a_title) && at(l.b_title));
+  const groups = new Map<string, number>();
+  for (const i of shown)
+    if (i.solution_id)
+      groups.set(i.solution_id, (groups.get(i.solution_id) ?? 0) + 1);
+  const merged = Math.max(0, ...groups.values());
+  const insight =
+    merged >= 2
+      ? `One system can fix ${merged === 3 ? "all three" : `${merged} of them`}.`
+      : lines.length
+        ? `pi found ${lines.length} connection${lines.length === 1 ? "" : "s"}.`
+        : `Your ${shown.length} request${shown.length === 1 ? "" : "s"} at a glance.`;
+  const caption = [
+    lines.length
+      ? `pi found ${lines.length} connection${lines.length === 1 ? "" : "s"}.`
+      : `Here's your map: ${shown.length} request${shown.length === 1 ? "" : "s"}.`,
+    lines[0]?.reason || lines[0]?.benefit || "",
+    "Full map: on your pi Customer page",
+  ].filter(Boolean);
+  const buttons = ["Makes sense", "Not related", "Show solution"];
+  const today = new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+  });
+  const short = (t: string) => (t.length > 20 ? `${t.slice(0, 19)}…` : t);
+
+  return (
+    <div className="grid items-start gap-6 md:grid-cols-[minmax(0,340px)_minmax(0,1fr)] md:justify-center">
+      {/* The card itself (4:5, like the PNG). */}
+      <div
+        className="pm-in mx-auto flex w-full max-w-[340px] flex-col rounded-2xl p-5 text-white shadow-lg"
+        style={{ background: CARD_INK, aspectRatio: "4 / 5" }}
+        aria-label="The map card pi sends the customer"
+      >
+        <div className="flex items-center gap-2">
+          <span
+            className="flex size-7 items-center justify-center rounded-full text-xs font-bold"
+            style={{ background: "#5A47F5" }}
+          >
+            pi
+          </span>
+          <span className="text-sm font-bold">Your Problem Map</span>
+          <span className="ml-auto text-[11px] text-[#a9a4c7]">{today}</span>
+        </div>
+        <div
+          className="mt-3 flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-xl"
+          style={{ background: "#26223f" }}
+        >
+          <svg
+            viewBox={`0 0 500 ${H}`}
+            className="h-full max-h-full w-full"
+            preserveAspectRatio="xMidYMid meet"
+            role="img"
+            aria-label={shown.map((n) => n.title).join(", ")}
+          >
+            {lines.map((l, k) => {
+              const a = at(l.a_title)!;
+              const b = at(l.b_title)!;
+              const dashed = l.type === "part_of" || l.type === "depends_on";
+              const d = `M ${a.x} ${a.y} L ${b.x} ${b.y}`;
+              return (
+                <g key={`${l.a_title}-${l.b_title}`}>
+                  <path
+                    d={d}
+                    pathLength={1}
+                    className={dashed ? "pm-fade" : "pm-draw"}
+                    stroke="#8b7cff"
+                    strokeWidth={5}
+                    strokeLinecap="round"
+                    strokeDasharray={dashed ? "0.04 0.03" : undefined}
+                    style={{ animationDelay: `${400 + k * 150}ms` }}
+                  />
+                  {!calm && (
+                    <circle r={6} fill="#c9c1ff">
+                      <animateMotion
+                        dur="2.4s"
+                        begin={`${(900 + k * 150) / 1000}s`}
+                        repeatCount="indefinite"
+                        path={d}
+                      />
+                    </circle>
+                  )}
+                </g>
+              );
+            })}
+            {nodes.map((n, i) => {
+              const t = tone(n.issue);
+              const hollow = t.label === "Noted";
+              return (
+                <g
+                  key={n.issue.title}
+                  className="pm-pop"
+                  style={{ animationDelay: `${i * 110}ms` }}
+                >
+                  <circle
+                    cx={n.x}
+                    cy={n.y}
+                    r={n.r}
+                    fill={hollow ? CARD_INK : t.fill}
+                    stroke={hollow ? t.ring : "#ffffff"}
+                    strokeWidth={hollow ? 5 : 3}
+                  />
+                  <text
+                    x={n.x}
+                    y={n.y + n.r + 30}
+                    textAnchor="middle"
+                    fill="#ffffff"
+                    fontSize={26}
+                    fontWeight={700}
+                  >
+                    {short(n.issue.title)}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+        <p className="mt-3 text-center text-sm leading-snug font-bold">
+          {insight}
+        </p>
+        <div className="mt-3 flex items-center">
+          <span className="text-[11px] text-[#a9a4c7]">pi Customer</span>
+          <span
+            className="ml-auto rounded-full px-3 py-1 text-[11px] font-bold"
+            style={{ background: "#5A47F5" }}
+          >
+            See full map
+          </span>
+        </div>
+      </div>
+
+      {/* How it lands in the customer's WhatsApp. */}
+      <div className="mx-auto w-full max-w-[300px] md:mx-0">
+        <p className="mb-2 text-xs font-semibold text-muted-foreground">
+          How it arrives in WhatsApp
+        </p>
+        <div
+          className="pm-in rounded-xl rounded-tl-sm bg-[#dcf8c6] p-2 text-[13px] text-[#111b21] shadow-sm"
+          style={{ animationDelay: "250ms" }}
+        >
+          <div
+            className="mx-auto mb-2 flex aspect-[4/5] w-24 items-center justify-center rounded-md"
+            style={{ background: CARD_INK }}
+          >
+            <svg viewBox={`0 0 500 ${H}`} className="h-[80%] w-[80%]">
+              {lines.map((l) => {
+                const a = at(l.a_title)!;
+                const b = at(l.b_title)!;
+                return (
+                  <line
+                    key={`${l.a_title}-${l.b_title}`}
+                    x1={a.x}
+                    y1={a.y}
+                    x2={b.x}
+                    y2={b.y}
+                    stroke="#8b7cff"
+                    strokeWidth={10}
+                  />
+                );
+              })}
+              {nodes.map((n) => {
+                const t = tone(n.issue);
+                return (
+                  <circle
+                    key={n.issue.title}
+                    cx={n.x}
+                    cy={n.y}
+                    r={n.r * 1.3}
+                    fill={t.label === "Noted" ? CARD_INK : t.fill}
+                    stroke={t.ring}
+                    strokeWidth={8}
+                  />
+                );
+              })}
+            </svg>
+          </div>
+          {caption.map((line) => (
+            <p key={line} className="px-1 leading-snug">
+              {line}
+            </p>
+          ))}
+          <p className="mt-1 text-right text-[10px] text-[#667781]">
+            {new Date().toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+        </div>
+        <div className="mt-1 space-y-1">
+          {buttons.map((b, i) => (
+            <div
+              key={b}
+              className="pm-in rounded-lg bg-[#f0fdf4] py-1.5 text-center text-[13px] font-medium text-[#047857] shadow-sm dark:bg-[#1f2c26] dark:text-[#4ade80]"
+              style={{ animationDelay: `${400 + i * 80}ms` }}
+            >
+              {b}
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          pi sends this card when it finds a connection, when a new request
+          makes three or more, or when the customer asks for their map (at least
+          2 hours apart, inside the 24-hour window). &quot;Not related&quot;
+          removes the connection.
+        </p>
+      </div>
+    </div>
   );
 }
