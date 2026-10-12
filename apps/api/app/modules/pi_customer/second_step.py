@@ -13,7 +13,6 @@ signs. Neither works without a fresh code first.
 """
 
 import asyncio
-import json
 import logging
 import secrets
 import time
@@ -26,9 +25,9 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
-from webauthn import generate_authentication_options, options_to_json
-from webauthn.helpers import base64url_to_bytes, bytes_to_base64url
-from webauthn.helpers.structs import PublicKeyCredentialDescriptor, UserVerificationRequirement
+from webauthn import generate_authentication_options
+from webauthn.helpers import bytes_to_base64url
+from webauthn.helpers.structs import UserVerificationRequirement
 
 from app.core.rate_limit import client_ip, hit
 from app.integrations.crypto import CredentialManager
@@ -43,9 +42,11 @@ from app.modules.auth.passkeys import (
     _store,
     check_login,
     credential_id_of,
+    descriptor,
     device_name,
     finish_registration,
     origin_for,
+    request_options_json,
     start_registration,
     take_login,
     transports_of,
@@ -241,15 +242,17 @@ async def fingerprint_options(data: TicketOnly, request: Request, session: Sessi
     phone = await _ticket(request, data.ticket)
     _, rp_id = origin_for(request, PI_CUSTOMER)
     keys = list(
-        await session.scalars(
-            select(CustomerPasskey.credential_id).where(CustomerPasskey.phone == phone)
+        await session.execute(
+            select(CustomerPasskey.credential_id, CustomerPasskey.transports).where(
+                CustomerPasskey.phone == phone
+            )
         )
     )
     if not keys:
         raise BusinessRuleViolation("NO_FINGERPRINT", "No fingerprint is saved for this number")
     options = generate_authentication_options(
         rp_id=rp_id,
-        allow_credentials=[PublicKeyCredentialDescriptor(id=base64url_to_bytes(k)) for k in keys],
+        allow_credentials=[descriptor(k, t) for k, t in keys],
         user_verification=UserVerificationRequirement.REQUIRED,
     )
     await _store(request).put(
@@ -257,7 +260,7 @@ async def fingerprint_options(data: TicketOnly, request: Request, session: Sessi
         {"challenge": bytes_to_base64url(options.challenge), "rp_id": rp_id},
         TICKET_SECONDS,
     )
-    return {"options": json.loads(options_to_json(options))}
+    return {"options": request_options_json(options)}
 
 
 @router.post("/mfa/fingerprint")

@@ -35,6 +35,7 @@ import { FaceCamera, type FaceProbe } from "@/features/face-camera";
 import { ApiError, del, errorText, get, post } from "@/lib/api";
 import {
   addPasskey,
+  deviceUnlockAvailable,
   fingerprintStep,
   passkeyError,
   passkeysAvailable,
@@ -89,6 +90,16 @@ export function SecondStepForm({
   const [error, setError] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
   const unlock = useUnlockName();
+  // No Windows Hello / Touch ID here: the browser would ask for a USB security key.
+  const [noDeviceLock, setNoDeviceLock] = React.useState(false);
+
+  React.useEffect(() => {
+    void deviceUnlockAvailable().then((available) => {
+      if (available) return;
+      setNoDeviceLock(true);
+      if (hasFace) setMode("face"); // the camera works on any computer
+    });
+  }, [hasFace]);
 
   function explain(e: unknown): string {
     if (e instanceof ApiError && e.code === "SIGN_IN_EXPIRED") {
@@ -161,6 +172,13 @@ export function SecondStepForm({
             >
               <Fingerprint className="size-4" aria-hidden /> Use {unlock}
             </Button>
+            {noDeviceLock ? (
+              <p className="text-xs text-muted-foreground">
+                This computer has no {unlockName()} set up. In the window that
+                opens, choose “Use a phone or tablet” and scan the QR code with
+                the phone where you saved your fingerprint.
+              </p>
+            ) : null}
           </div>
         )}
       </div>

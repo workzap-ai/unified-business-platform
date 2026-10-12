@@ -14,7 +14,6 @@ password first.
 """
 
 import asyncio
-import json
 import logging
 import secrets
 from datetime import UTC, datetime, timedelta
@@ -29,9 +28,9 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import undefer
-from webauthn import generate_authentication_options, options_to_json
-from webauthn.helpers import base64url_to_bytes, bytes_to_base64url
-from webauthn.helpers.structs import PublicKeyCredentialDescriptor, UserVerificationRequirement
+from webauthn import generate_authentication_options
+from webauthn.helpers import bytes_to_base64url
+from webauthn.helpers.structs import UserVerificationRequirement
 
 from app.core.audience import Audience
 from app.core.rate_limit import client_ip, hit
@@ -49,9 +48,11 @@ from app.modules.auth.passkeys import (
     _store,
     check_login,
     credential_id_of,
+    descriptor,
     device_name,
     finish_registration,
     origin_for,
+    request_options_json,
     start_registration,
     take_login,
     transports_of,
@@ -404,8 +405,8 @@ def second_step_router(audience: Audience, site: Site) -> APIRouter:
         user_id = await _ticket(request, data.ticket, audience)
         _, rp_id = origin_for(request, site)
         keys = list(
-            await session.scalars(
-                select(UserPasskey.credential_id).where(
+            await session.execute(
+                select(UserPasskey.credential_id, UserPasskey.transports).where(
                     UserPasskey.user_id == user_id, UserPasskey.rp_id.in_([rp_id, ""])
                 )
             )
@@ -414,9 +415,7 @@ def second_step_router(audience: Audience, site: Site) -> APIRouter:
             raise BusinessRuleViolation("NO_FINGERPRINT", "Add a fingerprint in Account first")
         options = generate_authentication_options(
             rp_id=rp_id,
-            allow_credentials=[
-                PublicKeyCredentialDescriptor(id=base64url_to_bytes(k)) for k in keys
-            ],
+            allow_credentials=[descriptor(k, t) for k, t in keys],
             user_verification=UserVerificationRequirement.REQUIRED,
         )
         await _store(request).put(
@@ -424,7 +423,7 @@ def second_step_router(audience: Audience, site: Site) -> APIRouter:
             {"challenge": bytes_to_base64url(options.challenge), "rp_id": rp_id},
             TICKET_SECONDS,
         )
-        return JSONResponse(content={"options": json.loads(options_to_json(options))})
+        return JSONResponse(content={"options": request_options_json(options)})
 
     @router.post("/mfa/fingerprint")
     async def sign_in_with_fingerprint(

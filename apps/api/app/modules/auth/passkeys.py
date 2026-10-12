@@ -46,7 +46,9 @@ from webauthn.helpers.exceptions import (
 from webauthn.helpers.structs import (
     AuthenticatorAttachment,
     AuthenticatorSelectionCriteria,
+    AuthenticatorTransport,
     PublicKeyCredentialDescriptor,
+    PublicKeyCredentialHint,
     ResidentKeyRequirement,
     UserVerificationRequirement,
 )
@@ -158,9 +160,8 @@ async def start_registration(
             resident_key=ResidentKeyRequirement.REQUIRED,
             user_verification=UserVerificationRequirement.REQUIRED,
         ),
-        exclude_credentials=[
-            PublicKeyCredentialDescriptor(id=base64url_to_bytes(c)) for c in existing
-        ],
+        exclude_credentials=[descriptor(c) for c in existing],
+        hints=[PublicKeyCredentialHint.CLIENT_DEVICE],
     )
     await _store(request).put(
         f"passkey:{site.key}:register:{owner}",
@@ -192,6 +193,28 @@ async def finish_registration(
         raise BusinessRuleViolation(
             "PASSKEY_INVALID", "This passkey couldn't be checked. Please try again."
         ) from None
+
+
+# Keys are made on the device's own lock, so without a saved list we say "this device,
+# or a phone nearby": Windows then offers Windows Hello (or a phone by QR code), never
+# "insert your USB security key".
+DEVICE_TRANSPORTS = (AuthenticatorTransport.INTERNAL, AuthenticatorTransport.HYBRID)
+REQUEST_HINTS = ["client-device", "hybrid"]
+
+
+def descriptor(credential_id: str, transports: str = "") -> PublicKeyCredentialDescriptor:
+    known = {t.value: t for t in AuthenticatorTransport}
+    saved = [known[t] for t in transports.split(",") if t in known]
+    return PublicKeyCredentialDescriptor(
+        id=base64url_to_bytes(credential_id), transports=saved or list(DEVICE_TRANSPORTS)
+    )
+
+
+def request_options_json(options: Any) -> dict[str, Any]:
+    """Sign-in options for the browser, with hints (py_webauthn doesn't set them here)."""
+    result: dict[str, Any] = json.loads(options_to_json(options))
+    result["hints"] = REQUEST_HINTS
+    return result
 
 
 def transports_of(credential: dict[str, Any]) -> str:

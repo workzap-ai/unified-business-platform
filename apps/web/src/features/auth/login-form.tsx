@@ -23,7 +23,12 @@ import { useSession } from "./session-provider";
 import { authService } from "./service";
 import { FaceCamera } from "./face-camera";
 import { probeFace } from "./passkey";
-import { passkeyError, passkeysAvailable, unlockName } from "./passkey";
+import {
+  deviceUnlockAvailable,
+  passkeyError,
+  passkeysAvailable,
+  unlockName,
+} from "./passkey";
 import type { SecondStep } from "./types";
 
 const schema = z.object({
@@ -220,11 +225,18 @@ function SecondStepForm({
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [unlock, setUnlock] = useState("fingerprint");
+  // No Windows Hello / Touch ID here: the browser would ask for a USB security key.
+  const [noDeviceLock, setNoDeviceLock] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time capability probe
     setUnlock(passkeysAvailable() ? unlockName() : "fingerprint");
-  }, []);
+    void deviceUnlockAvailable().then((available) => {
+      if (available) return;
+      setNoDeviceLock(true);
+      if (hasFace) setMode("face"); // the camera works on any computer
+    });
+  }, [hasFace]);
 
   function explain(e: unknown, fallback: string): string {
     if (e instanceof ApiError && e.code === "SIGN_IN_EXPIRED") {
@@ -297,6 +309,13 @@ function SecondStepForm({
             >
               <Fingerprint aria-hidden /> Use {unlock}
             </Button>
+            {noDeviceLock ? (
+              <p className="text-xs text-muted-foreground">
+                This computer has no {unlockName()} set up. In the window that
+                opens, choose “Use a phone or tablet” and scan the QR code with
+                the phone where you saved your fingerprint.
+              </p>
+            ) : null}
           </div>
         )}
       </div>
