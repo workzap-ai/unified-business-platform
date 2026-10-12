@@ -151,7 +151,7 @@ class MemberService:
         """New accounts get a one-time link to set their first password; an existing
         person added to another workspace already has one, so they just get pointed
         at sign-in. Either way, a failed send never blocks adding the member."""
-        base = settings.pi_app_public_url if audience == "pi" else settings.web_public_url
+        base = settings.pi_app_public_url if audience == "pi" else settings.web_base
         invite_link: str | None = None
         if is_new_account:
             current = datetime.now(UTC)

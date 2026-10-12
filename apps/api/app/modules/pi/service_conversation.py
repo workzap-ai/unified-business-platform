@@ -123,6 +123,24 @@ class Requirements(BaseModel):
         }
 
 
+class CustomerProfile(BaseModel):
+    """Who the customer is, ONLY from what they said: kept across all their chats."""
+
+    model_config = ConfigDict(extra="ignore")
+    name: str = Field(default="", max_length=120)
+    business_name: str = Field(default="", max_length=160)
+    business_type: str = Field(default="", max_length=300)  # what the business does or sells
+    location: str = Field(default="", max_length=160)
+    role: str = Field(default="", max_length=120)  # e.g. owner, marketing manager
+
+    @model_validator(mode="before")
+    @classmethod
+    def _tolerate(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return {}
+        return {key: _text(data.get(key), 300) for key in cls.model_fields if key in data}
+
+
 PROJECT_STATUS = ("collecting", "awaiting_confirmation", "confirmed", "with_team")
 
 
@@ -177,6 +195,8 @@ class ServiceTurn(BaseModel):
     # missing describe the one being discussed now.
     projects: list[Project] = Field(default_factory=list, max_length=10)
     requirements: Requirements = Field(default_factory=Requirements)
+    # Who the customer is (name, business): filled from their words, kept for every chat.
+    customer_profile: CustomerProfile = Field(default_factory=CustomerProfile)
     missing: list[str] = Field(default_factory=list, max_length=12)
     # Internal: how the customer feels, and what they asked that knowledge can't answer
     # (the team is told, so they can teach pi).
@@ -297,6 +317,17 @@ Reply style (pi brand: steady, plain, honest; WhatsApp, easy to read):
   each). Use *bold* (single asterisks) only for the one thing they must act on.
   Never use Markdown headings, tables, links in brackets or **double asterisks**.
 Use recent history and the brief; never ask again for something already answered.
+Know the customer first. customer_profile is what is already known about them (their
+record and earlier chats). A returning customer (returning_customer=true or a filled
+customer_profile): never ask again for anything in it; greet them by name when you know
+it and carry on from what they want now. A new customer: in your first or second reply,
+alongside helping with their request, ask in one short friendly question for their name
+and their business (its name and what it does), unless they already said. Fill
+customer_profile from the customer's own words only (name, business_name, business_type =
+what the business does or sells, location, role); leave unknown fields empty.
+Never say the company has or offers something ("haan, humare paas ERP hai") unless it
+is in offerings or approved_knowledge; otherwise say the team will confirm what fits
+and keep collecting the brief.
 Work like the company's best account manager. The company may be in any field (design
 agency, software house, clinic, salon, shop, consultancy...): learn what it does and how
 it works ONLY from company, offerings, approved_knowledge and operator_guidance. Each
@@ -653,6 +684,7 @@ async def prepare_context(
         else []
     )
     tenant = await session.get(Tenant, scope.tenant_id)
+    profile, returning = await customer_profile(session, scope, conversation)
     memories = (
         list(
             await session.scalars(
@@ -747,6 +779,8 @@ async def prepare_context(
         "company": tenant.name if tenant else "",
         "offerings": [p.name for p in offerings],  # Deliberately no catalog prices.
         "customer_memory": [m.content for m in memories],
+        "customer_profile": profile,
+        "returning_customer": returning,
         "approved_knowledge": knowledge,
         "operator_guidance": version.instructions if version else "",
         "brief": conversation.service_brief,
@@ -843,13 +877,32 @@ def shared_documents(message: PiMessage, rows: list[PiMessage]) -> list[str]:
     return found[:3]
 
 
+# Words that show a Latin-letter message is Spanish, French, German, Portuguese or Italian.
+FOREIGN_WORDS = re.compile(
+    r"\b(que|para|por|el|los|las|una|est|pour|avec|vous|nous|und|der|die|das|ist|nicht|"
+    r"com|você|não|per|sono|grazie|hola|gracias|bonjour|merci|danke)\b",
+    re.IGNORECASE,
+)
+
+
+def looks_foreign(text: str) -> bool:
+    """A Latin-letter message in another language (accents or its common words). Plain
+    English-looking words like "google meet meeting link?" are not: they follow the chat."""
+    return bool(re.search(r"[À-ÖØ-öø-ÿ]", text) or FOREIGN_WORDS.search(text))
+
+
 def reply_language(
     conversation: PiConversation, message: PiMessage, rows: list[PiMessage]
 ) -> dict[str, str]:
     """The language pi must answer in, from the customer's own latest words. Image and
     file descriptions are system English, so those fall back to the customer's last text."""
     texts = [message.body] if message.message_type in ("text", "audio") else []
-    if texts and not detect_language(texts[0]) and len(re.findall(r"\w{2,}", texts[0])) >= 3:
+    if (
+        texts
+        and not detect_language(texts[0])
+        and len(re.findall(r"\w{2,}", texts[0])) >= 3
+        and looks_foreign(texts[0])
+    ):
         return {}  # A real message in another language (e.g. Spanish): the model matches it.
     texts += [m.body for m in rows if m.sender_type == "customer" and m.message_type == "text"]
     language = next(
@@ -929,6 +982,12 @@ def needless_question(reply: str, context: dict[str, Any]) -> str | None:
         )
         if close or OPEN_ENDED.search(reply):
             return "the customer just said they have nothing more to add, and you asked again"
+    if OPEN_ENDED.search(reply.rsplit("?", 1)[0][-240:]):
+        return (
+            'it asks an open-ended question ("anything else?", "any specific features?", '
+            '"koi aur?"); ask instead for the next concrete thing still missing (for a new '
+            "customer: their name and business), or confirm the brief"
+        )
     return None
 
 
@@ -1178,7 +1237,11 @@ async def save_service_turn(
         "mood": turn.mood,
         "projects": [project.model_dump() for project in turn.projects],
         "meeting_requested": turn.meeting_requested or bool(previous.get("meeting_requested")),
+        "customer_profile": merge_profile(
+            previous.get("customer_profile"), turn.customer_profile.model_dump()
+        ),
     }
+    await remember_customer(session, scope, conversation, brief["customer_profile"])
     known = list(previous.get("knowledge_gaps") or [])
     new_gaps = [g for g in dict.fromkeys(turn.knowledge_gaps) if g not in known]
     brief["knowledge_gaps"] = [*known, *new_gaps][-10:]
@@ -1287,6 +1350,76 @@ def project_requirements(
     elif not mine:
         fields["scope"] = ""
     return fields
+
+
+def merge_profile(previous: Any, new: dict[str, Any]) -> dict[str, str]:
+    """What we know about the customer: new non-empty facts win, nothing known is lost."""
+    known = {k: str(v) for k, v in (previous or {}).items() if isinstance(v, str) and v.strip()}
+    known.update({k: str(v).strip() for k, v in new.items() if isinstance(v, str) and v.strip()})
+    return known
+
+
+PLACEHOLDER_NAME = re.compile(r"^(whatsapp|customer|unknown)\b|^\+?\d[\d ]+$", re.I)
+
+
+async def remember_customer(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    profile: dict[str, str],
+) -> None:
+    """The customer record follows what they told pi: their name (when the record only
+    has a WhatsApp placeholder) and their business name (when none is saved yet)."""
+    from app.modules.customers.models import Customer
+
+    if conversation.customer_id is None or not profile:
+        return
+    customer = await WorkspaceRepository(session, Customer, scope).find(
+        Customer.id == conversation.customer_id
+    )
+    if customer is None:
+        return
+    if profile.get("name") and (not customer.name or PLACEHOLDER_NAME.search(customer.name)):
+        customer.name = profile["name"][:160]
+    if profile.get("business_name") and not customer.company:
+        customer.company = profile["business_name"][:160]
+
+
+async def customer_profile(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation
+) -> tuple[dict[str, str], bool]:
+    """What is already known about the customer (their record, this chat and their
+    earlier chats), and whether they are returning (they chatted before)."""
+    from app.modules.customers.models import Customer
+
+    profile: dict[str, str] = {}
+    returning = False
+    if conversation.customer_id is not None:
+        earlier = await session.scalars(
+            WorkspaceRepository(session, PiConversation, scope)
+            .select()
+            .where(
+                PiConversation.customer_id == conversation.customer_id,
+                PiConversation.id != conversation.id,
+            )
+            .order_by(PiConversation.last_message_at.asc().nulls_first())
+            .limit(10)
+        )
+        for row in earlier:
+            returning = True
+            earlier_profile = (row.service_brief or {}).get("customer_profile") or {}
+            profile = merge_profile(profile, earlier_profile)
+        customer = await WorkspaceRepository(session, Customer, scope).find(
+            Customer.id == conversation.customer_id
+        )
+        if customer is not None:
+            if customer.name and not PLACEHOLDER_NAME.search(customer.name):
+                profile.setdefault("name", customer.name)
+            if customer.company:
+                profile.setdefault("business_name", customer.company)
+    current = (conversation.service_brief or {}).get("customer_profile") or {}
+    profile = merge_profile(profile, current)
+    return profile, returning
 
 
 def newly_confirmed(previous: Any, projects: list[Project]) -> bool:

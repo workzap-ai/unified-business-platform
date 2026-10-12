@@ -353,7 +353,7 @@ async def _invite(
                 + timedelta(minutes=settings.member_invite_ttl_minutes),
             )
         )
-        link = f"{settings.web_public_url}/accept-invite?token={token}"
+        link = f"{settings.web_base}/accept-invite?token={token}"
     try:
         await send_platform_template(
             settings,
@@ -364,7 +364,7 @@ async def _invite(
                 "name": user.display_name,
                 "inviter": inviter,
                 "workspace": tenant.name,
-                "link": link or f"{settings.web_public_url}/login",
+                "link": link or f"{settings.web_base}/login",
             },
         )
     except (BusinessRuleViolation, IntegrationError):

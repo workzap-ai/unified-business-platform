@@ -67,6 +67,17 @@ class Settings(BaseSettings):
     # reset). Kept separate from cors_origins, which may list several allowed origins.
     web_public_url: str = "http://localhost:3000"
 
+    @property
+    def web_base(self) -> str:
+        """The Owner OS address for links in emails. A server still on the development
+        default uses its HTTPS browser origin (when it has one), never localhost."""
+        url = self.web_public_url.rstrip("/")
+        if "localhost" in url or "127.0.0.1" in url:
+            live = next((o for o in self.cors_origins if o.startswith("https://")), None)
+            if live:
+                return live.rstrip("/")
+        return url
+
     # Background jobs: 'inline' runs jobs in-process and is only for development/tests.
     job_queue_mode: Literal["arq", "inline"] = "arq"
     job_queue_name: str = "arq:queue"

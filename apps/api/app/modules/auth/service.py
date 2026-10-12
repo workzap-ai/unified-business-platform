@@ -304,7 +304,7 @@ class AuthService:
             entity_type="user",
             entity_id=user.id,
         )
-        base = self.settings.pi_app_public_url if audience == "pi" else self.settings.web_public_url
+        base = self.settings.pi_app_public_url if audience == "pi" else self.settings.web_base
         link = f"{base}/reset-password?token={token}"
         try:
             await send_platform_template(
@@ -380,7 +380,7 @@ class AuthService:
                 + timedelta(minutes=self.settings.email_verification_ttl_minutes),
             )
         )
-        base = self.settings.pi_app_public_url if audience == "pi" else self.settings.web_public_url
+        base = self.settings.pi_app_public_url if audience == "pi" else self.settings.web_base
         link = f"{base}/verify-email?token={token}"
         try:
             await send_platform_template(

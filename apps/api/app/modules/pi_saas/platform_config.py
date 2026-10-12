@@ -117,6 +117,14 @@ KEYS: tuple[Key, ...] = (
         placeholder="https://api.example.com",
     ),
     Key(
+        "WEB_PUBLIC_URL",
+        "addresses",
+        "Owner OS address",
+        "url",
+        "Where your team opens Owner OS; used in confirm-email, invite and reset links.",
+        placeholder="https://os.example.com",
+    ),
+    Key(
         "PI_APP_PUBLIC_URL",
         "addresses",
         "Pi app address",

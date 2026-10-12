@@ -25,6 +25,7 @@ from app.modules.audit.service import record
 from app.modules.customers.models import Customer
 from app.modules.notifications.service import notify
 from app.modules.pi.models import PiConversation, PiMessage
+from app.modules.pi_saas.meetings import MeetingInput
 from app.modules.pi_saas.models import REQUEST_KINDS, PiConversationNote, PiStaffRequest
 from app.shared.errors import BusinessRuleViolation
 from app.shared.scope import WorkspaceScope
@@ -355,7 +356,15 @@ async def list_requests(
         query = query.where(PiStaffRequest.status != "open")
     rows = list(await session.scalars(query.order_by(PiStaffRequest.created_at.desc()).limit(200)))
     open_count = sum(1 for r in rows if r.status == "open") if status != "done" else 0
-    return {"items": await view(session, scope, rows), "open": open_count}
+    from app.modules.pi_saas import connectors
+
+    calendar = await connectors.current(session, scope, "google_calendar")
+    return {
+        "items": await view(session, scope, rows),
+        "open": open_count,
+        # Meeting requests can get a Google Meet link when a calendar is connected.
+        "google_meet": calendar is not None and calendar.status in connectors.USABLE,
+    }
 
 
 @router.post("/{request_id}/answer")
@@ -372,6 +381,29 @@ async def answer_request(
         request_id,
         data.answer,
         save_as_knowledge=data.save_as_knowledge,
+        max_bytes=request.app.state.settings.knowledge_upload_max_bytes,
+    )
+    await session.commit()
+    await enqueue_reply(request, row.id)
+    return (await view(session, scope, [row]))[0]
+
+
+@router.post("/{request_id}/meeting")
+async def arrange_meeting(
+    request_id: UUID, data: MeetingInput, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Book the meeting (Google Meet, a link or a place); pi tells the customer."""
+    from app.modules.pi.service import PiService
+    from app.modules.pi_saas.meetings import arrange, runtime_for
+
+    row = await WorkspaceRepository(session, PiStaffRequest, scope).get(request_id)
+    await PiService(session, scope).conversations.get(row.conversation_id)  # visibility
+    row = await arrange(
+        session,
+        scope,
+        runtime_for(request),
+        request_id,
+        data,
         max_bytes=request.app.state.settings.knowledge_upload_max_bytes,
     )
     await session.commit()

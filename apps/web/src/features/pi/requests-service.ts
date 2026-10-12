@@ -48,7 +48,17 @@ export type PiRequest = z.infer<typeof piRequestSchema>;
 const listSchema = z.object({
   items: z.array(piRequestSchema),
   open: z.number().catch(0),
+  google_meet: z.boolean().catch(false),
 });
+
+export type MeetingInput = {
+  starts_at: string;
+  duration_minutes: number;
+  how: "google_meet" | "link" | "in_person";
+  link: string;
+  place: string;
+  note: string;
+};
 
 export const piRequestsService = {
   list: (status: "open" | "done" | "all") =>
@@ -56,6 +66,10 @@ export const piRequestsService = {
   answer: (id: string, answer: string, saveAsKnowledge: boolean) =>
     apiRequest("POST", `/pi/requests/${id}/answer`, piRequestSchema, {
       body: { answer, save_as_knowledge: saveAsKnowledge },
+    }),
+  arrangeMeeting: (id: string, input: MeetingInput) =>
+    apiRequest("POST", `/pi/requests/${id}/meeting`, piRequestSchema, {
+      body: input,
     }),
   dismiss: (id: string) =>
     apiRequest("POST", `/pi/requests/${id}/dismiss`, piRequestSchema),

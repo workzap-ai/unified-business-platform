@@ -40,6 +40,7 @@ import {
   cn,
 } from "@/components/ui";
 import { fileDownloadUrl } from "@/features/customer-files";
+import { MeetingDialog } from "@/features/meeting-dialog";
 import { errorText, get, post } from "@/lib/api";
 import { dateTime, timeAgo } from "@/lib/format";
 import { useAction, useBusinessKey, useCan } from "@/lib/session";
@@ -68,6 +69,7 @@ export interface PiRequest {
 export interface RequestList {
   items: PiRequest[];
   open: number;
+  google_meet?: boolean;
 }
 
 const KINDS: Record<RequestKind, { label: string; icon: LucideIcon }> = {
@@ -114,6 +116,7 @@ export function RequestsPage() {
   const open = useOpenRequests(allowed && status !== "open");
   const openCount = status === "open" ? list.data?.open : open.data?.open;
   const [answering, setAnswering] = React.useState<PiRequest | null>(null);
+  const [meeting, setMeeting] = React.useState<PiRequest | null>(null);
 
   // A link to one request (from a deal or a notification) scrolls to it.
   React.useEffect(() => {
@@ -217,12 +220,20 @@ export function RequestsPage() {
                 request={r}
                 highlight={r.id === highlight}
                 onAnswer={setAnswering}
+                onMeeting={setMeeting}
               />
             ))}
           </ul>
         </>
       )}
       <AnswerDialog request={answering} onClose={() => setAnswering(null)} />
+      <MeetingDialog
+        key={meeting?.id ?? "none"}
+        requestId={meeting?.id ?? null}
+        question={meeting?.question ?? ""}
+        googleMeet={Boolean(list.data?.google_meet)}
+        onClose={() => setMeeting(null)}
+      />
     </div>
   );
 }
@@ -231,10 +242,12 @@ function RequestCard({
   request: r,
   highlight,
   onAnswer,
+  onMeeting,
 }: {
   request: PiRequest;
   highlight: boolean;
   onAnswer: (r: PiRequest) => void;
+  onMeeting: (r: PiRequest) => void;
 }) {
   const can = useCan();
   const kind = KINDS[r.kind] ?? KINDS.other;
@@ -304,8 +317,17 @@ function RequestCard({
             </div>
           ) : null}
           <div className="flex flex-wrap items-center gap-2">
+            {open && reply && r.kind === "meeting" ? (
+              <Button size="sm" onClick={() => onMeeting(r)}>
+                <CalendarClock className="size-4" aria-hidden /> Arrange meeting
+              </Button>
+            ) : null}
             {open && reply ? (
-              <Button size="sm" onClick={() => onAnswer(r)}>
+              <Button
+                size="sm"
+                variant={r.kind === "meeting" ? "secondary" : "primary"}
+                onClick={() => onAnswer(r)}
+              >
                 Answer
               </Button>
             ) : null}

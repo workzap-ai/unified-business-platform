@@ -815,7 +815,7 @@ def second_step_router(audience: Audience, site: Site) -> APIRouter:
         )
         await session.commit()
         settings = request.app.state.settings
-        base = settings.pi_app_public_url if audience == "pi" else settings.web_public_url
+        base = settings.pi_app_public_url if audience == "pi" else settings.web_base
         origin = request.headers.get("origin", "").rstrip("/")
         if origin and origin in {o.rstrip("/") for o in site.origins(settings)}:
             base = origin  # the same address the person is using now

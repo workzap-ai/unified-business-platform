@@ -539,6 +539,9 @@ function InviteDialog({ roles }: { roles: TeamView["roles"] }) {
             >
               <InviteLinkField link={invited.link ?? ""} />
             </Field>
+            {invited.link ? (
+              <WhatsAppInvite name={invited.name} link={invited.link} />
+            ) : null}
             <Button className="w-full" onClick={() => setOpen(false)}>
               Done
             </Button>
@@ -602,6 +605,66 @@ function InviteDialog({ roles }: { roles: TeamView["roles"] }) {
         </DialogContent>
       )}
     </Dialog>
+  );
+}
+
+/** The invite on WhatsApp: from the pi number when they have an open chat with it,
+ * otherwise from the inviter's own WhatsApp with the message ready. */
+function WhatsAppInvite({ name, link }: { name: string; link: string }) {
+  const [phone, setPhone] = React.useState("");
+  const [result, setResult] = React.useState<string | null>(null);
+  const send = useAction(
+    () =>
+      post<{ delivery: "sent" | "manual"; share: string }>(
+        "/team-invites/whatsapp",
+        { phone, name, link },
+      ),
+    {
+      onSuccess: (r) => {
+        if (r.delivery === "sent") {
+          setResult("Sent from your pi WhatsApp number.");
+        } else {
+          setResult(
+            "They haven't messaged your pi number yet, so WhatsApp needs you to send it: your WhatsApp opened with the message ready.",
+          );
+          window.open(r.share, "_blank", "noopener");
+        }
+      },
+    },
+  );
+  return (
+    <Field
+      label="Send it on WhatsApp"
+      htmlFor="inv-phone"
+      hint="Their WhatsApp number with country code, e.g. +92 300 1234567."
+    >
+      <div className="flex items-center gap-2">
+        <Input
+          id="inv-phone"
+          inputMode="tel"
+          autoComplete="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="+92 300 1234567"
+          className="min-w-0 flex-1"
+        />
+        <Button
+          type="button"
+          variant="secondary"
+          className="shrink-0"
+          loading={send.isPending}
+          disabled={phone.replace(/\D/g, "").length < 8}
+          onClick={() => send.mutate(undefined)}
+        >
+          <MessageCircle className="size-4" aria-hidden /> Send
+        </Button>
+      </div>
+      {result ? (
+        <p className="mt-2 text-[13px] text-muted-foreground" role="status">
+          {result}
+        </p>
+      ) : null}
+    </Field>
   );
 }
 

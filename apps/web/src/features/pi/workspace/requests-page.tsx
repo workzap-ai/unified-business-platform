@@ -42,6 +42,7 @@ import {
   type RequestKind,
 } from "../requests-service";
 import { inboxHref } from "./lib";
+import { MeetingDialog } from "./meeting-dialog";
 
 const KIND_ICONS: Record<RequestKind, typeof Bot> = {
   question: MessageCircleQuestion,
@@ -72,6 +73,7 @@ function RequestsView() {
     piRequestsService.list(status),
   );
   const [answering, setAnswering] = useState<PiRequest | null>(null);
+  const [meeting, setMeeting] = useState<PiRequest | null>(null);
   const items = query.data?.items ?? [];
   return (
     <PageShell>
@@ -118,11 +120,22 @@ function RequestsView() {
       ) : (
         <ul className="space-y-3">
           {items.map((r) => (
-            <RequestCard key={r.id} request={r} onAnswer={setAnswering} />
+            <RequestCard
+              key={r.id}
+              request={r}
+              onAnswer={setAnswering}
+              onMeeting={setMeeting}
+            />
           ))}
         </ul>
       )}
       <AnswerDialog request={answering} onClose={() => setAnswering(null)} />
+      <MeetingDialog
+        key={meeting?.id ?? "none"}
+        request={meeting}
+        googleMeet={query.data?.google_meet ?? false}
+        onClose={() => setMeeting(null)}
+      />
     </PageShell>
   );
 }
@@ -130,9 +143,11 @@ function RequestsView() {
 function RequestCard({
   request: r,
   onAnswer,
+  onMeeting,
 }: {
   request: PiRequest;
   onAnswer: (r: PiRequest) => void;
+  onMeeting: (r: PiRequest) => void;
 }) {
   const { can } = useSession();
   const Icon = KIND_ICONS[r.kind];
@@ -189,8 +204,17 @@ function RequestCard({
             </div>
           )}
           <div className="flex flex-wrap items-center gap-2">
+            {open && can("pi.inbox.reply") && r.kind === "meeting" && (
+              <Button size="sm" onClick={() => onMeeting(r)}>
+                <CalendarClock /> Arrange meeting
+              </Button>
+            )}
             {open && can("pi.inbox.reply") && (
-              <Button size="sm" onClick={() => onAnswer(r)}>
+              <Button
+                size="sm"
+                variant={r.kind === "meeting" ? "secondary" : "default"}
+                onClick={() => onAnswer(r)}
+              >
                 Answer
               </Button>
             )}
