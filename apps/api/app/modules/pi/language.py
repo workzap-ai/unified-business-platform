@@ -57,6 +57,18 @@ NAMES = {
 }
 
 
+def english_greeting(text: str | None) -> bool:
+    """A standalone English greeting, never the Urdu particle 'hi' inside a sentence."""
+    return bool(
+        re.fullmatch(
+            r"[\W_]*(?:(?:hi|hello|hey)(?:\s+there)?|good\s+(?:morning|afternoon|evening))"
+            r"[\W_]*",
+            text or "",
+            re.IGNORECASE,
+        )
+    )
+
+
 def detect_language(text: str | None) -> str | None:
     """'en', 'roman_ur' or 'ar' when the text clearly shows one, otherwise None.
     Urdu or Hindi written in its own script is 'roman_ur': pi answers those in Roman
@@ -64,6 +76,8 @@ def detect_language(text: str | None) -> str | None:
     text = (text or "").strip()
     if not text:
         return None
+    if english_greeting(text):
+        return "en"
     arabic = len(ARABIC_SCRIPT.findall(text))
     devanagari = len(DEVANAGARI.findall(text))
     latin = len(re.findall(r"[A-Za-z]", text))

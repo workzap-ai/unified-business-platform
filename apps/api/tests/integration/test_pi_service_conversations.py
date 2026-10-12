@@ -661,7 +661,7 @@ async def test_a_repeated_customer_date_is_dropped_instead_of_stopping_pi(
         ),
     )
     pi = await pi_workspace(api, business_db, business_type="service_business")
-    await pi.process("Hi", "date-1")
+    await pi.process("Website ka kaam kab tak hoga?", "date-1")
     await pi.deliver_all()
     conversation = await pi.conversation()
     assert conversation.mode == "ai"  # no handoff

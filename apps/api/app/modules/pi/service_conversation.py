@@ -24,7 +24,7 @@ from app.modules.notifications.service import notify
 from app.modules.pi import price_policy
 from app.modules.pi.guard import ReplyRejected, validate_reply
 from app.modules.pi.knowledge import KnowledgeService, remember
-from app.modules.pi.language import NAMES, clearly_other, detect_language
+from app.modules.pi.language import NAMES, clearly_other, detect_language, english_greeting
 from app.modules.pi.links import link_note
 from app.modules.pi.models import (
     PiAgent,
@@ -182,6 +182,8 @@ class ServiceTurn(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
     _attempts: list[Attempt] = PrivateAttr(default_factory=list)
+    # A plain greeting changes neither the customer's brief nor any business action.
+    _greeting_only: bool = PrivateAttr(default=False)
     # pi keeps the chat but needs the team: a question on the request desk.
     _ask_team: bool = PrivateAttr(default=False)
     # Filled FIRST (field order guides the model): what the customer wants right now and
@@ -299,6 +301,8 @@ Reply style (pi brand: steady, plain, honest; WhatsApp, easy to read):
   no recap of the brief or projects. Never end with "if you have any other questions,
   feel free to ask" or "let me know if you need anything else" (or the same in Roman
   Urdu): end when the answer or the next step is said.
+- A greeting alone gets a greeting and one short offer of help. Never answer it with
+  company goals, a service list, old project details or a business-details form.
 - Work out what this customer actually wants from the whole conversation (messages,
   voice-note transcripts, image and document descriptions) and respond to THAT. Never
   steer them to a topic they did not raise, and never pitch the company's services while
@@ -1209,11 +1213,14 @@ def too_long(reply: str, context: dict[str, Any]) -> str | None:
     latest = str(context.get("latest_customer_message", ""))
     if context.get("latest_message_kind") not in (None, "text") or not latest.strip():
         return None
-    if len(latest.split()) > SIMPLE_ASK or context.get("check_in_now"):
+    if (
+        len(latest.split()) > SIMPLE_ASK
+        or context.get("check_in_now")
+        or context.get("team_answer_now")
+    ):
         return None
-    brief = context.get("brief") or {}
-    if not (context.get("history") and (brief.get("projects") or brief.get("ready_for_team"))):
-        return None  # early in a chat a short "hi" may need the intro and a question
+    if re.search(r"\b(?:ideas?|list|options?|summary|brief|details?|explain)\b", latest, re.I):
+        return None  # A short request can explicitly ask for a detailed answer.
     bullets = sum(1 for line in reply.splitlines() if line.strip().startswith("•"))
     if len(reply) > 320 or (
         bullets >= 2 and not re.search(r"\b(?:idea|list|options?|summary|brief)\b", latest, re.I)
@@ -1373,6 +1380,30 @@ def team_summary(turn: ServiceTurn) -> str:
     return "\n".join(lines)[:4000]
 
 
+def greeting_reply(context: dict[str, Any]) -> str:
+    """pi's answer to a plain "Hi": who it is the first time; for a returning customer
+    with something still open, an offer to carry on with it (pi remembers)."""
+    if not any(h.get("role") == "ai" for h in context.get("history") or []):
+        company = str(context.get("company") or "").strip()
+        who = f"{company}'s AI assistant" if company else "your AI assistant"
+        return f"Hi, I'm pi, {who}. How can I help you today?"
+    name = str((context.get("customer_profile") or {}).get("name") or "").split(" ")[0]
+    hello = f"Hi {name}." if name and not PLACEHOLDER_NAME.search(name) else "Hi."
+    brief = context.get("brief") or {}
+    open_project = next(
+        (
+            p.get("title")
+            for p in reversed(brief.get("projects") or [])
+            if p.get("status") in (None, "", "collecting", "awaiting_confirmation")
+            and p.get("title")
+        ),
+        None,
+    )
+    if open_project:
+        return f"{hello} Shall we carry on with your {open_project}?"
+    return f"{hello} How can I help you today?"
+
+
 async def compose_service_turn(
     manager: LLMManager,
     scope: WorkspaceScope,
@@ -1380,6 +1411,18 @@ async def compose_service_turn(
     policy: PiSettings,
     context: dict[str, Any],
 ) -> ServiceTurn:
+    if (
+        context.get("latest_message_kind") in (None, "text")
+        and english_greeting(str(context.get("latest_customer_message", "")))
+        and not any(
+            context.get(key)
+            for key in ("check_in_now", "team_answer_now", "operator_review_required")
+        )
+    ):
+        # Old knowledge and the model's last language must not turn "Hi" into a pitch.
+        turn = ServiceTurn(reply=greeting_reply(context), language="en")
+        turn._greeting_only = True
+        return turn
     result = await manager.complete_structured(
         scope,
         ServiceTurn,
@@ -1462,6 +1505,15 @@ async def compose_service_turn(
         if invented(turn.reply, context, turn.action == "booking"):
             # Still made up after the rewrite: never sent (pi asks the team instead).
             raise ReplyRejected("INVENTED_DETAIL")
+    latest_language = detect_language(str(context.get("latest_customer_message", "")))
+    if latest_language == expected and (
+        clearly_other(turn.reply, str(expected or ""))
+        or mixed_line(turn.reply, str(expected or ""))
+    ):
+        # A failed rewrite must not send the same wrong-language reply to WhatsApp. Only
+        # when the customer clearly wrote in that language: otherwise the turn (and what
+        # it saves, e.g. "reminder mat bhejna" = no reminders) must never be lost.
+        raise ReplyRejected("REPLY_LANGUAGE_MISMATCH")
     if expected:
         turn.language = str(expected)  # The conversation follows the customer's language.
     if context.get("latest_message_kind") != "audio":
@@ -1521,6 +1573,9 @@ async def save_service_turn(
 ) -> list[UUID]:
     """Save the turn. Returns the leads pi should now write a proposal for (the caller
     queues it after commit, so the model call never runs under these row locks)."""
+    if turn._greeting_only:
+        conversation.language = turn.language
+        return []
     previous = conversation.service_brief or {}
     consent = previous.get("reminder_consent", "unknown")
     if turn.consent != "unchanged":

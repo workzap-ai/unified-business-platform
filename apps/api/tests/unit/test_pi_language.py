@@ -6,6 +6,7 @@ from app.modules.pi.language import (
     HANDOFF_NOTICES,
     clearly_other,
     detect_language,
+    english_greeting,
     notice_in,
 )
 
@@ -16,6 +17,11 @@ from app.modules.pi.language import (
         ("Can you tell me your team performance?", "en"),
         ("And 2nd software development of Cloud system for my company", "en"),
         ("I need a website for my bakery, can you help?", "en"),
+        ("Hi", "en"),
+        ("HELLO!", "en"),
+        ("Hey there 👋", "en"),
+        ("Good morning", "en"),
+        ("ye hi chahiye", "roman_ur"),
         ("Mujhe automation chahiye of flight booking", "roman_ur"),
         ("website design chahiye", "roman_ur"),
         ("Aap ka rate kya hai?", "roman_ur"),
@@ -31,6 +37,14 @@ from app.modules.pi.language import (
 )
 def test_detects_the_customers_language(text: str, expected: str | None) -> None:
     assert detect_language(text) == expected
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["Hi, I need a website", "hi mujhe website chahiye", "ye hi", "Hi مجھے مدد چاہیے", ""],
+)
+def test_a_greeting_with_a_request_is_not_just_a_greeting(text: str) -> None:
+    assert not english_greeting(text)
 
 
 def test_a_reply_in_the_other_language_is_caught_but_borrowed_words_are_not() -> None:

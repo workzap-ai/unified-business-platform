@@ -5,11 +5,14 @@ import json
 from types import SimpleNamespace
 
 import pytest
+from sqlalchemy import func, select
 from test_pi_pipeline import pi_workspace
 from test_pi_service_conversations import turn
 
 from app.ai.errors import GatewayUnavailable
 from app.ai.manager import LLMManager
+from app.modules.pi.models import PiMessage
+from app.modules.sales.models import SalesLead
 
 pytestmark = pytest.mark.integration
 
@@ -68,6 +71,92 @@ async def test_a_short_reply_keeps_the_language_of_the_chat(api, business_db, mo
     await pi.process("ok", "short-2")
     await pi.deliver_all()
     assert json.loads(prompts[1])["reply_language"] == "en"
+    await pi.close()
+
+
+async def test_hi_gets_a_short_english_greeting_despite_old_language_and_company_goals(
+    api, business_db, monkeypatch
+):
+    bad_reply = (
+        "Aapka message mila. Workzap ke kuch goals hain:\n"
+        "• Hamari services ki quality ko behtar banana.\n"
+        "• Clients ki zarurat ko samajhna aur unhe pura karna."
+    )
+    prompts = scripted(monkeypatch, turn(reply=bad_reply))
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("Hi", "greeting-first")
+    await pi.deliver_all()
+    first = await pi.reply_to("greeting-first")
+    assert first.body == "Hi, I'm pi, Service Agency's AI assistant. How can I help you today?"
+
+    conversation = await pi.conversation()
+    previous_brief = {
+        "requirements": {"service": "Website", "scope": "Online store"},
+        "projects": [{"title": "Website", "details": "Online store", "status": "confirmed"}],
+        "ready_for_team": True,
+        "reminder_consent": "granted",
+    }
+    conversation.service_brief = previous_brief
+    conversation.summary = "Earlier discussion: company goals and an online store."
+    conversation.language = "roman_ur"
+    business_db.add(
+        PiMessage(
+            tenant_id=conversation.tenant_id,
+            environment_id=conversation.environment_id,
+            conversation_id=conversation.id,
+            direction="inbound",
+            sender_type="customer",
+            message_type="text",
+            body="Aap ke business ke goals kya hain?",
+            status="processed",
+        )
+    )
+    await business_db.commit()
+    for n, greeting in enumerate(("Hi", "HELLO!", "Good morning")):
+        mid = f"greeting-return-{n}"
+        await pi.process(greeting, mid)
+        await pi.deliver_all()
+        body = (await pi.reply_to(mid)).body
+        assert body.startswith("Hi") and body.endswith("How can I help you today?")
+    await business_db.refresh(conversation)
+    assert conversation.language == "en"
+    assert conversation.service_brief == previous_brief
+    assert conversation.summary == "Earlier discussion: company goals and an online store."
+    assert prompts == []  # Greetings cannot be turned into an unrelated model-generated pitch.
+    assert (
+        await business_db.scalar(
+            select(func.count())
+            .select_from(SalesLead)
+            .where(SalesLead.tenant_id == conversation.tenant_id)
+        )
+        == 0
+    )
+    assert (await api.get("/api/v1/pi/requests")).json()["items"] == []
+    assert len(pi.sent) == 4
+    await pi.close()
+
+
+@pytest.mark.parametrize(
+    "draft",
+    [
+        "Main pi hoon, company ka AI assistant. Aap ka business kis type ka hai?",
+        "I'm pi, your AI assistant. Aap ka business kis type ka hai?",
+    ],
+)
+async def test_a_rewrite_still_in_the_wrong_language_is_never_sent(
+    api, business_db, monkeypatch, draft
+):
+    prompts = scripted(monkeypatch, turn(reply=draft), turn(reply=draft))
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("Can you explain your process?", "language-retry")
+    await pi.deliver_all()
+    assert len(prompts) == 2
+    assert json.loads(prompts[0])["reply_language"] == "en"
+    [reply] = await pi.outbound()
+    assert reply.body == "Noted. I'm checking this with the team and will confirm here shortly."
+    assert draft not in reply.body
+    assert (await pi.conversation()).mode == "ai"
+    assert (await api.get("/api/v1/pi/requests")).json()["items"]
     await pi.close()
 
 
