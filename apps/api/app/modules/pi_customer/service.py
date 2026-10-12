@@ -586,6 +586,16 @@ SERVICE_MATTER = re.compile(
 )
 
 
+# A title naming something to build is real work even when it mentions a dashboard,
+# a login, a status or a payment ("Sales dashboard", "Order status tracking").
+BUILD_WORD = re.compile(
+    r"\b(?:system|app|application|website|site|portal|tracker|tracking|integration|"
+    r"software|platform|store|shop|page|checkout|module|erp|crm|automation|dashboard for|"
+    r"admin|analytics|reporting)\b",
+    re.IGNORECASE,
+)
+
+
 def report_current(conversation: PiConversation, language: str = "auto") -> bool:
     cached = (conversation.service_brief or {}).get("customer_issues")
     return (
@@ -659,8 +669,9 @@ async def analyse(
     # the customer's business problems: they stay off the map and charts, listed apart.
     for item in found:
         # A request for work is the customer's own matter, whatever the model said.
-        if item.get("category") in ("inquiry", "order") and not SERVICE_MATTER.search(
-            f"{item.get('title', '')} {item.get('summary', '')}"
+        if item.get("category") in ("inquiry", "order") and (
+            BUILD_WORD.search(str(item.get("title", "")))
+            or not SERVICE_MATTER.search(f"{item.get('title', '')} {item.get('summary', '')}")
         ):
             item["about_service"] = False
     keep = [n for n, i in enumerate(found) if not i.get("about_service")]

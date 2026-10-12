@@ -92,3 +92,28 @@ async def test_a_request_for_work_always_stays_on_the_map(app, provider, busines
     assert [i["title"] for i in listed["issues"]] == ["ERP System Requirements"]
     await business.aclose()
     await customer.aclose()
+
+
+def test_titles_that_name_something_to_build_stay_on_the_map():
+    from app.modules.pi_customer.service import BUILD_WORD, SERVICE_MATTER
+
+    def kept(title: str) -> bool:
+        return bool(BUILD_WORD.search(title) or not SERVICE_MATTER.search(title))
+
+    for title in (
+        "Sales dashboard for my shop",
+        "Admin dashboard",
+        "Login system for my app",
+        "Order status tracking",
+        "Stripe checkout for my store",
+        "Payment gateway integration",
+        "ERP System Requirements",
+    ):
+        assert kept(title), title
+    for title in (
+        "Payment Method Inquiry",
+        "Project Completion Status",
+        "Meeting Link Request",
+        "Invoice download issue",
+    ):
+        assert not kept(title), title
