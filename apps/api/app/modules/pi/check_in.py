@@ -18,6 +18,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 
+from app.modules.pi.buttons import follow_up_buttons
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.followups import _waiting_until, quiet_until
 from app.modules.pi.models import PiConversation, PiMessage, WhatsAppConnection
@@ -279,7 +280,10 @@ async def check_in(ctx: dict[str, Any], conversation_id: UUID, now: datetime) ->
                 body=body,
                 status="queued",
                 idempotency_key=key,
-                media={"check_in": "missed" if missed else "quiet"},
+                media={
+                    "check_in": "missed" if missed else "quiet",
+                    **({} if missed else {"buttons": follow_up_buttons(turn.language)}),
+                },
             )
         )
         brief = dict(conversation.service_brief or {})

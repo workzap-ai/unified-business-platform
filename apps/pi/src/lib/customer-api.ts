@@ -82,6 +82,35 @@ export const customerGet = async <T>(path: string) =>
 export const customerPost = async <T>(path: string, body?: unknown) =>
   json<T>(await request("POST", path, body ?? {}));
 
+// "Since you last looked": the visit before this one, kept for the whole browser
+// session (the server's /seen moves last_seen_at to now and returns the previous time).
+const LAST_VISIT = "pi-customer-last-visit";
+
+/** Tell the server the customer is looking now (once per session) and keep the
+ * previous visit's time for "new since your last visit". */
+export async function markSeenOnce(): Promise<void> {
+  try {
+    if (sessionStorage.getItem(LAST_VISIT) !== null) return;
+  } catch {
+    return;
+  }
+  const result = await customerPost<{ previous: string | null }>("/seen");
+  try {
+    sessionStorage.setItem(LAST_VISIT, result.previous ?? "");
+  } catch {
+    // Storage unavailable: nothing is marked new, which is safe.
+  }
+}
+
+/** The previous visit (ISO time), or undefined on a first visit or before /seen ran. */
+export function lastVisit(): string | undefined {
+  try {
+    return sessionStorage.getItem(LAST_VISIT) || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export const customerPut = async <T>(path: string, body: unknown) =>
   json<T>(await request("PUT", path, body));
 

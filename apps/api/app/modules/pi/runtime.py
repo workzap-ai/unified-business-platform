@@ -472,6 +472,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
 
             await note_form_reply(session, ctx["settings"], scope, message)
             await note_opt_out(session, scope, message)  # "STOP" withdraws consent at once
+            from app.modules.pi.buttons import note_remind_later
+
+            await note_remind_later(session, scope, message)  # "Remind me later": 2 days
             # They wrote, so the 24-hour window is open: send proposal/invoice links that
             # were waiting for it.
             from app.modules.pi_saas.deals import release_waiting
@@ -1114,6 +1117,10 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             "processed",
             datetime.now(UTC),
         )
+        # The reminder permission question gets [Yes] [No] buttons.
+        from app.modules.pi.buttons import add_consent_buttons
+
+        await add_consent_buttons(session, scope, outbound)
         # A form Pi decided to send in this turn goes out with the reply.
         forms = await session.scalars(
             select(PiMessage.id).where(
@@ -1302,6 +1309,16 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                         **conversation.service_brief,
                         "reminded_source_id": reminder["source_message_id"],
                     }
+            elif message.media.get("buttons"):
+                # Quick-reply buttons (one tap), with the card's image on top if any.
+                message.provider_message_id = await whatsapp.send_buttons(
+                    connection.phone_number_id,
+                    conversation.contact_wa_id,
+                    message.body,
+                    [str(b) for b in message.media["buttons"]],
+                    token,
+                    image=str(message.media["image"]) if message.media.get("image") else None,
+                )
             elif message.media.get("image"):
                 # pi Customer's visual card: a PNG link with a short caption.
                 message.provider_message_id = await whatsapp.send_image(

@@ -23,6 +23,7 @@ import {
   customerGet,
   customerPost,
   customerPut,
+  markSeenOnce,
   type CustomerConversationItem,
   type CustomerIssue,
   type CustomerMe,
@@ -388,7 +389,7 @@ function useMarkSeen() {
   useEffect(() => {
     if (done.current) return;
     done.current = true;
-    void customerPost("/seen").catch(() => undefined);
+    void markSeenOnce().catch(() => undefined);
   }, []);
 }
 

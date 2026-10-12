@@ -82,7 +82,8 @@ async def test_quiet_customer_gets_one_check_in_that_asks_for_their_business(
     assert "Which reports" in context["check_in_now"]["your_last_message"]
     replies = await _ai_messages(pi, conversation)
     assert replies[-1].body.startswith("Picking up your ERP")
-    assert replies[-1].media == {"check_in": "quiet"} and replies[-1].status == "queued"
+    assert replies[-1].media["check_in"] == "quiet" and replies[-1].status == "queued"
+    assert replies[-1].media["buttons"] == ["Let's continue", "Remind me later", "Stop reminders"]
     await pi.db.refresh(row)
     assert [c["since"] for c in row.service_brief["check_ins"]] == [str(asked.id)]
     await pi.close()

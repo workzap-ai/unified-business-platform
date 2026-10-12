@@ -21,6 +21,7 @@ from typing import Any
 from sqlalchemy import select
 
 from app.modules.notifications.service import notify
+from app.modules.pi.buttons import FOLLOW_UP
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.followups import quiet_until
 from app.modules.pi.models import PiConversation, PiMessage, WhatsAppConnection
@@ -111,6 +112,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "you": "You: ",
         "next": "Next: ",
         "nudge": lambda title, q: f'Quick one on "{title}": {q}',
+        "buttons": FOLLOW_UP["en"],
         "status": lambda title, due: (
             f'The team is working on "{title}". You\'ll get an update here by {due}.'
         ),
@@ -125,6 +127,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "you": "Aap: ",
         "next": "Agla qadam: ",
         "nudge": lambda title, q: f'Ek chhota sa sawal "{title}" ke baare mein: {q}',
+        "buttons": FOLLOW_UP["roman_ur"],
         "status": lambda title, due: (
             f'"{title}" pe team kaam kar rahi hai. Update {due} tak yahin milega.'
         ),
@@ -137,6 +140,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "you": "أنت: ",
         "next": "الخطوة التالية: ",
         "nudge": lambda title, q: f'سؤال سريع حول "{title}": {q}',
+        "buttons": FOLLOW_UP["ar"],
         "status": lambda title, due: f'الفريق يعمل على "{title}". ستصلك تحديثات هنا بحلول {due}.',
     },
 }
@@ -534,7 +538,7 @@ async def nudge_customer(
                 body=body,
                 status="queued",
                 idempotency_key=key,
-                media={"nudge": "nudge1"},
+                media={"nudge": "nudge1", "buttons": TEXT[language]["buttons"]},
             )
         )
         _log(conversation, {"at": now.isoformat(), "since": since_raw, "step": "nudge1"})

@@ -109,7 +109,8 @@ def other_text(kind: str, message: dict[str, Any]) -> str:
         where = f"{part.get('latitude')}, {part.get('longitude')}"
         return f"Location shared: {place} ({where})".replace(":  (", ": (")[:1000]
     if kind == "contacts":
-        cards = message.get("contacts") if isinstance(message.get("contacts"), list) else []
+        found = message.get("contacts")
+        cards: list[Any] = found if isinstance(found, list) else []
         lines = []
         for card in cards[:5]:
             if not isinstance(card, dict):
@@ -415,6 +416,53 @@ class WhatsApp:
         except httpx.HTTPError:
             return False
         return response.status_code < 400
+
+    async def send_buttons(
+        self,
+        number: str,
+        recipient: str,
+        body: str,
+        buttons: list[str],
+        token: str,
+        image: str | None = None,
+    ) -> str:
+        """A session message with up to three quick-reply buttons (and optionally an image
+        on top). A tap comes back as a message whose text is the button's title."""
+        base, headers = self._endpoint(token)
+        interactive: dict[str, Any] = {
+            "type": "button",
+            "body": {"text": body[:1024]},
+            "action": {
+                "buttons": [
+                    {"type": "reply", "reply": {"id": f"b{n}", "title": title[:20]}}
+                    for n, title in enumerate(buttons[:3])
+                ]
+            },
+        }
+        if image:
+            interactive["header"] = {"type": "image", "image": {"link": image}}
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "interactive",
+                    "interactive": interactive,
+                },
+                timeout=20,
+                follow_redirects=False,
+            )
+            check_sent(response)
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Message delivery could not be confirmed", 503
+            ) from None
 
     async def send_image(
         self, number: str, recipient: str, link: str, caption: str, token: str

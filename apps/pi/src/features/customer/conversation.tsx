@@ -22,6 +22,8 @@ import {
   customerFile,
   customerGet,
   customerPost,
+  lastVisit,
+  markSeenOnce,
   type CustomerConversationDetail,
   type CustomerIssue,
   type CustomerIssues,
@@ -619,7 +621,13 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
   });
   const list = issues.data?.issues ?? [];
   const links = issues.data?.links ?? detail.issues?.links ?? [];
-  const prefs = usePrefs();
+  // The visit before this one (opening a chat directly also counts as a visit).
+  const [seenBefore, setSeenBefore] = useState(lastVisit);
+  useEffect(() => {
+    void markSeenOnce()
+      .then(() => setSeenBefore(lastVisit()))
+      .catch(() => undefined);
+  }, []);
   const activity = useQuery({
     queryKey: ["pi-customer", "timeline", detail.id, detail.last_message_at],
     queryFn: () =>
@@ -862,7 +870,7 @@ function Requests({ detail }: { detail: CustomerConversationDetail }) {
           <ActivityTimeline
             events={activity.data ?? []}
             lang={lang}
-            lastSeen={prefs.data?.last_seen_at}
+            lastSeen={seenBefore}
           />
         )}
       </Card>
