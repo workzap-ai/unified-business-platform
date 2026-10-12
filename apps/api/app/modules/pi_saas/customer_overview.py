@@ -15,6 +15,7 @@ per view, so the Problem Map never waits for the customer's next message.
 """
 
 import logging
+import re
 from datetime import datetime
 from typing import Any
 from uuid import UUID
@@ -33,6 +34,85 @@ from app.shared.workspace_repository import WorkspaceRepository
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/customers", tags=["customer-overview"])
 LINK_FIELDS = ("a", "b", "a_title", "b_title", "type", "reason", "benefit", "confidence")
+
+
+# Words that don't tell two requests apart ("Website request" vs "Website project").
+GENERIC = {
+    "request",
+    "requests",
+    "project",
+    "projects",
+    "inquiry",
+    "system",
+    "details",
+    "requirement",
+    "requirements",
+    "new",
+    "the",
+    "for",
+    "and",
+    "with",
+    "your",
+    "my",
+}
+# Not a project: the customer asking for their map, a meeting, an invoice...
+NOT_A_PROJECT = re.compile(
+    r"\b(?:map|meeting|meet|invoice|receipt|payment method|status|link)\b", re.IGNORECASE
+)
+PROJECT_STAGE = {
+    "collecting": ("noted", "pi", "pi: collecting the remaining details"),
+    "awaiting_confirmation": ("need_answer", "client", ""),
+    "confirmed": ("on_it", "team", "Team: prepare the proposal"),
+    "with_team": ("on_it", "team", "Team: working on it"),
+}
+
+
+def _words(title: str) -> set[str]:
+    return {w for w in re.findall(r"[a-z]{4,}", title.lower()) if w not in GENERIC}
+
+
+def _same(a: str, b: str) -> bool:
+    return bool(_words(a) & _words(b)) or a.strip().lower() == b.strip().lower()
+
+
+def brief_projects(
+    conversation: PiConversation, issues: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Projects in the chat's brief that pi's latest analysis left out (it reads recent
+    messages, so older projects fall off): on the map too, with their status."""
+    out: list[dict[str, Any]] = []
+    for project in (conversation.service_brief or {}).get("projects") or []:
+        title = str(project.get("title") or "").strip()
+        if (
+            not title
+            or NOT_A_PROJECT.search(title)
+            or any(_same(title, str(i.get("title", ""))) for i in [*issues, *out])
+        ):
+            continue
+        stage, ball, step = PROJECT_STAGE.get(
+            str(project.get("status") or "collecting"), PROJECT_STAGE["collecting"]
+        )
+        missing = [str(m) for m in project.get("missing") or [] if m]
+        out.append(
+            {
+                "title": title[:120],
+                "stage": stage,
+                "ball_with": ball,
+                "summary": str(project.get("details") or "")[:400],
+                "next_step": step,
+                "open_question": (
+                    "Confirm the brief so the team can start"
+                    if stage == "need_answer"
+                    else (f"Still needed: {', '.join(missing)[:200]}" if missing else "")
+                ),
+                "area": str(project.get("service") or "")[:40],
+                "impact": 3,
+                "urgency": 3,
+                "conversation_id": str(conversation.id),
+                "from_brief": True,
+            }
+        )
+    return out
 
 
 def _counts(issues: list[dict[str, Any]]) -> dict[str, int]:
@@ -62,6 +142,7 @@ async def _requests(
     for conversation in conversations:
         report = (conversation.service_brief or {}).get("customer_issues")
         if not isinstance(report, dict) or not report.get("issues"):
+            issues += brief_projects(conversation, issues)
             continue
         departments, _ = await portal.departments_for(
             session, conversation.tenant_id, conversation.environment_id
@@ -83,6 +164,7 @@ async def _requests(
             if isinstance(link, dict) and link.get("status") in ("auto", "confirmed")
         ]
         headline = headline or str(report.get("headline") or "")
+        issues += brief_projects(conversation, issues)
     return issues, links, headline
 
 

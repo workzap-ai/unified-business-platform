@@ -72,9 +72,10 @@ async def test_overview_has_profile_projects_and_the_problem_map(api, business_d
     assert project["next"]["title"]
 
     titles = [i["title"] for i in body["issues"]]
-    assert titles == ["Online shop", "Stock app"]
+    # pi's analysis, then the confirmed projects of the brief it didn't cover.
+    assert titles == ["Online shop", "Stock app", "Logo", "Website"]
     assert [link["type"] for link in body["links"]] == ["shared_data"]  # review ones hidden
-    assert body["counts"] == {"waiting_on_them": 1, "waiting_on_us": 1, "done": 0, "paused": 0}
+    assert body["counts"] == {"waiting_on_them": 1, "waiting_on_us": 3, "done": 0, "paused": 0}
     assert body["headline"].startswith("Two requests")
     assert UUID(body["issues"][0]["conversation_id"]) == conversation.id
     await pi.close()

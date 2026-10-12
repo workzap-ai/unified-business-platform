@@ -57,9 +57,33 @@ async def test_an_old_map_is_rebuilt_when_the_team_opens_the_customer(
     await pi.db.commit()
 
     first = (await api.get(f"/api/v1/customers/{customer_id}/pi-overview")).json()
-    assert [i["title"] for i in first["issues"]] == ["ERP System Requirements"]
+    # pi's analysis first, then the brief's other projects (Logo, Website).
+    assert [i["title"] for i in first["issues"]] == ["ERP System Requirements", "Logo", "Website"]
     assert calls == ["pi_customer_issues"]
     # Up to date now: opening the customer again makes no AI call.
     await api.get(f"/api/v1/customers/{customer_id}/pi-overview")
     assert calls == ["pi_customer_issues"]
     await pi.close()
+
+
+def test_projects_from_the_brief_join_the_map_without_duplicates():
+    from app.modules.pi_saas.customer_overview import brief_projects
+
+    conversation = SimpleNamespace(
+        id="c1",
+        service_brief={
+            "projects": [
+                {"title": "Furniture E-commerce Website", "status": "collecting"},
+                {"title": "Map Inquiry", "status": "collecting"},
+                {"title": "AI System for Visualization", "status": "confirmed"},
+                {"title": "Video Project: The Pulse of Precision", "status": "collecting"},
+            ]
+        },
+    )
+    analysed = [{"title": "Video Editing Request"}, {"title": "Additional Platform Request"}]
+    added = brief_projects(conversation, analysed)
+    assert [(p["title"], p["stage"], p["ball_with"]) for p in added] == [
+        ("Furniture E-commerce Website", "noted", "pi"),
+        ("AI System for Visualization", "on_it", "team"),
+    ]
+    assert added[1]["next_step"] == "Team: prepare the proposal"
