@@ -12,6 +12,7 @@ import {
   Bot,
   CalendarClock,
   ChevronRight,
+  Download,
   FileText,
   Mail,
   MessageSquare,
@@ -29,6 +30,7 @@ import {
   relativeTime,
 } from "@/lib/format";
 import { Button } from "@/components/ui/button";
+import { API_BASE } from "@/services/api-client";
 import {
   Card,
   CardBody,
@@ -385,6 +387,16 @@ function OverviewTab({
   return (
     <div className="space-y-4">
       <CustomerDuplicates customerId={customer.id} name={customer.name} />
+      <div className="flex justify-end">
+        <Button size="sm" variant="secondary" asChild>
+          <a
+            href={`${API_BASE}/customers/${customer.id}/pi-overview.pdf`}
+            download
+          >
+            <Download /> Share with my team (PDF)
+          </a>
+        </Button>
+      </div>
       <CustomerPiOverview customerId={customer.id} />
       <MetricGrid className="xl:grid-cols-4">
         <MetricCard

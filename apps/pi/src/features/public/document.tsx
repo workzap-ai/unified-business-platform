@@ -108,6 +108,13 @@ export function DocumentPage({ token }: { token: string }) {
               </a>
             </Button>
           ) : null}
+          {doc.data.kind === "proposal" || doc.data.kind === "invoice" ? (
+            <Button asChild variant="secondary" className="w-full">
+              <a href={`/api/v1/pi-app/docs/${token}/pdf`}>
+                <Download className="size-4" aria-hidden /> Download PDF
+              </a>
+            </Button>
+          ) : null}
           <Document
             view={doc.data}
             mode={mode}

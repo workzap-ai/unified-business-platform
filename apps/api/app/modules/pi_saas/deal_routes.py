@@ -764,6 +764,32 @@ async def public_document_file(token: str, request: Request, session: Session) -
     )
 
 
+@public_router.get("/{token}/pdf")
+async def public_document_pdf(token: str, request: Request, session: Session) -> Response:
+    """A proposal or invoice as a PDF on the business's letterhead. Only reads: opening
+    it doesn't count as the customer viewing the page."""
+    from app.modules.pi_saas import document_pdf
+
+    ip = rate_limit.client_ip(request)
+    if not await rate_limit.hit(request, "pi-doc-pdf", f"{token[:16]}:{ip}", 30, 3600):
+        raise HTTPException(status_code=429)
+    doc = await deals.document_for(session, token)
+    if doc.kind not in {"proposal", "invoice"}:
+        raise HTTPException(status_code=404)
+    system = await deals.system_scope_for(session, doc.tenant_id, doc.environment_id)
+    data, name = await document_pdf.for_document(session, system, doc)
+    return Response(
+        data,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename*=UTF-8''{quote_name(name)}",
+            "Cache-Control": "private, no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Content-Security-Policy": "default-src 'none'; sandbox",
+        },
+    )
+
+
 @public_router.post("/{token}/respond")
 async def public_respond(
     token: str, data: Answer, request: Request, session: Session

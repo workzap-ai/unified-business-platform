@@ -72,6 +72,7 @@ from app.modules.pi_saas.operator_number_routes import router as pi_operator_num
 from app.modules.pi_saas.operator_routes import router as pi_operator_router
 from app.modules.pi_saas.operator_system_routes import router as pi_operator_system_router
 from app.modules.pi_saas.operator_workspace_routes import router as operator_workspace_router
+from app.modules.pi_saas.overview_pdf import router as customer_overview_pdf_router
 from app.modules.pi_saas.payment_link import router as payment_link_router
 from app.modules.pi_saas.payment_routes import client_router as pi_payment_router
 from app.modules.pi_saas.payment_routes import operator_router as pi_payment_operator_router
@@ -109,6 +110,7 @@ ROUTERS = [
     pi_requests_router,
     team_whatsapp_router,
     customer_overview_router,
+    customer_overview_pdf_router,
     customer_merge_router,
     receipts_router,
     pi_operator_router,
@@ -187,6 +189,7 @@ PI_APP_ROUTERS = [
     pi_requests_router,
     team_whatsapp_router,
     customer_overview_router,
+    customer_overview_pdf_router,
     customer_merge_router,
     receipts_router,
     pi_documents_router,
