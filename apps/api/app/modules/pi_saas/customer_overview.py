@@ -26,7 +26,7 @@ from sqlalchemy.exc import DBAPIError
 from app.modules.access.dependencies import Scope, Session
 from app.modules.customers.models import Customer
 from app.modules.pi.models import PiConversation
-from app.modules.pi.service_conversation import PLACEHOLDER_NAME, merge_profile
+from app.modules.pi.service_conversation import PLACEHOLDER_NAME, STATUS_TEXT, merge_profile
 from app.modules.sales.models import SalesLead
 from app.shared.errors import BusinessRuleViolation
 from app.shared.workspace_repository import WorkspaceRepository
@@ -98,7 +98,12 @@ def brief_projects(
                 "title": title[:120],
                 "stage": stage,
                 "ball_with": ball,
-                "summary": str(project.get("details") or "")[:400],
+                # A status line is not the customer's problem: fall back to the service.
+                "summary": (
+                    str(project.get("service") or "")
+                    if STATUS_TEXT.search(str(project.get("details") or ""))
+                    else str(project.get("details") or project.get("service") or "")
+                )[:400],
                 "next_step": step,
                 "open_question": (
                     "Confirm the brief so the team can start"

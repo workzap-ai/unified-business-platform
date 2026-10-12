@@ -98,3 +98,28 @@ def test_hi_from_a_returning_customer_picks_up_their_open_project():
     )
     done = {**returning, "brief": {"projects": [{"title": "Logo", "status": "confirmed"}]}}
     assert greeting_reply(done) == "Hi Muhammad. How can I help you today?"
+
+
+def test_a_status_line_never_replaces_what_the_customer_wants():
+    from app.modules.pi.service_conversation import Project, ServiceTurn, merge_projects
+
+    before = [
+        {
+            "title": "Furniture E-commerce Website",
+            "details": "Online store for 200 products with card payment",
+            "status": "confirmed",
+        }
+    ]
+    turn = ServiceTurn(
+        reply="ok",
+        projects=[
+            Project(
+                title="Furniture E-commerce Website",
+                details="Proposal is being drafted; will be shared soon.",
+                status="collecting",
+            )
+        ],
+    )
+    [project] = merge_projects(before, turn)
+    assert project.details == "Online store for 200 products with card payment"
+    assert project.status == "confirmed"  # never goes back to collecting

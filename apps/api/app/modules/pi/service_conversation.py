@@ -515,11 +515,13 @@ Do not claim a meeting was booked, message was sent, order placed or quote issue
 Projects: a customer may bring several projects in one chat (a logo, then a website,
 then packaging). "projects" must list EVERY project raised in this conversation so far,
 including earlier ones from brief.projects and conversation_summary, each with a short
-English title, service, the details agreed so far (customer's words, references,
-choices they liked), status (collecting, awaiting_confirmation = brief shown and waiting
-for their yes, confirmed = they said yes, with_team = handed to the team) and what is
-still missing. A new request is a NEW project; never merge it into an earlier one or
-drop an earlier one. requirements and missing describe the project being discussed now.
+English title, service, the details agreed so far (customer's words, references, choices
+they liked; WHAT they want, never where the work stands such as "proposal is being
+drafted" - keep earlier details and add to them), status (collecting,
+awaiting_confirmation = brief shown and waiting for their yes, confirmed = they said
+yes, with_team = handed to the team) and what is still missing. A new request is a NEW
+project; never merge it into an earlier one or drop an earlier one. requirements and
+missing describe the project being discussed now.
 Remember the whole conversation: conversation_summary and brief carry what happened
 before the recent history; never ask again for anything recorded there.
 The application saves your summary for the team. Write that internal summary in English
@@ -1313,6 +1315,16 @@ def without_blocked_lines(reply: str, mode: str, allowed: list[str]) -> str:
     return cleaned if len(cleaned) >= 12 else reply
 
 
+PROJECT_RANK = {"collecting": 0, "awaiting_confirmation": 1, "confirmed": 2, "with_team": 3}
+# Where the work stands, not what the customer wants: never a project's details.
+STATUS_TEXT = re.compile(
+    r"\b(?:proposal (?:is|was|has been) (?:being )?(?:drafted|prepared|sent|shared)|"
+    r"(?:will be|being) (?:shared|sent|prepared|drafted)|team is (?:preparing|working)|"
+    r"waiting for|awaiting)\b",
+    re.IGNORECASE,
+)
+
+
 def merge_projects(previous: Any, turn: ServiceTurn) -> list[Project]:
     """Earlier projects are never lost: the model's list updates them by title and adds
     new ones; one it forgot keeps its last known state."""
@@ -1325,8 +1337,19 @@ def merge_projects(previous: Any, turn: ServiceTurn) -> list[Project]:
         if project.title:
             known[project.title.casefold()] = project
     for project in turn.projects:
-        if project.title:
-            known[project.title.casefold()] = project
+        if not project.title:
+            continue
+        before = known.get(project.title.casefold())
+        if before is not None:
+            # Details are what the customer wants; a status line ("Proposal is being
+            # drafted") never replaces them. A confirmed project never goes back.
+            if STATUS_TEXT.search(project.details) or not project.details.strip():
+                project.details = before.details
+            if PROJECT_RANK[project.status] < PROJECT_RANK[before.status]:
+                project.status = before.status
+        elif STATUS_TEXT.search(project.details):
+            project.details = ""
+        known[project.title.casefold()] = project
     req = turn.requirements
     current = (req.service or req.scope[:80]).strip()
     covered = any(
