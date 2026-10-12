@@ -108,6 +108,59 @@ def flow_json(purpose: str) -> dict[str, Any]:
     }
 
 
+# Follow-up templates pi writes and submits to Meta itself (plain text, no variables,
+# Utility: they are about a request the customer started). key -> (name, text).
+FOLLOW_UPS: dict[str, dict[str, tuple[str, str]]] = {
+    "en": {
+        "reminder": (
+            "pi_reminder_en",
+            "Hi, a gentle reminder about your request with us. Reply here whenever you're "
+            "ready and we'll take it from there. Reply STOP to stop reminders.",
+        ),
+        "day3": (
+            "pi_followup_day3_en",
+            "Hi, your request with us is waiting on one quick answer from you. Reply here "
+            "when you're ready and we'll continue straight away.",
+        ),
+        "day7": (
+            "pi_followup_day7_en",
+            "Hi, we've kept your request ready for you. If anything has changed or you have "
+            "a question, just reply here and we'll help.",
+        ),
+        "day14": (
+            "pi_followup_day14_en",
+            "Hi, should we keep your request open or close it for now? Just reply here. No "
+            "problem either way.",
+        ),
+    },
+    "roman_ur": {
+        "reminder": (
+            "pi_reminder_ru",
+            "Assalam o alaikum! Aap ki request ke baare mein ek yaad-dehani. Jab theek lage "
+            "yahan reply kar dein, hum wahin se aage barhenge. Reminders band karne ke liye "
+            "STOP likhein.",
+        ),
+        "day3": (
+            "pi_followup_day3_ru",
+            "Assalam o alaikum! Aap ki request bas aap ke ek jawab ka intezar kar rahi hai. "
+            "Jab theek lage yahan reply kar dein, hum foran aage barhenge.",
+        ),
+        "day7": (
+            "pi_followup_day7_ru",
+            "Assalam o alaikum! Aap ki request hamare paas tayyar hai. Agar kuch badla hai ya "
+            "koi sawal hai to yahan reply kar dein, hum madad karenge.",
+        ),
+        "day14": (
+            "pi_followup_day14_ru",
+            "Assalam o alaikum! Kya aap ki request khuli rakhein ya abhi ke liye band kar "
+            "dein? Bas yahan reply kar dein, dono theek hain.",
+        ),
+    },
+}
+# The language each template is approved in at Meta.
+META_LANGUAGE = {"en": "en_US", "roman_ur": "ur"}
+
+
 class TemplateInput(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     name: str = Field(pattern=r"^[a-z0-9_]{1,512}$")
@@ -173,6 +226,62 @@ def build() -> APIRouter:
         )
         await session.commit()
         return {"name": data.name, "status": state}
+
+    @router.post("/templates/follow-ups")
+    async def auto_follow_ups(request: Request, scope: Scope, session: Session) -> dict[str, Any]:
+        """pi writes its follow-up templates, submits them to Meta (Utility) and saves them
+        in the settings, then switches follow-ups on. Templates that already exist are
+        reused; each is only sent once Meta approves it (checked at send time)."""
+        await require_pi(session, scope, "pi.settings.manage")
+        number = await _number(session, scope)
+        kapso = Kapso(request.app.state.settings, request.app.state.http)
+        account = number.business_account_id or ""
+        existing = {
+            (t["name"], t["language"]): t["status"] for t in await kapso.list_templates(account)
+        }
+        statuses: dict[str, str] = {}
+        reminders: dict[str, dict[str, str]] = {}
+        ladder: dict[str, dict[str, dict[str, str]]] = {}
+        for language, steps in FOLLOW_UPS.items():
+            meta = META_LANGUAGE[language]
+            for step, (name, body) in steps.items():
+                status = existing.get((name, meta))
+                if status is None:
+                    try:
+                        status = await kapso.create_template(account, name, meta, "UTILITY", body)
+                    except BusinessRuleViolation as error:
+                        if "exist" not in error.message.lower():
+                            status = f"REJECTED: {error.message}"[:120]
+                        else:
+                            status = "PENDING"
+                statuses[f"{language}:{step}"] = status
+                if status.startswith("REJECTED"):
+                    continue
+                template = {"name": name, "language": meta}
+                if step == "reminder":
+                    reminders[language] = template
+                else:
+                    ladder.setdefault(language, {})[step] = template
+        policy = await session.scalar(
+            WorkspaceRepository(session, PiSettings, scope).select().limit(1).with_for_update()
+        )
+        if policy is None:
+            raise BusinessRuleViolation("PI_NOT_SET_UP", "Set up pi first")
+        config = dict(policy.whatsapp_config or {})
+        config["reminder_templates"] = {**(config.get("reminder_templates") or {}), **reminders}
+        config["ladder_templates"] = {**(config.get("ladder_templates") or {}), **ladder}
+        config["reminder_enabled"] = True
+        policy.whatsapp_config = config
+        await record(
+            session,
+            "pi.whatsapp_followup_templates",
+            scope=scope,
+            entity_type="whatsapp_connection",
+            entity_id=number.id,
+            details={"templates": statuses},
+        )
+        await session.commit()
+        return {"templates": statuses, "reminders_on": True}
 
     @router.get("/forms")
     async def forms(scope: Scope, session: Session) -> dict[str, Any]:

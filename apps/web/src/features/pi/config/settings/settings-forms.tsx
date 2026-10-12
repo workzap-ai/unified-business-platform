@@ -38,7 +38,7 @@ import {
 } from "@/components/app/forms";
 import { ErrorState, Notice } from "@/components/app/states";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
-import { errorMessage } from "@/services/api-client";
+import { apiRequest, errorMessage } from "@/services/api-client";
 import { piService } from "../../service";
 import type { PiSettings, ProviderName } from "../../types";
 import {
@@ -1418,8 +1418,74 @@ function ReminderTemplatesEditor({
   const [customerLanguage, setCustomerLanguage] = useState("");
   const [name, setName] = useState("");
   const [templateLanguage, setTemplateLanguage] = useState("");
+  const [auto, setAuto] = useState<{
+    busy: boolean;
+    statuses: Record<string, string> | null;
+    error: string | null;
+  }>({ busy: false, statuses: null, error: null });
+  async function setUpAutomatically() {
+    setAuto({ busy: true, statuses: null, error: null });
+    try {
+      const result = await apiRequest(
+        "POST",
+        "/pi/whatsapp/templates/follow-ups",
+        z.object({ templates: z.record(z.string(), z.string()) }),
+      );
+      const ok = (key: string) =>
+        !String(result.templates[key] ?? "").startsWith("REJECTED");
+      onChange({
+        ...value,
+        ...(ok("en:reminder")
+          ? { en: { name: "pi_reminder_en", language: "en_US" } }
+          : {}),
+        ...(ok("roman_ur:reminder")
+          ? { roman_ur: { name: "pi_reminder_ru", language: "ur" } }
+          : {}),
+      });
+      setAuto({ busy: false, statuses: result.templates, error: null });
+    } catch (e) {
+      setAuto({
+        busy: false,
+        statuses: null,
+        error: errorMessage(e, "pi couldn't set up the templates."),
+      });
+    }
+  }
   return (
     <div className="space-y-3">
+      <div className="rounded-lg border border-primary/30 bg-primary-soft/40 p-3">
+        <p className="text-sm font-medium">Let pi set this up</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          pi writes its follow-up messages (English and Roman Urdu), submits
+          them to Meta for approval and fills them in here, with the day 3, 7
+          and 14 follow-ups. Each is sent only after Meta approves it (usually
+          minutes to a day).
+        </p>
+        <Button
+          type="button"
+          size="sm"
+          className="mt-2"
+          loading={auto.busy}
+          onClick={() => void setUpAutomatically()}
+        >
+          Set up automatically
+        </Button>
+        {auto.error && (
+          <p role="alert" className="mt-2 text-xs text-danger">
+            {auto.error}
+          </p>
+        )}
+        {auto.statuses && (
+          <ul className="mt-2 space-y-0.5 text-xs">
+            {Object.entries(auto.statuses).map(([key, status]) => (
+              <li key={key}>
+                <span className="font-medium">{key.replace(":", " · ")}</span>:{" "}
+                {status.toLowerCase()}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
       <p className="text-sm text-muted-foreground">
         Add an approved text template without variables or buttons for each
         customer language. For Roman Urdu, use customer language roman_ur and

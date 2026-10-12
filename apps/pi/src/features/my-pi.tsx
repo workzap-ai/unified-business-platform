@@ -1314,7 +1314,22 @@ function FollowUpsForm({
               </Select>
             </Field>
             <div>
-              <h3 className="text-sm font-medium">
+              <AutoFollowUps
+                onDone={(templates) =>
+                  setConfig((c) =>
+                    c
+                      ? {
+                          ...c,
+                          reminder_templates: {
+                            ...c.reminder_templates,
+                            ...templates,
+                          },
+                        }
+                      : c,
+                  )
+                }
+              />
+              <h3 className="mt-4 text-sm font-medium">
                 Approved WhatsApp templates
               </h3>
               <p className="text-sm text-muted-foreground">
@@ -1435,5 +1450,68 @@ export function TestPiPage() {
     >
       <TestConversation includeDraftsToggle />
     </Shell>
+  );
+}
+
+/** pi writes its follow-up templates, submits them to Meta and fills them in. */
+function AutoFollowUps({
+  onDone,
+}: {
+  onDone: (
+    templates: Record<string, { name: string; language: string }>,
+  ) => void;
+}) {
+  const [statuses, setStatuses] = React.useState<Record<string, string> | null>(
+    null,
+  );
+  const run = useAction(
+    () =>
+      post<{ templates: Record<string, string> }>(
+        "/pi/whatsapp/templates/follow-ups",
+      ),
+    {
+      success: "pi submitted its follow-up templates to Meta.",
+      onSuccess: (result) => {
+        setStatuses(result.templates);
+        const ok = (key: string) =>
+          !String(result.templates[key] ?? "").startsWith("REJECTED");
+        onDone({
+          ...(ok("en:reminder")
+            ? { en: { name: "pi_reminder_en", language: "en_US" } }
+            : {}),
+          ...(ok("roman_ur:reminder")
+            ? { roman_ur: { name: "pi_reminder_ru", language: "ur" } }
+            : {}),
+        });
+      },
+    },
+  );
+  return (
+    <div className="rounded-lg border border-accent/30 bg-accent-soft/40 p-3">
+      <p className="text-sm font-medium">Let pi set this up</p>
+      <p className="mt-0.5 text-xs text-muted-foreground">
+        pi writes its follow-up messages (English and Roman Urdu), submits them
+        to Meta for approval and fills them in here, with the day 3, 7 and 14
+        follow-ups. Each is sent only after Meta approves it.
+      </p>
+      <Button
+        size="sm"
+        className="mt-2"
+        loading={run.isPending}
+        onClick={() => run.mutate(undefined)}
+      >
+        Set up automatically
+      </Button>
+      {statuses ? (
+        <ul className="mt-2 space-y-0.5 text-xs">
+          {Object.entries(statuses).map(([key, status]) => (
+            <li key={key}>
+              <span className="font-medium">{key.replace(":", " · ")}</span>:{" "}
+              {status.toLowerCase()}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   );
 }
