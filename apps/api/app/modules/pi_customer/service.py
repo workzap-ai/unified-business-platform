@@ -410,13 +410,13 @@ For each item:
   features PDF", not "Mendies features PDF"). Never a raw quote.
 - original_words: the customer's own words for it, quoted briefly from the transcript.
 - category: inquiry, order, booking, payment, complaint, support or other.
-- about_service: true ONLY for a problem with USING this business's service or tools,
-  not something the customer wants built, bought or done: an invoice, receipt or
-  document they can't get or download, a payment link, bank details or card payment
-  missing, a link that doesn't open, pi's replies or wording, the dashboard or app;
-  or a question about trust or privacy (who sees the chat, is it safe). A request for
-  work, a product, a project, a proposal or a meeting is NEVER about_service, even when
-  this business is the one that sells it (e.g. "I need an ERP" is false). Never link an
+- about_service: false ONLY for the customer's real problems and projects: something
+  they want built, bought, fixed or done for their business (e.g. "I need an ERP", "my
+  stock never matches", "a website for my shop", "edit my ceremony video"). true for
+  everything about dealing with this business rather than a problem of theirs:
+  meetings, calls and meeting links; invoices, receipts, payment methods, bank or card
+  details; asking about the status of existing work; links that don't open; pi's
+  replies or wording; the dashboard or app; trust and privacy. Never link an
   about_service item to anything.
 - stage, using ONLY these:
   "noted" = pi captured it and is still understanding it;
@@ -570,8 +570,9 @@ def _transcript(rows: list[PiMessage]) -> list[dict[str, str]]:
 
 
 # Bumped when the analysis rules change, so reports saved under the old rules are made
-# again (2: requests for work are never dropped as "about the service").
-REPORT_VERSION = 2
+# again (2: requests for work are never dropped as "about the service"; 3: meetings,
+# invoices, payments and status questions are kept off the map).
+REPORT_VERSION = 3
 
 
 def report_current(conversation: PiConversation, language: str = "auto") -> bool:
@@ -647,7 +648,7 @@ async def analyse(
     # the customer's business problems: they stay off the map and charts, listed apart.
     for item in found:
         # A request for work is the customer's own matter, whatever the model said.
-        if item.get("category") in ("inquiry", "order", "booking"):
+        if item.get("category") in ("inquiry", "order") and item.get("solution_outline"):
             item["about_service"] = False
     keep = [n for n, i in enumerate(found) if not i.get("about_service")]
     position = {old: new for new, old in enumerate(keep)}

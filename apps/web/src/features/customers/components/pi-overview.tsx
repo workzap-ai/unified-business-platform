@@ -25,6 +25,13 @@ const issueSchema = z.object({
   next_step: z.string().catch(""),
   impact: z.number().catch(3),
   urgency: z.number().catch(3),
+  area: z.string().catch(""),
+  open_question: z.string().catch(""),
+  root_cause: z.string().catch(""),
+  solution_outline: z.string().catch(""),
+  outcome: z.string().catch(""),
+  solution_id: z.string().catch(""),
+  original_words: z.string().catch(""),
 });
 const linkSchema = z.object({
   a_title: z.string(),
@@ -294,14 +301,15 @@ function ProblemMap({
 }) {
   const [active, setActive] = useState<number | null>(null);
   const [activeLink, setActiveLink] = useState<number | null>(null);
-  const shown = issues.slice(0, 9);
+  // Open problems first (pi's pick and its linked ones together), done ones last.
+  const shown = order(issues).slice(0, 8);
   const n = shown.length;
   // Two staggered columns with a wide lane between them: every line runs through the
   // lane, so its label is never hidden behind a card. Only as tall as it needs to be.
   const W = 720;
-  const CARD_W = 220;
-  const CARD_H = 72;
-  const STEP = 116; // vertical distance between cards in the same column
+  const CARD_W = 252;
+  const CARD_H = 118;
+  const STEP = 148; // vertical distance between cards in the same column
   const LEFT = 24;
   const RIGHT = W - 24 - CARD_W;
   const pos = shown.map((_, i) => {
@@ -373,6 +381,7 @@ function ProblemMap({
 
   return (
     <figure className="w-full">
+      <Insight issues={shown} links={visible} />
       <style>{MAP_MOTION}</style>
       <div className="mb-3 flex flex-wrap gap-2" aria-label="At a glance">
         {summary.map(({ label, count, sample }) => (
@@ -514,7 +523,7 @@ function ProblemMap({
               onClick={() => setActive(i)}
               aria-label={`${issue.title}: ${t.label}`}
               className={cn(
-                "pm-in absolute flex flex-col justify-center gap-1 rounded-xl border bg-surface px-3 text-left shadow-sm transition-[opacity,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary",
+                "pm-in absolute flex flex-col gap-0.5 rounded-xl border bg-surface px-3 py-2.5 text-left shadow-sm transition-[opacity,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary",
                 active === i ? "border-primary shadow-md" : "border-border",
                 waiting && "pm-pulse",
               )}
@@ -533,10 +542,26 @@ function ProblemMap({
                   Start here
                 </span>
               )}
-              <span className="line-clamp-2 text-[13px] leading-tight font-semibold">
+              {issue.area && (
+                <span className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
+                  {issue.area}
+                </span>
+              )}
+              <span className="line-clamp-1 text-[13px] leading-tight font-semibold">
                 {issue.title}
               </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              <span className="line-clamp-1 text-[11px] text-muted-foreground">
+                <span className="font-medium text-foreground">Problem: </span>
+                {issue.root_cause ||
+                  issue.summary ||
+                  issue.original_words ||
+                  "—"}
+              </span>
+              <span className="line-clamp-1 text-[11px] text-muted-foreground">
+                <span className="font-medium text-foreground">Next: </span>
+                {nextLine(issue)}
+              </span>
+              <span className="mt-auto flex items-center gap-1.5 text-[11px] text-muted-foreground">
                 <StatusDot issue={issue} />
                 {t.label}
               </span>
@@ -603,6 +628,101 @@ function ProblemMap({
         </p>
       )}
     </figure>
+  );
+}
+
+/** Open problems first, the most pressing (urgency x impact) leading, each followed by
+ * the requests that share its solution; done and paused ones last. */
+function order(issues: Issue[]): Issue[] {
+  const closed = (i: Issue) => ["live", "closed", "paused"].includes(i.stage);
+  const score = (i: Issue) => i.urgency * i.impact;
+  const open = issues
+    .filter((i) => !closed(i))
+    .sort((a, b) => score(b) - score(a));
+  const out: Issue[] = [];
+  for (const issue of open) {
+    if (out.includes(issue)) continue;
+    out.push(issue);
+    if (issue.solution_id)
+      out.push(
+        ...open.filter(
+          (o) =>
+            o !== issue &&
+            o.solution_id === issue.solution_id &&
+            !out.includes(o),
+        ),
+      );
+  }
+  return [...out, ...issues.filter(closed)];
+}
+
+/** "Next:" on a card: who does what. */
+function nextLine(issue: Issue): string {
+  if (issue.ball_with === "client" && issue.open_question)
+    return `Customer: ${issue.open_question}`;
+  if (issue.next_step) return issue.next_step;
+  if (["live", "closed"].includes(issue.stage)) return "Nothing, it's done";
+  return "pi is working it out";
+}
+
+/** pi's one-line picture above the map: what one solution covers, otherwise what's
+ * waiting on the customer, otherwise the team's next step. */
+function Insight({
+  issues,
+  links,
+}: {
+  issues: Issue[];
+  links: Overview["links"];
+}) {
+  const groups = new Map<string, Issue[]>();
+  for (const issue of issues)
+    if (issue.solution_id && !["live", "closed"].includes(issue.stage))
+      groups.set(issue.solution_id, [
+        ...(groups.get(issue.solution_id) ?? []),
+        issue,
+      ]);
+  const merged = [...groups.values()].find((g) => g.length > 1);
+  const waiting = issues.find(
+    (i) => i.ball_with === "client" && i.open_question,
+  );
+  let headline = "";
+  let detail = "";
+  if (merged) {
+    const titles = merged.map((i) => i.title);
+    const names =
+      titles.length > 2
+        ? `${titles.slice(0, -1).join(", ")} and ${titles.at(-1)}`
+        : titles.join(" and ");
+    const link = links.find(
+      (l) => titles.includes(l.a_title) && titles.includes(l.b_title),
+    );
+    headline = `One solution can cover ${names}.`;
+    detail =
+      link?.benefit ||
+      link?.reason ||
+      merged.find((i) => i.solution_outline)?.solution_outline ||
+      "";
+  } else if (waiting) {
+    headline = `Waiting on the customer: ${waiting.open_question}`;
+    detail = waiting.title;
+  } else {
+    const next = issues.find(
+      (i) => i.next_step && !["live", "closed"].includes(i.stage),
+    );
+    if (next) {
+      headline = `Next: ${next.next_step}`;
+      detail = next.title;
+    }
+  }
+  if (!headline) return null;
+  return (
+    <div className="pm-in mb-3 rounded-xl bg-[#1b1830] px-4 py-3 text-white">
+      <p className="text-[11px] font-semibold tracking-wide text-[#a99cff] uppercase">
+        pi&apos;s picture
+      </p>
+      <p className="mt-0.5 text-sm font-semibold">{headline}</p>
+      {detail && <p className="mt-0.5 text-xs text-white/70">{detail}</p>}
+    </div>
   );
 }
 
