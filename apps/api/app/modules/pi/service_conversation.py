@@ -1,5 +1,6 @@
 """Service discovery: conversation and an internal brief, never a quotation."""
 
+import difflib
 import hashlib
 import json
 import logging
@@ -534,9 +535,13 @@ Set request_human=true for complaints, payment disputes or requests for a person
 regardless of their language. Do not resolve sensitive account matters yourself.
 Projects still "collecting" in brief.projects: never leave them there. Once the
 customer's current question is handled (and they are not upset), move the oldest one
-forward: if its details are known, list them in 2-4 "• " points and ask them to confirm
-so the team can prepare its proposal ("Shall I send this to the team?"); if one detail
-is missing, ask only for that. One project per reply.
+forward by asking for the NEXT missing essential (one or two short questions). Only
+when the essentials for that kind of work are known (what it is for, the main features
+or pages, its size such as how many products or users, the style or a reference, and
+the timeline; skip what the customer said they don't know), list them in 2-4 "• "
+points and ask them to confirm so the team can prepare its proposal ("Shall I send this
+to the team?"). A one-line wish ("a modern website to sell online") is never a complete
+brief. One project per reply.
 If followups are enabled and consent is unknown, the application asks permission to
 follow up after a brief is confirmed; don't ask it yourself. Explicit permission is
 required: consent='granted' only when the LATEST customer message explicitly agrees to
@@ -1084,6 +1089,56 @@ def with_consent_question(turn: ServiceTurn, context: dict[str, Any]) -> str:
     return f"{turn.reply.rstrip()}\n\n{question}"
 
 
+# "I've sent it to the team" and "Shall I send it to the team?" in one reply.
+SAYS_SENT = re.compile(
+    r"\b(?:sent|passed|forwarded|shared) (?:this |it |the brief |your brief )?(?:on )?to the "
+    r"team\b|\bteam ko bhej (?:diya|di|dia)\b",
+    re.IGNORECASE,
+)
+ASKS_SEND = re.compile(
+    r"\b(?:shall|should|can|may) i (?:send|pass|forward|share)\b|\bbhej doon\b|\bbhej dun\b",
+    re.IGNORECASE,
+)
+
+
+def contradicts_itself(reply: str, context: dict[str, Any]) -> str | None:
+    """A reply that says it's sent and asks whether to send, or repeats pi's last message."""
+    if SAYS_SENT.search(reply) and ASKS_SEND.search(reply):
+        return (
+            "it says the brief was sent to the team and also asks whether to send it; if "
+            "the customer hasn't confirmed yet, only ask; never claim it was sent"
+        )
+    last = next(
+        (
+            str(h.get("text", ""))
+            for h in reversed(context.get("history") or [])
+            if h.get("role") == "ai"
+        ),
+        "",
+    )
+    if len(reply) > 40 and last:
+        same = difflib.SequenceMatcher(None, " ".join(reply.split()), " ".join(last.split()))
+        if same.ratio() >= 0.85:
+            return (
+                "it repeats your previous message almost word for word; answer what the "
+                "customer just said, in your own new words"
+            )
+    return None
+
+
+def mixed_line(reply: str, expected: str) -> str | None:
+    """An English reply with a Roman Urdu line in it (or the other way round)."""
+    if expected not in ("en", "roman_ur"):
+        return None
+    for line in re.split(r"(?<=[.!?])\s+|\n", reply):
+        if len(line.split()) < 4:
+            continue
+        found = detect_language(line)
+        if found in ("en", "roman_ur") and found != expected:
+            return found
+    return None
+
+
 def unknown_customer(turn: ServiceTurn, context: dict[str, Any]) -> str | None:
     """A new customer's brief is never sent to the team before pi knows whose business
     it is: the team can't prepare a proposal for an unknown business."""
@@ -1115,7 +1170,8 @@ FILLER_TAIL = re.compile(
     r"(?:^|(?<=[.!?\n]))\s*(?:"
     r"(?:if|in case) you (?:have|need) (?:any )?(?:other|more|further|additional)?\s*"
     r"(?:questions?|help|assistance|queries)[^.!?\n]*[.!?]?"
-    r"|(?:please )?(?:feel free to|don'?t hesitate to) (?:ask|reach out|let me know)[^.!?\n]*[.!?]?"
+    r"|(?:please )?(?:feel free to|don'?t hesitate to) "
+    r"(?:ask|share|reach out|contact|let me know|tell)[^.!?\n]*[.!?]?"
     r"|let me know if (?:you need|there'?s) anything (?:else|more)[^.!?\n]*[.!?]?"
     r"|agar aap ?ko (?:aur |koi )+(?:madad|sawal|cheez)[^.!?\n]*[.!?]?"
     r")\s*$",
@@ -1126,7 +1182,23 @@ FILLER_TAIL = re.compile(
 def without_filler(reply: str) -> str:
     """The reply without a generic closing line (when something else is left)."""
     trimmed = FILLER_TAIL.sub("", reply).rstrip()
+    # Any short last sentence that only invites more ("..., feel free to share!").
+    parts = re.split(r"(?<=[.!?])\s+", trimmed)
+    if (
+        len(parts) > 1
+        and len(parts[-1].split()) <= 25
+        and FILLER_HINT.search(parts[-1])
+        and "?" not in parts[-1].rstrip("!.")
+    ):
+        trimmed = " ".join(parts[:-1]).rstrip()
     return trimmed if len(trimmed) >= 6 else reply
+
+
+FILLER_HINT = re.compile(
+    r"feel free to|don'?t hesitate|let me know if|if you (?:have|need) any|"
+    r"zaroor batay|madad chahiye ho|bila jhijhak",
+    re.IGNORECASE,
+)
 
 
 SIMPLE_ASK = 8  # words: "ok", "thanks", "send link?", "kab milega?"
@@ -1338,8 +1410,12 @@ async def compose_service_turn(
         problem = f"{long}, and also: {problem}" if problem else long
     if gap := unknown_customer(turn, context):
         problem = f"{gap}, and also: {problem}" if problem else gap
+    if odd := contradicts_itself(turn.reply, context):
+        problem = f"{odd}, and also: {problem}" if problem else odd
     expected = context.get("reply_language")
-    wrong = clearly_other(turn.reply, str(expected or ""))
+    wrong = clearly_other(turn.reply, str(expected or "")) or mixed_line(
+        turn.reply, str(expected or "")
+    )
     if wrong:
         problem = (
             f"it is written in {NAMES[wrong]} but the customer wrote in "
