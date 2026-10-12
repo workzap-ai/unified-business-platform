@@ -399,7 +399,11 @@ Meetings: when the customer asks for a meeting, call, visit or appointment, set
    the meeting (team_answer_now / team_notes) is the time and link to confirm to them.
    With google_meet_ready=true and a day and time (meeting_time), pi books the
    Google Meet itself: say you're setting it up now and the link comes in this chat in a
-   moment (not "confirmed" yet). Asked for the link before it was arranged: say
+   moment (not "confirmed" yet).
+   A meeting time that passed with no link (the customer is upset): apologise once,
+   plainly, and ask for a new day and time; with google_meet_ready=true say pi will
+   set up the Google Meet right away and send the link here. Never list the brief or
+   ask for business details in that reply. Asked for the link before it was arranged: say
    plainly you've asked the team for it again and it will come in this chat; never
    repeat your earlier sentence word for word, and never say "shortly" twice.
 4. Share facts from approved_knowledge that answer the customer's obvious next worry
@@ -858,6 +862,14 @@ LATER_PROMISE = re.compile(
 PLACEHOLDER = re.compile(r"\[[^\]\n]{1,60}\]|\{\{[^}\n]{1,60}\}\}|<(?:link|url|date|time)>", re.I)
 URL = re.compile(r"https?://[^\s)\]>]+|\b(?:meet\.google\.com|zoom\.us)/[^\s)\]>]*", re.I)
 MEETING_HOW = ("google_meet", "zoom", "phone", "in_person")
+# "The link has been sent" / "link bhej diya gaya hai" with no link in the reply: a lie.
+LINK_SENT = re.compile(
+    r"\blink\b[^.!?\n]{0,40}\b(?:has been|was|is) (?:sent|shared|here|below|above)\b"
+    r"|\b(?:sent|shared) (?:you )?the (?:meeting )?link\b"
+    r"|\blink\b[^.!?\n]{0,40}\b(?:bhej|send|share) (?:diya|kar diya|kr diya|di) "
+    r"(?:gaya|gya|hai|he)\b|\blink (?:yeh|ye|yahan) (?:hai|he)\b",
+    re.IGNORECASE,
+)
 
 
 async def _meet_ready(session: AsyncSession, scope: WorkspaceScope) -> bool:
@@ -899,6 +911,11 @@ def invented(reply: str, context: dict[str, Any], booked: bool = False) -> str:
     for link in URL.findall(reply):
         if link.rstrip(".,") not in known:
             return "it contains a link nobody gave you; never make up links"
+    if LINK_SENT.search(reply) and not URL.search(reply):
+        return (
+            "it says the link was sent or is here, but there is no link in your reply and "
+            "none was sent; say honestly that the link isn't ready yet and what happens next"
+        )
     # Only a meeting the team really arranged (time and link) can be called confirmed;
     # a bare "yes" from the team is not a meeting.
     team_said = any(
@@ -1006,8 +1023,15 @@ def unknown_customer(turn: ServiceTurn, context: dict[str, Any]) -> str | None:
     """A new customer's brief is never sent to the team before pi knows whose business
     it is: the team can't prepare a proposal for an unknown business."""
     profile = merge_profile(context.get("customer_profile"), turn.customer_profile.model_dump())
+    brief = context.get("brief") or {}
+    known_work = brief.get("ready_for_team") or any(
+        p.get("status") in ("confirmed", "with_team") for p in brief.get("projects") or []
+    )
     if (
         not turn.ready_for_team
+        or known_work  # Already working with them: never stop the chat to ask.
+        or turn.meeting_requested
+        or turn.mood in ("frustrated", "urgent")
         or context.get("returning_customer")
         or profile.get("business_name")
         or profile.get("business_type")

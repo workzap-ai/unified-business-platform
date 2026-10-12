@@ -158,3 +158,19 @@ def test_a_new_customers_brief_waits_for_their_business():
     assert unknown_customer(ready, {"customer_profile": {"business_name": "Ali Traders"}}) is None
     asking = turn(reply="What's your business called?", ready_for_team=True)
     assert unknown_customer(asking, {}) is None
+
+
+def test_never_stops_a_known_or_upset_customer_to_ask_for_their_business():
+    ready = turn(reply="Noted, the team has it.", ready_for_team=True)
+    working = {"brief": {"projects": [{"status": "confirmed"}]}}
+    assert unknown_customer(ready, working) is None
+    upset = turn(reply="Sorry about the meeting.", ready_for_team=True, mood="frustrated")
+    assert unknown_customer(upset, {}) is None
+
+
+def test_saying_the_link_was_sent_without_a_link_is_refused():
+    from app.modules.pi.service_conversation import invented
+
+    assert invented("Aapka Google Meet meeting link abhi bhej diya gaya hai.", {})
+    assert invented("Your meeting link has been sent.", {})
+    assert not invented("I've asked the team for the link again; it will come here.", {})
