@@ -12,6 +12,7 @@ the reply guard only lets through links the team gave it.
 import logging
 import re
 from datetime import datetime, timedelta
+from types import SimpleNamespace
 from typing import Any, Literal
 from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -256,4 +257,91 @@ def runtime_for(request: Any) -> Any:
     return _Runtime()
 
 
-__all__ = ["MeetingInput", "arrange", "auto_arrange", "runtime_for"]
+__all__ = [
+    "MeetingInput",
+    "arrange",
+    "auto_arrange",
+    "book_for_customer",
+    "calendar_ready",
+    "runtime_for",
+]
+
+
+# ---- pi books the meeting itself -----------------------------------------------------
+
+AHEAD = timedelta(minutes=5)
+HORIZON = timedelta(days=90)
+
+
+async def calendar_ready(session: AsyncSession, scope: WorkspaceScope) -> bool:
+    """The business's Google Calendar is connected, so pi can make Meet links itself."""
+    connection = await connectors.current(session, scope, "google_calendar")
+    return connection is not None and connection.status in connectors.USABLE
+
+
+async def book_for_customer(ctx: dict[str, Any], conversation_id: str) -> str | None:
+    """Job: the customer gave a day and time for a meeting. When the business's Google
+    Calendar is connected (and pi books meetings), pi creates the Google Meet event at
+    that time and sends the real link in the chat - nobody has to remember to do it.
+    Otherwise the meeting request stays on the team's desk. Returns the request id."""
+    from app.modules.pi.configuration import settings_row as pi_settings
+    from app.modules.pi.models import PiConversation
+    from app.modules.pi_saas.deals import system_scope_for
+    from app.modules.pi_saas.requests import raise_request, reply_with_answer
+
+    async with ctx["sessions"]() as session:
+        conversation = await session.get(PiConversation, UUID(conversation_id))
+        if conversation is None or conversation.customer_id is None:
+            return None
+        scope = await system_scope_for(session, conversation.tenant_id, conversation.environment_id)
+        policy = await pi_settings(session, scope)
+        if (policy.whatsapp_config or {}).get("auto_meetings", True) is False:
+            return None
+        meeting = dict((conversation.service_brief or {}).get("meeting") or {})
+        starts_at, how = str(meeting.get("starts_at") or ""), str(meeting.get("how") or "")
+        if not starts_at or how not in ("", "google_meet") or meeting.get("booked") == starts_at:
+            return None
+        try:
+            start = _local(starts_at, policy.timezone)
+        except ValueError:
+            return None
+        now = datetime.now(start.tzinfo)
+        if not now + AHEAD <= start <= now + HORIZON:
+            return None
+        if not await calendar_ready(session, scope):
+            return None
+        row = await raise_request(
+            session,
+            scope,
+            conversation_id=conversation.id,
+            customer_id=conversation.customer_id,
+            kind="meeting",
+            question=f"The customer wants a meeting at {starts_at.replace('T', ' ')}.",
+            priority="high",
+        )
+        runtime = SimpleNamespace(
+            settings=ctx["settings"], http=OutboundClient(ctx["settings"], ctx["http"])
+        )
+        try:
+            async with session.begin_nested():
+                row = await arrange(
+                    session,
+                    scope,
+                    runtime,
+                    row.id,
+                    MeetingInput(starts_at=starts_at, how="google_meet"),
+                    max_bytes=ctx["settings"].knowledge_upload_max_bytes,
+                    any_kind=True,
+                )
+        except BusinessRuleViolation:
+            logger.warning("pi_auto_meeting_failed", exc_info=True)
+            await session.commit()  # The request stays open on the desk for the team.
+            return str(row.id)
+        conversation.service_brief = {
+            **(conversation.service_brief or {}),
+            "meeting": {**meeting, "booked": starts_at},
+        }
+        request_id = str(row.id)
+        await session.commit()
+    await reply_with_answer(ctx, request_id)  # pi sends the link in the customer's language
+    return request_id

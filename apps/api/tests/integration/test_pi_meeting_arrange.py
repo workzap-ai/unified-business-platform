@@ -127,3 +127,84 @@ async def test_without_a_time_the_answer_is_a_plain_note(api, business_db):
     assert done.status_code == 200, done.text
     assert done.json()["answer"] == "Yes, ask them which day suits"
     await pi.close()
+
+
+async def test_asking_for_a_link_nobody_arranged_goes_back_to_the_team(api, business_db):
+    from app.modules.pi.service_conversation import waiting_for_meeting_link
+
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    _, conversation = await _customer_in_chat(pi)
+    scope = WorkspaceScope.system(
+        UUID(pi.tenant_id), UUID(pi.environment_id), frozenset({"pi.read"}), "PI"
+    )
+    asked = {"meeting_requested": True}
+    assert await waiting_for_meeting_link(pi.db, scope, conversation, asked, "send link?")
+    assert not await waiting_for_meeting_link(pi.db, scope, conversation, {}, "send link?")
+    assert not await waiting_for_meeting_link(pi.db, scope, conversation, asked, "thanks")
+    await pi.close()
+
+
+def test_thanks_counts_as_nothing_more():
+    from app.modules.pi.service_conversation import CLOSING
+
+    assert CLOSING.match("thank you looking forward to it")
+    assert CLOSING.match("Shukriya")
+
+
+async def test_pi_books_the_google_meet_itself_and_sends_the_link(api, business_db, monkeypatch):
+    from datetime import UTC, datetime, timedelta
+
+    from sqlalchemy import select
+    from test_pi_service_conversations import mock_turns, turn
+
+    from app.modules.pi.models import PiConversation, PiMessage
+    from app.modules.pi_saas import meetings
+
+    link = "https://meet.google.com/abc-defg-hij"
+
+    async def fake_meet(*args, **kwargs):
+        return link, "event-1"
+
+    async def ready(*args, **kwargs):
+        return True
+
+    monkeypatch.setattr(meetings, "_google_meet", fake_meet)
+    monkeypatch.setattr(meetings, "calendar_ready", ready)
+    mock_turns(
+        monkeypatch, turn(reply=f"Your meeting is confirmed. Join here: {link}", language="en")
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    _, conversation = await _customer_in_chat(pi)
+    when = (datetime.now(UTC) + timedelta(days=2)).strftime("%Y-%m-%dT17:00")
+    row = await pi.db.get(PiConversation, conversation.id)
+    row.service_brief = {**row.service_brief, "meeting": {"starts_at": when, "how": ""}}
+    pi.db.add(
+        PiMessage(
+            tenant_id=UUID(pi.tenant_id),
+            environment_id=UUID(pi.environment_id),
+            conversation_id=conversation.id,
+            direction="inbound",
+            sender_type="customer",
+            message_type="text",
+            body="Day after tomorrow 5pm on Google Meet",
+            status="processed",
+        )
+    )
+    await pi.db.commit()
+
+    request_id = await meetings.book_for_customer(pi.ctx, str(conversation.id))
+    assert request_id is not None
+    request = await business_db_row(pi, request_id)
+    await pi.db.refresh(request)
+    assert request.status == "answered" and link in request.answer
+    sent = list(
+        await pi.db.scalars(
+            select(PiMessage).where(
+                PiMessage.conversation_id == conversation.id, PiMessage.sender_type == "ai"
+            )
+        )
+    )
+    assert [m.body for m in sent] == [f"Your meeting is confirmed. Join here: {link}"]
+    # Booked once: running the job again makes nothing new.
+    assert await meetings.book_for_customer(pi.ctx, str(conversation.id)) is None
+    await pi.close()

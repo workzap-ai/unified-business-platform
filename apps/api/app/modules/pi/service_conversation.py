@@ -397,6 +397,11 @@ Meetings: when the customer asks for a meeting, call, visit or appointment, set
    [Google Meet Link]: only the team (team_answer_now / team_notes) or a booking
    confirms it. A team answer about
    the meeting (team_answer_now / team_notes) is the time and link to confirm to them.
+   With google_meet_ready=true and a day and time (meeting_time), pi books the
+   Google Meet itself: say you're setting it up now and the link comes in this chat in a
+   moment (not "confirmed" yet). Asked for the link before it was arranged: say
+   plainly you've asked the team for it again and it will come in this chat; never
+   repeat your earlier sentence word for word, and never say "shortly" twice.
 4. Share facts from approved_knowledge that answer the customer's obvious next worry
    (what's included, how long, how they'll receive it) without being asked. Never invent
    them, and never promise a price or a date.
@@ -837,6 +842,7 @@ async def prepare_context(
         **reply_language(conversation, message, rows),
         "tone": policy.response_rules.get("tone", "friendly"),
         "now_local": _now_local(policy.timezone),
+        "google_meet_ready": await _meet_ready(session, scope),
         "followups_enabled": policy.whatsapp_config.get("reminder_enabled", True),
     }
 
@@ -852,6 +858,16 @@ LATER_PROMISE = re.compile(
 PLACEHOLDER = re.compile(r"\[[^\]\n]{1,60}\]|\{\{[^}\n]{1,60}\}\}|<(?:link|url|date|time)>", re.I)
 URL = re.compile(r"https?://[^\s)\]>]+|\b(?:meet\.google\.com|zoom\.us)/[^\s)\]>]*", re.I)
 MEETING_HOW = ("google_meet", "zoom", "phone", "in_person")
+
+
+async def _meet_ready(session: AsyncSession, scope: WorkspaceScope) -> bool:
+    from app.modules.pi_saas.meetings import calendar_ready
+
+    try:
+        async with session.begin_nested():
+            return await calendar_ready(session, scope)
+    except DBAPIError:
+        return False
 
 
 def _now_local(timezone: str) -> str:
@@ -957,6 +973,8 @@ CLOSING = re.compile(
     r"ok(?:ay)?|theek hai|thik hai|done|ye ?hi|yahi|yehi|ye (?:bnao|bnwao|banao|banwao)|"
     r"not (?:at the moment|right now|now|for now|really)|no more|nothing more|all good|"
     r"(?:abhi|filhal|filhaal) (?:nahi|nhi|nh|nahin)|"
+    r"thanks?|thank you|thx|shukri(?:y)?a|jazak ?allah|great|perfect|sounds good|"
+    r"looking forward|"
     r"(?:nh|nahi|no),? ye (?:bnao|bnwao|banao|banwao))\b",
     re.IGNORECASE,
 )
@@ -1382,6 +1400,16 @@ async def save_service_turn(
             how = turn.meeting_how.replace("_", " ") or "any way"
             said += f" (asked for {turn.meeting_time.replace('T', ' ')}, {how})"
         await ask_for_meeting(session, scope, conversation, turn.summary, said)
+    elif await waiting_for_meeting_link(session, scope, conversation, previous, message.body):
+        # They keep asking for the link and nothing has been arranged: the team is asked
+        # again (the open meeting request on the desk), so the promise gets kept.
+        await ask_for_meeting(
+            session,
+            scope,
+            conversation,
+            turn.summary,
+            f"The customer is waiting for the meeting link: {message.body}",
+        )
     elif turn._ask_team:
         await ask_team(session, scope, conversation, turn.summary, message.body)
     for gap in new_gaps:
@@ -1629,6 +1657,24 @@ async def ask_team(
             )
     except DBAPIError:
         logger.warning("pi_team_question_skipped", exc_info=True)
+
+
+MEETING_LINK = re.compile(r"\blinks?\b|\bzoom\b|\bmeet\b", re.IGNORECASE)
+
+
+async def waiting_for_meeting_link(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    previous: dict[str, Any],
+    latest: str,
+) -> bool:
+    """The customer asks for the meeting link, a meeting was requested, and the team
+    hasn't arranged it yet (no "Meeting confirmed by the team" answer)."""
+    if not previous.get("meeting_requested") or not MEETING_LINK.search(latest):
+        return False
+    notes = await _team_notes(session, scope, conversation.id)
+    return not any("Meeting confirmed by the team" in str(n.get("note", "")) for n in notes)
 
 
 async def ask_for_meeting(

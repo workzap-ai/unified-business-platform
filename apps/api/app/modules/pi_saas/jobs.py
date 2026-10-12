@@ -285,6 +285,19 @@ async def pi_reply_with_team_answer(ctx: dict[str, Any], request_id: str) -> Non
     await reply_with_answer(ctx, request_id)
 
 
+async def pi_book_meeting(ctx: dict[str, Any], conversation_id: str) -> None:
+    """The customer gave a meeting time: pi books it in Google Calendar and sends the link."""
+    from app.modules.pi_saas.meetings import book_for_customer
+
+    await book_for_customer(ctx, conversation_id)
+
+
+async def enqueue_meeting(ctx: dict[str, Any], conversation_id: UUID, starts_at: str) -> None:
+    await _enqueue(
+        ctx, "pi_book_meeting", str(conversation_id), f"pi-meeting:{conversation_id}:{starts_at}"
+    )
+
+
 async def _enqueue(ctx: dict[str, Any], name: str, arg: str, job_id: str) -> None:
     if ctx.get("redis"):
         await ctx["redis"].enqueue_job(name, arg, _job_id=job_id)
@@ -294,6 +307,7 @@ async def _enqueue(ctx: dict[str, Any], name: str, arg: str, job_id: str) -> Non
 
 JOBS: dict[str, Callable[..., Awaitable[Any]]] = {
     "pi_reply_with_team_answer": pi_reply_with_team_answer,
+    "pi_book_meeting": pi_book_meeting,
     "process_pi_provider_event": process_pi_provider_event,
     "process_pi_billing_event": process_pi_billing_event,
     "sweep_pi_saas": sweep_pi_saas,

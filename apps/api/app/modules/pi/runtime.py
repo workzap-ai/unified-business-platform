@@ -1130,6 +1130,11 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
 
         for lead_id in proposals_for:
             await enqueue_proposal(ctx, lead_id)
+    if service_turn is not None and service_turn.meeting_time:
+        from app.modules.pi_saas.jobs import enqueue_meeting
+
+        # pi books it in the business's Google Calendar and sends the Meet link.
+        await enqueue_meeting(ctx, conversation.id, service_turn.meeting_time)
 
 
 def _record_usage(
