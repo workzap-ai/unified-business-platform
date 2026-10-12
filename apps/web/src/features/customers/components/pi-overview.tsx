@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { z } from "zod";
 import { Building2, FolderKanban, Network } from "lucide-react";
@@ -100,7 +101,7 @@ function tone(issue: Issue): { fill: string; ring: string; label: string } {
   if (["live", "closed"].includes(issue.stage))
     return { fill: "#1f9d63", ring: "#1f9d63", label: "Done" };
   if (issue.stage === "noted")
-    return { fill: "transparent", ring: "#5A47F5", label: "Noted" };
+    return { fill: "#1b1830", ring: "#5A47F5", label: "Noted" };
   if (issue.ball_with === "client")
     return { fill: "#f5a524", ring: "#f5a524", label: "Waiting on them" };
   return { fill: "#3b82f6", ring: "#3b82f6", label: "Waiting on us" };
@@ -280,7 +281,9 @@ export function CustomerPiOverview({ customerId }: { customerId: string }) {
   );
 }
 
-/** Requests as circles (size = business impact) and pi's connections as labelled lines. */
+/** Requests as circles (size = business impact) and pi's connections as labelled lines.
+ * A fixed-size drawing (it never zooms with the page); hover or focus a circle for its
+ * details, a line for why pi connected the two. */
 function ProblemMap({
   issues,
   links,
@@ -288,87 +291,216 @@ function ProblemMap({
   issues: Issue[];
   links: Overview["links"];
 }) {
+  const [hover, setHover] = useState<number | null>(null);
+  const [hoverLink, setHoverLink] = useState<number | null>(null);
   const shown = issues.slice(0, 8);
+  const n = shown.length;
+  // The ring grows with the number of requests so circles and labels never touch.
+  const ringR = n <= 1 ? 0 : n === 2 ? 150 : Math.max(120, 30 + 22 * n);
   const W = 640;
-  const H = shown.length <= 2 ? 220 : 320;
+  const H = n <= 2 ? 160 : 2 * ringR + 110;
   const cx = W / 2;
-  const cy = H / 2;
-  const r = shown.length <= 1 ? 0 : Math.min(W, H) / 2 - 70;
-  const at = new Map(
-    shown.map((issue, i) => {
-      const angle = (2 * Math.PI * i) / shown.length - Math.PI / 2;
-      return [
-        issue.title,
-        { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) },
-      ] as const;
-    }),
-  );
-  const visible = links.filter((l) => at.has(l.a_title) && at.has(l.b_title));
+  const cy = n <= 2 ? 66 : ringR + 50;
+  const radius = (i: Issue) => 12 + 3 * Math.max(1, Math.min(5, i.impact));
+  const pos = shown.map((_, i) => {
+    // Two requests sit side by side; more go round a circle starting at the top.
+    const start = n === 2 ? Math.PI : -Math.PI / 2;
+    const angle = start + (2 * Math.PI * i) / Math.max(1, n);
+    return { x: cx + ringR * Math.cos(angle), y: cy + ringR * Math.sin(angle) };
+  });
+  const index = new Map(shown.map((issue, i) => [issue.title, i]));
+  const visible = links
+    .map((l) => ({ ...l, a: index.get(l.a_title), b: index.get(l.b_title) }))
+    .filter(
+      (l): l is typeof l & { a: number; b: number } =>
+        l.a !== undefined && l.b !== undefined,
+    );
+  const touches = (i: number) =>
+    visible.some(
+      (l) => (l.a === hover || l.b === hover) && (l.a === i || l.b === i),
+    );
+  const dim = (i: number) => hover !== null && hover !== i && !touches(i);
+  const short = (t: string) => (t.length > 22 ? `${t.slice(0, 21)}…` : t);
+  const active = hover !== null ? shown[hover] : null;
+  const activeLink = hoverLink !== null ? visible[hoverLink] : null;
+  const tip = active
+    ? pos[hover!]
+    : activeLink
+      ? {
+          x: (pos[activeLink.a].x + pos[activeLink.b].x) / 2,
+          y: (pos[activeLink.a].y + pos[activeLink.b].y) / 2,
+        }
+      : null;
+
   return (
-    <figure>
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        className="h-auto w-full rounded-xl bg-[#1b1830]"
-        role="img"
-        aria-label={`Problem Map: ${shown.length} requests, ${visible.length} connections`}
-      >
-        {visible.map((l, i) => {
-          const a = at.get(l.a_title)!;
-          const b = at.get(l.b_title)!;
-          const dashed = l.type === "part_of" || l.type === "depends_on";
-          return (
-            <g key={i}>
-              <line
-                x1={a.x}
-                y1={a.y}
-                x2={b.x}
-                y2={b.y}
-                stroke="#8b7cf8"
-                strokeWidth={3}
-                strokeDasharray={dashed ? "8 6" : undefined}
-              />
-              <text
-                x={(a.x + b.x) / 2}
-                y={(a.y + b.y) / 2 - 8}
-                textAnchor="middle"
-                fontSize="13"
-                fill="#d9d4ff"
+    <figure className="mx-auto w-full max-w-2xl">
+      <div className="relative">
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          className="block h-auto w-full rounded-xl bg-[#1b1830]"
+          role="img"
+          aria-label={`Problem Map: ${n} requests, ${visible.length} connections`}
+          onMouseLeave={() => {
+            setHover(null);
+            setHoverLink(null);
+          }}
+        >
+          {visible.map((l, k) => {
+            const a = pos[l.a];
+            const b = pos[l.b];
+            const dashed = l.type === "part_of" || l.type === "depends_on";
+            const lit =
+              hover === null ? hoverLink === k : l.a === hover || l.b === hover;
+            // Lines run edge to edge; the label sits outside, away from the circles.
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const len = Math.hypot(dx, dy) || 1;
+            const ra = radius(shown[l.a]) + 3;
+            const rb = radius(shown[l.b]) + 3;
+            const x1 = a.x + (dx / len) * ra;
+            const y1 = a.y + (dy / len) * ra;
+            const x2 = b.x - (dx / len) * rb;
+            const y2 = b.y - (dy / len) * rb;
+            const midX = (a.x + b.x) / 2;
+            const midY = (a.y + b.y) / 2;
+            const out = Math.hypot(midX - cx, midY - cy);
+            const push = out > 1 ? 18 / out : 0;
+            const mx = midX + (midX - cx) * push;
+            const my = midY + (midY - cy) * push;
+            const label = LINK_LABEL[l.type] ?? l.type;
+            return (
+              <g
+                key={k}
+                className="cursor-help"
+                opacity={hover !== null && !lit ? 0.25 : 1}
+                onMouseEnter={() => setHoverLink(k)}
+                onMouseLeave={() => setHoverLink(null)}
               >
-                {LINK_LABEL[l.type] ?? l.type}
-              </text>
-            </g>
-          );
-        })}
-        {shown.map((issue) => {
-          const pos = at.get(issue.title)!;
-          const t = tone(issue);
-          const radius = 22 + 5 * Math.max(1, Math.min(5, issue.impact));
-          return (
-            <g key={issue.title}>
-              <circle
-                cx={pos.x}
-                cy={pos.y}
-                r={radius}
-                fill={t.fill}
-                stroke={t.ring}
-                strokeWidth={t.fill === "transparent" ? 4 : 2}
-              />
-              <text
-                x={pos.x}
-                y={pos.y + radius + 18}
-                textAnchor="middle"
-                fontSize="14"
-                fontWeight="600"
-                fill="#ffffff"
+                {/* A wide invisible line makes the thin one easy to hover. */}
+                <line
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  stroke="transparent"
+                  strokeWidth={16}
+                />
+                <line
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  stroke={lit ? "#c4b8ff" : "#8b7cf8"}
+                  strokeWidth={lit ? 3 : 2}
+                  strokeDasharray={dashed ? "7 5" : undefined}
+                />
+                <rect
+                  x={mx - label.length * 3.4 - 8}
+                  y={my - 11}
+                  width={label.length * 6.8 + 16}
+                  height={22}
+                  rx={11}
+                  fill="#2a2546"
+                  stroke="#4b4280"
+                />
+                <text
+                  x={mx}
+                  y={my + 4}
+                  textAnchor="middle"
+                  fontSize="11"
+                  fill="#e4e0ff"
+                >
+                  {label}
+                </text>
+              </g>
+            );
+          })}
+          {shown.map((issue, i) => {
+            const t = tone(issue);
+            const r = radius(issue);
+            const p = pos[i];
+            return (
+              <g
+                key={`${issue.title}-${i}`}
+                tabIndex={0}
+                role="button"
+                aria-label={`${issue.title}: ${t.label}`}
+                className="cursor-pointer outline-none"
+                opacity={dim(i) ? 0.3 : 1}
+                onMouseEnter={() => setHover(i)}
+                onFocus={() => setHover(i)}
+                onBlur={() => setHover(null)}
               >
-                {issue.title.length > 26
-                  ? `${issue.title.slice(0, 25)}…`
-                  : issue.title}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
+                <circle
+                  cx={p.x}
+                  cy={p.y}
+                  r={r + (hover === i ? 3 : 0)}
+                  fill={t.fill}
+                  stroke={hover === i ? "#ffffff" : t.ring}
+                  strokeWidth={t.label === "Noted" ? 3 : 2}
+                />
+                <text
+                  x={p.x}
+                  y={p.y + r + 16}
+                  textAnchor="middle"
+                  fontSize="12"
+                  fontWeight="600"
+                  fill="#ffffff"
+                >
+                  {short(issue.title)}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+        {tip && (active || activeLink) && (
+          <div
+            role="tooltip"
+            className="pointer-events-none absolute z-10 w-64 -translate-x-1/2 rounded-lg border border-border bg-surface p-3 text-left text-xs shadow-lg"
+            style={{
+              left: `${Math.min(85, Math.max(15, (tip.x / W) * 100))}%`,
+              top: `${(tip.y / H) * 100}%`,
+              transform: `translate(-50%, ${tip.y > H / 2 ? "calc(-100% - 18px)" : "18px"})`,
+            }}
+          >
+            {active ? (
+              <>
+                <p className="text-[13px] font-semibold">{active.title}</p>
+                <p className="mt-1">
+                  <span
+                    className="mr-1 inline-block size-2 rounded-full align-middle"
+                    style={{ background: tone(active).ring }}
+                  />
+                  {tone(active).label} ·{" "}
+                  {STAGES.find(([k]) => k === active.stage)?.[1] ??
+                    active.stage}
+                </p>
+                {active.summary && (
+                  <p className="mt-1 text-muted-foreground">{active.summary}</p>
+                )}
+                {active.next_step && (
+                  <p className="mt-1">
+                    <span className="font-medium">Next: </span>
+                    {active.next_step}
+                  </p>
+                )}
+              </>
+            ) : activeLink ? (
+              <>
+                <p className="text-[13px] font-semibold">
+                  {activeLink.a_title} ↔ {activeLink.b_title}
+                </p>
+                <p className="mt-1">{activeLink.reason}</p>
+                {activeLink.benefit && (
+                  <p className="mt-1 text-muted-foreground">
+                    {activeLink.benefit}
+                  </p>
+                )}
+              </>
+            ) : null}
+          </div>
+        )}
+      </div>
       <figcaption className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
         {[
           ["#3b82f6", "Waiting on us"],
@@ -384,20 +516,15 @@ function ProblemMap({
             {label}
           </span>
         ))}
-        <span>Solid line: shared data / same cause · dashed: part of</span>
+        <span>
+          Solid line: shared data / same cause · dashed: part of / depends on
+        </span>
+        <span>Hover a circle or line for details</span>
       </figcaption>
-      {visible.length > 0 && (
-        <ul className="mt-3 space-y-1 text-[13px]">
-          {visible.map((l, i) => (
-            <li key={i}>
-              <span className="font-medium">
-                {l.a_title} ↔ {l.b_title}:
-              </span>{" "}
-              {l.reason}
-              {l.benefit ? ` (${l.benefit})` : ""}
-            </li>
-          ))}
-        </ul>
+      {issues.length > shown.length && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          +{issues.length - shown.length} more requests not drawn.
+        </p>
       )}
     </figure>
   );
