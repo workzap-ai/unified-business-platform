@@ -85,9 +85,9 @@ async def test_a_greeting_in_history_does_not_replace_a_system_triggered_reply(e
 def test_hi_from_a_returning_customer_picks_up_their_open_project():
     from app.modules.pi.service_conversation import greeting_reply
 
-    assert greeting_reply({"company": "Workzap Studio"}) == (
-        "Hi, I'm pi, Workzap Studio's AI assistant. How can I help you today?"
-    )
+    first = greeting_reply({"company": "Workzap Studio"})
+    assert first.startswith("Hi, I'm pi, Workzap Studio's AI assistant.")
+    assert "only you and the team see it" in first and "free" in first
     returning = {
         "history": [{"role": "ai", "text": "Earlier reply"}],
         "customer_profile": {"name": "Muhammad Ahtisham Khan"},

@@ -1391,7 +1391,12 @@ def greeting_reply(context: dict[str, Any]) -> str:
     if not any(h.get("role") == "ai" for h in context.get("history") or []):
         company = str(context.get("company") or "").strip()
         who = f"{company}'s AI assistant" if company else "your AI assistant"
-        return f"Hi, I'm pi, {who}. How can I help you today?"
+        team = f"The {company} team" if company else "A real team"
+        # The brief's first-reply intro: an AI, a real team, free, who sees the chat.
+        return (
+            f"Hi, I'm pi, {who}. {team} reads this chat and does the work; only you and "
+            "the team see it, and talking to me is free. How can I help you today?"
+        )
     name = str((context.get("customer_profile") or {}).get("name") or "").split(" ")[0]
     hello = f"Hi {name}." if name and not PLACEHOLDER_NAME.search(name) else "Hi."
     brief = context.get("brief") or {}

@@ -87,7 +87,8 @@ async def test_hi_gets_a_short_english_greeting_despite_old_language_and_company
     await pi.process("Hi", "greeting-first")
     await pi.deliver_all()
     first = await pi.reply_to("greeting-first")
-    assert first.body == "Hi, I'm pi, Service Agency's AI assistant. How can I help you today?"
+    assert first.body.startswith("Hi, I'm pi, Service Agency's AI assistant.")
+    assert first.body.endswith("How can I help you today?")
 
     conversation = await pi.conversation()
     previous_brief = {

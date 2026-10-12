@@ -410,13 +410,14 @@ For each item:
   features PDF", not "Mendies features PDF"). Never a raw quote.
 - original_words: the customer's own words for it, quoted briefly from the transcript.
 - category: inquiry, order, booking, payment, complaint, support or other.
-- about_service: true when the matter is about how THIS business's own service or tools
-  work for the customer, not a need or problem of the customer's own business: getting
-  or downloading an invoice, receipt or document, a payment link, bank details or card
-  payment missing, a link that doesn't open, pi's replies or wording, the dashboard or
-  app; and questions about the business itself rather than a need of theirs (its
-  prices or plans in general, whether it can be trusted, who sees the chat, what it
-  does). Otherwise false. Never link an about_service item to anything.
+- about_service: true ONLY for a problem with USING this business's service or tools,
+  not something the customer wants built, bought or done: an invoice, receipt or
+  document they can't get or download, a payment link, bank details or card payment
+  missing, a link that doesn't open, pi's replies or wording, the dashboard or app;
+  or a question about trust or privacy (who sees the chat, is it safe). A request for
+  work, a product, a project, a proposal or a meeting is NEVER about_service, even when
+  this business is the one that sells it (e.g. "I need an ERP" is false). Never link an
+  about_service item to anything.
 - stage, using ONLY these:
   "noted" = pi captured it and is still understanding it;
   "need_answer" = the business or pi asked the customer something and is waiting;
@@ -633,6 +634,10 @@ async def analyse(
     found = [i.model_dump() for i in result.value.issues]
     # Service matters (an invoice download, a missing payment link, pi's wording) are not
     # the customer's business problems: they stay off the map and charts, listed apart.
+    for item in found:
+        # A request for work is the customer's own matter, whatever the model said.
+        if item.get("category") in ("inquiry", "order", "booking"):
+            item["about_service"] = False
     keep = [n for n, i in enumerate(found) if not i.get("about_service")]
     position = {old: new for new, old in enumerate(keep)}
     raw_links = [

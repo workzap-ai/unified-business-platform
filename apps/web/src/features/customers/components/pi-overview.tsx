@@ -7,6 +7,7 @@ import { Building2, FolderKanban, Network } from "lucide-react";
 import { Badge, Card, CardBody, CardHeader } from "@/components/ui/display";
 import { useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
+import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
 import { apiRequest } from "@/services/api-client";
 
@@ -252,9 +253,7 @@ export function CustomerPiOverview({ customerId }: { customerId: string }) {
         <CardHeader
           title="Problem Map"
           icon={<Network />}
-          description={
-            o.headline || "Their requests, and how pi connected them"
-          }
+          description={`${o.issues.length} request${o.issues.length === 1 ? "" : "s"} · ${o.links.length} connection${o.links.length === 1 ? "" : "s"} found by pi`}
           actions={
             o.links.length ? (
               <Badge tone="info">
@@ -281,9 +280,11 @@ export function CustomerPiOverview({ customerId }: { customerId: string }) {
   );
 }
 
-/** Requests as circles (size = business impact) and pi's connections as labelled lines.
- * A fixed-size drawing (it never zooms with the page); hover or focus a circle for its
- * details, a line for why pi connected the two. */
+/** The Problem Map: each request is a card (full title, whose turn it is), and pi's
+ * connections are curved, labelled lines between them. Cards fade in one by one, lines
+ * draw themselves and anything waiting on the customer pulses gently (all motion is off
+ * for people who ask for reduced motion). Pick a card or a line for its details. On a
+ * phone it's a simple list. */
 function ProblemMap({
   issues,
   links,
@@ -291,214 +292,243 @@ function ProblemMap({
   issues: Issue[];
   links: Overview["links"];
 }) {
-  const [hover, setHover] = useState<number | null>(null);
-  const [hoverLink, setHoverLink] = useState<number | null>(null);
-  const shown = issues.slice(0, 8);
+  const [active, setActive] = useState<number | null>(null);
+  const [activeLink, setActiveLink] = useState<number | null>(null);
+  const shown = issues.slice(0, 9);
   const n = shown.length;
-  // The ring grows with the number of requests so circles and labels never touch.
-  const ringR = n <= 1 ? 0 : n === 2 ? 150 : Math.max(120, 30 + 22 * n);
-  const W = 640;
-  const H = n <= 2 ? 160 : 2 * ringR + 110;
-  const cx = W / 2;
-  const cy = n <= 2 ? 66 : ringR + 50;
-  const radius = (i: Issue) => 12 + 3 * Math.max(1, Math.min(5, i.impact));
+  // Two staggered columns with a wide lane between them: every line runs through the
+  // lane, so its label is never hidden behind a card. Only as tall as it needs to be.
+  const W = 720;
+  const CARD_W = 220;
+  const CARD_H = 72;
+  const STEP = 116; // vertical distance between cards in the same column
+  const LEFT = 24;
+  const RIGHT = W - 24 - CARD_W;
   const pos = shown.map((_, i) => {
-    // Two requests sit side by side; more go round a circle starting at the top.
-    const start = n === 2 ? Math.PI : -Math.PI / 2;
-    const angle = start + (2 * Math.PI * i) / Math.max(1, n);
-    return { x: cx + ringR * Math.cos(angle), y: cy + ringR * Math.sin(angle) };
+    const x = n === 1 ? (W - CARD_W) / 2 : i % 2 ? RIGHT : LEFT;
+    const y = 12 + Math.floor(i / 2) * STEP + (i % 2 ? STEP / 2 : 0);
+    return { x, y, cx: x + CARD_W / 2, cy: y + CARD_H / 2 };
   });
+  const H = Math.max(...pos.map((p) => p.y), 0) + CARD_H + 12;
   const index = new Map(shown.map((issue, i) => [issue.title, i]));
   const visible = links
     .map((l) => ({ ...l, a: index.get(l.a_title), b: index.get(l.b_title) }))
     .filter(
       (l): l is typeof l & { a: number; b: number } =>
-        l.a !== undefined && l.b !== undefined,
+        l.a !== undefined && l.b !== undefined && l.a !== l.b,
     );
   const touches = (i: number) =>
+    active !== null &&
     visible.some(
-      (l) => (l.a === hover || l.b === hover) && (l.a === i || l.b === i),
+      (l) => (l.a === active || l.b === active) && (l.a === i || l.b === i),
     );
-  const dim = (i: number) => hover !== null && hover !== i && !touches(i);
-  const short = (t: string) => (t.length > 22 ? `${t.slice(0, 21)}…` : t);
-  const active = hover !== null ? shown[hover] : null;
-  const activeLink = hoverLink !== null ? visible[hoverLink] : null;
-  const tip = active
-    ? pos[hover!]
-    : activeLink
-      ? {
-          x: (pos[activeLink.a].x + pos[activeLink.b].x) / 2,
-          y: (pos[activeLink.a].y + pos[activeLink.b].y) / 2,
-        }
-      : null;
+  const curve = (a: number, b: number, k = 0) => {
+    // Lines meeting the same card leave from slightly different points.
+    const shift = ((k % 3) - 1) * 12;
+    const p = { ...pos[a], cy: pos[a].cy + shift };
+    const q = { ...pos[b], cy: pos[b].cy + shift };
+    if (Math.abs(p.cx - q.cx) > CARD_W) {
+      // Across the lane: from the side of one card to the side of the other.
+      const [l, r] = p.cx < q.cx ? [p, q] : [q, p];
+      const x1 = l.x + CARD_W;
+      const x2 = r.x;
+      const mx = (x1 + x2) / 2;
+      return {
+        d: `M ${x1} ${l.cy} C ${mx} ${l.cy}, ${mx} ${r.cy}, ${x2} ${r.cy}`,
+        mx,
+        my: (l.cy + r.cy) / 2,
+      };
+    }
+    // Same column: out into the lane and back, so it never runs through a card.
+    const [t, u] = p.cy < q.cy ? [p, q] : [q, p];
+    const side = t.x < W / 2 ? 1 : -1;
+    const x = side > 0 ? t.x + CARD_W : t.x;
+    const reach = 70 * side;
+    return {
+      d: `M ${x} ${t.cy} C ${x + reach} ${t.cy}, ${x + reach} ${u.cy}, ${x} ${u.cy}`,
+      mx: x + reach * 0.75,
+      my: (t.cy + u.cy) / 2,
+    };
+  };
+  const detail = active !== null ? shown[active] : null;
+  const link = activeLink !== null ? visible[activeLink] : null;
 
   return (
-    <figure className="mx-auto w-full max-w-2xl">
-      <div className="relative">
+    <figure className="w-full">
+      <style>{MAP_MOTION}</style>
+      {/* Phone: a simple list, each request with its status and connections. */}
+      <ul className="space-y-2 sm:hidden">
+        {shown.map((issue, i) => {
+          const t = tone(issue);
+          const linked = visible.filter((l) => l.a === i || l.b === i).length;
+          return (
+            <li
+              key={`${issue.title}-${i}`}
+              className="pm-in rounded-lg border border-border bg-surface px-3 py-2"
+              style={{ animationDelay: `${i * 60}ms` }}
+            >
+              <p className="text-sm font-medium">{issue.title}</p>
+              <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+                <StatusDot issue={issue} /> {t.label}
+                {linked ? ` · linked to ${linked}` : ""}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+      <div
+        className="relative mx-auto hidden w-full max-w-3xl sm:block"
+        style={{ aspectRatio: `${W} / ${H}` }}
+        onMouseLeave={() => {
+          setActive(null);
+          setActiveLink(null);
+        }}
+      >
         <svg
           viewBox={`0 0 ${W} ${H}`}
-          className="block h-auto w-full rounded-xl bg-[#1b1830]"
-          role="img"
-          aria-label={`Problem Map: ${n} requests, ${visible.length} connections`}
-          onMouseLeave={() => {
-            setHover(null);
-            setHoverLink(null);
-          }}
+          className="absolute inset-0 h-full w-full overflow-visible"
+          aria-hidden="true"
         >
           {visible.map((l, k) => {
-            const a = pos[l.a];
-            const b = pos[l.b];
-            const dashed = l.type === "part_of" || l.type === "depends_on";
+            const { d } = curve(l.a, l.b, k);
             const lit =
-              hover === null ? hoverLink === k : l.a === hover || l.b === hover;
-            // Lines run edge to edge; the label sits outside, away from the circles.
-            const dx = b.x - a.x;
-            const dy = b.y - a.y;
-            const len = Math.hypot(dx, dy) || 1;
-            const ra = radius(shown[l.a]) + 3;
-            const rb = radius(shown[l.b]) + 3;
-            const x1 = a.x + (dx / len) * ra;
-            const y1 = a.y + (dy / len) * ra;
-            const x2 = b.x - (dx / len) * rb;
-            const y2 = b.y - (dy / len) * rb;
-            const midX = (a.x + b.x) / 2;
-            const midY = (a.y + b.y) / 2;
-            const out = Math.hypot(midX - cx, midY - cy);
-            const push = out > 1 ? 18 / out : 0;
-            const mx = midX + (midX - cx) * push;
-            const my = midY + (midY - cy) * push;
-            const label = LINK_LABEL[l.type] ?? l.type;
+              activeLink === k ||
+              (active !== null && (l.a === active || l.b === active));
+            const faded = active !== null && !lit;
+            const dashed = l.type === "part_of" || l.type === "depends_on";
             return (
               <g
                 key={k}
-                className="cursor-help"
-                opacity={hover !== null && !lit ? 0.25 : 1}
-                onMouseEnter={() => setHoverLink(k)}
-                onMouseLeave={() => setHoverLink(null)}
+                className="cursor-pointer"
+                onMouseEnter={() => {
+                  setActiveLink(k);
+                  setActive(null);
+                }}
+                onClick={() => setActiveLink(k)}
               >
-                {/* A wide invisible line makes the thin one easy to hover. */}
-                <line
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke="transparent"
-                  strokeWidth={16}
-                />
-                <line
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke={lit ? "#c4b8ff" : "#8b7cf8"}
+                <path d={d} stroke="transparent" strokeWidth={18} fill="none" />
+                <path
+                  d={d}
+                  fill="none"
+                  pathLength={1}
+                  className={dashed ? "pm-fade" : "pm-draw"}
+                  style={{
+                    animationDelay: `${n * 70 + k * 120}ms`,
+                    opacity: faded ? 0.2 : 1,
+                    transition: "opacity 200ms, stroke-width 200ms",
+                  }}
+                  stroke={lit ? "#7c6cf7" : "#8b7cf8"}
                   strokeWidth={lit ? 3 : 2}
-                  strokeDasharray={dashed ? "7 5" : undefined}
+                  strokeLinecap="round"
+                  strokeDasharray={dashed ? "0.03 0.025" : undefined}
                 />
-                <rect
-                  x={mx - label.length * 3.4 - 8}
-                  y={my - 11}
-                  width={label.length * 6.8 + 16}
-                  height={22}
-                  rx={11}
-                  fill="#2a2546"
-                  stroke="#4b4280"
-                />
-                <text
-                  x={mx}
-                  y={my + 4}
-                  textAnchor="middle"
-                  fontSize="11"
-                  fill="#e4e0ff"
-                >
-                  {label}
-                </text>
-              </g>
-            );
-          })}
-          {shown.map((issue, i) => {
-            const t = tone(issue);
-            const r = radius(issue);
-            const p = pos[i];
-            return (
-              <g
-                key={`${issue.title}-${i}`}
-                tabIndex={0}
-                role="button"
-                aria-label={`${issue.title}: ${t.label}`}
-                className="cursor-pointer outline-none"
-                opacity={dim(i) ? 0.3 : 1}
-                onMouseEnter={() => setHover(i)}
-                onFocus={() => setHover(i)}
-                onBlur={() => setHover(null)}
-              >
-                <circle
-                  cx={p.x}
-                  cy={p.y}
-                  r={r + (hover === i ? 3 : 0)}
-                  fill={t.fill}
-                  stroke={hover === i ? "#ffffff" : t.ring}
-                  strokeWidth={t.label === "Noted" ? 3 : 2}
-                />
-                <text
-                  x={p.x}
-                  y={p.y + r + 16}
-                  textAnchor="middle"
-                  fontSize="12"
-                  fontWeight="600"
-                  fill="#ffffff"
-                >
-                  {short(issue.title)}
-                </text>
               </g>
             );
           })}
         </svg>
-        {tip && (active || activeLink) && (
-          <div
-            role="tooltip"
-            className="pointer-events-none absolute z-10 w-64 -translate-x-1/2 rounded-lg border border-border bg-surface p-3 text-left text-xs shadow-lg"
-            style={{
-              left: `${Math.min(85, Math.max(15, (tip.x / W) * 100))}%`,
-              top: `${(tip.y / H) * 100}%`,
-              transform: `translate(-50%, ${tip.y > H / 2 ? "calc(-100% - 18px)" : "18px"})`,
-            }}
-          >
-            {active ? (
-              <>
-                <p className="text-[13px] font-semibold">{active.title}</p>
-                <p className="mt-1">
-                  <span
-                    className="mr-1 inline-block size-2 rounded-full align-middle"
-                    style={{ background: tone(active).ring }}
-                  />
-                  {tone(active).label} ·{" "}
-                  {STAGES.find(([k]) => k === active.stage)?.[1] ??
-                    active.stage}
-                </p>
-                {active.summary && (
-                  <p className="mt-1 text-muted-foreground">{active.summary}</p>
-                )}
-                {active.next_step && (
-                  <p className="mt-1">
-                    <span className="font-medium">Next: </span>
-                    {active.next_step}
-                  </p>
-                )}
-              </>
-            ) : activeLink ? (
-              <>
-                <p className="text-[13px] font-semibold">
-                  {activeLink.a_title} ↔ {activeLink.b_title}
-                </p>
-                <p className="mt-1">{activeLink.reason}</p>
-                {activeLink.benefit && (
-                  <p className="mt-1 text-muted-foreground">
-                    {activeLink.benefit}
-                  </p>
-                )}
-              </>
-            ) : null}
-          </div>
+        {visible.map((l, k) => {
+          const { mx, my } = curve(l.a, l.b, k);
+          const faded = active !== null && !(l.a === active || l.b === active);
+          return (
+            <button
+              type="button"
+              key={`label-${k}`}
+              onMouseEnter={() => {
+                setActiveLink(k);
+                setActive(null);
+              }}
+              onFocus={() => setActiveLink(k)}
+              className="pm-fade absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/30 bg-surface px-2 py-0.5 text-[11px] font-medium whitespace-nowrap text-foreground shadow-sm transition-opacity"
+              style={{
+                left: `${(mx / W) * 100}%`,
+                top: `${(my / H) * 100}%`,
+                opacity: faded ? 0.25 : 1,
+                animationDelay: `${n * 70 + k * 120 + 300}ms`,
+              }}
+            >
+              {l.reason || LINK_LABEL[l.type] || l.type}
+            </button>
+          );
+        })}
+        {shown.map((issue, i) => {
+          const t = tone(issue);
+          const p = pos[i];
+          const waiting = t.label === "Waiting on them";
+          const dim = active !== null && active !== i && !touches(i);
+          return (
+            <button
+              type="button"
+              key={`${issue.title}-${i}`}
+              onMouseEnter={() => {
+                setActive(i);
+                setActiveLink(null);
+              }}
+              onFocus={() => {
+                setActive(i);
+                setActiveLink(null);
+              }}
+              onClick={() => setActive(i)}
+              aria-label={`${issue.title}: ${t.label}`}
+              className={cn(
+                "pm-in absolute flex flex-col justify-center gap-1 rounded-xl border bg-surface px-3 text-left shadow-sm transition-[opacity,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary",
+                active === i ? "border-primary shadow-md" : "border-border",
+                waiting && "pm-pulse",
+              )}
+              style={{
+                left: `${(p.x / W) * 100}%`,
+                top: `${(p.y / H) * 100}%`,
+                width: `${(CARD_W / W) * 100}%`,
+                height: `${(CARD_H / H) * 100}%`,
+                opacity: dim ? 0.35 : 1,
+                animationDelay: `${i * 70}ms`,
+                borderLeft: `4px solid ${t.ring}`,
+              }}
+            >
+              <span className="line-clamp-2 text-[13px] leading-tight font-semibold">
+                {issue.title}
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                <StatusDot issue={issue} />
+                {t.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <div
+        className="mt-3 min-h-[3.25rem] rounded-lg bg-surface-muted px-3 py-2 text-xs"
+        aria-live="polite"
+      >
+        {detail ? (
+          <>
+            <p className="text-[13px] font-semibold">{detail.title}</p>
+            <p className="mt-0.5 text-muted-foreground">
+              {tone(detail).label} ·{" "}
+              {STAGES.find(([k]) => k === detail.stage)?.[1] ?? detail.stage}
+              {detail.summary ? ` · ${detail.summary}` : ""}
+            </p>
+            {detail.next_step && (
+              <p className="mt-0.5">
+                <span className="font-medium">Next: </span>
+                {detail.next_step}
+              </p>
+            )}
+          </>
+        ) : link ? (
+          <>
+            <p className="text-[13px] font-semibold">
+              {link.a_title} ↔ {link.b_title}
+            </p>
+            <p className="mt-0.5">{link.reason}</p>
+            {link.benefit && (
+              <p className="mt-0.5 text-muted-foreground">{link.benefit}</p>
+            )}
+          </>
+        ) : (
+          <p className="pt-1 text-muted-foreground">
+            Point at a request or a line to see what it is, whose turn it is and
+            why pi connected them.
+          </p>
         )}
       </div>
       <figcaption className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
@@ -516,10 +546,7 @@ function ProblemMap({
             {label}
           </span>
         ))}
-        <span>
-          Solid line: shared data / same cause · dashed: part of / depends on
-        </span>
-        <span>Hover a circle or line for details</span>
+        {visible.length > 0 && <span>Dashed line: part of / depends on</span>}
       </figcaption>
       {issues.length > shown.length && (
         <p className="mt-1 text-xs text-muted-foreground">
@@ -529,6 +556,35 @@ function ProblemMap({
     </figure>
   );
 }
+
+function StatusDot({ issue }: { issue: Issue }) {
+  const t = tone(issue);
+  return t.label === "Noted" ? (
+    <span
+      className="inline-block size-2.5 shrink-0 rounded-full border-2"
+      style={{ borderColor: t.ring }}
+    />
+  ) : (
+    <span
+      className="inline-block size-2.5 shrink-0 rounded-full"
+      style={{ background: t.ring }}
+    />
+  );
+}
+
+const MAP_MOTION = `
+@keyframes pm-in { from { opacity: 0; transform: translateY(8px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes pm-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes pm-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pm-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(245,165,36,.45); } 50% { box-shadow: 0 0 0 6px rgba(245,165,36,0); } }
+.pm-in { animation: pm-in 420ms cubic-bezier(.2,.8,.2,1) both; }
+.pm-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: pm-draw 700ms ease-out forwards; }
+.pm-fade { animation: pm-fade 500ms ease-out both; }
+.pm-pulse { animation: pm-in 420ms cubic-bezier(.2,.8,.2,1) both, pm-pulse 2.4s ease-in-out 1s infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .pm-in, .pm-draw, .pm-fade, .pm-pulse { animation: none !important; stroke-dashoffset: 0; }
+}
+`;
 
 /** How many requests sit at each stage of the journey. */
 function StageChart({

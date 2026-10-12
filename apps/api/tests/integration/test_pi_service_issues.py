@@ -63,3 +63,27 @@ async def test_service_problems_stay_off_the_problem_map(app, provider, business
     assert kept["title"] == "Invoice download issue"
     await business.aclose()
     await customer.aclose()
+
+
+async def test_a_request_for_work_always_stays_on_the_map(app, provider, business_db, monkeypatch):
+    wrong = IssueReport(
+        headline="Waiting on the team",
+        issues=[
+            # The model wrongly marks the customer's own request as a service matter.
+            Issue(title="ERP System Requirements", category="inquiry", about_service=True),
+            Issue(title="Invoice download issue", category="support", about_service=True),
+        ],
+    )
+
+    async def complete(self, scope, output, **kwargs):
+        return SimpleNamespace(value=wrong, response=SimpleNamespace(attempts=[]))
+
+    business = await _business_with_chat(app, provider, business_db, monkeypatch)
+    customer = await _sign_in(app, provider)
+    conversation_id = (await customer.get(f"{PORTAL}/conversations")).json()[0]["id"]
+    monkeypatch.setattr(LLMManager, "complete_structured", complete)
+    await customer.get(f"{PORTAL}/conversations/{conversation_id}/issues")
+    listed = (await customer.get(f"{PORTAL}/conversations")).json()[0]
+    assert [i["title"] for i in listed["issues"]] == ["ERP System Requirements"]
+    await business.aclose()
+    await customer.aclose()
