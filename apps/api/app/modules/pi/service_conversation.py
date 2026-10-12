@@ -344,8 +344,10 @@ Ideas: when the customer asks for ideas, suggestions or options ("idea do", "kya
 Meetings: when the customer asks for a meeting, call, visit or appointment, set
    meeting_requested=true. If bookable_services has slots, offer up to three slot labels
    verbatim and book with action="booking" only when they pick one. If there are no
-   slots, set request_human=true and say the meeting request has been passed to the team,
-   who will confirm a time here. Never invent a time or say it is booked.
+   slots, keep the chat (request_human stays false): ask which days and times suit them
+   if they haven't said, and say the team will propose a time here. Never invent a time
+   or say it is booked. A team answer about the meeting (team_answer_now / team_notes)
+   is the time to confirm to them.
 4. Share facts from approved_knowledge that answer the customer's obvious next worry
    (what's included, how long, how they'll receive it) without being asked. Never invent
    them, and never promise a price or a date.
@@ -1063,9 +1065,6 @@ async def compose_service_turn(
         turn.reply = HEARD_LINE.sub("", turn.reply, count=1).strip() or turn.reply
     if turn.mood == "frustrated" and (context.get("brief") or {}).get("mood") == "frustrated":
         turn.request_human = True  # Still upset after pi's last answer: a person takes over.
-    slots = any(service.get("slots") for service in context.get("bookable_services", []))
-    if turn.meeting_requested and not slots and turn.action != "booking":
-        turn.request_human = True  # Nothing pi can book: a person arranges the meeting.
     if turn.mood == "urgent" and turn.action_priority in ("low", "normal"):
         turn.action_priority = "high"
     if context.get("operator_review_required"):
@@ -1182,18 +1181,12 @@ async def save_service_turn(
         due = await _follow_deal(session, scope, conversation, lead, previous, turn)
         if due is not None:
             proposals_due.append(due)
-    if turn.meeting_requested and not previous.get("meeting_requested"):
-        await notify(
-            session,
-            scope,
-            "pi.meeting_request",
-            "A customer wants a meeting",
-            turn.summary,
-            link=f"/pi/inbox?conversation={conversation.id}",
-            permission="pi.read",
-            severity="warning",
-            dedupe_key=f"pi-meeting:{conversation.id}",
-        )
+    if (
+        turn.meeting_requested
+        and turn.action != "booking"
+        and (not previous.get("meeting_requested") or asks_for_meeting(message.body))
+    ):
+        await ask_for_meeting(session, scope, conversation, turn.summary, message.body)
     for gap in new_gaps:
         digest = hashlib.sha256(gap.lower().encode()).hexdigest()[:16]
         await notify(
@@ -1299,6 +1292,61 @@ async def _follow_deal(
             logger.warning("deal_proposal_check_skipped", exc_info=True)
     conversation.service_brief = brief
     return due
+
+
+MEETING_WORDS = re.compile(
+    r"\b(meeting|meet up|meet you|call me|a call|video call|zoom|google meet|demo|"
+    r"visit (your|the) (office|shop|store|showroom)|site visit|appointment|"
+    r"mulaqat|mulakat|milna|milte|baat kar|call kar|reunion|cita|rendez-vous|termin)\b"
+    r"|ملاقات|میٹنگ|اجتماع|موعد|मुलाकात|मीटिंग",
+    re.IGNORECASE,
+)
+
+
+def asks_for_meeting(text: str | None) -> bool:
+    """The customer's own message asks for a meeting, call, demo or visit."""
+    return bool(text and MEETING_WORDS.search(text))
+
+
+async def ask_for_meeting(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    summary: str,
+    latest: str,
+) -> None:
+    """The customer wants a meeting pi can't book itself: a "meeting" request on the
+    team's desk (one per chat; later messages add to it). Without the desk, the old
+    notification."""
+    from app.modules.pi_saas.requests import raise_request
+
+    if conversation.customer_id is not None:
+        try:
+            async with session.begin_nested():
+                await raise_request(
+                    session,
+                    scope,
+                    conversation_id=conversation.id,
+                    customer_id=conversation.customer_id,
+                    kind="meeting",
+                    question=f"The customer wants a meeting. They said: {latest[:600]}",
+                    context=summary,
+                    priority="high",
+                )
+            return
+        except DBAPIError:
+            logger.warning("pi_meeting_request_skipped", exc_info=True)
+    await notify(
+        session,
+        scope,
+        "pi.meeting_request",
+        "A customer wants a meeting",
+        summary,
+        link=f"/pi/inbox?conversation={conversation.id}",
+        permission="pi.read",
+        severity="warning",
+        dedupe_key=f"pi-meeting:{conversation.id}",
+    )
 
 
 async def _team_notes(

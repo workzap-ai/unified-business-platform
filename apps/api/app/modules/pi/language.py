@@ -109,6 +109,13 @@ MEDIA_NOTICES = {
     "roman_ur": "Attachment bhejne ka shukriya. Hamari team ise dekh kar yahan jawab degi.",
     "ar": "شكرًا على المرفق. سيراجعه أحد أعضاء فريقنا ويرد عليك هنا.",
 }
+MEETING_NOTICES = {
+    "en": "Happy to set up a meeting. Which days and times suit you? "
+    "Our team will confirm a time here.",
+    "roman_ur": "Zaroor, meeting rakh lete hain. Aap ko kaun se din aur waqt theek rahenge? "
+    "Hamari team yahan waqt confirm kar degi.",
+    "ar": "يسعدنا ترتيب اجتماع. ما الأيام والأوقات المناسبة لك؟ سيؤكد فريقنا الموعد هنا.",
+}
 
 
 def notice_in(notices: dict[str, str], language: str | None) -> str:

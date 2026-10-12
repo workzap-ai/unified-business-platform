@@ -10,6 +10,8 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import or_
+from sqlalchemy.exc import DBAPIError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.manager import build_llm_manager
 from app.core import rate_limit
@@ -22,9 +24,11 @@ from app.modules.orders.models import Order
 from app.modules.pi.service import require_pi
 from app.modules.pi_saas import deal_followups, deals
 from app.modules.pi_saas.deal_models import PAYMENT_DEFAULTS, PiDocument
+from app.modules.pi_saas.models import PiBooking, PiStaffRequest
 from app.modules.quotes.models import Quote
 from app.modules.sales.models import SalesLead
 from app.shared.errors import BusinessRuleViolation
+from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
 
 router = APIRouter(prefix="/pi/deals", tags=["pi-deals"])
@@ -314,6 +318,63 @@ def _step(key: str, label: str, at: Any, done: bool, detail: str = "") -> dict[s
     return {"key": key, "label": label, "at": at, "done": done, "detail": detail}
 
 
+async def _meeting(
+    session: AsyncSession, scope: WorkspaceScope, lead: SalesLead
+) -> dict[str, Any] | None:
+    """The deal's meeting, when the customer asked for one: booked (a booking in the
+    chat), arranged (the team answered with a time) or requested (waiting on the team)."""
+    if lead.conversation_id is None:
+        return None
+    try:
+        async with session.begin_nested():
+            booking = await session.scalar(
+                WorkspaceRepository(session, PiBooking, scope)
+                .select()
+                .where(
+                    PiBooking.conversation_id == lead.conversation_id,
+                    PiBooking.status != "cancelled",
+                )
+                .order_by(PiBooking.starts_at.desc())
+                .limit(1)
+            )
+            request = await session.scalar(
+                WorkspaceRepository(session, PiStaffRequest, scope)
+                .select()
+                .where(
+                    PiStaffRequest.conversation_id == lead.conversation_id,
+                    PiStaffRequest.kind == "meeting",
+                    PiStaffRequest.status != "dismissed",
+                )
+                .order_by(PiStaffRequest.created_at.desc())
+                .limit(1)
+            )
+    except DBAPIError:
+        return None
+    if booking is not None and (request is None or booking.created_at >= request.created_at):
+        done = booking.status == "completed" or booking.ends_at < datetime.now(UTC)
+        return {
+            "status": "done" if done else "booked",
+            "at": booking.starts_at,
+            "detail": f"{booking.starts_at:%a %d %b, %H:%M} ({booking.timezone})",
+            "request_id": None,
+        }
+    if request is None:
+        return None
+    if request.status == "open":
+        return {
+            "status": "requested",
+            "at": request.created_at,
+            "detail": "Waiting for the team to propose a time",
+            "request_id": request.id,
+        }
+    return {
+        "status": "arranged",
+        "at": request.resolved_at,
+        "detail": (request.answer or "")[:200],
+        "request_id": request.id,
+    }
+
+
 @router.get("/leads/{lead_id}/journey")
 async def journey(lead_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
     """Every step of one deal, from the enquiry to the payment, plus the one thing the
@@ -355,6 +416,7 @@ async def journey(lead_id: UUID, scope: Scope, session: Session) -> dict[str, An
         else None
     )
     briefed = lead.stage != "new" or quote is not None
+    meeting = await _meeting(session, scope, lead)
     steps = [
         _step(
             "enquiry",
@@ -417,11 +479,29 @@ async def journey(lead_id: UUID, scope: Scope, session: Session) -> dict[str, An
             bool(invoice and invoice.status == "paid"),
         ),
     ]
+    if meeting is not None:
+        # Only deals where the customer asked for one show the meeting, after the brief.
+        steps.insert(
+            2,
+            _step(
+                "meeting",
+                {
+                    "requested": "Meeting requested",
+                    "arranged": "Meeting time sent",
+                    "booked": "Meeting booked",
+                    "done": "Meeting held",
+                }[meeting["status"]],
+                meeting["at"],
+                meeting["status"] != "requested",
+                meeting["detail"],
+            ),
+        )
     return {
         "lead_id": lead.id,
         "stage": lead.stage,
         "steps": steps,
-        "next": _guide(lead, quote, doc, invoice, settings),
+        "meeting": meeting,
+        "next": _guide(lead, quote, doc, invoice, settings, meeting),
         "reminder": (
             deal_followups.next_reminder(doc, quote, invoice, datetime.now(UTC))
             if settings["auto_followups"] and lead.stage != "lost"
@@ -440,6 +520,7 @@ def _guide(
     doc: PiDocument | None,
     invoice: Invoice | None,
     settings: dict[str, Any],
+    meeting: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """The next step in plain words. ``action`` is a button the page can run; ``href``
     opens the page where the team does it; ``auto`` says pi handles it alone."""
@@ -465,6 +546,13 @@ def _guide(
         )
     if lead.customer_id is None:
         return step("Link a customer", "Add the customer so pi can reach them on WhatsApp.", "edit")
+    if meeting is not None and meeting["status"] == "requested":
+        return step(
+            "Arrange the meeting",
+            "The customer asked for a meeting. Answer the request with a time (and a link "
+            "or place); pi confirms it to them on WhatsApp.",
+            href=f"/pi/requests?request={meeting['request_id']}",
+        )
     if quote is None:
         if lead.stage == "new" and lead.source == "pi":
             return step(

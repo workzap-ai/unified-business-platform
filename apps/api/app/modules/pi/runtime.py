@@ -35,7 +35,13 @@ from app.modules.pi.agents import AgentContext, run_specialists
 from app.modules.pi.configuration import seed_agents, settings_row
 from app.modules.pi.graph import AGENTS, RouteState, keyword_intent, route_message
 from app.modules.pi.guard import ReplyRejected, rate_limited, validate_reply
-from app.modules.pi.language import HANDOFF_NOTICES, MEDIA_NOTICES, detect_language, notice_in
+from app.modules.pi.language import (
+    HANDOFF_NOTICES,
+    MEDIA_NOTICES,
+    MEETING_NOTICES,
+    detect_language,
+    notice_in,
+)
 from app.modules.pi.models import (
     PiAgent,
     PiAgentRun,
@@ -52,6 +58,8 @@ from app.modules.pi.service import HANDOFF_NOTICE, PiService
 from app.modules.pi.service_conversation import (
     ServiceTurn,
     allowed_text,
+    ask_for_meeting,
+    asks_for_meeting,
     compose_service_turn,
     prepare_context,
     run_service_action,
@@ -898,6 +906,30 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 run.error_code = exc.code
                 handoff_reason = handoff_reason or "policy"
                 handoff_summary = "A generated reply failed validation and was not sent."
+        if (
+            service_turn is None
+            and handoff_reason in (None, "customer_request", "low_confidence")
+            and not keyword_handoff
+            and conversation.customer_id is not None
+            and asks_for_meeting(message.body)
+        ):
+            # Any business: a meeting, call, demo or visit goes on the team's request
+            # desk and pi keeps the chat (the team's time comes back through pi).
+            await ask_for_meeting(
+                session,
+                scope,
+                conversation,
+                f"Customer asked for a meeting: {message.body[:300]}",
+                message.body,
+            )
+            if handoff_reason is not None:
+                handoff_reason = None
+                if not outbound:
+                    text = _localized(MEETING_NOTICES, message.body, conversation.language)
+                    sent = await agent_ctx.tool("router", "send_whatsapp_message", {"body": text})
+                    if sent.ok and sent.data is not None:
+                        outbound.append(str(sent.data["message_id"]))
+                run.agent_path = [*run.agent_path, "meeting_request"]
         if service_turn is not None and service_turn.proposal_answer != "none" and outbound:
             # They answered the proposal in the chat: the same steps as its page's buttons
             # (accepted → order, invoice and payment link, sent after pi's reply).

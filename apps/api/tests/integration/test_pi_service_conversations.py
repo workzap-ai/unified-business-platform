@@ -550,13 +550,15 @@ async def test_unknown_answers_reach_the_team_and_a_frustrated_customer_gets_a_p
     await pi.close()
 
 
-async def test_meeting_without_bookable_times_goes_to_the_team_and_tells_the_admins(
+async def test_meeting_without_bookable_times_goes_on_the_desk_and_pi_keeps_the_chat(
     api, business_db, monkeypatch
 ):
+    from app.modules.pi_saas.models import PiStaffRequest
+
     mock_turns(
         monkeypatch,
         turn(
-            reply="Meeting ki request team ko bhej di hai; woh yahin time confirm karenge.",
+            reply="Zaroor! Aap ko kaun se din theek rahenge? Team yahin time confirm karegi.",
             meeting_requested=True,
         ),
     )
@@ -564,14 +566,21 @@ async def test_meeting_without_bookable_times_goes_to_the_team_and_tells_the_adm
     await pi.process("Kya hum kal meeting kar sakte hain?", "meet-1")
     await pi.deliver_all()
     conversation = await pi.conversation()
-    assert conversation.mode == "human"  # pi has no times to offer: a person arranges it
+    assert conversation.mode == "ai"  # the team arranges the time; pi keeps talking
     assert conversation.service_brief["meeting_requested"] is True
+    [request] = list(
+        await business_db.scalars(
+            select(PiStaffRequest).where(PiStaffRequest.conversation_id == conversation.id)
+        )
+    )
+    assert request.kind == "meeting" and request.status == "open"
+    assert request.priority == "high" and "kal meeting" in request.question
     kinds = set(
         await business_db.scalars(
             select(Notification.kind).where(Notification.tenant_id == conversation.tenant_id)
         )
     )
-    assert {"pi.meeting_request", "pi.handoff"} <= kinds
+    assert "pi.request.meeting" in kinds and "pi.handoff" not in kinds
     await pi.close()
 
 
