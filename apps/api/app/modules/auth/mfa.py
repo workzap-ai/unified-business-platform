@@ -14,6 +14,8 @@ password first.
 """
 
 import asyncio
+import hashlib
+import hmac
 import logging
 import secrets
 from datetime import UTC, datetime, timedelta
@@ -35,7 +37,9 @@ from webauthn.helpers.structs import UserVerificationRequirement
 from app.core.audience import Audience
 from app.core.rate_limit import client_ip, hit
 from app.integrations.crypto import CredentialManager
+from app.integrations.email import send_platform_template
 from app.integrations.errors import IntegrationError
+from app.integrations.http import OutboundClient
 from app.modules.audit.service import record
 from app.modules.auth import face
 from app.modules.auth.crypto import verify_password
@@ -73,6 +77,7 @@ TICKET_SECONDS = 300
 MAX_FAILURES = 5
 LOCK_MINUTES = 15
 MAX_FACES = 3
+CODE_SECONDS = 10 * 60
 
 
 def _now() -> datetime:
@@ -124,9 +129,19 @@ async def second_step(
     return await open_ticket(request, user, methods, audience) if methods else None
 
 
+def email_ready(request: Request) -> bool:
+    """A code by email is offered only when the platform can send email."""
+    settings = request.app.state.settings
+    return bool(settings.platform_smtp_host and settings.platform_smtp_from)
+
+
 async def open_ticket(
     request: Request, user: PlatformUser, methods: list[str], audience: Audience = "owner_os"
 ) -> dict[str, Any]:
+    # Not every device has a fingerprint or face unlock (a PC without Windows Hello):
+    # a code sent to the account's email is the second step that works anywhere.
+    if methods and "email" not in methods and email_ready(request):
+        methods = [*methods, "email"]
     ticket = secrets.token_urlsafe(24)
     await _store(request).put(
         f"mfa:{ticket}",
@@ -198,7 +213,10 @@ async def _failed(
         return BusinessRuleViolation(
             "SECOND_STEP_LOCKED", f"Too many tries. Try again in {LOCK_MINUTES} minutes.", 423
         )
-    what = "That doesn't look like you" if method == "face" else "That fingerprint didn't work"
+    what = {
+        "face": "That doesn't look like you",
+        "email": "That code didn't work",
+    }.get(method, "That fingerprint didn't work")
     return BusinessRuleViolation(
         "SECOND_STEP_FAILED", f"{what}. {left} {'try' if left == 1 else 'tries'} left.", 401
     )
@@ -254,6 +272,19 @@ async def _read(frames: list[str]) -> list[face.FaceFrame]:
 class TicketOnly(BaseModel):
     model_config = ConfigDict(extra="forbid")
     ticket: str = Field(min_length=16, max_length=64)
+
+
+class EmailCode(TicketOnly):
+    code: str = Field(pattern=r"^\s*\d{6}\s*$")
+
+
+def _code_digest(ticket: str, code: str) -> str:
+    return hashlib.sha256(f"{ticket}:{code.strip()}".encode()).hexdigest()
+
+
+def _masked(email: str) -> str:
+    name, _, domain = email.partition("@")
+    return f"{name[:2]}{'•' * max(1, len(name) - 2)}@{domain}"
 
 
 class FingerprintCheck(TicketOnly):
@@ -459,6 +490,74 @@ def second_step_router(audience: Audience, site: Site) -> APIRouter:
         passkey.last_used_at = _now()
         return await _success(
             request, response, session, credential, data.ticket, "fingerprint", audience
+        )
+
+    @router.post("/mfa/email/start")
+    async def send_email_code(
+        data: TicketOnly, request: Request, session: Session
+    ) -> dict[str, Any]:
+        """Sends a 6-digit code to the account's email. Only after a correct password
+        (the ticket), at most 3 codes per sign-in and 6 an hour per person."""
+        user_id = await _ticket(request, data.ticket, audience)
+        await _credential(session, user_id)  # locked accounts get no codes
+        if not email_ready(request):
+            raise BusinessRuleViolation("EMAIL_UNAVAILABLE", "Email codes aren't switched on", 503)
+        if not await hit(request, "mfa-email", data.ticket, 3, TICKET_SECONDS) or not await hit(
+            request, "mfa-email-user", str(user_id), 6, 3600
+        ):
+            raise BusinessRuleViolation(
+                "TOO_MANY_CODES", "Too many codes. Wait a few minutes and try again.", 429
+            )
+        user = await session.get(PlatformUser, user_id)
+        if user is None:
+            raise BusinessRuleViolation("SIGN_IN_EXPIRED", "Enter your password again.")
+        code = f"{secrets.randbelow(1_000_000):06d}"
+        store = _store(request)
+        await store.put(
+            f"mfa-email:{data.ticket}", {"digest": _code_digest(data.ticket, code)}, CODE_SECONDS
+        )
+        ticket_data = await store.get(f"mfa:{data.ticket}")
+        if ticket_data is not None:  # The code's 10 minutes, not the ticket's 5.
+            await store.put(f"mfa:{data.ticket}", ticket_data, CODE_SECONDS)
+        settings = request.app.state.settings
+        try:
+            await send_platform_template(
+                settings,
+                OutboundClient(settings, request.app.state.http),
+                "sign_in_code",
+                [user.email],
+                {
+                    "name": user.display_name,
+                    "code": code,
+                    "minutes": str(CODE_SECONDS // 60),
+                },
+            )
+        except (BusinessRuleViolation, IntegrationError):
+            logger.warning("sign_in_code_email_failed", extra={"user_id": str(user_id)})
+            raise BusinessRuleViolation(
+                "EMAIL_FAILED", "We couldn't send the email. Try again in a minute.", 503
+            ) from None
+        return {"sent_to": _masked(user.email), "minutes": CODE_SECONDS // 60}
+
+    @router.post("/mfa/email")
+    async def sign_in_with_email_code(
+        data: EmailCode, request: Request, response: Response, session: Session
+    ) -> Any:
+        user_id = await _ticket(request, data.ticket, audience)
+        credential = await _credential(session, user_id)
+        store = _store(request)
+        saved = await store.get(f"mfa-email:{data.ticket}")
+        if saved is None:
+            raise BusinessRuleViolation(
+                "CODE_EXPIRED", "That code has expired. Send a new one.", 410
+            )
+        if not hmac.compare_digest(
+            str(saved.get("digest", "")), _code_digest(data.ticket, data.code)
+        ):
+            raise await _failed(request, session, credential, data.ticket, "email")
+        await store.delete(f"mfa-email:{data.ticket}")
+        return await _success(
+            request, response, session, credential, data.ticket, "email", audience
         )
 
     @router.get("/faces")

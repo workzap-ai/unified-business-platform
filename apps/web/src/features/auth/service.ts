@@ -36,6 +36,9 @@ export interface AuthService {
   signInWithFace(ticket: string, frames: string[]): Promise<Session>;
   /** Optional second step: the fingerprint (passkey) on this device. */
   signInWithFingerprint(ticket: string): Promise<Session>;
+  /** Second step on any computer: a 6-digit code sent to the account's email. */
+  sendSignInCode(ticket: string): Promise<{ sent_to: string; minutes: number }>;
+  signInWithEmailCode(ticket: string, code: string): Promise<Session>;
   register(input: RegisterInput): Promise<Session>;
   createWorkspace(
     name: string,
@@ -76,6 +79,17 @@ const live: AuthService = {
     fingerprintStep(ticket, (body) =>
       apiRequest("POST", "/auth/mfa/fingerprint", sessionSchema, { body }),
     ).then(bindSession),
+  sendSignInCode: (ticket) =>
+    apiRequest(
+      "POST",
+      "/auth/mfa/email/start",
+      z.object({ sent_to: z.string(), minutes: z.number() }),
+      { body: { ticket } },
+    ),
+  signInWithEmailCode: (ticket, code) =>
+    apiRequest("POST", "/auth/mfa/email", sessionSchema, {
+      body: { ticket, code },
+    }).then(bindSession),
   register: (input) =>
     apiRequest("POST", "/auth/register", sessionSchema, {
       body: input,
@@ -220,6 +234,14 @@ const demo: AuthService = {
   async signInWithFingerprint() {
     await demoDelay(200);
     throw new DemoError("Fingerprint sign-in needs a live API connection.");
+  },
+  async sendSignInCode() {
+    await demoDelay(200);
+    throw new DemoError("Email codes need a live API connection.");
+  },
+  async signInWithEmailCode() {
+    await demoDelay(200);
+    throw new DemoError("Email codes need a live API connection.");
   },
   async acceptInvite() {
     await demoDelay(300);

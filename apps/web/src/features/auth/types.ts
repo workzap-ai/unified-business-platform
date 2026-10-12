@@ -47,7 +47,7 @@ export type LoginInput = { email: string; password: string };
 export type SecondStep = {
   mfa_required: true;
   ticket: string;
-  methods: ("face" | "fingerprint")[];
+  methods: ("face" | "fingerprint" | "email")[];
   frames: number;
   name: string;
 };

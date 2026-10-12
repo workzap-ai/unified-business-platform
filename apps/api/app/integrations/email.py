@@ -107,11 +107,24 @@ TEMPLATES: dict[str, EmailTemplate] = {
         text="Hello $name,\n\nUse this link to choose a new password: $link\n"
         "This link expires in $minutes minutes and can only be used once.\n\n"
         "If you did not request this, ignore this email; your password stays unchanged.",
-        html="<p>Hello $name,</p><p><a href=\"$link\">Choose a new password</a></p>"
+        html='<p>Hello $name,</p><p><a href="$link">Choose a new password</a></p>'
         "<p>This link expires in $minutes minutes and can only be used once.</p>"
         "<p>If you did not request this, ignore this email; your password stays unchanged.</p>",
         variables=frozenset({"name", "link", "minutes", "workspace"}),
         links=frozenset({"link"}),
+    ),
+    # Account-level: the second sign-in step for people whose device has no
+    # fingerprint/face unlock. Only sent after a correct password.
+    "sign_in_code": EmailTemplate(
+        subject="Your sign-in code",
+        text="Hello $name,\n\nYour sign-in code is $code\n"
+        "It works for $minutes minutes, once, after your password.\n\n"
+        "If you are not signing in right now, change your password: someone knows it.",
+        html="<p>Hello $name,</p><p>Your sign-in code is</p>"
+        '<p style="font-size:24px;font-weight:bold;letter-spacing:4px">$code</p>'
+        "<p>It works for $minutes minutes, once, after your password.</p>"
+        "<p>If you are not signing in right now, change your password: someone knows it.</p>",
+        variables=frozenset({"name", "code", "minutes", "workspace"}),
     ),
     "verify_email": EmailTemplate(
         subject="Confirm your email address",

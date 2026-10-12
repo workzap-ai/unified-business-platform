@@ -218,9 +218,10 @@ function SecondStepForm({
 }) {
   const hasFace = step.methods.includes("face");
   const hasFingerprint = step.methods.includes("fingerprint");
+  const hasEmail = step.methods.includes("email");
   // The phone's own lock first (one touch, like banking apps); the camera otherwise.
-  const [mode, setMode] = useState<"face" | "fingerprint">(
-    hasFingerprint ? "fingerprint" : "face",
+  const [mode, setMode] = useState<Mode>(
+    hasFingerprint ? "fingerprint" : hasFace ? "face" : "email",
   );
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -234,9 +235,11 @@ function SecondStepForm({
     void deviceUnlockAvailable().then((available) => {
       if (available) return;
       setNoDeviceLock(true);
-      if (hasFace) setMode("face"); // the camera works on any computer
+      // The camera or an email code work on any computer.
+      if (hasFace) setMode("face");
+      else if (hasEmail) setMode("email");
     });
-  }, [hasFace]);
+  }, [hasFace, hasEmail]);
 
   function explain(e: unknown, fallback: string): string {
     if (e instanceof ApiError && e.code === "SIGN_IN_EXPIRED") {
@@ -274,14 +277,24 @@ function SecondStepForm({
         <ArrowLeft className="size-4" aria-hidden /> Back
       </button>
       <h1 className="text-2xl font-semibold tracking-tight">
-        {mode === "face" ? "Show your face" : `Use your ${unlock}`}
+        {mode === "face"
+          ? "Show your face"
+          : mode === "email"
+            ? "Enter the code from your email"
+            : `Use your ${unlock}`}
       </h1>
       <p className="mt-1.5 text-sm text-muted-foreground">
         Hi {step.name}. Your password was right; one more check keeps your
         account safe.
       </p>
       <div className="mt-6">
-        {mode === "face" ? (
+        {mode === "email" ? (
+          <EmailCodeForm
+            ticket={step.ticket}
+            onDone={onDone}
+            explain={(e) => explain(e, "That code didn't work.")}
+          />
+        ) : mode === "face" ? (
           <FaceCamera
             probe={(frame) => probeFace(step.ticket, frame)}
             autoStart
@@ -321,23 +334,143 @@ function SecondStepForm({
           </div>
         )}
       </div>
-      {hasFace && hasFingerprint ? (
-        <p className="mt-5 text-center text-sm">
-          <button
-            type="button"
-            className="font-medium text-primary hover:underline"
-            onClick={() => {
-              setError(null);
-              setMode(mode === "face" ? "fingerprint" : "face");
-            }}
-          >
-            {mode === "face"
-              ? `Use your phone lock (${unlock}) instead`
-              : "Use the camera face check instead"}
-          </button>
-        </p>
-      ) : null}
+      <div className="mt-5 flex flex-col items-center gap-2 text-sm">
+        {(
+          [
+            [
+              "fingerprint",
+              hasFingerprint,
+              `Use your phone lock (${unlock}) instead`,
+            ],
+            ["face", hasFace, "Use the camera face check instead"],
+            ["email", hasEmail, "Email me a code instead"],
+          ] as const
+        )
+          .filter(([m, has]) => has && m !== mode)
+          .map(([m, , label]) => (
+            <button
+              key={m}
+              type="button"
+              className="font-medium text-primary hover:underline"
+              onClick={() => {
+                setError(null);
+                setMode(m);
+              }}
+            >
+              {label}
+            </button>
+          ))}
+      </div>
     </div>
+  );
+}
+
+type Mode = "face" | "fingerprint" | "email";
+
+/** The second step on any computer: a 6-digit code sent to the account's email. */
+function EmailCodeForm({
+  ticket,
+  onDone,
+  explain,
+}: {
+  ticket: string;
+  onDone: (
+    session: Awaited<ReturnType<typeof authService.signInWithEmailCode>>,
+  ) => Promise<void>;
+  explain: (e: unknown) => string;
+}) {
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function send() {
+    setError(null);
+    setBusy(true);
+    try {
+      setSentTo((await authService.sendSignInCode(ticket)).sent_to);
+      setCode("");
+    } catch (e) {
+      const message = explain(e);
+      if (message) setError(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function check() {
+    setError(null);
+    setBusy(true);
+    try {
+      await onDone(await authService.signInWithEmailCode(ticket, code.trim()));
+    } catch (e) {
+      const message = explain(e);
+      if (message) setError(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (sentTo === null) {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-muted-foreground">
+          We&apos;ll email a 6-digit code to the address on your account. It
+          works for 10 minutes.
+        </p>
+        {error ? <InlineError message={error} /> : null}
+        <Button
+          size="lg"
+          className="w-full"
+          loading={busy}
+          onClick={() => void send()}
+        >
+          Email me a code
+        </Button>
+      </div>
+    );
+  }
+  return (
+    <form
+      className="space-y-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        void check();
+      }}
+    >
+      <FormField
+        label={`Code sent to ${sentTo}`}
+        htmlFor="sign-in-code"
+        error={error ?? undefined}
+      >
+        <Input
+          id="sign-in-code"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          maxLength={6}
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+          autoFocus
+        />
+      </FormField>
+      <Button
+        type="submit"
+        size="lg"
+        className="w-full"
+        loading={busy}
+        disabled={code.length !== 6}
+      >
+        Sign in
+      </Button>
+      <button
+        type="button"
+        className="w-full text-center text-sm font-medium text-primary hover:underline"
+        disabled={busy}
+        onClick={() => void send()}
+      >
+        Send a new code
+      </button>
+    </form>
   );
 }
 

@@ -48,7 +48,7 @@ import type { SessionView } from "@/lib/types";
 export interface SecondStep {
   mfa_required: true;
   ticket: string;
-  methods: ("face" | "fingerprint")[];
+  methods: ("face" | "fingerprint" | "email")[];
   frames: number;
   name: string;
 }
@@ -83,9 +83,10 @@ export function SecondStepForm({
 }) {
   const hasFace = step.methods.includes("face");
   const hasFingerprint = step.methods.includes("fingerprint");
-  const [mode, setMode] = React.useState<"face" | "fingerprint">(
+  const hasEmail = step.methods.includes("email");
+  const [mode, setMode] = React.useState<Mode>(
     // The phone's own lock first (one touch, like banking apps); the camera otherwise.
-    hasFingerprint ? "fingerprint" : "face",
+    hasFingerprint ? "fingerprint" : hasFace ? "face" : "email",
   );
   const [error, setError] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
@@ -97,9 +98,11 @@ export function SecondStepForm({
     void deviceUnlockAvailable().then((available) => {
       if (available) return;
       setNoDeviceLock(true);
-      if (hasFace) setMode("face"); // the camera works on any computer
+      // The camera or an email code work on any computer.
+      if (hasFace) setMode("face");
+      else if (hasEmail) setMode("email");
     });
-  }, [hasFace]);
+  }, [hasFace, hasEmail]);
 
   function explain(e: unknown): string {
     if (e instanceof ApiError && e.code === "SIGN_IN_EXPIRED") {
@@ -138,14 +141,24 @@ export function SecondStepForm({
         <ArrowLeft className="size-4" aria-hidden /> Back
       </button>
       <h2 className="text-xl font-semibold">
-        {mode === "face" ? "Show your face" : `Use your ${unlock}`}
+        {mode === "face"
+          ? "Show your face"
+          : mode === "email"
+            ? "Enter the code from your email"
+            : `Use your ${unlock}`}
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Hi {step.name}. Your password was right; one more check keeps your
         business safe.
       </p>
       <div className="mt-5">
-        {mode === "face" ? (
+        {mode === "email" ? (
+          <EmailCodeForm
+            ticket={step.ticket}
+            onDone={onDone}
+            explain={explain}
+          />
+        ) : mode === "face" ? (
           <FaceCamera
             probe={(frame) => probeFace(step.ticket, frame)}
             autoStart
@@ -186,23 +199,141 @@ export function SecondStepForm({
           </div>
         )}
       </div>
-      {hasFace && hasFingerprint ? (
-        <p className="mt-5 text-center text-sm">
-          <button
-            type="button"
-            className="font-medium text-accent hover:underline"
-            onClick={() => {
-              setError(null);
-              setMode(mode === "face" ? "fingerprint" : "face");
-            }}
-          >
-            {mode === "face"
-              ? `Use your phone lock (${unlock}) instead`
-              : "Use the camera face check instead"}
-          </button>
-        </p>
-      ) : null}
+      <div className="mt-5 flex flex-col items-center gap-2 text-sm">
+        {(
+          [
+            [
+              "fingerprint",
+              hasFingerprint,
+              `Use your phone lock (${unlock}) instead`,
+            ],
+            ["face", hasFace, "Use the camera face check instead"],
+            ["email", hasEmail, "Email me a code instead"],
+          ] as const
+        )
+          .filter(([m, has]) => has && m !== mode)
+          .map(([m, , label]) => (
+            <button
+              key={m}
+              type="button"
+              className="font-medium text-accent hover:underline"
+              onClick={() => {
+                setError(null);
+                setMode(m);
+              }}
+            >
+              {label}
+            </button>
+          ))}
+      </div>
     </div>
+  );
+}
+
+type Mode = "face" | "fingerprint" | "email";
+
+/** The second step on any computer: a 6-digit code sent to the account's email. */
+function EmailCodeForm({
+  ticket,
+  onDone,
+  explain,
+}: {
+  ticket: string;
+  onDone: (session: SessionView) => Promise<void> | void;
+  explain: (e: unknown) => string;
+}) {
+  const [sentTo, setSentTo] = React.useState<string | null>(null);
+  const [code, setCode] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
+  const [busy, setBusy] = React.useState(false);
+
+  async function send() {
+    setError(null);
+    setBusy(true);
+    try {
+      const sent = await post<{ sent_to: string }>("/auth/mfa/email/start", {
+        ticket,
+      });
+      setSentTo(sent.sent_to);
+      setCode("");
+    } catch (e) {
+      setError(explain(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function check() {
+    setError(null);
+    setBusy(true);
+    try {
+      await onDone(
+        await post<SessionView>("/auth/mfa/email", {
+          ticket,
+          code: code.trim(),
+        }),
+      );
+    } catch (e) {
+      setError(explain(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (sentTo === null) {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-muted-foreground">
+          We&apos;ll email a 6-digit code to the address on your account. It
+          works for 10 minutes.
+        </p>
+        {error ? <Notice tone="danger">{error}</Notice> : null}
+        <Button className="w-full" loading={busy} onClick={() => void send()}>
+          Email me a code
+        </Button>
+      </div>
+    );
+  }
+  return (
+    <form
+      className="space-y-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        void check();
+      }}
+    >
+      <Field
+        label={`Code sent to ${sentTo}`}
+        htmlFor="sign-in-code"
+        error={error}
+      >
+        <Input
+          id="sign-in-code"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          maxLength={6}
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+          autoFocus
+        />
+      </Field>
+      <Button
+        type="submit"
+        className="w-full"
+        loading={busy}
+        disabled={code.length !== 6}
+      >
+        Sign in
+      </Button>
+      <button
+        type="button"
+        className="w-full text-center text-sm font-medium text-accent hover:underline"
+        disabled={busy}
+        onClick={() => void send()}
+      >
+        Send a new code
+      </button>
+    </form>
   );
 }
 
