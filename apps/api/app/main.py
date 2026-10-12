@@ -59,6 +59,7 @@ from app.modules.pi_saas.assistant_routes import router as pi_assistant_router
 from app.modules.pi_saas.campaign_routes import router as pi_campaign_router
 from app.modules.pi_saas.connector_routes import router as pi_connector_router
 from app.modules.pi_saas.connector_routes import web_router as pi_connector_web_router
+from app.modules.pi_saas.customer_overview import router as customer_overview_router
 from app.modules.pi_saas.customer_payment_routes import public_router as pi_customer_pay_link_router
 from app.modules.pi_saas.customer_payment_routes import router as pi_customer_payment_router
 from app.modules.pi_saas.deal_routes import public_router as pi_documents_router
@@ -106,6 +107,7 @@ ROUTERS = [
     customer_files_router,
     pi_requests_router,
     team_whatsapp_router,
+    customer_overview_router,
     receipts_router,
     pi_operator_router,
     pi_operator_digest_router,
@@ -182,6 +184,7 @@ PI_APP_ROUTERS = [
     customer_files_router,
     pi_requests_router,
     team_whatsapp_router,
+    customer_overview_router,
     receipts_router,
     pi_documents_router,
     # The deal flow in the pi app: leads, proposals and orders (core modules, pi session).

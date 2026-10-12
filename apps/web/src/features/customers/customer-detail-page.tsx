@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { RecordAttachments } from "@/features/integrations/business-panels";
 import { CustomerFiles } from "./components/customer-files";
+import { CustomerPiOverview } from "./components/pi-overview";
 import Link from "next/link";
 import {
   Archive,
@@ -382,6 +383,7 @@ function OverviewTab({
 
   return (
     <div className="space-y-4">
+      <CustomerPiOverview customerId={customer.id} />
       <MetricGrid className="xl:grid-cols-4">
         <MetricCard
           label="Orders"
