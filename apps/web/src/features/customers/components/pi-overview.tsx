@@ -54,6 +54,7 @@ const projectSchema = z.object({
 });
 const overviewSchema = z.object({
   profile: z.object({
+    name: z.string().optional(),
     business_name: z.string().optional(),
     business_type: z.string().optional(),
     location: z.string().optional(),
@@ -277,7 +278,11 @@ export function CustomerPiOverview({ customerId }: { customerId: string }) {
             </p>
           ) : (
             <>
-              <ProblemMap issues={o.issues} links={o.links} />
+              <ProblemMap
+                issues={o.issues}
+                links={o.links}
+                customer={p.business_name || p.name || "This customer"}
+              />
               <StageChart issues={o.issues} counts={o.counts} />
             </>
           )}
@@ -295,9 +300,11 @@ export function CustomerPiOverview({ customerId }: { customerId: string }) {
 function ProblemMap({
   issues,
   links,
+  customer,
 }: {
   issues: Issue[];
   links: Overview["links"];
+  customer: string;
 }) {
   const [active, setActive] = useState<number | null>(null);
   const [asList, setAsList] = useState(false);
@@ -305,20 +312,39 @@ function ProblemMap({
   // Open problems first (pi's pick and its linked ones together), done ones last.
   const shown = order(issues).slice(0, 8);
   const n = shown.length;
-  // Two staggered columns with a wide lane between them: every line runs through the
-  // lane, so its label is never hidden behind a card. Only as tall as it needs to be.
-  const W = 720;
-  const CARD_W = 252;
+  // The customer in the middle, their requests on both sides: every request hangs off
+  // the customer, so it reads as one connected picture even with one or two requests.
+  const W = 800;
+  const CARD_W = 236;
   const CARD_H = 118;
-  const STEP = 148; // vertical distance between cards in the same column
-  const LEFT = 24;
-  const RIGHT = W - 24 - CARD_W;
+  const STEP = 140;
+  const HUB_W = 196;
+  const HUB_H = 104;
+  const sides = shown.map(
+    (_, i) => (i % 2 ? "right" : "left") as "left" | "right",
+  );
+  const perSide = (side: "left" | "right") =>
+    sides.filter((x) => x === side).length;
+  const tallest = Math.max(perSide("left"), perSide("right"), 1);
+  const H = Math.max(tallest * STEP - (STEP - CARD_H), HUB_H) + 32;
   const pos = shown.map((_, i) => {
-    const x = n === 1 ? (W - CARD_W) / 2 : i % 2 ? RIGHT : LEFT;
-    const y = 12 + Math.floor(i / 2) * STEP + (i % 2 ? STEP / 2 : 0);
-    return { x, y, cx: x + CARD_W / 2, cy: y + CARD_H / 2 };
+    const side = sides[i];
+    const count = perSide(side);
+    const slot = sides.slice(0, i).filter((x) => x === side).length;
+    const block = count * STEP - (STEP - CARD_H);
+    const x = side === "left" ? 8 : W - 8 - CARD_W;
+    const y = (H - block) / 2 + slot * STEP;
+    return { x, y, cx: x + CARD_W / 2, cy: y + CARD_H / 2, side };
   });
-  const H = Math.max(...pos.map((p) => p.y), 0) + CARD_H + 12;
+  const hub = { x: (W - HUB_W) / 2, y: (H - HUB_H) / 2 };
+  const spoke = (i: number) => {
+    const p = pos[i];
+    const fromX = p.side === "left" ? hub.x : hub.x + HUB_W;
+    const fromY = H / 2 + (p.cy - H / 2) * 0.25;
+    const toX = p.side === "left" ? p.x + CARD_W : p.x;
+    const mx = (fromX + toX) / 2;
+    return `M ${fromX} ${fromY} C ${mx} ${fromY}, ${mx} ${p.cy}, ${toX} ${p.cy}`;
+  };
   const index = new Map(shown.map((issue, i) => [issue.title, i]));
   const visible = links
     .map((l) => ({ ...l, a: index.get(l.a_title), b: index.get(l.b_title) }))
@@ -332,31 +358,37 @@ function ProblemMap({
       (l) => (l.a === active || l.b === active) && (l.a === i || l.b === i),
     );
   const curve = (a: number, b: number, k = 0) => {
-    // Lines meeting the same card leave from slightly different points.
-    const shift = ((k % 3) - 1) * 12;
-    const p = { ...pos[a], cy: pos[a].cy + shift };
-    const q = { ...pos[b], cy: pos[b].cy + shift };
-    if (Math.abs(p.cx - q.cx) > CARD_W) {
-      // Across the lane: from the side of one card to the side of the other.
-      const [l, r] = p.cx < q.cx ? [p, q] : [q, p];
-      const x1 = l.x + CARD_W;
-      const x2 = r.x;
-      const mx = (x1 + x2) / 2;
+    const p = pos[a];
+    const q = pos[b];
+    const shift = ((k % 3) - 1) * 10;
+    const inner = (c: typeof p) => (c.side === "left" ? c.x + CARD_W : c.x);
+    if (p.side === q.side) {
+      // Same side: a loop into the middle lane and back.
+      const [t, u] = p.cy < q.cy ? [p, q] : [q, p];
+      const x = inner(t);
+      const reach = (t.side === "left" ? 1 : -1) * 64;
       return {
-        d: `M ${x1} ${l.cy} C ${mx} ${l.cy}, ${mx} ${r.cy}, ${x2} ${r.cy}`,
-        mx,
-        my: (l.cy + r.cy) / 2,
+        d: `M ${x} ${t.cy + 18 + shift} C ${x + reach} ${t.cy + 18}, ${x + reach} ${u.cy - 18}, ${x} ${u.cy - 18 + shift}`,
+        mx: x + reach * 0.78,
+        my: (t.cy + u.cy) / 2,
       };
     }
-    // Same column: out into the lane and back, so it never runs through a card.
-    const [t, u] = p.cy < q.cy ? [p, q] : [q, p];
-    const side = t.x < W / 2 ? 1 : -1;
-    const x = side > 0 ? t.x + CARD_W : t.x;
-    const reach = 70 * side;
+    // Across: arc over (or under) the customer card.
+    const [l, r] = p.side === "left" ? [p, q] : [q, p];
+    // Alternate over and under the customer card, further out each time, so two
+    // connections never share a label spot.
+    const crossing = visible
+      .slice(0, k)
+      .filter((x) => pos[x.a].side !== pos[x.b].side).length;
+    const above = crossing % 2 === 0;
+    const out = 26 + Math.floor(crossing / 2) * 24;
+    const arc = above ? hub.y - out : hub.y + HUB_H + out;
+    const x1 = inner(l);
+    const x2 = inner(r);
     return {
-      d: `M ${x} ${t.cy} C ${x + reach} ${t.cy}, ${x + reach} ${u.cy}, ${x} ${u.cy}`,
-      mx: x + reach * 0.75,
-      my: (t.cy + u.cy) / 2,
+      d: `M ${x1} ${l.cy + shift} C ${x1 + 60} ${arc}, ${x2 - 60} ${arc}, ${x2} ${r.cy + shift}`,
+      mx: W / 2,
+      my: above ? hub.y - out + 10 : hub.y + HUB_H + out - 10,
     };
   };
   // pi's pick to start with: the open request that hurts most (urgency x impact).
@@ -458,6 +490,39 @@ function ProblemMap({
           className="absolute inset-0 h-full w-full overflow-visible"
           aria-hidden="true"
         >
+          {shown.map((issue, i) => {
+            const d = spoke(i);
+            const t = tone(issue);
+            const faded = active !== null && active !== i;
+            return (
+              <g key={`spoke-${i}`}>
+                <path
+                  d={d}
+                  fill="none"
+                  pathLength={1}
+                  className="pm-draw"
+                  stroke={t.ring}
+                  strokeWidth={active === i ? 2.5 : 1.5}
+                  strokeLinecap="round"
+                  style={{
+                    animationDelay: `${150 + i * 90}ms`,
+                    opacity: faded ? 0.15 : 0.55,
+                    transition: "opacity 200ms",
+                  }}
+                />
+                {!calm && (
+                  <circle r={3} fill={t.ring} opacity={faded ? 0.1 : 0.85}>
+                    <animateMotion
+                      dur={`${2.6 + (i % 3) * 0.5}s`}
+                      begin={`${(600 + i * 90) / 1000}s`}
+                      repeatCount="indefinite"
+                      path={d}
+                    />
+                  </circle>
+                )}
+              </g>
+            );
+          })}
           {visible.map((l, k) => {
             const { d } = curve(l.a, l.b, k);
             const lit =
@@ -529,6 +594,24 @@ function ProblemMap({
             </button>
           );
         })}
+        <div
+          className="pm-in pm-hub absolute flex flex-col items-center justify-center rounded-2xl px-3 text-center text-white shadow-lg"
+          style={{
+            left: `${(hub.x / W) * 100}%`,
+            top: `${(hub.y / H) * 100}%`,
+            width: `${(HUB_W / W) * 100}%`,
+            height: `${(HUB_H / H) * 100}%`,
+            background: "linear-gradient(135deg, #2a2160 0%, #1b1830 100%)",
+          }}
+        >
+          <span className="text-[10px] font-semibold tracking-wide text-[#a99cff] uppercase">
+            Customer
+          </span>
+          <span className="line-clamp-1 text-sm font-semibold">{customer}</span>
+          <span className="mt-0.5 text-[11px] text-white/70">
+            {n} request{n === 1 ? "" : "s"} · {visible.length} connected
+          </span>
+        </div>
         {shown.map((issue, i) => {
           const t = tone(issue);
           const p = pos[i];
@@ -789,9 +872,11 @@ const MAP_MOTION = `
 .pm-in { animation: pm-in 420ms cubic-bezier(.2,.8,.2,1) both; }
 .pm-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: pm-draw 700ms ease-out forwards; }
 .pm-fade { animation: pm-fade 500ms ease-out both; }
+@keyframes pm-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(139,124,248,.35); } 50% { box-shadow: 0 0 0 10px rgba(139,124,248,0); } }
+.pm-hub { animation: pm-in 420ms cubic-bezier(.2,.8,.2,1) both, pm-glow 3s ease-in-out 1s infinite; }
 .pm-pulse { animation: pm-in 420ms cubic-bezier(.2,.8,.2,1) both, pm-pulse 2.4s ease-in-out 1s infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .pm-in, .pm-draw, .pm-fade, .pm-pulse { animation: none !important; stroke-dashoffset: 0; }
+  .pm-in, .pm-draw, .pm-fade, .pm-pulse, .pm-hub { animation: none !important; stroke-dashoffset: 0; }
 }
 `;
 
