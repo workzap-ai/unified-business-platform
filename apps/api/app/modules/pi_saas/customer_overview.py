@@ -9,7 +9,9 @@
   Problem Map), the same data the customer sees on their own dashboard.
 - counts: every number counts requests (waiting on them / on us / done / paused).
 
-Read-only and cheap: it uses saved records and pi's cached analysis, never an AI call.
+Cheap: it uses saved records and pi's cached analysis. Only a chat whose analysis is
+out of date (a new message, or older analysis rules) is analysed again, at most a few
+per view, so the Problem Map never waits for the customer's next message.
 """
 
 import logging
@@ -17,7 +19,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from sqlalchemy.exc import DBAPIError
 
 from app.modules.access.dependencies import Scope, Session
@@ -126,8 +128,47 @@ async def _projects(session: Any, scope: Any, customer_id: UUID) -> list[dict[st
     return projects
 
 
+REFRESH_PER_VIEW = 3
+
+
+async def _refresh(request: Request, session: Any, conversations: list[PiConversation]) -> None:
+    """Re-analyse out-of-date chats (best effort: a failure keeps the saved analysis)."""
+    from app.modules.pi.models import WhatsAppConnection
+    from app.modules.pi_customer import service as portal
+    from app.modules.tenants.models import Tenant
+
+    state = request.app.state
+    done = 0
+    for conversation in conversations:
+        if done >= REFRESH_PER_VIEW or conversation.last_message_at is None:
+            break
+        if portal.report_current(conversation):
+            continue
+        connection = await session.get(WhatsAppConnection, conversation.connection_id)
+        tenant = await session.get(Tenant, conversation.tenant_id)
+        if connection is None:
+            continue
+        done += 1
+        try:
+            await portal.analyse(
+                session,
+                state.settings,
+                state.http,
+                getattr(state, "sessions", None),
+                conversation,
+                connection,
+                tenant.name if tenant else "us",
+            )
+            await session.refresh(conversation)
+        except Exception:  # noqa: BLE001 - the saved analysis is shown instead
+            logger.warning("pi_overview_refresh_failed", exc_info=True)
+            await session.rollback()
+
+
 @router.get("/{customer_id}/pi-overview")
-async def overview(customer_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+async def overview(
+    customer_id: UUID, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
     scope.require("customers.read")
     customer = await WorkspaceRepository(session, Customer, scope).get(customer_id)
     conversations = list(
@@ -150,6 +191,7 @@ async def overview(customer_id: UUID, scope: Scope, session: Session) -> dict[st
         profile.setdefault("business_name", customer.company)
     first: datetime | None = min((c.created_at for c in conversations), default=None)
     last: datetime | None = next((c.last_message_at for c in conversations), None)
+    await _refresh(request, session, conversations)
     issues, links, headline = await _requests(session, conversations)
     projects: list[dict[str, Any]] = []
     if scope.can("sales.read"):

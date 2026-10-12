@@ -569,6 +569,21 @@ def _transcript(rows: list[PiMessage]) -> list[dict[str, str]]:
     return out
 
 
+# Bumped when the analysis rules change, so reports saved under the old rules are made
+# again (2: requests for work are never dropped as "about the service").
+REPORT_VERSION = 2
+
+
+def report_current(conversation: PiConversation, language: str = "auto") -> bool:
+    cached = (conversation.service_brief or {}).get("customer_issues")
+    return (
+        isinstance(cached, dict)
+        and cached.get("at") == conversation.last_message_at.isoformat()
+        and cached.get("language", "auto") == language
+        and cached.get("v") == REPORT_VERSION
+    )
+
+
 async def analyse(
     session: AsyncSession,
     settings: Settings,
@@ -585,11 +600,7 @@ async def analyse(
     stamp = conversation.last_message_at.isoformat()
     brief = dict(conversation.service_brief or {})
     cached = brief.get("customer_issues")
-    if (
-        isinstance(cached, dict)
-        and cached.get("at") == stamp
-        and cached.get("language", "auto") == language
-    ):
+    if isinstance(cached, dict) and report_current(conversation, language):
         return cached
     from app.modules.pi.runtime import system_scope
 
@@ -660,6 +671,7 @@ async def analyse(
     links = judge_links(raw_links, issues, feedback if isinstance(feedback, dict) else {})
     report = {
         "at": stamp,
+        "v": REPORT_VERSION,
         "language": language,
         "headline": result.value.headline,
         "waiting": waiting_since(rows),
