@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { z } from "zod";
 import { Building2, FolderKanban, Network } from "lucide-react";
@@ -350,12 +350,46 @@ function ProblemMap({
       my: (t.cy + u.cy) / 2,
     };
   };
+  // pi's pick to start with: the open request that hurts most (urgency x impact).
+  const open = shown
+    .map((issue, i) => ({ i, score: issue.urgency * issue.impact, issue }))
+    .filter(({ issue }) => !["live", "closed", "paused"].includes(issue.stage));
+  const startHere =
+    n > 1 && open.length
+      ? open.reduce((best, x) => (x.score > best.score ? x : best)).i
+      : null;
+  const calm = useReducedMotion();
+  const summary = (
+    ["Waiting on them", "Waiting on us", "Noted", "Done"] as const
+  )
+    .map((label) => ({
+      label,
+      count: shown.filter((i) => tone(i).label === label).length,
+      sample: shown.find((i) => tone(i).label === label),
+    }))
+    .filter((x) => x.count > 0);
   const detail = active !== null ? shown[active] : null;
   const link = activeLink !== null ? visible[activeLink] : null;
 
   return (
     <figure className="w-full">
       <style>{MAP_MOTION}</style>
+      <div className="mb-3 flex flex-wrap gap-2" aria-label="At a glance">
+        {summary.map(({ label, count, sample }) => (
+          <span
+            key={label}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium"
+          >
+            {sample && <StatusDot issue={sample} />}
+            {count} {label.toLowerCase()}
+          </span>
+        ))}
+        {startHere !== null && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+            Start with: {shown[startHere].title}
+          </span>
+        )}
+      </div>
       {/* Phone: a simple list, each request with its status and connections. */}
       <ul className="space-y-2 sm:hidden">
         {shown.map((issue, i) => {
@@ -422,6 +456,16 @@ function ProblemMap({
                   strokeLinecap="round"
                   strokeDasharray={dashed ? "0.03 0.025" : undefined}
                 />
+                {!calm && (
+                  <circle r={3.5} fill="#a99cff" opacity={faded ? 0.15 : 0.9}>
+                    <animateMotion
+                      dur={`${3.2 + (k % 3) * 0.6}s`}
+                      begin={`${(n * 70 + k * 120 + 700) / 1000}s`}
+                      repeatCount="indefinite"
+                      path={d}
+                    />
+                  </circle>
+                )}
               </g>
             );
           })}
@@ -484,6 +528,11 @@ function ProblemMap({
                 borderLeft: `4px solid ${t.ring}`,
               }}
             >
+              {startHere === i && (
+                <span className="absolute -top-2.5 right-3 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground shadow-sm">
+                  Start here
+                </span>
+              )}
               <span className="line-clamp-2 text-[13px] leading-tight font-semibold">
                 {issue.title}
               </span>
@@ -556,6 +605,20 @@ function ProblemMap({
     </figure>
   );
 }
+
+/** True when the person asked their device for less motion. */
+function useReducedMotion(): boolean {
+  return useSyncExternalStore(
+    (change) => {
+      const query = window.matchMedia(REDUCED);
+      query.addEventListener("change", change);
+      return () => query.removeEventListener("change", change);
+    },
+    () => window.matchMedia(REDUCED).matches,
+    () => false,
+  );
+}
+const REDUCED = "(prefers-reduced-motion: reduce)";
 
 function StatusDot({ issue }: { issue: Issue }) {
   const t = tone(issue);
