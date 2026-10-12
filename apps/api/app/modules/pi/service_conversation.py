@@ -163,6 +163,8 @@ class ServiceTurn(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
     _attempts: list[Attempt] = PrivateAttr(default_factory=list)
+    # pi keeps the chat but needs the team: a question on the request desk.
+    _ask_team: bool = PrivateAttr(default=False)
     # Filled FIRST (field order guides the model): what the customer wants right now and
     # who the message is for. Internal; it makes the reply answer the actual request.
     understanding: str = Field(default="", max_length=600)
@@ -424,7 +426,8 @@ lead with the fastest option approved_knowledge offers for that case, and say wh
 happens next right away); otherwise "calm". Ask at most two short, related questions per reply.
 Introduce yourself only in your first message. When you set request_human=true, say a
 person from the team will reply here; don't ask whether they want one.
-If the enquiry is outside those offerings or needs judgement, request human review.
+If the enquiry is outside those offerings or needs the team's judgement, keep talking:
+say you will check with the team and come back here; request_human stays false.
 Do not claim a meeting was booked, message was sent, order placed or quote issued.
 Projects: a customer may bring several projects in one chat (a logo, then a website,
 then packaging). "projects" must list EVERY project raised in this conversation so far,
@@ -975,6 +978,8 @@ def team_summary(turn: ServiceTurn) -> str:
     lines.append("Still needed: " + (", ".join(turn.missing) if turn.missing else "none"))
     if turn.request_human:
         step = "A team member should reply to the customer."
+    elif turn._ask_team:
+        step = "Team to answer pi's question on the Requests desk; pi replies to the customer."
     elif turn.ready_for_team:
         step = "Team to review the confirmed brief and prepare a proposal."
     else:
@@ -1070,6 +1075,11 @@ async def compose_service_turn(
     if context.get("operator_review_required"):
         turn.request_human = True
         turn.awaiting_customer = False
+    if turn.request_human and not needs_person(turn, context):
+        # Nothing here needs a person in the chat: pi keeps talking, and what it can't
+        # answer goes on the team's request desk (the answer comes back through pi).
+        turn.request_human = False
+        turn._ask_team = True
     turn.projects = merge_projects((context.get("brief") or {}).get("projects"), turn)
     if not turn.summary.strip() or turn.summary.startswith("Conversation in progress"):
         turn.summary = team_summary(turn)
@@ -1187,6 +1197,8 @@ async def save_service_turn(
         and (not previous.get("meeting_requested") or asks_for_meeting(message.body))
     ):
         await ask_for_meeting(session, scope, conversation, turn.summary, message.body)
+    elif turn._ask_team:
+        await ask_team(session, scope, conversation, turn.summary, message.body)
     for gap in new_gaps:
         digest = hashlib.sha256(gap.lower().encode()).hexdigest()[:16]
         await notify(
@@ -1294,6 +1306,30 @@ async def _follow_deal(
     return due
 
 
+def needs_person(turn: ServiceTurn, context: dict[str, Any]) -> bool:
+    """A person takes over only when the customer asks for one, complains, has a
+    payment issue, is still upset, or a review policy says so."""
+    from app.modules.pi.graph import keyword_intent
+
+    if context.get("operator_review_required") or turn.mood == "frustrated":
+        return True
+    latest = str(context.get("latest_customer_message", ""))
+    if PERSON_WORDS.search(latest):
+        return True
+    fast = keyword_intent(latest)
+    return fast is not None and fast[0] in {"human_request", "complaint", "payment"}
+
+
+# Asking for a person, in the languages pi's customers write in.
+PERSON_WORDS = re.compile(
+    r"\b(human|real person|a person|someone from|representative|"
+    r"insaan|insan|bande se|kisi se baat|team se baat|"
+    r"persona|humano|asesor|personne|humain|conseiller|mensch|mitarbeiter)\b"
+    r"|شخص|إنسان|انسان|موظف|بندے|بندہ|इंसान|व्यक्ति|मानव",
+    re.IGNORECASE,
+)
+
+
 MEETING_WORDS = re.compile(
     r"\b(meeting|meet up|meet you|call me|a call|video call|zoom|google meet|demo|"
     r"visit (your|the) (office|shop|store|showroom)|site visit|appointment|"
@@ -1306,6 +1342,34 @@ MEETING_WORDS = re.compile(
 def asks_for_meeting(text: str | None) -> bool:
     """The customer's own message asks for a meeting, call, demo or visit."""
     return bool(text and MEETING_WORDS.search(text))
+
+
+async def ask_team(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    summary: str,
+    latest: str,
+) -> None:
+    """pi kept the chat but needs the team: a question on the request desk (one open
+    per chat; later messages add to it)."""
+    from app.modules.pi_saas.requests import raise_request
+
+    if conversation.customer_id is None:
+        return
+    try:
+        async with session.begin_nested():
+            await raise_request(
+                session,
+                scope,
+                conversation_id=conversation.id,
+                customer_id=conversation.customer_id,
+                kind="question",
+                question=f"pi needs the team for this. The customer said: {latest[:600]}",
+                context=summary,
+            )
+    except DBAPIError:
+        logger.warning("pi_team_question_skipped", exc_info=True)
 
 
 async def ask_for_meeting(

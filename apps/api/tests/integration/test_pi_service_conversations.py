@@ -374,7 +374,8 @@ async def test_service_handoff_delivers_acknowledgement(api, business_db, monkey
         ),
     )
     pi = await pi_workspace(api, business_db, business_type="service_business")
-    await pi.process("Necesito hablar sobre un proyecto especial", "service-human")
+    # Asking for a person (in Spanish): the chat goes to the team.
+    await pi.process("Quiero hablar con una persona sobre un proyecto especial", "service-human")
     await pi.deliver_all()
     assert (await pi.conversation()).mode == "human"
     replies = await pi.outbound()
