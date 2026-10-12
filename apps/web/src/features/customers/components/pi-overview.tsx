@@ -3,12 +3,18 @@
 import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { z } from "zod";
-import { Building2, FileText, FolderKanban, Network } from "lucide-react";
+import {
+  Building2,
+  Check,
+  FileText,
+  FolderKanban,
+  Network,
+} from "lucide-react";
 import { Badge, Card, CardBody, CardHeader } from "@/components/ui/display";
 import { useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
 import { cn } from "@/lib/utils";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatTime } from "@/lib/format";
 import { apiRequest } from "@/services/api-client";
 import { customerFilesService } from "../files-service";
 
@@ -55,6 +61,17 @@ const projectSchema = z.object({
   documents: z
     .array(z.object({ file_id: z.string(), name: z.string() }))
     .catch([]),
+  steps: z
+    .array(
+      z.object({
+        key: z.string(),
+        label: z.string(),
+        at: z.string().nullable().catch(null),
+        done: z.boolean(),
+        detail: z.string().catch(""),
+      }),
+    )
+    .catch([]),
 });
 const overviewSchema = z.object({
   profile: z.object({
@@ -81,6 +98,22 @@ const overviewSchema = z.object({
 });
 type Overview = z.infer<typeof overviewSchema>;
 type Issue = Overview["issues"][number];
+type Project = Overview["projects"][number];
+
+/** How often the open page asks for the latest picture (it's live while you watch). */
+const LIVE_EVERY_MS = 20_000;
+
+/** What each request and project looked like, to spot what just changed. */
+function signatures(o: Overview): Map<string, string> {
+  return new Map([
+    ...o.issues.map(
+      (i) => [i.title, `${i.stage}|${i.ball_with}|${i.next_step}`] as const,
+    ),
+    ...o.projects.map(
+      (p) => [p.lead_id, `${p.stage}|${p.steps_done ?? ""}`] as const,
+    ),
+  ]);
+}
 
 const LANGUAGE: Record<string, string> = {
   en: "English",
@@ -122,15 +155,39 @@ function tone(issue: Issue): { fill: string; ring: string; label: string } {
 
 export function CustomerPiOverview({ customerId }: { customerId: string }) {
   const { can } = useSession();
-  const query = useScopedQuery(["customers", customerId, "pi-overview"], () =>
-    apiRequest("GET", `/customers/${customerId}/pi-overview`, overviewSchema),
+  const query = useScopedQuery(
+    ["customers", customerId, "pi-overview"],
+    () =>
+      apiRequest("GET", `/customers/${customerId}/pi-overview`, overviewSchema),
+    // Live: a new message, step or answer shows up while the page is open.
+    { refetchInterval: LIVE_EVERY_MS },
   );
+  // What changed since the last look lights up for a moment.
+  const [seen, setSeen] = useState<{
+    at: number;
+    sig: Map<string, string>;
+    changed: Set<string>;
+  }>({ at: 0, sig: new Map(), changed: new Set() });
+  if (query.data && query.dataUpdatedAt !== seen.at) {
+    const sig = signatures(query.data);
+    const changed = new Set(
+      seen.at
+        ? [...sig].filter(([k, s]) => seen.sig.get(k) !== s).map(([k]) => k)
+        : [],
+    );
+    setSeen({ at: query.dataUpdatedAt, sig, changed });
+  }
   if (query.isPending)
     return <div className="h-40 animate-pulse rounded-xl bg-surface-sunken" />;
   if (query.isError) return null;
   const o = query.data;
   const p = o.profile;
   if (!p.chats && !o.projects.length) return null; // Not a pi customer yet.
+  const changed = seen.changed;
+  const justChanged = [
+    ...o.issues.filter((i) => changed.has(i.title)).map((i) => i.title),
+    ...o.projects.filter((d) => changed.has(d.lead_id)).map((d) => d.title),
+  ];
   return (
     <div className="space-y-4">
       <div className="grid gap-4 lg:grid-cols-2">
@@ -287,15 +344,42 @@ export function CustomerPiOverview({ customerId }: { customerId: string }) {
           icon={<Network />}
           description={`${o.issues.length} request${o.issues.length === 1 ? "" : "s"} · ${o.links.length} connection${o.links.length === 1 ? "" : "s"} found by pi`}
           actions={
-            o.links.length ? (
-              <Badge tone="info">
-                {o.links.length} connection{o.links.length === 1 ? "" : "s"}
-              </Badge>
-            ) : null
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground"
+              title={`Refreshes every ${LIVE_EVERY_MS / 1000} seconds while open`}
+            >
+              <span className="relative flex size-2">
+                <span
+                  className={cn(
+                    "absolute inline-flex size-full rounded-full bg-[#1f9d63] opacity-60",
+                    query.isFetching
+                      ? "animate-ping"
+                      : "motion-safe:animate-pulse",
+                  )}
+                />
+                <span className="relative inline-flex size-2 rounded-full bg-[#1f9d63]" />
+              </span>
+              Live ·{" "}
+              {query.isFetching
+                ? "updating…"
+                : formatTime(new Date(query.dataUpdatedAt))}
+            </span>
           }
         />
         <CardBody className="space-y-4">
-          {o.issues.length === 0 ? (
+          {justChanged.length > 0 && (
+            <p
+              key={seen.at}
+              className="pm-in rounded-lg border border-[#1f9d63]/40 bg-[#1f9d63]/10 px-3 py-2 text-xs font-medium"
+              role="status"
+            >
+              Just updated: {justChanged.slice(0, 3).join(", ")}
+              {justChanged.length > 3
+                ? ` and ${justChanged.length - 3} more`
+                : ""}
+            </p>
+          )}
+          {o.issues.length === 0 && o.projects.length === 0 ? (
             <p className="text-[13px] text-muted-foreground">
               Nothing yet. pi maps this customer&apos;s requests and how they
               connect as they talk.
@@ -305,9 +389,13 @@ export function CustomerPiOverview({ customerId }: { customerId: string }) {
               <ProblemMap
                 issues={o.issues}
                 links={o.links}
+                projects={o.projects}
+                changed={changed}
                 customer={p.business_name || p.name || "This customer"}
               />
-              <StageChart issues={o.issues} counts={o.counts} />
+              {o.issues.length > 0 && (
+                <StageChart issues={o.issues} counts={o.counts} />
+              )}
             </>
           )}
         </CardBody>
@@ -324,14 +412,21 @@ export function CustomerPiOverview({ customerId }: { customerId: string }) {
 function ProblemMap({
   issues,
   links,
+  projects,
+  changed,
   customer,
 }: {
   issues: Issue[];
   links: Overview["links"];
+  projects: Project[];
+  changed: Set<string>;
   customer: string;
 }) {
   const [active, setActive] = useState<number | null>(null);
-  const [asList, setAsList] = useState(false);
+  const [picked, setPicked] = useState<View | null>(null);
+  // No requests to draw yet: what's been done on the projects is the picture.
+  const view: View = picked ?? (issues.length ? "map" : "progress");
+  const asList = view === "list";
   const [activeLink, setActiveLink] = useState<number | null>(null);
   // Open problems first (pi's pick and its linked ones together), done ones last.
   const shown = order(issues).slice(0, 8);
@@ -458,307 +553,357 @@ function ProblemMap({
             Start with: {shown[startHere].title}
           </span>
         )}
-        <button
-          type="button"
-          onClick={() => setAsList((v) => !v)}
-          className="ml-auto hidden rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground sm:inline-flex"
-          aria-pressed={asList}
-        >
-          {asList ? "View as map" : "View as list"}
-        </button>
-      </div>
-      {/* Phone: a simple list, each request with its status and connections. */}
-      <ul className={cn("space-y-2", !asList && "sm:hidden")}>
-        {shown.map((issue, i) => {
-          const t = tone(issue);
-          const linked = visible.filter((l) => l.a === i || l.b === i).length;
-          return (
-            <li
-              key={`${issue.title}-${i}`}
-              className="pm-in rounded-lg border border-border bg-surface px-3 py-2"
-              style={{ animationDelay: `${i * 60}ms` }}
-            >
-              <p className="text-sm font-medium">{issue.title}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                <span className="font-medium text-foreground">Problem: </span>
-                {issue.root_cause ||
-                  issue.summary ||
-                  issue.original_words ||
-                  "—"}
-              </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                <span className="font-medium text-foreground">Next: </span>
-                {nextLine(issue)}
-              </p>
-              <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-                <StatusDot issue={issue} /> {t.label}
-                {linked ? ` · linked to ${linked}` : ""}
-              </p>
-            </li>
-          );
-        })}
-      </ul>
-      <div
-        className={cn(
-          "relative mx-auto hidden w-full max-w-3xl",
-          !asList && "sm:block",
-        )}
-        style={{ aspectRatio: `${W} / ${H}` }}
-        onMouseLeave={() => {
-          setActive(null);
-          setActiveLink(null);
-        }}
-      >
-        <svg
-          viewBox={`0 0 ${W} ${H}`}
-          className="absolute inset-0 h-full w-full overflow-visible"
-          aria-hidden="true"
-        >
-          {shown.map((issue, i) => {
-            const d = spoke(i);
-            const t = tone(issue);
-            const faded = active !== null && active !== i;
-            return (
-              <g key={`spoke-${i}`}>
-                <path
-                  d={d}
-                  fill="none"
-                  pathLength={1}
-                  className="pm-draw"
-                  stroke={t.ring}
-                  strokeWidth={active === i ? 2.5 : 1.5}
-                  strokeLinecap="round"
-                  style={{
-                    animationDelay: `${150 + i * 90}ms`,
-                    opacity: faded ? 0.15 : 0.55,
-                    transition: "opacity 200ms",
-                  }}
-                />
-                {!calm && (
-                  <circle r={3} fill={t.ring} opacity={faded ? 0.1 : 0.85}>
-                    <animateMotion
-                      dur={`${2.6 + (i % 3) * 0.5}s`}
-                      begin={`${(600 + i * 90) / 1000}s`}
-                      repeatCount="indefinite"
-                      path={d}
-                    />
-                  </circle>
-                )}
-              </g>
-            );
-          })}
-          {visible.map((l, k) => {
-            const { d } = curve(l.a, l.b, k);
-            const lit =
-              activeLink === k ||
-              (active !== null && (l.a === active || l.b === active));
-            const faded = active !== null && !lit;
-            const dashed = l.type === "part_of" || l.type === "depends_on";
-            return (
-              <g
-                key={k}
-                className="cursor-pointer"
-                onMouseEnter={() => {
-                  setActiveLink(k);
-                  setActive(null);
-                }}
-                onClick={() => setActiveLink(k)}
-              >
-                <path d={d} stroke="transparent" strokeWidth={18} fill="none" />
-                <path
-                  d={d}
-                  fill="none"
-                  pathLength={1}
-                  className={dashed ? "pm-fade" : "pm-draw"}
-                  style={{
-                    animationDelay: `${n * 70 + k * 120}ms`,
-                    opacity: faded ? 0.2 : 1,
-                    transition: "opacity 200ms, stroke-width 200ms",
-                  }}
-                  stroke={lit ? "#7c6cf7" : "#8b7cf8"}
-                  strokeWidth={lit ? 3 : 2}
-                  strokeLinecap="round"
-                  strokeDasharray={dashed ? "0.03 0.025" : undefined}
-                />
-                {!calm && (
-                  <circle r={3.5} fill="#a99cff" opacity={faded ? 0.15 : 0.9}>
-                    <animateMotion
-                      dur={`${3.2 + (k % 3) * 0.6}s`}
-                      begin={`${(n * 70 + k * 120 + 700) / 1000}s`}
-                      repeatCount="indefinite"
-                      path={d}
-                    />
-                  </circle>
-                )}
-              </g>
-            );
-          })}
-        </svg>
-        {visible.map((l, k) => {
-          const { mx, my } = curve(l.a, l.b, k);
-          const faded = active !== null && !(l.a === active || l.b === active);
-          return (
-            <button
-              type="button"
-              key={`label-${k}`}
-              onMouseEnter={() => {
-                setActiveLink(k);
-                setActive(null);
-              }}
-              onFocus={() => setActiveLink(k)}
-              className="pm-fade absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/30 bg-surface px-2 py-0.5 text-[11px] font-medium whitespace-nowrap text-foreground shadow-sm transition-opacity"
-              style={{
-                left: `${(mx / W) * 100}%`,
-                top: `${(my / H) * 100}%`,
-                opacity: faded ? 0.25 : 1,
-                animationDelay: `${n * 70 + k * 120 + 300}ms`,
-              }}
-            >
-              {l.reason || LINK_LABEL[l.type] || l.type}
-            </button>
-          );
-        })}
         <div
-          className="pm-in pm-hub absolute flex flex-col items-center justify-center rounded-2xl px-3 text-center text-white shadow-lg"
-          style={{
-            left: `${(hub.x / W) * 100}%`,
-            top: `${(hub.y / H) * 100}%`,
-            width: `${(HUB_W / W) * 100}%`,
-            height: `${(HUB_H / H) * 100}%`,
-            background: "linear-gradient(135deg, #2a2160 0%, #1b1830 100%)",
-          }}
+          role="tablist"
+          aria-label="View"
+          className="ml-auto inline-flex rounded-full border border-border p-0.5"
         >
-          <span className="text-[10px] font-semibold tracking-wide text-[#a99cff] uppercase">
-            Customer
-          </span>
-          <span className="line-clamp-1 text-sm font-semibold">{customer}</span>
-          <span className="mt-0.5 text-[11px] text-white/70">
-            {n} request{n === 1 ? "" : "s"} · {visible.length} connected
-          </span>
+          {VIEWS.filter(([v]) => issues.length || v === "progress").map(
+            ([v, label]) => (
+              <button
+                key={v}
+                type="button"
+                role="tab"
+                aria-selected={view === v}
+                onClick={() => setPicked(v)}
+                className={cn(
+                  "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
+                  view === v
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                  // A phone always gets the list in place of the drawing.
+                  v === "list" && "hidden sm:inline-flex",
+                )}
+              >
+                {label}
+              </button>
+            ),
+          )}
         </div>
-        {shown.map((issue, i) => {
-          const t = tone(issue);
-          const p = pos[i];
-          const waiting = t.label === "Waiting on them";
-          const dim = active !== null && active !== i && !touches(i);
-          return (
-            <button
-              type="button"
-              key={`${issue.title}-${i}`}
-              onMouseEnter={() => {
-                setActive(i);
-                setActiveLink(null);
-              }}
-              onFocus={() => {
-                setActive(i);
-                setActiveLink(null);
-              }}
-              onClick={() => setActive(i)}
-              aria-label={`${issue.title}: ${t.label}`}
-              className={cn(
-                "pm-in absolute flex flex-col gap-0.5 rounded-xl border bg-surface px-3 py-2.5 text-left shadow-sm transition-[opacity,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary",
-                active === i ? "border-primary shadow-md" : "border-border",
-                waiting && "pm-pulse",
-              )}
+      </div>
+      {view === "progress" ? (
+        <Progress issues={issues} projects={projects} changed={changed} />
+      ) : (
+        <>
+          {/* Phone: a simple list, each request with its status and connections. */}
+          <ul className={cn("space-y-2", !asList && "sm:hidden")}>
+            {shown.map((issue, i) => {
+              const t = tone(issue);
+              const linked = visible.filter(
+                (l) => l.a === i || l.b === i,
+              ).length;
+              return (
+                <li
+                  key={`${issue.title}-${i}`}
+                  className={cn(
+                    "pm-in rounded-lg border border-border bg-surface px-3 py-2",
+                    changed.has(issue.title) && "pm-flash",
+                  )}
+                  style={{ animationDelay: `${i * 60}ms` }}
+                >
+                  <p className="text-sm font-medium">{issue.title}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">
+                      Problem:{" "}
+                    </span>
+                    {issue.root_cause ||
+                      issue.summary ||
+                      issue.original_words ||
+                      "—"}
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">Next: </span>
+                    {nextLine(issue)}
+                  </p>
+                  <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <StatusDot issue={issue} /> {t.label}
+                    {linked ? ` · linked to ${linked}` : ""}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+          <div
+            className={cn(
+              "relative mx-auto hidden w-full max-w-3xl",
+              !asList && "sm:block",
+            )}
+            style={{ aspectRatio: `${W} / ${H}` }}
+            onMouseLeave={() => {
+              setActive(null);
+              setActiveLink(null);
+            }}
+          >
+            <svg
+              viewBox={`0 0 ${W} ${H}`}
+              className="absolute inset-0 h-full w-full overflow-visible"
+              aria-hidden="true"
+            >
+              {shown.map((issue, i) => {
+                const d = spoke(i);
+                const t = tone(issue);
+                const faded = active !== null && active !== i;
+                return (
+                  <g key={`spoke-${i}`}>
+                    <path
+                      d={d}
+                      fill="none"
+                      pathLength={1}
+                      className="pm-draw"
+                      stroke={t.ring}
+                      strokeWidth={active === i ? 2.5 : 1.5}
+                      strokeLinecap="round"
+                      style={{
+                        animationDelay: `${150 + i * 90}ms`,
+                        opacity: faded ? 0.15 : 0.55,
+                        transition: "opacity 200ms",
+                      }}
+                    />
+                    {!calm && (
+                      <circle r={3} fill={t.ring} opacity={faded ? 0.1 : 0.85}>
+                        <animateMotion
+                          dur={`${2.6 + (i % 3) * 0.5}s`}
+                          begin={`${(600 + i * 90) / 1000}s`}
+                          repeatCount="indefinite"
+                          path={d}
+                        />
+                      </circle>
+                    )}
+                  </g>
+                );
+              })}
+              {visible.map((l, k) => {
+                const { d } = curve(l.a, l.b, k);
+                const lit =
+                  activeLink === k ||
+                  (active !== null && (l.a === active || l.b === active));
+                const faded = active !== null && !lit;
+                const dashed = l.type === "part_of" || l.type === "depends_on";
+                return (
+                  <g
+                    key={k}
+                    className="cursor-pointer"
+                    onMouseEnter={() => {
+                      setActiveLink(k);
+                      setActive(null);
+                    }}
+                    onClick={() => setActiveLink(k)}
+                  >
+                    <path
+                      d={d}
+                      stroke="transparent"
+                      strokeWidth={18}
+                      fill="none"
+                    />
+                    <path
+                      d={d}
+                      fill="none"
+                      pathLength={1}
+                      className={dashed ? "pm-fade" : "pm-draw"}
+                      style={{
+                        animationDelay: `${n * 70 + k * 120}ms`,
+                        opacity: faded ? 0.2 : 1,
+                        transition: "opacity 200ms, stroke-width 200ms",
+                      }}
+                      stroke={lit ? "#7c6cf7" : "#8b7cf8"}
+                      strokeWidth={lit ? 3 : 2}
+                      strokeLinecap="round"
+                      strokeDasharray={dashed ? "0.03 0.025" : undefined}
+                    />
+                    {!calm && (
+                      <circle
+                        r={3.5}
+                        fill="#a99cff"
+                        opacity={faded ? 0.15 : 0.9}
+                      >
+                        <animateMotion
+                          dur={`${3.2 + (k % 3) * 0.6}s`}
+                          begin={`${(n * 70 + k * 120 + 700) / 1000}s`}
+                          repeatCount="indefinite"
+                          path={d}
+                        />
+                      </circle>
+                    )}
+                  </g>
+                );
+              })}
+            </svg>
+            {visible.map((l, k) => {
+              const { mx, my } = curve(l.a, l.b, k);
+              const faded =
+                active !== null && !(l.a === active || l.b === active);
+              return (
+                <button
+                  type="button"
+                  key={`label-${k}`}
+                  onMouseEnter={() => {
+                    setActiveLink(k);
+                    setActive(null);
+                  }}
+                  onFocus={() => setActiveLink(k)}
+                  className="pm-fade absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/30 bg-surface px-2 py-0.5 text-[11px] font-medium whitespace-nowrap text-foreground shadow-sm transition-opacity"
+                  style={{
+                    left: `${(mx / W) * 100}%`,
+                    top: `${(my / H) * 100}%`,
+                    opacity: faded ? 0.25 : 1,
+                    animationDelay: `${n * 70 + k * 120 + 300}ms`,
+                  }}
+                >
+                  {l.reason || LINK_LABEL[l.type] || l.type}
+                </button>
+              );
+            })}
+            <div
+              className="pm-in pm-hub absolute flex flex-col items-center justify-center rounded-2xl px-3 text-center text-white shadow-lg"
               style={{
-                left: `${(p.x / W) * 100}%`,
-                top: `${(p.y / H) * 100}%`,
-                width: `${(CARD_W / W) * 100}%`,
-                height: `${(CARD_H / H) * 100}%`,
-                opacity: dim ? 0.35 : 1,
-                animationDelay: `${i * 70}ms`,
-                borderLeft: `4px solid ${t.ring}`,
+                left: `${(hub.x / W) * 100}%`,
+                top: `${(hub.y / H) * 100}%`,
+                width: `${(HUB_W / W) * 100}%`,
+                height: `${(HUB_H / H) * 100}%`,
+                background: "linear-gradient(135deg, #2a2160 0%, #1b1830 100%)",
               }}
             >
-              {startHere === i && (
-                <span className="absolute -top-2.5 right-3 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground shadow-sm">
-                  Start here
-                </span>
-              )}
-              {issue.area && (
-                <span className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
-                  {issue.area}
-                </span>
-              )}
-              <span className="line-clamp-1 text-[13px] leading-tight font-semibold">
-                {issue.title}
+              <span className="text-[10px] font-semibold tracking-wide text-[#a99cff] uppercase">
+                Customer
               </span>
-              <span className="line-clamp-1 text-[11px] text-muted-foreground">
-                <span className="font-medium text-foreground">Problem: </span>
-                {issue.root_cause ||
-                  issue.summary ||
-                  issue.original_words ||
-                  "—"}
+              <span className="line-clamp-1 text-sm font-semibold">
+                {customer}
               </span>
-              <span className="line-clamp-1 text-[11px] text-muted-foreground">
-                <span className="font-medium text-foreground">Next: </span>
-                {nextLine(issue)}
+              <span className="mt-0.5 text-[11px] text-white/70">
+                {n} request{n === 1 ? "" : "s"} · {visible.length} connected
               </span>
-              <span className="mt-auto flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                <StatusDot issue={issue} />
-                {t.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-      <div
-        className="mt-3 min-h-[3.25rem] rounded-lg bg-surface-muted px-3 py-2 text-xs"
-        aria-live="polite"
-      >
-        {detail ? (
-          <>
-            <p className="text-[13px] font-semibold">{detail.title}</p>
-            <p className="mt-0.5 text-muted-foreground">
-              {tone(detail).label} ·{" "}
-              {STAGES.find(([k]) => k === detail.stage)?.[1] ?? detail.stage}
-              {detail.summary ? ` · ${detail.summary}` : ""}
-            </p>
-            {detail.next_step && (
-              <p className="mt-0.5">
-                <span className="font-medium">Next: </span>
-                {detail.next_step}
+            </div>
+            {shown.map((issue, i) => {
+              const t = tone(issue);
+              const p = pos[i];
+              const waiting = t.label === "Waiting on them";
+              const dim = active !== null && active !== i && !touches(i);
+              return (
+                <button
+                  type="button"
+                  key={`${issue.title}-${i}`}
+                  onMouseEnter={() => {
+                    setActive(i);
+                    setActiveLink(null);
+                  }}
+                  onFocus={() => {
+                    setActive(i);
+                    setActiveLink(null);
+                  }}
+                  onClick={() => setActive(i)}
+                  aria-label={`${issue.title}: ${t.label}`}
+                  className={cn(
+                    "pm-in absolute flex flex-col gap-0.5 rounded-xl border bg-surface px-3 py-2.5 text-left shadow-sm transition-[opacity,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary",
+                    active === i ? "border-primary shadow-md" : "border-border",
+                    waiting && "pm-pulse",
+                    changed.has(issue.title) && "pm-flash",
+                  )}
+                  style={{
+                    left: `${(p.x / W) * 100}%`,
+                    top: `${(p.y / H) * 100}%`,
+                    width: `${(CARD_W / W) * 100}%`,
+                    height: `${(CARD_H / H) * 100}%`,
+                    opacity: dim ? 0.35 : 1,
+                    animationDelay: `${i * 70}ms`,
+                    borderLeft: `4px solid ${t.ring}`,
+                  }}
+                >
+                  {startHere === i && (
+                    <span className="absolute -top-2.5 right-3 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground shadow-sm">
+                      Start here
+                    </span>
+                  )}
+                  {issue.area && (
+                    <span className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
+                      {issue.area}
+                    </span>
+                  )}
+                  <span className="line-clamp-1 text-[13px] leading-tight font-semibold">
+                    {issue.title}
+                  </span>
+                  <span className="line-clamp-1 text-[11px] text-muted-foreground">
+                    <span className="font-medium text-foreground">
+                      Problem:{" "}
+                    </span>
+                    {issue.root_cause ||
+                      issue.summary ||
+                      issue.original_words ||
+                      "—"}
+                  </span>
+                  <span className="line-clamp-1 text-[11px] text-muted-foreground">
+                    <span className="font-medium text-foreground">Next: </span>
+                    {nextLine(issue)}
+                  </span>
+                  <span className="mt-auto flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <StatusDot issue={issue} />
+                    {t.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <div
+            className="mt-3 min-h-[3.25rem] rounded-lg bg-surface-muted px-3 py-2 text-xs"
+            aria-live="polite"
+          >
+            {detail ? (
+              <>
+                <p className="text-[13px] font-semibold">{detail.title}</p>
+                <p className="mt-0.5 text-muted-foreground">
+                  {tone(detail).label} ·{" "}
+                  {STAGES.find(([k]) => k === detail.stage)?.[1] ??
+                    detail.stage}
+                  {detail.summary ? ` · ${detail.summary}` : ""}
+                </p>
+                {detail.next_step && (
+                  <p className="mt-0.5">
+                    <span className="font-medium">Next: </span>
+                    {detail.next_step}
+                  </p>
+                )}
+              </>
+            ) : link ? (
+              <>
+                <p className="text-[13px] font-semibold">
+                  {link.a_title} ↔ {link.b_title}
+                </p>
+                <p className="mt-0.5">{link.reason}</p>
+                {link.benefit && (
+                  <p className="mt-0.5 text-muted-foreground">{link.benefit}</p>
+                )}
+              </>
+            ) : (
+              <p className="pt-1 text-muted-foreground">
+                Point at a request or a line to see what it is, whose turn it is
+                and why pi connected them.
               </p>
             )}
-          </>
-        ) : link ? (
-          <>
-            <p className="text-[13px] font-semibold">
-              {link.a_title} ↔ {link.b_title}
-            </p>
-            <p className="mt-0.5">{link.reason}</p>
-            {link.benefit && (
-              <p className="mt-0.5 text-muted-foreground">{link.benefit}</p>
+          </div>
+          <figcaption className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            {[
+              ["#3b82f6", "Waiting on us"],
+              ["#f5a524", "Waiting on them"],
+              ["#1f9d63", "Done"],
+              ["#5A47F5", "Noted"],
+            ].map(([color, label]) => (
+              <span key={label} className="inline-flex items-center gap-1.5">
+                <span
+                  className="inline-block size-2.5 rounded-full"
+                  style={{ background: color }}
+                />
+                {label}
+              </span>
+            ))}
+            {visible.length > 0 && (
+              <span>Dashed line: part of / depends on</span>
             )}
-          </>
-        ) : (
-          <p className="pt-1 text-muted-foreground">
-            Point at a request or a line to see what it is, whose turn it is and
-            why pi connected them.
-          </p>
-        )}
-      </div>
-      <figcaption className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-        {[
-          ["#3b82f6", "Waiting on us"],
-          ["#f5a524", "Waiting on them"],
-          ["#1f9d63", "Done"],
-          ["#5A47F5", "Noted"],
-        ].map(([color, label]) => (
-          <span key={label} className="inline-flex items-center gap-1.5">
-            <span
-              className="inline-block size-2.5 rounded-full"
-              style={{ background: color }}
-            />
-            {label}
-          </span>
-        ))}
-        {visible.length > 0 && <span>Dashed line: part of / depends on</span>}
-      </figcaption>
-      {issues.length > shown.length && (
-        <p className="mt-1 text-xs text-muted-foreground">
-          +{issues.length - shown.length} more requests not drawn.
-        </p>
+          </figcaption>
+          {issues.length > shown.length && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              +{issues.length - shown.length} more requests not drawn.
+            </p>
+          )}
+        </>
       )}
     </figure>
   );
@@ -899,8 +1044,14 @@ const MAP_MOTION = `
 @keyframes pm-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(139,124,248,.35); } 50% { box-shadow: 0 0 0 10px rgba(139,124,248,0); } }
 .pm-hub { animation: pm-in 420ms cubic-bezier(.2,.8,.2,1) both, pm-glow 3s ease-in-out 1s infinite; }
 .pm-pulse { animation: pm-in 420ms cubic-bezier(.2,.8,.2,1) both, pm-pulse 2.4s ease-in-out 1s infinite; }
+@keyframes pm-flash { 0%, 60% { box-shadow: 0 0 0 3px rgba(31,157,99,.7); } 100% { box-shadow: 0 0 0 0 rgba(31,157,99,0); } }
+.pm-flash { animation: pm-flash 3s ease-out both !important; }
+@keyframes pm-now { 0%, 100% { box-shadow: 0 0 0 0 rgba(90,71,245,.45); } 50% { box-shadow: 0 0 0 5px rgba(90,71,245,0); } }
+.pm-now { animation: pm-now 2s ease-in-out infinite; }
+@keyframes pm-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.pm-grow { transform-origin: left; animation: pm-grow 700ms cubic-bezier(.2,.8,.2,1) both; }
 @media (prefers-reduced-motion: reduce) {
-  .pm-in, .pm-draw, .pm-fade, .pm-pulse, .pm-hub { animation: none !important; stroke-dashoffset: 0; }
+  .pm-in, .pm-draw, .pm-fade, .pm-pulse, .pm-hub, .pm-flash, .pm-now, .pm-grow { animation: none !important; stroke-dashoffset: 0; }
 }
 `;
 
@@ -958,5 +1109,295 @@ function StageChart({
         </div>
       </div>
     </div>
+  );
+}
+
+type View = "map" | "progress" | "list";
+const VIEWS = [
+  ["map", "Map"],
+  ["progress", "Progress"],
+  ["list", "List"],
+] as const;
+
+/** What's been done so far: each project's journey step by step (done with its date,
+ * the step it's on now, what's still ahead) and how far each request has come. */
+function Progress({
+  issues,
+  projects,
+  changed,
+}: {
+  issues: Issue[];
+  projects: Project[];
+  changed: Set<string>;
+}) {
+  const steps = projects.flatMap((d) => d.steps);
+  const stepsDone = steps.filter((s) => s.done).length;
+  const closed = issues.filter((i) =>
+    ["live", "closed"].includes(i.stage),
+  ).length;
+  const moving = issues.filter(
+    (i) => !["noted", "live", "closed", "paused"].includes(i.stage),
+  ).length;
+  const tiles = [
+    {
+      label: "Project steps done",
+      value: steps.length ? `${stepsDone} of ${steps.length}` : "—",
+      pct: steps.length ? stepsDone / steps.length : 0,
+    },
+    {
+      label: "Requests in progress",
+      value: `${moving} of ${issues.length}`,
+      pct: issues.length ? moving / issues.length : 0,
+    },
+    {
+      label: "Requests done",
+      value: `${closed} of ${issues.length}`,
+      pct: issues.length ? closed / issues.length : 0,
+    },
+  ];
+  return (
+    <div className="space-y-5">
+      <div className="grid gap-3 sm:grid-cols-3">
+        {tiles.map((t, i) => (
+          <div
+            key={t.label}
+            className="pm-in rounded-xl border border-border bg-surface px-3 py-2.5"
+            style={{ animationDelay: `${i * 60}ms` }}
+          >
+            <p className="text-xs text-muted-foreground">{t.label}</p>
+            <p className="mt-0.5 text-lg font-semibold tabular-nums">
+              {t.value}
+            </p>
+            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-muted">
+              <div
+                className="pm-grow h-full rounded-full bg-[#1f9d63]"
+                style={{
+                  width: `${Math.round(t.pct * 100)}%`,
+                  animationDelay: `${200 + i * 80}ms`,
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {projects.length > 0 && (
+        <section aria-label="What's been done on each project">
+          <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            What&apos;s been done
+          </h3>
+          <div className="grid gap-3 lg:grid-cols-2">
+            {projects.map((d, k) => (
+              <ProjectTimeline
+                key={d.lead_id}
+                project={d}
+                fresh={changed.has(d.lead_id)}
+                delay={k * 90}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {issues.length > 0 && (
+        <section aria-label="How far each request has come">
+          <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            Each request
+          </h3>
+          <ul className="space-y-2">
+            {order(issues).map((issue, i) => (
+              <RequestTrack
+                key={`${issue.title}-${i}`}
+                issue={issue}
+                fresh={changed.has(issue.title)}
+                delay={i * 60}
+              />
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  );
+}
+
+function ProjectTimeline({
+  project,
+  fresh,
+  delay,
+}: {
+  project: Project;
+  fresh: boolean;
+  delay: number;
+}) {
+  const now = project.steps.findIndex((s) => !s.done);
+  const done = project.steps.filter((s) => s.done).length;
+  return (
+    <div
+      className={cn(
+        "pm-in rounded-xl border border-border bg-surface p-3",
+        fresh && "pm-flash",
+      )}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-[13px] font-semibold">{project.title}</p>
+          {project.service && project.service !== project.title && (
+            <p className="text-xs text-muted-foreground">{project.service}</p>
+          )}
+        </div>
+        <Badge tone={now === -1 ? "success" : "info"}>
+          {now === -1 ? "Complete" : `${done}/${project.steps.length}`}
+        </Badge>
+      </div>
+      {project.steps.length === 0 ? (
+        <p className="text-xs text-muted-foreground">
+          {LEAD_STAGE[project.stage] ?? project.stage}
+        </p>
+      ) : (
+        <ol className="relative">
+          {project.steps.map((s, i) => {
+            const current = i === now;
+            const last = i === project.steps.length - 1;
+            const note = [
+              s.detail !== project.title ? s.detail : "",
+              s.done && s.at ? formatDate(s.at) : "",
+            ]
+              .filter(Boolean)
+              .join(" · ");
+            return (
+              <li
+                key={s.key}
+                className="pm-in relative flex gap-2.5 pb-2.5 last:pb-0"
+                style={{ animationDelay: `${delay + 120 + i * 45}ms` }}
+              >
+                {!last && (
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "absolute top-5 bottom-0 left-[9px] w-0.5",
+                      s.done ? "bg-[#1f9d63]" : "bg-border",
+                    )}
+                  />
+                )}
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "relative z-10 mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2",
+                    s.done
+                      ? "border-[#1f9d63] bg-[#1f9d63] text-white"
+                      : current
+                        ? "pm-now border-primary bg-surface"
+                        : "border-border bg-surface",
+                  )}
+                >
+                  {s.done ? (
+                    <Check className="size-3" strokeWidth={3} />
+                  ) : current ? (
+                    <span className="size-1.5 rounded-full bg-primary" />
+                  ) : null}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p
+                    className={cn(
+                      "text-[13px] leading-5",
+                      s.done
+                        ? "font-medium"
+                        : current
+                          ? "font-semibold text-primary"
+                          : "text-muted-foreground",
+                    )}
+                  >
+                    {s.label}
+                    {current && (
+                      <span className="ml-1.5 text-[11px] font-medium">
+                        · now
+                      </span>
+                    )}
+                    <span className="sr-only">
+                      {s.done ? " (done)" : current ? "" : " (to do)"}
+                    </span>
+                  </p>
+                  {note && (
+                    <p className="text-xs text-muted-foreground">{note}</p>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+      {project.next && now !== -1 && (
+        <p className="mt-2 rounded-lg bg-surface-muted px-2.5 py-1.5 text-xs">
+          <span className="font-medium">Next: </span>
+          {project.next.title}
+          {project.next.auto && (
+            <span className="ml-1 text-muted-foreground">(pi does this)</span>
+          )}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** One request across the stages: filled up to where it is now. */
+function RequestTrack({
+  issue,
+  fresh,
+  delay,
+}: {
+  issue: Issue;
+  fresh: boolean;
+  delay: number;
+}) {
+  const t = tone(issue);
+  const at =
+    issue.stage === "closed"
+      ? STAGES.length - 1
+      : STAGES.findIndex(([k]) => k === issue.stage);
+  const label =
+    issue.stage === "paused"
+      ? "Paused"
+      : (STAGES[Math.max(at, 0)]?.[1] ?? issue.stage);
+  return (
+    <li
+      className={cn(
+        "pm-in rounded-lg border border-border bg-surface px-3 py-2",
+        fresh && "pm-flash",
+      )}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5">
+        <p className="text-[13px] font-medium">{issue.title}</p>
+        <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <StatusDot issue={issue} />
+          {label}
+        </p>
+      </div>
+      <div
+        className="mt-1.5 grid grid-cols-6 gap-1"
+        role="img"
+        aria-label={`${issue.title}: ${label}, stage ${Math.max(at, 0) + 1} of ${STAGES.length}`}
+      >
+        {STAGES.map(([key, name], i) => (
+          <span
+            key={key}
+            title={name}
+            className={cn(
+              "pm-grow h-1.5 rounded-full",
+              i > at && "bg-surface-muted",
+            )}
+            style={{
+              background: i <= at ? t.ring : undefined,
+              animationDelay: `${delay + 150 + i * 60}ms`,
+            }}
+          />
+        ))}
+      </div>
+      <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+        <span className="font-medium text-foreground">Next: </span>
+        {nextLine(issue)}
+      </p>
+    </li>
   );
 }

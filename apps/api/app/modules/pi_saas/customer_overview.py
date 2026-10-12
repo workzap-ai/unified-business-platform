@@ -228,6 +228,10 @@ async def _projects(session: Any, scope: Any, customer_id: UUID) -> list[dict[st
                 "current_step": next((s["label"] for s in steps if not s["done"]), "Paid"),
                 "next": path["next"],
                 "meeting": path.get("meeting"),
+                # Every step with its date: the "what's been done" view.
+                "steps": [
+                    {k: s[k] for k in ("key", "label", "at", "done", "detail")} for s in steps
+                ],
             }
         except (BusinessRuleViolation, DBAPIError):
             pass  # Without the deal journey (pi off, older database) the lead still shows.
