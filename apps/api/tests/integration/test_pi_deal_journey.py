@@ -249,16 +249,23 @@ async def test_changes_in_the_chat_lead_to_a_revised_proposal(api, business_db, 
 
 
 async def test_pi_keeps_its_notes_and_leaves_the_teams_alone(api, business_db, monkeypatch):
+    # pi answers in English (the customer writes English).
+    english = {"reply": "Noted. What is the website for?", "language": "en"}
     mock_turns(
         monkeypatch,
         turn(
-            summary="Customer: a bakery\nWants: Website", requirements=Requirements(service="Web")
+            summary="Customer: a bakery\nWants: Website",
+            requirements=Requirements(service="Web"),
+            **english,
         ),
         turn(
             summary="Customer: a bakery\nWants: Website, blue",
             requirements=Requirements(service="Web"),
+            **english,
         ),
-        turn(summary="Customer: changed again", requirements=Requirements(service="Web")),
+        turn(
+            summary="Customer: changed again", requirements=Requirements(service="Web"), **english
+        ),
     )
     pi = await pi_workspace(api, business_db, business_type="service_business")
     await pi.process("I need a website", "notes-1")
