@@ -107,13 +107,7 @@ const TOGGLES: {
   {
     key: "auto_invoice",
     label: "Issue the invoice",
-    help: "The confirmed order is invoiced straight away.",
-    after: "auto_order",
-  },
-  {
-    key: "auto_payment_request",
-    label: "Send the payment link on WhatsApp",
-    help: "The customer gets the invoice and a way to pay.",
+    help: "The confirmed order is invoiced straight away. Your team checks it and sends it; pi never sends an invoice by itself.",
     after: "auto_order",
   },
   {

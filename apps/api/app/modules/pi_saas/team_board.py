@@ -42,7 +42,17 @@ from app.shared.workspace_repository import WorkspaceRepository
 logger = logging.getLogger(__name__)
 
 PREFIX = "board:"
-KINDS = ("price", "approve", "payment", "request", "reply", "start", "deliver", "feedback")
+KINDS = (
+    "price",
+    "approve",
+    "invoice",
+    "payment",
+    "request",
+    "reply",
+    "start",
+    "deliver",
+    "feedback",
+)
 LIVE = ("open", "in_progress", "blocked")
 COLUMNS = {"open": "todo", "in_progress": "doing", "blocked": "waiting", "done": "done"}
 DONE_DAYS = 7
@@ -307,6 +317,39 @@ async def _work(session: AsyncSession, scope: WorkspaceScope) -> list[Card]:
     return cards
 
 
+async def _invoices(session: AsyncSession, scope: WorkspaceScope) -> list[Card]:
+    """Accepted deals whose invoice is ready but not sent: pi never sends an invoice by
+    itself, a person checks it and sends it."""
+    rows = list(
+        await session.execute(
+            WorkspaceRepository(session, Invoice, scope)
+            .select()
+            .add_columns(SalesLead.title, SalesLead.conversation_id)
+            .join(Quote, Quote.order_id == Invoice.order_id)
+            .join(SalesLead, SalesLead.id == Quote.lead_id)
+            .where(Invoice.status.in_(["draft", "issued"]))
+            .limit(300)
+        )
+    )
+    sent = await deals.invoices_sent(session, scope, [invoice for invoice, _, _ in rows])
+    return [
+        Card(
+            "invoice",
+            str(invoice.id),
+            f"Send invoice {invoice.number}: {project}",
+            invoice.created_at,
+            invoice.customer_id,
+            conversation,
+            f"The customer accepted. Check invoice {invoice.number} "
+            f"({deals.money(invoice.total, invoice.currency)}), then send it: they get it "
+            "on WhatsApp with the payment link.",
+            priority="high",
+        )
+        for invoice, project, conversation in rows
+        if invoice.id not in sent
+    ]
+
+
 async def _feedback(session: AsyncSession, scope: WorkspaceScope) -> list[Card]:
     """Unhappy answers to "How did it go?" from the last 30 days."""
     since = datetime.now(UTC) - timedelta(days=FEEDBACK_DAYS)
@@ -348,6 +391,7 @@ async def _feedback(session: AsyncSession, scope: WorkspaceScope) -> list[Card]:
 
 COLLECTORS = {
     "proposals": (_proposals, ("price", "approve")),
+    "invoices": (_invoices, ("invoice",)),
     "payments": (_payments, ("payment",)),
     "requests": (_requests, ("request",)),
     "replies": (_replies, ("reply",)),
@@ -475,7 +519,11 @@ async def _context(
         for row in await session.scalars(
             WorkspaceRepository(session, Invoice, scope)
             .select()
-            .where(Invoice.id.in_([p.invoice_id for p in payments.values()] or [UUID(int=0)]))
+            .where(
+                Invoice.id.in_(
+                    [*(p.invoice_id for p in payments.values()), *ids("invoice")] or [UUID(int=0)]
+                )
+            )
         )
     }
     requests = {
@@ -532,6 +580,11 @@ async def _context(
             quote = by_quote.get(source)
             project = title(quote.lead_id) if quote else None
             link = f"/quotes/{source}/edit" if kind == "price" else f"/quotes/{source}"
+        elif kind == "invoice" and source:
+            invoice = invoices.get(source)
+            quote = by_order.get(invoice.order_id) if invoice and invoice.order_id else None
+            project = title(quote.lead_id) if quote else None
+            link = f"/billing/invoices/{source}"
         elif kind == "payment" and source:
             payment = payments.get(source)
             invoice = invoices.get(payment.invoice_id) if payment else None

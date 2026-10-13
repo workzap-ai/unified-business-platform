@@ -160,6 +160,11 @@ TEXTS: dict[str, dict[str, str]] = {
         "en": "Thank you! Your order {number} is confirmed.",
         "roman_ur": "Shukriya! Aap ka order {number} confirm ho gaya hai.",
     },
+    "accepted_manual": {
+        "en": "Thank you. Your order {number} is confirmed. Our team will send your invoice here.",
+        "roman_ur": "Shukriya. Aap ka order {number} confirm ho gaya hai. Hamari team "
+        "invoice yahin bhejegi.",
+    },
     "invoice": {
         "en": "Here is your invoice from {business}.",
         "roman_ur": "{business} ki taraf se aap ki invoice.",
@@ -1144,10 +1149,9 @@ async def after_accept(
     *,
     http: OutboundClient | None = None,
 ) -> list[str]:
-    """Accepted: confirm the order, issue the invoice and send the payment link, each
-    step only if the business switched it on. With ``http``, a business without pi's
-    payment methods still gets a pay link from its Stripe integration; the customer is
-    also emailed (best effort; the integrations sweep delivers it)."""
+    """Accepted: confirm the order and prepare the invoice (each only if the business
+    switched it on), and thank the customer. The invoice itself is never sent by pi:
+    a person checks it and sends it (the deal's "Send the invoice" step / Team board)."""
     deals = await deal_settings(session, scope)
     if not deals.auto_order:
         return []
@@ -1176,24 +1180,51 @@ async def after_accept(
         f"order {order.number} confirmed"
         + (f", invoice {invoice.number} issued" if invoice is not None else ""),
     )
-    if invoice is None or not deals.auto_payment_request:
-        return []
-    doc, text, customer = await invoice_message(
-        session,
-        scope,
-        settings,
-        invoice,
-        intro=say(
-            "accepted",
-            await customer_language(session, scope, quote.customer_id),
-            number=order.number,
-        ),
+    customer = await WorkspaceRepository(session, Customer, scope).find(
+        Customer.id == quote.customer_id
     )
-    invoice_url = text.rsplit("Invoice: ", 1)[-1]
-    text = await _with_card_link(session, settings, scope, invoice, text, http)
-    ids = await deliver(session, scope, doc, customer, text)
-    await _email_pay_link(session, scope, invoice, text, invoice_url)
-    return ids
+    contact = _contact(customer) if customer else None
+    conversation = (
+        await _conversation(session, scope, customer, contact) if customer and contact else None
+    )
+    if conversation is None or not conversation.last_inbound_at:
+        return []
+    if conversation.last_inbound_at < datetime.now(UTC) - WINDOW:
+        return []  # Outside the window the invoice message (sent by the team) says it.
+    text = say(
+        "accepted_manual",
+        await customer_language(session, scope, quote.customer_id),
+        number=order.number,
+    )
+    return [await _queue(session, scope, conversation, text, f"pi-accepted:{quote.id}")]
+
+
+async def invoices_sent(
+    session: AsyncSession, scope: WorkspaceScope, invoices: list[Invoice]
+) -> set[UUID]:
+    """The invoices a person has already sent to the customer (an invoice message or
+    a payment request exists), or that are being paid anyway."""
+    sent = {i.id for i in invoices if i.status in {"partially_paid", "paid"}}
+    ids = [i.id for i in invoices if i.id not in sent]
+    if not ids:
+        return sent
+    sent |= set(
+        await session.scalars(
+            WorkspaceRepository(session, PiDocument, scope)
+            .select()
+            .with_only_columns(PiDocument.invoice_id)
+            .where(PiDocument.kind == "invoice", PiDocument.invoice_id.in_(ids))
+        )
+    )
+    sent |= set(
+        await session.scalars(
+            WorkspaceRepository(session, PiPaymentRequest, scope)
+            .select()
+            .with_only_columns(PiPaymentRequest.invoice_id)
+            .where(PiPaymentRequest.invoice_id.in_(ids))
+        )
+    )
+    return sent
 
 
 async def _with_card_link(
@@ -1235,8 +1266,16 @@ async def _email_pay_link(
 
 
 async def send_invoice(
-    session: AsyncSession, scope: WorkspaceScope, settings: Settings, invoice_id: UUID
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    settings: Settings,
+    invoice_id: UUID,
+    *,
+    http: OutboundClient | None = None,
 ) -> tuple[dict[str, Any], list[str]]:
+    """A person sends the invoice (pi never does it alone): on WhatsApp with the payment
+    link, a card link from the Stripe integration when pi has no pay link, and the same
+    link by email when the customer has an address."""
     invoice = await WorkspaceRepository(session, Invoice, scope).get(invoice_id)
     if invoice.status == "draft":
         invoice = await BillingService(session, scope).act(invoice.id, "issue")
@@ -1256,8 +1295,10 @@ async def send_invoice(
             business=business,
         ),
     )
-    ids = await deliver(session, scope, doc, customer, text)
     url = text.rsplit("Invoice: ", 1)[-1]
+    text = await _with_card_link(session, settings, scope, invoice, text, http)
+    ids = await deliver(session, scope, doc, customer, text)
+    await _email_pay_link(session, scope, invoice, text, url)
     return delivery_view(doc, customer, url), ids
 
 

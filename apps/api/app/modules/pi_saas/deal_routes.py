@@ -130,7 +130,13 @@ async def send_invoice(
     invoice_id: UUID, request: Request, scope: Scope, session: Session
 ) -> dict[str, Any]:
     await require_pi(session, scope, "billing.write")
-    view, ids = await deals.send_invoice(session, scope, request.app.state.settings, invoice_id)
+    view, ids = await deals.send_invoice(
+        session,
+        scope,
+        request.app.state.settings,
+        invoice_id,
+        http=getattr(request.app.state, "http", None),
+    )
     await session.commit()
     await _enqueue(request, ids)
     return view
@@ -464,6 +470,9 @@ async def journey(lead_id: UUID, scope: Scope, session: Session) -> dict[str, An
     )
     briefed = lead.stage != "new" or quote is not None
     meeting = await _meeting(session, scope, lead)
+    invoice_sent = bool(invoice) and invoice.id in await deals.invoices_sent(
+        session, scope, [invoice]
+    )
     steps = [
         _step(
             "enquiry",
@@ -514,9 +523,9 @@ async def journey(lead_id: UUID, scope: Scope, session: Session) -> dict[str, An
         ),
         _step(
             "invoice",
-            f"Invoice {invoice.number}" if invoice else "Invoice sent",
+            f"Invoice {invoice.number} sent" if invoice else "Invoice sent",
             invoice.issue_date if invoice else None,
-            bool(invoice and invoice.status != "draft"),
+            invoice_sent,
             deals.money(invoice.total, invoice.currency) if invoice else "",
         ),
         _step(
@@ -563,7 +572,7 @@ async def journey(lead_id: UUID, scope: Scope, session: Session) -> dict[str, An
         "stage": lead.stage,
         "steps": steps,
         "meeting": meeting,
-        "next": _guide(lead, quote, doc, invoice, settings, meeting, order),
+        "next": _guide(lead, quote, doc, invoice, settings, meeting, order, invoice_sent),
         "reminder": (
             deal_followups.next_reminder(doc, quote, invoice, datetime.now(UTC))
             if settings["auto_followups"] and lead.stage != "lost"
@@ -584,6 +593,7 @@ def _guide(
     settings: dict[str, Any],
     meeting: dict[str, Any] | None = None,
     order: Order | None = None,
+    invoice_sent: bool = True,
 ) -> dict[str, Any]:
     """The next step in plain words. ``action`` is a button the page can run; ``href``
     opens the page where the team does it; ``auto`` says pi handles it alone."""
@@ -602,6 +612,14 @@ def _guide(
             "pi told the customer it's delivered and asked how it went. Their answer and "
             "any next project come back in the chat.",
             auto=True,
+        )
+    if invoice is not None and not invoice_sent and invoice.status in {"draft", "issued"}:
+        return step(
+            "Send the invoice",
+            "The customer accepted and the invoice is ready. Check it, then send it: the "
+            "customer gets it on WhatsApp with the payment link. pi never sends it by itself.",
+            action="send_invoice",
+            href=f"/invoices/{invoice.id}",
         )
     if invoice is not None:
         if invoice.status == "paid" and work in {"processing", "shipped"}:
@@ -692,8 +710,9 @@ def _guide(
         return step(
             "Waiting for the customer",
             ("They opened it. " if doc and doc.viewed_at else "Not opened yet. ")
-            + "When they accept, pi confirms the order and sends the invoice"
-            + (" by itself." if settings["auto_order"] else "."),
+            + "When they accept, pi confirms the order"
+            + (" by itself" if settings["auto_order"] else "")
+            + "; your team then sends the invoice.",
             action="send_proposal",
             auto=True,
         )

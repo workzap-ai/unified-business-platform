@@ -193,6 +193,14 @@ async def test_customer_accepts_in_the_chat_and_gets_the_invoice(api, business_d
     invoice = await pi.db.scalar(select(Invoice).where(Invoice.order_id == order.id))
     assert invoice is not None and invoice.status == "issued"
     bodies = [m.body for m in await pi.outbound()]
+    # Accepting never sends the invoice: pi confirms and says the team will send it.
+    assert not any("Invoice:" in body for body in bodies)
+    assert any("Hamari team invoice yahin bhejegi." in body for body in bodies)
+    assert not emailed
+    # The team sends it: WhatsApp with the card link, and the same link by email.
+    sent = await pi.api.post(f"{DEALS}/invoices/{invoice.id}/send")
+    assert sent.status_code == 200, sent.text
+    bodies = [m.body for m in await pi.outbound()]
     assert any(
         "Invoice:" in body and "Pay by card: https://checkout.stripe.com/" in body
         for body in bodies

@@ -12,6 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   CheckSquare,
   CreditCard,
+  Receipt,
   MessageCircle,
   MessageCircleQuestion,
   Play,
@@ -49,6 +50,7 @@ const LIVE_EVERY_MS = 20_000;
 type Kind =
   | "price"
   | "approve"
+  | "invoice"
   | "payment"
   | "request"
   | "reply"
@@ -103,6 +105,7 @@ const COLUMN_STATUS: Record<Column, string> = {
 const KINDS: Kind[] = [
   "price",
   "approve",
+  "invoice",
   "payment",
   "request",
   "reply",
@@ -121,6 +124,7 @@ const KIND: Record<
 > = {
   price: { label: "Price", icon: Tag, tone: "accent" },
   approve: { label: "Approve", icon: Stamp, tone: "info" },
+  invoice: { label: "Send invoice", icon: Receipt, tone: "warning" },
   payment: { label: "Payment", icon: CreditCard, tone: "success" },
   request: { label: "pi asks", icon: MessageCircleQuestion, tone: "accent" },
   reply: { label: "Reply", icon: MessageCircle, tone: "danger" },

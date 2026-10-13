@@ -117,7 +117,7 @@ accepts it or asks for changes, so make it clear, specific and complete.
 - timeline: ONLY from approved_knowledge (process, turnaround); otherwise leave it empty.
 - not_included: only what approved_knowledge says is extra or excluded; otherwise empty.
 - next_steps: one sentence: accept on this page, then the order is confirmed and the
-  invoice follows; or ask for changes here.
+  team sends the invoice; or ask for changes here.
 - lines: one per thing the customer is buying. For each, set offering_id to the id of the
   catalog option that clearly matches it (pick the option that fits their brief, e.g. the
   right package size), or "" when none clearly does. title is short, description says

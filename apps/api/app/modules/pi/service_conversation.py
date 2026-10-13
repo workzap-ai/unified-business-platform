@@ -669,8 +669,8 @@ Proposals:
 - open_proposal is a proposal the customer has and hasn't answered yet. If their LATEST
   message clearly accepts it ("haan theek hai, accept", "ok go ahead", "confirm kar
   dein"), set proposal_answer="accepted", copy their exact words into
-  proposal_evidence, and reply in one or two lines: thank them and say the order
-  confirmation and the invoice with the payment link follow here now (no amounts).
+  proposal_evidence, and reply in one or two lines: thank them, say the order is
+  confirmed and that the team will send the invoice here (no amounts, no time).
 - If they ask for changes to it, set proposal_answer="changes" with their exact words,
   add the changes to the project details, list the updated points and ask them to
   confirm; say the updated proposal follows on their yes.
@@ -2454,17 +2454,30 @@ async def project_deals(
             if order is not None
             else None
         )
+        from app.modules.pi_saas.deals import invoices_sent
+
+        sent = invoice is None or invoice.id in await invoices_sent(session, scope, [invoice])
         steps.append(
             {
                 "project": lead.title,
                 "stage": lead.stage,
-                "next": next_for(lead.stage, quote, auto, invoice=invoice, order=order),
+                "next": next_for(
+                    lead.stage, quote, auto, invoice=invoice, order=order, invoice_sent=sent
+                ),
             }
         )
     return steps
 
 
-def next_for(stage: str, quote: Any, auto: bool, *, invoice: Any = None, order: Any = None) -> str:
+def next_for(
+    stage: str,
+    quote: Any,
+    auto: bool,
+    *,
+    invoice: Any = None,
+    order: Any = None,
+    invoice_sent: bool = True,
+) -> str:
     """The honest next step of one project's deal, all the way to delivery."""
     if stage == "lost":
         return "closed"
@@ -2476,6 +2489,9 @@ def next_for(stage: str, quote: Any, auto: bool, *, invoice: Any = None, order: 
         )
     if work == "shipped":
         return f"order {order.number} is on its way to them"
+    if invoice is not None and not invoice_sent and str(invoice.status) in {"draft", "issued"}:
+        # The team checks and sends every invoice; pi never sends one by itself.
+        return "accepted; the order is confirmed and the team will send the invoice here"
     if invoice is not None and str(invoice.status) in {"issued", "partially_paid", "overdue"}:
         if str(invoice.status) == "partially_paid":
             return (
@@ -2512,7 +2528,7 @@ def next_for(stage: str, quote: Any, auto: bool, *, invoice: Any = None, order: 
             "replying here or on its page"
         )
     if status == "accepted":
-        return "accepted; the order confirmation and invoice with the payment link come here"
+        return "accepted; the order is confirmed and the team will send the invoice here"
     if status == "rejected":
         return "changes were asked; a revised proposal follows here once confirmed"
     return "a fresh proposal will be shared here"

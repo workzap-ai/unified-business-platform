@@ -10,6 +10,7 @@ import { apiRequest } from "@/services/api-client";
 export const BOARD_KINDS = [
   "price",
   "approve",
+  "invoice",
   "payment",
   "request",
   "reply",

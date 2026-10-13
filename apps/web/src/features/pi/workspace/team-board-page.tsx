@@ -6,6 +6,7 @@ import {
   ArrowRightLeft,
   CheckSquare,
   CreditCard,
+  Receipt,
   MessageCircle,
   MessageCircleQuestion,
   Play,
@@ -79,6 +80,7 @@ const KIND: Record<
 > = {
   price: { label: "Price", icon: Tag, tone: "primary" },
   approve: { label: "Approve", icon: Stamp, tone: "info" },
+  invoice: { label: "Send invoice", icon: Receipt, tone: "warning" },
   payment: { label: "Payment", icon: CreditCard, tone: "success" },
   request: { label: "pi asks", icon: MessageCircleQuestion, tone: "pi" },
   reply: { label: "Reply", icon: MessageCircle, tone: "danger" },

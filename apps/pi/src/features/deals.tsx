@@ -907,13 +907,10 @@ function SettingsDialog({
               disabled={!value.auto_order}
               onCheckedChange={(v) => set("auto_invoice", v)}
             />
-            <Switch
-              id="auto-pay"
-              label="Send the payment link on WhatsApp"
-              checked={value.auto_payment_request}
-              disabled={!value.auto_order}
-              onCheckedChange={(v) => set("auto_payment_request", v)}
-            />
+            <p className="text-xs text-muted-foreground">
+              Your team checks every invoice and sends it from the deal or the
+              Team board. pi never sends an invoice by itself.
+            </p>
             <Switch
               id="thank-you"
               label="Thank them when they pay"

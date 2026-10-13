@@ -166,13 +166,35 @@ async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db, monkeyp
     assert order is not None and order.status == "confirmed"
     invoice = await business_db.scalar(select(Invoice).where(Invoice.order_id == order.id))
     assert invoice is not None and invoice.status == "issued"
+    # pi never sends the invoice by itself: the customer is thanked, the team sends it.
+    assert (
+        await business_db.scalar(
+            select(PiPaymentRequest).where(PiPaymentRequest.invoice_id == invoice.id)
+        )
+        is None
+    )
+    texts = await _send(pi)
+    assert texts[-1].startswith("Thank you. Your order ORD-")
+    assert "Our team will send your invoice here." in texts[-1]
+    path = (await api.get(f"{DEALS}/leads/{lead_id}/journey")).json()
+    assert path["next"]["title"] == "Send the invoice"
+    assert path["next"]["action"] == "send_invoice"
+    board_view = (await api.get("/api/v1/pi/team-board")).json()
+    todo = board_view["columns"]["todo"]
+    assert [c["title"] for c in todo if c["kind"] == "invoice"] == [
+        f"Send invoice {invoice.number}: Branding for Crescent Bakers"
+    ]
+    sent_invoice = await api.post(f"{DEALS}/invoices/{invoice.id}/send")
+    assert sent_invoice.status_code == 200, sent_invoice.text
+    board_view = (await api.get("/api/v1/pi/team-board")).json()
+    assert not [c for c in board_view["columns"]["todo"] if c["kind"] == "invoice"]
     request = await business_db.scalar(
         select(PiPaymentRequest).where(PiPaymentRequest.invoice_id == invoice.id)
     )
     assert request is not None and request.method == "bank_transfer"
     texts = await _send(pi)
     paid_text = texts[-1]
-    assert "Thank you" in paid_text and "Meezan Bank" in paid_text and "Pay online:" in paid_text
+    assert "invoice" in paid_text and "Meezan Bank" in paid_text and "Pay online:" in paid_text
 
     board = (await api.get(f"{DEALS}/board")).json()
     item = next(i for i in board["items"] if i["id"] == lead_id)

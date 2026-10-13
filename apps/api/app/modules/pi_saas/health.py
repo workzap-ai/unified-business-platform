@@ -750,7 +750,6 @@ async def _deals(session: AsyncSession, scope: WorkspaceScope, now: datetime) ->
         "auto_proposal": "proposals",
         "auto_order": "orders",
         "auto_invoice": "invoices",
-        "auto_payment_request": "payment links",
         "auto_followups": "deal reminders",
     }
     off = [label for name, label in labels.items() if deal is not None and not getattr(deal, name)]
