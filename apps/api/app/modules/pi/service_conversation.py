@@ -1986,7 +1986,12 @@ async def save_service_turn(
     projects = [p for p in turn.projects if p.title.strip()]
     if projects:
         # One deal per project: each gets its own lead, brief and proposal.
+        won = await won_projects(session, scope, conversation)
         for project in projects:
+            if project.title.strip().casefold()[:120] in won:
+                # Already agreed and paid for: that deal is done; mentioning the project
+                # again in the chat never opens a second deal for it.
+                continue
             fields = project_requirements(project, requirements, len(projects) == 1)
             lead = await SalesService(session, scope).upsert_requirement(
                 conversation.customer_id,
@@ -2063,6 +2068,29 @@ async def save_service_turn(
             dedupe_key=f"pi-brief:{conversation.id}:{'ready' if turn.ready_for_team else 'new'}",
         )
     return proposals_due
+
+
+async def won_projects(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation
+) -> set[str]:
+    """The projects of this chat whose deal is already won (their key or title)."""
+    from app.modules.sales.models import SalesLead
+
+    rows = await session.execute(
+        WorkspaceRepository(session, SalesLead, scope)
+        .select()
+        .with_only_columns(SalesLead.title, SalesLead.requirements)
+        .where(
+            SalesLead.conversation_id == conversation.id,
+            SalesLead.stage == "won",
+        )
+    )
+    keys: set[str] = set()
+    for title, requirements in rows:
+        keys.add(str(title or "").strip().casefold()[:120])
+        if (requirements or {}).get("_project"):
+            keys.add(str(requirements["_project"]).strip().casefold()[:120])
+    return keys
 
 
 def project_requirements(

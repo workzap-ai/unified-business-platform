@@ -252,3 +252,38 @@ def test_a_project_is_known_deeply_and_nothing_known_is_lost():
     assert fields["features"] == ["Online catalogue", "Cart", "Stock tracking"]
     # A single string from the model still becomes a list.
     assert Project.model_validate({"title": "X", "features": "Cart"}).features == ["Cart"]
+
+
+def test_a_paid_project_shows_as_being_built_not_as_a_proposal_to_prepare():
+    from app.modules.pi_saas.customer_overview import follow_deals
+
+    issues = [
+        {
+            "title": "Website and Logo Design",
+            "stage": "on_it",
+            "ball_with": "team",
+            "next_step": "Team: prepare the proposal",
+            "open_question": "",
+        },
+        {
+            "title": "Employee tracking system",
+            "stage": "on_it",
+            "ball_with": "team",
+            "next_step": "Team: x",
+            "open_question": "",
+        },
+    ]
+    projects = [
+        {
+            "title": "Website and Logo Design",
+            "stage": "won",
+            "steps_done": 8,
+            "steps_total": 11,
+            "next": {"title": "Start the work"},
+        },
+        {"title": "Website and Logo Design", "stage": "new"},
+    ]
+    follow_deals(issues, projects)
+    assert issues[0]["stage"] == "building"
+    assert issues[0]["next_step"] == "Team: Start the work"
+    assert issues[1]["stage"] == "on_it"  # no won deal: unchanged

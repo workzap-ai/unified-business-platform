@@ -213,7 +213,11 @@ function MapCard({ data, urdu }: { data: CardData; urdu: boolean }) {
         : working
           ? urdu
             ? `${working} requests par kaam jaari hai.`
-            : `We're working on ${working} of your ${data.issues.length} requests.`
+            : working === data.issues.length
+              ? working === 1
+                ? "We're working on your request."
+                : `We're working on all ${working} of your requests.`
+              : `We're working on ${working} of your ${data.issues.length} requests.`
           : urdu
             ? `Aap ki ${data.issues.length} requests ek nazar mein.`
             : `Your ${data.issues.length} requests at a glance.`;
@@ -252,8 +256,21 @@ function MapCard({ data, urdu }: { data: CardData; urdu: boolean }) {
   const pad = 24;
   const rowH = Math.min(200, (panelH - top - pad) / Math.max(rows.length, 1));
   const nodeX = 84;
-  const nodeY = (i: number) => top + i * rowH + rowH / 2;
+  // A short list sits in the middle of the panel, not at its top.
+  const first =
+    top + Math.max(0, (panelH - top - pad - rows.length * rowH) / 2);
+  const nodeY = (i: number) => first + i * rowH + rowH / 2;
   const twoLines = rows.length <= 4;
+  // With room to spare, each row also says what happens next.
+  const roomy = rows.length <= 3;
+  const nextOf = (issue: CustomerIssue) =>
+    shortTitle(
+      (issue.ball_with === "client" && issue.open_question
+        ? issue.open_question
+        : issue.next_step
+      ).replace(/^(team|pi|you|customer)\s*:\s*/i, ""),
+      76,
+    );
 
   return (
     <Frame
@@ -319,7 +336,7 @@ function MapCard({ data, urdu }: { data: CardData; urdu: boolean }) {
                 justifyContent: "center",
                 position: "absolute",
                 left: nodeX + 64,
-                top: top + i * rowH,
+                top: first + i * rowH,
                 width: panelW - nodeX - 64 - 36,
                 height: rowH,
               }}
@@ -369,6 +386,18 @@ function MapCard({ data, urdu }: { data: CardData; urdu: boolean }) {
                   ))}
                 </div>
               </div>
+              {roomy && nextOf(row.issue) && (
+                <div
+                  style={{
+                    display: "flex",
+                    marginTop: 12,
+                    fontSize: 32,
+                    color: "#b9b4d6",
+                  }}
+                >
+                  {`${urdu ? "Agla qadam" : "Next"}: ${nextOf(row.issue)}`}
+                </div>
+              )}
             </div>
           );
         })}

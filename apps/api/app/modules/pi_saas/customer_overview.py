@@ -120,6 +120,30 @@ def brief_projects(
     return out
 
 
+def follow_deals(issues: list[dict[str, Any]], projects: list[dict[str, Any]]) -> None:
+    """A request whose deal is won (agreed and paid) is never "the team prepares the
+    proposal" again: it's being built, or done once every step of the deal is."""
+    for issue in issues:
+        deal = next(
+            (
+                p
+                for p in projects
+                if p.get("stage") == "won" and _same(str(issue.get("title", "")), p["title"])
+            ),
+            None,
+        )
+        if deal is None:
+            continue
+        finished = bool(deal.get("steps_total")) and deal.get("steps_done") == deal.get(
+            "steps_total"
+        )
+        issue["stage"] = "live" if finished else "building"
+        issue["ball_with"] = "team" if not finished else "none"
+        issue["open_question"] = ""
+        nxt = (deal.get("next") or {}).get("title") or "Deliver the work"
+        issue["next_step"] = "Nothing, it's done" if finished else f"Team: {nxt}"
+
+
 def _counts(issues: list[dict[str, Any]]) -> dict[str, int]:
     out = {"waiting_on_them": 0, "waiting_on_us": 0, "done": 0, "paused": 0}
     for issue in issues:
@@ -333,6 +357,7 @@ async def overview(
     projects: list[dict[str, Any]] = []
     if scope.can("sales.read"):
         projects = await _projects(session, scope, customer_id)
+    follow_deals(issues, projects)
     return {
         "profile": {
             **profile,

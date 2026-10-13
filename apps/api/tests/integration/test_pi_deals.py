@@ -244,6 +244,28 @@ async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db, monkeyp
     view = (await api.get(f"/api/v1/customers/{customer_id}/pi-overview")).json()
     [project] = [p for p in view["projects"] if p["lead_id"] == lead_id]
     assert project["feedback"][-1]["words"] == "Loved it, the logo is perfect"
+
+    # The paid project mentioned again in the chat never opens a second deal for it.
+    from app.modules.pi.service_conversation import Project
+
+    mock_turns(
+        monkeypatch,
+        turn(
+            reply="Glad to hear it. Anything else we can help with?",
+            language="en",
+            requirements=Requirements(service="Branding"),
+            missing=[],
+            projects=[Project(title="Branding for Crescent Bakers", status="confirmed")],
+        ),
+    )
+    await pi.process("The branding was great", "after-paid-1")
+    titles = [
+        lead.title
+        for lead in await business_db.scalars(
+            select(SalesLead).where(SalesLead.tenant_id == UUID(pi.tenant_id))
+        )
+    ]
+    assert titles.count("Branding for Crescent Bakers") == 1
     await public.aclose()
     await pi.close()
 
