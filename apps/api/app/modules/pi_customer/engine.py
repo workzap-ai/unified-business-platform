@@ -91,10 +91,11 @@ def norm_language(language: str | None) -> str:
 
 def wa_language(latest: str, conversation: PiConversation) -> str:
     """Strictly the language of the customer's latest WhatsApp message (the same
-    detector pi's replies use); the chat's last known language when it is unclear."""
+    detector pi's replies use). When the message doesn't show a language ("ok", an
+    emoji, a link), English: pi never picks another language on its own."""
     from app.modules.pi.language import detect_language
 
-    return norm_language(detect_language(latest) or conversation.language)
+    return norm_language(detect_language(latest) or "en")
 
 
 def _plural(n: int, word: str) -> str:

@@ -398,7 +398,8 @@ def test_pis_own_whatsapp_lines_follow_the_customers_latest_language():
     assert engine.wa_language("Show my map", chat) == "en"
     assert engine.wa_language("mujhe map dikhao", SimpleNamespace(language="en")) == "roman_ur"
     assert engine.wa_language("أرني الخريطة", chat) == "ar"
-    assert engine.wa_language("👍", chat) == "roman_ur"  # unclear: the chat's language
+    assert engine.wa_language("👍", chat) == "en"  # unclear: English, never the chat's old one
+    assert engine.wa_language("https://example.com/x", chat) == "en"
     report = {
         "language": "auto",
         "issues": [
