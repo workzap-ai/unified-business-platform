@@ -1430,10 +1430,14 @@ function RequestTrack({
 }
 
 const CARD_INK = "#1b1830";
+// The preview card's rows: where the first starts and where the nodes sit.
+const ROW_TOP = 6;
+const NODE_X = 22;
 
 /** "Customer's view": the Problem Map card pi sends the customer on WhatsApp (same
- * layout as the 1080 x 1350 PNG: bubbles sized by impact, zigzag down the card, pi's
- * connections as lines, one insight line) and how it lands in the chat. */
+ * layout as the 1080 x 1350 PNG: a row per request with where it stands and how far it
+ * has come, pi's connections between the rows, a count per status and one line on what
+ * matters most) and how it lands in the chat. */
 function CustomerCardView({
   issues,
   links,
@@ -1441,31 +1445,76 @@ function CustomerCardView({
   issues: Issue[];
   links: Overview["links"];
 }) {
-  const calm = useReducedMotion();
   const open = order(issues).filter(
     (i) => !["live", "closed"].includes(i.stage),
   );
   const shown = (open.length ? open : issues).slice(0, 5);
-  const nodes = shown.map((issue, i) => ({
-    issue,
-    x: i % 2 ? 330 : 170,
-    y: 90 + i * 150,
-    r: 18 + 5 * Math.min(Math.max(issue.impact, 1), 5),
-  }));
-  const H = Math.max(nodes.length * 150 + 40, 420);
-  const at = (title: string) => nodes.find((n) => n.issue.title === title);
-  const lines = links.filter((l) => at(l.a_title) && at(l.b_title));
+  const more = issues.length - shown.length;
+  // Each request with where it stands, in the customer's words, like the PNG card.
+  const rows = shown.map((issue) => {
+    const t = tone(issue);
+    const step = Math.max(
+      issue.stage === "closed"
+        ? STAGES.length - 1
+        : STAGES.findIndex(([k]) => k === issue.stage),
+      0,
+    );
+    const label =
+      t.label === "Noted"
+        ? "Noted"
+        : t.label === "Done"
+          ? "Done"
+          : issue.stage === "solution_ready"
+            ? "Solution ready"
+            : t.label === "Waiting on them"
+              ? "Waiting on you"
+              : "We're on it";
+    const color = label === "Solution ready" ? "#1f9d63" : t.ring;
+    return { issue, label, step, color, hollow: t.label === "Noted" };
+  });
+  const ROW_H = rows.length <= 3 ? 64 : 46;
+  const rowY = (i: number) => ROW_TOP + i * ROW_H + ROW_H / 2;
+  const at = (title: string) => shown.findIndex((i) => i.title === title);
+  const lines = links.filter((l) => at(l.a_title) >= 0 && at(l.b_title) >= 0);
   const groups = new Map<string, number>();
   for (const i of shown)
     if (i.solution_id)
       groups.set(i.solution_id, (groups.get(i.solution_id) ?? 0) + 1);
   const merged = Math.max(0, ...groups.values());
+  const waiting = rows.filter((r) => r.label === "Waiting on you").length;
+  const working = rows.filter((r) => r.label === "We're on it").length;
   const insight =
     merged >= 2
       ? `One system can fix ${merged === 3 ? "all three" : `${merged} of them`}.`
-      : lines.length
-        ? `pi found ${lines.length} connection${lines.length === 1 ? "" : "s"}.`
-        : `Your ${shown.length} request${shown.length === 1 ? "" : "s"} at a glance.`;
+      : waiting
+        ? `${waiting} request${waiting === 1 ? " needs" : "s need"} your answer.`
+        : working
+          ? `We're working on ${working} of your ${issues.length} requests.`
+          : `Your ${issues.length} request${issues.length === 1 ? "" : "s"} at a glance.`;
+  const chips = (
+    [
+      ["waiting on you", "#f5a524", false],
+      ["we're on it", "#3b82f6", false],
+      ["solution ready", "#1f9d63", false],
+      ["noted", "#5A47F5", true],
+    ] as const
+  )
+    .map(([label, color, hollow]) => ({
+      label,
+      color,
+      hollow,
+      count: rows.filter((r) =>
+        hollow
+          ? r.hollow
+          : r.label ===
+            (label === "waiting on you"
+              ? "Waiting on you"
+              : label === "we're on it"
+                ? "We're on it"
+                : "Solution ready"),
+      ).length,
+    }))
+    .filter((c) => c.count > 0);
   const caption = [
     lines.length
       ? `pi found ${lines.length} connection${lines.length === 1 ? "" : "s"}.`
@@ -1478,7 +1527,6 @@ function CustomerCardView({
     day: "numeric",
     month: "short",
   });
-  const short = (t: string) => (t.length > 20 ? `${t.slice(0, 19)}…` : t);
 
   return (
     <div className="grid items-start gap-6 md:grid-cols-[minmax(0,340px)_minmax(0,1fr)] md:justify-center">
@@ -1499,77 +1547,110 @@ function CustomerCardView({
           <span className="ml-auto text-[11px] text-[#a9a4c7]">{today}</span>
         </div>
         <div
-          className="mt-3 flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-xl"
+          className="relative mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl"
           style={{ background: "#26223f" }}
+          role="img"
+          aria-label={rows
+            .map((r) => `${r.issue.title}: ${r.label}`)
+            .join(", ")}
         >
-          <svg
-            viewBox={`0 0 500 ${H}`}
-            className="h-full max-h-full w-full"
-            preserveAspectRatio="xMidYMid meet"
-            role="img"
-            aria-label={shown.map((n) => n.title).join(", ")}
-          >
-            {lines.map((l, k) => {
-              const a = at(l.a_title)!;
-              const b = at(l.b_title)!;
-              const dashed = l.type === "part_of" || l.type === "depends_on";
-              const d = `M ${a.x} ${a.y} L ${b.x} ${b.y}`;
-              return (
-                <g key={`${l.a_title}-${l.b_title}`}>
+          {/* A count per status: the card's legend. */}
+          <div className="flex flex-wrap items-center justify-center gap-1 border-b border-[#34305a] px-2 py-2">
+            {chips.map((c) => (
+              <span
+                key={c.label}
+                className="inline-flex items-center gap-1 rounded-full bg-[#1b1830] px-2 py-0.5 text-[10px] text-[#e7e4f7]"
+              >
+                <span
+                  className="inline-block size-2 rounded-full"
+                  style={
+                    c.hollow
+                      ? { border: `2px solid ${c.color}` }
+                      : { background: c.color }
+                  }
+                />
+                {c.count} {c.label}
+              </span>
+            ))}
+            {more > 0 && (
+              <span className="text-[10px] text-[#a9a4c7]">+{more} more</span>
+            )}
+          </div>
+          <div className="relative flex-1">
+            <svg
+              className="absolute inset-0 h-full w-full overflow-visible"
+              aria-hidden="true"
+            >
+              {lines.map((l, k) => {
+                const ya = rowY(at(l.a_title));
+                const yb = rowY(at(l.b_title));
+                const reach = 10 + (k % 3) * 6;
+                const dashed = l.type === "part_of" || l.type === "depends_on";
+                const d = `M ${NODE_X} ${ya} C ${NODE_X - reach * 2} ${ya}, ${NODE_X - reach * 2} ${yb}, ${NODE_X} ${yb}`;
+                return (
                   <path
+                    key={`${l.a_title}-${l.b_title}`}
                     d={d}
                     pathLength={1}
                     className={dashed ? "pm-fade" : "pm-draw"}
-                    stroke="#8b7cff"
-                    strokeWidth={5}
-                    strokeLinecap="round"
-                    strokeDasharray={dashed ? "0.04 0.03" : undefined}
+                    fill="none"
+                    stroke="#a99cff"
+                    strokeWidth={2}
+                    strokeDasharray={dashed ? "0.05 0.04" : undefined}
                     style={{ animationDelay: `${400 + k * 150}ms` }}
                   />
-                  {!calm && (
-                    <circle r={6} fill="#c9c1ff">
-                      <animateMotion
-                        dur="2.4s"
-                        begin={`${(900 + k * 150) / 1000}s`}
-                        repeatCount="indefinite"
-                        path={d}
-                      />
-                    </circle>
-                  )}
-                </g>
-              );
-            })}
-            {nodes.map((n, i) => {
-              const t = tone(n.issue);
-              const hollow = t.label === "Noted";
-              return (
-                <g
-                  key={n.issue.title}
+                );
+              })}
+              {rows.map((r, i) => (
+                <circle
+                  key={r.issue.title}
                   className="pm-pop"
                   style={{ animationDelay: `${i * 110}ms` }}
-                >
-                  <circle
-                    cx={n.x}
-                    cy={n.y}
-                    r={n.r}
-                    fill={hollow ? CARD_INK : t.fill}
-                    stroke={hollow ? t.ring : "#ffffff"}
-                    strokeWidth={hollow ? 5 : 3}
-                  />
-                  <text
-                    x={n.x}
-                    y={n.y + n.r + 30}
-                    textAnchor="middle"
-                    fill="#ffffff"
-                    fontSize={26}
-                    fontWeight={700}
+                  cx={NODE_X}
+                  cy={rowY(i)}
+                  r={8 + Math.min(Math.max(r.issue.impact, 1), 5)}
+                  fill={r.hollow ? CARD_INK : r.color}
+                  stroke={r.hollow ? r.color : "#ffffff"}
+                  strokeWidth={r.hollow ? 2.5 : 1.5}
+                />
+              ))}
+            </svg>
+            {rows.map((r, i) => (
+              <div
+                key={r.issue.title}
+                className="pm-in absolute right-3 flex flex-col justify-center"
+                style={{
+                  left: NODE_X + 22,
+                  top: ROW_TOP + i * ROW_H,
+                  height: ROW_H,
+                  animationDelay: `${120 + i * 90}ms`,
+                }}
+              >
+                <span className="line-clamp-2 text-[12px] leading-tight font-semibold">
+                  {r.issue.title}
+                </span>
+                <span className="mt-0.5 flex items-center gap-2">
+                  <span
+                    className="text-[10px] font-medium"
+                    style={{ color: r.hollow ? "#c9c1ff" : r.color }}
                   >
-                    {short(n.issue.title)}
-                  </text>
-                </g>
-              );
-            })}
-          </svg>
+                    {r.label}
+                  </span>
+                  <span className="ml-auto flex gap-0.5" aria-hidden="true">
+                    {STAGES.map(([key], s) => (
+                      <span
+                        key={key}
+                        className="h-1 w-2.5 rounded-full"
+                        style={{
+                          background: s <= r.step ? r.color : "#3a3558",
+                        }}
+                      />
+                    ))}
+                  </span>
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
         <p className="mt-3 text-center text-sm leading-snug font-bold">
           {insight}
@@ -1598,37 +1679,22 @@ function CustomerCardView({
             className="mx-auto mb-2 flex aspect-[4/5] w-24 items-center justify-center rounded-md"
             style={{ background: CARD_INK }}
           >
-            <svg viewBox={`0 0 500 ${H}`} className="h-[80%] w-[80%]">
-              {lines.map((l) => {
-                const a = at(l.a_title)!;
-                const b = at(l.b_title)!;
-                return (
-                  <line
-                    key={`${l.a_title}-${l.b_title}`}
-                    x1={a.x}
-                    y1={a.y}
-                    x2={b.x}
-                    y2={b.y}
-                    stroke="#8b7cff"
-                    strokeWidth={10}
+            {/* A tiny version of the card: one bar per request. */}
+            <div className="flex w-[78%] flex-col gap-1.5" aria-hidden="true">
+              {rows.map((r) => (
+                <div key={r.issue.title} className="flex items-center gap-1">
+                  <span
+                    className="size-2 shrink-0 rounded-full"
+                    style={
+                      r.hollow
+                        ? { border: `1.5px solid ${r.color}` }
+                        : { background: r.color }
+                    }
                   />
-                );
-              })}
-              {nodes.map((n) => {
-                const t = tone(n.issue);
-                return (
-                  <circle
-                    key={n.issue.title}
-                    cx={n.x}
-                    cy={n.y}
-                    r={n.r * 1.3}
-                    fill={t.label === "Noted" ? CARD_INK : t.fill}
-                    stroke={t.ring}
-                    strokeWidth={8}
-                  />
-                );
-              })}
-            </svg>
+                  <span className="h-1 flex-1 rounded-full bg-white/70" />
+                </div>
+              ))}
+            </div>
           </div>
           {caption.map((line) => (
             <p key={line} className="px-1 leading-snug">
