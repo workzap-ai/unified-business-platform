@@ -434,3 +434,18 @@ def test_the_card_carries_the_customers_language(app, provider):
     token = card_token(settings, uuid4(), "map", 0, "roman_ur")
     assert read_card(settings, token)["language"] == "roman_ur"
     assert read_card(settings, card_token(settings, uuid4(), "map"))["language"] == ""
+
+
+def test_a_caption_never_mentions_a_connection_the_card_does_not_show():
+    report = {
+        "language": "en",
+        "issues": [{"title": "Employee tracking system", "stage": "on_it", "ball_with": "team"}],
+        # The other end of the link isn't on the map (dropped or about the service).
+        "links": [
+            {"status": "auto", "a_title": "Employee tracking system", "b_title": "Reporting app"}
+        ],
+        "new_events": [{"kind": "link.found", "announce": True, "detail": "tracking"}],
+    }
+    assert engine.pick_card(report) is None
+    report["issues"].append({"title": "Reporting app", "stage": "noted", "ball_with": "pi"})
+    assert engine.pick_card(report)[2].startswith("pi found 1 connection")

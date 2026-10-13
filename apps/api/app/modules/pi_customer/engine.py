@@ -285,9 +285,22 @@ def _open(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [i for i in issues if i.get("stage") not in ("live", "closed", "paused")]
 
 
+def shown_links(report: dict[str, Any]) -> list[dict[str, Any]]:
+    """Links the card actually draws: sure ones whose two requests are both on it, so
+    a caption never mentions a connection the picture doesn't show."""
+    titles = {service.norm_title(str(i.get("title", ""))) for i in report.get("issues") or []}
+    return [
+        x
+        for x in report.get("links") or []
+        if x.get("status") in ("auto", "confirmed")
+        and service.norm_title(str(x.get("a_title", ""))) in titles
+        and service.norm_title(str(x.get("b_title", ""))) in titles
+    ]
+
+
 def _map_caption(report: dict[str, Any], lang: str, lead: str = "") -> str:
     issues = _open(report.get("issues") or []) or list(report.get("issues") or [])
-    links = [x for x in report.get("links") or [] if x.get("status") in ("auto", "confirmed")]
+    links = shown_links(report)
     return f"{lead} {TEXT[lang]['glance'](len(issues), len(links))}".strip()
 
 
@@ -314,7 +327,7 @@ def pick_card(
     issues = report.get("issues") or []
     lang = norm_language(language or str(report.get("language") or ""))
     words = TEXT[lang]
-    links = [x for x in report.get("links") or [] if x.get("status") in ("auto", "confirmed")]
+    links = shown_links(report)
     if asked and issues:
         if len(issues) == 1:
             return "journey", 0, _journey_caption(issues[0], lang)
