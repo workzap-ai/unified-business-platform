@@ -33,28 +33,29 @@ def scripted(monkeypatch, *replies):
     return prompts
 
 
-async def test_roman_urdu_customers_get_english_replies(api, business_db, monkeypatch):
-    # pi replies in English, also when the customer writes Roman Urdu (they read it).
+async def test_english_after_roman_urdu_gets_an_english_reply(api, business_db, monkeypatch):
     prompts = scripted(
         monkeypatch,
-        # The model answers in Roman Urdu; pi's check sends it back once.
         turn(reply="Ji, main pi hoon, company ka AI assistant. Aap ko kya chahiye?"),
-        turn(reply="Hi, I'm pi, the company's AI assistant. What is the website for?"),
+        # The model drifts back to Roman Urdu; pi's check sends it back once.
+        turn(reply="Aap ka business kis type ka hai? Hum aap ki madad kar sakte hain."),
         turn(reply="Sure. What kind of business is it for?", language="roman_ur"),
     )
     pi = await pi_workspace(api, business_db, business_type="service_business")
     await pi.process("Salam, mujhe website chahiye", "lang-1")
     await pi.deliver_all()
     first = json.loads(prompts[0])
-    assert first["reply_language"] == "en" and first["reply_language_name"] == "English"
-    assert prompts[1].startswith("Don't send that draft: it is written in Roman Urdu")
+    assert first["reply_language"] == "roman_ur"
     await pi.process("Can you tell me your team performance?", "lang-2")
     await pi.deliver_all()
+    second = json.loads(prompts[1])
+    assert second["reply_language"] == "en" and second["reply_language_name"] == "English"
+    assert prompts[2].startswith("Don't send that draft: it is written in Roman Urdu")
     replies = [m.body for m in await pi.outbound()]
     assert "Sure. What kind of business is it for?" in replies
-    assert not any("Aap ko kya chahiye" in reply for reply in replies)
+    assert not any("kis type" in reply for reply in replies)
     conversation = await pi.conversation()
-    assert conversation.language == "en"  # follows the rule, not the model's label
+    assert conversation.language == "en"  # follows the customer, not the model's label
     await pi.close()
 
 
@@ -174,7 +175,7 @@ async def test_team_notice_is_in_the_customers_language(api, business_db, monkey
 async def test_another_language_is_left_to_the_model(api, business_db, monkeypatch):
     prompts = scripted(
         monkeypatch,
-        turn(reply="Hi, I'm pi, the company's AI assistant. What do you need?", language="en"),
+        turn(reply="Ji, main pi hoon, company ka AI assistant. Aap ko kya chahiye?"),
         turn(reply="Claro. ¿Para qué tipo de negocio es la tienda?", language="es"),
     )
     pi = await pi_workspace(api, business_db, business_type="service_business")
@@ -183,7 +184,7 @@ async def test_another_language_is_left_to_the_model(api, business_db, monkeypat
     await pi.process("Necesito una tienda online para mi negocio", "other-2")
     await pi.deliver_all()
     assert "reply_language" not in json.loads(prompts[1])
-    assert len(prompts) == 2  # no rewrite forced into English
+    assert len(prompts) == 2  # no rewrite forced into Roman Urdu
     assert (await pi.conversation()).language == "es"
     await pi.close()
 

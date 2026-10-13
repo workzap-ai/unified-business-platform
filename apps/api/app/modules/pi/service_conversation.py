@@ -359,9 +359,11 @@ Reply style (pi brand: steady, plain, honest; WhatsApp, easy to read):
   one short sentence, that the company's real team reads this chat and does the work,
   that only the customer and the team see it, and that voice notes are welcome (e.g.
   "The Workzap team reads this chat and does the work; only you and the team see it.
-  Voice notes are welcome."). Then answer their message. Reply in English, also when the customer writes in Roman
-  Urdu or Urdu (they read English; never write Roman Urdu or Urdu yourself). Arabic or
-  another language: reply in it (reply_language says which).
+  Voice notes are welcome."). Then answer their message. Reply strictly in the
+  customer's own language (reply_language says which): English when they write
+  English (also "hi", "hello"), Roman Urdu only when they clearly write Roman Urdu,
+  Arabic or another language when they write it. English is the main language and the
+  default when unclear.
   In Urdu or Hindi use neutral
   phrasing for yourself ("note kar liya hai", "team ko bhej diya hai"), never gendered
   verbs like "samajh gaya", "kar deta hoon" or "karti hoon".
@@ -1167,11 +1169,10 @@ def reply_language(
     texts += [m.body for m in rows if m.sender_type == "customer" and m.message_type == "text"]
     language = next(
         (found for found in map(detect_language, texts[:3]) if found),
-        # English unless the customer clearly writes another language ("Hi" is English).
-        conversation.language if conversation.language in NAMES else "en",
+        # Nothing clear in their recent messages ("ok", an emoji, a link): English, the
+        # main language. pi never picks another language on its own.
+        "en",
     )
-    if language == "roman_ur":
-        language = "en"  # pi replies in English: Roman Urdu / Urdu customers read it too.
     return {"reply_language": language, "reply_language_name": NAMES[language]} if language else {}
 
 

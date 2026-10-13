@@ -31,8 +31,15 @@ def test_judge_is_deterministic():
     assert judge(greeting, {"status": "blocked", "blocked_reason": "X"})[0] is False
     priced = {"status": "ok", "reply": "A logo costs 25000 rupees.", "price_rule": "quote"}
     assert judge(price, priced)[0] is False
-    roman = {"status": "ok", "reply": "Hum aap ki madad kar sakte hain, aap ko kya chahiye?"}
-    assert judge(BY_KEY["services_roman_urdu"], roman)[0] is False
+    # A Roman Urdu customer gets Roman Urdu (strictly their language), never English.
+    english = {"status": "ok", "reply": "We offer:\n• Logo design\n• Websites\nWhich one?"}
+    assert judge(BY_KEY["services_roman_urdu"], english)[0] is False
+    roman = {
+        "status": "ok",
+        "reply": "Hum yeh kaam karte hain:\n• Logo design\n• Websites\nAap ko kya chahiye?",
+        "knowledge_used": ["Services"],
+    }
+    assert judge(BY_KEY["services_roman_urdu"], roman) == (True, "passed")
     listed = {
         "status": "ok",
         "reply": "We offer:\n• Logo design\n• Websites\nWhich one interests you?",

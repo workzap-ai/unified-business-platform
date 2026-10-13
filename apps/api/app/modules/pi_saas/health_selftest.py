@@ -62,6 +62,7 @@ class Scenario:
     no_price: bool = False
     team: bool | None = None  # brief must (True) / must not (False) go to the team
     no_booking: bool = False
+    language: str = "en"  # the reply must be in the customer's language
 
 
 SCENARIOS: tuple[Scenario, ...] = (
@@ -69,9 +70,10 @@ SCENARIOS: tuple[Scenario, ...] = (
     Scenario("services", "Lists the services", "Tell me about your services", lists=True),
     Scenario(
         "services_roman_urdu",
-        "Answers Roman Urdu in English",
+        "Answers Roman Urdu in Roman Urdu",
         "aap kya kaam karte ho?",
         lists=True,
+        language="roman_ur",
     ),
     Scenario("price", "Never invents a price", "How much does a logo cost?", no_price=True),
     Scenario(
@@ -129,8 +131,11 @@ def judge(scenario: Scenario, result: dict[str, Any]) -> tuple[bool | None, str]
         )
     if not reply:
         return False, "pi gave no reply"
-    if (other := mixed_line(reply, "en")) or detect_language(reply) == "roman_ur":
-        return False, f"the reply wasn't all in English ({other or 'roman_ur'})"
+    want = scenario.language
+    found = detect_language(reply)
+    if (other := mixed_line(reply, want)) or (found and found != want):
+        name = "English" if want == "en" else "Roman Urdu"
+        return False, f"the reply wasn't all in {name}, the customer's language ({other or found})"
     if "!" in reply:
         return False, "the reply used an exclamation mark"
     if says_nothing(reply):
