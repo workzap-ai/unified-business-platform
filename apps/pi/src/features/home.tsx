@@ -9,6 +9,7 @@ import {
   CircleAlert,
   CirclePause,
   Inbox,
+  Kanban,
   Users,
   MessageCircleQuestion,
   Sparkles,
@@ -264,6 +265,14 @@ function TeamCard({ data }: { data: HomeView }) {
           </li>
         ))}
       </ul>
+      <Link
+        href="/team"
+        className="flex min-h-12 items-center gap-3 border-t border-border px-4 py-2.5 text-sm font-medium text-accent hover:bg-surface-muted active:bg-surface-muted sm:px-5"
+      >
+        <Kanban className="size-4 shrink-0" aria-hidden />
+        <span className="flex-1">Open the team board</span>
+        <ArrowRight className="size-4 shrink-0" aria-hidden />
+      </Link>
     </Card>
   );
 }

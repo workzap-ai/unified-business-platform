@@ -147,11 +147,23 @@ async def move_work(
 ) -> dict[str, Any]:
     """The deal's work moved on: started, or delivered (a service is completed, a product
     delivered once shipped). pi tells the customer straight away."""
+    await require_pi(session, scope, "orders.write")
+    order, ids = await advance_work(session, scope, order_id, data.step)
+    await session.commit()
+    await _enqueue(request, ids)
+    return {"order_id": order.id, "status": order.status}
+
+
+async def advance_work(
+    session: AsyncSession, scope: WorkspaceScope, order_id: UUID, step: str
+) -> tuple[Order, list[str]]:
+    """Move an order's work on ("start" or "delivered") and return the customer updates
+    pi queued for it; the caller commits, then enqueues them. Also used by the team
+    board, so moving a card tells the customer exactly as the deal page buttons do."""
     from app.modules.orders.service import OrderService, action_applies
 
-    await require_pi(session, scope, "orders.write")
     order = await WorkspaceRepository(session, Order, scope).get(order_id)
-    if data.step == "start":
+    if step == "start":
         action = "start_processing"
     else:
         action = next(
@@ -165,10 +177,7 @@ async def move_work(
         .with_only_columns(PiMessage.id)
         .where(PiMessage.idempotency_key.in_(keys), PiMessage.status == "queued")
     )
-    ids = [str(x) for x in queued]
-    await session.commit()
-    await _enqueue(request, ids)
-    return {"order_id": order.id, "status": order.status}
+    return order, [str(x) for x in queued]
 
 
 class StartDeal(BaseModel):

@@ -7,6 +7,7 @@ const RULES: [RegExp, string | ((m: RegExpMatchArray) => string)][] = [
   [/^\/pi\/inbox(\?.*)?$/, (m) => `/inbox${m[1] ?? ""}`],
   [/^\/pi\/handoffs(\/.*)?$/, "/inbox/handoffs"],
   [/^\/pi\/requests(\?.*)?$/, (m) => `/requests${m[1] ?? ""}`],
+  [/^\/pi\/team(\?.*)?$/, (m) => `/team${m[1] ?? ""}`],
   [/^\/pi\/knowledge(\/.*)?$/, "/my-pi/knowledge"],
   [/^\/pi\/settings\/whatsapp.*$/, "/settings/whatsapp"],
   [/^\/pi\/settings(\/.*)?$/, "/my-pi/settings"],

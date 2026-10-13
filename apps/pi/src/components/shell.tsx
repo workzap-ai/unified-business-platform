@@ -12,6 +12,7 @@ import {
   Handshake,
   Home,
   Inbox,
+  Kanban,
   LogOut,
   MessageCircleQuestion,
   Plus,
@@ -56,6 +57,14 @@ const NAV: {
     icon: MessageCircleQuestion,
     mobile: false,
     permission: "pi.read",
+  },
+  // Desktop sidebar; phones reach the team board from Home ("For your team").
+  {
+    href: "/team",
+    label: "Team board",
+    icon: Kanban,
+    mobile: false,
+    permission: "pi.work.read",
   },
   // Desktop sidebar only: phones reach it from Home (the bottom bar keeps five items).
   { href: "/analytics", label: "Analytics", icon: BarChart3, mobile: false },

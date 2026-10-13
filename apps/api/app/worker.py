@@ -26,6 +26,7 @@ from app.modules.pi_saas.health import heal as pi_health_heal
 from app.modules.pi_saas.health_selftest import self_test_daily as pi_health_self_test
 from app.modules.pi_saas.jobs import JOBS as PI_SAAS_JOBS
 from app.modules.pi_saas.jobs import sweep_pi_saas
+from app.modules.pi_saas.team_board import sweep as sweep_team_board
 
 
 async def health_probe(ctx: dict[str, Any]) -> str:
@@ -50,6 +51,8 @@ JOB_FUNCTIONS: dict[str, Callable[..., Awaitable[Any]]] = {
     # pi Health: safe self-fixes (every 5 minutes) and daily self-tests.
     "pi_health_heal": pi_health_heal,
     "pi_health_self_test": pi_health_self_test,
+    # Team board: the team's real work becomes cards (every 2 minutes).
+    "sweep_team_board": sweep_team_board,
     # Integration platform: inbound events, outbox dispatch, deliveries, sync, sweep.
     **INTEGRATION_JOBS,
     # Pi SaaS: provider/billing webhooks and lifecycle sweep.
@@ -106,6 +109,7 @@ class WorkerSettings:
         cron(sweep_digests, minute={7, 37}, second=45, unique=True),
         cron(pi_health_heal, minute=set(range(3, 60, 5)), second=15, unique=True),
         cron(pi_health_self_test, minute={23}, second=0, unique=True),
+        cron(sweep_team_board, minute=set(range(1, 60, 2)), second=25, unique=True),
     ]
     redis_settings = RedisSettings.from_dsn(get_settings().redis_url.get_secret_value())
     queue_name = get_settings().job_queue_name
