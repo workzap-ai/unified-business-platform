@@ -516,6 +516,35 @@ class Kapso:
         )
         return str(data.get("status") or "PENDING")[:24]
 
+    async def create_code_template(self, business_account_id: str, name: str, language: str) -> str:
+        """Meta's authentication template for one-time codes: Meta writes the text ("<code>
+        is your verification code"), adds the security line, the expiry and a copy-code
+        button. Usually approved within minutes."""
+        if not re.fullmatch(r"[0-9]{5,32}", business_account_id):
+            raise BusinessRuleViolation("WHATSAPP_NOT_CONNECTED", "Connect WhatsApp first")
+        if not re.fullmatch(r"[a-z0-9_]{1,512}", name) or not re.fullmatch(
+            r"[a-z]{2,3}(_[A-Z]{2})?", language
+        ):
+            raise BusinessRuleViolation("INVALID_TEMPLATE", "Invalid template name or language")
+        data = await self._meta(
+            "POST",
+            f"/{business_account_id}/message_templates",
+            json={
+                "name": name,
+                "language": language,
+                "category": "AUTHENTICATION",
+                "components": [
+                    {"type": "BODY", "add_security_recommendation": True},
+                    {"type": "FOOTER", "code_expiration_minutes": 10},
+                    {
+                        "type": "BUTTONS",
+                        "buttons": [{"type": "OTP", "otp_type": "COPY_CODE", "text": "Copy code"}],
+                    },
+                ],
+            },
+        )
+        return str(data.get("status") or "PENDING")[:24]
+
     async def health(self, phone_number_id: str) -> dict[str, Any]:
         if not PHONE_NUMBER_ID.fullmatch(phone_number_id):
             raise BusinessRuleViolation("INVALID_NUMBER", "Unknown WhatsApp number")

@@ -369,3 +369,62 @@ async def test_a_shared_link_shows_requests_only_and_can_be_turned_off(
     assert (await boss.get(f"{PORTAL}/shared/not-a-real-token")).status_code == 404
     for client in (business, customer, boss):
         await client.aclose()
+
+
+def _template_codes(provider: FakeProvider, to: str) -> list[str]:
+    codes = []
+    for request in provider.requests:
+        if not request.url.path.endswith("/messages") or _is_read_receipt(request):
+            continue
+        body = json.loads(request.content)
+        if body.get("type") == "template" and body.get("to") == to:
+            for part in body["template"].get("components", []):
+                if part.get("type") == "body":
+                    codes.append(part["parameters"][0]["text"])
+    return codes
+
+
+LATE = "15550007099"
+
+
+async def test_after_24_hours_the_code_comes_through_the_approved_template(
+    app, provider, business_db, monkeypatch
+):
+    from datetime import UTC, datetime, timedelta
+
+    business = await _business_with_chat(app, provider, business_db, monkeypatch)
+    # Its own customer number: other tests' chats with CUSTOMER may still be in their window.
+    await _kapso(
+        business,
+        "whatsapp.message.received",
+        _message_event(NUMBER, LATE, "Hello", "wamid.p-late"),
+    )
+    await _run_jobs(app, provider, business_db)
+    conversation = await business_db.scalar(
+        select(PiConversation).where(PiConversation.contact_wa_id == LATE)
+    )
+    conversation.last_inbound_at = datetime.now(UTC) - timedelta(days=2)
+    policy = await business_db.scalar(
+        select(PiSettings).where(PiSettings.tenant_id == conversation.tenant_id)
+    )
+    policy.whatsapp_config = {
+        **policy.whatsapp_config,
+        "code_template": {"name": "pi_customer_code", "language": "en_US"},
+    }
+    await business_db.commit()
+    customer = pi_client(app)
+    assert (await customer.post(f"{PORTAL}/code", json={"phone": f"+{LATE}"})).status_code == 202
+    [code] = _template_codes(provider, LATE)
+    assert _sent_codes(provider, LATE) == []  # not a normal message: WhatsApp would refuse
+    verified = await customer.post(f"{PORTAL}/verify", json={"phone": f"+{LATE}", "code": code})
+    assert verified.status_code == 200, verified.text
+    # Without an approved template nothing is sent (and the answer stays the same).
+    config = dict(policy.whatsapp_config)
+    config.pop("code_template")
+    policy.whatsapp_config = config
+    await business_db.commit()
+    other = pi_client(app)
+    assert (await other.post(f"{PORTAL}/code", json={"phone": f"+{LATE}"})).status_code == 202
+    assert _template_codes(provider, LATE) == [code] and _sent_codes(provider, LATE) == []
+    for client in (business, customer, other):
+        await client.aclose()

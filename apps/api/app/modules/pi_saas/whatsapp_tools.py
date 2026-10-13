@@ -169,6 +169,8 @@ FOLLOW_UPS: dict[str, dict[str, tuple[str, str]]] = {
         ),
     },
 }
+# pi Customer's sign-in code template (Meta authentication category).
+CODE_TEMPLATE = "pi_customer_code"
 # The language each template is approved in at Meta.
 META_LANGUAGE = {"en": "en_US", "roman_ur": "ur"}
 
@@ -283,6 +285,21 @@ def build() -> APIRouter:
         config["reminder_templates"] = {**(config.get("reminder_templates") or {}), **reminders}
         config["ladder_templates"] = {**(config.get("ladder_templates") or {}), **ladder}
         config["reminder_enabled"] = True
+        # pi Customer's sign-in code after the 24-hour window (Meta's authentication
+        # template: Meta writes the text, so one English template serves everyone).
+        code = existing.get((CODE_TEMPLATE, "en_US"))
+        if code is None:
+            try:
+                code = await kapso.create_code_template(account, CODE_TEMPLATE, "en_US")
+            except BusinessRuleViolation as error:
+                code = (
+                    "PENDING"
+                    if "exist" in error.message.lower()
+                    else f"REJECTED: {error.message}"[:120]
+                )
+        statuses["sign_in_code"] = code
+        if not code.startswith("REJECTED"):
+            config["code_template"] = {"name": CODE_TEMPLATE, "language": "en_US"}
         policy.whatsapp_config = config
         await record(
             session,

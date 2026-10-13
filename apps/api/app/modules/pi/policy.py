@@ -93,6 +93,13 @@ def validate_section(section: str, value: Any) -> None:
                 ensure(isinstance(template, dict) and set(template) == {"name", "language"})
                 ensure(bool(re.fullmatch(r"[a-z0-9_]{1,512}", template["name"])))
                 ensure(bool(re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", template["language"])))
+            code = value.get("code_template", {})
+            ensure(isinstance(code, dict) and set(code) <= {"name", "language"})
+            if code:
+                ensure(bool(re.fullmatch(r"[a-z0-9_]{1,512}", str(code.get("name", "")))))
+                ensure(
+                    bool(re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", str(code.get("language", ""))))
+                )
             ladder = value.get("ladder_templates", {})
             ensure(isinstance(ladder, dict) and len(ladder) <= 50)
             for language, steps in ladder.items():

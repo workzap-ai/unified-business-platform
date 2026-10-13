@@ -137,6 +137,9 @@ DEFAULTS: dict[str, Any] = {
         "reminder_templates": {},
         # Follow-up ladder after the 24-hour window: {"en": {"day3": {name, language}, ...}}.
         "ladder_templates": {},
+        # pi Customer's sign-in code after the 24-hour window: Meta's authentication
+        # template {name, language} ({} until "Auto follow-ups" sets it up).
+        "code_template": {},
         "follow_up_ladder": True,
         # pi's picture cards (Problem Map, journey) on WhatsApp.
         "visual_cards": True,

@@ -35,11 +35,13 @@ async def test_pi_creates_and_saves_its_follow_up_templates(app, provider, busin
         f"{lang}:{step}"
         for lang in ("en", "roman_ur")
         for step in ("reminder", "day3", "day7", "day14")
-    }
+    } | {"sign_in_code"}
     assert all(status == "PENDING" for status in statuses.values())
     created = {(t["name"], t["language"], t["category"]) for t in provider.templates}
     assert ("pi_reminder_en", "en_US", "UTILITY") in created
     assert ("pi_followup_day14_ru", "ur", "UTILITY") in created
+    # pi Customer's sign-in code after the 24-hour window.
+    assert ("pi_customer_code", "en_US", "AUTHENTICATION") in created
     assert all("{{" not in str(t.get("components")) for t in provider.templates)
 
     number = await business_db.scalar(

@@ -343,6 +343,53 @@ class WhatsApp:
                 "DELIVERY_UNCONFIRMED", "Reminder delivery could not be confirmed", 503
             ) from None
 
+    async def send_code_template(
+        self, number: str, recipient: str, template: dict[str, str], code: str, token: str
+    ) -> str:
+        """A one-time code through the business's approved authentication template: the
+        only way WhatsApp allows it more than 24 hours after the customer's last message."""
+        if (
+            not re.fullmatch(r"[a-z0-9_]{1,512}", template.get("name", ""))
+            or not re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", template.get("language", ""))
+            or not re.fullmatch(r"[0-9]{4,8}", code)
+        ):
+            raise BusinessRuleViolation("CODE_TEMPLATE_INVALID", "Invalid code template")
+        base, headers = self._endpoint(token)
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "template",
+                    "template": {
+                        "name": template["name"],
+                        "language": {"code": template["language"]},
+                        "components": [
+                            {"type": "body", "parameters": [{"type": "text", "text": code}]},
+                            {
+                                "type": "button",
+                                "sub_type": "url",
+                                "index": "0",
+                                "parameters": [{"type": "text", "text": code}],
+                            },
+                        ],
+                    },
+                },
+                timeout=15,
+                follow_redirects=False,
+            )
+            check_sent(response)
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Code delivery could not be confirmed", 503
+            ) from None
+
     async def send_flow(
         self,
         number: str,

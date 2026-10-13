@@ -108,6 +108,38 @@ def reply_channel(
     return best
 
 
+def code_channel(
+    items: list[tuple[PiConversation, WhatsAppConnection, str]], now: datetime | None = None
+) -> tuple[PiConversation, WhatsAppConnection, bool] | None:
+    """Where to send a sign-in code, and whether WhatsApp's 24-hour window is still open
+    there (a normal message) or closed (only an approved code template). Prefers a
+    business the customer wrote to recently, else the most recent one."""
+    open_now = reply_channel(items, now)
+    if open_now is not None:
+        return open_now[0], open_now[1], True
+    latest: tuple[PiConversation, WhatsAppConnection] | None = None
+    for conversation, connection, _ in items:
+        if connection.status != "active" or conversation.last_inbound_at is None:
+            continue
+        if latest is None or conversation.last_inbound_at > (
+            latest[0].last_inbound_at or conversation.last_inbound_at
+        ):
+            latest = (conversation, connection)
+    return (latest[0], latest[1], False) if latest else None
+
+
+async def code_template(session: AsyncSession, conversation: PiConversation) -> dict[str, str]:
+    """The business's approved sign-in code template ({} when it has none yet)."""
+    config = await session.scalar(
+        select(PiSettings.whatsapp_config).where(
+            PiSettings.tenant_id == conversation.tenant_id,
+            PiSettings.environment_id == conversation.environment_id,
+        )
+    )
+    template = (config or {}).get("code_template")
+    return template if isinstance(template, dict) and template.get("name") else {}
+
+
 async def open_requests(
     session: AsyncSession, conversation: PiConversation
 ) -> list[dict[str, Any]]:

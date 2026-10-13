@@ -158,9 +158,10 @@ def _wa_link(display_phone: str) -> str:
 
 @router.post("/code", status_code=202)
 async def send_code(body: PhoneInput, request: Request, session: Session) -> dict[str, Any]:
-    """Sends a sign-in code on WhatsApp from a business this number wrote to in the last
-    24 hours. The answer is the same whether or not a code was sent, so the endpoint
-    never reveals who has conversations."""
+    """Sends a sign-in code on WhatsApp from a business this number has chatted with: a
+    normal message inside WhatsApp's 24-hour window, the business's approved code
+    template after it. The answer is the same whether or not a code was sent, so the
+    endpoint never reveals who has conversations."""
     phone = _digits(body.phone)
     if not await hit(request, "pi-customer-code-ip", client_ip(request), 10, 3600) or not (
         await hit(request, "pi-customer-code-phone", phone, 3, 900)
@@ -168,7 +169,12 @@ async def send_code(body: PhoneInput, request: Request, session: Session) -> dic
         raise HTTPException(429, "Too many codes requested. Please wait a few minutes.")
     settings, http = request.app.state.settings, request.app.state.http
     store = access.code_store(request)
-    channel = service.reply_channel(await service.conversations(session, phone))
+    channel = service.code_channel(await service.conversations(session, phone))
+    template = await service.code_template(session, channel[0]) if channel else {}
+    if channel is not None and not channel[2] and not template:
+        # Window closed and no approved code template: WhatsApp would refuse a message.
+        logger.warning("pi_customer_code_window_closed")
+        channel = None
     if channel is not None:
         from app.integrations.whatsapp_bridge import token as connection_token
 
@@ -186,15 +192,19 @@ async def send_code(body: PhoneInput, request: Request, session: Session) -> dic
         except Exception:  # noqa: BLE001 - no code store: fail closed
             logger.warning("pi_customer_code_store_unavailable")
             raise HTTPException(503, "Sign-in is unavailable right now") from None
-        _, connection = channel
+        _, connection, window_open = channel
+        whatsapp = WhatsApp(settings, http, connection.provider)
+        token = await connection_token(session, settings, connection)
         try:
-            await WhatsApp(settings, http, connection.provider).send(
-                connection.phone_number_id,
-                phone,
-                CODE_MESSAGE.format(code=code),
-                await connection_token(session, settings, connection),
-            )
-            logger.info("pi_customer_code_sent")
+            if window_open:
+                await whatsapp.send(
+                    connection.phone_number_id, phone, CODE_MESSAGE.format(code=code), token
+                )
+            else:
+                await whatsapp.send_code_template(
+                    connection.phone_number_id, phone, template, code, token
+                )
+            logger.info("pi_customer_code_sent", extra={"template": not window_open})
         except BusinessRuleViolation:
             logger.warning("pi_customer_code_not_sent")
     return {"sent": True, "expires_in": access.CODE_SECONDS}
