@@ -603,8 +603,45 @@ def _transcript(rows: list[PiMessage]) -> list[dict[str, str]]:
 
 # Bumped when the analysis rules change, so reports saved under the old rules are made
 # again (2: requests for work are never dropped as "about the service"; 3: meetings,
-# invoices, payments and status questions are kept off the map).
-REPORT_VERSION = 3
+# invoices, payments and status questions are kept off the map; 4: a request whose
+# brief the customer hasn't confirmed is never "the team's turn").
+REPORT_VERSION = 4
+
+TEAM_STAGES = ("on_it", "building")
+UNCONFIRMED = ("collecting", "awaiting_confirmation")
+CONFIRM_QUESTION = "Shall I send this to the team? Please confirm the brief."
+
+
+def unconfirmed_brief(brief: dict[str, Any], title: str) -> dict[str, Any] | None:
+    """The chat's brief project for this request when the customer hasn't confirmed it
+    yet (pi is still collecting, or waiting for their yes)."""
+    from app.modules.pi_saas.customer_overview import _same
+
+    for project in brief.get("projects") or []:
+        if (
+            isinstance(project, dict)
+            and project.get("status") in UNCONFIRMED
+            and _same(title, f"{project.get('title') or ''} {project.get('service') or ''}")
+        ):
+            return project
+    return None
+
+
+def confirm_gate(issue: dict[str, Any], brief: dict[str, Any]) -> dict[str, Any]:
+    """Nobody works on a request before the customer confirms its brief: then it is the
+    customer's turn (confirm), never "We're on it" or a team update promise."""
+    if issue.get("stage") not in TEAM_STAGES or not unconfirmed_brief(
+        brief, str(issue.get("title") or "")
+    ):
+        return issue
+    return {
+        **issue,
+        "stage": "need_answer",
+        "ball_with": BALL["need_answer"],
+        "status": "open",
+        "next_step_owner": OWNER[BALL["need_answer"]],
+        "open_question": issue.get("open_question") or CONFIRM_QUESTION,
+    }
 
 
 # Dealing with the business, not a problem of the customer's: these stay off the map
@@ -696,7 +733,7 @@ async def analyse(
     except GatewayUnavailable:
         logger.info("pi_customer_issues_unavailable")
         return cached if isinstance(cached, dict) else None
-    found = [i.model_dump() for i in result.value.issues]
+    found = [confirm_gate(i.model_dump(), brief) for i in result.value.issues]
     # Service matters (an invoice download, a missing payment link, pi's wording) are not
     # the customer's business problems: they stay off the map and charts, listed apart.
     for item in found:

@@ -58,6 +58,18 @@ async def _business_with_chat(app, provider, db, monkeypatch, name="Portal Co", 
         _message_event(number, CUSTOMER, "Website chahiye", f"wamid.p-{number}"),
     )
     await _run_jobs(app, provider, db)
+    # The customer said yes to the brief, so the team really is working on it (an
+    # unconfirmed brief is never "the team's turn"; see the test for that).
+    for conversation in await db.scalars(
+        select(PiConversation).where(PiConversation.contact_wa_id == CUSTOMER)
+    ):
+        brief = dict(conversation.service_brief or {})
+        if brief.get("projects"):
+            brief["projects"] = [
+                {**project, "status": "with_team"} for project in brief["projects"]
+            ]
+            conversation.service_brief = brief
+    await db.commit()
     return client
 
 
@@ -400,17 +412,22 @@ async def test_after_24_hours_the_code_comes_through_the_approved_template(
         _message_event(NUMBER, LATE, "Hello", "wamid.p-late"),
     )
     await _run_jobs(app, provider, business_db)
-    conversation = await business_db.scalar(
-        select(PiConversation).where(PiConversation.contact_wa_id == LATE)
+    late = list(
+        await business_db.scalars(
+            select(PiConversation).where(PiConversation.contact_wa_id == LATE)
+        )
     )
-    conversation.last_inbound_at = datetime.now(UTC) - timedelta(days=2)
-    policy = await business_db.scalar(
-        select(PiSettings).where(PiSettings.tenant_id == conversation.tenant_id)
-    )
-    policy.whatsapp_config = {
-        **policy.whatsapp_config,
-        "code_template": {"name": "pi_customer_code", "language": "en_US"},
-    }
+    policies = []
+    for conversation in late:
+        conversation.last_inbound_at = datetime.now(UTC) - timedelta(days=2)
+        policy = await business_db.scalar(
+            select(PiSettings).where(PiSettings.tenant_id == conversation.tenant_id)
+        )
+        policy.whatsapp_config = {
+            **policy.whatsapp_config,
+            "code_template": {"name": "pi_customer_code", "language": "en_US"},
+        }
+        policies.append(policy)
     await business_db.commit()
     customer = pi_client(app)
     assert (await customer.post(f"{PORTAL}/code", json={"phone": f"+{LATE}"})).status_code == 202
@@ -419,12 +436,64 @@ async def test_after_24_hours_the_code_comes_through_the_approved_template(
     verified = await customer.post(f"{PORTAL}/verify", json={"phone": f"+{LATE}", "code": code})
     assert verified.status_code == 200, verified.text
     # Without an approved template nothing is sent (and the answer stays the same).
-    config = dict(policy.whatsapp_config)
-    config.pop("code_template")
-    policy.whatsapp_config = config
+    for policy in policies:
+        config = dict(policy.whatsapp_config)
+        config.pop("code_template", None)
+        policy.whatsapp_config = config
     await business_db.commit()
     other = pi_client(app)
     assert (await other.post(f"{PORTAL}/code", json={"phone": f"+{LATE}"})).status_code == 202
     assert _template_codes(provider, LATE) == [code] and _sent_codes(provider, LATE) == []
     for client in (business, customer, other):
         await client.aclose()
+
+
+async def test_an_unconfirmed_brief_is_never_the_teams_turn(
+    app, provider, business_db, monkeypatch
+):
+    business = await _business_with_chat(app, provider, business_db, monkeypatch)
+    customer = await _sign_in(app, provider)
+    conversation_id = (await customer.get(f"{PORTAL}/conversations")).json()[0]["id"]
+    conversation = await business_db.get(PiConversation, conversation_id)
+    await business_db.refresh(conversation)
+    conversation.service_brief = {
+        **(conversation.service_brief or {}),
+        "projects": [{"title": "Website Development", "status": "awaiting_confirmation"}],
+    }
+    await business_db.commit()
+    business_db.expire_all()  # the API shares this session in tests
+    # The model calls it "We're on it", but pi only asked "Shall I send this to the team?".
+    _mock_issues(
+        monkeypatch,
+        IssueReport(issues=[Issue(title="Website Development Request", stage="on_it")]),
+    )
+    await customer.get(f"{PORTAL}/conversations/{conversation_id}/issues")
+    business_db.expire_all()
+    [issue] = next(
+        c
+        for c in (await customer.get(f"{PORTAL}/conversations")).json()
+        if c["id"] == conversation_id
+    )["issues"]
+    assert issue["stage"] == "need_answer" and issue["ball_with"] == "client"
+    assert issue["open_question"] and issue["next_update_by"] is None
+    # Once the customer confirms, the same reading is the team's turn.
+    await business_db.refresh(conversation)
+    conversation.service_brief = {
+        **conversation.service_brief,
+        "projects": [{"title": "Website Development", "status": "with_team"}],
+    }
+    from datetime import UTC, datetime
+
+    conversation.last_message_at = datetime.now(UTC)
+    await business_db.commit()
+    business_db.expire_all()  # the API shares this session in tests
+    await customer.get(f"{PORTAL}/conversations/{conversation_id}/issues")
+    business_db.expire_all()
+    [issue] = next(
+        c
+        for c in (await customer.get(f"{PORTAL}/conversations")).json()
+        if c["id"] == conversation_id
+    )["issues"]
+    assert issue["stage"] == "on_it" and issue["ball_with"] == "team"
+    await business.aclose()
+    await customer.aclose()
