@@ -1398,6 +1398,13 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                 await meter(session, scope.tenant_id, scope.environment_id, "template_messages")
             conversation.last_message_at = connection.last_outbound_at = datetime.now(UTC)
             conversation.last_message_preview = message.body[:200]
+            # A send that went through clears an old send error, so the connection never
+            # shows a problem that's already over. Billing only counts as fixed when a
+            # paid (template) message goes out: free replies inside the window always do.
+            if connection.last_error_code and (
+                connection.last_error_code != "WHATSAPP_BILLING_PAUSED" or reminder or campaign
+            ):
+                connection.last_error_code = None
         except BusinessRuleViolation as exc:
             message.status, message.error_code = "failed", exc.code[:64]
             # pi's own follow-ups (reminder, ladder, nudge, check-in, card): a failed one is
