@@ -449,3 +449,45 @@ def test_a_caption_never_mentions_a_connection_the_card_does_not_show():
     assert engine.pick_card(report) is None
     report["issues"].append({"title": "Reporting app", "stage": "noted", "ball_with": "pi"})
     assert engine.pick_card(report)[2].startswith("pi found 1 connection")
+
+
+async def test_asking_for_the_code_in_the_chat_sends_one_that_signs_in(
+    app, provider, business_db, monkeypatch
+):
+    from test_pi_customer_portal import CUSTOMER, _sent_codes
+
+    business = await _business_with_chat(app, provider, business_db, monkeypatch)
+    conversation = await business_db.scalar(
+        select(PiConversation)
+        .where(PiConversation.contact_wa_id == CUSTOMER)
+        .order_by(PiConversation.last_inbound_at.desc())
+    )
+    inbound = await business_db.scalar(
+        select(PiMessage)
+        .where(PiMessage.conversation_id == conversation.id, PiMessage.direction == "inbound")
+        .order_by(PiMessage.created_at.desc())
+    )
+    inbound.body = "I need my whatsapp code"
+    conversation.last_inbound_at = datetime.now(UTC)
+    await business_db.commit()
+    # pi's own reply is told the code is coming, so it never invents one.
+    note = engine.map_request_note({}, app.state.settings, "I need my whatsapp code")
+    assert note == engine.CODE_NOTE
+    ctx = {**worker_ctx(app, business_db), "pi_customer_codes": app.state.pi_customer_codes}
+    before = len(_sent_codes(provider, CUSTOMER))
+    await engine.read_quiet_chats(ctx)
+    codes = _sent_codes(provider, CUSTOMER)
+    assert len(codes) == before + 1
+    await engine.read_quiet_chats(ctx)
+    assert len(_sent_codes(provider, CUSTOMER)) == before + 1  # once per message
+    customer = pi_client(app)
+    verified = await customer.post(
+        f"{PORTAL}/verify", json={"phone": f"+{CUSTOMER}", "code": codes[-1]}
+    )
+    assert verified.status_code == 200, verified.text
+    stored = await business_db.scalars(
+        select(PiMessage.body).where(PiMessage.conversation_id == conversation.id)
+    )
+    assert all("PI Customer code" not in body for body in stored)
+    await business.aclose()
+    await customer.aclose()

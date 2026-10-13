@@ -56,6 +56,19 @@ STOP = re.compile(
 )
 
 
+# The customer asks in the chat for their pi Customer sign-in code.
+CODE_ASK = re.compile(
+    r"\b(?:otp|verification code|login code|log-?in code|sign[- ]?in code|whatsapp code|"
+    r"portal code|pi customer code|code (?:bhej|bhejo|bhejein|do|de do|dein|chahiye|"
+    r"nahi aaya|nahi aya|nhi aaya|nhi aya|not received)|"
+    r"(?:my|send me|need)\s+(?:the\s+|a\s+|my\s+)?code)\b",
+    re.IGNORECASE,
+)
+CODE_NOTE = (
+    "The customer is asking for their pi Customer sign-in code. pi sends a fresh code in "
+    "this chat within a minute, as a separate message. Reply with ONE short line in their "
+    "language saying it is on its way. Never write, guess or repeat any code yourself."
+)
 MAP_NOTE = (
     "The customer is asking for their Problem Map: pi's picture of all their requests "
     "and how they connect (NOT a geographic map or a location). pi sends it as an image "
@@ -65,8 +78,11 @@ MAP_NOTE = (
 
 
 def map_request_note(whatsapp_config: dict[str, Any] | None, settings: Any, text: str) -> str:
-    """What pi's reply needs to know when the customer asks for their map, or ""."""
+    """What pi's reply needs to know when the customer asks for their map or their
+    sign-in code, or ""."""
     config = whatsapp_config or {}
+    if text and CODE_ASK.search(text) and service.portal_on(config):
+        return CODE_NOTE
     if (
         not text
         or not MAP_ASK.search(text)
@@ -222,6 +238,15 @@ async def read_quiet_chats(ctx: dict[str, Any]) -> list[str]:
             inbound_at = conversation.last_inbound_at.isoformat()
             latest = await _last_inbound_text(session, conversation)
             asked = brief.get("map_answered_for") != inbound_at and bool(MAP_ASK.search(latest))
+            if brief.get("code_answered_for") != inbound_at and CODE_ASK.search(latest):
+                # Asked in the chat for the sign-in code: they wrote just now, so the
+                # 24-hour window is open and the code can go as a normal message.
+                await send_chat_code(ctx, session, conversation, connection)
+                conversation.service_brief = {
+                    **(conversation.service_brief or {}),
+                    "code_answered_for": inbound_at,
+                }
+                brief = conversation.service_brief
             quiet = conversation.last_inbound_at <= now - READ_AFTER
             if not quiet and not asked:
                 continue  # never mid-explanation
@@ -283,6 +308,48 @@ async def read_quiet_chats(ctx: dict[str, Any]) -> list[str]:
 
 def _open(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [i for i in issues if i.get("stage") not in ("live", "closed", "paused")]
+
+
+async def send_chat_code(
+    ctx: dict[str, Any], session: Any, conversation: PiConversation, connection: Any
+) -> bool:
+    """A fresh pi Customer sign-in code to the number that asked for it in the chat. Sent
+    straight to WhatsApp and never stored as a chat message (like the portal's codes)."""
+    import time
+
+    from app.integrations.whatsapp_bridge import token as connection_token
+    from app.modules.pi.whatsapp import WhatsApp
+    from app.modules.pi_customer import access
+    from app.modules.pi_customer.routes import CODE_MESSAGE
+    from app.shared.errors import BusinessRuleViolation
+
+    settings, store = ctx["settings"], access.worker_code_store(ctx)
+    phone = "".join(ch for ch in conversation.contact_wa_id if ch.isdigit())
+    if store is None or not phone or connection.status != "active":
+        logger.warning("pi_customer_chat_code_unavailable")
+        return False
+    code = access.new_code()
+    await store.put(
+        access.code_key(settings, phone),
+        {
+            "h": access.code_hash(settings, phone, code),
+            "t": 0,
+            "e": int(time.time()) + access.CODE_SECONDS,
+        },
+        access.CODE_SECONDS,
+    )
+    try:
+        await WhatsApp(settings, ctx["http"], connection.provider).send(
+            connection.phone_number_id,
+            phone,
+            CODE_MESSAGE.format(code=code),
+            await connection_token(session, settings, connection),
+        )
+    except BusinessRuleViolation:
+        logger.warning("pi_customer_chat_code_not_sent")
+        return False
+    logger.info("pi_customer_chat_code_sent")
+    return True
 
 
 def shown_links(report: dict[str, Any]) -> list[dict[str, Any]]:
