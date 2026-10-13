@@ -61,6 +61,27 @@ const projectSchema = z.object({
   documents: z
     .array(z.object({ file_id: z.string(), name: z.string() }))
     .catch([]),
+  notes: z
+    .object({
+      problem: z.string().optional(),
+      goal: z.string().optional(),
+      audience: z.string().optional(),
+      target_date: z.string().optional(),
+      features: z.array(z.string()).optional(),
+      references: z.array(z.string()).optional(),
+      decisions: z.array(z.string()).optional(),
+      questions: z.array(z.string()).optional(),
+    })
+    .catch({}),
+  feedback: z
+    .array(
+      z.object({
+        mood: z.string().catch("neutral"),
+        words: z.string().catch(""),
+        at: z.string().nullable().catch(null),
+      }),
+    )
+    .catch([]),
   steps: z
     .array(
       z.object({
@@ -310,6 +331,7 @@ export function CustomerPiOverview({ customerId }: { customerId: string }) {
                           )}
                         </p>
                       )}
+                      <ProjectNotes project={d} />
                       {d.documents.length > 0 && (
                         <ul className="mt-2 space-y-1">
                           {d.documents.map((doc) => (
@@ -1638,6 +1660,87 @@ function CustomerCardView({
           removes the connection.
         </p>
       </div>
+    </div>
+  );
+}
+
+const MOOD: Record<
+  string,
+  { label: string; tone: "success" | "warning" | "info" }
+> = {
+  happy: { label: "Happy", tone: "success" },
+  unhappy: { label: "Unhappy", tone: "warning" },
+  neutral: { label: "Feedback", tone: "info" },
+};
+
+/** pi's deep notes on a project: why they need it and what success means up front;
+ * what it must do, what's decided, what's still open and their references one tap away.
+ * The customer's feedback after delivery is shown with its mood. */
+function ProjectNotes({ project }: { project: Project }) {
+  const n = project.notes;
+  const lists = (
+    [
+      ["Must have", n.features],
+      ["Decided", n.decisions],
+      ["Still open", n.questions],
+      ["References", n.references],
+    ] as const
+  ).filter(([, items]) => items && items.length > 0);
+  const lead = (
+    [
+      ["Problem", n.problem],
+      ["Goal", n.goal],
+      ["For", n.audience],
+      ["Timeline", n.target_date],
+    ] as const
+  ).filter(([, value]) => value);
+  const said = project.feedback.at(-1);
+  if (!lead.length && !lists.length && !said) return null;
+  return (
+    <div className="mt-2 space-y-1.5 rounded-lg bg-surface-muted px-2.5 py-2 text-xs">
+      {lead.map(([label, value]) => (
+        <p key={label}>
+          <span className="font-medium">{label}: </span>
+          <span className="text-muted-foreground">{value}</span>
+        </p>
+      ))}
+      {lists.length > 0 && (
+        <details className="group">
+          <summary className="cursor-pointer font-medium text-primary select-none">
+            Project notes ·{" "}
+            {lists
+              .map(
+                ([label, items]) => `${items!.length} ${label.toLowerCase()}`,
+              )
+              .join(" · ")}
+          </summary>
+          <div className="mt-1.5 grid gap-2 sm:grid-cols-2">
+            {lists.map(([label, items]) => (
+              <div key={label}>
+                <p className="font-medium">{label}</p>
+                <ul className="mt-0.5 space-y-0.5 text-muted-foreground">
+                  {items!.map((item) => (
+                    <li key={item} className="flex gap-1.5">
+                      <span aria-hidden="true">•</span>
+                      <span className="min-w-0 break-words">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
+      {said && (
+        <p className="flex flex-wrap items-center gap-1.5">
+          <Badge tone={(MOOD[said.mood] ?? MOOD.neutral).tone}>
+            {(MOOD[said.mood] ?? MOOD.neutral).label}
+          </Badge>
+          <span className="text-muted-foreground">
+            &ldquo;{said.words}&rdquo;
+          </span>
+        </p>
+      )}
     </div>
   );
 }

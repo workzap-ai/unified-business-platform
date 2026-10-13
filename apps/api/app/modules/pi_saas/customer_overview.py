@@ -173,6 +173,23 @@ async def _requests(
     return issues, links, headline
 
 
+NOTE_TEXT = ("problem", "goal", "audience", "target_date")
+NOTE_LISTS = ("features", "references", "decisions", "questions")
+
+
+def project_notes(requirements: dict[str, Any]) -> dict[str, Any]:
+    """pi's deep notes on one project (from its deal): why, for whom, what it must do,
+    what's decided and what's still open. Budget stays out of this view."""
+    notes: dict[str, Any] = {
+        key: str(requirements.get(key) or "")[:500] for key in NOTE_TEXT if requirements.get(key)
+    }
+    for key in NOTE_LISTS:
+        value = requirements.get(key)
+        if isinstance(value, list) and value:
+            notes[key] = [str(v)[:200] for v in value][:20]
+    return notes
+
+
 def _documents_for(title: str, documents: list[dict[str, Any]]) -> list[dict[str, str]]:
     """The documents the customer sent for this project (by title words)."""
     return [
@@ -198,6 +215,7 @@ async def _projects(session: Any, scope: Any, customer_id: UUID) -> list[dict[st
     from app.modules.pi.models import PiConversation as Chat
 
     documents: list[dict[str, Any]] = []
+    feedback: list[dict[str, Any]] = []
     for brief in await session.scalars(
         WorkspaceRepository(session, Chat, scope)
         .select()
@@ -205,6 +223,7 @@ async def _projects(session: Any, scope: Any, customer_id: UUID) -> list[dict[st
         .where(Chat.customer_id == customer_id)
     ):
         documents += (brief or {}).get("documents") or []
+        feedback += [f for f in (brief or {}).get("feedback") or [] if isinstance(f, dict)]
     projects = []
     for lead in leads:
         item: dict[str, Any] = {
@@ -217,6 +236,10 @@ async def _projects(session: Any, scope: Any, customer_id: UUID) -> list[dict[st
             "service": str((lead.requirements or {}).get("service") or ""),
             "scope": str((lead.requirements or {}).get("scope") or "")[:300],
             "documents": _documents_for(lead.title, documents),
+            "notes": project_notes(lead.requirements or {}),
+            "feedback": [f for f in feedback if _same(lead.title, str(f.get("project") or ""))][
+                -3:
+            ],
         }
         try:
             async with session.begin_nested():
@@ -274,6 +297,7 @@ async def _refresh(request: Request, session: Any, conversations: list[PiConvers
         except Exception:  # noqa: BLE001 - the saved analysis is shown instead
             logger.warning("pi_overview_refresh_failed", exc_info=True)
             await session.rollback()
+            break  # The rollback expired the loaded rows: the caller reloads them.
 
 
 @router.get("/{customer_id}/pi-overview")
@@ -282,15 +306,14 @@ async def overview(
 ) -> dict[str, Any]:
     scope.require("customers.read")
     customer = await WorkspaceRepository(session, Customer, scope).get(customer_id)
-    conversations = list(
-        await session.scalars(
-            WorkspaceRepository(session, PiConversation, scope)
-            .select()
-            .where(PiConversation.customer_id == customer_id)
-            .order_by(PiConversation.last_message_at.desc().nulls_last())
-            .limit(10)
-        )
+    chats = (
+        WorkspaceRepository(session, PiConversation, scope)
+        .select()
+        .where(PiConversation.customer_id == customer_id)
+        .order_by(PiConversation.last_message_at.desc().nulls_last())
+        .limit(10)
     )
+    conversations = list(await session.scalars(chats))
     profile: dict[str, str] = {}
     for conversation in reversed(conversations):  # oldest first, newest facts win
         profile = merge_profile(
@@ -303,6 +326,9 @@ async def overview(
     first: datetime | None = min((c.created_at for c in conversations), default=None)
     last: datetime | None = next((c.last_message_at for c in conversations), None)
     await _refresh(request, session, conversations)
+    # Fresh rows: a refresh commits (or rolls back), which expires what was loaded.
+    customer = await WorkspaceRepository(session, Customer, scope).get(customer_id)
+    conversations = list(await session.scalars(chats))
     issues, links, headline = await _requests(session, conversations)
     projects: list[dict[str, Any]] = []
     if scope.can("sales.read"):

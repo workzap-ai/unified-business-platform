@@ -1336,6 +1336,16 @@ async def after_order_moved(
         project=lead.title,
         number=order.number,
     )
+    if key == "delivered":
+        # pi asked how it went: the answer is saved on this deal (see save_feedback).
+        conversation.service_brief = {
+            **(conversation.service_brief or {}),
+            "awaiting_feedback": {
+                "lead_id": str(lead.id),
+                "project": lead.title,
+                "at": datetime.now(UTC).isoformat(),
+            },
+        }
     return [await _queue(session, scope, conversation, text, f"pi-order-{key}:{order.id}")]
 
 

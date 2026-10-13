@@ -113,7 +113,7 @@ def _token(link: str) -> str:
     return link.rsplit("/d/", 1)[1]
 
 
-async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db):
+async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db, monkeypatch):
     pi = await pi_workspace(api, business_db, business_type="service_business")
     put = await api.put(
         "/api/v1/pi/customer-payments/settings",
@@ -217,6 +217,33 @@ async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db):
     path = (await api.get(f"{DEALS}/leads/{lead_id}/journey")).json()
     assert all(s["done"] for s in path["steps"] if s["key"] != "meeting")
     assert path["next"]["title"] == "Delivered: get their feedback" and path["next"]["auto"]
+
+    # The customer answers "How did it go?": kept on the deal and the customer's page.
+    from test_pi_service_conversations import mock_turns, turn
+
+    from app.modules.pi.service_conversation import Requirements
+
+    mock_turns(
+        monkeypatch,
+        turn(
+            reply="Thank you, glad you like it. Is there a next project we can help with?",
+            language="en",
+            requirements=Requirements(),
+            missing=[],
+            feedback="Loved it, the logo is perfect",
+            feedback_mood="happy",
+        ),
+    )
+    await pi.process("Loved it, the logo is perfect", "feedback-1")
+    lead = await business_db.get(SalesLead, UUID(lead_id))
+    await business_db.refresh(lead)
+    assert "customer feedback (happy): Loved it, the logo is perfect" in lead.notes
+    chat = await pi.conversation()
+    assert "awaiting_feedback" not in chat.service_brief
+    assert chat.service_brief["feedback"][-1]["mood"] == "happy"
+    view = (await api.get(f"/api/v1/customers/{customer_id}/pi-overview")).json()
+    [project] = [p for p in view["projects"] if p["lead_id"] == lead_id]
+    assert project["feedback"][-1]["words"] == "Loved it, the logo is perfect"
     await public.aclose()
     await pi.close()
 

@@ -87,6 +87,7 @@ CHOICES: dict[str, tuple[str, ...]] = {
     "action_priority": ("normal", "low", "high", "urgent"),
     "mood": ("calm", "confused", "frustrated", "urgent"),
     "proposal_answer": ("none", "accepted", "changes", "declined"),
+    "feedback_mood": ("none", "happy", "neutral", "unhappy"),
 }
 TEXT_LIMITS = {
     "reply": 4000,
@@ -98,6 +99,7 @@ TEXT_LIMITS = {
     "booking_id": 40,
     "action_evidence": 500,
     "proposal_evidence": 500,
+    "feedback": 500,
 }
 
 
@@ -145,6 +147,10 @@ class CustomerProfile(BaseModel):
 PROJECT_STATUS = ("collecting", "awaiting_confirmation", "confirmed", "with_team")
 
 
+# A project's list fields and how many points each keeps.
+PROJECT_LISTS = {"features": 20, "references": 10, "decisions": 12, "questions": 8}
+
+
 class Project(BaseModel):
     """One piece of work the customer raised in this chat; a chat can hold several."""
 
@@ -154,6 +160,16 @@ class Project(BaseModel):
     details: str = Field(default="", max_length=1500)
     status: Literal["collecting", "awaiting_confirmation", "confirmed", "with_team"] = "collecting"
     missing: list[str] = Field(default_factory=list, max_length=12)
+    # The deep record of the project, in the customer's terms (English, facts only).
+    problem: str = Field(default="", max_length=500)  # why they need it: what hurts now
+    goal: str = Field(default="", max_length=300)  # what success looks like for them
+    audience: str = Field(default="", max_length=300)  # who it is for
+    features: list[str] = Field(default_factory=list, max_length=20)  # what it must do/have
+    references: list[str] = Field(default_factory=list, max_length=10)  # examples, links, files
+    decisions: list[str] = Field(default_factory=list, max_length=12)  # choices agreed so far
+    questions: list[str] = Field(default_factory=list, max_length=8)  # open points to settle
+    timeline: str = Field(default="", max_length=200)  # their words, internal only
+    budget: str = Field(default="", max_length=200)  # their words, internal only
 
     @model_validator(mode="before")
     @classmethod
@@ -161,9 +177,27 @@ class Project(BaseModel):
         if not isinstance(data, dict):
             return {}
         data = {key: value for key, value in data.items() if value is not None}
-        for key, limit in (("title", 120), ("service", 300), ("details", 1500)):
+        for key, limit in (
+            ("title", 120),
+            ("service", 300),
+            ("details", 1500),
+            ("problem", 500),
+            ("goal", 300),
+            ("audience", 300),
+            ("timeline", 200),
+            ("budget", 200),
+        ):
             if key in data:
                 data[key] = _text(data[key], limit)
+        for key, count in PROJECT_LISTS.items():
+            value = data.get(key)
+            if isinstance(value, str):
+                value = [value] if value.strip() else []
+            data[key] = (
+                [str(v).strip()[:200] for v in value if str(v).strip()][:count]
+                if isinstance(value, list)
+                else []
+            )
         status = str(data.get("status", "collecting")).strip().lower()
         data["status"] = status if status in PROJECT_STATUS else "collecting"
         missing = data.get("missing")
@@ -215,6 +249,9 @@ class ServiceTurn(BaseModel):
     meeting_how: str = Field(default="", max_length=20)
     awaiting_customer: bool = False
     ready_for_team: bool = False
+    # The customer's answer to "How did it go?" after a delivery (their words).
+    feedback: str = Field(default="", max_length=500)
+    feedback_mood: Literal["none", "happy", "neutral", "unhappy"] = "none"
     consent: Literal["unchanged", "granted", "declined"] = "unchanged"
     consent_evidence: str = Field(default="", max_length=500)
     request_human: bool = False
@@ -523,6 +560,12 @@ person from the team will reply here; don't ask whether they want one.
 If the enquiry is outside those offerings or needs the team's judgement, keep talking:
 say you will check with the team and come back here; request_human stays false.
 Do not claim a meeting was booked, message was sent, order placed or quote issued.
+feedback_for: a project the team just delivered; pi asked how it went. When the
+customer's latest message is about how it went, copy their words into feedback and set
+feedback_mood (happy, neutral or unhappy). Happy: thank them in one line, then ask once
+whether there's a next project or someone they'd recommend you to. Unhappy or asking
+for a change: say sorry once, note exactly what to fix as a point, and say the team
+will come back here on it (request_human stays false). Otherwise leave feedback empty.
 Projects: a customer may bring several projects in one chat (a logo, then a website,
 then packaging). "projects" must list EVERY project raised in this conversation so far,
 including earlier ones from brief.projects and conversation_summary, each with a short
@@ -533,6 +576,17 @@ awaiting_confirmation = brief shown and waiting for their yes, confirmed = they 
 yes, with_team = handed to the team) and what is still missing. A new request is a NEW
 project; never merge it into an earlier one or drop an earlier one. requirements and
 missing describe the project being discussed now.
+Know each project deeply, like an account manager's notes, from the customer's own
+words (and their documents, pictures and links), in English, facts only:
+problem = why they need it, what is hard or not working today; goal = what success looks
+like for them; audience = who it is for; features = what it must do or include, one short
+point each; references = examples, competitors, links or files they pointed to;
+decisions = choices they made (style, colours, platform, package); questions = points
+still to settle with them; timeline and budget = their own words (internal, never repeated
+to them). Fill what they said, leave the rest empty, and keep earlier points (brief.projects
+holds them): add to them, never drop one. Ask about a missing problem or goal naturally
+when it matters for the work ("What's not working with the current site?"), at most one
+such question per reply.
 Remember the whole conversation: conversation_summary and brief carry what happened
 before the recent history; never ask again for anything recorded there.
 The application saves your summary for the team. Write that internal summary in English
@@ -971,6 +1025,9 @@ async def prepare_context(
         **reply_language(conversation, message, rows),
         "tone": policy.response_rules.get("tone", "friendly"),
         "now_local": _now_local(policy.timezone),
+        "feedback_for": ((conversation.service_brief or {}).get("awaiting_feedback") or {}).get(
+            "project", ""
+        ),
         "meeting_over": meeting_over(
             conversation.service_brief or {},
             await _team_notes(session, scope, conversation.id),
@@ -1544,6 +1601,23 @@ STATUS_TEXT = re.compile(
 )
 
 
+def keep_known(project: Project, before: Project) -> None:
+    """What was known about a project stays known: an empty field keeps its earlier
+    value, list points add up (no repeats), and an open question the customer has since
+    answered (now among the decisions) is dropped."""
+    for key in ("problem", "goal", "audience", "timeline", "budget", "service"):
+        if not str(getattr(project, key)).strip():
+            setattr(project, key, getattr(before, key))
+    for key, count in PROJECT_LISTS.items():
+        merged: list[str] = []
+        for point in [*getattr(before, key), *getattr(project, key)]:
+            if point.casefold() not in {m.casefold() for m in merged}:
+                merged.append(point)
+        setattr(project, key, merged[-count:])
+    settled = " ".join(project.decisions).casefold()
+    project.questions = [q for q in project.questions if q.casefold() not in settled]
+
+
 def merge_projects(previous: Any, turn: ServiceTurn) -> list[Project]:
     """Earlier projects are never lost: the model's list updates them by title and adds
     new ones; one it forgot keeps its last known state."""
@@ -1566,6 +1640,7 @@ def merge_projects(previous: Any, turn: ServiceTurn) -> list[Project]:
                 project.details = before.details
             if PROJECT_RANK[project.status] < PROJECT_RANK[before.status]:
                 project.status = before.status
+            keep_known(project, before)
         elif STATUS_TEXT.search(project.details):
             project.details = ""
         known[project.title.casefold()] = project
@@ -1890,6 +1965,7 @@ async def save_service_turn(
                 f'Customer said "{turn.consent_evidence[:200]}" on WhatsApp',
                 message.id,
             )
+    await save_feedback(session, scope, conversation, brief, turn)
     conversation.service_brief = brief
     from app.modules.pi.business_form import after_turn
 
@@ -1999,6 +2075,16 @@ def project_requirements(
         fields["scope"] = details
     elif not mine:
         fields["scope"] = ""
+    for key in ("problem", "goal", "audience"):
+        if getattr(project, key).strip():
+            fields[key] = getattr(project, key).strip()
+    for key in PROJECT_LISTS:
+        if getattr(project, key):
+            fields[key] = list(getattr(project, key))
+    if project.timeline.strip():
+        fields["target_date"] = project.timeline.strip()
+    if project.budget.strip():
+        fields["customer_budget"] = project.budget.strip()
     return fields
 
 
@@ -2438,6 +2524,63 @@ async def log_request_changes(
         customer_id = conversation.customer_id
         await log_activity(
             session, scope, customer_id, "lead", text, "conversation", conversation.id
+        )
+
+
+async def save_feedback(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    brief: dict[str, Any],
+    turn: ServiceTurn,
+) -> None:
+    """The customer's answer to "How did it go?" is kept on the delivered deal and their
+    timeline; an unhappy one reaches the team straight away."""
+    from app.modules.customers.service import log_activity
+    from app.modules.pi_saas.deals import note_lead
+
+    waiting = brief.get("awaiting_feedback") or {}
+    words = turn.feedback.strip()
+    if not waiting or not words:
+        return
+    mood = turn.feedback_mood if turn.feedback_mood != "none" else "neutral"
+    project = str(waiting.get("project") or "the project")
+    try:
+        lead_id = UUID(str(waiting.get("lead_id")))
+    except ValueError:
+        lead_id = None
+    await note_lead(session, scope, lead_id, f"customer feedback ({mood}): {words[:300]}")
+    if conversation.customer_id is not None:
+        await log_activity(
+            session,
+            scope,
+            conversation.customer_id,
+            "feedback",
+            f"Feedback on {project} ({mood}): {words[:200]}",
+            "conversation",
+            conversation.id,
+        )
+    brief["feedback"] = [
+        *(brief.get("feedback") or [])[-9:],
+        {
+            "project": project,
+            "mood": mood,
+            "words": words[:500],
+            "at": datetime.now(UTC).isoformat(),
+        },
+    ]
+    brief.pop("awaiting_feedback", None)
+    if mood == "unhappy":
+        await notify(
+            session,
+            scope,
+            "pi.customer_feedback",
+            f"Unhappy feedback on {project}",
+            words[:300],
+            link=f"/pi/inbox?conversation={conversation.id}",
+            permission="pi.read",
+            severity="warning",
+            dedupe_key=f"pi-feedback:{conversation.id}:{lead_id}",
         )
 
 

@@ -219,3 +219,36 @@ def test_the_knowledge_search_understands_what_is_asked():
     assert "price:*" in search_terms("iski qeemat kitni hai")
     words = brief_words({"projects": [{"title": "Logo", "status": "collecting"}], "mood": "calm"})
     assert words == "Logo"  # never the JSON field names ("status", "mood", ...)
+
+
+def test_a_project_is_known_deeply_and_nothing_known_is_lost():
+    from app.modules.pi.service_conversation import (
+        Project,
+        Requirements,
+        ServiceTurn,
+        merge_projects,
+        project_requirements,
+    )
+
+    earlier = Project(
+        title="Furniture store",
+        problem="Orders come only through Instagram DMs and get lost",
+        features=["Online catalogue", "Cart"],
+        questions=["Which payment gateway?"],
+    ).model_dump()
+    now = Project(
+        title="Furniture store",
+        goal="Sell online across Pakistan",
+        features=["cart", "Stock tracking"],
+        decisions=["Payment gateway: JazzCash"],
+        questions=["Which payment gateway?"],
+    )
+    [merged] = merge_projects([earlier], ServiceTurn(reply="ok", projects=[now]))
+    assert merged.problem == "Orders come only through Instagram DMs and get lost"
+    assert merged.goal == "Sell online across Pakistan"
+    assert merged.features == ["Online catalogue", "Cart", "Stock tracking"]
+    fields = project_requirements(merged, Requirements().model_dump(), True)
+    assert fields["problem"].startswith("Orders come only")
+    assert fields["features"] == ["Online catalogue", "Cart", "Stock tracking"]
+    # A single string from the model still becomes a list.
+    assert Project.model_validate({"title": "X", "features": "Cart"}).features == ["Cart"]
