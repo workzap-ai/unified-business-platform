@@ -284,6 +284,17 @@ async def test_the_team_is_alerted_when_a_customer_waits_on_it(
     monkeypatch.setattr(engine, "prayer_or_quiet", lambda policy, now=None: False)
     ctx = worker_ctx(app, business_db)
     conversation = await _age(business_db, conversation_id, team_hours=25, inbound_hours=13)
+    # The analysis says "team's turn", but the customer never confirmed the brief: no
+    # "the team is working on it" to the customer, and no alert to the team.
+    brief = dict(conversation.service_brief)
+    brief["projects"] = [{"title": "Furniture website", "status": "awaiting_confirmation"}]
+    conversation.service_brief = brief
+    await business_db.commit()
+    assert await engine.run_ladder(ctx) == []
+    # Once they confirm it and it's with the team, the team owes them an update.
+    brief["projects"] = [{"title": "Furniture website", "status": "confirmed"}]
+    conversation.service_brief = dict(brief)
+    await business_db.commit()
     queued = await engine.run_ladder(ctx)
     kinds = [
         (n.title, n.severity)

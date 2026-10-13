@@ -629,6 +629,22 @@ async def nudge_customer(
     return str(message.id)
 
 
+def handed_to_team(brief: dict[str, Any], title: str) -> bool:
+    """The customer confirmed a brief for this request and it went to the team: only
+    then is the team really working on it."""
+    from app.modules.pi_saas.customer_overview import _same
+
+    projects = brief.get("projects") or []
+    if not projects:  # A chat from before projects: the brief itself went to the team.
+        return bool(brief.get("ready_for_team"))
+    return any(
+        isinstance(p, dict)
+        and p.get("status") in ("confirmed", "with_team")
+        and _same(title, f"{p.get('title') or ''} {p.get('service') or ''}")
+        for p in projects
+    )
+
+
 async def alert_team(
     session: Any,
     scope: Any,
@@ -651,6 +667,10 @@ async def alert_team(
         )
     )
     if replied:
+        return None
+    if not handed_to_team(conversation.service_brief or {}, str(issue.get("title") or "")):
+        # The analysis said "team's turn", but the customer never confirmed this brief:
+        # nobody is working on it yet, so never tell them so (nor alert the team).
         return None
     waited = now - since
     for hours, severity in SLA_HOURS:
