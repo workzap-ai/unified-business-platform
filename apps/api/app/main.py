@@ -87,11 +87,11 @@ from app.modules.pi_saas.review_routes import router as pi_review_router
 from app.modules.pi_saas.setup_routes import operator_router as pi_operator_setup_router
 from app.modules.pi_saas.setup_routes import router as pi_setup_router
 from app.modules.pi_saas.setup_routes import web_router as setup_web_router
+from app.modules.pi_saas.team_board_routes import router as pi_team_board_router
 from app.modules.pi_saas.team_whatsapp import router as team_whatsapp_router
 from app.modules.pi_saas.webhook_routes import router as pi_saas_webhook_router
 from app.modules.pi_saas.whatsapp_tools import router as pi_whatsapp_tools_router
 from app.modules.pi_saas.work_routes import router as pi_work_router
-from app.modules.pi_saas.team_board_routes import router as pi_team_board_router
 from app.modules.products.routes import router as products_router
 from app.modules.quotes.routes import router as quotes_router
 from app.modules.reports.routes import router as reports_router

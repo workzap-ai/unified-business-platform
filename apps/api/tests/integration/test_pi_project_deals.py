@@ -3,7 +3,7 @@ its own brief and its own proposal; an older lead of the chat is reused only by 
 project with its name; won deals are never reopened."""
 
 import json
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
 from sqlalchemy import select
@@ -87,6 +87,50 @@ async def test_two_confirmed_projects_become_two_deals(api, business_db, monkeyp
     steps = {d["project"]: d["next"] for d in json.loads(contexts[1])["project_deals"]}
     assert set(steps) == {"Furniture website", "AI system for employees"}
     assert all("preparing the proposal" in step for step in steps.values())
+    await pi.close()
+
+
+async def test_status_context_keeps_manual_deals_and_each_unconfirmed_project(api, business_db):
+    from test_pi_deals import _customer_in_chat
+
+    from app.modules.pi.service_conversation import project_deals
+
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    customer_id, conversation = await _customer_in_chat(pi)
+    conversation.service_brief = {
+        "projects": [
+            {"title": "Website for bakery", "status": "confirmed"},
+            {"title": "Website for clinic", "status": "collecting"},
+            {"title": "HR", "status": "awaiting_confirmation"},
+        ]
+    }
+    for title, stage, chat_id in [
+        ("Website for bakery", "new", conversation.id),
+        ("Website for bakery", "won", conversation.id),
+        ("HR", "new", conversation.id),
+        ("Unrelated deal", "won", uuid4()),
+    ]:
+        business_db.add(
+            SalesLead(
+                tenant_id=UUID(pi.tenant_id),
+                environment_id=UUID(pi.environment_id),
+                customer_id=UUID(customer_id),
+                title=title,
+                stage=stage,
+                source="manual",
+                currency="USD",
+                conversation_id=chat_id,
+            )
+        )
+    await business_db.flush()
+    states = await project_deals(business_db, pi.scope(), conversation, False)
+    assert len(states) == 3
+    projects = {p["project"]: p for p in states}
+    assert projects["Website for bakery"]["stage"] == "won"
+    assert projects["Website for bakery"]["status"] == "deal won; payment not confirmed"
+    assert projects["Website for clinic"]["status"] == "still collecting the details"
+    assert projects["HR"]["status"] == "brief written, waiting for the customer's confirmation"
+    assert projects["HR"]["next"] == "the customer confirms the brief, then it goes to the team"
     await pi.close()
 
 

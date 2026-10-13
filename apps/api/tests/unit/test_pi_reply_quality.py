@@ -287,3 +287,176 @@ def test_a_paid_project_shows_as_being_built_not_as_a_proposal_to_prepare():
     assert issues[0]["stage"] == "building"
     assert issues[0]["next_step"] == "Team: Start the work"
     assert issues[1]["stage"] == "on_it"  # no won deal: unchanged
+
+
+def test_pi_knows_where_each_project_really_stands():
+    from types import SimpleNamespace as N
+
+    from app.modules.pi.service_conversation import status_for
+
+    quote = N(status="accepted")
+    assert status_for("won", quote, invoice=None, order=None, sent=True).startswith(
+        "proposal accepted"
+    )
+    unsent = N(status="issued")
+    assert "invoice being prepared" in status_for(
+        "won", quote, invoice=unsent, order=N(status="confirmed"), sent=False
+    )
+    assert status_for("won", quote, invoice=unsent, order=N(status="confirmed"), sent=True) == (
+        "invoice sent, not paid yet"
+    )
+    paid = N(status="paid")
+    assert "work is in progress" in status_for(
+        "won", quote, invoice=paid, order=N(status="processing"), sent=True
+    )
+    assert status_for("proposal", N(status="sent"), invoice=None, order=None, sent=True) == (
+        "proposal shared, waiting for the customer's answer"
+    )
+
+
+def test_a_status_question_gets_real_project_lines_and_hello_gets_an_offer():
+    from app.modules.pi.service_conversation import greeting_reply, vague_status
+
+    deals_now = [
+        {"project": "Website and Logo Design", "stage": "won", "status": "paid; work in progress"},
+        {"project": "Employee Tracking System", "stage": "brief", "status": "collecting"},
+    ]
+    ask = {"project_deals": deals_now, "latest_customer_message": "any update?"}
+    assert vague_status("The team is working on your projects and will update you.", ask)
+    assert vague_status("• Website and Logo Design: paid, work in progress", ask)
+    answer = (
+        "• Website and Logo Design: paid, work in progress\n"
+        "• Employee Tracking System: still collecting the details"
+    )
+    assert vague_status(answer, ask) is None
+    assert too_long(answer, ask) is None
+    specific = {**ask, "latest_customer_message": "Website and Logo Design status?"}
+    assert vague_status("Website and Logo Design: paid, work in progress", specific) is None
+    # "Hi" never dumps the status: it offers it.
+    hello = {
+        "history": [{"role": "ai", "text": "earlier"}],
+        "customer_profile": {"name": "Dalal&Co."},
+        "project_deals": deals_now,
+        "brief": {},
+    }
+    assert greeting_reply(hello) == (
+        "Hi Dalal&Co. Would you like an update on your Website and Logo Design, or is "
+        "there something new I can help with?"
+    )
+
+
+@pytest.mark.parametrize("work", ["processing", "shipped"])
+@pytest.mark.parametrize("payment", [None, "issued", "partially_paid"])
+def test_work_progress_does_not_imply_full_payment(work, payment):
+    from app.modules.pi.service_conversation import next_for, status_for
+
+    invoice = SimpleNamespace(status=payment, number="INV-1") if payment else None
+    order = SimpleNamespace(status=work, number="ORD-1")
+    quote = SimpleNamespace(status="accepted", number="QUO-1")
+    status = status_for("won", quote, invoice=invoice, order=order, sent=True)
+    following = next_for("won", quote, False, invoice=invoice, order=order)
+    assert not status.startswith("paid")
+    assert not following.startswith("paid")
+    assert ("work is in progress" if work == "processing" else "on its way") in status
+    if payment == "partially_paid":
+        assert "part paid" in status
+    elif payment == "issued":
+        assert "not paid" in status
+
+
+def test_won_without_a_paid_invoice_does_not_claim_payment():
+    from app.modules.pi.service_conversation import next_for
+
+    quote = SimpleNamespace(status="accepted", number="QUO-1")
+    assert "paid" not in next_for("won", quote, False)
+    assert "paid" not in next_for("won", None, False)
+
+
+def test_an_approved_proposal_is_not_already_shared():
+    from app.modules.pi.service_conversation import next_for
+
+    quote = SimpleNamespace(status="approved", number="QUO-1")
+    assert "is shared" not in next_for("proposal", quote, False)
+
+
+async def test_a_real_status_list_is_sent_without_a_conflicting_short_reply_rewrite():
+    reply = (
+        "• Website: paid in full; the team is starting the work.\n"
+        "• Logo: waiting for your confirmation; then the team prepares the proposal."
+    )
+    complete = AsyncMock(
+        return_value=SimpleNamespace(
+            value=ServiceTurn(reply=reply), response=SimpleNamespace(attempts=[])
+        )
+    )
+    result = await compose_service_turn(
+        SimpleNamespace(complete_structured=complete),
+        WorkspaceScope.system(uuid4(), uuid4(), frozenset(), "PI"),
+        PiConversation(id=uuid4()),
+        PiSettings(ai_config={}, response_rules={}),
+        {
+            "latest_customer_message": "status?",
+            "latest_message_kind": "text",
+            "reply_language": "en",
+            "history": [{"role": "ai", "text": "I'm pi, your AI assistant."}],
+            "project_deals": [{"project": "Website"}, {"project": "Logo"}],
+        },
+    )
+    complete.assert_awaited_once()
+    assert result.reply == reply
+
+
+async def test_an_unknown_delivery_date_goes_to_the_request_desk():
+    complete = AsyncMock(
+        return_value=SimpleNamespace(
+            value=ServiceTurn(
+                reply="I'm checking with the team; their answer will come here.",
+                request_human=True,
+            ),
+            response=SimpleNamespace(attempts=[]),
+        )
+    )
+    result = await compose_service_turn(
+        SimpleNamespace(complete_structured=complete),
+        WorkspaceScope.system(uuid4(), uuid4(), frozenset(), "PI"),
+        PiConversation(id=uuid4()),
+        PiSettings(ai_config={}, response_rules={}),
+        {
+            "latest_customer_message": "delivery update?",
+            "latest_message_kind": "text",
+            "reply_language": "en",
+            "history": [{"role": "ai", "text": "I'm pi, your AI assistant."}],
+            "project_deals": [{"project": "Website", "status": "work in progress"}],
+        },
+    )
+    complete.assert_awaited_once()
+    assert result._ask_team
+    assert not result.request_human
+
+
+def test_status_answers_distinguish_similar_projects_and_recognize_short_names():
+    from app.modules.pi.service_conversation import vague_status
+
+    context = {
+        "latest_customer_message": "status?",
+        "project_deals": [
+            {"project": "Bakery website"},
+            {"project": "Clinic website"},
+            {"project": "HR"},
+        ],
+    }
+    assert vague_status("Bakery website: in progress. HR: awaiting confirmation.", context)
+    assert (
+        vague_status(
+            "• Bakery website: in progress\n• Clinic website: proposal sent\n• HR: collecting",
+            context,
+        )
+        is None
+    )
+    assert (
+        vague_status(
+            "Clinic website: proposal sent",
+            {**context, "latest_customer_message": "Clinic website status?"},
+        )
+        is None
+    )

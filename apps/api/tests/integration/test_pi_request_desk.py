@@ -107,7 +107,7 @@ async def test_team_answer_goes_back_to_pi_which_replies_itself(api, business_db
         )
     ]
     assert [m.body for m in replies] == [
-        "Thanks for waiting! I checked with the team: yes, we deliver to Karachi too. "
+        "Thanks for waiting. I checked with the team: yes, we deliver to Karachi too. "
         "Which city is it for?"
     ]
     assert replies[0].status == "queued"

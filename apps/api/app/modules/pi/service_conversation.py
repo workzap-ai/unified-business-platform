@@ -659,8 +659,18 @@ Actions (only when the matching data is present in the context):
 - action="cancel_booking" ONLY when the latest message explicitly asks to cancel one of
   customer_bookings; copy its booking_id and the exact words into action_evidence.
 Proposals:
+- When the customer asks where things stand ("status?", "update?", "kya hua", "paid
+  hua?", "proposal kab aayega", "where are we"), answer from project_deals: one "• "
+  line per project, keeping its project name, with its status and its next step in a few
+  words (e.g. "• Website:
+  paid, the work is in progress"). Never a vague "the team is working on your
+  projects". Give status ONLY when they ask (a plain hello gets a greeting and one
+  short question about what they'd like, never a status list). If they ask something
+  project_deals can't answer (a delivery date, why it's late, a technical detail), say
+  you're checking with the team and the answer comes here, and set request_human=true
+  (the question goes to the team's request desk; you keep the chat).
 - project_deals lists each project of this chat (each is its own deal) with its real
-  next step. Your "what happens next" line must come from it, per project when there
+  status and next step. Your "what happens next" line must come from it, per project when there
   are several ("Website: the proposal is being prepared and comes here; AI system:
   still collecting details"). Never a generic "the team will review it" when
   project_deals says something more specific.
@@ -1348,6 +1358,41 @@ def without_filler(reply: str) -> str:
     return trimmed if len(trimmed) >= 6 else reply
 
 
+STATUS_ASK = re.compile(
+    r"\b(?:status|updates?|progress|where (?:are|is) (?:we|it|my)|any news|kya hua|kahan tak|"
+    r"kab tak|kab milega|kab aaye?ga|paid hua|payment hui|proposal (?:kab|aaya)|invoice "
+    r"(?:kab|aaya)|kitna hua|ho gaya)\b",
+    re.IGNORECASE,
+)
+
+
+def vague_status(reply: str, context: dict[str, Any]) -> str | None:
+    """A status answer must cover each project asked about, or all for a general update."""
+    deals_now = context.get("project_deals") or []
+    latest = str(context.get("latest_customer_message", ""))
+    if not deals_now or not STATUS_ASK.search(latest):
+        return None
+    from app.modules.pi_saas.customer_overview import _same
+
+    def named(project: str, text: str) -> bool:
+        # Whole titles keep "Bakery website" distinct from "Clinic website" and work
+        # for short names such as "HR", which the overview's fuzzy matcher drops.
+        name = " ".join(re.findall(r"\w+", project.casefold()))
+        words = " ".join(re.findall(r"\w+", text.casefold()))
+        return bool(name) and f" {name} " in f" {words} "
+
+    requested = [d for d in deals_now if named(str(d.get("project") or ""), latest)]
+    if not requested:
+        requested = [d for d in deals_now if _same(str(d.get("project") or ""), latest)]
+    if all(named(str(d.get("project") or ""), reply) for d in requested or deals_now):
+        return None
+    return (
+        "the customer asked where things stand: answer from project_deals with one '• ' "
+        "line per project (its status and next step), never a general 'the team is "
+        "working on it'"
+    )
+
+
 def says_nothing(reply: str) -> str | None:
     """A reply that is only a closing line ("If you need any further assistance, feel
     free to ask.") answers nothing."""
@@ -1508,6 +1553,8 @@ def too_long(reply: str, context: dict[str, Any]) -> str | None:
         return None  # A short request can explicitly ask for a detailed answer.
     if INFO_QUESTION.search(latest):
         return None  # "Tell me your services", "how does it work?": answer it properly.
+    if context.get("project_deals") and STATUS_ASK.search(latest):
+        return None  # "Status?" needs one short line per project, even for several projects.
     bullets = sum(1 for line in reply.splitlines() if line.strip().startswith("•"))
     if len(reply) > 320 or (
         bullets >= 2 and not re.search(r"\b(?:idea|list|options?|summary|brief)\b", latest, re.I)
@@ -1719,6 +1766,7 @@ def greeting_reply(context: dict[str, Any]) -> str:
             "the team see it, and talking to me is free. How can I help you today?"
         )
     name = str((context.get("customer_profile") or {}).get("name") or "").split(" ")[0]
+    name = name.rstrip(".,")  # "Dalal&Co." -> "Hi Dalal&Co.", never "Co.."
     hello = f"Hi {name}." if name and not PLACEHOLDER_NAME.search(name) else "Hi."
     brief = context.get("brief") or {}
     open_project = next(
@@ -1730,6 +1778,17 @@ def greeting_reply(context: dict[str, Any]) -> str:
         ),
         None,
     )
+    active = [
+        str(d.get("project"))
+        for d in context.get("project_deals") or []
+        if d.get("stage") not in {"lost", "brief"} and d.get("status") != "delivered"
+    ]
+    if active:
+        which = f"your {active[0]}" if len(active) == 1 else "your projects"
+        return (
+            f"{hello} Would you like an update on {which}, or is there something new I "
+            "can help with?"
+        )
     if open_project:
         return f"{hello} Shall we carry on with your {open_project}?"
     return f"{hello} How can I help you today?"
@@ -1781,6 +1840,8 @@ async def compose_service_turn(
         problem = f"{made_up}, and also: {problem}" if problem else made_up
     if empty := says_nothing(turn.reply):
         problem = f"{empty}, and also: {problem}" if problem else empty
+    if not turn.request_human and (vague := vague_status(turn.reply, context)):
+        problem = f"{vague}, and also: {problem}" if problem else vague
     turn.reply = without_filler(turn.reply)
     if long := too_long(turn.reply, context):
         problem = f"{long}, and also: {problem}" if problem else long
@@ -1825,7 +1886,9 @@ async def compose_service_turn(
                 Message.assistant(json.dumps({"reply": turn.reply}, ensure_ascii=False)),
                 Message.user(
                     f"Don't send that draft: {problem}. Rewrite the whole result and fix "
-                    "that. If the brief was already confirmed, answer in one short line "
+                    "that. For a status question, cover each requested project's status "
+                    "and next step from project_deals. Otherwise, if the brief was already "
+                    "confirmed, answer in one short line "
                     "with what happens next. If the brief is complete but not yet "
                     "confirmed, confirm it in short points, say what happens next, set "
                     "ready_for_team=true and awaiting_customer=false. If one detail is "
@@ -2413,8 +2476,12 @@ async def _deal_context(
 async def project_deals(
     session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation, auto: bool
 ) -> list[dict[str, str]]:
-    """Where each project of this chat stands and what really happens next, in plain
-    words for pi's "what happens next" line (no prices)."""
+    """Every project of this chat with where it really stands now ("status") and what
+    happens next, from its deal (proposal, invoice, payment, work) or, before there is a
+    deal, from the brief. Plain words, no prices and no document numbers."""
+    from app.modules.billing.models import Invoice
+    from app.modules.orders.models import Order
+    from app.modules.pi_saas.deals import invoices_sent
     from app.modules.quotes.models import Quote
     from app.modules.sales.models import SalesLead
 
@@ -2422,16 +2489,24 @@ async def project_deals(
         await session.scalars(
             WorkspaceRepository(session, SalesLead, scope)
             .select()
-            .where(SalesLead.conversation_id == conversation.id, SalesLead.source == "pi")
+            .where(SalesLead.conversation_id == conversation.id)
             .order_by(SalesLead.created_at)
-            .limit(10)
+            .limit(20)
         )
     )
-    from app.modules.billing.models import Invoice
-    from app.modules.orders.models import Order
-
-    steps: list[dict[str, str]] = []
+    # The furthest deal per project wins (a stray duplicate never hides a paid one).
+    rank = {"won": 4, "proposal": 3, "qualified": 2, "new": 1, "lost": 0}
+    best: dict[str, Any] = {}
     for lead in leads:
+        key = lead.title.strip().casefold()
+        if key not in best or rank.get(lead.stage, 0) > rank.get(best[key].stage, 0):
+            best[key] = lead
+    steps: list[dict[str, str]] = []
+    brief_projects = {
+        str(p.get("title") or "").strip().casefold(): p
+        for p in (conversation.service_brief or {}).get("projects") or []
+    }
+    for lead in best.values():
         quote = await session.scalar(
             WorkspaceRepository(session, Quote, scope)
             .select()
@@ -2454,19 +2529,101 @@ async def project_deals(
             if order is not None
             else None
         )
-        from app.modules.pi_saas.deals import invoices_sent
-
         sent = invoice is None or invoice.id in await invoices_sent(session, scope, [invoice])
+        step = {
+            "project": lead.title,
+            "stage": lead.stage,
+            "status": status_for(lead.stage, quote, invoice=invoice, order=order, sent=sent),
+            "next": without_numbers(
+                next_for(lead.stage, quote, auto, invoice=invoice, order=order, invoice_sent=sent)
+            ),
+        }
+        brief_project = brief_projects.get(lead.title.strip().casefold())
+        if lead.stage == "new" and quote is None and brief_project:
+            brief_status = str(brief_project.get("status") or "collecting")
+            step["status"] = BRIEF_STATUS.get(brief_status, BRIEF_STATUS["collecting"])
+            step["next"] = BRIEF_NEXT.get(brief_status, BRIEF_NEXT["collecting"])
+        steps.append(step)
+    # Projects still being talked through have no deal yet: the brief says where they are.
+    for project in (conversation.service_brief or {}).get("projects") or []:
+        title = str(project.get("title") or "").strip()
+        if not title or title.casefold() in best:
+            continue
+        status = str(project.get("status") or "collecting")
         steps.append(
             {
-                "project": lead.title,
-                "stage": lead.stage,
-                "next": next_for(
-                    lead.stage, quote, auto, invoice=invoice, order=order, invoice_sent=sent
-                ),
+                "project": title,
+                "stage": "brief",
+                "status": BRIEF_STATUS.get(status, BRIEF_STATUS["collecting"]),
+                "next": BRIEF_NEXT.get(status, BRIEF_NEXT["collecting"]),
             }
         )
-    return steps
+    return steps[:10]
+
+
+BRIEF_STATUS = {
+    "collecting": "still collecting the details",
+    "awaiting_confirmation": "brief written, waiting for the customer's confirmation",
+    "confirmed": "brief confirmed and with the team",
+    "with_team": "brief confirmed and with the team",
+}
+BRIEF_NEXT = {
+    "collecting": "pi asks the details still needed",
+    "awaiting_confirmation": "the customer confirms the brief, then it goes to the team",
+    "confirmed": "the team prepares the proposal",
+    "with_team": "the team prepares the proposal",
+}
+NUMBERED = re.compile(r"\s*\b(?:QUO|INV|ORD|RCPT)-\d+\b")
+
+
+def without_numbers(text: str) -> str:
+    """A status line without document numbers (a reply may contain no digits)."""
+    return re.sub(r"\s{2,}", " ", NUMBERED.sub("", text)).strip()
+
+
+def status_for(stage: str, quote: Any, *, invoice: Any, order: Any, sent: bool) -> str:
+    """Where a project's deal stands right now, in the customer's terms."""
+    work = str(order.status) if order is not None else ""
+    paid = invoice is not None and str(invoice.status) == "paid"
+    part = invoice is not None and str(invoice.status) == "partially_paid"
+    if stage == "lost":
+        return "closed, not going ahead"
+    if work == "cancelled":
+        return "order cancelled"
+    if work == "delivered":
+        return "delivered"
+    if work in {"shipped", "processing"}:
+        progress = "on its way" if work == "shipped" else "the work is in progress"
+        if paid:
+            return f"paid; {progress}"
+        if part:
+            return f"part paid; the balance is still open; {progress}"
+        if invoice is not None and str(invoice.status) in {"issued", "overdue"}:
+            return f"not paid yet; {progress}"
+        return f"{progress}; payment not confirmed"
+    if paid:
+        return "paid in full; the work starts next"
+    if part:
+        return "part paid; the balance is still open"
+    if invoice is not None:
+        return "invoice sent, not paid yet" if sent else "proposal accepted; invoice being prepared"
+    if quote is None:
+        if stage == "won":
+            return "deal won; payment not confirmed"
+        return (
+            "brief confirmed; proposal being prepared"
+            if stage in {"qualified", "proposal"}
+            else "still collecting the details"
+        )
+    return {
+        "draft": "proposal being prepared",
+        "pending_approval": "proposal being checked by the team",
+        "approved": "proposal ready to be shared",
+        "sent": "proposal shared, waiting for the customer's answer",
+        "accepted": "proposal accepted; order being confirmed",
+        "rejected": "changes asked; a revised proposal follows",
+        "expired": "proposal expired; a fresh one follows",
+    }.get(str(quote.status), "proposal being prepared")
 
 
 def next_for(
@@ -2482,6 +2639,8 @@ def next_for(
     if stage == "lost":
         return "closed"
     work = str(order.status) if order is not None else ""
+    if work == "cancelled":
+        return "the order is cancelled; the team can confirm any next steps"
     if work == "delivered":
         return (
             "delivered; ask how it went and whether anything needs a change, then whether "
@@ -2496,16 +2655,23 @@ def next_for(
         if str(invoice.status) == "partially_paid":
             return (
                 f"part of invoice {invoice.number} is paid; the balance can be paid with the "
-                "same payment link, and the work carries on"
+                "same payment link" + (", and the work carries on" if work == "processing" else "")
+            )
+        if work == "processing":
+            return (
+                f"invoice {invoice.number} with the payment link is shared here; the "
+                "payment is still due while the work is in progress"
             )
         return (
             f"invoice {invoice.number} with the payment link is shared here; the work "
             "starts once it's paid"
         )
     if work == "processing":
-        return "paid; the team is working on it and progress updates come here"
-    if stage == "won" or (invoice is not None and str(invoice.status) == "paid"):
+        return "the team is working on it and progress updates come here"
+    if invoice is not None and str(invoice.status) == "paid":
         return "paid; the team is starting the work and the first update comes here"
+    if stage == "won" and quote is None:
+        return "the deal is won; the team will confirm the order and invoice here"
     if quote is None:
         if stage == "new":
             return "still collecting the details"
@@ -2522,7 +2688,9 @@ def next_for(
         )
     if status == "pending_approval":
         return f"proposal {quote.number} is waiting for a manager's approval, then shared here"
-    if status in {"approved", "sent"}:
+    if status == "approved":
+        return f"proposal {quote.number} is approved; the team will share it here"
+    if status == "sent":
         return (
             f"proposal {quote.number} is shared; they can accept it or ask for changes by "
             "replying here or on its page"

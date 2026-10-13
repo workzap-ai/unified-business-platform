@@ -114,6 +114,8 @@ def _token(link: str) -> str:
 
 
 async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db, monkeypatch):
+    from app.modules.pi.service_conversation import project_deals
+
     pi = await pi_workspace(api, business_db, business_type="service_business")
     put = await api.put(
         "/api/v1/pi/customer-payments/settings",
@@ -166,6 +168,10 @@ async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db, monkeyp
     assert order is not None and order.status == "confirmed"
     invoice = await business_db.scalar(select(Invoice).where(Invoice.order_id == order.id))
     assert invoice is not None and invoice.status == "issued"
+    states = await project_deals(business_db, pi.scope(), conversation, False)
+    project = next(p for p in states if p["project"] == "Branding for Crescent Bakers")
+    assert project["status"] == "proposal accepted; invoice being prepared"
+    assert "paid" not in project["next"] and "INV-" not in project["next"]
     # pi never sends the invoice by itself: the customer is thanked, the team sends it.
     assert (
         await business_db.scalar(
@@ -186,6 +192,10 @@ async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db, monkeyp
     ]
     sent_invoice = await api.post(f"{DEALS}/invoices/{invoice.id}/send")
     assert sent_invoice.status_code == 200, sent_invoice.text
+    states = await project_deals(business_db, pi.scope(), conversation, False)
+    project = next(p for p in states if p["project"] == "Branding for Crescent Bakers")
+    assert project["status"] == "invoice sent, not paid yet"
+    assert "INV-" not in project["next"]
     board_view = (await api.get("/api/v1/pi/team-board")).json()
     assert not [c for c in board_view["columns"]["todo"] if c["kind"] == "invoice"]
     request = await business_db.scalar(
@@ -205,6 +215,9 @@ async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db, monkeyp
         json={"amount": "100000.00", "method": "bank_transfer"},
     )
     assert payment.status_code == 201, payment.text
+    states = await project_deals(business_db, pi.scope(), conversation, False)
+    project = next(p for p in states if p["project"] == "Branding for Crescent Bakers")
+    assert project["status"] == "paid in full; the work starts next"
     texts = await _send(pi)
     # Paid in full: the receipt message is the thank-you (with the receipt's link).
     assert texts[-1].startswith("Thank you! We received your payment")
@@ -223,6 +236,9 @@ async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db, monkeyp
         f"/api/v1/orders/{order.id}/actions", json={"action": "start_processing"}
     )
     assert moved.status_code == 200, moved.text
+    states = await project_deals(business_db, pi.scope(), conversation, False)
+    project = next(p for p in states if p["project"] == "Branding for Crescent Bakers")
+    assert project["status"] == "paid; the work is in progress"
     texts = await _send(pi)
     assert texts == [
         "Good news Ayesha: work on Branding for Crescent Bakers has started. "
@@ -234,6 +250,9 @@ async def test_proposal_to_paid_invoice_runs_by_itself(api, business_db, monkeyp
     # The deal's "Mark delivered" button (a service order is completed).
     moved = await api.post(f"{DEALS}/orders/{order.id}/work", json={"step": "delivered"})
     assert moved.status_code == 200 and moved.json()["status"] == "delivered", moved.text
+    states = await project_deals(business_db, pi.scope(), conversation, False)
+    project = next(p for p in states if p["project"] == "Branding for Crescent Bakers")
+    assert project["status"] == "delivered"
     texts = await _send(pi)
     assert texts[-1].startswith("Branding for Crescent Bakers is delivered Ayesha. How did it go?")
     path = (await api.get(f"{DEALS}/leads/{lead_id}/journey")).json()
