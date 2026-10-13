@@ -63,6 +63,7 @@ from app.modules.pi_saas.connector_routes import web_router as pi_connector_web_
 from app.modules.pi_saas.customer_overview import router as customer_overview_router
 from app.modules.pi_saas.customer_payment_routes import public_router as pi_customer_pay_link_router
 from app.modules.pi_saas.customer_payment_routes import router as pi_customer_payment_router
+from app.modules.pi_saas.customer_solution import router as customer_solution_router
 from app.modules.pi_saas.deal_routes import public_router as pi_documents_router
 from app.modules.pi_saas.deal_routes import router as pi_deals_router
 from app.modules.pi_saas.digest_routes import operator_router as pi_operator_digest_router
@@ -111,6 +112,7 @@ ROUTERS = [
     team_whatsapp_router,
     customer_overview_router,
     customer_overview_pdf_router,
+    customer_solution_router,
     customer_merge_router,
     receipts_router,
     pi_operator_router,
@@ -190,6 +192,7 @@ PI_APP_ROUTERS = [
     team_whatsapp_router,
     customer_overview_router,
     customer_overview_pdf_router,
+    customer_solution_router,
     customer_merge_router,
     receipts_router,
     pi_documents_router,
