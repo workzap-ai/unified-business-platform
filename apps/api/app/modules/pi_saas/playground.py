@@ -212,4 +212,6 @@ async def _service_preview(
         "team_summary": turn.summary,
         "requirements": requirements,
         "missing": turn.missing,
+        # pi Health's self-tests check a brief is only sent once the customer agrees.
+        "ready_for_team": turn.ready_for_team,
     }

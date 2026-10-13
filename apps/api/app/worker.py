@@ -22,6 +22,8 @@ from app.modules.pi_saas.calendar_sync import JOBS as PI_CALENDAR_JOBS
 from app.modules.pi_saas.calendar_sync import sweep_pi_calendar
 from app.modules.pi_saas.campaigns import sweep_campaigns
 from app.modules.pi_saas.digests import sweep_digests
+from app.modules.pi_saas.health import heal as pi_health_heal
+from app.modules.pi_saas.health_selftest import self_test_daily as pi_health_self_test
 from app.modules.pi_saas.jobs import JOBS as PI_SAAS_JOBS
 from app.modules.pi_saas.jobs import sweep_pi_saas
 
@@ -45,6 +47,9 @@ JOB_FUNCTIONS: dict[str, Callable[..., Awaitable[Any]]] = {
     "embed_document": embed_document,
     "index_document": index_document,
     "sweep_knowledge": sweep_knowledge,
+    # pi Health: safe self-fixes (every 5 minutes) and daily self-tests.
+    "pi_health_heal": pi_health_heal,
+    "pi_health_self_test": pi_health_self_test,
     # Integration platform: inbound events, outbox dispatch, deliveries, sync, sweep.
     **INTEGRATION_JOBS,
     # Pi SaaS: provider/billing webhooks and lifecycle sweep.
@@ -99,6 +104,8 @@ class WorkerSettings:
         cron(sweep_pi_calendar, second={5, 35}, unique=True),
         cron(sweep_campaigns, second={25, 55}, unique=True),
         cron(sweep_digests, minute={7, 37}, second=45, unique=True),
+        cron(pi_health_heal, minute=set(range(3, 60, 5)), second=15, unique=True),
+        cron(pi_health_self_test, minute={23}, second=0, unique=True),
     ]
     redis_settings = RedisSettings.from_dsn(get_settings().redis_url.get_secret_value())
     queue_name = get_settings().job_queue_name

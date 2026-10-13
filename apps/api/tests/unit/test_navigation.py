@@ -74,6 +74,7 @@ def test_pi_is_a_top_level_product_with_its_own_subnavigation():
         "Handoffs",
         "Requests",
         "Analytics",
+        "Health",
         "Settings",
     ]
 

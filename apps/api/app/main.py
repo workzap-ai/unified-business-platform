@@ -68,6 +68,7 @@ from app.modules.pi_saas.deal_routes import public_router as pi_documents_router
 from app.modules.pi_saas.deal_routes import router as pi_deals_router
 from app.modules.pi_saas.digest_routes import operator_router as pi_operator_digest_router
 from app.modules.pi_saas.digest_routes import router as pi_digest_router
+from app.modules.pi_saas.health_routes import router as pi_health_router
 from app.modules.pi_saas.insights_routes import router as pi_insights_router
 from app.modules.pi_saas.operator_number_routes import router as pi_operator_number_router
 from app.modules.pi_saas.operator_routes import router as pi_operator_router
@@ -131,6 +132,7 @@ ROUTERS = [
     pi_saas_webhook_router,
     pi_read_router,
     pi_analytics_router,
+    pi_health_router,
     pi_config_router,
     pi_router,
     webhook_router,
