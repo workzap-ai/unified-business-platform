@@ -6,12 +6,7 @@
 import { ImageResponse } from "next/og";
 
 import type { CustomerIssue, IssueLink, Stage } from "@/lib/customer-api";
-import {
-  MARK,
-  layoutMap,
-  markOf,
-  shortTitle,
-} from "@/features/customer/layout";
+import { MARK, markOf, shortTitle } from "@/features/customer/layout";
 
 type CardData = {
   kind: "map" | "journey" | "flow";
@@ -171,38 +166,95 @@ function Frame({
   );
 }
 
+/** Where a request stands, in words, with its mark colour. */
+function statusOf(issue: CustomerIssue, urdu: boolean) {
+  const mark = markOf(issue);
+  if (mark.hollow) return { mark, label: urdu ? "Note hua" : "Noted" };
+  if (issue.stage === "closed" || issue.stage === "live")
+    return { mark, label: urdu ? "Mukammal" : "Done" };
+  if (mark.fill === MARK.off)
+    return { mark, label: urdu ? "Ruka hua" : "Paused" };
+  if (issue.stage === "solution_ready")
+    return { mark, label: urdu ? "Hal tayyar" : "Solution ready" };
+  if (issue.ball_with === "client")
+    return { mark, label: urdu ? "Aap ka jawab chahiye" : "Waiting on you" };
+  return { mark, label: urdu ? "Hum kaam kar rahe hain" : "We're on it" };
+}
+
+/** The Problem Map card: each request on its own row (full name, where it stands and
+ * how far it has come), pi's connections as lines between the rows, a count per status
+ * at the top and one line on what matters most. */
 function MapCard({ data, urdu }: { data: CardData; urdu: boolean }) {
-  const open = data.issues
-    .filter((i) => !["live", "closed"].includes(i.stage))
-    .slice(0, 5);
-  const shown = open.length ? open : data.issues.slice(0, 5);
-  const { nodes, height } = layoutMap(shown, true);
-  const at = (title: string) => nodes.find((n) => n.issue.title === title);
-  const links = data.links.filter((l) => at(l.a_title) && at(l.b_title));
-  const groups = new Map<string, number>();
-  shown.forEach((i) =>
-    groups.set(i.solution_id ?? "", (groups.get(i.solution_id ?? "") ?? 0) + 1),
+  const open = data.issues.filter((i) => !["live", "closed"].includes(i.stage));
+  const shown = (open.length ? open : data.issues).slice(0, 5);
+  const more = data.issues.length - shown.length;
+  const rows = shown.map((issue) => ({ issue, ...statusOf(issue, urdu) }));
+  const at = (title: string) => shown.findIndex((i) => i.title === title);
+  const links = data.links.filter(
+    (l) => at(l.a_title) >= 0 && at(l.b_title) >= 0,
   );
+  const groups = new Map<string, number>();
+  shown.forEach((i) => {
+    if (i.solution_id)
+      groups.set(i.solution_id, (groups.get(i.solution_id) ?? 0) + 1);
+  });
   const merged = Math.max(0, ...groups.values());
+  const waiting = rows.filter((r) => r.mark.fill === MARK.you).length;
+  const working = rows.filter((r) => r.mark.fill === MARK.us).length;
   const insight =
     merged >= 2
       ? urdu
         ? `Ek system ${merged} masle hal kar sakta hai.`
         : `One system can fix ${merged === 3 ? "all three" : `${merged} of them`}.`
-      : links.length === 0
+      : waiting
         ? urdu
-          ? `Aap ke ${shown.length} masle ek nazar mein.`
-          : `Your ${shown.length} requests at a glance.`
-        : urdu
-          ? `pi ne ${links.length} connection dhoonde.`
-          : `pi found ${links.length} connection${links.length === 1 ? "" : "s"}.`;
-  const more = data.issues.length - shown.length;
-  const boxW = 900;
-  const boxH = 840;
-  const viewH = Math.max(height, 420);
-  const scale = Math.min(boxW / 500, boxH / viewH);
-  const dx = (boxW - 500 * scale) / 2;
-  const dy = (boxH - viewH * scale) / 2;
+          ? `${waiting} request par aap ka jawab chahiye.`
+          : `${waiting} request${waiting === 1 ? " needs" : "s need"} your answer.`
+        : working
+          ? urdu
+            ? `${working} requests par kaam jaari hai.`
+            : `We're working on ${working} of your ${data.issues.length} requests.`
+          : urdu
+            ? `Aap ki ${data.issues.length} requests ek nazar mein.`
+            : `Your ${data.issues.length} requests at a glance.`;
+  // A count per status, in the order the customer cares about.
+  const chips = [
+    {
+      label: urdu ? "aap ka jawab" : "waiting on you",
+      color: MARK.you,
+      hollow: false,
+    },
+    {
+      label: urdu ? "kaam jaari" : "we're on it",
+      color: MARK.us,
+      hollow: false,
+    },
+    {
+      label: urdu ? "hal tayyar" : "solution ready",
+      color: MARK.ready,
+      hollow: false,
+    },
+    { label: urdu ? "note hua" : "noted", color: MARK.noted, hollow: true },
+  ]
+    .map((c) => ({
+      ...c,
+      count: rows.filter((r) =>
+        c.hollow ? r.mark.hollow : !r.mark.hollow && r.mark.fill === c.color,
+      ).length,
+    }))
+    .filter((c) => c.count > 0);
+
+  // The rows share the panel's height; a node sits at the start of each row.
+  // The panel fills the card; the status chips sit on top as its legend.
+  const panelW = W - 128;
+  const panelH = 880;
+  const top = 116;
+  const pad = 24;
+  const rowH = Math.min(200, (panelH - top - pad) / Math.max(rows.length, 1));
+  const nodeX = 84;
+  const nodeY = (i: number) => top + i * rowH + rowH / 2;
+  const twoLines = rows.length <= 4;
+
   return (
     <Frame
       title={urdu ? "Aap ka naqsha" : "Your Problem Map"}
@@ -212,85 +264,172 @@ function MapCard({ data, urdu }: { data: CardData; urdu: boolean }) {
       <div
         style={{
           display: "flex",
+          flexDirection: "column",
+          width: panelW,
+          height: panelH,
           position: "relative",
-          width: boxW,
-          height: boxH,
         }}
       >
         <svg
-          width={boxW}
-          height={boxH}
-          viewBox={`0 0 500 ${viewH}`}
+          width={panelW}
+          height={panelH}
+          viewBox={`0 0 ${panelW} ${panelH}`}
           style={{ position: "absolute", left: 0, top: 0 }}
         >
-          {links.map((link) => {
-            const a = at(link.a_title)!;
-            const b = at(link.b_title)!;
+          {links.map((link, k) => {
+            const ya = nodeY(at(link.a_title));
+            const yb = nodeY(at(link.b_title));
+            const reach = 26 + (k % 3) * 18;
             const dashed =
               link.type === "part_of" || link.type === "depends_on";
             return (
-              <line
+              <path
                 key={`${link.a_title}-${link.b_title}`}
-                x1={a.x}
-                y1={a.y}
-                x2={b.x}
-                y2={b.y}
-                stroke="#8b7cff"
-                strokeWidth="4"
-                strokeDasharray={dashed ? "10 8" : undefined}
+                d={`M ${nodeX} ${ya} C ${nodeX - reach * 2} ${ya}, ${nodeX - reach * 2} ${yb}, ${nodeX} ${yb}`}
+                fill="none"
+                stroke="#a99cff"
+                strokeWidth="5"
+                strokeDasharray={dashed ? "12 10" : undefined}
               />
             );
           })}
-          {nodes.map((node) => {
-            const mark = markOf(node.issue);
+          {rows.map((row, i) => {
+            const r = 20 + 3 * Math.min(Math.max(row.issue.impact ?? 3, 1), 5);
             return (
-              <g key={node.index}>
-                <circle
-                  cx={node.x}
-                  cy={node.y}
-                  r={node.r}
-                  fill={mark.hollow ? INK : mark.fill}
-                  stroke={mark.hollow ? mark.stroke : "#ffffff"}
-                  strokeWidth={mark.hollow ? 5 : 3}
-                />
-              </g>
+              <circle
+                key={row.issue.title}
+                cx={nodeX}
+                cy={nodeY(i)}
+                r={r}
+                fill={row.mark.hollow ? INK : row.mark.fill}
+                stroke={row.mark.hollow ? row.mark.stroke : "#ffffff"}
+                strokeWidth={row.mark.hollow ? 6 : 4}
+              />
             );
           })}
         </svg>
-        {nodes.map((node) => (
-          <div
-            key={node.index}
-            style={{
-              position: "absolute",
-              display: "flex",
-              justifyContent: "center",
-              width: 460,
-              left: dx + node.x * scale - 230,
-              top: dy + (node.y + node.r) * scale + 8,
-              fontSize: 44,
-              fontWeight: 700,
-              color: "#ffffff",
-            }}
-          >
-            {shortTitle(node.issue.title, 20)}
-          </div>
-        ))}
-        {more > 0 && (
-          <div
-            style={{
-              position: "absolute",
-              display: "flex",
-              bottom: 8,
-              left: 0,
-              width: boxW,
-              justifyContent: "center",
-              fontSize: 34,
-              color: "#a9a4c7",
-            }}
-          >
-            {`+${more} more`}
-          </div>
-        )}
+        {rows.map((row, i) => {
+          const done = STAGE_DONE[row.issue.stage] ?? 0;
+          return (
+            <div
+              key={row.issue.title}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                position: "absolute",
+                left: nodeX + 64,
+                top: top + i * rowH,
+                width: panelW - nodeX - 64 - 36,
+                height: rowH,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  fontSize: 40,
+                  fontWeight: 700,
+                  lineHeight: 1.15,
+                  color: "#ffffff",
+                }}
+              >
+                {shortTitle(row.issue.title, twoLines ? 62 : 32)}
+              </div>
+              <div
+                style={{ display: "flex", alignItems: "center", marginTop: 10 }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    fontSize: 32,
+                    fontWeight: 600,
+                    color: row.mark.hollow ? "#c9c1ff" : row.mark.fill,
+                  }}
+                >
+                  {row.label}
+                </div>
+                <div style={{ display: "flex", marginLeft: "auto" }}>
+                  {Array.from({ length: 7 }, (_, s) => (
+                    <div
+                      key={s}
+                      style={{
+                        display: "flex",
+                        width: 30,
+                        height: 12,
+                        marginLeft: 6,
+                        borderRadius: 6,
+                        background:
+                          s < done
+                            ? row.mark.hollow
+                              ? MARK.noted
+                              : row.mark.fill
+                            : "#3a3558",
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        {/* Counts per status, and how many more requests the customer has. */}
+        <div
+          style={{
+            display: "flex",
+            position: "absolute",
+            left: 0,
+            top: 0,
+            width: panelW,
+            height: top - 16,
+            alignItems: "center",
+            justifyContent: "center",
+            borderBottom: "2px solid #34305a",
+          }}
+        >
+          {chips.map((c) => (
+            <div
+              key={c.label}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginLeft: 10,
+                marginRight: 10,
+                padding: "6px 18px",
+                borderRadius: 30,
+                background: "#1b1830",
+                fontSize: 32,
+                color: "#e7e4f7",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  width: 22,
+                  height: 22,
+                  borderRadius: 11,
+                  marginRight: 12,
+                  background: c.hollow ? "transparent" : c.color,
+                  border: c.hollow ? `5px solid ${c.color}` : "none",
+                }}
+              />
+              {`${c.count} ${c.label}`}
+            </div>
+          ))}
+          {more > 0 && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginLeft: 10,
+                padding: "6px 18px",
+                fontSize: 32,
+                color: "#a9a4c7",
+              }}
+            >
+              {`+${more} ${urdu ? "aur" : "more"}`}
+            </div>
+          )}
+        </div>
       </div>
     </Frame>
   );
