@@ -429,7 +429,11 @@ turn, move the customer's request forward:
 1. Understand it, including references. When the customer sends an image, file or link
    as a reference ("aisa chahiye", "like this"), say in a few words what you see that
    matters for the work (style, colours, mood, layout) so they know you understood, and
-   treat "make it like this" as a clear brief, not a reason for more questions.
+   treat "make it like this" as a clear brief, not a reason for more questions. The
+   same when the words come in a separate message right after it ("app aisa chahiye"
+   after a picture): "aisa"/"like this"/"ye wala" means the latest image, file or link
+   in history, so answer about what it shows; never ask again for features it or an
+   earlier document already gives.
 2. Qualify the lead. From approved_knowledge, offerings and operator_guidance, work out
    what this company's team needs to start THIS kind of work (it differs by field and
    service: what to make, for whom, scope, references, the customer's or business name,
@@ -1181,6 +1185,25 @@ CONFIRMED_MEETING = re.compile(
 )
 
 
+# A sentence about what the customer's product does ("customers book a test drive
+# appointment, confirmed on WhatsApp"), never about a meeting with pi's team.
+PRODUCT_SENTENCE = re.compile(
+    r"\b(?:customers?|users?|patients?|clients?|buyers?|guests?|students?|members?|staff|"
+    r"visitors?|the app|an app|app will|system|website|platform|portal|software|features?|"
+    r"module|dashboard|booking (?:system|module|feature|page)|online booking)\b",
+    re.IGNORECASE,
+)
+
+
+def claims_meeting(reply: str) -> bool:
+    """A sentence saying pi's meeting with them is confirmed or booked (sentences that
+    describe the product they want built don't count)."""
+    return any(
+        CONFIRMED_MEETING.search(part) and not PRODUCT_SENTENCE.search(part)
+        for part in re.split(r"(?<=[.!?])\s+|\n", reply)
+    )
+
+
 def invented(reply: str, context: dict[str, Any], booked: bool = False) -> str:
     """What in a draft pi made up: a placeholder, a link nobody gave it, or a meeting it
     says is confirmed when no booking or team answer says so. "" when nothing."""
@@ -1204,7 +1227,7 @@ def invented(reply: str, context: dict[str, Any], booked: bool = False) -> str:
         "Meeting confirmed by the team" in str(n.get("note", n.get("answer", "")))
         for n in [context.get("team_answer_now") or {}, *(context.get("team_notes") or [])]
     )
-    if CONFIRMED_MEETING.search(reply) and not (booked or team_said):
+    if claims_meeting(reply) and not (booked or team_said):
         return (
             "it says the meeting is confirmed or booked, but nothing booked it and the team "
             "has not sent a time; say the team will confirm the time and send the link here"
@@ -1413,6 +1436,84 @@ INVOICES_COMING = {
     "roman_ur": "Aap ki baqi invoices tayyar ho rahi hain, team unhein yahin bhej degi.",
     "ar": "فواتيرك الأخرى قيد الإعداد، وسيرسلها الفريق هنا.",
 }
+# A link the system could not open: pi says so instead of acting as if it looked.
+LINK_UNREAD = {
+    "en": "I couldn't open that link here. What do you like about it, or could you send "
+    "a screenshot?",
+    "roman_ur": "Yeh link yahan open nahi ho saka. Aap ko is mein kya pasand hai, ya ek "
+    "screenshot bhej dein?",
+    "ar": "لم أتمكن من فتح هذا الرابط هنا. ما الذي يعجبك فيه، أو هل يمكنك إرسال لقطة شاشة؟",
+}
+SAYS_UNREAD = re.compile(
+    r"\b(?:couldn'?t|could not|can'?t|cannot|unable to|wasn'?t able to) "
+    r"(?:open|read|access|load)\b|"
+    r"\bopen nahi\b|\bnahi khul",
+    re.IGNORECASE,
+)
+
+
+def link_unread(turn: "ServiceTurn", context: dict[str, Any]) -> bool:
+    """Every link in their latest message failed to open and the reply doesn't say so."""
+    links = context.get("shared_links") or []
+    return (
+        bool(links)
+        and all(link.get("unreadable") for link in links)
+        and not (SAYS_UNREAD.search(turn.reply))
+    )
+
+
+BRIEF_SENT = {
+    "en": "Thank you. Your brief is with the team now; they'll prepare your proposal and "
+    "share it here.",
+    "roman_ur": "Shukriya. Aap ka brief team ke paas hai; woh proposal tayyar karke yahin "
+    "share karenge.",
+    "ar": "شكرًا لك. ملخص طلبك الآن لدى الفريق، وسيُعدّون عرضك ويرسلونه هنا.",
+}
+
+
+def agreed_to_send(turn: "ServiceTurn", context: dict[str, Any]) -> list[str]:
+    """pi's last message asked whether to send the brief to the team and their answer is
+    a short yes: the titles of the projects that summary named (still being collected)."""
+    latest = str(context.get("latest_customer_message", ""))
+    if turn.ready_for_team or len(latest.split()) > 6 or not AGREES.search(latest):
+        return []
+    said = [str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "ai"]
+    if not said or not ASKS_SEND.search(said[-1]):
+        return []
+    return [
+        str(project.get("title"))
+        for project in (context.get("brief") or {}).get("projects") or []
+        if isinstance(project, dict)
+        and project.get("title")
+        and project.get("status") in ("collecting", "awaiting_confirmation")
+        and _named(said[-1], str(project["title"]))
+    ]
+
+
+def send_now(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """ "Yes" to "Shall I send this to the team?": those projects are confirmed and the
+    brief goes to the team, whatever the draft said (it once asked "anything else?")."""
+    titles = agreed_to_send(turn, context)
+    if not titles:
+        return
+    brief_projects = {
+        str(p.get("title")): p for p in (context.get("brief") or {}).get("projects") or []
+    }
+    for title in titles:
+        mine = next((p for p in turn.projects if same_project(p.title, title)), None)
+        if mine is None:
+            try:
+                mine = Project.model_validate(brief_projects.get(title) or {"title": title})
+            except ValueError:
+                continue
+            turn.projects.append(mine)
+        mine.status = "confirmed"
+    turn.ready_for_team = True
+    turn.awaiting_customer = False
+    if not SAYS_SENT.search(turn.reply) or OPEN_ENDED.search(turn.reply):
+        turn.reply = BRIEF_SENT.get(turn.language or "en", BRIEF_SENT["en"])
+
+
 DOCS_AGAIN = {
     "en": "Here are your documents again:",
     "roman_ur": "Yeh rahe aap ke documents dobara:",
@@ -2037,6 +2138,27 @@ def keep_known(project: Project, before: Project) -> None:
     project.questions = [q for q in project.questions if q.casefold() not in settled]
 
 
+def rejected_with(turn: ServiceTurn, code: str) -> ReplyRejected:
+    """A refused reply that still carries what the turn understood (its projects), so a
+    document's details are never lost with the reply."""
+    error = ReplyRejected(code)
+    error.turn = turn  # type: ignore[attr-defined]
+    return error
+
+
+def keep_notes(conversation: PiConversation, turn: ServiceTurn) -> None:
+    """Save the projects a refused turn understood (details from a document, a feature
+    they named) without its reply. Nothing moves to confirmed without a sent reply."""
+    brief = dict(conversation.service_brief or {})
+    held = set(confirmed_now(turn, brief))
+    projects = merge_projects(brief.get("projects"), turn)
+    for project in projects:
+        if project.title in held:
+            project.status = "collecting"
+    brief["projects"] = [project.model_dump() for project in projects][:10]
+    conversation.service_brief = brief
+
+
 def merge_projects(previous: Any, turn: ServiceTurn) -> list[Project]:
     """Earlier projects are never lost: the model's list updates them by title and adds
     new ones; one it forgot keeps its last known state."""
@@ -2194,6 +2316,7 @@ async def compose_service_turn(
     turn = result.value
     turn._attempts = result.response.attempts
     turn.reply = tidy_list_numbers(turn.reply)
+    send_now(turn, context)
     mode = price_policy.price_mode(policy.response_rules, service=True)
     problem = needless_question(turn.reply, context)
     if LATER_PROMISE.search(turn.reply) and any(
@@ -2297,7 +2420,11 @@ async def compose_service_turn(
         turn.reply = without_filler(tidy_list_numbers(turn.reply))
         if invented(turn.reply, context, turn.action == "booking"):
             # Still made up after the rewrite: never sent (pi asks the team instead).
-            raise ReplyRejected("INVENTED_DETAIL")
+            logger.warning(
+                "pi reply rejected as invented",
+                extra={"reason": invented(turn.reply, context, turn.action == "booking")[:120]},
+            )
+            raise rejected_with(turn, "INVENTED_DETAIL")
         turn.reply = without_repeats(turn.reply, context)
         turn.reply = without_open_question(turn, context)
         if not turn.request_human and status_missed(turn.reply, context):
@@ -2337,7 +2464,7 @@ async def compose_service_turn(
         # A failed rewrite must not send the same wrong-language reply to WhatsApp. Only
         # when the customer clearly wrote in that language: otherwise the turn (and what
         # it saves, e.g. "reminder mat bhejna" = no reminders) must never be lost.
-        raise ReplyRejected("REPLY_LANGUAGE_MISMATCH")
+        raise rejected_with(turn, "REPLY_LANGUAGE_MISMATCH")
     if expected:
         turn.language = str(expected)  # The conversation follows the customer's language.
     if context.get("latest_message_kind") != "audio":
@@ -2370,6 +2497,11 @@ async def compose_service_turn(
         allowed,
     )
     latest = str(context["latest_customer_message"])
+    if link_unread(turn, context):
+        # Honest first line: the link wasn't read (e.g. a site that blocks readers).
+        line = LINK_UNREAD.get(turn.language or "en", LINK_UNREAD["en"])
+        rest = LAST_QUESTION.sub("", turn.reply).strip()
+        turn.reply = f"{rest}\n\n{line}".strip() if rest else line
     coming = int((context.get("account") or {}).get("invoices_coming") or 0)
     if coming and BALANCE_ASK.search(latest) and not COMING_SAID.search(turn.reply):
         # "Nothing owed" alone is wrong while invoices are still to be sent.
@@ -2773,7 +2905,11 @@ def needs_person(turn: ServiceTurn, context: dict[str, Any]) -> bool:
     latest = str(context.get("typed_message", context.get("latest_customer_message", "")))
     if len(latest) > 300:
         return False
-    return bool(PERSON_WORDS.search(latest)) or turn.wants_person
+    if PERSON_WORDS.search(latest):
+        return True
+    # "That's all" / "yes" / "ok" never asks for a person, whatever the model guessed.
+    closing = len(latest) <= 40 and bool(CLOSING.match(latest) or AGREES.search(latest))
+    return turn.wants_person and not closing
 
 
 # Asking for a person, in the languages pi's customers write in.

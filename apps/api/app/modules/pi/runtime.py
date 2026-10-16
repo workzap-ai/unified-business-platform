@@ -65,6 +65,7 @@ from app.modules.pi.service_conversation import (
     ask_team,
     asks_for_meeting,
     compose_service_turn,
+    keep_notes,
     prepare_context,
     run_service_action,
     save_service_turn,
@@ -898,6 +899,8 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 )
             except ReplyRejected as exc:
                 service_rejection = exc.code
+                if (kept := getattr(exc, "turn", None)) is not None:
+                    keep_notes(conversation, kept)
             except GatewayUnavailable:
                 decision["provider_failed"] = True
         elif keyword_handoff:

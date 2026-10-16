@@ -232,3 +232,75 @@ def test_a_rewrite_drops_what_pi_already_sent() -> None:
     reply = summary + "\n\nYour proposal QUO-000009 is shared here."
     assert without_repeats(reply, context) == "Your proposal QUO-000009 is shared here."
     assert without_repeats(summary, context) == summary  # nothing new: left as it was
+
+
+def test_a_booking_feature_is_not_a_meeting_claim() -> None:
+    from app.modules.pi.service_conversation import invented
+
+    context = {"history": [], "latest_customer_message": "This is what we need"}
+    feature = "The app lets customers book a test drive appointment, confirmed on WhatsApp."
+    assert invented(feature, context) == ""
+    assert invented("Your meeting with our team is confirmed for Friday.", context)
+
+
+def test_a_refused_reply_keeps_what_the_turn_understood() -> None:
+    from uuid import uuid4
+
+    from app.modules.pi.models import PiConversation
+    from app.modules.pi.service_conversation import Project, ServiceTurn, keep_notes
+
+    conversation = PiConversation(id=uuid4(), service_brief={"projects": []})
+    turn = ServiceTurn(
+        reply="(refused)",
+        projects=[
+            Project(title="Showroom ERP", features=["inventory", "installments"]),
+            Project(title="Customer app", status="confirmed", features=["test drives"]),
+        ],
+    )
+    keep_notes(conversation, turn)
+    saved = {p["title"]: p for p in conversation.service_brief["projects"]}
+    assert saved["Showroom ERP"]["features"] == ["inventory", "installments"]
+    assert saved["Customer app"]["status"] == "collecting"  # never confirmed by a refusal
+
+
+def test_an_unreadable_link_is_said_plainly() -> None:
+    from app.modules.pi.service_conversation import ServiceTurn, link_unread
+
+    context = {"shared_links": [{"url": "https://www.pakwheels.com", "unreadable": True}]}
+    turn = ServiceTurn(reply="You want to check PakWheels. What do you want to discuss?")
+    assert link_unread(turn, context)
+    turn.reply = "I couldn't open that link here. What do you like about it?"
+    assert not link_unread(turn, context)
+    assert not link_unread(turn, {"shared_links": [{"url": "x", "unreadable": False}]})
+
+
+def test_yes_to_send_sends_and_that_s_all_never_hands_over() -> None:
+    from app.modules.pi.service_conversation import ServiceTurn, needs_person, send_now
+
+    asked = (
+        "Understood, you have confirmed:\n• A complete ERP system for your car showroom\n"
+        "• A customer app for Android and iPhone\n\nShall I send this to the team so they "
+        "can prepare your proposal?"
+    )
+    context = {
+        "latest_customer_message": "yes",
+        "history": [{"role": "ai", "text": asked}],
+        "brief": {
+            "projects": [
+                {"title": "ERP System for Car Showroom", "status": "collecting"},
+                {"title": "Customer App", "status": "collecting"},
+                {"title": "AI Interview Taker Project", "status": "collecting"},
+            ]
+        },
+    }
+    turn = ServiceTurn(reply="Is there anything else you would like to add?", language="en")
+    send_now(turn, context)
+    assert turn.ready_for_team and not turn.awaiting_customer
+    assert sorted(p.title for p in turn.projects if p.status == "confirmed") == [
+        "Customer App",
+        "ERP System for Car Showroom",
+    ]
+    assert "anything else" not in turn.reply
+    closing = ServiceTurn(reply="ok", wants_person=True)
+    assert not needs_person(closing, {"latest_customer_message": "Bas yehi, that's all"})
+    assert needs_person(ServiceTurn(reply="ok"), {"latest_customer_message": "talk to a human"})
