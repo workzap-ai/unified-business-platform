@@ -100,6 +100,7 @@ TEXT_LIMITS = {
     "action_evidence": 500,
     "proposal_evidence": 500,
     "feedback": 500,
+    "plan": 800,
 }
 
 
@@ -135,6 +136,18 @@ class CustomerProfile(BaseModel):
     business_type: str = Field(default="", max_length=300)  # what the business does or sells
     location: str = Field(default="", max_length=160)
     role: str = Field(default="", max_length=120)  # e.g. owner, marketing manager
+    # What a good account manager remembers (their words, short).
+    industry: str = Field(default="", max_length=120)  # e.g. furniture retail
+    team_size: str = Field(default="", max_length=80)  # e.g. "12 staff", "3 branches"
+    customers: str = Field(default="", max_length=200)  # who they sell to
+    channels: str = Field(default="", max_length=200)  # shop, Instagram, website, Daraz
+    website: str = Field(default="", max_length=200)
+    current_tools: str = Field(default="", max_length=200)  # what they use today
+    decision_maker: str = Field(default="", max_length=120)  # who decides / pays
+    found_us: str = Field(default="", max_length=120)  # how they found the company
+    goal: str = Field(default="", max_length=300)  # what they want for the business
+    challenge: str = Field(default="", max_length=300)  # the main problem in the business
+    notes: str = Field(default="", max_length=400)  # notable facts ("exports to UAE")
 
     @model_validator(mode="before")
     @classmethod
@@ -223,6 +236,12 @@ class ServiceTurn(BaseModel):
     # Filled FIRST (field order guides the model): what the customer wants right now and
     # who the message is for. Internal; it makes the reply answer the actual request.
     understanding: str = Field(default="", max_length=600)
+    # pi's thinking before it writes (internal, English): what they want now, what was
+    # already said, what's still missing, and the one best next step.
+    plan: str = Field(default="", max_length=800)
+    # The customer explicitly asked to talk to a person (any language). Only then does a
+    # person take the chat; everything else goes to the team's request desk.
+    wants_person: bool = False
     reply: str = Field(min_length=1, max_length=4000)
     language: str = Field(default="en", pattern=LANGUAGE)
     # Internal team summary; when the model leaves it out the application writes one
@@ -293,7 +312,13 @@ class ServiceTurn(BaseModel):
         for key, allowed in CHOICES.items():
             value = str(data.get(key, allowed[0])).strip().lower()
             data[key] = value if value in allowed else allowed[0]
-        for key in ("awaiting_customer", "ready_for_team", "request_human", "meeting_requested"):
+        for key in (
+            "awaiting_customer",
+            "ready_for_team",
+            "request_human",
+            "meeting_requested",
+            "wants_person",
+        ):
             if key in data:
                 data[key] = _flag(data[key])
         when = str(data.get("meeting_time") or "").strip().replace(" ", "T")[:16]
@@ -384,7 +409,13 @@ it and carry on from what they want now. A new customer: in your first or second
 alongside helping with their request, ask in one short friendly question for their name
 and their business (its name and what it does), unless they already said. Fill
 customer_profile from the customer's own words only (name, business_name, business_type =
-what the business does or sells, location, role); leave unknown fields empty.
+what the business does or sells, location, role, and what a good account manager would
+remember: industry, team_size, customers = who they sell to, channels = where they sell,
+website, current_tools, decision_maker, found_us = how they found the company, goal,
+challenge = the main problem in their business, notes = notable facts); leave unknown
+fields empty and keep earlier facts. Learn these naturally while helping, never as a
+questionnaire: at most one profile question in a reply, and only when it helps their
+request (e.g. "Who will mostly use it, your sales team or customers?").
 Never say the company has or offers something ("haan, humare paas ERP hai") unless it
 is in offerings or approved_knowledge; otherwise say the team will confirm what fits
 and keep collecting the brief.
@@ -462,6 +493,19 @@ Meetings: when the customer asks for a meeting, call, visit or appointment, set
    them, and never promise a price or a date.
 5. Never ask a question that is the same as, or means the same as, one you asked earlier
    in history. If you can't move forward, say what happens next instead of asking.
+wants_person: true ONLY when the customer's latest message explicitly asks to talk to a
+person, a human, the owner or someone from the team, in any language ("insaan se baat
+karni hai", "connect me to your manager", "quiero hablar con una persona", "أريد التحدث
+مع موظف"). A complaint, frustration, a payment question or a hard question is NOT a
+request for a person: keep the chat and send the question to the team (request_human).
+Think before you write (fill "plan" right after "understanding", in English, a few
+short lines): 1) what they want or asked in their latest message; 2) what you already
+said or asked in your last replies (never say it again: no repeated sentences, no
+repeated "Shall I send this to the team?" while they haven't answered it); 3) what is
+still missing, for the project and about their business (name, what it does), and
+whether now is the right moment to ask (one question at most); 4) the one best next
+step that moves their request forward. Then write the reply from that plan: answer
+first, then that one step.
 Understanding (fill the "understanding" field FIRST, in English, one or two sentences):
 what the customer wants RIGHT NOW, in their own terms; who the latest message is for
 (pi, or a named person in team_members); and what has already been said or asked. Then
@@ -663,9 +707,17 @@ Proposals:
   hua?", "proposal kab aayega", "where are we"), answer from project_deals: one "• "
   line per project, keeping its project name, with its status and its next step in a few
   words (e.g. "• Website:
-  paid, the work is in progress"). Never a vague "the team is working on your
-  projects". Give status ONLY when they ask (a plain hello gets a greeting and one
-  short question about what they'd like, never a status list). If they ask something
+  paid, the work is in progress"). Exactly that shape: no "Status:" or "Next step:"
+  labels, no sub-points, no bold, at most five lines (the ones they asked about first).
+  If they name a proposal or invoice number, answer that one from project_deals'
+  "documents" (repeat the number only because they wrote it). Asked about an invoice,
+  a payment or what they owe, answer from "account" (its invoices with total, paid and
+  balance, and what they owe in all): those are their own records, so the figures may
+  be repeated exactly as written there. A question about a
+  meeting (its time, date or link) gets a meeting answer, never a project status list.
+  Never a vague "the team is working on your projects". Give status ONLY when they ask
+  (a plain hello gets a greeting and one short question about what they'd like, never a
+  status list). If they ask something
   project_deals can't answer (a delivery date, why it's late, a technical detail), say
   you're checking with the team and the answer comes here, and set request_human=true
   (the question goes to the team's request desk; you keep the chat).
@@ -749,11 +801,21 @@ def customer_figures(context: dict[str, Any] | None) -> list[str]:
 
 
 def allowed_text(context: dict[str, Any] | None) -> list[str]:
-    """Text a service reply may repeat verbatim: offered booking labels and the customer's
-    own (non-money) figures."""
+    """Text a service reply may repeat verbatim: offered booking labels, the customer's
+    own (non-money) figures, and the facts of invoices they already received (number,
+    total, paid, balance): those are their records, never a new price."""
     meeting = arranged_meeting(context)
     arranged = [str(meeting[k]) for k in ("label", "link") if meeting.get(k)]
-    return offered_labels(context) + customer_figures(context) + arranged
+    account = (context or {}).get("account") or {}
+    books = [
+        str(invoice[k])
+        for invoice in account.get("invoices") or []
+        for k in ("number", "total", "paid", "balance")
+        if invoice.get(k)
+    ]
+    if account.get("balance") and account["balance"] != "nothing owed":
+        books += [part.strip() for part in str(account["balance"]).split(",")]
+    return offered_labels(context) + customer_figures(context) + arranged + books
 
 
 ARRANGED = re.compile(
@@ -1119,7 +1181,7 @@ def invented(reply: str, context: dict[str, Any], booked: bool = False) -> str:
         )
     # Only a meeting the team really arranged (time and link) can be called confirmed;
     # a bare "yes" from the team is not a meeting.
-    team_said = any(
+    team_said = not context.get("meeting_over") and any(
         "Meeting confirmed by the team" in str(n.get("note", n.get("answer", "")))
         for n in [context.get("team_answer_now") or {}, *(context.get("team_notes") or [])]
     )
@@ -1265,6 +1327,40 @@ ASKS_SEND = re.compile(
 )
 
 
+def _sentences(text: str) -> list[str]:
+    return [
+        " ".join(part.casefold().split()).strip(" .•")
+        for part in re.split(r"(?<=[.!?])\s+|\n", text)
+        if len(part.split()) >= 7
+    ]
+
+
+def repeats_itself(reply: str, context: dict[str, Any]) -> str | None:
+    """A sentence pi already wrote in one of its last three replies, or "Shall I send
+    this to the team?" asked again while the customer hasn't answered it."""
+    earlier = [
+        str(h.get("text", "")) for h in (context.get("history") or []) if h.get("role") == "ai"
+    ][-3:]
+    said = {sentence for text in earlier for sentence in _sentences(text)}
+    again = [sentence for sentence in _sentences(reply) if sentence in said]
+    if again:
+        return (
+            f'it repeats what you already wrote ("{again[0][:80]}"); say only what is new '
+            "for their latest message"
+        )
+    latest = str(context.get("latest_customer_message", ""))
+    if (
+        ASKS_SEND.search(reply)
+        and any(ASKS_SEND.search(text) for text in earlier[-2:])
+        and not AGREES.search(latest)
+    ):
+        return (
+            "you already asked whether to send the brief to the team and they talked about "
+            "something else: answer what they said and don't ask it again now"
+        )
+    return None
+
+
 def contradicts_itself(reply: str, context: dict[str, Any]) -> str | None:
     """A reply that says it's sent and asks whether to send, or repeats pi's last message."""
     if SAYS_SENT.search(reply) and ASKS_SEND.search(reply):
@@ -1364,6 +1460,57 @@ STATUS_ASK = re.compile(
     r"(?:kab|aaya)|kitna hua|ho gaya)\b",
     re.IGNORECASE,
 )
+
+
+LABELLED_STATUS = re.compile(r"\b(?:status|next step)\s*:", re.IGNORECASE)
+
+
+# A reply that is a project status list ("Here's the current status of your projects").
+STATUS_LIST = re.compile(
+    r"\b(?:current )?status of (?:your|all your|each) projects?\b|"
+    r"here(?:'|’)?s (?:the|where) (?:current )?status",
+    re.IGNORECASE,
+)
+# "I'll check and get back to you" with nothing behind it.
+EMPTY_PROMISE = re.compile(
+    r"\b(?:please )?hold on\b|\bI(?:'|’)?ll (?:check|look into|verify|confirm)\b[^.?!\n]{0,80}"
+    r"(?:get back|shortly|moment|soon)|\bget back to you\b",
+    re.IGNORECASE,
+)
+
+
+def unasked_status(reply: str, context: dict[str, Any]) -> str | None:
+    """A project status list the customer didn't ask for (they changed a requirement,
+    asked about a meeting, asked for Roman Urdu...)."""
+    latest = str(context.get("latest_customer_message", ""))
+    if STATUS_LIST.search(reply) and not STATUS_ASK.search(latest):
+        return (
+            "they didn't ask where their projects stand: don't list project statuses; "
+            "answer exactly what their latest message says or asks"
+        )
+    return None
+
+
+def empty_promise(turn: "ServiceTurn", context: dict[str, Any]) -> str | None:
+    """'I'll check and get back to you' while nothing is sent to the team: the customer
+    would wait forever. Answer from the data, or really ask the team."""
+    if turn.request_human or not EMPTY_PROMISE.search(turn.reply):
+        return None
+    return (
+        "it promises to check and come back, but nothing goes to the team: answer now "
+        "from project_deals and account if they hold the answer; if not, say the team is "
+        "checking and set request_human=true so the question reaches their request desk"
+    )
+
+
+def wordy_status(reply: str) -> str | None:
+    """A status answer written as a form ("Status: ... Next Step: ...")."""
+    if len(LABELLED_STATUS.findall(reply)) >= 2:
+        return (
+            "write each project as one short '• Project: status, next step' line, with no "
+            "'Status:' or 'Next step:' labels, no sub-points and no bold"
+        )
+    return None
 
 
 def vague_status(reply: str, context: dict[str, Any]) -> str | None:
@@ -1842,6 +1989,14 @@ async def compose_service_turn(
         problem = f"{empty}, and also: {problem}" if problem else empty
     if not turn.request_human and (vague := vague_status(turn.reply, context)):
         problem = f"{vague}, and also: {problem}" if problem else vague
+    if wordy := wordy_status(turn.reply):
+        problem = f"{wordy}, and also: {problem}" if problem else wordy
+    if again := repeats_itself(turn.reply, context):
+        problem = f"{again}, and also: {problem}" if problem else again
+    if unasked := unasked_status(turn.reply, context):
+        problem = f"{unasked}, and also: {problem}" if problem else unasked
+    if promise := empty_promise(turn, context):
+        problem = f"{promise}, and also: {problem}" if problem else promise
     turn.reply = without_filler(turn.reply)
     if long := too_long(turn.reply, context):
         problem = f"{long}, and also: {problem}" if problem else long
@@ -2318,28 +2473,29 @@ async def _follow_deal(
 
 
 def needs_person(turn: ServiceTurn, context: dict[str, Any]) -> bool:
-    """A person takes over only when the customer asks for one, complains, has a
-    payment issue, is still upset, or a review policy says so."""
-    from app.modules.pi.graph import keyword_intent
+    """A person takes over the chat only when the customer asks for one (or a review
+    policy says so). Payment questions, complaints and anything pi can't answer go to
+    the team's request desk instead, and pi keeps the chat."""
 
-    still_upset = (
-        turn.mood == "frustrated" and (context.get("brief") or {}).get("mood") == "frustrated"
-    )
-    if context.get("operator_review_required") or still_upset:
+    if context.get("operator_review_required"):
         return True
-    # Only what the customer typed or said, never words inside a document they sent.
+    # Only a short message the customer typed or said, never words inside a document,
+    # a pasted transcript or a link they sent.
     latest = str(context.get("typed_message", context.get("latest_customer_message", "")))
-    if PERSON_WORDS.search(latest):
-        return True
-    fast = keyword_intent(latest)
-    return fast is not None and fast[0] in {"human_request", "complaint", "payment"}
+    if len(latest) > 300:
+        return False
+    return bool(PERSON_WORDS.search(latest)) or turn.wants_person
 
 
 # Asking for a person, in the languages pi's customers write in.
 PERSON_WORDS = re.compile(
-    r"\b(human|real person|a person|someone from|representative|"
-    r"insaan|insan|bande se|kisi se baat|team se baat|"
-    r"persona|humano|asesor|personne|humain|conseiller|mensch|mitarbeiter)\b"
+    r"\b(?:talk|speak|chat|connect|transfer|pass)\b[^.?!\n]{0,40}"
+    r"\b(?:human|person|someone|somebody|agent|representative|manager|owner|staff|"
+    r"team member|real team|your team)\b"
+    r"|\b(?:real (?:person|human)|human (?:agent|being|support)|live (?:agent|person)|"
+    r"customer (?:care|service)|insaan se|insan se|bande se|kisi se baat|team se baat|"
+    r"owner se baat|manager se baat|persona real|hablar con (?:una persona|alguien)|"
+    r"parler (?:à|a) (?:quelqu|un humain)|mit einem menschen)\b"
     r"|شخص|إنسان|انسان|موظف|بندے|بندہ|इंसान|व्यक्ति|मानव",
     re.IGNORECASE,
 )
@@ -2470,7 +2626,64 @@ async def _deal_context(
             steps = await project_deals(session, scope, conversation, auto)
     except DBAPIError:
         steps = []
-    return {"open_proposal": found, "auto_proposal": auto, "project_deals": steps}
+    try:
+        async with session.begin_nested():
+            account = await customer_account(session, scope, conversation.customer_id)
+    except DBAPIError:
+        account = {}
+    return {
+        "open_proposal": found,
+        "auto_proposal": auto,
+        "project_deals": steps,
+        "account": account,
+    }
+
+
+async def customer_account(
+    session: AsyncSession, scope: WorkspaceScope, customer_id: UUID | None
+) -> dict[str, Any]:
+    """The customer's invoices they have received (number, state, total, paid, balance)
+    and what they still owe, so pi answers "is INV-000003 paid?" or "what's my
+    balance?" from the books. Only invoices already sent to them, never drafts."""
+    if customer_id is None:
+        return {}
+    from app.modules.billing.models import Invoice
+    from app.modules.pi_saas.deals import invoices_sent, money
+
+    rows = list(
+        await session.scalars(
+            WorkspaceRepository(session, Invoice, scope)
+            .select()
+            .where(
+                Invoice.customer_id == customer_id,
+                Invoice.status.in_(["issued", "partially_paid", "paid", "overdue"]),
+            )
+            .order_by(Invoice.created_at.desc())
+            .limit(10)
+        )
+    )
+    sent = await invoices_sent(session, scope, rows)
+    invoices = []
+    owed: dict[str, Any] = {}
+    for invoice in rows:
+        if invoice.id not in sent:
+            continue
+        balance = invoice.total - invoice.amount_paid
+        invoices.append(
+            {
+                "number": invoice.number,
+                "status": str(invoice.status).replace("_", " "),
+                "total": money(invoice.total, invoice.currency),
+                "paid": money(invoice.amount_paid, invoice.currency),
+                "balance": money(balance, invoice.currency),
+            }
+        )
+        if balance > 0:
+            owed[invoice.currency] = owed.get(invoice.currency, 0) + balance
+    return {
+        "invoices": invoices,
+        "balance": ", ".join(money(v, k) for k, v in owed.items()) or "nothing owed",
+    }
 
 
 async def project_deals(
@@ -2536,6 +2749,16 @@ async def project_deals(
             "status": status_for(lead.stage, quote, invoice=invoice, order=order, sent=sent),
             "next": without_numbers(
                 next_for(lead.stage, quote, auto, invoice=invoice, order=order, invoice_sent=sent)
+            ),
+            "documents": "; ".join(
+                part
+                for part in (
+                    f"proposal {quote.number} {quote.status}" if quote is not None else "",
+                    f"invoice {invoice.number} " + (str(invoice.status) if sent else "not sent yet")
+                    if invoice is not None
+                    else "",
+                )
+                if part
             ),
         }
         brief_project = brief_projects.get(lead.title.strip().casefold())

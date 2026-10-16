@@ -532,6 +532,11 @@ async def test_unknown_answers_reach_the_team_and_a_frustrated_customer_gets_a_p
         turn(reply="Team is par confirm karke yahin batayegi.", knowledge_gaps=[gap]),
         turn(reply="Maazrat, team confirm karegi.", knowledge_gaps=[gap], mood="frustrated"),
         turn(reply="Maazrat, team ka banda abhi baat karega.", mood="frustrated"),
+        turn(
+            reply="Of course, a person from the team will reply here.",
+            language="en",
+            request_human=True,
+        ),
     )
     pi = await pi_workspace(api, business_db, business_type="service_business")
     await pi.process("Packaging design bhi karte ho?", "gap-1")
@@ -553,7 +558,12 @@ async def test_unknown_answers_reach_the_team_and_a_frustrated_customer_gets_a_p
     assert gaps == 1
     await pi.process("ye kya mazaak hai", "gap-3")
     await pi.deliver_all()
-    assert (await pi.conversation()).mode == "human"  # still upset: a person takes over
+    # Still upset, but they didn't ask for a person: pi keeps the chat and the team gets
+    # the question on its request desk (a person takes over only when asked).
+    assert (await pi.conversation()).mode != "human"
+    await pi.process("I want to talk to a human", "gap-4")
+    await pi.deliver_all()
+    assert (await pi.conversation()).mode == "human"
     await pi.close()
 
 

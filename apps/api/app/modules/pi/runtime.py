@@ -13,6 +13,7 @@ External delivery uncertainty never triggers a blind resend.
 
 import asyncio
 import logging
+import re
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
@@ -225,6 +226,46 @@ async def persist_inbound(
     )
 
 
+# Hindi (Devanagari) or Urdu (Arabic) letters in a voice-note transcript.
+SOUTH_ASIAN_SCRIPT = re.compile(r"[ऀ-ॿ؀-ۿ]")
+
+
+async def roman_transcript(
+    manager: Any, scope: WorkspaceScope, text: str, conversation_id: Any
+) -> str:
+    """A voice note in Urdu or Hindi, written in Roman Urdu (Latin letters) so the team
+    and pi read it the way customers type. Arabic stays Arabic; a failure keeps the
+    original words."""
+    from app.ai.types import Message
+
+    devanagari = len(re.findall(r"[ऀ-ॿ]", text))
+    urdu = len(re.findall(r"[ٹڈڑںھہےی]", text))
+    if not text.strip() or not SOUTH_ASIAN_SCRIPT.search(text) or not (devanagari or urdu):
+        return text
+    try:
+        response = await manager.complete(
+            scope,
+            alias="fast",
+            purpose="pi_transliterate",
+            messages=[
+                Message.system(
+                    "Rewrite this voice-note transcript in Roman Urdu (Latin letters, the "
+                    "way people type Urdu on WhatsApp). Keep English words, names, numbers "
+                    "and sound notes as they are. Change only the script, never the "
+                    "meaning. Reply with the rewritten text only."
+                ),
+                Message.user(text),
+            ],
+            max_tokens=1500,
+            conversation_id=conversation_id,
+        )
+    except Exception:  # noqa: BLE001 - the original transcript is still useful
+        logger.warning("pi_transcript_roman_failed", exc_info=True)
+        return text
+    roman = str(response.text or "").strip()
+    return roman[:4000] if roman and not SOUTH_ASIAN_SCRIPT.search(roman) else text
+
+
 async def _keep_file(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -252,7 +293,8 @@ async def _keep_file(
         return
     if existing is not None:
         return
-    name = str(message.media.get("filename") or "") or ("document" if document else "photo")
+    kind = "document" if document else (message.message_type or "image")
+    name = str(message.media.get("filename") or "") or ("photo" if kind == "image" else kind)
     saved = await save_from_message(
         session,
         scope,
@@ -270,7 +312,8 @@ async def _keep_file(
         scope,
         conversation.customer_id,
         "conversation.document",
-        f"{'Document' if document else 'Photo'} received on WhatsApp: {saved.name}",
+        f"{ {'document': 'Document', 'video': 'Video'}.get(kind, 'Photo') } received on "
+        f"WhatsApp: {saved.name}",
         "conversation",
         conversation.id,
     )
@@ -641,7 +684,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 mime = mime if document else normalize_mime(mime)
                 if not document and not mime.startswith(f"{message.message_type}/"):
                     raise BusinessRuleViolation("INVALID_MEDIA", "Media type does not match")
-                if (document or message.message_type == "image") and conversation.customer_id:
+                if (document or message.message_type in {"image", "video"}) and (
+                    conversation.customer_id
+                ):
                     # Kept on the customer's profile (Attachments), once per message.
                     await _keep_file(session, scope, conversation, message, content, document)
                 if document:
@@ -667,7 +712,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                             session, scope, conversation, message, doc_kind, description
                         )
                 elif audio and provider_transcript:
-                    description = provider_transcript[:4000]
+                    description = await roman_transcript(
+                        manager, scope, provider_transcript[:4000], conversation_id
+                    )
                 elif audio:
                     transcript = await manager.transcribe(
                         scope,
@@ -675,10 +722,13 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                         mime,
                         # Customers often mix Urdu, Hindi, Arabic and English.
                         prompt="The speaker may use Urdu, Hindi, Arabic, English or a mix; "
-                        "write the words as spoken.",
+                        "write Urdu and Hindi speech in Roman Urdu (Latin letters) and "
+                        "English words as spoken.",
                         conversation_id=conversation_id,
                     )
-                    description = transcript.text[:4000]
+                    description = await roman_transcript(
+                        manager, scope, transcript.text[:4000], conversation_id
+                    )
                 elif message.message_type == "video":
                     understood = await manager.complete(
                         scope,

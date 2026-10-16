@@ -25,9 +25,16 @@ logger = logging.getLogger(__name__)
 
 MAX_BYTES = 10 * 1024 * 1024
 DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+PPTX = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 EXTENSIONS = {
     "application/pdf": "pdf",
     DOCX: "docx",
+    XLSX: "xlsx",
+    PPTX: "pptx",
+    "video/mp4": "mp4",
+    "video/quicktime": "mov",
+    "video/3gpp": "3gp",
     "text/plain": "txt",
     "image/jpeg": "jpg",
     "image/png": "png",
@@ -45,6 +52,11 @@ def sniff(data: bytes) -> str:
         return "image/jpeg"
     if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
         return "image/webp"
+    if data[4:8] == b"ftyp":  # MP4 family: the brand says which
+        brand = data[8:12]
+        if brand.startswith(b"qt"):
+            return "video/quicktime"
+        return "video/3gpp" if brand.startswith(b"3gp") else "video/mp4"
     if data.startswith(b"PK\x03\x04"):
         from app.modules.pi_saas.teach_files import detect
 
@@ -53,6 +65,9 @@ def sniff(data: bytes) -> str:
                 return DOCX
         except BusinessRuleViolation:
             pass
+        office = _office_kind(data)
+        if office:
+            return office
     else:
         try:
             data[:65536].decode("utf-8")
@@ -61,8 +76,27 @@ def sniff(data: bytes) -> str:
         except UnicodeDecodeError:
             pass
     raise BusinessRuleViolation(
-        "FILE_UNSUPPORTED", "Upload a PDF, Word (.docx), text file or photo", 415
+        "FILE_UNSUPPORTED",
+        "Upload a PDF, Word, Excel, PowerPoint, text file, photo or video",
+        415,
     )
+
+
+def _office_kind(data: bytes) -> str | None:
+    """An Excel or PowerPoint file (a zip whose parts say which), else None."""
+    import io
+    import zipfile
+
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as archive:
+            names = set(archive.namelist())
+    except zipfile.BadZipFile:
+        return None
+    if "xl/workbook.xml" in names:
+        return XLSX
+    if "ppt/presentation.xml" in names:
+        return PPTX
+    return None
 
 
 def clean_name(name: str, mime: str) -> str:

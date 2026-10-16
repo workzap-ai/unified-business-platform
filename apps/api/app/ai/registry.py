@@ -92,6 +92,10 @@ def canonical_alias(alias: str) -> str:
     return ALIAS_SYNONYMS.get(alias, alias)
 
 
+# Gemini aliases its multimodal chat models serve as well (see ModelRegistry.resolve).
+GEMINI_MEDIA = frozenset({"video", "vision", "transcribe"})
+
+
 class ModelRegistry:
     def __init__(
         self,
@@ -123,6 +127,12 @@ class ModelRegistry:
         for name in names:
             if name in configured:
                 return configured[name] or None  # "" explicitly disables the alias
+        if provider == "gemini" and canonical in GEMINI_MEDIA:
+            # Gemini chat models also read video, images and speech: an operator who pinned
+            # a newer one (e.g. gemini-3.5-flash) gets it here too, never a retired default.
+            pinned = configured.get("agent") or configured.get("balanced")
+            if pinned:
+                return pinned
         if self.use_defaults:
             return self.defaults.get(provider, {}).get(canonical)
         return None
