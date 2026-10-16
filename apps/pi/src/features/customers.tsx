@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import * as React from "react";
 
+import { BookMeetingButton, NextMeetingCard } from "@/features/book-meeting";
 import { MarketingConsent } from "@/features/campaigns";
 import { CustomerActivity } from "@/features/customer-activity";
 import { CustomerFiles } from "@/features/customer-files";
@@ -371,6 +372,7 @@ export function CustomerProfilePage({ id }: { id: string }) {
         }
         action={
           <>
+            <BookMeetingButton customerId={id} customerName={p.customer.name} />
             {can("customers.read") ? (
               <Button variant="secondary" asChild>
                 <a
@@ -395,6 +397,7 @@ export function CustomerProfilePage({ id }: { id: string }) {
         }
       />
       <CustomerDuplicates id={id} name={p.customer.name} />
+      <NextMeetingCard customerId={id} />
       <CustomerOverview id={id} />
       {can("customers.read") ? <CustomerSolution id={id} /> : null}
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">

@@ -1,8 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { Input, NativeSelect, Textarea } from "@/components/ui/input";
-import { Label } from "@/components/ui/controls";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,13 +10,7 @@ import {
 } from "@/components/ui/overlays";
 import { useScopedMutation } from "@/hooks/use-scoped";
 import { piRequestsService, type PiRequest } from "../requests-service";
-
-type How = "google_meet" | "video" | "link" | "in_person";
-
-function tomorrow(): string {
-  const d = new Date(Date.now() + 86_400_000);
-  return d.toISOString().slice(0, 10);
-}
+import { MeetingFields, useMeetingForm } from "./meeting-fields";
 
 /** "Arrange meeting": pick a time and how to meet; pi sends it to the customer. */
 export function MeetingDialog({
@@ -34,26 +25,9 @@ export function MeetingDialog({
   /** Prefill the date and time ("YYYY-MM-DDTHH:MM", business time). */
   initialStartsAt?: string | null;
 }) {
-  const preset = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(initialStartsAt ?? "")
-    ? initialStartsAt!
-    : null;
-  const [date, setDate] = useState(preset ? preset.slice(0, 10) : tomorrow());
-  const [time, setTime] = useState(preset ? preset.slice(11, 16) : "17:00");
-  const [duration, setDuration] = useState("30");
-  const [how, setHow] = useState<How>(googleMeet ? "google_meet" : "video");
-  const [link, setLink] = useState("");
-  const [place, setPlace] = useState("");
-  const [note, setNote] = useState("");
+  const form = useMeetingForm({ googleMeet, initialStartsAt });
   const arrange = useScopedMutation(
-    () =>
-      piRequestsService.arrangeMeeting(request!.id, {
-        starts_at: `${date}T${time}`,
-        duration_minutes: Number(duration),
-        how,
-        link: link.trim(),
-        place: place.trim(),
-        note: note.trim(),
-      }),
+    () => piRequestsService.arrangeMeeting(request!.id, form.values),
     {
       invalidate: [["pi", "requests"], ["pi", "meetings"], ["pi"]],
       success:
@@ -61,12 +35,7 @@ export function MeetingDialog({
       onSuccess: () => onClose(),
     },
   );
-  const ready =
-    Boolean(date && time) &&
-    (how === "google_meet" ||
-      how === "video" ||
-      (how === "link" && /^https?:\/\//.test(link.trim())) ||
-      (how === "in_person" && place.trim().length > 1));
+  const ready = form.ready;
   return (
     <Dialog
       open={request !== null}
@@ -83,92 +52,7 @@ export function MeetingDialog({
               {request.question}
             </p>
           )}
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div>
-              <Label htmlFor="meet-date">Date</Label>
-              <Input
-                id="meet-date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="meet-time">Time</Label>
-              <Input
-                id="meet-time"
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="meet-duration">Length</Label>
-              <NativeSelect
-                id="meet-duration"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-              >
-                {["15", "30", "45", "60", "90"].map((m) => (
-                  <option key={m} value={m}>
-                    {m} minutes
-                  </option>
-                ))}
-              </NativeSelect>
-            </div>
-          </div>
-          <div>
-            <Label htmlFor="meet-how">How</Label>
-            <NativeSelect
-              id="meet-how"
-              value={how}
-              onChange={(e) => setHow(e.target.value as How)}
-            >
-              <option value="google_meet" disabled={!googleMeet}>
-                Google Meet (link made for you)
-                {googleMeet ? "" : " · connect Google Calendar first"}
-              </option>
-              <option value="video">
-                Video call (link made for you, no sign-up)
-              </option>
-              <option value="link">My own link (Zoom, Teams…)</option>
-              <option value="in_person">In person</option>
-            </NativeSelect>
-          </div>
-          {how === "link" && (
-            <div>
-              <Label htmlFor="meet-link">Meeting link</Label>
-              <Input
-                id="meet-link"
-                inputMode="url"
-                placeholder="https://zoom.us/j/…"
-                value={link}
-                onChange={(e) => setLink(e.target.value)}
-              />
-            </div>
-          )}
-          {how === "in_person" && (
-            <div>
-              <Label htmlFor="meet-place">Where</Label>
-              <Input
-                id="meet-place"
-                placeholder="e.g. Our office, 12 Main Boulevard, Lahore"
-                value={place}
-                onChange={(e) => setPlace(e.target.value)}
-              />
-            </div>
-          )}
-          <div>
-            <Label htmlFor="meet-note">Note for the customer (optional)</Label>
-            <Textarea
-              id="meet-note"
-              rows={2}
-              maxLength={1000}
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="e.g. Please keep your sales report handy."
-            />
-          </div>
+          <MeetingFields form={form} googleMeet={googleMeet} />
         </DialogBody>
         <DialogFooter>
           <Button

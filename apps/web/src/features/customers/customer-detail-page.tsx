@@ -7,6 +7,10 @@ import { CustomerPiOverview } from "./components/pi-overview";
 import { CustomerSolution } from "./components/customer-solution";
 import { CustomerActivityTab } from "./components/customer-activity";
 import { CustomerDuplicates } from "./components/customer-duplicates";
+import {
+  BookMeetingAction,
+  CustomerNextMeeting,
+} from "./components/customer-meeting";
 import Link from "next/link";
 import {
   Archive,
@@ -213,6 +217,12 @@ function CustomerRecord({ customer }: { customer: CustomerDetail }) {
           </Link>
         </Button>
       )}
+      {!archived && (
+        <BookMeetingAction
+          customerId={customer.id}
+          customerName={customer.name}
+        />
+      )}
       {canWrite && (
         <Button size="sm" variant="secondary" onClick={() => setEditing(true)}>
           <Pencil /> Edit
@@ -397,6 +407,7 @@ function OverviewTab({
           </a>
         </Button>
       </div>
+      <CustomerNextMeeting customerId={customer.id} />
       <CustomerPiOverview customerId={customer.id} />
       <CustomerSolution customerId={customer.id} />
       <MetricGrid className="xl:grid-cols-4">

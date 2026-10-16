@@ -142,6 +142,33 @@ export type MeetingChangeResult = z.infer<typeof changeResultSchema>;
 
 const okSchema = z.object({ ok: z.boolean().catch(true) });
 
+export const bookResultSchema = z.object({
+  ok: z.boolean().catch(true),
+  conversation_id: z.string(),
+  /** e.g. "Saturday 17 October, 10:30 AM" (business time). */
+  label: z.string().nullable().catch(null),
+  link: z
+    .string()
+    .nullable()
+    .catch("")
+    .transform((v) => v ?? ""),
+  /** False when WhatsApp's 24-hour window is closed: share the link yourself. */
+  told_customer: z.boolean().catch(false),
+});
+export type BookMeetingResult = z.infer<typeof bookResultSchema>;
+
+export type BookMeetingInput = {
+  customer_id: string;
+  /** Business-local "YYYY-MM-DDTHH:MM". */
+  starts_at: string;
+  duration_minutes?: number;
+  how?: "google_meet" | "video" | "link" | "in_person";
+  link?: string;
+  place?: string;
+  /** What it's about; told to the customer. */
+  note?: string;
+};
+
 export type MoveMeetingInput = {
   conversation_id: string;
   starts_at: string;
@@ -157,6 +184,9 @@ export const meetingsService = {
     apiRequest("GET", "/pi/meetings", meetingBoardSchema, {
       query: { start: start ?? undefined, days },
     }),
+  /** Book a meeting for a customer (from their profile); pi tells them on WhatsApp. */
+  book: (body: BookMeetingInput) =>
+    apiRequest("POST", "/pi/meetings/book", bookResultSchema, { body }),
   move: ({ conversation_id, ...body }: MoveMeetingInput) =>
     apiRequest("POST", path(conversation_id, "move"), changeResultSchema, {
       body,
