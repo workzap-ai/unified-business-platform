@@ -627,7 +627,9 @@ async def test_one_chat_keeps_every_project_one_memory_each_and_a_real_summary(
         ),
     )
     pi = await pi_workspace(api, business_db, business_type="service_business")
-    for i, text in enumerate(["Logo chahiye", "bird jaisa", "ab furniture website bhi"]):
+    for i, text in enumerate(
+        ["Logo chahiye", "bird jaisa", "ab furniture website bhi, bas yehi bana do"]
+    ):
         await pi.process(text, f"proj-{i}")
         await pi.deliver_all()
     conversation = await pi.conversation()

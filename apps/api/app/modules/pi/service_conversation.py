@@ -710,7 +710,10 @@ Proposals:
   paid, the work is in progress"). Exactly that shape: no "Status:" or "Next step:"
   labels, no sub-points, no bold, at most five lines (the ones they asked about first).
   If they name a proposal or invoice number, answer that one from project_deals'
-  "documents" (repeat the number only because they wrote it). Asked about an invoice,
+  "documents" (repeat the number only because they wrote it). Asked to send a
+  proposal or invoice again ("send it again", "link missing", "dobara bhejo"), send its
+  link from project_deals' "links" exactly as written, one line per document, never
+  just "it is shared". Asked about an invoice,
   a payment or what they owe, answer from "account" (its invoices with total, paid and
   balance, and what they owe in all): those are their own records, so the figures may
   be repeated exactly as written there. A question about a
@@ -722,7 +725,12 @@ Proposals:
   you're checking with the team and the answer comes here, and set request_human=true
   (the question goes to the team's request desk; you keep the chat).
 - project_deals lists each project of this chat (each is its own deal) with its real
-  status and next step. Your "what happens next" line must come from it, per project when there
+  status and next step; other_requests are further things they asked about. Asked to
+  list everything they asked for ("all my projects", "what did I give you"), list both,
+  one "• " line each, never just one.
+- A project's name is never a document number ("Proposal QUO-000016"), and "features
+  still needed" is never a brief point: ask for the missing feature instead.
+  Your "what happens next" line must come from it, per project when there
   are several ("Website: the proposal is being prepared and comes here; AI system:
   still collecting details"). Never a generic "the team will review it" when
   project_deals says something more specific.
@@ -1311,7 +1319,7 @@ def with_consent_question(turn: ServiceTurn, context: dict[str, Any]) -> str:
         return turn.reply
     # In the customer's language (a half-Roman-Urdu draft must not decide it).
     language = turn.language or detect_language(turn.reply)
-    question = CONSENT_QUESTION.get(language, CONSENT_QUESTION["en"])
+    question = CONSENT_QUESTION.get(language or "en", CONSENT_QUESTION["en"])
     return f"{turn.reply.rstrip()}\n\n{question}"
 
 
@@ -1503,6 +1511,27 @@ def empty_promise(turn: "ServiceTurn", context: dict[str, Any]) -> str | None:
     )
 
 
+RESEND_ASK = re.compile(
+    r"\b(?:send|share|give)\b[^.?\n]{0,30}\b(?:again|link|proposal|invoice|quote)\b|"
+    r"\b(?:again|resend|missing|not (?:received|got|get)|didn'?t (?:get|receive)|"
+    r"dobara|phir se|nahi mila|nahin mila)\b",
+    re.I,
+)
+
+
+def link_not_resent(reply: str, context: dict[str, Any]) -> str | None:
+    """They asked for a document again and pi answered without its link."""
+    latest = str(context.get("latest_customer_message", ""))
+    links = [d["links"] for d in context.get("project_deals") or [] if d.get("links")]
+    if not links or not RESEND_ASK.search(latest) or URL.search(reply):
+        return None
+    return (
+        "they asked for the document again: send its link from project_deals' links "
+        "exactly as written (one '• ' line per document they asked about), not just that "
+        "it is shared"
+    )
+
+
 def wordy_status(reply: str) -> str | None:
     """A status answer written as a form ("Status: ... Next Step: ...")."""
     if len(LABELLED_STATUS.findall(reply)) >= 2:
@@ -1592,8 +1621,10 @@ INFO_QUESTION = re.compile(
 # The customer agreeing to the brief pi showed them (or saying there's nothing more).
 AGREES = re.compile(
     r"\b(?:yes|yeah|yep|yup|sure|haan|han|ji|jee|g|ok|okay|alright|theek|thik|"
-    r"correct|right|perfect|confirm(?:ed)?|go ahead|proceed|send(?: it)?|bhej(?: do| dein| den)?|"
+    r"correct|right|perfect|confirm(?:ed)?|accept(?:ed)?|go ahead|proceed|send(?: it)?|"
+    r"bhej(?: do| dein| den)?|"
     r"kar do|karo|done|like this|aisa hi|aise hi|ye ?hi|yehi|make it|bana do|banao|"
+    r"that(?:'|’)?s (?:all|it|everything)|nothing (?:else|more)|bas|itna hi|"
     r"s[ií]|oui|ja)\b|نعم|ہاں|جی|ٹھیک",
     re.IGNORECASE,
 )
@@ -1632,11 +1663,47 @@ async def in_one_language(
     return fixed if fixed and not mixed_line(fixed, expected) else reply
 
 
+def project_words(text: str) -> set[str]:
+    return {w for w in re.findall(r"[a-z]{3,}", text.casefold()) if w not in PROJECT_FILLER}
+
+
+PROJECT_FILLER = frozenset(
+    {"the", "and", "for", "new", "project", "request", "development", "system", "app"}
+)
+
+
+def same_project(a: str, b: str) -> bool:
+    """Two names for one project ("SaaS Product Platform" / "SaaS Product Platform
+    Development"); "Video Editing SaaS Product" is a different one."""
+    x, y = project_words(a), project_words(b)
+    if not x or not y:
+        return a.strip().casefold() == b.strip().casefold()
+    return len(x & y) / len(x | y) >= 0.6
+
+
+def confirmed_now(turn: "ServiceTurn", brief: dict[str, Any]) -> list[str]:
+    """Projects this turn marks confirmed that weren't confirmed before."""
+    before = {
+        str(p.get("title") or ""): str(p.get("status") or "")
+        for p in brief.get("projects") or []
+        if isinstance(p, dict)
+    }
+    out = []
+    for project in turn.projects:
+        if project.status not in CONFIRMED:
+            continue
+        earlier = next((st for t, st in before.items() if same_project(t, project.title)), "")
+        if earlier not in CONFIRMED:
+            out.append(project.title)
+    return out
+
+
 def unconfirmed_brief(turn: "ServiceTurn", context: dict[str, Any]) -> str | None:
     """A brief sent to the team although the customer never agreed to it: their latest
     message is about something else ("Sorry tomorrow", "tell me your services")."""
     brief = context.get("brief") or {}
-    if not turn.ready_for_team or brief.get("ready_for_team"):
+    newly = confirmed_now(turn, brief)
+    if not newly and (not turn.ready_for_team or brief.get("ready_for_team")):
         return None
     if context.get("check_in_now") or context.get("team_answer_now"):
         return None
@@ -1799,6 +1866,12 @@ STATUS_TEXT = re.compile(
 )
 
 
+# "Proposal QUO-000016", "Invoice INV-000003": a document, never a project.
+DOCUMENT_TITLE = re.compile(
+    r"\b(?:QUO|INV|ORD|RCPT)-\d+\b|^\s*(?:proposal|invoice|receipt)\s*$", re.I
+)
+
+
 def keep_known(project: Project, before: Project) -> None:
     """What was known about a project stays known: an empty field keeps its earlier
     value, list points add up (no repeats), and an open question the customer has since
@@ -1828,7 +1901,7 @@ def merge_projects(previous: Any, turn: ServiceTurn) -> list[Project]:
         if project.title:
             known[project.title.casefold()] = project
     for project in turn.projects:
-        if not project.title:
+        if not project.title or DOCUMENT_TITLE.search(project.title):
             continue
         before = known.get(project.title.casefold())
         if before is not None:
@@ -1997,6 +2070,8 @@ async def compose_service_turn(
         problem = f"{unasked}, and also: {problem}" if problem else unasked
     if promise := empty_promise(turn, context):
         problem = f"{promise}, and also: {problem}" if problem else promise
+    if resend := link_not_resent(turn.reply, context):
+        problem = f"{resend}, and also: {problem}" if problem else resend
     turn.reply = without_filler(turn.reply)
     if long := too_long(turn.reply, context):
         problem = f"{long}, and also: {problem}" if problem else long
@@ -2060,10 +2135,23 @@ async def compose_service_turn(
         if invented(turn.reply, context, turn.action == "booking"):
             # Still made up after the rewrite: never sent (pi asks the team instead).
             raise ReplyRejected("INVENTED_DETAIL")
+        if link_not_resent(turn.reply, context):
+            # Still no link for "send it again": add the links they already received.
+            sent = [
+                f"• {link.strip()}"
+                for deal in context.get("project_deals") or []
+                for link in str(deal.get("links") or "").split(";")
+                if link.strip()
+            ]
+            turn.reply = turn.reply.rstrip() + "\n\n" + "\n".join(sent)
         if unconfirmed_brief(turn, context):
             # Still sending an unagreed brief: hold it and only ask (never claim sent).
             turn.ready_for_team = False
             turn.awaiting_customer = True
+            held = set(confirmed_now(turn, context.get("brief") or {}))
+            for project in turn.projects:
+                if project.title in held:
+                    project.status = "awaiting_confirmation"
     if expected in NAMES and mixed_line(turn.reply, str(expected)):
         turn.reply = await in_one_language(
             manager, scope, policy, conversation, turn.reply, str(expected)
@@ -2205,7 +2293,11 @@ async def save_service_turn(
     if projects:
         # One deal per project: each gets its own lead, brief and proposal.
         won = await won_projects(session, scope, conversation)
+        existing = await chat_deal_titles(session, scope, conversation)
         for project in projects:
+            twin = next((t for t in existing if same_project(t, project.title)), None)
+            if twin is not None and twin.casefold() != project.title.casefold():
+                project.title = twin  # the deal it already has, never a second one
             if project.title.strip().casefold()[:120] in won:
                 # Already agreed and paid for: that deal is done; mentioning the project
                 # again in the chat never opens a second deal for it.
@@ -2286,6 +2378,25 @@ async def save_service_turn(
             dedupe_key=f"pi-brief:{conversation.id}:{'ready' if turn.ready_for_team else 'new'}",
         )
     return proposals_due
+
+
+async def chat_deal_titles(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation
+) -> list[str]:
+    """The titles of this chat's deals (any stage), oldest first."""
+    from app.modules.sales.models import SalesLead
+
+    return [
+        str(title)
+        for title in await session.scalars(
+            WorkspaceRepository(session, SalesLead, scope)
+            .select()
+            .with_only_columns(SalesLead.title)
+            .where(SalesLead.conversation_id == conversation.id)
+            .order_by(SalesLead.created_at)
+            .limit(30)
+        )
+    ]
 
 
 async def won_projects(
@@ -2631,10 +2742,19 @@ async def _deal_context(
             account = await customer_account(session, scope, conversation.customer_id)
     except DBAPIError:
         account = {}
+    analysed = ((conversation.service_brief or {}).get("customer_issues") or {}).get("issues")
+    other = [
+        str(issue.get("title"))
+        for issue in analysed or []
+        if isinstance(issue, dict)
+        and issue.get("title")
+        and not any(same_project(str(issue["title"]), d["project"]) for d in steps)
+    ][:8]
     return {
         "open_proposal": found,
         "auto_proposal": auto,
         "project_deals": steps,
+        "other_requests": other,
         "account": account,
     }
 
@@ -2684,6 +2804,37 @@ async def customer_account(
         "invoices": invoices,
         "balance": ", ".join(money(v, k) for k, v in owed.items()) or "nothing owed",
     }
+
+
+SENT_LINK = re.compile(r"https?://\S+/d/[A-Za-z0-9_-]+")
+
+
+async def document_links(
+    session: AsyncSession, scope: WorkspaceScope, quote: Any, invoice: Any
+) -> str:
+    """The links the customer already received for this project's proposal and invoice
+    (taken from the message that carried them), so "send me the proposal again" gets
+    the real link back instead of "it's shared"."""
+    from app.modules.pi_saas.deal_models import PiDocument
+
+    parts = []
+    for label, column, row in (
+        ("proposal", PiDocument.quote_id, quote),
+        ("invoice", PiDocument.invoice_id, invoice),
+    ):
+        if row is None:
+            continue
+        text = await session.scalar(
+            WorkspaceRepository(session, PiDocument, scope)
+            .select()
+            .with_only_columns(PiDocument.message_text)
+            .where(column == row.id, PiDocument.delivery != "pending")
+            .order_by(PiDocument.created_at.desc())
+            .limit(1)
+        )
+        if text and (found := SENT_LINK.search(text)):
+            parts.append(f"{label} {row.number}: {found.group(0)}")
+    return "; ".join(parts)
 
 
 async def project_deals(
@@ -2761,6 +2912,8 @@ async def project_deals(
                 if part
             ),
         }
+        if links := await document_links(session, scope, quote, invoice if sent else None):
+            step["links"] = links
         brief_project = brief_projects.get(lead.title.strip().casefold())
         if lead.stage == "new" and quote is None and brief_project:
             brief_status = str(brief_project.get("status") or "collecting")

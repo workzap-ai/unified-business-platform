@@ -110,3 +110,41 @@ def test_status_only_when_asked_and_no_empty_promises():
     assert empty_promise(ServiceTurn(reply=wait), {})
     assert empty_promise(ServiceTurn(reply=wait, request_human=True), {}) is None
     assert PERSON_WORDS.search("Please transfer my situation to a real team member")
+
+
+def test_one_project_one_deal_and_no_confirmation_without_a_yes():
+    from app.modules.pi.service_conversation import (
+        DOCUMENT_TITLE,
+        Project,
+        ServiceTurn,
+        confirmed_now,
+        same_project,
+        unconfirmed_brief,
+    )
+
+    assert same_project("SaaS Product Platform", "SaaS Product Platform Development")
+    assert not same_project("SaaS Product Platform", "Video Editing SaaS Product")
+    assert DOCUMENT_TITLE.search("Proposal QUO-000016")
+    turn = ServiceTurn(
+        reply="x", projects=[Project(title="SaaS Product Platform", status="confirmed")]
+    )
+    # An older brief was already sent, but this project is confirmed only now.
+    brief = {"ready_for_team": True, "projects": [{"title": "Logo", "status": "confirmed"}]}
+    assert confirmed_now(turn, brief) == ["SaaS Product Platform"]
+    asked = {"brief": brief, "latest_customer_message": "Which saas product platform?"}
+    assert unconfirmed_brief(turn, asked)
+    assert unconfirmed_brief(turn, {**asked, "latest_customer_message": "yes send it"}) is None
+
+
+def test_send_again_needs_the_documents_link() -> None:
+    from app.modules.pi.service_conversation import link_not_resent
+
+    link = "https://pi.example/d/8uBNH5aw7Epv3L6ly4es"
+    context = {
+        "latest_customer_message": "Missing please send me again",
+        "project_deals": [{"project": "SaaS", "links": f"proposal QUO-000019: {link}"}],
+    }
+    assert link_not_resent("Your proposals are shared and waiting.", context)
+    assert link_not_resent(f"Here it is:\n• Proposal QUO-000019: {link}", context) is None
+    context["latest_customer_message"] = "What's the status of my project?"
+    assert link_not_resent("Proposal shared, waiting for your response.", context) is None
