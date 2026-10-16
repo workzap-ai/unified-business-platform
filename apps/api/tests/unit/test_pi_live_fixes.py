@@ -148,3 +148,20 @@ def test_send_again_needs_the_documents_link() -> None:
     assert link_not_resent(f"Here it is:\n• Proposal QUO-000019: {link}", context) is None
     context["latest_customer_message"] = "What's the status of my project?"
     assert link_not_resent("Proposal shared, waiting for your response.", context) is None
+
+
+def test_a_resent_link_survives_the_number_filter() -> None:
+    from app.modules.pi.service_conversation import allowed_text, without_blocked_lines
+
+    link = "https://pi.example/d/Tal8SCbNUxJrGVpnsmnnaGZfbrHf9"
+    context = {"project_deals": [{"project": "Video", "links": f"proposal QUO-000017: {link}"}]}
+    reply = f"Here is your proposal again:\n• Proposal QUO-000017: {link}"
+    assert without_blocked_lines(reply, "quote", allowed_text(context)) == reply
+
+
+def test_mixed_english_and_roman_urdu_is_english() -> None:
+    from app.modules.pi.language import TEAM_CHECK_NOTICES, detect_language
+
+    assert detect_language("Bas yehi, that's all") == "en"
+    assert detect_language("website design chahiye") == "roman_ur"
+    assert "batata hoon" not in TEAM_CHECK_NOTICES["roman_ur"]

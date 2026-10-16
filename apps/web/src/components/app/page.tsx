@@ -160,8 +160,11 @@ export function ModuleNav({
                 <NavIcon name={child.icon} className="size-3.5" />
                 {child.label}
                 {child.badge ? (
-                  <span className="tabular rounded-full bg-pi-soft px-1.5 text-[10.5px] leading-4 font-semibold text-pi-soft-foreground">
-                    {child.badge}
+                  <span
+                    className="tabular min-w-4 rounded-full bg-danger px-1.5 text-center text-[10.5px] leading-4 font-semibold text-white"
+                    aria-label={`${child.badge} waiting`}
+                  >
+                    {child.badge > 99 ? "99+" : child.badge}
                   </span>
                 ) : null}
               </Link>

@@ -323,7 +323,11 @@ function ProviderHealthCard({
                   <StatusBadge
                     status={p.status}
                     label={
-                      p.status === "unconfigured" ? "Not configured" : undefined
+                      p.status === "unconfigured"
+                        ? "Not configured"
+                        : p.configured && p.requests_24h === 0
+                          ? "Standby"
+                          : undefined
                     }
                   />
                 </div>
@@ -334,16 +338,20 @@ function ProviderHealthCard({
                       <dd
                         className={cn(
                           "tabular font-semibold",
-                          p.success_rate < 0.95 && "text-warning",
+                          p.requests_24h > 0 &&
+                            p.success_rate < 0.95 &&
+                            "text-warning",
                         )}
                       >
-                        {formatPercent(p.success_rate, 1)}
+                        {p.requests_24h > 0
+                          ? formatPercent(p.success_rate, 1)
+                          : "—"}
                       </dd>
                     </div>
                     <div>
                       <dt className="text-muted-foreground">p50 latency</dt>
                       <dd className="tabular font-semibold">
-                        {formatMs(p.p50_ms)}
+                        {p.requests_24h > 0 ? formatMs(p.p50_ms) : "—"}
                       </dd>
                     </div>
                     <div>

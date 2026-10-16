@@ -1294,7 +1294,7 @@
     "any_permissions": [
       "pi.inbox.reply"
     ],
-    "badge": null,
+    "badge": "pi.open_requests",
     "description": "",
     "enabled": true,
     "environment_scope": null,

@@ -352,6 +352,7 @@ def build_registry() -> NavigationRegistry:
             parent="pi",
             any_permissions=("pi.inbox.reply",),
             required_product="pi",
+            badge="pi.open_requests",
             analytics_id="nav.pi.requests",
         ),
         NavDefinition(

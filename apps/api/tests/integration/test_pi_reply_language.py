@@ -168,7 +168,7 @@ async def test_team_notice_is_in_the_customers_language(api, business_db, monkey
     await pi.deliver_all()
     assert (await pi.conversation()).mode == "ai"
     [notice] = await pi.outbound()
-    assert notice.body.startswith("Noted. Main team se confirm")
+    assert notice.body.startswith("Noted. Team se confirm")
     await pi.close()
 
 

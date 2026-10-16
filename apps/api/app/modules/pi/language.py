@@ -37,6 +37,7 @@ ENGLISH = frozenset(
     is are was were am be been have has had do does did don't i'm it's i've i'll
     i we they he she it this that these those my our their his her its
     want need like know tell help make get give send show please thanks thank hello
+    that's what's it's all everything nothing else sorry okay
     of and for with from about into on at by or but not no yes
     there here some any more much many also just only very really
     """.split()
@@ -94,7 +95,8 @@ def detect_language(text: str | None) -> str | None:
         return "roman_ur"
     if english > urdu:
         return "en"
-    return "roman_ur" if urdu else None
+    # As much English as Urdu ("bas yehi, that's all"): English, the main language.
+    return ("en" if english else "roman_ur") if urdu else None
 
 
 def clearly_other(reply: str, expected: str) -> str | None:
@@ -126,14 +128,14 @@ MEDIA_NOTICES = {
 # pi keeps the chat while the team checks something (no handoff).
 TEAM_CHECK_NOTICES = {
     "en": "Noted. I'm checking this with the team and will confirm here shortly.",
-    "roman_ur": "Noted. Main team se confirm kar ke yahin jaldi batata hoon.",
+    "roman_ur": "Noted. Team se confirm karke yahin jaldi update milega.",
     "ar": "تم. سأتحقق من ذلك مع الفريق وأؤكد لك هنا قريبًا.",
 }
 # A file pi couldn't open: ask for another way, keep the chat.
 MEDIA_UNREADABLE_NOTICES = {
     "en": "Thanks! I couldn't open that file here. Could you describe it in a few words, "
     "or send it as a PDF or a screenshot? I've also passed it to the team.",
-    "roman_ur": "Shukriya! Main yeh file yahan open nahi kar saka. Kya aap thora sa likh kar "
+    "roman_ur": "Shukriya! Yeh file yahan open nahi ho saki. Kya aap thora sa likh kar "
     "bata sakte hain, ya PDF/screenshot bhej dein? Maine team ko bhi bhej di hai.",
     "ar": "شكرًا! لم أتمكن من فتح هذا الملف هنا. هل يمكنك وصفه باختصار أو إرساله كملف PDF "
     "أو لقطة شاشة؟ لقد أرسلته أيضًا إلى الفريق.",

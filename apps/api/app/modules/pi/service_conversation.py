@@ -823,6 +823,13 @@ def allowed_text(context: dict[str, Any] | None) -> list[str]:
     ]
     if account.get("balance") and account["balance"] != "nothing owed":
         books += [part.strip() for part in str(account["balance"]).split(",")]
+    # The proposal and invoice links they already received, with their numbers, so a
+    # resent link is never cut out as "a number".
+    for deal in (context or {}).get("project_deals") or []:
+        for part in str(deal.get("links") or "").split(";"):
+            label, _, link = part.strip().partition(": ")
+            if link:
+                books += [link, label.split(" ")[-1]]
     return offered_labels(context) + customer_figures(context) + arranged + books
 
 
@@ -2785,8 +2792,10 @@ async def customer_account(
     sent = await invoices_sent(session, scope, rows)
     invoices = []
     owed: dict[str, Any] = {}
+    coming = 0
     for invoice in rows:
         if invoice.id not in sent:
+            coming += 1  # Made but not sent yet: the team sends it (never its figures).
             continue
         balance = invoice.total - invoice.amount_paid
         invoices.append(
@@ -2800,10 +2809,15 @@ async def customer_account(
         )
         if balance > 0:
             owed[invoice.currency] = owed.get(invoice.currency, 0) + balance
-    return {
-        "invoices": invoices,
-        "balance": ", ".join(money(v, k) for k, v in owed.items()) or "nothing owed",
-    }
+    balance = ", ".join(money(v, k) for k, v in owed.items()) or "nothing owed"
+    if coming:
+        # "Nothing owed" alone would be wrong: more invoices are on their way.
+        words = {1: "one more invoice is", 2: "two more invoices are", 3: "three more invoices are"}
+        balance += (
+            f" on the invoices sent so far; {words.get(coming, 'more invoices are')} being "
+            "prepared and the team will send them here"
+        )
+    return {"invoices": invoices, "balance": balance}
 
 
 SENT_LINK = re.compile(r"https?://\S+/d/[A-Za-z0-9_-]+")

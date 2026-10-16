@@ -17,14 +17,16 @@ from uuid import UUID
 
 from fastapi import APIRouter, Query, Request
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import func
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.customers.models import Customer
+from app.modules.navigation.service import badge_provider
 from app.modules.notifications.service import notify
-from app.modules.pi.models import PiConversation, PiMessage
+from app.modules.pi.models import PiConversation, PiHandoff, PiMessage
 from app.modules.pi_saas.meetings import MeetingInput
 from app.modules.pi_saas.models import REQUEST_KINDS, PiConversationNote, PiStaffRequest
 from app.shared.errors import BusinessRuleViolation
@@ -475,3 +477,31 @@ async def dismiss_request(request_id: UUID, scope: Scope, session: Session) -> d
         row.status, row.resolved_at = "dismissed", datetime.now(UTC)
     await session.commit()
     return (await view(session, scope, [row]))[0]
+
+
+@badge_provider("pi.open_requests")
+async def open_requests(session: AsyncSession, scope: WorkspaceScope) -> int | None:
+    """What pi is waiting on the team for (the "Requests" nav count)."""
+    if not scope.can("pi.inbox.reply"):
+        return None
+    count = await session.scalar(
+        WorkspaceRepository(session, PiStaffRequest, scope)
+        .select()
+        .with_only_columns(func.count())
+        .where(PiStaffRequest.status == "open")
+    )
+    return int(count or 0) or None
+
+
+@badge_provider("pi.open_handoffs")
+async def open_handoffs(session: AsyncSession, scope: WorkspaceScope) -> int | None:
+    """Chats waiting for a person (the "Handoffs" nav count)."""
+    if not (scope.can("pi.handoffs.manage") or scope.can("pi.inbox.reply")):
+        return None
+    count = await session.scalar(
+        WorkspaceRepository(session, PiHandoff, scope)
+        .select()
+        .with_only_columns(func.count())
+        .where(PiHandoff.status.in_(["open", "assigned", "in_progress"]))
+    )
+    return int(count or 0) or None

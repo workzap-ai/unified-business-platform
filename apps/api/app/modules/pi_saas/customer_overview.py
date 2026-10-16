@@ -272,7 +272,10 @@ async def _projects(session: Any, scope: Any, customer_id: UUID) -> list[dict[st
             item |= {
                 "steps_done": sum(1 for s in steps if s["done"]),
                 "steps_total": len(steps),
-                "current_step": next((s["label"] for s in steps if not s["done"]), "Delivered"),
+                # Where it really is: the last step done ("Next" says what comes after).
+                "current_step": next(
+                    (s["label"] for s in reversed(steps) if s["done"]), steps[0]["label"]
+                ),
                 "next": path["next"],
                 "meeting": path.get("meeting"),
                 # Every step with its date: the "what's been done" view.

@@ -301,7 +301,7 @@ async def test_provider_failure_does_not_invent_a_reply(api, business_db, monkey
     await pi.process("Website chahiye", "provider-down")
     assert (await pi.conversation()).mode == "ai"  # nothing invented; the team is asked
     [notice] = await pi.outbound()
-    assert notice.body.startswith("Noted. Main team se confirm")  # in their language
+    assert notice.body.startswith("Noted. Team se confirm")  # in their language
     desk = (await api.get("/api/v1/pi/requests")).json()["items"]
     assert "provider_failure" in desk[0]["context"]
     await pi.close()
