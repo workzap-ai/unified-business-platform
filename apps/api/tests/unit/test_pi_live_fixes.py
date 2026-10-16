@@ -304,3 +304,70 @@ def test_yes_to_send_sends_and_that_s_all_never_hands_over() -> None:
     closing = ServiceTurn(reply="ok", wants_person=True)
     assert not needs_person(closing, {"latest_customer_message": "Bas yehi, that's all"})
     assert needs_person(ServiceTurn(reply="ok"), {"latest_customer_message": "talk to a human"})
+
+
+def test_a_ready_brief_confirms_the_projects_it_names() -> None:
+    from app.modules.pi.service_conversation import Project, ServiceTurn, confirm_summarised
+
+    turn = ServiceTurn(
+        reply="I'll send the ERP and customer app requirements to the team now.",
+        ready_for_team=True,
+        projects=[
+            Project(title="ERP System for Car Showroom"),
+            Project(title="Customer App"),
+            Project(title="AI Interview Taker Project"),
+        ],
+    )
+    confirm_summarised(turn, {"history": []})
+    status = {p.title: p.status for p in turn.projects}
+    assert status["ERP System for Car Showroom"] == "confirmed"
+    assert status["Customer App"] == "confirmed"
+    assert status["AI Interview Taker Project"] == "collecting"
+
+
+def test_yes_to_a_meeting_question_is_about_the_meeting() -> None:
+    from app.modules.pi.service_conversation import ServiceTurn, meeting_yes
+
+    context = {
+        "latest_customer_message": "yes",
+        "history": [
+            {
+                "role": "ai",
+                "text": "You requested a meeting today at 5 PM. Shall I confirm "
+                "this time with the team?",
+            }
+        ],
+    }
+    turn = ServiceTurn(
+        reply="Your ERP system and customer app requirements will be sent to the team now.",
+        language="en",
+    )
+    meeting_yes(turn, context)
+    assert turn.meeting_requested
+    assert turn.reply.startswith("Done. I've asked the team to confirm that time")
+    other = ServiceTurn(reply="Great.", language="en")
+    meeting_yes(
+        other,
+        {
+            "latest_customer_message": "yes",
+            "history": [{"role": "ai", "text": "Shall I send this to the team?"}],
+        },
+    )
+    assert not other.meeting_requested
+
+
+def test_an_arranged_meeting_survives_a_new_time_request() -> None:
+    from app.modules.pi.service_conversation import ServiceTurn, arranged_meeting, merged_meeting
+
+    booked = {
+        "starts_at": "2026-10-17T16:00",
+        "how": "google_meet",
+        "label": "Saturday 17 October, 04:00 PM",
+        "link": "https://meet.jit.si/pi-meeting-1",
+    }
+    turn = ServiceTurn(reply="ok", meeting_time="2026-10-16T17:00")
+    after = merged_meeting(booked, turn)
+    assert after["link"] == booked["link"] and after["starts_at"] == booked["starts_at"]
+    assert after["change_to"] == "2026-10-16T17:00"
+    assert arranged_meeting({"brief": {"meeting": after}})["label"] == booked["label"]
+    assert merged_meeting(booked, ServiceTurn(reply="ok"))["link"] == booked["link"]

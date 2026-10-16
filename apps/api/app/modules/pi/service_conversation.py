@@ -847,6 +847,20 @@ ARRANGED = re.compile(
 )
 
 
+def merged_meeting(before: dict[str, Any], turn: "ServiceTurn") -> dict[str, Any]:
+    """The chat's meeting after this turn. An arranged meeting (time label and link)
+    is never lost: a different time they ask for is kept as the requested change until
+    the team arranges it."""
+    meeting = dict(before)
+    if before.get("link") and turn.meeting_time and turn.meeting_time != before.get("starts_at"):
+        meeting["change_to"] = turn.meeting_time
+        meeting["change_how"] = turn.meeting_how or str(before.get("how") or "")
+        return meeting
+    meeting["starts_at"] = turn.meeting_time or str(before.get("starts_at") or "")
+    meeting["how"] = turn.meeting_how or str(before.get("how") or "")
+    return meeting
+
+
 def arranged_meeting(context: dict[str, Any] | None) -> dict[str, str]:
     """The meeting the team (or pi) arranged for this chat: its time label and link, from
     the brief, or else from the team's latest "Meeting confirmed" answer. Empty once
@@ -1188,9 +1202,11 @@ CONFIRMED_MEETING = re.compile(
 # A sentence about what the customer's product does ("customers book a test drive
 # appointment, confirmed on WhatsApp"), never about a meeting with pi's team.
 PRODUCT_SENTENCE = re.compile(
-    r"\b(?:customers?|users?|patients?|clients?|buyers?|guests?|students?|members?|staff|"
-    r"visitors?|the app|an app|app will|system|website|platform|portal|software|features?|"
-    r"module|dashboard|booking (?:system|module|feature|page)|online booking)\b",
+    r"\b(?:customers?|users?|patients?|clients?|buyers?|guests?|students?|visitors?)\b"
+    r"[^.!?\n]{0,40}\b(?:can|could|will|would|should|to|book|books|booking|schedule|pick)\b|"
+    r"\b(?:the|an|your|a) (?:app|system|website|platform|portal)\b[^.!?\n]{0,12}"
+    r"\b(?:lets?|allows?|will let|will allow|helps?|enables?)\b|"
+    r"\b(?:booking|appointment) (?:system|module|feature|page|flow)\b|\bonline booking\b",
     re.IGNORECASE,
 )
 
@@ -1488,6 +1504,50 @@ def agreed_to_send(turn: "ServiceTurn", context: dict[str, Any]) -> list[str]:
         and project.get("status") in ("collecting", "awaiting_confirmation")
         and _named(said[-1], str(project["title"]))
     ]
+
+
+def confirm_summarised(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """A brief going to the team carries its projects as confirmed: the ones this reply
+    or pi's last summary names (or, if none is named, the one still being collected).
+    Without this, "ready" with every project still "collecting" sent nothing."""
+    said = [str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "ai"]
+    text = " ".join([turn.reply, *said[-1:]])
+    open_ones = [p for p in turn.projects if p.status in ("collecting", "awaiting_confirmation")]
+    named = [p for p in open_ones if _named(text, p.title)]
+    for project in named or (open_ones[-1:] if len(open_ones) == 1 else []):
+        project.status = "confirmed"
+
+
+MEETING_ASKED = {
+    "en": "Done. I've asked the team to confirm that time; the confirmation and the link "
+    "will come here.",
+    "roman_ur": "Theek hai. Team se yeh waqt confirm karwa rahe hain; confirmation aur link "
+    "yahin aa jayega.",
+    "ar": "تم. طلبت من الفريق تأكيد هذا الموعد، وسيصلك التأكيد والرابط هنا.",
+}
+
+
+def meeting_yes(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """A short yes to pi's own meeting question ("Shall I confirm this time with the
+    team?"): the answer is about that meeting and the request reaches the team, never
+    an unrelated reply (it once repeated the brief line)."""
+    latest = str(context.get("latest_customer_message", ""))
+    if len(latest.split()) > 6 or not AGREES.search(latest) or turn.action == "booking":
+        return
+    said = [str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "ai"]
+    if not said or "?" not in said[-1] or not MEETING_TIME_ASK.search(said[-1]):
+        return
+    turn.meeting_requested = True
+    if not MEETING_WORDS.search(turn.reply):
+        turn.reply = MEETING_ASKED.get(turn.language or "en", MEETING_ASKED["en"])
+
+
+# pi's question about a meeting time ("Shall I confirm this time with the team?").
+MEETING_TIME_ASK = re.compile(
+    r"\b(?:meeting|call|time|slot|appointment|waqt|mulaqat)\b[^?\n]{0,80}\?|"
+    r"\b(?:confirm|book|schedule|arrange)\b[^?\n]{0,40}\b(?:time|meeting|call|slot)\b",
+    re.IGNORECASE,
+)
 
 
 def send_now(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -2317,6 +2377,7 @@ async def compose_service_turn(
     turn._attempts = result.response.attempts
     turn.reply = tidy_list_numbers(turn.reply)
     send_now(turn, context)
+    meeting_yes(turn, context)
     mode = price_policy.price_mode(policy.response_rules, service=True)
     problem = needless_question(turn.reply, context)
     if LATER_PROMISE.search(turn.reply) and any(
@@ -2482,6 +2543,8 @@ async def compose_service_turn(
         # answer goes on the team's request desk (the answer comes back through pi).
         turn.request_human = False
         turn._ask_team = True
+    if turn.ready_for_team and not turn.request_human:
+        confirm_summarised(turn, context)
     # Added last, so a rewrite above can never drop it.
     turn.reply = with_consent_question(turn, context)
     turn.projects = merge_projects((context.get("brief") or {}).get("projects"), turn)
@@ -2558,10 +2621,7 @@ async def save_service_turn(
         "mood": turn.mood,
         "projects": [project.model_dump() for project in turn.projects],
         "meeting_requested": turn.meeting_requested or bool(previous.get("meeting_requested")),
-        "meeting": {
-            "starts_at": turn.meeting_time or (previous.get("meeting") or {}).get("starts_at", ""),
-            "how": turn.meeting_how or (previous.get("meeting") or {}).get("how", ""),
-        },
+        "meeting": merged_meeting(previous.get("meeting") or {}, turn),
         "customer_profile": merge_profile(
             previous.get("customer_profile"), turn.customer_profile.model_dump()
         ),
@@ -2639,8 +2699,10 @@ async def save_service_turn(
         due = await _follow_deal(session, scope, conversation, lead, previous, turn)
         if due is not None:
             proposals_due.append(due)
-    new_time = bool(turn.meeting_time) and turn.meeting_time != (previous.get("meeting") or {}).get(
-        "starts_at"
+    before_meeting = previous.get("meeting") or {}
+    new_time = bool(turn.meeting_time) and turn.meeting_time not in (
+        before_meeting.get("starts_at"),
+        before_meeting.get("change_to"),
     )
     if (
         (turn.meeting_requested or new_time)

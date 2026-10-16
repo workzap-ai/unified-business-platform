@@ -304,7 +304,8 @@ async def auto_arrange(
         row.conversation_id
     )
     meeting = (conversation.service_brief or {}).get("meeting") or {}
-    starts_at = str(meeting.get("starts_at") or "")
+    # A change they asked for after a meeting was arranged is the time to arrange now.
+    starts_at = str(meeting.get("change_to") or meeting.get("starts_at") or "")
     settings_row = await WorkspaceRepository(session, PiSettings, scope).find()
     zone = settings_row.timezone if settings_row else "UTC"
     try:
