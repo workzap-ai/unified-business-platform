@@ -45,6 +45,7 @@ import {
 import { del, errorText, get, post } from "@/lib/api";
 import product from "@/components/product.module.css";
 import { dateTime, timeAgo } from "@/lib/format";
+import { IncomingSoundToggle } from "@/features/incoming-alert";
 import { useAction, useBusinessKey, useCan, useSession } from "@/lib/session";
 import type {
   Conversation,
@@ -137,6 +138,7 @@ export function InboxPage() {
               >
                 Handoffs
               </Link>
+              <IncomingSoundToggle className="me-2" />
               <span>
                 <InboxIcon size={17} aria-hidden />
               </span>

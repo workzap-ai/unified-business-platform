@@ -27,6 +27,7 @@ import * as React from "react";
 
 import { Wordmark } from "@/components/brand";
 import { PiAssistant } from "@/features/assistant";
+import { IncomingMessageAlert } from "@/features/incoming-alert";
 import { NotificationBell } from "@/features/journey";
 import { useOpenRequests } from "@/features/requests";
 import { Badge, Button, ErrorState, Spinner, cn } from "@/components/ui";
@@ -385,6 +386,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             ))}
         </nav>
         <PiAssistant />
+        <IncomingMessageAlert />
       </div>
     </div>
   );

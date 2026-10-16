@@ -21,6 +21,7 @@ import { EnvironmentSwitcher } from "./workspace-switcher";
 import { useAdminAccess } from "@/features/operator/admin-access";
 import { WorkspaceAgentProvider } from "@/features/workspace-agent/workspace-agent";
 import { InstallPrompt } from "@/features/pwa/pwa";
+import { IncomingMessageAlert } from "@/features/pi/workspace/incoming-alert";
 
 const COLLAPSE_KEY = "platform.sidebar.collapsed";
 
@@ -183,6 +184,7 @@ function ShellFrame({ children }: { children: React.ReactNode }) {
         </main>
       </div>
       <InstallPrompt />
+      <IncomingMessageAlert />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import { SearchInput } from "@/components/app/filters";
 import { EmptyState, ErrorState } from "@/components/app/states";
 import { statusLabel } from "@/components/app/status-badge";
 import type { Conversation } from "../types";
+import { IncomingSoundToggle } from "./incoming-alert";
 import { ModeIndicator, TimeAgo, senderPrefix } from "./parts";
 
 export type InboxFilters = {
@@ -93,16 +94,19 @@ export function ConversationList({
       <div className="shrink-0 space-y-2 border-b border-border p-3">
         <div className="flex items-center justify-between gap-2">
           <h1 className="text-[15px] font-semibold tracking-tight">Inbox</h1>
-          {query.data && (
-            <span
-              className="tabular text-xs text-muted-foreground"
-              data-testid="conversation-count"
-            >
-              {query.data.items.length < query.data.total
-                ? `${formatNumber(query.data.items.length)} of ${formatNumber(query.data.total)} conversations`
-                : `${formatNumber(query.data.total)} conversations`}
-            </span>
-          )}
+          <div className="flex items-center gap-1">
+            {query.data && (
+              <span
+                className="tabular text-xs text-muted-foreground"
+                data-testid="conversation-count"
+              >
+                {query.data.items.length < query.data.total
+                  ? `${formatNumber(query.data.items.length)} of ${formatNumber(query.data.total)} conversations`
+                  : `${formatNumber(query.data.total)} conversations`}
+              </span>
+            )}
+            <IncomingSoundToggle />
+          </div>
         </div>
         <SearchInput
           value={filters.search}
