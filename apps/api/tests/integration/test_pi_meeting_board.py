@@ -167,3 +167,38 @@ async def test_a_meeting_within_the_hour_is_reminded_once(api, business_db):
     assert await remind_upcoming(pi.ctx) == 0  # one reminder per meeting
     assert (await _sent(pi, chat))[-1].startswith("Reminder: ")
     await pi.close()
+
+
+async def test_the_team_books_a_meeting_from_the_customer_profile(api, business_db):
+    from test_service_lifecycle import create
+
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    customer_id, conversation = await _customer_in_chat(pi)
+    day = _day(2)
+    booked = await api.post(
+        f"{BOARD}/book",
+        json={
+            "customer_id": customer_id,
+            "starts_at": f"{day}T14:00",
+            "how": "link",
+            "link": "https://zoom.us/j/77",
+            "note": "Logo review",
+        },
+    )
+    assert booked.status_code == 200, booked.text
+    body = booked.json()
+    assert body["conversation_id"] == str(conversation.id) and body["told_customer"] is True
+    assert body["link"] == "https://zoom.us/j/77"
+    jobs = [n for n, _ in pi.app.state.queue.jobs if n == "pi_reply_with_team_answer"]
+    assert jobs  # pi sends the time and link
+    board = (await api.get(BOARD, params={"start": day})).json()
+    [meeting] = board["meetings"]
+    assert meeting["customer_name"] == "Ayesha Khan" and meeting["local"] == f"{day}T14:00"
+
+    # No WhatsApp number: pi can't reach them, so nothing is booked.
+    nobody = await create(api, "customers", {"name": "No Phone"})
+    refused = await api.post(
+        f"{BOARD}/book", json={"customer_id": nobody["id"], "starts_at": f"{day}T15:00"}
+    )
+    assert refused.status_code == 422, refused.text
+    await pi.close()

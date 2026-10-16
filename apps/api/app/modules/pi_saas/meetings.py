@@ -241,7 +241,17 @@ async def _remember_meeting(
     from app.modules.pi.models import PiConversation
 
     conversation = await WorkspaceRepository(session, PiConversation, scope).get(conversation_id)
-    conversation.service_brief = {**(conversation.service_brief or {}), "meeting": meeting}
+    brief = dict(conversation.service_brief or {})
+    before = brief.get("meeting") or {}
+    if (before.get("link") or before.get("place")) and before.get("starts_at") != meeting.get(
+        "starts_at"
+    ):
+        # The meeting it replaces stays in the board's history, never silently lost.
+        past = [m for m in brief.get("meetings_past") or [] if isinstance(m, dict)]
+        replaced = {**before, "status": "cancelled", "outcome": "Replaced by a new time"}
+        brief["meetings_past"] = [*past, replaced][-20:]
+    brief["meeting"] = meeting
+    conversation.service_brief = brief
 
 
 ZONE_NAMES = {"Asia/Karachi": "Pakistan time", "Asia/Dubai": "UAE time"}

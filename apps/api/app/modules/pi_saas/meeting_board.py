@@ -439,6 +439,16 @@ async def _current(
     return conversation, meeting, _zone(zone), zone
 
 
+def moved_message(meeting: dict[str, Any], language: str) -> str:
+    """The new time, word for word, saying plainly that it changed."""
+    text = meeting_message(meeting, language)
+    if language == "roman_ur":
+        return text.replace(
+            "Aap ki meeting confirm ho gayi hai:", "Meeting ka waqt badal gaya hai:", 1
+        )
+    return text.replace("Your meeting is confirmed:", "Meeting time changed:", 1)
+
+
 def _language(conversation: PiConversation) -> str:
     return "roman_ur" if (conversation.language or "") == "roman_ur" else "en"
 
@@ -560,7 +570,7 @@ async def move(
             session,
             scope,
             conversation,
-            meeting_message(meeting, _language(conversation)),
+            moved_message(meeting, _language(conversation)),
             f"pi-meeting-move:{conversation.id}:{data.starts_at}",
         )
     await record(
@@ -820,3 +830,89 @@ async def remind_upcoming(ctx: dict[str, Any]) -> int:
                 continue
         await enqueue_sends(ctx, sends)
     return reminded
+
+
+# ---- book from a customer's profile -----------------------------------------------------
+
+
+class BookInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    customer_id: UUID
+    starts_at: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$")  # business time
+    duration_minutes: int = Field(default=30, ge=10, le=480)
+    how: Literal["google_meet", "video", "link", "in_person"] = "google_meet"
+    link: str = Field(default="", max_length=500)
+    place: str = Field(default="", max_length=300)
+    note: str = Field(default="", max_length=1000)  # what it's about, told to the customer
+
+
+@router.post("/book")
+async def book(data: BookInput, request: Request, scope: Scope, session: Session) -> dict[str, Any]:
+    """The team books a meeting for any customer (from their profile): pi makes the
+    link (Google Meet, its own video link, theirs, or a place), the meeting goes on the
+    board, and pi sends the customer the time and link on WhatsApp in their language."""
+    from app.modules.pi_saas.deals import _contact, _conversation
+    from app.modules.pi_saas.meetings import MeetingInput, arrange, runtime_for
+    from app.modules.pi_saas.requests import enqueue_reply, raise_request
+
+    await require_pi(session, scope, "pi.inbox.reply")
+    customer = await WorkspaceRepository(session, Customer, scope).get(data.customer_id)
+    conversation = await session.scalar(
+        WorkspaceRepository(session, PiConversation, scope)
+        .select()
+        .where(PiConversation.customer_id == customer.id, PiConversation.status == "open")
+        .order_by(PiConversation.last_message_at.desc().nulls_last())
+        .limit(1)
+    )
+    if conversation is None:
+        contact = _contact(customer)
+        conversation = await _conversation(session, scope, customer, contact) if contact else None
+    if conversation is None:
+        raise BusinessRuleViolation(
+            "NO_WHATSAPP",
+            "This customer has no WhatsApp number (or WhatsApp isn't connected), so pi "
+            "can't send them the meeting. Add their number first.",
+        )
+    if conversation.customer_id is None:
+        conversation.customer_id = customer.id
+    who = scope.actor_label or "The team"
+    row = await raise_request(
+        session,
+        scope,
+        conversation_id=conversation.id,
+        customer_id=customer.id,
+        kind="meeting",
+        question=f"{who} booked a meeting from the customer page."
+        + (f" About: {data.note}" if data.note else ""),
+        title="Meeting booked by the team",
+    )
+    await session.flush()
+    row = await arrange(
+        session,
+        scope,
+        runtime_for(request),
+        row.id,
+        MeetingInput(**data.model_dump(exclude={"customer_id"})),
+        max_bytes=request.app.state.settings.knowledge_upload_max_bytes,
+    )
+    window = conversation.last_inbound_at is not None and (
+        conversation.last_inbound_at > datetime.now(UTC) - WINDOW
+    )
+    await record(
+        session,
+        "pi.meeting_booked",
+        scope=scope,
+        entity_type="customer",
+        entity_id=customer.id,
+        details={"starts_at": data.starts_at, "how": data.how},
+    )
+    await session.commit()
+    await enqueue_reply(request, row.id)  # pi sends the time and link word for word
+    meeting = (conversation.service_brief or {}).get("meeting") or {}
+    return {
+        "ok": True,
+        "conversation_id": conversation.id,
+        "label": meeting.get("label"),
+        "link": meeting.get("link") or "",
+        "told_customer": window,
+    }

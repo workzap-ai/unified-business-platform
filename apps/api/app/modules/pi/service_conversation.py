@@ -1211,6 +1211,24 @@ PRODUCT_SENTENCE = re.compile(
 )
 
 
+def claims_other_meeting(reply: str, arranged: str) -> bool:
+    """A "meeting is confirmed" sentence about a time other than the one arranged
+    ("Friday 16 October, 05:00 PM"): e.g. "confirmed for tomorrow at 3 PM"."""
+    found = re.match(r"(\w+)\s.*?(\d{1,2}):(\d{2})\s*([AP]M)", arranged, re.IGNORECASE)
+    if not found:
+        return False
+    weekday, hour, minutes, half = found.groups()
+    same_time = re.compile(
+        rf"\b0?{int(hour)}(?::{minutes})?\s*{half}\b|\b{weekday}\b", re.IGNORECASE
+    )
+    return any(
+        CONFIRMED_MEETING.search(part)
+        and not PRODUCT_SENTENCE.search(part)
+        and not same_time.search(part)
+        for part in re.split(r"(?<=[.!?])\s+|\n", reply)
+    )
+
+
 def claims_meeting(reply: str) -> bool:
     """A sentence saying pi's meeting with them is confirmed or booked (sentences that
     describe the product they want built don't count)."""
@@ -1247,6 +1265,12 @@ def invented(reply: str, context: dict[str, Any], booked: bool = False) -> str:
         return (
             "it says the meeting is confirmed or booked, but nothing booked it and the team "
             "has not sent a time; say the team will confirm the time and send the link here"
+        )
+    arranged = str(arranged_meeting(context).get("label") or "")
+    if not booked and arranged and claims_other_meeting(reply, arranged):
+        return (
+            f"only the meeting on {arranged} is confirmed; a new time they ask for is not "
+            "booked yet: say the team will confirm it and send the link here"
         )
     return ""
 
@@ -1487,10 +1511,36 @@ BRIEF_SENT = {
 }
 
 
+# "Send it to the team" / "team ko bhej do": an explicit go-ahead, no question needed.
+SEND_TO_TEAM = re.compile(
+    r"\b(?:send|forward|pass|share|bhej\w*)\b[^.?\n]{0,40}\bteam\b|\bteam ko bhej",
+    re.IGNORECASE,
+)
+
+
+THEIR_TEAM = re.compile(r"(?:my|our|meri|hamari|apni) team", re.IGNORECASE)
+
+
 def agreed_to_send(turn: "ServiceTurn", context: dict[str, Any]) -> list[str]:
     """pi's last message asked whether to send the brief to the team and their answer is
     a short yes: the titles of the projects that summary named (still being collected)."""
     latest = str(context.get("latest_customer_message", ""))
+    projects = [
+        p
+        for p in (context.get("brief") or {}).get("projects") or []
+        if isinstance(p, dict)
+        and p.get("title")
+        and p.get("status") in ("collecting", "awaiting_confirmation")
+    ]
+    if (
+        not turn.ready_for_team
+        and SEND_TO_TEAM.search(latest)
+        and not THEIR_TEAM.search(latest)
+        and projects
+    ):
+        # "Please send it to the team": the projects they name, or the one being discussed.
+        named = [str(p["title"]) for p in projects if _named(latest, str(p["title"]))]
+        return named or [str(projects[-1]["title"])]
     if turn.ready_for_team or len(latest.split()) > 6 or not AGREES.search(latest):
         return []
     said = [str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "ai"]
@@ -2089,6 +2139,14 @@ def too_long(reply: str, context: dict[str, Any]) -> str | None:
     return None
 
 
+# "That's everything" (not a plain "ok" or "thanks"): the brief is complete.
+DONE_WORDS = re.compile(
+    r"\b(?:that'?s (?:all|it|everything)|nothing (?:else|more)|no more|bas|bs|itna hi|"
+    r"yahi|yehi|ye ?hi|done|kuch nahi|kch nh)\b",
+    re.IGNORECASE,
+)
+
+
 def needless_question(reply: str, context: dict[str, Any]) -> str | None:
     """Why a drafted reply must not be sent as is, or None. Deterministic, so the model
     can't talk its way past it: a first reply that hides it's an AI, a brief repeated after
@@ -2101,10 +2159,24 @@ def needless_question(reply: str, context: dict[str, Any]) -> str | None:
         return "it uses a gendered verb for yourself; use neutral phrasing like 'note kar liya hai'"
     latest = str(context.get("latest_customer_message", ""))
     bullets = [line for line in reply.splitlines() if line.strip().startswith("•")]
-    if bullets and len(latest) <= 40 and CLOSING.match(latest):
+    brief = context.get("brief") or {}
+    projects = [p for p in brief.get("projects") or [] if isinstance(p, dict)]
+    # The newest project still being talked through isn't confirmed by an older brief.
+    newest_open = bool(projects) and projects[-1].get("status") in (
+        "collecting",
+        "awaiting_confirmation",
+    )
+    if bullets and len(latest) <= 40 and CLOSING.match(latest) and not newest_open:
         for earlier in asked[-2:]:
             if sum(line.strip() in earlier for line in bullets) >= max(1, len(bullets) // 2):
                 return "you already confirmed this brief; don't repeat the list"
+    closing = len(latest) <= 40 and bool(CLOSING.match(latest))
+    if closing and DONE_WORDS.search(latest) and newest_open and not ASKS_SEND.search(reply):
+        return (
+            f'they said that\'s everything for "{projects[-1].get("title")}": sum it up in short '
+            "'• ' points from its details and ask whether to send it to the team (set "
+            "awaiting_customer=true); never a vague 'your projects are in progress'"
+        )
     if reply.count("?") >= 3:
         return "it asks more than two questions; keep only the one or two most important"
     if "?" not in reply:
@@ -2116,8 +2188,7 @@ def needless_question(reply: str, context: dict[str, Any]) -> str | None:
         other = _words(earlier)
         if words and other and len(words & other) / len(words | other) >= 0.45:
             return "it asks again what you already asked earlier in this chat"
-    closing = len(latest) <= 40 and bool(CLOSING.match(latest))
-    if closing and (context.get("brief") or {}).get("ready_for_team"):
+    if closing and brief.get("ready_for_team") and not newest_open:
         return (
             "the brief is already confirmed and the customer has nothing to add; don't ask "
             "anything, say in one short line what happens next"

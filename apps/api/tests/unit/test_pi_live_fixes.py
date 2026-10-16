@@ -381,3 +381,58 @@ def test_describing_a_product_never_hands_over() -> None:
     assert not needs_person(guessed, {"latest_customer_message": feature})
     assert needs_person(guessed, {"latest_customer_message": "Quiero hablar con alguien"})
     assert needs_person(guessed, {"latest_customer_message": "kisi se baat karwa do"})
+
+
+def test_that_s_all_for_a_new_project_sums_it_up_even_after_an_older_brief() -> None:
+    from app.modules.pi.service_conversation import needless_question
+
+    context = {
+        "latest_customer_message": "Bas yehi, that's all",
+        "history": [{"role": "ai", "text": "Anything specific about the dashboard?"}],
+        "brief": {
+            "ready_for_team": True,  # from an earlier, other project
+            "projects": [
+                {"title": "ERP System", "status": "confirmed"},
+                {"title": "Dental Clinic Appointment App", "status": "collecting"},
+            ],
+        },
+    }
+    problem = needless_question("Got it. Your projects are in progress.", context)
+    assert problem and "Dental Clinic Appointment App" in problem
+
+
+def test_send_it_to_the_team_sends_without_asking_again() -> None:
+    from app.modules.pi.service_conversation import ServiceTurn, send_now
+
+    context = {
+        "latest_customer_message": "please summarise the clinic app and send it to the team",
+        "history": [{"role": "ai", "text": "Got it, noted."}],
+        "brief": {
+            "projects": [
+                {"title": "AI Interview Taker Project", "status": "collecting"},
+                {"title": "Dental Clinic Appointment App", "status": "collecting"},
+            ]
+        },
+    }
+    turn = ServiceTurn(reply="Here's the summary... Shall I send this to the team?", language="en")
+    send_now(turn, context)
+    assert turn.ready_for_team
+    assert [p.title for p in turn.projects if p.status == "confirmed"] == [
+        "Dental Clinic Appointment App"
+    ]
+
+
+def test_only_the_arranged_meeting_can_be_called_confirmed() -> None:
+    from app.modules.pi.service_conversation import invented
+
+    context = {
+        "brief": {
+            "meeting": {
+                "label": "Friday 16 October, 05:00 PM",
+                "link": "https://meet.jit.si/pi-meeting-1",
+            }
+        },
+        "team_notes": [{"note": "Meeting confirmed by the team: Friday 16 October, 05:00 PM"}],
+    }
+    assert invented("Your meeting is confirmed for tomorrow at 3 PM.", context)
+    assert invented("Your meeting is confirmed for Friday at 5 PM.", context) == ""
