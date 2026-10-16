@@ -165,3 +165,25 @@ def test_mixed_english_and_roman_urdu_is_english() -> None:
     assert detect_language("Bas yehi, that's all") == "en"
     assert detect_language("website design chahiye") == "roman_ur"
     assert "batata hoon" not in TEAM_CHECK_NOTICES["roman_ur"]
+
+
+def test_no_send_offer_before_any_detail() -> None:
+    from app.modules.pi.service_conversation import (
+        STATUS_HEADER,
+        Project,
+        ServiceTurn,
+        asks_too_early,
+    )
+
+    turn = ServiceTurn(
+        reply="Noted. You want:\n• A website for your car showroom\nShall I send this to the team?",
+        projects=[Project(title="Website for Car Showroom")],
+    )
+    context = {"latest_customer_message": "I need a website for my car showroom"}
+    assert asks_too_early(turn, context)
+    turn.projects[0].features = ["cars with prices", "test drive booking"]
+    assert asks_too_early(turn, context) is None
+    turn.projects[0].features = []
+    assert asks_too_early(turn, {"latest_customer_message": "bas yehi, that's all"}) is None
+    reply = "Here's the current status of your projects:\n\n• Website: collecting details"
+    assert STATUS_HEADER.sub("", reply, count=1) == "• Website: collecting details"

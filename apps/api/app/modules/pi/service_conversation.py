@@ -1526,6 +1526,36 @@ RESEND_ASK = re.compile(
 )
 
 
+def asks_too_early(turn: "ServiceTurn", context: dict[str, Any]) -> str | None:
+    """Asking "Shall I send this to the team?" while pi knows only a project's name: understand
+    what they need first (one or two short questions), then offer to send."""
+    if not ASKS_SEND.search(turn.reply):
+        return None
+    if AGREES.search(str(context.get("latest_customer_message", ""))):
+        return None
+    bare = [
+        p.title
+        for p in turn.projects
+        if p.status in ("collecting", "awaiting_confirmation")
+        and not p.features
+        and len(p.details) < 60
+    ]
+    if not bare:
+        return None
+    return (
+        f"you only know the name of {', '.join(bare[:3])}: don't offer to send it to the "
+        "team yet; ask one or two short questions about what it must do or who it is for"
+    )
+
+
+# The opening line of an unasked status list, removed if a rewrite still writes one.
+STATUS_HEADER = re.compile(
+    r"^[^\n]*\b(?:here(?:'|’)?s (?:the|where) (?:current )?status|status of (?:your|all your|"
+    r"each) projects?)\b[^\n]*\n+",
+    re.IGNORECASE,
+)
+
+
 def link_not_resent(reply: str, context: dict[str, Any]) -> str | None:
     """They asked for a document again and pi answered without its link."""
     latest = str(context.get("latest_customer_message", ""))
@@ -2071,6 +2101,8 @@ async def compose_service_turn(
         problem = f"{vague}, and also: {problem}" if problem else vague
     if wordy := wordy_status(turn.reply):
         problem = f"{wordy}, and also: {problem}" if problem else wordy
+    if early_ask := asks_too_early(turn, context):
+        problem = f"{early_ask}, and also: {problem}" if problem else early_ask
     if again := repeats_itself(turn.reply, context):
         problem = f"{again}, and also: {problem}" if problem else again
     if unasked := unasked_status(turn.reply, context):
@@ -2123,7 +2155,11 @@ async def compose_service_turn(
                 Message.assistant(json.dumps({"reply": turn.reply}, ensure_ascii=False)),
                 Message.user(
                     f"Don't send that draft: {problem}. Rewrite the whole result and fix "
-                    "that. For a status question, cover each requested project's status "
+                    "that. If their latest message gives details or changes a project, "
+                    "never list project statuses: repeat what they asked for in short '• ' "
+                    "points (with the details they just gave) and ask the one thing still "
+                    "needed or whether that is everything. "
+                    "Only for a status question, cover each requested project's status "
                     "and next step from project_deals. Otherwise, if the brief was already "
                     "confirmed, answer in one short line "
                     "with what happens next. If the brief is complete but not yet "
@@ -2142,6 +2178,9 @@ async def compose_service_turn(
         if invented(turn.reply, context, turn.action == "booking"):
             # Still made up after the rewrite: never sent (pi asks the team instead).
             raise ReplyRejected("INVENTED_DETAIL")
+        if unasked_status(turn.reply, context):
+            # Still opens with a status list nobody asked for: drop that opening line.
+            turn.reply = STATUS_HEADER.sub("", turn.reply.lstrip(), count=1) or turn.reply
         if link_not_resent(turn.reply, context):
             # Still no link for "send it again": add the links they already received.
             sent = [
