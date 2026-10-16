@@ -155,6 +155,13 @@ export function RequestsPage() {
       <PageHeader
         title="Requests"
         description="What pi asked your team. Answer here and pi replies to the customer itself, in their language. Your answer isn't sent word for word."
+        action={
+          <Button asChild variant="secondary">
+            <Link href="/meetings">
+              <CalendarClock className="size-4" aria-hidden /> Meetings
+            </Link>
+          </Button>
+        }
       />
       <div
         className="mb-4 flex w-full gap-1 rounded-lg border border-border bg-surface p-1 sm:w-fit"

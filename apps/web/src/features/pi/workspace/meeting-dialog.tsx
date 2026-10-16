@@ -26,13 +26,19 @@ export function MeetingDialog({
   request,
   googleMeet,
   onClose,
+  initialStartsAt,
 }: {
-  request: PiRequest | null;
+  request: Pick<PiRequest, "id" | "question"> | null;
   googleMeet: boolean;
   onClose: () => void;
+  /** Prefill the date and time ("YYYY-MM-DDTHH:MM", business time). */
+  initialStartsAt?: string | null;
 }) {
-  const [date, setDate] = useState(tomorrow());
-  const [time, setTime] = useState("17:00");
+  const preset = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(initialStartsAt ?? "")
+    ? initialStartsAt!
+    : null;
+  const [date, setDate] = useState(preset ? preset.slice(0, 10) : tomorrow());
+  const [time, setTime] = useState(preset ? preset.slice(11, 16) : "17:00");
   const [duration, setDuration] = useState("30");
   const [how, setHow] = useState<How>(googleMeet ? "google_meet" : "video");
   const [link, setLink] = useState("");
@@ -49,7 +55,7 @@ export function MeetingDialog({
         note: note.trim(),
       }),
     {
-      invalidate: [["pi", "requests"], ["pi"]],
+      invalidate: [["pi", "requests"], ["pi", "meetings"], ["pi"]],
       success:
         "Meeting arranged. pi is sending the time and link to the customer.",
       onSuccess: () => onClose(),

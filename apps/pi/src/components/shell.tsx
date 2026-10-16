@@ -6,6 +6,7 @@ import {
   Layers,
   Bot,
   ArrowUpRight,
+  CalendarClock,
   Check,
   ChevronRight,
   ChevronsUpDown,
@@ -57,6 +58,14 @@ const NAV: {
     href: "/requests",
     label: "Requests",
     icon: MessageCircleQuestion,
+    mobile: false,
+    permission: "pi.read",
+  },
+  // Desktop sidebar; phones reach the meetings board from Requests.
+  {
+    href: "/meetings",
+    label: "Meetings",
+    icon: CalendarClock,
     mobile: false,
     permission: "pi.read",
   },

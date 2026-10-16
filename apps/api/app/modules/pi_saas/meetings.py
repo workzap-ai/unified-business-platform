@@ -183,9 +183,12 @@ async def arrange(
     when = f"{start:%A %d %B, %I:%M %p} ({zone}), {data.duration_minutes} minutes"
     how = data.how
     joined = ""  # the link the customer joins with
+    event_id = ""  # the Google Calendar event, so the board can move or cancel it
     if how == "google_meet":
         try:
-            link, _ = await _google_meet(session, scope, runtime, row, customer, start, end, zone)
+            link, event_id = await _google_meet(
+                session, scope, runtime, row, customer, start, end, zone
+            )
             where, joined = f"on Google Meet: {link}", link
         except BusinessRuleViolation as error:
             if error.code not in CALENDAR_PROBLEMS:
@@ -225,6 +228,7 @@ async def arrange(
             "link": joined,
             "place": data.place if how == "in_person" else "",
             "note": data.note,
+            "event_id": event_id if how == "google_meet" else "",
         },
     )
     return await answer(session, scope, row.id, text, save_as_knowledge=False, max_bytes=max_bytes)

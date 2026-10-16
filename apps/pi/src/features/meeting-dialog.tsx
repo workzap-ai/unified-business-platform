@@ -31,14 +31,20 @@ export function MeetingDialog({
   question,
   googleMeet,
   onClose,
+  initialStartsAt,
 }: {
   requestId: string | null;
   question: string;
   googleMeet: boolean;
   onClose: () => void;
+  /** A time to start from, "YYYY-MM-DDTHH:MM" in business time (the meetings board). */
+  initialStartsAt?: string;
 }) {
-  const [date, setDate] = React.useState(tomorrow());
-  const [time, setTime] = React.useState("17:00");
+  const prefill = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(initialStartsAt ?? "")
+    ? initialStartsAt
+    : undefined;
+  const [date, setDate] = React.useState(prefill?.slice(0, 10) ?? tomorrow());
+  const [time, setTime] = React.useState(prefill?.slice(11, 16) ?? "17:00");
   const [duration, setDuration] = React.useState("30");
   const [how, setHow] = React.useState<How>(
     googleMeet ? "google_meet" : "video",
@@ -59,7 +65,7 @@ export function MeetingDialog({
     {
       success:
         "Meeting arranged. pi is sending the time and link to the customer.",
-      invalidate: [["requests"], ["conversations"], ["home"]],
+      invalidate: [["requests"], ["conversations"], ["home"], ["meetings"]],
       onSuccess: () => onClose(),
     },
   );

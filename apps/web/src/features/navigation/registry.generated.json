@@ -1266,6 +1266,30 @@
     "visible": true
   },
   {
+    "analytics_id": "nav.pi.meetings",
+    "any_permissions": [],
+    "badge": "pi.meetings_today",
+    "description": "",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "calendar-clock",
+    "key": "pi-meetings",
+    "keywords": [],
+    "label": "Meetings",
+    "parent": "pi",
+    "required_feature": null,
+    "required_permissions": [
+      "pi.read"
+    ],
+    "required_product": "pi",
+    "required_roles": [],
+    "route": "/pi/meetings",
+    "section": "main",
+    "sort_order": 66,
+    "type": "page",
+    "visible": true
+  },
+  {
     "analytics_id": "nav.pi.overview",
     "any_permissions": [],
     "badge": null,

@@ -71,6 +71,7 @@ from app.modules.pi_saas.digest_routes import operator_router as pi_operator_dig
 from app.modules.pi_saas.digest_routes import router as pi_digest_router
 from app.modules.pi_saas.health_routes import router as pi_health_router
 from app.modules.pi_saas.insights_routes import router as pi_insights_router
+from app.modules.pi_saas.meeting_board import router as pi_meeting_board_router
 from app.modules.pi_saas.operator_number_routes import router as pi_operator_number_router
 from app.modules.pi_saas.operator_routes import router as pi_operator_router
 from app.modules.pi_saas.operator_system_routes import router as pi_operator_system_router
@@ -108,6 +109,7 @@ ROUTERS = [
     pi_inbox_router,
     pi_work_router,
     pi_team_board_router,
+    pi_meeting_board_router,
     pi_customer_payment_router,
     pi_deals_router,
     payment_link_router,
@@ -190,6 +192,7 @@ PI_APP_ROUTERS = [
     pi_inbox_router,
     pi_work_router,
     pi_team_board_router,
+    pi_meeting_board_router,
     pi_customer_payment_router,
     pi_deals_router,
     payment_link_router,
