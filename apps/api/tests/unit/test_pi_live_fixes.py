@@ -187,3 +187,17 @@ def test_no_send_offer_before_any_detail() -> None:
     assert asks_too_early(turn, {"latest_customer_message": "bas yehi, that's all"}) is None
     reply = "Here's the current status of your projects:\n\n• Website: collecting details"
     assert STATUS_HEADER.sub("", reply, count=1) == "• Website: collecting details"
+
+
+def test_that_s_all_never_gets_anything_else() -> None:
+    from app.modules.pi.service_conversation import ServiceTurn, without_open_question
+
+    turn = ServiceTurn(
+        reply="Got it. You want:\n• A website\n• A mobile app\n\n"
+        "Is there anything else you want to add?",
+        language="en",
+    )
+    reply = without_open_question(turn, {"latest_customer_message": "Bas yehi, that's all"})
+    assert "anything else" not in reply
+    assert reply.endswith("Shall I send this to the team so they can prepare your proposal?")
+    assert "• A mobile app" in reply and turn.awaiting_customer

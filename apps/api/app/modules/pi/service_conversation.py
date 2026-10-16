@@ -1330,6 +1330,27 @@ def with_consent_question(turn: ServiceTurn, context: dict[str, Any]) -> str:
     return f"{turn.reply.rstrip()}\n\n{question}"
 
 
+# After "that's all": the one question left is whether the brief may go to the team.
+SEND_QUESTION = {
+    "en": "Shall I send this to the team so they can prepare your proposal?",
+    "roman_ur": "Kya yeh team ko bhej doon taake woh aap ka proposal tayyar karein?",
+    "ar": "هل أرسل هذا إلى الفريق لإعداد عرضك؟",
+}
+LAST_QUESTION = re.compile(r"[^.!?\n]*\?\s*$")
+
+
+def without_open_question(turn: "ServiceTurn", context: dict[str, Any]) -> str:
+    """They said they have nothing to add, and the reply still ends with "anything
+    else?": end with the question that moves the brief on instead."""
+    latest = str(context.get("latest_customer_message", ""))
+    closing = len(latest) <= 40 and bool(CLOSING.match(latest))
+    if not closing or turn.ready_for_team or not OPEN_ENDED.search(turn.reply[-240:]):
+        return turn.reply
+    question = SEND_QUESTION.get(turn.language or "en", SEND_QUESTION["en"])
+    turn.awaiting_customer = True
+    return f"{LAST_QUESTION.sub('', turn.reply).rstrip()}\n\n{question}"
+
+
 # "I've sent it to the team" and "Shall I send it to the team?" in one reply.
 SAYS_SENT = re.compile(
     r"\b(?:sent|passed|forwarded|shared) (?:this |it |the brief |your brief )?(?:on )?to the "
@@ -2158,7 +2179,8 @@ async def compose_service_turn(
                     "that. If their latest message gives details or changes a project, "
                     "never list project statuses: repeat what they asked for in short '• ' "
                     "points (with the details they just gave) and ask the one thing still "
-                    "needed or whether that is everything. "
+                    "needed or whether that is everything; list every project they "
+                    "described in these last messages, never drop one. "
                     "Only for a status question, cover each requested project's status "
                     "and next step from project_deals. Otherwise, if the brief was already "
                     "confirmed, answer in one short line "
@@ -2178,6 +2200,7 @@ async def compose_service_turn(
         if invented(turn.reply, context, turn.action == "booking"):
             # Still made up after the rewrite: never sent (pi asks the team instead).
             raise ReplyRejected("INVENTED_DETAIL")
+        turn.reply = without_open_question(turn, context)
         if unasked_status(turn.reply, context):
             # Still opens with a status list nobody asked for: drop that opening line.
             turn.reply = STATUS_HEADER.sub("", turn.reply.lstrip(), count=1) or turn.reply
@@ -2848,15 +2871,15 @@ async def customer_account(
         )
         if balance > 0:
             owed[invoice.currency] = owed.get(invoice.currency, 0) + balance
-    balance = ", ".join(money(v, k) for k, v in owed.items()) or "nothing owed"
+    total_owed = ", ".join(money(v, k) for k, v in owed.items()) or "nothing owed"
     if coming:
         # "Nothing owed" alone would be wrong: more invoices are on their way.
         words = {1: "one more invoice is", 2: "two more invoices are", 3: "three more invoices are"}
-        balance += (
+        total_owed += (
             f" on the invoices sent so far; {words.get(coming, 'more invoices are')} being "
             "prepared and the team will send them here"
         )
-    return {"invoices": invoices, "balance": balance}
+    return {"invoices": invoices, "balance": total_owed}
 
 
 SENT_LINK = re.compile(r"https?://\S+/d/[A-Za-z0-9_-]+")
