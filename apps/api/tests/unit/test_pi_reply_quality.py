@@ -460,3 +460,31 @@ def test_status_answers_distinguish_similar_projects_and_recognize_short_names()
         )
         is None
     )
+
+
+async def test_a_balance_answer_says_more_invoices_are_coming():
+    complete = AsyncMock(
+        return_value=SimpleNamespace(
+            value=ServiceTurn(reply="Your invoice INV-000003 is paid, and nothing is owed."),
+            response=SimpleNamespace(attempts=[]),
+        )
+    )
+    result = await compose_service_turn(
+        SimpleNamespace(complete_structured=complete),
+        WorkspaceScope.system(uuid4(), uuid4(), frozenset(), "PI"),
+        PiConversation(id=uuid4()),
+        PiSettings(ai_config={}, response_rules={}),
+        {
+            "latest_customer_message": "Is my invoice paid? What's my balance?",
+            "latest_message_kind": "text",
+            "reply_language": "en",
+            "history": [],
+            "account": {
+                "invoices": [{"number": "INV-000003", "status": "paid", "total": "USD 2,500.00"}],
+                "balance": "nothing owed on the invoices sent so far",
+                "invoices_coming": 2,
+            },
+        },
+    )
+    assert result.reply.endswith("the team will send them here.")
+    assert "INV-000003" in result.reply

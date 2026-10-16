@@ -353,8 +353,11 @@ business's language and knowledge passages. Without it, reply in the customer's 
 language and writing style, including English, Roman Urdu, code switching and any other
 language. When the customer writes Urdu or
 Hindi in Urdu (Arabic) or Devanagari script, reply in Roman Urdu/Hindi written in
-English letters (e.g. "Ji bilkul, main note kar leta hoon.") and set
-language="roman_ur". Use simple everyday words they would use themselves.
+English letters (e.g. "Ji bilkul, note kar liya.") and set
+language="roman_ur". Use simple everyday words they would use themselves: in Roman Urdu
+keep the English business words people really use on WhatsApp (proposal, invoice,
+brief, price, payment, website, app, team, update, meeting), never formal Urdu for them
+("tajwez", "khulasah", "daam", "raqam").
 Reply style (pi brand: steady, plain, honest; WhatsApp, easy to read):
 - Answer first: deal with the customer's LATEST message. Use their own words for their
   request. Usually 1-4 short sentences; longer only when they ask for detail.
@@ -708,7 +711,8 @@ Proposals:
   line per project, keeping its project name, with its status and its next step in a few
   words (e.g. "• Website:
   paid, the work is in progress"). Exactly that shape: no "Status:" or "Next step:"
-  labels, no sub-points, no bold, at most five lines (the ones they asked about first).
+  labels, no sub-points, no bold, at most five lines (the ones they asked about first,
+  otherwise in project_deals' order: the newest first).
   If they name a proposal or invoice number, answer that one from project_deals'
   "documents" (repeat the number only because they wrote it). Asked to send a
   proposal or invoice again ("send it again", "link missing", "dobara bhejo"), send its
@@ -1397,6 +1401,18 @@ def repeats_itself(reply: str, context: dict[str, Any]) -> str | None:
     return None
 
 
+# Invoice / balance questions, and a reply that already says more invoices are coming.
+BALANCE_ASK = re.compile(
+    r"\b(?:invoices?|balance|owe|owed|due|outstanding|payment|paid|bill|baqaya|baqi|"
+    r"kitna dena|paise)\b",
+    re.IGNORECASE,
+)
+COMING_SAID = re.compile(r"\bmore invoices?\b|\binvoices? (?:is|are) being prepared\b", re.I)
+INVOICES_COMING = {
+    "en": "Your other invoices are being prepared, and the team will send them here.",
+    "roman_ur": "Aap ki baqi invoices tayyar ho rahi hain, team unhein yahin bhej degi.",
+    "ar": "فواتيرك الأخرى قيد الإعداد، وسيرسلها الفريق هنا.",
+}
 DOCS_AGAIN = {
     "en": "Here are your documents again:",
     "roman_ur": "Yeh rahe aap ke documents dobara:",
@@ -1723,6 +1739,8 @@ def polished(reply: str) -> str:
     if OWN_VIDEO_LINK.search(reply) and "meet.google.com" not in reply:
         reply = GOOGLE_MEET_WORDS.sub("video call", reply)
     reply = reply.replace("**", "*")
+    # A status line's project name is plain ("• Website: ..."), never bold.
+    reply = re.sub(r"^• \*([^*\n]+)\*:", r"• \1:", reply, flags=re.MULTILINE)
     links = URL_PART.findall(reply)
     text = URL_PART.sub("\x00", reply)
     text = re.sub(r"!+(?=\s|$)", ".", text)
@@ -2352,6 +2370,11 @@ async def compose_service_turn(
         allowed,
     )
     latest = str(context["latest_customer_message"])
+    coming = int((context.get("account") or {}).get("invoices_coming") or 0)
+    if coming and BALANCE_ASK.search(latest) and not COMING_SAID.search(turn.reply):
+        # "Nothing owed" alone is wrong while invoices are still to be sent.
+        line = INVOICES_COMING.get(turn.language or "en", INVOICES_COMING["en"])
+        turn.reply = f"{turn.reply.rstrip()}\n\n{line}"
     meeting = arranged_meeting(context)
     if meeting.get("link") and MEETING_LINK.search(latest) and meeting["link"] not in turn.reply:
         # They asked for the meeting link: it is always in the answer, exactly.
@@ -2965,7 +2988,7 @@ async def customer_account(
             f" on the invoices sent so far; {words.get(coming, 'more invoices are')} being "
             "prepared and the team will send them here"
         )
-    return {"invoices": invoices, "balance": total_owed}
+    return {"invoices": invoices, "balance": total_owed, "invoices_coming": coming}
 
 
 SENT_LINK = re.compile(r"https?://\S+/d/[A-Za-z0-9_-]+")
