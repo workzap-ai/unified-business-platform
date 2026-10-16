@@ -214,12 +214,15 @@ def project_notes(requirements: dict[str, Any]) -> dict[str, Any]:
     return notes
 
 
-def _documents_for(title: str, documents: list[dict[str, Any]]) -> list[dict[str, str]]:
-    """The documents the customer sent for this project (by title words)."""
+def _documents_for(
+    title: str, documents: list[dict[str, Any]], only_project: bool = False
+) -> list[dict[str, str]]:
+    """The documents the customer sent for this project (by title words; every document
+    when it is their only project)."""
     return [
         {"file_id": str(d["file_id"]), "name": str(d.get("name") or "Document")}
         for d in documents
-        if d.get("file_id") and (_same(title, str(d.get("title") or "")) or len(documents) == 1)
+        if d.get("file_id") and (only_project or _same(title, str(d.get("title") or "")))
     ][:5]
 
 
@@ -259,7 +262,7 @@ async def _projects(session: Any, scope: Any, customer_id: UUID) -> list[dict[st
             "created_at": lead.created_at,
             "service": str((lead.requirements or {}).get("service") or ""),
             "scope": str((lead.requirements or {}).get("scope") or "")[:300],
-            "documents": _documents_for(lead.title, documents),
+            "documents": _documents_for(lead.title, documents, len(leads) == 1),
             "notes": project_notes(lead.requirements or {}),
             "feedback": [f for f in feedback if _same(lead.title, str(f.get("project") or ""))][
                 -3:

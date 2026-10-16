@@ -401,7 +401,30 @@ async def _meeting(
                 .order_by(PiStaffRequest.created_at.desc())
                 .limit(1)
             )
+            # A chat's meeting belongs to the project being discussed when it was asked
+            # for: the newest of the chat's deals created before the request.
+            asked_at = max(
+                (r.created_at for r in (booking, request) if r is not None), default=None
+            )
+            newer = (
+                await session.scalar(
+                    WorkspaceRepository(session, SalesLead, scope)
+                    .select()
+                    .with_only_columns(SalesLead.id)
+                    .where(
+                        SalesLead.conversation_id == lead.conversation_id,
+                        SalesLead.id != lead.id,
+                        SalesLead.created_at > lead.created_at,
+                        SalesLead.created_at <= asked_at,
+                    )
+                    .limit(1)
+                )
+                if asked_at is not None
+                else None
+            )
     except DBAPIError:
+        return None
+    if newer is not None or (asked_at is not None and lead.created_at > asked_at):
         return None
     if booking is not None and (request is None or booking.created_at >= request.created_at):
         done = booking.status == "completed" or booking.ends_at < datetime.now(UTC)
