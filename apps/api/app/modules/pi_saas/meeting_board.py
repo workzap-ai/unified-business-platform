@@ -459,15 +459,40 @@ async def _tell(
     conversation: PiConversation,
     body: str,
     key: str,
+    meeting: dict[str, Any] | None = None,
 ) -> str | None:
-    """Queue a message to the customer when WhatsApp allows a free-form one (they wrote
-    in the last 24 hours). None when it can't go out (the team is told on the board)."""
-    from app.modules.pi_saas.deals import _queue
+    """Queue a message to the customer. Inside WhatsApp's 24-hour window it goes as
+    written; after it, a meeting's time and link go as the business's approved meeting
+    template (set up by "Auto follow-ups"). None when neither is possible."""
+    from app.modules.pi_saas.deals import _business_name, _queue
 
     last = conversation.last_inbound_at
-    if last is None or last < datetime.now(UTC) - WINDOW:
+    if last is not None and last >= datetime.now(UTC) - WINDOW:
+        return await _queue(session, scope, conversation, body, key)
+    if meeting is None:
         return None
-    return await _queue(session, scope, conversation, body, key)
+    settings = await WorkspaceRepository(session, PiSettings, scope).find()
+    templates = ((settings.whatsapp_config if settings else None) or {}).get(
+        "meeting_templates"
+    ) or {}
+    template = templates.get(_language(conversation)) or templates.get("en")
+    if not isinstance(template, dict) or not template.get("name"):
+        return None
+    zone = str(meeting.get("zone") or "")
+    when = f"{meeting.get('label')} ({ZONE_NAMES.get(zone, zone)})" if zone else meeting["label"]
+    values = [
+        await _business_name(session, scope),
+        str(when),
+        str(meeting.get("link") or meeting.get("place") or "-"),
+    ]
+    return await _queue(
+        session,
+        scope,
+        conversation,
+        body,
+        key,
+        {"meeting_notice": {"template": template, "values": values}},
+    )
 
 
 async def _calendar_change(
@@ -572,6 +597,7 @@ async def move(
             conversation,
             moved_message(meeting, _language(conversation)),
             f"pi-meeting-move:{conversation.id}:{data.starts_at}",
+            meeting,
         )
     await record(
         session,
@@ -675,6 +701,7 @@ async def remind(
         conversation,
         prefix + meeting_message(meeting, _language(conversation)),
         f"pi-meeting-remind:{conversation.id}:{stamp}",
+        meeting,
     )
     if sent is None:
         raise BusinessRuleViolation(
@@ -798,6 +825,7 @@ async def remind_upcoming(ctx: dict[str, Any]) -> int:
                         conversation,
                         prefix + meeting_message(meeting, language),
                         f"pi-meeting-auto-remind:{conversation.id}:{meeting.get('starts_at')}",
+                        meeting,
                     )
                     if sent:
                         sends.append(sent)
@@ -853,7 +881,7 @@ async def book(data: BookInput, request: Request, scope: Scope, session: Session
     board, and pi sends the customer the time and link on WhatsApp in their language."""
     from app.modules.pi_saas.deals import _contact, _conversation
     from app.modules.pi_saas.meetings import MeetingInput, arrange, runtime_for
-    from app.modules.pi_saas.requests import enqueue_reply, raise_request
+    from app.modules.pi_saas.requests import raise_request
 
     await require_pi(session, scope, "pi.inbox.reply")
     customer = await WorkspaceRepository(session, Customer, scope).get(data.customer_id)
@@ -906,13 +934,25 @@ async def book(data: BookInput, request: Request, scope: Scope, session: Session
         entity_id=customer.id,
         details={"starts_at": data.starts_at, "how": data.how},
     )
-    await session.commit()
-    await enqueue_reply(request, row.id)  # pi sends the time and link word for word
     meeting = (conversation.service_brief or {}).get("meeting") or {}
+    # The time and link, word for word (or the approved meeting template after 24 hours).
+    sent = await _tell(
+        session,
+        scope,
+        conversation,
+        meeting_message(meeting, _language(conversation)),
+        f"pi-meeting-book:{conversation.id}:{data.starts_at}",
+        meeting,
+    )
+    if sent is not None:
+        row.reply_message_id = UUID(sent)
+    await session.commit()
+    await _send_now(request, sent)
     return {
         "ok": True,
         "conversation_id": conversation.id,
         "label": meeting.get("label"),
         "link": meeting.get("link") or "",
-        "told_customer": window,
+        "told_customer": sent is not None,
+        "by_template": sent is not None and not window,
     }

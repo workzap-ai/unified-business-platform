@@ -169,6 +169,23 @@ FOLLOW_UPS: dict[str, dict[str, tuple[str, str]]] = {
         ),
     },
 }
+# A meeting's time and link after the 24-hour window (Utility, with variables:
+# {{1}} business, {{2}} time with zone, {{3}} link or place).
+MEETING_TEMPLATES: dict[str, tuple[str, str]] = {
+    "en": (
+        "pi_meeting_update_en",
+        "Your meeting with {{1}} is on {{2}}. Join here: {{3}}",
+    ),
+    "roman_ur": (
+        "pi_meeting_update_ru",
+        "{{1}} ke saath aap ki meeting {{2}} ko hai. Join karne ka link: {{3}}",
+    ),
+}
+MEETING_EXAMPLE = [
+    "Workzap",
+    "Saturday 17 October, 04:00 PM (Pakistan time)",
+    "https://meet.jit.si/abc",
+]
 # pi Customer's sign-in code template (Meta authentication category).
 CODE_TEMPLATE = "pi_customer_code"
 # The language each template is approved in at Meta.
@@ -300,6 +317,25 @@ def build() -> APIRouter:
         statuses["sign_in_code"] = code
         if not code.startswith("REJECTED"):
             config["code_template"] = {"name": CODE_TEMPLATE, "language": "en_US"}
+        meetings: dict[str, dict[str, str]] = {}
+        for language, (name, body) in MEETING_TEMPLATES.items():
+            meta = META_LANGUAGE[language]
+            status = existing.get((name, meta))
+            if status is None:
+                try:
+                    status = await kapso.create_template_with_values(
+                        account, name, meta, body, MEETING_EXAMPLE
+                    )
+                except BusinessRuleViolation as error:
+                    status = (
+                        "PENDING"
+                        if "exist" in error.message.lower()
+                        else f"REJECTED: {error.message}"[:120]
+                    )
+            statuses[f"{language}:meeting"] = status
+            if not status.startswith("REJECTED"):
+                meetings[language] = {"name": name, "language": meta}
+        config["meeting_templates"] = {**(config.get("meeting_templates") or {}), **meetings}
         policy.whatsapp_config = config
         await record(
             session,

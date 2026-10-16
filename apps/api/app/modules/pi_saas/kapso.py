@@ -516,6 +516,40 @@ class Kapso:
         )
         return str(data.get("status") or "PENDING")[:24]
 
+    async def create_template_with_values(
+        self,
+        business_account_id: str,
+        name: str,
+        language: str,
+        body: str,
+        examples: list[str],
+    ) -> str:
+        """A Utility template whose text has {{1}}..{{n}} filled at send time (the meeting
+        time and link); Meta needs one example value per variable to review it."""
+        if not re.fullmatch(r"[0-9]{5,32}", business_account_id):
+            raise BusinessRuleViolation("WHATSAPP_NOT_CONNECTED", "Connect WhatsApp first")
+        count = len(re.findall(r"\{\{\d+\}\}", body))
+        if (
+            not re.fullmatch(r"[a-z0-9_]{1,512}", name)
+            or not re.fullmatch(r"[a-z]{2,3}(_[A-Z]{2})?", language)
+            or not 1 <= len(body) <= 1024
+            or count != len(examples)
+        ):
+            raise BusinessRuleViolation("INVALID_TEMPLATE", "Invalid template text or examples")
+        data = await self._meta(
+            "POST",
+            f"/{business_account_id}/message_templates",
+            json={
+                "name": name,
+                "language": language,
+                "category": "UTILITY",
+                "components": [
+                    {"type": "BODY", "text": body, "example": {"body_text": [examples]}}
+                ],
+            },
+        )
+        return str(data.get("status") or "PENDING")[:24]
+
     async def create_code_template(self, business_account_id: str, name: str, language: str) -> str:
         """Meta's authentication template for one-time codes: Meta writes the text ("<code>
         is your verification code"), adds the security line, the expiry and a copy-code

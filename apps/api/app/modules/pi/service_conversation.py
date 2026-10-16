@@ -1211,6 +1211,9 @@ PRODUCT_SENTENCE = re.compile(
 )
 
 
+JOIN_WORDS = re.compile(r"\b(?:join|joining|attend|see you|link|aa jaunga|aaunga|aaungi)\b", re.I)
+
+
 def claims_other_meeting(reply: str, arranged: str) -> bool:
     """A "meeting is confirmed" sentence about a time other than the one arranged
     ("Friday 16 October, 05:00 PM"): e.g. "confirmed for tomorrow at 3 PM"."""
@@ -1257,9 +1260,13 @@ def invented(reply: str, context: dict[str, Any], booked: bool = False) -> str:
         )
     # Only a meeting the team really arranged (time and link) can be called confirmed;
     # a bare "yes" from the team is not a meeting.
-    team_said = not context.get("meeting_over") and any(
-        "Meeting confirmed by the team" in str(n.get("note", n.get("answer", "")))
-        for n in [context.get("team_answer_now") or {}, *(context.get("team_notes") or [])]
+    team_said = not context.get("meeting_over") and (
+        any(
+            "Meeting confirmed by the team" in str(n.get("note", n.get("answer", "")))
+            for n in [context.get("team_answer_now") or {}, *(context.get("team_notes") or [])]
+        )
+        # A meeting arranged on the chat (time and link, e.g. moved on the board).
+        or bool(arranged_meeting(context))
     )
     if claims_meeting(reply) and not (booked or team_said):
         return (
@@ -2552,6 +2559,20 @@ async def compose_service_turn(
         turn = retry.value
         turn._attempts = [*result.response.attempts, *retry.response.attempts]
         turn.reply = without_filler(tidy_list_numbers(turn.reply))
+        meeting = arranged_meeting(context)
+        latest_words = str(context.get("latest_customer_message", ""))
+        if (
+            invented(turn.reply, context, turn.action == "booking")
+            and meeting
+            and (MEETING_WORDS.search(latest_words) or JOIN_WORDS.search(latest_words))
+        ):
+            # About their meeting: its real time and link, word for word, never "checking".
+            from app.modules.pi_saas.meetings import meeting_message
+
+            brief_meeting = (context.get("brief") or {}).get("meeting") or meeting
+            turn.reply = meeting_message(
+                brief_meeting, "roman_ur" if turn.language == "roman_ur" else "en"
+            )
         if invented(turn.reply, context, turn.action == "booking"):
             # Still made up after the rewrite: never sent (pi asks the team instead).
             logger.warning(

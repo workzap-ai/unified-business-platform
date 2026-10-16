@@ -189,8 +189,7 @@ async def test_the_team_books_a_meeting_from_the_customer_profile(api, business_
     body = booked.json()
     assert body["conversation_id"] == str(conversation.id) and body["told_customer"] is True
     assert body["link"] == "https://zoom.us/j/77"
-    jobs = [n for n, _ in pi.app.state.queue.jobs if n == "pi_reply_with_team_answer"]
-    assert jobs  # pi sends the time and link
+    assert "https://zoom.us/j/77" in (await _sent(pi, conversation.id))[-1]
     board = (await api.get(BOARD, params={"start": day})).json()
     [meeting] = board["meetings"]
     assert meeting["customer_name"] == "Ayesha Khan" and meeting["local"] == f"{day}T14:00"
@@ -201,4 +200,39 @@ async def test_the_team_books_a_meeting_from_the_customer_profile(api, business_
         f"{BOARD}/book", json={"customer_id": nobody["id"], "starts_at": f"{day}T15:00"}
     )
     assert refused.status_code == 422, refused.text
+    await pi.close()
+
+
+async def test_after_24_hours_the_meeting_goes_as_the_approved_template(api, business_db):
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    day = _day(3)
+    chat = await _arranged(pi, f"{day}T11:00")
+    conversation = await pi.db.get(PiConversation, chat)
+    conversation.last_inbound_at = datetime.now(UTC) - timedelta(hours=30)  # window closed
+    await pi.db.commit()
+    no_template = await api.post(f"{BOARD}/{chat}/move", json={"starts_at": f"{day}T12:00"})
+    assert no_template.json()["told_customer"] is False
+
+    from app.modules.pi.configuration import settings_row
+
+    scope = WorkspaceScope.system(
+        UUID(pi.tenant_id), UUID(pi.environment_id), frozenset({"pi.read"}), "PI"
+    )
+    settings = await settings_row(pi.db, scope)
+    settings.whatsapp_config = {
+        **(settings.whatsapp_config or {}),
+        "meeting_templates": {"en": {"name": "pi_meeting_update_en", "language": "en_US"}},
+    }
+    await pi.db.commit()
+    moved = await api.post(f"{BOARD}/{chat}/move", json={"starts_at": f"{day}T15:00"})
+    assert moved.json()["told_customer"] is True
+    last = await pi.db.scalar(
+        select(PiMessage)
+        .where(PiMessage.conversation_id == chat, PiMessage.direction == "outbound")
+        .order_by(PiMessage.created_at.desc())
+        .limit(1)
+    )
+    notice = last.media["meeting_notice"]
+    assert notice["template"]["name"] == "pi_meeting_update_en"
+    assert "03:00 PM" in notice["values"][1] and notice["values"][2] == "https://zoom.us/j/42"
     await pi.close()

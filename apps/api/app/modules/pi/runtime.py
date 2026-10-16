@@ -1327,6 +1327,8 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
         ladder = message.media.get("ladder")
         # Deal flow: "your document is ready, reply to see it" outside the window.
         document_notice = message.media.get("document_notice")
+        # A meeting's time and link after the window: the approved meeting template.
+        meeting_notice = message.media.get("meeting_notice")
         from app.modules.pi.followups import reminder_allowed
 
         campaign_block = None
@@ -1366,6 +1368,7 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             and not campaign
             and not ladder
             and not document_notice
+            and not meeting_notice
             and (
                 not conversation.last_inbound_at
                 or conversation.last_inbound_at < datetime.now(UTC) - timedelta(hours=24)
@@ -1397,7 +1400,15 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             from app.integrations.whatsapp_bridge import token as connection_token
 
             token = await connection_token(session, ctx["settings"], connection)
-            if reminder or campaign or ladder or document_notice:
+            if meeting_notice:
+                message.provider_message_id = await whatsapp.send_template_values(
+                    connection.phone_number_id,
+                    conversation.contact_wa_id,
+                    meeting_notice["template"],
+                    [str(v) for v in meeting_notice["values"]],
+                    token,
+                )
+            elif reminder or campaign or ladder or document_notice:
                 message.provider_message_id, message.body = await whatsapp.send_template(
                     connection.phone_number_id,
                     connection.business_account_id,

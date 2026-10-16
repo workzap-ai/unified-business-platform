@@ -436,3 +436,18 @@ def test_only_the_arranged_meeting_can_be_called_confirmed() -> None:
     }
     assert invented("Your meeting is confirmed for tomorrow at 3 PM.", context)
     assert invented("Your meeting is confirmed for Friday at 5 PM.", context) == ""
+
+
+def test_a_meeting_arranged_on_the_board_can_be_confirmed() -> None:
+    from app.modules.pi.service_conversation import invented
+
+    context = {
+        "brief": {
+            "meeting": {
+                "label": "Friday 16 October, 05:00 PM",
+                "link": "https://meet.jit.si/pi-meeting-1",
+            }
+        }
+    }  # moved on the board: no "Meeting confirmed by the team" note
+    reply = "Great, your meeting is confirmed for today at 5 PM: https://meet.jit.si/pi-meeting-1"
+    assert invented(reply, context) == ""
