@@ -219,3 +219,16 @@ def test_a_status_question_gets_every_projects_status() -> None:
     assert built.count("• ") == 2 and status_missed(built, context) is None
     context["latest_customer_message"] = "Customers should see cars with prices"
     assert status_missed(summary, context) is None
+
+
+def test_a_rewrite_drops_what_pi_already_sent() -> None:
+    from app.modules.pi.service_conversation import without_repeats
+
+    summary = (
+        "Noted. You want:\n• A mobile app for booking test drives\n• A website for your "
+        "car showroom\n\nIs there anything else you want to add, or is this everything?"
+    )
+    context = {"history": [{"role": "ai", "text": summary}]}
+    reply = summary + "\n\nYour proposal QUO-000009 is shared here."
+    assert without_repeats(reply, context) == "Your proposal QUO-000009 is shared here."
+    assert without_repeats(summary, context) == summary  # nothing new: left as it was

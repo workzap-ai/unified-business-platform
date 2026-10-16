@@ -1397,6 +1397,47 @@ def repeats_itself(reply: str, context: dict[str, Any]) -> str | None:
     return None
 
 
+DOCS_AGAIN = {
+    "en": "Here are your documents again:",
+    "roman_ur": "Yeh rahe aap ke documents dobara:",
+    "ar": "إليك مستنداتك مرة أخرى:",
+}
+
+
+def _norm(text: str) -> str:
+    return " ".join(text.casefold().split()).strip(" .•*")
+
+
+def without_repeats(reply: str, context: dict[str, Any]) -> str:
+    """The reply minus what pi already sent in its last three replies (a whole repeated
+    line or sentence, and a "You want:" heading left with nothing under it). Unchanged
+    when nothing new would be left."""
+    earlier = [
+        str(h.get("text", "")) for h in (context.get("history") or []) if h.get("role") == "ai"
+    ][-3:]
+    lines_before = {_norm(line) for text in earlier for line in text.splitlines()}
+    said = {sentence for text in earlier for sentence in _sentences(text)}
+    kept: list[str] = []
+    for line in reply.splitlines():
+        if len(line.split()) >= 3 and _norm(line) in lines_before:
+            continue
+        parts = [
+            part
+            for part in re.split(r"(?<=[.!?])\s+", line)
+            if not (len(part.split()) >= 7 and _norm(part) in said)
+        ]
+        kept.append(" ".join(parts))
+    # A heading ("You want:") whose points were all dropped goes too.
+    out: list[str] = []
+    for i, line in enumerate(kept):
+        rest = [x for x in kept[i + 1 :] if x.strip()]
+        if line.rstrip().endswith(":") and (not rest or not rest[0].lstrip().startswith("•")):
+            continue
+        out.append(line)
+    cleaned = re.sub(r"\n{3,}", "\n\n", "\n".join(out)).strip()
+    return cleaned if len(cleaned.split()) >= 3 else reply
+
+
 def contradicts_itself(reply: str, context: dict[str, Any]) -> str | None:
     """A reply that says it's sent and asks whether to send, or repeats pi's last message."""
     if SAYS_SENT.search(reply) and ASKS_SEND.search(reply):
@@ -1599,7 +1640,7 @@ def status_missed(reply: str, context: dict[str, Any]) -> str | None:
 
 def status_lines(context: dict[str, Any]) -> str:
     """A status answer built from project_deals alone (most recent five)."""
-    deals = (context.get("project_deals") or [])[-5:]
+    deals = (context.get("project_deals") or [])[:5]
     lines = [
         f"• {d['project']}: " + "; ".join(str(d[k]) for k in ("status", "next") if d.get(k))
         for d in deals
@@ -2239,6 +2280,7 @@ async def compose_service_turn(
         if invented(turn.reply, context, turn.action == "booking"):
             # Still made up after the rewrite: never sent (pi asks the team instead).
             raise ReplyRejected("INVENTED_DETAIL")
+        turn.reply = without_repeats(turn.reply, context)
         turn.reply = without_open_question(turn, context)
         if not turn.request_human and status_missed(turn.reply, context):
             # Still no status for a status question: the facts straight from the deals.
@@ -2255,7 +2297,8 @@ async def compose_service_turn(
                 for link in str(deal.get("links") or "").split(";")
                 if link.strip()
             ]
-            turn.reply = turn.reply.rstrip() + "\n\n" + "\n".join(sent)
+            heading = DOCS_AGAIN.get(turn.language or "en", DOCS_AGAIN["en"])
+            turn.reply = heading + "\n" + "\n".join(sent)
         if unconfirmed_brief(turn, context):
             # Still sending an unagreed brief: hold it and only ask (never claim sent).
             turn.ready_for_team = False
@@ -2973,7 +3016,7 @@ async def project_deals(
             WorkspaceRepository(session, SalesLead, scope)
             .select()
             .where(SalesLead.conversation_id == conversation.id)
-            .order_by(SalesLead.created_at)
+            .order_by(SalesLead.created_at.desc())  # newest first: what they're on now
             .limit(20)
         )
     )
@@ -3039,13 +3082,15 @@ async def project_deals(
             step["status"] = BRIEF_STATUS.get(brief_status, BRIEF_STATUS["collecting"])
             step["next"] = BRIEF_NEXT.get(brief_status, BRIEF_NEXT["collecting"])
         steps.append(step)
-    # Projects still being talked through have no deal yet: the brief says where they are.
+    # Projects still being talked through have no deal yet: the brief says where they are
+    # (the newest of all, so they come first).
+    talking: list[dict[str, str]] = []
     for project in (conversation.service_brief or {}).get("projects") or []:
         title = str(project.get("title") or "").strip()
         if not title or title.casefold() in best:
             continue
         status = str(project.get("status") or "collecting")
-        steps.append(
+        talking.append(
             {
                 "project": title,
                 "stage": "brief",
@@ -3053,7 +3098,7 @@ async def project_deals(
                 "next": BRIEF_NEXT.get(status, BRIEF_NEXT["collecting"]),
             }
         )
-    return steps[:10]
+    return (talking[::-1] + steps)[:10]
 
 
 BRIEF_STATUS = {
