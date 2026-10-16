@@ -365,6 +365,7 @@ def build_registry() -> NavigationRegistry:
             parent="pi",
             required_permissions=("pi.work.read",),
             required_product="pi",
+            badge="pi.my_tasks",
             analytics_id="nav.pi.team",
         ),
         NavDefinition(

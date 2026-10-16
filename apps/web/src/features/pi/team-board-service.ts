@@ -72,13 +72,15 @@ export const teamBoardSchema = z.object({
   members: z.array(z.object({ id: z.string(), name: z.string() })),
   counts: z.record(z.string(), z.number()).catch({}),
   kinds: z.record(z.string(), z.number()).catch({}),
+  by_member: z.record(z.string(), z.number()).catch({}),
   me: z.string().nullable().catch(null),
   updated_at: z.string(),
 });
 export type TeamBoard = z.infer<typeof teamBoardSchema>;
 
 export type BoardFilter = {
-  who: "all" | "me" | "unassigned";
+  /** "all", "me", "unassigned" or one member's user id. */
+  who: string;
   kind: BoardKind | null;
 };
 
@@ -98,6 +100,35 @@ export type BoardTaskChange = {
   due_at?: string | null;
 };
 
+/** Team members' WhatsApp numbers for task alerts (team_alerts.py). */
+export const teamMembersSchema = z.object({
+  enabled: z.boolean().catch(true),
+  template_name: z.string().catch(""),
+  template_language: z.string().catch(""),
+  business_number: z.string().nullable().catch(null),
+  members: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string().catch(""),
+      whatsapp: z.string().catch(""),
+      window_open: z.boolean().catch(false),
+    }),
+  ),
+});
+export type TeamMembers = z.infer<typeof teamMembersSchema>;
+
+export type TeamMembersChange = {
+  enabled?: boolean;
+  numbers?: Record<string, string>;
+  template_name?: string;
+  template_language?: string;
+};
+
+const testSchema = z.object({
+  delivery: z.enum(["sent", "template", "no_window"]).catch("no_window"),
+  business_number: z.string().nullable().catch(null),
+});
+
 export const teamBoardService = {
   get: ({ who, kind }: BoardFilter) =>
     apiRequest("GET", "/pi/team-board", teamBoardSchema, {
@@ -113,5 +144,16 @@ export const teamBoardService = {
       `/pi/team-board/tasks/${encodeURIComponent(id)}`,
       boardCardSchema,
       { body: change },
+    ),
+  members: () => apiRequest("GET", "/pi/team-board/members", teamMembersSchema),
+  saveMembers: (change: TeamMembersChange) =>
+    apiRequest("PUT", "/pi/team-board/members", teamMembersSchema, {
+      body: change,
+    }),
+  testMember: (userId: string) =>
+    apiRequest(
+      "POST",
+      `/pi/team-board/members/${encodeURIComponent(userId)}/test`,
+      testSchema,
     ),
 };

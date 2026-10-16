@@ -152,6 +152,9 @@ DEFAULTS: dict[str, Any] = {
         "flows": {},
         # PI Customer: customers can see their own conversations with this business.
         "customer_portal": True,
+        # Team board alerts on WhatsApp (pi_saas/team_alerts.py): members' numbers,
+        # on/off and an optional approved template. Edited on the team board.
+        "team_alerts": {},
     },
 }
 

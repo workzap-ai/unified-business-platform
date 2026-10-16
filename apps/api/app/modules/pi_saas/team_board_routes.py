@@ -1,7 +1,10 @@
 """Team board API (/pi/team-board), mounted for Owner OS and the pi app. See
 ``team_board`` for how the cards are made. Reading needs ``pi.work.read``; adding,
 moving and assigning cards ``pi.work.manage`` (and ``orders.write`` to start or deliver
-a deal's work from its card)."""
+a deal's work from its card).
+
+Team members' WhatsApp numbers (``/members``) and the alerts pi sends them when a card
+is given to them or due soon: see ``team_alerts``."""
 
 import logging
 from datetime import UTC, datetime
@@ -10,7 +13,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Request
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.access.dependencies import Scope, Session
@@ -18,10 +21,11 @@ from app.modules.access.service import membership_grants
 from app.modules.audit.service import record
 from app.modules.customers.models import Customer
 from app.modules.memberships.models import Membership
+from app.modules.navigation.service import badge_provider
 from app.modules.notifications.service import notify
 from app.modules.orders.models import Order
 from app.modules.pi.service import require_pi
-from app.modules.pi_saas import team_board
+from app.modules.pi_saas import team_alerts, team_board
 from app.modules.pi_saas.deal_routes import _enqueue, advance_work
 from app.modules.pi_saas.models import PiTask
 from app.shared.errors import BusinessRuleViolation
@@ -40,10 +44,15 @@ Kind = Literal[
 async def get_board(
     scope: Scope,
     session: Session,
-    who: Literal["all", "me", "unassigned"] = "all",
+    who: str = "all",
     kind: Kind | None = None,
 ) -> dict[str, Any]:
     await require_pi(session, scope, "pi.work.read")
+    if who not in {"all", "me", "unassigned"}:
+        try:
+            who = str(UUID(who))
+        except ValueError:
+            raise BusinessRuleViolation("FILTER_INVALID", "Pick someone on your team") from None
     try:
         async with session.begin_nested():
             await team_board.sync_board(session, scope)
@@ -72,9 +81,11 @@ async def _check_assignee(session: AsyncSession, scope: WorkspaceScope, user_id:
         )
 
 
-async def _tell_assignee(session: AsyncSession, scope: WorkspaceScope, task: PiTask) -> None:
+async def _tell_assignee(session: AsyncSession, scope: WorkspaceScope, task: PiTask) -> bool:
+    """In-app notification for the new assignee; True when they should also hear on
+    WhatsApp (someone else gave them the card)."""
     if task.assignee_user_id is None or task.assignee_user_id == scope.user_id:
-        return
+        return False
     await notify(
         session,
         scope,
@@ -84,8 +95,12 @@ async def _tell_assignee(session: AsyncSession, scope: WorkspaceScope, task: PiT
         link="/pi/team",
         recipient_user_id=task.assignee_user_id,
         permission="pi.work.read",
-        dedupe_key=f"pi-task-assigned:{task.id}:{task.assignee_user_id}:{datetime.now(UTC):%s}",
+        dedupe_key=(
+            f"pi-task-assigned:{task.id}:{task.assignee_user_id}:"
+            f"{datetime.now(UTC).timestamp():.0f}"
+        ),
     )
+    return True
 
 
 class NewTask(BaseModel):
@@ -99,7 +114,9 @@ class NewTask(BaseModel):
 
 
 @router.post("/tasks", status_code=201)
-async def add_task(data: NewTask, scope: Scope, session: Session) -> dict[str, Any]:
+async def add_task(
+    data: NewTask, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
     await require_pi(session, scope, "pi.work.manage")
     if data.customer_id is not None:
         await WorkspaceRepository(session, Customer, scope).get(data.customer_id)
@@ -119,9 +136,13 @@ async def add_task(data: NewTask, scope: Scope, session: Session) -> dict[str, A
         )
     )
     await session.flush()
-    await _tell_assignee(session, scope, task)
+    tell = await _tell_assignee(session, scope, task)
     await record(session, "pi.task_created", scope=scope, entity_type="pi_task", entity_id=task.id)
     await session.commit()
+    if tell and task.assignee_user_id is not None:
+        await team_alerts.enqueue(
+            request.app.state.queue, scope, "assigned", task.id, task.assignee_user_id
+        )
     return await team_board.card(session, scope, task)
 
 
@@ -178,8 +199,7 @@ async def move_task(
         setattr(task, field, value)
     task.updated_at = datetime.now(UTC)
     await session.flush()
-    if assigned:
-        await _tell_assignee(session, scope, task)
+    tell = assigned and await _tell_assignee(session, scope, task)
     if moved is not None:
         # The order moved on: the board follows (a started deal gets its "Deliver" card).
         try:
@@ -197,4 +217,95 @@ async def move_task(
     )
     await session.commit()
     await _enqueue(request, moved or [])
+    if tell and task.assignee_user_id is not None:
+        await team_alerts.enqueue(
+            request.app.state.queue, scope, "assigned", task.id, task.assignee_user_id
+        )
     return await team_board.card(session, scope, task)
+
+
+# ---- Team members' WhatsApp numbers ----------------------------------------------------
+
+
+@router.get("/members")
+async def get_members(scope: Scope, session: Session) -> dict[str, Any]:
+    """Active members with their WhatsApp number (managers see all numbers, everyone
+    sees their own) and whether their 24-hour chat with the business number is open."""
+    await require_pi(session, scope, "pi.work.read")
+    view = await team_alerts.team_view(session, scope, show_numbers=scope.can("pi.work.manage"))
+    await session.commit()
+    return view
+
+
+class TeamAlertsInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    enabled: bool | None = None
+    # user id -> WhatsApp number with country code ("" removes it).
+    numbers: dict[str, str] | None = Field(default=None, max_length=200)
+    template_name: str | None = Field(default=None, max_length=512)
+    template_language: str | None = Field(default=None, max_length=12)
+
+
+@router.put("/members")
+async def put_members(data: TeamAlertsInput, scope: Scope, session: Session) -> dict[str, Any]:
+    await require_pi(session, scope, "pi.work.manage")
+    if data.numbers is not None and any(len(v) > 32 for v in data.numbers.values()):
+        raise BusinessRuleViolation("PHONE_INVALID", "Enter the WhatsApp number with country code")
+    await team_alerts.save_config(
+        session,
+        scope,
+        enabled=data.enabled,
+        numbers=data.numbers,
+        template_name=data.template_name,
+        template_language=data.template_language,
+    )
+    await session.commit()
+    view = await team_alerts.team_view(session, scope, show_numbers=True)
+    await session.commit()
+    return view
+
+
+@router.post("/members/{user_id}/test")
+async def test_member(
+    user_id: UUID, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Send a test message to one member's saved number, by the same rules as alerts.
+    Returns how it will go: "sent" (open chat), "template", or "no_window"."""
+    await require_pi(session, scope, "pi.work.manage")
+    view = await team_alerts.team_view(session, scope, show_numbers=True)
+    member = next((m for m in view["members"] if m["id"] == user_id), None)
+    if member is None:
+        raise BusinessRuleViolation("MEMBER_UNKNOWN", "Pick someone on your team")
+    if not member["whatsapp"]:
+        raise BusinessRuleViolation("PHONE_MISSING", "Save their WhatsApp number first")
+    if not view["business_number"]:
+        raise BusinessRuleViolation("WHATSAPP_NOT_CONNECTED", "Connect WhatsApp first")
+    if not view["enabled"]:
+        raise BusinessRuleViolation("TEAM_ALERTS_OFF", "Turn on WhatsApp alerts first")
+    if member["window_open"]:
+        delivery = "sent"
+    elif view["template_name"]:
+        delivery = "template"
+    else:
+        delivery = "no_window"
+    await session.commit()
+    if delivery != "no_window":
+        await team_alerts.enqueue(request.app.state.queue, scope, "test", None, user_id)
+    return {"delivery": delivery, "business_number": view["business_number"]}
+
+
+@badge_provider("pi.my_tasks")
+async def my_tasks(session: AsyncSession, scope: WorkspaceScope) -> int | None:
+    """Open cards given to the signed-in person (the "Team board" nav count)."""
+    if scope.user_id is None or not scope.can("pi.work.read"):
+        return None
+    count = await session.scalar(
+        WorkspaceRepository(session, PiTask, scope)
+        .select()
+        .with_only_columns(func.count())
+        .where(
+            PiTask.assignee_user_id == scope.user_id,
+            PiTask.status.in_(team_board.LIVE),
+        )
+    )
+    return int(count or 0) or None

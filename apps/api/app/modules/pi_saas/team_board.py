@@ -624,7 +624,8 @@ async def board(
     kind: str | None = None,
 ) -> dict[str, Any]:
     """The four columns, each card with its customer, project, assignee, due time and
-    link; the team's members for assigning; and counts (overall, before the filters)."""
+    link; the team's members for assigning; and counts (overall, before the filters).
+    ``who``: "all", "me", "unassigned" or one member's user id."""
     now = datetime.now(UTC)
     tasks = list(
         await session.scalars(
@@ -702,11 +703,18 @@ async def board(
     kinds: dict[str, int] = {}
     for task in live:
         kinds[kind_of(task)] = kinds.get(kind_of(task), 0) + 1
+    by_member: dict[str, int] = {}
+    for task in live:
+        if task.assignee_user_id is not None:
+            by_member[str(task.assignee_user_id)] = by_member.get(str(task.assignee_user_id), 0) + 1
     shown = tasks
     if who == "me":
         shown = [t for t in shown if t.assignee_user_id == scope.user_id]
     elif who == "unassigned":
         shown = [t for t in shown if t.assignee_user_id is None]
+    elif who != "all":
+        # One team member's cards (the route checked it's an id).
+        shown = [t for t in shown if str(t.assignee_user_id) == who]
     if kind:
         shown = [t for t in shown if kind_of(t) == kind]
     columns: dict[str, list[dict[str, Any]]] = {c: [] for c in COLUMNS.values()}
@@ -718,6 +726,7 @@ async def board(
         "members": team,
         "counts": counts,
         "kinds": kinds,
+        "by_member": by_member,
         "me": scope.user_id,
         "updated_at": now,
     }

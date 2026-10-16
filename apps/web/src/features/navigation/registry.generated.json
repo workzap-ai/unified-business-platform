@@ -1340,7 +1340,7 @@
   {
     "analytics_id": "nav.pi.team",
     "any_permissions": [],
-    "badge": null,
+    "badge": "pi.my_tasks",
     "description": "",
     "enabled": true,
     "environment_scope": null,

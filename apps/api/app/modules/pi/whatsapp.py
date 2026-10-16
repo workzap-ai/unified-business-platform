@@ -343,6 +343,51 @@ class WhatsApp:
                 "DELIVERY_UNCONFIRMED", "Reminder delivery could not be confirmed", 503
             ) from None
 
+    async def send_template_values(
+        self,
+        number: str,
+        recipient: str,
+        template: dict[str, str],
+        values: list[str],
+        token: str,
+    ) -> str:
+        """Send an approved template whose body has ``{{1}}``..``{{n}}`` text variables
+        (team alerts: name, task, due). Meta refuses a template that isn't approved or
+        whose variables don't match, which comes back as a refused send."""
+        if not re.fullmatch(r"[a-z0-9_]{1,512}", template.get("name", "")) or not re.fullmatch(
+            r"[a-z]{2,3}(?:_[A-Z]{2})?", template.get("language", "")
+        ):
+            raise BusinessRuleViolation("TEMPLATE_INVALID", "Invalid template")
+        base, headers = self._endpoint(token)
+        # Template variables can't hold new lines, tabs or long runs of spaces.
+        params = [{"type": "text", "text": " ".join(str(v).split())[:900] or "-"} for v in values]
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "template",
+                    "template": {
+                        "name": template["name"],
+                        "language": {"code": template["language"]},
+                        "components": [{"type": "body", "parameters": params}],
+                    },
+                },
+                timeout=15,
+                follow_redirects=False,
+            )
+            check_sent(response)
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Template delivery could not be confirmed", 503
+            ) from None
+
     async def send_code_template(
         self, number: str, recipient: str, template: dict[str, str], code: str, token: str
     ) -> str:

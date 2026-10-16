@@ -3,7 +3,9 @@
 import { useMemo, useState, type DragEvent } from "react";
 import Link from "next/link";
 import {
+  AlertTriangle,
   ArrowRightLeft,
+  CalendarClock,
   CheckSquare,
   CreditCard,
   Receipt,
@@ -14,10 +16,12 @@ import {
   Stamp,
   Tag,
   Truck,
+  Users,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/controls";
 import { Avatar, Badge } from "@/components/ui/display";
 import { Input, NativeSelect, Textarea } from "@/components/ui/input";
 import {
@@ -58,6 +62,7 @@ import {
   type BoardKind,
   type Priority,
   type TeamBoard,
+  type TeamMembers,
 } from "../team-board-service";
 
 const LIVE_EVERY_MS = 20_000;
@@ -111,6 +116,14 @@ export function dueLabel(due: string, now = Date.now()) {
   return diff < 0 ? `${span} late` : `in ${span}`;
 }
 
+/** An ISO time as the value of a datetime-local input (local time). */
+function localInput(iso: string | null) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export function TeamBoardPage() {
   return (
     <RequirePermission permission="pi.work.read" area="pi">
@@ -125,6 +138,7 @@ function TeamBoardView() {
   const [filter, setFilter] = useState<BoardFilter>({ who: "all", kind: null });
   const [tab, setTab] = useState<BoardColumn>("todo");
   const [creating, setCreating] = useState(false);
+  const [team, setTeam] = useState(false);
   // Cards being moved show in their new column straight away.
   const [moving, setMoving] = useState<Record<string, BoardColumn>>({});
   const query = useScopedQuery(
@@ -172,6 +186,20 @@ function TeamBoardView() {
     update.mutate({ id: card.id, assignee_user_id: userId });
   }
 
+  function setDue(card: BoardCard, due: string | null) {
+    update.mutate({ id: card.id, due_at: due });
+  }
+
+  // Late cards are pinned on top, so nothing overdue hides in a long column.
+  const overdue = useMemo(
+    () =>
+      (["todo", "doing", "waiting"] as const)
+        .flatMap((c) => columns[c])
+        .filter((card) => card.overdue)
+        .sort((a, b) => (a.due_at ?? "").localeCompare(b.due_at ?? "")),
+    [columns],
+  );
+
   return (
     <PageShell>
       <PageHeader
@@ -183,6 +211,9 @@ function TeamBoardView() {
               fetching={query.isFetching}
               updatedAt={query.dataUpdatedAt}
             />
+            <Button size="sm" variant="secondary" onClick={() => setTeam(true)}>
+              <Users aria-hidden="true" /> Team
+            </Button>
             {manage && (
               <Button size="sm" onClick={() => setCreating(true)}>
                 <Plus aria-hidden="true" /> New task
@@ -198,6 +229,33 @@ function TeamBoardView() {
       ) : (
         <div className="space-y-4">
           <Filters data={data} filter={filter} onChange={setFilter} />
+          {overdue.length > 0 && (
+            <section
+              aria-label="Overdue"
+              className="rounded-lg border border-danger/30 bg-danger-soft/40 p-2"
+            >
+              <header className="flex items-center gap-1.5 px-1.5 pt-0.5 pb-2 text-danger">
+                <AlertTriangle className="size-4" aria-hidden="true" />
+                <h2 className="text-[13px] font-semibold">Overdue</h2>
+                <span className="text-xs tabular-nums">{overdue.length}</span>
+              </header>
+              <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                {overdue.map((card) => (
+                  <li key={card.id}>
+                    <BoardCardView
+                      card={card}
+                      column={card.column}
+                      manage={manage}
+                      members={data.members}
+                      onMove={move}
+                      onAssign={assign}
+                      onDue={setDue}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
           <div
             role="tablist"
             aria-label="Columns"
@@ -239,6 +297,7 @@ function TeamBoardView() {
                 }}
                 onMove={move}
                 onAssign={assign}
+                onDue={setDue}
               />
             ))}
           </div>
@@ -248,6 +307,13 @@ function TeamBoardView() {
         <NewTaskDialog
           members={data.members}
           onClose={() => setCreating(false)}
+        />
+      )}
+      {team && (
+        <TeamDialog
+          manage={manage}
+          counts={data?.by_member ?? {}}
+          onClose={() => setTeam(false)}
         />
       )}
     </PageShell>
@@ -263,6 +329,7 @@ function Filters({
   filter: BoardFilter;
   onChange: (next: BoardFilter) => void;
 }) {
+  const person = data.members.find((m) => m.id === filter.who);
   const who: { key: BoardFilter["who"]; label: string; count?: number }[] = [
     { key: "all", label: "All", count: data.counts.all },
     { key: "me", label: "Mine", count: data.counts.mine },
@@ -294,6 +361,23 @@ function Filters({
           </button>
         ))}
       </div>
+      <NativeSelect
+        aria-label="Show one team member's cards"
+        className={cn(
+          "h-8 w-auto max-w-48 text-xs",
+          person &&
+            "border-primary bg-primary-soft text-primary-soft-foreground",
+        )}
+        value={person ? person.id : ""}
+        onChange={(e) => onChange({ ...filter, who: e.target.value || "all" })}
+      >
+        <option value="">Any member</option>
+        {data.members.map((m) => (
+          <option key={m.id} value={m.id}>
+            {m.name} ({data.by_member[m.id] ?? 0})
+          </option>
+        ))}
+      </NativeSelect>
       {kinds.map((k) => {
         const meta = KIND[k];
         const active = filter.kind === k;
@@ -336,6 +420,7 @@ function Column({
   onDropCard,
   onMove,
   onAssign,
+  onDue,
 }: {
   column: BoardColumn;
   cards: BoardCard[];
@@ -345,6 +430,7 @@ function Column({
   onDropCard: (id: string) => void;
   onMove: (card: BoardCard, to: BoardColumn) => void;
   onAssign: (card: BoardCard, userId: string | null) => void;
+  onDue: (card: BoardCard, due: string | null) => void;
 }) {
   const [over, setOver] = useState(false);
   return (
@@ -385,6 +471,7 @@ function Column({
               members={members}
               onMove={onMove}
               onAssign={onAssign}
+              onDue={onDue}
             />
           </li>
         ))}
@@ -407,6 +494,7 @@ function BoardCardView({
   members,
   onMove,
   onAssign,
+  onDue,
 }: {
   card: BoardCard;
   column: BoardColumn;
@@ -414,9 +502,18 @@ function BoardCardView({
   members: TeamBoard["members"];
   onMove: (card: BoardCard, to: BoardColumn) => void;
   onAssign: (card: BoardCard, userId: string | null) => void;
+  onDue: (card: BoardCard, due: string | null) => void;
 }) {
   const meta = KIND[card.kind];
   const done = column === "done";
+  const [editingDue, setEditingDue] = useState(false);
+  const [due, setDueValue] = useState(localInput(card.due_at));
+  const dueChip = cn(
+    "ml-auto shrink-0 rounded-full px-1.5 py-0.5 text-[11px] font-medium tabular-nums",
+    card.overdue
+      ? "bg-danger-soft text-danger"
+      : "bg-surface-muted text-muted-foreground",
+  );
   const subtitle = [card.customer?.name, card.project]
     .filter(Boolean)
     .join(" · ");
@@ -445,20 +542,74 @@ function BoardCardView({
           title={`${card.priority} priority`}
           aria-label={`${card.priority} priority`}
         />
-        {card.due_at && !done && (
-          <span
-            className={cn(
-              "ml-auto shrink-0 rounded-full px-1.5 py-0.5 text-[11px] font-medium tabular-nums",
-              card.overdue
-                ? "bg-danger-soft text-danger"
-                : "bg-surface-muted text-muted-foreground",
-            )}
-            title={new Date(card.due_at).toLocaleString()}
+        {!done && manage ? (
+          <button
+            type="button"
+            className={cn(dueChip, "hover:ring-1 hover:ring-border-strong")}
+            title={
+              card.due_at
+                ? `Due ${new Date(card.due_at).toLocaleString()}. Change`
+                : "Set a due time"
+            }
+            aria-label={`Due time for ${card.title}`}
+            aria-expanded={editingDue}
+            onClick={() => {
+              setDueValue(localInput(card.due_at));
+              setEditingDue((v) => !v);
+            }}
           >
-            {dueLabel(card.due_at)}
-          </span>
+            {card.due_at ? (
+              dueLabel(card.due_at)
+            ) : (
+              <CalendarClock className="size-3.5" aria-hidden="true" />
+            )}
+          </button>
+        ) : (
+          card.due_at &&
+          !done && (
+            <span
+              className={dueChip}
+              title={new Date(card.due_at).toLocaleString()}
+            >
+              {dueLabel(card.due_at)}
+            </span>
+          )
         )}
       </div>
+      {editingDue && (
+        <form
+          className="mt-2 flex items-center gap-1.5"
+          onSubmit={(e) => {
+            e.preventDefault();
+            onDue(card, due ? new Date(due).toISOString() : null);
+            setEditingDue(false);
+          }}
+        >
+          <Input
+            type="datetime-local"
+            aria-label={`Due time for ${card.title}`}
+            className="h-7 min-w-0 flex-1 px-1.5 text-xs"
+            value={due}
+            onChange={(e) => setDueValue(e.target.value)}
+          />
+          <Button type="submit" size="xs">
+            Save
+          </Button>
+          {card.due_at && (
+            <Button
+              type="button"
+              size="xs"
+              variant="ghost"
+              onClick={() => {
+                onDue(card, null);
+                setEditingDue(false);
+              }}
+            >
+              Clear
+            </Button>
+          )}
+        </form>
+      )}
       <h3 className="mt-1.5 text-[13px] leading-snug font-medium break-words">
         {card.link ? (
           <Link href={card.link} className="hover:underline">
@@ -682,6 +833,228 @@ function NewTaskDialog({
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+/** The team and their WhatsApp numbers: pi tells each person on WhatsApp when a card
+ * is given to them or due within the hour (team_alerts.py). */
+function TeamDialog({
+  manage,
+  counts,
+  onClose,
+}: {
+  manage: boolean;
+  counts: Record<string, number>;
+  onClose: () => void;
+}) {
+  const query = useScopedQuery([...KEY, "members"], () =>
+    teamBoardService.members(),
+  );
+  return (
+    <Dialog open onOpenChange={(next) => !next && onClose()}>
+      <DialogContent size="md">
+        <DialogHeader
+          title="Team"
+          description="pi messages a person on WhatsApp, from your business number, when a card is given to them and when it's due within the hour."
+        />
+        {query.isError && !query.data ? (
+          <DialogBody>
+            <ErrorState error={query.error} onRetry={() => query.refetch()} />
+          </DialogBody>
+        ) : !query.data ? (
+          <DialogBody>
+            <PageSkeleton variant="list" />
+          </DialogBody>
+        ) : (
+          <TeamForm
+            key={JSON.stringify(query.data)}
+            team={query.data}
+            manage={manage}
+            counts={counts}
+            onClose={onClose}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function TeamForm({
+  team,
+  manage,
+  counts,
+  onClose,
+}: {
+  team: TeamMembers;
+  manage: boolean;
+  counts: Record<string, number>;
+  onClose: () => void;
+}) {
+  const [enabled, setEnabled] = useState(team.enabled);
+  const [numbers, setNumbers] = useState<Record<string, string>>(() =>
+    Object.fromEntries(team.members.map((m) => [m.id, m.whatsapp])),
+  );
+  const [templateName, setTemplateName] = useState(team.template_name);
+  const [templateLanguage, setTemplateLanguage] = useState(
+    team.template_language,
+  );
+  const [error, setError] = useState<string | null>(null);
+  const save = useScopedMutation(teamBoardService.saveMembers, {
+    invalidate: [KEY],
+    success: "Team saved",
+    toastErrors: false,
+  });
+  const test = useScopedMutation(teamBoardService.testMember, {
+    success: (r) =>
+      r.delivery === "sent"
+        ? "Test message sent on WhatsApp"
+        : r.delivery === "template"
+          ? "Test sent with your template"
+          : `Their WhatsApp chat isn't open. Ask them to send "hi" to ${r.business_number ?? "your business number"} first, or add a template.`,
+  });
+  const changed = team.members.some(
+    (m) => (numbers[m.id] ?? "") !== m.whatsapp,
+  );
+  return (
+    <form
+      noValidate
+      className="flex min-h-0 flex-1 flex-col"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setError(null);
+        try {
+          await save.mutateAsync({
+            enabled,
+            numbers: Object.fromEntries(
+              team.members
+                .filter((m) => (numbers[m.id] ?? "") !== m.whatsapp)
+                .map((m) => [m.id, numbers[m.id] ?? ""]),
+            ),
+            template_name: templateName.trim(),
+            template_language: templateLanguage.trim(),
+          });
+        } catch (err) {
+          setError(errorMessage(err, "The team couldn't be saved."));
+        }
+      }}
+    >
+      <DialogBody className="space-y-4">
+        <label className="flex items-center justify-between gap-3 rounded-md border border-border p-3">
+          <span className="text-sm">
+            <span className="block font-medium">WhatsApp alerts</span>
+            <span className="text-xs text-muted-foreground">
+              Only people with a number below get them.
+            </span>
+          </span>
+          <Switch
+            checked={enabled}
+            onCheckedChange={setEnabled}
+            disabled={!manage}
+            aria-label="WhatsApp alerts"
+          />
+        </label>
+        <ul className="divide-y divide-border rounded-md border border-border">
+          {team.members.map((m) => (
+            <li
+              key={m.id}
+              className="flex flex-wrap items-center gap-2 p-2.5 sm:flex-nowrap"
+            >
+              <Avatar name={m.name} size="xs" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-medium">
+                  {m.name}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {counts[m.id] ?? 0} open ·{" "}
+                  {m.whatsapp
+                    ? m.window_open
+                      ? "chat open"
+                      : "chat closed"
+                    : "no number"}
+                </span>
+              </span>
+              {manage ? (
+                <>
+                  <Input
+                    aria-label={`${m.name}'s WhatsApp number`}
+                    inputMode="tel"
+                    autoComplete="off"
+                    placeholder="+92 300 1234567"
+                    className="h-8 w-full text-xs sm:w-44"
+                    value={numbers[m.id] ?? ""}
+                    onChange={(e) =>
+                      setNumbers((n) => ({ ...n, [m.id]: e.target.value }))
+                    }
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    disabled={!m.whatsapp || !enabled || changed}
+                    loading={test.isPending && test.variables === m.id}
+                    onClick={() => test.mutate(m.id)}
+                  >
+                    Test
+                  </Button>
+                </>
+              ) : (
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  {m.whatsapp
+                    ? m.whatsapp === "saved"
+                      ? "Saved"
+                      : `+${m.whatsapp}`
+                    : ""}
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+        <p className="text-xs text-muted-foreground">
+          WhatsApp lets pi write freely only to someone who messaged{" "}
+          {team.business_number ?? "your business number"} in the last 24 hours.
+          Otherwise pi uses your approved template, if you add one, or the
+          person only gets the notification in the app.
+        </p>
+        {manage && (
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField label="Template name" htmlFor="team-template" optional>
+              <Input
+                id="team-template"
+                autoComplete="off"
+                placeholder="task_assigned"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+              />
+            </FormField>
+            <FormField
+              label="Template language"
+              htmlFor="team-template-language"
+              optional
+              help="Body variables: {{1}} name, {{2}} task, {{3}} due."
+            >
+              <Input
+                id="team-template-language"
+                autoComplete="off"
+                placeholder="en"
+                value={templateLanguage}
+                onChange={(e) => setTemplateLanguage(e.target.value)}
+              />
+            </FormField>
+          </div>
+        )}
+        {error && <InlineError message={error} />}
+      </DialogBody>
+      <DialogFooter>
+        <Button type="button" variant="secondary" onClick={onClose}>
+          {manage ? "Cancel" : "Close"}
+        </Button>
+        {manage && (
+          <Button type="submit" loading={save.isPending}>
+            Save
+          </Button>
+        )}
+      </DialogFooter>
+    </form>
   );
 }
 
