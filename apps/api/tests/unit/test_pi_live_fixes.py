@@ -201,3 +201,21 @@ def test_that_s_all_never_gets_anything_else() -> None:
     assert "anything else" not in reply
     assert reply.endswith("Shall I send this to the team so they can prepare your proposal?")
     assert "• A mobile app" in reply and turn.awaiting_customer
+
+
+def test_a_status_question_gets_every_projects_status() -> None:
+    from app.modules.pi.service_conversation import status_lines, status_missed
+
+    context = {
+        "latest_customer_message": "What's the status of my projects?",
+        "project_deals": [
+            {"project": "Website for Car Showroom", "status": "brief sent", "next": "proposal"},
+            {"project": "Mobile App for Booking Test Drives", "status": "brief sent", "next": "x"},
+        ],
+    }
+    summary = "You want:\n• A mobile app\n\nIs there anything else you want to add?"
+    assert status_missed(summary, context)
+    built = status_lines(context)
+    assert built.count("• ") == 2 and status_missed(built, context) is None
+    context["latest_customer_message"] = "Customers should see cars with prices"
+    assert status_missed(summary, context) is None
