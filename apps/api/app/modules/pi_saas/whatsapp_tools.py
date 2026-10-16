@@ -172,13 +172,17 @@ FOLLOW_UPS: dict[str, dict[str, tuple[str, str]]] = {
 # A meeting's time and link after the 24-hour window (Utility, with variables:
 # {{1}} business, {{2}} time with zone, {{3}} link or place).
 MEETING_TEMPLATES: dict[str, tuple[str, str]] = {
+    # Meta refuses a template that starts or ends with a variable, or is mostly
+    # variables: each has an opening line and a closing line around them.
     "en": (
-        "pi_meeting_update_en",
-        "Your meeting with {{1}} is on {{2}}. Join here: {{3}}",
+        "pi_meeting_time_en",
+        "Hi, your meeting with {{1}} is on {{2}}. Join here: {{3}} Reply here if you "
+        "need to change the time.",
     ),
     "roman_ur": (
-        "pi_meeting_update_ru",
-        "{{1}} ke saath aap ki meeting {{2}} ko hai. Join karne ka link: {{3}}",
+        "pi_meeting_time_ru",
+        "Assalam o alaikum! {{1}} ke saath aap ki meeting {{2}} ko hai. Join karne ka "
+        "link: {{3}} Waqt badalna ho to yahan reply kar dein.",
     ),
 }
 MEETING_EXAMPLE = [
