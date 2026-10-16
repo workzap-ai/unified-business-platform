@@ -475,9 +475,15 @@ async def _tell(
     templates = ((settings.whatsapp_config if settings else None) or {}).get(
         "meeting_templates"
     ) or {}
-    template = templates.get(_language(conversation)) or templates.get("en")
-    if not isinstance(template, dict) or not template.get("name"):
+    # Their language's template once Meta approved it, else the approved English one.
+    ready = [
+        t
+        for t in (templates.get(_language(conversation)), templates.get("en"))
+        if isinstance(t, dict) and t.get("name") and t.get("status", "APPROVED") == "APPROVED"
+    ]
+    if not ready:
         return None
+    template = {"name": ready[0]["name"], "language": ready[0]["language"]}
     zone = str(meeting.get("zone") or "")
     when = f"{meeting.get('label')} ({ZONE_NAMES.get(zone, zone)})" if zone else meeting["label"]
     values = [

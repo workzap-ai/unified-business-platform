@@ -222,6 +222,28 @@ async def _number(session: Any, scope: Any) -> WhatsAppConnection:
     return row
 
 
+async def _refresh_meeting_templates(session: Any, scope: Any, items: list[dict[str, Any]]) -> None:
+    """Keep the saved meeting templates' Meta status current (PENDING -> APPROVED)."""
+    policy = await session.scalar(
+        WorkspaceRepository(session, PiSettings, scope).select().limit(1).with_for_update()
+    )
+    if policy is None:
+        return
+    config = dict(policy.whatsapp_config or {})
+    saved = dict(config.get("meeting_templates") or {})
+    live = {(t.get("name"), t.get("language")): t.get("status") for t in items}
+    changed = False
+    for language, template in saved.items():
+        status = live.get((template.get("name"), template.get("language")))
+        if isinstance(template, dict) and status and status != template.get("status"):
+            saved[language] = {**template, "status": status}
+            changed = True
+    if changed:
+        config["meeting_templates"] = saved
+        policy.whatsapp_config = config
+        await session.commit()
+
+
 def build() -> APIRouter:
     router = APIRouter(prefix="/pi/whatsapp", tags=["pi-whatsapp-tools"])
 
@@ -236,6 +258,7 @@ def build() -> APIRouter:
         items = await Kapso(request.app.state.settings, request.app.state.http).list_templates(
             number.business_account_id or ""
         )
+        await _refresh_meeting_templates(session, scope, items)
         return {"templates": items, "number": number.display_phone_number, "connected": True}
 
     @router.post("/templates", status_code=201)
@@ -338,7 +361,8 @@ def build() -> APIRouter:
                     )
             statuses[f"{language}:meeting"] = status
             if not status.startswith("REJECTED"):
-                meetings[language] = {"name": name, "language": meta}
+                # pi uses it only once Meta approves (refreshed when templates are listed).
+                meetings[language] = {"name": name, "language": meta, "status": status}
         config["meeting_templates"] = {**(config.get("meeting_templates") or {}), **meetings}
         policy.whatsapp_config = config
         await record(

@@ -2592,7 +2592,8 @@ async def compose_service_turn(
         if link_not_resent(turn.reply, context):
             # Still no link for "send it again": add the links they already received.
             sent = [
-                f"• {link.strip()}"
+                # "• Clinic App, proposal QUO-000020: https://…"
+                f"• {deal.get('project') or 'Your project'}, {link.strip()}"
                 for deal in context.get("project_deals") or []
                 for link in str(deal.get("links") or "").split(";")
                 if link.strip()
