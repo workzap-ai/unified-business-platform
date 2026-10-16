@@ -2134,7 +2134,9 @@ def needless_question(reply: str, context: dict[str, Any]) -> str | None:
         return (
             'it asks an open-ended question ("anything else?", "any specific features?", '
             '"koi aur?"); ask instead for the next concrete thing still missing (for a new '
-            "customer: their name and business), or confirm the brief"
+            "customer: their name and business; for a project you only know by name: one or "
+            "two short, specific questions about what it must do, e.g. who uses it and the "
+            "main things it must let them do), or confirm the brief"
         )
     return None
 
@@ -2971,7 +2973,18 @@ def needs_person(turn: ServiceTurn, context: dict[str, Any]) -> bool:
         return True
     # "That's all" / "yes" / "ok" never asks for a person, whatever the model guessed.
     closing = len(latest) <= 40 and bool(CLOSING.match(latest) or AGREES.search(latest))
-    return turn.wants_person and not closing
+    # The model's guess counts only when they really ask to talk to or reach someone
+    # (in any language); "patients pick a doctor" describes their product.
+    return turn.wants_person and not closing and bool(WANTS_TALK.search(latest))
+
+
+# Asking to talk to, reach or be called by someone, in the languages pi's customers use.
+WANTS_TALK = re.compile(
+    r"\b(?:talk|speak|chat|connect|transfer|contact|call|phone|reach|meet|discuss|"
+    r"baat|bat|rabta|raabta|milao|milwa|hablar|llamar|parler|appeler|sprechen|anrufen|"
+    r"falar|konuş\w*|berbicara|bicara)\w*|بات|رابط|تحدث|اتصل|कॉल|बात|संपर्क",
+    re.IGNORECASE,
+)
 
 
 # Asking for a person, in the languages pi's customers write in.

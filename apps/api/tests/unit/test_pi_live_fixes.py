@@ -371,3 +371,13 @@ def test_an_arranged_meeting_survives_a_new_time_request() -> None:
     assert after["change_to"] == "2026-10-16T17:00"
     assert arranged_meeting({"brief": {"meeting": after}})["label"] == booked["label"]
     assert merged_meeting(booked, ServiceTurn(reply="ok"))["link"] == booked["link"]
+
+
+def test_describing_a_product_never_hands_over() -> None:
+    from app.modules.pi.service_conversation import ServiceTurn, needs_person
+
+    guessed = ServiceTurn(reply="ok", wants_person=True)
+    feature = "Patients pick a doctor and a time, pay a deposit online, and get a reminder"
+    assert not needs_person(guessed, {"latest_customer_message": feature})
+    assert needs_person(guessed, {"latest_customer_message": "Quiero hablar con alguien"})
+    assert needs_person(guessed, {"latest_customer_message": "kisi se baat karwa do"})
