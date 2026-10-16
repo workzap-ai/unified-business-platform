@@ -7,6 +7,7 @@ import {
   BookOpenText,
   ChevronRight,
   Globe2,
+  HeartPulse,
   MessageCircle,
   Play,
   PlugZap,
@@ -114,10 +115,16 @@ function Studio({ account }: { account: Account }) {
           </h1>
           <p>A little of your knowledge. A lot of your personality.</p>
         </div>
-        <Link href="/my-pi/settings" className={s.settingsButton}>
-          <Settings2 size={16} aria-hidden />
-          All settings
-        </Link>
+        <div className="flex shrink-0 gap-2">
+          <Link href="/health" className={s.settingsButton}>
+            <HeartPulse size={16} aria-hidden />
+            pi Health
+          </Link>
+          <Link href="/my-pi/settings" className={s.settingsButton}>
+            <Settings2 size={16} aria-hidden />
+            All settings
+          </Link>
+        </div>
       </header>
 
       <section className={s.hero} aria-labelledby="pi-studio-hero">

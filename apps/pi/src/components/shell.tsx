@@ -10,6 +10,7 @@ import {
   ChevronRight,
   ChevronsUpDown,
   Handshake,
+  HeartPulse,
   Home,
   Inbox,
   Kanban,
@@ -70,6 +71,14 @@ const NAV: {
   { href: "/analytics", label: "Analytics", icon: BarChart3, mobile: false },
   // Desktop sidebar only, like Analytics: phones reach it from the inbox.
   { href: "/problems", label: "Problems", icon: Layers, mobile: false },
+  // Desktop sidebar; phones reach pi Health from My pi.
+  {
+    href: "/health",
+    label: "Health",
+    icon: HeartPulse,
+    mobile: false,
+    permission: "pi.read",
+  },
   // Desktop sidebar; phones reach Deals from Customers.
   { href: "/deals", label: "Deals", icon: Handshake, mobile: false },
   { href: "/customers", label: "Customers", icon: Users },
