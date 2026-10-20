@@ -100,6 +100,17 @@ def validate_section(section: str, value: Any) -> None:
                 ensure(
                     bool(re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", str(code.get("language", ""))))
                 )
+            meeting = value.get("meeting_templates", {})
+            ensure(isinstance(meeting, dict) and len(meeting) <= 50)
+            for language, template in meeting.items():
+                ensure(
+                    bool(re.fullmatch(r"roman_ur|[a-z]{2,3}(?:[-_][A-Za-z0-9]{2,8})?", language))
+                )
+                ensure(isinstance(template, dict) and {"name", "language"} <= set(template))
+                ensure(set(template) <= {"name", "language", "status"})
+                ensure(bool(re.fullmatch(r"[a-z0-9_]{1,512}", template["name"])))
+                ensure(bool(re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", template["language"])))
+                ensure(isinstance(template.get("status", ""), str))
             ladder = value.get("ladder_templates", {})
             ensure(isinstance(ladder, dict) and len(ladder) <= 50)
             for language, steps in ladder.items():

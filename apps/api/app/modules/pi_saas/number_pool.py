@@ -19,8 +19,11 @@ Safety:
   elsewhere).
 - Numbers with blocking problems are never offered: Meta test / display-name-only
   numbers, RED quality, sandbox numbers.
-- A released number is retired, not recycled, so a new owner can never receive the
-  previous business's customers' replies.
+- A released number is retired. Giving it to another business is an explicit operator
+  decision (``confirm_reuse``): the previous owner's connection is detached first (kept
+  for its history, never active again), so only the new owner can ever use the number.
+  The previous business's customers can still message it; those messages reach the new
+  owner, which the operator confirms knowingly.
 """
 
 from datetime import UTC, datetime, timedelta
@@ -72,6 +75,8 @@ class PoolUpdate(BaseModel):
     price_label: str | None = Field(default=None, max_length=80)
     notes: str | None = Field(default=None, max_length=300)
     status: str | None = Field(default=None, pattern=r"^(available|retired)$")
+    # Needed to make a retired number available again (the operator's explicit decision).
+    confirm_reuse: bool = False
 
 
 def view(row: PiPoolNumber, *, operator: bool = False) -> dict[str, Any]:
@@ -469,11 +474,17 @@ async def update(session: AsyncSession, pool_id: UUID, data: PoolUpdate) -> PiPo
     if row is None:
         raise ResourceNotFound
     if data.status == "available" and row.status == "retired":
-        raise BusinessRuleViolation(
-            "NUMBER_RETIRED",
-            "A retired number isn't reused, so earlier customers' replies can't reach a new "
-            "business.",
-        )
+        if not data.confirm_reuse:
+            raise BusinessRuleViolation(
+                "NUMBER_RETIRED",
+                "This number was used by another business. Its earlier customers can still "
+                "message it, and their messages would reach the next business. Confirm to "
+                "reuse it.",
+            )
+        await detach_previous_owner(session, row)
+        row.assigned_tenant_id = row.assigned_environment_id = row.assigned_at = None
+        row.offered_at = row.held_until = None
+        row.notes = (row.notes + " Reused by the operator.").strip()[:300]
     if data.status == "retired" and row.status == "assigned":
         raise Conflict("Disconnect the business from this number first")
     for field in ("country", "price_label", "notes", "status"):
@@ -481,6 +492,40 @@ async def update(session: AsyncSession, pool_id: UUID, data: PoolUpdate) -> PiPo
         if value is not None:
             setattr(row, field, value)
     return row
+
+
+async def detach_previous_owner(session: AsyncSession, row: PiPoolNumber) -> int:
+    """Take the previous business's connection off this number. Its row stays (so its
+    chats and history stay readable) but is disabled and moved to a placeholder number,
+    so the number can be linked to a new business and inbound messages find only the new
+    owner. Returns how many connections were detached."""
+    found = list(
+        await session.scalars(
+            select(WhatsAppConnection).where(
+                WhatsAppConnection.provider == "kapso",
+                WhatsAppConnection.phone_number_id == row.phone_number_id,
+            )
+        )
+    )
+    for connection in found:
+        connection.status = "disabled"
+        for prefix in range(99, 89, -1):  # 99…90: digits only, 32 characters at most
+            placeholder = f"{prefix}{row.phone_number_id[-30:]}"
+            taken = await session.scalar(
+                select(WhatsAppConnection.id).where(
+                    WhatsAppConnection.provider == "kapso",
+                    WhatsAppConnection.phone_number_id == placeholder,
+                )
+            )
+            if taken is None:
+                connection.phone_number_id = placeholder
+                break
+        else:
+            raise BusinessRuleViolation(
+                "NUMBER_REUSED_TOO_OFTEN", "This number has been reused too many times"
+            )
+    await session.flush()
+    return len(found)
 
 
 async def release_for(session: AsyncSession, provider_row: PiProviderConnection) -> None:

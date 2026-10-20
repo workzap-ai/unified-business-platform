@@ -6,6 +6,7 @@ import {
   BookOpenText,
   FlaskConical,
   Globe,
+  MessageCircle,
   MessageSquareText,
   PlugZap,
   SlidersHorizontal,
@@ -111,6 +112,12 @@ export function MyPiOverview() {
       icon: BellRing,
       title: "Follow-ups",
       body: "Friendly reminders for customers who agreed to them.",
+    },
+    {
+      href: "/settings/whatsapp",
+      icon: MessageCircle,
+      title: "WhatsApp profile",
+      body: "The photo, About line and details customers see on WhatsApp.",
     },
     {
       href: "/my-pi/advanced",

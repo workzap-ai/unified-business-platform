@@ -117,7 +117,14 @@ async def update_number(
 ) -> dict[str, Any]:
     operator.require("operator.numbers.manage")
     row = await number_pool.update(session, pool_id, data)
-    await _audit(session, operator, "pool_number_updated", {"number": row.display_phone_number})
+    await _audit(
+        session,
+        operator,
+        "pool_number_reused"
+        if data.confirm_reuse and data.status == "available"
+        else "pool_number_updated",
+        {"number": row.display_phone_number},
+    )
     await session.commit()
     return number_pool.view(row, operator=True)
 

@@ -140,6 +140,9 @@ DEFAULTS: dict[str, Any] = {
         # pi Customer's sign-in code after the 24-hour window: Meta's authentication
         # template {name, language} ({} until "Auto follow-ups" sets it up).
         "code_template": {},
+        # A meeting's time and link after the 24-hour window: Meta's approved Utility
+        # templates {"en": {name, language, status}} ("Auto follow-ups" sets them up).
+        "meeting_templates": {},
         "follow_up_ladder": True,
         # pi's picture cards (Problem Map, journey) on WhatsApp.
         "visual_cards": True,

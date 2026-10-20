@@ -196,7 +196,7 @@ async def test_pool_numbers_are_chosen_once_offered_and_retired(api, app, busine
             await api.get(f"/api/v1/operator/workspaces/{workspace.tenant_id}/whatsapp")
         ).json()
         assert panel["connection"]["status"] == "connected"
-        # Releasing retires the number; it can't be handed to someone else afterwards.
+        # Releasing retires the number; reusing it is the operator's explicit decision.
         await api.post("/api/v1/pi/whatsapp/kapso/disconnect", json={})
         row = await business_db.scalar(
             select(PiPoolNumber).where(PiPoolNumber.phone_number_id == "5000000002")
@@ -205,7 +205,31 @@ async def test_pool_numbers_are_chosen_once_offered_and_retired(api, app, busine
         reuse = await api.patch(
             f"/api/v1/operator/pi/numbers/{row.id}", json={"status": "available"}
         )
-        assert reuse.status_code == 422
+        assert reuse.status_code == 422  # not without the explicit confirmation
+        confirmed = await api.patch(
+            f"/api/v1/operator/pi/numbers/{row.id}",
+            json={"status": "available", "confirm_reuse": True},
+        )
+        assert confirmed.status_code == 200, confirmed.text
+        assert confirmed.json()["status"] == "available"
+        # The previous business's connection is detached (kept, disabled, placeholder number)
+        # so the number can go to someone else and nobody old can receive on it.
+        old = (
+            await business_db.scalars(
+                select(WhatsAppConnection).where(
+                    WhatsAppConnection.tenant_id == UUID(workspace.tenant_id)
+                )
+            )
+        ).all()
+        assert old and all(c.status == "disabled" for c in old)
+        assert all(c.phone_number_id != "5000000002" for c in old)
+        assert not await business_db.scalar(
+            select(WhatsAppConnection).where(WhatsAppConnection.phone_number_id == "5000000002")
+        )
+        again = (await second.get("/api/v1/pi-app/whatsapp/numbers")).json()
+        reused = next(n for n in again if n["display_phone_number"] == "+1 415 555 0102")
+        taken = await second.post(f"/api/v1/pi-app/whatsapp/numbers/{reused['id']}/choose", json={})
+        assert taken.status_code == 200 and taken.json()["status"] == "connected", taken.text
     finally:
         await workspace.close()
     await first.aclose()

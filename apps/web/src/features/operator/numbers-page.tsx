@@ -81,7 +81,7 @@ const api = {
         body: { country },
       },
     ),
-  update: (id: string, body: Record<string, string>) =>
+  update: (id: string, body: Record<string, string | boolean>) =>
     apiRequest<PoolRow>("PATCH", `/operator/pi/numbers/${id}`, null, { body }),
   offer: (id: string, tenantId: string) =>
     apiRequest<PoolRow>("POST", `/operator/pi/numbers/${id}/offer`, null, {
@@ -148,13 +148,14 @@ function Numbers({ me }: { me: OperatorMe }) {
   });
   const [connecting, setConnecting] = React.useState(false);
   const [offering, setOffering] = React.useState<PoolRow | null>(null);
+  const [reusing, setReusing] = React.useState<PoolRow | null>(null);
   const [country, setCountry] = React.useState("US");
   const invalidate = [["operator", "numbers"]];
   const provision = useScopedMutation(() => api.provision(country), {
     onSuccess: (r) => window.open(r.setup_url, "_blank", "noopener"),
   });
   const update = useScopedMutation(
-    ({ id, body }: { id: string; body: Record<string, string> }) =>
+    ({ id, body }: { id: string; body: Record<string, string | boolean> }) =>
       api.update(id, body),
     { invalidate, success: "Saved" },
   );
@@ -269,6 +270,15 @@ function Numbers({ me }: { me: OperatorMe }) {
                       Withdraw offer
                     </Button>
                   ) : null}
+                  {canManage && n.status === "retired" ? (
+                    <Button
+                      size="xs"
+                      variant="secondary"
+                      onClick={() => setReusing(n)}
+                    >
+                      Reuse…
+                    </Button>
+                  ) : null}
                   {canManage && n.status === "available" ? (
                     <Button
                       size="xs"
@@ -320,6 +330,7 @@ function Numbers({ me }: { me: OperatorMe }) {
         </Card>
       ) : null}
       <ConnectDialog open={connecting} onOpenChange={setConnecting} />
+      <ReuseDialog row={reusing} onOpenChange={(o) => !o && setReusing(null)} />
       <OfferDialog
         row={offering}
         onOpenChange={(o) => !o && setOffering(null)}
@@ -451,6 +462,73 @@ function ConnectDialog({
             onClick={() => connect.mutate(undefined)}
           >
             Add to pool
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** Give a retired number to a different business. The previous owner's connection is
+ * detached on the server; the operator confirms the consequence knowingly. */
+function ReuseDialog({
+  row,
+  onOpenChange,
+}: {
+  row: PoolRow | null;
+  onOpenChange: (o: boolean) => void;
+}) {
+  const [understood, setUnderstood] = React.useState(false);
+  const reuse = useScopedMutation(
+    () => api.update(row!.id, { status: "available", confirm_reuse: true }),
+    {
+      invalidate: [["operator", "numbers"]],
+      success: "Available again. Offer it to a business now.",
+      onSuccess: () => {
+        setUnderstood(false);
+        onOpenChange(false);
+      },
+    },
+  );
+  return (
+    <Dialog open={Boolean(row)} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader
+          title={`Reuse ${row?.display_phone_number ?? ""}`}
+          description="Make this retired number available to give to another business."
+        />
+        <DialogBody>
+          <div className="space-y-3 text-[13px]">
+            <p>
+              The business that used this number is taken off it. Their chats
+              and history stay in their workspace, but they can no longer send
+              or receive on it.
+            </p>
+            <p className="text-warning">
+              Their customers can still message this number. After you give it
+              to someone else, those messages will reach the new business.
+            </p>
+            <label className="flex items-start gap-2">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={understood}
+                onChange={(e) => setUnderstood(e.target.checked)}
+              />
+              <span>I understand, make this number available again.</span>
+            </label>
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            disabled={!understood}
+            loading={reuse.isPending}
+            onClick={() => reuse.mutate(undefined)}
+          >
+            Make available
           </Button>
         </DialogFooter>
       </DialogContent>

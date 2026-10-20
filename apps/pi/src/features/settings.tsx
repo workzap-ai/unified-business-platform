@@ -38,6 +38,7 @@ import {
 } from "@/components/ui";
 import { BusinessReview, NotificationSettings } from "@/features/journey";
 import { WhatsAppLiveCard } from "@/features/whatsapp-live";
+import { WhatsAppProfileCard } from "@/features/whatsapp-profile";
 import { CustomerPortalCard } from "@/features/customer/portal-setting";
 import { SignInSecurity } from "@/features/security";
 import { SetupCenter } from "@/features/setup-center";
@@ -154,7 +155,7 @@ export function SettingsOverview() {
       href: "/settings/whatsapp",
       icon: MessageCircle,
       title: "WhatsApp",
-      body: "Your connected number and its health.",
+      body: "Your connected number, its health and its public profile.",
     },
     {
       href: "/settings/team",
@@ -350,6 +351,7 @@ export function WhatsAppPage() {
               )}
             </CardSection>
           </Card>
+          <WhatsAppProfileCard />
           <CustomerPortalCard />
           <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
             <DialogContent

@@ -35,14 +35,25 @@ async def test_pi_creates_and_saves_its_follow_up_templates(app, provider, busin
         f"{lang}:{step}"
         for lang in ("en", "roman_ur")
         for step in ("reminder", "day3", "day7", "day14")
-    } | {"sign_in_code"}
+    } | {"sign_in_code", "en:meeting", "roman_ur:meeting"}
     assert all(status == "PENDING" for status in statuses.values())
     created = {(t["name"], t["language"], t["category"]) for t in provider.templates}
     assert ("pi_reminder_en", "en_US", "UTILITY") in created
     assert ("pi_followup_day14_ru", "ur", "UTILITY") in created
     # pi Customer's sign-in code after the 24-hour window.
     assert ("pi_customer_code", "en_US", "AUTHENTICATION") in created
-    assert all("{{" not in str(t.get("components")) for t in provider.templates)
+    # Only the meeting templates carry variables (the time and link, with Meta examples).
+    assert all(
+        "{{" not in str(t.get("components"))
+        for t in provider.templates
+        if not t["name"].startswith("pi_meeting_time_")
+    )
+    assert ("pi_meeting_time_en", "en_US", "UTILITY") in created
+    assert ("pi_meeting_time_ru", "ur", "UTILITY") in created
+    meeting_body = next(t for t in provider.templates if t["name"] == "pi_meeting_time_en")
+    body = meeting_body["components"][0]
+    assert body["text"].count("{{") == 3 and len(body["example"]["body_text"][0]) == 3
+    assert not body["text"].startswith("{{") and not body["text"].rstrip().endswith("}}")
 
     number = await business_db.scalar(
         select(WhatsAppConnection).where(WhatsAppConnection.phone_number_id == "8383838383")
@@ -58,6 +69,8 @@ async def test_pi_creates_and_saves_its_follow_up_templates(app, provider, busin
     assert config["reminder_enabled"] is True
     assert config["reminder_templates"]["en"] == {"name": "pi_reminder_en", "language": "en_US"}
     assert config["ladder_templates"]["roman_ur"]["day7"]["name"] == "pi_followup_day7_ru"
+    assert config["meeting_templates"]["en"]["name"] == "pi_meeting_time_en"
+    assert config["meeting_templates"]["en"]["status"] == "PENDING"
 
     # Saving the settings form afterwards keeps working (the ladder is a known field).
     view = (await client.get("/api/v1/pi-app/pi/settings")).json()

@@ -44,6 +44,7 @@ class FakeProvider:
         self.fail_kapso = False
         # WhatsApp message templates visible through Kapso's Meta proxy (campaigns/reminders).
         self.templates: list[dict[str, Any]] = []
+        self.profiles: dict[str, dict[str, Any]] = {}
         self.webhooks: dict[str, list[dict[str, Any]]] = {}
         self.flows: list[dict[str, Any]] = []
         self.connected_tokens: list[str] = []
@@ -156,6 +157,18 @@ class FakeProvider:
                 name = request.url.params.get("name", "")
                 found = [t for t in self.templates if not name or t["name"] == name]
                 return httpx.Response(200, json={"data": found})
+            if "/meta/whatsapp/" in path and path.endswith("/whatsapp_business_profile"):
+                number = path.split("/whatsapp/")[1].split("/")[1]
+                if request.method == "POST":
+                    body = json.loads(request.content)
+                    self.profiles.setdefault(number, {}).update(
+                        {k: v for k, v in body.items() if k != "messaging_product"}
+                    )
+                    return httpx.Response(200, json={"success": True})
+                saved = self.profiles.get(number, {"about": "Hey there", "vertical": "OTHER"})
+                return httpx.Response(
+                    200, json={"data": [{"messaging_product": "whatsapp", **saved}]}
+                )
             if "/meta/whatsapp/" in path and path.endswith("/messages"):
                 return httpx.Response(200, json={"messages": [{"id": f"wamid.k{next(self.ids)}"}]})
             return httpx.Response(404)

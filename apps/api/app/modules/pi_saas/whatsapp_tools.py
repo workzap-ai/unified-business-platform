@@ -14,6 +14,7 @@
   - Replies still need the signed token checked in ``flows.py``.
 """
 
+import re
 from typing import Any, Literal
 
 from fastapi import APIRouter, Request
@@ -244,6 +245,40 @@ async def _refresh_meeting_templates(session: Any, scope: Any, items: list[dict[
         await session.commit()
 
 
+VERTICALS = (
+    "ALCOHOL APPAREL AUTO BEAUTY EDU ENTERTAIN EVENT_PLAN FINANCE GOVT GROCERY HEALTH HOTEL "
+    "NONPROFIT ONLINE_GAMBLING OTC_DRUGS OTHER PHYSICAL_GAMBLING PROF_SERVICES RESTAURANT "
+    "RETAIL TRAVEL"
+).split()
+EMAIL_SHAPE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+class ProfileInput(BaseModel):
+    """What customers see on the business's WhatsApp profile (Meta's limits)."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    about: str = Field(min_length=1, max_length=139)
+    description: str = Field(default="", max_length=512)
+    address: str = Field(default="", max_length=256)
+    email: str = Field(default="", max_length=128)
+    vertical: Literal[
+        "ALCOHOL", "APPAREL", "AUTO", "BEAUTY", "EDU", "ENTERTAIN", "EVENT_PLAN", "FINANCE",
+        "GOVT", "GROCERY", "HEALTH", "HOTEL", "NONPROFIT", "ONLINE_GAMBLING", "OTC_DRUGS",
+        "OTHER", "PHYSICAL_GAMBLING", "PROF_SERVICES", "RESTAURANT", "RETAIL", "TRAVEL",
+    ] = "OTHER"  # fmt: skip
+    websites: list[str] = Field(default_factory=list, max_length=2)
+
+    def checked(self) -> "ProfileInput":
+        if self.email and not EMAIL_SHAPE.fullmatch(self.email):
+            raise BusinessRuleViolation("INVALID_EMAIL", "Enter a valid email address", 422)
+        for site in self.websites:
+            if not re.fullmatch(r"https?://\S{3,248}", site):
+                raise BusinessRuleViolation(
+                    "INVALID_WEBSITE", "Each website must start with http:// or https://", 422
+                )
+        return self
+
+
 def build() -> APIRouter:
     router = APIRouter(prefix="/pi/whatsapp", tags=["pi-whatsapp-tools"])
 
@@ -260,6 +295,51 @@ def build() -> APIRouter:
         )
         await _refresh_meeting_templates(session, scope, items)
         return {"templates": items, "number": number.display_phone_number, "connected": True}
+
+    @router.get("/profile")
+    async def profile(request: Request, scope: Scope, session: Session) -> dict[str, Any]:
+        """The connected number's public WhatsApp profile."""
+        await require_pi(session, scope, "pi.read")
+        try:
+            number = await _number(session, scope)
+        except BusinessRuleViolation:
+            return {"connected": False, "number": None, "profile": None}
+        kapso = Kapso(request.app.state.settings, request.app.state.http)
+        current = await kapso.business_profile(number.phone_number_id)
+        return {
+            "connected": True,
+            "number": number.display_phone_number,
+            "profile": current,
+            "verticals": VERTICALS,
+            "can_edit": scope.can("pi.whatsapp.manage"),
+        }
+
+    @router.put("/profile")
+    async def save_profile(
+        data: ProfileInput, request: Request, scope: Scope, session: Session
+    ) -> dict[str, Any]:
+        """Change what customers see on the WhatsApp profile (about, description, address,
+        email, category, websites). The photo isn't part of this yet."""
+        await require_pi(session, scope, "pi.whatsapp.manage")
+        data.checked()
+        number = await _number(session, scope)
+        kapso = Kapso(request.app.state.settings, request.app.state.http)
+        await kapso.update_business_profile(number.phone_number_id, data.model_dump())
+        await record(
+            session,
+            "pi.whatsapp_profile_updated",
+            scope=scope,
+            entity_type="whatsapp_connection",
+            entity_id=number.id,
+        )
+        await session.commit()
+        return {
+            "connected": True,
+            "number": number.display_phone_number,
+            "profile": await kapso.business_profile(number.phone_number_id),
+            "verticals": VERTICALS,
+            "can_edit": True,
+        }
 
     @router.post("/templates", status_code=201)
     async def create_template(
