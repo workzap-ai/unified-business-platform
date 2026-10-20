@@ -55,7 +55,9 @@ from app.shared.errors import BusinessRuleViolation, Conflict, ResourceNotFound
 from app.shared.scope import WorkspaceScope
 
 POOL_KEY = "kapso_pool_customer"
-BLOCKING = frozenset({"meta_test_number", "quality_red", "sandbox", "inbound_processing_off"})
+# A pool number that was deleted in Kapso or at Meta: kept only as history, never offered.
+GONE = "deleted_in_kapso"
+BLOCKING = frozenset({"meta_test_number", "quality_red", "sandbox", "inbound_processing_off", GONE})
 # An operator may set a sandbox number aside for a workspace to test with.
 BLOCKING_WHEN_OFFERED = BLOCKING - {"sandbox"}
 
@@ -137,6 +139,34 @@ def _apply(row: PiPoolNumber, number: PhoneNumber) -> None:
         row.country = "US"
 
 
+async def sync_gone(session: AsyncSession, live_ids: set[str]) -> int:
+    """Pool numbers Kapso no longer has (deleted there or at Meta). One nobody used is
+    removed; one that was used keeps its history but is flagged and never offered. When
+    Kapso lists nothing at all, nothing is deleted (an empty answer isn't trusted)."""
+    rows = list(
+        await session.scalars(
+            select(PiPoolNumber)
+            .where(PiPoolNumber.phone_number_id.not_in(live_ids or {""}))
+            .with_for_update()
+        )
+    )
+    for row in rows:
+        if row.status in ("available", "reserved") and live_ids:
+            await session.delete(row)
+        elif GONE not in (row.warnings or []):
+            row.warnings = [*(row.warnings or []), GONE]
+            row.notes = (row.notes + " Deleted in Kapso or Meta.").strip()[:300]
+            row.synced_at = datetime.now(UTC)
+    await session.flush()
+    return len(rows)
+
+
+async def refresh(session: AsyncSession, settings: Settings, http: httpx.AsyncClient) -> None:
+    """Drop numbers Kapso no longer has before anyone is offered one."""
+    numbers = await Kapso(settings, http).list_numbers()
+    await sync_gone(session, {n.phone_number_id for n in numbers})
+
+
 async def inventory(
     session: AsyncSession, settings: Settings, http: httpx.AsyncClient
 ) -> dict[str, Any]:
@@ -144,6 +174,7 @@ async def inventory(
     brought up to date with Kapso (new pool numbers become available)."""
     pool_id = await pool_customer(session, settings, http)
     numbers = await Kapso(settings, http).list_numbers()
+    await sync_gone(session, {n.phone_number_id for n in numbers})
     mapped = {
         c.phone_number_id: c
         for c in await session.scalars(
@@ -248,6 +279,9 @@ async def choose(
         raise Conflict("Someone just took this number. Please choose another.")
     if _blocking(row) & set(row.warnings or []):
         raise BusinessRuleViolation("NUMBER_NOT_READY", "This number isn't ready to use yet")
+    live = {n.phone_number_id for n in await Kapso(settings, http).list_numbers()}
+    if live and row.phone_number_id not in live:
+        raise Conflict("This number is no longer available. Please choose another.")
     provider_row = await connection_for(session, target)
     if provider_row.status == "connected":
         raise Conflict("This workspace already has a connected WhatsApp number")
@@ -474,6 +508,11 @@ async def update(session: AsyncSession, pool_id: UUID, data: PoolUpdate) -> PiPo
     if row is None:
         raise ResourceNotFound
     if data.status == "available" and row.status == "retired":
+        if GONE in (row.warnings or []):
+            raise BusinessRuleViolation(
+                "NUMBER_DELETED",
+                "This number was deleted in Kapso or Meta, so it can't be reused.",
+            )
         if not data.confirm_reuse:
             raise BusinessRuleViolation(
                 "NUMBER_RETIRED",

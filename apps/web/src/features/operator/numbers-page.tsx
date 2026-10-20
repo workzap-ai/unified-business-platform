@@ -53,7 +53,12 @@ interface WorkspaceOption {
 }
 
 // Numbers that can't be given to anyone until fixed (sandbox numbers can, for testing).
-const BLOCKING = ["meta_test_number", "quality_red", "inbound_processing_off"];
+const BLOCKING = [
+  "meta_test_number",
+  "quality_red",
+  "inbound_processing_off",
+  "deleted_in_kapso",
+];
 
 const WARNING: Record<string, string> = {
   meta_test_number:
@@ -66,6 +71,8 @@ const WARNING: Record<string, string> = {
   default_customer:
     "In another Kapso customer: can't join the pool through the API",
   no_customer: "Not linked to a Kapso customer",
+  deleted_in_kapso:
+    "Deleted in Kapso or Meta: kept for history, it can't be offered or reused",
 };
 
 const api = {
@@ -270,7 +277,9 @@ function Numbers({ me }: { me: OperatorMe }) {
                       Withdraw offer
                     </Button>
                   ) : null}
-                  {canManage && n.status === "retired" ? (
+                  {canManage &&
+                  n.status === "retired" &&
+                  !n.warnings.includes("deleted_in_kapso") ? (
                     <Button
                       size="xs"
                       variant="secondary"

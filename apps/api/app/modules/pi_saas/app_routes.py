@@ -740,7 +740,10 @@ async def whatsapp_disconnect(
 
 @router.get("/whatsapp/numbers")
 async def whatsapp_numbers(
-    scope: Scope, session: Session, environment: Literal["production", "test"] = "production"
+    request: Request,
+    scope: Scope,
+    session: Session,
+    environment: Literal["production", "test"] = "production",
 ) -> list[dict[str, Any]]:
     """Numbers from the platform pool this business can choose (or was offered)."""
     from app.modules.pi_saas import number_pool
@@ -748,6 +751,8 @@ async def whatsapp_numbers(
     scope.require("pi.whatsapp.manage")
     row = await _account(session, scope)
     target = connections.pi_target(row, environment)
+    await number_pool.refresh(session, request.app.state.settings, request.app.state.http)
+    await session.commit()
     return [
         {**number_pool.view(n), "offered_to_you": n.status == "reserved"}
         for n in await number_pool.available(session, target)

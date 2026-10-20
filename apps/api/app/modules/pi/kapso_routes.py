@@ -132,9 +132,13 @@ async def kapso_disconnect(
 
 
 @router.get("/numbers")
-async def available_numbers(scope: Scope, session: Session) -> list[dict[str, Any]]:
+async def available_numbers(
+    request: Request, scope: Scope, session: Session
+) -> list[dict[str, Any]]:
     await require_pi(session, scope, "pi.whatsapp.manage")
     target = await _target(session, scope)
+    await number_pool.refresh(session, request.app.state.settings, request.app.state.http)
+    await session.commit()
     return [
         {**number_pool.view(n), "offered_to_you": n.status == "reserved"}
         for n in await number_pool.available(session, target)
