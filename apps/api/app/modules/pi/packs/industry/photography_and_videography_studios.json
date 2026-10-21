@@ -1,0 +1,274 @@
+{
+ "key": "photography_and_videography_studios",
+ "name": "Photography and videography studios",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "photographer",
+  "photography studio",
+  "videographer",
+  "wedding shoot",
+  "event coverage",
+  "cinematography",
+  "drone",
+  "highlights",
+  "teaser",
+  "album",
+  "editing",
+  "retouching",
+  "raw files",
+  "delivery",
+  "product shoot",
+  "fashion shoot",
+  "corporate headshots",
+  "reels",
+  "content shoot",
+  "shoot",
+  "album kab milega",
+  "mehndi coverage",
+  "taswir",
+  "musawwir",
+  "tasweer"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Main work: weddings and events, studio portraits, commercial/product, fashion, real estate, social media content, corporate video.",
+  "Team size: lead photographer(s), second shooters, videographers, editors, album designers, drone operator; how many are freelance.",
+  "Equipment owned vs rented, and whether there is a physical studio.",
+  "Volume: shoots per week or per season.",
+  "Delivery products: online galleries, edited videos, printed albums, frames.",
+  "Pricing model: packages, per day, per deliverable, retainers for brands.",
+  "Where clients come from: Instagram, referrals, wedding planners, agencies."
+ ],
+ "scope_rule": "pi notes operational and business problems: booking and team scheduling, editing backlogs, delivery delays, file storage and loss, album production, payment collection, equipment tracking and lead follow-up. pi does not advise on copyright, model releases, image-use rights, drone flight permissions, contracts or tax; it records the friction only. pi never collects clients’ names, photos, videos or personal details, and records roles (couple, brand client, editor). pi does not help with covert photography or misuse of people’s images.",
+ "vocabulary": {
+  "raw files": "unedited camera files",
+  "culling": "selecting the best images before editing",
+  "highlights / teaser": "short edited wedding video",
+  "album design": "laying out printed wedding albums",
+  "second shooter": "additional photographer at an event",
+  "turnaround": "time from shoot to delivery",
+  "backup": "copy of files on drives or cloud",
+  "retainer": "monthly fee from a brand for regular content",
+  "drone NOC/permit": "permission to fly a drone",
+  "musawwir": "photographer (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "We’re months behind on editing and clients keep calling",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Albums from last season still haven’t been delivered",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Clients pay the advance and then delay the balance until they get the album",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Two weddings booked on the same night and not enough shooters",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Freelance shooters cancel at the last minute in peak season",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "A hard drive crashed and we lost a wedding’s footage",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "Files are scattered across drives and nobody knows where anything is",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Cameras, lenses and batteries go missing after events",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "We don’t know which equipment is out with which team",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Client keeps asking for more edits than the package includes",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Album printing lab sends wrong colours or late albums",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Editing quality changes depending on which editor did it",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Clients complain the highlights video doesn’t match what they wanted",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Instagram brings lots of DMs asking prices, but few bookings",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "I don’t follow up on enquiries because I’m always shooting",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We undercharge for travel and extra hours",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "I don’t know my real profit per wedding after freelancers, editing and albums",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Planners take commission but it isn’t recorded anywhere",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Equipment repairs and upgrades come as surprise costs",
+   "category": "planning_growth",
+   "subtype": "budgeting_process"
+  },
+  {
+   "phrase": "Wedding season is crazy, the rest of the year is dry",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Brand clients’ monthly content shoots aren’t tracked and they dispute what was delivered",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "I’m the only one who talks to clients and it’s killing me",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Client feedback comes in fragments over WhatsApp voice notes",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Our website portfolio is outdated",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  },
+  {
+   "phrase": "We want to open a second studio in another city",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "delivery": [
+   "How many projects are waiting for editing or delivery?",
+   "What’s the oldest one?",
+   "Where does it usually get stuck?"
+  ],
+  "team": [
+   "How many shooters and editors are freelance?",
+   "How do you assign them to events?"
+  ],
+  "files": [
+   "Where do the files go after a shoot?",
+   "Is there a second copy?",
+   "Have you lost files before?"
+  ],
+  "payments": [
+   "When do clients pay the balance?",
+   "How long do the slow ones take?"
+  ],
+  "scope": [
+   "What does a package include?",
+   "How do you handle extra requests?"
+  ],
+  "equipment": [
+   "How do you track what goes out with each team?"
+  ],
+  "leads": [
+   "Where do enquiries come from?",
+   "What happens after someone asks the price?"
+  ],
+  "albums": [
+   "Which lab prints your albums?",
+   "What goes wrong most often?"
+  ],
+  "money": [
+   "Do you work out profit per shoot?",
+   "Which cost is hardest to predict?"
+  ]
+ },
+ "seasons": "PK: wedding season roughly November to March with December the busiest, plus post-Eid ul Fitr weddings; Ramadan and early Muharram very slow; summer brings product, fashion (Eid and lawn campaigns are shot weeks before Eid and summer launches) and graduation shoots. UAE: weddings and corporate events October to April; Ramadan and Eid campaign shoots for brands; summer quieter with indoor commercial work; New Year and National Day events. Canada: wedding season May to October, graduation season May–June, holiday portraits November–December; South Asian weddings cluster in summer.",
+ "care": [
+  "Copyright, model releases, client image use, drone permissions and contracts are not advised on; pi notes the business problem only.",
+  "Never collect clients’ photos, videos, names or contact details through pi.",
+  "pi will not help with covert photography, sharing private images without consent, or anything involving minors’ images being misused; serious concerns go to authorities.",
+  "Drone incidents or equipment accidents with injury: emergency services first.",
+  "Freelancers and editors recorded by role.",
+  "pi does not help create fake invoices or backdated contracts."
+ ],
+ "build_ideas": [
+  "Booking calendar with event details and team assignment, with clash warnings.",
+  "Freelancer roster with confirmations and per-event payouts.",
+  "Project pipeline board: shot, culled, edited, client review, album design, printing, delivered, with ageing.",
+  "Client delivery updates sent on WhatsApp at each stage.",
+  "Payment schedule per booking with balance reminders before delivery milestones.",
+  "Package scope sheet and change-request log with extra charges.",
+  "File storage register: which drive/cloud folder holds each project, with backup confirmation.",
+  "Equipment check-out/check-in log per event.",
+  "Album lab order tracker with dates and issues.",
+  "Lead tracker from Instagram and WhatsApp with follow-ups.",
+  "Profit per shoot report: package price vs freelancers, editing, albums, travel.",
+  "Brand retainer deliverables log signed off monthly."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Pichle season ki 30 shadiyon mein se abhi 12 ki albums deliver nahi hui, log roz phone karte hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — 12 albums pending hain aur clients follow up kar rahe hain. Yeh zyada tar kis stage pe ruki hui hain, editing, design ya printing?"
+  },
+  {
+   "role": "Person",
+   "text": "Zyada tar album design pe, ek hi designer hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, ek designer pe sara load hai. Client selection kitni der mein wapas bhejte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Kai to mahino lagate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, client ki selection bhi deri ki wajah hai. Balance payment album ke saath lete hain ya pehle?"
+  }
+ ]
+}

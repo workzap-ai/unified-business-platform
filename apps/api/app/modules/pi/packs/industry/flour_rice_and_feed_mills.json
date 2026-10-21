@@ -1,0 +1,277 @@
+{
+ "key": "flour_rice_and_feed_mills",
+ "name": "Flour, rice and feed mills",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "flour mill / atta chakki",
+  "maida",
+  "suji",
+  "chokar",
+  "rice mill / husking / sheller",
+  "paddy / munji",
+  "basmati",
+  "IRRI / sella",
+  "polish",
+  "brokens / tota",
+  "feed mill",
+  "poultry feed",
+  "cattle feed / wanda",
+  "khal",
+  "pellets",
+  "premix",
+  "raw material",
+  "finished goods",
+  "bags / packing",
+  "quota",
+  "wheat release",
+  "mat’han",
+  "tahin",
+  "’alaf",
+  "Canadian feed mill / grain handling"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Mill type: flour, rice (husking, polishing, parboiling), feed (poultry, cattle, fish), or combination",
+  "Daily capacity roughly, and number of shifts",
+  "Raw material sources: open market, government wheat release, own paddy procurement, imports",
+  "Selling route: distributors, wholesalers, retail brand, export, contract to poultry farms, own farms",
+  "Credit given to buyers and taken from suppliers",
+  "Number of staff and whether there’s a lab or quality person",
+  "Systems: registers, Excel, accounting software, weighbridge software, ERP"
+ ],
+ "scope_rule": "pi notes business and operational problems: raw material purchasing and moisture or weight disputes, stock of grain, finished goods and bags, yield and wastage visibility, production planning, downtime, dispatch and credit sales, distributor management, quality complaints, staff and shift accountability, and compliance paperwork effort. pi does not advise on feed formulations, nutrient levels, medicated feed or additives, milling technology, food-safety standards, fortification rules, quota allocations, tax or export regulations. It does not store names, CNICs or numbers of suppliers, distributors, drivers or staff.",
+ "vocabulary": {
+  "chakki": "stone or small mill; also used for flour mills generally",
+  "maida / suji / chokar": "fine flour / semolina / bran",
+  "extraction / recovery": "flour or rice yield from raw grain",
+  "paddy / munji": "unhusked rice",
+  "sella": "parboiled rice",
+  "tota / brokens": "broken rice grains, sold separately",
+  "khal / wanda": "oilseed cake / cattle feed",
+  "premix": "vitamin and mineral blend added to feed (pi notes cost and supply only)",
+  "moisture cut": "deduction on raw material weight for excess moisture",
+  "kanta parchi": "weighbridge slip"
+ },
+ "problems": [
+  {
+   "phrase": "Yield from wheat is dropping and I don’t know where the loss is",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Weighbridge slip and supplier’s weight never match",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Moisture deductions cause a fight with every supplier",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Raw material ran out and the mill stood for two days",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Bought paddy too early at a high price",
+   "category": "suppliers_purchasing",
+   "subtype": "price_comparison"
+  },
+  {
+   "phrase": "Finished bags in the godown don’t match dispatch records",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Empty bags and packing material go missing",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Distributors take maal on credit and pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Raw material suppliers want cash upfront",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Prices change daily and invoices go out at the wrong rate",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Electricity cost per bag keeps rising",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "I don’t know my real cost per bag for each product",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Machine breakdowns stop the line and spare parts take days",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Production plan is in the manager’s head",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Night shift output is always lower",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Poultry farmers complain the feed quality varies batch to batch",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "A rice consignment was rejected by the exporter",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Trucks wait hours at the gate to unload or load",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Dispatch orders from distributors come on WhatsApp and calls",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Distributors in some areas are selling below our rate",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Our brand isn’t known outside our city",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "Food authority and other inspection paperwork takes days",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Reports for the bank come from three different registers",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Accounts and production records don’t talk to each other",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Owner sees the numbers only at month end",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Considering a second line but not sure about demand",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  }
+ ],
+ "questions": {
+  "raw material": [
+   "How do you buy raw material now, open market, contracts, or both?",
+   "Where do weight or moisture disputes come up?"
+  ],
+  "yield": [
+   "How do you measure how much finished product you get from each lot?",
+   "When did it last drop without a clear reason?"
+  ],
+  "stock": [
+   "Who counts finished bags and raw material?",
+   "How often does the count differ from the records?"
+  ],
+  "cost per bag": [
+   "Do you know your cost per bag for each product?",
+   "Which cost is hardest to pin down?"
+  ],
+  "production": [
+   "How is the daily production plan made?",
+   "What usually stops the line?"
+  ],
+  "quality": [
+   "How do quality complaints reach you?",
+   "Can you trace a complaint back to a batch?"
+  ],
+  "sales and credit": [
+   "How much of your selling is on credit to distributors?",
+   "How long do they usually take to pay?"
+  ],
+  "pricing": [
+   "How do rate changes reach the people making invoices?"
+  ],
+  "dispatch": [
+   "How do orders from distributors come in?",
+   "What goes wrong between order and truck?"
+  ],
+  "reporting": [
+   "What numbers do you look at daily, and how do they reach you?"
+  ],
+  "growth": [
+   "What would you want to know before adding capacity or a new product?"
+  ]
+ },
+ "seasons": "Pakistan: wheat harvest (April–May) brings procurement and stocking; government wheat release policies and flour price swings affect flour mills through the year; Ramadan lifts flour and maida demand; rice mills peak after the Kharif harvest (October– January) with export shipments following; feed demand follows poultry cycles, with higher broiler production before winter weddings (November–February) and dips in extreme summer heat; Eid ul Adha shifts cattle feed demand. UAE: flour and rice demand rise ahead of Ramadan and Eid; feed demand follows camel, goat and poultry farming and racing seasons in winter. Canada: grain harvest August– October, feed demand highest through winter for livestock.",
+ "care": [
+  "No advice on feed formulations, additives, medicated feed, antibiotics, fortification levels or food-safety parameters; pi suggests a qualified nutritionist, veterinarian or food technologist.",
+  "Dust explosions, fires, people caught in machinery or falls into silos: pi tells them to call emergency services (1122, 999/998, 911) immediately.",
+  "Never helps with adulteration, mixing low-grade grain and selling as premium, false weights, hoarding, evading quotas, under-invoicing exports or fake quality certificates.",
+  "Government quota and price-control topics are regulatory; pi notes the business impact only.",
+  "Does not store names, CNICs or numbers of suppliers, distributors, drivers or workers.",
+  "Labour safety and wage law questions: pi notes the problem, does not advise."
+ ],
+ "build_ideas": [
+  "Raw material receiving log: lot, supplier code, gross and net weight, moisture cut, weighbridge slip photo, agreed rate",
+  "Lot-to-output yield tracker showing recovery per lot and per shift",
+  "Raw material and finished goods stock by godown, with daily closing and variance flags",
+  "Packing material and empty-bag stock with issue against production",
+  "Daily production sheet by shift and line, with downtime reasons logged",
+  "Cost-per-bag view by product, pulling raw material, power, labour and packing costs",
+  "Distributor order intake via WhatsApp feeding a dispatch plan and gate pass",
+  "Central rate list pushed to invoicing staff, with rate history",
+  "Distributor ledger with credit limits, ageing and reminders",
+  "Batch records linking dispatches to production lots for complaint tracing",
+  "Gate and truck turnaround log",
+  "Maintenance log with spare parts stock and service reminders",
+  "Owner’s daily WhatsApp summary: intake, output, yield, dispatch, cash and receivables",
+  "Inspection and licence document register with reminders"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We run a feed mill in Sargodha, mostly broiler feed. Farmers keep saying one batch is good and the next isn’t."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a hard complaint to pin down when it comes and goes. Noted. When a farmer complains, can you tell which batch his feed came from?"
+  },
+  {
+   "role": "Person",
+   "text": "Not really, the bags don’t carry a batch number."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, no batch link on the bags. How do those complaints usually reach you, through the distributor or directly from the farmer?"
+  }
+ ]
+}

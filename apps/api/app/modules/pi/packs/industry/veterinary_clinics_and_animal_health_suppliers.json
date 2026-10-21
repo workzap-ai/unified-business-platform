@@ -1,0 +1,281 @@
+{
+ "key": "veterinary_clinics_and_animal_health_suppliers",
+ "name": "Veterinary clinics and animal-health suppliers",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "vet clinic",
+  "veterinary hospital",
+  "dangar daktar",
+  "janwaron ka doctor",
+  "pet clinic",
+  "small-animal clinic",
+  "large-animal vet",
+  "mobile vet",
+  "farm visits",
+  "vet store",
+  "dawai ki dukaan",
+  "animal medicine distributor",
+  "vaccine cold chain",
+  "feed additives",
+  "iyada baytariya",
+  "tabeeb baytari",
+  "pet grooming",
+  "boarding",
+  "pet shop",
+  "appointment",
+  "daily OPD",
+  "surgery",
+  "AI technician",
+  "dangar"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: pet/small-animal clinic, large-animal/farm practice, mixed, mobile vet, government-linked, animal-health shop/distributor, or a mix (clinic plus pharmacy plus grooming/boarding).",
+  "Number of vets, assistants, branches and vehicles.",
+  "Services sold: consultations, farm visits, surgery, lab, vaccinations, grooming, boarding, pharmacy, feed/supplement sales.",
+  "Booking method: walk-in, phone, WhatsApp, Instagram, a booking app.",
+  "Stock held: medicines, vaccines needing cold chain, pet food and accessories.",
+  "Systems: paper case cards, Excel, clinic software, accounting package, POS.",
+  "Customers: pet owners, dairy/poultry farms, stables, government contracts."
+ ],
+ "scope_rule": "pi notes the clinic’s or supplier’s business problems: appointments, follow-ups, stock and expiry, cold chain logistics, billing, receivables from farms, staff, records and marketing. pi never gives clinical, diagnostic, treatment, dosing or prescribing advice, even to a vet asking; it does not comment on drug scheduling, prescription rules or registration. It never helps sell unregistered, smuggled, expired or restricted medicines, or bypass prescription controls. It does not collect pet owners’ or farmers’ personal details, animal medical records content, or payment details; it records roles and counts only.",
+ "vocabulary": {
+  "OPD": "walk-in consultations",
+  "dangar": "livestock (cattle/buffalo) in common speech",
+  "farm call / field visit": "vet visiting a farm",
+  "AI technician": "artificial insemination technician",
+  "cold chain": "keeping vaccines refrigerated from supplier to use",
+  "batch / expiry": "lot number and expiry date on medicines",
+  "distributor / sub-dealer": "medicine wholesaler / small reseller",
+  "boarding": "keeping pets while owners travel",
+  "iyada baytariya": "veterinary clinic (Arabic)",
+  "tabeeb baytari": "veterinarian (Arabic)",
+  "microchipping": "pet ID chip",
+  "follow-up / booster": "return visit or next due vaccination"
+ },
+ "problems": [
+  {
+   "phrase": "Reception phone and WhatsApp don’t stop, we miss bookings",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Pet owners forget boosters and we don’t remind them",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "No-shows waste our surgery slots",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Case notes are on paper cards, we can’t find history",
+   "category": "operations_process",
+   "subtype": "no_records"
+  },
+  {
+   "phrase": "Vaccines lost when the fridge failed over the weekend",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Medicines expire on the shelf because nobody checks dates",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Pharmacy stock never matches the system",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Assistants give medicines without billing them",
+   "category": "loss_security",
+   "subtype": "void_refund_abuse"
+  },
+  {
+   "phrase": "Farm clients take visits and medicine on credit, months behind",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Vets in the field don’t log every visit, so we don’t bill it",
+   "category": "sales_revenue",
+   "subtype": "unbilled_work"
+  },
+  {
+   "phrase": "Farm call fuel and driver costs aren’t tracked",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Distributor delays on key vaccines during outbreak season",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Counterfeit products from cheaper suppliers worry us",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Google reviews complain about waiting time",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Good vets leave for the Gulf or bigger clinics",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Weekend and night emergency rota causes fights",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Grooming and boarding bookings clash with clinic work",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Owners unhappy with surprise bills",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Instagram is our main marketing but posting is random",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "Branches price the same service differently",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Licence, controlled-drug registers and inspections take hours",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Distributor: sub-dealers order on WhatsApp, orders get mixed up",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Distributor: can’t see which sales rep’s area is growing",
+   "category": "sales_revenue",
+   "subtype": "salesforce_performance"
+  },
+  {
+   "phrase": "I don’t know which service actually makes money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  }
+ ],
+ "questions": {
+  "setup": [
+   "Is it mostly pets, farm animals, or both?",
+   "How many vets and branches?"
+  ],
+  "bookings": [
+   "How do clients book with you now?",
+   "What happens when you’re busy and messages pile up?"
+  ],
+  "follow-ups": [
+   "How are clients reminded of boosters or rechecks?",
+   "Who does it?"
+  ],
+  "records": [
+   "Where is each patient’s history kept?",
+   "How long does it take to find it?"
+  ],
+  "stock": [
+   "How do you check expiry dates?",
+   "Who counts the pharmacy?"
+  ],
+  "cold chain": [
+   "What happens if the vaccine fridge fails out of hours?",
+   "How would you find out?"
+  ],
+  "billing": [
+   "How do you make sure every item and visit gets billed?",
+   "Where does it slip?"
+  ],
+  "farm credit": [
+   "Do farm clients pay later?",
+   "How far behind do they usually run?"
+  ],
+  "field vets": [
+   "How are farm visits logged?",
+   "How do you see costs like fuel?"
+  ],
+  "staff": [
+   "How is the night or weekend rota set?",
+   "What causes the most friction?"
+  ],
+  "distributor": [
+   "How do sub-dealers place orders?",
+   "How do you see each rep’s area?"
+  ],
+  "reviews": [
+   "What do unhappy clients complain about most?"
+  ]
+ },
+ "seasons": "- Pakistan: farm-vet demand rises in monsoon and early winter with disease pressure; pre-Eid ul Adha brings heavy farm and trader visits; post-Eid injuries and illnesses in purchased animals; summer heat and dairy flush cycles drive demand. - Vaccination campaigns (government or private) create bursts in demand and stock needs. - Pet clinics: summer travel (boarding peak) in UAE and Canada, Eid/Christmas holidays (boarding peak), New Year fireworks anxiety cases in Canada/UAE, puppy/kitten seasons in spring. - UAE: summer exodus means boarding peaks and clinic dips; winter is busier; pet relocation paperwork peaks before summer. - Canada: spring tick and flea season, summer, and holiday boarding.",
+ "care": [
+  "pi never offers diagnosis, treatment, dosing or drug advice, even to vets; it notes the business problem only.",
+  "An animal in emergency: pi suggests the client contacts the clinic/vet immediately; for the clinic itself pi stays on business issues.",
+  "Bites, scratches, needle-stick or zoonotic exposure to staff: pi suggests medical help, and emergency services if serious.",
+  "Never helps with unregistered/smuggled medicines, expired stock relabelling, prescription bypass or controlled-drug record falsification.",
+  "Animal records and owners’ details are private: pi records counts and roles only.",
+  "Euthanasia or animal welfare cases: pi is respectful, notes only operational issues.",
+  "Staff conflicts: noted neutrally by role."
+ ],
+ "build_ideas": [
+  "WhatsApp booking assistant that takes appointment requests by service and passes them to reception, with confirmations and reminders.",
+  "Booster and recheck reminder system based on due dates the clinic enters.",
+  "Digital patient card linked to owner account (stored securely in the clinic’s own system), searchable by staff.",
+  "Pharmacy stock and expiry tracker with batch numbers and near-expiry alerts.",
+  "Vaccine fridge temperature alerts from a sensor routed to on-call staff.",
+  "Billing checklist that links each consultation to items used, reducing missed charges.",
+  "Field-visit app for farm vets: visit logged, items used, travel, invoice sent by WhatsApp.",
+  "Farm client credit ledger with statements and reminders.",
+  "Rota planner for night and weekend cover.",
+  "Grooming/boarding calendar separate from clinic slots.",
+  "Distributor order portal for sub-dealers with rep-wise sales view.",
+  "Service-level margin report from the clinic’s own costs."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "I run a small-animal clinic in Dubai, two vets. Clients keep forgetting vaccine boosters and then blame us."
+  },
+  {
+   "role": "pi",
+   "text": "That’s frustrating, especially when it turns into a complaint. How are clients reminded right now, if at all?"
+  },
+  {
+   "role": "Person",
+   "text": "Reception is supposed to call, but they’re always busy."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — booster reminders depend on reception calling, and it gets missed when they’re busy. Where are the due dates kept?"
+  },
+  {
+   "role": "Person",
+   "text": "In the patient file on paper mostly."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, due dates sit in paper files. Roughly how many clients come through in a normal week?"
+  }
+ ]
+}

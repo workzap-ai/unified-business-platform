@@ -1,0 +1,258 @@
+{
+ "key": "cold_chain_logistics",
+ "name": "Cold-chain logistics",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "cold chain",
+  "cold storage",
+  "cold store",
+  "reefer",
+  "reefer truck",
+  "chiller",
+  "freezer",
+  "frozen",
+  "chilled",
+  "temperature log",
+  "data logger",
+  "thanda godown",
+  "cold storage mein maal",
+  "ice",
+  "barf",
+  "blast freezer",
+  "pre-cooling",
+  "plug-in",
+  "genset",
+  "temperature excursion",
+  "pharma cold chain",
+  "vaccines",
+  "dairy",
+  "meat",
+  "seafood",
+  "ice cream",
+  "frozen food",
+  "tabreed",
+  "mubarrad",
+  "HACCP"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "What they store or carry: fruit/vegetables, potatoes, meat, poultry, seafood, dairy, frozen foods, ice cream, pharma.",
+  "Storage capacity and temperature zones (chilled, frozen, deep-frozen, controlled atmosphere).",
+  "Number of reefer vehicles and whether owned or hired; number of cold rooms or sites.",
+  "Whether they store own goods, clients’ goods, or both.",
+  "Power source and backup (grid, generator, solar).",
+  "Temperature monitoring: manual logs, data loggers, remote sensors, none.",
+  "Main customers: exporters, importers, processors, restaurants/retail, pharma distributors."
+ ],
+ "scope_rule": "pi notes operational and business problems: temperature records, alarms not acted on, equipment downtime, power cost, space and stock control, deliveries, client billing, claims and coordination. It does not advise on food safety standards, pharma GDP compliance, HACCP plans, refrigeration engineering, ammonia or refrigerant safety, product shelf-life or whether spoiled goods are safe; those go to qualified food safety, pharma or refrigeration professionals. It never helps alter temperature records, relabel or re-date expired goods, or release goods that went out of range without proper checks. It records client and staff roles only, never names or IDs.",
+ "vocabulary": {
+  "reefer": "refrigerated container or truck",
+  "chilled / frozen": "roughly above-zero vs below-zero storage",
+  "excursion": "temperature going outside the allowed range",
+  "data logger": "device recording temperature over time",
+  "blast freezer": "rapid freezing room",
+  "pre-cooling": "cooling produce quickly after harvest",
+  "plug-in": "reefer container connected to power at port/yard",
+  "genset": "generator set powering reefers on the road",
+  "controlled atmosphere (CA)": "storage with managed gases for fruit",
+  "cold storage rent": "charges per crate, bag, pallet or tonne per month",
+  "thanda godown": "cold store (Urdu colloquial)",
+  "mubarrad": "refrigerated (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Temperature logs are filled by hand at the end of the shift",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "We found out about a compressor failure only in the morning",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Client claims goods spoiled in our store and we have no records to show",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Load-shedding means the generator runs half the day",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Electricity and diesel bills are eating the margin",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Reefer truck doors open too long during multi-drop deliveries",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Drivers switch off the reefer unit to save diesel",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Potato/fruit season fills the store and we turn clients away, then it’s empty half the year",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "We don’t know which chamber has whose goods and how many bags",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Clients’ bags/crates go missing or get mixed up",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Stock that sat too long ends up rotting",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Clients take goods out but rent calculations are disputed",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Rent per bag rates are set by habit, not by actual cost",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Restaurants complain frozen deliveries arrive soft",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Delivery windows for supermarkets are strict and we miss them",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Technicians aren’t available at night when units fail",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Maintenance is only done when something breaks",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Audits from clients or authorities take days to prepare records for",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Sensors exist but no one looks at the dashboard",
+   "category": "tech_systems",
+   "subtype": "user_adoption"
+  },
+  {
+   "phrase": "I can’t see temperature across all sites from my phone",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Staff don’t follow loading order and goods block the door",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Wanting to add pharma clients but our records aren’t good enough",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Hiring reliable night supervisors is hard",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  }
+ ],
+ "questions": {
+  "temperature": [
+   "How are temperatures recorded today, and how often?",
+   "Who looks at them?",
+   "What happens when a reading goes out of range?"
+  ],
+  "equipment": [
+   "How do you find out when a unit fails, especially at night?",
+   "How is maintenance planned?"
+  ],
+  "power": [
+   "How much of the day runs on generator?",
+   "Do you know what power costs you per chamber or month?"
+  ],
+  "stock": [
+   "How do you track whose goods are in which chamber?",
+   "How often are counts done, and what goes wrong?"
+  ],
+  "clients and billing": [
+   "How is rent charged — per bag, crate, pallet, tonne?",
+   "What do clients dispute most?"
+  ],
+  "deliveries": [
+   "What complaints come back from deliveries?",
+   "How do you check temperature during transport?"
+  ],
+  "claims": [
+   "When a client says goods spoiled, how do you respond?",
+   "What records do you have?"
+  ],
+  "seasons": [
+   "How full are you in peak versus off-season?"
+  ]
+ },
+ "seasons": "In Pakistan, potato harvest (December–March in Punjab) fills cold stores until the following autumn; kinnow (December–March), mango (May–August) and apple (August–October) drive fruit storage and reefer exports; Eid ul Adha brings a surge in meat storage and freezer demand. Summer heat (May–August) and load-shedding push power costs and failure risk to the peak. Ramadan lifts frozen foods, dairy and meat. In the UAE, summer temperatures stress equipment and reefer trucks; Ramadan and Eid drive food volumes; Gulfood (February) and import seasons for fruit. In Canada, harvest season (late summer–autumn), holiday food peak in December, and winter means freeze-protection issues for chilled goods in transit.",
+ "care": [
+  "Ammonia or refrigerant leaks, fire, or someone trapped in a cold room: pi stops and points to emergency services immediately.",
+  "Whether spoiled or out-of-range goods are safe to sell or use: pi never says; food safety/pharma professionals decide.",
+  "Requests to edit temperature logs, re-date or relabel goods: pi declines plainly.",
+  "Vaccines and medicines: pharma cold-chain rules are regulated; pi notes only operational problems.",
+  "Refrigeration engineering, generator sizing, electrical safety: out of scope.",
+  "Insurance or legal claims over spoilage: pi notes the business effect only.",
+  "Client and staff personal data: roles only."
+ ],
+ "build_ideas": [
+  "Temperature monitoring dashboard pulling from sensors/loggers per chamber and reefer, with WhatsApp alarms to the on-duty person and escalation if not acknowledged.",
+  "Digital temperature log with automatic readings, so records exist for client queries and audits.",
+  "Chamber-wise stock register: client, lot, bags/crates/pallets, date in, location map.",
+  "Rent calculator by unit and days stored, generating client statements and invoices.",
+  "Gate pass system for goods in/out, linked to client balances.",
+  "Reefer trip log with temperature trace and door-open events per delivery.",
+  "Preventive maintenance schedule for compressors, gensets and reefer units with technician checklists.",
+  "Power and generator log: hours, diesel, cost per day and per chamber.",
+  "Seasonal capacity planner using past occupancy by month.",
+  "Claim file per incident collecting temperature records, photos and handover notes.",
+  "Owner phone view across all sites: temperatures, alarms, occupancy, receivables."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamara cold storage Okara mein hai, aloo ka season mein full hota hai. Pichle hafte raat ko ek chamber ka compressor band ho gaya, subah pata chala."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh to pareshaani wali baat hai — raat bhar chamber ka cooling band raha aur kisi ko pata nahi chala. Noted. Abhi raat ko chambers ka temperature kaun dekhta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Chowkidar hai, lekin woh sirf gate dekhta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, raat ko temperature check karne wala koi nahi. Noted. Kya chambers mein koi meter ya sensor laga hai jo reading record karta ho?"
+  }
+ ]
+}

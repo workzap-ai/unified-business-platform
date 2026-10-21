@@ -1,0 +1,274 @@
+{
+ "key": "orchards",
+ "name": "Orchards (mango, citrus, dates, apples)",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "bagh",
+  "baghaat",
+  "aam",
+  "kinnow / malta",
+  "khajoor",
+  "seb",
+  "theka / bagh ka theka",
+  "thekedar",
+  "peti / crate",
+  "packing house / waxing",
+  "grading",
+  "export",
+  "Multan",
+  "Sargodha",
+  "Khairpur",
+  "Swat",
+  "Kalat",
+  "mazra’a",
+  "nakheel",
+  "rutab / tamr",
+  "khalas",
+  "lulu",
+  "sukkari",
+  "date factory",
+  "Okanagan / Niagara orchards",
+  "pick-your-own",
+  "cold chain"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Fruit type(s) and number of trees or acres",
+  "Own orchard, leased orchard, or the fruit sold on the tree to a thekedar",
+  "Selling route: thekedar, mandi arhti, packing house, exporter, own brand, retail or online",
+  "Whether they grade, pack, wax or store themselves",
+  "Workforce: permanent mali/caretakers versus seasonal pickers",
+  "Owner presence: on site, in the city, or abroad (common for UAE date farms and Pakistani orchards)",
+  "Export involvement and destination markets (pi notes the fact only)"
+ ],
+ "scope_rule": "pi notes business and operational problems: fruit losses in picking, packing and transport, contracts with thekedars, payment delays, grading inconsistency, crate and packing material stock, labour during picking, cold chain coordination, export paperwork effort and sales visibility. pi does not advise on tree care, pruning, spray programmes, fertiliser or pesticide choice or doses, fruit fly or disease control, post-harvest chemical or hot-water treatment parameters, phytosanitary requirements, or export regulations. It does not store names or IDs of thekedars, pickers or buyers.",
+ "vocabulary": {
+  "theka": "sale of an orchard’s fruit on the tree for a season to a contractor",
+  "thekedar": "contractor who buys the crop on the tree and harvests it",
+  "peti": "wooden or cardboard fruit crate",
+  "grading": "sorting fruit by size and quality",
+  "waxing / packing house": "facility that washes, grades, waxes and packs citrus",
+  "rutab": "fresh, soft dates; tamr — dried, mature dates",
+  "khalas, lulu, sukkari, aseel": "date varieties",
+  "jhola / phal girna": "fruit drop (pi notes losses only)",
+  "mali / chowkidar": "caretaker / watchman",
+  "nakhla / nakheel": "date palm / palms"
+ },
+ "problems": [
+  {
+   "phrase": "Gave the orchard on theka and the thekedar paid only half",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "I don’t know if theka is better or picking myself, I’ve never compared",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Fruit sold in the mandi at a rate I never get to see on paper",
+   "category": "sales_revenue",
+   "subtype": "no_sales_visibility"
+  },
+  {
+   "phrase": "Too many crates arrive bruised by the time they reach Lahore / Karachi",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Grading is different every day depending on who is on the line",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "We ran out of crates in the middle of picking",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Packing material bought too much last year, it’s still lying there",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Pickers are paid per crate and the counts get disputed",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Fruit goes missing from the orchard at night",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Caretaker sells some fruit privately",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Exporter rejected part of the consignment and I don’t know why",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Export paperwork takes days and someone always misses a document",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Cold store space wasn’t available when the fruit was ready",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Freight to the port costs more every season",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "My UAE date farm is run by a manager and I only see totals",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Dates delivered to the factory, weights on their slip differ from ours",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Corporate gift orders for dates in Ramadan pile up on WhatsApp",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "We want to sell direct online but have no website or order system",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "Repeat buyers from last year never hear from us again",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Irrigation pump breakdowns at the worst time",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Water and power bills for the farm keep climbing",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Canada: pick-your-own bookings are a mess on weekends",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Canada: seasonal worker hours and housing records are in different places",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Old trees need replacing but I don’t know which blocks earn the least",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Brothers share the bagh and the accounts cause fights",
+   "category": "planning_growth",
+   "subtype": "succession_family"
+  }
+ ],
+ "questions": {
+  "selling route": [
+   "How do you usually sell the fruit, on theka, through the mandi, or yourself?",
+   "How is the price agreed?",
+   "When does the money arrive?"
+  ],
+  "theka contracts": [
+   "How are theka terms written down?",
+   "What went wrong with the last one?"
+  ],
+  "picking and packing": [
+   "Who counts the crates during picking?",
+   "Where do the counts most often disagree?"
+  ],
+  "losses": [
+   "Where do you lose the most fruit, in the orchard, packing or transport?",
+   "How do you find out?"
+  ],
+  "grading and quality": [
+   "Who decides the grade on the line?",
+   "How often do buyers complain about it?"
+  ],
+  "packing stock": [
+   "How do you know how many crates and cartons you need?",
+   "Has it run out mid-season?"
+  ],
+  "owner visibility": [
+   "How often are you at the orchard during the season?",
+   "What do you hear from the manager, and how?"
+  ],
+  "export": [
+   "Which part of exporting takes the most of your time?",
+   "Which documents usually cause delays?"
+  ],
+  "direct sales": [
+   "Do you sell any fruit directly to customers?",
+   "How do those orders come in?"
+  ],
+  "planning": [
+   "Which blocks or varieties do you feel earn the least?",
+   "What would help you decide what to replace?"
+  ]
+ },
+ "seasons": "Pakistan mango: early varieties from May, main Sindhri and Chaunsa season June–August; theka deals often signed at flowering in spring. Kinnow and citrus: harvest December–March, packing houses and export at full stretch. Apples (Balochistan, Swat, KP): August–October. Dates in Pakistan (Khairpur, Turbat): July–September. UAE dates: harvest June–September, Liwa Date Festival in July, heavy demand for dates and date gifts in Ramadan and Eid. Canada: cherries July, apples and pears September–October, pick- your-own and agri-tourism on autumn weekends and Thanksgiving. Heatwaves, monsoon rain and hailstorms disrupt picking and transport.",
+ "care": [
+  "No advice on sprays, fertilisers, doses, fruit fly or disease control, ripening chemicals, or post-harvest treatments; pi refers to an agronomist, extension office or the relevant plant-protection authority.",
+  "Never helps with ripening fruit using banned chemicals, mislabelling origin, faking phytosanitary or export certificates, or under- invoicing exports.",
+  "Falls from ladders or palms, heatstroke in pickers, snake or scorpion bites: pi tells them to call emergency services (1122, 999/998, 911) at once.",
+  "Thekedar disputes: pi notes the operational problem and does not give legal views on the contract.",
+  "Does not record names, CNICs, Emirates IDs or visa details of pickers, caretakers or seasonal workers; Canadian seasonal worker programme questions are immigration matters pi does not advise on.",
+  "Absentee owners abroad may be worried about a manager’s honesty; pi notes trust concerns neutrally without accusing anyone.",
+  "Water rights and well permits in the UAE or Pakistan: pi notes the effort involved, not the rules."
+ ],
+ "build_ideas": [
+  "Orchard register by block: trees, variety, age, and a season-by-season record of picks, sales and costs per block",
+  "Theka contract tracker: terms, instalments due, received amounts, with WhatsApp reminders before due dates",
+  "Picking tally on phone: crates per picker per day, with the supervisor’s count and a daily pay sheet",
+  "Crate and packing material stock tracker with reorder alerts before the season",
+  "Grading log: fruit by grade per day and per line, with buyer complaints linked to dispatches",
+  "Dispatch register: truck, crates, destination, buyer, and rate received, against what was promised",
+  "Mandi sale reconciliation from arhti slips, showing deductions line by line",
+  "Export document checklist per consignment, with status and missing-item alerts",
+  "Date farm manager dashboard for owners abroad: daily weights, deliveries, labour and spend",
+  "Direct-to-customer ordering via WhatsApp and a simple web shop for seasonal boxes and Ramadan gifts",
+  "Customer list from past direct buyers with a pre-season message flow",
+  "Pick-your-own booking slots for Canadian farms",
+  "Pump and equipment maintenance log with reminders"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Pichle saal aam ka bagh theke pe diya tha, thekedar ne aadhi payment ab tak nahi di."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh to mushkil hai, aadhi payment abhi tak pending hai. Noted. Theke ki terms kahin likhi hui thin, ya zubani baat hui thi?"
+  },
+  {
+   "role": "Person",
+   "text": "Stamp paper pe tha, lekin qiston ki dates clear nahi thin."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, qiston ki dates clear nahi thin. Aap aam tor pe har saal theke pe dete hain ya kabhi khud bhi turwaate hain?"
+  }
+ ]
+}

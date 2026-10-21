@@ -1,0 +1,264 @@
+{
+ "key": "re_export_traders",
+ "name": "Re-export traders (Dubai / Jebel Ali)",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "re-export",
+  "Jebel Ali",
+  "JAFZA",
+  "free zone",
+  "mainland",
+  "Deira",
+  "Al Ras",
+  "Hamriyah",
+  "Sharjah",
+  "Ajman",
+  "Africa buyers",
+  "CIS buyers",
+  "Iran",
+  "Iraq",
+  "Afghanistan",
+  "Central Asia",
+  "dhow",
+  "Dubai Creek",
+  "Port Rashid",
+  "transit",
+  "consolidation",
+  "container",
+  "cash buyer",
+  "tajir",
+  "i’adat tasdeer",
+  "bida’a",
+  "hawala",
+  "mandoob",
+  "proforma",
+  "sample room"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "What they trade (electronics, mobile phones, auto parts, tyres, textiles, foodstuffs, cosmetics, general goods) and from where.",
+  "Which markets they sell to (Africa, CIS, South Asia, GCC, Iraq, etc.).",
+  "Whether they operate from a free zone, mainland, or both, and whether they hold stock in their own warehouse or a third-party one.",
+  "Typical buyer: walk-in cash buyers, regular agents, distributors abroad.",
+  "Shipping mode: container, LCL consolidation, air, dhow, or buyer-arranged.",
+  "Team size: sales, warehouse, documentation/PRO, accounts; whether multilingual staff handle buyers.",
+  "Systems: Excel, Tally, QuickBooks, Odoo, Zoho, or none."
+ ],
+ "scope_rule": "pi notes operational and commercial problems: stock across warehouses, buyer follow-up, order and shipment visibility, credit, margin by market, staff coordination and reporting. It does not advise on customs, free-zone rules, VAT, corporate tax, export controls, sanctions, payments routing or banking. It never helps with misdeclaring destination or goods, routing to sanctioned parties, avoiding export controls, informal value transfer, or cash structuring. It records buyer and supplier roles (“a Lagos buyer”, “a Shenzhen supplier”), never names, passport details, trade licence numbers or bank details.",
+ "vocabulary": {
+  "re-export": "goods imported into Dubai then sold onward to another country",
+  "free zone / mainland": "different licence and operating areas in the UAE",
+  "JAFZA": "Jebel Ali Free Zone",
+  "consolidation": "combining several buyers’ goods into one container",
+  "dhow": "traditional wooden vessel still used from Dubai Creek for regional trade",
+  "mandoob / PRO": "runner who handles paperwork with authorities",
+  "proforma": "advance invoice for the buyer to arrange payment",
+  "walk-in buyer": "foreign trader who visits, picks goods and pays on the spot",
+  "sample room / showroom": "where buyers inspect goods",
+  "transit": "goods passing through without entering the local market",
+  "CIF / FOB / EXW": "common delivery terms (pi does not advise on them)"
+ },
+ "problems": [
+  {
+   "phrase": "Stock is split across Jebel Ali, Al Ras and a Sharjah warehouse and no one knows exact quantities",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Buyer comes to pick goods and we find we’ve already sold them to someone else",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Old models of phones and electronics lose value every week they sit",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "African buyers’ demand dropped because of their currency crisis",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "I don’t know which market is actually profitable after freight and discounts",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Regular buyers order on WhatsApp voice notes in four languages and things get missed",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "We gave goods on credit to an agent and payment keeps getting pushed",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Too much cash collected from walk-in buyers in the showroom",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Payment comes in many different ways and matching it to invoices is hard",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "Supplier price increases come after we’ve already quoted the buyer",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Consolidated containers get delayed because one buyer’s goods aren’t ready",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Wrong cartons get loaded into a buyer’s container",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Buyer disputes quantity after arrival and we have no loading photos",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Documents for each shipment take my staff hours to prepare and fix",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Trade licence, free zone and visa renewals sneak up on us",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "My salesmen each keep their own buyers and won’t share the list",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "When a salesman leaves, his buyers go with him",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Rent and warehouse charges in the free zone keep rising",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "I quote in dirhams, buy in dollars or yuan, and get paid in another currency",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "I can’t see sales by buyer, market or product without asking accounts",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Buyers ask for photos, videos and prices of the same items again and again",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Sea freight rates jump and my landed-at-buyer price stops working",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "I want to open a branch in an African market but I can’t control it from here",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "We don’t follow up with buyers who visited once and didn’t buy",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  }
+ ],
+ "questions": {
+  "stock": [
+   "How many locations do you keep stock in?",
+   "How do you check what’s available before promising a buyer?",
+   "How often has a promised item turned out not to be there?"
+  ],
+  "buyers and orders": [
+   "How do buyers usually order — visit, WhatsApp, agent?",
+   "Where does that order get written down?",
+   "What goes wrong between order and loading?"
+  ],
+  "margin": [
+   "Do you know your margin by market or by buyer?",
+   "What eats into it most — freight, discounts, currency, something else?"
+  ],
+  "credit": [
+   "How much do you sell on credit, and to whom?",
+   "How do you track overdue balances?"
+  ],
+  "cash": [
+   "How is showroom cash recorded and deposited?",
+   "Who handles it?"
+  ],
+  "loading and disputes": [
+   "How do you confirm what went into each container?",
+   "How are quantity disputes settled now?"
+  ],
+  "admin": [
+   "What paperwork or renewals take most of your team’s time?",
+   "Who keeps track of the deadlines?"
+  ],
+  "reporting": [
+   "What do you wish you could see every morning?"
+  ]
+ },
+ "seasons": "Dubai’s re-export trade is busiest in the cooler months (October–April), when foreign buyers travel; summer (June– August) is slower. Ramadan slows daytime trade but buyers stock before it for Eid in their home markets; Eid ul Fitr and Eid ul Adha holidays shut buyers’ markets. Chinese New Year halts Chinese supply for several weeks. African markets’ festive season (December) and back-to-school (January in many markets) drive orders in October–November. Nowruz (March) affects Iranian and Central Asian trade. Major trade exhibitions (GITEX in October, Automechanika in autumn, Gulfood in February) bring buyers to Dubai. Currency crises or elections in buyer countries cause sudden drops.",
+ "care": [
+  "Anything touching sanctions, restricted end-users or destinations, dual-use goods or export controls: pi does not advise and does not help route around them; it says this needs proper compliance/legal advice.",
+  "Requests to change declared destination, consignee, values or descriptions: pi declines plainly.",
+  "Hawala, cash couriers, splitting cash to avoid reporting, or paying via third parties: pi does not engage; it can note only “receiving payments is hard to match” as a business problem.",
+  "UAE VAT, corporate tax and free-zone qualifying rules: out of scope; refer to a tax adviser.",
+  "Never stores buyer passports, Emirates IDs, trade licence numbers or bank details.",
+  "Staff visa and labour matters: immigration/legal; pi notes only the admin effort.",
+  "Large showroom cash: pi notes the risk; if there’s a robbery or threat, pi tells them to call 999."
+ ],
+ "build_ideas": [
+  "Multi-warehouse stock register with live availability and reservations, so a buyer’s goods are held once promised.",
+  "Order book per buyer: items, quantities, prices, deposits, loading date and container.",
+  "Loading checklist with carton counts and photos per container, shared with the buyer on WhatsApp.",
+  "Product catalogue with photos, videos and current prices that salesmen can send in one tap.",
+  "Buyer database owned by the company, not individual salesmen, with history and last contact.",
+  "Follow-up reminders for buyers who visited or enquired but didn’t order.",
+  "Credit ledger with ageing and approval rules for agents.",
+  "Showroom cash log with daily closing and deposit tracking.",
+  "Margin view by market, buyer and product, including freight and discounts entered per shipment.",
+  "Licence, lease and visa renewal calendar with alerts.",
+  "Ageing stock alert for fast-depreciating items (phones, electronics).",
+  "Owner dashboard: stock value by location, sales by market, receivables, containers loading this week."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We have stock in Jebel Ali and Al Ras. Last week a buyer from Nairobi came, we confirmed 200 units, then found only 140 were left."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a tough one to explain to a buyer — stock across two warehouses, and a confirmed quantity that wasn’t actually there. Noted. How did your team check availability before confirming?"
+  },
+  {
+   "role": "Person",
+   "text": "They called the warehouse guy. He looked at his Excel."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — availability comes from a phone call and a warehouse Excel sheet. How often does that sheet get updated when goods go out?"
+  }
+ ]
+}

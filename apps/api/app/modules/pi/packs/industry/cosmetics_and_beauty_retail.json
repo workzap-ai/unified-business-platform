@@ -1,0 +1,272 @@
+{
+ "key": "cosmetics_and_beauty_retail",
+ "name": "Cosmetics and beauty retail",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "cosmetics shop",
+  "beauty store",
+  "makeup",
+  "skincare",
+  "bannao singhar",
+  "makeup ka saman",
+  "lipstick",
+  "foundation",
+  "shades",
+  "testers",
+  "imported",
+  "original vs copy",
+  "first copy",
+  "Korean skincare",
+  "K-beauty",
+  "haircare",
+  "nail polish",
+  "salon products",
+  "beauty supply",
+  "mikyaj",
+  "Instagram store",
+  "Daraz",
+  "Noon",
+  "Amazon",
+  "Sephora-style",
+  "influencer",
+  "PR packages",
+  "expiry"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Store type: neighbourhood cosmetics shop, mall store, online-only, or wholesale/beauty supply to salons.",
+  "Imported vs local brands, and whether they import directly or buy from distributors.",
+  "Number of SKUs and shades carried.",
+  "Channel mix: walk-in, Instagram/TikTok, own website, marketplaces (Daraz, Noon, Amazon).",
+  "Delivery method: own riders, courier, COD share.",
+  "Whether they also run beauty services (makeup artist, testers, consultations).",
+  "Branch count."
+ ],
+ "scope_rule": "pi notes operational problems such as shade-level stock, expiry, tester wastage, online order flow, COD returns, influencer campaign tracking and staff selling. pi does not advise on product safety, ingredients, skin conditions, allergic reactions or which product suits someone’s skin. It does not advise on import licensing or cosmetic registration rules, or say whether a product is genuine. pi never records customer photos, skin details, phone numbers or addresses.",
+ "vocabulary": {
+  "shade": "colour variant of a product, each a separate SKU",
+  "tester": "open sample on display",
+  "PAO": "period-after-opening symbol on packaging",
+  "batch code": "manufacturing lot identifier",
+  "first copy / master copy": "local slang for high-grade fakes",
+  "original / imported": "claimed genuine branded product",
+  "COD": "cash on delivery",
+  "RTO": "return to origin, undelivered COD parcel",
+  "PR box / influencer kit": "free products sent for promotion",
+  "bundle / deal": "combined products at one price",
+  "restock drop": "announcement that a popular item is back",
+  "mikyaj": "makeup (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Best-selling shades go out of stock and we only notice when customers ask",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "We have boxes of colours nobody buys",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Products expire before we sell them",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Testers get used up or stolen and we don’t count the cost",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Small items walk out of the shop",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "COD orders get refused at the door and the courier charges us both ways",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Courier COD money comes late and doesn’t match",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "Instagram DMs are full of ‘price?’ and ‘is this original?’ and we can’t reply to all",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "We pay influencers and don’t know what we got",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Website stock and shop stock never match, so we oversell",
+   "category": "orders_fulfilment",
+   "subtype": "multi_channel_orders"
+  },
+  {
+   "phrase": "Daraz/Noon listings show wrong stock or wrong price",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Customers complain we sent the wrong shade",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Imported shipments stuck at customs and we miss the season",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Distributor raised prices and I didn’t update mine",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Customers buy once in a sale and never come back",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "We don’t know who our customers are, everything is walk-in",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Discount codes get shared everywhere and used too much",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Sales girls don’t know the products, so they can’t recommend",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Batch codes not tracked, so when a customer complains we can’t trace it",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Bad reviews about late delivery are hurting the page",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "I don’t know my margin per product after courier and returns",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "White Friday / 11.11 orders crash our system",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "Staff do their own discount to friends",
+   "category": "loss_security",
+   "subtype": "void_refund_abuse"
+  }
+ ],
+ "questions": {
+  "stock": [
+   "How many products and shades do you roughly carry?",
+   "How do you find out something is running low?"
+  ],
+  "expiry": [
+   "Do expiry dates get checked, and by whom?",
+   "What happens to products close to expiry?"
+  ],
+  "online orders": [
+   "Where do most orders come from, Instagram, website, marketplace or walk-in?",
+   "How does an online order reach the person packing it?"
+  ],
+  "cod and returns": [
+   "How much of your online business is COD?",
+   "What happens when a parcel is refused?"
+  ],
+  "marketing": [
+   "Do you work with influencers or run ads?",
+   "How do you tell what each one brought in?"
+  ],
+  "customers": [
+   "Do you keep any record of who buys from you?",
+   "How do you let them know about new stock or a sale?"
+  ],
+  "suppliers": [
+   "Do you import directly or buy from distributors?",
+   "What usually goes wrong with deliveries?"
+  ],
+  "staff": [
+   "How many people sell in the shop?",
+   "How do they learn about new products?"
+  ],
+  "loss": [
+   "Are testers and small items counted at any point?",
+   "Where do you think most of the loss happens?"
+  ],
+  "reporting": [
+   "At the end of the month, how do you work out what you actually made?"
+  ]
+ },
+ "seasons": "In PK: Eid ul Fitr (Chaand Raat is huge), wedding season (October to March), White Friday / 11.11 / 12.12 on Daraz and brand sites, and summer for sunscreens. In the UAE: Ramadan and Eid, Dubai Shopping Festival, White Friday / Black Friday, Singles’ Day sales on Noon and Amazon, Diwali, and the slower summer months. In Canada: Black Friday and Boxing Day, Christmas gift sets, Valentine’s and Mother’s Day, and summer for sun care. Beauty also spikes around viral social trends that are hard to predict.",
+ "care": [
+  "Never advise on ingredients, product safety, allergies, skin conditions or what to use. If someone describes a severe reaction (swelling, breathing difficulty), pi tells them to seek emergency care.",
+  "Never help sell counterfeit or “first copy” products as originals, repack or relabel expired stock, or change expiry dates.",
+  "Import permits and cosmetic registration are regulatory; pi notes only the operational effort or delay.",
+  "Do not record customer photos, skin information, phone numbers or addresses.",
+  "Influencer disputes: note the business issue, not the person’s name.",
+  "Refuse to help bypass customs or under-declare imports.",
+  "Staff theft suspicions are recorded by role and pattern only."
+ ],
+ "build_ideas": [
+  "Shade-level stock with barcode scanning, reorder points and low-stock alerts on WhatsApp.",
+  "Expiry and batch tracker with near-expiry lists to plan bundles or clearance in time.",
+  "Tester log: opened, replaced, cost written off per month.",
+  "Unified stock across shop, website, Instagram and marketplaces to stop overselling.",
+  "Order desk pulling Instagram/WhatsApp, website and marketplace orders into one pick-pack list with shade check.",
+  "COD and courier reconciliation: dispatched, delivered, refused, remitted, outstanding.",
+  "Pre-dispatch confirmation message to COD buyers to reduce refusals.",
+  "Influencer and campaign tracker with unique codes and the sales they brought.",
+  "Customer list (with consent) and WhatsApp broadcast for restocks and sales.",
+  "Discount-code rules with usage caps and reports.",
+  "Product knowledge cards for staff on phone.",
+  "Margin per product after courier, returns and marketplace fees."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamara Instagram pe bohat order aata hai lekin COD wale aadhe parcel wapis aa jaate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Ye to kaafi nuqsan wala masla hai. Noted: COD parcel bohat wapis aa rahe hain. Aap ke total online orders mein COD kitna hissa hai, andaza?"
+  },
+  {
+   "role": "Person",
+   "text": "Taqreeban sab COD hi hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted. Jab parcel wapis aata hai to courier ka kharcha aap hi ko padta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Haan, dono taraf ka."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, wapisi ka courier kharcha bhi aap pe aata hai. Order bhejne se pehle customer se koi confirmation hoti hai abhi?"
+  }
+ ]
+}

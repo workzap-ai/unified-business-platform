@@ -1,0 +1,246 @@
+{
+ "key": "elevator_and_escalator_services",
+ "name": "Elevator and escalator services",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "lift",
+  "elevator",
+  "escalator",
+  "travelator",
+  "AMC",
+  "breakdown",
+  "entrapment",
+  "callback",
+  "lift band hai",
+  "lift phans gayi",
+  "lift mein phans gaye",
+  "mas’ad",
+  "modernisation",
+  "installation",
+  "controller",
+  "ropes",
+  "door operator",
+  "inspection",
+  "third-party inspection",
+  "certificate",
+  "Civil Defence",
+  "TSSA",
+  "dumbwaiter",
+  "home lift",
+  "spare parts",
+  "OEM"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Services: new installations, maintenance/AMC, repairs, modernisation, inspections support.",
+  "Number of lifts and escalators under contract and number of buildings.",
+  "Brands serviced and whether they are an OEM agent, authorised distributor or independent.",
+  "Number of technicians, supervisors and on-call arrangements.",
+  "Building types served: residential towers, malls, hospitals, offices, villas.",
+  "Spare parts sourcing (OEM imports vs local/compatible).",
+  "Country/city (inspection and certification regimes differ)."
+ ],
+ "scope_rule": "pi notes operational and business problems: breakdown call handling and response times, preventive maintenance schedules, technician deployment, spare parts availability, AMC renewals and billing, inspection and certificate tracking, client reporting and collections. pi gives absolutely no technical or safety-engineering advice on lifts, escalators, rescues, brakes, ropes, controllers or overrides, and does not advise on inspection or certification rules. It never records names of building residents, trapped passengers, client contacts or technicians, or their IDs; it records roles and counts.",
+ "vocabulary": {
+  "AMC": "annual maintenance contract covering scheduled visits and breakdown calls",
+  "comprehensive vs non-comprehensive AMC": "whether parts are included",
+  "PM": "preventive maintenance visit",
+  "callback": "breakdown call from a client",
+  "entrapment": "passenger stuck inside a lift (always an emergency)",
+  "lift phans gayi": "the lift is stuck",
+  "modernisation": "replacing controllers, drives or doors on an old lift",
+  "OEM": "the original manufacturer",
+  "controller / drive / door operator": "key lift components",
+  "third-party inspection": "periodic independent check required by authorities",
+  "certificate / permit": "operating approval for each lift"
+ },
+ "problems": [
+  {
+   "phrase": "Breakdown calls come in at night and the on-call technician doesn’t pick up",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "We don’t know our average response time to a breakdown",
+   "category": "reporting_visibility",
+   "subtype": "kpi_undefined"
+  },
+  {
+   "phrase": "Monthly PM visits are skipped and the client finds out",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Same lift breaks down three times in a month",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Parts for old or discontinued models take months",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "OEM parts imports are stuck at customs",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Expensive parts are used on non-comprehensive contracts and never billed",
+   "category": "cash_collections",
+   "subtype": "unbilled_work"
+  },
+  {
+   "phrase": "Technicians take parts and we can’t trace which lift they went into",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Inspection certificates for some lifts expired without us noticing",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "AMCs auto-expire and we keep servicing without a valid contract",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Building managers pay AMC invoices months late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Clients want monthly reports and we prepare them by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Technicians spend half the day travelling between buildings",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Skilled lift technicians are very hard to hire and train",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Work done at a site is only in the technician’s head",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Competitors undercut our AMC rates",
+   "category": "sales_revenue",
+   "subtype": "pricing_competition"
+  },
+  {
+   "phrase": "Modernisation quotes go out and we never follow up",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "New installation projects get delayed because the building isn’t ready",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Breakdown calls come through WhatsApp groups of each building",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "I can’t see which buildings are profitable and which cost us more than they pay",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  }
+ ],
+ "questions": {
+  "portfolio": [
+   "How many lifts and escalators are you maintaining?",
+   "Roughly how many buildings is that?"
+  ],
+  "breakdowns": [
+   "How do breakdown calls reach you, day and night?",
+   "Who decides which technician goes?"
+  ],
+  "response": [
+   "Do you know how long it typically takes to reach a stuck lift?",
+   "Where does the delay usually happen?"
+  ],
+  "maintenance": [
+   "How are monthly PM visits scheduled?",
+   "How do you confirm a visit actually happened?"
+  ],
+  "parts": [
+   "Which parts are hardest to get?",
+   "How do you track which part went into which lift?"
+  ],
+  "contracts": [
+   "How do you keep track of AMC end dates?",
+   "What happens when a contract expires?"
+  ],
+  "inspections": [
+   "Who keeps track of inspection and certificate due dates?",
+   "Has anything been missed recently?"
+  ],
+  "billing": [
+   "How are AMC invoices and extra parts billed?",
+   "Which clients pay slowest?"
+  ],
+  "reporting": [
+   "What do building managers ask you for every month?",
+   "How long does preparing it take?"
+  ],
+  "team": [
+   "How many technicians do you have?",
+   "How many are on call at night?"
+  ]
+ },
+ "seasons": "In Pakistan, summer heat and load-shedding cause more controller and drive faults and entrapments during outages, and voltage fluctuation damages boards; monsoon can flood pits in basements. In the UAE, peak summer heat stresses machine rooms and drives; the busy construction cycle drives installation projects; contract renewals often follow the calendar or building fiscal year. In Canada, winter cold affects outdoor escalators and hydraulic lifts; annual inspection cycles follow the provincial regulator’s schedule.",
+ "care": [
+  "Any mention of someone trapped in a lift, an injury, a fall into a shaft, smoke or fire → pi stops immediately and tells them to call emergency services (Rescue 1122 / 15 in Pakistan, 997/999 in the UAE, 911 in Canada); pi gives no rescue instructions.",
+  "pi never explains how to override, bypass, release brakes or manually move a lift, even for a technician.",
+  "Requests to issue certificates without inspection, backdate PM records, bypass safety devices to keep a lift running, or bribe inspectors are refused.",
+  "Safety and compliance judgements belong to licensed inspectors and engineers; pi notes the tracking problem only.",
+  "Never record names of trapped people, residents or client contacts; incidents are recorded as counts and dates without personal details.",
+  "Fitting non-genuine parts while billing as OEM is not helped with."
+ ],
+ "build_ideas": [
+  "Asset register: every lift and escalator with building, brand, model, contract type, inspection and certificate dates.",
+  "Breakdown call line via WhatsApp and phone creating a ticket with time stamps (reported, assigned, arrived, fixed).",
+  "Entrapment-priority flag that escalates to supervisor and management if not acknowledged within set minutes.",
+  "On-call roster with automatic escalation.",
+  "PM scheduler with monthly visit lists and a technician checklist with photo and time proof.",
+  "Parts issue log linked to each lift, with chargeable/non-chargeable flag by contract type.",
+  "Repeat-breakdown alerts per lift to drive root-cause review or modernisation proposals.",
+  "AMC renewal and certificate expiry calendar with alerts.",
+  "Monthly client report auto-generated per building: visits, breakdowns, response times, parts used.",
+  "AMC billing and receivables tracker per building.",
+  "Modernisation and installation quote pipeline with follow-up reminders.",
+  "Profitability per contract: AMC income vs labour and parts cost."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We maintain about 300 lifts. Night breakdown calls are a mess — the duty guy doesn’t always answer."
+  },
+  {
+   "role": "pi",
+   "text": "Understood — night breakdown calls don’t always reach the on-call technician. Noted. If anyone is ever stuck in a lift, please call emergency services first. How do the night calls reach your duty technician right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Building guards call his mobile directly."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, guards call the duty technician’s mobile directly. What happens if he doesn’t pick up — is there anyone else they’re told to call?"
+  }
+ ]
+}

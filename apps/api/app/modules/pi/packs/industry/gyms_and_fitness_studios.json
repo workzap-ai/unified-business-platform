@@ -1,0 +1,279 @@
+{
+ "key": "gyms_and_fitness_studios",
+ "name": "Gyms and fitness studios",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "gym",
+  "fitness centre",
+  "fitness studio",
+  "CrossFit",
+  "boxing gym",
+  "MMA",
+  "yoga studio",
+  "Pilates",
+  "Zumba",
+  "spin",
+  "personal training",
+  "PT",
+  "membership",
+  "freeze",
+  "renewal",
+  "class schedule",
+  "trainer",
+  "ladies gym",
+  "ladies timing",
+  "gym ki fees",
+  "membership khatam",
+  "nadi riyadi",
+  "sala riyadiyya",
+  "mudarrib"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: full gym, boutique studio (yoga, Pilates, spin, boxing), ladies-only, or mixed with separate timings.",
+  "Number of members and branches.",
+  "Revenue mix: memberships, personal training, classes, supplements/café, corporate packages.",
+  "Membership terms: monthly, quarterly, annual, class packs, freezes.",
+  "Trainers: salaried, commission on PT, or freelance renting space.",
+  "Systems used: register, Excel, gym software, turnstile/biometric access, class booking app.",
+  "Location: mall, standalone, residential community, hotel."
+ ],
+ "scope_rule": "pi notes operational and business problems: renewals and churn, fee collection, trainer commissions, class utilisation, equipment downtime, cleanliness, staff and access control. pi does not give fitness, nutrition, supplement, injury or medical advice, and does not advise on health and safety rules, licensing or tax. pi never collects members’ names, body measurements, health conditions, photos or biometric data, and records roles only (member, trainer, front desk). Medical emergencies on the floor are routed to emergency services.",
+ "vocabulary": {
+  "PT": "personal training sessions, usually sold in packs",
+  "freeze": "pausing a membership for travel or illness",
+  "walk-in / day pass": "single visit without membership",
+  "renewal": "member paying for the next period",
+  "churn": "members who leave and don’t renew",
+  "class pack": "bundle of class credits",
+  "PT commission": "trainer’s share of personal training revenue",
+  "ladies timing": "hours reserved for women in mixed gyms",
+  "biometric / turnstile": "access control at entry",
+  "mudarrib": "trainer or coach (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Half of January’s new members stop coming by March and never renew",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Renewals expire and nobody calls the member",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Front desk lets people in whose membership has expired",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Members share cards or bring friends on one membership",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Trainers take PT clients privately and collect the money themselves",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "PT commission calculations cause arguments every month",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Good trainers leave and take their clients",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Treadmills and machines are out of order for weeks",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Members complain the changing rooms are dirty",
+   "category": "quality_complaints",
+   "subtype": "hygiene"
+  },
+  {
+   "phrase": "Peak evening hours are packed, mornings and afternoons empty",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Some classes are always full, others have two people",
+   "category": "reporting_visibility",
+   "subtype": "kpi_undefined"
+  },
+  {
+   "phrase": "I don’t know how many active members I actually have",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Fees are paid in cash and transfers, and I can’t reconcile them",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Discount offers are given by sales staff without approval",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Lots of enquiries on Instagram, few join",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Leads from free trials aren’t followed up",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Supplements on the counter expire before they’re sold",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Corporate packages pay late",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Electricity and AC bills are huge in summer",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Rent went up at renewal and my margins disappeared",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "Bad Google reviews about crowded hours and rude staff",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Class bookings via WhatsApp lead to overbooked classes",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "The gym software doesn’t talk to the access turnstile",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Trainers show up late for morning sessions",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Each branch runs its own way and reports different numbers",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Ramadan kills attendance and I still pay full rent",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  }
+ ],
+ "questions": {
+  "members and churn": [
+   "Roughly how many active members do you have?",
+   "How do you know when someone’s membership is about to end?",
+   "What happens then?"
+  ],
+  "entry control": [
+   "How do members get in?",
+   "How would you know if someone expired came in?"
+  ],
+  "personal training": [
+   "How are PT sessions sold and paid?",
+   "How is the trainer’s share worked out?"
+  ],
+  "trainers": [
+   "Which trainers have left recently?",
+   "What usually makes them leave?"
+  ],
+  "capacity and classes": [
+   "Which hours are packed and which are empty?",
+   "Which classes struggle to fill?"
+  ],
+  "equipment and cleanliness": [
+   "What breaks most often?",
+   "How long does it usually stay broken?"
+  ],
+  "leads": [
+   "Where do new members come from?",
+   "What happens after someone takes a trial?"
+  ],
+  "money": [
+   "How do members pay, cash, card or transfer?",
+   "How do you match payments to members?"
+  ],
+  "branches": [
+   "How many branches?",
+   "How do you compare them?"
+  ]
+ },
+ "seasons": "January New Year resolutions are a strong sign-up month everywhere; pre-summer (March to May) “summer body” push; wedding season prep in PK (October to December) for brides, grooms and families; Ramadan sees lower daytime attendance with late-night sessions after iftar or taraweeh; Eid holidays dip; UAE summer sees expats travelling and freezing memberships (July to August) while indoor demand holds for residents; September back-to-routine rush in UAE and Canada; Canada’s winter keeps indoor gyms busy, with summer dips as people go outdoors.",
+ "care": [
+  "No fitness, diet, supplement, steroid or injury advice. If asked, pi says it can’t advise on that and notes only the business issue.",
+  "Collapse, chest pain, serious injury on the floor: pi stops and points to emergency services.",
+  "Never collect members’ health data, weights, measurements, photos or biometric fingerprints.",
+  "Ladies-only areas: pi does not help with any recording or monitoring in changing rooms.",
+  "Selling unregistered or prohibited supplements or substances: pi does not help.",
+  "Trainer disputes recorded by role only.",
+  "Membership cancellation and refund disputes noted as business issues, no consumer-law advice."
+ ],
+ "build_ideas": [
+  "Member register with plan, start/end dates and status, with renewal reminders on WhatsApp before expiry.",
+  "Access check linking turnstile or front desk to membership status, flagging expired entries.",
+  "Churn watch: members who haven’t visited in a set number of days, listed for a call.",
+  "PT session log with client sign-off and automatic monthly commission calculation.",
+  "Class schedule with WhatsApp booking, capacity limits and waitlist.",
+  "Trial-to-member lead tracker with follow-up reminders.",
+  "Equipment maintenance log with downtime days per machine.",
+  "Cleaning checklist with time stamps for changing rooms and floors.",
+  "Payment reconciliation view: cash, card and transfers matched to members.",
+  "Supplement and café stock tracker with expiry alerts.",
+  "Corporate package billing and ageing.",
+  "Branch dashboard: active members, new joins, renewals, churn, revenue."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "I have around 600 members on paper, but the floor feels like 200 come regularly, and renewals are a mess."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, member count on record doesn’t match the people actually showing up, and renewals are messy. How do you find out a membership has expired right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Front desk checks the register when someone comes in, if they remember."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted that expiry is only checked at the door and not always. Does anyone contact members before their plan ends?"
+  },
+  {
+   "role": "Person",
+   "text": "No, never."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Roughly how many memberships would be ending each month?"
+  }
+ ]
+}

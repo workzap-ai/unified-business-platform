@@ -1,0 +1,281 @@
+{
+ "key": "daycare_nurseries_and_preschools",
+ "name": "Daycare, nurseries and preschools",
+ "kind": "industry",
+ "sector": {
+  "code": "J",
+  "title": "Education and childcare"
+ },
+ "signals": [
+  "daycare",
+  "day care",
+  "nursery",
+  "preschool",
+  "playgroup",
+  "Montessori",
+  "early learning centre",
+  "kindergarten",
+  "KG",
+  "toddler room",
+  "infant room",
+  "ratios",
+  "waitlist",
+  "full-day",
+  "half-day",
+  "after-care",
+  "pick-up",
+  "drop-off",
+  "nursery ki fees",
+  "bachon ki dekh bhaal",
+  "aaya / maasi",
+  "hadana",
+  "rawdat atfal",
+  "early childhood centre",
+  "nursery licence",
+  "CCFRI",
+  "$10-a-day",
+  "child care subsidy",
+  "licensed childcare",
+  "ECE"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: daycare, nursery/preschool, Montessori, or home-based; number of centres.",
+  "Licensed capacity and age groups served (infants, toddlers, preschool) — counts only.",
+  "Opening hours, full/half-day options, after-care.",
+  "Fee model: monthly, termly, hourly; any government subsidy or fee-reduction programme (Canada) — pi notes it exists, gives no advice on its rules.",
+  "Staff count by role (lead teachers, assistants, aayas, cook, cleaner) and how staffing is planned per room.",
+  "Meals: cooked on-site, catered, or packed from home.",
+  "Current tools: paper sign-in sheets, Excel, a childcare app, WhatsApp groups."
+ ],
+ "scope_rule": "pi notes the centre’s operational and business problems: enrolment and waitlist handling, fee and subsidy-claim admin effort, staff rostering, sign-in/out logistics, supplies and food stock, parent communication workload, cleaning checklists and multi- centre visibility. pi never asks for or stores any child’s name, photo, age/date of birth, health, allergy, development or incident details, or parent/staff personal details — it notes roles, rooms and counts only. It gives no advice on licensing, ratio regulations, child health or allergies, safeguarding procedure, food safety standards or employment law. Any injury, illness, missing child, abuse concern or danger is an emergency: pi stops and points to emergency services and the relevant authority.",
+ "vocabulary": {
+  "Ratio": "number of children per staff member required for an age group.",
+  "Room": "age-group class (infant room, toddler room, preschool room).",
+  "Waitlist": "families waiting for a place.",
+  "Sign-in / sign-out": "recording drop-off and pick-up.",
+  "Aaya / maasi": "caregiver or helper (Pakistan).",
+  "ECE / RECE": "early childhood educator (Canada).",
+  "Subsidy claim / CCFRI": "government fee-reduction paperwork a Canadian centre submits.",
+  "Incident report": "record of an accident or event (pi does not take details).",
+  "After-care": "care after school hours for older children.",
+  "Settling-in": "new child’s gradual start period.",
+  "Late pick-up fee": "charge when parents collect after closing."
+ },
+ "problems": [
+  {
+   "phrase": "Our waitlist is in a notebook and we lose track of who’s still interested.",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Rooms are full in toddlers but we have empty places in preschool.",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Staff call in sick and we struggle to cover rooms that morning.",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Finding qualified educators takes months.",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Staff turnover means parents keep seeing new faces and complain.",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Subsidy claims take me two evenings every month and I keep re-checking numbers.",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Government subsidy payments come late and I’m short for payroll.",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Parents pay late and some leave owing two months.",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Late pick-up fees are never actually charged.",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Sign-in sheets are paper and half the time a time is missing.",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Nappies, wipes and formula run out without warning.",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Food is wasted because we cook for full attendance every day.",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Supplies cost more every month and I don’t know where it goes.",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Cleaning and sanitising checklists are ticked but I doubt they’re done.",
+   "category": "quality_complaints",
+   "subtype": "hygiene"
+  },
+  {
+   "phrase": "Parents message the teachers’ personal WhatsApp all day.",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Daily updates to parents take staff away from the children.",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "We bought a childcare app but staff went back to paper.",
+   "category": "tech_systems",
+   "subtype": "user_adoption"
+  },
+  {
+   "phrase": "Two centres run completely differently; I can’t compare.",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Licensing inspection prep means pulling files from everywhere.",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Staff certifications and checks expire and I only find out late.",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Tour requests come by phone and Instagram and nobody books them in properly.",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "A parent left a bad Google review over one issue and it hurts enrolment.",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Summer months enrolment dips and I still pay full rent and staff.",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Opening a second centre — all the know-how is in my head.",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Rent went up at renewal and fees are already high for our area.",
+   "category": "margin_cost",
+   "subtype": "rent"
+  }
+ ],
+ "questions": {
+  "capacity": [
+   "How many places do you have across the rooms?",
+   "Which rooms are full and which have space?"
+  ],
+  "waitlist": [
+   "How is the waitlist kept today?",
+   "How often do you go through it?"
+  ],
+  "staffing": [
+   "When someone calls in sick, what happens that morning?",
+   "How often does that happen in a month?"
+  ],
+  "hiring": [
+   "How long does it take to fill an educator role?",
+   "What makes it hard?"
+  ],
+  "fees": [
+   "How do parents pay?",
+   "How many are usually behind?"
+  ],
+  "subsidy": [
+   "Do you claim any government fee programme?",
+   "How long does the monthly paperwork take?"
+  ],
+  "daily records": [
+   "How is sign-in and sign-out done?",
+   "What goes wrong with it?"
+  ],
+  "supplies and food": [
+   "Who keeps track of nappies, food and supplies?",
+   "What runs out most often?"
+  ],
+  "parents": [
+   "How do parents get updates during the day?",
+   "How much staff time does it take?"
+  ],
+  "hygiene": [
+   "How are cleaning checks recorded?",
+   "Who checks them?"
+  ],
+  "centres": [
+   "How many centres do you run?",
+   "What’s different between them?"
+  ]
+ },
+ "seasons": "- Canada: September is the biggest start; January second; summer dips with family vacations and school-age children moving to camps; winter illness season raises staff absence; provincial funding programme timelines drive admin peaks. - UAE: academic year September–June; FS1/KG feeder admissions around January–April; summer heat and travel empty centres July– August (summer camps fill some gaps); Ramadan shorter hours. - Pakistan: admissions pushes around March–April and August; summer vacation June–July reduces attendance; winter break late December; Eid holidays; smog or heatwave closures. - Year-round: illness waves, school holidays affecting after-care demand, annual fee revisions.",
+ "care": [
+  "Strictest data rule: never ask for or record any child’s name, photo, age, birth date, allergy, medical, developmental, custody or family information. If shared, pi does not repeat it and notes only the operational point.",
+  "No advice on ratios, licensing, subsidy rules, food safety, medication or allergy handling, or safeguarding procedures.",
+  "Any mention of a child injured, ill, choking, missing, left behind, abused, or of an unsafe adult at pick-up → pi stops and directs to emergency services (1122/15, 999/998, 911) and the appropriate authority; it does not continue the business conversation until the person says it is handled.",
+  "Custody disputes over pick-up: pi does not advise; it notes only “pick-up authorisation is hard to manage”.",
+  "Staff background checks and certificates: pi notes the tracking effort, no legal advice, no storing of staff documents.",
+  "CCTV or live-streaming for parents: pi notes the operational request; never helps with covert recording of staff or children.",
+  "Requests to falsify attendance or enrolment for subsidy claims: pi declines."
+ ],
+ "build_ideas": [
+  "Waitlist and enquiry tracker: family reference, preferred start month and room, tour booked, follow-up dates, offer status.",
+  "Tour booking page with calendar slots and WhatsApp confirmation.",
+  "Room capacity board: places filled vs licensed capacity per room, looking ahead by month.",
+  "Staff roster planner showing staffing per room against expected attendance and the centre’s own ratio settings, with a sick-call cover list.",
+  "Digital sign-in/out on a tablet with PINs for authorised adults (configured by the centre; no IDs stored by pi).",
+  "Fee ledger with reminders, late pick-up fee capture and payment links.",
+  "Subsidy claim workbook compiling attendance-day counts into the provincial format for the owner to check and submit.",
+  "Supplies and food stock register with par levels and reorder alerts; meal counts adjusted to expected attendance.",
+  "Cleaning and sanitising checklist app with time-stamped completion per room.",
+  "Parent communication channel separate from staff personal phones, with templated daily updates.",
+  "Staff certification and check-expiry tracker with reminders.",
+  "Multi-centre dashboard: occupancy, collections, staffing cost and checklist completion per centre.",
+  "Seasonal cash planner showing the summer dip against fixed costs."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "The subsidy paperwork every month is brutal. I sit with the sign-in sheets for two nights making sure the day counts are right."
+  },
+  {
+   "role": "pi",
+   "text": "That’s two evenings a month just reconciling attendance for the claim — noted. Are the sign-in sheets paper, or kept in an app?"
+  },
+  {
+   "role": "Person",
+   "text": "Paper. One per room per week."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, paper sheets per room per week. How many rooms are you working through each time?"
+  }
+ ]
+}

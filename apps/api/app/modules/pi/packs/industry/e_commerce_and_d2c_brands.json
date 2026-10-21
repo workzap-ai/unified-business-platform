@@ -1,0 +1,295 @@
+{
+ "key": "e_commerce_and_d2c_brands",
+ "name": "E-commerce and D2C brands",
+ "kind": "industry",
+ "sector": {
+  "code": "M",
+  "title": "Digital economy, social and public sector"
+ },
+ "signals": [
+  "Shopify",
+  "WooCommerce",
+  "my store",
+  "D2C",
+  "own website",
+  "COD",
+  "cash on delivery",
+  "RTO",
+  "returns",
+  "courier",
+  "Leopards",
+  "TCS",
+  "PostEx",
+  "Trax",
+  "M&P",
+  "Aramex",
+  "abandoned cart",
+  "ROAS",
+  "Meta ads",
+  "conversion rate",
+  "order confirm nahi hota",
+  "parcel wapas aa gaya",
+  "fake orders",
+  "payment kab aayegi",
+  "restock",
+  "drop",
+  "launch",
+  "bundle",
+  "tawseel",
+  "talabiya"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Main storefront (Shopify, WooCommerce, custom) and whether they also sell on marketplaces or Instagram.",
+  "Rough order volume per day or month and average order size band (only if they volunteer it).",
+  "Share of COD versus prepaid, and which couriers they use.",
+  "Own warehouse/home stock, third-party fulfilment, or made-to-order.",
+  "Markets served: Pakistan only, UAE/GCC, Canada, or cross-border.",
+  "Team size and who handles customer service, packing and ads.",
+  "Whether they manufacture, source locally, or import."
+ ],
+ "scope_rule": "pi notes operational problems across the order-to-cash chain: order confirmation, stock, packing, couriers, returns, COD remittance, ad tracking, customer service and reporting. It does not give tax advice (sales tax registration, VAT, GST/HST, customs duties), consumer-law or legal advice on refund policies, or advice on payment-gateway compliance. It never asks for customer names, phone numbers, addresses, card details or store/admin passwords, and records customers only as “a customer” or “repeat buyers”. It does not help with fake reviews, fake order inflation or under-declaring shipments.",
+ "vocabulary": {
+  "COD": "cash on delivery; customer pays the rider.",
+  "RTO": "return to origin; parcel refused or undelivered and sent back.",
+  "Remittance / payment cycle": "courier transferring collected COD money to the seller.",
+  "Order confirmation call": "calling or WhatsApping the buyer before dispatch.",
+  "Abandoned cart": "checkout started but not finished.",
+  "ROAS": "revenue per unit of ad spend.",
+  "SKU / variant": "specific product, size or colour.",
+  "Drop": "limited release of new stock.",
+  "Load sheet": "courier pickup list.",
+  "Fake order": "order placed with no intention to receive.",
+  "Restock alert": "notice when an item is back.",
+  "Bundle / deal": "grouped products at a set price."
+ },
+ "problems": [
+  {
+   "phrase": "Almost a third of our COD parcels come back and we pay shipping both ways",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Courier says delivered but the money hasn’t come in weeks",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "I can’t tell which courier’s settlement matches which orders",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Website shows in stock but the shelf is empty, then we cancel",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Best-sellers sell out right when the ads are running",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Old season colours just sitting there",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Wrong size or colour going into parcels",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Confirmation calls are done by one girl and half get missed",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "We spend on Meta every day but don’t know which ad actually sold",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Pixel and Shopify numbers never agree",
+   "category": "marketing_leads",
+   "subtype": "no_tracking"
+  },
+  {
+   "phrase": "Lots of add-to-carts, very few checkouts",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Customers keep asking ‘where is my parcel’ on WhatsApp all day",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "People buy once and never come back",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "I don’t really know my profit per order after shipping, returns and ads",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Courier rates went up and I didn’t notice for months",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Return parcels arrive damaged or with the wrong item inside",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Orders from website, Instagram and Daraz are in three places",
+   "category": "orders_fulfilment",
+   "subtype": "multi_channel_orders"
+  },
+  {
+   "phrase": "Website is slow on mobile and checkout breaks sometimes",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "Discount codes get shared on coupon groups and abused",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Supplier delivers late so launches slip",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Fabric/print quality varies batch to batch and customers complain",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Packers take things — stock goes missing",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "I make the monthly sales report by hand from four exports",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Shopify, courier portal and accounts don’t talk to each other",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Eid rush — we can’t plan how much to make or buy",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Refunds to prepaid customers take ages and get forgotten",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Want to start shipping to UAE but don’t know how we’d handle it operationally",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "returns/rto": [
+   "Roughly how many parcels come back out of every ten?",
+   "Do you confirm orders before sending them?",
+   "Is it certain cities or certain products?"
+  ],
+  "cod cash": [
+   "Which couriers do you use?",
+   "How long after delivery does the money usually land?",
+   "How do you check each payment against orders today?"
+  ],
+  "stock": [
+   "Where do you keep your stock count — Shopify, Excel, or in your head?",
+   "How often do you find the website and the shelf don’t match?"
+  ],
+  "ads": [
+   "Which channels are you spending on right now?",
+   "How do you decide an ad is working?"
+  ],
+  "margin": [
+   "When you think about one order, what costs do you subtract?",
+   "Do you know which products lose money once returns are counted?"
+  ],
+  "customer service": [
+   "How many “where’s my order” messages do you get a day?",
+   "Who answers them?"
+  ],
+  "channels": [
+   "Where do orders come in from?",
+   "How do they end up in one list for packing?"
+  ],
+  "packing": [
+   "How do packers know what goes in each parcel?",
+   "How do you find out a wrong item was sent?"
+  ],
+  "reporting": [
+   "What numbers do you look at every morning?",
+   "How long does it take to put them together?"
+  ],
+  "growth": [
+   "What is the next big thing you’re planning — new market, new range, more volume?",
+   "What worries you most about it?"
+  ]
+ },
+ "seasons": "Pakistan: Ramadan and Eid ul-Fitr (biggest fashion, gifting and food peak), Eid ul-Adha, wedding season (roughly November to March), 11.11 and 12.12 sales, Black Friday/“White Friday”, summer lawn launches (spring), winter collections (October onward), 14 August, school-start season. UAE: Ramadan and Eid, Dubai Shopping Festival (December–January), White Friday/Yellow Friday, 11.11, Back-to-School (late August), summer slowdown with residents travelling, National Day (2 December). Canada: Black Friday/Cyber Monday, Boxing Day, holiday season, back-to-school, Valentine’s and Mother’s Day for gifting. Ramadan moves about ten to eleven days earlier each year.",
+ "care": [
+  "Never collect customer phone numbers, addresses, card details or Shopify/courier logins; ask for patterns, not records.",
+  "Do not advise on sales tax, VAT, GST/HST, customs declaration or import duty; note “unsure about tax registration” as compliance_admin/tax_filing_effort only.",
+  "Refuse requests to generate fake reviews, inflate order counts, use competitor branding or under-declare parcel values.",
+  "Do not give legal views on refund/return policy wording or consumer-protection rules.",
+  "Fake-order and fraud discussions: note the operational pattern; do not help profile or blacklist individuals by identity.",
+  "If an owner mentions a rider or customer being threatened or harmed during delivery, point to emergency services first.",
+  "Do not promise lower RTO or higher ROAS; never quote benchmark rates.",
+  "Founders often blur personal and business money; note cash_flow_tight without giving financial advice."
+ ],
+ "build_ideas": [
+  "Single order inbox pulling Shopify/WooCommerce, Instagram DMs and marketplace orders into one packing queue.",
+  "WhatsApp order-confirmation flow that messages each COD buyer, records confirm/cancel, and holds unconfirmed orders.",
+  "COD remittance reconciler: upload courier settlement sheets, auto-match to orders, list unpaid and short-paid parcels.",
+  "RTO tracker by city, courier, product and confirmation status, showing where returns cluster.",
+  "Per-order profit view combining product cost, shipping, payment fees, returns and allocated ad spend.",
+  "Live stock sync between warehouse count and storefront with low-stock alerts on best-sellers.",
+  "Pick-and-pack checklist with barcode or SKU scan to catch wrong items before sealing.",
+  "“Where is my order” WhatsApp bot that reads courier tracking and replies automatically.",
+  "Repeat-buyer and win-back lists (without exposing personal data in reports) with campaign scheduling.",
+  "Daily owner summary on WhatsApp: orders, dispatched, delivered, returned, cash due from couriers.",
+  "Returns intake log: condition check, restock or write-off, refund status.",
+  "Seasonal buying planner using last year’s sales by SKU around Eid, sales events and launches.",
+  "Ad spend versus orders dashboard linking campaign UTM tags to actual delivered (not just placed) orders."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai sab se bara masla returns ka hai. COD parcels wapas aa jate hain aur double shipping lagti hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, yeh kaafi mehnga par jata hai. Noted — COD parcels zyada wapas aa rahe hain aur dono taraf ki shipping lag rahi hai. Kya aap order bhejne se pehle customer se confirm karte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Karte hain, lekin ek hi larki karti hai calls, aadhe miss ho jate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — confirmation ek bande par hai aur kaafi orders bina confirm ke chale jate hain. Zyada returns kisi khaas sheher ya product se aate hain, ya har jagah se?"
+  },
+  {
+   "role": "Person",
+   "text": "Karachi se kam, interior Sindh aur Punjab ke chhote sheheron se zyada."
+  }
+ ]
+}

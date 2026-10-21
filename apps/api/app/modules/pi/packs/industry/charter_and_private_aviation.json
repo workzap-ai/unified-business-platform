@@ -1,0 +1,264 @@
+{
+ "key": "charter_and_private_aviation",
+ "name": "Charter and private aviation",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "charter quote",
+  "empty leg",
+  "ferry flight",
+  "positioning",
+  "ad hoc charter",
+  "jet card",
+  "block hours",
+  "broker",
+  "operator",
+  "owner aircraft",
+  "management fee",
+  "FBO",
+  "handling",
+  "landing permit",
+  "overflight permit",
+  "catering",
+  "crew duty",
+  "Part 135-style ops",
+  "private jet",
+  "charter ka quote",
+  "rehla khassa",
+  "tayyara khassa"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Whether they are an operator (own certificate), an aircraft manager, a broker, or an owner with a managed aircraft.",
+  "Number and type of aircraft (helicopters, turboprops, light, midsize, heavy jets).",
+  "Client mix: corporate, VIP/family offices, medevac, tourism, government, broker resale.",
+  "Main base and typical destinations (domestic, Gulf, Europe, Central Asia).",
+  "How quotes are built and sent (spreadsheet, broker platforms, WhatsApp).",
+  "Whether crew are employed or freelance.",
+  "Systems used for scheduling, quoting, invoicing."
+ ],
+ "scope_rule": "pi notes the commercial and coordination side: quote speed, empty legs, client communication, trip cost overruns, owner billing, crew scheduling admin, supplier and handling invoices, and reporting. pi never advises on airworthiness, operational approvals, permits from a regulatory standpoint, duty-time rules, weather or go/no-go decisions, and never interprets PCAA, GCAA or Transport Canada requirements. It never stores client or passenger names, passport data, VIP travel details, crew licence data or medical information, and notes roles only (“principal”, “PA”, “captain”).",
+ "vocabulary": {
+  "empty leg": "a one-way repositioning flight sold at short notice",
+  "positioning / ferry": "flying the aircraft empty to where the client is",
+  "broker": "middleman who sells charters on others' aircraft",
+  "managed aircraft": "an owner's aircraft run by an operator for a fee",
+  "FBO": "private terminal and handling at an airport",
+  "block hours": "hours charged from chocks off to chocks on",
+  "handling agent": "local company arranging fuel, permits, transport at a destination",
+  "overnight / night stop": "crew and aircraft staying away from base",
+  "jet card": "prepaid flying hours",
+  "quote turnaround": "time to send a charter price"
+ },
+ "problems": [
+  {
+   "phrase": "Brokers send ten requests a day and we lose half because our quote takes hours",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Empty legs fly empty because we don’t tell anyone in time",
+   "category": "marketing_leads",
+   "subtype": "empty_leg_unsold"
+  },
+  {
+   "phrase": "We don’t know the real profit on a trip until all the handling bills come in weeks later",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Handling, fuel and catering invoices abroad come in higher than quoted",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Owner billing for managed aircraft is late and full of disputes",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Clients ask for last-minute changes on WhatsApp and someone forgets to pass it on",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Catering requests get mixed up between trips",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Freelance crew availability is tracked in my head",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Crew expenses on night stops come back as a pile of receipts",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  },
+  {
+   "phrase": "Repeat VIP clients feel we don’t remember their preferences",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "We get enquiries but can’t tell which broker or ad they came from",
+   "category": "marketing_leads",
+   "subtype": "no_tracking"
+  },
+  {
+   "phrase": "Permit and handling requests are chased by one person on phone and email",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Trip sheets are made in Word and every team edits a different copy",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Payment from new clients arrives after the flight, sometimes not at all",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Fuel prices differ wildly between airports and nobody compares",
+   "category": "suppliers_purchasing",
+   "subtype": "price_comparison"
+  },
+  {
+   "phrase": "Quotes in USD, costs in AED and PKR, and the exchange difference eats the margin",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Aircraft sits idle for days while we’re turning down trips on the other one",
+   "category": "sales_revenue",
+   "subtype": "fleet_utilisation_low"
+  },
+  {
+   "phrase": "I can’t see utilisation and revenue per aircraft in one place",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Insurance, registration and contract renewal dates get noticed at the last minute",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Clients’ passport and visa paperwork is flying around on WhatsApp",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Our website doesn’t let anyone request a quote properly",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "Owner wants monthly reports and we build them by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Ops is all on one manager, if he’s off nothing moves",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Thinking of adding an aircraft but no idea if demand is there",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "quotes": [
+   "How do charter requests come in mostly?",
+   "How long does a quote take to go out?",
+   "What slows it down?"
+  ],
+  "empty legs": [
+   "How often do you have positioning flights?",
+   "How do you let people know about them today?"
+  ],
+  "trip costs": [
+   "When do you find out the true cost of a trip?",
+   "Which cost surprises you most often?"
+  ],
+  "owner billing": [
+   "How many managed aircraft do you bill owners for?",
+   "How long does the monthly statement take?"
+  ],
+  "collections": [
+   "Do clients pay before the flight or after?",
+   "What happens when someone pays late?"
+  ],
+  "client changes": [
+   "When a client changes plans last minute, how does it reach ops and crew?",
+   "Where has it gone wrong before?"
+  ],
+  "crew admin": [
+   "Are your crew employed or freelance?",
+   "How do you check who’s free for a trip?"
+  ],
+  "suppliers": [
+   "Which handling or fuel bills cause the most arguments?",
+   "How do you check them against what was agreed?"
+  ],
+  "reporting": [
+   "What do you look at to know if an aircraft is earning?",
+   "How do you get that number today?"
+  ],
+  "growth": [
+   "Are you thinking of adding aircraft or routes?",
+   "What’s missing to make that call?"
+  ]
+ },
+ "seasons": "Summer outbound from the Gulf to Europe and cooler destinations (June to September); UAE winter season (November to March) with events, exhibitions and inbound VIP travel; Ramadan slowdowns followed by Eid travel spikes; Hajj and Umrah VIP movements; Pakistan’s northern areas helicopter and tourism demand in summer; wedding season in Pakistan (winter) with family charters; year-end corporate travel and Christmas/New Year peaks for Canadian and European clients; Canadian winter weather and summer cottage/fishing-lodge flying.",
+ "care": [
+  "Flight-safety incident in progress (emergency, accident, missing aircraft, medical emergency on board): pi stops and directs the person to emergency services and their emergency response plan.",
+  "Never comments on airworthiness, operational approvals, weather or go/no-go decisions, crew duty limits, or what PCAA, GCAA or Transport Canada would allow.",
+  "Never stores client, passenger or crew names, passport or ID numbers, visa details or VIP itineraries; roles only.",
+  "Never helps with illegal charter (flying commercially without the right approvals), hiding passengers or cargo from manifests, or getting around permits or sanctions.",
+  "Discretion around high-profile clients: pi does not ask who they are and doesn’t record identifying details even if offered.",
+  "No tax, VAT or customs advice on aircraft ownership or imports; notes the admin burden only.",
+  "Medevac businesses: pi notes scheduling and billing problems only, never clinical matters."
+ ],
+ "build_ideas": [
+  "Quick quote builder: aircraft, route, block time, positioning, handling and fees in one form producing a branded PDF quote in minutes.",
+  "Empty leg broadcaster: posts available legs to a WhatsApp broadcast list, broker contacts and the website automatically.",
+  "Trip file: one record per trip holding schedule, catering, handling, crew and changes, with change notifications to everyone involved.",
+  "Trip costing tracker comparing quoted against actual costs as invoices arrive, with margin per trip.",
+  "Owner billing module producing monthly statements per managed aircraft with cost categories.",
+  "Freelance crew availability board with acknowledgement of assignments.",
+  "Crew expense capture on phone with photo receipts and currency conversion.",
+  "Handling and fuel invoice checker against agreed quotes.",
+  "Client preference notes (stored as role/account preferences, not personal IDs) for repeat accounts.",
+  "Aircraft utilisation dashboard: flying hours, revenue, idle days per aircraft.",
+  "Renewal tracker for insurance, contracts and registrations with alerts.",
+  "Lead source tracking on enquiries from brokers, website and ads.",
+  "Website quote request form linked to the quoting tool."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We keep losing broker requests, by the time we send the price they’ve booked someone else."
+  },
+  {
+   "role": "pi",
+   "text": "That hurts, especially when the aircraft is sitting there. Noted: quotes going out too slowly to win broker requests. Roughly how long does a quote take you from request to sending?"
+  },
+  {
+   "role": "Person",
+   "text": "Two, three hours if I’m busy. I build every one in Excel myself."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, so it all runs through you and a spreadsheet. Which part of building the quote takes the longest?"
+  }
+ ]
+}

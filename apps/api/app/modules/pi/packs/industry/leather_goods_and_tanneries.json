@@ -1,0 +1,283 @@
+{
+ "key": "leather_goods_and_tanneries",
+ "name": "Leather goods and tanneries",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "tannery",
+  "leather goods",
+  "hides",
+  "skins",
+  "wet blue",
+  "crust",
+  "finished leather",
+  "khaal",
+  "chamra",
+  "kachi khaal",
+  "salted hides",
+  "Eid ul Adha skins",
+  "qurbani skins",
+  "splits",
+  "grain",
+  "nubuck",
+  "suede",
+  "sq ft",
+  "cutting",
+  "karigar",
+  "jackets",
+  "gloves",
+  "bags",
+  "belts",
+  "wallets",
+  "garments",
+  "Kasur",
+  "Korangi",
+  "Sialkot",
+  "jild"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Tannery (hides to leather), leather goods maker (leather to products), or both.",
+  "For tanneries: stages done in-house (wet blue, crust, finished) and hide sources (local collectors, slaughterhouses, Eid collection, imports).",
+  "For goods makers: product types (garments, gloves, bags, small leather goods, saddlery) and export vs local.",
+  "Monthly volume in hides or pieces, roughly.",
+  "Whether cutting and stitching are in-house or with karigars/subcontractors.",
+  "How leather stock is measured and recorded (sq ft, pieces, kg)."
+ ],
+ "scope_rule": "pi notes operational problems: hide quality and grading disputes, leather stock confusion, cutting yield, late orders, subcontractor delays, receivables and cash tied up in seasonal hide buying. pi does not advise on chemical handling, effluent treatment, environmental permits, chrome or wastewater regulation, animal-origin certification, or export documentation. Chemical exposure and gas incidents in drums or pits are emergencies. pi never stores names of hide collectors, workers or buyers; it uses roles.",
+ "vocabulary": {
+  "khaal/ chamra": "hide or skin / leather",
+  "wet blue": "chrome-tanned hide, semi-processed",
+  "crust": "tanned and dried leather before finishing",
+  "splits": "lower layer of a hide after splitting",
+  "grain / full grain": "top surface of leather",
+  "sq ft": "the unit leather is sold and measured in",
+  "grading / selection": "sorting hides by defects into grades",
+  "cutting yield": "how much usable area comes from each hide",
+  "karigar": "skilled leather worker",
+  "qurbani khaal": "sacrificial animal skins collected at Eid ul Adha",
+  "drum": "rotating vessel used in tanning",
+  "jild": "leather (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Eid ul Adha skins arrive all at once and we can’t process them fast enough",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Skins rot because salting was poor at collection",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Collectors grade hides one way, we grade another, always a fight",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "All our cash goes into hides at Eid and we’re stretched for months",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Leather stock in sq ft never matches the books",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Cutting yield is low and karigars waste leather",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Offcuts disappear from the cutting section",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Colour or finish varies between lots and the buyer rejects",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Chemical prices went up and we didn’t change our quotes",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "We don’t know the cost per sq ft of finished leather",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Jackets or gloves sent to outside karigars come back late",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Pieces sent and pieces returned by subcontractors don’t match",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Buyer samples take too long, we lose the order",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Export buyer pays late and adds claims",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Grades B and C pile up unsold",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Finished goods stock is in three places and no one has the full count",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Skilled karigars are hard to find and the young don’t want the work",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Orders are tracked on WhatsApp with the merchandiser",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Buyer wants traceability documents and we dig through files",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Machines (splitting, shaving) break down in peak time",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Local retail shop sales of leather goods aren’t recorded properly",
+   "category": "sales_revenue",
+   "subtype": "no_sales_visibility"
+  },
+  {
+   "phrase": "No online presence, buyers find us only through agents",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "Owner doesn’t know which product line actually makes money",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Process permits and renewals keep the office busy",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  }
+ ],
+ "questions": {
+  "hides": [
+   "Where do most hides come from?",
+   "How are they graded when they arrive?",
+   "Where do disputes usually start?"
+  ],
+  "eid peak": [
+   "What happens in the weeks after Eid ul Adha?",
+   "What’s the biggest headache then?"
+  ],
+  "stock": [
+   "How is leather stock counted — sq ft, pieces or weight?",
+   "How often is it checked against the books?"
+  ],
+  "cutting": [
+   "How do you know how much leather a karigar should use per piece?",
+   "What happens to offcuts?"
+  ],
+  "quality": [
+   "What do buyers reject most — colour, finish, defects or sizing?",
+   "Is that checked before dispatch?"
+  ],
+  "subcontracting": [
+   "How much of the stitching goes outside?",
+   "How do you track pieces sent and returned?"
+  ],
+  "costing": [
+   "Do you know your cost per sq ft or per piece right now?",
+   "What makes it hard to work out?"
+  ],
+  "cash": [
+   "How long is cash tied up between buying hides and getting paid?",
+   "Who follows up on payments?"
+  ],
+  "orders": [
+   "How are buyer orders and samples tracked?",
+   "What slips most often?"
+  ],
+  "staff": [
+   "Which skills are hardest to find?",
+   "How do you train new workers?"
+  ],
+  "sales": [
+   "Where do new buyers come from today?",
+   "What do they ask to see first?"
+  ]
+ },
+ "seasons": "Pakistan: Eid ul Adha is the single biggest raw hide event, with a flood of skins over a few days, needing fast salting and processing, and cash outlay; the date moves about 11 days earlier each year. Winter demand for leather jackets locally (November to February); export orders for jackets and gloves are produced in spring and summer for Western autumn/winter; motorcycle and work gloves steady year-round; summer heat affects raw hide preservation. UAE: leather goods trade and retail peaks in Dubai Shopping Festival, Ramadan and Eid gifting, and the tourist season (October to April). Canada: leather goods and outerwear peak in autumn and holiday gifting; winter accessories.",
+ "care": [
+  "Gas exposure in pits or drums (e.g. hydrogen sulphide), chemical burns, fires: pi stops and points to emergency services immediately.",
+  "No advice on chemicals, chrome, effluent treatment, environmental permits or how to handle inspectors.",
+  "No help to misdeclare species, origin or materials (e.g. calling synthetic “genuine leather”, or restricted species) or to under-invoice.",
+  "No guidance on animal welfare, halal or religious rulings around qurbani skins; pi notes collection logistics only.",
+  "Never stores hide collectors’, charities’ or workers’ personal details; uses roles.",
+  "Child labour or unsafe conditions mentioned: pi does not help optimise these."
+ ],
+ "build_ideas": [
+  "Hide intake register: source type, count, weight, grade at receipt, photos, with disputed lots flagged.",
+  "Eid collection tracker: lots by area and collector type, salting date, arrival date and processing queue.",
+  "Lot tracker from raw hide to wet blue to crust to finished, with yield at each stage.",
+  "Leather stock in sq ft by grade, colour and lot, across stores.",
+  "Cutting issue and return log per karigar with expected vs actual consumption.",
+  "Offcut and scrap register with sales recorded.",
+  "Subcontractor ledger: pieces sent, received, rejected and payments.",
+  "Costing sheet per article using current hide and chemical rates.",
+  "Order and sample tracker with buyer deadlines and status.",
+  "Receivables and claims tracker per buyer.",
+  "Graded stock list (B/C grades) shareable with local buyers.",
+  "Permit and certificate renewal calendar."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Eid ke baad 3 hafte pagal pan hota hai, khaalain aati hain aur hisaab ka pata nahi chalta kis ki kitni aayi."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted: Eid ul Adha ke baad khaalon ki aamad ka record clear nahi rehta. Abhi aamad kahan likhi jaati hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Gate pe register hai, par raat ko trucks aate hain to aksar rehta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, raat ki deliveries register mein reh jaati hain. Grading arrival pe hoti hai ya baad mein?"
+  },
+  {
+   "role": "Person",
+   "text": "Baad mein, aur phir collector se jhagra hota hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, grading baad mein hone se collectors ke saath disputes. Kya yeh nuksaan zyada salting kharab hone se hota hai ya grade pe ikhtilaf se?"
+  }
+ ]
+}

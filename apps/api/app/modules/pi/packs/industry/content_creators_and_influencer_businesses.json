@@ -1,0 +1,270 @@
+{
+ "key": "content_creators_and_influencer_businesses",
+ "name": "Content creators and influencer businesses",
+ "kind": "industry",
+ "sector": {
+  "code": "M",
+  "title": "Digital economy, social and public sector"
+ },
+ "signals": [
+  "creator",
+  "influencer",
+  "YouTuber",
+  "TikToker",
+  "vlogger",
+  "podcast",
+  "brand deal",
+  "collab",
+  "sponsorship",
+  "barter",
+  "PR package",
+  "agency",
+  "talent manager",
+  "media kit",
+  "rate card",
+  "deliverables",
+  "content calendar",
+  "editor",
+  "AdSense",
+  "monetisation",
+  "Shorts",
+  "Reels",
+  "views gir gaye",
+  "payment nahi aayi brand se",
+  "shoot",
+  "khabar",
+  "UAE “advertiser permit”",
+  "mu’athir"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Main platforms and content type (comedy, food, beauty, tech, family, education, gaming).",
+  "Revenue sources: brand deals, platform payouts, affiliate, own products, events, courses.",
+  "Solo creator or a team (editor, manager, shooter, assistant).",
+  "Whether they work through an agency/manager or deal with brands directly.",
+  "Number of brand deals in a typical month (if volunteered).",
+  "Markets served: Pakistan, UAE/GCC, Canada, diaspora.",
+  "Whether they also run a merch or product line."
+ ],
+ "scope_rule": "pi notes the business side of a creator operation: managing brand deals and deliverables, invoicing and chasing payments, team coordination, production schedules, rights and usage tracking as admin, and reporting to brands. It does not give legal advice on contracts, exclusivity, IP or defamation, does not advise on advertising disclosure law, UAE media/advertiser licensing, or tax on foreign income, and does not give platform-growth guarantees. It never asks for account passwords, bank details, or brand contacts’ personal details, and it records family members (especially children) appearing in content only as roles, never names or ages.",
+ "vocabulary": {
+  "Brand deal / collab": "paid content for a brand.",
+  "Barter": "product given in place of payment.",
+  "Deliverables": "agreed posts, reels, stories, videos.",
+  "Usage rights / whitelisting": "brand using the creator’s content or account for ads.",
+  "Exclusivity": "not working with competitors for a period.",
+  "Media kit / rate card": "profile and pricing sheet.",
+  "Brief": "brand’s instructions for content.",
+  "Approval round": "brand reviewing the draft.",
+  "Insights": "platform analytics screenshots sent to brands.",
+  "Monetisation": "platform ad revenue.",
+  "Agency / manager": "middle party taking a cut.",
+  "Go-live date": "agreed posting date."
+ },
+ "problems": [
+  {
+   "phrase": "Brands pay 60–90 days late, some never pay",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "I don’t know which brand owes me what right now",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Deliverables and deadlines are all over WhatsApp groups",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Missed a go-live date because nobody reminded me",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  },
+  {
+   "phrase": "Brand asked for five revisions and I had no limit agreed",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Agency took a cut I didn’t expect",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Can’t tell which kind of content actually earns money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Income swings — great months then nothing",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Barter deals pile up products but no cash",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Editor delivers late so posting is inconsistent",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Good editors leave after a few months",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "No contract tracking — forgot I was exclusive with one brand",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Brand asks for insights screenshots each time, I make reports by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Views dropped and brand inquiries dropped with them",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Inbound brand emails get lost in my DMs",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Lots of inquiries but most want free content",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Merch orders: stock and courier are a mess",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Brands complain the content wasn’t what the brief said",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Footage on random drives — lost a full shoot once",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "Everything goes through me; team waits for my approval",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Can’t plan shoots around travel and events",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Content usage — brand ran my video as an ad longer than agreed and I didn’t track it",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "I don’t know if I should hire a manager or grow the team",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Invoices made from a Word template, numbering is all over the place",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  }
+ ],
+ "questions": {
+  "payments": [
+   "How many brands owe you at the moment, roughly?",
+   "How do you keep track of who has paid?",
+   "What usually happens before a payment goes really late?"
+  ],
+  "deals pipeline": [
+   "Where do brand inquiries come in — email, DMs, agency?",
+   "How do you decide which ones to take?"
+  ],
+  "deliverables": [
+   "Where do you track what’s due and when?",
+   "Who on the team sees it?"
+  ],
+  "team": [
+   "Who helps you — editor, manager, shooter?",
+   "Where do things usually get stuck between you?"
+  ],
+  "revenue mix": [
+   "Where does most of your income come from?",
+   "Which of those feels least predictable?"
+  ],
+  "reporting": [
+   "What do brands ask you for after a campaign?",
+   "How long does that take you?"
+  ],
+  "contracts admin": [
+   "Where are your agreements stored?",
+   "Have you ever lost track of terms like exclusivity or usage?"
+  ],
+  "files": [
+   "Where does your raw footage live?",
+   "Has anything ever gone missing?"
+  ],
+  "merch/products": [
+   "Do you sell anything of your own?",
+   "Who handles orders and delivery?"
+  ]
+ },
+ "seasons": "Brand budgets peak in Ramadan and before Eid in Pakistan and the GCC (food, telecom, fashion, FMCG), around 11.11/White Friday and wedding season in Pakistan, DSF and National Day in the UAE, back-to-school (August–September), and Black Friday to holiday season in Canada. Quarter-end and new-financial-year budget releases (July in Pakistan; January for many UAE/Canada brands) affect when deals and payments arrive. Summer is often slower in the UAE with audiences travelling.",
+ "care": [
+  "Never ask for social media or email passwords, 2FA codes, or bank details.",
+  "No legal advice on contracts, exclusivity, IP, defamation or disclosure; note “unclear contract terms” as an admin tracking problem only.",
+  "UAE advertiser/media licensing and Pakistani tax on brand income: do not advise; note the admin burden if raised.",
+  "Children in family content: do not ask for names, ages or schools; keep focus on business operations.",
+  "Refuse help with buying followers/engagement, fake giveaways, undisclosed paid promotion, or copying others’ content.",
+  "If a creator mentions harassment, doxxing, stalking or threats, prioritise safety: point to police/cybercrime units and do not continue the business interview unless they want to.",
+  "Mental-health strain from online abuse is common; respond kindly, do not counsel, and suggest professional support if they seem distressed.",
+  "Do not promise growth, virality or brand rates."
+ ],
+ "build_ideas": [
+  "Brand deal tracker: inquiry, negotiation, contracted, in production, posted, invoiced, paid — with ageing on unpaid invoices.",
+  "Deliverables calendar with go-live dates, approval rounds and WhatsApp reminders to creator and editor.",
+  "Invoice generator with consistent numbering and automatic payment-reminder messages to brand finance contacts’ roles.",
+  "Contract terms register (exclusivity window, usage period, whitelisting end date) with expiry alerts.",
+  "Campaign report builder that compiles insight screenshots and metrics into a branded PDF.",
+  "Inbound inquiry form on a link-in-bio page that sorts brand requests into one inbox.",
+  "Revenue mix dashboard by source and month to show seasonality.",
+  "Footage and asset library structure with backup reminders.",
+  "Editor task board with due dates, revision counts and handoff status.",
+  "Merch order and stock tracker with courier booking."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Honestly the content side is fine. It’s chasing brands for payment that’s killing me."
+  },
+  {
+   "role": "pi",
+   "text": "That makes sense — doing the work and then waiting months is draining. Noted — brand payments come in late and chasing them takes a lot of your time. Roughly how many brands owe you right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Maybe six or seven. Two of them from March."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — several open payments, some outstanding for months. How do you currently keep track of who has paid and who hasn’t?"
+  },
+  {
+   "role": "Person",
+   "text": "I scroll back through my email and WhatsApp, basically."
+  }
+ ]
+}

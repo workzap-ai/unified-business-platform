@@ -1,0 +1,265 @@
+{
+ "key": "resorts_and_farmhouse_rentals",
+ "name": "Resorts and farmhouse rentals",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "resort",
+  "farmhouse",
+  "farm house",
+  "day booking",
+  "overnight stay",
+  "pool",
+  "picnic",
+  "family day out",
+  "chalet",
+  "cottage",
+  "glamping",
+  "camp site",
+  "desert camp",
+  "lake house",
+  "farmhouse booking",
+  "pool party",
+  "din ki booking",
+  "raat ki booking",
+  "istiraha",
+  "mazraa",
+  "shalay",
+  "barbeque raat"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of farmhouses, chalets or rooms, and capacity per booking.",
+  "Day-use, overnight, events (mehndi, birthdays, corporate retreats) or a mix.",
+  "Owned land or leased property, and whether the owner lives nearby.",
+  "Facilities that need upkeep: pool, generator, solar, kitchen, play area, horses, boating.",
+  "Who runs it on site: caretaker ( chowkidar), manager, cook, cleaners, lifeguard.",
+  "How bookings come in: WhatsApp, Instagram, OLX/Dubizzle listings, agents, Airbnb.",
+  "Distance from the city and seasonality of the location."
+ ],
+ "scope_rule": "pi notes business and operational problems: booking clashes, advance payments, caretaker accountability, damage and cleanup, food and supply runs, generator and pool upkeep, and seasonal cash flow. pi does not advise on pool safety standards, water treatment chemistry, lifeguard requirements, food safety rules, land use or zoning permissions, event licences or tax. Safety risks such as drowning, electrical faults or fire are emergencies if live and otherwise noted as maintenance problems without technical advice. pi records guests and staff by role only and never stores guests’ ID copies or payment details.",
+ "vocabulary": {
+  "day booking": "use of the farmhouse from morning to evening",
+  "overnight": "stay until the next morning",
+  "chowkidar": "caretaker or watchman on site (Urdu)",
+  "advance / bayana": "deposit to confirm the date",
+  "security deposit": "refundable amount against damage",
+  "generator / UPS": "backup power, essential in PK and remote sites",
+  "istiraha": "rest house or private retreat for gatherings (Gulf Arabic)",
+  "mazraa": "farm (Arabic)",
+  "desert camp": "tented camp with activities, common in UAE",
+  "family only": "booking restricted to families",
+  "BBQ night": "evening package with barbecue"
+ },
+ "problems": [
+  {
+   "phrase": "Two families came on the same date because the caretaker and I both took bookings",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "People book, I hold the date, then they cancel and I lose a full weekend",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "The advance is sent to whoever’s number they called, and I can’t track who received what",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Caretaker takes cash bookings on the side when I’m not there",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Guests break things, and by the time I visit I can’t tell which group did it",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Pool water goes green and guests complain",
+   "category": "quality_complaints",
+   "subtype": "hygiene"
+  },
+  {
+   "phrase": "Generator diesel bills are huge and I suspect fuel is going missing",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Load-shedding and generator breakdowns ruin events",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Every weekend is full but weekdays are empty",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "In summer it’s packed, in winter nobody comes and I still pay the staff",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "I don’t know if the farmhouse is profitable after diesel, salaries, repairs and cleaning",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Enquiries come on Instagram, WhatsApp and phone and I lose track of who asked for which date",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Lots of people ask the price and disappear",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Food runs and supplies are bought in cash with no record",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  },
+  {
+   "phrase": "Cleaning after a big party takes all next day, so I can’t take a back-to-back booking",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Staff don’t turn up on Eid days, which is exactly when we’re busiest",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Neighbours or local officials complain about noise and I don’t keep any record of what was agreed",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "My listing photos are old and other farmhouses look better online",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "I don’t know which advertising actually brings bookings",
+   "category": "marketing_leads",
+   "subtype": "no_tracking"
+  },
+  {
+   "phrase": "Checklist for pool, power and cleaning before guests arrive is never done properly",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Guests stay beyond their time and argue about extra charges",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "I want to add a second farmhouse but can’t even manage the first remotely",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Repairs are done by whoever is free, with no history of what was fixed",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Linen and utensils keep getting lost",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  }
+ ],
+ "questions": {
+  "bookings": [
+   "Who is allowed to confirm a booking?",
+   "Where is the calendar kept?",
+   "When did you last have a clash?"
+  ],
+  "advances": [
+   "How do guests pay the advance?",
+   "Who receives it?",
+   "How do you match it to a date?"
+  ],
+  "caretaker": [
+   "What does the caretaker handle on his own?",
+   "How do you know what happened on a day you weren’t there?"
+  ],
+  "damage and cleanup": [
+   "How do you check the place after guests leave?",
+   "How long does cleaning take after a big event?"
+  ],
+  "power and pool": [
+   "What breaks most often?",
+   "How do you track diesel or fuel use?"
+  ],
+  "seasons": [
+   "Which months are slow?",
+   "What do you do with the staff then?"
+  ],
+  "leads": [
+   "Where do most enquiries come from?",
+   "What usually happens after someone asks the price?"
+  ],
+  "money": [
+   "Do you know your monthly running cost roughly?",
+   "Which cost has gone up most?"
+  ]
+ },
+ "seasons": "PK: summer weekends and summer holidays for pool farmhouses, Eid ul Fitr and Eid ul Adha (multi-day full bookings), 14 August, New Year’s Eve, winter wedding season for mehndi and dholki events, corporate retreats in spring; monsoon and Muharram reduce bookings; Ramadan shifts to iftar and sehri gatherings. UAE: desert camps, farms and istirahat peak October to April, especially National Day, New Year and long weekends; summer is near-dead outdoors except pool-equipped indoor venues. Canada: cottages and lake houses peak June to September and long weekends; ski chalets in winter.",
+ "care": [
+  "Pool, water and electrical safety: pi gives no technical or chemical advice. If someone reports a drowning, injury, electric shock or fire in progress, pi stops and points to emergency services (1122/15 in PK, 999/998/997 in UAE, 911 in Canada).",
+  "Events involving alcohol, gambling or unlicensed activities: pi does not help organise anything illegal in that jurisdiction.",
+  "pi does not help with avoiding taxes on cash bookings or hiding income.",
+  "Disputes with neighbours, landlords or local authorities are noted as problems only; no legal view.",
+  "Guests’ CNIC/Emirates ID copies, phone numbers and names are not collected; “a guest family” is enough.",
+  "Caretakers suspected of theft are recorded by role; pi does not help set up covert recording of staff in private spaces.",
+  "Animals on site (horses, livestock): any care or dosing questions are out of scope."
+ ],
+ "build_ideas": [
+  "Single booking calendar for all farmhouses with one source of truth, shared read-only with the caretaker.",
+  "WhatsApp booking flow: guest picks date and package, gets an advance link or account details, booking confirmed only after payment is logged.",
+  "Advance and deposit ledger by booking, showing who received each payment.",
+  "Pre-arrival checklist (pool, power, cleaning, supplies) with photo proof from the caretaker.",
+  "Post-checkout inspection with photos, linked to the booking for damage claims.",
+  "Diesel and generator log: fuel bought, hours run, readings, with mismatch flags.",
+  "Petty cash and supply-run log by trip with receipt photos.",
+  "Maintenance history per asset (pump, generator, ACs) with service reminders.",
+  "Lead tracker pulling enquiries from Instagram and WhatsApp with follow-up reminders.",
+  "Monthly profit per property: bookings vs fuel, salaries, repairs, supplies.",
+  "Staff duty roster for peak days with confirmations.",
+  "Simple booking website with real photos and availability."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mera farmhouse Bahria mein hai, chowkidar bookings leta hai jab main nahi hota, aur mujhe pata hi nahi chalta kitni hui."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — aapki gair-mojoodgi mein bookings aur paise ka record aap tak nahi pohanchta. Woh booking ka hisaab kahin likhta bhi hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Ek register hai, lekin aadhi entries hoti hi nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, register adhoora rehta hai. Advance guests kis ko bhejte hain, aap ko ya usay?"
+  },
+  {
+   "role": "Person",
+   "text": "Kabhi mujhe, kabhi usay cash de dete hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, advance do jagah aa raha hai. Aap ke andaze se mahine mein kitni bookings hoti hongi?"
+  }
+ ]
+}

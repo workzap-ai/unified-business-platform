@@ -1,0 +1,283 @@
+{
+ "key": "test_preparation",
+ "name": "Test preparation (O/A Levels, MDCAT, ECAT, IELTS, SAT)",
+ "kind": "industry",
+ "sector": {
+  "code": "J",
+  "title": "Education and childcare"
+ },
+ "signals": [
+  "MDCAT",
+  "ECAT",
+  "NUMS",
+  "ETEA",
+  "entry test prep",
+  "O Level",
+  "A Level",
+  "IGCSE",
+  "past papers",
+  "topical",
+  "mock exam",
+  "test series",
+  "crash course",
+  "IELTS",
+  "PTE",
+  "TOEFL",
+  "SAT",
+  "ACT",
+  "GRE",
+  "GMAT",
+  "band score",
+  "booking",
+  "test ki tayyari",
+  "entry test academy",
+  "mock dena",
+  "registration khul gayi",
+  "daurat",
+  "imtihan tajribi",
+  "CAEL",
+  "CELPIP",
+  "online test series",
+  "recorded lectures"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Which tests they prepare for, and whether courses are fixed-date cohorts or rolling.",
+  "Delivery: physical campus, online live, recorded, or hybrid; number of branches/cities.",
+  "Approximate students per cycle (a count) and number of instructors.",
+  "Instructor pay: salary, per-session, or revenue share.",
+  "Whether they also handle official test bookings for clients or act as a test-centre partner (pi notes it; no regulatory advice).",
+  "Materials: printed books, test series, online question bank — own or third-party.",
+  "Payment model: full upfront, installments, refund/repeat policy."
+ ],
+ "scope_rule": "pi notes the test-prep business’s operational problems: cohort enrolment, lead conversion, installment collection, instructor scheduling, mock-test logistics, material printing and stock, online access control, and visibility across branches and cycles. pi never asks for or stores any student’s name, scores, band results, mock marks, photos or ID/passport details, and never asks for test-booking account credentials. It gives no advice on admission chances, university selection, visas or immigration, makes no score guarantees, and never helps with leaked papers, impersonation or result manipulation. Many students are under 18, so all personal details are off-limits.",
+ "vocabulary": {
+  "Test series": "set of timed mock exams sold as a package.",
+  "Topical": "past-paper questions grouped by topic.",
+  "Crash course": "final weeks’ intensive programme.",
+  "Cohort / session": "a batch starting on a fixed date for a specific test.",
+  "Band score": "IELTS/CELPIP result scale.",
+  "Repeater": "student retaking the test or the course.",
+  "Question bank (QBank)": "online question practice tool.",
+  "Mock day": "full-length simulated exam under timed conditions.",
+  "Booking": "registering a candidate for an official exam date.",
+  "Leak / paper out": "illegal circulation of exam content."
+ },
+ "problems": [
+  {
+   "phrase": "Whole year’s revenue depends on three months before MDCAT, and then it’s dead.",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Hundreds of enquiries come when the test date is announced and we can’t reply fast enough.",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Ad spend triples in season and I can’t see which ads filled seats.",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Students pay the first installment and disappear after the mock.",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Refund requests after the test date changes are handled on WhatsApp with no record.",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Our recorded lectures are shared in groups — one paid login, ten users.",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Printed books run out mid-course and the printer needs a week.",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "We printed too many test series books for a test that changed its syllabus.",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Mock exam papers are checked by hand and results take a week.",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Star instructors leave for competitors right before the season.",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Instructors on per-session pay claim sessions that didn’t happen.",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Classes are full in one city campus and empty in another.",
+   "category": "sales_revenue",
+   "subtype": "branch_underperforming"
+  },
+  {
+   "phrase": "Online LMS and the fee system are separate, so unpaid students still have access.",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Zoom links get shared and outsiders join live classes.",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "The site and portal crash when results or schedules are posted.",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "Our WhatsApp number is overloaded with ‘when is the next batch’ messages.",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "We don’t know which past students would come back for a repeat course.",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Seats are oversold for mock days and the hall is overcrowded.",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Clients whose test bookings we handle ask for status and we check manually each time.",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Margins are down because we discount so heavily against competitors.",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Discount codes from influencers are used by everyone.",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Every syllabus change means re-doing all the material by hand.",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "I can’t see enrolments, collections and dropouts per cohort in one place.",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Bad reviews after a student’s poor result spread fast in groups.",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Expansion to a new city — no idea which one has enough demand.",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  }
+ ],
+ "questions": {
+  "season": [
+   "Which test brings in most of your revenue?",
+   "How many months of the year are busy versus quiet?"
+  ],
+  "leads": [
+   "When a test date is announced, how many enquiries come in roughly?",
+   "Who replies to them?",
+   "How quickly?"
+  ],
+  "marketing": [
+   "Where do you spend on ads?",
+   "Do you know which channel fills most seats?"
+  ],
+  "payments": [
+   "Do students pay upfront or in installments?",
+   "At what point do most stop paying?"
+  ],
+  "refunds": [
+   "How are refund or transfer requests handled now?",
+   "Is there a record of each one?"
+  ],
+  "online access": [
+   "Do you sell recorded or live online classes?",
+   "How do you control who can watch?"
+  ],
+  "materials": [
+   "Are books printed in-house or outside?",
+   "Have you run out or overprinted recently?"
+  ],
+  "mocks": [
+   "How are mock papers checked?",
+   "How long until results go back?"
+  ],
+  "instructors": [
+   "How are instructors paid?",
+   "What happens when one leaves just before season?"
+  ],
+  "branches": [
+   "How many cities or campuses?",
+   "Which one is the concern right now?"
+  ],
+  "visibility": [
+   "What would you want to see per cohort every week?",
+   "Who puts the numbers together now?"
+  ]
+ },
+ "seasons": "- Pakistan: MDCAT and ECAT/engineering entry test prep peaks after Inter exams through late summer (test dates are set each year, so peaks move); NUMS and other university tests in summer; O/A Level prep before May/June and October/November Cambridge sessions; Inter board exams April–May. - UAE: SAT/ACT demand around test dates through the year (more in spring and autumn); IELTS/PTE year-round with spikes before university intakes; EmSAT-style national assessments for UAE nationals; summer dip with travel. - Canada: IELTS/CELPIP/CAEL demand steady year-round; GRE/GMAT before fall-application deadlines (October–January). - Ramadan evening classes; Eid breaks; result-announcement days create enquiry spikes.",
+ "care": [
+  "No guarantees about scores, admission chances or merit — pi never repeats or endorses “guaranteed band 7” style claims and does not help write them.",
+  "No student visa, study permit, points or immigration advice of any kind; if asked, pi says it can’t help with that and stays on business operations.",
+  "Never asks for or stores students’ names, scores, passport numbers or test-booking logins.",
+  "Leaked papers, proxy test-takers, fake score reports or certificates: pi declines immediately.",
+  "Content piracy by others: pi notes the business loss; it does not advise on legal action.",
+  "Refund disputes: tracking problem only, no consumer-law advice.",
+  "Student distress before exams (mentions of self-harm): pi stops, responds with care, points to emergency services/helplines.",
+  "Covert monitoring of students’ devices or webcams beyond normal proctoring the owner describes: pi does not help design covert surveillance."
+ ],
+ "build_ideas": [
+  "Season enquiry engine: WhatsApp auto-reply with cohort dates and branches, then hand-off to a counsellor with a follow-up queue.",
+  "Cohort enrolment tracker per test and branch: enquiries, demos, enrolled, paid, dropped.",
+  "Installment schedule with reminders, and LMS access paused automatically on overdue (rule set by the owner).",
+  "Refund/transfer request log with approval and status.",
+  "Secure LMS access: device-limited logins, per-user watermarking, session-sharing alerts.",
+  "Live class links issued per enrolled student with attendance log.",
+  "Online mock-test platform with auto-marking and per-cohort analytics (aggregated, no names in owner reports).",
+  "Print-run planner linking enrolments to book quantities and printer lead times.",
+  "Instructor session log matched to timetable before pay.",
+  "Discount-code manager with usage limits and per-influencer reporting.",
+  "Booking-service tracker for clients’ official test bookings (status only, no credentials stored).",
+  "Owner dashboard: revenue per cohort, ad spend per enrolment, collection rate and branch comparison."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "MDCAT ki date announce hoti hai to ek din mein 400-500 messages aa jate hain, aur hum aadhon ko reply hi nahi kar paate."
+  },
+  {
+   "role": "pi",
+   "text": "Yani sab se zyada demand wale din hi leads haath se nikal rahi hain. Noted. Abhi in messages ko kaun dekhta hai — ek banda ya poori team?"
+  },
+  {
+   "role": "Person",
+   "text": "Do receptionists, aur raat ko main khud."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, do log aur raat ko aap — ye load aap pe bhi aa raha hai, isko bhi note kar liya. Jo reply milta hai, us mein se kitne log aam tor pe enrol hote hain, kuch andaaza hai?"
+  }
+ ]
+}

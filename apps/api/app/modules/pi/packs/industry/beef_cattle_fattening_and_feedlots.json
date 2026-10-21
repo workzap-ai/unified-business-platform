@@ -1,0 +1,276 @@
+{
+ "key": "beef_cattle_fattening_and_feedlots",
+ "name": "Beef cattle fattening and feedlots",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "fattening farm",
+  "feedlot",
+  "bachhre",
+  "wachhe",
+  "bail",
+  "saand",
+  "weight gain",
+  "live weight",
+  "zinda wazan",
+  "per mann",
+  "qasai",
+  "butcher",
+  "slaughterhouse",
+  "abattoir",
+  "meat export",
+  "gosht",
+  "Eid batch",
+  "Brahman cross",
+  "Sahiwal cross",
+  "Cholistani",
+  "Bhagnari",
+  "mawashi",
+  "ijl",
+  "feeder cattle",
+  "backgrounding",
+  "pen",
+  "CCIA tag"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Model: Eid-only batch, year-round supply to butchers/slaughterhouses, export-linked, or (Canada) backgrounding/feedlot selling to packers.",
+  "Number of animals per batch and batches per year; typical days on feed.",
+  "Where calves come from: mandis, village agents, own breeding, auction marts.",
+  "Feed source: own fodder land, bought silage, bagged ration, by-products.",
+  "Buyers: retail butchers, slaughterhouses, exporters, Eid customers direct, packers.",
+  "Finance: own money, investors/partners sharing profit, supplier credit.",
+  "Whether animals are weighed at purchase and sale or valued by eye."
+ ],
+ "scope_rule": "pi notes the business side of fattening: buying calves, feed cost and stock, weight tracking, mortality and its cost, buyers and payments, partner accounting, staff and security. pi does not advise on growth promoters, hormones, rations, medicines, vaccines or withdrawal periods; it does not judge animal health or fitness for slaughter or export. It never helps bypass slaughter, movement, export health certification or (in Canada) tagging and traceability rules. It records buyers and partners by role, not name, and never collects ID or bank details.",
+ "vocabulary": {
+  "bachhra / wachha": "young male calf bought for fattening",
+  "saand / bail": "bull / ox",
+  "zinda wazan": "live weight",
+  "mann": "40 kg unit used to price live animals in Pakistan",
+  "qasai": "butcher",
+  "beopari": "livestock trader",
+  "khal-wanda": "oilcake and concentrate feed",
+  "munh khur": "foot-and-mouth disease (noted, never treated)",
+  "days on feed": "length of the fattening period",
+  "shrink": "weight lost in transport before weighing",
+  "backgrounding": "growing calves on forage before the feedlot (Canada)",
+  "packer": "meat-packing plant buying finished cattle (Canada)",
+  "ijl / ujool": "calf / calves (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "I buy calves by eye at the mandi and later realise I overpaid",
+   "category": "suppliers_purchasing",
+   "subtype": "price_comparison"
+  },
+  {
+   "phrase": "We don’t weigh animals regularly so I don’t know who’s gaining",
+   "category": "reporting_visibility",
+   "subtype": "no_weight_tracking"
+  },
+  {
+   "phrase": "Feed cost per animal is a guess",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Last batch looked profitable until I added transport, mortality and labour",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Feed rate went up mid-batch and wiped my margin",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Bagged feed disappears faster than the animals could eat it",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Three animals died this batch and I can’t say what that cost me",
+   "category": "margin_cost",
+   "subtype": "mortality_cost"
+  },
+  {
+   "phrase": "Lumpy skin scare last year and buyers stopped coming",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Butchers take animals on credit and pay in pieces",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Eid customers book with a small advance then don’t show",
+   "category": "orders_fulfilment",
+   "subtype": "booking_no_show"
+  },
+  {
+   "phrase": "I sell everything at Eid then sit with empty pens for months",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Partners each put money in and argue about the profit share",
+   "category": "compliance_admin",
+   "subtype": "partner_accounting"
+  },
+  {
+   "phrase": "Workers sleep at night and we lost an animal to thieves",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Transport truck was late and animals lost weight on the way",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Slaughterhouse grading cut my price and I couldn’t check",
+   "category": "sales_revenue",
+   "subtype": "pricing_disputes"
+  },
+  {
+   "phrase": "No record of which village agent sent which calves",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Silage runs out before the batch ends",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Water and power cuts in summer make the pens unbearable",
+   "category": "operations_process",
+   "subtype": "utility_downtime"
+  },
+  {
+   "phrase": "Movement or export paperwork holds animals for days",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Tag and movement reporting is all manual and we miss entries",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Everything is on WhatsApp voice notes from the manager",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Want to run two batches a year but cash runs out halfway",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "I don’t know which breed or source makes the most money",
+   "category": "reporting_visibility",
+   "subtype": "kpi_undefined"
+  }
+ ],
+ "questions": {
+  "buying": [
+   "Where do you usually buy calves?",
+   "How do you decide the price — by weight or by eye?",
+   "Do you keep a note of which seller each animal came from?"
+  ],
+  "weight": [
+   "Do you weigh animals during the fattening, or only at sale?",
+   "How often?"
+  ],
+  "cost": [
+   "Do you know roughly what each animal costs you from purchase to sale?",
+   "Which cost surprised you most last batch?"
+  ],
+  "feed": [
+   "How is feed bought and stored?",
+   "Who issues it each day, and is it written down?"
+  ],
+  "losses": [
+   "How many animals did you lose last batch?",
+   "How did you find out, and how fast?"
+  ],
+  "selling": [
+   "Who buys most of your animals?",
+   "How quickly do they pay?"
+  ],
+  "eid": [
+   "How do Eid bookings work for you today?",
+   "What happens when a buyer doesn’t turn up?"
+  ],
+  "partners": [
+   "Are there partners or investors in the batch?",
+   "How is the profit worked out today?"
+  ],
+  "security": [
+   "Who stays with the animals at night?",
+   "Have you had theft before?"
+  ],
+  "compliance (canada/export)": [
+   "How much time does tagging, movement or export paperwork take each batch?"
+  ],
+  "planning": [
+   "What stops you running more batches a year?"
+  ]
+ },
+ "seasons": "- Pakistan: Eid ul Adha is the biggest single sale; buying of calves starts months before, and prices for calves and fodder rise as Eid approaches. Wedding season (winter) lifts beef demand; Muharram and Ramadan patterns vary by area. - Summer heat slows gains and raises water and cooling costs; monsoon brings mud, flies and disease pressure (noted only). - Fodder prices follow harvests: wheat straw after April–May harvest, maize silage in summer. - UAE/Gulf: demand peaks around Ramadan, Eid ul Fitr and Eid ul Adha; many cattle and sheep are imported, so shipping schedules matter. - Canada (Alberta): calves come off grass and sell in autumn (September–November) into feedlots; winter feeding is costly and weather- heavy; packer prices and feed grain prices drive margin.",
+ "care": [
+  "No advice on growth promoters, hormones, injections, rations or medicines; pi suggests their vet or nutritionist for those.",
+  "Never helps sell sick animals, hide disease, fake weights or forge movement, health or export papers.",
+  "Disease outbreaks (lumpy skin, FMD): pi notes business impact and suggests contacting their vet and the livestock department.",
+  "Worker injuries from handling bulls or loading trucks: pi points to emergency services first.",
+  "Partner disputes: pi notes the accounting problem, no legal opinion on who owns what.",
+  "Theft: pi notes security gaps; never advises on confronting suspects or armed guarding.",
+  "Records workers, agents and buyers by role only; no CNIC, Emirates ID or bank details.",
+  "Canada: does not advise on CCIA, provincial traceability or packer contract terms; notes admin effort only."
+ ],
+ "build_ideas": [
+  "Batch register: each animal’s tag, purchase date, source, purchase weight and price, breed, pen.",
+  "Weigh-day entry on phone with weight-gain per animal and per batch, flagging animals below the farm’s own target.",
+  "Batch cost sheet that adds feed, fodder, labour, transport, vet bills and mortality to give cost per animal and per kg, from the farm’s entries.",
+  "Feed store log with deliveries vs orders, daily issue and stock days remaining.",
+  "Buyer and credit ledger for butchers, slaughterhouses and Eid customers with dues and reminders.",
+  "Eid booking system: advance received, animal reserved (photo + tag), delivery slot, balance due, cancellations.",
+  "Partner/investor statement per batch showing capital in, costs, sales and agreed profit share.",
+  "Night-watch checklist with timed check-ins and headcount photos.",
+  "Movement and traceability log to keep tag and transfer records in one place.",
+  "Supplier/agent scorecard: which source’s calves gained and survived best.",
+  "Owner WhatsApp summary: headcount, deaths, feed days left, cash due."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hum har saal Eid ke liye 80–100 bachhre fattening karte hain, lekin is dafa profit samajh hi nahi aaya."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh sakta hoon, poori mehnat ke baad hisaab clear na ho toh bura lagta hai. Har jaanwar ki khareed ki qeemat aur wazan likha hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Qeemat likhi hai, wazan nahi kiya."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — khareed ki qeemat record hai, wazan na khareedte waqt liya na baad mein. Feed aur chara ka kharcha kaise track hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Bas bills ki file hai, total kabhi nahi banaya."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, feed ka kharcha bills mein bikhra hua hai, batch ke hisaab se jama nahi hota. Is batch mein koi partner ya investor bhi tha?"
+  }
+ ]
+}

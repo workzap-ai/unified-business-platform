@@ -1,0 +1,271 @@
+{
+ "key": "trucking_and_goods_transport_companies",
+ "name": "Trucking and goods transport companies",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "goods transport",
+  "goods company",
+  "adda",
+  "truck",
+  "trailer",
+  "mazda",
+  "Shehzore",
+  "container carrier",
+  "22-wheeler",
+  "bilty",
+  "builty",
+  "kiraya",
+  "bhara",
+  "load",
+  "return load",
+  "khali wapsi",
+  "driver",
+  "cleaner",
+  "diesel",
+  "toll",
+  "challan",
+  "motorway",
+  "N-5",
+  "shahin naql",
+  "naql",
+  "haulage",
+  "carrier",
+  "dispatcher",
+  "owner-operator",
+  "broker",
+  "load board",
+  "ELD",
+  "HOS",
+  "cross-border",
+  "TIR"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Fleet size and types (Mazda/Shehzore, 10/22-wheelers, flatbeds, containers, reefers, tankers) and how many owned vs attached/hired.",
+  "Main routes: intra-city, Karachi–upcountry, GCC cross-border, Afghanistan/Central Asia transit, Canada–US.",
+  "Whether they run from an adda/terminal with walk-in booking or only contract customers.",
+  "Number of drivers and whether paid salary, per trip, or as owner-operators.",
+  "How freight is charged and collected (cash at booking, to-pay at destination, monthly credit).",
+  "Tracking in use: none, phone calls, GPS trackers, ELDs.",
+  "Maintenance done in-house or at workshops."
+ ],
+ "scope_rule": "pi notes operational and business problems: load planning, empty returns, trip costing, fuel control, driver accountability, maintenance, tracking, bookings, receivables and reporting. It does not advise on road safety engineering, axle load rules, licensing, hours-of-service regulation, insurance claims, accident liability or labour law. It never helps overloading against rules, falsifying logs or bilties, avoiding tolls or challans improperly, carrying undeclared goods, or paying off officials. It never stores drivers’ names, licence numbers, CNICs or phone numbers — only roles and counts.",
+ "vocabulary": {
+  "bilty / builty": "goods transport receipt issued at booking",
+  "adda": "transport terminal/booking office",
+  "kiraya / bhara": "freight charge",
+  "to-pay": "freight collected from the receiver at destination",
+  "khali wapsi": "truck returning empty",
+  "attached vehicle": "privately owned truck working under the company’s name",
+  "cleaner": "driver’s assistant",
+  "Mazda / Shehzore": "light/medium trucks commonly used in Pakistan",
+  "naql": "transport (Arabic)",
+  "dispatcher": "person who assigns loads and trucks",
+  "ELD / HOS": "electronic logging device / hours-of-service rules (Canada)",
+  "deadhead": "empty miles (North American usage)"
+ },
+ "problems": [
+  {
+   "phrase": "Trucks come back empty from upcountry most of the time",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Diesel bills don’t match the kilometres driven",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Drivers take longer routes or stop for personal work",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Customers call asking where the truck is and I have to call the driver",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Trucks reach late and the customer deducts from the freight",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Goods arrive damaged or short and we get the claim",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "I don’t know profit per trip after diesel, tolls, driver allowance and repairs",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Freight rates are under pressure but diesel keeps going up",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Big customers pay after 60–90 days",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "To-pay freight collected at destination doesn’t all reach the office",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Driver advances for the trip are never properly settled",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  },
+  {
+   "phrase": "Trucks break down on the highway because servicing is missed",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Tyres disappear or get swapped",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Good drivers are hard to find and leave for the Gulf",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Driver documents and vehicle fitness/permits expire without us noticing",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Bilties are handwritten and copies go missing",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Booking at the adda is all on paper, nothing reaches the head office",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Attached vehicle owners argue over their share",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Dispatcher assigns trucks by habit, not what’s best",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "I lose bookings because I can’t confirm availability quickly",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Tracker company’s dashboard doesn’t connect to anything we use",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Customers want proof of delivery quickly to pay us",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Toll and challan costs keep surprising us",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "I want to add more trucks but can’t control the ones I have",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "trips and loads": [
+   "How do you decide which truck goes on which load?",
+   "How often do trucks come back empty?",
+   "How are return loads found now?"
+  ],
+  "trip cost": [
+   "How do you work out what a trip actually cost you?",
+   "Which costs are hardest to control?"
+  ],
+  "fuel": [
+   "How is diesel given to drivers — cash, card, pump account?",
+   "How do you check it against the distance?"
+  ],
+  "tracking": [
+   "How do you know where trucks are during a trip?",
+   "How do customers get updates?"
+  ],
+  "maintenance": [
+   "How do you keep track of servicing and tyres?",
+   "What breakdowns have hurt most recently?"
+  ],
+  "cash and receivables": [
+   "How is freight collected — at booking, at delivery, or on credit?",
+   "Which customers pay slowest?"
+  ],
+  "drivers": [
+   "How are drivers paid and given trip advances?",
+   "What disputes come up most?"
+  ],
+  "paperwork": [
+   "How are bilties and delivery proofs kept?",
+   "What goes missing?"
+  ]
+ },
+ "seasons": "In Pakistan, wheat harvest (April–May) and sugarcane crushing (November–March) drive heavy agricultural haulage; cotton season (August–November) for textiles; rice harvest (October–November). Ramadan and pre-Eid push FMCG and garments; Eid ul Adha brings livestock movement and driver shortages as drivers go home; Eid holidays halt operations. Monsoon floods (July–September) close routes. Fog in Punjab (December–January) closes motorways at night. Budget/fuel price changes hit costs. In the UAE, construction cycles and cooler months raise demand; summer heat affects driver hours. In Canada, winter roads, spring load restrictions on some roads, harvest season on the Prairies, and holiday retail peak.",
+ "care": [
+  "Accidents, injuries, hijacking or threats on the road: pi stops and points to emergency services (1122/15 or Motorway Police 130 in Pakistan, 999 in the UAE, 911 in Canada).",
+  "Requests to overload, falsify logbooks/ELDs, alter bilties, or avoid weigh stations: pi declines.",
+  "Carrying undeclared or smuggled goods, including across Afghan or GCC borders: pi declines plainly.",
+  "Paying police or officials to avoid challans: pi declines and does not note it as a problem to solve.",
+  "Driver fatigue and hours-of-service: safety-regulated; pi does not advise, notes only the scheduling problem.",
+  "Driver personal data, licences and CNICs: never stored.",
+  "Insurance claims and accident liability: legal/insurance; pi notes the business impact."
+ ],
+ "build_ideas": [
+  "Trip register: each trip’s truck, route, customer, freight, advance, diesel, tolls, expenses and profit.",
+  "Fuel log comparing litres issued with distance from trackers, flagging unusual consumption.",
+  "Dispatch board showing which trucks are free, on trip, or in workshop, for quick booking confirmation.",
+  "Return-load list matching trucks heading back with pending bookings at destination.",
+  "Digital bilty issued from phone with a copy sent to customer on WhatsApp.",
+  "POD capture by driver photo, triggering the invoice.",
+  "Customer trip updates on WhatsApp from tracker locations.",
+  "Maintenance and tyre register per truck with service due alerts and tyre serial tracking.",
+  "Vehicle permit/fitness and driver document expiry calendar (dates only, no ID numbers stored by pi).",
+  "Driver advance and settlement ledger.",
+  "Attached-vehicle owner statements showing trips, freight and share.",
+  "Receivables with ageing and owner-approved reminders.",
+  "Owner dashboard: trucks active, empty-return rate, profit per truck per month."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mere 14 truck hain, Karachi se Lahore load jata hai lekin wapsi pe aadhe khali aate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — upcountry jaate waqt load hota hai, lekin wapsi pe aadhe truck khali. Abhi return load dhoondne ka kaam kaun karta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Driver khud adda pe pooch leta hai, ya mera munshi phone karta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, driver aur munshi apne taur pe dhoondte hain. Noted. Kya aap ko pata hota hai kis din kaun sa truck Lahore se free hoga?"
+  }
+ ]
+}

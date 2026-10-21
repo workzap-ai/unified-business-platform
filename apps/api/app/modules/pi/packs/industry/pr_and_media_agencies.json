@@ -1,0 +1,261 @@
+{
+ "key": "pr_and_media_agencies",
+ "name": "PR and media agencies",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "press release",
+  "media list",
+  "journalist",
+  "coverage",
+  "clippings",
+  "press kit",
+  "media relations",
+  "event launch",
+  "press conference",
+  "crisis comms",
+  "influencer seeding",
+  "media monitoring",
+  "AVE",
+  "earned media",
+  "khabar lagwani hai",
+  "coverage nahi aayi",
+  "embargo",
+  "interview request",
+  "retainer",
+  "ilaqat ’amma",
+  "i’lam",
+  "media buying",
+  "advertorial"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Services: press relations, media buying, events, influencer relations, crisis communications, corporate comms",
+  "Number of retainer clients and typical sectors (government, real estate, FMCG, tech, hospitality)",
+  "Team size and roles (account managers, writers, media relations, event staff)",
+  "Whether they buy media space on behalf of clients and handle the money",
+  "Languages and markets covered (Urdu/English press, Arabic/English, Canadian outlets)",
+  "How media contacts, coverage and client reporting are kept today",
+  "Use of monitoring tools or manual clipping"
+ ],
+ "scope_rule": "pi notes how the agency operates: media list management, coverage tracking, client reporting, approvals, event logistics, media-buying billing, collections, capacity and new business. pi gives no legal, defamation, regulatory or crisis-strategy advice, and does not take journalists’ or clients’ personal contact details, client confidential information, or staff personal data. It records roles and outlet types only. Requests to plant false stories, pay for undisclosed coverage where unlawful, smear competitors, fake reviews or bribe officials are declined.",
+ "vocabulary": {
+  "Media list": "contacts at publications and channels for pitching",
+  "Coverage / clippings": "articles and broadcasts that resulted from PR work",
+  "Earned media": "coverage not paid for",
+  "Advertorial": "paid content styled like editorial",
+  "Embargo": "news held until an agreed release time",
+  "Press kit": "package of releases, photos and facts for journalists",
+  "Monitoring": "tracking mentions across media",
+  "Crisis comms": "handling negative news situations",
+  "Media buying": "purchasing ad space or airtime for clients",
+  "Seeding": "sending products to influencers or media",
+  "Wrap-up report": "summary of coverage after a campaign"
+ },
+ "problems": [
+  {
+   "phrase": "Our media list is out of date and journalists keep changing outlets",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Each account manager keeps their own contacts in their phone",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "When someone leaves, their media relationships go with them",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Clients ask for coverage reports and we spend days compiling clippings",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "We can’t show clients the value of coverage in a way they accept",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Press releases go through six rounds of client approval",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "News goes stale because approval came too late",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "We pay newspapers for ads and the client pays us months later",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Media buying commissions and rebates are hard to reconcile",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "Retainer clients expect unlimited events and crisis support",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Event suppliers deliver late or the wrong setup",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Event budgets overrun and we absorb it",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "We miss mentions of clients because monitoring is manual",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Coverage gets mixed up between clients in our records",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Clients leave after a year saying they didn’t see impact",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Pitches for new accounts take weeks and win rate is low",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Our own visibility is poor, ironic for a PR firm",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "Weekend crises land on me personally, no rota",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Influencer seeding products go missing or aren’t tracked",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Media regulator or permit paperwork for events is chaos",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Team uses three different templates for releases",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Junior writers’ drafts need heavy rewriting",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "I can’t see which client the team spent the week on",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  }
+ ],
+ "questions": {
+  "media relationships": [
+   "Where does the team keep media contacts?",
+   "What happens to those contacts when someone leaves?"
+  ],
+  "coverage": [
+   "How do you track coverage for each client?",
+   "How long does a monthly report take to put together?"
+  ],
+  "approvals": [
+   "How many rounds does a release usually go through?",
+   "Has slow approval ever cost you a story?"
+  ],
+  "value": [
+   "How do clients judge whether the PR is working?",
+   "Is that a common reason for losing a client?"
+  ],
+  "media buying": [
+   "Do you pay outlets before clients pay you?",
+   "How long is that gap usually?"
+  ],
+  "events": [
+   "How do you manage suppliers for events?",
+   "Where do budgets usually run over?"
+  ],
+  "capacity": [
+   "How do you know what each person is working on?",
+   "Who covers out-of-hours or weekend issues?"
+  ],
+  "retention": [
+   "How long do retainer clients usually stay?",
+   "What do they say when they leave?"
+  ],
+  "growth": [
+   "Where does new business come from?",
+   "What makes pitching hard right now?"
+  ]
+ },
+ "seasons": "- Pakistan: budget announcement (June), Independence Day, Ramadan and Eid campaigns, PSL season, wedding and lifestyle season in winter; elections bring sharp spikes in media demand and cost. - UAE: GITEX, Dubai Shopping Festival, Arab Health, Cityscape, National Day, Ramadan and Eid; summer is slower with many journalists travelling. - Canada: autumn and spring announcement windows, holiday gift guides (October–November), summer slowdown. - Year-end award seasons and annual reports create corporate comms peaks.",
+ "care": [
+  "No legal, defamation, regulatory or crisis-response advice; if a crisis is live, note the operational problem only.",
+  "Do not take journalists’ personal numbers, client confidential plans or unannounced news.",
+  "Decline fake news, smear campaigns, fake reviews, undisclosed paid coverage where unlawful, or bribing officials.",
+  "If a crisis involves danger to people (accident, threat), pi points to emergency services first.",
+  "Political or sensitive content: stay neutral, note only the operational problem.",
+  "Client names are not recorded; use sector descriptors."
+ ],
+ "build_ideas": [
+  "Shared media contact register owned by the agency (outlet, role, beat, last contact), with access controls",
+  "Pitch and story tracker per client: angle, outlets pitched, responses, coverage achieved",
+  "Coverage log with links, screenshots and outlet type, feeding an automatic monthly client report",
+  "Approval workflow for releases with timestamps and automated client nudges",
+  "Media-buying ledger per client: bookings, outlet invoices, client billing and payment status",
+  "Event planner: supplier list, deliverables, deadlines, budget versus actual",
+  "Seeding tracker for products sent to influencers and media, with follow-up dates",
+  "Out-of-hours rota for crisis monitoring with escalation chain",
+  "Retainer scope tracker comparing agreed activities against delivered work",
+  "New business pipeline with stage and follow-ups",
+  "Owner dashboard: active clients, coverage this month, pending approvals, receivables, team load"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We spend the first week of every month just compiling coverage reports for clients."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a big chunk of the month going into compiling rather than doing PR — noted. How does the team find and collect the coverage today?"
+  },
+  {
+   "role": "Person",
+   "text": "Google alerts, people sending screenshots, and someone checks the papers."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, a mix of alerts, screenshots and manual checking. Do clients ever say a piece is missing from their report?"
+  },
+  {
+   "role": "Person",
+   "text": "Yes, and sometimes we put one client’s clipping in another’s report."
+  },
+  {
+   "role": "pi",
+   "text": "Understood, missing clippings and mix-ups between clients — both noted. How many retainer clients are you reporting to each month?"
+  }
+ ]
+}

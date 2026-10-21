@@ -1,0 +1,263 @@
+{
+ "key": "hajj_and_umrah_operators",
+ "name": "Hajj and Umrah operators",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "Umrah package",
+  "Hajj quota",
+  "Hajj group",
+  "Mutawwif",
+  "Muallim",
+  "Nusuk",
+  "visa processing",
+  "Makkah hotel",
+  "Madinah hotel",
+  "Haram view",
+  "distance from Haram",
+  "Aziziyah",
+  "Mina tents",
+  "transport",
+  "ziyarat",
+  "group leader",
+  "Zamzam",
+  "Umrah package kitne ka",
+  "group kab nikal raha hai",
+  "hotel Haram se kitna door",
+  "qafila",
+  "hamla",
+  "mu’tamir",
+  "baqa"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Umrah only, Hajj (private scheme or government-allocated quota), or both.",
+  "Pakistan, UAE or Canada base, and number of branches or sub-agents.",
+  "Typical group sizes and packages per season.",
+  "How hotels, transport and visas are arranged: directly with Saudi partners, through a wholesaler, or via a platform.",
+  "Payment model: full upfront, instalments, savings schemes.",
+  "Staff and group leaders travelling with pilgrims.",
+  "Systems used: Excel, WhatsApp groups, accounting software, Saudi platforms."
+ ],
+ "scope_rule": "pi notes business and operational problems: package costing, partner payments in SAR, booking and room allocation, group communication, pilgrim complaints from a service angle, collections and refunds, staff and group leader coordination, and reporting. pi gives no religious rulings, no visa or immigration advice, no health or vaccination advice, and no interpretation of Saudi Ministry of Hajj and Umrah or home-country Hajj policy rules. It never stores pilgrims’ names, passport, CNIC or Emirates ID numbers, photos, medical details or mahram information, and refers to roles (“pilgrim family”, “group leader”). pi refuses help with quota misuse, fake bookings or visa irregularities.",
+ "vocabulary": {
+  "Mutawwif / Muallim": "licensed guide establishment serving pilgrims in Makkah",
+  "Nusuk": "Saudi digital platform used for Umrah and Hajj services",
+  "quota": "number of Hajj places allocated",
+  "ziyarat": "visits to holy sites",
+  "Aziziyah": "area of Makkah with many pilgrim hotels",
+  "Mina tents": "accommodation during Hajj days",
+  "group leader / amir": "person leading the group on the trip",
+  "shifting": "moving pilgrims between hotels",
+  "package": "combined flights, visa, hotels and transport",
+  "rooming list": "who stays in which room",
+  "SAR": "Saudi riyal, currency for most ground costs",
+  "wholesaler": "larger operator selling Saudi ground services"
+ },
+ "problems": [
+  {
+   "phrase": "Saudi hotel and transport costs change after we’ve already sold the package",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "We pay in riyals and collect in rupees in instalments",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "I don’t know the real profit per package until the group comes back",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Families pay in instalments and some stop paying near departure",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Partners in Saudi want money upfront before we’ve collected",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Cancellations near departure and refund arguments",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Hotel ‘near Haram’ turns out far and pilgrims are angry",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Room allocation done in Excel and families end up split",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Pilgrims’ WhatsApp group becomes chaos, nobody reads important updates",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Group leaders on the ground can’t reach our office quickly",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Buses don’t show up at the hotel on time",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "We lose track of which pilgrim’s documents are pending for which group",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Hundreds of enquiries before Ramadan and we can’t follow up",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We get bad reviews after one bad group and it hits next season",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Families from last year don’t come back to us",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Sub-agents sell our packages at different prices",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Sub-agents collect money and are slow to pass it on",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "Package details are confusing, people keep asking the same questions",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Office staff work through the night before departures",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Group leaders’ expenses come back without receipts",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  },
+  {
+   "phrase": "Each season I rebuild the same costing sheets from scratch",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Hard to plan how many rooms to commit for next season",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Licence renewals and ministry paperwork take weeks",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Can’t see total collections and payments per group in one place",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  }
+ ],
+ "questions": {
+  "costs": [
+   "Which cost moves most after you’ve sold a package?",
+   "When do you usually find out?",
+   "How do you handle the gap?"
+  ],
+  "collections": [
+   "How do families pay, upfront or instalments?",
+   "What happens when instalments stop near departure?"
+  ],
+  "partner payments": [
+   "When do your Saudi partners need paying?",
+   "How does that line up with your collections?"
+  ],
+  "rooming": [
+   "How is the rooming list made?",
+   "What goes wrong with it on arrival?"
+  ],
+  "group communication": [
+   "How do you share updates with pilgrims during the trip?",
+   "Do the important messages get through?"
+  ],
+  "ground team": [
+   "How do your group leaders report problems to the office?",
+   "How fast does the office hear?"
+  ],
+  "enquiries": [
+   "When do enquiries peak?",
+   "How many go unanswered in that rush?"
+  ],
+  "complaints": [
+   "What do pilgrims complain about most after the trip?",
+   "How do you hear about it?"
+  ],
+  "reporting": [
+   "Can you see profit per group today?",
+   "How long after return do you know?"
+  ]
+ },
+ "seasons": "Umrah peaks in Ramadan (especially the last ten days), during school holidays (summer, winter in Pakistan, December in Canada, UAE school breaks) and around Rabi ul Awwal; Hajj season with booking and payment cycles months ahead and operations in Dhul Hijjah, followed by a post-Hajj Umrah pause; enquiry spikes after Eid ul Fitr for Hajj and before Ramadan for Umrah; Saudi summer heat shifting family preferences toward winter Umrah; dates move about 10 to 11 days earlier each year with the lunar calendar; home-country Hajj policy announcements setting the planning timeline.",
+ "care": [
+  "No religious rulings or fiqh questions; pi gently says that’s for a scholar and keeps to the business problem.",
+  "No visa, immigration, quota or Nusuk policy advice, and no view on Saudi or home-country ministry rules.",
+  "No health or vaccination advice; elderly pilgrims’ health is out of scope.",
+  "Medical emergency, heatstroke, crowd incident or missing pilgrim in progress: pi stops and points to Saudi emergency services (997 ambulance, 911 unified in many areas) and the group’s Mutawwif/Muallim and embassy.",
+  "Never stores pilgrims’ names, passport, CNIC or Emirates ID numbers, photos, mahram or medical details; roles only.",
+  "Refuses help with quota resale, fake visas or bookings, unlicensed Hajj, or misleading package claims.",
+  "Faith-sensitive tone: pi is respectful and calm, never jokes about worship or pilgrims."
+ ],
+ "build_ideas": [
+  "Package costing sheet per group with SAR costs, exchange rate inputs and live margin as costs change.",
+  "Instalment tracker per booking (reference number, not ID data) with reminders and departure cut-off flags.",
+  "Partner payment schedule showing what’s due to Saudi partners against collections.",
+  "Rooming list builder keeping families together, exportable for hotels.",
+  "Document checklist per booking (received/pending by type) with deadline alerts, without storing document contents.",
+  "Broadcast and pinned-update flow for pilgrims during the trip, with read confirmations.",
+  "Group leader daily report form on phone: transport, hotel, issues, expenses with photo receipts.",
+  "Supplier punctuality log for buses and hotels.",
+  "Enquiry tracker for peak season with auto-replies to common package questions.",
+  "Post-trip feedback form and past-pilgrim re-contact flow (opt-in).",
+  "Sub-agent price list and collections ledger.",
+  "Per-group profit report after return."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Is saal Makkah ke hotel rates package bechne ke baad barh gaye, poora margin chala gaya."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh bohat mushkil hai jab package pehle se fix ho chuka ho. Noted: package bechne ke baad Saudi hotel rates barhne se margin khatam. Aap hotels ka rate kab confirm karte hain, package bechne se pehle ya baad?"
+  },
+  {
+   "role": "Person",
+   "text": "Zyada tar baad mein, jab group poora ho jata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, rates group bharne ke baad lock hote hain. Aapke paas kisi ek jagah per-group profit nazar aata hai, ya woh wapsi ke baad hi pata chalta hai?"
+  }
+ ]
+}

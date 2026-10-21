@@ -1,0 +1,286 @@
+{
+ "key": "textile_spinning_and_weaving_mills",
+ "name": "Textile spinning and weaving mills",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "spinning mill",
+  "weaving unit",
+  "power looms",
+  "loom band hain",
+  "airjet",
+  "shuttleless",
+  "rapier",
+  "ring frame",
+  "open-end",
+  "spindles",
+  "yarn count",
+  "20s / 30s / 40s",
+  "sooth/ dhaga",
+  "greige",
+  "kora kapra",
+  "phutti",
+  "bales",
+  "lint",
+  "waste",
+  "efficiency",
+  "picks",
+  "beam",
+  "sizing",
+  "warping",
+  "conversion",
+  "job-work",
+  "RLNG",
+  "gas pressure",
+  "captive power",
+  "Faisalabad",
+  "masna’ ghazl"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Spinning, weaving, or both (composite), and whether they sell yarn/greige or only do conversion (job-work) for others.",
+  "Approximate number of spindles or looms, and loom type (power loom, shuttleless, airjet).",
+  "Fibre mix: cotton, polyester, viscose, blends.",
+  "Power source: grid, gas-based captive power, RLNG, solar, mix.",
+  "Export, local, or both; direct buyers or through brokers and traders.",
+  "Shifts per day and labour arrangements.",
+  "How production, waste and stock are recorded."
+ ],
+ "scope_rule": "pi notes operational problems like low efficiency, high waste, raw material shortages, unsold yarn or cloth, energy cost pressure, receivables from traders, and lack of a daily production picture. pi does not give energy tariff, gas allocation, tax refund, export rebate, sales tax or customs advice, and does not comment on cotton crop forecasts or commodity price predictions. Fire, dust and machine-safety engineering is out of scope; fires in cotton godowns are emergencies. pi records roles (shift in-charge, jobber, weaving master), never worker names or IDs.",
+ "vocabulary": {
+  "phutti": "seed cotton before ginning",
+  "lint / bale": "ginned cotton, pressed into bales",
+  "count": "yarn fineness (e.g. 20s, 30s)",
+  "greige / kora": "unfinished cloth straight off the loom",
+  "picks": "weft threads per inch; also used for loom output",
+  "beam": "warp yarn wound for the loom",
+  "sizing": "coating warp yarn before weaving",
+  "conversion / job-work": "weaving someone else’s yarn for a per-pick or per-metre rate",
+  "jobber": "loom technician responsible for a group of looms",
+  "broker / aarhti": "middleman for yarn or cloth sales",
+  "RLNG": "imported gas used for captive power",
+  "waste": "fibre or yarn lost during processing, often sold"
+ },
+ "problems": [
+  {
+   "phrase": "Looms stand idle half the shift because beams are not ready",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Efficiency on the looms is low but I don’t know which shed or shift is worse",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Waste percentage keeps creeping up",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Waste is sold but the weight on the gate pass never matches",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Gas pressure drops and we lose a whole shift",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Power cost now decides whether we run or shut",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Cotton price moved after we booked a yarn order",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "We buy cotton in bulk and then can’t sell the yarn",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Yarn lots get mixed and the cloth shows shade variation",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Cloth is rejected for faults and nobody logs which loom made it",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Traders take cloth and pay in instalments over months",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Conversion parties dispute how many metres we wove",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Brokers book orders but rates change at delivery",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Daily production reports come from the shed on paper, a day late",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Spare parts store is chaos, we buy parts we already have",
+   "category": "suppliers_purchasing",
+   "subtype": "buying_wrong_items"
+  },
+  {
+   "phrase": "Jobbers leave for the next mill for a small raise",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Night shift output is always lower and I can’t see why",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Stock of yarn in the godown doesn’t match the books",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "I don’t know my real cost per kg of yarn or per metre of cloth",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Export buyer wants lot-wise test reports and we scramble",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Machines get serviced only when they break",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Orders shrink in some months and we run half the looms",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Owner calls three people every morning to know production",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Accounts, store and production each have different numbers",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  }
+ ],
+ "questions": {
+  "production": [
+   "How do you see each day’s output today?",
+   "Is it by loom or shed, or just a total?",
+   "Who compiles it?"
+  ],
+  "efficiency": [
+   "Which part feels slowest — preparation, beams, or the looms themselves?",
+   "What stops the looms most often?"
+  ],
+  "waste": [
+   "How is waste measured now?",
+   "Who weighs it when it goes out of the gate?"
+  ],
+  "energy": [
+   "When power or gas drops, what happens to the shift?",
+   "Is that tracked anywhere?"
+  ],
+  "raw material": [
+   "How far ahead do you buy cotton or yarn?",
+   "Has that left you with stock you couldn’t move?"
+  ],
+  "quality": [
+   "Where are cloth faults caught — at the loom, folding or by the buyer?",
+   "Can you tell which loom a fault came from?"
+  ],
+  "sales": [
+   "Do you sell direct, through brokers, or do conversion work?",
+   "Which of those causes the most trouble?"
+  ],
+  "cash": [
+   "How long do traders or conversion parties usually take to pay?",
+   "How do you keep track of what each owes?"
+  ],
+  "costing": [
+   "Do you know your cost per kg or per metre this month?",
+   "What makes it hard to work out?"
+  ],
+  "staff": [
+   "Which roles are hardest to keep — jobbers, operators or supervisors?",
+   "What usually makes them leave?"
+  ],
+  "stores": [
+   "How are spare parts issued and recorded?",
+   "Do you find yourselves buying parts you already have?"
+  ]
+ },
+ "seasons": "Pakistan: cotton arrives from ginning between roughly August and January, with buying decisions concentrated then; monsoon floods can affect cotton quality and transport; winter gas curtailment to industry; summer heat and load shedding; Eid labour gaps; budget in June changes rates and duties; export orders follow Western retail seasons (spring/summer and autumn/winter collections). UAE: few spinning/weaving units, but traders and re-exporters peak around Q4 and before Ramadan. Canada: small technical-textile weavers follow industrial customer cycles; winter energy costs rise.",
+ "care": [
+  "Fire in cotton or yarn godowns, machine entanglement injuries, electrical faults: pi stops and points to emergency services immediately.",
+  "No advice on gas or power tariffs, export incentive schemes, sales tax refunds or customs procedures.",
+  "No cotton price predictions or commodity trading suggestions.",
+  "Requests to misdeclare count, weight or origin, or to under-invoice exports: pi declines plainly.",
+  "Labour issues (wages, contractor arrangements): notes operational impact only, no legal interpretation.",
+  "Never asks for broker or buyer contact details, worker identities or bank information.",
+  "Disputes with conversion parties: pi notes the record-keeping gap, not who is right."
+ ],
+ "build_ideas": [
+  "Shift production log on phone per loom or frame: picks or kg, stops and reasons, filled by shift in-charge.",
+  "Daily efficiency dashboard by shed, shift and loom type, sent to the owner each morning.",
+  "Beam and preparation tracker showing which looms are waiting for beams.",
+  "Waste register with weighing at source and gate pass matching.",
+  "Yarn lot tracker linking cotton lot to yarn lot to cloth roll.",
+  "Cloth fault log at folding with loom number, fault type and photo.",
+  "Conversion work register: party, yarn received, metres delivered, rate, balance due.",
+  "Receivables ledger for traders with ageing and reminders.",
+  "Costing sheet per count or quality, updated with current cotton, power and labour rates.",
+  "Spare parts store with issue against machine and reorder levels.",
+  "Energy downtime log recording gas/power interruptions and lost hours.",
+  "Preventive maintenance schedule per machine with checklists."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamari 48 looms hain, efficiency ka pata hi nahi chalta, shift in-charge bas bol deta hai “theek chal rahi thi”."
+  },
+  {
+   "role": "pi",
+   "text": "Noted: loom-wise efficiency ka koi record nahi, sirf zabani update milta hai. Abhi roz ki production kaise likhi jaati hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Register mein total meter likhte hain, loom-wise nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, sirf total meter likha jata hai. Looms sab se zyada kis wajah se rukti hain — beam ka intezar, breakdown, ya bijli?"
+  },
+  {
+   "role": "Person",
+   "text": "Zyada tar beam aur bijli."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted dono. Bijli jaane pe kya poori shift ka nuksaan ho jata hai ya generator se chal jaata hai?"
+  }
+ ]
+}

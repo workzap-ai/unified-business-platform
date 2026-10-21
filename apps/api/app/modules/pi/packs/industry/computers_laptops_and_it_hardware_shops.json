@@ -1,0 +1,286 @@
+{
+ "key": "computers_laptops_and_it_hardware_shops",
+ "name": "Computers, laptops and IT hardware shops",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "laptops",
+  "computers",
+  "PCs",
+  "gaming PC",
+  "build",
+  "custom build",
+  "components",
+  "GPU",
+  "graphics card",
+  "RAM",
+  "SSD",
+  "motherboard",
+  "printers",
+  "toners",
+  "networking",
+  "routers",
+  "CCTV installation",
+  "used laptops",
+  "box pack",
+  "open box",
+  "used imported laptop",
+  "Hafeez Centre",
+  "Techno City",
+  "Computer Market Saddar",
+  "Al Ain Centre",
+  "corporate order",
+  "quotation",
+  "tender",
+  "hasoob",
+  "laptob"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Walk-in retail vs corporate/B2B supply vs both.",
+  "New, refurbished/used imported, or both.",
+  "Services offered: repairs, custom PC builds, network/CCTV installation, AMC (annual maintenance contracts).",
+  "Number of shops and whether there is a warehouse.",
+  "Main suppliers: local distributors, importers, Dubai traders, online B2B.",
+  "Whether serial numbers are recorded and warranty given by the shop.",
+  "Payment terms with corporate clients (advance, 30/60 days, cheques)."
+ ],
+ "scope_rule": "pi notes stock and serials, pricing volatility, quotations and corporate orders, receivables, repairs and service jobs, warranty handling, installations, and staff. pi gives no cybersecurity, data-recovery legal, software licensing compliance, customs, tax, or procurement-law advice. pi never collects customers’ passwords, data on their devices, licence keys, or corporate clients’ staff details; it records roles and counts. Requests to install pirated software, bypass licence activation, or supply equipment for covert surveillance are declined.",
+ "vocabulary": {
+  "box pack / open box": "new sealed / opened-return unit",
+  "used imported": "second-hand laptops imported in bulk, graded A/B/C",
+  "grade A/B": "cosmetic/functional condition of used units",
+  "build": "custom-assembled desktop",
+  "AMC": "annual maintenance contract for a client’s IT",
+  "quotation / tender": "price offer to a company or institution",
+  "serial / service tag": "unique ID for warranty",
+  "RMA": "return to supplier for warranty replacement",
+  "toner / cartridge": "printer consumables",
+  "rate list": "daily price list from distributors",
+  "market rate": "current open-market price, changes often",
+  "hasoob": "computer (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "GPU and RAM prices change every week and our stock loses value",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Quotation given last week, client accepts now, price has gone up",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Corporate clients pay after 90 days or more",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Cheques from clients bounce",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "We don’t know which quotes became orders",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Tender and quotation documents take hours to prepare",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Used laptops arrive with faults not matching the grade",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "RMA to distributor takes weeks and the customer waits",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "We don’t record serials so we can’t tell if a returned unit was ours",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Components swapped in returned units",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "RAM and SSDs go missing from the counter",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Repair jobs pile up and customers keep calling",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Custom PC builds get delayed waiting for one part",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Old-generation laptops and parts are stuck",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Technicians’ time on AMC visits isn’t tracked so we lose money",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Network/CCTV installation jobs run over and we can’t bill the extra",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Field technicians — I don’t know where they are or what they did",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Good technicians leave for jobs abroad",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Toner and cartridge orders from offices are repeat but we never remind them",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Facebook/Instagram leads for gaming PCs ask questions and disappear",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "OLX/Dubizzle listings take too much time to update",
+   "category": "customer_experience_digital",
+   "subtype": "marketplace_listing"
+  },
+  {
+   "phrase": "Importer shipments from Dubai get held up",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Stock list is in Excel, prices in WhatsApp groups",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "We can’t see profit per job for builds and services",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Customer data lost on a laptop during repair, now we have a complaint",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Plan to open a second shop or online store but stock control is weak",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "pricing": [
+   "How often do your purchase prices change?",
+   "How long are your quotations valid?",
+   "What happens when prices move after a quote?"
+  ],
+  "corporate": [
+   "How much of your business is companies or institutions?",
+   "How long do they usually take to pay?",
+   "Who follows up on payments?"
+  ],
+  "stock": [
+   "Do you note serial numbers when stock comes in and goes out?",
+   "What’s sitting unsold longest?"
+  ],
+  "used units": [
+   "Where do your used laptops come from?",
+   "How often does the grade not match?"
+  ],
+  "repairs and service": [
+   "How many jobs are open right now?",
+   "How do customers get updates?",
+   "How is technician time recorded?"
+  ],
+  "warranty": [
+   "How do RMAs to distributors go?",
+   "How long does the customer usually wait?"
+  ],
+  "field work": [
+   "How many technicians go out to clients?",
+   "How do you know what they did on a visit?"
+  ],
+  "leads": [
+   "Where do most enquiries come from?",
+   "What usually happens after the first message?"
+  ]
+ },
+ "seasons": "Pakistan: university admissions and semester starts (August–September, February–March) for student laptops, fiscal year-end (June) when government and corporate budgets are spent and tenders spike, new fiscal year procurement July– September, budget-related duty changes, 11.11 and White Friday, freelancer demand steady. UAE: back-to-school (late August), GITEX period (October), White Friday, Dubai Shopping Festival, corporate year-end budgets (December), Ramadan corporate slowdown. Canada: back-to-school (August–September), Black Friday/Boxing Day, government and corporate fiscal year-end (March) procurement, holiday gaming builds.",
+ "care": [
+  "Pirated software, cracked licences and activation bypass: declined.",
+  "Customer device data and passwords: pi never asks for them; data loss complaints noted as service issue only.",
+  "Covert surveillance equipment or spyware for monitoring people without consent: declined.",
+  "Bribes or “commission” to win tenders: pi does not help and notes only legitimate tender effort.",
+  "Customs, duty and under-invoicing on imports: declined; no advice.",
+  "Cybersecurity incidents at a client: noted operationally; no security advice.",
+  "Electrical shocks, battery fires in the workshop: emergency services first."
+ ],
+ "build_ideas": [
+  "Serial-number stock register for laptops and components with purchase cost, supplier, warranty start/end and sale.",
+  "Daily rate-list import from distributors to update the price list, with alerts on held stock losing value.",
+  "Quotation builder with validity date, price-change flag, and quote-to-order conversion tracking.",
+  "Corporate receivables ledger with ageing, cheque tracking and reminder messages.",
+  "Repair and service job board with status updates to customers via WhatsApp.",
+  "RMA tracker per distributor: sent, received, replaced, days pending.",
+  "Used-unit intake grading checklist with photos and test results, linked to supplier claims.",
+  "Custom build order tracker showing parts reserved, parts awaited, assembly and testing status.",
+  "Field technician job app: check-in, tasks done, photos, client sign-off, time spent, linked to AMC or billable jobs.",
+  "AMC contract register with visit schedules and hours used vs included.",
+  "Consumables reorder reminders to office clients based on their usual cycle.",
+  "Profit per job for builds, installations and repairs.",
+  "Marketplace listing manager with stock sync."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Corporate clients ko quote deta hoon, woh do hafte baad confirm karte hain aur tab tak GPU ka rate barh chuka hota hai."
+  },
+  {
+   "role": "pi",
+   "text": "Ye bohot common masla hai jab rates har hafte badalte hon — noted, quote aur order ke beech rate barh jaata hai. Aap ke quotes pe koi validity date likhi hoti hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Nahi, bas rate de dete hain."
+  },
+  {
+   "role": "pi",
+   "text": "Theek, likh liya. Mahine mein andazan kitne quotations jaate hain?"
+  },
+  {
+   "role": "Person",
+   "text": "40-50, chhote bade mila ke."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. In mein se kitne order bante hain, iska koi hisaab rakha jaata hai?"
+  }
+ ]
+}

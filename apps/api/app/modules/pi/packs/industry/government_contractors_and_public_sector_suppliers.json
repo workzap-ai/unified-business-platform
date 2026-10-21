@@ -1,0 +1,278 @@
+{
+ "key": "government_contractors_and_public_sector_suppliers",
+ "name": "Government contractors and public-sector suppliers",
+ "kind": "industry",
+ "sector": {
+  "code": "M",
+  "title": "Digital economy, social and public sector"
+ },
+ "signals": [
+  "tender",
+  "bid",
+  "RFP",
+  "RFQ",
+  "tender lagaya",
+  "e-PADS",
+  "PPRA",
+  "SPPRA",
+  "KPPRA",
+  "PEPRA",
+  "Tejari/Dubai eSupply",
+  "supplier registration",
+  "vendor registration",
+  "MERX",
+  "CanadaBuys",
+  "standing offer",
+  "pre-qualification",
+  "earnest money",
+  "bid security",
+  "performance guarantee",
+  "bank guarantee",
+  "work order",
+  "purchase order",
+  "supply order",
+  "running bills",
+  "measurement book",
+  "payment kab release hogi",
+  "accounts office",
+  "AGPR",
+  "file chal rahi hai",
+  "inspection committee",
+  "delivery challan",
+  "mumtathil"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "What they supply: goods (stationery, IT, medical consumables, uniforms), works (construction, repairs), or services (cleaning, security, IT, catering, consultancy).",
+  "Which buyers: federal/provincial/municipal departments, hospitals, schools, utilities, armed forces, semi-government entities, or prime contractors.",
+  "Roughly how many tenders they bid on and how many active contracts they run (if volunteered).",
+  "Typical payment pattern and delay experience (in general terms).",
+  "Whether they need guarantees or securities that tie up working capital.",
+  "Team size and who prepares bids and tracks payments.",
+  "Countries/jurisdictions they operate in."
+ ],
+ "scope_rule": "pi notes operational problems: finding and tracking tenders, preparing bid documents, contract and delivery tracking, inspection and documentation, invoicing, following up payments, guarantees expiry tracking, cash-flow strain, staff and subcontractor coordination. It does not advise on procurement law, bid challenges, contract interpretation, tax deductions/withholding, legal recovery of dues, or how to win evaluations. It firmly refuses anything involving bribes, “speed money”, facilitation payments, bid rigging, cartels, fake documents, inflated bills, or using insiders; pi never helps with these. It never collects officials’ names, tender reference numbers tied to individuals, bank or guarantee details, or ID numbers.",
+ "vocabulary": {
+  "Tender / RFQ / RFP": "formal invitation to bid.",
+  "Bid security / earnest money": "deposit submitted with a bid.",
+  "Performance guarantee": "bank guarantee held during contract.",
+  "Work order / supply order": "confirmed instruction to deliver.",
+  "Running bill": "interim invoice on works contracts.",
+  "Measurement book": "recorded quantities of work done for billing.",
+  "Delivery challan": "delivery note signed on receipt.",
+  "Inspection / acceptance": "formal check before payment is processed.",
+  "Retention money": "portion withheld until completion or defect period ends.",
+  "Standing offer / framework": "pre-agreed supply arrangement.",
+  "Blacklisting / debarment": "exclusion from future tenders.",
+  "Release": "payment issued by accounts."
+ },
+ "problems": [
+  {
+   "phrase": "We find out about tenders too late to prepare properly",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "We bid on everything and win little; no idea which ones are worth it",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Bid documents are assembled from scratch every time",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Missed a submission because one certificate had expired",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Bank guarantees expire and we forget to renew or release them",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Payments take months after delivery and we’re paying suppliers from our pocket",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Working capital stuck in securities and retention",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Don’t know which invoice is stuck at which office",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Inspection keeps rejecting deliveries for small paperwork gaps",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Delivery challans and signed receipts get lost",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Prices quoted months ago, supplier prices went up before delivery",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "We don’t know true profit after delays, guarantees and penalties",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Late-delivery penalties because suppliers failed us",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Imported items stuck at port, contract deadline looming",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Site teams on works contracts don’t report progress properly",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Manpower contracts — guard/cleaner attendance disputes cut our bills",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Subcontractors’ work is inconsistent and has to be redone",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Many contracts running; no single view of deadlines",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Everything depends on one person who knows the departments’ process",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Exchange-rate moves wipe out margins on imported goods",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Records for audits by the client department take days to pull",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Stock bought for a contract sits unused after a cancellation",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Bidding in UAE/Canada too, but each portal has its own process",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Payroll for large manpower contracts is error-prone",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  }
+ ],
+ "questions": {
+  "finding tenders": [
+   "How do you hear about new tenders now?",
+   "How often do you find one too late?"
+  ],
+  "bid prep": [
+   "How long does it take to prepare a bid?",
+   "Which documents cause the most last-minute rush?"
+  ],
+  "win rate": [
+   "How do you decide which tenders to go for?",
+   "Do you keep a record of why bids were lost?"
+  ],
+  "contracts": [
+   "How many contracts are running right now?",
+   "Where do you track their deadlines?"
+  ],
+  "delivery and inspection": [
+   "What usually holds up acceptance after delivery?",
+   "Where are signed challans kept?"
+  ],
+  "payments": [
+   "After you submit an invoice, how do you follow its progress?",
+   "What’s the longest wait you’re dealing with now?"
+  ],
+  "cash": [
+   "How much of your cash feels stuck in guarantees or retention?",
+   "How do you manage suppliers while waiting?"
+  ],
+  "guarantees and certificates": [
+   "Who tracks expiry dates?",
+   "Has anything lapsed before?"
+  ],
+  "field/manpower": [
+   "How do site or deployed staff report attendance and progress?",
+   "How often are bills cut over disputes?"
+  ],
+  "margin": [
+   "Do you work out profit per contract once it closes?"
+  ]
+ },
+ "seasons": "Pakistan: fiscal year runs July to June; budget announced in June; heavy procurement and “lapse” rush in the last quarter (April–June) as departments use allocations; new development budgets released gradually from July/August; payments often slow at year start and around budget transitions. UAE: federal and emirate budgets on calendar year; procurement activity slows in summer and Ramadan; Expo-style or national events create spikes. Canada: federal fiscal year April to March, with year-end spending in Q4 (January–March); construction season concentrated spring to autumn. Elections or government transitions can freeze new tenders.",
+ "care": [
+  "Absolute refusal on bribery, “speed money”, facilitation payments, kickbacks, bid rigging, collusion, fake experience certificates, inflated measurements or invoices; pi says plainly it can’t help with that and moves on or ends that thread.",
+  "No advice on procurement rules, bid protests, contract disputes, blacklisting, or legal recovery.",
+  "No tax advice (withholding, sales tax on supplies, VAT, GST).",
+  "Never collect officials’ names, departments’ internal contacts, bank guarantee numbers or bank details.",
+  "If an owner describes pressure or threats from officials, note that it’s a serious matter they may want to raise with appropriate authorities or a lawyer; do not investigate.",
+  "Worksite accidents or danger to life on works contracts: point to emergency services first.",
+  "Security, defence or classified contracts: do not ask about specifics; note only generic operational issues.",
+  "Do not quote typical payment times, margins or win rates."
+ ],
+ "build_ideas": [
+  "Tender tracker capturing opportunities from portals and newspapers, deadlines, go/no-go decision and outcome.",
+  "Bid document library: company profile, certificates, past contract summaries, with expiry alerts on each certificate.",
+  "Guarantee and security register with issue, expiry and release dates and reminders.",
+  "Contract register with delivery milestones, inspection status, penalties and retention.",
+  "Invoice pipeline board showing where each bill sits (submitted, verified, approved, released) and days waiting.",
+  "Cash-flow view combining receivables, securities and supplier commitments.",
+  "Delivery and inspection documentation pack per order: challans, photos of goods, signed acceptance scans.",
+  "Manpower contract attendance app (check-in at site) feeding monthly billing and payroll.",
+  "Site progress reporting form for works contracts with photos and quantities.",
+  "Contract closure profitability report.",
+  "SOP guides for each portal and department process."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hum hospitals ko medical consumables supply karte hain. Maal deliver ho jata hai lekin payment chhe chhe maheene nahi aati."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh cash par bohot dabao dalta hai, khaas taur par jab supplier ko paise dene hon. Noted — delivery ke baad payment mein kaafi maheene lag jate hain. Invoice jama karne ke baad aap kaise pata karte hain ke file kahan pohanchi hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Hamara banda khud jaa kar poochta hai, koi record nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — payments ka pata karne ke liye khud chakkar lagane parte hain aur kahin likha nahi hota. Is waqt kitne invoices aise hain jo atke hue hain, andaazan?"
+  },
+  {
+   "role": "Person",
+   "text": "Chaudah ya pandrah, teen alag hospitals mein."
+  }
+ ]
+}

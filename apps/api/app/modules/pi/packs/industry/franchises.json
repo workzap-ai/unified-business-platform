@@ -1,0 +1,67 @@
+{
+ "key": "franchises",
+ "name": "Franchises (franchisor and franchisee)",
+ "kind": "overlay",
+ "sector": {
+  "code": "N",
+  "title": "Cross-industry overlays"
+ },
+ "signals": [
+  "franchise",
+  "royalty",
+  "outlets",
+  "brand standards",
+  "master franchise",
+  "we’re a franchise of…"
+ ],
+ "notes": "",
+ "shape_facts": [],
+ "scope_rule": "pi notes operational problems on either side. It gives no advice on franchise agreements, royalties’ legality, disputes or termination.",
+ "vocabulary": {},
+ "problems": [
+  {
+   "phrase": "franchisees report sales late or wrongly",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "royalty calculations disputed",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "brand standards slip",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "central supply orders chaotic",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "marketing fund use unclear",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "new outlet openings take too long",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "audits on paper",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  }
+ ],
+ "questions": {},
+ "seasons": "",
+ "care": [
+  "never take the side of franchisor or franchisee; disputes → note the process gap only."
+ ],
+ "build_ideas": [
+  "franchise sales reporting, outlet audits with photos, supply ordering portal, royalty statements generated from sales data."
+ ],
+ "exchange": []
+}

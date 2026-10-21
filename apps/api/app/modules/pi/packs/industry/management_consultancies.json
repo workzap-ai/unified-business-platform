@@ -1,0 +1,274 @@
+{
+ "key": "management_consultancies",
+ "name": "Management consultancies",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "engagement",
+  "proposal",
+  "RFP",
+  "scope of work",
+  "SOW",
+  "deliverables",
+  "steering committee",
+  "workshop",
+  "deck",
+  "utilisation",
+  "bench",
+  "day rate",
+  "change request",
+  "project overrun",
+  "retainer",
+  "client sign-off nahi hua",
+  "proposal bheja tha",
+  "PMO",
+  "framework",
+  "discovery phase",
+  "istishari",
+  "mashrou",
+  "government tender",
+  "subcontractor",
+  "associate consultant"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Service lines (strategy, operations, HR advisory, financial advisory, digital transformation, training)",
+  "Team size and how much work uses freelance associates or subcontractors",
+  "Typical client type (SMEs, corporates, government/semi-government, donors/NGOs)",
+  "How engagements are priced (fixed fee, day rate, retainer, success fee)",
+  "Number of live engagements at a time and typical duration",
+  "Countries served and whether staff travel or work remotely",
+  "How proposals and pipeline are tracked today"
+ ],
+ "scope_rule": "pi notes the consultancy’s own operational problems: pipeline, proposals, utilisation, scope creep, project delivery, invoicing and collections, knowledge reuse and staffing. pi does not give strategy, financial, legal or tax advice to the consultancy or its clients, and does not take client names, confidential client data, tender details or staff personal information. It records engagement types and roles only. Requests to obtain competitors’ confidential bids, inflate invoices or arrange inducements for tenders are declined.",
+ "vocabulary": {
+  "Engagement": "a single client project",
+  "SOW": "statement of work defining scope and deliverables",
+  "Utilisation": "share of consultants’ time that is billable",
+  "Bench": "consultants not currently on billable work",
+  "Day rate": "fee per consultant per day",
+  "Change request": "formal request to alter scope and fee",
+  "Steerco": "steering committee meeting with client leadership",
+  "Deliverable": "report, deck or output promised to the client",
+  "Pipeline": "proposals and opportunities not yet won",
+  "Associate": "freelance consultant brought in for a project",
+  "RFP / tender": "formal request from a client for proposals",
+  "Milestone billing": "invoicing tied to project stages"
+ },
+ "problems": [
+  {
+   "phrase": "We write proposals for weeks and can’t tell which ones are still alive",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Win rate is low but we don’t know why we lose",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Clients keep adding work without paying for it",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Projects run over by months on a fixed fee",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Some consultants are overloaded and others are on the bench",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "I can’t see utilisation until the month is over",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Milestone invoices go out late because sign-off is stuck",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Government clients pay six months late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Every proposal is written from scratch",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Good frameworks sit in someone’s laptop and nobody reuses them",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Deliverable quality depends on who did it",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Partners spend all their time reviewing decks",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Associates invoice us late and argue over days worked",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_communication"
+  },
+  {
+   "phrase": "We lose senior consultants to clients who hire them",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Travel and expense claims are a mess",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  },
+  {
+   "phrase": "We don’t know which service line is actually profitable",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Revenue swings wildly month to month",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Tender documents and compliance certificates expire and we scramble",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Project status lives in WhatsApp groups with each client",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Our website and LinkedIn haven’t been updated in a year",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "Clients we worked with once never come back",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Timesheets are filled in at month-end from memory",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "We want to open in Riyadh or Dubai but don’t know if we can staff it",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Meetings eat the week and nobody owns the action points",
+   "category": "communication_coordination",
+   "subtype": "meetings_wasteful"
+  }
+ ],
+ "questions": {
+  "pipeline": [
+   "How many proposals do you usually have out at once?",
+   "How do you track where each one stands?"
+  ],
+  "win/loss": [
+   "Do you hear back on why you lost a bid?",
+   "Where in the process do most go cold?"
+  ],
+  "scope": [
+   "How often does a project grow beyond what was agreed?",
+   "What happens when it does — is it billed?"
+  ],
+  "delivery": [
+   "How do you see whether a project is on track?",
+   "Who notices first when it slips?"
+  ],
+  "people": [
+   "How do you decide who works on which project?",
+   "Do you know your team’s billable time week to week?"
+  ],
+  "billing": [
+   "Are invoices tied to milestones or months?",
+   "What usually holds an invoice up?"
+  ],
+  "collections": [
+   "Which clients pay slowest?",
+   "How do you follow up?"
+  ],
+  "knowledge": [
+   "Where do your past proposals and frameworks live?",
+   "How easy is it for someone new to find them?"
+  ],
+  "associates": [
+   "How much of your work uses freelancers?",
+   "What’s the hardest part of managing them?"
+  ],
+  "growth": [
+   "Which service line do you want to grow?",
+   "What’s stopping you?"
+  ]
+ },
+ "seasons": "- Pakistan: government and donor budgets set in June, so tenders cluster in Q3–Q4 of the fiscal year; corporate planning cycles around October–December. - UAE and GCC: government budgets and strategy cycles drive Q4 and Q1 RFPs; summer (July–August) and Ramadan slow decision- making; year-end spend-it-or-lose-it budgets in Q4. - Canada: client fiscal years (often March or December) drive spring and autumn work; summer slowdown. - December holidays and Eid delay sign-offs and payments.",
+ "care": [
+  "Never advise on the client’s strategy, finances or regulatory matters; pi is only interested in how the consultancy runs.",
+  "Do not take client names, tender references, or confidential client information; refer to “a government client” or “a retail client”.",
+  "Decline anything involving inducements, kickbacks, bid-rigging or obtaining competitors’ bids.",
+  "Staff poaching or non-compete disputes: note as a turnover problem, no legal comment.",
+  "Associates’ personal or tax details are not collected.",
+  "Founder fatigue from proposal cycles: stay warm, practical."
+ ],
+ "build_ideas": [
+  "Pipeline tracker with proposal stage, value band, owner, next action date and win/loss reason",
+  "Proposal library: past proposals, CVs and case write-ups tagged by service line for quick reuse",
+  "Engagement tracker with milestones, deliverables, owners and status, plus a client-facing summary",
+  "Weekly timesheet linked to engagements, with utilisation per consultant and bench visibility",
+  "Scope change log per engagement with approval and billing flag",
+  "Milestone billing trigger: invoice drafted when a deliverable is signed off, with ageing and reminders",
+  "Associate register with availability, agreed rates and invoice matching against logged days",
+  "Expense claim flow on phone with receipt photo and approval",
+  "Service line profitability view: fees versus logged effort and associate cost",
+  "Compliance document register (registrations, certificates, insurance) with expiry alerts for tenders",
+  "Resource planner showing who is booked where over the next 8–12 weeks",
+  "Partner dashboard: pipeline, live engagements, utilisation, receivables"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We send maybe 10 proposals a month and honestly I couldn’t tell you which ones are still live."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a lot of effort going out with no clear view of what’s coming back — noted. Where do you keep track of the proposals once they’re sent?"
+  },
+  {
+   "role": "Person",
+   "text": "A sheet, but nobody updates it after the first week."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, the sheet goes stale soon after sending. When you do lose a bid, do you usually find out why?"
+  },
+  {
+   "role": "Person",
+   "text": "Rarely. Sometimes we only hear months later."
+  },
+  {
+   "role": "pi",
+   "text": "Understood, no clear loss reasons — I’ve noted that too. Is chasing proposals one person’s job, or whoever wrote it?"
+  }
+ ]
+}

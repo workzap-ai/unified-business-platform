@@ -1,0 +1,268 @@
+{
+ "key": "pet_shops_and_pet_supplies",
+ "name": "Pet shops and pet supplies",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "pet shop",
+  "pet store",
+  "pet supplies",
+  "cat food",
+  "dog food",
+  "kibble",
+  "cat litter",
+  "aquarium",
+  "fish tank",
+  "birds",
+  "parrots",
+  "tote",
+  "chirya",
+  "hamster",
+  "grooming",
+  "pet accessories",
+  "pet food delivery",
+  "subscription",
+  "janwaron ki dukaan",
+  "hayawanat alifa",
+  "vet referral",
+  "imported food",
+  "Royal Canin-type premium brands",
+  "cages",
+  "pet boarding"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "What they sell: food and supplies only, or also live animals (birds, fish, small pets) and services (grooming, boarding).",
+  "Imported vs local food brands, and buying direct vs distributor.",
+  "Channels: walk-in, WhatsApp/Instagram delivery, website, Talabat/Noon/Instashop/Amazon, subscriptions.",
+  "Delivery fleet: own riders or courier.",
+  "Branch count and storage space.",
+  "Whether a vet works with or near the shop (referral only)."
+ ],
+ "scope_rule": "pi notes operational problems such as food stock and expiry, repeat delivery orders, grooming bookings, live-animal care workload, supplier imports and staff. pi gives no veterinary, nutritional, medication, dosing or breeding advice, and no advice on animal import or export permits or wildlife law. If an animal is in distress, pi suggests contacting a vet urgently; if people are in danger (bites, fire), pi points to emergency services. pi does not record customers’ or pets’ owners’ personal details, and refuses to help with trade in protected or wild species.",
+ "vocabulary": {
+  "kibble": "dry pet food",
+  "wet food": "canned or pouched food",
+  "litter": "material for cat toilet trays",
+  "grooming": "bathing, trimming and nail clipping",
+  "boarding": "looking after pets while owners are away",
+  "aquarium / tank": "fish tanks, with filters, pumps and accessories",
+  "livestock (aquatic)": "trade term for live fish and invertebrates",
+  "tota / chirya": "parrot / bird (Urdu)",
+  "subscription / autoship": "recurring food delivery",
+  "prescription diet": "vet-prescribed food (shop only stocks; vet decides)",
+  "expiry / best before": "date on food packs",
+  "hayawanat alifa": "pets (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Regular customers’ food brand runs out and they switch to another shop",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Imported food stuck at customs, shelves empty for weeks",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Bags of food expire in the storeroom",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Torn bags and pest damage in storage",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Customers order every month on WhatsApp but we don’t remind them, so they forget or go elsewhere",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Delivery orders for heavy litter bags cost more than they earn",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Riders deliver late and customers complain",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Grooming bookings clash and groomers are double-booked",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Fish and birds die in the shop and we don’t track the loss",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Tank cleaning and feeding schedules get skipped when staff are off",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Supplier keeps changing prices on imported brands",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Our app/website listings on Talabat or Instashop show wrong stock",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Customers complain the pet came back from grooming with a cut",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Hard to find staff who know animals",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Boarding bookings and pickup times are in a notebook",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "We give credit to breeders or vets who take stock and pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We don’t know which brands make money after delivery costs",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Instagram DMs asking ‘do you have this?’ all day",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Summer heat in the UAE ruins deliveries",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Distributor minimum orders are too big for us",
+   "category": "suppliers_purchasing",
+   "subtype": "minimum_orders"
+  },
+  {
+   "phrase": "Pet licensing and shop inspection paperwork take time",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Two branches don’t know each other’s stock",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Customer data is only on staff phones",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  }
+ ],
+ "questions": {
+  "mix": [
+   "Do you mainly sell food and supplies, or also animals and services like grooming?",
+   "Which part brings in most of the money?"
+  ],
+  "stock": [
+   "Which items run out most often?",
+   "How do you find out before a customer asks?"
+  ],
+  "expiry and storage": [
+   "How do you check expiry dates on food?",
+   "Where is stock kept and does anything get damaged there?"
+  ],
+  "repeat orders": [
+   "Do customers buy the same food every month?",
+   "How do they usually reorder?"
+  ],
+  "delivery": [
+   "Who delivers, your riders or a courier?",
+   "What goes wrong most with deliveries?"
+  ],
+  "grooming/boarding": [
+   "How are appointments booked today?",
+   "What happens on busy days?"
+  ],
+  "live animals": [
+   "Who looks after the animals in the shop each day?",
+   "How do you check it’s been done?"
+  ],
+  "suppliers": [
+   "Is most of your stock imported or local?",
+   "What happens when a shipment is delayed?"
+  ],
+  "marketplaces": [
+   "Do you sell on any delivery apps or marketplaces?",
+   "Does that stock match yours?"
+  ],
+  "owner view": [
+   "At month end, how do you see what each category earned?"
+  ]
+ },
+ "seasons": "In the UAE: summer heat affects deliveries and live-animal handling, while summer travel drives boarding and pet relocation (relocation itself is out of pi’s scope). Cooler months bring outdoor activity and accessories, along with Black Friday/White Friday, and Ramadan and Eid travel for boarding. In PK: Eid holidays drive boarding demand, and imported-food availability swings with currency moves and import restrictions; summer heat matters for fish and birds. Spring is the main bird and aquarium season. In Canada: holiday season gifting, summer boarding and Black Friday. Subscriptions smooth demand across the year.",
+ "care": [
+  "No veterinary, medical, dosing, diet or breeding advice; animal in distress → contact a vet urgently.",
+  "Danger to people (serious bite, fire, chemical exposure from aquarium products) → emergency services.",
+  "Refuse any help with trade in protected, wild or illegally imported animals, or bypassing import/quarantine controls.",
+  "Do not advise on permits for animal import/export, licensing or welfare law; record effort only.",
+  "Animal welfare concerns raised by the owner: record the operational issue (checklists, staffing) without judgement; refuse to help conceal mistreatment.",
+  "Do not record customers’ names, addresses or pet records.",
+  "Staff suspicions recorded by role only."
+ ],
+ "build_ideas": [
+  "Food stock by brand, size and expiry with first-expiry-first-out alerts and reorder suggestions.",
+  "Repeat-order reminders on WhatsApp timed to each customer’s usual cycle (with consent), with one-tap reorder.",
+  "Subscription/autoship list with delivery schedule and payment status.",
+  "Delivery planner grouping orders by area, with rider assignment and proof of delivery.",
+  "Grooming and boarding booking calendar with groomer schedules and reminders.",
+  "Grooming job card with intake condition notes and photos.",
+  "Live-animal daily care checklist (feeding, water changes, temperature) with staff sign-off.",
+  "Live-stock loss log for fish/birds with cost per month.",
+  "Marketplace stock sync for delivery apps.",
+  "Supplier tracker for imported shipments with expected dates.",
+  "Margin by brand after delivery costs.",
+  "Owner daily read: sales, stockouts, orders due, bookings."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our regular customers buy the same food every month, but if we’re out of stock they just go to another shop."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a hard way to lose a regular. Noted: customers switch shops when their usual food is out of stock. Is it mostly imported brands that run out?"
+  },
+  {
+   "role": "Person",
+   "text": "Yes, the premium imported ones."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. When you place an order with the distributor, how do you decide how much to buy?"
+  },
+  {
+   "role": "Person",
+   "text": "Honestly, I just look at the shelf."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted that ordering is done by looking at the shelf. How long does a delivery from the distributor usually take to arrive?"
+  }
+ ]
+}

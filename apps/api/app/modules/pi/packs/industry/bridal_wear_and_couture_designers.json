@@ -1,0 +1,286 @@
+{
+ "key": "bridal_wear_and_couture_designers",
+ "name": "Bridal wear and couture designers",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "bridal",
+  "couture",
+  "formals",
+  "lehnga",
+  "sharara",
+  "gharara",
+  "maxi",
+  "peshwas",
+  "walima dress",
+  "mehndi outfit",
+  "barat",
+  "custom order",
+  "made- to-measure",
+  "fittings",
+  "trial",
+  "booking",
+  "advance",
+  "karigar",
+  "adda",
+  "zardozi",
+  "dabka",
+  "tilla",
+  "delivery date",
+  "shaadi se pehle",
+  "atelier",
+  "fustan zifaf",
+  "tasmeem"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Atelier/studio only, or flagship stores in several cities, plus international clients.",
+  "In-house embroidery (adda) workshop vs outsourced karigars.",
+  "Number of bridal orders in a peak month and typical lead time from booking to delivery.",
+  "Advance and payment-stage structure (booking advance, fitting, final), without amounts.",
+  "Whether clients are local, diaspora (UAE, UK, Canada, US) needing virtual consultations and shipping.",
+  "Ready-to-wear formals line alongside bespoke.",
+  "Who handles client communication (designer personally, studio manager, sales team)."
+ ],
+ "scope_rule": "pi notes the operational side of custom orders: booking, design approvals, production tracking, karigar capacity, fittings, deliveries, payments, and client communication. pi does not give contract, refund-law, customs, tax or intellectual-property advice, and does not collect brides’ names, measurements, photographs, event dates tied to identities, addresses or phone numbers, nor karigars’ personal details. Disputes with clients are recorded as an operational problem (e.g. “approvals not documented”), never judged.",
+ "vocabulary": {
+  "adda": "wooden frame on which hand embroidery is done; also the embroidery workshop",
+  "karigar": "skilled craftsman (embroiderer, tailor)",
+  "zardozi / dabka / tilla / gota": "hand-embroidery techniques using metallic threads",
+  "trial / fitting": "client tries the outfit for alterations",
+  "booking / advance": "first payment that secures an order slot",
+  "barat / walima / mehndi": "main wedding events, each needing outfits",
+  "made-to-measure": "stitched to the client’s measurements",
+  "colourway": "the colour combination chosen for a design",
+  "sampling": "swatch or test embroidery for approval",
+  "lead time": "weeks from booking to delivery",
+  "rush order": "order with less than normal lead time",
+  "atelier": "designer’s studio"
+ },
+ "problems": [
+  {
+   "phrase": "We take more bookings than the karigars can handle in wedding season",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "I have no single view of which order is at which stage",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Delivery dates slip and brides panic a week before the barat",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Client approved the colour on WhatsApp but now says she never did",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Design changes after embroidery has started cost us a lot",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Embroidery quality changes with which karigar worked on it",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Karigars leave mid-season for another designer",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Karigars are paid per piece and disputes happen about what they finished",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Embellishments and dabka run out in the middle of an order",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Fabric and materials issued to the adda don’t add up",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "We don’t know the real cost of a bridal after all the handwork hours",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Gold thread and fabric prices went up after we quoted",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Final payments are chased right before delivery, sometimes after",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Cancellations after work has started and arguments about the advance",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Enquiries on Instagram DM go unanswered for days",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Lots of enquiries, few bookings",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Overseas brides want video consultations and updates, it takes all our time",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Shipping bridals abroad gets stuck and the wedding is in a week",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Fittings booked by phone clash with each other",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Alterations after delivery pile up",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Everything waits for the designer’s approval",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Off-season the workshop sits idle but we still pay salaries",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Order details are in notebooks, WhatsApp and the manager’s head",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Copies of our bridal show up on Instagram stores",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "One bad review about a late delivery went viral",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Studio manager and workshop head blame each other when something’s late",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  }
+ ],
+ "questions": {
+  "orders": [
+   "How many custom orders are in progress right now?",
+   "How do you know which stage each one is at?",
+   "Who updates it?"
+  ],
+  "capacity": [
+   "How many karigars work on your pieces?",
+   "When did you last have to turn work away or rush it?"
+  ],
+  "approvals": [
+   "How do clients approve designs and colours today?",
+   "What happens if they change their mind after work starts?"
+  ],
+  "delivery": [
+   "How often do deliveries run close to the event date?",
+   "Where does the delay usually start?"
+  ],
+  "materials": [
+   "How are fabric and embellishments issued to the workshop?",
+   "Do you ever run out mid-order?"
+  ],
+  "payments": [
+   "How many stages of payment do you take?",
+   "Which stage is hardest to collect?"
+  ],
+  "enquiries": [
+   "Where do most enquiries come from?",
+   "How quickly does someone reply?"
+  ],
+  "costing": [
+   "How do you work out a quote for a bridal?",
+   "Do you track the hours each piece actually takes?"
+  ],
+  "overseas": [
+   "How many clients are abroad?",
+   "What’s hardest about serving them?"
+  ]
+ },
+ "seasons": "Pakistan: the main wedding season runs November–February (with heavy bookings from July–September for winter weddings), a secondary spring season in March–April, and quiet months during Muharram and Ramadan when weddings are fewer; Eid formals demand before both Eids. UAE: winter wedding season October–April, Ramadan quiet for weddings but busy for Eid formals, diaspora clients ordering from Pakistan with long lead times. Canada: summer wedding season (June–September) for South Asian diaspora, with orders placed 4–6 months earlier; Diwali and Eid formals.",
+ "care": [
+  "Brides’ details, photos, measurements and event dates: pi never asks for or stores them; it talks in counts and stages.",
+  "Client disputes over advances or refunds: pi records the operational issue and gives no legal or contract advice.",
+  "Karigar pay, piece rates and working conditions: noted as operational; no labour-law advice. If unsafe conditions or child labour come up, pi does not assist with them and recommends acting on safety.",
+  "Copying another designer’s work: declined.",
+  "Customs declarations for bridal shipments abroad: no advice; under-declaring is declined.",
+  "Emotional clients or owners stressed before a wedding: pi is calm and kind, stays on notes, no promises about delivery.",
+  "Posting client photos for marketing without consent: pi does not help with that."
+ ],
+ "build_ideas": [
+  "Custom order board: each order by code with stage (booked, design approved, cutting, adda, stitching, finishing, trial, ready, shipped) and due date.",
+  "Countdown alerts when an order is behind relative to its event date.",
+  "Design approval flow on WhatsApp: sketch/colour sent, client taps approve, approval timestamped and saved.",
+  "Change-request log with stage at which change was made and extra work noted.",
+  "Workshop capacity planner: karigar hours available vs hours booked by week, flagging overbooking.",
+  "Piece-rate tracker per karigar code: work assigned, finished, paid.",
+  "Material issue register: fabric, threads and embellishments issued per order, returned and balance.",
+  "Quote builder using standard handwork hours and material costs per design element.",
+  "Payment stage tracker per order with reminders before trial and before delivery.",
+  "Enquiry inbox for Instagram and WhatsApp with response time tracking and follow-up reminders.",
+  "Fitting and trial booking calendar with reminders and video-consult slots for overseas clients.",
+  "Overseas shipment tracker with dispatch, courier status and arrival confirmation.",
+  "Post-delivery alterations queue.",
+  "Off-season planner showing booked work by month to plan RTW or formals production."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Shaadiyon ke season mein humare paas 40 se zyada bridal orders hote hain aur kisi ko nahi pata kaun sa kahan hai."
+  },
+  {
+   "role": "pi",
+   "text": "Wow, wo kaafi load hai — noted, peak season mein 40+ bridal orders aur kisi ek jagah status nahi dikhta. Abhi order ka stage kaun track karta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Studio manager ek register mein likhti hai, lekin adda wale WhatsApp pe batate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, likh liya — register aur WhatsApp, do alag jagah. Pichle season mein kitni dafa delivery event ke bohot qareeb pahunchi?"
+  },
+  {
+   "role": "Person",
+   "text": "Kayi dafa. Ek dafa barat se ek din pehle."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, ye bhi add kar liya. Aapke hisaab se aksar delay kis stage pe shuru hota hai?"
+  }
+ ]
+}

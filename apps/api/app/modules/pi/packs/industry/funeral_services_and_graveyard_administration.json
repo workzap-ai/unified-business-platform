@@ -1,0 +1,273 @@
+{
+ "key": "funeral_services_and_graveyard_administration",
+ "name": "Funeral services and graveyard administration",
+ "kind": "industry",
+ "sector": {
+  "code": "M",
+  "title": "Digital economy, social and public sector"
+ },
+ "signals": [
+  "funeral home",
+  "funeral director",
+  "ghusl",
+  "kafan",
+  "janaza",
+  "qabristan",
+  "qabar",
+  "gorkan",
+  "ambulance / mayyat gari",
+  "cold storage / sard khana",
+  "repatriation",
+  "body transport",
+  "burial plot",
+  "plot booking",
+  "cremation",
+  "crematorium",
+  "maqbara",
+  "dafn",
+  "ghuslkhana",
+  "death certificate",
+  "NOC",
+  "pre- need plans",
+  "cemetery committee",
+  "trust qabristan",
+  "funeral package"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "What they do: full funeral service, ghusl/kafan service, hearse/ambulance service, cold storage, repatriation, graveyard/cemetery administration, or a combination.",
+  "Run by: private business, trust/community committee, municipality or mosque, or faith-specific funeral home.",
+  "Scale: number of services handled in a typical week (if volunteered), number of vehicles, cold storage capacity, graveyard size.",
+  "Faith communities served and their rites (Muslim, Christian, Hindu, Sikh, others).",
+  "Whether they handle cross-border repatriation (e.g., UAE or Canada to Pakistan).",
+  "Staff: drivers, ghassal (washers), gravediggers, admin, on-call rota.",
+  "Income model: fees, packages, donations, plot sales/allotments, municipality funding."
+ ],
+ "scope_rule": "pi notes operational and administrative problems: on-call coordination, vehicle and cold-storage scheduling, supply stock (shrouds, coffins, materials), grave plot records and allocation process, booking and payment handling, staff rotas, family communication workflow and paperwork tracking. It does not give advice on religious rites, legal requirements for death registration, repatriation regulations, health/body-handling safety rules, or burial-ground land disputes. It never collects details of the deceased or their families — no names, cause of death, ID numbers, medical information, addresses, photos or grave-to-person mapping — and refers to cases only by role or count (e.g., “a family”, “three services yesterday”).",
+ "vocabulary": {
+  "Ghusl": "Islamic ritual washing of the deceased.",
+  "Kafan": "burial shroud.",
+  "Janaza": "funeral prayer/procession.",
+  "Gorkan": "gravedigger.",
+  "Mayyat gari / hearse": "vehicle carrying the deceased.",
+  "Sard khana / cold storage / morgue": "refrigerated holding.",
+  "Repatriation": "sending the deceased to another country for burial.",
+  "Plot / qabar allotment": "assignment of a grave space.",
+  "Pre-need / pre-arranged plan": "funeral arranged and paid in advance (common in Canada).",
+  "Register / burial register": "record of graves and burials.",
+  "Visitation / wake": "gathering before the funeral (in some communities).",
+  "NOC / permits": "documents needed to move or bury the deceased."
+ },
+ "problems": [
+  {
+   "phrase": "Calls come at any hour and the on-call person sometimes doesn’t pick up",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Two families booked for the same hearse at the same time",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Cold storage is full at times and we have to turn people away",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Cold storage unit broke down and we only found out late",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "We run out of kafan cloth or coffins at the worst moment",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "The graveyard register is an old book; no one knows which plots are free",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Plots get double-allotted",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Families say they were charged differently from others",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Cash payments at the graveyard not properly recorded",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Donations for the graveyard trust come in cash and go into a drawer",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Repatriation paperwork follow-up is all on WhatsApp and gets lost",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Families keep calling for updates and staff are stretched",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Gravediggers and washers paid daily cash with no record",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Hard to find and keep washers and gravediggers",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Staff burnout from constant on-call and emotional load",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Graveyard upkeep — boundary walls, lighting, water — never planned",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Vehicle fuel and maintenance costs unclear",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Supplier of coffins or shrouds raised prices without notice",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Thefts from the graveyard — fittings, plants, materials",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Committee can’t see monthly numbers of burials, income and expenses",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Pre-need plan records spread across paper files",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Licence or permit renewals for vehicles or premises missed",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Quality complaints — late arrival, wrong arrangements",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Graveyard filling up; no plan for the next years",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  }
+ ],
+ "questions": {
+  "on-call": [
+   "How do families reach you when someone passes away?",
+   "Who answers at night?",
+   "What happens if they don’t pick up?"
+  ],
+  "vehicles and cold storage": [
+   "How many vehicles and storage spaces do you have?",
+   "How do you schedule them when several families need them at once?"
+  ],
+  "supplies": [
+   "Which items run out most often?",
+   "Who keeps track of stock?"
+  ],
+  "graveyard records": [
+   "Where is the record of graves kept now?",
+   "How do you know which plots are available?"
+  ],
+  "payments": [
+   "How do families pay — cash, transfer, packages?",
+   "How is each payment recorded?"
+  ],
+  "families": [
+   "How do you keep families updated during the process?",
+   "Who handles those calls?"
+  ],
+  "repatriation (if relevant)": [
+   "Which steps take the longest to coordinate?",
+   "How do you keep track of where each case stands?"
+  ],
+  "staff": [
+   "How is the rota set for washers, drivers and gravediggers?",
+   "How are they paid?"
+  ],
+  "committee/owner": [
+   "What numbers would you like to see each month?",
+   "Who prepares them now?"
+  ],
+  "maintenance": [
+   "What in the facility needs regular attention?",
+   "How do you find out about problems?"
+  ]
+ },
+ "seasons": "Demand rises with extreme weather: Pakistan’s summer heatwaves (notably in Karachi and Sindh, typically May– July) and cold-weather periods; monsoon flooding can disrupt graveyard access and burials. Canada sees higher demand in winter, and frozen ground can affect burial timing in some areas. UAE summer heat affects scheduling and cold-storage load; Ramadan shifts janaza and work timings. Eid and long holidays can slow paperwork offices while services continue. Graveyard visits peak on Eid days and Shab-e-Barat, requiring upkeep and crowd arrangements.",
+ "care": [
+  "Approach with gentleness; the owner may be grieving or dealing with grieving families. Acknowledge, never rush.",
+  "Never collect information about the deceased or relatives (names, cause of death, IDs, medical details, addresses, grave locations of named individuals).",
+  "No advice on religious rites, death registration, permits, repatriation law, embalming or infection-control procedures; note only the coordination or paperwork-tracking burden.",
+  "If anyone mentions an unattended death, suspicious death, or ongoing emergency, pi asks them to contact emergency services or police first (1122/15 in Pakistan, 999 in UAE, 911 in Canada).",
+  "Refuse anything involving falsified death documents, bypassing permits, illegal plot sales or land encroachment.",
+  "Do not discuss grave reselling or exhumation beyond noting an administrative issue; legal questions go to authorities.",
+  "Respect all faiths’ rites equally; no judgement.",
+  "Staff trauma: respond kindly; suggest professional support if someone seems distressed, without counselling."
+ ],
+ "build_ideas": [
+  "24/7 WhatsApp intake line that captures a service request, routes it to the on-call person, and escalates if not acknowledged within minutes.",
+  "Vehicle and cold-storage scheduling board showing availability and preventing double-booking.",
+  "Supply stock tracker (shrouds, coffins, washing materials) with reorder alerts.",
+  "Digital graveyard register with plot map, status (available, reserved, occupied) and allocation workflow, access restricted by role.",
+  "Payment and donation register with receipts and daily cash close.",
+  "Family update flow: automated, respectful status messages (vehicle dispatched, prayer time confirmed) sent to the family’s chosen contact.",
+  "Repatriation case checklist tracking each document step and responsible role.",
+  "Staff rota and on-call calendar with daily wage records.",
+  "Maintenance log for vehicles, cold storage units and graveyard infrastructure with service reminders and temperature alerts.",
+  "Monthly committee report: services handled, income, expenses, plots remaining.",
+  "Pre-need plan register with plan status and payment schedule.",
+  "Capacity planner projecting remaining plots based on recent burial counts."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hum ek trust ka qabristan chalate hain. Register purana hai, pata hi nahi chalta kaunsi jagah khali hai."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh bohot nazuk kaam hai aur aisi uljhan mein mushkil aur barh jati hai. Noted — qabron ka record purane register mein hai aur khali jagah ka pata nahi chalta. Kya kabhi aisa hua ke ek hi jagah do dafa allot ho gayi ho?"
+  },
+  {
+   "role": "Person",
+   "text": "Haan, do teen dafa. Bohot sharmindagi hui."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — kuch dafa ek hi plot do dafa allot ho gaya. Abhi naya plot allot karne ka faisla kaun karta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Gorkan bata deta hai, phir main register mein likhta hoon."
+  }
+ ]
+}

@@ -1,0 +1,280 @@
+{
+ "key": "law_firms",
+ "name": "Law firms (operations and admin)",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "case files",
+  "hearing dates",
+  "cause list",
+  "peshi",
+  "adjournment",
+  "tareekh",
+  "court fee",
+  "stamp paper",
+  "vakalatnama",
+  "munshi",
+  "clerk",
+  "chambers",
+  "retainer",
+  "billable hours",
+  "client matter",
+  "legal notice",
+  "drafting",
+  "filing",
+  "power of attorney",
+  "notarisation",
+  "muhami",
+  "qadiya",
+  "maktab muhamah",
+  "conflict check",
+  "trust account"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Practice areas (litigation, corporate, family, property, banking, immigration-related admin)",
+  "Number of lawyers, associates, clerks/munshis and support staff",
+  "Number of active matters and how many are in court versus advisory",
+  "Courts and jurisdictions they appear in (district, high court, DIFC/ADGM, provincial)",
+  "How the firm charges (retainer, per hearing, fixed per matter, hourly)",
+  "How hearing dates and files are tracked today (diary, register, Excel, software)",
+  "Single office or multiple cities"
+ ],
+ "scope_rule": "pi notes only how the firm runs as a business: diary and hearing-date tracking, file movement, billing and collections, clerk and associate workload, client updates and document handling. pi never gives legal opinions, never comments on the merits, strategy or likely outcome of any case, and never interprets law or procedure. pi does not take client names, opposing parties, case numbers, case facts, ID numbers or any privileged information; it records “a client matter” and the type of work only. Requests to forge, backdate or tamper with documents, influence courts or officials, or conceal assets are declined.",
+ "vocabulary": {
+  "Peshi / tareekh": "court hearing date",
+  "Cause list": "the court’s published list of cases fixed for a given day",
+  "Munshi": "law clerk who handles filing, court diaries and runner work",
+  "Vakalatnama": "document authorising a lawyer to act for a client in court",
+  "Adjournment": "hearing postponed to a later date",
+  "Chambers": "the lawyer’s office",
+  "Matter": "a single client case or piece of work",
+  "Billable hours": "time charged to a client",
+  "Retainer": "fixed fee for ongoing availability or a defined scope",
+  "Conflict check": "confirming the firm doesn’t act for the other side",
+  "Trust / client account": "money held on behalf of clients",
+  "Diary": "the firm’s master record of hearing and deadline dates"
+ },
+ "problems": [
+  {
+   "phrase": "We missed a hearing because the date was only in the munshi’s diary",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  },
+  {
+   "phrase": "Cause list is checked by hand every evening",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Physical files go missing between chambers and court",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Clients keep calling to ask what happened at the last hearing",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Associates’ time is never recorded, so we underbill",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Fixed-fee matters drag for years and we lose money",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Clients pay the first instalment then disappear",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Court fees and expenses we pay on behalf of clients never get recovered",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  },
+  {
+   "phrase": "Senior partner has to approve every draft",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Drafts go back and forth on WhatsApp and we lose the final version",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "No idea how many active matters each associate is carrying",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Good associates leave to start their own practice",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "New juniors don’t know our formats and templates",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Every lawyer drafts the same agreement differently",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Limitation dates and filing deadlines are tracked in someone’s head",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Bar and licence renewals for lawyers get forgotten",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Old closed files take up a whole room and we can’t find anything",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Leads from our website just sit in an inbox",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We don’t know which referral sources bring the paying clients",
+   "category": "marketing_leads",
+   "subtype": "no_tracking"
+  },
+  {
+   "phrase": "Conflict checks are done from memory",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Our Karachi and Lahore offices don’t know each other’s dates",
+   "category": "communication_coordination",
+   "subtype": "branches_not_aligned"
+  },
+  {
+   "phrase": "Invoices are typed in Word from scratch every time",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "We work for clients on account and never reconcile what they owe",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Our shared drive got wiped and some scanned files are gone",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "We want to open a corporate desk but can’t see where our revenue really comes from",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  }
+ ],
+ "questions": {
+  "diary": [
+   "How are hearing dates tracked today, and who updates them?",
+   "What happens when a date changes after an adjournment?"
+  ],
+  "files": [
+   "Are your files mostly physical, digital, or both?",
+   "How do you know where a particular file is right now?"
+  ],
+  "billing": [
+   "How do you usually charge clients?",
+   "Do you track the time associates spend on each matter?"
+  ],
+  "collections": [
+   "How late do clients typically pay?",
+   "Are expenses you pay on their behalf recovered?"
+  ],
+  "client updates": [
+   "How do clients find out what happened at a hearing?",
+   "How much of your staff’s day goes into those calls?"
+  ],
+  "workload": [
+   "How many active matters does the firm have roughly?",
+   "Can you see how they’re spread across lawyers?"
+  ],
+  "drafting": [
+   "Who reviews drafts before they go out?",
+   "Where do they get stuck?"
+  ],
+  "staff": [
+   "Where does turnover hurt most — associates or clerks?",
+   "How long does it take a new junior to be useful?"
+  ],
+  "systems": [
+   "What do you use for diary, documents and invoices?",
+   "Which of those causes the most trouble?"
+  ],
+  "growth": [
+   "Which practice area do you want to grow?",
+   "What makes it hard to take on more right now?"
+  ]
+ },
+ "seasons": "- Pakistan: courts’ summer and winter vacations slow litigation and push hearings into busy periods after; budget/Finance Act changes in June–July bring corporate and tax advisory requests; Ramadan court timings shorten days. - UAE: judicial summer recess and Ramadan reduce hearings; year-end and Q1 bring corporate restructuring, licence and employment work; real estate cycles drive property dispute volumes. - Canada: courts quieter around late December and summer; corporate year-end and real estate closing peaks in spring and summer. - Family matters often rise after holidays; Eid and year-end slow client payments.",
+ "care": [
+  "Never give a legal view, predict outcomes or suggest strategy; if asked, say pi notes operational issues and the lawyer is the expert.",
+  "Never take client identities, case numbers, case facts or opposing parties; legal privilege matters.",
+  "Decline any request touching forged documents, backdating, influencing judges, police or officials.",
+  "Trust/client money concerns: note as a business-control problem, no regulatory advice.",
+  "If someone describes threats or danger related to a case, pi stops and points to emergency services or police.",
+  "Staff misconduct allegations: record as a trust/accountability issue without names.",
+  "Bar council or regulatory complaints: note as a concern only."
+ ],
+ "build_ideas": [
+  "Shared hearing diary by matter with next date, court and responsible lawyer, updated from phone by the munshi after each hearing",
+  "Daily morning summary on WhatsApp to each lawyer: today’s and tomorrow’s hearings and deadlines",
+  "Matter register with stage, assigned lawyer, fee type and outstanding balance",
+  "File location tracker: check-out/check-in of physical files with who has it and since when",
+  "Client update flow: short post-hearing note sent to the client after approval",
+  "Simple time capture per matter for associates, rolled up into fee-versus-effort per matter",
+  "Expense log for court fees and disbursements per matter, added to client invoices automatically",
+  "Invoice generator from matter records with receivables ageing and reminders",
+  "Template library for standard drafts with version control",
+  "Limitation and deadline tracker with escalating alerts",
+  "Internal conflict-check search across the matter register (by role and matter type, set up by the firm)",
+  "Partner dashboard: active matters, hearings this week, workload by lawyer, collections"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our biggest issue is dates. The munshi keeps the diary and last month we missed a hearing because he was on leave."
+  },
+  {
+   "role": "pi",
+   "text": "That sounds stressful — the hearing dates live with one person, so when he’s away there’s no backup. Noted. When a hearing gets adjourned, how does the new date reach the lawyer handling the matter?"
+  },
+  {
+   "role": "Person",
+   "text": "He calls them or sends it in the office WhatsApp group."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, new dates go out by phone or in a group chat. Roughly how many active court matters is the firm carrying right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Around 300 across four lawyers."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, around 300 matters across four lawyers — noted. Do clients usually hear from you after each hearing, or do they call in to ask?"
+  }
+ ]
+}

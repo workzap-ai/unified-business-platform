@@ -1,0 +1,261 @@
+{
+ "key": "sugar_mills_and_cotton_ginning",
+ "name": "Sugar mills and cotton ginning",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "sugar mill",
+  "crushing season",
+  "ganna / cane",
+  "CPR",
+  "cane commissioner",
+  "procurement centre / purchase centre",
+  "cane yard",
+  "grower payment",
+  "molasses / sheera",
+  "bagasse",
+  "recovery percentage",
+  "ginning factory / ginner",
+  "phutti / seed cotton",
+  "lint / rui",
+  "bale / gath",
+  "binola",
+  "khal",
+  "delinting",
+  "pressing",
+  "trash / moisture",
+  "spinning mill buyer",
+  "Canadian sugar beet processing"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Business: sugar mill, ginning factory, or both; and any by-products sold (molasses, bagasse, cottonseed, oil cake)",
+  "Crushing or ginning capacity roughly, and length of the season",
+  "Number of growers or phutti suppliers dealt with, and purchase centres operated",
+  "Selling route for sugar or lint: wholesalers, spinning mills, industrial buyers, export",
+  "Credit terms with growers and with buyers",
+  "Staff: permanent versus seasonal",
+  "Systems: weighbridge software, ERP, accounting software, registers"
+ ],
+ "scope_rule": "pi notes business and operational problems: cane or phutti intake and weighing, grower payment tracking, yard congestion, purchase centre control, stock of sugar, lint, bales and by-products, dispatch to buyers, receivables, downtime during the season, seasonal staffing, and reporting to owners and boards. pi does not advise on cane support prices, grower payment law, cane commissioner rules, sugar pricing or export policy, cotton grading standards, factory safety engineering, environmental compliance, tax or credit. It does not store growers’, suppliers’ or workers’ names, CNICs or phone numbers.",
+ "vocabulary": {
+  "crushing season": "period when a sugar mill processes cane, roughly November to March",
+  "CPR": "cane procurement receipt given to the grower at weighment",
+  "recovery": "sugar yield as a share of cane crushed",
+  "sheera / molasses": "syrup by-product sold to distilleries or feed makers",
+  "bagasse": "cane fibre used as boiler fuel",
+  "phutti": "seed cotton as picked",
+  "rui / lint": "ginned cotton fibre",
+  "gath / bale": "pressed bale of lint",
+  "binola": "cottonseed, sold for oil and cake",
+  "trash": "leaves and dirt in phutti (often a deduction point)",
+  "yard": "area where trolleys queue before weighing"
+ },
+ "problems": [
+  {
+   "phrase": "Trolleys queue for two days at the cane yard and growers are furious",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Growers say our weighbridge cheats them",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "CPR records and payment records are kept separately and don’t match",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "We’re behind on grower payments and get pressure from all sides",
+   "category": "cash_collections",
+   "subtype": "supplier_payments_late"
+  },
+  {
+   "phrase": "Purchase centre staff are taking money from growers to jump the queue",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Middlemen bring cane in growers’ names",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Mill stopped for a day in peak crushing because of a breakdown",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Sugar stock in godowns differs from book stock",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Molasses sales record is loose, tankers go out without a clear count",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Buyers lift sugar late and our godowns fill up",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Spinning mills pay for lint months later",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Phutti quality varies and trash deductions cause arguments",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Bales graded differently by our staff and the buyer",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Seasonal staff need training every year from scratch",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Shift supervisors don’t hand over properly",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Fuel and power costs during ginning eat our margin",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "We don’t know our cost per bale or per bag until the season is over",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Board wants daily crushing reports, we compile them by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Regulatory reports to the cane department take a lot of time",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Weighbridge software, accounts and the store run on different systems",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Instructions to purchase centres get lost on WhatsApp",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Cotton area near us is falling and we have idle capacity",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Off season, the plant sits idle and costs still run",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  }
+ ],
+ "questions": {
+  "intake": [
+   "How do trolleys or phutti loads get from arrival to weighment today?",
+   "Where does the longest wait happen?"
+  ],
+  "weighing and trust": [
+   "How do growers or suppliers see their weights?",
+   "What disputes come up most?"
+  ],
+  "grower payments": [
+   "How are CPRs matched to payments?",
+   "Who tracks what’s outstanding?"
+  ],
+  "purchase centres": [
+   "How many centres do you run?",
+   "How do you know what’s happening at each?"
+  ],
+  "stock": [
+   "How is sugar, lint or by-product stock counted?",
+   "When did a count last not match?"
+  ],
+  "dispatch and buyers": [
+   "How do buyers arrange lifting?",
+   "What slows dispatch down?"
+  ],
+  "receivables": [
+   "How long do buyers usually take to pay?",
+   "Who follows up?"
+  ],
+  "downtime": [
+   "How are breakdowns recorded during the season?",
+   "What’s the most common cause?"
+  ],
+  "reporting": [
+   "Who needs daily figures, and how are they compiled?",
+   "How long does that take?"
+  ],
+  "seasonal staff": [
+   "How many people do you add for the season?",
+   "What do you have to teach them every year?"
+  ],
+  "off season": [
+   "What happens to the plant and team outside the season?"
+  ]
+ },
+ "seasons": "Pakistan sugar: crushing season usually starts in November and runs into March or April, with the start date set by provincial authorities; grower payment pressure builds through the season; sugar lifting and price swings around Ramadan and Eid. Cotton ginning: phutti arrives from about August–September, peaks September–December, and tapers by February; floods or pest outbreaks in the cotton belt change volumes sharply. Monsoon delays early cotton arrivals. UAE: no cane or cotton processing; refined sugar trading and re-export follows Ramadan and Eid demand. Canada: sugar beet processing in Alberta runs from autumn harvest into winter.",
+ "care": [
+  "Boiler accidents, fires (cotton lint is highly flammable), people caught in machinery or crushed in the yard: pi tells them to call emergency services (1122, 999/998, 911) immediately.",
+  "No advice on support prices, cane laws, grower payment obligations, sugar export or import policy, environmental or effluent rules, or tax.",
+  "Never helps manipulate weighbridges, under-record growers’ cane, issue fake CPRs, hoard sugar, mis-declare stock or evade sales tax.",
+  "Grower protests or unrest: if anyone is in danger, emergency services first; otherwise pi notes the operational problem neutrally.",
+  "Does not store growers’, middlemen’s, buyers’ or workers’ names, CNICs, bank details or phone numbers.",
+  "Politically sensitive topics (sugar prices, government action) are not pi’s to comment on."
+ ],
+ "build_ideas": [
+  "Yard token system: each trolley gets a WhatsApp token with queue position and expected weighment time",
+  "Weighment record that sends the grower or supplier their weights and deductions instantly by WhatsApp",
+  "CPR-to-payment reconciliation with outstanding by grower code and purchase centre",
+  "Purchase centre dashboard: arrivals, weights, queue length, issues reported",
+  "Phutti intake log with moisture and trash deductions recorded with photos",
+  "Sugar, lint, bale, cottonseed and molasses stock by godown with dispatch against gate passes",
+  "Tanker dispatch log for molasses with weight in and out",
+  "Buyer lifting schedule and receivables tracker with reminders",
+  "Downtime log by section and cause, with the season’s total visible to management",
+  "Daily crushing or ginning report generated automatically for owners and the board",
+  "Seasonal staff onboarding checklist and short training pack on phone",
+  "Shift handover form for supervisors",
+  "Regulatory report templates pre-filled from daily data"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Ginning factory hai Rahim Yar Khan mein. Phutti waale har dafa trash ki katauti pe jhagra karte hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, katauti pe har baar behes hoti hai. Noted. Abhi trash ka faisla kaun karta hai aur kaise likha jaata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Hamara banda dekh ke bata deta hai, likha kuch nahi jaata."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, katauti sirf andaze se aur bina record ke. Ek din mein aam tor pe kitni gaariyan phutti le ke aati hain season mein?"
+  }
+ ]
+}

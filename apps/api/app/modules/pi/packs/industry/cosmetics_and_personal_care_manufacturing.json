@@ -1,0 +1,256 @@
+{
+ "key": "cosmetics_and_personal_care_manufacturing",
+ "name": "Cosmetics and personal-care manufacturing",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "cosmetics factory",
+  "skincare",
+  "haircare",
+  "shampoo",
+  "soap",
+  "beauty cream",
+  "whitening cream",
+  "serum",
+  "lotion",
+  "perfume/attar",
+  "oud",
+  "bakhoor",
+  "henna",
+  "hair oil",
+  "private label",
+  "white label",
+  "third-party manufacturing",
+  "contract filling",
+  "cream banane wali company",
+  "beauty products",
+  "mustahdarat tajmeel ’itr ( ﺮﻄﻋ influencer launch, Daraz/Noon/Amazon listing"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Own brand, private-label for others, or both.",
+  "Product types (skincare, haircare, soaps, fragrances/oud/bakhoor, colour cosmetics, henna).",
+  "Number of SKUs and launches per year.",
+  "Sales channels: own website, Instagram/TikTok, marketplaces (Daraz, Noon, Amazon), pharmacies/retail chains, salons, exports.",
+  "In-house filling and packing or outsourced.",
+  "Imported raw materials and packaging (jars, pumps, bottles) share.",
+  "Team size for production, marketing and customer service."
+ ],
+ "scope_rule": "pi notes business problems: batches, packaging stock, launches, marketplace operations, returns, influencer costs, retailer credit, quality complaints and reporting. It never gives formulation, ingredient-safety, skin/medical, claims-compliance, labelling-law or product-registration advice, and does not judge whether a product is safe. It records no customer personal data, skin conditions or photos of people, and no influencer personal details — only roles. If a customer reaction sounds serious (swelling, breathing difficulty, eye injury), pi says urgent medical help is needed and points to emergency services.",
+ "vocabulary": {
+  "private label / white label": "products made for another brand",
+  "MOQ": "minimum order quantity (often for packaging)",
+  "filling / packing line": "where product goes into containers",
+  "batch": "one production run",
+  "jar, pump, dropper, tube": "packaging components",
+  "attar / ’itr": "oil-based perfume",
+  "bakhoor / oud": "incense and agarwood fragrance",
+  "PR box / influencer kit": "free product sent for promotion",
+  "listing": "product page on a marketplace",
+  "COD": "cash on delivery",
+  "RTO": "return to origin (failed delivery)"
+ },
+ "problems": [
+  {
+   "phrase": "Customer says the cream gave her a rash and posted it on Instagram",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Same product feels different batch to batch",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Packaging supplier MOQ forces us to buy 10,000 jars we can’t use",
+   "category": "suppliers_purchasing",
+   "subtype": "minimum_orders"
+  },
+  {
+   "phrase": "Pumps and droppers arrive defective and leak",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Launch delayed because the boxes weren’t printed on time",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "We spend on influencers and have no idea which ones sell",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Meta ads cost more every month for the same sales",
+   "category": "marketing_leads",
+   "subtype": "ad_spend_waste"
+  },
+  {
+   "phrase": "COD orders get refused at the door, RTO is killing us",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Courier COD money comes late and never matches our list",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "Orders from Instagram DMs, WhatsApp, website and Daraz — some slip through",
+   "category": "orders_fulfilment",
+   "subtype": "multi_channel_orders"
+  },
+  {
+   "phrase": "Fake versions of our product are sold on marketplaces",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Old packaging stock is dead after a rebrand",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Products near expiry are with retailers and they want to return them",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Private label clients change artwork after we’ve ordered packaging",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "We don’t know true cost per unit including packaging, ads and returns",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Pharmacy chains pay in 60–90 days",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Customers don’t reorder after the first purchase",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "DMs and comments go unanswered for a day",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Free PR products and samples leave the store without records",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Bad reviews on Noon/Daraz about leakage in transit",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Registration and import documents for each new product take ages",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Raw material count never matches what’s on paper",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Website checkout breaks on mobile",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "We can’t see which channel actually makes money",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  }
+ ],
+ "questions": {
+  "complaints": [
+   "What kind of complaints come in most — quality, leakage, reactions or delivery?",
+   "Where do they arrive?",
+   "Who handles them?"
+  ],
+  "batches": [
+   "Do customers notice differences between batches?",
+   "Can you tell which batch a complaint relates to?"
+  ],
+  "packaging": [
+   "Which packaging item causes the most trouble?",
+   "How much unused packaging is sitting in stock?"
+  ],
+  "marketing": [
+   "Which channels do you spend on?",
+   "How do you know which influencer or ad brought sales?"
+  ],
+  "orders and cod": [
+   "Roughly what share of orders are COD?",
+   "How often do they come back?",
+   "How is courier cash reconciled?"
+  ],
+  "channels": [
+   "Where do orders come from?",
+   "How are they collected into one place?"
+  ],
+  "retail/pharmacy": [
+   "Which retailers stock you?",
+   "How do they pay and return stock?"
+  ],
+  "margins": [
+   "How do you work out cost per unit?",
+   "Are ads and returns included?"
+  ]
+ },
+ "seasons": "PK wedding season (October–March) for bridal skincare, henna and gift sets; Eid ul Fitr (Chand Raat henna, gift boxes) and Eid ul Adha; winter moisturisers and summer sunscreen/deodorant; 11.11 and Black Friday sales on Daraz. UAE: Ramadan and Eid gifting (oud, bakhoor, perfume sets), Dubai Shopping Festival (December–January), White Friday on Noon/Amazon, Mother’s Day (21 March), summer travel lull. Canada: holiday gift sets (November–December), Black Friday/Cyber Monday, Valentine’s and Mother’s Day.",
+ "care": [
+  "No formulation, ingredient safety, dermatological or medical advice; note complaints as business problems only.",
+  "Serious reactions (swelling, breathing problems, eye injury): pi urges urgent medical help and emergency services; no details of the person are recorded.",
+  "No advice on labelling claims, whitening/mercury rules, halal certification or registration; note admin effort only.",
+  "Never help copy another brand’s packaging, fake halal or certification marks, or relabel expired stock — decline.",
+  "No customer photos, skin conditions or contact details stored; roles and counts only.",
+  "Influencer contracts and disclosure rules: no legal advice.",
+  "Fake reviews: pi does not help write or buy them."
+ ],
+ "build_ideas": [
+  "Batch register: batch number, fill date, expiry, raw-material lots, and channels shipped to.",
+  "Packaging component stock board with MOQ, open POs and usage per SKU.",
+  "Launch tracker: formulation sign-off, packaging, printing, photography, listing and stock-ready dates.",
+  "Unified order inbox pulling website, Daraz/Noon/Amazon and WhatsApp orders into one list.",
+  "COD reconciliation: courier remittance files matched to orders, with gaps flagged.",
+  "RTO tracker by city, courier and channel, with WhatsApp confirmation before dispatch.",
+  "Influencer and ad tracker with unique codes or links per influencer and orders attributed.",
+  "Complaint log linked to SKU and batch, with response time tracking.",
+  "Unit economics sheet: product cost, packaging, shipping, ads and return rate per SKU.",
+  "Repeat-purchase reminders on WhatsApp for customers who opted in.",
+  "Retailer/pharmacy ledger with stock, near-expiry and receivables.",
+  "Owner dashboard: sales by channel, ad spend vs orders, RTO rate, top SKUs, stock cover."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We send products to so many influencers but I honestly can’t tell if any of it is working."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a really common frustration, and an expensive one. Noted — influencer spend with no clear link to sales. Roughly how many influencers do you work with in a month?"
+  },
+  {
+   "role": "Person",
+   "text": "Around 15 to 20, mostly PR boxes, a few paid."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, 15–20 a month, mostly PR boxes. When a sale comes in, is there any way right now to see where the customer came from?"
+  }
+ ]
+}

@@ -1,0 +1,46 @@
+{
+ "key": "large_enterprises_and_business_groups",
+ "name": "Large enterprises and business groups",
+ "kind": "overlay",
+ "sector": {
+  "code": "N",
+  "title": "Cross-industry overlays"
+ },
+ "signals": [
+  "group",
+  "our IT department",
+  "procurement",
+  "RFP",
+  "board",
+  "20+ branches",
+  "1,000 staff"
+ ],
+ "notes": "",
+ "shape_facts": [],
+ "scope_rule": "standard listening. After noting, pi may offer — alongside the normal document offer — to bring in the Workzap team directly (escalate enterprise_lead with the sorted summary).",
+ "vocabulary": {},
+ "problems": [
+  {
+   "phrase": "procurement process needs formal proposals",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "IT team must approve any new system",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "departments with separate systems",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  }
+ ],
+ "questions": {},
+ "seasons": "",
+ "care": [
+  "the person is often not the decider; ask (once) how decisions on new systems are made there. Never ask for internal documents in chat."
+ ],
+ "build_ideas": [],
+ "exchange": []
+}

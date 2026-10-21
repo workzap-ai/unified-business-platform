@@ -1,0 +1,280 @@
+{
+ "key": "tiles_marble_and_bathroom_kitchen_showrooms",
+ "name": "Tiles, marble and bathroom/kitchen showrooms",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "tile showroom",
+  "tiles",
+  "porcelain",
+  "ceramic",
+  "tile wala",
+  "marble",
+  "granite",
+  "pathar",
+  "sang-e-marmar",
+  "quartz",
+  "slab",
+  "countertop",
+  "kitchen cabinets",
+  "modular kitchen",
+  "bathroom fittings",
+  "sanitaryware",
+  "vanity",
+  "WC",
+  "shower",
+  "jacuzzi",
+  "imported tiles",
+  "Spanish/Italian/Chinese tiles",
+  "local tiles",
+  "batch",
+  "shade",
+  "caliber",
+  "rukhaam",
+  "balat",
+  "fit-out",
+  "interior designer",
+  "architect",
+  "site measurement"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Mix: tiles, natural stone/marble, quartz worktops, sanitaryware, kitchens/cabinets.",
+  "Imported vs local, and whether they import containers directly.",
+  "Fabrication/cutting workshop (marble cutting, countertop fabrication) or retail only.",
+  "Project business (developers, contractors, architects, designers) vs homeowners.",
+  "Warehouse size and number of locations.",
+  "Installation offered in-house or through partners.",
+  "Commission to architects/designers as part of the trade."
+ ],
+ "scope_rule": "pi notes operational problems such as batch/shade tracking, breakage, slab inventory, project quotes, delivery and site measurement, fabrication scheduling, installer coordination, designer commissions and project credit. pi does not advise on structural loading, waterproofing, slip-resistance suitability, or installation methods for safety. It does not advise on import duty or classification. pi refuses to help with disguised kickbacks or fake invoices. It records clients’ and architects’ roles only, never names, addresses or plans.",
+ "vocabulary": {
+  "batch / lot": "production run; tiles from different batches can differ in shade",
+  "shade / tone": "colour variation code on the box",
+  "caliber": "size tolerance code",
+  "slab": "full natural stone or quartz sheet",
+  "offcut": "leftover piece after cutting a slab",
+  "running foot / square foot / sqm": "pricing units",
+  "wastage allowance": "extra quantity ordered to cover cuts and breakage",
+  "container": "imported shipment",
+  "template": "site measurement pattern for countertops",
+  "project / site": "a construction job",
+  "designer/architect commission": "referral fee to trade professionals",
+  "rukhaam / balat": "marble / tiles (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Customer bought tiles in two lots and the shades don’t match on the wall",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Breakage in the warehouse and in delivery, no record of who broke what",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Slabs in the yard, we don’t know which are reserved or sold",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Display samples are from collections we no longer stock",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Container delayed and the project waits",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Quotes for a full villa take days and have mistakes in quantities",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Quote follow-ups get forgotten and the client goes elsewhere",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Countertop measurements are wrong and the slab is cut wrong",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Fabrication workshop is overloaded before handover dates",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Installer teams don’t show up on the agreed day",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Developers pay on long credit and retentions are held",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Architect commissions are calculated by hand and disputed",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Sales staff promise delivery dates the warehouse can’t meet",
+   "category": "communication_coordination",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Customer wants to return leftover boxes after the job",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Currency changes mess up our import cost",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Freight and clearance charges not in the selling price",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Showroom footfall but few conversions",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Leads come from Instagram and website but we don’t know which turn into projects",
+   "category": "marketing_leads",
+   "subtype": "no_tracking"
+  },
+  {
+   "phrase": "Client complaints about chipped tiles after installation",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Owner signs off every discount and is the bottleneck",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "We don’t know margin per project after cutting, wastage and installation",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Warehouse and showroom stock lists never match",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Supplier sends the wrong design or size in the container",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  }
+ ],
+ "questions": {
+  "mix": [
+   "What’s the main business, tiles, marble and stone, sanitaryware or kitchens?",
+   "Is it mostly homeowners or projects with contractors and designers?"
+  ],
+  "batches and stock": [
+   "How do you record the batch and shade for tiles in stock?",
+   "How do you make sure one customer gets a single batch?"
+  ],
+  "slabs": [
+   "How do you keep track of slabs in the yard, including reserved ones?",
+   "What happens to offcuts?"
+  ],
+  "breakage": [
+   "Where does most breakage happen, warehouse, loading or site?",
+   "How is it recorded?"
+  ],
+  "quotes": [
+   "How long does a full project quote take?",
+   "How do you follow up after sending it?"
+  ],
+  "fabrication and measurement": [
+   "Who takes site measurements?",
+   "How often does a piece need to be re-cut?"
+  ],
+  "installation": [
+   "Do you install yourselves or through partners?",
+   "How do you schedule and confirm installations?"
+  ],
+  "imports": [
+   "Do you import directly?",
+   "How do you track containers from order to warehouse?"
+  ],
+  "credit and projects": [
+   "How do project clients usually pay?",
+   "What’s the usual delay?"
+  ],
+  "trade partners": [
+   "Do architects or designers refer clients?",
+   "How are their commissions worked out?"
+  ],
+  "owner view": [
+   "Can you see the margin on a finished project today?"
+  ]
+ },
+ "seasons": "In the UAE, fit-out and renovation peaks in the cooler months (October to April), with handover-driven project peaks tied to developer timelines and summer moves bringing tenant renovations; trade exhibitions also generate leads. In PK, construction slows in the monsoon, and renovation rises before Eid and wedding season. Import timing is affected by currency movements and port congestion, and the June budget announcement can shift buying. In Canada, spring and summer renovation season dominates, with winter slower and kitchen and bath projects often planned in winter for spring.",
+ "care": [
+  "No advice on structural loading, waterproofing, slip resistance, installation safety or suitability of materials.",
+  "Site accident (fall, injury, cutting machine injury in workshop, silica/dust exposure emergency) → emergency services; pi records only the business process issue afterwards.",
+  "Refuse to help with fake or inflated invoices, hidden kickbacks, or misdeclared imports.",
+  "Architect/designer referral fees: note the business tracking problem; do not advise on legality or tax treatment.",
+  "Do not record client names, villa addresses, floor plans or architects’ identities.",
+  "Contract and retention disputes: record the cash problem; no legal advice.",
+  "Staff and installer suspicions recorded by role."
+ ],
+ "build_ideas": [
+  "Stock by design, size, batch, shade and caliber, with location, so each order is allocated from one batch.",
+  "Slab yard register with photos, dimensions, rack location, reserved/sold status and offcut log.",
+  "Breakage log by stage (receiving, warehouse, loading, site) with cost.",
+  "Project quotation builder: room by room, area plus wastage allowance, linked to live stock and prices, as a PDF.",
+  "Quote follow-up pipeline with reminders and won/lost reasons.",
+  "Site measurement and template capture on tablet, linked to the fabrication job.",
+  "Fabrication workshop schedule with job stages and due dates.",
+  "Installer schedule with job cards, photos and client sign-off.",
+  "Container tracker: PO, shipping, clearance, arrival, costs landed into item cost.",
+  "Trade-partner commission ledger.",
+  "Project receivables and retention tracker.",
+  "Margin per project including freight, wastage, fabrication and installation."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our biggest headache is shade variation. A client takes tiles, comes back for more, and the new batch is a different shade."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a painful one, especially once tiles are on the wall. Noted: repeat orders get a different batch and the shade doesn’t match. How do you record the batch for each box in stock today?"
+  },
+  {
+   "role": "Person",
+   "text": "It’s written on the box, but the system just shows the design code."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, the system tracks the design but not the batch. When a sale is made, how does the warehouse decide which boxes to send?"
+  },
+  {
+   "role": "Person",
+   "text": "Whatever’s closest to the door."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted. How often does a client come back with a shade complaint, roughly?"
+  }
+ ]
+}

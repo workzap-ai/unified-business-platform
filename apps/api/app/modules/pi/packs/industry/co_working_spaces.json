@@ -1,0 +1,268 @@
+{
+ "key": "co_working_spaces",
+ "name": "Co-working spaces",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "hot desk",
+  "dedicated desk",
+  "private office",
+  "meeting room booking",
+  "day pass",
+  "members",
+  "membership",
+  "virtual office",
+  "business address",
+  "mail handling",
+  "flexi desk",
+  "community manager",
+  "events",
+  "seat available hai?",
+  "occupancy",
+  "licence agreement",
+  "deposit",
+  "access card",
+  "Wi-Fi complaints",
+  "pantry",
+  "cleaning",
+  "maktab mushtarak",
+  "Ejari for flexi desk",
+  "landlord",
+  "fit-out"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of locations, total desks/offices, and meeting rooms",
+  "Membership mix: hot desks, dedicated desks, private offices, virtual office/business address, day passes",
+  "Typical members (freelancers, startups, SMEs, remote corporate teams)",
+  "Lease structure with the landlord and fit-out situation",
+  "Staff on site (community manager, front desk, cleaners, IT)",
+  "Systems used for bookings, billing and access (spreadsheets, booking software, door access system)",
+  "Extra services sold (printing, events, mail, licensing support in UAE)"
+ ],
+ "scope_rule": "pi notes the operator’s business and operational problems: occupancy and sales, enquiries and tours, bookings, billing and collections, member experience, facilities and maintenance, staff, access control and reporting. pi gives no real estate, lease, legal, tax or building-safety-engineering advice, and never takes members’ names, IDs, company details, access codes or Wi-Fi passwords. It records member types and counts only. Requests to issue fake tenancy contracts or addresses for visa purposes, monitor members covertly, or bypass building safety rules are declined; any fire, gas, electrical or medical emergency goes to emergency services.",
+ "vocabulary": {
+  "Hot desk": "any free desk, no fixed seat",
+  "Dedicated desk": "reserved desk for one member",
+  "Private office": "lockable office for a team",
+  "Virtual office": "business address and mail handling without a desk",
+  "Day pass": "single-day access",
+  "Occupancy": "share of desks or offices currently sold",
+  "Membership agreement": "contract with a member, usually month-to-month or fixed term",
+  "Community manager": "staff who runs member relations and events",
+  "Credits": "included meeting-room hours or printing allowance",
+  "Tour": "showing a prospect around the space",
+  "Fit-out": "interior build of the space",
+  "Flexi desk": "UAE desk package often used to meet licence office requirements"
+ },
+ "problems": [
+  {
+   "phrase": "Enquiries from our website and Instagram sit unanswered for a day",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Lots of tours, few sign-ups",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Occupancy dropped and I don’t know why",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Meeting rooms are double-booked",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Members use meeting rooms more than their credits and we never charge",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Monthly invoices are made by hand and some members get missed",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Members pay late and we keep letting them in",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Deposits and refunds when members leave are always messy",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Members leave after three months",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Wi-Fi complaints are our number one issue",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "AC and maintenance issues take days to fix",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Cleaning checklists aren’t followed",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Electricity bill keeps going up",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Rent is fixed but we can’t tell which floor or location is profitable",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Ex-members still have working access cards",
+   "category": "loss_security",
+   "subtype": "cctv_gaps"
+  },
+  {
+   "phrase": "Things go missing from the pantry and members’ desks",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Mail and parcels for virtual office members get lost",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Front desk staff change often and members notice",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Two locations run on different spreadsheets",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Membership agreements and renewal dates are in a folder nobody checks",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Events are planned on WhatsApp and nobody shows up",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "We’re listed on aggregator sites but don’t know if they bring members",
+   "category": "marketing_leads",
+   "subtype": "marketplace_visibility"
+  },
+  {
+   "phrase": "Thinking of a second location but don’t know if demand is there",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  }
+ ],
+ "questions": {
+  "occupancy": [
+   "How many desks and offices do you have, and roughly how full are you now?",
+   "Has that changed recently?"
+  ],
+  "enquiries": [
+   "Where do enquiries come from?",
+   "How quickly does someone respond and offer a tour?"
+  ],
+  "conversion": [
+   "Out of the people who tour, how many sign up?",
+   "What do the others usually say?"
+  ],
+  "bookings": [
+   "How are meeting rooms booked today?",
+   "How often do clashes happen?"
+  ],
+  "billing": [
+   "How do you invoice members each month?",
+   "What happens when someone pays late?"
+  ],
+  "retention": [
+   "How long do members typically stay?",
+   "Do you know why they leave?"
+  ],
+  "facilities": [
+   "What do members complain about most?",
+   "How quickly do issues get fixed?"
+  ],
+  "access": [
+   "How are access cards issued and switched off?",
+   "Are there cards still active for people who left?"
+  ],
+  "locations": [
+   "If you have more than one site, how do you compare them?",
+   "Which feels weaker?"
+  ],
+  "growth": [
+   "What would need to be true before you open another space?"
+  ]
+ },
+ "seasons": "- Pakistan: demand from freelancers and remote workers for international clients rises with load-shedding and internet issues at home (summer); university graduation season brings startups; Ramadan changes hours. - UAE: September–January is peak for new members and licence-linked flexi desks; summer sees members travel and churn; new-year business setups drive virtual office demand. - Canada: September and January are strong; summer and December slow; winter weather can increase day-pass use near transit. - Event-led footfall during tech weeks and exhibitions.",
+ "care": [
+  "No lease, real estate, legal, tax or building-safety advice.",
+  "Never collect members’ names, IDs, company documents, access codes or Wi-Fi passwords.",
+  "Decline fake tenancy contracts or addresses used to obtain visas or licences improperly.",
+  "Fire, electrical, gas or medical emergencies on site → pi stops and points to emergency services.",
+  "CCTV and access logs: note operational gaps; decline covert monitoring of members.",
+  "Member disputes: note, don’t take sides."
+ ],
+ "build_ideas": [
+  "Enquiry inbox from website, social and WhatsApp with tour booking and follow-up reminders",
+  "Occupancy board per location: every desk and office with status (sold, available, notice given)",
+  "Meeting room booking via web or WhatsApp with credits per member and automatic overage charges",
+  "Recurring billing with automatic invoices, payment links and late-payment reminders",
+  "Membership register with start, notice and renewal dates and deposit status",
+  "Move-out checklist: access card deactivation, deposit settlement, mail redirect",
+  "Maintenance ticketing from members via WhatsApp with tracking until fixed",
+  "Cleaning and facilities checklists on phone with timestamps",
+  "Mail and parcel log for virtual office members with notification on arrival",
+  "Member feedback pulse and exit reasons",
+  "Location dashboard: occupancy, revenue, costs, collections, complaints",
+  "Event sign-up and attendance tracking"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our occupancy is around 60 percent and it’s been stuck there for months."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a frustrating plateau, especially with rent fixed — noted. Where are most of your enquiries coming from at the moment?"
+  },
+  {
+   "role": "Person",
+   "text": "Instagram, Google, and a couple of listing websites."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, Instagram, Google and listings. When someone enquires, how quickly do they usually hear back?"
+  },
+  {
+   "role": "Person",
+   "text": "Depends who’s on the front desk — sometimes same hour, sometimes next day."
+  },
+  {
+   "role": "pi",
+   "text": "Understood, response time depends on who’s on shift — I’ve noted that. Of the people who come for a tour, roughly how many end up signing?"
+  }
+ ]
+}

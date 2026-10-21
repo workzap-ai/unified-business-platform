@@ -1,0 +1,257 @@
+{
+ "key": "auto_parts_manufacturers_and_vendors_to_oems",
+ "name": "Auto parts manufacturers and vendors to OEMs",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "auto parts",
+  "vendor to OEM",
+  "tier-1",
+  "tier-2",
+  "sheet metal parts",
+  "pressing",
+  "stamping",
+  "die and mould",
+  "plastic injection moulding",
+  "rubber parts",
+  "forging",
+  "casting",
+  "machining",
+  "wiring harness",
+  "aftermarket parts",
+  "PPAP",
+  "schedule",
+  "kalpurze",
+  "spare parts",
+  "qita’ ghiyar rejection",
+  "line stoppage",
+  "kanban",
+  "delivery schedule"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Supplies OEM assemblers (cars, motorcycles, tractors), aftermarket, or both.",
+  "Core process: pressing, moulding, forging, casting, machining, rubber, harness, assembly.",
+  "Number of part numbers and customers.",
+  "Delivery frequency demanded by the customer (daily, weekly, per schedule).",
+  "In-house tool room or outsourced dies and moulds.",
+  "Number of shifts, machines and workers.",
+  "Imported vs local raw materials and components."
+ ],
+ "scope_rule": "pi notes business and operational problems: schedules, rejections, inventory, dies and machines, raw material, cash cycles, staff and reporting. It does not advise on engineering design, tolerances, quality-system certification content, homologation, or contract and pricing negotiations with OEMs, and gives no machine-safety engineering advice. It does not record names of buyers or workers, only roles. Injuries on presses or machines mean pi stops and points to emergency services.",
+ "vocabulary": {
+  "schedule": "monthly/weekly quantities the OEM releases",
+  "rejection / line rejection": "parts refused by the customer",
+  "PPAP / sample approval": "approval of a new part before supply",
+  "die / mould / tool": "tooling that shapes the part",
+  "tool room": "in-house tooling workshop",
+  "debit note": "charge-back from the customer for rejected parts",
+  "line stoppage": "customer’s assembly line stopped because of a shortage",
+  "rework": "fixing rejected parts",
+  "FG / WIP": "finished goods / work in progress",
+  "aftermarket": "replacement parts sold through shops",
+  "kalpurze": "parts (Urdu)"
+ },
+ "problems": [
+  {
+   "phrase": "OEM changes the schedule mid-month and we’re left with excess or shortage",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Customer threatened penalty because their line stopped on our part",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Rejections come back with a debit note, we don’t know which shift made them",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Debit notes for rejections hit the bill and margins vanish",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Die breaks and the whole part is stuck until the tool room fixes it",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "WIP is everywhere on the floor and nobody knows the count",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Raw material coils run out because purchase didn’t see the schedule",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "OEM pays in 60–90 days but steel suppliers want cash",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Price revisions from the OEM don’t cover the raw-material increase",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "We don’t know the real cost of each part number",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Aftermarket dealers sell fakes of our part",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Aftermarket orders come on WhatsApp from dozens of shops",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "OEM sales dropped because car sales are down",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Machine operators leave for other vendors for a small raise",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Inspection is done at the end, not during production",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Quality documents for audits are scattered in files and PCs",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Tool room priorities are decided by whoever shouts loudest",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Overtime keeps rising every month-end to meet schedule",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Import components stuck at port",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "I can’t see OEE or machine utilisation",
+   "category": "reporting_visibility",
+   "subtype": "kpi_undefined"
+  },
+  {
+   "phrase": "Finished parts sent in wrong packing quantity",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Supplier of plating/heat treatment sends parts back late",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "New part development keeps slipping",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Scrap metal from pressing is sold without proper weighing",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  }
+ ],
+ "questions": {
+  "schedules": [
+   "How often does the customer change the schedule?",
+   "How much notice do you get?",
+   "How do you plan production now?"
+  ],
+  "rejections": [
+   "What’s the most common rejection reason?",
+   "Can you trace a rejected part to a shift or machine?",
+   "How are debit notes reconciled?"
+  ],
+  "tooling": [
+   "How often do dies or moulds break down?",
+   "How long does a repair usually take?"
+  ],
+  "inventory": [
+   "How do you count WIP and finished goods today?",
+   "How often does raw material run short?"
+  ],
+  "cash": [
+   "What are the customer’s payment terms?",
+   "And your suppliers’?"
+  ],
+  "costing": [
+   "How is a part’s cost worked out?",
+   "When was it last revised?"
+  ],
+  "aftermarket": [
+   "How do aftermarket orders come in?",
+   "Are fakes affecting your sales?"
+  ],
+  "staff": [
+   "How is output per shift recorded?",
+   "How much overtime is normal at month-end?"
+  ]
+ },
+ "seasons": "PK demand follows car/motorcycle sales, which shift with budget announcements (June), duty changes, interest- rate moves and import policy; OEM plant shutdowns around Eid and for maintenance; motorcycle demand often rises after harvest (wheat April–May, cotton/rice autumn). UAE: mostly aftermarket and trading; demand steady with summer peaks for AC and cooling parts. Canada: OEM model-year changeovers and summer plant shutdowns (typically July); winter aftermarket (batteries, tyres, wipers).",
+ "care": [
+  "No engineering, tolerance, metallurgy or certification-content advice; note “audit documentation effort” only.",
+  "Press and machine injuries — pi stops and points to emergency services.",
+  "Never help copy another maker’s branded part or packaging, or fake test reports — decline.",
+  "OEM contract terms, penalties and price disputes: pi notes the business pain, gives no legal or negotiation advice.",
+  "Workers’ names, wage details and IDs are not recorded; roles and counts only.",
+  "Counterfeit parts reported in the market: note the sales impact; no advice on legal action."
+ ],
+ "build_ideas": [
+  "Schedule tracker: customer releases by part number with planned vs dispatched quantities and gaps highlighted.",
+  "Production log per shift and machine, entered on a tablet at the line.",
+  "Rejection and debit-note register linked to part, shift, machine and defect type.",
+  "Die/mould register with stroke/shot counts, maintenance due and repair history.",
+  "Raw-material requirement planner driven by the schedule and current stock.",
+  "WIP and FG count app with cycle counts by location.",
+  "Part costing sheet: material, process time, overheads, rejection allowance, compared to current price.",
+  "Receivables and payables view showing the cash gap between customer and supplier terms.",
+  "Outsourced process tracker (plating, heat treatment) with send and return dates.",
+  "Aftermarket dealer order intake via WhatsApp feeding one order book.",
+  "Quality document library organised for customer audits.",
+  "Owner dashboard: on-time delivery, rejection rate, machine downtime, overtime hours."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "The OEM keeps changing the monthly schedule and we end up with piles of one part and shortage of another."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a tough position to be in. Noted — schedule changes mid-month causing excess and shortages. How much notice do you usually get when it changes?"
+  },
+  {
+   "role": "Person",
+   "text": "Sometimes two days, sometimes the same day."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, very short notice. How do you plan the next day’s production at the moment?"
+  }
+ ]
+}

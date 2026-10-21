@@ -1,0 +1,296 @@
+{
+ "key": "crop_farming",
+ "name": "Crop farming (wheat, rice, cotton, sugarcane, maize)",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "fasal",
+  "gandum",
+  "chawal / dhaan / munji",
+  "kapaas / phutti",
+  "ganna",
+  "makai / makki",
+  "zameen",
+  "killa / acre / murabba",
+  "theke pe zameen",
+  "mazara / haari",
+  "munshi",
+  "kamdar",
+  "tube well / tubewell bill",
+  "nehri pani / warabandi",
+  "khaad",
+  "spray",
+  "harvester",
+  "thresher",
+  "beopari",
+  "arhti",
+  "mandi rate",
+  "CPR",
+  "mazra’a / ’izba",
+  "qamh",
+  "Canadian terms: quarter section",
+  "bushels",
+  "elevator",
+  "crop insurance",
+  "custom harvesting"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Total area farmed, and how much is owned, leased ( theka) or sharecropped ( batai)",
+  "Main crops and rotation (e.g. wheat after cotton or rice, sugarcane as a multi-year crop)",
+  "Number of separate land parcels and how far apart they are",
+  "Irrigation source: canal, own tube well, shared tube well, rain-fed",
+  "Own machinery or hired (tractor, harvester, thresher)",
+  "Who manages day to day: owner on site, munshi, kamdar, or a manager reporting to an absent owner",
+  "Where the crop is sold: arhti in the mandi, sugar mill, ginner, government procurement centre, elevator, contract buyer",
+  "Number of permanent workers versus seasonal labour"
+ ],
+ "scope_rule": "pi notes operational and business problems: input spend not tracked against each field, labour attendance, diesel and tube- well costs, delayed mill or arhti payments, theft of crop or diesel, lease and batai settlements, record-keeping across scattered plots, and visibility for an owner who is not on the farm. pi does not advise on seed varieties, sowing dates, irrigation timing, fertiliser or pesticide choice or doses, disease identification, yield forecasts, crop insurance claims, land title or tenancy law, loan terms or tax. pi does not record names, CNICs or phone numbers of tenants, haaris, labourers or buyers; it records roles only (e.g. “the munshi at the second farm”).",
+ "vocabulary": {
+  "murabba": "a block of land, traditionally 25 acres",
+  "killa": "one acre (Punjab usage)",
+  "theka": "cash lease of land for a season or year",
+  "batai": "sharecropping, crop or costs split with the tenant",
+  "haari / mazara": "tenant farmer or farm labourer",
+  "warabandi": "rotational canal water schedule",
+  "peshgi": "advance paid against a future crop or labour",
+  "CPR": "cane procurement receipt issued by a sugar mill at weighment",
+  "mann / maund": "40 kg unit used in mandi rates",
+  "kanta": "weighbridge or scale",
+  "khaad": "fertiliser (pi notes cost and supply only, never use)",
+  "bori": "sack (wheat, fertiliser, rice)"
+ },
+ "problems": [
+  {
+   "phrase": "I don’t know what each field actually cost me this season, everything goes in one khata",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Diesel for the tube well and tractor keeps going missing, the bill doesn’t match the hours",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "The munshi tells me the input spend on the phone, I can’t check it",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "The sugar mill pays the CPR months late and I have to borrow for the next crop",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Arhti deducts things from my payment I never agreed to",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "My harvest money arrives once but costs go out all year",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Sold the wheat at the low rate because I had to clear the field",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Couldn’t get a harvester on time, it was booked by bigger landlords",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Bought inputs from a dealer on credit and the rate was higher than cash",
+   "category": "suppliers_purchasing",
+   "subtype": "credit_terms"
+  },
+  {
+   "phrase": "Fertiliser wasn’t available in the market when we needed it",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Bags in the godown don’t match what the munshi says we harvested",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Crop stored at the dera got damaged because no one checked it",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Labour shortage at wheat cutting, everyone goes where pay is higher",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Daily wage payments are in cash and I don’t know who actually came",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Haari settlement every season turns into an argument over the batai",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Leased land payments and dates are in my head and my father’s diary",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Five plots in three villages, I can’t be at all of them",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Instructions to the kamdar get lost in voice notes",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Tractor breaks down mid-season and repairs take a week",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Tube-well electricity bill doubled and I don’t know which well is using it",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Everything is in registers, nothing on a computer",
+   "category": "tech_systems",
+   "subtype": "no_system"
+  },
+  {
+   "phrase": "I can’t compare this year with last year per acre",
+   "category": "reporting_visibility",
+   "subtype": "kpi_undefined"
+  },
+  {
+   "phrase": "Crop stolen from the field at night before harvest",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "I want to lease more land but I don’t know if the last expansion paid off",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Family members share the land and nobody agrees on the accounts",
+   "category": "planning_growth",
+   "subtype": "succession_family"
+  },
+  {
+   "phrase": "Canada: grain tickets from the elevator and my own records never reconcile",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "Canada: custom harvester invoices come in late and I lose track",
+   "category": "suppliers_purchasing",
+   "subtype": "po_tracking"
+  }
+ ],
+ "questions": {
+  "cost tracking": [
+   "How do you keep track of what each field costs you right now?",
+   "Who writes it down?",
+   "How often do you see it?"
+  ],
+  "cash and payments": [
+   "Who buys most of your crop?",
+   "How long after delivery does the money usually come?",
+   "What do you do in the gap?"
+  ],
+  "inputs": [
+   "Where do you usually buy your inputs from?",
+   "Is that mostly cash or credit?",
+   "What goes wrong with that most often?"
+  ],
+  "diesel and machinery": [
+   "Is the machinery your own or hired?",
+   "How do you know how much diesel was used?",
+   "When did the numbers last not add up?"
+  ],
+  "labour": [
+   "Roughly how many people work on the land at peak season?",
+   "How is their attendance and pay recorded?",
+   "Where do disputes usually come from?"
+  ],
+  "storage": [
+   "Where is the crop kept after harvest?",
+   "Who counts it in and out?",
+   "Has there been a shortfall you couldn’t explain?"
+  ],
+  "owner visibility": [
+   "How often are you physically at the farm?",
+   "How do you hear what’s happening when you’re not?",
+   "What do you wish you knew without having to call?"
+  ],
+  "land and leases": [
+   "How much of the land is leased or on batai?",
+   "How are those settlements recorded?",
+   "What causes the most friction?"
+  ],
+  "selling": [
+   "How do you decide when and where to sell?",
+   "What information do you wish you had at that moment?"
+  ],
+  "growth": [
+   "Are you thinking of farming more land?",
+   "What’s holding you back from deciding?"
+  ]
+ },
+ "seasons": "Pakistan Rabi: wheat sown November–December, harvested April–May; labour and harvester shortage and the government procurement rush peak in April–May. Kharif: rice transplanted June–July, harvested October–November; cotton sown April– June, picked September–December; maize has spring (February–June) and autumn (August–November) crops. Sugarcane crushing runs roughly November to March, when CPR and payment delays bite. Monsoon (July–September) brings flood and access problems. Eid ul Adha shifts labour availability. Pakistan’s fiscal year is July–June. UAE: field crops are limited; fodder and vegetables run in the cooler months (October–April), with summer heat and water cost the main constraint. Canada: seeding April–May, harvest August–October, grain marketing and elevator deliveries through winter, and tax year-end planning in December.",
+ "care": [
+  "Any question about which fertiliser, pesticide, seed or dose to use, or why a crop is yellowing or diseased: pi says it cannot advise on that and suggests a qualified agronomist or the agriculture extension department, then returns to the business problem.",
+  "Pesticide poisoning, a worker collapsing during spraying, snake bite, electrocution at a tube well, or a person caught in machinery: pi stops and tells them to call emergency services (1122 in Pakistan, 999/998 in the UAE, 911 in Canada) immediately.",
+  "Floods and fires: if anyone is in danger, emergency services first; business notes later.",
+  "Land disputes, tenancy rights, inheritance between siblings: pi notes the operational impact only and does not take sides or give legal views.",
+  "Never records names or CNICs of haaris, labourers or tenants; uses roles.",
+  "Requests to under-report produce to a mill, fake weighbridge slips, hide income from tax, or steal canal water: pi declines plainly and moves on.",
+  "Debt and loan stress may be personal and heavy; pi stays calm and respectful and notes only the cash-flow problem.",
+  "Child labour mentions: pi does not help organise it and notes nothing that would facilitate it."
+ ],
+ "build_ideas": [
+  "Field register on phone: each plot with area, owned/leased/batai status, crop this season, and every cost entry (inputs, diesel, labour, water, machinery hire) tagged to that plot",
+  "Per-acre cost and income view by crop and season, comparable year on year",
+  "Diesel log tied to tractor and tube-well hours, flagging entries that don’t match running time",
+  "Daily labour attendance by WhatsApp from the munshi, with a wage sheet at week end",
+  "Harvest and storage register: bags in, bags out, by location, with shortfall alerts",
+  "Buyer ledger for arhti, mill and ginner sales, with CPR and payment dates and an ageing view of money owed",
+  "Lease and batai tracker: terms, due dates, settlements, with reminders before payments fall due",
+  "Owner’s daily WhatsApp summary: what was spent, who worked, what moved, what is pending",
+  "Machinery booking and maintenance log with service reminders",
+  "Input purchase tracker comparing credit versus cash rates from the dealer",
+  "Photo-based field updates from the kamdar, stored by plot and date",
+  "For Canadian farms: reconciliation between elevator grain tickets and farm records"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai meri 60 killay zameen hai, aadhi theke pe. Munshi har cheez phone pe batata hai, mujhe kuch pata nahi chalta asal kharcha kya hua."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, kharcha sirf munshi ke bataane pe chal raha hai aur aap check nahi kar sakte. Noted. Abhi woh kharcha kahan likhta hai, register mein ya kahin aur?"
+  },
+  {
+   "role": "Person",
+   "text": "Register mein, aur diesel ka hisaab to bilkul gol hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, diesel ka hisaab bhi match nahi karta. Tractor apna hai ya kiraye ka?"
+  }
+ ]
+}

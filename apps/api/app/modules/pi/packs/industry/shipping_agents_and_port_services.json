@@ -1,0 +1,256 @@
+{
+ "key": "shipping_agents_and_port_services",
+ "name": "Shipping agents and port services",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "shipping agent",
+  "line agent",
+  "ship agency",
+  "port agency",
+  "husbandry",
+  "vessel call",
+  "port call",
+  "berth",
+  "anchorage",
+  "pilotage",
+  "stevedoring",
+  "terminal",
+  "container yard",
+  "CFS",
+  "empty depot",
+  "DO",
+  "delivery order",
+  "detention",
+  "demurrage",
+  "laytime",
+  "PDA",
+  "FDA",
+  "disbursement account",
+  "crew change",
+  "bunker",
+  "wakeel bahri",
+  "mina’",
+  "safina",
+  "KPT",
+  "Port Qasim",
+  "Gwadar",
+  "Jebel Ali",
+  "Port Rashid",
+  "Khalifa Port",
+  "Vancouver",
+  "Montreal",
+  "Halifax"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Services offered: line agency, port/husbandry agency, stevedoring, CFS, empty depot, crew services, bunkering coordination.",
+  "Ports covered and number of vessel calls or containers handled per month.",
+  "Principals: shipping lines, ship owners, charterers, NVOCCs.",
+  "Team: boarding officers, documentation, equipment control, accounts, customer service.",
+  "How disbursements are funded (principal advance vs agent funds first).",
+  "Systems: line’s own system, Excel, email, port community systems, Dubai Trade/PSW."
+ ],
+ "scope_rule": "pi notes operational and business problems: vessel call coordination, document turnaround, DO release, equipment and empty container control, detention/demurrage billing, disbursement accounts, collections, customer service, staff workload and reporting. It does not advise on maritime law, charter party terms, laytime calculations as legal disputes, sanctions, P&I or cargo claims, crew immigration or port safety rules. It never helps release cargo improperly, hide sanctioned vessels or cargo, or pay officials to speed things up. It records principals and customers as roles; never stores crew names, passports, seafarer IDs, or personal details.",
+ "vocabulary": {
+  "line agent": "represents a shipping line’s commercial and documentation side locally",
+  "port/husbandry agent": "handles a vessel’s needs during a port call",
+  "PDA / FDA": "proforma / final disbursement account of port call costs",
+  "DO": "delivery order releasing import cargo",
+  "detention / demurrage": "charges for keeping containers beyond free time",
+  "CFS": "container freight station where LCL cargo is stuffed/unstuffed",
+  "empty depot": "yard holding empty containers",
+  "equipment control": "managing container inventory and repositioning",
+  "stevedoring": "loading/unloading ships",
+  "IGM / manifest": "import general manifest listing cargo on the vessel",
+  "bunker": "ship fuel",
+  "wakeel bahri": "shipping agent (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "DO release queue at our counter is always full",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Customers can’t see their detention charges until they come to pay",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Detention invoices are calculated by hand and often wrong",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "Empties aren’t returned and we lose track of containers",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Equipment imbalance — empties pile up here and are short elsewhere",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Principals pay FDAs late and we fund port costs",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Disbursement accounts take weeks to finalise",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Port invoices arrive after we’ve closed the FDA",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Manifest corrections take too long and cause penalties",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Boarding officer updates come by phone and get lost",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Every customer emails for the same arrival information",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Principal’s system and our accounts never match",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Staff shifts at port don’t cover night vessel arrivals",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Experienced documentation staff leave and new ones make mistakes",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Customers dispute detention, saying they returned the box on time",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Collections from local customers are slow",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Approval of waivers on detention goes through too many people",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "I can’t see vessel calls, revenues and costs per principal in one view",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Principals complain about our KPIs and reporting",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "Losing an agency principal would hit us hard and I can’t see warning signs",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Cash payments at the counter are risky and hard to reconcile",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Port charges and tariffs change and our quotes go out of date",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  }
+ ],
+ "questions": {
+  "do and counter": [
+   "How does a customer get a DO today, start to finish?",
+   "Where do they wait the longest?"
+  ],
+  "detention": [
+   "How are detention charges calculated and shared with customers?",
+   "How often are they disputed, and why?"
+  ],
+  "equipment": [
+   "How do you track where each container is — with customer, depot, port?",
+   "How do you find boxes that are overdue?"
+  ],
+  "disbursements": [
+   "How long does an FDA take to close after the vessel sails?",
+   "What holds it up?"
+  ],
+  "cash": [
+   "Who funds port costs first, you or the principal?",
+   "How long do principals take to settle?"
+  ],
+  "vessel calls": [
+   "How do boarding officers and the office share updates?",
+   "What gets missed?"
+  ],
+  "principals": [
+   "What do principals ask you to report, and how do you produce it?"
+  ],
+  "staff": [
+   "What happens on night or holiday vessel calls?"
+  ]
+ },
+ "seasons": "Shipping agents follow global trade peaks: August–October before Western Q4, and the pre-Chinese New Year rush, with slack after CNY. In Pakistan, export seasons (textiles, rice, kinnow, mango) shift equipment demand; Eid holidays close offices but vessels still call, creating staffing pressure; Karachi monsoon and cyclone season (May–June, October–November) can disrupt port operations. In the UAE, Ramadan shortens office hours while port operations continue; summer heat affects port labour. In Canada, winter weather on the east coast and the St Lawrence, and rail congestion inland. Global disruptions (route diversions, port congestion) change vessel schedules suddenly.",
+ "care": [
+  "Maritime law, charter party disputes, laytime claims, P&I and cargo claims: legal; pi notes only the operational effect.",
+  "Sanctions screening of vessels, cargo, owners or destinations: out of scope; pi does not help work around it.",
+  "Crew changes, visas, shore passes: immigration; pi notes only the coordination effort and never stores crew details.",
+  "Port safety incidents, injuries, fires, spills or medical emergencies on board: pi stops and points to emergency services and port authorities.",
+  "Releasing cargo without proper authority or “managing” officials: pi declines.",
+  "Customer and principal financial details: never stored."
+ ],
+ "build_ideas": [
+  "Online DO request and payment flow with document upload and status messages, reducing counter visits.",
+  "Detention/demurrage calculator per container with live free-time countdown, shared with the customer on WhatsApp.",
+  "Container movement tracker (gate out, with customer, returned to depot) with overdue alerts.",
+  "Equipment balance view by port and type to support repositioning decisions.",
+  "PDA/FDA builder that collects port invoices as they arrive and shows what’s still outstanding.",
+  "Principal receivables tracker with ageing and settlement status.",
+  "Vessel call board: ETA, berth, boarding updates, tasks and responsible staff.",
+  "Automatic arrival notices to consignees from the manifest.",
+  "Waiver approval workflow with reasons and limits by role.",
+  "Principal KPI report pack produced from the operational data.",
+  "Counter cash log with daily closing."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We are agents for two lines in Jebel Ali. Our biggest problem is detention disputes — customers say they returned the empty earlier than our record."
+  },
+  {
+   "role": "pi",
+   "text": "That puts you in a tough spot with customers. Noted. Where does your record of the empty’s return date come from today?"
+  },
+  {
+   "role": "Person",
+   "text": "The depot sends us an Excel every few days."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — return dates come from a depot Excel every few days. When a customer disputes, what proof can they or you show?"
+  }
+ ]
+}

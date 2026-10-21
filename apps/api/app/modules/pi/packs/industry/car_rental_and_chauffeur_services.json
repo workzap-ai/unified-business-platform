@@ -1,0 +1,273 @@
+{
+ "key": "car_rental_and_chauffeur_services",
+ "name": "Car rental and chauffeur services",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "rent a car",
+  "rental",
+  "gaari kiraye pe",
+  "driver ke saath",
+  "self-drive",
+  "chauffeur",
+  "limousine",
+  "airport transfer",
+  "monthly rental",
+  "leasing",
+  "deposit",
+  "security deposit",
+  "Salik",
+  "tolls",
+  "fines",
+  "traffic fines",
+  "challan",
+  "mileage limit",
+  "damage",
+  "insurance excess",
+  "booking",
+  "wedding car",
+  "protocol",
+  "VIP",
+  "corporate account",
+  "ta’jeer sayyarat",
+  "sa’iq",
+  "limo",
+  "Darb",
+  "RTA",
+  "407 ETR",
+  "one-way"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Fleet size and ownership: owned, financed, or managed vehicles belonging to investors.",
+  "Self-drive rentals, chauffeur-driven, or both; daily, monthly, airport transfers, events.",
+  "Customer mix: tourists, residents, corporates, wedding/events, ride-hailing drivers renting cars.",
+  "Number of branches or counters (airport, hotel desks).",
+  "How drivers are engaged: salaried, per trip, or freelance.",
+  "Booking channels: phone/WhatsApp, website, aggregators, travel agents, corporate contracts.",
+  "How they track vehicles: GPS trackers, paper log books, nothing."
+ ],
+ "scope_rule": "pi notes operational and business problems: fleet availability, bookings and double bookings, check-out/check-in inspections, damage and fine recovery processes, deposit handling, utilisation, maintenance scheduling, chauffeur scheduling and attendance, corporate billing and customer communication. pi does not advise on rental agreements, liability, insurance claims, traffic law, licensing of rental or limousine operators, or how to dispute fines legally. pi never asks for or stores customers’ passports, Emirates IDs, CNICs, driving licences, credit card details, or drivers’ personal data, and refers to people by role.",
+ "vocabulary": {
+  "Self-drive": "customer drives the rented car.",
+  "Chauffeur-driven / with driver": "car comes with the company’s driver.",
+  "Security deposit / block": "money held against damage and fines.",
+  "Salik / Darb": "Dubai and Abu Dhabi road toll systems.",
+  "Challan": "traffic fine (Pakistan); mukhalafa — fine (Arabic).",
+  "Excess": "the amount the renter pays on damage before insurance covers it.",
+  "Check-out / check-in": "handover and return inspection of a car.",
+  "Utilisation": "share of days a car is actually rented.",
+  "Off-hire": "car unavailable due to repair or service.",
+  "Protocol car": "VIP or wedding vehicle, often with a driver.",
+  "Mileage cap": "kilometres allowed per day before extra charges."
+ },
+ "problems": [
+  {
+   "phrase": "Same car got booked to two customers for the same day",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "I don’t know which cars are free tomorrow without calling everyone",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Car comes back with scratches and the customer says they were already there",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Traffic fines and tolls arrive weeks later after the deposit is released",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Recovering fines from customers is almost impossible",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Deposits are tracked on paper and refunds get delayed, customers complain",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Some cars sit idle while others are always out",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Cars miss their services because nobody tracks kilometres",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Too many cars off-hire in the workshop at once",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Chauffeurs come late for airport pickups",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Driver duty hours and overtime are argued every month",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Drivers use cars for personal trips",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Fuel cards are misused",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Corporate clients’ monthly bills are made by hand from log sheets",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Corporates pay in 60–90 days",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Bookings come on WhatsApp, calls, website and agents; some get lost",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "We pay commission to agents and don’t know which ones are worth it",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Low season, cars and loan instalments both sitting",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "I don’t know profit per car after fuel, service, insurance and depreciation",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Registration and insurance renewals slip and a car can’t go out",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Investors who own cars in our fleet want monthly statements and it takes days",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Customer messages pile up on WhatsApp after hours",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "No-shows and late returns mess up the next booking",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Website doesn’t show availability, people just call",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "Peak season we turn people away, but we can’t decide whether to add cars",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  }
+ ],
+ "questions": {
+  "availability": [
+   "How do you see which cars are free for the next few days?",
+   "How often does a double booking happen?"
+  ],
+  "handover": [
+   "What happens when a car goes out and comes back?",
+   "Are photos taken both times?"
+  ],
+  "damage, fines and deposits": [
+   "How do you find out about fines and tolls after a rental?",
+   "How are deposits held and returned?"
+  ],
+  "fleet upkeep": [
+   "How do you know when a car is due for service or renewal?",
+   "How many cars are usually off the road?"
+  ],
+  "chauffeurs": [
+   "How are driver duties assigned?",
+   "How do you know pickups happen on time?"
+  ],
+  "corporate": [
+   "How are corporate bills made each month?",
+   "How long do they take to pay?"
+  ],
+  "bookings": [
+   "Where do bookings come from?",
+   "What happens to ones that come in after hours?"
+  ],
+  "profit": [
+   "Do you know which cars earn their keep after all their costs?"
+  ],
+  "investors": [
+   "If you manage cars for owners, how do you report to them?"
+  ]
+ },
+ "seasons": "Pakistan: wedding season (roughly October–February) drives chauffeur and decorated-car demand; Eid holidays bring intercity self-drive and with-driver trips; summer travel to the northern areas (June–August); overseas Pakistanis visiting in December and summer. UAE: tourist high season October–April, peaking around Christmas–New Year, Dubai Shopping Festival and major events; summer is low for tourists but some resident monthly demand; Ramadan and Eid patterns; exhibitions and conferences drive chauffeur demand. Canada: summer tourism and road trips; winter demand for AWD and winter-tyred cars; holiday travel around Christmas; airport transfers year-round.",
+ "care": [
+  "Never ask for or store passports, IDs, licences, card numbers or deposit card details; refer to “a tourist customer”.",
+  "No advice on rental contracts, liability for damage, insurance excess or how to contest fines.",
+  "Decline any request to transfer fines to someone wrongly, falsify accident records or evade tolls.",
+  "Tracking drivers: note visibility needs around vehicles and duties; never suggest covert tracking of individuals’ phones.",
+  "If an accident, breakdown on a highway or passenger emergency is mentioned, point to emergency services first.",
+  "Licensing of rental and limousine operations is regulated; note admin effort only.",
+  "Do not discuss investors’ returns or advise on financing."
+ ],
+ "build_ideas": [
+  "Fleet availability calendar showing every car’s bookings, off-hire and returns; blocks double booking.",
+  "Booking capture from WhatsApp, website and agents into one list with confirmations.",
+  "Check-out/check-in app with timed photos, fuel and kilometre readings, signed on phone.",
+  "Fines and tolls reconciliation: match each fine or toll to the rental by time and car.",
+  "Deposit tracker with hold date, release date and deductions noted.",
+  "Service and renewal scheduler by kilometres and dates, with off-hire alerts.",
+  "Chauffeur duty roster with pickup confirmations and duty-hour logs.",
+  "Vehicle logbook and fuel card usage per car, flagging unusual patterns.",
+  "Corporate billing generated from trips logged, with statements and ageing.",
+  "Per-car profitability: revenue versus fuel, maintenance, insurance and fixed costs.",
+  "Investor statements per owned-by-investor car.",
+  "Utilisation dashboard by car and category to inform fleet decisions.",
+  "After-hours WhatsApp booking capture."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our biggest headache is fines. Deposit is released, then three weeks later the fine shows up and the customer has already flown home."
+  },
+  {
+   "role": "pi",
+   "text": "That’s money just walking out the door — noted. How do you currently find out about fines on your cars?"
+  },
+  {
+   "role": "Person",
+   "text": "One of my staff checks the RTA portal every few days and matches it by hand."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. How long do you usually hold a deposit before releasing it?"
+  }
+ ]
+}

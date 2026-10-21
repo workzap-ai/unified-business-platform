@@ -1,0 +1,264 @@
+{
+ "key": "yacht_and_boat_charters",
+ "name": "Yacht and boat charters",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "yacht charter",
+  "boat rental",
+  "hourly charter",
+  "sunset cruise",
+  "fishing trip",
+  "dhow cruise",
+  "speedboat",
+  "jet ski",
+  "marina",
+  "berth",
+  "captain",
+  "deckhand",
+  "skipper",
+  "fuel top-up",
+  "catering on board",
+  "private party",
+  "corporate charter",
+  "yacht booking",
+  "cruise ka package",
+  "boat available hai",
+  "yakht",
+  "qarib",
+  "marsa",
+  "rihlat sayd"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number, size and type of vessels (yachts, speedboats, dhows, fishing boats, jet skis).",
+  "Owned, managed for owners, or brokered from other operators.",
+  "Marina or berth locations (Dubai Marina, Abu Dhabi, Karachi, Canadian lakes and coasts).",
+  "Customer types: tourists, residents, corporate, events, weddings, fishing groups.",
+  "Sales channels: own website, Instagram, OTAs and booking platforms, hotel concierges, brokers.",
+  "Crew size, employed or freelance, and catering in-house or outsourced.",
+  "Seasonal or year-round operation."
+ ],
+ "scope_rule": "pi notes commercial and operational problems: bookings, double bookings, broker and platform sales, deposits and cancellations, fuel and maintenance costs, crew scheduling admin, catering and add-ons, customer complaints, reviews and reporting. pi never advises on maritime safety, vessel seaworthiness, weather or sea-state decisions, licensing, safety equipment or how maritime authorities, coast guards or Transport Canada would interpret rules. It never stores guests’ names, passport or Emirates ID numbers, card details, or crew licence and ID data, and refers to roles (“guest group”, “captain”). Any incident at sea is an emergency.",
+ "vocabulary": {
+  "charter": "renting a vessel, usually with crew",
+  "berth": "mooring spot in the marina",
+  "skipper / captain": "person in command of the vessel",
+  "deckhand": "crew member assisting on board",
+  "dhow": "traditional wooden boat used for cruises",
+  "hourly / half-day / full-day charter": "booking durations",
+  "add-ons": "catering, decor, DJ, water toys",
+  "broker": "middleman selling charters on others' boats",
+  "managed yacht": "owner's boat run by an operator",
+  "fuel burn": "fuel used per hour",
+  "haul-out": "lifting the boat out of water for maintenance",
+  "no-sail day": "trips cancelled for weather or wind"
+ },
+ "problems": [
+  {
+   "phrase": "Same yacht booked twice for Friday evening by two different staff",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Brokers sell our boats at prices lower than our own",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Weekdays are empty, weekends are overbooked",
+   "category": "sales_revenue",
+   "subtype": "utilisation_imbalance"
+  },
+  {
+   "phrase": "Bookings come from Instagram, website, platforms and concierges and we can’t track them",
+   "category": "orders_fulfilment",
+   "subtype": "multi_channel_orders"
+  },
+  {
+   "phrase": "Deposits taken by different staff don’t add up",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Weather cancellations mean refund or rescheduling fights",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Platform payouts arrive late and with deductions we don’t understand",
+   "category": "cash_collections",
+   "subtype": "payout_reconciliation"
+  },
+  {
+   "phrase": "Fuel cost per trip isn’t tracked, so hourly prices don’t cover it",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Fuel use doesn’t match hours on the engine",
+   "category": "loss_security",
+   "subtype": "fuel_leakage"
+  },
+  {
+   "phrase": "Maintenance takes a boat out in peak season",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Marine parts take weeks to arrive",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Berth, insurance and permit renewals sneak up on us",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Catering orders get mixed up between charters",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Add-ons like cakes and decor are promised but not delivered",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Captains and crew get the schedule last minute",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Freelance captains’ pay disputes at month end",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Crew collect tips and extra cash and it’s not recorded",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Guests complain the boat was smaller or older than the photos",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Reviews are great or terrible and we don’t reply",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Instagram enquiries go unanswered for hours and the guest books elsewhere",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We spend on ads but don’t know which bookings came from them",
+   "category": "marketing_leads",
+   "subtype": "no_tracking"
+  },
+  {
+   "phrase": "Managed yacht owners want monthly statements and we make them by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Can’t see revenue and utilisation per boat",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Summer is dead and we still pay berths and crew",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  }
+ ],
+ "questions": {
+  "bookings": [
+   "Where do most bookings come from?",
+   "How do you check a boat is free before confirming?",
+   "Has a double booking happened recently?"
+  ],
+  "channels": [
+   "How many brokers or platforms sell your boats?",
+   "How do you keep prices consistent across them?"
+  ],
+  "payments": [
+   "How are deposits taken?",
+   "What happens when a trip is cancelled for weather?"
+  ],
+  "costs": [
+   "Do you know the fuel cost per hour for each boat?",
+   "How do you check it against engine hours?"
+  ],
+  "maintenance": [
+   "How do you plan maintenance around bookings?",
+   "What happens when a boat breaks mid-season?"
+  ],
+  "crew": [
+   "How do captains and crew learn their schedule?",
+   "How is their pay worked out?"
+  ],
+  "guest experience": [
+   "What do guests complain about most?",
+   "How are add-ons passed to the team on board?"
+  ],
+  "marketing": [
+   "How fast do Instagram and WhatsApp enquiries get a reply?",
+   "Do you know which ads bring bookings?"
+  ],
+  "reporting": [
+   "Can you see revenue per boat this month?",
+   "How long does an owner statement take to prepare?"
+  ]
+ },
+ "seasons": "UAE peak October to April with tourists, events, New Year’s Eve and Dubai Shopping Festival, quiet hot summer (June to September) and shifted evening demand; Ramadan slowdown then Eid holiday surges; weekends (Friday to Sunday in the UAE) and public holidays; Karachi boating and crabbing trips in cooler months with monsoon and rough-sea restrictions in summer; Canada’s short peak May to September on lakes and coasts, with boats hauled out for winter; wedding, birthday and corporate party seasons; major events (boat shows, Formula 1 weekend in Abu Dhabi, exhibitions) driving short spikes.",
+ "care": [
+  "Any incident at sea in progress (person overboard, fire, collision, sinking, medical emergency, missing vessel): pi stops and points to the coast guard or emergency services immediately (999/996 coast guard in the UAE, 1122/115 in Pakistan, 911 or the Canadian Coast Guard in Canada).",
+  "No maritime safety, seaworthiness, weather or sea-state go/no-go, life-jacket or equipment advice, and no interpretation of maritime authority or Transport Canada rules.",
+  "Never stores guests’ names, passport or Emirates ID numbers, card details, or crew licence and ID data; roles only.",
+  "Refuses help with operating without licences, overloading beyond capacity, or getting around marina or coast guard rules.",
+  "Alcohol on board and local laws: pi gives no legal view and notes only the operational question.",
+  "Managed yacht owners’ finances: notes reporting needs only, no tax or financial advice.",
+  "Fake reviews or misleading photos: pi won’t help create them."
+ ],
+ "build_ideas": [
+  "Central booking calendar per vessel taking bookings from staff, website and platforms, blocking double bookings.",
+  "Online booking and deposit link with clear cancellation and weather-reschedule terms shown to guests.",
+  "Channel rate sheet shared with brokers, with price-parity check.",
+  "Deposit and payment ledger per booking, reconciled with platform payouts.",
+  "Fuel log per trip against engine hours, giving fuel cost per hour per boat.",
+  "Maintenance planner blocking booking calendar dates, with parts orders and renewal reminders.",
+  "Charter run sheet sent to captain and crew: time, guests count, add-ons, catering, special requests.",
+  "Catering and add-on order flow to suppliers with confirmation.",
+  "Crew schedule and freelance pay calculator from completed trips.",
+  "Tips and on-board cash log.",
+  "Post-trip feedback and review reply reminders.",
+  "Enquiry inbox across Instagram and WhatsApp with response time tracking and ad source tagging.",
+  "Revenue and utilisation dashboard per vessel, and automated monthly owner statements for managed yachts."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We had two groups show up for the same yacht last Friday. Total disaster."
+  },
+  {
+   "role": "pi",
+   "text": "That sounds awful, for the guests and for your team on the dock. Noted: same yacht double-booked for one slot. How do bookings get added to the calendar right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Sales staff each have their own sheet, and the platforms send emails."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, so bookings land in several places with no single calendar. Has this happened before, or was Friday the first time?"
+  }
+ ]
+}

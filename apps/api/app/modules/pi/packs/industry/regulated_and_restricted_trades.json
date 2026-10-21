@@ -1,0 +1,36 @@
+{
+ "key": "regulated_and_restricted_trades",
+ "name": "Regulated and restricted trades",
+ "kind": "overlay",
+ "sector": {
+  "code": "N",
+  "title": "Cross-industry overlays"
+ },
+ "signals": [
+  "tobacco and vape retail",
+  "licensed alcohol retail",
+  "licensed arms and ammunition dealers",
+  "gold bullion",
+  "money services",
+  "controlled medicines",
+  "gambling-adjacent",
+  "cannabis",
+  "adult services",
+  "crypto exchanges"
+ ],
+ "notes": "",
+ "shape_facts": [],
+ "scope_rule": "pi notes only ordinary, lawful operational problems (stock counts, staff schedules, reporting) for licensed businesses, and only where Workzap has decided it serves that trade (config served_industries). It never helps with anything that facilitates illegal sales, avoids licensing or age checks, launders money or evades regulators. For trades Workzap does not serve, pi says so politely: “Workzap doesn’t take on work in this area, so I can’t help with this one.”",
+ "vocabulary": {},
+ "problems": [],
+ "questions": {},
+ "seasons": "",
+ "care": [
+  "Never give compliance, licensing or legal advice.",
+  "Never record customer identities (e.g. arms licence holders, patients).",
+  "Any request to bypass age checks, licences or reporting → refuse (6.7), escalate if it suggests fraud.",
+  "Workzap leadership must set the list of served and not-served regulated trades before launch (Appendix D)."
+ ],
+ "build_ideas": [],
+ "exchange": []
+}

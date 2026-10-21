@@ -1,0 +1,270 @@
+{
+ "key": "cloud_kitchens_and_virtual_brands",
+ "name": "Cloud kitchens and virtual brands",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "cloud kitchen",
+  "dark kitchen",
+  "ghost kitchen",
+  "virtual brand",
+  "delivery-only",
+  "multi-brand kitchen",
+  "shared kitchen",
+  "Foodpanda/Talabat/Careem/Deliveroo/Noon Food/Uber Eats/DoorDash/SkipTheDishes",
+  "commission",
+  "menu listing",
+  "ratings",
+  "prep time",
+  "packaging",
+  "matbakh ghar ka khana",
+  "home chef",
+  "tiffin"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of virtual brands run from one kitchen, and number of kitchens",
+  "Own kitchen vs rented station in a shared/managed kitchen facility",
+  "Which apps each brand is listed on, and whether there is a direct-order channel",
+  "App riders vs own riders for direct orders",
+  "Shared ingredients across brands vs brand-specific stock",
+  "Home-based operation vs commercial premises",
+  "Staff count per shift and whether one cook covers several brands"
+ ],
+ "scope_rule": "pi notes operational problems: app commissions and payouts, ratings, prep time, packaging, multi-brand stock, order errors and reporting. It does not advise on app contract terms, home-kitchen licensing, food-safety permits, trademark/branding law or tax. It never records customer addresses, phone numbers or names from orders, nor any rider or staff personal details, and does not take app login credentials.",
+ "vocabulary": {
+  "virtual brand": "a menu sold only online from an existing kitchen",
+  "dark/ghost kitchen": "delivery-only kitchen with no dining room",
+  "aggregator": "the delivery app",
+  "commission": "percentage the app takes per order",
+  "payout": "what the app transfers after deductions",
+  "prep time": "time set on the app for the kitchen to be ready",
+  "acceptance rate": "share of orders the kitchen accepts",
+  "rating": "app star score that affects ranking",
+  "marketing spend/ads": "paid placement inside the app",
+  "tiffin": "packed home meal subscription"
+ },
+ "problems": [
+  {
+   "phrase": "App payouts never match the orders I count",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "I don’t know my actual margin after commission, discount and ads",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Ad spend inside the app goes up but orders don’t",
+   "category": "marketing_leads",
+   "subtype": "ad_spend_waste"
+  },
+  {
+   "phrase": "Our rating dropped and orders fell off a cliff",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Three brands, three tablets, cooks miss orders",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Riders wait because food isn’t ready, then the app penalises us",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Missing drink or sauce complaints every day",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Packaging cost has doubled and we can’t pass it on",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Shared ingredients get used by one brand and the other runs out",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Chicken goes bad because we over-prep for a brand that’s slow",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Refunds are approved by the app and we can’t dispute fast enough",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "One brand sells, the other two are dead weight",
+   "category": "sales_revenue",
+   "subtype": "branch_underperforming"
+  },
+  {
+   "phrase": "Listings show old prices on one app",
+   "category": "customer_experience_digital",
+   "subtype": "marketplace_listing"
+  },
+  {
+   "phrase": "We’re buried on page five of the app",
+   "category": "marketing_leads",
+   "subtype": "marketplace_visibility"
+  },
+  {
+   "phrase": "No customer data — the app owns the customer",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Direct WhatsApp orders get mixed up with app orders",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Cooks don’t follow the portion for each brand",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Night cook doesn’t show up and we switch brands off",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Shared-kitchen rent and utilities eat everything",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "Gas cylinder and electricity bills are unpredictable",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "I spend hours downloading app reports into Excel",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Supplier credit is tight and app payouts come weekly",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Home kitchen getting too small, not sure when to move",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Subscription tiffin customers drop off after a month",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Registering each brand and keeping documents current is a mess",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  }
+ ],
+ "questions": {
+  "payouts": [
+   "Which app’s payouts confuse you most?",
+   "How do you check them against your orders now?"
+  ],
+  "margin": [
+   "Do you know what you keep from an average order after the app’s cut?",
+   "Which costs do you think you might be missing?"
+  ],
+  "ratings": [
+   "What do the low ratings usually mention?",
+   "Did a drop line up with anything changing in the kitchen?"
+  ],
+  "orders": [
+   "How many tablets or screens are in the kitchen?",
+   "What usually goes wrong at the pass?"
+  ],
+  "prep": [
+   "How long do riders usually wait at your door?",
+   "Which brand is slowest to prepare?"
+  ],
+  "stock": [
+   "Do your brands share ingredients?",
+   "How do you know what each brand used?"
+  ],
+  "brands": [
+   "Which brand is doing best, and which least?",
+   "What made you start the slow one?"
+  ],
+  "direct orders": [
+   "Do you take orders outside the apps?",
+   "How do they reach the kitchen?"
+  ],
+  "staff": [
+   "How many cooks per shift, and do they cover more than one brand?"
+  ],
+  "reporting": [
+   "How long does it take you to pull the numbers each week?"
+  ],
+  "growth": [
+   "What’s pushing you to expand right now?"
+  ]
+ },
+ "seasons": "- PK: Ramadan sehri and iftar deliveries; winter nights and rain spike delivery; cricket matches; exam season late-night orders; app-led sale weeks (e.g. platform anniversary or 11.11-style campaigns). - UAE: summer is strong for delivery as people stay in; Ramadan late-night and iftar boxes; weekends and month-end payday; app-wide promotional weeks. - Canada: winter and storms lift delivery; major sports nights; December holidays and New Year’s Eve; university exam periods.",
+ "care": [
+  "Gas cylinder leaks, kitchen fires, electrical faults in home kitchens, or rider road accidents: pi tells the person to contact emergency services first.",
+  "Home-kitchen legality and permits: pi notes the admin burden only and suggests the relevant authority.",
+  "App contract and commission disputes: noted as business problems, no legal advice.",
+  "Never asks for app logins or passwords to “check” payouts.",
+  "Customer addresses and phone numbers from orders are not collected.",
+  "Requests to create fake accounts to post reviews or order from competitors: pi declines.",
+  "Requests to list the same brand under false names to dodge app penalties: pi declines."
+ ],
+ "build_ideas": [
+  "Payout reconciliation tool: upload or pull each app’s statement, match to orders, show commission, discounts, ads, refunds and net per order and brand",
+  "True margin per brand per app, after every deduction",
+  "Single kitchen order screen combining apps and direct WhatsApp orders, with brand labels and timers",
+  "Prep-time tracker per brand showing rider wait times",
+  "Packing checklist per order type with photo before sealing",
+  "Shared-ingredient stock tracker that allocates usage by brand from recipes",
+  "Prep plan per day by brand, based on recent order patterns, to reduce over-prep",
+  "Ratings and review digest across apps with recurring complaint themes",
+  "Menu and price sync checklist across apps with change log",
+  "WhatsApp direct-order flow with menu, cart and order status for repeat customers who opt in",
+  "Tiffin subscription manager: plans, pauses, renewals, delivery days",
+  "Weekly owner report on WhatsApp: orders, net payout, margin by brand, rating trend"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "I run 3 brands out of one kitchen on Talabat and Deliveroo. Payouts make zero sense."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — three brands, two apps, and the payouts don’t add up. Is it the commission, the discounts, or refunds you can’t make sense of?"
+  },
+  {
+   "role": "Person",
+   "text": "All of it honestly. Refunds especially."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted refunds as the biggest confusion. Do you know which brand gets the most refunds?"
+  },
+  {
+   "role": "Person",
+   "text": "Probably the burger one."
+  },
+  {
+   "role": "pi",
+   "text": "Thanks, noted. When a refund happens, do you usually find out why, or just see it deducted?"
+  }
+ ]
+}

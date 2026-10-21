@@ -1,0 +1,277 @@
+{
+ "key": "media_production_and_publishing",
+ "name": "Media production and publishing",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "production house",
+  "shoot",
+  "pre-production",
+  "post-production",
+  "edit",
+  "colour grading",
+  "call sheet",
+  "crew",
+  "equipment rental",
+  "location permit",
+  "TVC",
+  "drama serial",
+  "YouTube channel",
+  "podcast",
+  "magazine",
+  "print run",
+  "publisher",
+  "distributor",
+  "royalties",
+  "ad sales",
+  "shoot cancel ho gaya",
+  "payment rukii hui hai",
+  "channel",
+  "OTT",
+  "intaj i’lami",
+  "nashr",
+  "deliverables",
+  "rough cut"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "What they produce: TV commercials, dramas, documentaries, corporate video, YouTube/social content, podcasts, books, magazines, digital publications",
+  "Whether they own equipment and studios or rent per project",
+  "Core team size versus freelance crew per project",
+  "Who pays them: brands/agencies, channels/OTT, advertisers, readers/subscribers, distributors",
+  "Number of projects or titles in progress at a time",
+  "For publishers: print versus digital, print run sizes, distribution channels",
+  "How budgets, schedules and assets are tracked"
+ ],
+ "scope_rule": "pi notes the business and operational problems: project budgets and overruns, scheduling and crew, equipment tracking, post-production bottlenecks, asset storage, client approvals, billing and collections, ad sales, distribution, inventory of printed stock, royalties administration effort and audience growth. pi gives no legal, copyright, licensing, defamation, censorship or tax advice, and never takes talent or crew names, contracts’ personal terms, unreleased content or readers’ data. It records roles and project types only. Requests to use content without rights, pirate, plagiarise, make defamatory or deceptive content, or evade content regulators are declined; on-set accidents or dangerous stunts go to emergency services.",
+ "vocabulary": {
+  "Pre-production": "planning, casting, locations and scheduling before a shoot",
+  "Post-production": "editing, colour, sound and effects after a shoot",
+  "Call sheet": "daily schedule and details for cast and crew",
+  "TVC": "television commercial",
+  "Rough cut / final cut": "draft edit / approved edit",
+  "Line producer": "manages the budget and logistics of a production",
+  "Rushes": "raw footage from a shoot",
+  "Deliverables": "final files in agreed formats",
+  "Print run": "number of copies printed in one go",
+  "Returns (publishing)": "unsold copies sent back by distributors",
+  "Royalties": "payments to authors or rights holders based on sales",
+  "Ad inventory": "advertising space available to sell"
+ },
+ "problems": [
+  {
+   "phrase": "Every shoot goes over budget and we only find out after",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Clients approve the script, then change it on set",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Rough cuts go back and forth for weeks",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Editors are the bottleneck, five projects waiting on one person",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Crew cancel the night before a shoot",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "We don’t know which freelancers are reliable",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Equipment goes out on shoots and comes back damaged or missing",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "We can’t tell which camera or lens is where",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Rental equipment costs more than if we owned it, but no one tracks it",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Footage is spread across hard drives and nobody knows which drive has what",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "We lost rushes when a drive died",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "Agencies and channels pay 90–120 days after delivery",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Crew want cash on the day but the client pays months later",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Location permits and NOCs delay shoots",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Contracts and usage rights per project are hard to find later",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Ad sales for the magazine/channel are falling",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Distributors return a lot of unsold copies and we can’t plan print runs",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Warehouse count of books doesn’t match the distributor’s statement",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Royalty statements take weeks to prepare manually",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Paper and printing costs keep rising",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "YouTube views are up and down and we don’t know what works",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Content calendar for our digital channels keeps slipping",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "We don’t know which projects or clients are actually profitable",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Owner is on every shoot so nothing else moves",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  }
+ ],
+ "questions": {
+  "work type": [
+   "What does most of your work look like right now — commercials, shows, digital content, publishing?",
+   "How many projects are running at once?"
+  ],
+  "budgets": [
+   "How do you track spend during a project?",
+   "When do you usually find out it’s gone over?"
+  ],
+  "approvals": [
+   "How many rounds does an edit usually go through?",
+   "Who on the client side holds things up?"
+  ],
+  "crew": [
+   "How do you book freelance crew?",
+   "How often do you get last-minute drop-outs?"
+  ],
+  "equipment": [
+   "Do you own or rent most equipment?",
+   "How do you track what goes out on each shoot?"
+  ],
+  "assets": [
+   "Where does footage live after a project?",
+   "Could you find a clip from a year ago quickly?"
+  ],
+  "cash": [
+   "How long after delivery do clients pay?",
+   "How do you cover crew payments in the meantime?"
+  ],
+  "publishing": [
+   "How do you decide print run sizes?",
+   "How much usually comes back unsold?"
+  ],
+  "audience/ad sales": [
+   "How do you track what content performs?",
+   "How are ad sales going compared to last year?"
+  ],
+  "growth": [
+   "What’s the next thing you want to build — a show, a channel, a new client type?"
+  ]
+ },
+ "seasons": "- Pakistan: Ramadan transmissions and Eid campaigns are the biggest production peak (shoots weeks before); Eid film releases; wedding-season content; PSL season; budget/election periods affect ad spend; monsoon disrupts outdoor shoots. - UAE: Ramadan and Eid campaigns, Q4 events season, Dubai Shopping Festival, National Day; summer heat limits outdoor shoots and many crew travel. - Canada: production heavy in summer and early autumn; winter weather limits outdoor work; holiday advertising peak in Q4. - Publishing: school year starts (books, stationery), book fairs and literature festivals, year-end gift season.",
+ "care": [
+  "No copyright, licensing, defamation, censorship, legal or tax advice.",
+  "Never take talent or crew names, personal contract terms, unreleased content or reader/subscriber data.",
+  "Decline plagiarism, pirated content, using footage or music without rights, deceptive or defamatory content, or getting around regulators.",
+  "On-set accidents, fires, stunts going wrong → pi points to emergency services first.",
+  "Disputes with talent or crew over pay: note as an operational problem, no legal view.",
+  "Sensitive or political content: neutral, note only operational issues."
+ ],
+ "build_ideas": [
+  "Project budget tracker with line items, committed costs and actuals updated during the shoot",
+  "Change log per project recording client changes with cost impact, feeding billing",
+  "Approval tracker for scripts and edits with rounds counted and timestamps",
+  "Crew roster and booking with availability, confirmations and reliability notes",
+  "Equipment register with check-out/check-in per shoot, condition notes and maintenance schedule",
+  "Footage and asset catalogue mapping projects to drives or cloud storage, with backup status",
+  "Post-production queue showing each editor’s projects and deadlines",
+  "Receivables tracker per project with milestones and reminders",
+  "Contracts and usage-rights register per project with expiry dates",
+  "Publishing stock tracker: print runs, warehouse stock, distributor stock and returns",
+  "Royalty statement generator from sales data",
+  "Content performance dashboard across YouTube and social channels",
+  "Ad sales pipeline and booking calendar for inventory"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Ramzan ki shoots aa rahi hain aur har saal budget nikal jata hai, pata end mein chalta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, peak season mein budget overrun ka pata sirf baad mein chalta hai — noted. Shoot ke dauran kharcha kahan record hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Line producer ki diary mein aur kuch WhatsApp pe receipts."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, diary aur WhatsApp receipts. Client agar set pe changes maange to woh kahin record hote hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Nahi, bas kar dete hain."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, set pe changes bina record ke ho jate hain — yeh bhi note kar liya. Is season mein kitni shoots plan hain?"
+  }
+ ]
+}

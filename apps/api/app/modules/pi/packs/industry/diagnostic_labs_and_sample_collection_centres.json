@@ -1,0 +1,277 @@
+{
+ "key": "diagnostic_labs_and_sample_collection_centres",
+ "name": "Diagnostic labs and sample-collection centres",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "lab",
+  "laboratory",
+  "diagnostic centre",
+  "pathology",
+  "collection centre",
+  "collection point",
+  "home sampling",
+  "phlebotomist",
+  "test karwana",
+  "report kab milegi",
+  "sample lene aaye",
+  "lab wala",
+  "mukhtabar",
+  "tahleel",
+  "fahs",
+  "reagents",
+  "kits",
+  "analyser",
+  "TAT",
+  "turnaround",
+  "report delivery",
+  "franchise collection point",
+  "referring doctor"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Main lab versus collection points only, and how many collection points or franchises",
+  "Whether home sample collection is offered, and how many riders/phlebotomists",
+  "Rough daily sample volume and peak hours",
+  "Referral business: walk-ins, doctor referrals, corporate/panel contracts, hospital outsourcing",
+  "Analysers and whether reagents are bought outright or under a reagent-rental arrangement with a supplier",
+  "Lab software in use (LIS) and how reports reach patients (counter, WhatsApp, portal, email)",
+  "Payment mix: cash, panels, insurance, corporate accounts"
+ ],
+ "scope_rule": "pi notes the operational side of a lab: sample logistics, turnaround times as a process, report delivery, home-collection routing, reagent and kit stock, analyser downtime as a business disruption, referral and panel billing, franchise control, staffing and reporting. pi never interprets test results, comments on reference ranges, suggests which tests someone should take, or assesses quality-control or accreditation procedures. pi does not ask for or store any patient name, phone number, sample ID, test ordered or result; when an owner describes a report going to the wrong person, pi notes the process failure only. Referral payments to doctors are noted only as a legitimate commercial arrangement problem, never helped with if they amount to kickbacks that breach rules.",
+ "vocabulary": {
+  "TAT": "turnaround time from sample to report",
+  "LIS": "laboratory information system",
+  "collection point / CC": "site that only takes samples and sends them on",
+  "home sampling": "phlebotomist visits the patient’s home",
+  "phlebotomist": "staff member who draws blood",
+  "reagent / kit": "consumables used by analysers, often with short expiry",
+  "reagent rental": "supplier places an analyser and the lab buys reagents",
+  "cold chain": "keeping samples at the right temperature in transit",
+  "rejection / recollect": "sample unusable, patient asked again",
+  "referring doctor / referral": "doctor who sends patients to the lab",
+  "panel / corporate": "company that pays for employees’ tests",
+  "outsourced tests": "tests sent to another lab"
+ },
+ "problems": [
+  {
+   "phrase": "Reports are promised by evening and go out next morning",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Collection points send samples late and the main lab batches miss the run",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Riders on home collection reach late and patients cancel",
+   "category": "orders_fulfilment",
+   "subtype": "rider_management"
+  },
+  {
+   "phrase": "We can’t see where a home-collection rider is",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Samples get rejected and we have to call people back for a recollect",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Reports sent on WhatsApp to the wrong number",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Reagents expire before we use them on low-volume tests",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "A kit runs out and we have to outsource tests at a loss",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Analyser goes down and we find out when samples pile up",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Reagent supplier’s rental terms are eating our margin and I can’t see per-test cost",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Franchise collection points collect cash and deposit late",
+   "category": "cash_collections",
+   "subtype": "deposit_delays"
+  },
+  {
+   "phrase": "Collection point counts don’t match what arrives at the lab",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Panel companies pay late and dispute bills",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Counter staff give discounts to friends and family",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Price list on the website is different from the counter",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Report-collection calls jam the phone all day",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Doctors who used to refer have stopped and we don’t know why",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Other labs undercut us on package tests",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Home-collection bookings come on five different WhatsApp numbers",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "LIS and billing are separate so every test is entered twice",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Night-shift technologists keep leaving",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Accreditation paperwork takes over the whole team before audits",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Biohazard waste pick-up isn’t regular and the contractor bills don’t match",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "I find out about branch volumes once a month from an Excel",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "We want more collection points but quality drops at every new one",
+   "category": "planning_growth",
+   "subtype": "franchise_control"
+  }
+ ],
+ "questions": {
+  "turnaround": [
+   "Which reports most often go out late?",
+   "Where does the delay start, at collection, transport or in the lab?",
+   "How do you find out a report is late?"
+  ],
+  "collection points": [
+   "How do samples get from the collection points to the lab?",
+   "How often do counts not match on arrival?"
+  ],
+  "home sampling": [
+   "How do home-collection requests come in?",
+   "How do you know where riders are during the day?"
+  ],
+  "reagents": [
+   "Who decides how much reagent to order?",
+   "How often do kits expire or run out?"
+  ],
+  "equipment": [
+   "When an analyser goes down, how quickly does someone know?",
+   "Who calls the service engineer?"
+  ],
+  "billing": [
+   "Which panels or corporates take the longest to pay?",
+   "How are disputes handled?"
+  ],
+  "cash": [
+   "How does cash from collection points reach the bank?",
+   "Who checks it against tests booked?"
+  ],
+  "reports delivery": [
+   "How do patients get their reports now?",
+   "What goes wrong most often?"
+  ],
+  "referrals": [
+   "Where do most of your patients come from?",
+   "Have you noticed any changes there recently?"
+  ],
+  "reporting": [
+   "What do you look at to know how each branch is doing?",
+   "How long does it take to get?"
+  ],
+  "staff": [
+   "Which shift is hardest to staff?"
+  ]
+ },
+ "seasons": "- Pakistan’s dengue and malaria season (post-monsoon, roughly August to November) creates heavy testing surges and kit shortages. - Winter respiratory season in Pakistan and Canada lifts testing volumes. - Ramadan shifts fasting-test bookings to early morning or after iftar and changes home-collection timings; Eid closes sites and creates backlogs. - UAE: annual corporate medicals and visa-related medical testing follow hiring cycles, which pick up in autumn; summer travel lowers routine volumes. - Pre-Hajj and Umrah medical requirements, pre-employment and pre-departure medicals (for workers going to the Gulf) create spikes in Pakistan. - Canada: year-end benefits usage and winter weather affect home-collection routing.",
+ "care": [
+  "If a caller describes someone collapsed, a severe reaction, or a dangerously unwell person, pi stops and points to emergency services (1122/115, 998/999, 911).",
+  "pi never reads, explains or comments on any result, range or “critical value”; if an owner asks, pi says it can’t help with that and the treating doctor or lab pathologist should.",
+  "No patient names, numbers, sample IDs, tests ordered or results; pi asks the owner not to share them.",
+  "Reports sent to the wrong person are a privacy incident; pi notes it as a process failure and does not advise on legal obligations.",
+  "Requests to issue reports without testing, alter results, produce fitness or visa medical certificates without proper testing, or back-date reports are refused.",
+  "Doctor “commission” for referrals may be restricted; pi notes referral tracking only as a legitimate relationship or volume problem, never helps set up hidden payments.",
+  "Biohazard waste handling and cold-chain standards are regulated; pi notes contractor or logistics issues only.",
+  "Staff, riders and franchisees are recorded by role."
+ ],
+ "build_ideas": [
+  "Sample movement tracker: batch sent from collection point, rider/courier handover, received count at lab, mismatches flagged",
+  "TAT board showing samples by stage (received, in process, validated, released) by test group, with late items highlighted",
+  "Home-collection booking flow on WhatsApp with slot selection, rider assignment, live status and reschedule option",
+  "Rider/phlebotomist day plan and check-in log with route order and arrival confirmations",
+  "Reagent and kit register with lot, expiry, opening date, usage per test and reorder levels",
+  "Analyser downtime log with alerts to the lab manager and service-call tracking",
+  "Report-delivery flow that sends reports only to the registered contact with confirmation steps, with a log of each send",
+  "Collection-point and franchise cash reconciliation with deposit proof upload and daily variance list",
+  "Panel and corporate billing tracker with monthly statements, disputes and ageing",
+  "Referral source tracker showing volumes by referring clinic and trend over time",
+  "Price list master pushed to all branches, the website and the counter so they match",
+  "Branch dashboard: tests per day, revenue, recollect rate, average TAT, home collections completed",
+  "Audit-document folder and checklist calendar ahead of accreditation visits",
+  "Integration between the LIS and billing/accounting so tests aren’t entered twice"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamaray collection points se samples der se aate hain aur phir lab ka evening run miss ho jata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, samples late pohanchne se reports bhi late ho rahi hain. Noted. Samples collection point se lab tak kaun le kar aata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Apne riders hain, lekin kabhi kabhi ek rider teen points cover karta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, ek rider par kai points ka load hai. Noted. Aapko kaise pata chalta hai ke rider abhi kahan hai ya kab nikla?"
+  }
+ ]
+}

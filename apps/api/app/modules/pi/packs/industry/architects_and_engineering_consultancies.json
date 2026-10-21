@@ -1,0 +1,254 @@
+{
+ "key": "architects_and_engineering_consultancies",
+ "name": "Architects and engineering consultancies",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "design stage",
+  "concept",
+  "schematic",
+  "DD",
+  "tender drawings",
+  "IFC",
+  "working drawings",
+  "supervision",
+  "site visit",
+  "RFI",
+  "NCR",
+  "fee proposal",
+  "scope creep",
+  "timesheet",
+  "billable hours",
+  "approvals",
+  "naqsha",
+  "naqsha pass",
+  "LDA/CDA/KDA/SBCA approval",
+  "Dubai Municipality",
+  "Trakhees",
+  "building permit",
+  "structural design",
+  "MEP design",
+  "PMC",
+  "istishari",
+  "stamp",
+  "seal"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Disciplines: architecture, interior, structural, MEP, civil, landscape, project management/cost consultancy.",
+  "Number of architects, engineers and draughtspeople.",
+  "Project mix: residential, commercial, institutional, government; local vs overseas clients.",
+  "Services: design only, design plus authority approvals, site supervision, PMC.",
+  "Fee basis: percentage of construction cost, lump sum per stage, time-based.",
+  "Software used for design and for running the business (timesheets, invoicing).",
+  "Country/city (registration, approval authorities and stamping rules differ)."
+ ],
+ "scope_rule": "pi notes the business problems of running a design or engineering practice: fee tracking against effort, scope creep, stage invoicing and collections, staff utilisation, resource planning, drawing and revision control, authority approval tracking, RFIs and client communication. pi does not give structural, geotechnical, fire, MEP or any engineering design opinion, does not comment on whether a design is safe or compliant, and does not advise on professional liability, contracts or registration law. It does not record clients’ or staff names, IDs or salaries; it notes roles.",
+ "vocabulary": {
+  "concept / schematic / DD / IFC": "design stages up to issued-for-construction drawings",
+  "naqsha pass": "approval of building plans by the local authority",
+  "SBCA / LDA / CDA / KDA": "Pakistani building control and development authorities",
+  "RFI": "request for information from contractor to consultant",
+  "NCR": "non-conformance report on site work",
+  "supervision": "site visits to check work against drawings",
+  "PMC": "project management consultancy",
+  "scope creep": "extra work demanded without extra fee",
+  "utilisation": "share of staff time spent on billable work",
+  "stage payment": "fee invoiced on completing a design stage",
+  "stamp / seal": "registered engineer or architect sign-off on drawings"
+ },
+ "problems": [
+  {
+   "phrase": "Clients ask for endless changes and we don’t charge for them",
+   "category": "margin_cost",
+   "subtype": "scope_creep"
+  },
+  {
+   "phrase": "We have no idea how many hours each project actually takes",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Fees are fixed but the project dragged on for two extra years",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Stage invoices go out late because nobody tells accounts the stage is done",
+   "category": "cash_collections",
+   "subtype": "invoicing_delays"
+  },
+  {
+   "phrase": "Clients pay design fees months late or stop paying when the project stalls",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Payroll is fixed but fee income is lumpy",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Some staff are overloaded while others have little to do",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Timesheets are filled at month-end from memory",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Good architects leave for the Gulf or Canada",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Juniors need a lot of checking, seniors are the bottleneck",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "We issued the wrong drawing revision to site",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Drawings live on different people’s computers",
+   "category": "tech_systems",
+   "subtype": "data_scattered_files"
+  },
+  {
+   "phrase": "Approval files sit at the authority and we can’t track them",
+   "category": "compliance_admin",
+   "subtype": "permits_approvals"
+  },
+  {
+   "phrase": "RFIs from the contractor pile up and responses are late",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Site visit reports are not written or not sent",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Coordination between architecture and structure is done at the last minute",
+   "category": "communication_coordination",
+   "subtype": "handoffs_trades"
+  },
+  {
+   "phrase": "Fee proposals take days to prepare",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "We submit many proposals but win few",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Most work comes from referrals and we have no other lead source",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "Software licences are expensive and we don’t know who uses them",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Professional registrations and insurance renewals are missed",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "I review every drawing personally and it slows everything",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  }
+ ],
+ "questions": {
+  "practice": [
+   "How many people are in the practice, and in which disciplines?",
+   "What kind of projects make up most of your work?"
+  ],
+  "fees": [
+   "How do you usually charge — percentage, lump sum, or by time?",
+   "How do you know if a project is using more time than the fee allows?"
+  ],
+  "scope": [
+   "When a client asks for extra work, what happens?",
+   "How often does it get billed?"
+  ],
+  "invoicing": [
+   "Who decides a stage is complete and raises the invoice?",
+   "How long do clients take to pay?"
+  ],
+  "people": [
+   "How do you see who is busy and who has capacity?",
+   "How are timesheets filled in today?"
+  ],
+  "drawings": [
+   "Where are the current drawings kept?",
+   "How do you make sure site gets the latest revision?"
+  ],
+  "approvals": [
+   "Which authorities do you submit to most?",
+   "How do you track where each file stands?"
+  ],
+  "site stage": [
+   "How are RFIs and site visits tracked?",
+   "What tends to get missed?"
+  ],
+  "new work": [
+   "Where do most new projects come from?",
+   "How long does a fee proposal take to put together?"
+  ]
+ },
+ "seasons": "In Pakistan, government and institutional design work follows the fiscal year ending 30 June, with PSDP releases and tenders bunching in the second half; private residential design rises before construction season (autumn and winter) and after the budget. In the UAE, design commissions often follow launch cycles and Cityscape season in autumn; summer is quieter as decision- makers travel; Ramadan slows approvals. In Canada, design work peaks ahead of spring construction and municipal permit queues lengthen in spring; government RFPs follow the 1 April fiscal year start.",
+ "care": [
+  "pi never comments on structural adequacy, loads, fire escape design, seismic matters or MEP sizing, even if asked; it says that is for the registered engineer and notes only the business problem.",
+  "Requests to stamp drawings without proper review, lend a registration/stamp to others, backdate approvals, or pay officials to speed up a naqsha pass are refused.",
+  "Professional liability, contract and fee-dispute questions are legal; pi notes the cash or process impact.",
+  "Staff salaries, names and personal details are not recorded; utilisation is discussed by role or team.",
+  "If someone reports an immediate building danger (cracks widening, collapse risk, fire) → pi points to emergency services and the authority.",
+  "Clients’ project details may be confidential; pi records only what is needed to describe the problem."
+ ],
+ "build_ideas": [
+  "Project register with fee, stages, stage status and invoice trigger when a stage is marked complete.",
+  "Simple timesheets on phone or web by project and stage, with fee-burn vs budget alerts.",
+  "Scope-change log: request, estimated effort, client approval and additional fee.",
+  "Resource planner showing each person’s load for the coming weeks.",
+  "Fee invoicing and receivables ageing with reminders.",
+  "Drawing register with revision control and transmittal log of what was issued to whom and when.",
+  "Authority approval tracker: submission date, comments, resubmissions, current status.",
+  "RFI and site-visit log with response deadlines and report templates.",
+  "Fee proposal builder from past project data and stage templates.",
+  "Proposal and win/loss tracker with lead source.",
+  "Licence, registration and professional insurance renewal calendar.",
+  "Practice dashboard: utilisation, fee earned vs billed vs collected, projects over budget."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We charge a lump-sum design fee but then the client keeps adding floors and changing layouts. We end up working for free."
+  },
+  {
+   "role": "pi",
+   "text": "Understood — scope keeps growing on fixed fees and the extra work isn’t paid. Noted. Do you currently track the hours each project takes?"
+  },
+  {
+   "role": "Person",
+   "text": "Not really, maybe a rough idea from the team leads."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, only rough estimates from team leads. How many people are in the practice at the moment?"
+  }
+ ]
+}

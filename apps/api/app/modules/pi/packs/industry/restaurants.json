@@ -1,0 +1,304 @@
+{
+ "key": "restaurants",
+ "name": "Restaurants (casual and fine dining)",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "restaurant",
+  "dine-in",
+  "covers",
+  "table turnover",
+  "kitchen",
+  "chef",
+  "waiter",
+  "captain",
+  "menu engineering",
+  "food cost",
+  "Foodpanda/Talabat orders",
+  "reservations",
+  "walk-ins",
+  "hotel",
+  "karahi",
+  "BBQ",
+  "buffet",
+  "handi",
+  "mat’am tawleh",
+  "shef",
+  "wastage",
+  "comp/void",
+  "service charge",
+  "tips"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of outlets and whether each has its own kitchen or a central kitchen supplies them",
+  "Dine-in vs takeaway vs delivery-app share, roughly as the owner describes it",
+  "Seating capacity and service style (à la carte, buffet, set menu, live counters)",
+  "Owned vs leased premises, and whether in a mall, food street or standalone",
+  "POS used, if any, and whether it is connected to the delivery tablets",
+  "Head chef/kitchen ownership (partner-chef vs salaried) and headcount per shift",
+  "Whether the owner is on the floor daily or managing remotely"
+ ],
+ "scope_rule": "pi notes operational and business problems: food cost and wastage, staff and shift issues, covers and table turnover, delivery-app headaches, reviews, cash and card reconciliation, and visibility across branches. It does not give food-safety, hygiene- certification, allergen-labelling or licensing advice, does not interpret municipality or food-authority rules, and does not advise on tax (sales tax, VAT, service-charge treatment). It never records names or contact details of staff or guests, never takes card or bank details, and records complaints by role (“a guest”, “the night-shift cashier”) only.",
+ "vocabulary": {
+  "covers": "number of guests served",
+  "comp": "a dish or bill given free, usually by a manager",
+  "void": "an item cancelled off a bill after entry",
+  "KOT": "kitchen order ticket",
+  "mise en place": "prep done before service",
+  "86’d": "item sold out for the shift",
+  "captain": "senior waiter running a section",
+  "hotel": "in Pakistan, often means a plain eatery, not lodging",
+  "khata": "running ledger, often paper",
+  "food cost %": "ingredient cost as share of the menu price",
+  "aggregator": "delivery app such as Foodpanda, Talabat, Deliveroo, Uber Eats"
+ },
+ "problems": [
+  {
+   "phrase": "Food cost keeps going up but I don’t know which dishes are eating the margin",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Chicken and oil prices change every week and my menu prices are from last year",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Kitchen throws away trays of rice and gravy at night and nobody records it",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Every weekend we run out of the mutton karahi by 9pm",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "The storeroom count never matches what the chef says he used",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Waiters void items after the guest pays cash and pocket the difference",
+   "category": "loss_security",
+   "subtype": "void_refund_abuse"
+  },
+  {
+   "phrase": "Closing cash is short almost every night by a small amount",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Talabat orders come on a separate tablet and staff forget to punch them into the POS",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Delivery orders leave late because dine-in gets priority",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Wrong items go in delivery bags and the app penalises us",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Weeknights are dead, weekends we turn people away",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Our second branch does half the covers of the first and I can’t see why",
+   "category": "sales_revenue",
+   "subtype": "branch_underperforming"
+  },
+  {
+   "phrase": "Google reviews say the food was cold and service slow",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Same biryani tastes different at both branches",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Cooks leave after Eid and I train new ones every few months",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Rota is on WhatsApp and every day someone says they didn’t know their shift",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Tips and service charge split always causes fights",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Reservations come by phone, Instagram and WhatsApp and we double-book tables",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Instagram page posts once a month, nobody owns it",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "I pay for boosted posts but can’t tell if anyone came because of them",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "No record of regulars, we can’t even send them a Ramadan offer",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Opening and closing checklists are signed but nobody actually does them",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Fryer and AC break down in peak summer and we lose service",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Inspection paperwork, renewals and medical cards for staff — I lose track of what’s due",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "I only find out the month was bad when the accountant sends figures weeks later",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Supplier delivers short weight on meat and vegetables and we sign anyway",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Thinking of a third branch but I can’t run two properly yet",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Manager calls me for every small approval, I can’t take a day off",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  }
+ ],
+ "questions": {
+  "food cost": [
+   "Which dishes do you feel are losing you money?",
+   "How do you work out the cost of a plate today?",
+   "How often do you change menu prices?"
+  ],
+  "wastage": [
+   "What gets thrown away most at the end of the day?",
+   "Does anyone write it down?"
+  ],
+  "stock": [
+   "How do you know what’s in the storeroom right now?",
+   "Who does the count, and how often?"
+  ],
+  "cash": [
+   "Is the gap usually in cash, card, or app payments?",
+   "Who closes the till at night?"
+  ],
+  "delivery": [
+   "Roughly how many delivery orders on a busy night?",
+   "Do app orders go into your POS, or stay on the tablet?"
+  ],
+  "staff": [
+   "Which role is hardest to keep?",
+   "How do staff find out their shifts?"
+  ],
+  "branches": [
+   "How do the branches compare, from what you can see?",
+   "What would you want to see from each branch every night?"
+  ],
+  "reviews": [
+   "What do the bad reviews usually say?",
+   "Who replies to them now?"
+  ],
+  "bookings": [
+   "How do guests book a table today?",
+   "How often does a double-booking happen?"
+  ],
+  "marketing": [
+   "Where do most new guests say they heard about you?",
+   "Who handles your social pages?"
+  ],
+  "reporting": [
+   "When do you find out how a day went?",
+   "What number do you check first?"
+  ],
+  "growth": [
+   "What’s holding you back from the next branch?"
+  ]
+ },
+ "seasons": "- PK: Ramadan iftar and sehri rushes reshape the day entirely; Eid ul Fitr and Eid ul Adha bring family dining surges and then staff leave; wedding season (roughly November–March) pulls cooks and waiters to caterers; winter favours BBQ, karahi, nihari and soups; summer heat and load-shedding push people to air-conditioned malls; cricket matches drive group dining and delivery. - UAE: cooler months October–April are peak with outdoor seating; summer slump with tourism dip; Ramadan iftar and suhoor tents; Dubai Shopping Festival, New Year and long weekends; Dubai Food Festival season. - Canada: patio season late spring to early autumn; December holiday parties; Valentine’s, Mother’s Day and Thanksgiving as fine-dining peaks; winter storms hit walk-ins but lift delivery.",
+ "care": [
+  "Food poisoning, choking, gas leaks, kitchen fires, burns or anyone collapsing: pi stops and tells the person to call emergency services (1122 or 15 in PK, 999/998/997 in UAE, 911 in Canada) before anything else.",
+  "Allergen, halal certification and hygiene grading questions: pi notes the admin problem only and suggests the relevant authority or a qualified consultant.",
+  "Staff theft suspicion: pi notes the pattern (“voids after cash payment”) but never records the staff member’s name or helps set up hidden cameras or covert monitoring of staff.",
+  "Guest complaints or review disputes: no guest names, phone numbers or photos stored.",
+  "Requests to manipulate reviews, post fake reviews or remove competitors’ reviews: pi declines.",
+  "Requests to keep “two sets of bills” or hide sales from tax or the landlord’s turnover clause: pi declines and moves on.",
+  "Staff medical cards and visas: pi notes tracking effort, never collects documents or ID numbers.",
+  "Alcohol service (UAE and Canada): pi notes operational issues only, no licensing advice."
+ ],
+ "build_ideas": [
+  "Recipe costing sheet linked to purchase prices: each dish’s ingredients, latest supplier prices, plate cost and margin, flagged when a price rise pushes a dish under target",
+  "Nightly owner summary on WhatsApp: covers, sales by channel, voids, comps, cash vs card vs app, wastage logged",
+  "Wastage log on a kitchen tablet: item, quantity, reason, shift, with weekly totals by dish",
+  "Storeroom stock count app with par levels and low-stock alerts before the weekend",
+  "Void and comp report by shift and role, highlighting voids after payment",
+  "Delivery-app order consolidation: app orders pulled into one screen next to POS sales, with daily reconciliation against app payouts",
+  "Shift rota sent to each staff member on WhatsApp, with swap requests and confirmations",
+  "Table booking page and WhatsApp booking flow feeding one reservation list",
+  "Simple guest list with opt-in for offers (birthdays, Ramadan menus) and visit history",
+  "Branch comparison dashboard: covers, average bill, food cost %, wastage, review score",
+  "Opening/closing checklist with photo proof and time stamps",
+  "Licence, renewal and staff medical-card due-date tracker with reminders",
+  "Review inbox pulling Google and app reviews into one place with reply status",
+  "Equipment maintenance log with service due dates for fryers, chillers and AC"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai do branches hain, dono ka cash roz thora short aata hai, aur samajh nahi aata kahan ja raha hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — dono branches mein raat ko cash thora kam nikalta hai. Ye gap zyada tar cash mein hota hai ya card aur Foodpanda payments mein bhi?"
+  },
+  {
+   "role": "Person",
+   "text": "Cash mein. Card theek hota hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted. Raat ko till kaun close karta hai, aur kya wo hi subah kholta bhi hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Night manager close karta hai, subah koi aur."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted ke close aur open alag log karte hain. Bill par items void ya cancel kaun kar sakta hai abhi?"
+  }
+ ]
+}

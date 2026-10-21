@@ -1,0 +1,279 @@
+{
+ "key": "home_textiles_and_towels",
+ "name": "Home textiles and towels",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "home textiles",
+  "made-ups",
+  "towels",
+  "terry",
+  "bath towels",
+  "bed sheets",
+  "bed linen",
+  "duvet covers",
+  "pillow covers",
+  "GSM",
+  "dyeing",
+  "processing",
+  "printing",
+  "stitching",
+  "packing",
+  "retail-ready",
+  "barcode",
+  "hangtag",
+  "carton marking",
+  "programme order",
+  "hotel linen",
+  "chadar",
+  "takiya ghilaf",
+  "tolia",
+  "jahez bedding",
+  "bayadat",
+  "manashif"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Product focus: towels, bed linen, kitchen linen, hospitality linen, or a mix.",
+  "Which stages are in-house: weaving, dyeing/processing, printing, stitching, packing.",
+  "Export programmes for retailers, local retail/brand, hospitality supply, or all.",
+  "Order sizes and how many SKUs (colour, size, design) are live.",
+  "Whether they sell through own shops, wholesale, Daraz/Amazon/noon or hotel contracts.",
+  "How stock and orders are tracked."
+ ],
+ "scope_rule": "pi notes operational issues: GSM or shade inconsistency, SKU-level stock confusion, packing and barcode errors, late programme deliveries, hotel contract supply problems, receivables, and margin pressure from yarn, dye and energy costs. pi does not advise on dye chemistry, effluent and environmental compliance, product certifications, customs or export incentives. pi records roles and customer types, never individual buyer, hotel staff or employee details.",
+ "vocabulary": {
+  "made-ups": "finished stitched textile items (sheets, towels, covers)",
+  "GSM": "weight of fabric in grams per square metre",
+  "terry": "looped pile fabric used for towels",
+  "processing": "dyeing, bleaching and finishing of greige",
+  "programme order": "a recurring retail order with fixed specs and dates",
+  "retail-ready": "packed with barcodes, labels and inserts ready for shelf",
+  "carton marking": "buyer-required labels on outer cartons",
+  "shade band": "approved colour tolerance",
+  "chadar/ takiya ghilaf": "bedsheet / pillow cover",
+  "tolia": "towel",
+  "jahez": "dowry; bedding sets are a big wedding purchase",
+  "bayadat": "linen (Arabic, used for hotel linen)"
+ },
+ "problems": [
+  {
+   "phrase": "Towel GSM varies batch to batch and the buyer complains",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Shade varies between dye lots in the same order",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Wrong barcodes on inserts, buyer threatened a chargeback",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Carton marking errors at the port",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "So many colour/size combinations, I can’t see stock per SKU",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Seconds and B-grade pile up and we sell them cheap with no record",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "B-grade goes out of the gate without proper billing",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Programme reorder came and we had to reconfirm everything from scratch",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Yarn and dye costs went up mid-programme",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Hotels order irregularly and pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Hotel complains of linen wearing out early",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Processing house we outsource to is always behind",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Packing accessories (inserts, bags, labels) run out at the last minute",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Online orders on Daraz/noon and shop orders get mixed up",
+   "category": "orders_fulfilment",
+   "subtype": "multi_channel_orders"
+  },
+  {
+   "phrase": "Online returns come back damaged or without tags",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Wedding-season bedding sets sold out, then leftover after season",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "We don’t know which designs actually sell in the local market",
+   "category": "sales_revenue",
+   "subtype": "no_sales_visibility"
+  },
+  {
+   "phrase": "Retailer chargebacks and deductions eat into margin",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Stitching output per operator is unknown",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "QC checks are done but nothing is written down",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Power cost on dyeing and drying is huge",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Pricing for local wholesale is different for every dealer",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Social media posts are irregular, no catalogue for dealers",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "Every report comes from three different sheets",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  }
+ ],
+ "questions": {
+  "quality": [
+   "What do buyers complain about most — weight, shade, size or stitching?",
+   "Where in the process would that be caught?"
+  ],
+  "skus": [
+   "How many colour and size combinations are live?",
+   "How do you check stock of one exact item?"
+  ],
+  "packing": [
+   "Who checks barcodes, inserts and carton marks before shipment?",
+   "What went wrong last time?"
+  ],
+  "programmes": [
+   "For repeat orders, where are the previous specs kept?",
+   "How long does it take to set up a reorder?"
+  ],
+  "outsourcing": [
+   "Which stages go outside — dyeing, printing, stitching?",
+   "How do you track what’s with each party?"
+  ],
+  "seconds": [
+   "What happens to B-grade pieces?",
+   "How are those sales recorded?"
+  ],
+  "hotels": [
+   "How do hotel or hospitality clients place orders?",
+   "How long do they take to pay?"
+  ],
+  "online": [
+   "Which marketplaces do you sell on?",
+   "How are orders from each one handled?"
+  ],
+  "costing": [
+   "When yarn or dye rates move, how quickly do your prices change?",
+   "Do you see the margin per order?"
+  ],
+  "seasons": [
+   "Which months sell out and which leave you with stock?",
+   "How do you plan production for them?"
+  ],
+  "reporting": [
+   "What do you look at weekly to know how things are going?",
+   "Who puts it together?"
+  ]
+ },
+ "seasons": "Export: Western retail “white sales” in January, back-to-college in late summer, and holiday gifting in Q4, so production peaks months earlier. Pakistan: wedding season (roughly October to March) drives jahez bedding sets; Eid ul Fitr and Eid ul Adha home refreshes; winter quilts and blankets; summer heat and load shedding affect dyeing and drying; budget in June. UAE: hotel and hospitality demand grows ahead of the tourism season (October to April) and big events; Dubai Shopping Festival (December to January) and Ramadan/Eid home sales; summer slowdown. Canada: back-to-school and university move-in (August to September), Black Friday and Boxing Day, spring cleaning.",
+ "care": [
+  "Chemical exposure, boiler or dryer incidents, fires: pi stops and points to emergency services.",
+  "No advice on dye chemistry, wastewater or environmental compliance, organic or other product certifications, or label claims.",
+  "No help with false fibre content or origin labelling, or misdeclaring shipments.",
+  "No customs, tax or export incentive advice.",
+  "Never stores hotel staff, retail buyer or employee personal details; uses “hotel client”, “retail buyer”.",
+  "Chargeback disputes: notes the operational gap only, not who is right."
+ ],
+ "build_ideas": [
+  "SKU-level stock by design, colour, size and grade (A/B), across godowns and shops.",
+  "Batch record per dye lot with GSM, shade reference and QC result, linked to orders.",
+  "Packing checklist per buyer: barcode scan verification against order before cartons close.",
+  "Carton label generator from order data in the buyer’s required format.",
+  "Programme library storing specs, accessories and packing instructions for instant reorders.",
+  "Outsourced job tracker: what’s at each processing or stitching party and when it’s due back.",
+  "B-grade sales register with invoice per sale and monthly summary.",
+  "Hotel client portal or WhatsApp ordering with par-level reminders and statement of account.",
+  "Multi-channel order inbox pulling Daraz/noon/Amazon and shop orders into one list.",
+  "Costing sheet per item linked to current yarn, dye and energy rates.",
+  "Seasonal sales history by design to guide production planning.",
+  "Owner weekly summary: output, dispatches, stock by grade, receivables."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our towels keep failing GSM checks with one buyer. Some batches fine, some 30 grams under."
+  },
+  {
+   "role": "pi",
+   "text": "Noted: GSM inconsistent between batches, with one buyer flagging it. Is GSM checked at your end before packing, or only by the buyer?"
+  },
+  {
+   "role": "Person",
+   "text": "We check sometimes, not every batch."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted that checks aren’t on every batch. When a batch comes out light, can you trace which loom or dye lot it came from?"
+  },
+  {
+   "role": "Person",
+   "text": "Not really."
+  },
+  {
+   "role": "pi",
+   "text": "Understood, noted. Has this led to any deductions or rejected shipments yet, or so far just warnings?"
+  }
+ ]
+}

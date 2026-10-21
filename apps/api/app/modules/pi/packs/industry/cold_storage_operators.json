@@ -1,0 +1,266 @@
+{
+ "key": "cold_storage_operators",
+ "name": "Cold storage operators",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "cold store",
+  "cold storage",
+  "chiller",
+  "freezer",
+  "blast freezer",
+  "CA store",
+  "aloo cold store",
+  "rent per bori / per crate",
+  "chamber",
+  "rack",
+  "palette / pallet",
+  "temperature",
+  "generator",
+  "load shedding",
+  "compressor",
+  "ammonia plant",
+  "inward / outward",
+  "gate pass",
+  "receipt / raseed",
+  "mukhzan mubarrad",
+  "tabreed",
+  "frozen warehouse",
+  "3PL cold chain",
+  "reefer",
+  "Canadian cold storage / refrigerated warehouse"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Capacity and number of chambers, and whether chilled, frozen or controlled-atmosphere",
+  "Products stored: potatoes, fruit, vegetables, dates, meat, fish, dairy, frozen foods, pharma",
+  "Business model: rented space to farmers and traders, own trading stock, or 3PL for brands and importers",
+  "How rent is charged: per sack, per crate, per pallet, per month, per season",
+  "Power source and backup: grid, generator, solar",
+  "Number of clients and whether they collect stock in parts",
+  "Whether they also offer transport (reefer trucks)"
+ ],
+ "scope_rule": "pi notes business and operational problems: inward and outward records, client stock balances, rent billing and collection, space utilisation, power and diesel costs, breakdowns and downtime, claims from clients over damage, staff and gate control, and reporting. pi does not advise on refrigeration engineering, ammonia or refrigerant handling, storage temperatures for specific produce, food-safety or pharma storage rules, insurance claims or contract law. It does not store clients’ names, CNICs, trade licences or phone numbers; it records roles and counts.",
+ "vocabulary": {
+  "chamber": "insulated room within the cold store",
+  "inward / outward": "stock received / released",
+  "gate pass / raseed": "receipt issued when stock comes in, presented to take it out",
+  "rent per bori": "storage charge per sack for the season",
+  "CA store": "controlled-atmosphere store for long-term fruit storage",
+  "blast freezer": "fast-freezing room for meat, fish or prepared food",
+  "load shedding": "scheduled power cuts",
+  "reefer": "refrigerated truck or container",
+  "3PL": "third-party logistics, storing and dispatching for other companies",
+  "shrinkage / weight loss": "loss of weight in stored produce over time (pi notes the dispute, not the science)"
+ },
+ "problems": [
+  {
+   "phrase": "Client says he stored 500 bags, our register shows 470",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Stock taken out in parts and the balance per client gets confused",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Bags end up in the wrong chamber and take hours to find",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Some clients’ stock went missing and we had to pay",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Gate passes are handwritten and can be copied",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Rent collection at season end is a fight",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Traders leave stock and disappear when prices fall",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Diesel for generators during load shedding is killing margins",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Electricity bill keeps rising and I don’t know per chamber cost",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Compressor failed at night and nobody noticed till morning",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Temperature logs are filled in at the end of the week, not actually checked",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Client claims produce rotted in our store",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Half empty in summer, full and turning people away in season",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Rates differ client to client and no one remembers what was agreed",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Night shift staff sleep or leave the gate open",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Labourers for loading are hard to find in peak days",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Trucks queue at the gate for hours",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Brands we store for want daily stock reports, we send them by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "3PL client orders come by email and WhatsApp and some get missed",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Expiry dates on frozen stock not tracked per batch",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Food authority inspection paperwork takes days",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "I’m away and can’t see if the store is running at the right temperature",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Few new clients find us, it’s all word of mouth",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "Thinking of adding a chamber but don’t know if utilisation justifies it",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "records": [
+   "How is stock recorded when it comes in and goes out?",
+   "Who keeps that record?"
+  ],
+  "client balances": [
+   "When a client takes stock out in parts, how do you track what’s left?",
+   "How often do clients dispute it?"
+  ],
+  "location": [
+   "How do staff know where a client’s stock is in the store?"
+  ],
+  "billing": [
+   "How is rent charged and when?",
+   "What happens at season end with unpaid rent?"
+  ],
+  "power": [
+   "What’s your backup when the power goes?",
+   "How do you track diesel against generator hours?"
+  ],
+  "breakdowns": [
+   "How would you find out if a chamber’s temperature went wrong at night?",
+   "When did that last happen?"
+  ],
+  "claims": [
+   "Have clients claimed for damaged produce?",
+   "How did you resolve it?"
+  ],
+  "utilisation": [
+   "How full are you in the off season compared to peak?"
+  ],
+  "staff and gate": [
+   "Who controls the gate at night?",
+   "How are releases authorised?"
+  ],
+  "3pl clients": [
+   "Do any clients want regular stock reports?",
+   "How do you send them now?"
+  ],
+  "growth": [
+   "What would you need to see before adding capacity?"
+  ]
+ },
+ "seasons": "Pakistan potato stores fill after the main potato harvest (roughly January–March) and release through summer and autumn; fruit stores fill with kinnow (December–March), apples (August–October) and mango for short holds in summer; summer load shedding and heat raise diesel and power costs sharply (May–September). Eid ul Adha brings meat storage peaks. UAE: dates after harvest (June–September), frozen food and meat demand ahead of Ramadan and Eid, summer cooling load highest; Dubai’s re-export trade keeps 3PL busy year-round. Canada: fall harvest storage (apples, potatoes, root vegetables) from September, holiday frozen food peaks in November–December.",
+ "care": [
+  "Ammonia or refrigerant leaks, a person trapped in a freezer room, fire, or electrical incidents: pi tells them to leave the area and call emergency services (1122, 999/998, 911) immediately.",
+  "No advice on refrigeration engineering, safe storage temperatures, food or pharma storage compliance, or insurance claims.",
+  "Never helps alter temperature logs, backdate gate passes, release a client’s stock to someone else improperly, or hide stock from tax or customs.",
+  "Client disputes over losses: pi notes the operational gap, does not assign blame or give legal views.",
+  "Does not store clients’ or labourers’ names, CNICs, trade licences or phone numbers.",
+  "Stored goods abandoned by clients raise legal questions pi does not advise on."
+ ],
+ "build_ideas": [
+  "Inward/outward register on phone: client (by account code), product, quantity, chamber and rack, with a printed or WhatsApp receipt carrying a unique code",
+  "Client stock statement on WhatsApp after every movement, showing remaining balance",
+  "Chamber and rack map showing where each lot sits",
+  "Release authorisation flow: outward only against a valid receipt code, with an approval step",
+  "Rent billing by season or month, with balances and reminders",
+  "Temperature and power log with hourly entries by the shift, flagged if missed",
+  "Integration with temperature sensors where available, sending an alert to the owner’s phone when a chamber goes out of range",
+  "Diesel and generator-hours log",
+  "Utilisation dashboard: space used by chamber over the year",
+  "3PL order intake and daily stock report emailed to brand clients automatically",
+  "Batch and expiry tracking for frozen goods",
+  "Inspection document folder and checklist",
+  "Maintenance schedule for compressors, generators and doors"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamara aloo ka cold store hai Okara ke paas. Har saal kuch zameendar kehte hain unke bori kam nikle."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, nikasi ke waqt boriyon ka farq aata hai. Noted. Jab maal andar aata hai to raseed kaise di jaati hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Haath se likhi raseed, aur register mein entry."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, raseed aur register dono haath se. Zameendar maal thora thora karke nikaalte hain ya ek dafa mein?"
+  }
+ ]
+}

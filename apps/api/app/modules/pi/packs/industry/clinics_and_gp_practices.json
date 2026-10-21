@@ -1,0 +1,280 @@
+{
+ "key": "clinics_and_gp_practices",
+ "name": "Clinics and GP practices",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "clinic",
+  "GP",
+  "family doctor",
+  "polyclinic",
+  "medical centre",
+  "OPD",
+  "walk-in clinic",
+  "consultant clinic",
+  "dawakhana",
+  "mattab",
+  "clinic pe rush",
+  "doctor sahab",
+  "parchi",
+  "token system",
+  "appointment nahi milti",
+  "iyada",
+  "markaz tibbi",
+  "insurance approval",
+  "panel patients",
+  "MRN",
+  "EMR",
+  "patient file",
+  "no-show"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of doctors and whether they are owners, partners, salaried or on a revenue-share/visiting basis",
+  "Number of branches and opening hours (single shift, evening clinic, 24-hour)",
+  "How patients pay: cash, corporate panel, insurance/TPA, provincial plan billing (Canada)",
+  "Whether there is an in-house pharmacy, lab collection point or procedure room",
+  "Walk-in versus appointment-led, and roughly how busy a normal day feels",
+  "What system is used now: paper register, Excel, a clinic software or EMR, WhatsApp only",
+  "Who runs the front desk and billing (owner, family member, receptionist, manager)"
+ ],
+ "scope_rule": "pi notes the business and admin side of running a clinic: queues, appointments, no-shows, billing, insurance claim effort, doctor rosters, staff behaviour at the front desk, consumable purchasing, reporting and patient-communication workflows. pi never comments on diagnoses, treatments, prescriptions, referrals or clinical protocols, and never says whether a doctor’s decision was right. pi does not ask for or record any patient’s name, phone number, file number, condition or test result; if an owner shares one, pi notes the problem in general terms (“a patient’s report was sent to the wrong person”) and leaves the detail out. Licensing and regulatory questions are noted only as admin effort, not answered.",
+ "vocabulary": {
+  "parchi": "the slip or token a patient gets on arrival",
+  "token": "queue number at the front desk",
+  "OPD": "outpatient department, the walk-in consultation side",
+  "panel": "corporate or insurer arrangement where the company pays the clinic",
+  "TPA": "third-party administrator that processes insurance claims (UAE)",
+  "pre-approval": "insurer’s permission needed before certain services (UAE)",
+  "rejection / denial": "an insurance claim not paid",
+  "visiting consultant": "a doctor who comes on certain days and shares fees",
+  "fee share / revenue share": "the split between clinic and doctor",
+  "no-show": "booked patient who does not come",
+  "follow-up": "repeat visit, often free or discounted",
+  "OHIP / MSP / AHCIP": "provincial health plan billing in Canada"
+ },
+ "problems": [
+  {
+   "phrase": "Mornings the waiting area is packed and by 3pm it’s empty",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Patients book on WhatsApp and half of them never turn up",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Reception tells people the doctor is in when he’s still not here",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "The visiting consultant says we owe him more than our register shows",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Insurance claims keep coming back rejected and nobody tracks why",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Panel companies pay us three, four months late",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Cash at the counter never matches the number of parchis",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Receptionist gives free follow-ups to people she knows",
+   "category": "loss_security",
+   "subtype": "discount_abuse_free_visits"
+  },
+  {
+   "phrase": "We run out of gloves, syringes and strips and find out mid-clinic",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Expired stock in the procedure room keeps getting thrown away",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "I don’t know which doctor actually brings in the money",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Evening clinic loses money but I can’t prove it",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Patients complain on Google that they waited two hours",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Nobody calls back patients who asked for a callback",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Clinic WhatsApp number has hundreds of unread messages",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Doctors cancel at the last minute and we have to phone everyone",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "We bought clinic software but the doctors still write on paper",
+   "category": "tech_systems",
+   "subtype": "user_adoption"
+  },
+  {
+   "phrase": "Billing is typed twice, once in the system and once for the insurer portal",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Licence renewals and staff licence expiries sneak up on us",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Every month-end I spend days making the doctor payout sheet",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Patient files go missing between reception and the doctor’s room",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Ads bring calls but nobody knows if any of them booked",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Second branch is quiet and I don’t know why",
+   "category": "sales_revenue",
+   "subtype": "branch_underperforming"
+  },
+  {
+   "phrase": "Receptionists keep leaving after two months",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Ramadan timings mess up every roster",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  }
+ ],
+ "questions": {
+  "queues and capacity": [
+   "Which part of the day feels the most jammed?",
+   "Is it more walk-ins or booked patients then?",
+   "How many doctors are sitting at that time?"
+  ],
+  "appointments": [
+   "How do patients book with you at the moment?",
+   "Roughly how often do booked patients not turn up?",
+   "Does anyone remind them before the visit?"
+  ],
+  "insurance and panels": [
+   "Which payers take the longest to pay you?",
+   "When a claim is rejected, who finds out and how?",
+   "Is anyone keeping a list of what’s still pending?"
+  ],
+  "cash and front desk": [
+   "How does the cash get counted at the end of the day?",
+   "Who checks it against the number of visits?"
+  ],
+  "doctor payouts": [
+   "How is each doctor’s share worked out at month-end?",
+   "Where do the disagreements usually come from?"
+  ],
+  "consumables": [
+   "Who notices when supplies are running low?",
+   "How do orders get placed with the supplier?"
+  ],
+  "reporting": [
+   "What numbers do you look at to know how the clinic is doing?",
+   "How long does it take to get them?"
+  ],
+  "systems": [
+   "What do you use to keep appointments and billing today?",
+   "Which part of it do the staff avoid?"
+  ],
+  "patient communication": [
+   "How do patients reach you after hours?",
+   "Who replies to the WhatsApp messages?"
+  ],
+  "staff": [
+   "Which role is hardest to keep filled?",
+   "What usually makes people leave?"
+  ],
+  "growth": [
+   "Are you thinking of adding a branch or more evening hours?",
+   "What’s holding that back?"
+  ]
+ },
+ "seasons": "- Winter flu and respiratory season (roughly November to February) brings heavier walk-in loads in Pakistan and Canada; dengue season after the monsoon (August to November) in Pakistan. - Summer heat in Pakistan and the UAE raises walk-ins for heat-related and stomach complaints; UAE summer also sees many residents travel, so appointment volumes dip in July and August. - Ramadan changes clinic hours, shifts evening clinics later, and shifts staff rosters; Eid holidays close or thin out clinics and create a rush just before and after. - School-year start (August/September) brings school-medical and vaccination-card admin requests. - UAE insurance policy renewals (often January) and corporate panel renewals create a spike in eligibility and pre-approval queries. - Canadian fiscal year-end (31 March) and extended-health benefit resets at the calendar year-end change patient booking behaviour.",
+ "care": [
+  "If anyone describes a patient in danger, chest pain, breathing trouble, heavy bleeding, collapse or suicidal thoughts, pi stops the problem-noting and says plainly to call emergency services (1122 or 115 in Pakistan, 998 or 999 in the UAE, 911 in Canada) or go to the nearest emergency department.",
+  "pi never comments on whether a treatment, prescription or referral was correct, and never suggests what a doctor should have done.",
+  "No patient names, numbers, file numbers, conditions, results or images; if shared, pi says it doesn’t need those details and notes only the operational issue.",
+  "pi does not record doctors’ or staff names, only roles (“visiting consultant”, “evening receptionist”).",
+  "Requests to adjust claim codes to get paid, back-date visits, issue sick notes without a visit, or hide income from tax are declined plainly; pi notes the underlying admin pain only if it is legitimate.",
+  "Licensing, DHA/DOH/MOHAP, PMDC or provincial college questions are noted as admin effort; pi gives no regulatory interpretation.",
+  "Doctor-pay disputes are sensitive between partners; pi stays neutral and records the process problem, not who is right.",
+  "Complaints about a specific doctor’s conduct are noted as a service-quality or accountability problem without naming anyone."
+ ],
+ "build_ideas": [
+  "WhatsApp booking flow with doctor-wise slots, automatic reminders the day before and a simple confirm/cancel reply",
+  "Front-desk token and queue board that shows waiting count per doctor and average wait, without any patient identifiers on screen",
+  "Daily cash close sheet that reconciles visits issued against cash, card and panel totals by shift and receptionist role",
+  "Doctor payout calculator: visits, procedures and fee-share rules per doctor, producing a month-end statement both sides can check",
+  "Insurance and panel receivables tracker: claims submitted, pending, rejected with reason, resubmitted, paid, with ageing by payer",
+  "Consumables register with par levels, expiry dates and a reorder list sent to the purchasing person on WhatsApp",
+  "Owner dashboard on phone: visits by doctor, branch and shift, revenue split by cash/panel/insurance, no-show rate",
+  "Doctor and staff roster with leave, cover requests and licence-expiry reminders",
+  "Shared WhatsApp inbox with tags (booking, report collection, billing query, complaint) and response-time tracking",
+  "Ad lead tracker that links enquiries from ads and Google to bookings made, by source",
+  "Free follow-up and discount approval log so every waiver has a reason and an approver role",
+  "Review and feedback request sent after a visit, routing unhappy responses to the manager before they go public",
+  "Licence and renewal calendar for the clinic, equipment and staff registrations",
+  "Light integration between the existing clinic software and the accounting system so billing is not typed twice"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai clinic mein shaam ko itna rush hota hai ke log do do ghante wait karte hain, phir Google pe ganday reviews dete hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, shaam ka rush aur lambi waiting, aur us se reviews kharab ho rahe hain. Noted. Shaam ko kitne doctors baithe hote hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Do, lekin ek senior doctor aksar 7 baje ki jagah 8 baje aate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, doctor ka late aana bhi waiting barha raha hai. Noted. Patients ko reception se is delay ke baare mein bataya jata hai ya woh bas intezar karte rehte hain?"
+  }
+ ]
+}

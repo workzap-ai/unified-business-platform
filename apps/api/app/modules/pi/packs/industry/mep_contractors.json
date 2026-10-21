@@ -1,0 +1,270 @@
+{
+ "key": "mep_contractors",
+ "name": "MEP contractors",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "MEP",
+  "electrical",
+  "plumbing",
+  "HVAC works",
+  "firefighting",
+  "fire alarm",
+  "BMS",
+  "ELV",
+  "chilled water",
+  "ducting",
+  "cabling",
+  "DB",
+  "panel",
+  "submittal",
+  "shop drawing",
+  "material approval",
+  "testing and commissioning",
+  "T&C",
+  "as-built",
+  "DEWA/ADDC/SEWA approval",
+  "Civil Defence approval",
+  "K-Electric/LESCO connection",
+  "wiring",
+  "pipe fitting",
+  "electrician",
+  "plumber",
+  "fundi",
+  "fanni",
+  "subcontract",
+  "LPO",
+  "retention",
+  "ESA",
+  "permit"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Disciplines covered: electrical, plumbing/drainage, HVAC, firefighting/fire alarm, ELV/low current, BMS.",
+  "Role: main MEP subcontractor, specialist sub, or direct to owner.",
+  "Number of live projects and technicians/foremen.",
+  "Typical project type: villas, towers, malls, hospitals, factories, fit-outs.",
+  "Whether they also hold maintenance/AMC contracts after handover.",
+  "Import share of materials (cables, panels, chillers, pumps, fittings) and main suppliers.",
+  "Country/emirate/province (authority approvals and licensing differ)."
+ ],
+ "scope_rule": "pi notes operational and business problems: submittals and approvals tracking, material procurement and site stock, technician deployment, testing and commissioning workflow, documentation (as-builts, O&M manuals), billing and retentions, and coordination with the main contractor. pi gives no electrical, fire, gas, plumbing, pressure or other safety-engineering advice, does not interpret codes, authority requirements or contract terms, and does not advise on licensing law. It never records technicians’ or clients’ names, IDs, visa or bank details; it records roles and counts.",
+ "vocabulary": {
+  "MEP": "mechanical, electrical and plumbing",
+  "submittal": "material or drawing package sent to the consultant for approval",
+  "shop drawings": "detailed installation drawings for approval",
+  "material approval / MAR": "consultant’s approval of a specific product",
+  "T&C": "testing and commissioning",
+  "as-built drawings": "record of what was actually installed",
+  "O&M manual": "operation and maintenance manual handed to the client",
+  "DB / MDB / SMDB": "distribution boards",
+  "ELV": "extra-low-voltage systems (CCTV, data, access control)",
+  "authority approval": "Civil Defence, DEWA, ADDC, utility company sign-off",
+  "fanni": "technician (Arabic, common in Gulf sites)",
+  "back-charge": "cost the main contractor deducts from a sub"
+ },
+ "problems": [
+  {
+   "phrase": "Submittals sit with the consultant for weeks and we can’t order material",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "We lose track of which submittal revision is approved",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Cable and fittings bought for one project end up on another",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Copper cable keeps disappearing from site stores",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Leftover material after projects piles up in the warehouse",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Imported panels and chillers arrive late and delay testing",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Supplier prices for copper changed between quote and order",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "We quote in dirhams but buy some gear in euros or dollars",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Main contractor deducts back-charges we never agreed to",
+   "category": "cash_collections",
+   "subtype": "disputed_deductions"
+  },
+  {
+   "phrase": "Our payments depend on the main contractor getting paid first",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Retention from finished buildings is not released",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Technicians are on the wrong site and another site is idle",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Skilled electricians and HVAC technicians are very hard to find",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Testing fails because installation was not done to the drawing",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Snag items reopen after we closed them",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "As-builts and O&M manuals delay our final payment",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Authority inspections get rebooked because something wasn’t ready",
+   "category": "compliance_admin",
+   "subtype": "inspection_readiness"
+  },
+  {
+   "phrase": "Variations from the main contractor are verbal and we lose track",
+   "category": "cash_collections",
+   "subtype": "unbilled_variations"
+  },
+  {
+   "phrase": "I don’t know the margin per project until it’s finished",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Coordination clashes with civil and interiors found too late on site",
+   "category": "communication_coordination",
+   "subtype": "handoffs_trades"
+  },
+  {
+   "phrase": "Estimating takes forever and errors creep in",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "After handover the client calls us for maintenance and nobody tracks the calls",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Trade licence, company classification and insurances expire",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  }
+ ],
+ "questions": {
+  "projects": [
+   "How many projects are you running now?",
+   "Are you working under a main contractor or direct to the owner on most?"
+  ],
+  "approvals": [
+   "How do you track submittals and their status?",
+   "Where do they usually get stuck?"
+  ],
+  "materials": [
+   "How is material ordered for each project?",
+   "How do you know what’s in the site store versus the warehouse?"
+  ],
+  "imports": [
+   "Which items do you import?",
+   "How often do they hold up the programme?"
+  ],
+  "technicians": [
+   "How many technicians and foremen do you have?",
+   "How do you decide who goes to which site each day?"
+  ],
+  "quality": [
+   "What usually causes rework or failed tests?",
+   "How are inspections prepared for?"
+  ],
+  "billing": [
+   "How are your bills certified — by the main contractor, consultant, or both?",
+   "What deductions or delays hurt most?"
+  ],
+  "handover": [
+   "What’s normally left at the end — snags, as-builts, O&M manuals?",
+   "Who owns getting those done?"
+  ],
+  "estimating": [
+   "How long does it take to price a typical tender?",
+   "Where do pricing mistakes come from?"
+  ],
+  "after-sales": [
+   "Do you maintain systems after handover?",
+   "How do those service calls come in?"
+  ]
+ },
+ "seasons": "In the UAE, the midday outdoor-work ban (mid-June to mid-September) mainly hits external works and rooftop plant; peak demand for HVAC works builds before summer; many projects target handover before year-end; Ramadan shortens shifts. In Pakistan, the fiscal-year end on 30 June drives government project billing; summer heat and load-shedding raise demand for electrical and backup power works; monsoon affects external drainage works; labour travels home around Eid. In Canada, construction peaks spring to autumn; winter work moves indoors; heating system installations peak before winter.",
+ "care": [
+  "No advice on electrical loads, cable sizing, earthing, fire-system design, gas, pressure testing or code compliance; pi notes the process problem and says a qualified engineer or the authority decides.",
+  "Electrocution, fire, gas leak, fall from height or confined-space incident → pi stops and points to emergency services.",
+  "Requests to fake test certificates, bypass authority inspections, get approvals through payments, or use unapproved materials in place of approved ones are refused.",
+  "Contract disputes over back-charges, retention and payment terms are legal; pi notes the cash impact only.",
+  "Never record technicians’ names, IDs, visa or salary details; clients and main contractors are recorded by role.",
+  "Copper and cable theft suspicions → pi notes the loss pattern, no covert surveillance of staff."
+ ],
+ "build_ideas": [
+  "Submittal and material approval tracker: each item, revision, date sent, consultant status, days waiting, with reminders.",
+  "Material requisition-to-delivery flow per project linked to approved items only.",
+  "Warehouse and site store stock with transfer logs and leftover-material register for reuse.",
+  "Import order tracker: PO, supplier, shipment status, expected arrival vs programme date.",
+  "Technician deployment board: who is on which site each day, skills, with WhatsApp daily assignments.",
+  "Installation and testing checklists per system with photo proof, feeding into inspection readiness.",
+  "Snag tracker shared with the main contractor, with reopen counts.",
+  "Handover document tracker: as-builts, O&M manuals, warranties, certificates per project.",
+  "Billing and retention ledger with back-charge register and ageing.",
+  "Variation log with instruction source, photos and approval status.",
+  "Estimating sheet with a reusable rate and material library and supplier price history.",
+  "AMC and service-call module for maintenance after handover.",
+  "Licence, classification and insurance expiry calendar."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our main problem is submittals. Consultant takes three, four weeks and then we’re blamed for delay."
+  },
+  {
+   "role": "pi",
+   "text": "Understood — submittal approvals take weeks and the delay lands on you. Noted. How are you keeping track of which submittals are pending right now?"
+  },
+  {
+   "role": "Person",
+   "text": "An Excel sheet the document controller updates when he remembers."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, an Excel sheet that’s updated irregularly. Roughly how many submittals are open across your projects at the moment?"
+  }
+ ]
+}

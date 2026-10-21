@@ -1,0 +1,256 @@
+{
+ "key": "steel_re_rolling_mills_and_metal_fabrication",
+ "name": "Steel, re-rolling mills and metal fabrication",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "re-rolling mill",
+  "sarya",
+  "girder",
+  "T-iron",
+  "angle",
+  "channel",
+  "billet",
+  "scrap",
+  "ship-breaking scrap",
+  "furnace",
+  "induction furnace",
+  "bhatti",
+  "lohay ka kaam",
+  "fabrication shop",
+  "welding",
+  "sheet metal",
+  "CNC cutting",
+  "laser cutting",
+  "structural steel",
+  "gates/grills",
+  "hadeed ( ﺪﻳﺪﺣ steel trading, weighbridge, kanta"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Re-rolling mill, melting (furnace) unit, steel trader, or fabrication workshop — or a mix.",
+  "Raw material: imported scrap, ship-breaking scrap, local scrap or billets.",
+  "Monthly tonnage or number of fabrication jobs.",
+  "Sells to dealers/traders, contractors, or direct projects.",
+  "Own weighbridge or relies on outside kanta.",
+  "Number of shifts and workers on the floor.",
+  "Fabrication: own designs vs working to client drawings; on-site installation or not."
+ ],
+ "scope_rule": "pi notes operational problems: scrap and billet stock, yield, weight differences, dealer credit, rate changes, job tracking, delays, wages and machines. It gives no structural engineering, metallurgical, furnace-safety, welding-safety or load/design advice, and no opinion on steel grade compliance. It does not record workers’ names or ID details, only roles and counts. Any report of burns, falls, furnace accidents or electrocution means pi stops and points to emergency services immediately.",
+ "vocabulary": {
+  "sarya": "reinforcing bar",
+  "ton / maund": "weight units (maund about 40 kg, used locally)",
+  "kanta / weighbridge": "weighing scale for trucks",
+  "yield / burning loss": "weight lost from scrap to finished product",
+  "billet": "semi-finished steel input for rolling",
+  "rate": "the day’s steel price, often shared on WhatsApp",
+  "bhatti": "furnace",
+  "thekedar": "labour contractor",
+  "fabrication drawing": "the client’s drawing for the job",
+  "mill scale / miss roll": "production waste and defective lengths",
+  "advance booking": "customer locking a rate by paying upfront"
+ },
+ "problems": [
+  {
+   "phrase": "Weight at our kanta and customer’s kanta never match, every truck is an argument",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Burning loss is higher than it should be but I can’t prove where it goes",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Scrap price changes daily and I buy at the wrong time",
+   "category": "suppliers_purchasing",
+   "subtype": "price_comparison"
+  },
+  {
+   "phrase": "Booked customers at old rate, now steel has gone up and I’m losing",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Dealers delay payment and keep rolling over balances",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Scrap yard stock is a guess, no proper count",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Material walks out of the yard at night",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Gas and electricity load-shedding stops the mill mid-shift",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Power bills are killing us",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Fabrication jobs always finish late and I can’t see why",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Site installation team says they finished, client says they didn’t",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "We quote fabrication jobs by experience and lose money on half of them",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Welders are paid per piece and disputes happen every week",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Labour contractor brings different workers every week, no training",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Miss rolls and short lengths pile up unsold",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Import scrap container delayed, mill sits idle",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Gate passes are handwritten and trucks leave without them sometimes",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "I don’t know my cost per ton this month until the accountant closes",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Client changes the drawing after we’ve cut the steel",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Customers call for the day’s rate and nobody has the same number",
+   "category": "communication_coordination",
+   "subtype": "branches_not_aligned"
+  },
+  {
+   "phrase": "Withholding and sales-tax paperwork on every invoice takes ages",
+   "category": "compliance_admin",
+   "subtype": "tax_filing_effort"
+  },
+  {
+   "phrase": "Contractor projects hold retention money for a year",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Cutting machine down for days waiting for a part",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Workers skip shifts after payday",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  }
+ ],
+ "questions": {
+  "weight and yield": [
+   "How big is the usual weight difference per truck?",
+   "Who weighs it — you, the customer, or both?",
+   "Is burning loss recorded per heat or per day?"
+  ],
+  "rates and booking": [
+   "How do you share the day’s rate with customers?",
+   "How often do you book at a fixed rate in advance?"
+  ],
+  "scrap and stock": [
+   "How do you know how much scrap is in the yard right now?",
+   "How often is it physically counted?"
+  ],
+  "credit": [
+   "How many dealers buy on credit?",
+   "Who decides their limit?",
+   "What’s the oldest balance you’re chasing?"
+  ],
+  "fabrication jobs": [
+   "Where do jobs usually get delayed — cutting, welding, painting or installation?",
+   "How do you track each job’s progress now?"
+  ],
+  "costing": [
+   "How do you price a fabrication job?",
+   "How often does it go over?"
+  ],
+  "power and downtime": [
+   "How many hours a week is the mill down?",
+   "What’s the most common reason?"
+  ],
+  "staff and gate": [
+   "How are shifts and output recorded?",
+   "How are gate passes checked?"
+  ]
+ },
+ "seasons": "PK construction picks up after monsoon (September onwards) and through winter to spring; budget announcements (June) move steel rates; Ramadan slows sites; Eid holidays shut mills for days; government development spending cycles affect demand. UAE: construction busiest in cooler months; summer midday work ban (mid-June to mid-September) slows site installation; Expo- or mega-project-driven demand spikes. Canada: construction season spring to autumn; winter slows site erection; fabrication shops busy before spring starts.",
+ "care": [
+  "No structural design, weld procedure, load or grade-compliance advice; note only “drawing changes cause rework” style issues.",
+  "Burns, falls, crushing, furnace or electrocution accidents: pi stops and points to emergency services first.",
+  "Child labour or unsafe labour practices raised: pi does not advise, notes nothing that could help hide it, and points to the relevant authorities if someone is in danger.",
+  "Never helps tamper with weighbridge readings, under-invoice or adjust weights to avoid tax — decline plainly.",
+  "Scrap of unknown origin or suspected stolen material: pi does not help process it.",
+  "Workers and labour contractors: roles and counts only, never names, CNICs or wages per person.",
+  "Customs and import duty questions: no advice, note admin effort only."
+ ],
+ "build_ideas": [
+  "Weighbridge log: each truck in and out with weights, photos of the reading, gate pass and linked invoice.",
+  "Heat/shift yield register: scrap charged versus finished output, burning loss per heat with trends.",
+  "Daily rate broadcaster: one approved rate sent to all dealers on WhatsApp, with booking confirmations recorded.",
+  "Rate-booking ledger showing booked tons, booked rate, delivered tons and open exposure.",
+  "Scrap yard and finished-goods stock board by size and grade, with cycle counts.",
+  "Dealer credit ledger with limits, ageing and automatic reminders.",
+  "Fabrication job tracker by stage (cutting, fit-up, welding, painting, dispatch, installation) with photos from site.",
+  "Job costing template: steel weight, consumables, labour hours and overheads versus quote.",
+  "Downtime log for mill and machines with reasons and parts waiting.",
+  "Piece-rate output log for welders and helpers, visible to supervisor and staff to cut disputes.",
+  "Gate pass app: no truck leaves without a digital pass matched to an invoice.",
+  "Owner dashboard: tons produced, yield, cost per ton estimate, receivables, power hours lost."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Har truck pe weight ka jhagra hota hai. Hamara kanta kuch aur kehta hai, party ka kuch aur."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh roz ka sar dard lagta hai. Noted — har truck par weight difference aur party se behes. Aam tor par farq kitna hota hai, kuch kilo ya zyada?"
+  },
+  {
+   "role": "Person",
+   "text": "50 se 200 kilo tak, depend karta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, 50–200 kg per truck. Weight ki slip abhi kaise rakhte hain — kaghaz pe ya kahin system mein?"
+  }
+ ]
+}

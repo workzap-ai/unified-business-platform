@@ -1,0 +1,283 @@
+{
+ "key": "hardware_paint_sanitary_and_building_materials_shops",
+ "name": "Hardware, paint, sanitary and building-materials shops",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "hardware store",
+  "hardware ki dukaan",
+  "paint shop",
+  "sanitary shop",
+  "sanitary fittings",
+  "taps",
+  "nalka",
+  "pipes",
+  "PPR",
+  "PVC",
+  "GI pipe",
+  "electrical store",
+  "wires",
+  "switches",
+  "cement",
+  "sariya",
+  "bricks",
+  "sand",
+  "bajri",
+  "plumbing",
+  "tools",
+  "fasteners",
+  "nuts and bolts",
+  "tint machine",
+  "shade card",
+  "contractor",
+  "thekedar",
+  "mistri",
+  "plumber",
+  "electrician",
+  "building materials",
+  "mawad bina",
+  "adawat",
+  "trade counter",
+  "site delivery"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Mix: general hardware, paint, sanitary/plumbing, electrical, heavy building materials (cement, steel, blocks).",
+  "Retail walk-in vs contractor/trade customers share.",
+  "Credit given to contractors, builders and plumbers.",
+  "Whether they run a paint tinting machine.",
+  "Delivery to site: own trucks, hired loaders, or customer pickup.",
+  "SKU count (often many thousands of small items).",
+  "Dealer/distributor status with brands, and target-based incentives."
+ ],
+ "scope_rule": "pi notes business problems such as huge SKU counts, contractor credit, site deliveries, price lists that change often, tinting errors, brand target schemes and staff. pi gives no structural, electrical, plumbing, gas or safety-engineering advice, and does not say which material is suitable or safe for a job. It does not advise on building codes or permits. pi refuses to help with fake invoices for contractors, inflated bills, or substituting inferior materials as branded. pi does not record contractors’, customers’ or site details beyond their role.",
+ "vocabulary": {
+  "thekedar": "contractor",
+  "mistri": "skilled tradesman (mason, plumber, electrician)",
+  "sariya": "steel reinforcement bar, sold by weight",
+  "bajri / ret": "gravel / sand",
+  "tinting": "mixing paint colour by machine from a base",
+  "shade card": "paint colour catalogue",
+  "base": "untinted paint the colour is mixed into",
+  "PPR / PVC / GI": "pipe material types",
+  "trade price / list price": "contractor vs retail rate",
+  "udhaar / khata": "credit and the credit book",
+  "scheme / target": "brand incentive for hitting sales volumes",
+  "loader / Suzuki": "small delivery vehicle",
+  "adawat": "tools (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Contractors take material on udhaar and the khata keeps growing",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Credit book entries get missed when the shop is busy",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Prices change every week from the company and the counter quotes old rates",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Steel and cement prices swing and my margin disappears",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "We have ten thousand small items and no idea what’s in stock",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Fittings sit for years in the back store",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Plumbers come in and take items while the counter is busy",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Staff give trade price to friends",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Tinting mistakes, customer says the shade is wrong and we remix",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Site deliveries go late and the contractor shouts",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Delivery driver says he delivered, contractor says short quantity",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Loader costs aren’t charged properly",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Brand scheme targets missed, we didn’t know how close we were",
+   "category": "sales_revenue",
+   "subtype": "target_missed"
+  },
+  {
+   "phrase": "Brand claims for schemes and rebates are paperwork hell",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Supplier sends short or damaged goods and we notice too late",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Hard to find someone who knows all the parts",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Only I know where things are kept",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Contractor orders come by WhatsApp voice note and get missed",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Quotations for a whole house take hours to write",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Returns of unused fittings after a job finishes are a mess",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Two shops and no idea which one sells what",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Construction slowdown and our sales dropped",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Paying suppliers late because contractors haven’t paid us",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  }
+ ],
+ "questions": {
+  "mix": [
+   "What’s your main line, hardware, paint, sanitary, electrical or heavy materials?",
+   "Is most business walk-in or contractors?"
+  ],
+  "credit": [
+   "How much of your sales are on credit?",
+   "How do you record and chase it today?"
+  ],
+  "pricing": [
+   "How do new price lists reach your counter?",
+   "How often do they change?"
+  ],
+  "stock": [
+   "Roughly how many items do you keep?",
+   "How do you know what to reorder?"
+  ],
+  "paint": [
+   "Do you tint paint in the shop?",
+   "How often does a shade get remixed?"
+  ],
+  "delivery": [
+   "Do you deliver to sites?",
+   "How do you confirm what was delivered?"
+  ],
+  "brand schemes": [
+   "Are you working towards any brand targets?",
+   "How do you track progress against them?"
+  ],
+  "quotes": [
+   "How do you make quotations for big jobs?",
+   "How long does one usually take?"
+  ],
+  "suppliers": [
+   "What goes wrong most often with deliveries from suppliers?"
+  ],
+  "staff": [
+   "Who else at the counter can find any item without asking you?"
+  ],
+  "owner view": [
+   "If you wanted to know your total credit outstanding today, how would you check?"
+  ]
+ },
+ "seasons": "In PK, construction slows in the monsoon (July to August) and peaks in the drier months. Paint and renovation demand rises before Eid and before wedding season (homes repainted), and pipes and fittings peak in winter for gas and water heater installs. Budget announcements (June) and price changes often trigger forward buying. In the UAE, the cooler months (October to April) see more renovation and fit-out, while summer midday work bans slow outdoor site work; paint demand rises before Ramadan/Eid and at tenancy turnover. In Canada, spring and summer are renovation and construction season and winter is slow, with Black Friday for tools and holiday-season tool gifting.",
+ "care": [
+  "No structural, electrical, gas, plumbing, fire-safety or engineering advice, and no “is this material suitable” judgements.",
+  "Gas leak, electrocution, fire or a site collapse described → pi stops and points to emergency services (PK 1122/15/16, UAE 999/997/998, Canada 911).",
+  "Refuse requests for fake or inflated invoices for contractors or clients, or passing off non-branded goods as branded.",
+  "Refuse under-invoicing or tax-avoidance requests.",
+  "Do not advise on building permits or codes.",
+  "Do not record contractors’ names, phone numbers or site addresses; record roles (“a contractor customer”).",
+  "Credit disputes: note the business problem neutrally, never advise on legal recovery.",
+  "Staff theft suspicion recorded by role and pattern only."
+ ],
+ "build_ideas": [
+  "Digital khata per contractor: every credit sale logged at the counter, running balance, WhatsApp statement and reminders.",
+  "Price list manager: upload the brand’s new list once, and counter and quote prices update immediately, with a margin check.",
+  "SKU catalogue with photos, location (rack/bin) and barcode, so staff can find items.",
+  "Reorder suggestions by sales velocity; dead-stock report by age.",
+  "Paint tinting log: formula, base, customer job, so remixes match and errors are recorded.",
+  "Quotation builder for whole jobs from the catalogue, sent as PDF on WhatsApp.",
+  "Delivery challan on phone with photo and receiver confirmation at site.",
+  "Brand scheme tracker showing progress against targets and claim paperwork.",
+  "Supplier GRN check: ordered vs received vs damaged.",
+  "Contractor order intake via WhatsApp with a structured confirmation.",
+  "Branch comparison: sales, margin, stock by shop.",
+  "Cash-flow view: receivables vs supplier payables due."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Thekedar log udhaar le jaate hain, aur mera khata har mahine barhta jaa raha hai."
+  },
+  {
+   "role": "pi",
+   "text": "Ye bohat aam masla hai aur pareshani wala bhi. Noted: contractors ka udhaar barh raha hai. Ye khata abhi register mein hai ya computer pe?"
+  },
+  {
+   "role": "Person",
+   "text": "Register mein. Rush mein kabhi entry reh jaati hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, rush ke waqt entries miss ho jaati hain. Aap ke kitne contractors regular udhaar pe lete hain, taqreeban?"
+  },
+  {
+   "role": "Person",
+   "text": "Pachees tees."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted. Unhe payment yaad karwane ka abhi kya tareeqa hai?"
+  }
+ ]
+}

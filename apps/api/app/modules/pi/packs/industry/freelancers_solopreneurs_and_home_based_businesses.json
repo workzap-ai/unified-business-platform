@@ -1,0 +1,286 @@
+{
+ "key": "freelancers_solopreneurs_and_home_based_businesses",
+ "name": "Freelancers, solopreneurs and home-based businesses",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "freelancer",
+  "Upwork",
+  "Fiverr",
+  "LinkedIn clients",
+  "client ne payment nahi ki",
+  "invoice",
+  "Payoneer",
+  "Wise",
+  "PayPal",
+  "Stripe",
+  "Instagram shop",
+  "home bakery",
+  "home-based boutique",
+  "tutoring",
+  "ghar se kaam",
+  "orders DM pe aate hain",
+  "COD",
+  "side hustle",
+  "solo",
+  "burnout",
+  "time nahi milta",
+  "freelance permit",
+  "UAE freelance licence",
+  "sole proprietor",
+  "Etsy",
+  "Daraz seller",
+  "kaam zyada hai, haath kam"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "What they sell: services (design, writing, development, consulting, tutoring) or products (food, clothing, crafts)",
+  "Where customers come from (Upwork, Fiverr, Instagram, WhatsApp, referrals, Daraz, Etsy)",
+  "Working alone, with family help, or with a few part-time helpers or subcontractors",
+  "Number of active clients or orders per week",
+  "How they get paid (platforms, bank transfer, COD, cards, payment links)",
+  "Local versus international clients, and currencies",
+  "Whether this is full-time or alongside a job or family responsibilities"
+ ],
+ "scope_rule": "pi notes the business and operational problems: finding and following up clients, pricing consistency, order and project tracking, invoicing and late payments, scope creep, time and workload, delivery and suppliers for product sellers, reviews and repeat customers, and admin effort. pi gives no tax, legal, licensing, immigration, banking, foreign exchange or food-safety/medical advice, and never takes card details, platform logins, bank details or customers’ personal data. It records customer types and volumes only. Requests to evade taxes or platform rules, fake reviews or portfolios, share accounts against terms, or sell regulated products illegally are declined.",
+ "vocabulary": {
+  "Gig": "a service listing on a marketplace like Fiverr",
+  "Proposal / bid": "application to a job on a freelance platform",
+  "Connects": "Upwork credits used to send proposals",
+  "Milestone": "staged payment on a project",
+  "Retainer client": "client paying monthly for ongoing work",
+  "Scope creep": "work growing beyond what was agreed",
+  "DM orders": "orders taken through Instagram or WhatsApp messages",
+  "COD": "cash on delivery",
+  "Payoneer / Wise": "services used to receive international payments",
+  "Freelance permit": "UAE licence for individuals to work independently",
+  "Portfolio": "samples of past work",
+  "Side hustle": "business run alongside a main job"
+ },
+ "problems": [
+  {
+   "phrase": "Clients disappear after I deliver and don’t pay",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Some months I earn well, some months nothing",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "I keep doing extra revisions for free",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "I don’t know if I’m charging enough for my time",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "I spend hours writing proposals and get few replies",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "My Fiverr gigs stopped getting impressions",
+   "category": "marketing_leads",
+   "subtype": "marketplace_visibility"
+  },
+  {
+   "phrase": "All my clients come from one platform and I’m scared it’ll dry up",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "I don’t post consistently because client work takes over",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "Instagram DMs and WhatsApp orders get mixed up and I miss some",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "I send the wrong size or flavour sometimes",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Courier delays and COD returns eat my profit",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Courier sends my COD money late",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "I run out of ingredients or fabric in the middle of orders",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Supplier prices keep changing",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "I forget deadlines because everything is in my head",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  },
+  {
+   "phrase": "I can’t take more work but don’t know how to hand off to a helper",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "The helper I hired doesn’t do things the way I do",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Invoices are made in Word each time, and I lose track of who paid",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Personal and business money are mixed in one account",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "I don’t know how much I actually made last month",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Customers order once and never come back",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "One bad review on the platform hurt my ranking",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Replying to messages all day leaves no time to work",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Keeping receipts and records for my licence or tax filing is a mess",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "I’m working at night after the kids sleep and I’m burnt out",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "I want a website so I’m not dependent on Instagram",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  }
+ ],
+ "questions": {
+  "work": [
+   "What do you mainly sell or offer?",
+   "Is it full-time or alongside something else?"
+  ],
+  "clients": [
+   "Where do most of your clients or orders come from?",
+   "What happens if that source slows down?"
+  ],
+  "pricing": [
+   "How do you set your prices?",
+   "Do you know roughly how many hours a typical job takes?"
+  ],
+  "payments": [
+   "How do clients usually pay you?",
+   "How often do you have to chase payment?"
+  ],
+  "scope": [
+   "How do you handle extra requests after you’ve agreed a price?",
+   "Does that happen often?"
+  ],
+  "orders": [
+   "Where do orders arrive, and how do you keep track of them?",
+   "Has an order slipped through recently?"
+  ],
+  "delivery (products)": [
+   "How do you deliver orders?",
+   "What happens with returns or refused COD?"
+  ],
+  "workload": [
+   "How many hours a week are you working right now?",
+   "What eats time without earning money?"
+  ],
+  "money": [
+   "Do you have a separate business account or records?",
+   "How do you know what you earned last month?"
+  ],
+  "growth": [
+   "What would you change first if you had more time?"
+  ]
+ },
+ "seasons": "- Pakistan: Eid (clothes, food, gifts), wedding season (November–February), Ramadan (iftar orders, home bakers), 11.11 and White Friday sales; academic year for tutors; summer load-shedding disrupts home work and internet. - UAE: Ramadan and Eid, Dubai Shopping Festival, National Day, back-to-school; summer exodus slows local orders but international freelance work continues. - Canada: holiday season (November–December) and Black Friday; tax season (by April and June for self-employed) drives bookkeeping effort; summer slowdown. - International freelance clients slow in late December and August; new budgets in January.",
+ "care": [
+  "No tax, legal, licensing, immigration, banking, foreign exchange or food-safety advice.",
+  "Never ask for card numbers, platform or bank logins, or customers’ addresses and numbers.",
+  "Decline platform rule evasion (account renting, off-platform payment against terms), fake reviews, fake portfolios or under-declaring income.",
+  "Burnout or stress: respond warmly and briefly, note the workload problem; if someone expresses thoughts of self-harm, point them to local emergency or helpline services.",
+  "Home-based food or cosmetics sellers: no food safety or ingredient guidance; note operational issues only.",
+  "Scam clients or fraud attempts: note as a loss/fraud problem; suggest reporting to the platform."
+ ],
+ "build_ideas": [
+  "Simple client and project tracker on phone: client type, job, deadline, price, status, paid or not",
+  "Invoice and payment link generator with automatic polite payment reminders",
+  "Scope and revision log per job so extra requests are visible and can be quoted",
+  "Time logger to see hours per job and effective earnings per hour",
+  "WhatsApp/Instagram order capture form that turns DMs into a numbered order list with details confirmed back to the customer",
+  "Order board for home businesses: today’s orders, prep, dispatch, delivered, paid",
+  "Stock list for ingredients or materials with low-stock alerts and supplier reorder notes",
+  "COD and courier remittance tracker matching delivered orders to money received",
+  "Income and expense log separating business from personal, with a monthly summary",
+  "Quick-reply library and WhatsApp catalogue to cut time spent answering the same questions",
+  "Repeat customer list with reminder messages for occasions or re-orders",
+  "Simple one-page website or ordering page linked to WhatsApp",
+  "Receipt and records folder organised by month for later use by their accountant"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Main ghar se cakes bechti hoon, orders Instagram aur WhatsApp dono pe aate hain aur kabhi kabhi koi order bhool jati hoon."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, do jagah se orders aate hain aur kabhi koi chhoot jata hai — yeh stressful hota hai, noted. Abhi aap orders kahan likhti hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Kuch diary mein, kuch bas chat mein rehte hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, kuch diary mein aur kuch sirf chats mein. Ek hafte mein taqreeban kitne orders aate hain?"
+  },
+  {
+   "role": "Person",
+   "text": "25–30, Eid pe double."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, aam hafte mein 25–30 aur Eid pe double — note kar liya. Payment zyada tar kaise milti hai, advance mein ya delivery pe?"
+  }
+ ]
+}

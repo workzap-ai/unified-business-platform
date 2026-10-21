@@ -1,0 +1,281 @@
+{
+ "key": "airlines",
+ "name": "Airlines (regional and low-cost operations)",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "load factor",
+  "empty seats",
+  "ancillary revenue",
+  "on-time performance",
+  "OTP",
+  "AOG",
+  "aircraft on ground",
+  "wet lease",
+  "ACMI",
+  "block hours",
+  "crew rostering",
+  "slot",
+  "turnaround",
+  "no-shows",
+  "overbooking",
+  "BSP",
+  "GSA",
+  "interline",
+  "fuel surcharge",
+  "jahaz",
+  "flight late ho gayi",
+  "seat khali",
+  "tayyara",
+  "rihla",
+  "ta’kheer"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Fleet size and type mix, and whether aircraft are owned, dry-leased or wet-leased.",
+  "Network shape: domestic only, regional, Gulf routes, Hajj/Umrah charters.",
+  "Sales channel mix: own website, GDS/travel agents, GSAs, OTAs, call centre, airport counters.",
+  "Whether ground handling, maintenance and catering are in-house or outsourced.",
+  "Number of bases and outstations.",
+  "Systems in use: reservation/PSS, revenue accounting, crew and ops tools, or mostly Excel.",
+  "Whether the person is the owner, commercial head, ops head or finance lead."
+ ],
+ "scope_rule": "pi notes commercial, financial and operational coordination problems: seat sales, agent settlements, ancillary revenue, delays from a schedule and customer point of view, crew rostering admin, outstation communication, reporting and systems. pi never comments on airworthiness, maintenance sign-off, flight or duty-time limits, safety management or how PCAA, GCAA or Transport Canada would interpret a rule. It treats those as matters for the airline’s accountable managers and regulator. pi never stores passenger or crew names, PNR details, passport numbers or licence data, and records roles only (captain, cabin crew, station manager, agent).",
+ "vocabulary": {
+  "PNR": "passenger booking record",
+  "load factor": "share of seats sold on a flight",
+  "ancillaries": "extra paid items like bags, seats, meals",
+  "AOG": "aircraft on ground, unable to fly until fixed",
+  "ACMI / wet lease": "leasing aircraft with crew, maintenance and insurance",
+  "BSP": "I ATA settlement system collecting money from agents",
+  "GSA": "general sales agent selling on the airline's behalf",
+  "outstation": "any airport that isn't the main base",
+  "OTP": "on-time performance",
+  "roster": "crew duty schedule",
+  "interline": "ticketing across two airlines",
+  "no-show": "booked passenger who doesn't turn up"
+ },
+ "problems": [
+  {
+   "phrase": "Flights to the Gulf go full but the domestic sectors are flying half empty midweek",
+   "category": "sales_revenue",
+   "subtype": "route_load_imbalance"
+  },
+  {
+   "phrase": "We don’t know which route actually makes money after fuel and leases",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Fuel and lease bills come in dollars and the rupee keeps moving",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Ancillary sales are tiny, nobody buys extra bags or seats online",
+   "category": "sales_revenue",
+   "subtype": "basket_small"
+  },
+  {
+   "phrase": "GSAs abroad are late remitting what they’ve sold",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Agents’ sales and BSP reports never match our own figures",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Refunds after cancellations take months and passengers are furious",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Every delay means a flood of calls and WhatsApps we can’t answer",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Passengers find out about schedule changes at the airport",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Our reviews online are all about delays and lost bags",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Website booking breaks at payment and people go to the agent instead",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "Spares sit at the main base when the aircraft is stuck at an outstation",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Crew roster is built in Excel and changes go out by WhatsApp",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Crew allowances and per diems get calculated wrong every month",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Station managers at outstations report on their own phones, no common format",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Ops, commercial and engineering each keep their own sheet of the day’s flights",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "I get the daily load and revenue report two days late",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Reservation system, accounts and crew tool don’t talk to each other",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Catering is ordered for the full aircraft even when it’s half booked",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Ground handling invoices at outstations are higher than what we agreed",
+   "category": "suppliers_purchasing",
+   "subtype": "invoice_disputes"
+  },
+  {
+   "phrase": "Lost and delayed baggage claims are handled on paper and fall through",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Overbooking rules are applied differently by each counter supervisor",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Regulatory paperwork takes up my ops team’s whole week",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Ticket counter cash at smaller airports doesn’t reconcile",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Planning a new route is guesswork, we don’t have demand data in one place",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Hajj and Umrah charter season stretches everyone and things get missed",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  }
+ ],
+ "questions": {
+  "sales and loads": [
+   "Which routes worry you most right now?",
+   "Is it certain days or the whole week?",
+   "How do you see loads today, a report or someone telling you?"
+  ],
+  "agents and settlement": [
+   "Where does most of your selling happen, own website or agents?",
+   "How long after a sale does the money actually reach you?",
+   "Who checks the agent figures against yours?"
+  ],
+  "margins": [
+   "Do you know route-wise profit today, or only the overall picture?",
+   "Which cost hurts most, fuel, leases or handling?"
+  ],
+  "delays and customers": [
+   "When a flight is delayed, how do passengers hear about it?",
+   "Who handles the calls and messages that follow?"
+  ],
+  "refunds": [
+   "Roughly how long does a refund take from request to payout?",
+   "Where does it get stuck?"
+  ],
+  "crew admin": [
+   "How is the roster built and shared?",
+   "What goes wrong when it changes last minute?"
+  ],
+  "outstations": [
+   "How do your station managers report back each day?",
+   "What do you wish you knew from them sooner?"
+  ],
+  "reporting": [
+   "Which number do you look at first every morning?",
+   "How old is it by the time you see it?"
+  ],
+  "systems": [
+   "Which systems do your teams use day to day?",
+   "Where do people re-type the same data?"
+  ],
+  "growth": [
+   "Are you planning new routes or aircraft this year?",
+   "What makes that decision hard right now?"
+  ]
+ },
+ "seasons": "Eid ul Fitr and Eid ul Adha travel peaks (dates shift each year with the lunar calendar); Hajj season outbound and return; Umrah peaks in Ramadan and school holidays; Pakistani diaspora summer peak June to August from the Gulf, UK and Canada; December and winter wedding season in Pakistan; UAE school holidays (summer, winter, spring) and the cooler October to April tourist season; Canadian summer and Christmas peaks, with winter weather disruption; northern Pakistan tourism in summer; fog season in Punjab (December to January) causing delays; fiscal year-end (June in Pakistan, December for most UAE and Canadian companies).",
+ "care": [
+  "Any flight-safety incident in progress (emergency, accident, diversion with injuries, security threat) is an emergency: pi stops, tells the person to follow their emergency procedures and contact emergency services and the relevant authority, and does not continue.",
+  "pi never comments on airworthiness, maintenance release, MEL items, flight and duty-time limits, crew licensing or safety management, and never interprets PCAA, GCAA or Transport Canada rules.",
+  "Never store passenger or crew names, PNRs, passport or CNIC/Emirates ID numbers, medical or licence details; record roles only.",
+  "Never help with falsifying records, logbooks, load sheets, crew hours or maintenance entries, and never help bypass slot, route or permit rules.",
+  "Labour disputes with pilots or crew unions: note the operational impact only, no employment-law advice.",
+  "Fuel hedging, lease negotiations and tax: pi notes the pain point but gives no financial or tax advice.",
+  "No speculation about competitor airlines or naming individuals in incidents.",
+  "If the person mentions a whistleblowing or safety report, pi notes the business frustration only and suggests they use their formal safety reporting channel."
+ ],
+ "build_ideas": [
+  "Daily route dashboard: loads, revenue, ancillary sales and yield per flight, sent to the owner’s WhatsApp each morning.",
+  "Route profitability tracker combining ticket revenue with fuel, lease, handling and catering cost per sector, with currency conversion.",
+  "Agent and GSA settlement tracker matching agent sales, BSP statements and receipts, with ageing and reminders.",
+  "Refund pipeline tracker: each request’s status, owner, age and payout date, with passenger updates by template.",
+  "Disruption messaging flow: bulk WhatsApp/SMS notices to affected bookings and a self-service rebooking or refund request link.",
+  "Crew roster publishing and change-acknowledgement tool, with per diem and allowance calculation feeding payroll.",
+  "Outstation daily report form on phone (departures, delays, handling issues, cash), rolled into one view.",
+  "Spares location register showing what sits at which base, with transfer requests.",
+  "Catering order calculator tied to booked loads at cut-off time.",
+  "Ground handling invoice checker against agreed rate cards per station.",
+  "Baggage claim tracker with case status, ageing and closure.",
+  "Integration between reservation system, accounting and ops sheets to remove re-keying.",
+  "Route demand view pulling search, booking and agent data for new-route planning."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our agents abroad sell well but the money takes forever to come in."
+  },
+  {
+   "role": "pi",
+   "text": "That’s frustrating, especially with fuel and leases due on fixed dates. Noted: agent remittances arriving late. Roughly how long after a sale does the money usually reach you?"
+  },
+  {
+   "role": "Person",
+   "text": "Sometimes 45 days, sometimes 90. And their figures never match ours."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, so it’s two things: slow payment, and agent figures not matching your records. Who checks the agent statements against your own sales right now?"
+  }
+ ]
+}

@@ -1,0 +1,254 @@
+{
+ "key": "seafood_and_fish_markets",
+ "name": "Seafood and fish markets",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "fish market",
+  "fish shop",
+  "machhli",
+  "machhi",
+  "seafood",
+  "prawns",
+  "jhinga",
+  "crabs",
+  "pomfret",
+  "surmai",
+  "rohu",
+  "hamour",
+  "sherry",
+  "safi",
+  "kingfish",
+  "samak ( ﻚﻤﺳ auction, harraj, landing, boats, nakhuda, ice, cold store, fillet, cleaning, frozen export, fish harbour, Deira fish market"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Retail shop, wholesale stall at a market, auction trader, exporter, or restaurant supplier",
+  "Buying from auction, own/partner boats, farmers (aquaculture), or importers",
+  "Fresh vs frozen share, and processing (cleaning, filleting, packing)",
+  "Cold storage and ice supply arrangements",
+  "Customer mix: households, restaurants/hotels, export buyers, online",
+  "Number of stalls/shops and staff (cleaners, cutters, drivers)",
+  "Export documentation handled in-house or by an agent"
+ ],
+ "scope_rule": "pi notes operational problems: daily price swings, spoilage, ice and cold-chain downtime, weighing and cleaning loss, credit to restaurants, export shipment coordination and reporting. It does not advise on fishing seasons and bans, export certification, sanitary/phytosanitary rules, customs, food safety or tax. It does not record names of boat owners, buyers, staff or customers, and never takes bank or payment details.",
+ "vocabulary": {
+  "harraj": "auction at the harbour/market",
+  "nakhuda": "boat captain/owner",
+  "landing": "catch arriving at harbour",
+  "hamour, sherry, safi, kingfish": "popular Gulf fish",
+  "pomfret, surmai, rohu, jhinga": "popular Pakistani fish and prawns",
+  "cleaning charge": "fee for gutting, scaling and cutting",
+  "dressed weight": "weight after cleaning",
+  "glaze": "ice coating on frozen seafood, adds weight",
+  "IQF": "individually quick frozen",
+  "reefer": "refrigerated container"
+ },
+ "problems": [
+  {
+   "phrase": "Fish not sold by afternoon loses value, by night it’s gone",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Auction prices change every morning and I can’t keep up my retail price",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "After cleaning, weight drops and I don’t know my real cost",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Ice supply runs out on hot days",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Freezer and cold store breakdowns",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Diesel for the generator is a huge cost",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Cleaners keep the best pieces or take cash for cleaning",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Scale disputes with customers",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Restaurants and hotels pay 60–90 days late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Export shipment delayed and the buyer cancelled",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Export documents take days and we miss the vessel",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Glazing and weight complaints from buyers abroad",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Which variety makes money? I have no idea",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Ledger with boat owners for advances is all in a register",
+   "category": "cash_collections",
+   "subtype": "supplier_payments_late"
+  },
+  {
+   "phrase": "Prices in dirhams/dollars swing and I lose on export margin",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "WhatsApp orders from restaurants overnight, someone misses one",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Rider delivers fish late and the restaurant rejects it",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Supply drops in certain months and customers move to another supplier",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Cutters are hard to keep in summer",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Stock in cold store doesn’t match the book",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "No way to show daily catch to customers online",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "Cleaning area hygiene complaints",
+   "category": "quality_complaints",
+   "subtype": "hygiene"
+  },
+  {
+   "phrase": "Two stalls, I don’t know which is profitable",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  }
+ ],
+ "questions": {
+  "spoilage": [
+   "How much is usually unsold at the end of the day?",
+   "What happens to it?"
+  ],
+  "buying": [
+   "Where do you buy — auction, boats, farms or importers?",
+   "How do you decide quantity?"
+  ],
+  "pricing": [
+   "How often do you change your selling price?",
+   "Who decides it?"
+  ],
+  "cleaning": [
+   "Do you track weight before and after cleaning?",
+   "Who handles cleaning charges?"
+  ],
+  "cold chain": [
+   "How do you store unsold stock?",
+   "How often does ice or the freezer let you down?"
+  ],
+  "credit": [
+   "How many restaurants or hotels buy on credit?",
+   "How long do they take?"
+  ],
+  "export": [
+   "Do you export?",
+   "What usually delays a shipment?"
+  ],
+  "orders": [
+   "How do trade orders reach you?"
+  ],
+  "stock": [
+   "Does the cold store count match your book?"
+  ],
+  "reporting": [
+   "Can you see which fish makes money?"
+  ]
+ },
+ "seasons": "- PK: winter is peak fish season and demand ( machhli with rain and cold); fishing restrictions/closures in parts of the year affect supply (pi notes the effect only, not the rules); Lent and Christmas for Christian customers; Ramadan iftar fried fish; summer heat raises spoilage. - UAE: cooler months raise demand; seasonal fishing restrictions on certain species affect supply (pi notes the effect only); Ramadan and Eid; tourism season for hotels and restaurants. - Canada: lobster, crab and salmon seasons by region; Lent and Easter; Christmas Eve seafood; summer cottage and BBQ season.",
+ "care": [
+  "Cold-room entrapment, knife injuries, slips, boat accidents or ammonia leaks: pi points to emergency services immediately.",
+  "Fishing bans, species restrictions, export certification and customs: no advice; pi notes the admin effort only.",
+  "Requests to mislabel species, origin, or over-glaze to inflate weight: pi declines.",
+  "Requests to under-invoice exports or move cash informally: pi declines.",
+  "Boat owners, buyers and staff are recorded by role only.",
+  "No food-safety or allergen advice."
+ ],
+ "build_ideas": [
+  "Daily buying log by species: source, weight, price, with yield after cleaning",
+  "Cost per kg after cleaning and selling-price helper using the owner’s margin rule",
+  "Unsold stock and markdown log by species and day",
+  "Cold-store stock book with in/out and count variance",
+  "Ice and freezer downtime log with costs",
+  "Trade order intake via WhatsApp form, with a consolidated morning dispatch list",
+  "Restaurant/hotel credit ledger with statements and reminders",
+  "Boat advance ledger by boat label, with settlements per landing",
+  "Export shipment tracker: buyer order, packing, document checklist status, vessel cut-off dates, with currency noted per order",
+  "Daily catch broadcast to opted-in customers with today’s prices",
+  "Stall comparison dashboard"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Every morning I buy at the auction and by evening a lot is still sitting there. Restaurants also pay so late."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — unsold fish by evening, and slow payments from restaurants. Which of those is hurting you more right now?"
+  },
+  {
+   "role": "Person",
+   "text": "The payments. Some owe for three months."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted as the bigger one. Roughly how many restaurant or hotel accounts buy from you on credit?"
+  },
+  {
+   "role": "Person",
+   "text": "About 25."
+  },
+  {
+   "role": "pi",
+   "text": "Thanks, noted. How do you keep track of what each one owes today?"
+  }
+ ]
+}

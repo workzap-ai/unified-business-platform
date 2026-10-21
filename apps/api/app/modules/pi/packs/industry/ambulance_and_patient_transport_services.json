@@ -1,0 +1,259 @@
+{
+ "key": "ambulance_and_patient_transport_services",
+ "name": "Ambulance and patient-transport services",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "ambulance service",
+  "patient transport",
+  "non-emergency transport",
+  "medical transport",
+  "ambulance fleet",
+  "ICU ambulance",
+  "dispatch",
+  "ambulance bhejo",
+  "gaari",
+  "driver",
+  "paramedic",
+  "is’af",
+  "sayyarat is’af",
+  "naql al-mardha",
+  "inter-hospital transfer",
+  "dialysis transport",
+  "wheelchair van",
+  "call centre",
+  "dispatch log",
+  "trip sheet",
+  "fuel",
+  "standby at events"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Emergency response, non-emergency patient transport, or both (pi only handles the business operations of either)",
+  "Fleet size and types (basic, advanced/ICU, wheelchair vans), owned or leased",
+  "Staff: drivers, paramedics/EMTs, nurses, dispatchers, and how shifts run",
+  "Customers: private families, hospitals, dialysis centres, insurers, corporate/event standby contracts, government contracts",
+  "Cities and coverage areas, and whether there are long-distance or inter-city transfers",
+  "How calls come in and are dispatched (phone, WhatsApp, app, hospital requests)",
+  "Billing basis: per trip, per km, monthly contracts"
+ ],
+ "scope_rule": "pi notes the business and logistics side: dispatch process, response and turnaround times as operational metrics, fleet availability and maintenance, fuel and running costs, crew rosters, trip billing and collections, contracts with hospitals and events, equipment and consumables stock on vehicles, complaints and reporting. pi never gives clinical, first-aid, triage or medical-transport- protocol advice, and never assesses whether a crew’s care was right. pi does not ask for or record any patient’s name, address, condition or trip-specific personal details, nor staff licence or ID numbers. Most importantly, pi is not a dispatch line: if anyone tries to request an ambulance or describes a live emergency, pi stops and tells them to call the emergency number directly.",
+ "vocabulary": {
+  "dispatch": "assigning a vehicle and crew to a call",
+  "response time": "time from call to arrival",
+  "turnaround": "time until the vehicle is free again",
+  "trip sheet / run sheet": "record of each trip (km, times)",
+  "standby": "ambulance stationed at an event or site under contract",
+  "IFT": "inter-facility transfer between hospitals",
+  "BLS / ALS": "basic or advanced life-support vehicle type (pi notes as fleet types only)",
+  "crew": "driver plus paramedic/EMT or nurse",
+  "off-road": "vehicle unavailable for repair",
+  "oxygen cylinders": "refills tracked as consumable stock",
+  "per-km billing": "charges based on distance",
+  "despatcher / control room": "staff who take calls and assign vehicles"
+ },
+ "problems": [
+  {
+   "phrase": "Calls come on five phones and two get missed during peak",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Dispatcher doesn’t know which vehicle is free right now",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Drivers take personal detours and the km don’t add up",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Fuel cost per trip keeps rising and I can’t see why",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Fuel cards are misused",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Vehicles go off-road for weeks because nobody schedules servicing",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Oxygen cylinders aren’t refilled after a trip",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Vehicle equipment and consumables go missing",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Hospitals and insurers pay trip bills months late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Families argue over the trip charge after the trip",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Cash collected by crews reaches the office late or short",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Trip sheets are handwritten and half are missing",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Crew rosters fall apart when someone calls in sick",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Night shift overtime claims are hard to check",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Trained paramedics leave for better jobs abroad",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Event standby contracts are underpriced and we lose money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Dialysis transport schedules change every week and drivers get confused",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  },
+  {
+   "phrase": "Complaints about late arrival come to me directly and I don’t know the facts",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Vehicle fitness, insurance and permits expire without warning",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "No monthly report on trips, km, and revenue per vehicle",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "We want a second city but can’t control it from here",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Hospitals don’t know we exist for non-emergency transfers",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "Tracker installed on vehicles but nobody looks at it",
+   "category": "tech_systems",
+   "subtype": "user_adoption"
+  }
+ ],
+ "questions": {
+  "calls and dispatch": [
+   "How do requests reach you now?",
+   "How does the dispatcher know which vehicle is free?",
+   "Roughly how many calls a day at peak?"
+  ],
+  "fleet": [
+   "How many vehicles are on the road today versus off-road?",
+   "How is servicing planned?"
+  ],
+  "running costs": [
+   "Which cost has grown the most?",
+   "How do you check fuel against trips?"
+  ],
+  "vehicle readiness": [
+   "How do crews confirm a vehicle is restocked after a trip?",
+   "Who checks that?"
+  ],
+  "billing": [
+   "How is each trip priced and billed?",
+   "Which customers are slowest to pay?"
+  ],
+  "cash": [
+   "How does cash collected by crews reach the office?"
+  ],
+  "crews": [
+   "How are rosters made?",
+   "What happens when someone calls in sick?"
+  ],
+  "contracts": [
+   "Which contracts do you think are underpriced?",
+   "How did you set those rates?"
+  ],
+  "records": [
+   "How are trip sheets kept now?",
+   "What goes missing most often?"
+  ],
+  "reporting": [
+   "What would you most like to see each month per vehicle?"
+  ]
+ },
+ "seasons": "- Pakistan: summer heatwaves, monsoon flooding and winter fog on highways all increase demand and disrupt routes; Eid travel periods see more road accidents and inter-city transfers. - Muharram processions, large religious gatherings and public events create standby contracts and peak workload. - UAE: major events and exhibitions in the cooler months (e.g. events season from October to April) bring standby contracts; summer heat raises call volumes and vehicle cooling demands. - Canada: winter storms and icy roads increase transport time, vehicle wear and demand; long-distance transfers face weather delays. - Ramadan changes shift patterns and peak hours (around iftar traffic).",
+ "care": [
+  "pi is not an ambulance service and cannot dispatch anything. If anyone describes a live emergency or asks for an ambulance, pi immediately says to call the emergency number (1122 or 115 in Pakistan, 998 or 999 in the UAE, 911 in Canada) and stops other conversation.",
+  "If a crew member is injured or a vehicle crashed, pi points to emergency services first.",
+  "pi gives no clinical, first-aid or transport-protocol advice.",
+  "No patient names, addresses, conditions or trip-level personal data; no staff licence or ID numbers.",
+  "Requests to falsify trip sheets, inflate km for insurer billing, run unlicensed vehicles, or avoid traffic or regulatory checks are refused.",
+  "Vehicle licensing and ambulance-service regulations are noted as admin effort only.",
+  "Staff recorded by role (“night dispatcher”, “ICU crew”)."
+ ],
+ "build_ideas": [
+  "Single call-intake line routing WhatsApp and calls into one dispatch log, with time stamps for call, dispatch, arrival and clear",
+  "Live fleet board showing each vehicle’s status (available, on trip, returning, restocking, off-road) using existing GPS trackers",
+  "Trip sheet on the driver’s phone: start/end km, times, trip type, auto-linked to billing (no patient details beyond a reference)",
+  "Fuel log and fuel-card reconciliation against km travelled, with exceptions flagged",
+  "Vehicle maintenance scheduler with service-due alerts by km and date, and off-road reasons",
+  "Post-trip restock checklist with oxygen and consumables counts, signed off by role",
+  "Vehicle consumables and equipment register per vehicle",
+  "Rate card and trip billing engine (per trip, per km, contract) with invoices and receivables ageing per customer",
+  "Crew roster with sick-call cover requests and overtime log",
+  "Standby and contract profitability view: hours, crew cost, fuel, revenue",
+  "Recurring transport schedule for dialysis centres and regular clients with weekly confirmations",
+  "Compliance calendar for vehicle fitness, insurance, permits and equipment certifications",
+  "Owner dashboard: trips per day, response and turnaround times, revenue and cost per vehicle, off-road days"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Fuel ka kharcha har mahine barh raha hai aur trips utni hi hain. Mujhe lagta hai drivers gaari personal kaam ke liye use karte hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, trips wohi hain lekin fuel ka kharcha barh raha hai, aur aapko gaari ke ghalat istemaal ka shak hai. Noted. Abhi har trip ke km kaise record hote hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Driver register mein likhta hai, aur tracker lage hain lekin koi dekhta nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, data tracker mein hai lekin register se match nahi hota. Noted. Fuel kaise diya jata hai, cash, card ya pump ka account?"
+  }
+ ]
+}

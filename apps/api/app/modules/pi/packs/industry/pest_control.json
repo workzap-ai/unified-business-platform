@@ -1,0 +1,258 @@
+{
+ "key": "pest_control",
+ "name": "Pest control",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "pest control",
+  "fumigation",
+  "termite",
+  "deemak",
+  "cockroach",
+  "lal beg",
+  "bed bugs",
+  "khatmal",
+  "rodents",
+  "rats",
+  "chuhe",
+  "mosquitoes",
+  "dengue spray",
+  "spray karwana hai",
+  "makafahat al-hasharat",
+  "ta’qeem",
+  "disinfection",
+  "sanitisation",
+  "treatment",
+  "follow-up visit",
+  "AMC",
+  "service report",
+  "municipality approval",
+  "licensed technician",
+  "food business audit",
+  "bird control",
+  "gel baiting"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Residential, commercial (restaurants, hotels, warehouses, hospitals, factories), agricultural or export fumigation.",
+  "Number of technicians and vehicles; teams per city.",
+  "Mix of one-off treatments vs AMCs with scheduled visits.",
+  "Main pests and services: termite pre-construction treatment, general pest, rodent, bed bug, fumigation, mosquito/dengue.",
+  "Clients who need documentation for audits (food safety, hotels, healthcare, exporters).",
+  "Product stock held and suppliers (local distributors, importers).",
+  "Country/city (licensing and product regulations differ)."
+ ],
+ "scope_rule": "pi notes operational and business problems: booking and scheduling, follow-up visits, AMC renewals, service reports for client audits, chemical stock and usage records, technician productivity, complaints and re-treatments, pricing, collections and licence tracking. pi gives no advice on which chemicals to use, dosages, dilution, re-entry times, fumigation procedures or health effects, and does not interpret pesticide regulations. It never records customers’ names, addresses or phone numbers, technicians’ personal details or licence numbers tied to individuals; it records roles and counts.",
+ "vocabulary": {
+  "deemak": "termites; khatmal — bed bugs; chuhe — rats/mice; lal beg — cockroaches",
+  "general pest control (GPC)": "routine treatment for crawling insects",
+  "fumigation": "gas treatment of a sealed space or cargo",
+  "pre-construction termite treatment": "soil treatment before building",
+  "gel baiting": "targeted cockroach bait treatment",
+  "bait stations": "rodent control boxes placed and checked regularly",
+  "follow-up visit": "second visit included in a treatment",
+  "AMC": "annual contract with scheduled visits",
+  "service report": "record of what was treated, products used, findings",
+  "re-entry time": "period before people can re-enter a treated space",
+  "audit file": "documents a food business shows inspectors"
+ },
+ "problems": [
+  {
+   "phrase": "Customers call saying the cockroaches are back a week later",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Follow-up visits included in the price are forgotten",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "AMC visits are missed and the restaurant fails its inspection",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "Clients ask for service reports for audits and we can’t find them",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Service reports are handwritten and illegible",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Chemical stock goes down faster than the jobs justify",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "We don’t record how much product each job used",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "A product we rely on was out of stock in peak season",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Supplier prices for chemicals keep increasing",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Technicians quote different prices for the same job",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Technicians do private jobs with our products",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Bookings pile up in summer and we can’t reach everyone",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Calls come into one phone and get missed",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "AMC renewals lapse because nobody reminds the client",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Restaurants pay their AMC invoices very late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Customers are scared about safety and ask lots of questions we answer differently",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Bad review after a technician arrived late and left early",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Company licence and technician certifications renewals sneak up",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "I don’t know which service lines make money — termite, GPC or fumigation",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Leads come from Google but we can’t tell which ads work",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "New technicians take months to become reliable",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Technicians’ daily route is planned on the spot",
+   "category": "orders_fulfilment",
+   "subtype": "route_planning"
+  }
+ ],
+ "questions": {
+  "mix": [
+   "Are most of your clients homes or businesses?",
+   "Which services make up most of your work?"
+  ],
+  "bookings": [
+   "How do customers book a treatment?",
+   "How quickly can you usually get a technician there?"
+  ],
+  "follow-ups": [
+   "How are follow-up visits scheduled?",
+   "How do you know they happened?"
+  ],
+  "amcs": [
+   "How many AMC clients do you have?",
+   "How do you keep track of visit dates and renewals?"
+  ],
+  "reports": [
+   "How are service reports written today?",
+   "How quickly can you send one when a client needs it for an audit?"
+  ],
+  "stock": [
+   "How are products issued to technicians?",
+   "How do you check usage against jobs done?"
+  ],
+  "complaints": [
+   "What’s the most common complaint after a treatment?",
+   "How are re-treatments handled and charged?"
+  ],
+  "pricing": [
+   "Is there a fixed price list?",
+   "Who decides the price on site?"
+  ],
+  "payments": [
+   "How long do business clients take to pay?",
+   "Which clients cause the most delays?"
+  ],
+  "compliance admin": [
+   "Which licences and certifications do you need to keep current?",
+   "Who keeps track of expiry dates?"
+  ]
+ },
+ "seasons": "In Pakistan, mosquito and dengue spraying demand spikes after monsoon (August to November); cockroach, termite and rodent activity rises in hot, humid months (April to October); pre-construction termite treatment follows the building season; demand rises before Eid and weddings. In the UAE, pest activity rises in summer; restaurant and hotel AMCs run year-round with inspections throughout; demand for treatments rises before the October–April tourist season and with move-in/move-out cycles. In Canada, insect and wasp work peaks in summer, rodent calls peak in autumn as temperatures drop, and bed bug work is year-round.",
+ "care": [
+  "pi never recommends products, dosages, dilution rates, application methods, re-entry times or safety precautions; it says the licensed technician and product label decide.",
+  "Suspected poisoning, breathing difficulty, exposure of a child or pet, fumigation gas leak → pi stops and points to emergency services or the poison centre; for pets, a vet.",
+  "Requests to use banned or unlabelled chemicals, sell diluted product as full-strength, fake service reports or audit certificates, or work without a licence are refused.",
+  "Never record customers’ names, addresses, phone numbers, or technicians’ personal details; restaurant clients are referred to by type.",
+  "Health questions from customers (e.g. “is it safe for my baby?”) → pi does not advise and notes only that the business needs consistent, approved customer guidance.",
+  "Bed bug and rodent problems may carry stigma; pi records them neutrally."
+ ],
+ "build_ideas": [
+  "WhatsApp booking flow capturing pest type, property type, area and preferred slot.",
+  "Job scheduler with automatic follow-up visit creation for treatments that include one.",
+  "Technician job app: arrival time, areas treated, products and quantities used, photos, client sign-off.",
+  "Digital service reports generated per visit and sent to the client instantly, stored for audits.",
+  "Client audit file portal or monthly PDF pack for restaurants, hotels and warehouses.",
+  "AMC register with visit calendar, missed-visit alerts and renewal reminders.",
+  "Product stock register with issue to technicians and usage vs jobs completed.",
+  "Fixed price list by service and property size; on-site deviations need approval.",
+  "Re-treatment tracker with cause and cost, to see repeat-complaint patterns.",
+  "Route planning for the day’s jobs by area.",
+  "Licence and certification expiry calendar.",
+  "Lead source tracking from Google, Facebook and referrals through to booked jobs.",
+  "Service-line profitability dashboard."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Restaurants want their service reports for inspections and our technicians write them by hand. Half the time we can’t find them."
+  },
+  {
+   "role": "pi",
+   "text": "Got it — handwritten service reports that are hard to find when a restaurant needs them for an inspection. Noted. Roughly how many business clients are on regular contracts with you?"
+  },
+  {
+   "role": "Person",
+   "text": "Around 90, mostly restaurants and a few warehouses."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, about 90 contract clients, mostly restaurants. Where do the reports go after the technician fills them in?"
+  }
+ ]
+}

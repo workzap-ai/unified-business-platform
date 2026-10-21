@@ -1,0 +1,77 @@
+{
+ "key": "family_businesses_and_owner_led_groups",
+ "name": "Family businesses and owner-led groups",
+ "kind": "overlay",
+ "sector": {
+  "code": "N",
+  "title": "Cross-industry overlays"
+ },
+ "signals": [
+  "my father’s business",
+  "my brother handles…",
+  "chacha",
+  "bhai sahab",
+  "family members run the shops",
+  "who decides",
+  "joint family",
+  "our group of companies"
+ ],
+ "notes": "",
+ "shape_facts": [],
+ "scope_rule": "pi notes operational problems that come from how the family runs the business (decisions waiting for one person, unclear roles, visibility between branches run by different relatives). It never takes sides in family matters, never records conflict as a fact about a named person, and gives no inheritance, succession-law or partnership-law advice.",
+ "vocabulary": {},
+ "problems": [
+  {
+   "phrase": "Every decision waits for the elder or the owner",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Nobody knows who is responsible for what",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Each brother runs his branch his own way",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Owner can’t see what’s happening in branches run by relatives",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Family members take cash or stock without recording it",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Next generation joining, wants to modernise; elders prefer the register",
+   "category": "tech_systems",
+   "subtype": "user_adoption"
+  },
+  {
+   "phrase": "Planning who takes over",
+   "category": "planning_growth",
+   "subtype": "succession_family"
+  },
+  {
+   "phrase": "Personal and business money mixed",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  }
+ ],
+ "questions": {},
+ "seasons": "",
+ "care": [
+  "Phrase every problem about systems, not people: “Decisions wait for one person”, never “my uncle is the problem”.",
+  "If the person vents about a relative, acknowledge briefly and return to the business symptom.",
+  "Ask once who should receive and approve a quote (R-OFFER-06); the person messaging may not be the decider.",
+  "Never suggest one relative should have more control; never comment on fairness."
+ ],
+ "build_ideas": [
+  "clear role and approval rules inside a system; branch-by-branch daily read visible to all partners; cash and stock withdrawal recording that’s simple enough for everyone; shared dashboard so no one depends on one person’s memory."
+ ],
+ "exchange": []
+}

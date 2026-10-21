@@ -1,0 +1,273 @@
+{
+ "key": "medical_equipment_and_device_distributors",
+ "name": "Medical equipment and device distributors",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "medical equipment",
+  "medical devices",
+  "surgical supplies",
+  "disposables",
+  "distributor",
+  "importer",
+  "dealer",
+  "principal",
+  "tender",
+  "hospital supply",
+  "surgical saman",
+  "machine ka engineer",
+  "installation",
+  "service contract",
+  "mu’iddat tibbiya",
+  "ajhiza tibbiya",
+  "wakeel",
+  "DRAP registration",
+  "MOHAP registration",
+  "Health Canada licence",
+  "AMC",
+  "PM visit",
+  "demo unit",
+  "consignment",
+  "lot number"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Product range: capital equipment, consumables/disposables, spare parts, reagents, rentals",
+  "Principals (foreign manufacturers) represented and whether exclusive",
+  "Customers: private hospitals, clinics, labs, government tenders, pharmacies, home users",
+  "Whether they provide installation, service engineers and annual maintenance contracts",
+  "Warehouse locations and whether stock needs temperature control",
+  "Import routes and currency of purchase",
+  "Sales team size and field engineers count"
+ ],
+ "scope_rule": "pi notes the trading and service business: stock and expiry, lot and serial tracking, import and clearance delays as logistics, tenders and quotations as sales process, receivables from hospitals, service-engineer scheduling, AMC renewals, demo and consignment stock, sales-team visibility and reporting. pi does not advise on clinical use of devices, product suitability, safety performance, recalls handling procedures, or product registration requirements with regulators, and never interprets import, customs or tender rules. pi does not record customer staff names, patient information, or any personal data; it records customer types and roles. Anything involving bribes to win tenders, under-invoicing imports, or selling unregistered products is refused.",
+ "vocabulary": {
+  "principal": "foreign manufacturer the distributor represents",
+  "tender": "formal bid process, often for government hospitals",
+  "quotation / proforma": "price offer before an order",
+  "AMC / CMC": "annual or comprehensive maintenance contract",
+  "PM visit": "scheduled preventive-maintenance visit",
+  "installation & training": "setting up equipment at the customer site",
+  "demo unit": "equipment lent for trial",
+  "consignment stock": "stock placed at a hospital, paid when used",
+  "lot / batch / serial number": "traceability identifiers",
+  "LC": "letter of credit for imports",
+  "clearing agent": "agent handling customs clearance",
+  "registration": "product approval with the health regulator (pi notes admin only)",
+  "short expiry": "stock nearing expiry, hard to sell"
+ },
+ "problems": [
+  {
+   "phrase": "Consumables expire in the warehouse while we wait for a tender",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "We can’t trace which lot went to which hospital quickly",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Consignment stock at hospitals is never reconciled",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Demo units go out and come back months later, or not at all",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Shipments stuck at port for weeks",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Principal changes prices and our quotes are already out",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Dollar moves and wipes out our margin on fixed-price tenders",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Government hospitals pay six months late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Private hospitals keep extending credit and we can’t refuse",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Cash flow is tight because we pay principals upfront",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Tender documents take the whole team a week every time",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "We miss tender deadlines because nobody tracks them",
+   "category": "sales_revenue",
+   "subtype": "target_missed"
+  },
+  {
+   "phrase": "Sales reps say they visited hospitals, I can’t verify",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Quotes are made in Word and nobody knows which version went out",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Engineers’ service visits clash and customers complain",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "AMCs expire and nobody tells the customer to renew",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Spare parts for older machines are never in stock",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Complaints about devices aren’t logged properly",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Product registration renewals sneak up on us",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Warehouse temperature logs are paper sheets",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Warehouse and accounts systems don’t match",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "I find out monthly sales by principal only at quarter-end",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Good service engineers leave for the Gulf or for principals directly",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Principal wants monthly reports in their format and it takes days",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Sales commission arguments every quarter",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  }
+ ],
+ "questions": {
+  "stock and expiry": [
+   "Which products expire on you most often?",
+   "How do you find out stock is near expiry?"
+  ],
+  "traceability": [
+   "If you needed to know where a particular lot went, how would you find it today?",
+   "How long would that take?"
+  ],
+  "consignment and demos": [
+   "How many items are out on consignment or demo right now?",
+   "How do you keep track of them?"
+  ],
+  "imports": [
+   "Where do shipments usually get held up?",
+   "How do you hear about it?"
+  ],
+  "pricing": [
+   "How do you update quotes when principal prices or the exchange rate change?",
+   "Has a fixed-price deal hurt you recently?"
+  ],
+  "receivables": [
+   "Which customer types pay slowest?",
+   "Who follows up?"
+  ],
+  "tenders": [
+   "How do you keep track of tender deadlines?",
+   "What takes the most time in preparing one?"
+  ],
+  "service": [
+   "How are engineer visits scheduled?",
+   "How do you know an AMC is about to expire?"
+  ],
+  "sales team": [
+   "How do you know which hospitals your reps visited this week?"
+  ],
+  "reporting": [
+   "What reports do principals expect from you?",
+   "How long do they take?"
+  ]
+ },
+ "seasons": "- Pakistan: government budget is announced in June and the fiscal year starts 1 July, so tenders and procurement cluster around budget release and before 30 June when unspent funds must be used. - UAE: government and hospital procurement often follows the calendar year; Arab Health exhibition (late January in Dubai) is a key period for principals, launches and orders. - Canada: hospital and provincial procurement cycles follow the 1 April fiscal year; year-end (February–March) spending rushes. - Dengue and winter respiratory seasons lift demand for certain consumables and diagnostic supplies. - Eid and Chinese New Year holidays at principals’ factories affect lead times. - Currency volatility affects import timing year-round.",
+ "care": [
+  "If a device failure is putting a patient in immediate danger, pi says to alert the hospital’s emergency team and emergency services right away, then the principal’s safety channel; pi does not troubleshoot.",
+  "pi never advises on clinical use, safety, recalls procedures or whether a device is suitable.",
+  "Regulatory registration (DRAP, MOHAP, Health Canada) is noted as admin effort; pi does not interpret requirements.",
+  "Requests involving kickbacks to hospital staff for tenders, fake documents, under-invoicing, mis-declaring goods at customs, or selling unregistered or expired products are refused.",
+  "No personal data of customer staff or patients; customers recorded as types (“private hospital”, “government teaching hospital”).",
+  "Contract and distribution-agreement disputes with principals are noted as commercial problems; no legal advice."
+ ],
+ "build_ideas": [
+  "Inventory system with lot, serial and expiry tracking by warehouse, with near-expiry alerts and “sell first” lists for the sales team",
+  "Traceability lookup: lot or serial to customer, invoice and delivery date in one search",
+  "Consignment and demo register with location, issue date, expected return and reconciliation visits",
+  "Import shipment tracker from PO to principal, LC, shipping, port, clearing and warehouse receipt",
+  "Quotation builder with current principal price, exchange rate input and version history",
+  "Tender calendar with document checklists, owners by role and deadline alerts",
+  "Receivables tracker by customer type with ageing and follow-up notes",
+  "Service management: installations, PM schedules, AMC contracts, renewal reminders, engineer calendars and job sheets on phone",
+  "Spare-parts stock linked to installed base",
+  "Field sales visit log with check-in location and visit notes",
+  "Complaint and after-sales log",
+  "Principal report pack generated from sales and stock data in the principal’s format",
+  "Warehouse temperature log with digital entries or sensor feed and exceptions list",
+  "Owner dashboard: sales by principal and customer type, margin after currency, stock value near expiry, receivables"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Government hospitals pay us after 6-8 months, and meanwhile we pay our principals in advance."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a heavy gap to carry, paying out early and collecting so late. Noted. Roughly what share of your sales go to government hospitals?"
+  },
+  {
+   "role": "Person",
+   "text": "Around half, the rest is private."
+  },
+  {
+   "role": "pi",
+   "text": "Understood, so half of the business sits on long payment cycles. Noted. Who on your team follows up these payments, and how do they keep track of what’s pending?"
+  }
+ ]
+}

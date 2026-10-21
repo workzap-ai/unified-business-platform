@@ -1,0 +1,259 @@
+{
+ "key": "landscaping_and_swimming_pool_services",
+ "name": "Landscaping and swimming-pool services",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "landscaping",
+  "gardening",
+  "maintenance",
+  "irrigation",
+  "sprinklers",
+  "drip",
+  "lawn",
+  "grass",
+  "turf",
+  "hardscape",
+  "softscape",
+  "tree trimming",
+  "palm trimming",
+  "maali",
+  "bagh",
+  "ghaas",
+  "paudhe",
+  "nursery",
+  "pool cleaning",
+  "pool maintenance",
+  "chemicals",
+  "chlorine",
+  "pH",
+  "pool pump",
+  "filter",
+  "backwash",
+  "green pool",
+  "hammam sibaha",
+  "zira’a",
+  "bustani",
+  "pool opening/closing",
+  "snow removal",
+  "AMC"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Landscaping only, pools only, or both; design-and-build vs maintenance.",
+  "Residential villas, compounds/communities, hotels, offices, government or developers.",
+  "Number of maintenance contracts and visits per week; one-off projects.",
+  "Number of gardeners/pool technicians, teams and vehicles.",
+  "Own nursery or plant suppliers; materials stocked (soil, fertiliser, chemicals, irrigation parts).",
+  "Water source and irrigation type at client sites (affects scheduling, not advice).",
+  "Country/city (climate defines the whole calendar)."
+ ],
+ "scope_rule": "pi notes operational and business problems: visit scheduling, team routing and attendance, proof of service, chemicals and materials stock, plant and material procurement, irrigation fault tickets, project quotes and variations, contract renewals, billing and collections. pi gives no agronomy or plant-treatment dosing, no fertiliser or pesticide rates, no pool chemical dosing, water-safety, electrical (pumps, lighting) or structural (pool shell, retaining walls) advice, and does not advise on water-use regulations. It never records clients’ names, villa or home addresses, gate codes, staff names, IDs or bank details; it records roles and counts.",
+ "vocabulary": {
+  "maali/ bustani": "gardener",
+  "softscape": "plants, grass, trees; hardscape — paving, walls, pergolas",
+  "irrigation / drip / sprinklers": "watering systems",
+  "turf / sod": "ready-grown grass rolls",
+  "palm trimming": "seasonal pruning of date palms",
+  "pool maintenance visit": "cleaning, chemical testing and equipment check",
+  "backwash": "cleaning a pool’s sand filter by reversing flow",
+  "green pool": "algae-affected pool that needs recovery",
+  "pool opening/closing": "start and end of the season (Canada)",
+  "AMC": "annual maintenance contract",
+  "nursery": "supplier of plants and trees",
+  "snow removal": "winter add-on service for Canadian landscapers"
+ },
+ "problems": [
+  {
+   "phrase": "Gardeners skip villas and the client says nobody came for two weeks",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "I can’t prove the pool was cleaned on the day",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Teams waste hours driving back and forth across the city",
+   "category": "orders_fulfilment",
+   "subtype": "route_planning"
+  },
+  {
+   "phrase": "Pool chemicals run out quickly and I don’t know where they go",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Fertiliser and irrigation parts ordered twice for the same job",
+   "category": "suppliers_purchasing",
+   "subtype": "buying_wrong_items"
+  },
+  {
+   "phrase": "Plants from the nursery die within weeks and the client blames us",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Irrigation breakdowns get reported late and plants die",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Client complaints about a green pool after a visit",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Quotes for landscaping projects take a week",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Projects go over budget because of extra plants and hardscape changes",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Clients add things on site and refuse to pay later",
+   "category": "cash_collections",
+   "subtype": "unbilled_variations"
+  },
+  {
+   "phrase": "Communities and developers pay 90 days late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Contracts end and we don’t know until the client stops paying",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Summer heat — staff can’t work midday and visits back up",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Winter is dead for pools and we still carry the team",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Water bills at some sites shot up and the client asks why",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Each team does the job differently",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Equipment — mowers, blowers, pumps — breaks down with no service history",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Good gardeners and pool techs leave for better offers",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Most leads come from word of mouth and we have nothing online",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "I don’t know which contracts are worth keeping",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  }
+ ],
+ "questions": {
+  "mix": [
+   "Is most of your work landscaping, pools, or both?",
+   "Roughly how many maintenance clients do you visit each week?"
+  ],
+  "visits": [
+   "How are the weekly visits planned?",
+   "How do you know a team actually went?"
+  ],
+  "routing": [
+   "How many teams and vehicles do you have?",
+   "How is the order of visits decided each day?"
+  ],
+  "stock": [
+   "How are chemicals, fertiliser and parts given to teams?",
+   "How do you track what each site uses?"
+  ],
+  "faults": [
+   "How do clients report a broken sprinkler or pump?",
+   "How fast does it usually get fixed?"
+  ],
+  "projects": [
+   "How do you put together a quote for a new garden or pool job?",
+   "Where do budgets usually go over?"
+  ],
+  "contracts": [
+   "How do you keep track of contract end dates?",
+   "What usually makes a client leave?"
+  ],
+  "payments": [
+   "How long do your clients take to pay?",
+   "Which type of client is slowest?"
+  ],
+  "seasons": [
+   "How does your work change through the year?",
+   "What do the teams do in the quiet months?"
+  ],
+  "quality": [
+   "What do clients complain about most?",
+   "How is it checked before the team leaves a site?"
+  ]
+ },
+ "seasons": "In the UAE, planting and landscaping projects favour the cooler months (October to April), when winter flower planting happens and outdoor events increase; summer brings the midday outdoor-work ban (mid-June to mid-September), heat stress on plants and irrigation, and peak pool usage and chemical demand; palm trimming and date-harvest work cluster in late spring and summer. In Pakistan, spring planting (February to April) and the monsoon planting season (July to August), winter lawn overseeding, and peak pool demand in May to August; water shortages in summer affect gardens. In Canada, landscaping runs April to October, pool openings in May–June and closings in September; winter shifts to snow removal; spring clean-ups are a peak.",
+ "care": [
+  "No fertiliser, pesticide or herbicide dosing, plant disease treatment advice, pool chemical dosing, or water-quality safety guidance; pi notes the process problem and says trained technicians and product labels decide.",
+  "Drowning, near-drowning, a child alone near a pool, electric shock from pool equipment or garden lighting, chemical exposure, heatstroke of a worker → pi stops and points to emergency services.",
+  "Never record clients’ names, home or villa addresses, gate codes, or staff names and IDs.",
+  "Requests to bill for visits not done, falsify pool test logs, dump chemicals or green waste illegally, or employ workers without valid permits are refused.",
+  "Water-use and irrigation restrictions are regulatory; pi does not advise and notes only the operational effect.",
+  "Worker heat safety in summer is respected; pi does not help schedule work that breaks outdoor-work rules."
+ ],
+ "build_ideas": [
+  "Visit schedule per client with recurring frequency, assigned team and route order for the day.",
+  "Team check-in/check-out with geotag and before/after photos as proof of service.",
+  "Pool service log on phone: tests done, chemicals added, equipment checks, with photos (no dosing guidance in the system).",
+  "Client-facing visit summary sent by WhatsApp after each visit.",
+  "Chemicals, fertiliser and parts stock register with issue per team and usage per site.",
+  "Irrigation and pump fault ticketing from clients, with response tracking.",
+  "Project quote builder with plant, material and labour rates and margin shown.",
+  "Variation log on site with client approval before work starts.",
+  "Contract register with renewal alerts and per-contract profitability.",
+  "Equipment register for mowers, blowers and pumps with service due dates.",
+  "Seasonal planning board: summer/winter scheduling and off-season service offers.",
+  "Invoicing and receivables tracker for communities and developers."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We look after around 120 villas. Clients keep saying the gardener didn’t come, and honestly I can’t prove he did."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a frustrating spot — clients say visits were missed and there’s no proof either way. Noted. How are your gardeners’ daily visits planned right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Supervisor sends a list on WhatsApp every morning."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, a WhatsApp list from the supervisor each morning. After a visit, does the gardener send anything back to show it’s done?"
+  }
+ ]
+}

@@ -1,0 +1,276 @@
+{
+ "key": "tailoring_and_alteration_shops",
+ "name": "Tailoring and alteration shops",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "tailor",
+  "tailoring",
+  "alteration",
+  "alterations",
+  "stitching",
+  "darzi",
+  "suit",
+  "sherwani",
+  "shalwar kameez",
+  "kurta",
+  "abaya",
+  "kandura",
+  "dishdasha",
+  "bridal dress",
+  "measurements",
+  "fitting",
+  "trial",
+  "ready by",
+  "hemming",
+  "silai",
+  "naap",
+  "trial kab hai",
+  "Eid se pehle",
+  "khayyat",
+  "tafsil",
+  "qiyas"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Gents, ladies or both; bespoke tailoring, alterations only, or uniforms and bulk orders.",
+  "Number of karigars (craftsmen) and whether they work in-shop, from home or on piece rate.",
+  "Volume of orders per day, and peak-time backlog before Eid and weddings.",
+  "Fabric supplied by customer, sold by the shop, or both.",
+  "Specialities: sherwanis, suits, bridal, abayas, kanduras, school or corporate uniforms.",
+  "Number of shops and whether there is a central workshop.",
+  "Booking and order tracking: slip book, register, WhatsApp, software."
+ ],
+ "scope_rule": "pi notes operational and business problems: order slips and tracking, delivery delays, measurement errors, karigar capacity and pay, fabric and accessory stock, advances and balances, and peak-season overload. pi does not advise on labour law, piece-rate legality, visa matters for workers, or tax. pi never collects customers’ names, phone numbers or body measurements tied to a person; it records roles (customer, karigar, cutter master) and describes measurement problems generally. Customer fabric loss disputes are noted as business problems only.",
+ "vocabulary": {
+  "darzi": "tailor (Urdu)",
+  "karigar": "skilled craftsman doing stitching or embroidery",
+  "cutting master": "person who takes measurements and cuts fabric",
+  "naap": "measurements (Urdu)",
+  "silai": "stitching charge",
+  "parchi / slip": "order receipt given to the customer",
+  "trial": "fitting before final delivery",
+  "piece rate": "paying karigars per garment",
+  "khayyat": "tailor (Arabic)",
+  "kandura / dishdasha": "traditional Emirati/Gulf men’s robe",
+  "tafsil": "tailoring to measure (Gulf Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Before Eid we take more orders than we can stitch and half get delayed",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Customers come on the promised date and the suit isn’t ready",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "We lose slips and then can’t find the customer’s fabric",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Wrong measurements get used and the whole suit has to be redone",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Fitting is different every time depending on which karigar did it",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Karigars leave right before Eid for better pay",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Piece-rate payments to karigars are calculated by hand and disputed",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Karigars take outside work and our orders get delayed",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Buttons, linings and threads run out at the worst time",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Fabric we sell isn’t counted and metres go missing",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Customers don’t pick up finished clothes for months",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Advance is taken but the balance never comes because the customer disappears",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Cash in the drawer doesn’t match the slips",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Customers keep calling to ask if their clothes are ready",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Uniform orders for schools pay months later",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "I don’t know if bridal and sherwani work actually makes more money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Rent in the market went up and stitching rates can’t go up as fast",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "Bad reviews about late delivery",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "No record of regular customers’ measurements, so we re-measure every time",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Embroidery outsourced to another workshop comes back late",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Everything depends on me remembering who needs what by when",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Instagram followers don’t turn into orders",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Main shop and workshop don’t know each other’s status",
+   "category": "communication_coordination",
+   "subtype": "branches_not_aligned"
+  },
+  {
+   "phrase": "Alterations for a retailer partner aren’t tracked and they dispute the bill",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "Thinking of a second branch but quality would drop",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "orders and slips": [
+   "How do you record a new order now?",
+   "How do you find it when the customer comes back?"
+  ],
+  "capacity": [
+   "How many pieces can your team finish in a normal week?",
+   "How many do you take before Eid?"
+  ],
+  "delivery": [
+   "How often are orders late?",
+   "What usually causes it?"
+  ],
+  "measurements and quality": [
+   "Who takes measurements?",
+   "How often does a garment need redoing?"
+  ],
+  "karigars": [
+   "How are karigars paid?",
+   "How do you count what each one finished?"
+  ],
+  "materials": [
+   "Which accessories run out most?",
+   "How do you know when to reorder?"
+  ],
+  "payments": [
+   "How much advance do you take?",
+   "What happens with uncollected orders?"
+  ],
+  "customers": [
+   "Do you keep regular customers’ measurements?",
+   "How do they check on their order?"
+  ],
+  "workshop": [
+   "Is stitching done in the shop or a separate workshop?",
+   "How do they share status?"
+  ]
+ },
+ "seasons": "PK: the weeks before Eid ul Fitr are the biggest crunch (order booking often closes 10–15 days before Eid), then Eid ul Adha; wedding season November to March for sherwanis, bridal and family outfits; Independence Day and school-year start (uniforms, roughly April and August); Ramadan is booking-heavy, delivery-heavy at month end. UAE: Ramadan and Eid for kanduras, abayas and jalabiyas; National Day; winter wedding season; school uniform rush in late August/September. Canada: South Asian and Arab community demand before Eid, Diwali and summer weddings; prom and graduation alterations in spring; mainstream alteration shops busy around holidays and weddings.",
+ "care": [
+  "Body measurements are personal; pi never asks for or stores a specific customer’s measurements or photos.",
+  "Labour issues with karigars (pay rates, contracts, visas) are noted as business problems, no legal advice.",
+  "Child labour concerns: pi does not help with anything involving under-age workers and does not facilitate it.",
+  "Lost or damaged customer fabric disputes noted without legal opinion.",
+  "pi does not help copy registered designs or produce counterfeit branded garments.",
+  "Workshop fire or electrical hazards happening now: emergency services first.",
+  "Staff recorded by role only."
+ ],
+ "build_ideas": [
+  "Digital order slip on phone or tablet: order number, garment type, promised date, advance, with a copy sent to the customer on WhatsApp.",
+  "Order status board: received, cutting, stitching, embroidery, trial, ready, collected.",
+  "Capacity planner that warns when booked orders for a date exceed what the team can make.",
+  "Automatic “ready for collection” WhatsApp messages and reminders for uncollected orders.",
+  "Measurement profile stored per customer ID (not name) for repeat orders, with consent.",
+  "Karigar piece-rate log: pieces assigned and completed, with weekly payout calculation.",
+  "Rework log with reasons (measurement, cutting, stitching) to spot patterns.",
+  "Accessory and fabric stock tracker with reorder alerts.",
+  "Daily cash and slip reconciliation.",
+  "Outsourced embroidery tracker with send and return dates.",
+  "Bulk/uniform order module with invoices and receivable ageing.",
+  "Shop-to-workshop status sharing."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Eid se pehle 400 suit book kar liye, aadhe abhi tak cut bhi nahi hue."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — Eid ke liye 400 orders hain aur kaafi abhi cutting tak nahi pohanche. Aap ki team normal hafte mein kitne suit tayyar kar leti hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Shayad 120, 130."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, capacity se zyada orders le liye gaye. Booking band karne ka faisla kaun karta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Main hi, lekin customer naraz ho jate hain to mana nahi kar pata."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Jo orders late hon ge, un customers ko abhi tak bataya gaya hai?"
+  }
+ ]
+}

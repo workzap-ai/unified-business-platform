@@ -1,0 +1,264 @@
+{
+ "key": "scrap_recycling_and_waste_management",
+ "name": "Scrap, recycling and waste management",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "scrap",
+  "kabaar",
+  "kabariya",
+  "raddi",
+  "scrap yard",
+  "kabaar khana",
+  "metal scrap",
+  "copper",
+  "aluminium",
+  "iron",
+  "steel",
+  "plastic",
+  "PET",
+  "cardboard",
+  "OCC",
+  "e-waste",
+  "recycling",
+  "waste collection",
+  "skip",
+  "bin",
+  "garbage truck",
+  "landfill",
+  "kachra",
+  "weighbridge",
+  "kanta",
+  "tol",
+  "bale",
+  "baler",
+  "shredder",
+  "khurda",
+  "nifayat",
+  "i’adat tadweer",
+  "ship-breaking",
+  "Gadani"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "What they handle: ferrous/non-ferrous metal, paper/cardboard, plastics, e-waste, construction waste, general/municipal or commercial waste.",
+  "Whether they buy scrap (from kabariyas, factories, demolition), sell to mills/exporters, collect waste for a fee, or process/recycle.",
+  "Yard size, equipment (weighbridge, balers, shredders, trucks, skips) and number of sites.",
+  "Number of collection vehicles and routes, and client types (households, commercial, factories, municipalities).",
+  "Cash vs credit in buying and selling.",
+  "Staff: buyers, weighers, sorters, drivers, labour.",
+  "Systems: paper kanta slips, Excel, accounting software, none."
+ ],
+ "scope_rule": "pi notes operational and business problems: weighing and buying records, cash handling, stock and grades in the yard, sorting yield, collection routes and schedules, client billing, price swings, staff honesty, equipment downtime and reporting. It does not advise on environmental permits, hazardous waste handling, e-waste or chemical safety, emissions, landfill regulation, export rules for scrap, or health effects. It never helps buy stolen metal (cables, manhole covers, utility property) without proper records, dump illegally, burn waste, mislabel hazardous waste, or avoid environmental rules. It records roles only, never sellers’ or staff names, CNICs or vehicle numbers.",
+ "vocabulary": {
+  "kabaar / kabaariya": "scrap / small scrap collector",
+  "raddi": "waste paper",
+  "kanta / tol": "weighbridge or scale / weighing",
+  "ferrous / non-ferrous": "iron and steel / copper, aluminium, brass etc.",
+  "grade": "quality class of scrap that sets its price",
+  "bale": "compressed block of cardboard, plastic or metal",
+  "OCC": "old corrugated cardboard",
+  "yield": "usable material recovered after sorting",
+  "skip": "large waste container placed at a site",
+  "tipping fee": "charge to dump at a landfill or facility",
+  "khurda": "scrap (Arabic)",
+  "nifayat": "waste (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Weigher and seller could be adjusting the kanta together",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Cash paid out for scrap doesn’t match the weight in the yard",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Yard stock by grade is a guess",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Copper and aluminium go missing from the yard",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "We buy at one rate and the mill price drops before we sell",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "I don’t know my real margin per grade after sorting loss",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Sorting is inconsistent, so mills downgrade our loads",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Mills deduct for moisture or impurities and we can’t argue",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Mills and exporters pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We pay kabariyas cash every day and cash flow is tight",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Collection trucks miss pickups and commercial clients complain",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Routes are planned by drivers’ habit, so fuel is wasted",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Skips sit full at sites and we don’t know until the client calls",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Billing commercial clients for pickups and skips is manual and late",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Baler or shredder breaks and everything stops",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Labour comes and goes; no one is trained on grades",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Permit and licence renewals are a scramble every year",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Clients ask for collection and recycling records and we don’t have them",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Tipping fees keep going up",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Too much material stockpiled waiting for a better price",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Few corporate contracts; we live on walk-in scrap",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "Branch yards report numbers late and differently",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "We want to add plastics recycling but don’t know the volumes we’d get",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  }
+ ],
+ "questions": {
+  "weighing and buying": [
+   "How is scrap weighed and recorded when you buy it?",
+   "Who checks the slips against the cash paid?",
+   "How often do numbers not add up?"
+  ],
+  "yard stock": [
+   "How do you know how much of each grade is in the yard?",
+   "When was it last measured?"
+  ],
+  "prices": [
+   "How do you set buying rates each day?",
+   "How do you handle it when the selling price drops?"
+  ],
+  "selling": [
+   "Who do you sell to, and how are deductions decided?",
+   "How long do buyers take to pay?"
+  ],
+  "collection (if applicable)": [
+   "How are pickup routes and schedules planned?",
+   "How do you know when a skip is full?"
+  ],
+  "billing": [
+   "How are commercial clients billed?",
+   "What gets missed?"
+  ],
+  "equipment": [
+   "Which machine stopping hurts most?",
+   "How is maintenance tracked?"
+  ],
+  "records": [
+   "What records do clients or authorities ask you for?",
+   "How long does it take to prepare them?"
+  ]
+ },
+ "seasons": "Scrap supply in Pakistan rises around Eid ul Adha (packaging, hides handled separately) and after wedding season and house moves; raddi rises at school year-end (old books) and after Ramadan. Construction cycles drive metal and debris; monsoon (July–August) waterlogs yards, raises moisture deductions and slows collection. International metal and paper prices swing with global markets and steel mill demand, often more than local seasons. In the UAE, construction activity peaks in cooler months; summer heat affects outdoor labour hours; Ramadan and Eid shift collection schedules. In Canada, spring clean-up and construction season (April– October) raise volumes; winter slows yards and collection; municipal contract cycles matter.",
+ "care": [
+  "Possibly stolen metal (power cables, telecom wire, manhole covers, railway parts, utility property): pi does not help buy, process or move it, and does not suggest ways to avoid checks.",
+  "Hazardous materials (batteries, e-waste, chemicals, medical waste, asbestos, oil drums): safety- and environment-regulated; pi does not advise on handling or disposal.",
+  "Fires in yards, explosions, chemical exposure, crush injuries from balers or shredders: pi stops and points to emergency services.",
+  "Illegal dumping, open burning or mislabelling waste: pi declines.",
+  "Environmental permits, export rules for scrap, emissions: out of scope; suggest the relevant authority or a consultant.",
+  "Sellers’ personal details, CNICs and vehicle numbers: never stored by pi.",
+  "Suspected staff collusion at the scale: pi notes it neutrally; no covert surveillance planning."
+ ],
+ "build_ideas": [
+  "Digital weighing slip: weight, grade, rate, photo of the load and time stamp, printed and logged, matched to cash paid.",
+  "Daily cash reconciliation of scrap purchases vs weighed intake.",
+  "Yard stock by grade updated from purchases, sorting output and sales.",
+  "Sorting yield tracker: input weight vs output by grade per batch.",
+  "Daily rate board for buying, with history to compare against selling prices.",
+  "Sales log per buyer with deductions recorded and photos, plus receivables ageing.",
+  "Collection route planner and schedule with driver app to confirm each pickup with photo.",
+  "Skip register: location, client, date placed, expected collection, client “full” request via WhatsApp.",
+  "Automatic monthly invoices for commercial clients from logged pickups.",
+  "Collection and recycling certificates/records per client generated from the logs.",
+  "Equipment maintenance log for balers, shredders, weighbridge calibration dates and trucks.",
+  "Owner dashboard across yards: intake, stock, sales, cash, margins by grade."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mera scrap yard hai Shershah mein. Mujhe shak hai ke kanta pe kuch gadbad hoti hai, maal kam nikalta hai jab bechte hain."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh fikar wali baat hai — khareed ke waqt jitna wazan likha, bechte waqt utna nahi nikalta. Noted. Khareed ke waqt wazan kaun likhta hai, aur kahan likha jata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Kanta wala parchi pe likhta hai, phir shaam ko register mein."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — parchi aur shaam ko register. Noted. Kya kabhi kisi aur ne us parchi ko cash ke saath milaya hai?"
+  }
+ ]
+}

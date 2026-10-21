@@ -1,0 +1,261 @@
+{
+ "key": "property_management_and_rentals",
+ "name": "Property management and rentals",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "tenant",
+  "landlord",
+  "rent",
+  "cheques",
+  "PDCs",
+  "Ejari",
+  "Tawtheeq",
+  "lease renewal",
+  "move-in",
+  "move-out",
+  "deposit",
+  "maintenance request",
+  "vacancy",
+  "kiraya",
+  "kirayedar",
+  "malik-e-makaan",
+  "agreement",
+  "pagri",
+  "holiday home",
+  "short-let",
+  "Airbnb",
+  "unit turnover",
+  "arrears",
+  "N4 / notice",
+  "rent roll"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of units under management and number of buildings or landlords.",
+  "Long-term rentals, short-term/holiday homes, or both.",
+  "Own portfolio vs managing for third-party owners on a fee.",
+  "How rent is collected: cash, cheques/post-dated cheques, bank transfer, card, online.",
+  "In-house maintenance team or outsourced contractors.",
+  "Country/city (tenancy registration, rent rules and notice regimes differ).",
+  "Software in use, if any (Excel, Yardi, Buildium, a local system, a booking channel manager)."
+ ],
+ "scope_rule": "pi notes operational problems: rent collection, arrears tracking, vacancy and turnover, maintenance requests, landlord reporting, short-let operations and staff coordination. pi does not give legal advice on leases, evictions, deposits, rent increases, tenancy disputes or rental registration rules, and does not tell anyone how to remove or pressure a tenant. It does not give safety-engineering advice on gas, electrical, fire or structural issues in units. It never records tenant or landlord names, phone numbers, IDs, cheque numbers or bank details; it notes counts and roles (“six tenants in arrears”).",
+ "vocabulary": {
+  "kiraya": "rent; kirayedar — tenant; malik-e-makaan — landlord",
+  "pagri": "key money paid for long-term tenancy rights (Pakistan)",
+  "PDCs": "post-dated cheques, common for rent in the UAE",
+  "Ejari": "Dubai tenancy contract registration; Tawtheeq — Abu Dhabi equivalent",
+  "RERA rental index": "Dubai reference for permitted rent increases",
+  "rent roll": "list of units with rents and payment status",
+  "arrears": "rent overdue",
+  "turnover / make-ready": "preparing a unit between tenants",
+  "holiday home / short-let": "nightly rentals through Airbnb, Booking.com and similar",
+  "N4": "Ontario notice for non-payment (process noted, never advised on)",
+  "move-in / move-out inspection": "condition check of a unit"
+ },
+ "problems": [
+  {
+   "phrase": "I don’t have one list showing who’s paid this month",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Cheques bounce and we find out a week later",
+   "category": "cash_collections",
+   "subtype": "bounced_cheques"
+  },
+  {
+   "phrase": "Arrears keep building and nobody chases until it’s three months",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Caretakers collect rent in cash and some doesn’t reach us",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Owners call every week asking where their money is",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Owner statements take my accountant three days each month",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Units sit empty for weeks between tenants",
+   "category": "sales_revenue",
+   "subtype": "vacancy_high"
+  },
+  {
+   "phrase": "Make-ready after move-out takes too long — painter, cleaner, AC, all separately",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Maintenance requests come by WhatsApp, calls, everywhere, and get lost",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "The same AC complaint comes back three times",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Contractors bill us for jobs I can’t verify were done",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Maintenance costs are eating the owner’s return and I can’t show why",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Lease renewals sneak up on us",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Deposit refunds at move-out cause fights every time",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Holiday-home calendar double-booked between two platforms",
+   "category": "orders_fulfilment",
+   "subtype": "double_booking"
+  },
+  {
+   "phrase": "Guest check-in is chaos — keys, codes, cleaners not ready",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Reviews on Airbnb dropped because of cleaning",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Utility bills for vacant units are piling up",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "I can’t compare which building is performing",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Tenants complain no one replies after hours",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Move-in and move-out inspections have no photos, so it’s my word against theirs",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Taking on 50 more units and my team is already drowning",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Everything is in Excel and one person knows how it works",
+   "category": "tech_systems",
+   "subtype": "excel_dependency"
+  }
+ ],
+ "questions": {
+  "portfolio": [
+   "How many units are you managing at the moment?",
+   "Are they your own, or do you manage for other owners?"
+  ],
+  "rent collection": [
+   "How do most tenants pay — cash, cheques or transfer?",
+   "How do you know who hasn’t paid this month?"
+  ],
+  "arrears": [
+   "Roughly how many units are behind right now?",
+   "At what point does someone start following up?"
+  ],
+  "owners": [
+   "How do your landlord clients get their statements?",
+   "What do they complain about most?"
+  ],
+  "maintenance": [
+   "How do tenants report a problem?",
+   "Who decides which contractor goes, and how do you check it was fixed?"
+  ],
+  "turnover": [
+   "How long does a unit usually sit empty between tenants?",
+   "What step takes the longest?"
+  ],
+  "short-lets": [
+   "Which platforms are you listed on?",
+   "How do you keep the calendars in sync?"
+  ],
+  "costs": [
+   "Which costs are hurting you most — maintenance, utilities, vacancies?",
+   "Can you see them per building?"
+  ],
+  "renewals and deposits": [
+   "How do you keep track of lease end dates?",
+   "What usually causes a deposit argument?"
+  ],
+  "systems": [
+   "Where is the rent roll kept today?",
+   "Who else can update it?"
+  ]
+ },
+ "seasons": "In the UAE, moves and renewals bunch in August–September (school year) and January; summer brings some vacancy as families leave; holiday homes peak October to April and around New Year and Eid holidays. In Pakistan, moves cluster around the school year (spring admissions, March–April) and after Eid; summer heat drives AC repair requests; monsoon brings leak and seepage complaints. In Canada, rental turnover is heaviest in summer, July 1 is the big moving day in Quebec, and winter brings heating and frozen-pipe callouts.",
+ "care": [
+  "Eviction, rent increase, deposit and lease-term questions are legal; pi notes the operational problem and suggests a lawyer or the rental dispute authority for the substance.",
+  "Requests to lock tenants out, cut utilities, enter units without notice or pressure tenants are refused.",
+  "Never record tenant or landlord names, phone numbers, IDs, cheque numbers or bank details; counts and roles only.",
+  "Requests for help with unregistered rentals, cash rent to avoid tax, or illegal subletting/partitioning are refused.",
+  "Gas smell, fire, electrical sparking, flooding or someone trapped/injured in a unit → pi stops and points to emergency services, then notes the response-process problem afterwards if the person wants.",
+  "Short-let guest cameras: pi does not help set up covert recording of guests.",
+  "Tenant complaints are noted as patterns, not individuals."
+ ],
+ "build_ideas": [
+  "Rent roll on the phone: every unit, rent due, paid/unpaid, payment method, with an arrears ageing list.",
+  "Cheque register for PDCs with deposit dates, bounce flags and reminders.",
+  "Automated WhatsApp rent reminders and receipts to tenants (no ID data stored in chat).",
+  "Cash collection log for caretakers with handover confirmation to the office.",
+  "Owner statements generated monthly per property: rent in, expenses out, net payable.",
+  "Maintenance ticketing: tenant reports via a WhatsApp flow with photos, ticket assigned, contractor closes with photo proof, repeat- fault flag.",
+  "Contractor job and invoice matching so bills are paid only against closed tickets.",
+  "Make-ready checklist per unit after move-out with each trade’s task and target days.",
+  "Lease and renewal calendar with alerts at chosen lead times.",
+  "Move-in/move-out inspection app with dated photos per room.",
+  "Short-let calendar sync across channels with cleaning and check-in task assignment.",
+  "Portfolio dashboard: occupancy, arrears, maintenance cost per unit, by building and by owner."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our biggest issue is cheques. Tenants give PDCs, they bounce, and we only find out when the bank statement comes."
+  },
+  {
+   "role": "pi",
+   "text": "Understood — bounced rent cheques are discovered late, only from the bank statement. Noted. Roughly how many units are you collecting cheques for?"
+  },
+  {
+   "role": "Person",
+   "text": "About 180 units across four buildings."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, about 180 units in four buildings. Who keeps track of which cheque is due to be deposited on which date?"
+  }
+ ]
+}

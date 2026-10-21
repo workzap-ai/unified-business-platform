@@ -1,0 +1,274 @@
+{
+ "key": "sports_clubs_academies_and_turf_court_rentals",
+ "name": "Sports clubs, academies and turf/court rentals",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "turf",
+  "futsal",
+  "cricket ground",
+  "indoor cricket",
+  "padel",
+  "padel court",
+  "tennis court",
+  "badminton court",
+  "squash",
+  "football academy",
+  "cricket academy",
+  "swimming academy",
+  "coaching",
+  "slot booking",
+  "hourly booking",
+  "membership",
+  "tournament",
+  "league",
+  "turf booking",
+  "ground ka slot",
+  "raat ka match",
+  "malaab",
+  "nadi riyadi",
+  "akadimiyya"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Facility type: turfs, padel or tennis courts, indoor nets, pools, multi-sport club, or coaching-only academy using others’ facilities.",
+  "Number of courts/grounds and peak hours (night slots under floodlights are often the main money).",
+  "Revenue mix: hourly rentals, academy fees, memberships, tournaments, café or pro shop.",
+  "Owned land, leased plot, rooftop, or rented school/club facility.",
+  "Number of coaches and whether they are salaried, per-session or revenue-share.",
+  "Age groups trained (children, juniors, adults) and number of students.",
+  "Booking channels: WhatsApp, phone, Instagram, booking apps."
+ ],
+ "scope_rule": "pi notes operational and business problems: slot double-booking, no-shows, fee collection, coach scheduling and pay, floodlight and turf maintenance, tournament admin and student retention. pi does not advise on sports injuries or medical matters, training loads, safeguarding law, pool or equipment safety, land-use permissions or tax; it records the business friction only. pi never collects children’s names, ages, photos, medical information or parents’ contact details, and records roles (parent, student, coach). Injuries on site are emergencies first.",
+ "vocabulary": {
+  "slot": "one booked hour (or 90 minutes) on a court or turf",
+  "futsal / 5-a-side": "small-sided football on artificial turf",
+  "padel": "racket sport on enclosed courts, booming in UAE and PK cities",
+  "floodlights": "lights for night play, major electricity cost",
+  "academy fee": "monthly fee for coaching programmes",
+  "batch": "a coaching group at a fixed time",
+  "no-show": "booked slot not used and often not paid",
+  "tournament entry": "fee for teams to enter a league",
+  "malaab": "playground or pitch (Arabic)",
+  "nadi": "club (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Two teams turn up for the same slot because bookings are on WhatsApp",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "People book late-night slots and don’t show, and I’ve turned others away",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Advance payment for slots is collected by the ground boy and sometimes never reaches me",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Academy parents pay late every month and I’m chasing them on WhatsApp",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "I don’t know which students have actually paid this month",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Coaches claim more sessions than they actually ran",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Coaches leave and take the students with them",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Floodlight electricity bill is huge and I don’t know if late slots even cover it",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Turf is worn out and the replacement is a big cost I didn’t plan for",
+   "category": "planning_growth",
+   "subtype": "budgeting_process"
+  },
+  {
+   "phrase": "Nets, balls and equipment get stolen or damaged",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Generator or lights fail mid-match and we have to give refunds",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Daytime slots are empty, nights are full",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Summer heat kills bookings for months",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Tournament registrations, fixtures and results are all done on paper and WhatsApp groups",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Students drop out after two or three months",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Parents complain they don’t know how their child is progressing",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "We post on Instagram sometimes but don’t know if it brings bookings",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "New padel courts keep opening nearby and stealing customers",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Café and pro shop sales aren’t recorded properly",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Staff on the night shift don’t lock up properly or switch off lights",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Discounts for regular groups are given without my approval",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Corporate leagues pay invoices months later",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Booking app commission is high but we depend on it",
+   "category": "marketing_leads",
+   "subtype": "marketplace_visibility"
+  },
+  {
+   "phrase": "I want to open a second location but can’t even see the first one’s numbers clearly",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Lease renewal on the plot is coming and I don’t have documents in order",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  }
+ ],
+ "questions": {
+  "bookings": [
+   "How do people book a slot now?",
+   "Who keeps the schedule?",
+   "How often do clashes or no-shows happen?"
+  ],
+  "slot payments": [
+   "Do you take an advance for slots?",
+   "Who collects it and how does it reach you?"
+  ],
+  "academy fees": [
+   "How many students are enrolled?",
+   "How do you track who’s paid?",
+   "How long do late payers usually take?"
+  ],
+  "coaches": [
+   "How are coaches paid?",
+   "How do you know how many sessions they ran?"
+  ],
+  "utilisation": [
+   "Which hours are always empty?",
+   "What have you tried to fill them?"
+  ],
+  "facility upkeep": [
+   "What breaks or wears out most?",
+   "Do you know when the next big replacement is due?"
+  ],
+  "retention": [
+   "When do students usually drop out?",
+   "What reasons do parents give?"
+  ],
+  "tournaments": [
+   "How do you run registrations and fixtures?",
+   "What goes wrong most?"
+  ],
+  "competition and growth": [
+   "What’s changed since nearby courts opened?",
+   "Are you planning another location?"
+  ]
+ },
+ "seasons": "PK: night slots dominate in summer due to heat; Ramadan brings huge late-night demand after taraweeh (futsal and cricket night tournaments); winter afternoons pick up; summer vacations fill academies; cricket season around PSL and international series lifts interest; monsoon rain cancels outdoor play. UAE: outdoor season October to April; summer moves demand to indoor/air- conditioned courts and evenings; Ramadan late-night leagues; school terms drive academy enrolments (September and January intakes); padel demand strong year-round indoors. Canada: outdoor turf and courts May to September; indoor domes and courts in winter; registration cycles for fall and spring seasons; summer camps.",
+ "care": [
+  "Injuries, collapses, heat stroke, drowning in academy pools: pi stops and points to emergency services immediately.",
+  "No advice on training, injury recovery, nutrition, heat safety or medical fitness.",
+  "Children’s personal data (names, ages, photos, medical notes) is never collected; “a junior student” or “a parent” is enough.",
+  "Any concern about a coach’s conduct with a child: pi does not investigate; it says this needs to go to the appropriate authorities and does not record identifying details.",
+  "Betting on matches or tournaments: pi does not help with anything related to it.",
+  "Land, lease and permit questions are noted only.",
+  "Coaches and staff recorded by role."
+ ],
+ "build_ideas": [
+  "Slot booking calendar per court/turf with WhatsApp booking flow and advance payment link.",
+  "No-show and late-cancel tracker per group, with a simple deposit rule set by the owner.",
+  "Academy register: batches, students (by ID number only), monthly fee status, automated reminders to parents.",
+  "Coach session log with check-in per batch and monthly payout calculation.",
+  "Floodlight and utility log per slot, showing cost against slot revenue.",
+  "Maintenance and asset tracker: turf, nets, lights, generator, with replacement dates.",
+  "Tournament module: team registration, entry fees, fixtures, results posted to WhatsApp.",
+  "Progress note template for coaches to share with parents monthly.",
+  "Utilisation heatmap by hour and day.",
+  "Café/pro shop simple POS with daily summary.",
+  "Closing checklist for night staff with time-stamped confirmation."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Ramzan mein raat 11 se 3 baje tak sab slots full hote hain lekin aadhe log aate hi nahi aur paise bhi nahi dete."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — Ramzan ki raat ke slots book hote hain lekin kai teams aati nahi aur payment bhi nahi hoti. Booking ke waqt koi advance liya jata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Nahi, bas WhatsApp pe naam likh lete hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, bina advance ke slot block hota hai. Jab team nahi aati, kya woh slot kisi aur ko de pate hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Kabhi kabhi, agar koi wahan khara ho."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Aap ke paas kitne turf ya courts hain?"
+  }
+ ]
+}

@@ -1,0 +1,265 @@
+{
+ "key": "beverage_juice_and_water_bottling_plants",
+ "name": "Beverage, juice and water bottling plants",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "bottling plant",
+  "mineral water",
+  "drinking water",
+  "RO plant",
+  "19-litre bottles",
+  "gallon",
+  "bottle wapsi",
+  "PET bottles",
+  "preforms",
+  "blowing machine",
+  "filling line",
+  "carbonated drinks",
+  "juice plant",
+  "nectar",
+  "concentrate",
+  "cans",
+  "maa’ ( ءﺎﻣ water delivery, coolers/dispensers, route sales, crates, empties, deposit, sharbat"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Products: bottled water (small PET), 19-litre/5-gallon home and office delivery, juices, carbonated soft drinks, energy drinks, syrups",
+  "Own plant vs co-packing for others or using a co-packer",
+  "Line capacity and number of shifts",
+  "Route sales with own trucks vs distributors vs supermarket direct",
+  "Returnable bottle/crate system and deposits",
+  "Dispenser/cooler placement with customers",
+  "Customer mix: homes, offices, shops, hotels, events, government/institutions"
+ ],
+ "scope_rule": "pi notes operational problems: production planning, preforms and caps supply, returnable bottle tracking, route sales and cash collection, dispensers, line downtime, QC records and reporting. It does not advise on water-quality standards, testing parameters, treatment chemicals, food-authority licensing, or tax. It does not record names, addresses or numbers of household or office customers, drivers’ details, or payment details.",
+ "vocabulary": {
+  "preform": "small plastic tube blown into a PET bottle",
+  "blowing": "forming bottles from preforms",
+  "filling line": "machine filling and capping bottles",
+  "19-litre/5-gallon": "large returnable water bottle",
+  "empties": "returned bottles or crates",
+  "deposit": "refundable charge for a returnable bottle",
+  "route sales/van sales": "driver sells and collects from a truck",
+  "coupon book": "prepaid bottles used by home customers",
+  "RO": "reverse osmosis treatment",
+  "concentrate": "base for juice or soft drink",
+  "SKU": "each size/flavour variant"
+ },
+ "problems": [
+  {
+   "phrase": "Thousands of 19-litre bottles are out there and we don’t know who has them",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Customers stop ordering and keep our bottles and dispensers",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Drivers sell bottles for cash and don’t hand it all in",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Coupon books — drivers mark coupons used that weren’t",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Route sales cash comes in days late",
+   "category": "cash_collections",
+   "subtype": "deposit_delays"
+  },
+  {
+   "phrase": "Office customers pay monthly invoices late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Preforms and caps run out and the line stops",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Preform prices follow oil and dollar and I can’t pass it on",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Electricity costs are the biggest bill after materials",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Line breakdowns every week, no maintenance schedule",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Summer demand outruns capacity",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Winter we have idle shifts",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Orders for home delivery come on WhatsApp and calls, some get missed",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Routes are planned by the drivers themselves",
+   "category": "orders_fulfilment",
+   "subtype": "rider_management"
+  },
+  {
+   "phrase": "Diesel and van repairs are rising",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "QC records are filled at the end of the week, not each batch",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Customers complain of taste or particles in some bottles",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Damaged bottles and leakage during transport",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Supermarket returns of near-expiry juices",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Dispensers placed with customers aren’t tracked",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "No app or website for customers to order",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "Licence and lab test renewals keep me on edge",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "I don’t know profit per route",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Drivers quit and take customers with them to a competitor",
+   "category": "people_staff",
+   "subtype": "turnover"
+  }
+ ],
+ "questions": {
+  "bottles": [
+   "Roughly how many returnable bottles do you have in the market?",
+   "How do you track who has them?"
+  ],
+  "drivers and cash": [
+   "How do drivers settle cash at the end of a route?",
+   "Where do the gaps appear?"
+  ],
+  "coupons": [
+   "Do you use coupon books?",
+   "How are they checked?"
+  ],
+  "orders": [
+   "How do home and office customers place orders?",
+   "What gets missed?"
+  ],
+  "routes": [
+   "Who plans the routes?",
+   "How many vans run daily?"
+  ],
+  "production": [
+   "What stops the line most often?",
+   "Is there a maintenance schedule?"
+  ],
+  "materials": [
+   "Which input runs short most — preforms, caps, labels?"
+  ],
+  "capacity": [
+   "How do you cope with summer peak?"
+  ],
+  "quality": [
+   "How are QC checks recorded?"
+  ],
+  "collections": [
+   "How long do office and shop customers take to pay?"
+  ],
+  "reporting": [
+   "Can you see profit by route or product?"
+  ]
+ },
+ "seasons": "- PK: summer (April–September) is peak for water, juices and carbonated drinks; Ramadan raises sharbat, juices and iftar demand; winter dip for cold drinks; monsoon can disrupt routes; heatwaves create sudden spikes. - UAE: long hot season April–October drives water and home-delivery demand; Ramadan; events and outdoor season in winter for small bottles; construction-site demand year-round. - Canada: summer peak for bottled water and drinks; winter dip; long weekends and festivals.",
+ "care": [
+  "Plant injuries, chemical exposure (treatment chemicals, CO2), electrical faults, forklift or van accidents: pi points to emergency services immediately.",
+  "Water quality, treatment chemical dosing and test parameters: out of scope; pi notes only the record-keeping burden.",
+  "Contamination reports or recalls: pi notes the traceability problem and points to the authority/qualified advisers.",
+  "Customer addresses and phone numbers for home delivery: pi does not collect them.",
+  "Driver theft suspicion: noted by pattern, no covert tracking of personal phones.",
+  "Requests to refill branded bottles of competitors, fake test reports or skip licensing: pi declines."
+ ],
+ "build_ideas": [
+  "Returnable bottle and dispenser register by customer account (account number only), with delivered, returned and balance counts",
+  "Driver route app: stops, deliveries, empties collected, cash collected, coupon scans",
+  "Digital coupon/prepaid balance in place of paper coupon books",
+  "End-of-route settlement screen with cash vs expected and variance by driver label",
+  "Customer ordering via WhatsApp flow or simple web page with delivery day slots",
+  "Subscription schedules for home and office customers, with pause/stop and bottle return reminders",
+  "Route planning sheet by area and day",
+  "Production plan by SKU tied to orders and stock",
+  "Preform, cap, label stock with reorder points",
+  "Line maintenance schedule and downtime log",
+  "Batch QC log on a tablet with time stamps",
+  "Office/shop receivables ledger with statements",
+  "Route profitability report (sales, diesel, driver cost, breakages)"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We do 19-litre water delivery in Sharjah and Ajman. Bottles just disappear."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — 19-litre bottles going missing in the market. Do you know roughly how many bottles you’ve put out overall?"
+  },
+  {
+   "role": "Person",
+   "text": "Maybe 30,000, no idea how many are actually with customers."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted. When a driver delivers, is the empty bottle collected and recorded anywhere?"
+  },
+  {
+   "role": "Person",
+   "text": "Supposed to be, on paper."
+  },
+  {
+   "role": "pi",
+   "text": "Thanks, noted that it’s paper-based. Do customers pay a deposit for the bottle today?"
+  }
+ ]
+}

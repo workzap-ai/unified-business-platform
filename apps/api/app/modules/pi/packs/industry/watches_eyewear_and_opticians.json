@@ -1,0 +1,273 @@
+{
+ "key": "watches_eyewear_and_opticians",
+ "name": "Watches, eyewear and opticians",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "watch shop",
+  "optician",
+  "optical store",
+  "chashma",
+  "ainak",
+  "ainak wala",
+  "spectacles",
+  "frames",
+  "lenses",
+  "contact lenses",
+  "sunglasses",
+  "eye test",
+  "refraction",
+  "prescription",
+  "nazar ka chashma",
+  "varifocal / progressive",
+  "anti-glare",
+  "blue cut",
+  "watch repair",
+  "battery change",
+  "strap",
+  "authorised dealer",
+  "grey market",
+  "saa’a",
+  "nadharat",
+  "lab",
+  "fitting"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Mix: watches only, eyewear only, or both; luxury, mid-range or budget.",
+  "Whether the shop has an optometrist or does eye tests in-house, or only fills outside prescriptions.",
+  "In-house edging/fitting lab vs sending jobs to an outside lab.",
+  "Authorised dealer/brand agreements vs multi-brand sourcing.",
+  "Branch count and whether stock is held centrally.",
+  "Insurance billing (UAE and Canada) or cash-only.",
+  "Repair and service desk volume."
+ ],
+ "scope_rule": "pi notes business problems such as order tracking for lenses, lab turnaround, frame and SKU stock, repairs, insurance claim effort, staff, and follow-up for collection and re-tests. pi does not interpret prescriptions, advise on eye health, recommend lens types for a condition, or comment on whether someone needs a test. It does not advise on the authenticity of watches or on parallel-import legality. pi never records patients’ prescriptions, test results, insurance member numbers or customer identities. It notes only that, for example, “prescriptions are stored on paper and get lost”.",
+ "vocabulary": {
+  "Rx / prescription": "the lens power written after an eye test",
+  "refraction": "the eye test to measure lens power",
+  "single vision / bifocal / progressive (varifocal)": "lens types",
+  "edging / fitting": "cutting lenses to fit a frame",
+  "lab": "where lenses are made or cut",
+  "job card / envelope": "order slip carrying the frame and lens details",
+  "blank": "uncut lens stock",
+  "AD (authorised dealer)": "officially appointed seller of a watch brand",
+  "grey market": "goods sourced outside official distribution",
+  "movement / calibre": "the internal mechanism of a watch",
+  "service": "periodic overhaul of a mechanical watch",
+  "ainak / chashma": "spectacles (Urdu)",
+  "nadharat": "glasses (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Customer comes to collect glasses and the lab hasn’t sent them",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Lens orders go to the lab with the wrong power or wrong fitting height",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "We remake a lot of lenses at our cost",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Thousands of frame SKUs, no idea which colours and sizes are actually there",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Old frame collections sit for years",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Contact lens boxes expire on the shelf",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Watches sent for repair to the brand service centre, we lose track of them",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Customer says the watch was scratched while with us",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Insurance claim forms take my staff half the day",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Insurance pays late and some claims get rejected",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Nobody reminds customers when it’s time for a new eye test",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Paper envelopes with prescriptions pile up in drawers",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Optometrist is only here three days, so test bookings clash",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "We can’t hire good opticians or watch technicians",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Sales staff push the cheapest lens and don’t upsell coatings",
+   "category": "sales_revenue",
+   "subtype": "basket_small"
+  },
+  {
+   "phrase": "Brand wants monthly sell-out reports and we compile them by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Brand price changes don’t get updated on our tags",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Expensive watches displayed, and I worry about theft from the counter",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Online sunglasses orders come back as returns",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Supplier frames arrive late before the summer sunglasses season",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Lab sends a bill every month and I can’t match it to jobs",
+   "category": "suppliers_purchasing",
+   "subtype": "po_tracking"
+  },
+  {
+   "phrase": "Branches each keep their own customer files",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Battery and strap jobs are cash and never recorded properly",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  }
+ ],
+ "questions": {
+  "mix": [
+   "Is this mainly eyewear, watches, or both?",
+   "Do you do eye tests in-house or work from outside prescriptions?"
+  ],
+  "lab and jobs": [
+   "Do you have your own fitting lab or send jobs out?",
+   "How do you track each job until collection?",
+   "How often does a job come back wrong?"
+  ],
+  "stock": [
+   "Roughly how many frame styles do you carry?",
+   "How do you check what’s in stock before ordering more?"
+  ],
+  "repairs": [
+   "Do you handle watch repairs in-house or send to a service centre?",
+   "How do you and the customer know where the watch is?"
+  ],
+  "insurance": [
+   "Do you bill insurance, and if so, how much time does it take each week?",
+   "What usually causes a delay or rejection?"
+  ],
+  "customers": [
+   "What happens after someone collects their glasses?",
+   "Do they hear from you again?"
+  ],
+  "bookings": [
+   "How do people book an eye test today?",
+   "What happens when it’s busy?"
+  ],
+  "staff": [
+   "Who checks the job card before it goes to the lab?",
+   "Is it the same person every time?"
+  ],
+  "brand reporting": [
+   "Do any brands ask you for sales or stock reports?",
+   "How long does that take?"
+  ],
+  "security": [
+   "How are high-value watches displayed and locked at night?"
+  ]
+ },
+ "seasons": "Back-to-school (PK around March to April and August, UAE late August to September, Canada September) drives children’s eye tests and frames. Summer drives sunglasses in all three markets. In the UAE, Dubai Shopping Festival, Ramadan and Eid lift watch and sunglasses gifting, and summer travel lowers footfall. In PK, Eid and wedding season drive watch gifting. In Canada, Christmas and Boxing Day drive watches, and insurance-benefit year-end (December) pushes people to use their optical coverage.",
+ "care": [
+  "No clinical advice: never interpret a prescription, suggest lenses for symptoms, or comment on eye conditions. If someone describes sudden vision loss, eye injury or chemical in the eye, pi says to get emergency care immediately.",
+  "Never record prescriptions, test results, insurance member IDs or customer identities.",
+  "Do not advise on whether grey-market or parallel imports are legal; note only the operational issue.",
+  "Refuse requests to submit inflated or false insurance claims, or to bill items not supplied.",
+  "Refuse to help with counterfeit or replica watches presented as genuine.",
+  "Staff suspicion is recorded by role and pattern only.",
+  "Licensing for optometrists is a regulatory matter; pi notes only “renewals are hard to track”."
+ ],
+ "build_ideas": [
+  "Digital job card: frame, lens type, coating, measurements captured by staff, sent to the lab, status tracked through to collection.",
+  "Customer SMS/WhatsApp notification when glasses or a repaired watch is ready.",
+  "Lab reconciliation: monthly lab bill matched job by job, with remakes flagged and cause recorded.",
+  "Frame stock by style, colour, size and branch, with barcode scanning and slow-mover lists.",
+  "Contact-lens batch and expiry tracking with first-expiry-first-out alerts.",
+  "Eye-test booking calendar tied to the optometrist’s schedule, with reminders.",
+  "Recall reminders for re-tests and contact-lens reorders, with the customer’s consent.",
+  "Insurance claim tracker: submitted, approved, rejected, paid, ageing.",
+  "Watch repair log with intake photos, condition notes, service-centre handoff and return dates.",
+  "Brand sell-out report generator from POS data.",
+  "Upsell prompts at the counter showing coating and lens-option attach rates by salesperson.",
+  "Owner dashboard: sales by category, jobs pending, remakes, insurance receivables."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our main issue is the lab. Half the time the glasses aren’t ready when the customer comes in."
+  },
+  {
+   "role": "pi",
+   "text": "That’s frustrating for you and the customer. Noted: lab jobs often aren’t ready by the promised collection date. Is that an outside lab or your own?"
+  },
+  {
+   "role": "Person",
+   "text": "Outside lab, we send everything there."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. When a job goes to them, how do you keep track of it until it comes back?"
+  },
+  {
+   "role": "Person",
+   "text": "Paper envelope and a WhatsApp message."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, paper envelope plus WhatsApp. Noted. Roughly how many jobs go to the lab in a normal week?"
+  }
+ ]
+}

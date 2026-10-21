@@ -1,0 +1,51 @@
+{
+ "key": "multi_country_and_cross_border_businesses",
+ "name": "Multi-country and cross-border businesses (PK–UAE–Canada and beyond)",
+ "kind": "overlay",
+ "sector": {
+  "code": "N",
+  "title": "Cross-industry overlays"
+ },
+ "signals": [
+  "our Dubai office",
+  "head office in Karachi",
+  "we ship to Canada",
+  "two companies",
+  "different currencies"
+ ],
+ "notes": "",
+ "shape_facts": [],
+ "scope_rule": "pi notes the operating problems of running across countries (time zones, currencies, duplicate systems). No tax residency, transfer pricing, or company-structure advice.",
+ "vocabulary": {},
+ "problems": [
+  {
+   "phrase": "numbers from each country in different systems",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "currency differences confuse margins",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "teams in different time zones miss handoffs",
+   "category": "communication_coordination",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "inter- company stock transfers untracked",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  }
+ ],
+ "questions": {},
+ "seasons": "",
+ "care": [
+  "use each person’s own time zone for follow-ups; store currency per problem."
+ ],
+ "build_ideas": [
+  "consolidated multi-entity reporting, transfer tracking between entities, shared task boards across offices."
+ ],
+ "exchange": []
+}

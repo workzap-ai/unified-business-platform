@@ -1,0 +1,289 @@
+{
+ "key": "fish_and_shrimp_farming",
+ "name": "Fish and shrimp farming (aquaculture)",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "fish farm",
+  "machli farm",
+  "talab",
+  "pond",
+  "shrimp farm",
+  "jheenga",
+  "prawn",
+  "tilapia",
+  "rohu",
+  "mori",
+  "thaila",
+  "carp",
+  "pangasius",
+  "trout",
+  "hatchery fry",
+  "bacha machli",
+  "fingerlings",
+  "seed",
+  "stocking",
+  "harvest",
+  "jaal",
+  "aerator",
+  "paani badalna",
+  "water quality",
+  "feed pellets",
+  "floating feed",
+  "mazraat asmak",
+  "samak",
+  "rubyan",
+  "hamour",
+  "sobaity",
+  "RAS",
+  "recirculating",
+  "cage farm",
+  "Thatta",
+  "Badin",
+  "Muzaffargarh"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Species and system: carp polyculture in earthen ponds, tilapia, shrimp in brackish ponds, trout in cold water, RAS/indoor tanks (common in the UAE), or sea cages.",
+  "Number and size of ponds/tanks; own or leased land; canal, tubewell, river or seawater source.",
+  "Stocking source: own hatchery, government or private hatchery, imported seed.",
+  "Cycle: grow-out months, harvests per year, partial vs full harvest.",
+  "Buyers: local machli market commission agents, processors/exporters, restaurants and hotels, supermarkets, direct retail.",
+  "Power: grid, generator, solar for aerators and pumps.",
+  "Staff on site and whether the owner lives nearby."
+ ],
+ "scope_rule": "pi notes the business and operational side: stocking and harvest records, feed stock and cost, fish/shrimp losses as a business loss, buyer payments, cold chain and logistics, power and equipment downtime, theft and staff. pi does not advise on feeding rates, water treatment chemicals, medicines, antibiotics, disease, stocking densities or pond design; it suggests their fisheries officer, aquaculture consultant or vet. It never helps evade export residue tests, food-safety, environment, water-use or fishing permit rules. It records workers and buyers by role only.",
+ "vocabulary": {
+  "talab": "pond",
+  "machli / jheenga": "fish / shrimp",
+  "rohu, mori, thaila": "common carp species in Pakistan polyculture",
+  "fry / fingerlings / bacha": "baby fish for stocking",
+  "PL (post-larvae)": "baby shrimp for stocking",
+  "stocking": "putting seed into ponds",
+  "jaal": "net (harvesting)",
+  "aerator": "machine that adds oxygen to water",
+  "FCR": "feed used per kg of fish produced",
+  "machli mandi / arhti": "fish market / commission agent",
+  "RAS": "recirculating aquaculture system (indoor tanks)",
+  "samak / rubyan": "fish / shrimp (Arabic)",
+  "hamour, sobaity": "Gulf fish species in demand"
+ },
+ "problems": [
+  {
+   "phrase": "I don’t know how many fish are left in the pond until we net it",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Stocked 10,000 fingerlings, harvested far fewer, no idea where they went",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Fish died overnight when the aerator stopped and nobody called me",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Power cuts at night are my biggest fear",
+   "category": "operations_process",
+   "subtype": "utility_downtime"
+  },
+  {
+   "phrase": "Feed bags go missing from the store",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Feed cost has doubled and I don’t know cost per kg of fish",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Feed supplier delays and fish go hungry",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Seed from the hatchery was poor quality, many died",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "People net fish from my ponds at night",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Arhti weighs the fish and sets the rate, I can’t check",
+   "category": "sales_revenue",
+   "subtype": "pricing_disputes"
+  },
+  {
+   "phrase": "Fish market agent pays weeks later",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Everyone harvests at the same time and prices crash",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Exporter rejected our shrimp batch and I don’t fully know why",
+   "category": "quality_complaints",
+   "subtype": "rejections"
+  },
+  {
+   "phrase": "Ice and transport to Karachi cost more each season",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Fish spoil if the truck is late",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Hotel and restaurant clients want fixed weekly supply, I can’t commit",
+   "category": "sales_revenue",
+   "subtype": "supply_consistency"
+  },
+  {
+   "phrase": "Water test results are on paper scraps",
+   "category": "operations_process",
+   "subtype": "no_records"
+  },
+  {
+   "phrase": "Staff don’t log daily checks",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Lease and water-right renewals keep me in offices",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Export documentation and traceability eat time",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Floods wiped ponds and I had no record of what was lost",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "UAE: RAS farm, I can’t link power bill to production",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Supermarket orders come by email and WhatsApp, some get missed",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "No idea which pond or batch made money",
+   "category": "reporting_visibility",
+   "subtype": "kpi_undefined"
+  }
+ ],
+ "questions": {
+  "setup": [
+   "What do you farm, and in how many ponds or tanks?",
+   "Earthen ponds, cages or indoor tanks?"
+  ],
+  "stocking": [
+   "Where do your seed or fingerlings come from?",
+   "Do you record how many went into each pond?"
+  ],
+  "stock": [
+   "How do you estimate what’s in the pond before harvest?",
+   "How did the last harvest compare to what you expected?"
+  ],
+  "power": [
+   "How often do aerators or pumps stop?",
+   "How do you get told at night?"
+  ],
+  "feed": [
+   "How is feed stored and issued?",
+   "Do you know your feed cost per kg of fish?"
+  ],
+  "selling": [
+   "Who buys most of your harvest?",
+   "Who weighs and sets the rate?",
+   "How fast do they pay?"
+  ],
+  "logistics": [
+   "How does the harvest reach the buyer?",
+   "What happens if the truck is late?"
+  ],
+  "losses": [
+   "Have you had theft from ponds?",
+   "What happened?"
+  ],
+  "quality": [
+   "Have buyers or exporters rejected any batch?",
+   "Did you get the reason in writing?"
+  ],
+  "records": [
+   "Where are daily checks and water readings written?"
+  ],
+  "planning": [
+   "How do you decide when to harvest?"
+  ]
+ },
+ "seasons": "- Pakistan: carp and tilapia grow fastest in warm months (spring–autumn); stocking is often in spring and harvesting in late autumn and winter, when fish demand peaks (fish is eaten heavily in winter in Punjab and Sindh). - Winter cold slows growth; summer heat and monsoon bring oxygen-depletion risk and flooding (noted operationally). - Shrimp in coastal Sindh follows warm-season cycles; export demand varies. - Ramadan and wedding season lift fish demand; Lent has no major effect in Pakistan. - UAE: RAS and sea-cage farms run year-round; tourist season (winter) and Ramadan lift hotel/restaurant demand; summer heat raises cooling and power costs. - Canada: trout and other freshwater farms see summer growth and winter slow-down; holiday seasons lift retail demand.",
+ "care": [
+  "No feeding rates, chemicals, medicines, antibiotics or disease advice; suggest fisheries officer/consultant/vet.",
+  "Never helps hide antibiotic or residue issues, evade export tests, or use unlicensed water or land.",
+  "Drowning, electric shock from pumps in water, or flood danger: pi points to emergency services (1122/15 or 999) first.",
+  "Theft by armed groups: pi notes the security problem and suggests police; no confrontation advice.",
+  "Mass die-off: suggest immediate contact with their fisheries officer or consultant; pi notes the business impact later.",
+  "Records workers and agents by role; no ID or bank details."
+ ],
+ "build_ideas": [
+  "Pond/tank register: stocking date, species, seed source, count stocked, planned harvest.",
+  "Daily check log on phone: feed given, readings the farm already takes, mortality seen, photos.",
+  "Feed store tracker with deliveries vs orders, issue per pond and cost per pond.",
+  "Power and aerator downtime log, plus alert routing to on-call staff from existing alarm or monitoring devices.",
+  "Harvest record: kg per pond, buyer, rate, weighbridge slip photo, payment status.",
+  "Buyer ledger for arhtis, exporters, hotels and supermarkets with dues and reminders.",
+  "Batch traceability sheet for export or supermarket customers (pond, stocking, feed batches, harvest date).",
+  "Delivery tracker with truck departure/arrival times and temperature notes.",
+  "Weekly supply planner for hotel/restaurant clients.",
+  "Per-pond profit report from the farm’s own costs and sales.",
+  "Licence and lease renewal reminders."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Muzaffargarh mein 12 talab hain rohu aur thaila ke, pichli dafa harvest bohat kam nikla."
+  },
+  {
+   "role": "pi",
+   "text": "Afsos hua, itni mehnat ke baad kam nikle toh dil toot jata hai. Har talab mein kitna bacha daala tha, woh likha hua hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Total pata hai, talab wise nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — stocking ka total maloom hai, lekin har talab ka alag record nahi. Raat ko aerator ya bijli band ho jaye toh aapko kaise pata chalta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Subah chowkidar batata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, raat ki bandish ka subah hi pata chalta hai. Pichle season mein machli ek saath mari hui kitni dafa mili?"
+  }
+ ]
+}

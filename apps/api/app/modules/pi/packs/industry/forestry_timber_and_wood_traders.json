@@ -1,0 +1,274 @@
+{
+ "key": "forestry_timber_and_wood_traders",
+ "name": "Forestry, timber and wood traders",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "lakdi",
+  "lakkar mandi / timber market",
+  "shisham",
+  "kikar",
+  "deodar",
+  "partal",
+  "diyar",
+  "sheesham",
+  "poplar / safeda",
+  "round logs/ gelli",
+  "sawmill / aara",
+  "sawn timber / phatta / takhta",
+  "plywood",
+  "MDF",
+  "chipboard",
+  "imported wood",
+  "ash / beech / meranti",
+  "teak",
+  "cubic feet / CFT",
+  "khashab",
+  "manshar",
+  "Canadian lumber yard",
+  "softwood",
+  "board feet",
+  "woodlot"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Business type: farm forestry grower, timber trader, sawmill, imported wood and board dealer, or a mix",
+  "Wood types handled: local (shisham, kikar, poplar, eucalyptus, deodar) and imported (pine, ash, beech, teak, meranti, plywood, MDF)",
+  "Number of yards, shops or sawmills",
+  "Customers: furniture makers, carpenters, builders, contractors, packaging makers, households",
+  "Credit given to carpenters and contractors",
+  "Import involvement and container volume roughly",
+  "Staff: sawyers, loaders, salesmen, drivers",
+  "Systems: registers, Excel, accounting software"
+ ],
+ "scope_rule": "pi notes business and operational problems: log and timber stock by species and size, measurement disputes, sawmill yield and wastage, pricing, credit sales and recovery, import tracking, transport costs, staff and theft, documentation effort, and visibility. pi does not advise on tree felling permissions, forest laws, transit permits, species protection, timber treatment chemicals, sawmill safety engineering, import duties, tax or wood grading standards. It does not record names, CNICs or numbers of suppliers, landowners, drivers, customers or workers.",
+ "vocabulary": {
+  "CFT / cubic feet": "standard unit for measuring timber volume in Pakistan",
+  "board feet": "North American lumber volume unit",
+  "gelli / log": "round log before sawing",
+  "aara / sawmill": "sawing operation",
+  "phatta / takhta": "sawn plank or board",
+  "seasoning": "drying timber before use (pi notes time and storage only)",
+  "yield / recovery": "sawn timber obtained from a log",
+  "burada": "sawdust, often sold",
+  "transit pass / permit": "document needed to move timber in many areas (pi notes paperwork effort only)",
+  "container": "imported shipment of timber or boards"
+ },
+ "problems": [
+  {
+   "phrase": "Measurement of logs is always disputed, buyer’s CFT and ours differ",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "I don’t know what yield we’re getting from each log at the sawmill",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Stock in the yard isn’t recorded by size and type, staff search for hours",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Some sizes run out while others sit for years",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Timber goes missing from the yard at night",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Sawyers sell offcuts and planks on the side",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Carpenters and contractors take wood on credit and pay late",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Big builders hold payments for months",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Rates change with the dollar and staff quote old prices",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Imported wood got more expensive and I can’t pass it on",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Containers held at the port and customers wait",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Imported boards arrived damaged or wrong grade",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Transport from the forest or farm is costly and slow",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Delivery to sites is late and the builder blames us",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Orders come by phone and WhatsApp, and cutting sizes get mixed up",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Saw blade and machine breakdowns stop work",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Sawmill electricity bill is huge and I can’t tell per job",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Permits and transit documents take days and cost us deals",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Wood damp or warped because it was stored badly",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Labour turnover at the sawmill is high",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "I can’t see daily sales and stock from my other yard",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Furniture makers now buy from online suppliers",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Nobody knows us outside the market street",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "Farm forestry trees, I don’t know when to sell or what they’re worth",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Family partners argue over yard stock and money",
+   "category": "planning_growth",
+   "subtype": "succession_family"
+  }
+ ],
+ "questions": {
+  "measurement": [
+   "How are logs and timber measured when you buy and sell?",
+   "Where do disputes usually happen?"
+  ],
+  "yard stock": [
+   "How do you know what sizes and types are in the yard right now?",
+   "How long does it take staff to find something?"
+  ],
+  "yield": [
+   "Do you track how much sawn timber you get from each log or lot?",
+   "When did it last seem low?"
+  ],
+  "loss": [
+   "Has stock gone missing from the yard or sawmill?",
+   "How did you find out?"
+  ],
+  "credit": [
+   "How much of your selling is on credit to carpenters or builders?",
+   "Who’s slowest to pay, and why?"
+  ],
+  "pricing": [
+   "How do rate changes reach your salesmen?",
+   "Has quoting an old rate cost you?"
+  ],
+  "imports": [
+   "How do you track containers from order to yard?",
+   "What delayed the last one?"
+  ],
+  "orders and cutting": [
+   "How are customers’ cutting sizes recorded?",
+   "What goes wrong with them?"
+  ],
+  "deliveries": [
+   "How are site deliveries arranged?",
+   "What usually makes them late?"
+  ],
+  "paperwork": [
+   "Which document task takes the most time?",
+   "When did it last hold up a sale?"
+  ],
+  "visibility": [
+   "How do you see what’s happening at each yard when you’re not there?"
+  ]
+ },
+ "seasons": "Pakistan: construction and furniture demand rises after harvests (when rural buyers have cash), in the wedding season (November–February, dowry furniture) and ahead of Eid; monsoon (July–September) brings timber storage and drying problems and slows construction; felling and transit on many forest and farm lands is seasonal and subject to local rules. UAE: construction and fit- out work is year-round but slows in peak summer and Ramadan; imported timber and board demand follows project cycles. Canada: building season spring to fall drives lumber yards; winter harvesting on frozen ground for woodlots; lumber prices can swing with housing markets.",
+ "care": [
+  "No advice on felling rules, forest laws, protected species, transit permits, import duties, tax or wood treatment chemicals.",
+  "Never helps move timber without permits, fake transit passes, mislabel species or origin, under-invoice imports, or evade customs.",
+  "Sawmill injuries, falling logs, fires in yards or sawdust, crushing during loading: pi tells them to call emergency services (1122, 999/998, 911) immediately.",
+  "Disputes with landowners or forest officials: pi notes the operational impact only and does not advise or take sides.",
+  "Bribery requests for permits: pi declines and moves on.",
+  "Does not record names, CNICs or numbers of suppliers, landowners, customers, drivers or workers."
+ ],
+ "build_ideas": [
+  "Log intake register: species, length, girth, calculated CFT or board feet with a fixed formula, supplier code and photo",
+  "Yard stock by species, size and bay location, with search on phone",
+  "Sawmill yield tracker per log or lot: input volume versus sawn output, offcuts and sawdust",
+  "Cutting order sheet with exact sizes confirmed by WhatsApp before cutting",
+  "Central rate list updated when import costs change, visible to salesmen",
+  "Credit ledger for carpenters and contractors with limits, ageing and reminders",
+  "Import container tracker from order to port to yard, with document checklist",
+  "Delivery scheduler for site drops with proof of delivery",
+  "Night-yard stock check and gate pass for every outgoing load",
+  "Machine and blade maintenance log",
+  "Permit and document register with renewal and expiry reminders",
+  "Multi-yard dashboard: daily sales, stock value, receivables, and yield",
+  "Simple catalogue on WhatsApp or web for furniture makers to check availability"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Lakkar mandi mein do yard hain. Carpenter udhaar pe maal le jaate hain aur mahinon tak paisa nahi dete."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, udhaar ka paisa mahinon atka rehta hai. Noted. Abhi udhaar ka hisaab kahan rakha jaata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Har yard ka apna register hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, dono yard ke alag alag register. Aap ko total udhaar ka andaza kaise milta hai, ek jagah pe dekh sakte hain?"
+  }
+ ]
+}

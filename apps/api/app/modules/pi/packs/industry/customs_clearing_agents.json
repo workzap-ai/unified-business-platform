@@ -1,0 +1,258 @@
+{
+ "key": "customs_clearing_agents",
+ "name": "Customs clearing agents",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "clearing agent",
+  "customs agent",
+  "CHA",
+  "clearance",
+  "GD",
+  "WeBOC",
+  "PSW",
+  "assessment",
+  "examination",
+  "examination ho rahi hai",
+  "release",
+  "out of charge",
+  "Dubai Trade",
+  "Mirsal",
+  "bill of entry",
+  "takhlees",
+  "mukhallis",
+  "jumruk",
+  "CBSA",
+  "customs broker",
+  "CARM",
+  "B3",
+  "port",
+  "terminal",
+  "KICT",
+  "QICT",
+  "PICT",
+  "Port Qasim",
+  "Jebel Ali",
+  "delivery order",
+  "maal release nahi hua"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Which ports/terminals and airports they work at, and which country (Pakistan, UAE, Canada).",
+  "Number of clearances per month and whether import, export or both.",
+  "Main client types: importers, exporters, forwarders, individuals with personal effects.",
+  "Team: number of field staff/runners at port, documentation staff, accounts.",
+  "How they handle client advance money for duties and port charges.",
+  "Systems used besides the government portal: Excel, accounting software, WhatsApp groups.",
+  "Whether they also arrange transport, warehousing or forwarding."
+ ],
+ "scope_rule": "pi notes the operational problems of running the clearing business: tracking each file’s stage, document follow-up with clients, field staff coordination, client advances and billing, receivables, staff workload and client updates. pi never gives customs, classification, valuation, duty, tax or licensing advice, and never comments on how to get a consignment assessed, examined or released faster through anything other than proper process. It never helps with misdeclaration, under-invoicing, “speed money”, facilitation payments or bribery of officials, and does not note those as problems to solve. It records client roles (“an auto parts importer client”), never client names, NTN/CNIC, licence numbers or bank details.",
+ "vocabulary": {
+  "GD": "goods declaration filed in Pakistan’s WeBOC/PSW",
+  "WeBOC / PSW": "Pakistan’s customs system / Pakistan Single Window",
+  "Mirsal / Dubai Trade": "Dubai Customs’ declaration and trade platforms",
+  "B3 / CARM": "Canadian import accounting form / CBSA’s online portal",
+  "assessment": "customs determining value and duty",
+  "examination": "physical inspection of goods",
+  "out of charge": "goods released by customs",
+  "mukhallis": "clearing agent (Arabic); takhlees — clearance",
+  "terminal charges": "port handling and storage charges",
+  "advance": "money the client deposits to cover duties and charges",
+  "DO": "delivery order from the shipping line",
+  "runner / field staff": "staff who move papers and follow up at port"
+ },
+ "problems": [
+  {
+   "phrase": "Clients call twenty times a day asking where their file is",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "We track file status on a whiteboard and WhatsApp groups",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Clients send incomplete documents and blame us for the delay",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Field staff don’t update the office until evening",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Same consignment data typed into the portal, Excel and invoice",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "We pay duties and terminal charges from our pocket and clients pay us months later",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Clients’ advance balances are a mess; we don’t know who has credit left",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Billing is done late so we forget to charge some expenses",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "We miss charging for examination days, extra trips and storage",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Demurrage piles up while a file waits for the client’s documents and they want us to pay",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Some clients haven’t paid for six months",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Petty cash with runners at port is never properly accounted for",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  },
+  {
+   "phrase": "Experienced documentation staff are hard to find and hard to keep",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "When the portal is down, everything backs up",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "Rules and procedures change and staff aren’t trained on the update",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "I don’t know which clients are profitable after all the running around",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Original documents get misplaced in the office",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Our own licence and staff passes renewals get missed",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Every file has a different checklist and new staff forget steps",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Errors in a declaration cause re-work and amendment fees",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Too much depends on me personally knowing every file",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "We want to add transport and warehousing but can’t manage more",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "No new clients except by word of mouth",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  }
+ ],
+ "questions": {
+  "file tracking": [
+   "How do you keep track of where each file stands today?",
+   "Who updates it, and how often?",
+   "How do clients get updates now?"
+  ],
+  "documents": [
+   "Which documents most often arrive late or wrong from clients?",
+   "How do you chase them?"
+  ],
+  "field staff": [
+   "How do runners at port report back to the office?",
+   "What gets lost between them and the office?"
+  ],
+  "money": [
+   "How do you handle the client’s advance for duties and charges?",
+   "How do you know each client’s balance?",
+   "How long do clients usually take to settle bills?"
+  ],
+  "billing": [
+   "When is the bill made — when the file closes or later?",
+   "What expenses tend to get missed?"
+  ],
+  "staff": [
+   "How do new staff learn the steps for each type of clearance?",
+   "What mistakes come up most?"
+  ],
+  "reporting": [
+   "Do you know which clients take the most effort for the fees?",
+   "What would you most want to see each day?"
+  ]
+ },
+ "seasons": "Volumes follow importers’ cycles: heavy before Ramadan and Eid, before winter and summer stock seasons, and around year-end. Pakistan’s federal budget (June) and any mid-year duty or regulatory changes cause rushes to clear before or after new rates. Fiscal year-end (June in Pakistan; December for many UAE firms; varies in Canada) brings billing and reconciliation pressure. Eid holidays close ports and offices for several days, followed by backlogs. Karachi monsoon (July–August) disrupts port movement. In the UAE, Ramadan shortens office hours. In Canada, holiday retail peak (September–December) and CARM transitions add workload.",
+ "care": [
+  "Any question on HS codes, valuation, duty/tax amounts, exemptions, SROs, licences or “the best way to declare”: pi says it can’t advise and suggests they rely on their own licensed expertise or the customs authority’s guidance.",
+  "Requests or hints about paying officials, “speed money”, or “managing” examination: pi declines and does not record it as a problem to solve.",
+  "Misdeclaration, under-invoicing or substituting goods: pi declines plainly.",
+  "Disputes with customs (penalties, seizures, appeals): legal matters; pi notes only the business impact.",
+  "Never stores client NTNs, CNICs, Emirates IDs, import licence numbers, bank details or passport copies.",
+  "Personal-effects clients (individuals relocating) — no personal details recorded; roles only.",
+  "Port incidents involving injury or hazardous cargo: pi points to emergency services first."
+ ],
+ "build_ideas": [
+  "File tracker: each consignment’s stage (documents received, filed, assessed, examined, duty paid, released, delivered) with responsible staff and age.",
+  "Client update automation on WhatsApp when a file changes stage.",
+  "Document checklist per file type showing what’s received and what’s missing, with reminders to the client.",
+  "Field staff mobile form to log port actions with time stamps and photos of receipts.",
+  "Client advance ledger: deposits, payments made on their behalf, balance remaining, alerts when low.",
+  "Expense capture per file so every charge is billed; draft invoice generated when the file closes.",
+  "Receivables ageing by client with reminder messages approved by the owner.",
+  "Runner petty cash log with daily settlement.",
+  "Client effort-vs-fee view: files, days, trips and revenue per client.",
+  "SOP checklists per clearance type for training new staff.",
+  "Licence and pass renewal calendar.",
+  "Owner daily summary: files open by stage, stuck files, cash out on behalf of clients, collections."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Sir sab se bara masla yeh hai ke hum duty aur port charges apni jeb se dete hain aur client 3-4 mahine baad paise deta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — client ki taraf se kharcha aap pehle karte hain aur recovery bohat der se hoti hai. Noted. Kya clients pehle se koi advance jama karwate hain, ya har file aap khud fund karte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Kuch purane clients advance dete hain, baaki nahi. Aur advance ka hisaab bhi Excel mein gadbad hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — advance sirf kuch clients dete hain aur unka balance Excel mein clear nahi. Abhi aap ko kaise pata chalta hai kis client ka advance khatam ho gaya?"
+  }
+ ]
+}

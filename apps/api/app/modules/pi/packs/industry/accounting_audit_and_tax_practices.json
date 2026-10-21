@@ -1,0 +1,286 @@
+{
+ "key": "accounting_audit_and_tax_practices",
+ "name": "Accounting, audit and tax practices",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "bookkeeping clients",
+  "audit season",
+  "tax return deadline",
+  "FBR",
+  "IRIS",
+  "sales tax return",
+  "withholding statements",
+  "FTA",
+  "VAT return",
+  "corporate tax registration",
+  "CRA",
+  "T2",
+  "HST filing",
+  "year-end close",
+  "working papers",
+  "client documents pending",
+  "client ne papers nahi bheje",
+  "deadline sar pe hai",
+  "hisaab kitaab",
+  "retainer fees",
+  "partner review",
+  "article students",
+  "trainees",
+  "engagement letter",
+  "muhasib",
+  "tadqeeq"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Mix of services: bookkeeping, audit, tax filing, VAT/corporate tax, payroll, advisory",
+  "Number of active clients and how many are monthly retainers versus one-off filings",
+  "Team size and structure (partners, managers, seniors, trainees/article students)",
+  "Jurisdictions served (Pakistan, UAE, Canada, cross-border)",
+  "How client documents arrive (WhatsApp, email, physical files, client portal)",
+  "Software used for bookkeeping and for practice/job tracking, if any",
+  "How fees are charged (fixed monthly, per return, hourly, per audit)"
+ ],
+ "scope_rule": "pi notes how the practice runs: job tracking, deadline pile-ups, document chasing, staff capacity, billing and collections, review bottlenecks and client communication. pi never gives tax, accounting, audit or legal opinions, never interprets FBR, FTA or CRA rules, and never comments on any client’s tax position. pi does not ask for or store client names, NTNs, TRNs, CNICs, Emirates IDs, SINs, bank statements or any client financial data; it records only the type and volume of work. Requests to help backdate documents, hide income or arrange filings that avoid tax are declined.",
+ "vocabulary": {
+  "Article student / trainee": "junior staff training towards a qualification while working at the firm",
+  "Working papers": "the file of evidence and schedules supporting an audit or return",
+  "IRIS": "Pakistan’s FBR online filing portal",
+  "Retainer": "fixed monthly fee for ongoing bookkeeping or compliance",
+  "Engagement letter": "agreement setting the scope of work with a client",
+  "Year-end": "client’s financial year close, which drives audit and filing workload",
+  "Partner review": "final sign-off by a partner before anything goes out",
+  "Write-off (of time)": "hours worked but not billed",
+  "Hisaab": "accounts, bookkeeping",
+  "Tax season / filing season": "the period when returns pile up",
+  "WIP": "work in progress, unbilled time sitting on jobs"
+ },
+ "problems": [
+  {
+   "phrase": "Every September we drown in returns and half the clients send papers in the last week",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Clients send bank statements on WhatsApp as photos, and we lose track of what came in",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "I don’t know which jobs are stuck at which stage",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Everything waits for me to review, nothing leaves without my sign-off",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Bookkeeping clients pay three, four months late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We charge a flat fee but some clients take three times the work",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Staff don’t log time, so I can’t tell which client is profitable",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Scope creeps, they ask for extra reports and we don’t bill for it",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Trainees leave right after they qualify",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Hard to find seniors who know both local tax and VAT",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Two people worked on the same client file and overwrote each other",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "We missed a filing deadline because nobody had it on a calendar",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Every client deadline is in a different person’s head",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  },
+  {
+   "phrase": "Engagement letters are unsigned or we can’t find them",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Quality varies, some returns go out with silly mistakes",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Rework after partner review eats a whole day per file",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Our client files are on one laptop and a USB",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "We use five different spreadsheets for job tracking",
+   "category": "tech_systems",
+   "subtype": "excel_dependency"
+  },
+  {
+   "phrase": "Clients complain we don’t reply fast enough during season",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "We lose small clients every year and don’t know why",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "All our new work comes from referrals, nothing else",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "Our own month-end reporting is always late, ironic for an accounting firm",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Invoices go out late because we bill only after the job closes",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Overtime in season burns everyone out",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "We want to add a UAE corporate tax line but don’t have the capacity planned",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Partners argue about who brought in which client",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  }
+ ],
+ "questions": {
+  "workload": [
+   "Roughly how many active clients do you look after?",
+   "How many are monthly retainers versus one-off filings?",
+   "When does the pile-up usually start?"
+  ],
+  "documents": [
+   "How do clients usually send you their papers?",
+   "What happens when something is missing — who chases it?"
+  ],
+  "tracking": [
+   "How do you currently see which job is at which stage?",
+   "Who updates that, and how often?"
+  ],
+  "review": [
+   "Who signs off before work goes to a client?",
+   "How long do files usually wait for that sign-off?"
+  ],
+  "billing": [
+   "How do you charge — fixed, per return, or by time?",
+   "Do you know which clients take more hours than they pay for?"
+  ],
+  "collections": [
+   "How late do payments usually come in?",
+   "Who follows up, and how?"
+  ],
+  "staff": [
+   "How big is the team, and how is it split between seniors and trainees?",
+   "Where does turnover hurt most?"
+  ],
+  "deadlines": [
+   "How do you keep track of filing dates across clients?",
+   "Has anything slipped recently?"
+  ],
+  "systems": [
+   "What do you use for bookkeeping and for tracking jobs?",
+   "Where do things fall between the gaps?"
+  ],
+  "growth": [
+   "Is there a service line you want to grow?",
+   "What’s stopping you taking on more?"
+  ]
+ },
+ "seasons": "- Pakistan: individual and company tax returns peak around the September filing deadline (often extended); monthly sales tax and withholding statements; fiscal year ends 30 June, so July–September is audit and closing crunch. - UAE: VAT returns quarterly or monthly; corporate tax registration and first filings created new demand; many companies close 31 December, so Q1–Q2 is audit season; Ramadan shortens working hours. - Canada: personal tax season to 30 April, self-employed to mid-June; T2 corporate returns six months after year-end; HST/GST filing cycles; December year-ends drive spring audits. - Year-end holidays (December) and Eid slow client responses and push work later.",
+ "care": [
+  "Never comment on whether a client’s tax treatment is right, what they owe or how to reduce tax; note only the workflow problem.",
+  "If an owner hints at backdating, altering records or helping a client hide income, pi declines plainly and moves on.",
+  "Do not take client names, tax numbers, ID numbers or any financial figures for third parties; use “a client”, “a retainer client”.",
+  "Staff disputes over credit or pay: note the operational problem, do not take sides.",
+  "Regulatory sanctions, licence or professional-body issues: note as a business concern, no advice.",
+  "Data security worries (lost laptops, leaked files): note it; do not ask what was lost in detail.",
+  "Founder stress in season is common; stay warm and practical, no counselling."
+ ],
+ "build_ideas": [
+  "Job tracker per client and per service with stages (documents requested, received, in progress, review, filed, billed) and a board view by staff member",
+  "Filing deadline calendar per client and jurisdiction with reminders to staff and to clients",
+  "WhatsApp document intake: client sends papers to a number, they are filed under the right client and job with an acknowledgement",
+  "Missing-documents checklist per job, with automatic polite chasers to clients",
+  "Simple timesheet on phone or web linked to jobs, showing hours versus fee per client",
+  "Client profitability view: fee charged against logged time, flagged when a fixed-fee client runs over",
+  "Review queue showing what is waiting for partner sign-off and for how long",
+  "Billing trigger: invoice drafted when a job reaches a stage, with receivables ageing and reminder flow",
+  "Engagement letter register with signed status and renewal dates",
+  "Staff capacity view for season planning, showing load per person by week",
+  "Secure shared client folders with access control and an activity log",
+  "Partner dashboard: active jobs, overdue items, WIP, receivables, season progress"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Season shuru hone wala hai aur pichle saal humare 40 returns last 3 din mein gaye. Clients papers hi nahi bhejte time pe."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, last-minute papers ki wajah se aakhri dinon mein pressure ban jata hai — noted. Abhi clients se documents aam taur pe kis tareeqe se aate hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Zyada tar WhatsApp pe photos, kuch email pe. Phir trainee unko folders mein daalta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, WhatsApp aur email dono se aate hain aur trainee manually file karta hai. Jab koi document missing ho to usko follow up kaun karta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Koi fixed banda nahi, jo free ho."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, missing documents ka follow up kisi ki zimmedari nahi hai — yeh bhi note kar liya. Kya aap ko pata chal jata hai ke kaunsa client file kis stage pe atka hua hai?"
+  }
+ ]
+}

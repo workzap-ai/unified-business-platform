@@ -1,0 +1,276 @@
+{
+ "key": "call_centres_and_bpos",
+ "name": "Call centres and BPOs",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "agents",
+  "seats",
+  "floor",
+  "shift",
+  "night shift",
+  "campaign",
+  "inbound",
+  "outbound",
+  "AHT",
+  "SLA",
+  "QA scoring",
+  "call recording",
+  "dialer",
+  "CRM",
+  "KPIs",
+  "attrition",
+  "agent late aya",
+  "login time",
+  "break zyada",
+  "US campaign",
+  "UK campaign",
+  "back office",
+  "data entry process",
+  "chat support",
+  "markaz ittisal",
+  "team leader",
+  "client audit",
+  "ramp-up"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of seats and agents, and number of shifts (day/night)",
+  "Inbound, outbound, chat/email support, back-office processing or a mix",
+  "Client geography and languages served",
+  "How the business is paid (per seat, per hour, per call, per sale, per transaction)",
+  "Systems used (dialer, CRM, ticketing, HRMS, attendance machine)",
+  "Size of QA and team leader structure",
+  "Owned site, rented floor, or work-from-home agents"
+ ],
+ "scope_rule": "pi notes the operational problems of running the centre: attendance and adherence, scheduling, attrition, training, QA, SLA performance, client reporting, billing, technology and power/internet uptime. pi gives no labour-law, telemarketing-regulation, data- protection or tax advice, and never asks for agents’ names, CNICs, salaries, call recordings, end-customer data or client logins. It records roles and volumes only. Requests to run deceptive sales scripts, robocall without consent, spoof caller IDs, misuse customer data or covertly monitor staff outside lawful policy are declined.",
+ "vocabulary": {
+  "Seat": "one workstation or agent position billed to a client",
+  "AHT": "average handling time per call",
+  "SLA": "agreed service level, e.g. percentage of calls answered within a time",
+  "Adherence": "agents logged in and working to their schedule",
+  "Shrinkage": "paid time agents are not available (breaks, absence, training)",
+  "QA": "quality assurance scoring of calls or chats",
+  "Dialer": "system that places outbound calls automatically",
+  "Campaign / process": "one client programme",
+  "Ramp-up": "hiring and training to add seats",
+  "Attrition": "agents leaving",
+  "Nesting": "new agents’ supervised period after training",
+  "Floor": "the operations area"
+ },
+ "problems": [
+  {
+   "phrase": "Agents come late on night shift and we miss the client’s SLA",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Attrition is so high we’re always training new people",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Breaks run long and nobody notices until the client complains",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Schedules are built by hand and never match call volume",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "QA only checks a tiny share of calls",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Client scores us lower than our own QA does",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Some agents are great and others drag the whole team down, but I can’t see who until month-end",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Client reports are made manually in Excel every morning",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Dialer, CRM and attendance data don’t match",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Internet or power goes down and we lose hours",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Load-shedding means generator fuel bills are eating margin",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Clients pay per seat but we’re paying more agents than billed",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Foreign clients pay late and we still have to pay salaries",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Sales commission calculations cause fights every month",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Payroll errors because attendance deductions are calculated by hand",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Ramp-ups fail because we can’t hire 30 agents in two weeks",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Training is different every batch",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Agents share logins or take photos of customer data",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Headsets and equipment go missing",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "We depend on one or two clients",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Client audits find gaps in our process documents",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Team leaders run their teams on WhatsApp groups",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Owner is on calls with US clients at 3am and still handling HR at noon",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "We can’t win new clients beyond referrals",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  }
+ ],
+ "questions": {
+  "size": [
+   "How many seats or agents are you running, and across how many shifts?",
+   "What kind of work is it — calls, chats, back office?"
+  ],
+  "attendance": [
+   "How are logins and breaks tracked today?",
+   "How quickly does a supervisor see someone missing?"
+  ],
+  "scheduling": [
+   "Who builds the schedules, and how?",
+   "How often do they fall short of client volume?"
+  ],
+  "attrition": [
+   "Roughly how many agents leave in a typical month?",
+   "At what stage do most leave?"
+  ],
+  "quality": [
+   "How many calls or chats get QA reviewed?",
+   "How do your scores compare with the client’s?"
+  ],
+  "reporting": [
+   "What reports do clients expect, and how often?",
+   "Who builds them and how long does it take?"
+  ],
+  "uptime": [
+   "How often do power or internet issues stop work?",
+   "What’s the backup when it happens?"
+  ],
+  "billing": [
+   "How are you paid by clients?",
+   "How long do payments take to arrive?"
+  ],
+  "pay": [
+   "How are incentives or commissions calculated?",
+   "Do agents dispute them often?"
+  ],
+  "growth": [
+   "What’s the biggest blocker to adding a new campaign?"
+  ]
+ },
+ "seasons": "- US/UK/Canada-facing campaigns peak around Black Friday, Christmas, tax season (US/Canada January–April), US open enrolment (healthcare, November–January) and summer travel. - Pakistan: Ramadan changes energy and attendance on night shifts; Eid causes absence spikes; summer load-shedding peaks; attrition spikes after bonus/increment cycles and university intakes. - UAE: Ramadan reduced hours, summer travel season staffing gaps; banking and telecom campaign peaks around Q4. - Daylight saving changes in North America shift night-shift timings twice a year.",
+ "care": [
+  "No labour-law, telemarketing-regulation, data-protection or tax advice.",
+  "Never take agent names, IDs, salaries, call recordings or end-customer data; refer to roles.",
+  "Decline deceptive scripts, caller ID spoofing, unconsented robocalls, buying leads lists of personal data, or covert surveillance of staff.",
+  "Harassment or safety issues on night shifts (including transport): note seriously; if anyone is in immediate danger, point to emergency services.",
+  "Data leaks by agents: note as fraud/security problem; suggest they follow their client’s incident process.",
+  "Agent welfare concerns: respectful, no counselling."
+ ],
+ "build_ideas": [
+  "Live floor board: agents logged in, on break, idle, by shift and campaign, with alerts when breaks overrun or adherence drops",
+  "Attendance and lateness tracker combining biometric/login data, feeding payroll deductions with a review step",
+  "Forecast-based schedule builder using past volume per hour for each campaign",
+  "QA scoring form with random sampling, calibration notes and agent-level trends",
+  "Daily client report generator pulling from dialer, CRM and QA into the client’s format",
+  "Incentive and commission calculator with transparent breakdown agents can see",
+  "Attrition tracker by stage, reason and team leader",
+  "Hiring and ramp-up pipeline for batches, with training checklists and nesting progress",
+  "Asset register for headsets, PCs and access cards issued to agents",
+  "Uptime log for power and internet outages with generator fuel usage and cost",
+  "Seat versus billable seat reconciliation per campaign",
+  "Owner dashboard: SLA by campaign, attendance, attrition, QA, receivables"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "120 seat ka centre hai, night shift pe US campaign. Agents late aate hain aur breaks lambe ho jate hain, client SLA pe complaint karta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, raat ki shift pe adherence ki wajah se client ke saath SLA ka pressure ban raha hai — noted. Abhi logins aur breaks kaise track hote hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Dialer mein dikh jata hai lekin koi live nahi dekhta, subah report nikalte hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, data hai lekin live nazar nahi rakhi jati, sirf agle din report. Shift pe har team leader ke neeche kitne agents hote hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Taqreeban 15–18."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, ek team leader pe 15 se 18 agents — note kar liya. Client ne SLA ki complaint kitni baar ki hai pichle mahine mein?"
+  }
+ ]
+}

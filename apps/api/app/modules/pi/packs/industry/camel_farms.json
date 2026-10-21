@@ -1,0 +1,277 @@
+{
+ "key": "camel_farms",
+ "name": "Camel farms (UAE and Cholistan)",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "camel farm",
+  "oont",
+  "untni",
+  "oontni ka doodh",
+  "toda",
+  "ezba",
+  "hijn",
+  "naqa",
+  "jamal",
+  "ibil",
+  "haleeb al naga",
+  "camel milk",
+  "racing camel",
+  "hajin",
+  "beauty contest",
+  "mazayna",
+  "Al Dhafra",
+  "Marmoom",
+  "Al Wathba",
+  "matiya",
+  "gaid",
+  "raee",
+  "Cholistani camel",
+  "Marecha",
+  "Brela",
+  "Thar",
+  "toba",
+  "rohi"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Purpose: milk (fresh or to a processor), racing, beauty/heritage ( mazayna), breeding, meat, tourism/desert camps, or traditional pastoral herding.",
+  "Herd size and mix: lactating females, calves, racing stock, breeding males.",
+  "Location and water: UAE ezba with piped water and shade, or Cholistan desert grazing relying on tobas and wells, migrating seasonally.",
+  "Who runs it: owner family, a manager, expatriate herders and trainers; number of staff living on site.",
+  "Where milk goes: processor/collector, own sales, shops, cafés, home delivery, local villages.",
+  "Records today: memory, register, WhatsApp photos, registration system for racing or microchipping.",
+  "Ownership: single owner, family herd, or shares among relatives."
+ ],
+ "scope_rule": "pi notes the business and operational side: herd records, milk volume and sales, feed and water costs, staff, racing/beauty event logistics, costs per animal, theft and straying, and family/shared-ownership record keeping. pi does not advise on medicines, doses, vaccines, breeding or embryo transfer, training methods, or anything touching doping or performance drugs in racing; it suggests their vet. It never helps get around racing or competition rules, microchip/registration, milk-quality or export rules. It records herders, trainers and jockey-robot operators by role only, never names or Emirates ID/CNIC/passport numbers.",
+ "vocabulary": {
+  "oont / untni": "camel / female camel (Urdu)",
+  "toda": "young camel (Cholistan)",
+  "ibil": "camels (Arabic)",
+  "naqa": "female camel (Arabic); haleeb al naqa — camel milk",
+  "hajin / hijn": "racing camel(s)",
+  "mazayna": "camel beauty contest",
+  "ezba": "farm/camp",
+  "raee": "herder (Arabic)",
+  "mudammar": "training/conditioning stable for racing camels",
+  "toba": "rain-fed pond in Cholistan",
+  "rohi": "Cholistan desert area",
+  "mehlab": "milking area or milking parlour (Arabic)",
+  "robot jockey": "remote-controlled rider used in camel racing"
+ },
+ "problems": [
+  {
+   "phrase": "Milk per naqa is not recorded, only the total in the tank",
+   "category": "reporting_visibility",
+   "subtype": "no_yield_per_animal"
+  },
+  {
+   "phrase": "The collector rejects milk sometimes and I don’t know why or how much",
+   "category": "quality_complaints",
+   "subtype": "rejections"
+  },
+  {
+   "phrase": "Fresh camel milk spoils if the van is late in summer",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Home delivery customers stop ordering and I don’t know why",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Feed and hay prices keep rising, I don’t know cost per camel",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Hay deliveries are short and nobody checks",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Water tanker bills in summer are huge and unclear",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Camels stray in Cholistan and we spend days searching",
+   "category": "loss_security",
+   "subtype": "stray_lost_animals"
+  },
+  {
+   "phrase": "Camels stolen from the herd near the border area",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Racing season entries, trainer fees and transport are all on WhatsApp",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "I don’t know if racing camels earn more than they cost",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Herders on long contracts, I can’t tell who’s doing the work",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Staff visas, housing and food costs are mixed with farm costs",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Brothers share the herd and argue about whose camels are whose",
+   "category": "planning_growth",
+   "subtype": "succession_family"
+  },
+  {
+   "phrase": "Calving dates and which bull was used live in the old herder’s head",
+   "category": "operations_process",
+   "subtype": "no_breeding_records"
+  },
+  {
+   "phrase": "Mazayna preparation spends a lot and we can’t track it per camel",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Buyers want photos and history of a camel and we scramble",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Shade, fans and water pumps break in summer and fixing takes days",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Microchip and registration paperwork falls behind",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Cholistan milk has no buyer nearby so much is wasted",
+   "category": "sales_revenue",
+   "subtype": "no_market_access"
+  },
+  {
+   "phrase": "Tourists at the desert camp want camel rides, bookings are chaos",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "I’m in the city and only see the farm on weekends",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Cash given to the herder for supplies, no receipts",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  }
+ ],
+ "questions": {
+  "purpose": [
+   "What are the camels mainly for — milk, racing, beauty shows, breeding or a mix?",
+   "Roughly how many?"
+  ],
+  "milk": [
+   "Is milk measured per camel or just in total?",
+   "Where does it go after milking?",
+   "How often is any rejected?"
+  ],
+  "delivery": [
+   "How does the milk reach customers?",
+   "What happens when the van is late in summer?"
+  ],
+  "costs": [
+   "Do you know roughly what one camel costs you a month?",
+   "Which cost has grown most?"
+  ],
+  "feed and water": [
+   "How are hay and feed deliveries checked?",
+   "How is water bought or supplied?"
+  ],
+  "racing/shows": [
+   "How do you track what each racing or show camel costs?",
+   "Where are entries and results kept?"
+  ],
+  "staff": [
+   "How many herders and trainers do you have?",
+   "How do you know the daily work got done?"
+  ],
+  "losses (cholistan)": [
+   "How often do camels stray or go missing?",
+   "How do you find them?"
+  ],
+  "shared herd": [
+   "Is the herd owned by one person or shared in the family?",
+   "How is each person’s share recorded?"
+  ],
+  "records": [
+   "Where are birth dates and parentage kept?"
+  ],
+  "visibility": [
+   "How often do you see the farm yourself?"
+  ]
+ },
+ "seasons": "- UAE: cool season (October–April) is the main racing and heritage-festival period, including large festivals in Abu Dhabi’s Al Dhafra region and racing at tracks such as Al Marmoom and Al Wathba; summer (June–September) is off-season with heat, water and staff- hour constraints. - UAE: Ramadan raises camel milk and laban demand; National Day (2 December) and winter tourism lift desert-camp and heritage activity. - Camel calving tends to cluster in the cooler months; milk supply follows. - Cholistan: herders migrate with water; after monsoon rains (July–September) the tobas fill and grazing improves; dry season (spring– early summer) brings water scarcity and movement toward canal areas. - Cholistan Jeep Rally and local melas (often February) bring camel trading and visitors; Eid ul Adha brings some camel qurbani and hissa sales.",
+ "care": [
+  "No medicine, doping, performance-enhancer, training-method, breeding or embryo advice; suggest their vet.",
+  "Never helps evade racing/competition rules, doping tests, microchip/registration or milk-quality checks.",
+  "Heat emergencies for staff (heatstroke), vehicle accidents in the desert, or camel attacks: pi points to 999/998 (UAE) or 1122 (Pakistan) first.",
+  "Expatriate staff matters (visas, contracts, wages): pi notes the admin burden only, gives no immigration or labour-law advice, and never stores passport or Emirates ID numbers.",
+  "Cross-border movement or theft near border areas: pi never helps with smuggling or unlicensed movement; suggests police for theft.",
+  "Family-shared herds: pi notes the record-keeping problem neutrally; no legal or inheritance opinions.",
+  "Racing and beauty camels can be very high value; pi notes value questions without quoting prices."
+ ],
+ "build_ideas": [
+  "Camel register with tag/microchip reference, sex, birth date, dam/sire, purpose, owner (for shared family herds), photos.",
+  "Milk log per camel or group with rejected-milk notes and daily totals to the owner.",
+  "Milk delivery and subscription system with routes, cold-chain timing notes, missed-delivery alerts and customer pauses.",
+  "Hay, feed and water log with deliveries vs orders and cost per camel per month.",
+  "Racing/show tracker: entries, dates, trainer, transport, costs and results per camel.",
+  "Herder daily check-in on WhatsApp with headcount photo and location (Cholistan grazing).",
+  "Stray/lost animal log with last seen location and search status.",
+  "Petty cash app for herders with photo receipts.",
+  "Family share ledger showing which animals belong to whom and their costs and sales.",
+  "Sale profile sheet per camel that the owner can share with buyers.",
+  "Desert-camp camel ride booking page with slots and WhatsApp confirmations.",
+  "Maintenance log for shade, fans, pumps and tanks."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "ﺐﺒﺴﻟا فﺮﻋأ ﺎﻣو ﻞﻘﻳ ﺐﻴﻠﺤﻟاو ،بﻮﻠﺣ ﺔﻗﺎﻧ ٠٦ ﻲﻟاﻮﺣ ﺎﻬﻴﻓ ﻦﻴﻌﻟا ﻲﻓ ﺔﺑﺰﻋ يﺪﻨﻋ."
+  },
+  {
+   "role": "pi",
+   "text": "؟ﺲﺑ عﻮﻤﺠﻤﻟا ﻻو ،ﺎﻬﻟﺎﺤﻟ ﺔﻗﺎﻧ ﻞﻜﻟ سﺎﻘﻨﻳ ﺐﻴﻠﺤﻟا. ﺢﺿاو ﻞﺠﺳ ﻲﻓ ﺎﻣ اذإ ًﺎﺻﻮﺼﺧ ﻖﻠﻘﻳ اﺬﻫ ءﻲﺸﻟا ،ﻚﻤﻬﻓأ"
+  },
+  {
+   "role": "Person",
+   "text": "بﺎﺴﺗاﻮﻟﺎﺑ ﻪﺒﺘﻜﻳ ﻲﻋاﺮﻟا ،ﺲﺑ عﻮﻤﺠﻤﻟا."
+  },
+  {
+   "role": "pi",
+   "text": "؟حوﺮﻳ ﻦﻳو ﺐﻠﺤﻟا ﺪﻌﺑ ﺐﻴﻠﺤﻟا. ﺔﻗﺎﻧ ﻞﻜﻟ ﺐﻣ ،بﺎﺴﺗاﻮﻟا ﻖﻳﺮﻃ ﻦﻋ ﻲﻣﻮﻳ عﻮﻤﺠﻤﻛ ﻞﺠﺴﺘﻳ ﺐﻴﻠﺤﻟا — ﻆﺣﻼﻣ ،ﻢﺗ"
+  },
+  {
+   "role": "Person",
+   "text": "ﻪﻨﻣ ءﺰﺟ نﻮﻌﺟﺮﻳ ًﺎﻧﺎﻴﺣأو ،ﻊﻨﺼﻤﻟ."
+  },
+  {
+   "role": "pi",
+   "text": "؟بﻮﺘﻜﻣ ﻞﻜﺸﺑ ﻪﺘﻴﻤﻛو ﺾﻓﺮﻟا ﺐﺒﺳ ﻚﻠﺻﻮﻳ ﻞﻫ. ًﺎﻧﺎﻴﺣأ ﺐﻴﻠﺤﻟا ﻦﻣ ءﺰﺟ ﺾﻓﺮﻳ ﻊﻨﺼﻤﻟا نأ ﻆﺣﻼﻣ ،ﻢﺗ"
+  }
+ ]
+}

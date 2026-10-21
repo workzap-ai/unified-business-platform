@@ -1,0 +1,284 @@
+{
+ "key": "footwear_manufacturing",
+ "name": "Footwear manufacturing",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "shoe factory",
+  "footwear",
+  "joota",
+  "chappal",
+  "khussa",
+  "sandals",
+  "slippers",
+  "sports shoes",
+  "school shoes",
+  "safety shoes",
+  "uppers",
+  "soles",
+  "PU sole",
+  "PVC",
+  "EVA",
+  "lasting",
+  "last",
+  "moulds",
+  "size set",
+  "size run",
+  "pairs",
+  "dozen",
+  "maal set mein nahi",
+  "cutting",
+  "closing",
+  "stitching",
+  "pasting",
+  "finishing",
+  "dealers",
+  "wholesale",
+  "mandi",
+  "ahdhiya"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Product type: formal, casual, sports, school, safety, sandals/chappals, traditional ( khussa, Peshawari).",
+  "Materials: leather, synthetic/PU, PVC/EVA moulded.",
+  "Made-to-stock for dealers/retail, made-to-order for brands/export, or own retail.",
+  "Pairs per day roughly, and number of sizes and colours per article.",
+  "Which processes are in-house (cutting, closing, sole moulding, lasting) vs bought or outsourced.",
+  "Sales channels: dealers, own shops, Daraz/online, institutions (schools, factories)."
+ ],
+ "scope_rule": "pi notes operational and business problems: broken size sets, slow-moving articles, sole and material shortages, mould and machine downtime, defects and returns, dealer credit and collections, and production visibility. pi does not advise on safety-footwear certification or standards, chemical or adhesive handling, orthopaedic or medical fit claims, customs or taxes. pi records roles and dealer types, not names or IDs.",
+ "vocabulary": {
+  "upper": "the top part of the shoe, cut and stitched",
+  "closing": "stitching uppers together",
+  "lasting": "shaping the upper over a last and attaching it",
+  "last": "foot-shaped form a shoe is built on",
+  "size set / size run": "the mix of sizes in a production lot or carton",
+  "article": "a design or model number",
+  "PU / PVC / EVA": "common sole materials",
+  "moulds": "dies for soles, size-specific and costly",
+  "pairs": "the unit output is counted in",
+  "khussa/ chappal": "traditional embroidered shoe / slipper or sandal",
+  "mandi/ wholesale market": "where dealers buy in bulk",
+  "ahdhiya": "shoes (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "We have size 40 and 41 stuck while 42 and 43 sold out",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Size sets get broken at the godown and dealers refuse half sets",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Sole supplier delivers late and lasting stops",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "We don’t have moulds in all sizes so some sizes can’t be made",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Mould or press breaks and we lose days",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Old articles stay in stock for seasons",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Dealers return shoes after the season",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Sole separation complaints coming back",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Defects found only when dealers open cartons",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Dealers take goods on credit and pay after the season",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Cash is stuck in stock and receivables at the same time",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "PU and chemicals keep getting expensive",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "We don’t know cost per pair for each article",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Pairs per worker are disputed every week (piece rate)",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Skilled lasting and closing workers keep switching factories",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "School shoe season order rush overwhelms us",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Own shops’ sales aren’t visible to the factory until month end",
+   "category": "sales_revenue",
+   "subtype": "no_sales_visibility"
+  },
+  {
+   "phrase": "Shop counts of pairs never match what we dispatched",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Daraz orders come in with the wrong size picked",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Online returns for size are high",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Designs are copied by others in the market within weeks",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "Leftover leather and synthetic pieces walk out",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "No planning for which articles to make next season",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Production updates are on WhatsApp voice notes",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  }
+ ],
+ "questions": {
+  "stock": [
+   "Which sizes or articles get stuck most?",
+   "How do you see stock by size today?"
+  ],
+  "size sets": [
+   "How are cartons packed — full size sets or loose pairs?",
+   "Where do sets get broken?"
+  ],
+  "materials": [
+   "Which material stops production most — soles, uppers, adhesive or packing?",
+   "How much warning do you get?"
+  ],
+  "moulds and machines": [
+   "Do you have moulds for every size you sell?",
+   "What breaks down most?"
+  ],
+  "quality": [
+   "What do customers return shoes for most?",
+   "Is there a check before cartons are closed?"
+  ],
+  "dealers": [
+   "How many active dealers do you supply?",
+   "What credit period do they usually take?"
+  ],
+  "returns": [
+   "How much comes back after the season?",
+   "What happens to those pairs?"
+  ],
+  "costing": [
+   "How do you work out cost per pair?",
+   "When did prices last change?"
+  ],
+  "staff": [
+   "Are workers paid per pair, per day or monthly?",
+   "How are pairs counted?"
+  ],
+  "seasons": [
+   "Which season is biggest for you?",
+   "How early do you start producing for it?"
+  ],
+  "own retail and online": [
+   "Do you have your own shops or sell online?",
+   "How quickly do you see what’s sold there?"
+  ]
+ },
+ "seasons": "Pakistan: Eid ul Fitr is the biggest footwear season by far, with heavy pre-Eid production and dealer orders weeks ahead; Eid ul Adha a second peak; school shoes in March to April (new session) and August; wedding season (roughly October to March) for formal and khussa; winter boots and closed shoes from October; summer chappals and sandals from March. UAE: back-to- school (late August), Ramadan and Eid, Dubai Shopping Festival, summer slowdown. Canada: back-to-school, winter boots (October to January), spring/summer sandals, Black Friday and Boxing Day.",
+ "care": [
+  "Fumes from adhesives or solvents causing collapse, fires, machine injuries: pi stops and points to emergency services.",
+  "No advice on safety-footwear certification, standards or how to claim them; no medical or orthopaedic claims.",
+  "No help copying another brand’s trademarks or logos, or making counterfeit goods; pi declines plainly.",
+  "No customs, tax or under-invoicing help.",
+  "Never stores dealer, worker or customer personal details; uses roles like “Lahore dealer” or “lasting worker”.",
+  "Piece-rate disputes: pi notes the counting gap, does not judge fairness or wage legality."
+ ],
+ "build_ideas": [
+  "Article-size matrix stock: pairs by article, colour and size across factory, godown and shops.",
+  "Size-set carton packing with scan-in/scan-out to stop broken sets.",
+  "Production lot tracker through cutting, closing, lasting, finishing, with pairs per stage.",
+  "Mould register by article and size, with condition and repair history.",
+  "Material requirement from planned pairs (soles, uppers, adhesive, boxes) with shortage alerts.",
+  "Dealer ordering via WhatsApp catalogue with size-set selection and credit limit checks.",
+  "Dealer ledger with ageing and season-end return tracking.",
+  "Pre-dispatch QC checklist with defect types and photos.",
+  "Piece-count capture per worker per day, feeding a weekly wage sheet.",
+  "Cost per pair calculator by article using current material rates.",
+  "Own-shop sales sync to the factory daily, with size-level sell-through.",
+  "Season planning view comparing last season’s sales by article and size."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Eid ke liye maal banaya, ab 40-41 size pada hai aur 43 ki demand hai jo khatam ho gaya."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted: Eid stock mein chhote size bach gaye aur bade size khatam. Production ke waqt size ka mix kaise decide hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Pichle saal ke andaaze se, likha hua kuch nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, size mix andaaze se banta hai, record nahi hai. Dealers ko aap full size set mein dete hain ya woh apni marzi ke size chunte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Set mein, lekin woh set tod dete hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, dealers set tod dete hain. Jo pairs bach jaate hain, woh season ke baad wapas aate hain ya dealers ke paas pade rehte hain?"
+  }
+ ]
+}

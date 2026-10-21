@@ -1,0 +1,268 @@
+{
+ "key": "duty_free_and_airport_retail",
+ "name": "Duty-free and airport retail",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "duty free",
+  "duty-free shop",
+  "airport shop",
+  "travel retail",
+  "departures",
+  "arrivals duty free",
+  "concession",
+  "concessionaire",
+  "landside",
+  "airside",
+  "boarding pass scan",
+  "tax-free",
+  "bonded warehouse",
+  "bonded stock",
+  "liquor and tobacco",
+  "confectionery",
+  "travel essentials",
+  "souvenir shop",
+  "airport ki dukaan",
+  "souq hurra",
+  "matar",
+  "flight bank",
+  "peak wave",
+  "transit passengers"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Format: duty-free operator, specialist concession inside an airport, landside convenience/souvenir shop, or a supplier/brand selling into travel retail.",
+  "Airside vs landside, and departures vs arrivals.",
+  "Number of outlets/terminals and opening hours (often 24/7).",
+  "Bonded warehouse or not; who controls the stock movements.",
+  "Concession agreement structure as it affects reporting (e.g. sales reports to the airport); pi notes the effort only.",
+  "Categories carried (fragrance, cosmetics, confectionery, tobacco, liquor where legal, electronics, souvenirs).",
+  "Staff count, shift pattern and security-clearance process (noted as effort only)."
+ ],
+ "scope_rule": "pi notes operational problems such as replenishment through security, flight-wave staffing, shift handovers, multi-currency cash, stock reconciliation, concession reporting effort, staff turnover and promotions execution. pi does not advise on customs, bonded- goods, excise or duty rules, allowance limits for passengers, alcohol or tobacco licensing, aviation security, or airport authority regulations. It refuses anything that would help move goods out of bond improperly, sell to ineligible passengers or bypass security screening. pi never records passengers’ boarding passes, passport details or flight data, or staff names and ID or permit numbers.",
+ "vocabulary": {
+  "airside / landside": "after or before security and passport control",
+  "bonded": "goods held without duty paid, under customs control",
+  "concession / concessionaire": "operator with a contract to trade at the airport",
+  "MAG / turnover rent": "minimum guarantee or sales-based rent to the airport (operator’s arrangement; pi doesn’t advise)",
+  "flight bank / wave": "cluster of departures that drives footfall peaks",
+  "penetration": "share of passengers who buy",
+  "spend per passenger": "average sales divided by passenger count",
+  "boarding pass scan": "capturing flight data at sale, often required",
+  "gondola / promo unit": "display unit for offers",
+  "replenishment window": "permitted time for goods to come through security",
+  "souq hurra": "duty-free market (Arabic)",
+  "matar": "airport (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Shelves empty during the morning wave because replenishment can only come at night",
+   "category": "stock_inventory",
+   "subtype": "slow_replenishment"
+  },
+  {
+   "phrase": "Stock counts at month end don’t match the bonded records",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Damaged and expired confectionery not written off properly",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Transfers between terminal shops get lost",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "We’re understaffed when three flights leave together, overstaffed at 3 a.m.",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Night shift handover misses things",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Staff turnover is huge and each new hire waits weeks for an airport pass",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Cash in five currencies and the till never balances",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Exchange rates on the till are out of date",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Promotions from the brands aren’t set up on time in the shop",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Brand partners want sell-out data and we compile it manually",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Airport sales reports take a day every month to prepare",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "We can’t see sales per flight wave or per nationality to plan",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Passengers in a hurry leave the queue and we lose the sale",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Basket size is small, people only buy a water and go",
+   "category": "sales_revenue",
+   "subtype": "basket_small"
+  },
+  {
+   "phrase": "Refunds and returns are impossible once the passenger has flown",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Tester and sample theft",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Staff discount and void misuse",
+   "category": "loss_security",
+   "subtype": "void_refund_abuse"
+  },
+  {
+   "phrase": "POS goes down and we have no backup",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "Airport rent and fees are eating us and I can’t see the margin per outlet",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "Flight schedule changes mean our planning is wrong",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Head office instructions reach shop staff late on WhatsApp",
+   "category": "communication_coordination",
+   "subtype": "branches_not_aligned"
+  },
+  {
+   "phrase": "Passenger complaints about rude staff during rush",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  }
+ ],
+ "questions": {
+  "format": [
+   "Are you airside, landside or both?",
+   "How many outlets do you run?"
+  ],
+  "replenishment": [
+   "When can stock be brought in to the shop?",
+   "What runs out most before the next window?"
+  ],
+  "stock control": [
+   "How often do you do full counts?",
+   "Where do differences usually show up?"
+  ],
+  "staffing": [
+   "How do you plan rosters against the flight schedule?",
+   "What happens when several flights leave together?"
+  ],
+  "cash and currencies": [
+   "How many currencies do you accept at the till?",
+   "How is the till checked at shift end?"
+  ],
+  "reporting": [
+   "Which reports do you have to send to the airport or brands?",
+   "How long do they take each time?"
+  ],
+  "promotions": [
+   "How do brand promotions get set up in the shop?",
+   "How do you check they’re live?"
+  ],
+  "hiring": [
+   "How long does it take from hiring someone to them starting on the floor?",
+   "How long do people usually stay?"
+  ],
+  "sales": [
+   "Do you know which flights or times bring in most sales?",
+   "How do you use that today?"
+  ],
+  "systems": [
+   "What happens when the POS goes down mid-wave?"
+  ]
+ },
+ "seasons": "In the UAE, peak travel runs from late June to August (summer departures), the Eid holidays, school holidays (December to January, spring break in March to April), Dubai Shopping Festival and winter tourism (November to March), and major events and conferences; Ramadan shifts flight and shopping patterns. In PK, Hajj and Umrah seasons, Eid holidays, the summer diaspora return (June to August), the December/winter wedding season with diaspora visits, and school holidays are the peaks. In Canada, summer, Christmas and New Year, March Break and the US Thanksgiving/long-weekend cross-border travel are busiest. Daily flight banks drive hour-by-hour peaks.",
+ "care": [
+  "No advice on customs, bond, excise, duty, passenger allowances, alcohol or tobacco licensing, or aviation security.",
+  "Refuse any help moving bonded goods out without proper process, selling to ineligible passengers, or bypassing screening or the pass system.",
+  "Never record boarding pass, passport, flight or nationality data on individuals; aggregate patterns only as the owner describes them.",
+  "Never record staff names, ID or airport-pass numbers.",
+  "A security incident, suspicious item, fire or medical emergency in the terminal → stop and tell them to alert airport security/emergency services immediately.",
+  "Concession contracts and rent disputes: note the business impact only, no legal or financial advice.",
+  "Staff suspicions recorded by role and pattern only."
+ ],
+ "build_ideas": [
+  "Replenishment planner: sales by SKU per flight wave, suggested pick lists for each permitted window.",
+  "Stock reconciliation tool between shop counts and warehouse/bond movement records (internal records only), with variance reports.",
+  "Expiry and damage write-off log with approvals.",
+  "Inter-outlet transfer slips with scan out/in.",
+  "Roster planner driven by the flight schedule and historical hourly sales.",
+  "Digital shift handover checklist.",
+  "Multi-currency till close with exchange rate table updated centrally.",
+  "Brand sell-out and airport report generator from POS data.",
+  "Promotions checklist per outlet with photo proof of setup.",
+  "Hiring pipeline tracker showing where each new hire is in onboarding (status only, no ID data).",
+  "Head-office-to-floor broadcast with read confirmation.",
+  "Owner dashboard: sales, spend-per-transaction, stock gaps and staffing by outlet and hour."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We’re a concession in the departures area. The issue is the 6 a.m. wave, our best sellers are gone by 7."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a frustrating hour to run short. Noted: best sellers run out early in the morning wave. When are you allowed to bring stock through to the shop?"
+  },
+  {
+   "role": "Person",
+   "text": "Only between midnight and 4."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, replenishment only happens in that overnight window. How does the night team decide what to bring in for the morning?"
+  },
+  {
+   "role": "Person",
+   "text": "They just look at the gaps on the shelf."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted. Do you have sales by hour from your POS that anyone looks at?"
+  }
+ ]
+}

@@ -1,0 +1,270 @@
+{
+ "key": "telecom_franchises_and_mobile_network_retailers",
+ "name": "Telecom franchises and mobile-network retailers",
+ "kind": "industry",
+ "sector": {
+  "code": "L",
+  "title": "Finance-adjacent, energy and utilities"
+ },
+ "signals": [
+  "franchise",
+  "telecom franchise",
+  "customer service centre",
+  "retailer",
+  "SIM sale",
+  "SIM activation",
+  "postpaid connection",
+  "MNP",
+  "device sales",
+  "scratch cards",
+  "load",
+  "recharge",
+  "targets from operator",
+  "franchise ka target",
+  "SIM ki sale",
+  "biometric verification",
+  "BVS",
+  "retailer commission",
+  "line",
+  "khatt",
+  "shareeha",
+  "recharge card",
+  "prepaid/postpaid",
+  "home broadband sales",
+  "distributor",
+  "BA"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Operator franchise, independent retailer, or distributor with a retailer network.",
+  "What they sell: SIMs and activations, recharge/load, postpaid, devices, home internet, accessories.",
+  "Number of outlets, staff and field sales/BAs.",
+  "Whether targets and incentives come from the operator and how they are measured.",
+  "Stock types held: SIM kits, scratch cards, handsets, routers, accessories.",
+  "Systems used: operator’s portal/app, own POS or Excel, paper.",
+  "Location type: mall, market, high street, small town."
+ ],
+ "scope_rule": "pi notes operational problems such as stock of SIMs and devices, targets and incentive tracking, staff performance, queues, customer complaints at the counter, reconciliation with the operator and multi-outlet visibility. It never advises on tariffs, packages, or the operator’s rules, and never helps with SIM issuance without proper verification, re-using thumbprints, issuing SIMs on others’ IDs or any workaround of PTA, TDRA or CRTC requirements. It never asks for or stores customers’ names, CNIC/Emirates ID, numbers, biometric data or account details. Customer data stays in the operator’s systems; pi records only counts and roles.",
+ "vocabulary": {
+  "Activation": "making a new SIM live on the network",
+  "BVS": "biometric verification system used for SIM issuance in Pakistan",
+  "MNP / port-in": "customer moving their number from another operator",
+  "Gross adds": "new connections sold in a period",
+  "Target / KPI sheet": "operator-set sales goals for the franchise",
+  "Incentive / slab": "bonus tiers on hitting targets",
+  "Kit": "SIM pack before activation",
+  "Scratch card / e-load": "prepaid balance stock",
+  "BA": "brand ambassador doing field or kiosk sales",
+  "CSC / franchise": "customer service centre run under operator brand",
+  "Clawback": "operator recovering commission (e.g. for inactive SIMs)",
+  "Shareeha": "SIM card (Gulf Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "We miss monthly targets and only find out on the last two days",
+   "category": "sales_revenue",
+   "subtype": "target_missed"
+  },
+  {
+   "phrase": "Incentive calculations from the operator never match what we think we earned",
+   "category": "cash_collections",
+   "subtype": "commission_reconciliation"
+  },
+  {
+   "phrase": "Commission gets clawed back for SIMs that went inactive and we cannot see which",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "SIM kits issued to BAs go missing or are not accounted for",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Handsets sit in stock for months while popular models are always out",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Popular handsets and routers sell out and replenishment takes a week",
+   "category": "stock_inventory",
+   "subtype": "slow_replenishment"
+  },
+  {
+   "phrase": "Moving stock between our outlets is by phone and nobody records it",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Counts of scratch cards and accessories never match the register",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Field BAs claim sales but I cannot see where they were or what they did",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "No clear way to see which staff member is selling and who is just standing",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Staff disagree about whose sale it was for incentive",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Staff leave as soon as they are trained on the operator systems",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Long queues for complaints and SIM replacements, and people leave angry",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Customers come back with the same complaint because the operator has not fixed it",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Bad Google reviews about wait times hurt our outlet",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Operator portal is down and verification stops",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "We enter sales in the operator portal and then again in our Excel",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "I run four outlets and see their numbers only when managers send screenshots",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Cash from device sales and recharges does not tally at day end",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Handset theft from display or by staff",
+   "category": "loss_security",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Device returns and warranty cases are tracked on paper and lost",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Operator audits find missing documents and we get penalised",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Retailers under our distribution owe us money for stock and pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Want to add an outlet but setup and operator approval drag",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  }
+ ],
+ "questions": {
+  "targets": [
+   "Which target is hardest to hit each month?",
+   "When do you first get a sense you are behind?",
+   "Where do you look to check progress?"
+  ],
+  "incentives": [
+   "Is the problem the amount, the timing, or not understanding how it was worked out?",
+   "How do you check it today?"
+  ],
+  "stock": [
+   "Which stock causes more trouble, SIM kits, handsets, or cards and accessories?",
+   "How is it counted and how often?"
+  ],
+  "field sales": [
+   "How many BAs or field staff do you have?",
+   "How do you know what they did in a day?"
+  ],
+  "staff": [
+   "How do you decide who gets credit for a sale?",
+   "How long does a new person take to learn the systems?"
+  ],
+  "customers": [
+   "What are people mostly coming in for, sales or complaints?",
+   "What does the wait look like at peak time?"
+  ],
+  "outlets": [
+   "How many outlets do you run?",
+   "How do their daily numbers reach you?"
+  ],
+  "distribution": [
+   "Do you supply other retailers?",
+   "How do they pay you for stock?"
+  ]
+ },
+ "seasons": "- PK: Ramadan and Eid campaigns from operators, start of month salary period, back-to-school and university admissions (August– September) for student SIMs and internet, new handset launches, cricket events driving data packages; year-end operator target pushes. - UAE: new arrivals in September (schools) and January, Dubai Shopping Festival (December–January), GITEX period (October) for devices, Ramadan offers, summer travel when residents leave. - Canada: back-to-school (August–September), Black Friday and Boxing Day for devices and plans, new phone launches in autumn, student arrivals.",
+ "care": [
+  "Never help with issuing SIMs without verification, re-using fingerprints, using another person’s ID, or activating SIMs in bulk on one identity; pi says plainly it cannot help.",
+  "Never ask for or store customer identity, numbers, biometric or account information.",
+  "Do not advise on tariffs, packages or operator policy; note customer confusion as a complaint pattern only.",
+  "Grey-market or smuggled handsets, PTA/TDRA non-registered devices: pi does not assist; it keeps to legitimate stock issues.",
+  "Staff theft concerns recorded as control gaps, no names.",
+  "Operator contract and penalty disputes are out of scope except as “audit and documentation effort”.",
+  "Robbery or violence at the outlet: point to emergency services."
+ ],
+ "build_ideas": [
+  "Target tracker updated daily from staff entries: progress by target type versus days left, with a mid-month alert.",
+  "Incentive and commission expected-vs-received view, with clawback log by month.",
+  "Serialised stock register for SIM kits and handsets: received, issued to whom (by role), sold, returned, with counts per outlet.",
+  "Inter-outlet stock transfer log with confirm-on-receipt.",
+  "Field BA daily check-in and sales log with locations visited (place names, not live tracking).",
+  "Staff sales leaderboard and attribution rules for incentive.",
+  "Queue and visit-reason tally to plan staffing and see complaint vs sales mix.",
+  "Multi-outlet owner dashboard: sales, stock, cash closing.",
+  "Day-end cash closing sheet per outlet.",
+  "Returns and warranty case tracker with status and handover.",
+  "Retailer receivables ledger for distributors with reminders.",
+  "Audit document checklist per sale type so files are complete.",
+  "Google Business profile and review-response routine per outlet."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Every month we realise on the 28th that we are behind on gross adds."
+  },
+  {
+   "role": "pi",
+   "text": "Got it — finding out late that you are behind on new connections, noted. Where do you check progress against the target during the month?"
+  },
+  {
+   "role": "Person",
+   "text": "The operator portal, but only the manager logs in, and he sends me a screenshot sometimes."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, progress sits in the portal and reaches you as occasional screenshots. How many outlets and field staff are working towards that target?"
+  },
+  {
+   "role": "Person",
+   "text": "Three outlets and six BAs."
+  },
+  {
+   "role": "pi",
+   "text": "Thanks, noted. How do you currently know what each BA did in a day?"
+  }
+ ]
+}

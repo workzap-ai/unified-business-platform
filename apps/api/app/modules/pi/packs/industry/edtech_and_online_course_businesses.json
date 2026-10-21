@@ -1,0 +1,289 @@
+{
+ "key": "edtech_and_online_course_businesses",
+ "name": "Edtech and online course businesses",
+ "kind": "industry",
+ "sector": {
+  "code": "J",
+  "title": "Education and childcare"
+ },
+ "signals": [
+  "online course",
+  "edtech",
+  "LMS",
+  "course platform",
+  "cohort-based course",
+  "recorded course",
+  "live classes",
+  "membership",
+  "subscription",
+  "app",
+  "students dashboard",
+  "Teachable",
+  "Thinkific",
+  "Kajabi",
+  "Udemy",
+  "Moodle",
+  "Google Classroom",
+  "Zoom",
+  "YouTube channel",
+  "freelancing course",
+  "coding bootcamp",
+  "online classes",
+  "course lene ke baad",
+  "refund chahiye",
+  "daurat online",
+  "mansa ta’limiya",
+  "affiliate",
+  "webinar funnel",
+  "upsell",
+  "churn",
+  "completion rate"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Product type: recorded courses, live cohorts, subscription/membership, app, tutoring marketplace, or B2B/school SaaS.",
+  "Audience: school children, university students, adult learners, professionals, schools as customers.",
+  "Platform: own app/website or third-party LMS; payment gateways used (local cards, wallets, Stripe, PayPal, in-app purchase).",
+  "Team size: founders, instructors, support, sales/call team.",
+  "Revenue model: one-time, installments, subscription, freemium.",
+  "Markets served: Pakistan, UAE/GCC, Canada, global.",
+  "Acquisition channels: paid social, YouTube, influencers, webinars, affiliates, school partnerships."
+ ],
+ "scope_rule": "pi notes the edtech business’s operational problems: lead-to-sale funnel, payments and failed charges, refunds, churn, course delivery and support load, content production workflow, instructor management, platform reliability and data visibility. pi never asks for or stores any learner’s name, email, phone, login, grades, progress records or payment details, and is especially strict where learners are children — roles and counts only. It gives no advice on data-protection law, children’s privacy regulation, app-store policy, consumer-refund law, tax or securities/fundraising. pi notes “we have under-18 users” as a shape fact, never collects their data, and never helps build covert tracking or dark patterns.",
+ "vocabulary": {
+  "Funnel": "steps from ad or content to sign-up to purchase.",
+  "Webinar funnel": "free live session used to sell a course.",
+  "Cohort": "group of learners starting together on a live programme.",
+  "Completion rate": "share of buyers who finish a course.",
+  "Churn": "subscribers who cancel.",
+  "Failed payment / dunning": "card or wallet charge that didn’t go through, and the follow-up process.",
+  "Chargeback": "payment reversed by the card holder’s bank.",
+  "Account sharing": "one paid login used by several people.",
+  "Affiliate": "partner who earns a commission per sale.",
+  "Upsell": "selling an advanced or premium course after the first.",
+  "Support ticket": "learner request for help."
+ },
+ "problems": [
+  {
+   "phrase": "Webinar sign-ups are high but only a few buy.",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Our sales team calls leads days late and they’ve already bought elsewhere.",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Ad costs went up and we don’t know our cost per paying student.",
+   "category": "marketing_leads",
+   "subtype": "ad_spend_waste"
+  },
+  {
+   "phrase": "Card payments fail a lot for Pakistani learners and we lose sales.",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "Installment buyers stop paying after month two but keep access.",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Refund requests come through email, DMs and WhatsApp with no record.",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Chargebacks from learners who completed half the course.",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Logins are shared in groups — one account, many viewers.",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Our course videos get pirated and sold on Telegram.",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Subscribers cancel after the first month.",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Most buyers never finish the course and then ask for refunds.",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "Support inbox and WhatsApp are flooded with login problems.",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Affiliates claim sales that we can’t verify.",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Instructors deliver content late, so launches slip.",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Video editing and uploading is all manual.",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "LMS, payment gateway and CRM don’t talk to each other, so we copy-paste.",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Platform fees are going up and moving away would be painful.",
+   "category": "tech_systems",
+   "subtype": "vendor_lock"
+  },
+  {
+   "phrase": "App crashes during live classes.",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "Website checkout is slow on mobile and people drop off.",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "I can’t see revenue, refunds and churn per course in one place.",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Currency changes make our USD tools and ads much more expensive.",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Influencer campaigns — no idea which ones paid back.",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Selling to schools takes months and we don’t track the pipeline.",
+   "category": "sales_revenue",
+   "subtype": "no_sales_visibility"
+  },
+  {
+   "phrase": "School partners want usage reports and we make them by hand.",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "We launched in the UAE but the content and pricing don’t fit.",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Live class team and content team aren’t aligned on what’s coming.",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  }
+ ],
+ "questions": {
+  "product": [
+   "What do you sell mainly — recorded courses, live cohorts, subscriptions, or something for schools?"
+  ],
+  "funnel": [
+   "Where do most buyers first hear about you?",
+   "What happens between sign-up and purchase?",
+   "Roughly how many convert?"
+  ],
+  "sales team": [
+   "Do you have people calling leads?",
+   "How quickly do they reach them?"
+  ],
+  "payments": [
+   "Which payment methods do learners use?",
+   "How often do payments fail?",
+   "What happens next?"
+  ],
+  "refunds and chargebacks": [
+   "How do refund requests come in?",
+   "Is there a single record of them?"
+  ],
+  "access": [
+   "Have you seen account sharing or piracy?",
+   "How do you notice it?"
+  ],
+  "retention": [
+   "How long do subscribers usually stay?",
+   "Do you know why they leave?"
+  ],
+  "support": [
+   "What do learners contact support about most?",
+   "Who answers and how fast?"
+  ],
+  "systems": [
+   "Which tools run the business — LMS, payments, CRM?",
+   "Where do people copy data between them?"
+  ],
+  "content": [
+   "How is a new course produced?",
+   "Where does it usually get stuck?"
+  ],
+  "visibility": [
+   "Which numbers do you look at weekly?",
+   "Where do they come from?"
+  ]
+ },
+ "seasons": "- School-year driven products: back-to-school (August–September in Pakistan/Canada, September in UAE), exam-prep peaks before board and Cambridge sessions, summer slumps or summer-course spikes. - Professional/upskilling courses: January “new year” buying, post-Eid and post-Ramadan pushes in PK/UAE; Ramadan evening engagement high but spending patterns shift. - Sales events: 11.11, Black Friday/White Friday (November), Cyber Monday; year-end offers. - Canada: September and January starts; tax-season and fiscal year-end training budgets for B2B. - Currency moves and ad-platform cost changes (Q4 ad costs rise) affect margins.",
+ "care": [
+  "Never ask for or store learners’ names, emails, phone numbers, logins, payment details or progress; for children’s products, pi explicitly avoids any child data and notes only aggregated counts.",
+  "No advice on data-protection or children’s privacy law, app-store compliance, consumer refund obligations, tax or fundraising.",
+  "No help with dark patterns (hidden cancellation, fake countdown timers, fake reviews, fake “students enrolled” counters) — pi declines.",
+  "No help with scraping competitors’ content, pirating material, or covert tracking of learners’ devices beyond what the owner describes as normal platform analytics.",
+  "Income or job guarantees in course marketing (“earn $1,000 a month”): pi does not help write or endorse them.",
+  "Immigration-linked courses: no visa or migration advice.",
+  "Learner distress or self-harm mentions in support messages: pi advises the owner to point the learner to emergency services/helplines and does not handle details."
+ ],
+ "build_ideas": [
+  "Unified funnel dashboard: ad spend, sign-ups, webinar attendance, purchases and refunds per channel and course.",
+  "Lead routing to the sales team with speed-to-lead alerts and call outcome logging.",
+  "Local payment integration options (wallets, bank transfer, links) alongside cards, with failed-payment retry and reminder sequences.",
+  "Installment manager that pauses or restores LMS access based on payment status per the owner’s rules.",
+  "Refund and chargeback register with reason codes and evidence of access history.",
+  "Account-sharing detection (concurrent device/IP signals) and per-user video watermarking.",
+  "Piracy monitoring checklist workflow and takedown request tracker (owner-run).",
+  "Churn view for subscriptions with cancellation reasons and save-flow tracking.",
+  "Support helpdesk with WhatsApp intake, FAQ bot for login/access, and ticket SLAs.",
+  "Affiliate tracking with unique links/codes and monthly commission statements.",
+  "Content production board: script, recording, editing, upload, QA, launch.",
+  "Integration layer syncing LMS, payment gateway and CRM.",
+  "School-partner usage report generator (aggregated, no student-level data).",
+  "B2B school sales pipeline tracker."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our biggest leak is shared accounts. One student buys, then the whole WhatsApp group logs in."
+  },
+  {
+   "role": "pi",
+   "text": "So paying for one seat ends up as access for many — noted. How did you first notice it was happening?"
+  },
+  {
+   "role": "Person",
+   "text": "Same account logged in from five cities in one day."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a clear signal. Roughly how many accounts do you think are being shared right now — a handful, or a lot more?"
+  }
+ ]
+}

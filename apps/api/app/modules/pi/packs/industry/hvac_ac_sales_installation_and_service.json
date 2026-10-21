@@ -1,0 +1,258 @@
+{
+ "key": "hvac_ac_sales_installation_and_service",
+ "name": "HVAC / AC sales, installation and service",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "AC",
+  "split",
+  "inverter AC",
+  "window AC",
+  "ducted",
+  "VRF",
+  "chiller",
+  "cassette",
+  "gas refill",
+  "gas charging",
+  "service",
+  "cleaning",
+  "installation",
+  "uninstall",
+  "compressor",
+  "PCB",
+  "AC thanda nahi kar raha",
+  "gas khatam",
+  "AC service karwani hai",
+  "mistri",
+  "technician",
+  "mukayyif",
+  "sayyana",
+  "AMC",
+  "warranty",
+  "furnace",
+  "heat pump",
+  "duct cleaning"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Sales of units, installation, repair/servicing, AMCs, or a mix.",
+  "Residential vs commercial (offices, shops, buildings, chillers and VRF).",
+  "Number of technicians and vehicles.",
+  "Brands carried and whether they are an authorised dealer/service centre.",
+  "Volume of service calls per day in peak season.",
+  "Spare parts held (compressors, PCBs, gas cylinders, capacitors).",
+  "Country/city (climate and peak seasons differ sharply)."
+ ],
+ "scope_rule": "pi notes operational and business problems: call booking and dispatch, technician productivity, spare parts and gas stock, warranty claims, AMC renewals, pricing consistency, customer follow-up, collections and seasonal capacity. pi gives no technical advice on refrigerant handling, electrical connections, gas safety, pressure or structural mounting, and does not diagnose faults for customers. It does not advise on environmental or refrigerant regulations. It never records customers’ names, addresses, phone numbers or payment details, or technicians’ personal details; it records roles and counts.",
+ "vocabulary": {
+  "split / inverter / window AC": "common unit types",
+  "VRF / VRV": "multi-zone commercial systems",
+  "chiller": "large central cooling plant",
+  "gas refill / charging": "topping up refrigerant",
+  "PCB / kit": "the unit’s electronic control board",
+  "mistri/ fanni": "technician",
+  "AMC": "annual maintenance contract",
+  "uninstall / reinstall": "moving a unit when people shift homes",
+  "service": "cleaning of filters, coils and drain",
+  "copper piping": "refrigerant pipe between indoor and outdoor units",
+  "heat pump / furnace": "common heating systems in Canada"
+ },
+ "problems": [
+  {
+   "phrase": "In June we get hundreds of calls and miss half of them",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Bookings are written in a diary and some never get assigned",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Technicians do side jobs for our customers in their own time",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Technicians quote whatever they like for gas and parts",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Cash collected by technicians doesn’t match the jobs done",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "I don’t know how many jobs each technician did today",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "The same customer calls back — ‘not cooling again’",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Gas cylinders run out halfway through the season",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Old model PCBs and parts are stuck in the store",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Parts taken out by technicians are never accounted for",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Warranty claims with the brand get rejected for missing paperwork",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "AMC customers don’t get their scheduled services",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "AMCs expire and nobody calls to renew",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Customers wait all day because there’s no time slot",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Technicians spend hours in traffic going across the city",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Winter is completely dead and I still pay salaries",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Good technicians leave for the Gulf or another company before summer",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Commercial clients pay 90 days late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Online reviews say we never turned up",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Unit sales and service are two separate businesses with no link",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Our website and Google listing don’t show booking",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Supplier price of units goes up before summer",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  }
+ ],
+ "questions": {
+  "mix": [
+   "Is most of your work selling units, installing, or servicing?",
+   "Mainly homes or commercial clients?"
+  ],
+  "bookings": [
+   "How do customers book a service today?",
+   "What happens to a call that comes in when everyone’s busy?"
+  ],
+  "dispatch": [
+   "How many technicians do you have out on a normal day?",
+   "How are jobs assigned to them?"
+  ],
+  "pricing": [
+   "Is there a fixed rate list for gas, services and parts?",
+   "How do you check what the technician charged?"
+  ],
+  "cash": [
+   "How do customers pay the technician?",
+   "How is that cash handed back to the office?"
+  ],
+  "parts": [
+   "Which parts or gas run out most often?",
+   "How are parts issued to technicians?"
+  ],
+  "repeat calls": [
+   "How often does the same customer call back about the same fault?",
+   "How do you find out?"
+  ],
+  "amcs": [
+   "How many AMC customers do you have?",
+   "How do you know whose service is due?"
+  ],
+  "warranty": [
+   "How are warranty claims sent to the brand?",
+   "What usually causes a rejection?"
+  ],
+  "seasons": [
+   "How does your workload change between summer and winter?",
+   "What do you do with the team in the quiet months?"
+  ]
+ },
+ "seasons": "In Pakistan, pre-summer servicing and installation surge from March to May, peak breakdowns from May to August, with load-shedding and voltage fluctuations causing extra PCB and compressor faults; winter is quiet except for inverter heat-pump use; shifting season around the school year brings uninstall/reinstall jobs. In the UAE, demand is year-round but peaks April to October; pre- summer AMC servicing in March–April; Ramadan in summer changes visiting hours. In Canada, AC installation and service peak May to August, furnace and heat-pump service peaks September to January, with no-heat emergencies in deep winter.",
+ "care": [
+  "No guidance on refrigerant handling, gas charging, electrical wiring, or mounting outdoor units at height; pi notes the process issue only and says qualified technicians must follow the proper procedure.",
+  "Electric shock, fall from height, gas leak, fire from a unit, carbon monoxide (furnaces) → pi stops and points to emergency services.",
+  "Heat emergencies in vulnerable homes (elderly, infants, no cooling in extreme heat) → pi points to emergency services if there is danger to life.",
+  "Requests to fake warranty cards, swap genuine parts for used ones while billing new, or under-invoice are refused.",
+  "Never record customers’ names, addresses or phone numbers; technicians are referred to by role.",
+  "Technician side-jobs or theft are noted as loss patterns; pi does not help covertly track employees’ personal phones."
+ ],
+ "build_ideas": [
+  "WhatsApp booking flow with time slots, area and issue type, creating a job ticket automatically.",
+  "Missed-call and overflow capture so every call in peak season becomes a ticket.",
+  "Dispatch board assigning jobs by area and skill, with daily WhatsApp job lists to technicians.",
+  "Technician job app: arrival, photos, work done, parts used, amount collected, customer confirmation.",
+  "Fixed rate card in the app so prices are consistent; deviations need approval.",
+  "Cash reconciliation per technician per day against completed jobs.",
+  "Parts and gas cylinder issue log per technician with return and usage match.",
+  "Repeat-fault flag when the same unit gets a call within a set number of days.",
+  "AMC register with scheduled visits, reminders and renewal alerts.",
+  "Warranty claim file per unit: serial, install date, photos, claim status.",
+  "Off-season campaign list (pre-summer servicing) from past customer history.",
+  "Dashboard: calls received vs completed, jobs per technician, repeat rate, collections."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Garmiyon mein itni calls aati hain ke aadhi miss ho jati hain. Phir customer Google pe bura review de deta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — peak garmiyon mein bohat calls miss hoti hain aur reviews kharab aate hain. Noted. Abhi customers aap se zyada tar kis tarah rabta karte hain — phone call ya WhatsApp?"
+  },
+  {
+   "role": "Person",
+   "text": "Dono, lekin zyada call. Office mein do log hain sunne wale."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, zyada calls aati hain aur office mein do log sunte hain. Ek din mein peak season mein taqreeban kitni calls aati hain?"
+  }
+ ]
+}

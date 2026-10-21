@@ -1,0 +1,270 @@
+{
+ "key": "managed_it_support_and_cybersecurity_firms",
+ "name": "Managed IT support and cybersecurity firms",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "AMC",
+  "annual maintenance contract",
+  "helpdesk",
+  "tickets",
+  "SLA",
+  "on-site visit",
+  "remote support",
+  "MSP",
+  "managed services",
+  "endpoint",
+  "firewall",
+  "backup",
+  "antivirus licences",
+  "Microsoft 365",
+  "Google Workspace",
+  "renewals",
+  "server down hai",
+  "email nahi chal rahi",
+  "VAPT",
+  "pen test",
+  "SOC",
+  "audit",
+  "ISO 27001",
+  "da’m tiqni",
+  "amn sibrani",
+  "engineer visit",
+  "hardware supply"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Services: helpdesk/AMC, managed infrastructure, cloud/M365 administration, hardware supply, security testing, monitoring/SOC, compliance support",
+  "Number of client contracts and typical client size",
+  "Engineers and how they are split (helpdesk, field, senior, security)",
+  "How support is priced (per user, per device, fixed AMC, hourly, block hours)",
+  "Tools in use (ticketing, RMM, monitoring, PSA, spreadsheets)",
+  "Whether they resell licences and hardware, and how renewals are tracked",
+  "Cities or regions covered for on-site visits"
+ ],
+ "scope_rule": "pi notes the firm’s operational problems: ticket handling, SLA performance, engineer scheduling and field visibility, contract and licence renewals, billing and collections, documentation, knowledge handover and pipeline. pi gives no technical security guidance, incident response instructions, legal, compliance-certification or regulatory advice. pi never asks for or stores passwords, admin credentials, network diagrams, vulnerability details, client data or client names; it records client types and roles only. Requests to break into systems without authorisation, bypass licensing, deploy hidden monitoring, or help cover up a breach are declined.",
+ "vocabulary": {
+  "AMC": "annual maintenance contract covering support for a fixed fee",
+  "MSP": "managed service provider",
+  "Ticket": "logged support request",
+  "SLA": "agreed response and resolution times",
+  "RMM": "remote monitoring and management tool",
+  "PSA": "professional services automation (tickets, time, billing)",
+  "VAPT / pen test": "authorised vulnerability and penetration testing",
+  "SOC": "security operations centre monitoring alerts",
+  "Block hours": "prepaid support hours",
+  "Escalation": "passing a ticket to a senior engineer",
+  "Licence renewal": "annual renewal of software subscriptions resold to clients",
+  "Site visit": "engineer going on-site"
+ },
+ "problems": [
+  {
+   "phrase": "Clients WhatsApp the engineer directly and the ticket never gets logged",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "We breach SLAs and only know when the client complains",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Fixed AMC clients use us far more than they pay for",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Engineers’ time on-site isn’t recorded",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "I don’t know where field engineers are or how many visits they did",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Licence renewals get missed and the client’s service stops",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "We pay the vendor for licences before the client pays us",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Invoices for extra work go out late or not at all",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Client documentation is in one senior engineer’s head",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Same issues repeat at the same clients because root cause isn’t fixed",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Engineers solve the same problem different ways",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Backups checks are supposed to be done monthly but aren’t",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Hardware ordered for clients arrives late from distributors",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Spare parts and stock in our store don’t match records",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Good engineers leave for bigger companies or abroad",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "On-call after hours is unfair and people burn out",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Ticket data, billing and our accounts are three separate systems",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Monthly service reports to clients are built by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Clients don’t see the value and push back on renewal",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Security assessments generate leads but nobody follows up",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Our own certifications and vendor partner renewals lapse",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Projects (migrations, new offices) overrun and starve the helpdesk",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "We want to sell managed security but can’t staff 24/7",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "intake": [
+   "How do clients usually report problems?",
+   "How many of those end up as logged tickets?"
+  ],
+  "slas": [
+   "What response times have you promised clients?",
+   "How do you know when you’re close to breaching?"
+  ],
+  "field work": [
+   "How are on-site visits assigned?",
+   "How do you see what each engineer did that day?"
+  ],
+  "contracts": [
+   "How are your support contracts priced?",
+   "Do you know which clients use more than they pay for?"
+  ],
+  "renewals": [
+   "How do you track licence and contract renewal dates?",
+   "Has anything lapsed recently?"
+  ],
+  "billing": [
+   "How does extra or out-of-scope work get invoiced?",
+   "How quickly do clients pay?"
+  ],
+  "knowledge": [
+   "Where is each client’s setup documented?",
+   "What happens when the engineer who knows it is away?"
+  ],
+  "team": [
+   "How is after-hours cover handled?",
+   "Where’s turnover hurting most?"
+  ],
+  "reporting": [
+   "Do clients get a regular service report?",
+   "How long does it take to produce?"
+  ],
+  "growth": [
+   "Which service do you want to grow?",
+   "What’s in the way?"
+  ]
+ },
+ "seasons": "- Year-end and fiscal year starts bring licence renewals and budget approvals (June/July in Pakistan, December/January and fiscal-year cycles in UAE and Canada). - Pakistan: summer heat and load-shedding cause hardware and UPS failures; budget announcements change hardware import costs. - UAE: GITEX (October) drives security and cloud deals; summer staff travel thins client teams; office moves cluster around lease renewals. - Canada: winter storms and office closures drive remote-access demand; December holidays bring change freezes. - Audit and compliance deadlines for regulated clients create assessment peaks.",
+ "care": [
+  "Never ask for passwords, admin credentials, IP details, network diagrams, vulnerability findings or client data.",
+  "No technical incident-response or security instructions; if a live breach is described, pi notes it and suggests they follow their incident process and contact relevant authorities.",
+  "Decline unauthorised access, cracking licences, hidden monitoring of employees, or concealing a breach from a client or regulator.",
+  "Client names are not recorded; use “a bank client”, “a school client”.",
+  "Engineers’ personal details are not collected."
+ ],
+ "build_ideas": [
+  "WhatsApp and email ticket intake that creates a logged ticket with client, priority and SLA timer, and replies with a reference number",
+  "SLA dashboard showing tickets near breach, by client and engineer",
+  "Field visit app: assigned jobs, check-in/check-out on site, work notes and photos, client sign-off",
+  "Contract register per client: type, scope, price, renewal date and usage against allowance",
+  "Licence and subscription renewal calendar with reminders to the team and the client",
+  "Time and effort capture per client rolled into a contract profitability view",
+  "Out-of-scope work log that drafts invoices automatically",
+  "Client documentation vault (structure and asset lists, not credentials in plain view) with access controls and change history",
+  "Recurring maintenance checklists (backups, updates, health checks) with completion tracking",
+  "Store and spare parts register with issue/return to engineers",
+  "On-call rota with fair distribution and overtime tracking",
+  "Monthly client service report generated from ticket data"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We have about 35 AMC clients and half of them just WhatsApp my engineers directly. Nothing gets logged."
+  },
+  {
+   "role": "pi",
+   "text": "That makes it hard to see the real workload or prove what was done — noted. When a client messages an engineer directly, does it ever make it into your ticketing system?"
+  },
+  {
+   "role": "Person",
+   "text": "Only if the engineer remembers, which is rarely."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, logging depends on memory. Do you have SLAs with these clients that you’re expected to report on?"
+  },
+  {
+   "role": "Person",
+   "text": "Yes, for some of the bigger ones."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, SLAs exist for the larger clients — noted. How do you currently know which clients are using far more support than their contract covers?"
+  }
+ ]
+}

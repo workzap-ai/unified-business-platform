@@ -1,0 +1,274 @@
+{
+ "key": "hr_and_recruitment_agencies",
+ "name": "HR and recruitment agencies",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "CVs",
+  "candidates",
+  "job orders",
+  "placements",
+  "shortlist",
+  "interviews",
+  "no-show",
+  "offer drop",
+  "replacement guarantee",
+  "placement fee",
+  "retainer search",
+  "headhunting",
+  "payroll outsourcing",
+  "staffing contract",
+  "candidate ne join nahi kiya",
+  "client ne feedback nahi diya",
+  "LinkedIn",
+  "Rozee",
+  "Indeed",
+  "Bayt",
+  "Naukrigulf",
+  "Job Bank",
+  "tawzeef",
+  "sira dhatiya",
+  "sourcing",
+  "ATS"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Model: permanent placement, executive search, contract staffing, payroll outsourcing, or a mix",
+  "Number of recruiters and account managers",
+  "Typical roles filled (blue-collar, admin, tech, executive) and industries",
+  "Number of open job orders at a time and active clients",
+  "How fees are charged (percentage of salary, retainer, monthly margin on contractors)",
+  "Job boards and tools used (LinkedIn, Rozee, Bayt, Indeed, an ATS, Excel)",
+  "Countries placed in (local, GCC, Canada)"
+ ],
+ "scope_rule": "pi notes how the agency runs: sourcing, candidate pipeline tracking, client feedback delays, placements, guarantees, billing, recruiter performance and systems. pi does not give employment law, labour law, visa or immigration advice, or salary benchmarking as advice. pi never collects candidates’ or clients’ names, CVs, CNICs, Emirates IDs, passports, salaries or contact details; it records role types and volumes only. Requests to fabricate experience letters, fake references or degrees, discriminate unlawfully, or charge candidates illegal fees are declined.",
+ "vocabulary": {
+  "Job order / mandate": "a client’s request to fill a role",
+  "Placement": "a candidate who has been hired through the agency",
+  "Replacement guarantee": "free replacement if the hire leaves within an agreed period",
+  "Shortlist": "CVs sent to the client after screening",
+  "Offer drop / back-out": "candidate accepts then doesn’t join",
+  "ATS": "applicant tracking system",
+  "Retained search": "fee partly paid upfront for a senior search",
+  "Contract staffing": "agency employs workers and places them with a client",
+  "Margin": "difference between what the client pays and what the contractor is paid",
+  "Sourcing": "finding candidates",
+  "Time-to-fill": "days from job order to joining",
+  "Rozee / Bayt / Naukrigulf": "regional job portals"
+ },
+ "problems": [
+  {
+   "phrase": "Same candidate is in our system three times with different CVs",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Clients take weeks to give interview feedback and candidates go elsewhere",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Candidates accept and then don’t show up on day one",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Replacements under guarantee eat our margin",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Recruiters keep their best candidates in their own phones",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "When a recruiter leaves, their whole pipeline goes with them",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Recruiters argue over who sourced the placed candidate",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "I can’t see how many CVs each recruiter sent this week",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Clients delay paying placement fees until after probation",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "For contract staff we pay salaries before the client pays us",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Contract staff timesheets come in wrong and we pay the wrong amount",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Job board subscriptions cost a lot and we don’t know which one works",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Hundreds of irrelevant applications to screen by hand",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Our WhatsApp is flooded with candidates asking for updates",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "We only have two or three big clients, if one leaves we’re in trouble",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "New clients are hard to win, we only grow by referral",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "No idea of our average time-to-fill",
+   "category": "reporting_visibility",
+   "subtype": "kpi_undefined"
+  },
+  {
+   "phrase": "Offer letters and contracts are made in Word each time",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Client contracts and fee terms are scattered and nobody knows the guarantee period",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Candidates complain we never got back to them",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "We bought an ATS but recruiters still use Excel",
+   "category": "tech_systems",
+   "subtype": "user_adoption"
+  },
+  {
+   "phrase": "Shortlists sometimes go out with unsuitable CVs",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Our licence renewal and labour registrations are a scramble",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "We want to start a Canada/GCC desk but can’t manage what we have",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "pipeline": [
+   "How many open roles are you working on right now?",
+   "Where do you track candidates against each one?"
+  ],
+  "client feedback": [
+   "How long do clients usually take to respond to a shortlist?",
+   "What happens to the candidates while you wait?"
+  ],
+  "drop-offs": [
+   "How often do candidates back out after accepting?",
+   "At which stage do you usually find out?"
+  ],
+  "recruiters": [
+   "How do you see each recruiter’s activity during the week?",
+   "What happens to their pipeline if they leave?"
+  ],
+  "fees": [
+   "How do you charge — percentage, retainer, or monthly margin?",
+   "When does the money usually arrive?"
+  ],
+  "guarantees": [
+   "How often do replacements come up?",
+   "Do you know what they cost you?"
+  ],
+  "sourcing": [
+   "Which job boards or channels bring your best candidates?",
+   "Do you track that?"
+  ],
+  "contract staff": [
+   "How do you collect their timesheets?",
+   "How often is payroll corrected after the fact?"
+  ],
+  "systems": [
+   "What do you use for CVs and pipeline today?",
+   "Do recruiters actually use it?"
+  ],
+  "growth": [
+   "Where do new clients come from?",
+   "What would you need to take on more roles?"
+  ]
+ },
+ "seasons": "- Pakistan: hiring picks up after the fiscal year starts (July) and after Eid; banking and corporate graduate hiring cycles; slow in Ramadan and late December. - UAE and GCC: Q1 and September–October hiring peaks after budgets and summer; summer and Ramadan slow interviews; Expo-style events and project awards bring bulk demand. - Canada: spring and early autumn hiring peaks; summer and December slow. - Bonus season (Q1) causes resignations and backfills; academic calendar drives graduate intake.",
+ "care": [
+  "Never take candidate CVs, names, numbers, ID or passport details; record role types and volumes.",
+  "No visa, work permit, immigration or labour law advice; note as an operational problem only.",
+  "Decline fake experience letters, forged degrees, false references or charging candidates unlawful fees.",
+  "Discriminatory requests (excluding by religion, nationality, gender where unlawful): pi doesn’t help and notes only the business need.",
+  "Candidate complaints of exploitation or unsafe conditions at a client: pi points to the relevant authorities and doesn’t investigate.",
+  "Salary figures for individuals are not collected."
+ ],
+ "build_ideas": [
+  "Candidate pipeline per job order with stages (sourced, screened, shortlisted, interviewed, offered, joined, in guarantee)",
+  "Duplicate detection when a candidate is added, with source and recruiter credit recorded",
+  "Client feedback chaser: automatic reminders when a shortlist has no response after set days",
+  "Candidate update messages on WhatsApp at each stage to reduce inbound chasing",
+  "Recruiter activity board: CVs sourced, shortlisted, interviews and placements per week",
+  "Placement and guarantee register with guarantee end dates and replacement tracking",
+  "Fee invoicing triggered by joining date, with receivables ageing and reminders",
+  "Contractor timesheet capture on phone, approved by client supervisor, feeding payroll and client billing",
+  "Source tracking per placement to show which job boards and channels work",
+  "Client contract register with fee terms and guarantee periods",
+  "Owner dashboard: open roles, time-to-fill, placements, revenue, receivables"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Clients ka feedback itna late aata hai ke tab tak candidate kahin aur join kar leta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh to bohat frustrating hai — mehnat se candidate dhoondo aur woh wait mein nikal jaye. Noted. Shortlist bhejne ke baad aam taur pe kitne din lagte hain feedback aane mein?"
+  },
+  {
+   "role": "Person",
+   "text": "Kabhi ek hafta, kabhi teen hafte."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, ek se teen hafte tak. Us dauran candidates ko update kaun deta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Recruiter, apne phone se, jab yaad aaye."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, update recruiter ke apne phone se aur bina kisi fixed routine ke — noted. Aap ke paas abhi kitne open roles chal rahe hain?"
+  }
+ ]
+}

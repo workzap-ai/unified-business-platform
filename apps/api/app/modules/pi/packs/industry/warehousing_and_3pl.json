@@ -1,0 +1,267 @@
+{
+ "key": "warehousing_and_3pl",
+ "name": "Warehousing and 3PL",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "warehouse",
+  "3PL",
+  "third-party logistics",
+  "fulfilment centre",
+  "godown",
+  "storage",
+  "racking",
+  "pallet",
+  "bin location",
+  "inbound",
+  "outbound",
+  "putaway",
+  "picking",
+  "packing",
+  "dispatch",
+  "cycle count",
+  "WMS",
+  "SKU",
+  "client stock",
+  "storage charges",
+  "per pallet",
+  "per order",
+  "e-commerce fulfilment",
+  "bonded warehouse",
+  "mustawda’",
+  "makhzan",
+  "free zone warehouse",
+  "forklift",
+  "loader"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Size and type of space (ambient, racked, bonded, free zone) and number of sites.",
+  "Whether they store own goods, clients’ goods (3PL), or both; number of clients.",
+  "Client types: e-commerce sellers, FMCG/distributors, importers, retailers, industrial.",
+  "Services: storage only, pick-pack, kitting, labelling, returns, last-mile.",
+  "Orders/pallets handled per day roughly.",
+  "Team: supervisors, pickers, loaders, forklift operators; permanent vs daily-wage/agency.",
+  "Systems: WMS, Excel, client portals, Shopify/marketplace links, barcode scanners or none."
+ ],
+ "scope_rule": "pi notes operational and business problems: stock accuracy, locations, inbound/outbound flow, picking errors, labour productivity, billing clients for storage and handling, client reporting, space utilisation, systems and coordination. It does not advise on fire safety engineering, racking load ratings, forklift safety certification, bonded or free-zone customs rules, insurance or lease law. It never helps hide client stock discrepancies, release bonded goods improperly, or store prohibited goods. It never stores client customers’ names/addresses, staff names or IDs — only roles.",
+ "vocabulary": {
+  "3PL": "third-party logistics provider handling others’ goods",
+  "WMS": "warehouse management system",
+  "putaway": "placing received goods into storage locations",
+  "bin / location": "a specific rack slot",
+  "pick-pack": "picking items for an order and packing them",
+  "cycle count": "counting part of the stock regularly instead of all at once",
+  "FIFO / FEFO": "first in first out / first expired first out",
+  "ASN": "advance shipping notice from a client about incoming goods",
+  "bonded warehouse": "storage of goods before duties are paid",
+  "kitting": "assembling items into sets or bundles",
+  "pallet position": "one pallet space, a common billing unit",
+  "mustawda’": "warehouse (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Client says they sent 500 cartons, we counted 470",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Pickers can’t find items because they were put in the wrong place",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Wrong items get shipped to the client’s customers",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "We don’t charge clients for all the handling we actually do",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Billing each client every month takes days in Excel",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Clients want live stock reports and we send Excel once a week",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Space is full but I’m not sure it’s being used well",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Stock goes missing and we have to compensate the client",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Expired or near-expiry goods get shipped because FEFO isn’t followed",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Trucks wait hours at the dock because unloading is slow",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Same-day e-commerce cut-off missed during sales",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Returns pile up and no one processes them",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Our WMS doesn’t connect to clients’ Shopify or marketplace accounts",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Clients’ orders come by email and WhatsApp and get re-typed",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Daily-wage labour don’t turn up on peak days",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "I don’t know picks per hour per picker",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Forklift breakdowns stop the whole shift",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Clients pay storage invoices late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Electricity costs for lighting and cooling keep rising",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "I don’t know which clients are profitable for the space they take",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Lease rent increases faster than I can raise prices",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "No one does the daily safety and housekeeping checklist properly",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Serial numbers and batches aren’t recorded so recalls are impossible",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "We want to open a second site near the port but can’t manage both",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "We lose deals because we can’t show clients a proper system",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  }
+ ],
+ "questions": {
+  "inbound": [
+   "What happens when a client’s goods arrive?",
+   "How do you confirm quantities against what they said they sent?",
+   "How long does putaway usually take?"
+  ],
+  "accuracy": [
+   "How often do you count stock, and how far off is it?",
+   "Who takes the loss when stock is missing?"
+  ],
+  "picking": [
+   "How do pickers know where items are?",
+   "What mistakes come up most in orders?"
+  ],
+  "clients": [
+   "How do clients send orders and get stock reports?",
+   "What do they complain about most?"
+  ],
+  "billing": [
+   "How do you calculate each client’s monthly bill?",
+   "What handling tends not to get charged?"
+  ],
+  "labour": [
+   "How many staff on a normal day versus a peak day?",
+   "How do you know who’s productive?"
+  ],
+  "space": [
+   "How full is the warehouse, and how do you decide where things go?"
+  ],
+  "systems": [
+   "What system do you use, and where does it fall short?"
+  ]
+ },
+ "seasons": "E-commerce fulfilment peaks before Ramadan and Eid ul Fitr, around 11.11, White/Black Friday and 12.12 in Pakistan and the UAE, and Black Friday through Christmas in Canada. FMCG clients load stock before Ramadan and summer beverage season. Importer clients’ containers bunch before Chinese New Year and before Pakistani budget changes. UAE summer raises cooling costs and slows labour midday; Dubai Shopping Festival and back-to-school create spikes. Year-end stock counts (June in Pakistan; December for many UAE and Canadian clients) bring audit workload.",
+ "care": [
+  "Fire, racking collapse, forklift accidents or injuries: pi stops and points to emergency services (1122/16 fire in Pakistan, 997 fire / 999 police in the UAE, 911 in Canada).",
+  "Fire safety, racking ratings, forklift certification, hazardous goods storage: safety-regulated; pi does not advise.",
+  "Bonded and free-zone rules, customs releases: out of scope; refer to their clearing agent or authority.",
+  "Requests to adjust client stock records to hide losses: pi declines.",
+  "Storing prohibited or undeclared goods: pi declines.",
+  "Labour and agency staffing law, visas: out of scope; pi notes only scheduling or productivity problems.",
+  "Client’s end-customer data (names, addresses on orders): never stored by pi."
+ ],
+ "build_ideas": [
+  "Inbound receiving app: scan or count against ASN, photos of damage, discrepancy report sent to client the same day.",
+  "Location-based stock register with bin labels and putaway confirmation.",
+  "Pick lists sorted by location with scan-to-confirm to catch wrong items.",
+  "FEFO picking rules and expiry alerts per client batch.",
+  "Client portal or WhatsApp report giving live stock, orders shipped and inbound status.",
+  "Order intake that accepts client spreadsheets or connects to Shopify/marketplaces.",
+  "Activity-based billing: storage days, pallets, picks, packs, labelling captured automatically into a monthly invoice.",
+  "Client profitability view: revenue vs space and labour used.",
+  "Labour productivity board: picks/packs per person per hour, shift attendance.",
+  "Returns processing workflow with grading and restock or write-off.",
+  "Equipment maintenance log for forklifts and racking inspections.",
+  "Daily checklist on phone for housekeeping and safety walk, with photo proof."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We run a 3PL in Dubai Investments Park with about 20 clients. Monthly billing is a nightmare — it takes my accountant almost a week."
+  },
+  {
+   "role": "pi",
+   "text": "A week every month just to bill is a lot of time. Noted. What makes it take so long — gathering the activity, calculating, or chasing approvals?"
+  },
+  {
+   "role": "Person",
+   "text": "Gathering. Storage, picks, labelling, extra labour, all in different sheets."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — the billable activity is spread across different sheets. Do you think some of that activity ends up not being billed at all?"
+  }
+ ]
+}

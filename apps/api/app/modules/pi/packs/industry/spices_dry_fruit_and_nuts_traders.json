@@ -1,0 +1,270 @@
+{
+ "key": "spices_dry_fruit_and_nuts_traders",
+ "name": "Spices, dry fruit and nuts traders",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "spices",
+  "masala",
+  "mirch",
+  "haldi",
+  "dhania",
+  "zeera",
+  "dry fruit",
+  "mewa",
+  "khajoor",
+  "dates",
+  "almonds",
+  "badam",
+  "pistachio",
+  "pista",
+  "walnut",
+  "akhrot",
+  "chilgoza",
+  "cashew",
+  "kaju",
+  "kishmish",
+  "saffron",
+  "zafran",
+  "bahar mukassarat tamr ( ﺮﻤﺗ Jodia Bazaar, Akbari Mandi, Deira spice souk, wholesale, bori, maund, grinding, packing"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Wholesale, retail, or both; number of shops/stalls",
+  "Import, local sourcing, or buying from bigger wholesalers",
+  "Whole vs ground spices, own grinding unit, own packing/brand",
+  "Customer mix: retailers, restaurants, households, online, export",
+  "Storage: godown, cold storage for dry fruit, pest control",
+  "Credit given to shopkeepers and terms",
+  "Currencies involved in imports"
+ ],
+ "scope_rule": "pi notes operational problems: price swings, stock ageing and pests, godown counts, grading, credit to shopkeepers, import timing, packing, brand and online sales. It does not advise on customs, import duties, food-adulteration law, labelling, testing standards, or tax, and never helps with under-invoicing or smuggling. It does not record names of buyers, suppliers or staff, nor bank or payment details.",
+ "vocabulary": {
+  "mewa": "dry fruit",
+  "bori": "sack",
+  "maund/mann": "traditional weight unit (about 40 kg)",
+  "godown": "warehouse",
+  "grading": "sorting by size/quality",
+  "kacha/pakka maal": "raw vs processed/packed goods",
+  "arhat/arhti": "commission agent in wholesale markets",
+  "rate list": "daily price sheet sent to buyers",
+  "ghun": "weevil/pest infestation"
+ },
+ "problems": [
+  {
+   "phrase": "Prices of dry fruit change every week before winter and I’m stuck with old stock bought high",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Pests got into a lot of stock in the godown",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Godown count never matches the register",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Old lots sit at the back and we sell new ones first",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Some lots haven’t moved since last season",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Import container held up and Ramadan dates arrived late",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Rupee/dirham move ate my margin on the last shipment",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Shopkeepers take goods on credit, then delay months",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Credit ledger with 100+ shopkeepers in a khata",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Daily rate list goes out by WhatsApp voice notes and people quote old rates",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Grinding loss is more than it should be",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Packed weight is sometimes under, customers complain",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Quality differs lot to lot and buyers return goods",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Staff weighing and packing take extra home",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Orders from retailers come on WhatsApp all day",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Online orders on Daraz/Amazon/Noon, stock goes negative",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Courier COD money comes late",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "Own brand packs not reaching supermarkets",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "I don’t know which items actually make money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Ramadan and winter peak, I can’t hire enough packers",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Supplier sends lower grade than the sample",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Everything runs through me, my son doesn’t know the business",
+   "category": "planning_growth",
+   "subtype": "succession_family"
+  },
+  {
+   "phrase": "Test reports and registrations for packed goods are a headache",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "No idea what stock I have until I go to the godown",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  }
+ ],
+ "questions": {
+  "stock": [
+   "How do you know what’s in the godown today?",
+   "When was the last full count?"
+  ],
+  "ageing": [
+   "Which items sit the longest?",
+   "How do you decide which lot goes out first?"
+  ],
+  "pests and storage": [
+   "Have you lost stock to pests or damp?",
+   "How is it stored?"
+  ],
+  "pricing": [
+   "How do buyers get your daily rates?",
+   "How often do quoted rates go wrong?"
+  ],
+  "imports": [
+   "Which items do you import?",
+   "What usually causes the delays?"
+  ],
+  "currency": [
+   "Do you buy in a foreign currency?"
+  ],
+  "credit": [
+   "How many shopkeepers buy on credit?",
+   "Where is the ledger kept?"
+  ],
+  "packing": [
+   "Do you grind or pack yourselves?",
+   "How do you check packed weights?"
+  ],
+  "online": [
+   "Do you sell online?",
+   "How do you keep stock in sync?"
+  ],
+  "margin": [
+   "Which items do you think make the least?"
+  ],
+  "succession": [
+   "Who else in the family knows the numbers?"
+  ]
+ },
+ "seasons": "- PK: winter is peak for dry fruit (almonds, walnuts, chilgoza, kishmish) and gifting; Ramadan drives dates, spices and pakora mixes; Eid ul Adha raises demand for BBQ and meat masalas; wedding season for dry-fruit gift trays; harvest timing of chillies and other crops sets prices. - UAE: Ramadan dates and nuts peak; Eid gifting; Diwali dry-fruit boxes; winter season for tourists in spice souks; date harvest in summer. - Canada: Diwali, Eid, Christmas and holiday baking seasons; Ramadan for halal grocers.",
+ "care": [
+  "Fire in godowns (dust, electrics), stack collapses or fumigation chemical exposure: pi points to emergency services.",
+  "Fumigation and pest-control chemicals: no dosing or safety advice; operational notes only.",
+  "Adulteration (dyes, fillers) and mislabelling: pi never helps; declines requests.",
+  "Customs, duties and import documentation: no advice; notes the delay and admin effort.",
+  "Requests to under-invoice imports, use informal money transfer, or smuggle across borders: pi declines.",
+  "Shopkeepers in credit ledgers recorded by label/role only."
+ ],
+ "build_ideas": [
+  "Godown stock register by item, grade and lot, with purchase date and cost, showing age of each lot",
+  "Count app for godown with variance against the register",
+  "Daily rate list builder sent as one formatted WhatsApp message/PDF with date, so old rates can’t be confused",
+  "Credit ledger for shopkeepers with statements, ageing and reminders",
+  "Import shipment tracker: order, supplier, expected dates, currency rate at order and at payment",
+  "Margin per item using actual landed cost",
+  "Grinding and packing yield log, packed-weight checks",
+  "Retailer order form via WhatsApp feeding one order list",
+  "Marketplace stock sync between shop and online listings",
+  "COD remittance tracker by courier",
+  "Seasonal buying planner using last year’s sales by month",
+  "Owner dashboard: stock value, receivables, top movers, ageing stock"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Jodia Bazaar mein dukaan hai. Sab se bara masla udhaar hai, 150 dukaandaar hain aur khata hi khata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — takreeban 150 dukaandaar udhaar par lete hain aur sab hisaab khatay mein hai. Inn mein se kitne waqt par payment kar dete hain, aap ke andaze mein?"
+  },
+  {
+   "role": "Person",
+   "text": "Aadhe bhi nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted. Payment yaad dilane ka kaam abhi kaun karta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Main khud phone karta hun."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted ke reminders aap khud karte hain. Kya kabhi hisaab par dukaandaar se ikhtilaaf hota hai?"
+  }
+ ]
+}

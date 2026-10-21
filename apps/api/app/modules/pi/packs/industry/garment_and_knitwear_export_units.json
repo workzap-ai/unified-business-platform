@@ -1,0 +1,298 @@
+{
+ "key": "garment_and_knitwear_export_units",
+ "name": "Garment and knitwear export units",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "garment factory",
+  "stitching unit",
+  "knitwear",
+  "CMT",
+  "FOB",
+  "buyer",
+  "merchandiser",
+  "tech pack",
+  "PP sample",
+  "fit sample",
+  "TNA",
+  "ship date",
+  "ex-factory",
+  "air shipment",
+  "cutting",
+  "stitching",
+  "finishing",
+  "washing",
+  "line efficiency",
+  "SMV",
+  "piece rate",
+  "thekedar",
+  "line in-charge",
+  "AQL",
+  "inspection",
+  "audit",
+  "chargeback",
+  "claim",
+  "LC",
+  "maal shipment se reh gaya"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Woven, knitwear, denim, or a mix; and whether they also do knitting, dyeing or washing in-house.",
+  "Full package (FOB) or cut-make-trim (CMT) only.",
+  "Number of stitching lines and machines, and whether stitching is in-house or outsourced to thekedars/subcontractors.",
+  "Main buyer markets (EU, UK, US, Middle East, local brands) and whether through buying houses or direct.",
+  "How orders are tracked: Excel TNA, ERP, buyer portal, WhatsApp.",
+  "Payment terms typically received: LC, advance, open account."
+ ],
+ "scope_rule": "pi notes operational problems: missed ship dates, line efficiency, material arrival delays, cutting wastage, quality failures, chargebacks, sample delays, payment delays and visibility across orders. pi does not give advice on customs, export finance, duty drawback or export facilitation schemes, LC terms, labour law, or social-compliance audit outcomes, and does not help prepare or alter audit records. pi records roles such as merchandiser, line in-charge, QA, never worker names, IDs or buyer contact details.",
+ "vocabulary": {
+  "CMT": "cut, make, trim: factory stitches using buyer-supplied fabric",
+  "FOB": "factory supplies all materials and delivers to the port",
+  "tech pack": "buyer’s specification for a style",
+  "PP sample": "pre-production sample to be approved before bulk",
+  "TNA": "time-and-action calendar of every milestone to ship date",
+  "SMV / SAM": "standard minutes to make one garment",
+  "AQL": "sampling standard used for final inspection",
+  "ex-factory": "date goods must leave the factory",
+  "chargeback / claim": "deduction from buyer for delay or defect",
+  "air shipment": "goods flown at factory cost when late",
+  "trims / accessories": "buttons, labels, zips, hangtags, polybags",
+  "thekedar": "contractor running a stitching line or providing workers"
+ },
+ "problems": [
+  {
+   "phrase": "We missed the ex-factory date and had to air-ship at our own cost",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Fabric arrived late from the mill so stitching started late",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Trims arrive in wrong quantities or wrong colours",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Merchandisers keep the TNA in their own Excel and I can’t see all orders",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "PP sample approval takes forever and eats into production time",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Line efficiency varies a lot and I don’t know why",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Cutting wastage is higher than the costing allowed",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Leftover fabric and cut panels go missing",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Final inspection failed and we reworked the whole lot",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Defects are found at the end, not inline",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Buyer deducted a claim and we don’t know what for",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Payment comes 60 to 120 days after shipment",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "I don’t know the real margin per style once rework and air freight are in",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Costing sheets are done in a hurry and we underquote",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Operators leave after Eid and new ones are slow",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Piece-rate counts are disputed every week",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Subcontractor delivered fewer pieces than we sent cut panels for",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Excess stock from cancelled orders sits in the godown",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Too much reliance on one buyer",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Audit document requests take the whole office a week",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Merchandiser leaves and takes all order knowledge with them",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Production, store and merchandising send conflicting updates to the buyer",
+   "category": "communication_coordination",
+   "subtype": "branches_not_aligned"
+  },
+  {
+   "phrase": "Few new buyers; we rely on agents",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "No proper catalogue or website for new buyers to see our capability",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  },
+  {
+   "phrase": "Capacity is booked but I don’t know if we can take another order",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Overtime before shipments is huge",
+   "category": "people_staff",
+   "subtype": "overtime"
+  }
+ ],
+ "questions": {
+  "ship dates": [
+   "How many orders missed ex-factory in the last few months?",
+   "At which stage did they usually slip?"
+  ],
+  "materials": [
+   "Which arrives late most often — fabric, trims or accessories?",
+   "Who chases suppliers?"
+  ],
+  "order tracking": [
+   "Where does each order’s TNA live today?",
+   "Can you see all orders on one page?"
+  ],
+  "samples": [
+   "How long does a sample usually take from tech pack to approval?",
+   "What causes rounds of re-sampling?"
+  ],
+  "lines": [
+   "How is line output recorded during the day?",
+   "When efficiency drops, how do you find out?"
+  ],
+  "quality": [
+   "Is there inline checking or only end-of-line and final?",
+   "What are the top defects?"
+  ],
+  "cutting": [
+   "How do you compare actual fabric used against costing?",
+   "Where does leftover fabric go?"
+  ],
+  "subcontracting": [
+   "How much stitching goes outside?",
+   "How do you reconcile pieces sent and received?"
+  ],
+  "cash": [
+   "What payment terms do your main buyers give?",
+   "How are claims and deductions tracked?"
+  ],
+  "costing": [
+   "How are costings prepared?",
+   "Do you compare them with actual after shipment?"
+  ],
+  "staff": [
+   "Are operators paid monthly or per piece?",
+   "Where do disputes come from?"
+  ],
+  "buyers": [
+   "How do new buyers usually find you?",
+   "What do they ask to see first?"
+  ]
+ },
+ "seasons": "Export production follows Western retail seasons: spring/summer goods produced roughly from October to March and autumn/winter goods from April to August, with Q3 rush for Black Friday and Christmas deliveries. Pakistan local brands peak before Eid ul Fitr, Eid ul Adha, wedding season (roughly October to March) and summer and winter lawn/knitwear launches. Labour shortage after both Eids; summer heat and load shedding; monsoon transport delays; budget in June. UAE units (mostly in free zones) serve GCC uniforms and regional brands, peaking before Ramadan, Eid and the school year (late August). Canada: small apparel manufacturers in Montreal, Toronto and Winnipeg follow back-to-school and holiday seasons, with winter outerwear produced in summer.",
+ "care": [
+  "Factory fire, building safety concerns, injuries or stampede risk: pi stops and points to emergency services first.",
+  "No advice on social-compliance audits, certifications, or how to pass them; pi never helps create or alter attendance, wage or working- hour records.",
+  "Requests for fake origin labels, misdeclared quantities or under-invoicing: pi declines plainly.",
+  "No advice on LCs, export finance, duty drawback, customs or tax refunds.",
+  "Child labour, forced overtime or withheld wages: pi does not help optimise these and states it is outside what it can help with.",
+  "Never stores buyer names with contact details, worker identities or bank details; records “EU buyer”, “buying house”.",
+  "Disputes over claims: pi notes the record gap, not liability."
+ ],
+ "build_ideas": [
+  "Order and TNA board: every style, milestone dates, status and risk flags, visible to merchandisers and the owner.",
+  "Material arrival tracker per order with PO, promised date, received date and shortage alerts.",
+  "Sample tracker from tech pack to approval with rounds, comments and turnaround days.",
+  "Hourly line output entry on phone by line in-charge, with efficiency against SMV.",
+  "Inline and final QC app recording defects by type, operation and line, with photos.",
+  "Cutting register comparing fabric issued, pieces cut and costing allowance.",
+  "Subcontractor ledger for pieces sent, received, rejected and paid.",
+  "Piece-rate wage sheet built from verified daily counts.",
+  "Costing tool with post-shipment actual-vs-costing comparison per style.",
+  "Buyer payment and claims tracker with ageing and deduction reasons.",
+  "Leftover and cancelled stock register for liquidation.",
+  "Audit document folder with expiry reminders for licences and certificates.",
+  "Simple capability website and digital lookbook for new buyers."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We missed ex-factory twice this quarter and both times paid for air freight. Fabric came late."
+  },
+  {
+   "role": "pi",
+   "text": "That’s painful on margin. Noted: two missed ex-factory dates this quarter, with air freight paid, linked to late fabric. Is the fabric mostly from one mill or several?"
+  },
+  {
+   "role": "Person",
+   "text": "Mostly one mill in Faisalabad. They keep saying next week."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, one main mill with repeated delays. How do you track promised versus actual arrival dates right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Merchandiser’s Excel, and calls."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted. When the fabric slips, does anyone see the knock-on to the ship date straight away, or does it come up later?"
+  }
+ ]
+}

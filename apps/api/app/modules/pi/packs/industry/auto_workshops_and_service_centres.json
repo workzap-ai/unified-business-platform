@@ -1,0 +1,279 @@
+{
+ "key": "auto_workshops_and_service_centres",
+ "name": "Auto workshops and service centres",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "workshop",
+  "garage",
+  "service centre",
+  "mistri",
+  "ustad",
+  "chhota",
+  "job card",
+  "estimate",
+  "tuning",
+  "oil change",
+  "denting painting",
+  "body shop",
+  "AC repair",
+  "electrician",
+  "scanner",
+  "diagnostic",
+  "gaari khuli pari hai",
+  "parts nahi aaye",
+  "comeback",
+  "warranty job",
+  "insurance claim",
+  "surveyor",
+  "bay",
+  "lift",
+  "warsha/ karaj",
+  "mekaniki",
+  "qita’ ghiyar",
+  "MOT / safety inspection",
+  "appointment",
+  "fleet account"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type of workshop: general mechanical, body and paint, electrical/AC, tyre, quick service, or authorised dealer service.",
+  "Number of bays/lifts and mechanics, and how mechanics are paid (salary, daily wage, per-job share).",
+  "Whether they buy parts themselves or customers bring parts.",
+  "Mix of walk-in private customers, fleet/corporate accounts and insurance jobs.",
+  "How jobs are recorded today: paper job cards, Excel, workshop software, WhatsApp photos.",
+  "Number of branches and whether the owner is on the floor daily.",
+  "Typical vehicles (cars, SUVs, commercial vehicles, luxury, hybrids/EVs)."
+ ],
+ "scope_rule": "pi notes operational and business problems: job intake, estimates and approvals, parts sourcing delays, bay utilisation, mechanic productivity, comebacks, billing, collections from fleet or insurance accounts, and customer communication. pi does not give technical repair diagnoses, safety-engineering advice, environmental compliance advice (oil and coolant disposal rules), insurance claim legal advice, or labour-law advice. pi does not store customers’ names, phone numbers, plate numbers linked to people, or mechanics’ personal details; it uses roles (“a fleet client”, “my senior mechanic”).",
+ "vocabulary": {
+  "Job card": "the record of a vehicle’s complaint, work done, parts and labour.",
+  "Estimate / quotation": "the expected cost given before work starts.",
+  "Ustad / mistri": "senior mechanic; chhota — apprentice or helper.",
+  "Comeback": "a car returning because the same problem wasn’t fixed.",
+  "Surveyor": "insurer’s assessor who approves accident repair.",
+  "Denting-painting": "body panel repair and paint.",
+  "Scanner": "diagnostic tool plugged into the car’s computer.",
+  "Bay / lift": "a working space for one vehicle.",
+  "OEM / genuine vs local / Chinese parts": "original versus aftermarket parts.",
+  "Karaj / warsha": "Arabic/Gulf words for garage/workshop.",
+  "Sublet": "work sent to another specialist (e.g. machining, upholstery)."
+ },
+ "problems": [
+  {
+   "phrase": "Cars sit for days because parts haven’t come",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Customer approved one amount, final bill is higher, then a fight",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Estimates are verbal, nothing written, then disputes",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Same car comes back next week with the same problem",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "I don’t know which mechanic is productive and which is sitting",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Mechanics do side jobs on my bay and my tools",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Parts are taken from stock and never billed",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Old parts and oil stock, no count, things disappear",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Customers keep calling to ask if the car is ready",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Bays are jammed some days and empty others",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Fleet companies pay after 60–90 days and cash is stuck",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Insurance jobs wait for surveyor approval and the car blocks a bay",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "I don’t know my profit on labour versus parts",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Customers bring their own parts, then blame us when they fail",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Good mechanics leave for the Gulf or the dealer",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Hard to find trained hybrid or electric car technicians",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Job cards are handwritten and get lost",
+   "category": "tech_systems",
+   "subtype": "no_system"
+  },
+  {
+   "phrase": "No reminders for next oil change, customers forget us",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Cash taken at the counter is less than the jobs done",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Lift and compressor break down and work stops",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Bad Google reviews about delays",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Photos of damage before work are not taken, then the customer claims we scratched it",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Sublet work goes out and we lose track",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Parts prices from suppliers change every week",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "I can’t leave the workshop because everything comes to me",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "We want online booking, people just turn up",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  }
+ ],
+ "questions": {
+  "intake": [
+   "What happens when a car first arrives — who writes up the complaint?",
+   "Is the estimate written or verbal?",
+   "How does the customer approve extra work?"
+  ],
+  "parts": [
+   "When a part is needed, who orders it and from where?",
+   "How long do cars usually wait for parts?"
+  ],
+  "bays and staff": [
+   "How many bays and mechanics do you have?",
+   "How do you see who’s working on what right now?"
+  ],
+  "quality": [
+   "How often does a car come back for the same issue?",
+   "What usually causes it?"
+  ],
+  "billing and cash": [
+   "How is the final bill made?",
+   "Who takes payment, and how do you check it against jobs done?"
+  ],
+  "fleet and insurance": [
+   "Which accounts pay on credit?",
+   "How long do they usually take?"
+  ],
+  "stock": [
+   "Do you keep parts and oils in stock?",
+   "How do you know what’s been used versus billed?"
+  ],
+  "customers": [
+   "How do customers know their car is ready?",
+   "Do you remind them about their next service?"
+  ],
+  "owner time": [
+   "Which decisions still have to come to you personally?"
+  ]
+ },
+ "seasons": "Pakistan: AC repair peaks from April to September; pre-Eid rush for servicing before long trips; monsoon (July– September) brings electrical faults, flooded cars and wiper/brake work; winter brings battery and starting issues in the north. UAE: summer is AC and cooling-system season and heavy on tyres and batteries due to heat; pre-summer-travel servicing in June; quieter evenings in Ramadan but late-night work. Canada: seasonal tyre changeovers in spring and autumn create huge peaks; winter brings battery, block heater and accident body work; pre-road-trip summer servicing.",
+ "care": [
+  "Never diagnose a fault or say a car is safe to drive; if brakes, steering or fire risk is mentioned, say pi can’t advise and that it needs a qualified technician; if anyone is hurt, point to emergency services.",
+  "Do not advise on oil, coolant, battery acid or paint waste disposal rules; note the problem as compliance effort only.",
+  "Insurance disputes and claims are out of scope beyond the process delay.",
+  "Do not record customers’ plates with names, phone numbers or mechanics’ personal details.",
+  "Decline anything that helps inflate insurance claims, fake invoices, or tamper with emissions or odometers.",
+  "Staff theft accusations: note the pattern, never encourage covert surveillance or name individuals.",
+  "Labour disputes, wages and apprentices’ ages are legal matters; note only the operational effect.",
+  "Workplace injuries (lift falls, burns) → emergency services first."
+ ],
+ "build_ideas": [
+  "Digital job card on phone: vehicle, complaint, check-in photos, estimate, approvals, parts, labour, status.",
+  "WhatsApp estimate approval: the customer receives the estimate and approves extra work with one reply, logged on the job.",
+  "Bay board showing every car, its mechanic, stage and promised time.",
+  "Parts request and purchase tracker with supplier, expected date and car waiting.",
+  "Parts stock register with issue-to-job, so every part used is tied to a bill.",
+  "Mechanic productivity view: jobs done, hours booked, comebacks.",
+  "Comeback log linking returning cars to the original job.",
+  "Credit account ledger for fleet and insurance clients with ageing alerts and statement sending.",
+  "“Car ready” and next-service reminder messages.",
+  "Daily cash-up reconciling payments received against closed jobs.",
+  "Equipment maintenance schedule for lifts, compressors and scanners.",
+  "Online booking slots for routine services and seasonal tyre changes.",
+  "Owner dashboard: cars in, cars out, revenue split labour/parts, average days in workshop."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Customer bolta hai 8,000 ka bola tha, bill 14,000 ka kaise aa gaya. Har hafte yehi jhagra."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh jhagra baar baar hona thakaane wala hai — noted. Estimate abhi customer ko likh kar diya jata hai ya zubani bataya jata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Zubani. Ustad dekh ke bata deta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Jab kaam ke dauran koi aur kharabi nikalti hai, customer se approval kaise li jati hai?"
+  }
+ ]
+}

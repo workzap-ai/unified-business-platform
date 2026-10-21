@@ -1,0 +1,285 @@
+{
+ "key": "packaged_food_and_fmcg_brands",
+ "name": "Packaged food and FMCG brands",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "FMCG",
+  "packaged food",
+  "brand",
+  "SKU",
+  "distributor",
+  "dealer",
+  "retailer",
+  "modern trade",
+  "general trade",
+  "kiryana",
+  "pansari",
+  "supermarket listing",
+  "shelf space",
+  "order booker",
+  "salesman",
+  "beat",
+  "route",
+  "primary/secondary sales",
+  "trade scheme",
+  "factory",
+  "production line",
+  "packaging",
+  "private label",
+  "wakeel",
+  "muwazzi’",
+  "hypermarket",
+  "Daraz/Noon/Amazon"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Own factory, contract manufacturer (toll packing), or importer/brand owner",
+  "Number of SKUs and main categories (snacks, sauces, spices, biscuits, frozen, ready meals)",
+  "Route to market: own distributors, appointed distributors, direct to modern trade, online",
+  "Number of distributors and cities/emirates/provinces covered",
+  "Sales team structure: order bookers, merchandisers, area managers",
+  "Export markets, if any",
+  "Systems in use: ERP, Tally/QuickBooks, distributor management system, Excel"
+ ],
+ "scope_rule": "pi notes operational and business problems: secondary-sales visibility, distributor stock and claims, trade schemes, expiry returns, production planning, packaging supply, sales-team performance and reporting. It does not advise on food registration, labelling, nutrition claims, halal certification, food-authority approvals, competition law, trade contracts or tax. It does not record names or contact details of distributors’ staff, retailers, salespeople or customers, and never takes bank details.",
+ "vocabulary": {
+  "primary sales": "factory to distributor",
+  "secondary sales": "distributor to retailer",
+  "tertiary": "retailer to consumer",
+  "order booker": "salesperson taking orders from shops on a beat",
+  "beat/route": "fixed list of shops visited on a day",
+  "trade scheme": "discount or free goods to the trade",
+  "claims": "distributor requests for scheme reimbursement or expiry returns",
+  "listing fee": "charge to get on a supermarket shelf",
+  "MT/GT": "modern trade (supermarkets) / general trade (small shops)",
+  "near-expiry": "stock close to its date",
+  "co-packer": "contract manufacturer"
+ },
+ "problems": [
+  {
+   "phrase": "I only see primary sales, I don’t know what actually sold in the market",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Distributors load up on stock at month-end to hit targets, then don’t order",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Expired stock comes back from the market and we eat the cost",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Distributor claims for schemes take months to verify",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "I’m not sure schemes reach the retailer or the distributor keeps them",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Order bookers fake visits, shops say nobody came",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Sales team misses targets and blames stock",
+   "category": "sales_revenue",
+   "subtype": "target_missed"
+  },
+  {
+   "phrase": "Some SKUs always out of stock in the market, others rot",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Production plan is made on gut feel",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Packaging film/cartons run out and the line stops",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Raw material import delays stop production",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Commodity prices up, can’t raise MRP fast enough",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "I don’t know margin by SKU after schemes and returns",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Supermarkets pay in 90–120 days",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Listing fees and promotions at hypermarkets, can’t tell if they pay back",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Batch on the shelf has a defect and I can’t trace which line or shift",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Quality varies batch to batch",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "QC checks are skipped on night shift",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Line breakdowns kill output",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Online sales on Daraz/Noon/Amazon clash with distributor pricing",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Freight costs to other cities are rising",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Every distributor sends a different Excel",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Registration renewals for each SKU and market are hard to track",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "New product launches flop and we don’t know why",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Brand isn’t known outside our home city",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "Head office and factory don’t talk, orders confirmed that can’t be made",
+   "category": "communication_coordination",
+   "subtype": "handoffs"
+  }
+ ],
+ "questions": {
+  "visibility": [
+   "Can you see what your distributors sell to shops?",
+   "How do they send it?"
+  ],
+  "distributors": [
+   "How many distributors do you work with?",
+   "Which ones worry you most, and why?"
+  ],
+  "schemes and claims": [
+   "How are trade schemes paid out?",
+   "How long do claims take to settle?"
+  ],
+  "expiry": [
+   "How much stock comes back as near-expiry or expired?",
+   "Which SKUs mostly?"
+  ],
+  "sales team": [
+   "How do you know order bookers visited their shops?",
+   "How are targets set?"
+  ],
+  "production": [
+   "How do you decide what to produce each week?",
+   "What stops the line most often?"
+  ],
+  "materials": [
+   "Which raw material or packaging runs short most?"
+  ],
+  "margin": [
+   "Do you know margin per SKU after schemes and returns?"
+  ],
+  "modern trade": [
+   "How long do supermarkets take to pay?"
+  ],
+  "quality": [
+   "If a complaint comes in, can you trace the batch?"
+  ],
+  "reporting": [
+   "How long does it take to get last month’s numbers together?"
+  ]
+ },
+ "seasons": "- PK: Ramadan is the biggest FMCG season (beverages, pakora mixes, dates, sauces, sharbat), with heavy pre-loading in Shaban; Eid ul Adha for spices and masalas; summer for drinks and ice-lolly mixes; winter for soups, dry fruit and tea; back-to-school for snacks and juices; budget announcements in June can shift prices and pre-buying. - UAE: Ramadan and Eid; back-to-school in late August/September; summer heat for beverages; Dubai Shopping Festival and year-end promotions; White Friday/11.11 online sales. - Canada: back-to-school, Thanksgiving, Christmas holidays; summer BBQ season; Ramadan and Diwali for ethnic food brands.",
+ "care": [
+  "Factory injuries, machinery entanglement, boiler issues, ammonia or chemical leaks, fires: pi points to emergency services immediately.",
+  "Product recalls or contamination reports: pi notes the traceability problem and suggests the relevant authority and qualified advisers; it does not advise on recall steps.",
+  "Food registration, labelling, nutrition and health claims: out of scope.",
+  "Distributor contract disputes and exclusivity: no legal advice.",
+  "Requests to fix prices with competitors, under-invoice, or relabel expired stock: pi declines.",
+  "Personal data of retailers, order bookers or consumers: not collected."
+ ],
+ "build_ideas": [
+  "Distributor management portal where distributors submit secondary sales and stock weekly in one format",
+  "Order booker app: beat plan, shop check-in with location and photo, order capture, visit history",
+  "Scheme and claim tracker: scheme rules, claims submitted, evidence, approval status, ageing",
+  "Near-expiry radar: stock by batch and expiry at factory and distributors, with alerts",
+  "Batch traceability from raw material lot to production line, shift and dispatch",
+  "Weekly production plan using recent secondary sales and current stock",
+  "Raw and packaging material stock with reorder points and supplier lead times",
+  "SKU margin model including schemes, returns, freight and listing fees",
+  "Modern-trade receivables tracker with invoice ageing",
+  "QC checklist per batch on a tablet with sign-off",
+  "Line downtime log with reasons",
+  "Registration and renewal tracker per SKU and market",
+  "Owner dashboard: primary vs secondary, stock in market, returns, receivables, top/bottom SKUs"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We sell through 14 distributors. I see what I sell to them, but no clue what they sell to shops."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — 14 distributors, and you can only see primary sales. Do any of them send you secondary sales at all?"
+  },
+  {
+   "role": "Person",
+   "text": "A few send Excel, most don’t bother."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted. What would you most want to know from them each week?"
+  },
+  {
+   "role": "Person",
+   "text": "Stock in their godown, mainly, before Ramadan."
+  },
+  {
+   "role": "pi",
+   "text": "Thanks, noted — distributor stock ahead of Ramadan matters most. Have you had stock-outs in the market during past Ramadans?"
+  }
+ ]
+}

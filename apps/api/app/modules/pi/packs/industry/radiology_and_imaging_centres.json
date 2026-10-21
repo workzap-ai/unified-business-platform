@@ -1,0 +1,269 @@
+{
+ "key": "radiology_and_imaging_centres",
+ "name": "Radiology and imaging centres",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "radiology",
+  "imaging centre",
+  "X-ray",
+  "ultrasound",
+  "CT scan",
+  "MRI",
+  "mammography",
+  "DEXA",
+  "OPG",
+  "scan karwana",
+  "ultrasound wala",
+  "X- ray ki report",
+  "ashe’a",
+  "taswir",
+  "markaz ashe’a",
+  "modality",
+  "PACS",
+  "RIS",
+  "radiologist",
+  "technologist",
+  "reporting backlog",
+  "film",
+  "CD",
+  "contrast"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Modalities on site (X-ray, ultrasound, CT, MRI, mammography, others) and how many machines",
+  "Whether the radiologists are employed, partners, visiting or reporting remotely (teleradiology)",
+  "Machines owned, leased or under a revenue-share with a vendor",
+  "Referral sources: walk-ins, doctors, hospitals, panels, insurers",
+  "How images and reports are delivered (film, CD, portal, WhatsApp, email)",
+  "Operating hours and whether there is a night or 24-hour service",
+  "Power backup arrangements for high-load machines"
+ ],
+ "scope_rule": "pi notes the business and admin side of an imaging centre: scheduling slots per machine, waiting times, reporting backlog as a workflow problem, machine downtime and service contracts, image and report delivery logistics, referral and panel billing, staff rosters, consumables like films and contrast as stock, and reporting. pi does not comment on which scan someone needs, image interpretation, contrast reactions, radiation doses, shielding, or the clinical quality of reports, and does not interpret radiation-safety regulations. pi does not ask for or keep patient names, numbers, images, reports or clinical reasons for scans. Machine vendor or lease contracts are noted as commercial pain only, without legal interpretation.",
+ "vocabulary": {
+  "modality": "type of machine (CT, MRI, X-ray, ultrasound)",
+  "slot": "booked time on a machine",
+  "PACS": "system storing and viewing images",
+  "RIS": "radiology information system for bookings and reports",
+  "reporting backlog": "scans done but not yet reported",
+  "teleradiology": "reporting done remotely by radiologists elsewhere",
+  "contrast": "agent used in some scans, bought as a consumable",
+  "film / CD / USB": "physical ways images are handed over",
+  "service contract / AMC": "annual maintenance contract with the machine vendor",
+  "helium / cryogen": "MRI running cost the owner may mention",
+  "fasting prep": "patient instructions before some scans (pi never gives these)",
+  "referring physician": "doctor who requested the scan"
+ },
+ "problems": [
+  {
+   "phrase": "MRI is booked solid for a week but evenings are dead",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Scans are done but reports take two days because the radiologist is backed up",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "The visiting radiologist doesn’t come on time and patients wait",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Teleradiology bills don’t match the number of studies we sent",
+   "category": "suppliers_purchasing",
+   "subtype": "po_tracking"
+  },
+  {
+   "phrase": "CT went down for four days and the vendor took their time",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "I don’t know what each machine actually earns after lease and service",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Electricity and generator costs for the MRI are killing us",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Films and CDs run out mid-shift",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Contrast stock expires and nobody tracks it",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Patients come without the right preparation and we have to reschedule",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "No-shows on MRI slots waste our most expensive time",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Patients call ten times asking if the report is ready",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Reports went to the wrong doctor",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Doctors who used to refer now send patients to the new centre",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Panels and insurers pay late and reject for paperwork reasons",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "UAE pre-approvals for MRI take days",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Counter discounts aren’t approved by anyone",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Cash at the counter doesn’t match the scans done",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "PACS, RIS and billing are three separate systems",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Old images are on a server nobody backs up",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "Technologists for MRI and CT are very hard to hire",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Radiation-safety licence and machine certificates renew at random times",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "I want to add a CT but can’t work out if volume justifies it",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Night shift is a black box, I never know how many scans were done",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  }
+ ],
+ "questions": {
+  "machine capacity": [
+   "Which machine has the longest wait?",
+   "What does its day look like hour by hour?",
+   "Are there gaps you’d like to fill?"
+  ],
+  "reporting backlog": [
+   "How long between a scan and the report going out?",
+   "Who reports, and are they on site or remote?",
+   "What happens when they fall behind?"
+  ],
+  "downtime": [
+   "When a machine goes down, who calls the vendor?",
+   "How long did the last breakdown last?"
+  ],
+  "costs": [
+   "Which costs worry you most on the big machines?",
+   "Do you know what each machine makes in a month?"
+  ],
+  "bookings": [
+   "How do patients book a scan now?",
+   "How often do booked patients not turn up or arrive unprepared?"
+  ],
+  "report delivery": [
+   "How do patients and doctors get their reports and images?",
+   "What goes wrong most often?"
+  ],
+  "referrals": [
+   "Where do most of your scans come from?",
+   "Have any referral sources dropped off lately?"
+  ],
+  "billing": [
+   "Which payers take longest?",
+   "What are the usual rejection reasons?"
+  ],
+  "systems": [
+   "Which systems do you use for bookings, images and billing?",
+   "Where do they not talk to each other?"
+  ],
+  "staffing": [
+   "Which role is hardest to fill?"
+  ]
+ },
+ "seasons": "- Winter months see more trauma and respiratory-related imaging in Pakistan and Canada; winter road conditions in Canada raise trauma volumes. - Summer heat in Pakistan and the UAE increases power and cooling costs for MRI and CT, and load-shedding risk in Pakistan. - Ramadan shifts appointments to evenings; Eid holidays bring backlogs before and after. - UAE: corporate and pre-employment imaging follows hiring cycles; residents travel in July and August. - Overseas Pakistanis visiting in December and summer book scans in a short window. - Canada: year-end extended-benefit usage in November and December for private imaging.",
+ "care": [
+  "Any mention of a patient reacting badly, collapsing, or a severe injury: pi stops and says to alert the on-site medical team or call 1122/115, 998/999, 911.",
+  "pi never explains scan findings, recommends scans, gives preparation instructions, or comments on contrast or radiation; it says these are for the radiologist or referring doctor.",
+  "No patient names, numbers, images, report text or reasons for the scan.",
+  "Reports or images sent to the wrong recipient are noted as a process problem; no legal advice.",
+  "Requests to issue reports without a scan, alter findings, back-date reports, or bill insurers for scans not done are refused.",
+  "Radiation-safety licensing and shielding are regulated; pi notes renewal tracking only.",
+  "Visiting and remote radiologists are recorded by role."
+ ],
+ "build_ideas": [
+  "Machine-wise booking calendar with slot lengths per study type, WhatsApp booking and a waitlist for cancellations",
+  "Preparation-reminder messages sent on booking and the day before, using text supplied and approved by the centre’s radiologist",
+  "Reporting worklist board showing studies awaiting report by age and radiologist role, with escalation when overdue",
+  "Teleradiology reconciliation: studies sent versus studies billed, monthly",
+  "Machine downtime and service log with vendor response times and AMC terms on file",
+  "Per-machine profitability view: scans, revenue, lease, service, power cost entered monthly",
+  "Films, CDs and contrast stock register with expiry dates and reorder points",
+  "Report and image delivery flow with secure link to the registered contact and referring doctor, and a send log",
+  "Referral source dashboard showing volume by referring clinic and month",
+  "Panel and insurer receivables with pre-approval tracking and rejection reasons",
+  "Daily counter close reconciling scans done with cash, card and credit",
+  "Image archive backup check with alerts if a backup fails",
+  "Licence and certificate calendar for machines and the facility",
+  "Owner dashboard: scans by modality and shift, waiting days per machine, average report time"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our MRI has a week-long waiting list but I see the machine idle after 7pm."
+  },
+  {
+   "role": "pi",
+   "text": "So demand is there, but evening slots aren’t being used. Noted. What stops you from booking patients after 7 at the moment?"
+  },
+  {
+   "role": "Person",
+   "text": "Technologist leaves at 7 and the radiologist doesn’t want to report late scans."
+  },
+  {
+   "role": "pi",
+   "text": "Understood, the evening gap is a staffing and reporting cover issue rather than demand. Noted. Have you ever tried running an evening shift before, even for a short time?"
+  }
+ ]
+}

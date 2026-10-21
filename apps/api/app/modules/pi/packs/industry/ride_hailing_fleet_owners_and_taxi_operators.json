@@ -1,0 +1,267 @@
+{
+ "key": "ride_hailing_fleet_owners_and_taxi_operators",
+ "name": "Ride-hailing fleet owners and taxi operators",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "fleet",
+  "Careem",
+  "Uber",
+  "inDrive",
+  "Bykea",
+  "Yango",
+  "Captain",
+  "partner",
+  "gaari lagai hui hai",
+  "driver ko gaari di hai",
+  "daily rent",
+  "dihari",
+  "weekly settlement",
+  "cash trips",
+  "card trips",
+  "commission",
+  "acceptance rate",
+  "rating",
+  "deactivated",
+  "blocked",
+  "taxi",
+  "cab",
+  "meter",
+  "limo company",
+  "RTA franchise",
+  "taksi",
+  "kabtin",
+  "mushghil",
+  "CNG pe chalti hai",
+  "LPG kit",
+  "kilometres",
+  "tracker"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Fleet size and type: cars, rickshaws, bikes, vans; owned outright, on instalments, or leased.",
+  "Which platforms the vehicles run on, or traditional taxi/meter operations.",
+  "Arrangement with drivers: salaried, daily/weekly rent, revenue share, or driver-owned.",
+  "Who collects cash trip money and how settlements happen.",
+  "Fuel type and how fuel is paid (driver pays, fuel card, company tank).",
+  "Whether vehicles have GPS trackers and who watches them.",
+  "City and country, since licensing, platform rules and franchise models differ."
+ ],
+ "scope_rule": "pi notes operational and business problems: driver settlements and arrears, vehicle utilisation, maintenance and downtime, fuel cost control, platform account issues, driver turnover and accountability, accident handling process and fleet reporting. pi does not advise on transport licensing, platform terms or appeals, insurance claims, employment status of drivers, traffic law, or vehicle financing. pi never stores drivers’ CNIC, Emirates ID, licence, platform login details, bank accounts, or passengers’ details, and refers to drivers by role (“the driver on the night shift”).",
+ "vocabulary": {
+  "Captain / partner": "the driver on a ride-hailing platform.",
+  "Daily rent / dihari": "fixed amount a driver pays the owner each day for the vehicle.",
+  "Revenue share": "split of earnings between driver and owner.",
+  "Settlement": "weekly or daily accounting between owner and driver.",
+  "Cash trip / card trip": "fare paid in cash to driver versus through the app.",
+  "Deactivation / block": "platform suspends the account.",
+  "Acceptance rate / rating": "platform performance measures.",
+  "Tracker": "GPS device fitted to the vehicle.",
+  "Kit": "CNG or LPG conversion kit.",
+  "Franchise": "licensed taxi operation (e.g. UAE emirates).",
+  "Off-road": "vehicle not working due to repair or no driver."
+ },
+ "problems": [
+  {
+   "phrase": "Drivers don’t pay the daily rent on time and arrears keep growing",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Every settlement turns into an argument about cash and card trips",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "I don’t know how many hours each car actually worked",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Some cars sit at home because the driver didn’t show up",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Drivers quit and take the car for days before returning",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Drivers use the car off-app for private trips",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Fuel spend is way more than trips justify",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Kilometres are high but platform earnings low",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Oil changes and tyres skipped until something breaks",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Cars off-road waiting for parts or the workshop",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "After an accident, nobody knows who pays for what",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Platform account blocked and earnings stop, no idea when it’ll be back",
+   "category": "tech_systems",
+   "subtype": "vendor_lock"
+  },
+  {
+   "phrase": "Trackers show location but nobody checks them",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Don’t know profit per car after instalment, fuel, repairs and downtime",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Instalments are due but this month’s collections are short",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Car registration, fitness and insurance renewals get missed",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Traffic fines come to me as owner, driver has left",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Hard to find trustworthy drivers",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Everything is in a WhatsApp group with 40 drivers",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Different platforms, different payout reports, I combine them in Excel",
+   "category": "tech_systems",
+   "subtype": "excel_dependency"
+  },
+  {
+   "phrase": "Passenger complaints lower the car’s rating",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "Thinking of adding 10 more cars but not sure the numbers work",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "CNG shortages in winter, cars stand idle",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Platform commission or incentives change and my earnings drop",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  }
+ ],
+ "questions": {
+  "fleet": [
+   "How many vehicles do you run, and on which platforms?",
+   "How are they arranged with drivers — rent, share or salary?"
+  ],
+  "settlements": [
+   "How often do you settle with drivers?",
+   "How do you check cash trips against app earnings?",
+   "How much is in arrears right now, roughly?"
+  ],
+  "utilisation": [
+   "How do you know each car worked its shift?",
+   "How many are off-road on an average day?"
+  ],
+  "fuel": [
+   "Who pays for fuel, and how do you keep an eye on it?"
+  ],
+  "maintenance": [
+   "How do you know when a car is due for service?",
+   "Who takes it to the workshop?"
+  ],
+  "accidents and fines": [
+   "What happens today when a car is in an accident?",
+   "How are fines passed to drivers?"
+  ],
+  "drivers": [
+   "What’s the hardest part about drivers — finding, keeping or trusting them?"
+  ],
+  "reporting": [
+   "How do you see profit car by car?",
+   "Which platform reports do you combine by hand?"
+  ],
+  "paperwork": [
+   "How do you keep track of registration and insurance dates?"
+  ]
+ },
+ "seasons": "Pakistan: Ramadan evenings and Eid shopping nights are busy, then Eid days drop as drivers go home; monsoon rain raises demand but also breakdowns; winter CNG shortages in some cities; wedding season evenings. UAE: tourist season October– April, major events and exhibitions, New Year, Ramadan late-night demand; summer quieter for tourists but steady resident travel; drivers’ home-leave periods create shortages. Canada: winter storms raise demand but slow trips; summer festivals and tourism; university terms; holiday season peaks.",
+ "care": [
+  "No advice on driver employment status, contracts, licensing, platform appeals or insurance; note operational impact only.",
+  "Never store drivers’ IDs, licences, platform passwords, bank accounts or phone numbers; never record passengers’ details.",
+  "Decline any request to share accounts, run unlicensed operations, bypass platform verification, or alter fines records.",
+  "Driver monitoring: frame needs around vehicle usage and settlements; do not help with covert tracking of a person.",
+  "Accident with injuries or a passenger in danger → stop and point to emergency services.",
+  "Do not comment on whether a rent or revenue arrangement is fair or legal.",
+  "Avoid any figures on platform earnings or commissions."
+ ],
+ "build_ideas": [
+  "Driver settlement ledger: daily rent or share, cash collected, app payouts, deductions, balance, with WhatsApp statements to each driver.",
+  "Platform payout import that combines earnings reports from several platforms into one view per car.",
+  "Arrears alerts when a driver’s balance crosses a limit.",
+  "Car-by-car utilisation: shifts worked, kilometres, earnings per kilometre, idle days.",
+  "Fuel log per car matched to trips and kilometres, flagging gaps.",
+  "Maintenance scheduler by kilometres with workshop job tracking and off-road days.",
+  "Accident and incident register with photos, workshop status and agreed cost split recorded.",
+  "Fines register per car and date, matched to the driver on shift.",
+  "Document and renewal tracker per vehicle with reminders.",
+  "Driver roster and handover checklist (fuel, damage photos, kilometres) per shift change.",
+  "Per-car profit view including instalments and repairs.",
+  "Broadcast and announcements channel for drivers, replacing the noisy group."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mere 25 gaariyan Careem aur inDrive pe chalti hain, har Monday hisaab pe drivers se larai hoti hai."
+  },
+  {
+   "role": "pi",
+   "text": "Har hafte yeh larai thaka deti hogi — noted. Hisaab ke waqt cash trips aur app wali earning ko aap kaise milate hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Driver screenshot bhejta hai, main Excel mein dalta hoon."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Is waqt drivers ka total baqaya andaazan kitne hafton ka jama ho chuka hai?"
+  }
+ ]
+}

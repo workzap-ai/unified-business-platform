@@ -1,0 +1,271 @@
+{
+ "key": "tuition_centres_and_academies",
+ "name": "Tuition centres and academies",
+ "kind": "industry",
+ "sector": {
+  "code": "J",
+  "title": "Education and childcare"
+ },
+ "signals": [
+  "academy",
+  "tuition centre",
+  "coaching centre",
+  "batch",
+  "session",
+  "group classes",
+  "home tuition",
+  "monthly fee",
+  "admission fee",
+  "teacher share",
+  "percentage system",
+  "academy ki fees",
+  "batch full hai",
+  "sir ki class",
+  "miss ki tuition",
+  "teacher ka hissa",
+  "test session",
+  "crash course",
+  "mudarris khususi",
+  "dawra taqwiya",
+  "learning centre",
+  "after-school",
+  "demo class"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of branches and rooms, and roughly how many batches run per week.",
+  "Subjects and levels (primary, Matric/O Level, Inter/A Level, curriculum support in UAE/Canada).",
+  "Teacher pay model: fixed salary, per-class, or revenue share/percentage.",
+  "Fee model: monthly, per-course, per-session package; channels used.",
+  "Whether classes are in-person, online or hybrid.",
+  "Whether the centre operates under a centre permit (UAE/Canada) or from home/commercial space — pi notes it, gives no licensing advice.",
+  "Current tools: register book, Excel, WhatsApp groups, a centre app."
+ ],
+ "scope_rule": "pi notes the academy’s operational problems: enrolment and lead follow-up, fee collection, teacher scheduling and pay share, batch utilisation, attendance logistics, parent communication workload, branch visibility and cash handling. pi never asks for or records any student’s name, photo, school, test marks, grades or progress details, or parents’ contact details — roles and counts only. It does not advise on teaching methods, licensing requirements, tax or employment law, or teacher-contract disputes. Child safety concerns are referred to emergency services and the appropriate authority.",
+ "vocabulary": {
+  "Batch": "a group class at a fixed time slot.",
+  "Percentage system": "teacher keeps an agreed share of fees from their students.",
+  "Crash course": "short intensive pre-exam programme.",
+  "Demo class": "free trial class for new enquiries.",
+  "Test session": "weekly/monthly test series.",
+  "Admission fee": "one-time joining charge.",
+  "Home tuition": "tutor visiting a student’s home, often arranged by the academy.",
+  "Bunk": "student missing class.",
+  "Group": "subject combination (e.g. pre-medical, pre-engineering).",
+  "Fee card": "paper card stamped when monthly fee is paid."
+ },
+ "problems": [
+  {
+   "phrase": "Parents pay cash at the desk and the fee card and the register never match.",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Every month the receptionist chases fees one by one on WhatsApp.",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Teachers on percentage dispute how many students they had this month.",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "A senior teacher left and took half his batch with him.",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Some batches are packed and others have four students, and I still pay the teacher the same.",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Enquiries come on WhatsApp after our Facebook post and nobody follows up after the demo class.",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We don’t know how many demo classes turn into admissions.",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Students drop out after the exams and we only notice when the fee doesn’t come.",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Our ads bring enquiries from areas too far away to attend.",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Timetable changes are announced in five WhatsApp groups and parents still miss them.",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Teachers arrive late or cancel and parents call me directly.",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Finding a good chemistry or maths teacher takes months.",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "I can’t tell which branch is actually making money.",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Receptionist handles cash all day and I count it only at night.",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Sibling and ‘friend’ discounts are given verbally and never recorded.",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Notes and photocopies cost a lot and nobody tracks how many are printed.",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Rent and generator costs went up but we can’t raise fees mid-session.",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "Test results are made on paper and parents ask for them on WhatsApp individually.",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "When a parent asks if their child came to class, we have to dig through the register.",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Room clashes happen when two teachers book the same slot.",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Online batches on Zoom — I can’t tell who is actually paying versus sharing links.",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "During exam season everything depends on me; I can’t step away.",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Opening a second branch, I couldn’t copy the way the first one runs.",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "Google reviews are few and one bad review sits at the top.",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "No website; people can’t see timings or fees without messaging.",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  }
+ ],
+ "questions": {
+  "fees": [
+   "How do most parents pay — cash at the desk or transfer?",
+   "How do you check at month-end who hasn’t paid?",
+   "Who chases them?"
+  ],
+  "cash": [
+   "Who holds the cash during the day?",
+   "When is it counted and by whom?"
+  ],
+  "teacher pay": [
+   "How are teachers paid — fixed or percentage?",
+   "What do disagreements usually come down to?"
+  ],
+  "batches": [
+   "Roughly how many batches run in a week?",
+   "Are some regularly half-empty?"
+  ],
+  "enquiries": [
+   "Where do new enquiries come from mostly?",
+   "What happens after a demo class?",
+   "Do you know how many join?"
+  ],
+  "retention": [
+   "When do students usually leave?",
+   "How do you find out someone has left?"
+  ],
+  "staff": [
+   "How often do teachers leave?",
+   "What happens to their batch when they go?"
+  ],
+  "communication": [
+   "How many WhatsApp groups are you running?",
+   "What do parents ask most often?"
+  ],
+  "branches": [
+   "How many branches do you have?",
+   "How do you compare them today?"
+  ],
+  "online": [
+   "Do you run any online batches?",
+   "How do you know who’s attending versus paying?"
+  ]
+ },
+ "seasons": "- Pakistan: admissions spike after school results (March–April) and at the start of new sessions; crash courses before Matric/Inter board exams (February–May) and before O/A Level sessions (April–June, September–November); summer tuition June–August; Ramadan evening timings; drop-off after board exams. - UAE: demand rises around school mid-terms and finals (November–December, March, May–June); summer programmes July–August when many families travel (dip); Ramadan shift to evenings. - Canada: September and January enrolment; provincial exam preparation in spring; summer camps; March break programmes. - Wedding season and Eid holidays cause attendance dips in Pakistan.",
+ "care": [
+  "Never ask for students’ names, schools, marks, test results or photos; if parents’ WhatsApp screenshots are shared, pi does not repeat any names or numbers.",
+  "No advice on licensing, home-based business permits or zoning — note the admin effort only.",
+  "Teacher non-compete or “taking students” disputes: note the business problem, no legal advice.",
+  "Tax on cash fees: pi does not help hide income or keep “off-book” records.",
+  "Requests to secretly record classes, monitor teachers’ personal phones or track students’ locations: pi declines.",
+  "Any mention of a child harmed or at risk with a tutor or at the centre: pi stops and directs to emergency services and the relevant authority.",
+  "Fee refund or deposit disputes with parents: note tracking problem, no legal guidance.",
+  "Avoid judging teaching quality; record what the owner reports as a business symptom."
+ ],
+ "build_ideas": [
+  "Fee desk app: digital receipt for every payment (cash, wallet, transfer) replacing the paper fee card, with daily cash close per receptionist.",
+  "Automated monthly fee reminders on WhatsApp with paid/unpaid list per batch.",
+  "Teacher share calculator: students enrolled and paid per teacher per month, share computed and shown to the teacher for sign-off.",
+  "Batch utilisation board: seats filled vs capacity per batch and room, with cost per batch.",
+  "Enquiry-to-admission tracker: source, demo class date, follow-up, outcome.",
+  "Early dropout signal: missed attendance plus late fee flagged to the desk.",
+  "Timetable and room booking with conflict check and one-tap broadcast of changes.",
+  "Attendance by QR/tap at entry with parent notification on request (opt-in, no names in owner reports).",
+  "Test-result distribution through a secure parent link instead of individual WhatsApp messages.",
+  "Online batch access control with unique join links and attendance log.",
+  "Branch dashboard: enrolment, collections, teacher costs, rent and margin per branch.",
+  "Simple website/landing page with timings, subjects and a WhatsApp enquiry button."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Sir log percentage pe parhate hain, aur har mahine end pe jhagra hota hai ke kitne bachay the."
+  },
+  {
+   "role": "pi",
+   "text": "Ye to har mahine ka tension hai — teacher ka hissa aur students ki ginti pe ikhtilaaf. Noted. Abhi ginti kahan se li jati hai — register se, fee card se, ya kisi aur cheez se?"
+  },
+  {
+   "role": "Person",
+   "text": "Register se, lekin kuch bachon ne fees nahi di hoti, phir bhi teacher unhe count karta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — attend karne wale aur fees dene wale alag alag hain, aur hissa kis pe banta hai wo clear nahi. Noted. Is waqt kitne teachers percentage system pe hain?"
+  }
+ ]
+}

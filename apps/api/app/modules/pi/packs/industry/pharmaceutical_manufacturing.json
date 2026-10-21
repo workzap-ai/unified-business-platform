@@ -1,0 +1,261 @@
+{
+ "key": "pharmaceutical_manufacturing",
+ "name": "Pharmaceutical manufacturing",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "pharma",
+  "pharmaceutical company",
+  "tablets",
+  "capsules",
+  "syrups",
+  "injectables",
+  "ointments",
+  "nutraceuticals",
+  "toll manufacturing",
+  "contract manufacturing",
+  "third-party manufacturing",
+  "batch manufacturing record",
+  "API",
+  "excipients",
+  "DRAP",
+  "registration",
+  "dawa",
+  "dawai ki company",
+  "distributor",
+  "medical rep",
+  "dawa’ masna’ adwiya",
+  "GMP",
+  "near expiry",
+  "chemist"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Own brands, toll/contract manufacturing for others, or both.",
+  "Dosage forms produced (tablets, capsules, liquids, sterile, topicals, nutraceuticals).",
+  "Number of registered products/SKUs.",
+  "Distribution model: national distributors, own distribution, institutional/tender sales, exports.",
+  "Size of field force (medical reps/PSOs).",
+  "Imported APIs share and main source countries.",
+  "Plant count and whether in-house warehouse and QC lab exist."
+ ],
+ "scope_rule": "pi notes operational and business problems only: stock of materials and finished goods, batch traceability as a record- keeping matter, distributor credit, field-force visibility, near-expiry returns, reporting and staff. It never gives medical, dosing, formulation, stability, GMP-interpretation, regulatory registration or pricing-law advice, and never comments on whether a product is safe or effective. It records no patient, doctor or chemist personal data, and no prescriptions — only roles. Reports of adverse reactions or harm to anyone mean pi says this needs medical help and points to emergency services and the relevant regulator channel, and notes nothing clinical.",
+ "vocabulary": {
+  "API": "active pharmaceutical ingredient",
+  "excipient": "inactive ingredient",
+  "BMR / BPR": "batch manufacturing / packaging record",
+  "QA / QC": "quality assurance / quality control",
+  "registration": "product approval by the regulator",
+  "MR / PSO": "medical rep / product sales officer",
+  "distributor": "company that stocks chemists and hospitals",
+  "near expiry / expiry return": "stock close to its date being sent back",
+  "toll manufacturing": "producing for another company’s brand",
+  "tender": "hospital or government supply contract",
+  "bonus scheme": "extra units given free with an order"
+ },
+ "problems": [
+  {
+   "phrase": "API imports stuck at port and a product has been short in the market for weeks",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Regulated price is fixed but API cost went up with the dollar",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Distributors send back near-expiry stock and claim full credit",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Expired stock write-offs are huge at year end",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "I don’t know which batch is lying with which distributor",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Medical reps report doctor visits but I can’t verify any of it",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Field force targets missed and no one knows why until the quarter ends",
+   "category": "sales_revenue",
+   "subtype": "salesforce_performance"
+  },
+  {
+   "phrase": "Distributors pay late and keep pushing returns to offset balances",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Bonus schemes to distributors are inconsistent and hard to track",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "BMRs are paper and audit preparation takes weeks",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Registration renewals and variations are tracked in an Excel nobody updates",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Packaging material printed with wrong text and a whole lot is wasted",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Packaging material suppliers deliver late, production waits",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Toll manufacturing clients change orders and dispute costs",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Hospital tenders pay after many months",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Line clearance and checklists signed without being done",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Production planning is on a whiteboard",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Trained QC analysts leave for multinationals",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Sales data from distributors comes late and in different formats",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Some products are short while slow movers sit in the warehouse",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Samples given to field force aren’t accounted for",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Export documentation takes too long for each consignment",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Market complaints come by phone and email and aren’t logged in one place",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Utility costs for HVAC and clean rooms keep rising",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  }
+ ],
+ "questions": {
+  "materials": [
+   "Which inputs cause the most delays — API, excipients or packaging?",
+   "How far ahead do you order them?",
+   "How is stock of each tracked?"
+  ],
+  "near-expiry and returns": [
+   "How are returns from distributors handled now?",
+   "How is credit for them decided?",
+   "Do you know the batches involved?"
+  ],
+  "distributors": [
+   "How many distributors do you work with?",
+   "How often do you get their secondary sales data?",
+   "In what format?"
+  ],
+  "field force": [
+   "How many reps are in the field?",
+   "How do they report their day?",
+   "How do you check it?"
+  ],
+  "schemes": [
+   "What bonus schemes are running?",
+   "How are they recorded against orders?"
+  ],
+  "records and audits": [
+   "Are batch records on paper or digital?",
+   "How long does audit preparation usually take?"
+  ],
+  "registrations": [
+   "How do you keep track of renewal dates?",
+   "Has one ever been missed?"
+  ],
+  "planning": [
+   "How is the monthly production plan made?",
+   "What changes it most often?"
+  ]
+ },
+ "seasons": "PK seasonal demand around winter (cough/cold, flu), monsoon and post-flood periods (gastro, skin, vector-borne illnesses), summer heat (ORS, gastro); dengue season (September–November) spikes certain lines; fiscal-year-end (June) institutional purchasing; Ramadan affects field-force working hours. UAE: winter respiratory season, Ramadan and summer travel; hospital procurement cycles. Canada: autumn–winter cold and flu season, allergy season in spring.",
+ "care": [
+  "No medical, dosing, formulation, stability or clinical advice of any kind; pi only notes business problems.",
+  "Adverse events or patient harm mentioned: pi says it can’t help with that, urges medical care and emergency services if urgent, and suggests using the regulator’s reporting channel; it does not record patient details.",
+  "Never help sell unregistered or expired products, relabel batches, change expiry dates, or make fake documents — decline.",
+  "No advice on DRAP, MOHAP/EDE or Health Canada regulations, pricing law or registration strategy; note the admin effort only.",
+  "Doctor incentives that could be improper: pi does not help design them.",
+  "Controlled substances (narcotics, psychotropics): no help with diversion; note only record-keeping effort.",
+  "No patient, doctor or chemist names or numbers; roles and towns only."
+ ],
+ "build_ideas": [
+  "Material stock board for APIs, excipients and packaging with lead times and reorder alerts.",
+  "Import consignment tracker showing order, shipment, port and clearance stages.",
+  "Batch-to-distributor dispatch register so any batch can be located quickly.",
+  "Near-expiry monitor by distributor and batch, flagging stock months before expiry.",
+  "Returns and credit-claim workflow with batch checks before approval.",
+  "Distributor secondary-sales upload: standard template or WhatsApp submission merged into one report.",
+  "Field-force daily reporting app with visit logs, sample issue and stock-in-hand.",
+  "Scheme ledger linking bonus quantities to orders and distributors.",
+  "Registration and licence renewal calendar with reminders and document storage.",
+  "Digital checklists for routine operational steps with timestamped sign-off.",
+  "Production plan board showing products, batches, lines and material readiness.",
+  "Owner dashboard: sales by product and region, stock cover, near-expiry value, receivables."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Distributors near-expiry stock wapas bhej dete hain aur poora credit maangte hain. Humein pata hi nahi chalta kaunsa batch kahan gaya tha."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh kaafi pareshani wali baat hai. Noted — near-expiry returns par poora credit aur batch tracking ka na hona. Aap kitne distributors ke saath kaam karte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Taqreeban 25 distributors hain poore mulk mein."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, around 25 nationwide. Returns abhi aam tor par kaise approve hote hain — kaun decide karta hai?"
+  }
+ ]
+}

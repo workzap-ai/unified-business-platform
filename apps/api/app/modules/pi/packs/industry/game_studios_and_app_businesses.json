@@ -1,0 +1,294 @@
+{
+ "key": "game_studios_and_app_businesses",
+ "name": "Game studios and app businesses",
+ "kind": "industry",
+ "sector": {
+  "code": "M",
+  "title": "Digital economy, social and public sector"
+ },
+ "signals": [
+  "game studio",
+  "indie dev",
+  "app",
+  "SaaS",
+  "Play Store",
+  "App Store",
+  "publisher",
+  "hyper-casual",
+  "hybrid-casual",
+  "Unity",
+  "Unreal",
+  "live ops",
+  "DAU",
+  "retention",
+  "D1/D7",
+  "ARPU",
+  "eCPM",
+  "AdMob",
+  "ironSource/LevelPlay",
+  "AppLovin",
+  "in-app purchase",
+  "subscription",
+  "churn",
+  "build reject ho gayi",
+  "sprint",
+  "Jira",
+  "bug",
+  "crash rate",
+  "outsourcing",
+  "client project",
+  "P@SHA",
+  "Dubai Internet City",
+  "fintech app"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "What they make: own games, own apps/SaaS, client/outsourced development, or a mix.",
+  "Revenue model: ads, in-app purchases, subscriptions, publishing deals, service contracts.",
+  "Team size and whether staff are in-house, remote, or freelancers.",
+  "Platforms (Android, iOS, web, PC/console) and key markets.",
+  "Whether they work with a publisher or self-publish.",
+  "Number of live titles/products being maintained.",
+  "Where payments come from (store payouts, ad networks, foreign clients) — business pattern only."
+ ],
+ "scope_rule": "pi notes operational and business problems: project delivery, sprint and bug management, team capacity, client billing, revenue visibility across stores and ad networks, live-ops coordination, user support load and reporting. It does not advise on IP ownership, publishing contract terms, data-protection law, app-store policy appeals, foreign remittance rules, export-of-services tax regimes, or securities/fundraising matters. It never asks for source code, API keys, store console logins, bank or payout details, or end- user personal data, and records team members by role.",
+ "vocabulary": {
+  "DAU/MAU": "daily/monthly active users.",
+  "Retention (D1/D7/D30)": "share of users returning after days.",
+  "eCPM": "ad revenue per thousand impressions.",
+  "IAP": "in-app purchase.",
+  "Live ops": "ongoing events and updates in a released game.",
+  "Build": "packaged version submitted to stores or testers.",
+  "Sprint": "fixed work cycle, often two weeks.",
+  "Publisher": "company that funds/markets games for a revenue share.",
+  "Prototype / CPI test": "early version tested for install cost.",
+  "Crash rate / ANR": "stability measures on Android.",
+  "Retainer / T&M": "client billing models.",
+  "Churn": "subscribers who cancel."
+ },
+ "problems": [
+  {
+   "phrase": "Client projects always run over and we eat the extra hours",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "We don’t know which project is actually profitable",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Foreign clients pay late and we’re short for salaries",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Revenue sits in AdMob, AppLovin, Play and App Store — no single view",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Ad revenue dropped this month and we can’t tell why",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Retention on the new game is weak and we’re not sure where players drop",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Subscriptions cancel after the first month",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Support emails and store reviews pile up unanswered",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "One-star reviews after an update broke something",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Bugs get reported on WhatsApp and lost",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Builds go out without proper QA",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Store rejected our build and the launch slipped",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Senior devs leave for remote jobs abroad",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Hard to hire good Unity/backend people",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "We don’t know who’s overloaded and who’s free",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Timesheets are guesswork, so billing clients is guesswork",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Everything waits for the founder to approve",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Tools — Jira, Slack, Sheets, Trello — none connected",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Paying for licences and cloud nobody’s using",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Cloud bill jumped and nobody noticed",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Server went down during a live event",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "Currency swings mess up our dollar contracts versus rupee salaries",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Client change requests come in verbally, then disputes over scope",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "No documented process for releases",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Can’t forecast if we survive six months without a hit",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Paperwork for software-export registration and remittances eats time",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Opening a Dubai entity but don’t know how we’d run two offices",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "business mix": [
+   "Is most of your income from your own products or client work?",
+   "Which part keeps you up at night?"
+  ],
+  "client delivery": [
+   "How do you estimate a project?",
+   "How do you find out it’s going over?"
+  ],
+  "billing": [
+   "How are client hours or milestones tracked?",
+   "How long after invoicing do you usually get paid?"
+  ],
+  "revenue visibility": [
+   "Where do you check daily revenue from stores and ad networks?",
+   "How long does it take to see the full picture?"
+  ],
+  "product performance": [
+   "What number do you watch most — retention, revenue, crashes?",
+   "Where do you get it from?"
+  ],
+  "quality": [
+   "What happens before a build goes out?",
+   "How do bugs reach the team?"
+  ],
+  "team": [
+   "How many people are working now, in-house or remote?",
+   "Where does the team get blocked most?"
+  ],
+  "hiring": [
+   "Which roles are hardest to fill or keep?",
+   "What happens to the work when someone leaves?"
+  ],
+  "costs": [
+   "Which recurring tools or cloud costs do you track?",
+   "Has anything surprised you lately?"
+  ],
+  "growth": [
+   "What’s the next step — new title, new market, new office?",
+   "What would have to be in place first?"
+  ]
+ },
+ "seasons": "Mobile ad rates usually rise in Q4 (November–December holiday advertising) and soften in January. Ramadan changes engagement patterns across Pakistan and the GCC (late-night peaks). School holidays (summer, winter) lift casual-game play. Canadian and US clients slow over late December. Pakistan’s fiscal year ends 30 June; budgets and some client renewals follow. Store featuring events and major platform OS updates (often September for iOS) force compatibility work.",
+ "care": [
+  "Never request source code, keys, console or payout credentials, or user databases.",
+  "No advice on IP ownership, publishing contracts, NDAs or employment law; note “scope disputes with clients” as an operations problem.",
+  "No advice on data protection, children’s privacy rules for kids’ apps, or store policy appeals.",
+  "No tax or remittance advice (export of services, withholding, foreign currency accounts).",
+  "Refuse help with fake installs, fake ratings, click fraud or ad-fraud schemes, or circumventing store rules.",
+  "Gambling/betting-style apps: pi does not help operate or grow anything illegal in the owner’s jurisdiction; note only legitimate operational issues.",
+  "Do not quote benchmark retention, eCPM or salary figures.",
+  "Founders under funding pressure may vent; stay calm and avoid financial advice."
+ ],
+ "build_ideas": [
+  "Project profitability tracker: estimate versus actual hours per milestone, with overrun alerts.",
+  "Lightweight timesheet via WhatsApp or web, tied to client billing.",
+  "Client invoicing and receivables ageing board with automated reminders.",
+  "Unified revenue dashboard pulling store and ad-network reports into one daily view per title.",
+  "Change-request log where every client ask is recorded, estimated and approved before work.",
+  "Bug intake form that pushes reports into the team’s tracker instead of chats.",
+  "Release checklist with QA sign-off before builds are submitted.",
+  "Team capacity planner showing allocation per person per week.",
+  "Subscription and cloud spend register with renewal alerts.",
+  "Support inbox triage for store reviews and support emails with saved replies.",
+  "Cash runway view combining receivables, payroll and recurring costs."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We do client work to fund our own games. Problem is client projects always overrun."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a tough loop — the overruns eat into the time meant for your own games. Noted — client projects regularly go over and the studio absorbs the extra. How do you usually estimate a project at the start?"
+  },
+  {
+   "role": "Person",
+   "text": "Our lead dev gives a rough number of weeks."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — estimates come from one person’s rough sense. How do you find out a project has started going over?"
+  },
+  {
+   "role": "Person",
+   "text": "Usually when the client asks why it’s late."
+  }
+ ]
+}

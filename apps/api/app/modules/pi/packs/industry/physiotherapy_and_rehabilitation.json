@@ -1,0 +1,268 @@
+{
+ "key": "physiotherapy_and_rehabilitation",
+ "name": "Physiotherapy and rehabilitation",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "physio",
+  "physiotherapy",
+  "physiotherapist",
+  "rehab",
+  "rehabilitation centre",
+  "sports injury clinic",
+  "chiropractic",
+  "occupational therapy",
+  "speech therapy",
+  "physio ke sessions",
+  "sikai",
+  "exercise karwana",
+  "ilaj tabi’i",
+  "mu’alaj tabi’i",
+  "ta’heel",
+  "package of sessions",
+  "home visits",
+  "session count",
+  "plan of care",
+  "drop-outs",
+  "insurance claims",
+  "WSIB",
+  "MVA claims"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of therapists and treatment beds or rooms, and whether a gym area is used",
+  "Clinic-based, home visits, or both; how many home-visit therapists",
+  "Session packages versus pay-per-visit",
+  "Payers: self-pay, insurance, corporate panels, workplace or motor-accident insurers (e.g. Canadian WSIB or auto insurers), extended health benefits",
+  "Main referral sources: orthopaedic surgeons, hospitals, sports clubs, direct",
+  "Therapists salaried, per-session, or as independent contractors",
+  "Booking and records system used"
+ ],
+ "scope_rule": "pi notes the business side of a rehab practice: session scheduling, drop-offs from packages as a retention problem, home- visit logistics, therapist utilisation and pay, package and insurance billing, equipment upkeep, referral relationships, marketing and reporting. pi never suggests exercises, treatment plans, numbers of sessions needed, return-to-sport timing, or whether a treatment is working, and does not comment on injuries. pi does not ask for or record patients’ names, contacts, injuries, conditions or progress notes. Insurer and accident-claim rules are noted only as admin effort, not interpreted.",
+ "vocabulary": {
+  "session": "one treatment visit, the main unit of sale",
+  "package": "prepaid bundle of sessions",
+  "plan of care": "therapist’s planned course of sessions",
+  "drop-off / drop-out": "patient stops coming before finishing",
+  "home visit": "therapist goes to the patient’s home",
+  "modalities": "machines like TENS, ultrasound therapy, traction (pi notes them only as equipment)",
+  "direct billing": "clinic bills the insurer directly (common in Canada)",
+  "WSIB / WCB": "workplace injury insurer in Canadian provinces",
+  "MVA claim": "motor-vehicle accident insurance claim",
+  "referral": "doctor or hospital sending patients",
+  "utilisation": "share of a therapist’s hours actually booked",
+  "sikai": "heat/hot compress, often what patients ask for by name"
+ },
+ "problems": [
+  {
+   "phrase": "Patients buy ten sessions, come for four and stop",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Therapists’ diaries have big gaps in the middle of the day",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Home-visit therapists say they went but I can’t confirm",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Home-visit travel takes more time than the session itself",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Per-session therapists dispute how many sessions they did",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Unused package sessions sit on the books and I don’t know what I owe",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Insurance and accident claims need so many forms they come back rejected",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Direct-billed claims take months to pay",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Front desk forgets to collect the co-pay",
+   "category": "cash_collections",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Surgeons who used to send patients have gone quiet",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "We post on Instagram randomly and nothing comes from it",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "Enquiries on WhatsApp aren’t followed up",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Equipment like the traction unit breaks and waits weeks for repair",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Consumables like tape and electrodes run out",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Therapists document sessions late or not at all",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Every therapist schedules differently and patients get double-booked",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Patients complain they saw a different therapist every time",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "Good therapists leave to start their own practice",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "I can’t tell which therapist or service makes money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Monthly figures are a pile of receipts and an Excel",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Bookings, notes and billing are three different places",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Session reminders are sent manually one by one",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Second location never got enough patients",
+   "category": "sales_revenue",
+   "subtype": "branch_underperforming"
+  },
+  {
+   "phrase": "Front desk gives free extra sessions without asking",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  }
+ ],
+ "questions": {
+  "drop-offs": [
+   "When patients stop coming before their package ends, how do you find out?",
+   "Does anyone contact them?",
+   "Roughly how common is it?"
+  ],
+  "scheduling": [
+   "How are therapists’ diaries filled now?",
+   "Which times stay empty?"
+  ],
+  "home visits": [
+   "How are home visits assigned and confirmed?",
+   "How much of a therapist’s day goes on travel?"
+  ],
+  "therapist pay": [
+   "How is each therapist paid?",
+   "Where do disagreements come from?"
+  ],
+  "packages": [
+   "How do you keep track of sessions used and remaining?",
+   "What happens with unused sessions?"
+  ],
+  "claims": [
+   "Which insurers or claim types cause the most paperwork?",
+   "How often do claims get rejected?"
+  ],
+  "referrals": [
+   "Where do most patients come from?",
+   "Have any sources changed lately?"
+  ],
+  "leads": [
+   "How do new enquiries reach you?",
+   "Who replies and how fast?"
+  ],
+  "equipment": [
+   "When something breaks, how long does it usually take to fix?"
+  ],
+  "reporting": [
+   "Which numbers do you check every month?",
+   "How long do they take to put together?"
+  ],
+  "systems": [
+   "What do you use for bookings and notes today?"
+  ]
+ },
+ "seasons": "- Winter brings more slips, falls and joint complaints in Canada and northern Pakistan; Canadian winter also complicates home-visit travel. - Sports seasons (school and club cricket, football, hockey in Canada) bring sports-injury surges. - Ramadan reduces session attendance during the day and shifts bookings to evenings; Eid holidays cause drop-offs mid-package. - UAE: residents travel in July and August, interrupting packages; cooler months see more sports activity. - Canada: extended-health benefits often reset 1 January, so patients rush to use them in November and December, then pause. - Post-surgery referrals follow hospitals’ elective surgery cycles.",
+ "care": [
+  "If someone describes a fall with serious injury, chest pain, sudden weakness, or a patient in distress during a session, pi stops and says to call emergency services (1122/115, 998/999, 911).",
+  "pi never suggests exercises, treatments, session counts or whether a patient is fit to return to work or sport.",
+  "No patient names, contacts, injuries, progress notes or photos.",
+  "Home visits involve staff safety; if a therapist is in danger at a visit, pi points to emergency services; otherwise it notes field-visibility problems only.",
+  "Requests to bill insurers for sessions not delivered, inflate session counts, or produce documents for accident claims that weren’t treated are refused.",
+  "Insurer and workplace-claim rules are not interpreted.",
+  "Therapists recorded by role (“senior physio”, “home-visit therapist”)."
+ ],
+ "build_ideas": [
+  "Therapist-wise booking calendar with WhatsApp booking, reminders and easy rescheduling",
+  "Package tracker: sessions bought, used, remaining, expiry, with alerts when a patient misses two booked sessions",
+  "Drop-off follow-up list for the front desk with simple outcome notes (rebooked, paused, not interested)",
+  "Home-visit planner with route order, check-in and check-out by location, and visit confirmation from the patient side",
+  "Therapist session log feeding a monthly pay statement for per-session staff",
+  "Insurance and direct-billing tracker with document checklist per claim type, submission dates, rejections and payments",
+  "Co-pay and daily cash close reconciliation",
+  "Referral source tracker with monthly volumes per referring practice",
+  "Lead inbox for WhatsApp, Instagram and Google enquiries with response timer",
+  "Equipment register and repair log; consumables reorder list",
+  "Owner dashboard: utilisation per therapist, sessions delivered, package completion rate, revenue by payer",
+  "Simple content calendar for social posts approved by the clinic"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Most of our patients buy a 10-session package and vanish after 4 or 5. Then they come back months later asking for their remaining sessions."
+  },
+  {
+   "role": "pi",
+   "text": "So packages are being left half-used, and old balances come back to you later. Noted. When someone misses a couple of booked sessions, does anyone get in touch with them?"
+  },
+  {
+   "role": "Person",
+   "text": "No, we only notice when they turn up again."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, there’s no early signal when someone drops off. Noted. How do you keep track of how many sessions each person has left right now?"
+  }
+ ]
+}

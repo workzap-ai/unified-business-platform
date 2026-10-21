@@ -1,0 +1,298 @@
+{
+ "key": "hotels",
+ "name": "Hotels",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "hotel",
+  "rooms",
+  "occupancy",
+  "check-in",
+  "check-out",
+  "front desk",
+  "reception",
+  "walk-in",
+  "OTA",
+  "Booking.com",
+  "Agoda",
+  "Expedia",
+  "channel manager",
+  "PMS",
+  "housekeeping",
+  "room service",
+  "no-show",
+  "overbooking",
+  "corporate rate",
+  "group booking",
+  "kamra",
+  "booking confirm karo",
+  "advance",
+  "fundoq",
+  "ghurfa",
+  "hajz"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of rooms and room types, and whether there is a restaurant, banquet or conference space attached.",
+  "Star level or segment (budget, business, boutique, resort-style) and city or tourist area.",
+  "Owned building or leased, and whether the hotel is independently run or under a management or franchise arrangement.",
+  "Which booking channels are used (direct, walk-in, OTAs, corporate accounts, travel agents) and whether a PMS or channel manager exists.",
+  "Size of front desk, housekeeping and F&B teams, and whether shifts run 24 hours.",
+  "Main guest mix: corporate, tourists, families, pilgrims, wedding guests, long stays.",
+  "Country (PK, UAE, Canada), because peaks, tourism fees and reporting differ."
+ ],
+ "scope_rule": "pi notes operational and business problems: occupancy, rate leakage across channels, overbookings, housekeeping turnaround, guest complaints, cash and card reconciliation at the desk, and reporting gaps. pi does not advise on tourism or municipality fees, licensing classification, tax treatment, fire and building safety engineering, food safety rules or employment law; it records that the owner finds these hard to keep track of. pi does not collect guest names, passport or ID copies, card details or booking references, and records roles only (guest, front-desk agent, housekeeper). Guest registration and police reporting obligations are noted only as an admin effort, never advised on.",
+ "vocabulary": {
+  "OTA": "online travel agency such as Booking.com, Agoda or Expedia",
+  "channel manager": "tool that pushes rates and availability to all OTAs at once",
+  "PMS": "property management system for rooms, folios and check-in",
+  "folio": "a guest’s running bill during a stay",
+  "ADR": "average daily rate per occupied room",
+  "rack rate": "the published full price for a room",
+  "no-show": "guest who books but never arrives",
+  "house count": "number of guests in-house tonight",
+  "turnaround": "time to clean and ready a room after check-out",
+  "C-form / guest register": "guest record kept for authorities (PK)",
+  "kamra khali hai?": "is a room free?",
+  "hajz": "booking or reservation (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Booking.com shows rooms available that we’ve already sold to walk-ins, so we get double bookings",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Two guests arrived for the same room last week and we had to shift one to another hotel",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Occupancy looks fine on weekends but weekdays are dead and I don’t know how to fill them",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Commission to the OTAs is eating most of what we make on a room",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "I don’t know what my real rate per room is after discounts and commissions",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Front desk gives discounts to friends and I only find out at month end",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "The cash at reception never matches what the register says",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Corporate clients stay on credit and pay us three months later",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Rooms aren’t ready by check-in time because housekeeping doesn’t know which ones are vacated",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Guests complain about AC, hot water, broken locks, and maintenance only hears about it from reviews",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Our TripAdvisor and Google ratings dropped after a few bad reviews and nobody replies",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Minibar and laundry charges never make it to the bill",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Linen and towels keep disappearing and I can’t tell how many we actually have",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Toiletries and amenities run out on the busiest nights",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Housekeeping staff keep quitting, and every new one needs training from scratch",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Night shift is a black box; I don’t know what happened until morning",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "I still get my daily occupancy report on WhatsApp as a photo of a register",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "No-shows on prepaid-later bookings leave rooms empty on peak nights",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "We get lots of WhatsApp enquiries asking for rates and half go unanswered",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Our own website can’t take bookings, so everyone goes through the OTAs",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "We have no list of past guests to invite back",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Guest registration and authority reporting take my desk staff ages every night",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Electricity bills in summer are huge because ACs run in empty rooms",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Laundry vendor returns sheets late or stained",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Group and wedding blocks get held for weeks and then released at the last minute",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Restaurant and room bills are separate so guests check out with unpaid food charges",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "When we opened the second property, nothing was standardised",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  }
+ ],
+ "questions": {
+  "bookings and channels": [
+   "Where do most of your bookings come from right now?",
+   "How do you update availability when a walk-in takes a room?",
+   "How often does a double booking actually happen?"
+  ],
+  "rate and margin": [
+   "Do you know roughly what you keep per room after commissions?",
+   "Who is allowed to give discounts at the desk?",
+   "Is that tracked anywhere?"
+  ],
+  "front desk cash": [
+   "How is cash handed over between shifts?",
+   "When it doesn’t match, how do you find out?",
+   "How long does it usually take to settle?"
+  ],
+  "housekeeping": [
+   "How does housekeeping know a room is vacated?",
+   "How do they tell the desk it’s ready?",
+   "What usually causes the delay?"
+  ],
+  "maintenance": [
+   "How do guests’ complaints about the room reach maintenance?",
+   "Who checks it was fixed?"
+  ],
+  "guests and reviews": [
+   "Who reads and replies to reviews?",
+   "Do you keep any record of returning guests?"
+  ],
+  "corporate credit": [
+   "How many corporate accounts are on credit?",
+   "How do you chase them when they’re late?"
+  ],
+  "reporting": [
+   "What do you look at each morning to know how last night went?",
+   "Who prepares it and how?"
+  ],
+  "staff": [
+   "Which role is hardest to keep staffed?",
+   "What usually makes people leave?"
+  ],
+  "growth": [
+   "Are you thinking of adding rooms or another property?",
+   "What worries you most about running two places?"
+  ]
+ },
+ "seasons": "PK: northern areas (Hunza, Skardu, Swat, Murree, Naran) peak in summer and Eid holidays, with Murree and Swat snow weekends in winter; city hotels peak in wedding season (roughly November to March), cricket fixtures, exhibitions and conferences; Muharram and Ramadan soften leisure demand; Independence Day and long weekends spike domestic travel. UAE: high season October to April with winter tourism, Dubai Shopping Festival, GITEX, Dubai Airshow, Abu Dhabi F1, New Year’s Eve; summer is low for leisure but Eid holidays bring GCC visitors; Ramadan changes F&B patterns. Canada: summer tourism June to September, ski season in mountain areas December to March, conventions and sports events in cities, long weekends (Victoria Day, Canada Day, Thanksgiving).",
+ "care": [
+  "Never collect guest names, passport or CNIC/Emirates ID copies, card numbers or booking reference numbers; record “a guest” or “a corporate client”.",
+  "Guest registration and reporting to police or tourism authorities are noted as admin effort only; pi gives no guidance on what must be filed.",
+  "If the owner hints at not registering guests, unrecorded room sales or splitting bills to reduce tax, pi declines to help with that and moves on.",
+  "Fire, gas, lift and electrical safety concerns are noted as maintenance problems; any immediate danger (fire, gas smell, injured guest) means pi stops and tells them to call emergency services (15/1122 in PK, 999/997/998 in UAE, 911 in Canada).",
+  "Food safety issues in the hotel kitchen are noted operationally, not advised on.",
+  "Covert monitoring of guests or staff in rooms is not something pi will help with; CCTV gaps in public areas are fine to note.",
+  "Disputes with OTAs or management companies are noted as business problems; pi does not interpret contracts.",
+  "Staff conduct complaints are recorded by role, never by name."
+ ],
+ "build_ideas": [
+  "Room availability board synced with walk-ins and an OTA channel manager feed, so a room sold at the desk closes on all channels.",
+  "Daily night-audit summary sent to the owner on WhatsApp: occupancy, ADR, revenue by channel, cash collected, discounts given.",
+  "Housekeeping status app: desk marks check-out, housekeeper sees the room, marks cleaned and inspected, desk sees “ready”.",
+  "Maintenance ticket flow from desk or guest WhatsApp, with photo, assignee and “fixed” confirmation.",
+  "Shift handover sheet for front desk cash, card totals and open folios, with mismatch flags.",
+  "Discount and complimentary approval flow: desk requests, owner approves by WhatsApp tap, all logged.",
+  "Corporate accounts ledger with ageing and automatic statement reminders.",
+  "Linen and amenities stock tracker with par levels per floor and laundry out/in counts.",
+  "Direct booking page and WhatsApp booking flow with deposit link.",
+  "Review monitor that gathers new Google and OTA reviews into one list for reply.",
+  "Past-guest list (with consent) for seasonal offers.",
+  "Group block tracker with release dates and pickup reminders.",
+  "Utility usage log by floor or block to spot waste.",
+  "Multi-property dashboard comparing occupancy and rate across hotels."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Weekend pe aksar double booking ho jati hai, Booking.com pe room khula reh jata hai jab walk-in aa jata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted — walk-in aur Booking.com ki availability aapas mein sync nahi hoti. Abhi walk-in aane par room band kaun karta hai, aur kaise?"
+  },
+  {
+   "role": "Person",
+   "text": "Receptionist ko khud extranet mein jaa ke band karna hota hai, raat ko aksar bhool jata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, raat ki shift mein manual update reh jata hai. Pichle mahine aisa kitni dafa hua hoga, andaza hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Kam az kam chaar paanch dafa, aur har dafa guest ko doosre hotel bhejna para."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh bhi note kar liya — har double booking par guest shift karna para. Kya iska asar reviews par bhi aaya hai?"
+  }
+ ]
+}

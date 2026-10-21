@@ -1,0 +1,269 @@
+{
+ "key": "courier_and_last_mile_delivery_companies",
+ "name": "Courier and last-mile delivery companies",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "courier",
+  "last mile",
+  "delivery",
+  "rider",
+  "COD",
+  "cash on delivery",
+  "RTO",
+  "return to origin",
+  "parcel",
+  "consignment",
+  "CN number",
+  "tracking",
+  "hub",
+  "sorting",
+  "pickup",
+  "booking",
+  "failed delivery",
+  "customer ne phone nahi uthaya",
+  "address nahi mil raha",
+  "merchant",
+  "e-commerce seller",
+  "mandoob tawseel",
+  "tawseel",
+  "sha’hna",
+  "same-day",
+  "next-day",
+  "bike",
+  "van",
+  "fuel allowance"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Cities and areas covered, and whether intercity or only intra-city.",
+  "Number of riders and vehicles, and whether riders are salaried, per-parcel or freelance.",
+  "Parcels per day roughly, and share that is COD.",
+  "Who the customers are: e-commerce merchants, marketplaces, documents/corporate, food/grocery, individuals.",
+  "Number of hubs or branches.",
+  "Systems: own app, a courier software, Excel, merchant portals, Shopify/WooCommerce integrations, aggregator platforms.",
+  "In the UAE/Canada: whether riders are company-sponsored or contracted through agencies."
+ ],
+ "scope_rule": "pi notes operational and business problems: pickups, sorting, rider productivity, failed deliveries, RTO, COD remittance, merchant communication, cost per parcel, staffing and reporting. It does not advise on employment status, labour or visa law, traffic law, insurance claims or tax. It never helps track riders covertly, hide parcels’ contents, move prohibited items, or delay merchants’ COD money improperly. It never stores riders’, merchants’ customers’ or recipients’ names, addresses, phone numbers or IDs — only roles and counts.",
+ "vocabulary": {
+  "COD": "cash on delivery, collected by the rider",
+  "remittance": "paying collected COD money to the merchant",
+  "RTO": "return to origin, a parcel sent back after failed delivery",
+  "CN / AWB": "consignment note / tracking number",
+  "hub": "sorting centre",
+  "first mile / last mile": "pickup from merchant / delivery to recipient",
+  "attempt": "a delivery try; failed attempts lead to RTO",
+  "POD": "proof of delivery (signature, photo, OTP)",
+  "runsheet / manifest": "list of parcels a rider takes out",
+  "mandoob / mandoob tawseel": "delivery rider (Gulf)",
+  "zone": "delivery area assigned to a rider",
+  "fake order / prank order": "orders recipients refuse or never placed"
+ },
+ "problems": [
+  {
+   "phrase": "Riders bring back COD cash short or late",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "Merchants complain their COD payments come late",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "RTO is too high, especially on COD orders",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Riders mark ‘customer not answering’ without actually trying",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Parcels go missing between hub and rider",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "We can’t tell which parcel is where at any time",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Recipients call us angry because the rider didn’t come",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Addresses are vague and riders waste time finding them",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Cost per parcel keeps rising with fuel",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Some zones lose money every day",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Riders leave after a few weeks",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Rider attendance is unpredictable on Mondays and after Eid",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Rider pay per parcel is always disputed",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Merchants upload orders in different formats and we re-type them",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Our system doesn’t connect with merchants’ Shopify stores",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Sorting at the hub is slow and parcels miss the morning dispatch",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Damaged parcels and merchants claiming full value",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Customer service WhatsApp is overflowing with ‘where is my parcel’",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Big merchants leave for cheaper couriers",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Bikes break down and no maintenance record",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "I can’t see daily delivery success rate by rider or zone",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Cash collected by riders at night is risky",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Fake orders waste our trips",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Expanding to a new city but no idea how to set up the hub",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "Sale events overwhelm us and everything gets delayed",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  }
+ ],
+ "questions": {
+  "cod": [
+   "How does rider cash come back to you each day?",
+   "How do you match it to delivered parcels?",
+   "How long do merchants wait for their money?"
+  ],
+  "failed deliveries": [
+   "Roughly what share of parcels fail on first attempt?",
+   "What reasons do riders give most?",
+   "How do you check those reasons?"
+  ],
+  "tracking": [
+   "How do you see where a parcel is right now?",
+   "How do merchants and recipients get updates?"
+  ],
+  "hub": [
+   "What happens to parcels between pickup and the rider leaving?",
+   "Where do they get delayed or lost?"
+  ],
+  "riders": [
+   "How are riders paid, and what disputes come up?",
+   "How long do riders usually stay?"
+  ],
+  "merchants": [
+   "How do merchants send you their orders?",
+   "What do they complain about most?"
+  ],
+  "cost": [
+   "Do you know your cost per parcel by zone?",
+   "What’s pushing it up most?"
+  ],
+  "growth": [
+   "What breaks first when volume spikes?"
+  ]
+ },
+ "seasons": "In Pakistan, Ramadan and the run-up to Eid ul Fitr are the biggest e-commerce peaks, with clothing and gifts; 11.11 and 12.12 sales on Daraz and others, and Black Friday/White Friday in November, create huge spikes. Eid holidays shut deliveries and cause backlogs; Eid ul Adha disrupts with animal markets and traffic. Monsoon flooding in Karachi and Lahore (July–August) causes failed deliveries. In the UAE, White Friday/Black Friday, Dubai Shopping Festival, Ramadan nights, Eid and back-to-school; summer midday heat restrictions affect riders’ working hours. In Canada, Black Friday through Christmas is the main peak, and winter storms disrupt routes.",
+ "care": [
+  "Recipients’ and merchants’ customers’ personal data (names, addresses, phone numbers): never stored by pi.",
+  "Rider employment status, visas, labour law, insurance: out of scope; pi notes the operational impact.",
+  "Requests to track riders secretly or monitor personal phones: pi declines covert surveillance; can note “can’t see riders’ progress” as an operational problem.",
+  "Prohibited items (weapons, drugs, restricted goods) or “don’t ask what’s in the parcel”: pi declines to help.",
+  "Delaying merchant COD remittances to use the money: pi does not help; can note cash flow strain neutrally.",
+  "Rider accidents or assaults: pi stops and points to emergency services (1122/15 in Pakistan, 999 in the UAE, 911 in Canada).",
+  "Heat safety for riders in the UAE summer: pi does not give safety-engineering advice, but notes scheduling problems."
+ ],
+ "build_ideas": [
+  "Rider app with runsheet, delivery attempts, POD photo/OTP and location stamp at each attempt.",
+  "Daily COD reconciliation: parcels delivered vs cash handed in per rider, shortages flagged on the spot.",
+  "Merchant COD remittance schedule and statements sent automatically.",
+  "Live parcel status board by hub, rider and zone.",
+  "Automated WhatsApp status messages to recipients, with a “confirm address/time” reply before dispatch.",
+  "Order confirmation flow for COD orders to reduce refusals.",
+  "Merchant order upload that accepts their spreadsheets or connects to Shopify/WooCommerce.",
+  "Hub scan-in/scan-out log to find where parcels go missing.",
+  "Rider pay calculator per parcel/attempt that riders can see.",
+  "Zone and rider performance dashboard: success rate, RTO, cost per parcel.",
+  "Bike/van maintenance log with reminders.",
+  "Peak-day planner using past sale events to plan riders and hub shifts."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our RTO on COD is crazy, almost one in four parcels come back. Merchants are blaming us."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a lot of wasted trips, and merchants are holding you responsible. Noted. When a parcel comes back, what reason do riders usually record?"
+  },
+  {
+   "role": "Person",
+   "text": "Mostly “customer not responding” or “refused”."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — mostly no response or refused. Is there any way right now to check that the rider actually called or visited before marking it?"
+  }
+ ]
+}

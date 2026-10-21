@@ -1,0 +1,280 @@
+{
+ "key": "mosques_religious_trusts_and_community_institutions",
+ "name": "Mosques, religious trusts and community institutions (administration)",
+ "kind": "industry",
+ "sector": {
+  "code": "M",
+  "title": "Digital economy, social and public sector"
+ },
+ "signals": [
+  "masjid",
+  "mosque",
+  "markaz",
+  "imambargah",
+  "jamaat khana",
+  "gurdwara",
+  "church",
+  "mandir",
+  "community centre",
+  "madrasa",
+  "intezamia committee",
+  "mutawalli",
+  "waqf",
+  "chanda",
+  "chanda box",
+  "jummah collection",
+  "imam sahab ki tankhwah",
+  "bijli ka bill",
+  "electricity bill",
+  "renovation",
+  "tameer",
+  "iftar arrangement",
+  "nikah booking",
+  "hall booking",
+  "awqaf",
+  "board of directors",
+  "membership dues",
+  "mujtama"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type of institution and whether it is run by a registered trust, society, local committee, or government department (e.g., state-run mosques in UAE).",
+  "Size: approximate congregation, number of buildings or facilities (hall, school, library, parking).",
+  "Income sources: box collections, monthly pledges, online giving, hall/space rental, waqf property rent, events.",
+  "Paid staff (imam, muezzin, caretaker, teachers, cleaners, security) versus volunteers.",
+  "Whether there are ongoing construction or renovation projects.",
+  "Services run: classes, iftar, funerals, nikah, food bank, youth programmes.",
+  "Who manages accounts: treasurer, committee member, accountant."
+ ],
+ "scope_rule": "pi notes administrative and operational problems: collection counting and recording, expense tracking, utility and maintenance management, staff payroll and rotas, facility bookings, event logistics, member/congregation communication and committee coordination. It does not give religious rulings (on zakat, waqf use, or fiqh), legal advice on trust deeds, waqf law, property disputes or registration, and it does not take sides in committee or sectarian disputes. It never collects congregants’, donors’, students’ or staff members’ names, contact details, ID numbers or family details, and records roles only (e.g., “the treasurer”, “the caretaker”).",
+ "vocabulary": {
+  "Intezamia / management committee": "elected or appointed body running affairs.",
+  "Mutawalli": "custodian of waqf property.",
+  "Waqf": "endowed property dedicated for religious/charitable use.",
+  "Chanda / donation box": "collection boxes, often counted weekly.",
+  "Jummah collection": "Friday prayer collection, usually the biggest.",
+  "Pledge": "promised regular contribution.",
+  "Tameer fund": "construction or expansion fund.",
+  "Iftar / sehri arrangement": "Ramadan meals.",
+  "Hall booking": "renting community hall for nikah, events.",
+  "Khadim / caretaker": "staff maintaining premises.",
+  "Treasurer / khazanchi": "person handling funds.",
+  "Awqaf": "government department overseeing religious endowments."
+ },
+ "problems": [
+  {
+   "phrase": "Box collection is counted by one person and nobody double-checks",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Collection amounts don’t match what’s deposited in the bank",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Cash sits in the office for weeks before it reaches the bank",
+   "category": "cash_collections",
+   "subtype": "deposit_delays"
+  },
+  {
+   "phrase": "Members ask where the money went and we have no clear statement",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Construction fund and running expenses mixed together",
+   "category": "operations_process",
+   "subtype": "quality_inconsistent"
+  },
+  {
+   "phrase": "Electricity and AC bills are huge, especially in summer",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Pledges made at fundraisers never get fully paid",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Staff salaries late because the account signatory is travelling",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Caretaker and cleaners — no record of who did what or when",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "AC, sound system and generator break and no one tracks maintenance",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Hall bookings double-booked for nikahs",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Iftar food ordered too much some days, too little others",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Contractor for renovation keeps overrunning cost",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Contractor quotes — no fair comparison",
+   "category": "suppliers_purchasing",
+   "subtype": "price_comparison"
+  },
+  {
+   "phrase": "Announcements only on WhatsApp; half the community misses them",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Committee decisions made in WhatsApp group then forgotten",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Everything depends on one elderly trustee who keeps the records at home",
+   "category": "planning_growth",
+   "subtype": "succession_family"
+  },
+  {
+   "phrase": "Online donation link not working, donors give up",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "Receipts for donors written by hand in a book",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Charity registration and annual filings are always last-minute",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Class/madrasa fees and attendance kept in notebooks",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Shoes, fans and donation boxes have gone missing",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "CCTV doesn’t cover the office where cash is counted",
+   "category": "loss_security",
+   "subtype": "cctv_gaps"
+  },
+  {
+   "phrase": "Ramadan volunteer roster collapses mid-month",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Rent from shops on the waqf property comes late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  }
+ ],
+ "questions": {
+  "collections": [
+   "How often are the boxes opened and counted?",
+   "Who is present when it’s counted?",
+   "How does the money get to the bank?"
+  ],
+  "records": [
+   "Where are income and expenses recorded now?",
+   "Who can see them?"
+  ],
+  "transparency": [
+   "What do members or the committee ask about money?",
+   "How do you answer them today?"
+  ],
+  "funds": [
+   "Are construction, running and charity money kept separate in your records?",
+   "How do you know each balance?"
+  ],
+  "staff": [
+   "How many paid staff do you have?",
+   "How are their duties and salaries tracked?"
+  ],
+  "facilities": [
+   "What breaks down most often?",
+   "How do you find out before it’s urgent?"
+  ],
+  "bookings": [
+   "How are hall or room bookings taken?",
+   "Has double-booking happened?"
+  ],
+  "communication": [
+   "How do you reach the community with announcements?",
+   "Who misses out?"
+  ],
+  "ramadan": [
+   "What’s the hardest part to organise in Ramadan?",
+   "What went wrong last year?"
+  ],
+  "continuity": [
+   "If the treasurer or main trustee stepped away, who would know where everything is?"
+  ]
+ },
+ "seasons": "Ramadan (iftar, taraweeh, itikaf, peak giving, especially the last ten nights), Eid ul-Fitr and Eid ul-Adha prayers (overflow crowds, Qurbani coordination), Muharram/Ashura for imambargahs, Rabi ul-Awwal events, Shab-e-Barat, Friday every week. Summer cooling costs in Pakistan and the UAE; winter heating and snow clearing in Canada. Canada: year-end donation receipts (December), community events around Canada Day, Eid festivals in parks. Other faiths’ institutions peak around Christmas/Easter, Diwali, Vaisakhi or their own calendars. Islamic dates shift about ten to eleven days earlier each year.",
+ "care": [
+  "No religious rulings on zakat, waqf use, fund-mixing or rituals; record only the administrative problem and suggest they consult their own scholars if asked.",
+  "Stay strictly neutral in committee disputes, sectarian or faith matters; note the coordination problem only.",
+  "No legal advice on trust deeds, property, registration or government oversight (Awqaf, CRA, Islamic Affairs).",
+  "Never collect names or details of congregants, donors, students (especially children in madrasa/Sunday school), staff or volunteers.",
+  "Suspected misappropriation: note it as a control gap (e.g., single-person counting), do not encourage accusations or ask who.",
+  "Security concerns, threats or attacks against a place of worship: point to police/emergency services immediately (15 or 1122 in Pakistan, 999 in UAE, 911 in Canada).",
+  "Refuse requests to hide income from authorities, issue false receipts, or channel funds improperly.",
+  "Be warm and respectful; many administrators are volunteers and elderly."
+ ],
+ "build_ideas": [
+  "Collection count app: two counters enter amounts per box per day, totals locked and shared with the committee instantly.",
+  "Deposit tracker matching counted cash to bank deposits with alerts for gaps or delays.",
+  "Fund-wise ledger (running, construction, charity, restricted) with simple monthly statement for members.",
+  "Pledge register with WhatsApp reminders and progress against fundraising targets.",
+  "Digital donation receipts by WhatsApp/email, with year-end summaries where needed.",
+  "Facility booking calendar for hall and rooms with deposits and confirmation messages.",
+  "Maintenance log for AC, sound, generator, plumbing with service reminders.",
+  "Staff duty roster and salary sheet with approval flow when signatories are away.",
+  "Ramadan planner: iftar headcount estimates, food orders, volunteer shifts.",
+  "Broadcast channel/WhatsApp list management for announcements in multiple languages.",
+  "Committee decision and action log.",
+  "Waqf property rent tracker for shops or flats owned by the trust."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Assalam o alaikum. Masjid ki committee mein hoon, treasurer. Jummah ka chanda count hota hai lekin bank mein jo jata hai woh match nahi hota."
+  },
+  {
+   "role": "pi",
+   "text": "Walaikum assalam. Yeh zimmedari bhaari hoti hai, aur hisaab saaf hona zaroori hai. Noted — Jummah ki collection aur bank deposit match nahi hote. Gintee ke waqt kitne log maujood hote hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Aksar sirf khadim sahab hote hain, kabhi main bhi."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — gintee aksar ek hi bande ke saath hoti hai. Ginne ke baad paisa bank tak kitne dinon mein pohanchta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Kabhi do din, kabhi do hafte."
+  }
+ ]
+}

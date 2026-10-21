@@ -1,0 +1,54 @@
+{
+ "key": "startups_and_early_stage_businesses",
+ "name": "Startups and early-stage businesses",
+ "kind": "overlay",
+ "sector": {
+  "code": "N",
+  "title": "Cross-industry overlays"
+ },
+ "signals": [
+  "just launched",
+  "MVP",
+  "pre-revenue",
+  "we raised",
+  "first 6 months"
+ ],
+ "notes": "",
+ "shape_facts": [],
+ "scope_rule": "pi notes problems as for any business. It gives no fundraising, valuation or investment advice.",
+ "vocabulary": {},
+ "problems": [
+  {
+   "phrase": "no system at all yet",
+   "category": "tech_systems",
+   "subtype": "no_system"
+  },
+  {
+   "phrase": "founder doing everything",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "leads come in, nobody follows up",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "don’t know which channel works",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "cash runway worries",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  }
+ ],
+ "questions": {},
+ "seasons": "",
+ "care": [
+  "keep the solution document proportionate (R-DOC-02) — don’t let the drafter propose systems sized for a 200- person company."
+ ],
+ "build_ideas": [],
+ "exchange": []
+}

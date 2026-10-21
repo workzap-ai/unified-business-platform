@@ -1,0 +1,267 @@
+{
+ "key": "water_tanker_and_ro_filtration_plant_operators",
+ "name": "Water tanker and RO/filtration plant operators",
+ "kind": "industry",
+ "sector": {
+  "code": "L",
+  "title": "Finance-adjacent, energy and utilities"
+ },
+ "signals": [
+  "water tanker",
+  "tanker service",
+  "hydrant",
+  "tanker booking",
+  "RO plant",
+  "filtration plant",
+  "mineral water plant",
+  "bottled water",
+  "19-litre bottle",
+  "gallon delivery",
+  "water supply",
+  "tanker wala",
+  "paani ka tanker",
+  "gallon",
+  "bottle wapas nahi aayi",
+  "plant",
+  "filter plant",
+  "mai",
+  "wayit mai/ tanker mai",
+  "qarooraat",
+  "sweet water",
+  "borehole",
+  "desalinated water delivery"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Tanker delivery, RO/filtration plant with bottled/gallon delivery, walk-in refill counter, or a mix.",
+  "Number of tankers or delivery vehicles and whether owned, rented or contracted.",
+  "Water source type in general terms (hydrant, bore, municipal connection, own plant).",
+  "Customer mix: households, buildings, offices, construction sites, restaurants, events.",
+  "Daily trips or bottles delivered, roughly.",
+  "How orders come in: phone, WhatsApp, app, walk-in, fixed contracts.",
+  "Number of drivers, helpers and plant staff."
+ ],
+ "scope_rule": "pi notes operational problems: order taking, scheduling and routing, driver accountability, bottle returns and deposits, credit customers and collections, plant downtime, stock of bottles and caps, and reporting. It never advises on water quality testing, treatment chemistry, filter or membrane specifications, health effects or safety limits, and never helps get around water authority, municipal or food-safety licensing. It never asks for or stores customers’ names, addresses, phone numbers or payment details; it records only customer types and areas in general terms. Water quality complaints are noted as complaints, with any health emergency pointed to medical help.",
+ "vocabulary": {
+  "Tanker": "truck carrying bulk water, sized by gallons or litres",
+  "Trip / phera": "one delivery run",
+  "Hydrant": "official or private filling point for tankers",
+  "Gallon / 19-litre bottle": "reusable water bottle for dispensers",
+  "Bottle deposit / security": "refundable charge on a reusable bottle",
+  "Empties": "returned empty bottles",
+  "RO": "reverse osmosis filtration",
+  "Membrane / cartridge": "filtration parts that need replacing",
+  "Refill counter": "walk-in point to fill containers",
+  "Booking": "a tanker order",
+  "Contract customer": "building or business on fixed regular supply",
+  "Sweet water": "drinkable water as opposed to brackish supply (Gulf usage)"
+ },
+ "problems": [
+  {
+   "phrase": "Orders come on five phones and some tankers never get booked",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Customers call again and again asking where the tanker is",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Deliveries arrive late because routes are planned in the driver’s head",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Drivers do extra private trips with our tanker and pocket the money",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Number of trips the driver claims does not match what I collect",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Diesel costs keep climbing and I cannot see cost per trip",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Empty bottles don’t come back and we keep buying new ones",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "We don’t know how many bottles are out with which customers",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Bottle deposits were never recorded so customers dispute them",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Caps, seals and labels run out without warning",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Buildings and offices on credit pay two months late",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Plant stops when a pump or membrane fails and orders pile up",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Load-shedding stops the plant and production falls short",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Customer says the water tasted different and we had no log of when filters were changed",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Bottles not washed properly sometimes and we get complaints",
+   "category": "quality_complaints",
+   "subtype": "hygiene"
+  },
+  {
+   "phrase": "Summer demand doubles and we cannot add tankers fast enough",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Waiting hours at the hydrant wastes the whole day",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Licence and inspection renewals come up and nobody tracked the date",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Drivers and helpers leave without notice in peak season",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Subscription customers drop off and we don’t notice until they’ve gone",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Riders’ COD cash comes to the plant days late",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "No online ordering, people just call",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "Can’t compare which area or route earns more",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Vehicle maintenance is only done when something breaks",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  }
+ ],
+ "questions": {
+  "orders": [
+   "How do most orders reach you today?",
+   "Who writes them down?",
+   "How do you find out an order was missed?"
+  ],
+  "delivery": [
+   "How many tankers or delivery vehicles are on the road on a normal day?",
+   "How is the day’s route decided?"
+  ],
+  "driver accountability": [
+   "How do you match the trips a driver did with the money he brings back?",
+   "Where does it usually not add up?"
+  ],
+  "bottles": [
+   "Roughly how many reusable bottles do you have in circulation?",
+   "How do you know which customer has how many?"
+  ],
+  "credit customers": [
+   "How many of your customers are on monthly credit?",
+   "How long do they usually take to pay?"
+  ],
+  "plant": [
+   "What usually stops the plant?",
+   "How long does it take to get going again?"
+  ],
+  "costs": [
+   "Do you know roughly what one trip or one bottle costs you?",
+   "Which cost is hardest to keep track of?"
+  ],
+  "seasonality": [
+   "When is demand highest?",
+   "What gives way first when it peaks?"
+  ]
+ },
+ "seasons": "- PK: severe peak in summer (April–August) with heat and municipal supply shortfalls, especially in Karachi; Ramadan shifts delivery to evenings and sehri; Eid and wedding season increase event bookings; monsoon can cut roads and hydrant access; load-shedding affects plants. - UAE: summer heat drives bottled water demand; schools and offices restart in September; Ramadan iftar events; construction sites need steady supply year-round; many residents leave in July–August, shifting demand from homes to businesses. - Canada: bottled water delivery fairly steady, rises in summer and during boil-water advisories; rural cistern/tanker delivery for homes and cottages peaks in summer; winter roads affect delivery.",
+ "care": [
+  "No water treatment, testing, chemical dosing or health advice; pi notes “quality complaint” or “no filter change log” as operational issues.",
+  "If someone describes illness after drinking water, pi points to medical help and, if serious, emergency services.",
+  "Never help with illegal hydrants, water theft from mains, tampering with meters or avoiding authority licensing.",
+  "Customer addresses, names and phone numbers are not stored; pi uses areas and customer types.",
+  "Driver theft concerns are recorded as control gaps, no names.",
+  "Road accidents or vehicle emergencies: pi points to emergency services first.",
+  "Do not advise on vehicle safety or roadworthiness standards."
+ ],
+ "build_ideas": [
+  "WhatsApp order intake that turns messages into bookings with time slot, area, size and status updates.",
+  "Daily dispatch board: orders assigned to tankers/vehicles, grouped by area, with completion marked by drivers.",
+  "Driver trip log: start/end, trips completed, cash collected, diesel filled, matched against bookings.",
+  "Cost-per-trip view combining diesel, driver pay, hydrant/source cost and maintenance entered by the owner.",
+  "Bottle circulation ledger: bottles out per customer reference, empties returned, deposit taken.",
+  "Subscription schedule for regular customers with reminders and missed-delivery flags.",
+  "Credit customer ledger with monthly statements and reminders.",
+  "Plant maintenance and filter-change log with due-date reminders and downtime record.",
+  "Daily production vs orders view for the plant.",
+  "Consumables stock tracker (caps, seals, labels, cartridges) with reorder alerts.",
+  "Vehicle service reminders by date or mileage.",
+  "Licence and inspection renewal reminders.",
+  "Simple online order page linked to WhatsApp."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Garmiyon mein orders itne aate hain ke aadhe likhe hi nahi jate, customer gussa hote hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — rush mein orders miss ho jana aur customer naraz, noted. Orders zyadatar kis tarah aate hain — call, WhatsApp, ya koi aur?"
+  },
+  {
+   "role": "Person",
+   "text": "Teen mobile numbers pe call aur WhatsApp dono."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, teen numbers pe calls aur WhatsApp. Kitne tankers din mein chal rahe hote hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Saat tankers, apne."
+  },
+  {
+   "role": "pi",
+   "text": "Theek, saat apne tankers, noted. Driver jo trips karta hai, unka hisaab paison se kaise milate hain?"
+  }
+ ]
+}

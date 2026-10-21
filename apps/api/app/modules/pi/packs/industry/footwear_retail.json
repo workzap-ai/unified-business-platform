@@ -1,0 +1,277 @@
+{
+ "key": "footwear_retail",
+ "name": "Footwear retail",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "shoes",
+  "footwear",
+  "khussa",
+  "kolhapuri",
+  "chappal",
+  "sandals",
+  "joggers",
+  "sneakers",
+  "heels",
+  "school shoes",
+  "size run",
+  "number",
+  "jori",
+  "size nahi hai",
+  "ek pair ka farq",
+  "box khaali nikla",
+  "article number",
+  "sale pe joote",
+  "warranty",
+  "sole nikal gaya",
+  "na’al",
+  "jazma",
+  "maqaas"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Own brand (manufactured or sourced) vs multi-brand retailer vs franchise of a known brand.",
+  "Number of outlets and online channels.",
+  "Categories covered (men, women, kids, school, sports, formal, traditional).",
+  "Size range and whether stock is held as size runs per article.",
+  "Local manufacturing (Lahore, Karachi, Peshawar workshops), imports (China, Vietnam, Turkey), or both.",
+  "Whether the store gives a sole/stitching guarantee or exchange policy.",
+  "Share of sales from sale/discount periods."
+ ],
+ "scope_rule": "pi notes stock by article and size, sell-through, returns and exchanges, outlet performance, supplier delays, quality complaints, online orders and staff issues. pi gives no orthopaedic or foot-health advice, product safety certification, customs, trademark or tax advice. pi does not collect customers’ details or staff identities. Requests to pass off copies as branded goods, or to mislabel origin or materials (e.g. calling synthetic “genuine leather”), are declined.",
+ "vocabulary": {
+  "article": "shoe style code",
+  "size run / size set": "one pair in each size of an article",
+  "number": "shoe size (e.g. “8 number”)",
+  "jori": "pair",
+  "khussa": "traditional embroidered Punjabi shoe",
+  "chappal": "slipper/sandal",
+  "upper / sole / lasting": "parts and stage of shoe making",
+  "first copy / master copy": "replica of a branded shoe",
+  "claim": "customer complaint for sole or stitching failure",
+  "broken size": "article missing some sizes",
+  "display pair": "single shoe or pair on show",
+  "jazma / na'al": "shoes / sandals (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Customer likes the shoe, but we don’t have her size — happens all day",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Every article ends up with only 5s and 11s left",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Box says size 8, inside is a 7 or two left shoes",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Display pairs go missing",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Pairs swapped by staff with old ones and sold as new",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Soles come off within a month and customers return angry",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Workshop delivers late for school season",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Import shipment of joggers stuck at port before Eid",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Exchange policy differs at every outlet",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "We don’t know how many claims each supplier causes",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Online, people order two sizes and return one",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Size guide on the website is wrong so returns are high",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "COD parcels refused at the door",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Leather and material costs went up, our prices haven’t",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "No idea of margin per article after discounts",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "We go on 50% sale and lose money on half the range",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Salesmen push the shoes with higher commission, not what the customer wants",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "New staff can’t measure or fit properly",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "One outlet sells loads of kids’ shoes, another nothing",
+   "category": "sales_revenue",
+   "subtype": "branch_underperforming"
+  },
+  {
+   "phrase": "Customers try on, leave, and buy online cheaper",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Back-room stock is a mess, takes ten minutes to find a size",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Transfers of single sizes between outlets get lost",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Stocktake takes two days and we close the shop",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "POS shows the article but not the sizes",
+   "category": "tech_systems",
+   "subtype": "pos_issues"
+  },
+  {
+   "phrase": "Can’t see which sizes sell most to plan the next order",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Daraz listing shows wrong stock and we get cancellations",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  }
+ ],
+ "questions": {
+  "sizes": [
+   "How often do you lose a sale because the size isn’t there?",
+   "Which sizes are always left over?",
+   "Can staff check another outlet’s stock?"
+  ],
+  "stockroom": [
+   "How are boxes arranged in the back?",
+   "How long does a stocktake take?"
+  ],
+  "quality": [
+   "What do customers bring back most?",
+   "Is it mostly one supplier or workshop?",
+   "How do you track claims?"
+  ],
+  "suppliers": [
+   "Where do you get most of your shoes from?",
+   "How often are deliveries late for a season?"
+  ],
+  "online": [
+   "Where do you sell online?",
+   "What’s the main reason for returns?"
+  ],
+  "margin": [
+   "Do you know which articles make money after sale periods?",
+   "When did you last change prices for cost increases?"
+  ],
+  "staff": [
+   "How is commission worked out?",
+   "How do new staff learn to fit shoes?"
+  ],
+  "outlets": [
+   "Which outlet sells differently from the rest?",
+   "What’s different about its customers?"
+  ]
+ },
+ "seasons": "Pakistan: Eid ul-Fitr is the biggest shoe peak (new shoes for the whole family, Chand Raat late-night sales), Eid ul- Adha, back-to-school (March–April, August), wedding season Nov–Feb (khussas, heels, formal), winter boots and closed shoes Nov– Jan, summer sandals and chappals April–August, end-of-season sales. UAE: Ramadan/Eid, back-to-school late August, Dubai Shopping Festival, White Friday, summer sales. Canada: back-to-school, winter boot season Oct–Jan, Black Friday/Boxing Day, spring/summer sandals, Eid and Diwali for diaspora stores.",
+ "care": [
+  "“First copy” or replica sales under brand names: pi declines to help and notes only legitimate stock/sales problems.",
+  "Foot pain or medical footwear questions from the owner’s customers: pi does not advise; out of scope.",
+  "Product origin and material claims: pi does not help mislabel.",
+  "Staff suspected of swapping pairs: pi notes the pattern, no accusations, no covert surveillance.",
+  "Workshop labour conditions, glue fumes or fire hazards: if danger is described, pi points to emergency services; no safety engineering advice.",
+  "Customer data from exchanges: not collected."
+ ],
+ "build_ideas": [
+  "Size-grid stock view per article per outlet, with the “lost size” button for staff to log when a size was asked for but unavailable.",
+  "Size-curve report by category and outlet to guide future order ratios.",
+  "Broken-size consolidation suggestions: move remaining sizes to one outlet or to online.",
+  "Stockroom location codes (rack/shelf) printed on box labels and searchable on POS.",
+  "Receiving check: scan box labels and spot-check pairs against the delivery note.",
+  "Claims register: article, supplier, defect type, days since sale, outcome — with supplier claim totals.",
+  "Exchange policy checklist shared to all outlets with exceptions logged.",
+  "Supplier/workshop production and delivery tracker before season deadlines.",
+  "Margin per article including markdowns, with a pre-sale simulation of discount depth.",
+  "Commission calculator per salesperson code.",
+  "Marketplace stock sync for Daraz/Noon/Amazon to reduce cancellations.",
+  "Online returns analysis by article and size to fix size guides.",
+  "Cycle-count schedule so stocktakes happen by section without closing the shop."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Eid pe aadhe customers wapas jaate hain kyunke unka number nahi hota."
+  },
+  {
+   "role": "pi",
+   "text": "Ye to sab se bura waqt hai size na hone ka — noted, Eid pe bohot sales size na hone ki wajah se ho nahi paatin. Kya aapko andaza hai kaun se sizes sab se pehle khatam hote hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Gents mein 8 aur 9, ladies mein 37-38."
+  },
+  {
+   "role": "pi",
+   "text": "Theek, likh liya. Order dete waqt har article ke sizes kaise decide karte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Supplier set mein deta hai, har size ka ek ya do pair."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — fixed size sets aate hain. Jo sizes bach jaate hain, season ke baad unka kya karte hain?"
+  }
+ ]
+}

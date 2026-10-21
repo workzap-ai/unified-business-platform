@@ -1,0 +1,276 @@
+{
+ "key": "corporate_events_and_exhibitions",
+ "name": "Corporate events and exhibitions",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "corporate event",
+  "conference",
+  "exhibition",
+  "expo",
+  "trade show",
+  "booth",
+  "stand",
+  "stall",
+  "exhibitor",
+  "delegate",
+  "registration",
+  "badge",
+  "gala dinner",
+  "product launch",
+  "activation",
+  "brand activation",
+  "MICE",
+  "AV",
+  "LED wall",
+  "fabrication",
+  "stall booking",
+  "expo center",
+  "maarid",
+  "mutamar",
+  "jinah"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Main services: event management, exhibition stand design and fabrication, AV and staging, registration and ticketing, brand activations, or organising their own expos.",
+  "Typical client types: corporates, government entities, NGOs, associations.",
+  "Average event size and number of events per year.",
+  "Own workshop, warehouse and equipment, or rented and subcontracted.",
+  "Countries served (Karachi/Lahore/Islamabad expo centres, Dubai World Trade Centre, ADNEC, Canadian convention centres).",
+  "How they win work: tenders, repeat clients, agencies, direct.",
+  "Payment terms typical with corporates (often long credit)."
+ ],
+ "scope_rule": "pi notes operational and business problems: tender and proposal effort, project costing, fabrication timelines, crew scheduling, equipment tracking, vendor coordination, client approvals, registration data handling burden and slow corporate payments. pi does not advise on venue regulations, structural or electrical safety of stands, fire codes, permits, government procurement rules, data protection law or tax. pi never collects delegate or attendee personal data, client contacts’ names or financial details, and records roles only. pi does not help with bribes, kickbacks or rigging tenders.",
+ "vocabulary": {
+  "MI CE": "meetings, incentives, conferences and exhibitions",
+  "booth / stand": "exhibitor’s space at a trade show",
+  "shell scheme": "basic standard booth supplied by the organiser",
+  "space only": "bare floor where a custom stand is built",
+  "build-up / breakdown": "set-up and dismantling days at the venue",
+  "AV": "audio-visual equipment: screens, sound, lighting",
+  "delegate": "conference attendee",
+  "PO": "purchase order from the corporate client",
+  "tender / RFP": "formal request for proposals",
+  "activation": "on-ground brand promotion event",
+  "maarid": "exhibition (Arabic)",
+  "mutamar": "conference (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Corporate clients pay 90 to 120 days after the event and I’ve already paid vendors",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We start work on verbal approval and then the PO never comes",
+   "category": "suppliers_purchasing",
+   "subtype": "po_tracking"
+  },
+  {
+   "phrase": "Stand fabrication always overshoots the budget",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "I don’t know the real profit per event after all the small costs",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Tender documents take my team a week every time",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "We win few of the proposals we send and don’t know why",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Our LED screens and AV gear go out to sites and come back missing cables or damaged",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "We don’t know which equipment is booked on which dates",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Fabrication workshop misses the build-up deadline",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Client approvals on designs take forever and then we’re rushed",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Last-minute changes from the client’s marketing team aren’t passed to the crew",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Freelance crew don’t turn up for overnight build-up",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Overtime for crew during build-up is disputed every time",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Registration on the day is chaos with paper lists and long queues",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "We can’t tell which marketing gets exhibitors to sign up for our own expo",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Exhibitor bookings for our expo are tracked in three different Excel files",
+   "category": "tech_systems",
+   "subtype": "excel_dependency"
+  },
+  {
+   "phrase": "Material rates from fabricators change between quote and order",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Event equipment imported from abroad gets stuck in customs",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Quality of stands varies depending on which supervisor is on site",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Clients complain afterwards about things that went wrong at the booth",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "We do events in Dubai and Pakistan and the books are a mess",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Event season is all at once and then nothing for months",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Stored stand materials from old events just sit in the warehouse",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Petty cash on site during set-up is impossible to track",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  },
+  {
+   "phrase": "I’m the only one who can price a project properly",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  }
+ ],
+ "questions": {
+  "cash and terms": [
+   "What payment terms do your corporate clients usually have?",
+   "How long do they actually take?",
+   "How do you fund vendors meanwhile?"
+  ],
+  "pos and approvals": [
+   "When do you start work, before or after a PO?",
+   "What’s held up approvals recently?"
+  ],
+  "costing": [
+   "How do you estimate a project?",
+   "Where do the overruns usually come from?"
+  ],
+  "equipment": [
+   "How do you track what’s out on site?",
+   "What comes back damaged or missing most?"
+  ],
+  "fabrication and build-up": [
+   "What usually causes delays before build-up?",
+   "Who signs off the stand as ready?"
+  ],
+  "crew": [
+   "How many crew are freelance?",
+   "How do you confirm them for night shifts?"
+  ],
+  "proposals": [
+   "How many proposals or tenders do you send a month?",
+   "What takes the most time in each?"
+  ],
+  "own expos (if any)": [
+   "How do exhibitors book with you?",
+   "Where is that tracked?"
+  ],
+  "reporting": [
+   "How do you see the overall position across events?",
+   "Who prepares it?"
+  ]
+ },
+ "seasons": "UAE: exhibition season runs roughly September to May, with heavy clusters around GITEX, Arab Health, Gulfood, Big 5, ADIPEC, IDEX and Dubai Airshow years; summer is quiet; Ramadan reduces events but brings corporate iftars. PK: event season October to April, with expos at Karachi Expo Centre, Lahore Expo and Islamabad venues; fiscal year end (June) brings corporate budget- spend events and client payment delays; Ramadan and Muharram are quiet. Canada: spring and autumn conference seasons, summer festivals and activations, December holiday parties; fiscal year-ends (often March or December) affect budgets.",
+ "care": [
+  "No advice on stand structural safety, rigging, electrical loads or venue fire rules; accidents or injuries during build-up mean pi stops and points to emergency services.",
+  "Delegate and attendee data are never collected or stored by pi; registration problems are recorded as process issues.",
+  "Government tenders: pi does not help with kickbacks, collusive bidding or fake experience documents.",
+  "Customs and import delays are noted only; no advice on duties or classification, and no help with under-invoicing.",
+  "Disputes over unpaid invoices or contract scope are recorded without legal opinion.",
+  "Client contacts and freelancers recorded by role."
+ ],
+ "build_ideas": [
+  "Project costing sheet per event: budgeted vs actual by line (fabrication, AV, crew, transport, venue).",
+  "PO and approval tracker: no work order released until PO is logged.",
+  "Receivables tracker with ageing and polite WhatsApp/email reminders.",
+  "Equipment booking calendar with check-out/check-in by event and damage notes.",
+  "Fabrication schedule board with build-up deadlines and status.",
+  "Crew roster and overtime log with sign-off by supervisor.",
+  "Proposal and tender library: reusable company documents, past projects, standard costing.",
+  "Registration flow with QR badges and on-day check-in.",
+  "Exhibitor booking and payment tracker for own expos.",
+  "Site petty cash app with receipt photos.",
+  "Multi-country dashboard showing events, cash and receivables by entity.",
+  "Warehouse register of stored stand materials with age and reuse flags."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We did 14 events last quarter and I still haven’t been paid for 9 of them."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, most of last quarter’s events are still unpaid. What payment terms were agreed with those clients?"
+  },
+  {
+   "role": "Person",
+   "text": "Mostly 60 days, but it’s been more than 100 for some."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted that they’re well past terms. Did all of them have a PO before you started work?"
+  },
+  {
+   "role": "Person",
+   "text": "Not all, a few were on email approval."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Who on your side follows up with their finance teams at the moment?"
+  }
+ ]
+}

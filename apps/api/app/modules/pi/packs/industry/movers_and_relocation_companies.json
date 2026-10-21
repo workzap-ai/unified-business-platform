@@ -1,0 +1,261 @@
+{
+ "key": "movers_and_relocation_companies",
+ "name": "Movers and relocation companies",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "movers",
+  "packers and movers",
+  "relocation",
+  "house shifting",
+  "ghar shift karna",
+  "saman",
+  "office move",
+  "international move",
+  "household goods",
+  "survey",
+  "pre-move survey",
+  "packing material",
+  "carton",
+  "bubble wrap",
+  "crate",
+  "storage",
+  "villa move",
+  "naql athath",
+  "sharikat naql",
+  "Dubizzle",
+  "labour",
+  "helper",
+  "truck",
+  "tootna",
+  "insurance",
+  "quote",
+  "booking"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Local, intercity, international, office/commercial or a mix.",
+  "Moves per month roughly and the peak months.",
+  "Own trucks and crew vs hired trucks and daily labour.",
+  "Whether they offer storage, handyman/assembly, cleaning, packing-only.",
+  "Where customers come from: Google, Dubizzle/OLX, Facebook, corporate HR, referrals, relocation agents.",
+  "How surveys are done (in person, video call, photos).",
+  "Systems: WhatsApp, Excel, a CRM, none."
+ ],
+ "scope_rule": "pi notes operational and business problems: enquiries and quotes, survey accuracy, scheduling crews and trucks, damage and complaints, packing material cost, labour reliability, payments, storage tracking and reviews. It does not advise on customs rules for international household goods, insurance claim outcomes, consumer law, immigration or residency matters of customers. It never helps move prohibited items, under-declare international shipments, or disguise goods. It never stores customers’ names, addresses, phone numbers, IDs or inventory of their valuables — only roles and job types.",
+ "vocabulary": {
+  "survey": "assessing the volume of goods before quoting",
+  "CBM": "cubic metres, the usual volume measure for moves",
+  "packing list / inventory": "list of items packed (pi doesn’t store customers’ item details)",
+  "crating": "building wooden crates for fragile items",
+  "dismantle / assemble": "taking apart and rebuilding furniture",
+  "helpers / labour": "packers and loaders, often daily-hired",
+  "storage": "keeping goods between moves",
+  "door-to-door": "international move handled from origin home to destination home",
+  "destination agent": "partner mover at the other end",
+  "saman": "belongings",
+  "naql athath": "furniture moving (Arabic)",
+  "tootna / toot-phoot": "breakage"
+ },
+ "problems": [
+  {
+   "phrase": "Lots of enquiries on WhatsApp but most just want a price and disappear",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "We reply late to enquiries and lose them",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Quotes based on photos are wrong and we lose money on the day",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Customers add items on moving day and argue about extra charges",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Breakages lead to angry calls and bad Google reviews",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Two jobs booked on the same day with the same truck",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Helpers don’t show up on the morning of a move",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Crew are rough with furniture and nobody’s accountable",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Customers accuse crew of taking things",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Packing material costs are rising and we don’t track usage",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "We don’t know profit per job after labour, truck and material",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Customers delay the final payment after the move",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Crew leaders collect cash on site and it doesn’t all reach us",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Storage clients forget to pay and we don’t know whose boxes are where",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "End of month and summer are crazy, rest of the year is dead",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Google Ads spend goes up but bookings don’t",
+   "category": "marketing_leads",
+   "subtype": "ad_spend_waste"
+  },
+  {
+   "phrase": "We don’t know which channel brings the good customers",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "No repeat or referral system even though people move again",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "International moves involve partners abroad and updates get lost",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Trucks break down on move day",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "No standard packing method, quality depends on who’s on the crew",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Everything depends on me going for surveys myself",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Website doesn’t let people book a survey online",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Corporate HR clients want proper reports and invoices",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  }
+ ],
+ "questions": {
+  "enquiries": [
+   "Where do most enquiries come from?",
+   "How quickly do you usually reply?",
+   "Roughly how many turn into bookings?"
+  ],
+  "quotes and surveys": [
+   "How do you estimate a job — visit, video, photos?",
+   "How often does the actual move turn out bigger than the quote?"
+  ],
+  "scheduling": [
+   "How do you plan which crew and truck go where?",
+   "What clashes have happened?"
+  ],
+  "crew": [
+   "How do you hire helpers for each job?",
+   "What problems come up with them on site?"
+  ],
+  "damage and complaints": [
+   "When something breaks, what happens next?",
+   "How often does it end up in a bad review?"
+  ],
+  "money": [
+   "How and when do customers pay?",
+   "Who handles cash on site?"
+  ],
+  "profit": [
+   "Do you know what each job actually cost you?",
+   "What eats into it most?"
+  ],
+  "storage": [
+   "How do you keep track of stored goods and who’s paid?"
+  ]
+ },
+ "seasons": "In the UAE, the biggest peaks are end-of-month (lease renewals and moves), summer (June–August, families relocating at school year end and expats leaving) and late August before schools reopen; Ramadan is quieter during the day. In Pakistan, moves peak around school holidays (June–August and late December), before and after Eid (people relocate after Eid), and in the wedding season (November–February, new households). In Canada, 1 July is a major moving day in Quebec, and May–September is peak, with winter moves harder and slower. Corporate relocations cluster around fiscal years and the start of school terms.",
+ "care": [
+  "Customers’ addresses, phone numbers, inventories of valuables, ID copies: never stored by pi.",
+  "Accusations of theft against crew: pi notes the problem neutrally, no names, and doesn’t help with covert monitoring of staff.",
+  "International household goods customs rules, duty-free allowances, prohibited items: out of scope; suggest the destination agent or customs authority.",
+  "Requests to hide items in a shipment or under-declare: pi declines.",
+  "Insurance claim decisions and consumer disputes: pi notes the business impact, suggests proper advice.",
+  "Injuries during lifting, falls from height, truck accidents: pi points to emergency services immediately.",
+  "Customer immigration/residency questions tied to the move: out of scope."
+ ],
+ "build_ideas": [
+  "Enquiry intake on WhatsApp: asks move type, size and date, collects photos/video, and routes to the surveyor quickly.",
+  "Survey checklist and volume calculator by room, producing a standard quote.",
+  "Change-order form on move day: added items priced and approved by the customer before loading.",
+  "Job calendar showing crew, truck and helpers assigned to avoid double booking.",
+  "Helper roster with confirmations the night before.",
+  "Job costing: labour hours, truck, materials used vs quoted, per job.",
+  "Packing material stock and usage log per job.",
+  "Pre-move and post-move condition photos per job for damage disputes.",
+  "Payment links and payment status per job; on-site cash logged.",
+  "Storage register: unit, client job reference, start date, monthly fee and payment status.",
+  "Post-move feedback and review request flow.",
+  "Lead source tracking so owner sees which channels bring paying jobs."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We are movers in Dubai. Biggest problem: we quote from photos, then on the day there’s twice the stuff and the customer refuses to pay extra."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a frustrating day for the crew and for you. Noted — photo quotes are coming in well under the real volume. Who usually prepares the quote from the photos?"
+  },
+  {
+   "role": "Person",
+   "text": "Me or my supervisor, whoever’s free."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. When there’s extra on the day, how is that handled with the customer right now?"
+  }
+ ]
+}

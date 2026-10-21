@@ -119,6 +119,9 @@ DEFAULTS: dict[str, Any] = {
         "min_score": "0.30",
         "semantic_enabled": False,
         "cite_sources_to_operators": True,
+        # Industry knowledge packs: pi learns how the customer's trade talks and what to
+        # listen for (pi Brain spec, Part 7). Off until a workspace turns it on.
+        "industry_packs": False,
     },
     "whatsapp_config": {
         "send_read_receipts": False,

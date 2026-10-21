@@ -1,0 +1,265 @@
+{
+ "key": "dairy_processing",
+ "name": "Dairy processing (milk, yoghurt, cheese)",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "dairy",
+  "milk plant",
+  "doodh",
+  "dahi",
+  "lassi",
+  "makhan",
+  "desi ghee",
+  "khoya",
+  "paneer",
+  "cheese",
+  "laban labneh",
+  "haleeb pasteurisation",
+  "UHT",
+  "chilling centre",
+  "collection centre",
+  "gawala",
+  "dodhi",
+  "fat percentage",
+  "SNF",
+  "cold chain",
+  "milk route",
+  "farmers",
+  "bulk tank",
+  "cream separator"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Products: fresh milk, UHT, yoghurt, laban, butter, ghee, cheese, cream, ice-cream mix",
+  "Milk source: own farm, contracted farmers, collection centres, gawalas/middlemen",
+  "Daily intake volume range and number of collection points",
+  "Processing capacity, shifts and chilling capacity",
+  "Distribution: own vans, distributors, retail shops, supermarkets, home delivery subscriptions",
+  "Shelf life of main products and cold-chain coverage",
+  "Payment cycle to farmers and terms from buyers"
+ ],
+ "scope_rule": "pi notes operational and business problems: milk intake records, farmer payments, quality testing records, production yield, cold-chain downtime, expiry returns, route sales and reporting. It does not advise on veterinary matters, animal feed, food-safety standards, adulteration testing methods, licensing or tax, and never helps conceal adulteration. It does not record farmers’, drivers’ or customers’ names, numbers, ID or bank details; farmers are recorded by code or collection point only.",
+ "vocabulary": {
+  "gawala/dodhi": "milk collector/vendor",
+  "fat %": "butterfat content, often used for pricing milk",
+  "SNF": "solids-not-fat",
+  "chilling centre": "point where raw milk is cooled",
+  "bulk tank": "refrigerated storage tank",
+  "UHT": "long-life milk",
+  "laban ( ﻦﺒﻟ buttermilk-style drink in the Gulf; labneh": "strained yoghurt",
+  "khoya/mawa": "reduced milk solids used in sweets",
+  "yield": "output per litre of milk (e.g. kg of cheese)",
+  "returns": "expired or unsold products sent back by shops"
+ },
+ "problems": [
+  {
+   "phrase": "Milk intake slips and lab results are on paper and don’t match",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Farmers complain their payments are wrong or late",
+   "category": "cash_collections",
+   "subtype": "supplier_payments_late"
+  },
+  {
+   "phrase": "Fat test disputes with suppliers every week",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Some collection points send watered milk and we only find out later",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Summer milk drops, winter we have surplus",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Surplus milk in winter, we sell at a loss or make ghee",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Yoghurt and fresh milk returns from shops are huge",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Cheese yield varies and I don’t know why",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Chiller or pasteuriser breakdown, whole batch lost",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Power cuts and generator fuel cost",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "I don’t know margin per product",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Feed and fuel push farmers to raise milk prices",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Van drivers’ cash and returns don’t reconcile",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Shops’ fridges are off at night and products spoil",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Supermarkets pay late and deduct for returns",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Home-delivery subscribers pause and forget to restart",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Orders from shops come via order bookers’ phone calls",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Production plan doesn’t match next day’s orders",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Batch records needed for inspections are incomplete",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Lab staff and plant operators leave often",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Brand competes with loose milk on price",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Can’t see daily intake, production and dispatch in one place",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Expanding collection to new villages is a mess to set up",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "intake": [
+   "How is milk received and recorded at each collection point?",
+   "How do those records reach the plant?"
+  ],
+  "testing": [
+   "Which tests are recorded at intake?",
+   "What happens when results don’t match the supplier’s claim?"
+  ],
+  "farmers": [
+   "How often are farmers paid?",
+   "What do their complaints usually say?"
+  ],
+  "seasonality": [
+   "How different is intake in summer vs winter?",
+   "What do you do with surplus?"
+  ],
+  "production": [
+   "How do you decide daily production by product?",
+   "Which product’s yield varies most?"
+  ],
+  "returns": [
+   "Which products come back most?",
+   "Who takes the hit — you or the shop?"
+  ],
+  "cold chain": [
+   "Where does the cold chain break most — plant, vans or shops?"
+  ],
+  "distribution": [
+   "How do drivers settle cash and returns?"
+  ],
+  "customers": [
+   "Do you run home-delivery subscriptions?",
+   "How are pauses handled?"
+  ],
+  "reporting": [
+   "Can you see intake, production and dispatch for a day in one place?"
+  ]
+ },
+ "seasons": "- PK: milk supply peaks in winter (flush season) and drops in summer heat; Ramadan raises demand for yoghurt, lassi, dahi bhallay and milk for sweets; Eid ul Fitr for sheer khurma and khoya; Eid ul Adha shifts household spending briefly; wedding season raises khoya, cream and paneer orders; summer lassi demand. - UAE: Ramadan peak for laban, yoghurt and dairy desserts; summer heat stresses cold chain; school terms drive small-pack sales. - Canada: dairy is supply-managed (pi does not advise on quota or regulation); holiday baking season for butter and cream; summer for ice-cream mix.",
+ "care": [
+  "Ammonia leaks, boiler incidents, steam burns, chemical (CIP) exposure, electrical faults: pi points to emergency services immediately.",
+  "Adulteration: pi notes it as a supplier-quality and records problem only; never helps conceal it or avoid testing.",
+  "Veterinary, animal health, feed and antibiotic residue questions: out of scope.",
+  "Food-safety standards and testing methods: no advice.",
+  "Farmer data: no names, CNIC/IDs or bank details; farmers recorded by code.",
+  "Canadian supply management, quota and pricing regulations: out of scope.",
+  "Requests to relabel expired product or change dates: pi declines."
+ ],
+ "build_ideas": [
+  "Milk intake app at collection points: supplier code, litres, fat/SNF readings, time, photo of slip, synced to the plant",
+  "Farmer payment calculator using the plant’s own pricing rule, with statements per supplier code",
+  "Quality dispute log per supplier code with test history",
+  "Daily intake vs production vs dispatch dashboard",
+  "Production plan by product from next-day orders and stock",
+  "Yield tracker by product and batch (litres in, kg/packs out)",
+  "Cold-chain log for chillers and vans, with downtime and losses",
+  "Route sales and returns settlement per van",
+  "Returns analysis by shop label, product and reason",
+  "Home-delivery subscription manager with pause/resume reminders",
+  "Batch record book on a tablet for inspections",
+  "Supermarket receivables and deduction tracker",
+  "Seasonal surplus/shortage planner from last year’s intake"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamari 40 collection points hain, parchi pe likha jata hai aur plant tak aate aate sab gadbad ho jata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — 40 collection points par parchi par record hota hai aur plant tak pohanchte hue mismatch ho jata hai. Mismatch zyada litres mein hota hai ya fat ki reading mein?"
+  },
+  {
+   "role": "Person",
+   "text": "Dono, lekin fat pe zyada jhagra hota hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted — fat reading par zyada ikhtilaaf hai. Ye jhagra aam tor par farmer ke sath hota hai ya collection centre wale ke sath?"
+  },
+  {
+   "role": "Person",
+   "text": "Farmer ke sath, payment ke waqt."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted. Farmers ko payment kitne din baad hoti hai?"
+  }
+ ]
+}

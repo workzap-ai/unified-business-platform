@@ -1,0 +1,271 @@
+{
+ "key": "solar_epc_and_installers",
+ "name": "Solar EPC and installers",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "solar",
+  "panels",
+  "plates",
+  "inverter",
+  "hybrid",
+  "on-grid",
+  "off-grid",
+  "net metering",
+  "net metering file",
+  "green meter",
+  "bi-directional meter",
+  "kW/ kWp",
+  "batteries",
+  "lithium",
+  "structure",
+  "survey",
+  "installation",
+  "commissioning",
+  "solar lagwana",
+  "inverter kharab",
+  "bijli ka bill",
+  "DEWA Shams Dubai",
+  "DRRG",
+  "ESA",
+  "microFIT",
+  "rooftop",
+  "ground-mount",
+  "C&I",
+  "EPC",
+  "O&M",
+  "cleaning",
+  "generation drop",
+  "monitoring app"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Customer mix: residential, commercial and industrial (C&I), agricultural (solar tubewells), utility-scale.",
+  "Typical system sizes and number of installs per month.",
+  "Business model: trading panels/inverters, installation only, full EPC, O&M contracts, financing partners.",
+  "Own installation crews vs subcontracted teams; number of crews.",
+  "Import dependence for panels, inverters and batteries; main sales channels (walk-in shop, dealers, online).",
+  "Net metering/grid connection volume handled for customers.",
+  "Country/city (utility and grid connection rules differ widely)."
+ ],
+ "scope_rule": "pi notes operational and business problems: lead handling, site surveys and quotations, import and stock management, crew scheduling, installation quality and commissioning records, net metering or grid connection paperwork tracking, after-sales service, warranties and collections. pi gives no electrical, structural (roof loading, mounting) or battery/fire safety engineering advice, does not size systems or predict generation or savings, and does not advise on utility regulations, subsidies, tax or financing terms. It never records customers’ names, addresses, meter or reference numbers, IDs or bank details; it records roles and counts.",
+ "vocabulary": {
+  "kWp": "peak capacity of a solar system",
+  "on-grid / off-grid / hybrid": "connected to grid, battery-only, or both",
+  "net metering": "exporting surplus power to the grid for credit",
+  "net metering file": "the application paperwork with the power utility",
+  "green meter / bi-directional meter": "meter that records import and export",
+  "plates": "solar panels (common Pakistani usage)",
+  "structure": "mounting frame for panels",
+  "EPC": "engineering, procurement and construction (turnkey)",
+  "C&I": "commercial and industrial clients",
+  "O&M": "operations and maintenance after installation",
+  "Shams Dubai": "Dubai’s rooftop solar connection programme",
+  "tier-1 / A-grade": "informal panel quality labels used in sales"
+ },
+ "problems": [
+  {
+   "phrase": "Panel prices change every week and my old quotes become loss-making",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "I bought a big container and then prices dropped",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Customers want a specific inverter brand and it’s out of stock",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Serial numbers of panels and inverters are not recorded per customer",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Shipments stuck at port for weeks",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Dollar rate moves and wipes out margin",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Lots of enquiries, most just want a price to compare",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Site surveys are booked but the surveyor doesn’t go on time",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Quotes take two days because each one is done in Excel",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Competitors are underquoting and we’re losing deals",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Customers pay the advance and then delay the balance after installation",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Net metering files stuck at the utility and customers blame us",
+   "category": "compliance_admin",
+   "subtype": "permits_approvals"
+  },
+  {
+   "phrase": "Customers call every day asking about their net metering status",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Installation crews double-booked, one site waiting all day",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Installers leave half the cabling untidy and we get complaints",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Roof leaks after installation and the customer wants us to fix it",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Generation complaints — ‘my bill didn’t go down’",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Warranty claims with suppliers take months",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Nobody tracks which customers are due panel cleaning or a check-up",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Cables and small parts go missing from the van",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Commissioning photos and test records are on installers’ phones",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Dealers in other cities sell our stock but pay late",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Summer rush means we can’t handle the volume",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  }
+ ],
+ "questions": {
+  "business shape": [
+   "Are most of your jobs homes, businesses, or farms?",
+   "Roughly how many installations do you do in a month?"
+  ],
+  "leads and quotes": [
+   "How do enquiries come in?",
+   "How long does it take to send a quote after a survey?",
+   "Who prepares it?"
+  ],
+  "pricing": [
+   "How often do your supplier prices change?",
+   "How long is a quote valid for today?"
+  ],
+  "stock": [
+   "Do you hold stock or buy per order?",
+   "How do you know what’s in the warehouse right now?"
+  ],
+  "imports": [
+   "Which items do you import yourselves?",
+   "How often do delays hold up installations?"
+  ],
+  "crews": [
+   "How many installation teams do you have?",
+   "How are jobs assigned to them each day?"
+  ],
+  "grid paperwork": [
+   "How many customers are waiting on net metering or grid connection?",
+   "How do you track where each one stands?"
+  ],
+  "payments": [
+   "How is payment split — advance, on delivery, after commissioning?",
+   "Which part is hardest to collect?"
+  ],
+  "after-sales": [
+   "What do customers call about most after installation?",
+   "How do those calls get logged and assigned?"
+  ],
+  "quality": [
+   "How do you check an installation before handing it over?",
+   "What gets recorded?"
+  ]
+ },
+ "seasons": "In Pakistan, demand surges from March to July as heat rises and power bills climb, and spikes after tariff increases; the June budget can change duties and taxes on panels and batteries, causing rushes before announcements; monsoon slows rooftop work and brings leak complaints; agricultural solar for tubewells tracks sowing seasons (wheat in winter, cotton and rice in summer). In the UAE, residential uptake is year-round but installation is harder in peak summer heat; C&I projects often target completion before summer. In Canada, installation season is spring to autumn; snow limits winter work; incentive-programme changes create rushes.",
+ "care": [
+  "No advice on system sizing, roof structure capacity, wiring, earthing, battery safety or fire risk; pi says a qualified electrical/structural engineer decides.",
+  "Electrocution, fall from roof, battery fire or smoke → pi stops and points to emergency services.",
+  "No predictions of savings, payback or generation; pi never promises a customer’s bill will drop.",
+  "Requests to sell used or refurbished panels as new, change serial labels, fake warranties, misdeclare imports at customs, or bribe utility staff to move net metering files are refused.",
+  "Never record customer names, addresses, meter numbers, reference numbers, CNIC/Emirates ID or bank details.",
+  "Subsidy, tax and utility-policy questions are not advised on; pi notes the business impact only."
+ ],
+ "build_ideas": [
+  "Lead intake from WhatsApp, Facebook and website with qualifying questions (site type, monthly bill range, roof type) and follow-up reminders.",
+  "Survey booking and survey form on phone with roof photos and measurements.",
+  "Quote builder pulling live supplier prices, with validity dates and margin shown before sending.",
+  "Stock register with serial numbers per panel batch and inverter, linked to each installation.",
+  "Import shipment tracker from order to warehouse.",
+  "Crew scheduling board with daily WhatsApp job sheets and completion check-ins.",
+  "Installation and commissioning checklist with photos and test readings saved per job.",
+  "Net metering / grid connection tracker per customer with stage, documents checklist and automatic status updates to the customer.",
+  "Payment milestone tracker with reminders for balances after installation.",
+  "Service and warranty ticketing with supplier claim tracking.",
+  "Cleaning and maintenance reminder schedule per installed system as a repeat-revenue list.",
+  "Dealer ledger for credit sales to other cities.",
+  "Owner dashboard: leads, quotes sent, installs this month, pending grid files, receivables."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Customers net metering file ka status poochte rehte hain, din mein 20-30 calls aati hain sirf is pe."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — net metering status ke liye roz bohat calls aati hain. Noted. Abhi har customer ki file kahan tak pohanchi, yeh kaun track karta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Ek banda hai jo utility office jaata hai, uske paas register hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, ek banda register mein track karta hai. Is waqt taqreeban kitni files pending hain?"
+  }
+ ]
+}

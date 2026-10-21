@@ -1,0 +1,300 @@
+{
+ "key": "cattle_and_buffalo_dairy_farms",
+ "name": "Cattle and buffalo dairy farms",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "dairy farm",
+  "cattle farm",
+  "buffalo farm",
+  "bhains",
+  "bhainsein",
+  "gaye",
+  "doodh",
+  "gawala",
+  "dodhi",
+  "milk yield",
+  "doodh kam ho gaya",
+  "wanda",
+  "khal",
+  "toori",
+  "chara",
+  "hara chara",
+  "silage",
+  "berseem",
+  "thaan",
+  "bara",
+  "soo gayi",
+  "gaaban",
+  "heifer",
+  "bachhri",
+  "AI",
+  "insemination",
+  "Holstein",
+  "Sahiwal",
+  "Nili- Ravi",
+  "cattle colony",
+  "mazra’at al abqar",
+  "halib",
+  "ezba"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Herd size and mix: buffaloes vs cows, how many in milk, dry, pregnant, heifers and calves.",
+  "Where the milk goes: sold loose to a dodhi or retail shop, to a chiller or processor, own shop or home delivery, or sold as dahi/ghee.",
+  "Fodder model: own or leased land for green fodder and silage, or everything bought in.",
+  "Who runs it day to day: owner on site, a manager, or family; number of milkers and labour; live-in staff or not.",
+  "Location type: peri-urban cattle colony, village farm, corporate farm, UAE ezba.",
+  "Whether animals are replaced by buying in fresh milkers or raised from own calves.",
+  "What records exist today: register, Excel, WhatsApp, nothing."
+ ],
+ "scope_rule": "pi notes operational and business problems: milk yield tracking, fodder and feed buying, milk sales and payments, staff, theft, record keeping, herd numbers and replacement planning, and who knows what when. pi does not diagnose illness (for example thanela/mastitis, fevers, lameness), advise on medicines, doses, vaccines, withdrawal periods, feed rations, breeding or calving technique, or oxytocin use; it notes that a problem exists and how it affects the business, and suggests their vet for the animal itself. It does not give advice on milk-quality standards to “pass” tests, food-authority rules, land or tax matters. It records staff by role (milker, manager, driver), never names, and does not collect buyers’ or workers’ ID numbers.",
+ "vocabulary": {
+  "bhains / gaye": "buffalo / cow",
+  "dodhi": "milk collector who buys from farms and resells",
+  "gawala": "milkman/dairy keeper, often selling directly to homes",
+  "wanda": "concentrate feed (bagged)",
+  "khal": "oilseed cake fed as concentrate",
+  "toori / bhoosa": "wheat straw",
+  "chara / hara chara": "fodder / green fodder (berseem, maize, sorghum)",
+  "thaan": "the stall or tethering spot of an animal",
+  "soo gayi": "has calved",
+  "gaaban": "pregnant",
+  "khushk/ dry": "not in milk",
+  "thanela": "mastitis (pi notes it, never treats it)",
+  "toka": "chaff cutter",
+  "ezba": "farm (UAE/Gulf)"
+ },
+ "problems": [
+  {
+   "phrase": "Doodh roz kam aa raha hai aur pata nahi kis bhains ka kam hua",
+   "category": "reporting_visibility",
+   "subtype": "no_yield_per_animal"
+  },
+  {
+   "phrase": "Milk yield per animal is only on the manager’s register, I see it once a month",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "I think milk is being taken before it’s measured",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "The dodhi owes me for two months and keeps saying next week",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "He sets the rate and cuts for fat whenever he likes, I can’t check",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Wanda prices went up three times this year and I don’t know my cost per litre anymore",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Feed bags come in short, the count never matches",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "We run out of silage in summer and buy at the worst price",
+   "category": "stock_inventory",
+   "subtype": "seasonal_fodder_shortage"
+  },
+  {
+   "phrase": "Fodder rots or gets wasted, nobody tracks how much is fed",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "I don’t know which animals are pregnant or when they’re due",
+   "category": "operations_process",
+   "subtype": "no_breeding_records"
+  },
+  {
+   "phrase": "Animals stay dry too long and I’m feeding them for nothing",
+   "category": "margin_cost",
+   "subtype": "unproductive_animals"
+  },
+  {
+   "phrase": "Calves die and I hear about it days later",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Vet visits and medicine bills are scattered, no idea what each animal cost us",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Milkers leave after Eid and new ones don’t know the animals",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Milking is late in the morning, buyers complain",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Customers complain the milk is thin or watered",
+   "category": "quality_complaints",
+   "subtype": "consistency_issues"
+  },
+  {
+   "phrase": "Home delivery customers pay late and the rider keeps the cash too long",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Load-shedding stops the chiller and milk goes sour",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "We bought animals from the mandi and half underperformed, no record of where each came from",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "An animal went missing from the colony last month",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Everything is in a register that gets wet and torn",
+   "category": "tech_systems",
+   "subtype": "no_system"
+  },
+  {
+   "phrase": "I live in the city, I only find out problems when the manager calls",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "I want to grow to 200 animals but don’t know if the current 60 even make money",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Labour, power and fodder bills come on different days, cash is always tight",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Paperwork for the food authority and licence renewal takes my whole week",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  }
+ ],
+ "questions": {
+  "yield": [
+   "Roughly how many animals are in milk right now?",
+   "Is milk measured per animal, or just the total?",
+   "Who writes it down, and where?"
+  ],
+  "milk sales": [
+   "Where does most of the milk go — a dodhi, a chiller, or your own customers?",
+   "How is the rate and fat deduction decided?",
+   "How often do you get paid?"
+  ],
+  "feed cost": [
+   "Do you grow your own fodder or buy it all in?",
+   "Do you know roughly what a litre costs you to produce?",
+   "Which feed cost has hurt most this year?"
+  ],
+  "stock": [
+   "How do feed bags get counted when they arrive?",
+   "Who keeps the key to the store?"
+  ],
+  "herd records": [
+   "How do you know which animals are pregnant or due?",
+   "What happens when an animal stays dry longer than expected?"
+  ],
+  "losses": [
+   "When a calf or animal dies, how do you usually find out?",
+   "How long after?"
+  ],
+  "theft": [
+   "What makes you think milk or feed is going missing?",
+   "Is it worse on certain shifts or days?"
+  ],
+  "staff": [
+   "How many people work on the farm, and who’s in charge when you’re not there?",
+   "What usually goes wrong when a milker leaves?"
+  ],
+  "customers": [
+   "Are complaints mostly about quality, timing or payment?",
+   "How do they reach you?"
+  ],
+  "power": [
+   "How often does load-shedding hit the chiller or milking?",
+   "What happens to the milk when it does?"
+  ],
+  "visibility": [
+   "If you could see one number every morning, what would it be?"
+  ],
+  "growth": [
+   "What’s holding you back from adding more animals?"
+  ]
+ },
+ "seasons": "- Pakistan: milk is more plentiful in winter and spring (the “flush” after many buffaloes calve) and scarcer in peak summer; summer heat (May–August) lowers yield and raises cooling and water costs. - Ramadan raises demand for milk, dahi, lassi and sweets; wedding season (winter) lifts demand for milk and dahi. - Eid ul Adha: labour goes home, some farmers sell animals, fodder prices around mandis spike. - Monsoon (July–September): flooding risk in low-lying colonies, fodder spoilage, disease pressure (noted operationally only). - Fodder cycle: berseem in winter, maize/sorghum and silage-making in summer; prices swing with wheat straw after the wheat harvest (April–May). - UAE: extreme summer heat (June–September) affects animals, workers’ outdoor hours and cooling costs; cooler months are easier for operations; Ramadan lifts demand for laban and milk.",
+ "care": [
+  "Never suggests medicine, doses, injections, oxytocin, vaccines or treatment; says “That’s one for your vet” and keeps to the business impact.",
+  "If milk adulteration comes up (water, chemicals, preservatives), pi notes quality-control problems but never helps hide, pass or work around tests; if asked, it declines plainly.",
+  "An animal acutely sick or many dying: pi suggests calling their vet or local livestock department now, and offers to note the problem later.",
+  "Staff injuries (bull, toka machine, electric shock, heat): pi stops and points to emergency services (1122 in Pakistan, 999/998 in the UAE).",
+  "Records milkers, managers, drivers by role only; no names, CNIC or Emirates ID numbers.",
+  "Disputes with the dodhi or partner: pi notes the business problem, gives no legal opinion.",
+  "No advice on land, loans, subsidies, tax or food-authority licensing beyond noting that the admin effort is a problem.",
+  "Absentee owners may suspect staff of theft; pi notes the suspicion neutrally and never helps covertly monitor people."
+ ],
+ "build_ideas": [
+  "Herd register on phone: each animal’s tag, type, status (milking, dry, pregnant, heifer), source and purchase cost, with due-date and dry-off reminders entered by the farm.",
+  "Twice-daily milk entry per animal or per group by the milker on WhatsApp or a simple app, rolled into a daily total.",
+  "Morning owner summary on WhatsApp: litres yesterday vs last week, animals below their usual yield, deaths, births, cash in.",
+  "Buyer ledger for dodhi, chiller and home customers: litres supplied, agreed rate, fat deductions, payments, balance due, with polite payment reminders.",
+  "Feed and fodder store log: bags received vs ordered, daily issue, stock left, reorder alert, supplier prices over time.",
+  "Cost-per-litre view combining feed, fodder, labour, power and vet bills entered by the farm.",
+  "Home-delivery route sheet with rider cash collection and end-of-day reconciliation.",
+  "Event log for deaths, illness reports, vet visits and costs (records only, no clinical guidance).",
+  "Staff attendance and shift checklist (milking times, cleaning, feeding) with photo proof.",
+  "Animal purchase tracker showing which mandi or seller each animal came from and how it performed.",
+  "Generator/chiller downtime log tied to milk loss.",
+  "Expansion planner that projects cash needs from the farm’s own numbers."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai meri 40 bhainsein hain Landhi mein, doodh har mahine kam ho raha hai, samajh nahi aata kahan ja raha hai."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh pareshan karne wali baat hai. Doodh abhi har bhains ka alag naapa jata hai, ya sirf total?"
+  },
+  {
+   "role": "Person",
+   "text": "Sirf total, manager subah shaam register mein likhta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — har jaanwar ka doodh alag record nahi hota, sirf total likha jata hai. Aapko yeh register kitni dafa dekhne ko milta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Mahine mein ek baar, jab hisaab hota hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, aapko pura mahina guzarne ke baad hi pata chalta hai. Jo doodh bikta hai, uska rate aur paisa kaun handle karta hai?"
+  }
+ ]
+}

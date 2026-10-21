@@ -1,0 +1,293 @@
+{
+ "key": "furniture_and_home_decor_retail",
+ "name": "Furniture and home décor retail",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "furniture",
+  "home décor",
+  "sofa",
+  "bed set",
+  "dining table",
+  "wardrobe",
+  "custom furniture",
+  "made-to-order",
+  "showroom",
+  "workshop",
+  "carpenter",
+  "polish",
+  "sheesham",
+  "deodar",
+  "MDF",
+  "chipboard",
+  "upholstery",
+  "rugs",
+  "curtains",
+  "lighting",
+  "order pe banwana",
+  "delivery aur fitting",
+  "advance",
+  "polish wala",
+  "Chiniot",
+  "Allama Iqbal Town",
+  "Sheikh Zayed Road showrooms",
+  "athath",
+  "dicor",
+  "najjar"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Ready stock only, made-to-order (own workshop or subcontracted carpenters), imported, or a mix.",
+  "Number of showrooms and whether there is a warehouse or workshop.",
+  "Product range (living, bedroom, dining, office, outdoor, décor accessories, rugs, curtains, lighting).",
+  "Delivery and assembly done in-house vs outsourced.",
+  "Typical lead time for custom orders.",
+  "B2B/project business (hotels, offices, developers, interior designers) vs households.",
+  "Online channels (website, Instagram, Daraz, Dubizzle, Amazon, Wayfair-style marketplaces)."
+ ],
+ "scope_rule": "pi notes the operational side: custom order tracking, workshop capacity, material shortages, delivery and assembly, damages, showroom stock, payments and advances, after-sales and staff. pi gives no structural, fire-safety, timber sourcing law, import/customs, contract-law or tax advice. pi never collects customers’ home addresses, phone numbers, floor plans or photos of their homes, or carpenters’ identities; it records roles and counts. Requests to misrepresent wood type or materials (e.g. MDF sold as solid wood) are declined.",
+ "vocabulary": {
+  "sheesham / deodar / oak": "hardwoods commonly used and marketed",
+  "MDF / chipboard / laminate": "engineered boards",
+  "polish / lacquer": "finishing stage, often subcontracted",
+  "upholstery / poshish": "fabric and foam covering for sofas and chairs",
+  "made-to-order": "built after the customer orders and pays an advance",
+  "advance / balance": "deposit at order / payment on delivery",
+  "mistri / najjar": "carpenter",
+  "fitting / assembly": "putting furniture together at the customer’s home",
+  "display piece": "showroom item, often sold at discount",
+  "project order": "bulk order for a hotel, office or developer",
+  "athath": "furniture (Arabic)",
+  "jahez furniture": "dowry furniture set for weddings"
+ },
+ "problems": [
+  {
+   "phrase": "Custom orders take double the promised time",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "I don’t know which order is at which stage in the workshop",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Carpenters work on whichever order shouts loudest",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Wood, foam or fabric runs out mid-order",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Timber prices changed after we took the advance",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "We don’t know the true cost of a custom sofa",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Furniture gets scratched or broken in delivery",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Delivery team takes extra money from customers for upstairs carrying",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Assembly is done badly, customers call us back",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Polish finish differs from the sample the customer approved",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Customer approved fabric on WhatsApp but says she chose another colour",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Balance payment is delayed after delivery",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Project clients (hotels/offices) pay in stages and late",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Showroom is full of display pieces nobody buys",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Warehouse stock and showroom tags don’t match",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Lots of visitors, few orders",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Instagram enquiries ask ‘price?’ and vanish",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Salesmen don’t follow up on people who visited the showroom",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Delivery costs eat the margin on small items",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Showroom rent keeps rising",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "Warranty/after-sales repairs pile up with no schedule",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Good carpenters leave or work for others at the same time",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Workshop electricity and machine breakdowns stop production",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Imported furniture containers arrive late or damaged",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Every quote, design and price goes through me",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Website photos and prices are outdated",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "No idea which product lines or showrooms make money",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  }
+ ],
+ "questions": {
+  "custom orders": [
+   "How many made-to-order jobs are running now?",
+   "How do you know where each one is?",
+   "How often do they miss the promised date?"
+  ],
+  "workshop": [
+   "Who makes the furniture — your own workshop or outside carpenters?",
+   "What usually holds up a job?"
+  ],
+  "materials": [
+   "Which materials run short most often?",
+   "How are materials issued for each order?"
+  ],
+  "costing": [
+   "How do you work out the price of a custom piece?",
+   "Has a cost change ever wiped out the profit on an order?"
+  ],
+  "approvals": [
+   "How do customers approve fabric, colour and finish?",
+   "What happens when there’s a disagreement later?"
+  ],
+  "delivery": [
+   "Who delivers and assembles?",
+   "What goes wrong most at the customer’s place?"
+  ],
+  "payments": [
+   "How much do you take as advance?",
+   "Which payments are hardest to collect?"
+  ],
+  "sales": [
+   "What happens after someone visits the showroom without buying?",
+   "Where do online enquiries go?"
+  ],
+  "stock": [
+   "How old are the oldest display pieces?",
+   "Do showroom and warehouse records match?"
+  ]
+ },
+ "seasons": "Pakistan: wedding season Nov–Feb (jahez/dowry bedroom and dining sets, ordered 2–4 months earlier), pre-Eid home refresh, moving into new homes in housing societies year-round, winter upholstery demand, monsoon (July–August) humidity affecting wood work and delivery. UAE: moving season around lease renewals and school-year start (August–September), Ramadan home refresh and majlis seating, Dubai Shopping Festival, winter outdoor furniture season Oct–April, White Friday. Canada: spring and summer moving season (especially July 1 in Quebec), Black Friday/Boxing Day, patio season May–August, new-home closings.",
+ "care": [
+  "Misrepresenting wood or materials, or fake certifications: declined.",
+  "Structural, wall-mounting or fire-safety guidance: out of scope; if furniture has fallen or injured someone, pi points to emergency/medical help first.",
+  "Customer home addresses, layouts and photos: not collected.",
+  "Disputes over advances, cancellations or defects: noted as operational; no legal advice.",
+  "Timber sourcing legality or import duties: no advice; evasion declined.",
+  "Workshop safety (saws, dust, polish chemicals, fire): if danger is described, emergency services first; no safety-engineering advice.",
+  "Carpenter pay disputes: noted as operational; no labour-law advice."
+ ],
+ "build_ideas": [
+  "Made-to-order job board: each order by code with stages (design, materials, frame, polish, upholstery, QC, delivery, assembly) and promised date, with late alerts.",
+  "Design/finish approval via WhatsApp with photos of samples and a timestamped customer approval.",
+  "Material issue and requirement list per order, with shortfalls flagged before work starts.",
+  "Costing sheet for custom pieces: wood/board, hardware, foam, fabric, polish, labour hours, delivery.",
+  "Workshop capacity view by week across carpenters and subcontractors.",
+  "Delivery and assembly scheduler with routes, team assignment, photos at delivery and customer sign-off.",
+  "Damage and callback log by product, delivery team and cause.",
+  "Advance and balance tracker per order with reminders before delivery.",
+  "Project order tracker for B2B clients with stage payments and deliveries.",
+  "Showroom and warehouse stock register with display-piece ageing.",
+  "Showroom visitor follow-up list (opt-in) with reminders for salespeople.",
+  "After-sales service queue with appointment slots.",
+  "Product line and showroom profitability dashboard."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We make sofas and beds to order. Customers keep complaining we’re late, and honestly I don’t always know where their order is."
+  },
+  {
+   "role": "pi",
+   "text": "That’s tough when customers are chasing you — noted, custom orders run late and there’s no clear view of where each one is. Roughly how many orders are in the workshop right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Around 35."
+  },
+  {
+   "role": "pi",
+   "text": "Thanks, I’ve written that down. Do you make them in your own workshop, or do outside carpenters do some of it?"
+  },
+  {
+   "role": "Person",
+   "text": "Frames in our workshop, polish and upholstery outside."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — frames in-house, polish and upholstery outsourced. When a piece goes to the polish or upholstery vendor, how do you know when it’ll come back?"
+  }
+ ]
+}

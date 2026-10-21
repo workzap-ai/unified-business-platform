@@ -1,0 +1,255 @@
+{
+ "key": "mental_health_and_therapy_practices",
+ "name": "Mental-health and therapy practices (admin)",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "therapy practice",
+  "counselling centre",
+  "psychologist",
+  "psychotherapist",
+  "psychiatry clinic",
+  "mental health clinic",
+  "online therapy",
+  "sessions",
+  "therapist",
+  "counselling",
+  "nafsiyati",
+  "ma’alij nafsi",
+  "istishara nafsiya",
+  "ilaj nafsi",
+  "teletherapy",
+  "Zoom sessions",
+  "intake form",
+  "waitlist",
+  "sliding scale",
+  "no-show fee",
+  "couples therapy",
+  "child and adolescent"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Solo practitioner, group practice, or clinic with psychiatrists, psychologists and counsellors",
+  "In-person, online, or mixed sessions",
+  "Number of practitioners and whether they are employees, associates or rent rooms",
+  "Payment mix: self-pay, insurance/extended health (Canada, UAE), corporate wellness contracts, sliding-scale fees",
+  "Booking and records system used, and how sessions are conducted online",
+  "Waitlist length (as the owner describes it) and intake process",
+  "Languages offered"
+ ],
+ "scope_rule": "pi notes only the administrative and business side of a practice: bookings, cancellations and no-shows, intake admin, waitlist management, practitioner rosters and pay splits, billing and insurance receipts, room usage, online-session tooling, marketing and enquiries, and reporting. pi never gives therapy, counselling, diagnosis, crisis advice or medication guidance, and never comments on a client’s situation. pi does not ask for or record any client’s identity, contact details, reasons for seeking help, session content or notes, and does not discuss individual clients even in general terms beyond the process issue. Record-keeping and confidentiality rules are noted only as admin concerns and never interpreted.",
+ "vocabulary": {
+  "session": "usually a fixed-length appointment",
+  "intake": "first steps before a client starts (forms, matching)",
+  "matching": "pairing a new client with a suitable practitioner",
+  "waitlist": "people waiting for a first slot",
+  "late cancellation / no-show fee": "charge for missed sessions",
+  "sliding scale": "reduced fees based on ability to pay",
+  "associate": "practitioner working under a practice, often on a fee split",
+  "room rental": "practitioners paying for room time",
+  "superbill / receipt": "document clients use to claim from insurers",
+  "EAP / corporate wellness": "employer-paid sessions",
+  "teletherapy": "online sessions",
+  "nafsiyati": "psychological (Urdu/Arabic usage)"
+ },
+ "problems": [
+  {
+   "phrase": "Late cancellations leave practitioners with empty hours",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "We have a long waitlist but some practitioners still have gaps",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Matching new clients to the right practitioner takes days of back-and-forth",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Intake forms come in on paper, email and WhatsApp",
+   "category": "tech_systems",
+   "subtype": "data_scattered_intake"
+  },
+  {
+   "phrase": "Associates argue about the fee split and room charges",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Insurance receipts and corporate invoices are made by hand",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Corporate wellness contracts pay late",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "No-show fees are never actually charged",
+   "category": "cash_collections",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Sliding-scale discounts aren’t tracked so I don’t know their cost",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Rooms are double-booked between practitioners",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Online session links get sent to the wrong person",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Practitioners use their own phones and WhatsApp to message clients",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Enquiries sit in the inbox for days",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We don’t know where new clients hear about us",
+   "category": "marketing_leads",
+   "subtype": "no_tracking"
+  },
+  {
+   "phrase": "Website booking is broken on mobile",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "Admin staff feel overwhelmed by distressed callers",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Good associates leave to go solo",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Practitioners’ licence and supervision renewals aren’t tracked",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "I can’t see utilisation per practitioner",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Booking, video and billing tools are all separate",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Owner is still doing all the scheduling herself",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Want to add a second location or go fully online but unsure about demand",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Some clients ask for refunds after cancelling and policy isn’t clear",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  }
+ ],
+ "questions": {
+  "cancellations": [
+   "How often do sessions get cancelled late or missed?",
+   "Is there a policy, and is it applied?"
+  ],
+  "waitlist and matching": [
+   "How do new clients get matched with a practitioner?",
+   "How long does that usually take?"
+  ],
+  "intake": [
+   "How do intake forms reach you now?",
+   "Who checks they’re complete?"
+  ],
+  "practitioner pay": [
+   "How are associates paid or charged for rooms?",
+   "Where do disagreements start?"
+  ],
+  "billing": [
+   "How are receipts and invoices produced?",
+   "Which payers are slowest?"
+  ],
+  "rooms and online": [
+   "How are rooms booked between practitioners?",
+   "How are online session links sent?"
+  ],
+  "enquiries": [
+   "How do new enquiries come in?",
+   "How quickly are they answered?"
+  ],
+  "admin team": [
+   "Which part of the front-desk job is hardest for your admin staff?"
+  ],
+  "reporting": [
+   "Which numbers would you like to see each month that you can’t now?"
+  ],
+  "systems": [
+   "Which tools do you use for bookings, sessions and billing?"
+  ]
+ },
+ "seasons": "- January and September often see more new enquiries (new-year resolutions, back-to-school and back-to-work stress), noted as patterns owners commonly report. - Exam seasons (Pakistan board exams in spring, O/A Level sessions in May–June and October–November) bring student and parent enquiries. - Ramadan and Eid shift session timings; some clients pause during holidays. - UAE: summer travel thins in-person sessions and shifts more to online. - Canada: extended-health benefits often reset 1 January, with year-end rush to use remaining coverage; winter months bring more enquiries.",
+ "care": [
+  "If anyone (owner, staff or a client who reaches pi) mentions suicide, self-harm, wanting to die, harming someone, or a person in immediate danger, pi stops all problem-noting and urges them to contact emergency services right away (1122/115 in Pakistan, 998/999 in the UAE, 911 in Canada) or go to the nearest emergency department; in Canada pi can also mention the 9-8-8 suicide crisis helpline. pi stays calm and kind and does not attempt counselling.",
+  "pi never gives therapy, diagnosis, medication or crisis-management advice, even framed as “what should my staff say”.",
+  "No client names, contacts, reasons for seeking help, session content, notes or recordings.",
+  "Confidentiality and record-keeping laws differ by country; pi notes concerns as admin only.",
+  "Requests to access or share client records without consent, or issue letters or certificates without proper sessions, are refused.",
+  "Staff recorded by role; owners discussing a practitioner’s conduct are noted without names.",
+  "pi is gentle in tone: owners in this field may themselves be carrying strain."
+ ],
+ "build_ideas": [
+  "Online booking per practitioner with reminders and a clear cancellation-policy acknowledgement at booking",
+  "Waitlist and matching board showing open requests by service type, language and availability, with time-on-list",
+  "Digital intake form with secure submission and a completeness check for the admin role",
+  "Room and online-session scheduler that prevents double-booking and sends links only to the booked contact",
+  "Associate pay and room-rental statement from completed sessions and agreed split",
+  "Receipt and corporate-invoice generator with payment tracking and ageing",
+  "No-show and late-cancellation log with fee status",
+  "Sliding-scale register showing total discount given per month",
+  "Enquiry inbox with response timers and source tracking, routing anything urgent to a staff member and an emergency-signpost message",
+  "Licence and supervision renewal calendar for practitioners",
+  "Owner dashboard: sessions delivered, utilisation per practitioner, waitlist length, cancellations, receivables"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our biggest issue is late cancellations. Therapists lose hours every week and we never charge the fee."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a real loss of time for your therapists, and the policy isn’t doing its job. Noted. How do clients cancel at the moment?"
+  },
+  {
+   "role": "Person",
+   "text": "Mostly WhatsApp messages to the admin number, sometimes an hour before."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, cancellations come in informally and very late. Noted. When a slot frees up like that, is there any way to offer it to someone on the waitlist?"
+  }
+ ]
+}

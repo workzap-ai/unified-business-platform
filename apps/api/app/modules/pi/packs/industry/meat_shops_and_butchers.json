@@ -1,0 +1,272 @@
+{
+ "key": "meat_shops_and_butchers",
+ "name": "Meat shops and butchers",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "butcher",
+  "qasai",
+  "qassab",
+  "meat shop",
+  "gosht",
+  "mutton",
+  "beef",
+  "chicken",
+  "murgi",
+  "chicken shop",
+  "zinda murgi",
+  "boneless",
+  "qeema",
+  "chhota/bara gosht",
+  "halal",
+  "zabiha",
+  "slaughterhouse",
+  "mazbah",
+  "lahm malhama dajaj",
+  "frozen meat",
+  "chilled imports",
+  "cuts",
+  "carcass",
+  "Qurbani",
+  "bakra"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Meat types sold: chicken, mutton, beef, goat, camel, frozen imported",
+  "Live-bird or live-animal sales vs carcass purchase vs boxed/chilled cuts",
+  "Own slaughter arrangement vs buying from a slaughterhouse or wholesaler",
+  "Number of shops and whether there is a central cutting/processing room",
+  "Customer mix: walk-in households, restaurants and caterers on credit, online/delivery",
+  "Cold storage: chillers, freezers, generator backup",
+  "Qurbani/Eid ul Adha services offered"
+ ],
+ "scope_rule": "pi notes operational problems: yield from carcasses, weight and cut accuracy, cold-storage downtime, credit to restaurants, Eid peaks, staff and theft, delivery and reporting. It does not advise on halal certification, slaughter regulations, animal welfare law, veterinary matters, food-safety rules or tax. It does not record names or numbers of customers, restaurant owners or staff, and never takes payment details.",
+ "vocabulary": {
+  "qasai/qassab": "butcher",
+  "zabiha": "slaughtered according to Islamic rules",
+  "mazbah": "slaughterhouse",
+  "chhota gosht": "mutton/goat; bara gosht — beef",
+  "qeema": "minced meat",
+  "boneless/with bone": "main cut pricing split",
+  "yield": "saleable meat from a carcass after bone and trim",
+  "Qurbani": "Eid ul Adha sacrifice",
+  "hissa": "share in a large animal for Qurbani",
+  "zinda": "live (bird or animal)",
+  "kata hua": "dressed/slaughtered"
+ },
+ "problems": [
+  {
+   "phrase": "I buy a carcass and don’t know how much saleable meat I actually get",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Mutton price changes daily, my board price doesn’t",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Scale weight and actual sale don’t add up at night",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Cutters give extra weight or better cuts to friends",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Chiller failed in the night, meat spoiled",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Load-shedding means generator diesel all day",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Fat, bone and trim not recorded, money disappears",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Restaurants take meat on credit and pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Credit customers’ running ledger is in a copy and disputes start",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Live chickens die in heat before sale",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Boneless runs out on weekends, mince sits",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Customers complain the qeema has fat or the cut was wrong",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "WhatsApp orders for home delivery get missed or packed wrong",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Rider takes too long and the meat warms up",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Qurbani orders, hissa allocations and timings are chaos",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Eid ul Adha staff demand double and still leave",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Skilled butchers are hard to find",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Wholesaler sometimes sends lower quality than agreed",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Two shops, I can’t compare which makes money",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Cleaning and hygiene routine not followed when I’m away",
+   "category": "quality_complaints",
+   "subtype": "hygiene"
+  },
+  {
+   "phrase": "No online presence, people order from apps instead",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "Licence and health inspection dates I keep missing",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Frozen import stock arrives late at the port",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Cash heavy business and I worry about robbery at closing",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  }
+ ],
+ "questions": {
+  "yield": [
+   "When you buy a carcass, do you know what you get back in saleable meat?",
+   "Is bone and trim weighed?"
+  ],
+  "pricing": [
+   "How often does your buying price change?",
+   "How often do you change the board price?"
+  ],
+  "weights": [
+   "Does the day’s sold weight match what you bought?",
+   "Who does the cutting and weighing?"
+  ],
+  "cold storage": [
+   "What happens when the chiller or power fails?",
+   "Is temperature recorded anywhere?"
+  ],
+  "credit": [
+   "How many restaurants or caterers buy on credit?",
+   "How long do they usually take?"
+  ],
+  "orders": [
+   "How do home-delivery orders reach you?",
+   "What goes wrong most often?"
+  ],
+  "qurbani": [
+   "Do you handle Qurbani orders?",
+   "What was hardest last Eid?"
+  ],
+  "staff": [
+   "How many cutters do you have?",
+   "What happens in Eid week?"
+  ],
+  "branches": [
+   "Can you see each shop’s sales and stock daily?"
+  ],
+  "supply": [
+   "Where do you buy from, and how do you check quality on arrival?"
+  ]
+ },
+ "seasons": "- PK: Eid ul Adha is the defining peak (Qurbani, cutting services, hissa arrangements, then a slump as households have meat stocked); Ramadan raises chicken and qeema demand for iftar items; wedding season raises caterer orders; winter favours mutton and beef dishes ( nihari, paye); meat-less days set by local rules can affect trading days (pi only notes the effect). - UAE: Eid ul Adha and Ramadan peaks; National Day and winter BBQ/camping season; wedding season in cooler months. - Canada: Eid ul Adha and Ramadan for halal butchers; summer BBQ season; Thanksgiving and Christmas for turkey and roasts.",
+ "care": [
+  "Knife and bandsaw injuries, cold-room lock-ins, electrical faults or robbery: pi stops and points to emergency services.",
+  "Halal/zabiha certification and slaughter rules: pi does not advise, notes only the documentation effort.",
+  "Animal welfare, live-animal handling and veterinary questions: out of scope.",
+  "Food-safety and temperature rules: pi notes record-keeping only.",
+  "Requests to pass off one meat as another, sell spoiled meat, or mislabel origin: pi declines.",
+  "Customer and restaurant names for credit ledgers: recorded by role or label only.",
+  "Cash handling worries: pi notes the risk, gives no security engineering advice."
+ ],
+ "build_ideas": [
+  "Carcass yield tracker: purchase weight, cuts produced, bone/fat/trim weight, cost per saleable kg",
+  "Daily price board manager: buying rate in, suggested board price per cut using the owner’s margin rule, WhatsApp broadcast to opted- in customers",
+  "Scale-to-sales reconciliation at day end",
+  "Cold-room temperature and power-cut log with alerts",
+  "Credit ledger for restaurant and caterer accounts with statements and reminders",
+  "WhatsApp order flow: cut, weight, delivery slot, packing checklist",
+  "Qurbani booking system: animal or hissa, slot, cutting preferences, status updates, advance tracking",
+  "Eid staffing and overtime planner",
+  "Supplier quality check on receipt with photos",
+  "Two-shop dashboard: sales, purchases, yield, wastage",
+  "Hygiene and cleaning checklist with time stamps",
+  "Licence and inspection reminders"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mutton ka pura bakra leta hun, lekin pata nahi chalta asal mein kitna maal bikne layak nikla."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — poore bakray se bikne wala gosht kitna nikla, ye clear nahi hota. Haddi aur charbi ka wazan alag se tola jata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Nahi, wo bas side pe rakh dete hain."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted. Katai aur tolai zyada tar kaun karta hai — aap ya karigar?"
+  },
+  {
+   "role": "Person",
+   "text": "Do karigar."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted. Din ke end par khareeda hua wazan aur bika hua wazan kabhi milaya jata hai?"
+  }
+ ]
+}

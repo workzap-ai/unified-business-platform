@@ -1,0 +1,259 @@
+{
+ "key": "car_wash_and_detailing",
+ "name": "Car wash and detailing",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "car wash",
+  "service station wash",
+  "gaari dhulai",
+  "detailing",
+  "polish",
+  "ceramic coating",
+  "PPF",
+  "tinting",
+  "interior cleaning",
+  "steam wash",
+  "waterless wash",
+  "mobile wash",
+  "doorstep wash",
+  "subscription",
+  "monthly package",
+  "foam wash",
+  "wax",
+  "ghaseel sayyarat",
+  "tanzeef",
+  "tilmee’",
+  "queue",
+  "tokens",
+  "membership",
+  "building/basement wash"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Format: fixed site with bays, automatic/tunnel wash, mobile/doorstep service, or a detailing studio.",
+  "Services mix: basic wash, interior, polish, ceramic, PPF, tint.",
+  "Number of sites, vans or teams and number of washers/detailers.",
+  "How customers pay: per wash, monthly subscriptions, corporate fleet contracts.",
+  "How bookings come in: walk-in queue, phone/WhatsApp, app, building concierge.",
+  "Water and chemical sources (tanker, municipal, recycling) as cost and supply matters."
+ ],
+ "scope_rule": "pi notes operational and business problems: booking and queue management, washer productivity and attendance, subscription billing, chemical and consumables usage, damage complaints, quality consistency, field team visibility for mobile washes, and marketing. pi does not advise on environmental or water-discharge regulations, chemical safety handling, labour law (including visas or housing for workers), or insurance claims. pi never stores customers’ addresses, building access codes, plate numbers tied to names, or workers’ personal details.",
+ "vocabulary": {
+  "Ceramic coating": "long-lasting protective coating on paint.",
+  "PPF": "paint protection film applied to body panels.",
+  "Detailing": "deep cleaning and correction of paint and interior.",
+  "Waterless wash": "cleaning with sprays and cloths, common for parked cars in UAE buildings.",
+  "Monthly package": "subscription of washes per month.",
+  "Foam / snow foam": "pre-wash foam.",
+  "Compounding": "machine polishing to remove scratches.",
+  "Ghaseel": "Arabic for washing.",
+  "Basement wash": "washing cars parked in residential building car parks.",
+  "Tunnel": "automatic conveyor wash."
+ },
+ "problems": [
+  {
+   "phrase": "Customers say the car wasn’t cleaned properly, we redo it for free",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Car got scratched and the customer says we did it",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "We don’t take photos before starting, so we can’t prove anything",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Subscription customers say they didn’t get their washes this month",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Monthly payments for packages come late or not at all",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Washers skip cars in the basement and still mark them done",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "I don’t know how many cars each washer did today",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Weekend queue is so long people drive away",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Weekdays the bays are empty",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Shampoo, wax and microfibre usage keeps going up",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Water bill or tanker cost is a big chunk and rising",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Cash from walk-in washes doesn’t match the car count",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Washers take tips and extra side washes for cash",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Bookings come on WhatsApp, Instagram and calls and get mixed up",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Ceramic and PPF jobs take longer than planned and slots overlap",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Detailers are hard to find and leave after training",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "No standard steps, each washer does it his own way",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "We don’t know which service makes money — basic wash or detailing",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Instagram posts are irregular",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "No reminders for coating maintenance, customers don’t return",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Corporate fleet contract invoices are done manually every month",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Pressure washers and vacuums break down",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Vans for mobile wash waste fuel driving across the city",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Different branches, different quality",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  }
+ ],
+ "questions": {
+  "bookings": [
+   "How do customers usually book or show up?",
+   "What happens when it’s busy?",
+   "Do people leave without being served?"
+  ],
+  "quality": [
+   "What do complaints usually say?",
+   "Do you take any photos before you start?"
+  ],
+  "washers": [
+   "How many washers do you have, and how do you know what each did today?"
+  ],
+  "subscriptions": [
+   "How many customers are on monthly packages?",
+   "How do you track their washes and payments?"
+  ],
+  "mobile teams": [
+   "How do you know a basement or home wash was actually done?",
+   "How are routes decided?"
+  ],
+  "consumables": [
+   "Who controls chemicals and cloths?",
+   "Do you know roughly how much goes per car?"
+  ],
+  "cash": [
+   "How is cash taken and counted?",
+   "How do you compare it against cars washed?"
+  ],
+  "profit": [
+   "Which service do you think earns the most?",
+   "Do you know the time each takes?"
+  ],
+  "marketing": [
+   "Where do new customers find you?",
+   "Who posts and replies on social media?"
+  ]
+ },
+ "seasons": "Pakistan: rush before Eid and Fridays/weekends; monsoon causes dips in washing followed by spikes of muddy interior work; winter dust and fog; wedding season detailing demand. UAE: steady weekly demand with dust and sandstorm spikes; summer heat shifts washes to early mornings/evenings and boosts interior and AC cleaning; Ramadan pushes work to after iftar; Eid and National Day detailing. Canada: winter salt brings demand for undercarriage washes after storms, spring detailing peaks, summer is steady, frozen weather limits outdoor washing.",
+ "care": [
+  "No advice on water discharge, chemical storage, or environmental permits; note the cost and effort only.",
+  "Damage disputes with customers: note the process gap, do not judge liability or advise on insurance.",
+  "Never store building access codes, parking slot details linked to residents, or customer addresses.",
+  "Workers’ visas, housing, wages and hours are legal matters; note only the operational effect (e.g. turnover).",
+  "Never suggest covert tracking of workers; field visibility should be framed around job proof.",
+  "Chemical exposure or injury at site → point to emergency services.",
+  "Do not quote typical pricing for coatings or packages."
+ ],
+ "build_ideas": [
+  "WhatsApp booking flow with time slots per service and bay, with confirmations and reminders.",
+  "Before-and-after photo capture per car, stored against the job.",
+  "Subscription manager: package, washes used, renewal date and payment status, with reminders.",
+  "Mobile-wash job list per team with photo proof of completion and route order.",
+  "Washer daily tally: cars done, services done, per person.",
+  "Queue display or token system for walk-ins on busy days.",
+  "Consumables issue log and usage per car estimate.",
+  "Daily cash-up matched to cars washed.",
+  "Service profitability view by time taken and consumables.",
+  "Coating/PPF maintenance reminders to customers.",
+  "Corporate fleet invoicing from logged washes.",
+  "Standard wash checklists per service level for training and consistency."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We do basement washes in 12 buildings in Dubai. Customers keep saying their car wasn’t washed but the guys say they did it."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a tough spot, stuck between your customer and your team — noted. Right now, how does a washer show that a car was done?"
+  },
+  {
+   "role": "Person",
+   "text": "Just a tick on the list he sends on WhatsApp at night."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Roughly how many cars does each washer cover in a night?"
+  }
+ ]
+}

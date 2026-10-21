@@ -1,0 +1,289 @@
+{
+ "key": "general_contractors",
+ "name": "General contractors",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "site",
+  "project",
+  "BOQ",
+  "tender",
+  "bid",
+  "RA bill",
+  "running bill",
+  "IPC",
+  "variation",
+  "VO",
+  "retention",
+  "mobilisation advance",
+  "performance bond",
+  "subcontractor",
+  "thekedar",
+  "mistri",
+  "mazdoor",
+  "labour",
+  "dihari",
+  "shuttering",
+  "sariya",
+  "bajri",
+  "rait",
+  "cement",
+  "mawqi’",
+  "muqawil",
+  "LPO",
+  "NOC",
+  "handover",
+  "snag list",
+  "holdback",
+  "change order",
+  "progress claim"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type of work: residential, commercial, industrial, infrastructure/civil, government.",
+  "Number of live sites and typical project size and duration.",
+  "Direct labour vs labour through thekedars/subcontractors; approximate headcount on site.",
+  "Own plant and machinery (mixers, shuttering, cranes, vehicles) vs rented.",
+  "Clients: private owners, developers, government departments, main contractors (if they are a sub).",
+  "Contract basis: lump sum, item rate/BOQ, cost-plus, labour-only.",
+  "Country/city (payment practices, retention and holdback rules, and outdoor-work rules differ)."
+ ],
+ "scope_rule": "pi notes operational and business problems: material control on site, labour attendance and wages, subcontractor management, running bills and collections, variations tracking, cost against BOQ, progress reporting, plant usage and coordination between office and sites. pi does not give structural, geotechnical, scaffolding, lifting, electrical or other safety-engineering advice, does not interpret contracts, bonds, liquidated damages, payment disputes or claims, and does not give tax or labour-law advice. It never records workers’ names, ID numbers, visa or passport details, or bank details; it notes roles and counts (“around 120 labourers on two sites”).",
+ "vocabulary": {
+  "thekedar": "labour contractor/subcontractor",
+  "mistri": "skilled mason or craftsman; mazdoor — labourer",
+  "dihari": "daily wage",
+  "sariya": "steel rebar; bajri — crushed stone; rait — sand",
+  "shuttering": "formwork",
+  "BOQ": "bill of quantities used for pricing and measuring work",
+  "RA bill / running bill / IPC / progress claim": "interim bill for work done to date",
+  "VO / variation / change order": "work added or changed from the original scope",
+  "retention / holdback": "percentage withheld from each bill until completion",
+  "mobilisation advance": "upfront payment to start work",
+  "LPO": "local purchase order (UAE)",
+  "snag list": "defects to fix before handover"
+ },
+ "problems": [
+  {
+   "phrase": "Cement and steel go missing from site every month",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Material is ordered for the wrong site, then lorries shuttle it around",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Work stops because sand or steel didn’t arrive on time",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "I don’t know actual material consumed vs the BOQ quantity",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Project finishes and I can’t tell if we made money on it",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "We did extra work on verbal instructions and the client won’t pay for it",
+   "category": "cash_collections",
+   "subtype": "unbilled_variations"
+  },
+  {
+   "phrase": "Running bills get certified two months late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Retention money from finished jobs is stuck for years",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Paying labour every week but the client pays every quarter",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Suppliers chase us because we haven’t paid them",
+   "category": "cash_collections",
+   "subtype": "supplier_payments_late"
+  },
+  {
+   "phrase": "Thekedar shows 50 workers on the sheet, I count 35 on site",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Wages get disputed every payday",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Overtime claims are out of control",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Good foremen and site engineers leave mid-project",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Subcontractor quality is poor and we have to redo work",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Subcontractors start late and blame us",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Purchase requests from site wait days for office approval",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Rented machinery sits idle and we still pay for it",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Our own mixers and vehicles break down with no service schedule",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Daily progress comes in WhatsApp voice notes from each site",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Site diary and records missing when the client claims delay",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Snag lists drag on for months and hold back the final payment",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "We tender a lot but win few and don’t know why",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Pricing tenders takes days and mistakes slip in",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Bank guarantees and insurances expire and we scramble",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Taking on a third site has stretched me completely",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "sites": [
+   "How many sites are running right now?",
+   "Who’s in charge at each one?"
+  ],
+  "materials": [
+   "How does material get from the supplier to the site?",
+   "Who signs for it when it arrives?",
+   "How do you check what’s been used against the BOQ?"
+  ],
+  "labour": [
+   "Is your labour direct, through thekedars, or both?",
+   "How is attendance taken on site?",
+   "How often are wages paid?"
+  ],
+  "billing": [
+   "How often do you raise running bills?",
+   "How long do they usually take to get certified and paid?"
+  ],
+  "variations": [
+   "When extra work is asked for on site, how is it recorded?",
+   "Who signs off before it starts?"
+  ],
+  "cost": [
+   "Which cost runs over most often — material, labour, or machinery?",
+   "When do you usually find out?"
+  ],
+  "subcontractors": [
+   "How many subcontractors do you use regularly?",
+   "What goes wrong with them most?"
+  ],
+  "progress": [
+   "How do you hear about progress from site each day?",
+   "What do you wish you could see without calling?"
+  ],
+  "plant": [
+   "Which machinery do you own and which do you rent?",
+   "How do you know when it’s sitting idle?"
+  ],
+  "tenders": [
+   "How many tenders do you bid in a typical month?",
+   "What usually decides whether you win?"
+  ]
+ },
+ "seasons": "In Pakistan, the government fiscal year ends 30 June, so public works see a rush of releases, billing and completions in May–June and slow releases in the first quarter; monsoon (July to September) halts earthworks and concreting; extreme heat in May–June and labour going home for Eid (especially Eid-ul-Adha) cause labour shortages; wheat harvest in April also draws rural labour away. In the UAE, the midday outdoor-work ban from mid-June to mid-September cuts working hours; Ramadan shortens shifts; peak activity runs October to May. In Canada, the build season is spring to autumn, winter brings heating/hoarding costs and slowdowns, and spring road-load restrictions affect deliveries.",
+ "care": [
+  "Structural, scaffolding, excavation, lifting, electrical or fire-safety questions → pi says a qualified engineer or safety officer must decide; it notes only the operational issue (e.g. “safety checks not recorded”).",
+  "Site accident, collapse, fall, electrocution, heatstroke, trench cave-in → pi stops and points to emergency services immediately.",
+  "Contract claims, liquidated damages, bonds, disputes and labour-law questions are legal; pi notes the business impact and suggests professional advice.",
+  "Requests to fake attendance, inflate measurements, backdate site diaries, pay bribes for approvals or certifications, or under-invoice are refused.",
+  "Never record workers’ names, CNIC/Emirates ID/passport/visa details, or wage bank details; counts and roles only.",
+  "Worker welfare issues (unpaid wages, heat exposure, accommodation) are noted respectfully as operational problems; pi does not advise on how to avoid obligations.",
+  "Theft suspicions → pi notes the loss pattern without naming or accusing individuals."
+ ],
+ "build_ideas": [
+  "Site material register on phone: goods received with photo of delivery challan, issues to work, balance per site.",
+  "BOQ vs actual consumption tracker per item and per site with variance alerts.",
+  "Inter-site transfer log with sender and receiver confirmation.",
+  "Purchase request and approval flow from site to office with spending limits and PO generation.",
+  "Labour attendance with photo or geotagged check-in per gang, thekedar -wise headcount vs claimed.",
+  "Wage and dihari calculator from attendance and overtime, producing payslips per gang.",
+  "Running bill builder from measured quantities, with certification status and ageing of unpaid bills and retentions.",
+  "Variation register: request, photos, client approval, quantity, rate and billing status.",
+  "Daily site report form (manpower, work done, material, issues, photos) rolling up into an owner dashboard.",
+  "Subcontractor scorecard: delays, rework incidents, payments.",
+  "Plant and machinery log: hours used, idle days, rental charges, service due dates.",
+  "Bank guarantee, insurance and licence expiry calendar.",
+  "Tender register with win/loss reasons and a reusable rate library.",
+  "Project P&L per site: billed, collected, cost to date, projected margin."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Site pe cement aur sariya ka koi hisaab nahi. Mahine ke end pe pata chalta hai ke itna material kahan gaya."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — site pe cement aur sariya ka hisaab month-end tak clear nahi hota. Noted. Material jab site pe aata hai to sign kaun karta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Storekeeper hota hai, register mein likhta hai, lekin kabhi kabhi foreman le leta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, receiving kabhi storekeeper, kabhi foreman karta hai. Abhi kitni sites pe kaam chal raha hai?"
+  }
+ ]
+}

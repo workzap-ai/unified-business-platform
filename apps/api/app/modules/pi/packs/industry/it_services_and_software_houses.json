@@ -1,0 +1,284 @@
+{
+ "key": "it_services_and_software_houses",
+ "name": "IT services and software houses",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "project",
+  "client project",
+  "outsourcing",
+  "offshore team",
+  "sprint",
+  "Jira",
+  "backlog",
+  "change request",
+  "scope",
+  "fixed bid",
+  "T&M",
+  "time and material",
+  "staff augmentation",
+  "resource",
+  "bench",
+  "developer",
+  "QA",
+  "deployment",
+  "bug",
+  "UAT",
+  "client ne requirement change kar di",
+  "deadline miss",
+  "P@SHA",
+  "PSEB",
+  "freelancer",
+  "Upwork",
+  "Fiverr",
+  "export remittance",
+  "sharikat barmajiyat",
+  "milestone"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Business model: fixed-price projects, time and material, staff augmentation, product plus services",
+  "Team size and mix (developers, QA, designers, PMs, sales), in-house versus contractors",
+  "Client geography (local, GCC, North America, Europe) and billing currencies",
+  "Number of active projects and typical project size/duration",
+  "Tools used (Jira, ClickUp, GitHub, Slack, Excel for resources)",
+  "How sales happen (referrals, Upwork/Fiverr, outbound, partners)",
+  "Whether they maintain support contracts after delivery"
+ ],
+ "scope_rule": "pi notes the company’s operational problems: estimation and scope creep, resource allocation, delivery delays, quality and rework, billing and collections, foreign remittance timing as a cash-flow issue, hiring and attrition, sales pipeline and internal visibility. pi gives no tax, foreign exchange regulation, legal, IP or contract advice, and does not take source code, credentials, client data, client names or employee personal details. It records project types and roles only. Requests to route payments to avoid tax or regulator reporting, misuse client data, pirate software or misrepresent staff on bids are declined.",
+ "vocabulary": {
+  "T&M": "time and material billing by hours worked",
+  "Fixed bid": "one price for an agreed scope",
+  "Staff augmentation": "developers placed into a client’s team, billed monthly",
+  "Bench": "staff not allocated to billable work",
+  "Sprint": "fixed development cycle, often two weeks",
+  "UAT": "user acceptance testing by the client",
+  "Change request (CR)": "formal scope change with cost and time",
+  "Resource": "industry term for a staff member allocated to a project",
+  "Burn": "hours or budget used so far",
+  "Milestone": "project stage tied to delivery and payment",
+  "Support / AMC": "post-delivery maintenance contract",
+  "Upwork / Fiverr": "freelance marketplaces used to win work"
+ },
+ "problems": [
+  {
+   "phrase": "Fixed-price projects always run over and we eat the loss",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Clients change requirements mid-sprint and don’t want to pay for it",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Our estimates are always too optimistic",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Some devs are on three projects and others are on the bench",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "I can’t see project health across all projects in one place",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Timesheets are filled on Friday from memory",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "We miss deadlines and only find out at the demo",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  },
+  {
+   "phrase": "Bugs come back after release, QA is rushed",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Rework after UAT is eating our margin",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Good developers leave for remote jobs paying in dollars",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Hiring senior developers takes months",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Foreign clients pay late and remittances take time to land",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Milestone payments are held because UAT never formally closes",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "We don’t know which project or client is actually profitable",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Support contracts turn into unlimited free work",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Client communication is spread across Slack, email and WhatsApp",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "When a lead dev leaves, nobody knows how the system works",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "We depend on Upwork for leads and fees are rising",
+   "category": "marketing_leads",
+   "subtype": "marketplace_visibility"
+  },
+  {
+   "phrase": "Sales pipeline is in the founder’s head",
+   "category": "marketing_leads",
+   "subtype": "no_tracking"
+  },
+  {
+   "phrase": "Two or three clients make most of our revenue",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Server and SaaS subscription costs keep creeping up",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Every PM runs projects differently",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Laptops and licences aren’t tracked when people leave",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Registration renewals and export-related paperwork are always last minute",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "We want to build our own product but services eat all our time",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "projects": [
+   "How many projects are running at the moment?",
+   "How are most of them priced — fixed or by time?"
+  ],
+  "scope": [
+   "How do requirement changes usually reach the team?",
+   "Are they priced or just absorbed?"
+  ],
+  "estimates": [
+   "How close do your estimates usually land?",
+   "Where do they go wrong most often?"
+  ],
+  "resources": [
+   "How do you decide who works on which project?",
+   "Can you see who’s overloaded or on the bench?"
+  ],
+  "visibility": [
+   "How do you know a project is slipping?",
+   "How early do you usually find out?"
+  ],
+  "quality": [
+   "Who tests before work goes to the client?",
+   "How often does it come back with issues?"
+  ],
+  "cash": [
+   "How long do clients take to pay after a milestone?",
+   "What usually holds the payment up?"
+  ],
+  "team": [
+   "Where’s attrition hurting most?",
+   "What happens to knowledge when someone leaves?"
+  ],
+  "sales": [
+   "Where do new clients come from?",
+   "How do you keep track of leads?"
+  ],
+  "support": [
+   "How are post-launch support requests handled?",
+   "Is that work billed?"
+  ]
+ },
+ "seasons": "- Clients in North America and Europe slow down in late December and August; budgets reset in January, and Q4 often brings rushed “use the budget” projects. - Pakistan: fiscal year end (June) and budget changes affect costs and planning; Ramadan reduces hours; attrition peaks after annual increments and bonuses. - UAE: GITEX (October) drives demos and new deals; government digital projects follow budget cycles; summer quieter. - Canada: fiscal year-ends (often March) drive spring project starts.",
+ "care": [
+  "Never ask for code, credentials, server access or client data.",
+  "No tax, foreign exchange, legal, IP or contract advice; record payment delays and remittance timing only as cash-flow problems.",
+  "Decline anything involving under-reporting export income, routing funds to avoid regulators, pirated software, or misrepresenting CVs on bids.",
+  "Data breaches or security incidents: note as an operational concern and suggest they involve their security lead; no forensic guidance.",
+  "Employee names, salaries and personal details are not recorded.",
+  "Client names are not recorded; use “a US client”, “a fintech client”."
+ ],
+ "build_ideas": [
+  "Project portfolio dashboard: status, budget burn versus progress, upcoming milestones and risks per project",
+  "Resource planner showing each person’s allocation by week and bench time",
+  "Timesheet capture linked to projects and tasks, with daily nudges rather than Friday catch-up",
+  "Change request log per project with approval, cost and time impact, feeding invoices",
+  "Milestone billing tracker with UAT sign-off dates, invoice status and remittance receipt",
+  "Project profitability view: billed amount versus logged effort and contractor cost",
+  "Support ticket intake with hours logged per client against the support contract",
+  "Knowledge handover checklist and documentation register per project",
+  "Asset register for laptops and software licences with assignment and return on exit",
+  "Sales pipeline with lead source, stage and follow-up dates",
+  "Hiring pipeline for open roles with interview stages",
+  "Owner dashboard: projects at risk, utilisation, receivables by client, pipeline"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We’re a 40-person software house. Fixed-price projects keep going over, and I only find out at the end."
+  },
+  {
+   "role": "pi",
+   "text": "That’s tough — the overrun only shows up when it’s too late to fix — noted. How do you track hours spent against each project today?"
+  },
+  {
+   "role": "Person",
+   "text": "Jira for tasks, and timesheets in a Google Sheet that people fill in on Fridays."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, Jira plus a weekly timesheet sheet. When a client asks for a change mid-project, what usually happens?"
+  },
+  {
+   "role": "Person",
+   "text": "The PM just squeezes it in to keep them happy."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, changes are absorbed rather than priced — I’ve noted that as well. Roughly how many fixed-price projects are running right now?"
+  }
+ ]
+}

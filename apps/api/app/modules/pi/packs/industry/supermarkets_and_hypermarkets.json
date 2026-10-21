@@ -1,0 +1,300 @@
+{
+ "key": "supermarkets_and_hypermarkets",
+ "name": "Supermarkets and hypermarkets",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "supermarket",
+  "hypermarket",
+  "mart",
+  "store",
+  "grocery",
+  "fresh section",
+  "bakery counter",
+  "butchery",
+  "produce",
+  "aisles",
+  "gondola",
+  "planogram",
+  "checkouts",
+  "tills",
+  "barcode",
+  "expiry",
+  "near-expiry",
+  "expiry wala maal",
+  "sabzi kharab ho gayi",
+  "rate change",
+  "scheme",
+  "trade offer",
+  "rack khaali",
+  "baqala kabeer",
+  "hyper",
+  "takhfeedat",
+  "ard"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Store size (rough floor area or number of checkouts) and number of stores.",
+  "Fresh sections run in-house (bakery, butchery, produce, hot food) vs consignment/concession.",
+  "Number of SKUs and share bought from distributors vs direct from principals vs imports.",
+  "POS and back-office system in use; whether scales and barcodes are integrated.",
+  "Home delivery or app/aggregator presence (Foodpanda Pandamart, Talabat Mart, Careem Quik, Instacart, own WhatsApp).",
+  "Whether the store runs a loyalty card.",
+  "Supplier payment terms commonly used (cash, 15/30/60 days, consignment)."
+ ],
+ "scope_rule": "pi notes operational problems in buying, receiving, shelf availability, fresh wastage, checkout, cash, staff and reporting. pi does not give food safety, hygiene certification, halal certification, pricing law or tax advice, and does not advise on weights-and- measures compliance beyond noting it as admin effort. pi does not collect loyalty member details, cashier names or supplier bank details. Food poisoning reports or fire/electrical hazards trigger an immediate pointer to the relevant authorities or emergency services.",
+ "vocabulary": {
+  "trade offer / scheme": "distributor discount or free goods linked to volume",
+  "near-expiry": "stock close to its use-by or best-before date",
+  "planogram": "shelf layout plan for each category",
+  "gondola / end cap": "shelf unit / prominent display at aisle end",
+  "shrink": "losses from theft, damage, expiry and admin errors",
+  "GRN": "goods received note",
+  "claim": "credit owed back by distributor for expired or damaged goods",
+  "listing fee / shelf rent": "fee suppliers pay for placement",
+  "baqala": "small grocery (Gulf); hyper = large format",
+  "sabzi / phal": "vegetables / fruit",
+  "kaanta": "weighing scale",
+  "consignment": "supplier owns stock until sold"
+ },
+ "problems": [
+  {
+   "phrase": "Bread and dairy expire on the shelf because we over-order every day",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Fresh produce wastage is huge and nobody records it",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Shelves look empty in the evening even though the godown is full",
+   "category": "stock_inventory",
+   "subtype": "slow_replenishment"
+  },
+  {
+   "phrase": "The system says 40 pieces, the shelf has 6",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Distributors don’t take back expired goods unless we fight for the claim",
+   "category": "suppliers_purchasing",
+   "subtype": "credit_terms"
+  },
+  {
+   "phrase": "Receivers sign GRNs without counting cartons",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Price changed at the distributor but the shelf label still shows old rate",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Cashiers’ tills are short at night almost every day",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "One checkout does a lot of voids after the customer leaves",
+   "category": "loss_security",
+   "subtype": "void_refund_abuse"
+  },
+  {
+   "phrase": "Things go missing from the cosmetics and chocolate aisles",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Margins have dropped since the hyper opened nearby",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "We don’t know which brands give us real margin after schemes and claims",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Basket size is small, people come for milk and leave",
+   "category": "sales_revenue",
+   "subtype": "basket_small"
+  },
+  {
+   "phrase": "Long queues at peak and empty tills in the afternoon",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Loyalty card exists but we never use the data",
+   "category": "customers_retention",
+   "subtype": "loyalty"
+  },
+  {
+   "phrase": "Customers complain about rotten fruit in home delivery orders",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Pandamart/Talabat orders come in and pickers can’t find items",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Online prices and store prices don’t match",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Delivery riders take too long and customers cancel",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Suppliers want payment before we’ve sold anything, cash is always tight",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "We’re paying suppliers late and they’re stopping supply",
+   "category": "cash_collections",
+   "subtype": "supplier_payments_late"
+  },
+  {
+   "phrase": "Electricity bill for the chillers is killing us",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Freezer breaks down and we lose stock before anyone notices",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Hygiene in the butchery depends on who’s on shift",
+   "category": "quality_complaints",
+   "subtype": "hygiene"
+  },
+  {
+   "phrase": "The POS goes down on weekends and we write bills by hand",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "Daily sales by department take till the afternoon to compile",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Scales print labels that don’t scan at the till",
+   "category": "tech_systems",
+   "subtype": "pos_issues"
+  },
+  {
+   "phrase": "We don’t know what to stock up on before Ramadan",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  }
+ ],
+ "questions": {
+  "fresh": [
+   "Which fresh section loses the most?",
+   "Is wastage written down anywhere?",
+   "Who decides daily order quantities?"
+  ],
+  "shelves": [
+   "When do shelves usually go empty?",
+   "Who refills, and how do they know what’s needed?"
+  ],
+  "receiving": [
+   "What happens when a delivery arrives?",
+   "Does anyone count against the order before signing?"
+  ],
+  "expiry": [
+   "How do you spot near-expiry items today?",
+   "Do distributors honour claims, or do you absorb the loss?"
+  ],
+  "checkout": [
+   "How often are tills short?",
+   "Is it spread out or mostly certain counters or shifts?"
+  ],
+  "margin": [
+   "Do you know which brands or departments earn the most after schemes?",
+   "Has a competitor nearby changed things?"
+  ],
+  "online": [
+   "Which apps or channels do you take orders from?",
+   "What usually goes wrong with those orders?"
+  ],
+  "suppliers": [
+   "How many suppliers do you deal with?",
+   "Which payment terms cause you the most strain?"
+  ],
+  "reporting": [
+   "What do you look at first each morning?",
+   "How long does it take to get?"
+  ],
+  "equipment": [
+   "Have you lost stock to a chiller or freezer failure?",
+   "How did you find out?"
+  ]
+ },
+ "seasons": "Pakistan: pre-Ramadan stock-up (dates, besan, Rooh Afza, oil, flour), Ramadan iftar rush and Chand Raat; Eid ul- Adha (spices, masala, disposables); summer beverages and ice; winter dry fruit; month-start salary week peaks; flour and sugar price shocks. UAE: Ramadan stock-up and post-iftar shopping, Eid, Dubai Shopping Festival promotions, summer slowdown with residents away, back-to-school lunchbox items, National Day; payday spikes at month end. Canada: Thanksgiving, Christmas, Ramadan/Eid and Diwali for ethnic grocers, summer BBQ season, winter storms driving stock-up, month-start payday.",
+ "care": [
+  "Expired or relabelled goods: pi will not help repackage, relabel or re-date products; it notes only the wastage and claim process.",
+  "Food poisoning complaints or contamination: pi notes the complaint process and points to the local food authority; no medical advice.",
+  "Chiller, gas leak or electrical fire risk: pi tells the person to get people safe and call emergency services before anything else.",
+  "Halal, PSQCA, municipality or food-licence questions: noted as admin load; no regulatory advice.",
+  "Price-control and official rate lists (Pakistan): pi notes pressure, never helps evade price controls.",
+  "Shoplifting confrontations: pi does not advise detaining people; suggests police for serious incidents.",
+  "Loyalty-card data and customer numbers: pi does not request them."
+ ],
+ "build_ideas": [
+  "nori daily read for the supermarket: sales by department, top sellers, items with zero sales, stock cover in days.",
+  "Near-expiry tracker: batches with expiry dates captured at receiving, alerts 30/15/7 days before, list of items for markdown or return claim.",
+  "Fresh wastage log on phone by section, item and reason, with weekly cost totals.",
+  "Suggested daily order quantities for bread, dairy and produce based on recent sales by weekday.",
+  "Receiving app: scan items against the PO, record shortages and damages, generate GRN and a claim note.",
+  "Distributor claims tracker: claims raised, accepted, credited, pending, by supplier.",
+  "Shelf-gap checklist: staff walk aisles and tick empty facings; refill tasks assigned and timed.",
+  "Price-change workflow: new distributor rate → POS update → shelf label print list → confirmation.",
+  "Till reconciliation per cashier and shift with void/refund exceptions flagged.",
+  "Margin view by brand and department including schemes, claims and listing fees.",
+  "Online order picking list grouped by aisle, with substitutions logged and sent to the customer on WhatsApp.",
+  "Chiller/freezer temperature log with alerts if readings are missed or out of range.",
+  "Supplier payment calendar showing what’s due by date against expected cash.",
+  "Ramadan/Eid stock planner using last year’s sales by item."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our bakery and dairy wastage has gone crazy, we throw away so much every night."
+  },
+  {
+   "role": "pi",
+   "text": "That sounds frustrating, noted — heavy end-of-day wastage in bakery and dairy. Is any of it written down, or is it just thrown out?"
+  },
+  {
+   "role": "Person",
+   "text": "Just thrown out. The supervisor orders the same quantity every day."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — no wastage record, and daily orders are a fixed quantity rather than based on what sold. Do the distributors take any of it back, or is all of it your loss?"
+  },
+  {
+   "role": "Person",
+   "text": "Dairy guy takes some back, bread no."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, I’ve added that. Which days of the week feel worst for leftovers?"
+  }
+ ]
+}

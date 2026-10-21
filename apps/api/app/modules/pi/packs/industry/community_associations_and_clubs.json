@@ -1,0 +1,276 @@
+{
+ "key": "community_associations_and_clubs",
+ "name": "Community associations and clubs",
+ "kind": "industry",
+ "sector": {
+  "code": "M",
+  "title": "Digital economy, social and public sector"
+ },
+ "signals": [
+  "association",
+  "society",
+  "club",
+  "sports club",
+  "gymkhana",
+  "residents’ welfare association",
+  "RWA",
+  "society maintenance",
+  "owners’ association",
+  "HOA",
+  "condo board",
+  "alumni association",
+  "professional association",
+  "cultural society",
+  "membership fee",
+  "annual dues",
+  "AGM",
+  "elections",
+  "committee",
+  "secretary",
+  "treasurer",
+  "facility booking",
+  "court booking",
+  "maintenance charges",
+  "defaulters",
+  "guest entry",
+  "event tickets",
+  "nadi",
+  "jam’iya"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: residents’/owners’ association, sports/social club, alumni/professional body, cultural/community society.",
+  "Number of members or units (if volunteered) and membership tiers.",
+  "Facilities managed: courts, pool, gym, halls, restaurant/canteen, parking, security gates.",
+  "Income: dues, maintenance charges, facility fees, events, sponsorships, canteen.",
+  "Paid staff (manager, security, gardeners, coaches, kitchen) versus volunteers.",
+  "Governance: elected committee, board, management company.",
+  "Systems now: registers, Excel, WhatsApp groups, a club software, nothing."
+ ],
+ "scope_rule": "pi notes operational problems: dues collection and defaulter follow-up, membership records process, facility bookings, events, staff and contractor management, communication with members, committee coordination and financial reporting effort. It does not advise on constitutions, bylaws, election rules, property/strata law (e.g., RERA/Jointly Owned Property rules in Dubai, condo law in Canada), dispute resolution or legal action against defaulters, and it does not take sides in committee politics. It never collects members’ names, unit numbers, phone numbers, IDs, vehicle plates or payment details, and records members as groups (e.g., “units in arrears”).",
+ "vocabulary": {
+  "Dues / subscription": "recurring membership fee.",
+  "Maintenance charges / service charges": "fees for common-area upkeep.",
+  "Defaulter": "member behind on payments.",
+  "AGM / EGM": "annual or extraordinary general meeting.",
+  "Secretary / treasurer": "key committee roles.",
+  "Facility booking": "reserving courts, hall, BBQ area.",
+  "Guest pass": "temporary access for non-members.",
+  "Sinking/reserve fund": "money set aside for major repairs.",
+  "Management company": "firm contracted to run a building/community.",
+  "Gate pass / access card": "entry control.",
+  "Mess / canteen": "club dining facility."
+ },
+ "problems": [
+  {
+   "phrase": "A big chunk of members are behind on dues and we chase manually",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Payments come by cash, cheque and transfer and we can’t match them to members",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Membership list is out of date — no idea who’s active",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Court bookings on WhatsApp lead to fights over slots",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Members complain they never know what’s happening",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "The WhatsApp group is chaos, important notices get buried",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "New committee every year, records don’t get handed over",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Treasurer prepares accounts for the AGM by hand over weeks",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Security guards don’t do rounds, nobody can check",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Contractors for cleaning and gardening don’t show up as agreed",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Pool pump, gym machines, lifts break and repairs take ages",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Electricity for common areas keeps rising",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Canteen loses money and we don’t know why",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Canteen stock goes missing",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Event ticket money collected by volunteers in cash, never fully reconciled",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Non-members using facilities through guest passes",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Approvals for spending need three signatures and things stall",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Membership numbers falling, younger people not joining",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Sponsors want reports on events and we have nothing to show",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Repair reserve keeps getting used for daily expenses",
+   "category": "planning_growth",
+   "subtype": "budgeting_process"
+  },
+  {
+   "phrase": "Staff wages and overtime calculated on paper",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Registration renewals and audits sneak up on us",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Complaints from members go to individual committee members and get lost",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Everything depends on the general secretary’s phone",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  }
+ ],
+ "questions": {
+  "dues": [
+   "How do members pay their dues today?",
+   "How do you know who is behind?",
+   "What happens when someone is late?"
+  ],
+  "members list": [
+   "Where is the membership list kept?",
+   "When was it last fully updated?"
+  ],
+  "facilities": [
+   "Which facilities need booking?",
+   "How are bookings taken now, and where do clashes happen?"
+  ],
+  "communication": [
+   "How do you send notices to members?",
+   "What do members say they miss?"
+  ],
+  "committee": [
+   "How often does the committee change?",
+   "What gets lost when it does?"
+  ],
+  "accounts": [
+   "Who prepares the accounts for the AGM?",
+   "How long does that take?"
+  ],
+  "staff and contractors": [
+   "Who works on site — guards, cleaners, coaches?",
+   "How do you check they’ve done their work?"
+  ],
+  "maintenance": [
+   "What breaks down most often?",
+   "How is it reported and followed up?"
+  ],
+  "canteen/events": [
+   "Does the club run food or events?",
+   "How is the cash from those counted?"
+  ],
+  "growth": [
+   "What would you like to change about membership numbers?"
+  ]
+ },
+ "seasons": "Dues cycles (annual or quarterly) and AGM season create peaks in collection and reporting. Pakistan: Independence Day, Eid gatherings, winter sports season and cricket tournaments, summer when clubs’ pools and AC load peak. UAE: cooler months (October–April) are peak for outdoor sports and events; summer moves activity indoors and many members travel; National Day events. Canada: summer outdoor season (pools, tennis, BBQs) and winter (rinks, snow clearing); condo AGMs often in spring; fiscal year-end budgets for HOAs/condos. Ramadan changes event timing (iftar gatherings).",
+ "care": [
+  "No advice on bylaws, elections, strata/owners’-association law or legal action against defaulters.",
+  "Stay neutral in committee disputes and elections; note only the process issue.",
+  "Never collect member names, unit numbers, contact details, IDs, vehicle plates or bank details.",
+  "Defaulter lists: pi will not help publicly name or shame individuals; note the collection process problem.",
+  "Security incidents (break-ins, fights, drownings, lift accidents) involving danger to life: point to emergency services first.",
+  "Refuse requests to falsify AGM accounts, rig elections or hide funds.",
+  "Do not quote typical dues or service-charge levels.",
+  "Children’s sports programmes: do not collect children’s details."
+ ],
+ "build_ideas": [
+  "Member dues ledger with tiered fees, automated WhatsApp/email reminders and payment links.",
+  "Payment matcher linking bank transfers, cash and cheques to member codes.",
+  "Clean membership register with active/lapsed status and renewal dates (access restricted by role).",
+  "Facility booking app for courts, hall, pool and BBQ areas with slot rules and member-only checks.",
+  "Notice board/broadcast channel separating announcements from chatter.",
+  "Complaint and request tracker with status updates to the member.",
+  "Handover pack: digital records, contracts and passwords stored under the association’s control, not personal phones.",
+  "AGM financial pack generator from the ledger.",
+  "Guard patrol checkpoint app (scan points with timestamps) and staff attendance.",
+  "Contractor service log with visit verification.",
+  "Canteen stock and sales tracker with daily cash count.",
+  "Event ticketing with QR entry and reconciled sales.",
+  "Reserve fund and budget tracker showing spend against approved budget."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "I’m the treasurer for our building’s owners’ association. Half the owners are late on service charges and I’m chasing them one by one."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a lot to carry, especially as a volunteer role. Noted — many owners are behind on service charges and you’re following up individually. How do owners usually pay at the moment?"
+  },
+  {
+   "role": "Person",
+   "text": "Bank transfer mostly, a few cheques."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — mostly transfers plus some cheques. How do you match each transfer to the right unit when it arrives?"
+  },
+  {
+   "role": "Person",
+   "text": "Honestly, guesswork from the reference, if they put one."
+  }
+ ]
+}

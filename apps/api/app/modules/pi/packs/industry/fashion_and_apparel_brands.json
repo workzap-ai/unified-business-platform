@@ -1,0 +1,299 @@
+{
+ "key": "fashion_and_apparel_brands",
+ "name": "Fashion and apparel brands (pret, stitched, western wear)",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "pret",
+  "ready-to-wear",
+  "stitched",
+  "kurta",
+  "co-ords",
+  "eastern",
+  "western wear",
+  "collection",
+  "drop",
+  "launch",
+  "lookbook",
+  "sizes",
+  "size chart",
+  "exchange",
+  "return",
+  "COD",
+  "RTO",
+  "article",
+  "design number",
+  "sale lag gayi",
+  "size khatam",
+  "collection nahi bik raha",
+  "Instagram pe order",
+  "outlets",
+  "factory/vendor se stitching",
+  "maqaas",
+  "tashkeela",
+  "abaya"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of outlets and whether the brand sells mainly online, mainly in-store, or both.",
+  "In-house production/stitching unit vs outsourced to vendors (CMT) vs bought finished.",
+  "Collections per year and roughly how many articles per drop.",
+  "Size range and whether sizes are standard or custom.",
+  "Online channels in use (Shopify/website, Instagram, WhatsApp, Daraz, Noon, Amazon, Etsy) and courier partners.",
+  "Markets served (PK only, PK plus international shipping, UAE, Canada diaspora).",
+  "Share of COD vs prepaid online orders."
+ ],
+ "scope_rule": "pi notes problems across design-to-sale: production delays, size-wise stock, sell-through, markdowns, COD returns, online order handling, outlet performance, and staff. pi gives no intellectual property, trademark, design-copying, customs duty, export documentation, labour law or tax advice. pi does not collect customer addresses, phone numbers, measurements or model/influencer personal details; it records roles (designer, merchandiser, stitching vendor). Requests to copy another brand’s designs or labels, or to undervalue shipments for customs, are declined.",
+ "vocabulary": {
+  "article / design number": "a single style code",
+  "drop / launch": "release of a new collection",
+  "sell-through": "share of a collection sold before markdown",
+  "CMT": "cut, make, trim (outsourced stitching)",
+  "karigar": "craftsman/tailor",
+  "fabric khata": "record of fabric issued to stitching vendors",
+  "RTO": "return to origin, a COD parcel refused or undelivered",
+  "COD": "cash on delivery",
+  "exchange": "swap of size or style, common instead of refund",
+  "markdown / sale": "price cut on older stock",
+  "broken sizes": "article left with only some sizes",
+  "sampling": "making prototypes before production"
+ },
+ "problems": [
+  {
+   "phrase": "Medium and large sell out on day one, small and XL sit forever",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "End of season we’re left with broken sizes in every outlet",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Website shows in stock but the outlet sold the last piece",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Stitching vendor is two weeks late and the launch date is fixed",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Fabric given to the vendor never fully comes back as pieces",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Stitching quality varies by batch, hems and sizes are off",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "We don’t know true cost per article after fabric, embroidery, stitching and packaging",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "We go on sale too early because we panic",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "COD returns are eating us alive, so many RTOs",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Courier hasn’t remitted COD money for weeks",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "Exchange requests on Instagram DMs get lost",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Wrong size or colour goes out in online orders",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Instagram, website and WhatsApp orders all managed separately",
+   "category": "orders_fulfilment",
+   "subtype": "multi_channel_orders"
+  },
+  {
+   "phrase": "DMs pile up during launch and we lose sales",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "We spend on Meta ads but can’t tell which drop they sold",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Influencer collabs and gifting with no idea if they worked",
+   "category": "marketing_leads",
+   "subtype": "ad_spend_waste"
+  },
+  {
+   "phrase": "Website crashes on launch day",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "One mall outlet does half what the others do",
+   "category": "sales_revenue",
+   "subtype": "branch_underperforming"
+  },
+  {
+   "phrase": "Copycats sell our designs cheaper on Instagram",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Customers complain colour looks different from the picture",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Outlet staff discount for friends and family",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Retail staff don’t know product details or the new collection",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Merchandiser plans in Excel, nobody else understands it",
+   "category": "tech_systems",
+   "subtype": "excel_dependency"
+  },
+  {
+   "phrase": "Shopify and the store POS don’t sync",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Transfers between outlets for size requests get lost",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Sales reports by article and size take days to put together",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Every design decision waits for me",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "International orders get stuck in customs and customers ask for refunds",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  }
+ ],
+ "questions": {
+  "sizes and stock": [
+   "Which sizes run out first?",
+   "What happens to the leftover sizes at season end?",
+   "Can you see stock at all outlets and online in one place?"
+  ],
+  "production": [
+   "Who stitches your collections?",
+   "How often are launches delayed by vendors?",
+   "How do you track fabric given out?"
+  ],
+  "costing": [
+   "Do you know the full cost of each article?",
+   "Which costs tend to surprise you?"
+  ],
+  "online": [
+   "Which channels bring most orders?",
+   "Roughly how many COD orders come back?",
+   "How long does the courier take to send you the money?"
+  ],
+  "exchanges": [
+   "How do customers ask for exchanges?",
+   "Who handles them, and how long does it take?"
+  ],
+  "marketing": [
+   "Where does most of your ad spend go?",
+   "How do you judge whether a campaign worked?"
+  ],
+  "outlets": [
+   "Which outlet worries you?",
+   "What do you think is different there?"
+  ],
+  "planning": [
+   "How do you decide quantities for a new drop?",
+   "When do you usually start a sale?"
+  ],
+  "systems": [
+   "What do you use for the website and the store tills?",
+   "Do they talk to each other?"
+  ]
+ },
+ "seasons": "Pakistan: summer lawn/pret season from February–March, Ramadan and Eid ul-Fitr (biggest single peak), Eid ul- Adha, 14 August green collections, winter/festive collections Oct–Dec, wedding season Nov–Feb, end-of-season sales in June–July and January, 11.11 and White Friday. UAE: Ramadan and Eid (abaya and kaftan peaks), Dubai Shopping Festival, Diwali for South Asian buyers, White Friday, summer slowdown. Canada: Eid, Diwali and wedding season for diaspora brands, Black Friday/Boxing Day, back- to-school; long shipping times from Pakistan mean pre-Eid order cut-offs matter.",
+ "care": [
+  "Copying designs or using another brand’s labels: pi declines to help and notes only the competitive pressure.",
+  "Customs under-declaration or splitting parcels to dodge duty: declined.",
+  "Customer measurements, addresses and phone numbers: pi does not collect them.",
+  "Disputes with influencers or models: noted as marketing pain; no contract or legal advice.",
+  "Stitching unit labour conditions, wages and overtime: pi notes operational issues, no labour-law advice; any mention of unsafe working conditions or fire risk gets a pointer to act immediately.",
+  "Fake reviews or buying followers: pi does not help.",
+  "Child workers mentioned in a supply chain: pi does not assist and notes it cannot help with that."
+ ],
+ "build_ideas": [
+  "Size-wise stock grid per article across outlets, warehouse and website, synced every few minutes.",
+  "Sell-through dashboard per drop: sold by day, by size, by outlet, with broken-size alerts.",
+  "Vendor production tracker: fabric issued, pieces due, pieces received, rejections, days late.",
+  "Article costing sheet: fabric, embroidery, stitching, trims, packaging, freight, giving landed cost and margin at each price point.",
+  "Unified order hub pulling Shopify, Instagram/WhatsApp and marketplace orders into one queue with packing slips.",
+  "COD remittance reconciler matching courier statements to orders, flagging unpaid and RTO parcels.",
+  "RTO analysis by city, courier and customer history to show where returns cluster.",
+  "Exchange and return workflow via WhatsApp: request logged, approved, reverse pickup booked, new size dispatched.",
+  "Inter-outlet transfer requests for a customer waiting for a size.",
+  "Launch-day DM triage flow on WhatsApp with size availability replies.",
+  "Campaign tracker linking ad spend and influencer posts to tagged links and discount codes.",
+  "Markdown planner showing ageing stock by article before deciding sale timing.",
+  "New collection quantity planner using past drops’ size curves.",
+  "Staff product briefing pack sent on WhatsApp before each launch."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Every Eid collection, M and L are gone in two days and we’re stuck with S and XL in all outlets."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a painful pattern, noted — mid sizes sell out fast and S and XL pile up across outlets. How do you decide the size split when you place a production order?"
+  },
+  {
+   "role": "Person",
+   "text": "Honestly, same ratio every time, the vendor suggests it."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — the size ratio is fixed and comes from the vendor. When a customer asks for an M that’s gone in one outlet, can staff see if another outlet still has it?"
+  },
+  {
+   "role": "Person",
+   "text": "They call around. Sometimes it works."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, I’ve added that too. What happens to the leftover sizes at the end of the season?"
+  }
+ ]
+}

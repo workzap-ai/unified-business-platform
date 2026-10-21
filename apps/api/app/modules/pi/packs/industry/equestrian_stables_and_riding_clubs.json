@@ -1,0 +1,275 @@
+{
+ "key": "equestrian_stables_and_riding_clubs",
+ "name": "Equestrian, stables and riding clubs",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "stable",
+  "riding club",
+  "equestrian centre",
+  "livery",
+  "ghora",
+  "ghoray",
+  "ghuraswari",
+  "tent pegging",
+  "naiza bazi",
+  "polo",
+  "showjumping",
+  "endurance",
+  "dressage",
+  "riding lessons",
+  "ustad",
+  "groom",
+  "saees",
+  "farrier",
+  "khail",
+  "faras",
+  "istabl",
+  "nadi al furousiya",
+  "Arabian horses",
+  "livery board",
+  "hay",
+  "bhoosa",
+  "paddock",
+  "arena",
+  "horse transport",
+  "horse box"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: riding school, livery (horses boarded for owners), private stable, polo/tent-pegging team, endurance stable, breeding, trekking/tourism rides.",
+  "Number of horses (owned vs boarded) and staff (grooms, instructors, farrier, manager).",
+  "Revenue mix: lessons, memberships, livery fees, events, horse sales, pony rides, camps.",
+  "Facilities: arenas, paddocks, covered school, horse walker, shade/cooling (UAE).",
+  "Booking method: walk-in, phone, WhatsApp, Instagram, a booking platform.",
+  "Owner profile: family, club committee, private owner, hotel or resort.",
+  "Location: Pakistan city clubs, rural tent-pegging stables, UAE desert-edge stables, Canadian boarding barns."
+ ],
+ "scope_rule": "pi notes the business side: lesson and livery bookings, memberships and fees, feed/bedding stock, horse workload scheduling, staff, events, payments, and safety-record admin. pi never gives veterinary, farrier, nutrition, medication, training or riding- technique advice, and never comments on whether a horse is fit to ride or compete; it suggests their vet, farrier or instructor. It never helps get around competition rules, doping controls, passports/microchips, import/export or insurance requirements. It records riders (including children), owners and grooms by role, not names, and never stores ID or card details.",
+ "vocabulary": {
+  "livery": "boarding a client’s horse for a monthly fee (full, part, DIY)",
+  "saees/ groom": "person caring for horses daily",
+  "farrier": "specialist who trims and shoes hooves",
+  "naiza bazi": "tent pegging",
+  "ghuraswari": "horse riding",
+  "arena / school": "enclosed riding area",
+  "hay / bhoosa": "dried fodder / wheat straw",
+  "bedding / shavings": "stall floor material",
+  "horse box / trailer": "horse transport",
+  "khail / faras": "horses / horse (Arabic)",
+  "istabl": "stable (Arabic)",
+  "endurance": "long-distance horse race",
+  "lesson package": "prepaid group of lessons"
+ },
+ "problems": [
+  {
+   "phrase": "Lessons booked on WhatsApp get double-booked",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Same horses used too many lessons a day, no record",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Instructors cancel last minute and parents get angry",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Livery owners pay late and we keep feeding their horses",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Extras for livery horses (farrier, vet, transport) never get billed",
+   "category": "sales_revenue",
+   "subtype": "unbilled_work"
+  },
+  {
+   "phrase": "Package lessons used up but nobody tracks the balance",
+   "category": "cash_collections",
+   "subtype": "prepaid_balance_tracking"
+  },
+  {
+   "phrase": "Hay prices jump and I don’t know cost per horse",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Hay and shavings run out unexpectedly",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Feed store looks lighter than it should",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Grooms change often and new ones don’t know each horse’s routine",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Daily care checklists (water, mucking out, turnout) aren’t done when I’m away",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Membership renewals slip and we don’t chase them",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Summer in Dubai, lessons drop to almost nothing",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Event entries and results sit in WhatsApp groups",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Running a show costs more than it brings in, I think",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Instagram brings enquiries but few convert to bookings",
+   "category": "marketing_leads",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Waivers and rider forms are paper and some are missing",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Insurance and passport renewals for horses get forgotten",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Arena lights, water pumps or fans break and take weeks to fix",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Horse transport to events is arranged last minute",
+   "category": "orders_fulfilment",
+   "subtype": "logistics_coordination"
+  },
+  {
+   "phrase": "Committee members want monthly reports, I build them by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Want to add a second arena but don’t know utilisation",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "setup": [
+   "Is it mainly lessons, livery, competition or a mix?",
+   "How many horses, and how many are clients’?"
+  ],
+  "bookings": [
+   "How do riders book lessons now?",
+   "What goes wrong most often?"
+  ],
+  "horse workload": [
+   "How do you track how many sessions each horse does?",
+   "Who decides?"
+  ],
+  "payments": [
+   "How are lesson packages and livery fees paid?",
+   "How far behind do some clients run?"
+  ],
+  "extras": [
+   "How do farrier, vet or transport costs get passed to owners?",
+   "Do some get missed?"
+  ],
+  "feed": [
+   "How are hay and bedding ordered?",
+   "Have you run out before?"
+  ],
+  "staff": [
+   "How many grooms and instructors?",
+   "What goes wrong when one leaves?"
+  ],
+  "daily care": [
+   "How do you check daily routines got done?"
+  ],
+  "members": [
+   "How are memberships renewed?",
+   "Who follows up?"
+  ],
+  "seasonality": [
+   "What happens to bookings in the off-season?"
+  ],
+  "admin": [
+   "Where are rider forms and horse documents kept?"
+  ],
+  "events": [
+   "How do you organise entries and transport for shows?"
+  ]
+ },
+ "seasons": "- UAE: riding and competition season runs in cooler months (roughly October–April) with show jumping, endurance and Arabian horse shows; summer (June–September) sees lessons drop, indoor/early-morning sessions, and many owners travelling; school holidays shape camps. - Pakistan: winter and spring are main riding and polo/tent-pegging seasons (including national horse and cattle shows and melas, often in spring); summer heat cuts lessons in Punjab and Sindh; northern areas ride in summer. - School summer and winter holidays drive children’s camps in all three countries. - Canada: outdoor season spring–autumn; indoor arenas carry winter; hay is bought after summer cutting; heating and snow costs in winter. - Ramadan reduces lesson hours in Pakistan and the UAE; Eid holidays bring family pony-ride peaks.",
+ "care": [
+  "No veterinary, farrier, feeding, medication, training or fitness-to-ride advice; suggest their vet, farrier or instructor.",
+  "Riding falls, kicks or crush injuries, especially to children: pi points to emergency services (1122/15 or 999/998, or 911 in Canada) first.",
+  "Children’s data: roles and age groups only, never names, school or photos.",
+  "Never helps with doping, false passports/microchips, illegal import/export or hiding injuries from buyers or competitions.",
+  "Gambling on races or tent pegging: pi does not engage.",
+  "Waivers and insurance: pi notes admin gaps, gives no legal or insurance advice.",
+  "Animal welfare concerns: pi does not help with methods that harm horses."
+ ],
+ "build_ideas": [
+  "Online/WhatsApp lesson booking with instructor and horse assignment, preventing double bookings.",
+  "Horse workload tracker showing sessions per horse per day and week against limits the stable sets.",
+  "Lesson package and membership balances with renewal reminders.",
+  "Livery billing: monthly fees plus extras (farrier, vet visits, transport) logged as they happen and invoiced.",
+  "Hay, feed and bedding stock tracker with reorder alerts and cost per horse.",
+  "Daily care checklist per stable block with timestamps and photos.",
+  "Horse document vault reminders (passport, vaccination record dates, insurance, registration renewals) entered by the stable.",
+  "Digital rider forms and waivers stored against bookings.",
+  "Event planner: entries, transport, grooms assigned, costs and results.",
+  "Instructor schedule and cancellation log.",
+  "Monthly committee report built automatically from bookings, income and costs.",
+  "Arena utilisation view to support expansion decisions."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We have a riding school in Lahore, 18 horses, mostly kids’ lessons. Bookings are total chaos on weekends."
+  },
+  {
+   "role": "pi",
+   "text": "Weekends with kids’ lessons can get hectic fast. How do parents book lessons now?"
+  },
+  {
+   "role": "Person",
+   "text": "WhatsApp to me or the instructor, and we write it on a whiteboard."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — bookings come to two different WhatsApp numbers and go on a whiteboard. Does it ever happen that the same horse or slot gets given twice?"
+  },
+  {
+   "role": "Person",
+   "text": "All the time, and some horses end up doing six lessons."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, double bookings happen and some horses get overworked on busy days. How do parents pay — per lesson or in packages?"
+  }
+ ]
+}

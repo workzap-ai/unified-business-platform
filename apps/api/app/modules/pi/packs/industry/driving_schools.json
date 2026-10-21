@@ -1,0 +1,250 @@
+{
+ "key": "driving_schools",
+ "name": "Driving schools",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "driving school",
+  "driving centre",
+  "driving seekhni hai",
+  "instructor",
+  "lessons",
+  "package",
+  "classes",
+  "automatic ya manual",
+  "test",
+  "road test",
+  "theory test",
+  "licence test",
+  "learner permit",
+  "L",
+  "dual control",
+  "simulator",
+  "female instructor",
+  "ladies driving",
+  "booking slot",
+  "madrasat al- qiyada",
+  "mudarrib",
+  "ikhtibar",
+  "rukhsa",
+  "RTA file",
+  "G1/G2",
+  "Class 5"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: small independent school with a few cars, a franchise branch, or a large licensed driving institute (UAE).",
+  "Number of cars (manual/automatic), motorcycles or heavy vehicles, and instructors.",
+  "Whether instructors are salaried, per-lesson, or freelance with their own cars.",
+  "Mix of students: new learners, women-only classes, expats converting licences, corporate drivers, heavy-vehicle trainees.",
+  "How lessons are booked and paid: packages upfront, per lesson, instalments.",
+  "Whether they also handle classroom theory or simulator training.",
+  "Country and city, as licensing processes and test systems differ."
+ ],
+ "scope_rule": "pi notes operational and business problems: lesson scheduling and cancellations, instructor utilisation and attendance, package payments and refunds, car maintenance and fuel, lead follow-up, student progress records as a process, reviews and complaints. pi does not advise on licensing law, test rules or ways to pass tests, road-safety instruction content, insurance, or instructor certification requirements. pi never stores students’ names, phone numbers, IDs, licence or file numbers, or instructors’ personal details, and refers to “a student” or “a female instructor”.",
+ "vocabulary": {
+  "Package": "a bundle of lessons paid upfront.",
+  "Dual control": "training car with a brake pedal for the instructor.",
+  "Learner permit / G1 / Class 7": "beginner licence stages (Canada).",
+  "Road test / yard test": "practical driving tests.",
+  "Theory test": "written or computer test on rules.",
+  "Simulator": "training machine used before road lessons in some markets.",
+  "Slot": "a booked lesson time.",
+  "No-show": "a student who doesn’t turn up for a lesson.",
+  "Mudarrib": "Arabic for instructor.",
+  "File": "the student’s registration record with the licensing authority (UAE)."
+ },
+ "problems": [
+  {
+   "phrase": "Students cancel at the last minute and the instructor sits idle",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Double bookings on the same car and instructor",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Scheduling is done on a whiteboard and WhatsApp",
+   "category": "tech_systems",
+   "subtype": "no_system"
+  },
+  {
+   "phrase": "Instructors run late or skip lessons",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "I don’t know how many lessons each instructor actually gave",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Instructors take students privately on the side",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Students pay part and disappear before finishing",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Refund requests for unused lessons cause arguments",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "We don’t track how many lessons each student has left",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Fuel cost per car is going up and we can’t tell why",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Cars damaged by learners, repairs pile up",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Enquiries come on Instagram and WhatsApp and we reply late",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Lots of enquiries for women instructors, we don’t have enough",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Weekend and evening slots full, weekday mornings empty",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Students complain the instructor was rude or impatient",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "Different instructors teach differently, students get confused",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "No notes on what each student has covered",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Bad reviews on Google after a failed test",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Car registration, insurance and permit renewals slip",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "We advertise but don’t know which ads bring students",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Commission to instructors calculated by hand, disputes monthly",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Cash from lessons handed to instructors goes missing",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  },
+  {
+   "phrase": "Students ask the same questions on WhatsApp again and again",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  }
+ ],
+ "questions": {
+  "scheduling": [
+   "How are lessons booked today?",
+   "What happens when a student cancels late?",
+   "How often does that happen in a week?"
+  ],
+  "instructors": [
+   "How many instructors and cars do you have?",
+   "How do you know lessons were actually given?"
+  ],
+  "payments": [
+   "Do students pay upfront, per lesson or in parts?",
+   "How do you keep track of lessons left on a package?"
+  ],
+  "refunds": [
+   "What usually causes refund disputes?"
+  ],
+  "leads": [
+   "Where do most enquiries come from?",
+   "Who replies, and how quickly?"
+  ],
+  "quality": [
+   "How do instructors record what a student has covered?",
+   "What do complaints usually say?"
+  ],
+  "cars": [
+   "Who looks after fuel and servicing of the cars?",
+   "How often is a car off the road?"
+  ],
+  "capacity": [
+   "Which times are packed and which are empty?"
+  ]
+ },
+ "seasons": "Pakistan: summer vacations (June–August) and after intermediate/A Level exams bring student learners; demand before overseas travel or job moves; Ramadan reduces lesson hours. UAE: steady expatriate demand year-round, with spikes when new residents arrive (September–October and January); summer heat pushes lessons to mornings and evenings; Ramadan timings change. Canada: spring and summer are the busiest for road tests and lessons; winter weather causes cancellations and slower progress; demand rises among newcomers and students around the start of terms.",
+ "care": [
+  "Never advise how to pass tests, bypass test steps, or obtain a licence improperly; decline requests about fake certificates, test bribes or proxy test-takers.",
+  "No advice on licensing regulations, instructor certification or insurance.",
+  "Students are often young or women in a sensitive setting: don’t store names, phone numbers or any personal details; refer to roles only.",
+  "Harassment or misconduct complaints against an instructor: note that a complaint exists, avoid judging, and if anyone is in danger direct them to emergency services or police.",
+  "A crash during a lesson with injuries → stop and point to emergency services.",
+  "Do not comment on whether a refund is legally owed."
+ ],
+ "build_ideas": [
+  "Lesson booking calendar by instructor and car, preventing double booking, with WhatsApp self-booking.",
+  "Automatic reminders and a late-cancellation rule recorded on each booking.",
+  "Package tracker per student: lessons bought, taken and remaining, with payment status.",
+  "Instructor lesson log with start/end confirmation from the student.",
+  "Instructor pay or commission calculation from logged lessons.",
+  "Student progress card listing skills covered per lesson, shared between instructors.",
+  "Car log for fuel, kilometres, damage and service schedule.",
+  "Enquiry inbox from Instagram, WhatsApp and website with response tracking and source.",
+  "FAQ WhatsApp flow answering common questions on packages and timings.",
+  "Utilisation view showing empty slots, to plan offers for quiet hours.",
+  "Review requests after course completion."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Students book on WhatsApp, then cancel one hour before. My instructors sit doing nothing."
+  },
+  {
+   "role": "pi",
+   "text": "That’s lost time you can’t get back — noted. In a typical week, roughly how many lessons get cancelled that late?"
+  },
+  {
+   "role": "Person",
+   "text": "Maybe 15 out of 120."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Right now, is there any rule students agree to about cancelling?"
+  }
+ ]
+}

@@ -1,0 +1,270 @@
+{
+ "key": "security_guard_companies",
+ "name": "Security guard companies",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "guards",
+  "guard force",
+  "deployment",
+  "posts",
+  "sites",
+  "duty roster",
+  "double duty",
+  "12-hour shift",
+  "relievers",
+  "supervisor rounds",
+  "patrolling",
+  "guard tour",
+  "armed guards",
+  "unarmed",
+  "ex-servicemen",
+  "guard so raha tha",
+  "post khali tha",
+  "chowkidar",
+  "attendance register",
+  "uniform",
+  "weapons licence",
+  "SIRA",
+  "contract renewal",
+  "haris amn",
+  "bouncer",
+  "CCTV monitoring",
+  "mobile patrol"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of guards and number of client sites/posts",
+  "Armed versus unarmed services, and other services (mobile patrol, CCTV monitoring, event security, cash escort)",
+  "Shift pattern (8 or 12 hours) and whether relievers are kept",
+  "Client types (residential, commercial, banks, factories, events, schools)",
+  "How attendance and supervision are done today (register, calls, biometric, app)",
+  "Cities covered and whether supervisors are mobile",
+  "Whether guards are housed in company accommodation"
+ ],
+ "scope_rule": "pi notes the company’s operational problems: guard attendance, post coverage, rosters and relievers, supervision, client complaints, payroll and deductions, uniforms and equipment tracking, billing and collections, licence and contract renewals, and recruitment. pi gives no weapons, tactical, safety-engineering, legal, labour-law or regulatory advice, and never takes guard names, CNICs, Emirates IDs, licence numbers, weapon details or client site layouts. It records roles and counts only. Requests to falsify attendance or training records, underpay below legal requirements, carry unlicensed weapons, or surveil people covertly are declined; any live threat goes straight to emergency services.",
+ "vocabulary": {
+  "Post": "a fixed guard position at a client site",
+  "Reliever": "spare guard who covers leave or absence",
+  "Double duty": "one guard working two consecutive shifts",
+  "Guard tour / patrolling system": "checkpoints scanned during rounds to prove patrols",
+  "Supervisor rounds": "supervisor visits to check posts",
+  "Deployment": "guards assigned to sites",
+  "Chowkidar": "traditional watchman",
+  "Armed / unarmed guard": "with or without a licensed weapon",
+  "Kit / uniform issue": "uniforms, torches, radios, batons provided",
+  "Occurrence book": "log of incidents at a post",
+  "SIRA": "Dubai’s security industry regulator",
+  "Man-hours": "billed hours per post"
+ },
+ "problems": [
+  {
+   "phrase": "Posts are left empty at night and clients find out before we do",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Guards sign each other’s attendance register",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Supervisors claim they did rounds but I can’t verify",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Guards sleeping on duty is our top client complaint",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "We don’t have enough relievers, so guards do double duty",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Rosters are made in a notebook and nobody knows who’s where",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Guard turnover is huge, people leave without notice",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Recruiting trained guards fast enough for a new contract is impossible",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Training records are incomplete when clients ask",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Payroll is a fight every month over absences and fines",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "We bill clients for posts but sometimes the post wasn’t covered",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Clients pay after 60–90 days but guards need salary on the 1st",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Contract rates haven’t changed but salaries and fuel have",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Uniforms and equipment issued are never returned",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Radios and torches break and we don’t know which post has what",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Incident reports come in as voice notes and get lost",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Licence and permit renewals sneak up on us",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Client contracts and renewal dates are in files",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Mobile patrol vehicles cost a lot in fuel and we can’t see routes",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "We lose contracts to cheaper competitors at renewal",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Owner has to personally handle every client complaint",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "I don’t know which sites are profitable after overtime and relievers",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Expanding to another city but supervision would be impossible",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "size": [
+   "How many guards and how many sites are you running?",
+   "Mostly 8-hour or 12-hour shifts?"
+  ],
+  "attendance": [
+   "How is a guard’s presence at a post confirmed today?",
+   "How quickly would you know if a post was empty?"
+  ],
+  "supervision": [
+   "How often do supervisors visit each site?",
+   "How do you check that the visits actually happened?"
+  ],
+  "cover": [
+   "Do you keep relievers?",
+   "How often do guards end up doing double duty?"
+  ],
+  "complaints": [
+   "What do clients complain about most?",
+   "How do those complaints reach you?"
+  ],
+  "payroll": [
+   "How are absences and fines worked out for salary?",
+   "How often do guards dispute their pay?"
+  ],
+  "billing": [
+   "How are clients billed — per post, per guard, per hour?",
+   "How long do they take to pay?"
+  ],
+  "equipment": [
+   "How is kit issued and returned?",
+   "Do you know what’s at each post?"
+  ],
+  "hiring": [
+   "How long does it take to staff a new contract?",
+   "Where do you find guards?"
+  ],
+  "growth": [
+   "What’s the main thing stopping you taking on more sites?"
+  ]
+ },
+ "seasons": "- Pakistan: Muharram, Eid, elections and major public events raise demand and risk; wedding season (November–February) drives event security; summer heat affects night attendance; harvest and Eid leave cause guard shortages. - UAE: winter events season (concerts, exhibitions, Expo-style events, New Year’s Eve, Dubai Shopping Festival); summer midday rules affect outdoor posts; Ramadan changes timings. - Canada: winter conditions affect mobile patrols; summer festivals and construction sites drive demand. - Contract renewals often fall at fiscal year-end (June in Pakistan, December in UAE).",
+ "care": [
+  "Any live threat, robbery, violence or injury → pi stops and points to police/emergency services (15 / 1122 in Pakistan, 999 / 998 in UAE, 911 in Canada).",
+  "No weapons, tactical, licensing or legal advice; record only the operational issue.",
+  "Never take guard names, IDs, licence or weapon numbers, or client site details and layouts.",
+  "Decline falsified attendance, fake training certificates, underpaying staff unlawfully or covert surveillance requests.",
+  "Guards working excessive hours: note as an overtime/welfare concern, no labour-law opinion.",
+  "Incidents involving harm to guards or third parties: respectful, no blame."
+ ],
+ "build_ideas": [
+  "Guard attendance on phone at the post: check-in with time and location at the site, with alerts to supervisors when a post isn’t checked in",
+  "Patrol checkpoint scanning (QR/NFC) with route completion reports per shift",
+  "Supervisor visit log with geo-tagged check-in and short checklist per site",
+  "Digital roster by site and shift with reliever pool and double-duty flags",
+  "Incident reporting form via WhatsApp or app with photo, time and post, routed to supervisor and owner",
+  "Post coverage report reconciling billed posts with actual covered hours",
+  "Payroll calculator from attendance with transparent deductions and approval step",
+  "Kit and equipment register by guard role and post, with issue and return",
+  "Recruitment and training tracker with document checklist per new guard (stored securely by the company)",
+  "Licence, permit and client contract renewal calendar",
+  "Client portal or WhatsApp summary showing coverage and incidents for their site",
+  "Owner dashboard: posts covered, absences, incidents, overtime, receivables, site profitability"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamare 300 guards hain 45 sites pe. Masla yeh hai ke raat ko post khali hoti hai aur client hum se pehle dekh leta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, raat ko post khali hone ka pata client ko pehle chalta hai — yeh serious masla hai, noted. Abhi guard post pe maujood hai, yeh kaise confirm hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Register mein sign karte hain aur supervisor raat ko phone karta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, register aur phone calls se confirm hota hai. Supervisor raat mein kitni sites ka round lagata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Kehte hain 10–12, lekin pata nahi kitne actually karte hain."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, supervisor ke rounds verify nahi ho pate — yeh bhi note kar liya. Kya aap ke paas relievers hain, ya absence pe guards double duty karte hain?"
+  }
+ ]
+}

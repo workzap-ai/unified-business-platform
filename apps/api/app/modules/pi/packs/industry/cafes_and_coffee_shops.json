@@ -1,0 +1,284 @@
+{
+ "key": "cafes_and_coffee_shops",
+ "name": "Cafés and coffee shops",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "café",
+  "coffee shop",
+  "specialty coffee",
+  "espresso",
+  "barista",
+  "beans",
+  "roaster",
+  "milk",
+  "oat milk",
+  "latte art",
+  "pastries",
+  "brunch",
+  "laptop crowd",
+  "chai",
+  "karak",
+  "gahwa qahwa",
+  "dalla",
+  "takeaway cups",
+  "loyalty card",
+  "grinder",
+  "La Marzocco",
+  "footfall"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of outlets and whether beans are roasted in-house or bought from a roaster",
+  "Food offering: pastries bought in, baked on site, or a full brunch kitchen",
+  "Seating vs grab-and-go share, and any drive-thru or kiosk",
+  "Opening hours and peak windows (morning commute, afternoon, late night)",
+  "Delivery-app presence and share of orders",
+  "Equipment owned vs leased (espresso machine, grinders)",
+  "Whether the owner works the bar"
+ ],
+ "scope_rule": "pi notes operational problems: milk and pastry wastage, bean and cup stock, barista consistency and turnover, slow queues, loyalty, laptop sitters, delivery apps and cash. It does not give food-safety, allergen, caffeine-health or licensing advice, nor tax or lease- law advice. It does not store customer names, numbers or loyalty data, staff details, or payment details, and records issues by role.",
+ "vocabulary": {
+  "shot": "a single espresso extraction",
+  "dial in": "adjusting grind and recipe each morning",
+  "milk wastage": "milk steamed and thrown away",
+  "specialty": "high-grade, traceable coffee",
+  "single origin": "beans from one farm or region",
+  "karak": "strong, sweet milk tea popular in the Gulf",
+  "dalla": "traditional Arabic coffee pot",
+  "grab-and-go": "chilled ready items for takeaway",
+  "laptop crowd": "customers occupying seats for hours",
+  "par": "how much of an item should be in stock",
+  "roaster": "supplier who roasts green beans"
+ },
+ "problems": [
+  {
+   "phrase": "Pastries left at closing every day, we bin them",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Oat and almond milk run out on weekends",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Milk bills keep rising but sales don’t",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Bean price went up and I haven’t changed menu prices in a year",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "I don’t know my cost per cup for each drink",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Coffee tastes different depending on which barista is on",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Good baristas leave for bigger chains after I train them",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Morning queue is too long, people walk to the next place",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "People sit four hours on one latte and block tables",
+   "category": "sales_revenue",
+   "subtype": "basket_small"
+  },
+  {
+   "phrase": "Afternoons are empty",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Staff give free drinks to friends",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Card machine and POS totals never match at closing",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Paper loyalty cards get faked with extra stamps",
+   "category": "customers_retention",
+   "subtype": "loyalty"
+  },
+  {
+   "phrase": "No idea who our regulars are",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Instagram gets likes but I can’t tell if it brings people in",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Talabat orders arrive with spilt drinks and we get the bad rating",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Roaster delivers late and we’re on the last bag",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Grinder broke and there was no backup or service contact",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Rota is a photo in the WhatsApp group",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Second outlet’s numbers I only see when I go there",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Pre-orders for office coffee runs come by WhatsApp and get missed",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "No online ordering, people ask on Instagram DMs",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "Rent in this area keeps going up",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "Cleaning checklist isn’t done on night shifts",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Wholesale bean customers pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Want to open a second location but not sure the first is solid",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "wastage": [
+   "What gets binned most at closing — pastries, milk or something else?",
+   "Does anyone write it down?"
+  ],
+  "costing": [
+   "Do you know roughly what each drink costs you to make?",
+   "When did you last change prices?"
+  ],
+  "consistency": [
+   "Do customers notice a difference between baristas?",
+   "How are recipes shared with new staff?"
+  ],
+  "staff": [
+   "How long do baristas usually stay?",
+   "What makes them leave, from what you hear?"
+  ],
+  "queue": [
+   "What time is the busiest rush?",
+   "Where does the line get stuck?"
+  ],
+  "customers": [
+   "Do you know who your regulars are?",
+   "How do you reward them now?"
+  ],
+  "supply": [
+   "Who roasts your beans?",
+   "How often do you run low before the next delivery?"
+  ],
+  "cash": [
+   "Is the closing gap in cash or card?",
+   "Who closes the till?"
+  ],
+  "delivery": [
+   "What share of orders come through apps?",
+   "What do app complaints usually say?"
+  ],
+  "marketing": [
+   "Where do new customers find you?",
+   "Who runs the social pages?"
+  ],
+  "reporting": [
+   "How do you see the day’s sales if you’re not there?"
+  ]
+ },
+ "seasons": "- PK: winter is peak café season; Ramadan flips trade to post-iftar and late night; university exams fill seats; summer heat pushes iced drinks and evening trade; Independence Day and New Year events in malls. - UAE: October–April outdoor season is strongest; Ramadan evenings very late; summer pushes traffic into malls and delivery; school and university terms shape weekday mornings. - Canada: autumn and winter boost hot drinks and seasonal specials; summer iced drinks and patios; university terms and exam weeks; December holiday gift cards and bean gifting.",
+ "care": [
+  "Burns from steam wands, slips, electrical faults or a customer collapsing: pi points to emergency services first.",
+  "Allergen or dairy-alternative questions from customers: pi notes the operational process issue only, no health advice.",
+  "Caffeine and health claims for menu items: pi does not advise.",
+  "Loyalty or customer lists: pi never collects customer phone numbers or names.",
+  "Barista theft suspicion: noted by pattern and role, no covert monitoring advice.",
+  "Lease and rent disputes: noted as a cost problem, no legal advice.",
+  "Requests to write fake reviews or bulk-follow schemes: pi declines."
+ ],
+ "build_ideas": [
+  "Cost-per-cup calculator for every drink, linked to latest bean, milk and cup prices",
+  "Daily wastage log on a tablet for pastries and milk, with weekly trend by item",
+  "Par-level stock list for milks, beans, syrups and cups with reorder alerts via WhatsApp",
+  "Recipe cards with photos and target shot/milk measures for each drink",
+  "Digital loyalty using phone number at the counter, with stamp history and abuse checks",
+  "End-of-day WhatsApp summary: sales by hour, top drinks, wastage, cash vs card",
+  "WhatsApp or web pre-order flow for office runs with ready-time slots",
+  "Barista rota and swap requests on phone",
+  "Wholesale bean customer ledger with invoice reminders",
+  "Equipment service log with due dates and supplier contacts",
+  "Free-drink and staff-meal log by shift",
+  "Two-outlet comparison view: sales by hour, average ticket, wastage"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "honestly my main issue is pastries. we throw out so many every night."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — a lot of pastries end up binned at closing. Are they baked in-house or bought in from a bakery?"
+  },
+  {
+   "role": "Person",
+   "text": "bought in, delivered every morning."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted. Who decides how many to order each day?"
+  },
+  {
+   "role": "Person",
+   "text": "me, just a guess really"
+  },
+  {
+   "role": "pi",
+   "text": "Thanks, noted that the order is a daily guess. Is it the same quantity every day, or do you change it for weekends?"
+  }
+ ]
+}

@@ -1,0 +1,283 @@
+{
+ "key": "salons_and_barbers",
+ "name": "Salons and barbers",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "salon",
+  "beauty salon",
+  "parlour",
+  "barber",
+  "barbershop",
+  "gents salon",
+  "ladies salon",
+  "unisex salon",
+  "nail bar",
+  "lash",
+  "brow",
+  "threading",
+  "waxing",
+  "facial",
+  "hair colour",
+  "keratin",
+  "bridal makeup",
+  "booking",
+  "walk-in",
+  "chair rental",
+  "stylist",
+  "bridal package",
+  "nai",
+  "hajjam",
+  "saloon",
+  "salon nisaai",
+  "halaq",
+  "mawid"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Gents, ladies or unisex, and number of branches.",
+  "Number of chairs/stations and stylists, beauticians or barbers.",
+  "Staff pay model: salary, commission per service, chair rent, or mix.",
+  "Service mix: haircuts, colour, treatments, nails, makeup, bridal, home service.",
+  "Booking: walk-in, phone, WhatsApp, Instagram DMs, booking apps (Fresha, Booksy, etc.).",
+  "Retail products sold (shampoos, serums, kits) and from whom they are bought.",
+  "Location: mall, street, residential area, inside a hotel or home-based."
+ ],
+ "scope_rule": "pi notes operational and business problems: appointments and no-shows, staff commissions, product usage and theft, service consistency, bridal bookings and advances, cleanliness, retail stock and reviews. pi does not advise on skin, hair or allergic reactions, chemical treatments, cosmetic procedures, product safety, municipal health licensing or tax. pi never collects clients’ names, photos, phone numbers or skin/health information, and records roles only (client, bride, stylist, barber). Treatments that cross into medical procedures are out of scope.",
+ "vocabulary": {
+  "parlour": "ladies beauty salon (PK)",
+  "bridal package": "wedding-day makeup, hair and pre-wedding treatments",
+  "commission": "stylist’s share of each service",
+  "chair rent": "stylist pays fixed rent for a station",
+  "walk-in": "client without appointment",
+  "back-bar": "products used during services (not sold)",
+  "retail": "products sold to clients",
+  "keratin / rebonding": "chemical hair straightening treatments",
+  "threading": "hair removal with thread",
+  "hajjam / halaq": "barber (Urdu / Arabic)",
+  "mawid": "appointment (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Clients book on WhatsApp and Instagram and we double-book stylists",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "No-shows on Saturday leave chairs empty while walk-ins were turned away",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Commission calculations at month end always cause fights",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Staff do home services for my clients privately",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Senior stylists leave and take clients with them",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Colour and keratin products run out faster than the services we billed",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Expensive products disappear from the back-bar",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "We run out of popular colours on wedding days",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Retail shelf products expire before they sell",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Services are rung up cheaper than what was actually done",
+   "category": "loss_security",
+   "subtype": "void_refund_abuse"
+  },
+  {
+   "phrase": "Cash at the counter never matches the day’s services",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Bridal advances are taken and then the date gets clashing bookings",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Results vary a lot depending on which stylist the client gets",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Clients complain about waiting even with appointments",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "A bad review about hygiene is hurting us",
+   "category": "quality_complaints",
+   "subtype": "hygiene"
+  },
+  {
+   "phrase": "Clients come once for a festival and don’t return",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "I have no client list to send offers to",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Instagram posts are random and nobody owns them",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "Supplier sends near-expiry products or fakes",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Product prices from suppliers keep going up, but service prices haven’t changed",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "I don’t know which service actually makes money after product and commission",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Staff come late and the first appointments get delayed",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "New juniors aren’t trained the same way",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Membership and package sessions aren’t tracked properly",
+   "category": "customers_retention",
+   "subtype": "loyalty"
+  },
+  {
+   "phrase": "Two branches, and I can’t see which one is doing better",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Municipal and health licence renewals take a lot of running around",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  }
+ ],
+ "questions": {
+  "bookings": [
+   "How do clients book with you now?",
+   "Who manages the appointment list?",
+   "How often do clashes or no-shows happen?"
+  ],
+  "commissions": [
+   "How are stylists paid?",
+   "How is commission worked out each month?",
+   "What usually causes disputes?"
+  ],
+  "products": [
+   "How do you track products used in services?",
+   "Which products go missing or run out most?"
+  ],
+  "counter cash": [
+   "How is the day’s billing recorded?",
+   "How is cash checked against services done?"
+  ],
+  "bridal": [
+   "How far ahead do brides book?",
+   "How do you record the advance and the date?"
+  ],
+  "quality": [
+   "Do clients ask for specific stylists?",
+   "What do complaints usually say?"
+  ],
+  "repeat clients": [
+   "Do you keep any client list?",
+   "How do you invite clients back?"
+  ],
+  "staff": [
+   "Who has left recently?",
+   "Did clients follow them?"
+  ],
+  "branches": [
+   "How many branches?",
+   "How do you compare them now?"
+  ]
+ },
+ "seasons": "PK: wedding season (November to March) drives bridal and party bookings; Chand Raat and the days before Eid ul Fitr are the busiest of the year, with mehndi and late-night openings; Eid ul Adha also busy; Ramadan days are slow with evenings busy; university farewells and graduation; summer slower. UAE: weekends (Friday–Sunday), Eid, Diwali for South Asian clients, New Year’s Eve, wedding season in winter; summer quieter as residents travel; Ramadan evening peaks. Canada: December holidays, prom and graduation season (May–June), wedding season (May–September), Eid and Diwali for community salons.",
+ "care": [
+  "No advice on skin reactions, allergies, scalp burns, chemical treatments or cosmetic injections; if someone describes a client’s injury or reaction, pi says the client should get medical help and notes only the business problem.",
+  "Severe reactions or injuries happening now: pi points to emergency services.",
+  "Never collect clients’ names, photos (before/after), phone numbers or skin and health details.",
+  "Ladies salons: pi never helps with covert recording; CCTV questions are noted only as gaps in public counter areas.",
+  "Selling counterfeit or unregistered products: pi does not help.",
+  "Staff disputes recorded by role; no employment-law advice."
+ ],
+ "build_ideas": [
+  "Appointment book per stylist with WhatsApp booking, reminders and no-show tracking.",
+  "Bridal booking register with date lock, advance log and trial appointment scheduling.",
+  "Service billing app at the counter producing daily sales by stylist and service.",
+  "Commission calculator per stylist from billed services, with monthly statement.",
+  "Back-bar product usage log per service type, compared to stock bought.",
+  "Retail stock tracker with expiry alerts and reorder points.",
+  "Cash-up sheet at day end matching services, cash, cards and transfers.",
+  "Client list (with consent) for reminders and festive offers.",
+  "Package and membership session tracker.",
+  "Opening hygiene checklist with time stamps.",
+  "Branch comparison dashboard: services, revenue, average bill, product cost."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mere parlour mein stylists ki commission har mahine jhagre ka masla ban jati hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — mahine ke aakhir mein commission par behes hoti hai. Abhi commission ka hisaab kaun aur kaise lagata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Main khud register dekh ke lagati hoon, lekin aadhi services likhi hi nahi hoti."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gayi, kai services register mein darj hi nahi hotin. Jo services rehti hain, woh zyada tar kis waqt hoti hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Shaam ko jab rush hota hai, aur shadi ke dino mein."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, rush ke waqt record chhoot jata hai. Aap ke parlour mein kitne stylists kaam karte hain?"
+  }
+ ]
+}

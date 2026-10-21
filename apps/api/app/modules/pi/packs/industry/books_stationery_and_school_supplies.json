@@ -1,0 +1,271 @@
+{
+ "key": "books_stationery_and_school_supplies",
+ "name": "Books, stationery and school supplies",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "bookshop",
+  "book store",
+  "stationery",
+  "kitabon ki dukaan",
+  "kitab ghar",
+  "school books",
+  "course books",
+  "syllabus",
+  "booklist",
+  "school list",
+  "Urdu Bazaar",
+  "copies",
+  "kaapi",
+  "registers",
+  "notebooks",
+  "pens",
+  "art supplies",
+  "school uniform",
+  "school bags",
+  "office supplies",
+  "photocopy",
+  "printing",
+  "O/A Level books",
+  "Oxford/Cambridge editions",
+  "qirtasiya",
+  "maktaba",
+  "back to school",
+  "toner"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Mix: textbooks/school lists, general books, stationery, office supplies, art supplies, printing/photocopy.",
+  "Whether they supply schools or offices directly (contracts, bulk orders) or sell retail only.",
+  "Whether they sell school uniforms or bags as well.",
+  "Buying model: publishers, distributors, wholesale market (e.g. Urdu Bazaar), imports.",
+  "Returns arrangement with publishers (sale-or-return or firm sale).",
+  "Branch count and online channels (website, WhatsApp booklist orders, Daraz, Amazon).",
+  "Credit given to schools, offices or institutions."
+ ],
+ "scope_rule": "pi notes operational problems such as school-list fulfilment, syllabus changes, edition errors, the back-to-school rush, institutional credit, returns to publishers and stationery stock. pi does not advise on copyright licensing, curriculum choices or education policy. It refuses to help with photocopying or printing whole books, selling pirated editions, or bidding irregularities in school or government tenders. pi never records students’ names, classes or parents’ contact details. It notes only “parents’ booklist orders are on paper”.",
+ "vocabulary": {
+  "booklist / school list": "the list of books and stationery set by a school for each class",
+  "syllabus change": "school or board changing prescribed books",
+  "edition": "version of a textbook; the wrong edition is a common issue",
+  "Urdu Bazaar": "wholesale book and stationery market (Karachi and Lahore)",
+  "sale or return (SOR)": "unsold books can be returned to the publisher or distributor",
+  "firm sale": "no returns allowed",
+  "kaapi / register": "notebook (Urdu)",
+  "qirtasiya": "stationery (Arabic)",
+  "maktaba": "bookshop (Arabic/Urdu)",
+  "bundle": "pre-packed set of books per class",
+  "bulk order": "institutional order from a school or office",
+  "pirated / photocopy edition": "illegal copy"
+ },
+ "problems": [
+  {
+   "phrase": "Back-to-school week, we can’t serve the crowd and the queue goes out the door",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "School changed the syllabus and we’re stuck with last year’s books",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Customers get the wrong edition and come back angry",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Popular books on the list run out in the first week",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Publishers deliver late, right when school starts",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "We forget to return unsold books to the distributor in time",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Thousands of small stationery items, no idea what’s in stock",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Schools take supplies on credit and pay months later",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Office customers send orders on WhatsApp and they get missed",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Parents send booklist photos on WhatsApp and we type them up by hand",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Packing class bundles by hand takes days and has mistakes",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Sales drop to nothing after the school rush",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Stationery margins are thin and I don’t know which items make money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Paper price went up and our selling prices didn’t",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Kids pocket small items",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Photocopy counter cash never matches",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "We hire temporary staff for the rush and they make mistakes",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Imported books stuck in customs or shipping delays",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Our website stock is wrong, people order books we don’t have",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "Tender and bulk paperwork for schools takes too long",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "I don’t know how this year’s school season compared to last year",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Damaged books from shipments, can’t claim back",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Customers don’t come back outside the season",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  }
+ ],
+ "questions": {
+  "mix": [
+   "Is most of your business school books, stationery, general books or office supplies?",
+   "Do you sell to schools or offices directly too?"
+  ],
+  "school season": [
+   "How many schools’ lists do you usually handle?",
+   "What goes wrong most in that rush?"
+  ],
+  "booklists": [
+   "How do parents send their lists today?",
+   "How is a list turned into a packed bundle?"
+  ],
+  "stock and editions": [
+   "How do you know which edition a school wants this year?",
+   "What happens to books left over when the list changes?"
+  ],
+  "suppliers": [
+   "Do you buy from publishers, distributors or the wholesale market?",
+   "Can you return unsold books, and how do you track that?"
+  ],
+  "stationery": [
+   "How do you check stationery stock before reordering?"
+  ],
+  "credit": [
+   "Do schools or offices buy on credit?",
+   "How do you remind them when payment is late?"
+  ],
+  "staff": [
+   "Do you bring in extra staff for the rush?",
+   "How do they learn where everything is?"
+  ],
+  "online": [
+   "Do you take orders online or on WhatsApp?",
+   "How do those reach the person packing?"
+  ],
+  "owner view": [
+   "After the season ends, how do you work out how it went?"
+  ]
+ },
+ "seasons": "In PK, the academic year mostly starts in April for many schools (with an August start for others, often Cambridge- system schools). The weeks before each start are the main rush, with a smaller peak around exams and at year-end for office diaries and calendars. In the UAE, most schools start in late August/September (with April for Indian- and Pakistani-curriculum schools), and there is a January term restart; Ramadan brings shifted hours. In Canada, “back to school” runs August to early September, with a January post-secondary term and Christmas for general books and gifts. Office supply demand rises at fiscal year-start (July in PK, January in UAE, varies in Canada).",
+ "care": [
+  "Refuse to help with pirated, photocopied or scanned books for sale, or printing unlicensed copies.",
+  "Do not advise on copyright or licensing law; note the operational issue only.",
+  "Never record students’ or parents’ names, classes, phone numbers or addresses.",
+  "Refuse to help with kickbacks to schools for “recommended shop” status, or with tender manipulation.",
+  "If school or government contracts involve compliance, pi notes the effort and does not advise.",
+  "Temporary staff issues: record by role.",
+  "If a crowd or crush risk is described during the rush, pi records the capacity problem and, if someone is hurt, points to emergency services."
+ ],
+ "build_ideas": [
+  "School booklist library: each school, class and year with titles, editions and prices, updated when syllabi change.",
+  "Pre-order system: parents order a class bundle via a WhatsApp link, pay or reserve, and get a pickup slot.",
+  "Bundle packing list per class with barcode check to catch wrong editions.",
+  "Demand forecast per title from last year’s sales and current pre-orders.",
+  "Sale-or-return tracker per publisher with return deadlines and alerts.",
+  "Stationery stock by SKU with reorder points.",
+  "Institutional accounts: school/office orders, delivery notes, invoices, credit ageing and reminders.",
+  "WhatsApp order intake for offices with order confirmation and status.",
+  "Photocopy/printing counter log reconciled with cash.",
+  "Season review report comparing titles, schools and margins year on year.",
+  "Online catalogue synced with real stock.",
+  "Temporary-staff quick guide on phone with shelf locations."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Every April it’s madness. Parents send booklist pictures on WhatsApp and my staff type everything out."
+  },
+  {
+   "role": "pi",
+   "text": "That sounds exhausting in the busiest weeks. Noted: booklist orders come in as WhatsApp photos and are typed up by hand. Roughly how many schools’ lists do you handle in that season?"
+  },
+  {
+   "role": "Person",
+   "text": "Maybe fifteen schools."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. When a school changes a book or an edition, how do you usually find out?"
+  },
+  {
+   "role": "Person",
+   "text": "Mostly when a parent complains."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted that edition changes often surface only through complaints. What happens to the old books you’re left with?"
+  }
+ ]
+}

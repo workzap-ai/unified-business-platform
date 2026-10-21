@@ -1,0 +1,268 @@
+{
+ "key": "air_cargo_and_air_freight_agents",
+ "name": "Air cargo and air-freight agents",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "air waybill",
+  "AWB",
+  "MAWB",
+  "HAWB",
+  "consolidation",
+  "consol",
+  "chargeable weight",
+  "volumetric weight",
+  "booking",
+  "space allocation",
+  "offload",
+  "rollover",
+  "GSA cargo",
+  "freight forwarder",
+  "clearing agent",
+  "customs clearance",
+  "CBM",
+  "perishables",
+  "courier",
+  "door to door",
+  "cargo bhejna hai",
+  "maal phans gaya",
+  "customs mein ruka",
+  "shahn jawwi",
+  "bolisa"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Role: freight forwarder, cargo GSA for an airline, consolidator, courier, customs broker, or a mix.",
+  "Main lanes (Pakistan to Gulf, Gulf to Europe, Canada, China import) and export versus import share.",
+  "Typical cargo: garments, perishables, pharma, e-commerce parcels, machinery parts, personal effects.",
+  "Customer types: exporters, importers, e-commerce sellers, individuals.",
+  "Size of team, branches and whether they own trucks or warehouse space.",
+  "Whether they hold airline allocations or buy space spot.",
+  "Systems used for bookings, AWBs, billing and tracking."
+ ],
+ "scope_rule": "pi notes business and operational problems: rate quoting speed, space availability, shipment tracking, customer updates, invoicing and collections, margin per shipment, carrier and agent issues, staff workload and reporting. pi never advises on customs classification, duties, export or import regulations, dangerous goods acceptance, sanctions, or how customs or aviation regulators would interpret rules. It never stores shippers’ or consignees’ personal IDs, NTN/CNIC/Emirates ID numbers, bank details or individuals’ contact data, and refers to roles (“exporter”, “consignee”). pi refuses anything that looks like under-declaration, misdeclaring goods or smuggling.",
+ "vocabulary": {
+  "AWB / MAWB / HAWB": "air waybill; master is the airline's, house is the forwarder's",
+  "chargeable weight": "the higher of actual and volumetric weight",
+  "consol": "combining several shippers' goods under one master waybill",
+  "offload": "cargo removed from a booked flight",
+  "rollover": "cargo pushed to a later flight",
+  "allocation": "space reserved with an airline in advance",
+  "spot rate": "one-off price for space",
+  "clearing agent": "handles customs clearance",
+  "DO": "delivery order to release cargo",
+  "demurrage / storage": "charges for cargo left at the terminal",
+  "perishables": "fresh produce, meat, fish, flowers",
+  "door to door": "pickup to final delivery"
+ },
+ "problems": [
+  {
+   "phrase": "Customers ask for a rate and by the time we get airline prices they’ve gone elsewhere",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "We sell at a rate and then the airline raises theirs before departure",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "We don’t know the profit on each shipment once all the charges come in",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Storage charges at the terminal appear on bills we didn’t expect",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Cargo gets offloaded and the customer hears it from someone else first",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Customers call all day asking ‘where’s my shipment’",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Perishables get delayed and the customer claims for spoilage",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Overseas agents take months to pay their share",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Small exporters want credit and some never pay",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Rates in dollars, customers pay in rupees, and the gap moves every week",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "AWB and invoice details are typed three times in different places",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Weights declared by customers don’t match the scale",
+   "category": "operations_process",
+   "subtype": "weight_mismatch"
+  },
+  {
+   "phrase": "Bookings and confirmations live in staff WhatsApps",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Sales staff each keep their own customer list",
+   "category": "marketing_leads",
+   "subtype": "no_customer_data_centralised"
+  },
+  {
+   "phrase": "Our clearing agent’s delays hold up every import",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Space is impossible to find in peak months",
+   "category": "suppliers_purchasing",
+   "subtype": "capacity_unavailable"
+  },
+  {
+   "phrase": "Pickup trucks arrive late and miss cut-off",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Shipments go out without all documents and get stuck",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Monthly profit report takes our accountant two weeks",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Staff give customers discounts I don’t know about",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Customers stop sending after one bad experience and we don’t notice",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "E-commerce sellers want tracking links and we can’t give them",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_tracking"
+  },
+  {
+   "phrase": "Packages get damaged or opened between pickup and the terminal",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Thinking of opening in another city but not sure the volume is there",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  }
+ ],
+ "questions": {
+  "quoting": [
+   "How do customers ask for rates?",
+   "How long does a quote usually take?",
+   "What holds it up?"
+  ],
+  "margins": [
+   "When do you know the final profit on a shipment?",
+   "Which charges tend to appear late?"
+  ],
+  "tracking": [
+   "How do customers find out where their cargo is?",
+   "How many status calls does the team get on a busy day?"
+  ],
+  "offloads": [
+   "How often does cargo get offloaded or rolled?",
+   "Who tells the customer, and how quickly?"
+  ],
+  "collections": [
+   "Which customers or agents pay slowest?",
+   "What do you do when a payment is overdue?"
+  ],
+  "documents and data": [
+   "How many times is the same shipment’s data typed in?",
+   "Where do mistakes usually creep in?"
+  ],
+  "suppliers": [
+   "Which part of the chain slows you most, airline, terminal or clearing?",
+   "How do you chase them?"
+  ],
+  "customers": [
+   "Do you know which customers have stopped sending?",
+   "How would you find out today?"
+  ],
+  "reporting": [
+   "What do you look at to know how the month is going?",
+   "How long does it take to get?"
+  ],
+  "growth": [
+   "Are you thinking about new lanes or branches?",
+   "What would you need to know first?"
+  ]
+ },
+ "seasons": "Pre-Eid and Ramadan rush for garments, food and gifts to the Gulf and diaspora; mango season (May to August) and kinnow/citrus season (December to March) for Pakistani perishable exports; Christmas and Black Friday peaks for e-commerce and exports to Canada and Europe; UAE shopping festivals (Dubai Shopping Festival in winter) driving imports; Chinese New Year disrupting imports from China; Hajj period space crunch on Saudi routes; garment export order cycles tied to European and North American seasons; Canadian winter weather delays; fiscal year-end (June in Pakistan) affecting exporters’ cash.",
+ "care": [
+  "pi never gives customs, duty, tariff classification, export or import licensing, sanctions or dangerous goods advice, and never interprets customs or aviation regulator rules.",
+  "Refuses under-declaration, misdeclared goods, undervalued invoices, hidden items, smuggling or helping avoid inspections; pi says it can’t help with that and moves on.",
+  "Never stores shipper or consignee IDs, NTN/CNIC/Emirates ID numbers, passport data, bank details or personal addresses of individuals; roles only.",
+  "Dangerous goods or a suspicious package situation in progress (fire, leak, injury, security threat): pi stops and points to emergency services and the terminal’s emergency contacts.",
+  "Pharma and perishables: pi notes delay and spoilage as business problems, no handling or temperature advice.",
+  "Disputes with airlines or customers over claims: no legal advice, just the operational problem."
+ ],
+ "build_ideas": [
+  "Rate quote tool storing current airline and agent buy rates by lane with margin rules, producing a quote in minutes.",
+  "Shipment file: one entry per shipment creating AWB data, invoice and tracking once, without re-typing.",
+  "Customer tracking link and automatic WhatsApp status updates (booked, departed, offloaded, arrived, cleared, delivered).",
+  "Offload alert flow notifying the customer and sales person immediately.",
+  "Shipment profitability view: sell rate against all buy-side charges, updated as bills arrive.",
+  "Receivables tracker for customers and overseas agents with ageing and reminders.",
+  "Weight check log capturing scale weight and photos against declared weight.",
+  "Pre-departure document checklist per shipment type.",
+  "Pickup scheduling board for trucks with cut-off alerts.",
+  "Customer activity report flagging regular shippers who have gone quiet.",
+  "Discount approval rule so discounts beyond a limit need owner approval.",
+  "Monthly dashboard by lane, customer and salesperson.",
+  "Clearing agent and supplier turnaround tracker."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Customers call us all day asking where their cargo is, my staff do nothing else."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a lot of time gone on one question. Noted: constant tracking calls taking over the team. How do your staff find the status when a customer calls?"
+  },
+  {
+   "role": "Person",
+   "text": "They call the airline or check the portal, then call back."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, so each call means a second lookup and a callback. Roughly how many of these calls come in on a busy day?"
+  }
+ ]
+}

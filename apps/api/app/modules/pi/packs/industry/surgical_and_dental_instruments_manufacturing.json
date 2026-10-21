@@ -1,0 +1,282 @@
+{
+ "key": "surgical_and_dental_instruments_manufacturing",
+ "name": "Surgical and dental instruments manufacturing",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "surgical instruments",
+  "dental instruments",
+  "Sialkot",
+  "forceps",
+  "scissors",
+  "needle holders",
+  "retractors",
+  "scalpels handles",
+  "elevators",
+  "extraction forceps",
+  "scalers",
+  "beauty instruments",
+  "tweezers",
+  "auzaar",
+  "forging",
+  "ghaiyye",
+  "grinding",
+  "filing",
+  "polishing",
+  "passivation",
+  "heat treatment",
+  "laser marking",
+  "single-use",
+  "OEM",
+  "private label",
+  "CE",
+  "FDA",
+  "ISO",
+  "adawat jarahiya"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Product range: general surgery, dental, orthopaedic, beauty/manicure, veterinary, single-use.",
+  "OEM/private label for distributors, own brand, or both.",
+  "Which processes are in-house (forging, machining, heat treatment, finishing, marking) vs outsourced to vendors.",
+  "Main markets and buyer types (distributors in EU, US, Middle East; hospitals; dental suppliers).",
+  "Order profile: many small mixed orders or large repeat programmes.",
+  "Whether they already hold quality management certifications (pi notes, does not assess)."
+ ],
+ "scope_rule": "pi notes operational problems: tracking instruments through many outsourced stages, lot traceability, inspection and rejection rates, documentation effort for buyers, sample delays, freight, payments and lead management. pi does not advise on medical device regulation, certification, clinical use, sterilisation validation, material specification or how to pass audits; nor does it give customs or tax advice. pi never helps falsify certificates, test reports or markings. Personal data of vendors, workers, buyers, and any patient information is never stored.",
+ "vocabulary": {
+  "forging / ghaiyye": "hot-shaping steel blanks into instrument form",
+  "filing / grinding": "shaping and finishing by hand or machine",
+  "heat treatment / hardening": "treating steel for strength",
+  "passivation": "chemical finishing to improve corrosion resistance",
+  "laser marking / etching": "putting codes, logos, CE marks on instruments",
+  "lot / batch number": "group of instruments made together, needed for traceability",
+  "OEM / private label": "making under the buyer’s brand",
+  "vendor": "outside workshop doing one stage, e.g. forging or polishing",
+  "rejection": "instruments failing inspection",
+  "catalogue number": "buyer’s or maker’s item code",
+  "DHR / batch record": "documentation of how a lot was made (buyer term)",
+  "adawat jarahiya": "surgical instruments (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Instruments go to five different vendors and we lose track of where a lot is",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Pieces sent to the polisher and pieces returned don’t match",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Buyer wants lot-wise records and we build them by hand after the fact",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Rejection rate at final inspection is high and we don’t know which stage causes it",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Rust spots or finish issues reported by the buyer",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Inspection happens but results are on paper",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Documentation for buyers takes days for every shipment",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Certificate renewals and audit dates sneak up",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Small mixed orders of 200 catalogue numbers are a nightmare to plan",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Vendors are late and they work for every factory",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Steel quality from the supplier varies",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Steel rates up, old price lists still with buyers",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "We don’t know our real cost per instrument",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Laser marking errors, wrong logo on a private label lot",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Buyer says shipment short against packing list",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Courier costs for samples and small orders are high",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Buyers pay 60–90 days after shipment",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Inquiries from website and B2B platforms aren’t followed up",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Catalogue is old and doesn’t show new items",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  },
+  {
+   "phrase": "Skilled filers and polishers retiring, young people not joining",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Semi-finished stock piles up while urgent items wait",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Owner chases each vendor on WhatsApp personally",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Repeat buyers ask for the same item and we can’t find the old spec",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Exchange rate changes make quotes risky",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  }
+ ],
+ "questions": {
+  "tracking": [
+   "How many stages go out to vendors?",
+   "How do you know where a lot is right now?"
+  ],
+  "counts": [
+   "Do pieces sent and received match?",
+   "Where do they usually go missing or come back short?"
+  ],
+  "traceability": [
+   "When a buyer asks for lot records, how do you prepare them?",
+   "How long does it take?"
+  ],
+  "quality": [
+   "What’s rejected most at final inspection?",
+   "Can you tell which stage caused it?"
+  ],
+  "orders": [
+   "What does a typical order look like — few items in bulk or many items in small quantities?",
+   "What’s hardest to plan?"
+  ],
+  "vendors": [
+   "Which vendor stage causes the most delay?",
+   "How do you follow up?"
+  ],
+  "marking and packing": [
+   "Where do labelling or marking mistakes happen?",
+   "Who checks before packing?"
+  ],
+  "costing": [
+   "Do you know cost per catalogue item?",
+   "When did you last update it?"
+  ],
+  "cash": [
+   "How long do buyers take to pay?",
+   "How are overdue payments followed up?"
+  ],
+  "leads": [
+   "Where do new inquiries come from?",
+   "How quickly do they get a reply?"
+  ],
+  "documentation": [
+   "Which documents take most time for each shipment?",
+   "Who prepares them?"
+  ]
+ },
+ "seasons": "Demand is steadier than consumer goods but follows buyers’ budget cycles: many hospital and government buyers spend near fiscal year-ends (December in much of the EU and Gulf, March in Canada and the UK public sector, September for the US federal year), and distributors restock in Q1 and Q4. Trade fairs (such as major medical and dental exhibitions in Germany and Dubai) drive inquiry spikes afterwards. Pakistan: Eid holidays pause vendor work; summer heat and load shedding affect grinding and polishing; budget in June. UAE: distributors’ demand rises ahead of the Dubai healthcare and dental exhibitions and Q4. Canada: dental and clinic suppliers follow the April to March public fiscal year.",
+ "care": [
+  "Never helps falsify or “arrange” CE, FDA, ISO or other certificates, test reports, markings or batch records; pi declines plainly and moves on.",
+  "No regulatory, sterilisation, clinical-use or material advice; pi notes the documentation effort only.",
+  "No advice on handling acids or chemicals for passivation; chemical exposure or burns are emergencies.",
+  "No help with misdeclaring goods, origin or value at customs.",
+  "Never stores vendor, worker, buyer or patient details; uses roles.",
+  "If someone describes a patient harmed by an instrument, pi points them to appropriate medical help and records only the business-side issue (complaint received) if the owner wishes.",
+  "Grinding injuries or fires: pi stops and points to emergency services."
+ ],
+ "build_ideas": [
+  "Lot tracker following each lot through forging, machining, heat treatment, filing, polishing, passivation and marking, with vendor and dates.",
+  "Vendor issue/receive ledger with counts, shortfalls and payments per stage.",
+  "Digital batch record built automatically as each stage is completed, exportable per shipment.",
+  "Inspection app recording results per lot and stage, rejection reasons and photos.",
+  "Order planner breaking mixed catalogue orders into lots and vendor jobs.",
+  "Item master with specs, drawings and marking instructions per catalogue number and buyer.",
+  "Laser marking job sheet checked against order before marking.",
+  "Packing list builder with scan-check against order.",
+  "Cost per item using steel, vendor rates and rejection rates.",
+  "Certificate and audit calendar with reminders and document folder.",
+  "Inquiry tracker for website and B2B leads with reply timers.",
+  "Updated digital catalogue with search by category and catalogue number."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our main problem is tracking. One forceps lot goes to forging, then filing, then polishing, all outside. I never know where it is."
+  },
+  {
+   "role": "pi",
+   "text": "Understood, noted: lots pass through several outside vendors and you can’t see where each one is. Roughly how many lots are moving through vendors at any time?"
+  },
+  {
+   "role": "Person",
+   "text": "Maybe 60 to 80."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, 60 to 80 lots in motion. When a lot comes back from a vendor, do the counts usually match what was sent?"
+  },
+  {
+   "role": "Person",
+   "text": "Often short by a few pieces, and nobody notices until packing."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, shortfalls found only at packing. Does that delay shipments, or do you usually manage to make up the pieces in time?"
+  }
+ ]
+}

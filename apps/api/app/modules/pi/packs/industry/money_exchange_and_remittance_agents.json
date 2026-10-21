@@ -1,0 +1,267 @@
+{
+ "key": "money_exchange_and_remittance_agents",
+ "name": "Money exchange and remittance agents",
+ "kind": "industry",
+ "sector": {
+  "code": "L",
+  "title": "Finance-adjacent, energy and utilities"
+ },
+ "signals": [
+  "money exchange",
+  "exchange company",
+  "exchange house",
+  "remittance",
+  "remittance agent",
+  "sub-agent of exchange company",
+  "currency counter",
+  "home remittance",
+  "payout counter",
+  "currency exchange",
+  "dollar rate",
+  "paisay bhejne",
+  "hawala",
+  "sarraf",
+  "sarafa shop",
+  "tahweel",
+  "foreign currency",
+  "FX counter",
+  "branch till",
+  "cash in transit"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Licensed exchange company, franchise/branch, or authorised sub-agent/payout location of a larger company.",
+  "Services offered: currency exchange, outward/inward remittance payout, both.",
+  "Number of counters and branches.",
+  "Which system is used for transactions (principal’s system, own software, manual register plus principal’s portal).",
+  "Number of counter staff and shifts.",
+  "Cash handling arrangement: own vault, cash-in-transit service, daily deposits.",
+  "Customer mix: walk-in, labour/expat workers, travellers, businesses."
+ ],
+ "scope_rule": "pi notes operational problems such as till mismatches, queues, staff shifts, cash-handling risk, reporting effort, coordination between branches and customer communication. It never discusses exchange rates, where rates are heading, when to buy or sell, how to move money, transfer limits, or compliance thresholds, and it never comments on any customer’s eligibility. It never asks for or stores customer names, IDs, beneficiary details, account numbers or transaction details, and never helps with anything that avoids KYC, reporting or licensing requirements (SBP, CBUAE, FINTRAC). Compliance work is noted only as “time spent on paperwork” or “record keeping effort”.",
+ "vocabulary": {
+  "Till / counter": "the cash drawer and terminal a staff member operates",
+  "Day-end closing": "counting cash and matching to the system at close",
+  "Short / excess": "cash below or above system figure",
+  "Payout": "handing over an inward remittance to the receiver",
+  "Principal": "the licensed company the agent works under",
+  "Float": "cash kept at the counter to run the day",
+  "CIT": "cash-in-transit service that moves cash to/from bank",
+  "KYC": "identity checks required on customers",
+  "Denomination": "note sizes the counter holds",
+  "Sarraf": "money changer (Arabic)",
+  "Tahweel": "transfer (Arabic)",
+  "Rate board": "displayed buy/sell rates"
+ },
+ "problems": [
+  {
+   "phrase": "Day-end closing never matches on the first count, and finding the difference takes an hour",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "One counter keeps coming up short and I cannot prove who",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "We hold too much cash at the branch overnight and it worries me",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Running out of certain notes or currencies mid-day and turning customers away",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Holding currency notes that hardly anyone asks for",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Moving currency between branches is done by phone and sometimes the count is wrong on arrival",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Queues on Fridays and after salary days are so long people walk out",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Customers call or WhatsApp all day asking ‘has my money arrived’",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "The principal’s system goes down and we write things on paper, then retype later",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "Entering the same transaction into the principal’s system and our own register",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Rate board changed late and staff used the old rate at the counter",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "I cannot see each branch’s volume and closing without driving there",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Daily reports to the principal take a staff member half a shift",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Record keeping for compliance is all paper files and hard to find later",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Licence and agent agreement renewals catch us by surprise",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Counter staff leave after training and new ones make mistakes",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "No clear rule for who is responsible for the till during a shift change",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Staff come late and the counter opens late on busy mornings",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "CCTV does not cover the counter properly and recordings get overwritten",
+   "category": "loss_security",
+   "subtype": "cctv_gaps"
+  },
+  {
+   "phrase": "Commission from the principal is hard to reconcile with our own counts",
+   "category": "cash_collections",
+   "subtype": "commission_reconciliation"
+  },
+  {
+   "phrase": "We have regulars who used to come every month and now use apps",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "No one knows our branch exists beyond the street",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "Customers complain about wait time and rude staff on Google",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Wanting to add another payout location but worried about control",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "day-end closing": [
+   "How often does the closing not match on the first count?",
+   "What do you usually do to find the difference?",
+   "How long does that take?"
+  ],
+  "till responsibility": [
+   "How many counters run in a normal shift?",
+   "How is the till handed over when the shift changes?"
+  ],
+  "cash holding": [
+   "Is the bigger worry running short of notes or holding too much?",
+   "How is cash moved to and from the bank today?"
+  ],
+  "queues": [
+   "Which days or times does the queue get worst?",
+   "What do customers do while they wait?"
+  ],
+  "customer enquiries": [
+   "Roughly how many “has it arrived” messages do you get in a day?",
+   "Who answers them?"
+  ],
+  "systems": [
+   "What do you use to record transactions besides the principal’s system?",
+   "What happens when that system is down?"
+  ],
+  "reporting": [
+   "Which reports do you have to send, and to whom?",
+   "How long do they take each day?"
+  ],
+  "branches": [
+   "How many locations do you run?",
+   "How do you check each one’s closing today?"
+  ],
+  "staff": [
+   "How long does a new counter staff member take to work confidently?"
+  ]
+ },
+ "seasons": "- PK: inward remittance payout spikes before Eid ul Fitr and Eid ul Adha, Ramadan, and at start of month when overseas workers are paid; foreign currency demand peaks before Hajj/Umrah and summer travel, and around student fee deadlines abroad. - UAE: outward remittance peaks around salary days (end/start of month), before Eid and before Diwali, Christmas and Onam for different expat communities; Fridays and weekends are busy. - Canada: remittance peaks around holidays (Christmas, Eid, Diwali) and month-end paydays; currency demand before winter and summer travel.",
+ "care": [
+  "Never give exchange rates, rate forecasts, timing advice or comparisons with other providers.",
+  "Never discuss transfer limits, reporting thresholds or how to structure transactions; if asked how to avoid reporting or KYC, pi declines plainly.",
+  "“Hawala/hundi” or unlicensed transfers: pi does not help, does not note it as a business process to improve, and keeps the conversation to legitimate operations.",
+  "Never asks for or stores customers’ or beneficiaries’ names, IDs, phone numbers, account numbers or transaction references.",
+  "Theft or shortage accusations: pi records the problem as a process issue without naming staff.",
+  "Robbery, threat or armed incident: pi stops and points to police/emergency services first.",
+  "Compliance and licensing (SBP, CBUAE, FINTRAC) questions are out of scope; pi notes the effort only.",
+  "Security details (vault location, cash-transport times) are not recorded; pi notes “cash moved too infrequently” in general terms."
+ ],
+ "build_ideas": [
+  "Shift and till handover log: opening float, handover counts, closing, with sign-off by role.",
+  "Day-end closing sheet by denomination with variance flagged and a short reason field.",
+  "Note and currency stock tracker per branch with low-level alerts and inter-branch transfer log with confirm-on-receipt.",
+  "Owner dashboard: daily closing status, variances, volumes by branch (aggregates only, no customer data).",
+  "Queue and footfall tally by hour to plan staffing.",
+  "Staff roster with shift times and late-arrival tracking.",
+  "Standard WhatsApp auto-reply for status questions that directs customers to the principal’s tracking channel, with no transaction data handled.",
+  "Daily report generator that compiles branch figures into the format the owner needs to send.",
+  "Records index: where each day’s paper files are stored and retrieval log.",
+  "Licence, agreement and certification expiry reminders.",
+  "Rate board update checklist with time-stamped confirmation per branch.",
+  "Incident log for shortages, excesses and system downtime."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Every evening closing doesn’t match. Sometimes short 2000, sometimes excess."
+  },
+  {
+   "role": "pi",
+   "text": "Got it — day-end closing not matching, noted. How many counters are running when that happens?"
+  },
+  {
+   "role": "Person",
+   "text": "Three counters, two shifts."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, three counters across two shifts. When the shift changes, how is the till handed over to the next person?"
+  },
+  {
+   "role": "Person",
+   "text": "Honestly they just tell each other, no count."
+  },
+  {
+   "role": "pi",
+   "text": "Thanks, noted — handover happens verbally without a count. Is the difference usually found in the end, or does it stay unexplained?"
+  }
+ ]
+}

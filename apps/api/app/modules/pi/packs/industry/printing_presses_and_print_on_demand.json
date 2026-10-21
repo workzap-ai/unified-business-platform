@@ -1,0 +1,258 @@
+{
+ "key": "printing_presses_and_print_on_demand",
+ "name": "Printing presses and print-on-demand",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "printing press",
+  "offset",
+  "digital print",
+  "flex/panaflex printing",
+  "screen printing",
+  "DTF/DTG",
+  "sublimation",
+  "visiting cards",
+  "packaging boxes",
+  "labels",
+  "stickers",
+  "wedding cards",
+  "plate",
+  "chapai",
+  "press wala",
+  "Urdu Bazaar",
+  "mutba’a ( ﺔﻌﺒﻄﻣ proof approval, reprint, print-on-demand, Etsy/Shopify POD orders, job card"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Offset, digital, large-format, screen/DTF, or a mix — and how many machines of each.",
+  "Mostly B2B (packaging, corporate, publishers) or walk-in/retail (cards, flex, wedding invitations).",
+  "In-house design team or customers bring ready files.",
+  "Number of jobs per day/week and typical run size (short runs vs long runs).",
+  "Whether post-press (lamination, die-cutting, binding, foiling) is in-house or outsourced.",
+  "Online POD channel or marketplace selling, and whether fulfilment is local or international.",
+  "Paper/board and ink bought on credit from a few dealers or imported."
+ ],
+ "scope_rule": "pi notes problems with job flow, quoting, proof approvals, wastage, paper stock, reprints, receivables, delivery and staff. It does not advise on copyright or trademark questions (e.g. whether a customer may print a brand logo), election or political printing rules, currency or document printing legality, or colour-management engineering. It never stores customers’ artwork contents, guest lists from wedding cards, or personal details of the people whose names appear on printed items. Requests to print fake documents, certificates, receipts, stamps or counterfeit packaging are refused plainly.",
+ "vocabulary": {
+  "job card": "the slip that follows a job through the press",
+  "CTP / plate": "printing plate made for each colour on offset",
+  "proof": "sample sent to the customer for approval before the run",
+  "gattay / board": "paperboard for boxes",
+  "rim / ream": "500 sheets of paper",
+  "wastage sheets / setting": "sheets lost while setting colours on the machine",
+  "die": "cutting tool for boxes and labels",
+  "panaflex": "vinyl banner printing",
+  "binding / lamination / UV": "finishing steps",
+  "Urdu Bazaar": "Karachi/Lahore print and paper market",
+  "advance": "deposit taken before starting a job"
+ },
+ "problems": [
+  {
+   "phrase": "Customer approved the proof on WhatsApp, now says colours are wrong and wants a reprint free",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "I don’t know which jobs are stuck at lamination or die-cutting right now",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Paper rates changed again and my quotes from last month are now loss-making",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Setting wastage is huge and nobody records it",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "We quote every job by hand on a calculator, takes too long, customers go elsewhere",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Corporate clients pay after 90 days, sometimes 120",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Board stock in the godown never matches what the register says",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "We ran out of a specific GSM in the middle of a big job",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Job files are in ten WhatsApp chats and the operator printed the old version",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "I can’t tell which customer or job type actually makes money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Outsourced die-cutting vendor delays everything",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Wedding season orders pile up and delivery dates slip",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Machine breaks down and the spare part takes two weeks",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Operators print extra copies on the side for their own customers",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "POD orders from the website don’t flow to the production queue, we retype them",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "International POD returns because of misprints eat our margin",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Advances taken in cash at the counter don’t always reach the books",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "I don’t know my machine utilisation — some sit idle, one is overloaded",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Good operators leave for Dubai or for a competitor",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "No one checks the first sheet against the proof before the run",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Leads come in on Instagram at night and nobody replies till noon",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Sales tax invoices and withholding on corporate jobs take my accountant days",
+   "category": "compliance_admin",
+   "subtype": "tax_filing_effort"
+  },
+  {
+   "phrase": "Dead stock of old-design boxes printed for a client who never collected",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "I have to be at the press to approve every quote",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  }
+ ],
+ "questions": {
+  "job flow": [
+   "Where does a job usually get stuck — design, plates, printing or finishing?",
+   "Roughly how many jobs are open at any time?",
+   "How do you know a job’s status today?"
+  ],
+  "quoting": [
+   "How do you work out a quote now?",
+   "How long does one take?",
+   "How often does the final cost come in above the quote?"
+  ],
+  "proofs and reprints": [
+   "How do customers approve proofs?",
+   "How often do reprints happen in a month?",
+   "Who carries the cost when it happens?"
+  ],
+  "wastage": [
+   "Is setting wastage recorded anywhere?",
+   "Does anyone compare it job to job?"
+  ],
+  "paper and board": [
+   "Who decides when to reorder paper?",
+   "Have you run short mid-job recently?",
+   "How do counts in the godown compare with the register?"
+  ],
+  "receivables": [
+   "Which customers are slowest to pay?",
+   "How are advances recorded at the counter?"
+  ],
+  "machines": [
+   "Which machine is the bottleneck?",
+   "How is breakdown time tracked?"
+  ],
+  "online/pod": [
+   "Where do online orders arrive?",
+   "How do they reach the shop floor?"
+  ],
+  "staff": [
+   "How do you know what each operator produced in a shift?",
+   "Has side-printing ever been a worry?"
+  ]
+ },
+ "seasons": "PK wedding season (October–March) drives cards and favours; Ramadan and Eid packaging and greeting runs; school and university session starts (books, registers, notebooks around March–April and August); calendar and diary season (November–January); election periods bring large flex/banner surges subject to rules. UAE: Ramadan and Eid packaging, National Day (2 December) branding, GITEX and trade-show season (October–March), back-to-school in late August. Canada: back-to-school, Black Friday and holiday POD peaks, tax-season form printing (February–April).",
+ "care": [
+  "Refuse plainly any request to print fake degrees, IDs, stamps, receipts, currency or counterfeit brand packaging; pi notes nothing about it beyond declining.",
+  "Copyright/trademark questions from customers: pi does not advise, just notes the operational issue (e.g. “jobs held up waiting for brand permission”).",
+  "Political and election printing: no advice on legal limits; note only workload or payment problems.",
+  "Do not collect wedding guest lists, student data or names printed on corporate cards.",
+  "Chemical, solvent and machine-guarding safety: no engineering advice; if someone is hurt or there is a fire, pi stops and points to emergency services (Rescue 1122 / 15 in PK, 999/997/998 in UAE, 911 in Canada).",
+  "Staff side-printing suspicions: note as a business issue, never record named accusations.",
+  "Customer artwork may be confidential; pi does not ask for files."
+ ],
+ "build_ideas": [
+  "Digital job card: each job’s stages (design, plates, print, lamination, die-cut, binding, dispatch) with status updates from the shop floor by phone.",
+  "Quote calculator: paper/board size, GSM, colours, quantity, finishing and current paper rates, producing a quote in minutes with margin shown.",
+  "Proof approval link: customer approves a specific version; the approved file and timestamp are locked to the job.",
+  "Paper and board stock register by GSM, size and brand, with reorder alerts and consumption per job.",
+  "Setting-wastage log per job and per operator, compared against an agreed allowance.",
+  "Machine board: which machine is running which job, idle time, breakdown log and spare-parts list.",
+  "Receivables tracker with ageing, advance received vs balance due, and WhatsApp reminders.",
+  "Job costing report: actual paper, plates, ink allowance, finishing and outsourced costs versus quote.",
+  "Outsourced vendor tracker for die-cutting, foiling and binding with promised and actual dates.",
+  "POD order bridge pulling Shopify/Etsy/website orders straight into the production queue with print files attached.",
+  "Counter cash and advance register that reconciles daily with the till.",
+  "Owner dashboard: open jobs, late jobs, today’s dispatches, cash collected, top customers by margin."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai sab se bara masla reprints ka hai. Customer WhatsApp pe proof OK karta hai phir baad mein kehta hai rang sahi nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, yeh kaafi thaka dene wali situation hai. Noted — proof approve hone ke baad reprints ki demand. Yeh mahine mein taqreeban kitni dafa hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "6-7 dafa to ho jata hai, aur zyada tar corporate jobs mein."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, 6–7 reprints a month, mostly corporate. Jab reprint hota hai to kharcha aam tor par kaun uthata hai — aap ya customer?"
+  }
+ ]
+}

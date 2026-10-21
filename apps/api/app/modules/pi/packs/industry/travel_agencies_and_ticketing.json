@@ -1,0 +1,272 @@
+{
+ "key": "travel_agencies_and_ticketing",
+ "name": "Travel agencies and ticketing",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "ticketing",
+  "GDS",
+  "Sabre",
+  "Amadeus",
+  "Galileo",
+  "PNR",
+  "BSP",
+  "IATA agent",
+  "consolidator",
+  "fare",
+  "reissue",
+  "refund",
+  "void",
+  "ADM",
+  "credit limit",
+  "group booking",
+  "visa file",
+  "hotel booking",
+  "travel insurance",
+  "corporate travel",
+  "ticket karwana hai",
+  "sasta ticket",
+  "visa lagwana",
+  "refund kab aayega",
+  "tadhkira",
+  "maktab siyaha",
+  "hajz"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "IATA-accredited, or buying through a consolidator or sub-agent arrangement.",
+  "Mix of business: tickets, visas assistance, hotels, packages, corporate accounts, students, labour travel.",
+  "Number of branches and counter staff, and whether sales staff work on commission.",
+  "Customer base: walk-in, diaspora families, corporate clients, sub-agents.",
+  "Systems: GDS, consolidator portals, back-office or accounting software, Excel.",
+  "Credit given to corporates or sub-agents.",
+  "Online presence: website, social media, WhatsApp only."
+ ],
+ "scope_rule": "pi notes business and operational problems: fare quoting speed, leads and conversion, refunds tracking, ADMs and ticketing errors, credit and collections, staff commissions, customer communication, reporting and systems. pi gives no immigration or visa advice, no legal or consumer-law advice, and no view on airline or regulator rules. It never stores travellers’ names, passport, CNIC or Emirates ID numbers, visa documents, card or bank details, and records roles (“corporate client”, “walk-in family”). pi refuses help with fake documents, fake bookings for visa applications, or ticket fraud.",
+ "vocabulary": {
+  "GDS": "booking system like Sabre, Amadeus or Galileo",
+  "PNR": "booking reference",
+  "BSP": "I ATA settlement where agents pay airlines",
+  "ADM": "debit memo an airline charges an agent for a ticketing error",
+  "reissue": "changing a ticket after it's issued",
+  "void": "cancelling a ticket the same day",
+  "consolidator": "larger agency that issues tickets for smaller ones",
+  "sub-agent": "smaller agent selling through you",
+  "group fare": "special price for 10+ passengers",
+  "markup / service fee": "agency's earning on a ticket",
+  "time limit": "deadline to issue before the booking cancels",
+  "credit shell": "airline credit kept after cancellation"
+ },
+ "problems": [
+  {
+   "phrase": "We get enquiries all day on WhatsApp but half never reply after the quote",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Customers compare our fare with OTAs and walk away",
+   "category": "sales_revenue",
+   "subtype": "price_competition"
+  },
+  {
+   "phrase": "Staff quote different markups to different people",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Airline ADMs keep arriving for mistakes made months ago",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "I don’t know real profit per ticket after commissions and ADMs",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "BSP payment is due before corporate clients pay us",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Corporate clients and sub-agents owe us and the list keeps growing",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Refunds take months from airlines and customers blame us",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "We lose track of which refunds and credit shells are still pending",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Bookings expire because nobody issued before the time limit",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Wrong name spellings or dates on tickets cost us reissue fees",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Staff commission calculations cause fights every month",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Good ticketing staff leave and take customers with them",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Each branch keeps its own sales register",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Daily sales report is put together from GDS reports and Excel by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Customer documents are stuck in staff phones",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Customers call for schedule changes and nobody informs them proactively",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "We have years of customers but never contact them again",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Facebook ads bring clicks but no bookings",
+   "category": "marketing_leads",
+   "subtype": "ad_spend_waste"
+  },
+  {
+   "phrase": "Our website is just a brochure, no one can book on it",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "Cash taken at the counter doesn’t match the day’s tickets",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Someone issued tickets on credit without approval",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "GDS, accounts and WhatsApp aren’t connected",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "IATA and licence renewal paperwork is a scramble every year",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Thinking of a second branch or going online but not sure which",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "enquiries": [
+   "Where do most enquiries come from?",
+   "How quickly do they get a quote?",
+   "What share books, roughly?"
+  ],
+  "pricing": [
+   "Who decides the markup on each ticket?",
+   "How do you know what each person charged?"
+  ],
+  "adms and errors": [
+   "How often do ADMs arrive?",
+   "What mistakes usually cause them?"
+  ],
+  "refunds": [
+   "How many refunds are pending right now, roughly?",
+   "How do you track each one?"
+  ],
+  "credit": [
+   "Who do you give credit to?",
+   "How long do they usually take to pay?",
+   "When is BSP due against that?"
+  ],
+  "staff": [
+   "How are commissions worked out?",
+   "Where do disputes usually come from?"
+  ],
+  "customers": [
+   "When a flight changes, how does the customer find out?",
+   "Do you ever contact past customers again?"
+  ],
+  "reporting": [
+   "How do you see today’s sales and profit?",
+   "How long does that take to put together?"
+  ],
+  "digital": [
+   "Can customers book or pay online today?",
+   "What would you want them to be able to do?"
+  ]
+ },
+ "seasons": "Eid ul Fitr and Eid ul Adha travel; summer diaspora travel June to August between Pakistan and the Gulf, UK and Canada; December holidays and Pakistani winter wedding season; Umrah peaks in Ramadan and school holidays; student season for UK, Canada and Australia intakes (August to September and January); UAE school holidays and summer outbound; Canadian March break, summer and Christmas; labour travel cycles to the Gulf; airline fare sales and fiscal year-end (June in Pakistan) affecting corporate travel budgets.",
+ "care": [
+  "No visa, immigration, work permit or travel-document advice; pi notes only the business problem (e.g. “visa files delayed”).",
+  "Refuses fake bookings for visa applications, forged documents, fake hotel confirmations, or helping people travel on wrong documents.",
+  "Never stores traveller names, passport, CNIC or Emirates ID numbers, visa copies, card numbers or bank details, even if the person pastes them; pi asks them not to share and refers to roles.",
+  "Card fraud or chargebacks: pi notes the loss, no legal or banking advice.",
+  "Labour travel and recruitment: pi stays out of anything that looks like exploitation or misrepresentation.",
+  "Traveller stranded or in danger abroad: pi points to emergency services and the relevant embassy or consulate, then stops."
+ ],
+ "build_ideas": [
+  "Enquiry tracker across WhatsApp, calls and walk-ins with quote sent, follow-up reminders and booked/lost reason.",
+  "Quote template generator with standard markup rules by route and customer type.",
+  "Ticketing time-limit alert board so bookings get issued or released before expiry.",
+  "Ticket profit view per sale: fare, commission, markup, ADMs and refunds netted.",
+  "ADM log with cause, staff role and cost, to show patterns.",
+  "Refund and credit shell tracker with status, age and customer update messages.",
+  "Corporate and sub-agent credit ledger with limits, ageing and reminders before BSP dates.",
+  "Commission calculator per staff from confirmed sales.",
+  "Daily branch sales dashboard pulling GDS reports and receipts.",
+  "Counter cash reconciliation against tickets issued.",
+  "Past customer re-contact flow (opt-in) for Eid, summer and Umrah seasons.",
+  "Schedule change notification flow to affected bookings.",
+  "Simple website with fare enquiry and payment link integration."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Refunds ka bohat masla hai, customers roz phone karte hain aur humein khud nahi pata kis ka refund kahan hai."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh kaafi thaka dene wala hai, aur customer ka gussa aap pe aata hai. Noted: pending refunds ka status pata nahi chalta. Is waqt taqreeban kitne refunds pending honge?"
+  },
+  {
+   "role": "Person",
+   "text": "Shayad 60, 70. Kuch to chhe mahine purane hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, kuch refunds kaafi purane ho chuke hain. Abhi in ko track kaise karte hain, register mein, Excel mein ya kisi ke dimagh mein?"
+  }
+ ]
+}

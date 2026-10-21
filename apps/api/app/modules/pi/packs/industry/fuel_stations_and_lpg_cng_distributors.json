@@ -1,0 +1,273 @@
+{
+ "key": "fuel_stations_and_lpg_cng_distributors",
+ "name": "Fuel stations and LPG/CNG distributors",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "petrol pump",
+  "filling station",
+  "fuel station",
+  "dealer",
+  "OMC",
+  "nozzle",
+  "dispenser",
+  "meter reading",
+  "totaliser",
+  "dip",
+  "dip stick",
+  "tank",
+  "shortage",
+  "gain/loss",
+  "evaporation",
+  "tanker",
+  "decanting",
+  "credit customers",
+  "fleet card",
+  "CNG station",
+  "LPG cylinders",
+  "gas ki agency",
+  "cylinder bharna",
+  "tuck shop",
+  "lube bay",
+  "tyre air",
+  "mahattat wuqud",
+  "bitrol",
+  "diesel",
+  "ghaz cylinder",
+  "ADNOC/ENOC style card",
+  "shift handover"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Whether they run a fuel station, CNG station, LPG cylinder distribution/agency, or several.",
+  "Number of sites, nozzles/dispensers and tanks.",
+  "Ownership model: dealer-operated on an oil company’s site, own site, or managed for an owner.",
+  "Ancillary businesses: tuck shop/convenience store, lube bay, car wash, tyre shop.",
+  "Credit customers and fleet accounts versus cash and card sales.",
+  "Number of attendants and shifts.",
+  "For LPG: number of cylinders in circulation, delivery vehicles and customer types (homes, restaurants, industry)."
+ ],
+ "scope_rule": "pi notes operational and business problems: shift-by-shift sales and cash reconciliation, meter and dip variances as a recording issue, tanker receiving checks as a process, credit customer collections, attendant management, cylinder tracking, delivery coordination, convenience store stock and reporting. pi does not give safety-engineering advice (tank, pressure, fire, gas leaks), environmental advice, licensing or explosives/regulator advice, pricing regulation advice, or tax advice. pi never stores customers’ or attendants’ personal details, card numbers, or fleet card PINs, and refers to people by role. Any mention of a leak, fire or explosion risk means pi stops and points to emergency services.",
+ "vocabulary": {
+  "Nozzle / dispenser": "the fuel pump unit and hose.",
+  "Totaliser / meter reading": "cumulative litres dispensed per nozzle.",
+  "Dip": "measuring fuel level in an underground tank with a stick or gauge.",
+  "Gain / loss": "difference between book stock and dip stock.",
+  "Decanting": "unloading a tanker into the tanks.",
+  "OMC": "oil marketing company supplying the station (Pakistan).",
+  "Dealer margin": "fixed or regulated margin the dealer earns per litre.",
+  "Shift handover": "the change of attendants with readings and cash counted.",
+  "Cylinder rotation": "LPG cylinders going out full and coming back empty.",
+  "Fleet card": "prepaid or credit card used by company vehicles.",
+  "Lube bay": "oil-change service point on the forecourt."
+ },
+ "problems": [
+  {
+   "phrase": "Meter readings and cash never match at shift change",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Dip stock and book stock differ every week and I don’t know why",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Tanker deliveries seem short but we don’t check properly",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Attendants fill and take cash without recording",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Card machine settlements don’t match the card sales recorded",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "Cash is kept on site too long before banking",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Credit customers and transporters owe us and keep delaying",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Fleet accounts need monthly statements I make by hand",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Fuel ran out on a busy day because order went late",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Supplier delivers late during shortages",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Margins are fixed so any loss hurts, I don’t see true profit",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Electricity and generator costs keep rising",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Tuck shop stock goes missing and expired items sit on shelves",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Attendants quit often; training new ones every month",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Shift rosters and overtime are a constant fight",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "LPG cylinders go out and don’t come back; I don’t know who has them",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Gas delivery orders come on calls and get missed",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Delivery riders skip customers or deliver late",
+   "category": "orders_fulfilment",
+   "subtype": "rider_management"
+  },
+  {
+   "phrase": "Customers complain about short filling",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Licences, inspections and calibration certificates come due and we scramble",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Daily sales report reaches me the next afternoon",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Three stations and I can’t compare them easily",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Dispenser breaks down and a nozzle is out for days",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Safety checklist exists but attendants don’t fill it",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Thinking of adding a convenience store or car wash but not sure",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "shift close": [
+   "What happens at shift change — who takes readings and counts cash?",
+   "How often do they not match?",
+   "By roughly how much?"
+  ],
+  "stock": [
+   "How often do you dip the tanks?",
+   "How do you compare that with what was sold?"
+  ],
+  "deliveries": [
+   "When a tanker arrives, what checks happen before unloading?"
+  ],
+  "collections": [
+   "How many credit or fleet customers do you have?",
+   "How do they get statements?",
+   "How long do they take to pay?"
+  ],
+  "cash and cards": [
+   "How long is cash kept on site before banking?",
+   "How do you match card settlements to sales?"
+  ],
+  "staff": [
+   "How many attendants per shift?",
+   "What’s the hardest part of managing them?"
+  ],
+  "lpg/cng": [
+   "How do you track cylinders that are out with customers?",
+   "How do delivery orders come in?"
+  ],
+  "shop and services": [
+   "Does the tuck shop or lube bay have its own stock count?"
+  ],
+  "reporting": [
+   "When do you see yesterday’s sales for each site?"
+  ]
+ },
+ "seasons": "Pakistan: fuel demand surges before Eid travel and long weekends; announced fortnightly price changes trigger rush buying before increases and hoarding concerns; CNG shortages and gas load-shedding in winter; LPG demand peaks in winter for heating and cooking, especially in the north and in areas without piped gas; harvest season raises diesel demand in rural areas. UAE: monthly fuel price announcements shift behaviour around month-end; summer heat and travel season; Ramadan changes forecourt and shop hours. Canada: summer driving season peaks, winter heating fuel and propane demand, long-weekend surges.",
+ "care": [
+  "Any mention of a leak, smell of gas, fire, cylinder explosion or injury → stop, tell them to contact emergency services and the supplier’s emergency line, and leave the business discussion.",
+  "No safety-engineering, tank, pressure, storage or calibration advice; note the checklist or record-keeping problem only.",
+  "Decline any request to tamper with dispensers, under-measure, adulterate fuel, refill or sell unauthorised cylinders, hoard during shortages, or evade price regulation.",
+  "No advice on licensing, regulator inspections, tax or dealer agreements with oil companies.",
+  "Never store attendants’ names, customers’ fleet card numbers or PINs.",
+  "Theft by attendants: note patterns; don’t encourage covert surveillance of individuals.",
+  "Do not quote fuel prices, margins or industry figures."
+ ],
+ "build_ideas": [
+  "Shift close app: attendants enter nozzle readings, cash, card and credit sales; variances computed and sent to the owner on WhatsApp.",
+  "Tank stock book: dips, deliveries and sales reconciled daily with gain/loss trend per tank.",
+  "Tanker receiving checklist with photos and recorded readings before and after decanting.",
+  "Credit and fleet customer ledger with automatic monthly statements and overdue reminders.",
+  "Card settlement reconciliation against recorded card sales.",
+  "Cash banking log showing cash held on site and deposits made.",
+  "LPG cylinder register: serial, customer type and location, with return tracking and deposit status.",
+  "Gas order capture over WhatsApp with rider assignment and delivery confirmation.",
+  "Attendant roster and attendance with overtime summaries.",
+  "Tuck shop stock and expiry tracking (nori daily read for the shop).",
+  "Licence, calibration and inspection reminder calendar.",
+  "Multi-site owner dashboard with litres, revenue, variances and receivables per station."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Every month the dip says we have less diesel than the books show. Small amounts but it adds up."
+  },
+  {
+   "role": "pi",
+   "text": "Those small gaps adding up every month would worry anyone — noted. How often are the tanks dipped right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Once a day in the morning, written in a register."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. When a tanker comes in, what gets checked and written down before it’s unloaded?"
+  }
+ ]
+}

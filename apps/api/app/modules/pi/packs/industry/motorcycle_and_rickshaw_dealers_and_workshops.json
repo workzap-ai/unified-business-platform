@@ -1,0 +1,265 @@
+{
+ "key": "motorcycle_and_rickshaw_dealers_and_workshops",
+ "name": "Motorcycle and rickshaw dealers and workshops",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "motorcycle",
+  "bike",
+  "70",
+  "125",
+  "CD 70",
+  "Honda ki dealership",
+  "rickshaw",
+  "chingchi",
+  "loader rickshaw",
+  "qingqi",
+  "electric bike",
+  "e- bike",
+  "scooter",
+  "dealership",
+  "booking",
+  "file",
+  "registration",
+  "number lagwana",
+  "instalments",
+  "qiston pe bike",
+  "mechanic",
+  "bike ki service",
+  "spare parts",
+  "tuning",
+  "chain sprocket",
+  "delivery bikes",
+  "scooter rental",
+  "darraja nariya",
+  "tuk-tuk",
+  "wakeel",
+  "Talabat/Deliveroo rider bikes"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Authorised dealer for a brand, multi-brand or used-bike dealer, or a workshop only.",
+  "What they sell or service: motorcycles, rickshaws (passenger/loader), electric bikes, scooters, delivery fleets.",
+  "Whether they sell on instalments themselves, via banks, or via third-party financiers.",
+  "Monthly units roughly, and stock held versus booked.",
+  "Workshop size: mechanics, whether they stock parts.",
+  "Customer mix: individual riders, delivery companies, rickshaw operators, fleet clients.",
+  "City or town, since many are in smaller cities and markets with cash-heavy trade."
+ ],
+ "scope_rule": "pi notes operational and business problems: stock and booking tracking, instalment collections as a records issue, registration and paperwork follow-up effort, workshop job and parts tracking, delivery-fleet servicing contracts, staff and cash control and marketing. pi does not advise on instalment or financing contracts, interest or Islamic finance structures, repossession law, vehicle registration rules, road safety or helmet laws, or technical repairs. pi never asks for or stores buyers’ CNIC, guarantor details, cheques, bank details or phone numbers, and refers to people by role (“an instalment customer”, “a guarantor”).",
+ "vocabulary": {
+  "Qist / qiston pe": "instalment / on instalments.",
+  "Guarantor / zamin": "person guaranteeing an instalment buyer.",
+  "File": "registration and ownership papers for the bike.",
+  "Number plate / registration": "getting the bike registered with the excise department (Pakistan).",
+  "Chingchi / qingqi": "motorcycle rickshaw used for passengers.",
+  "Loader": "goods-carrying rickshaw.",
+  "Tuning": "basic engine service and adjustment.",
+  "Free service": "warranty services due after purchase.",
+  "Booking amount": "advance to secure a bike.",
+  "Darraja": "Arabic for a bike/motorcycle.",
+  "Rider fleet": "bikes used by delivery riders, often serviced in bulk."
+ },
+ "problems": [
+  {
+   "phrase": "Instalment customers stop paying after 3–4 months",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Instalment records are in registers; I don’t know the total outstanding",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Recovery staff collect cash and don’t deposit it all",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Customers keep coming back asking when their number plate will be ready",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Registration files get lost between us and the agent",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Booked customers wait months because the company delays supply",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Popular colours run out, others sit",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "We’ve got unsold older models and nobody wants them",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Spare parts go missing from the workshop",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Fake parts come from the market and customers complain",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Free service coupons claimed but we can’t track them for the company",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Delivery companies send 30 bikes and want them back the same day",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Fleet service bills to delivery companies take ages to get paid",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Mechanics do work and don’t write it on the job card",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "I don’t know profit per bike after discounts and free helmets",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Price increases from the company come suddenly and we’ve already promised a price",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Few people walk in now; they check prices on Facebook",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "Facebook enquiries asking ‘price?’ never turn into sales",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Salesmen give extra discounts to close",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Cash payments at the counter don’t match the register",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Electric bike buyers ask about batteries and charging and we can’t answer well",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Everything is in my head and my register",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Rickshaw owners want service on credit and pay late",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "We want to open in the next town but can’t control cash remotely",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  }
+ ],
+ "questions": {
+  "sales mix": [
+   "Do you mostly sell for cash or on instalments?",
+   "Roughly how many bikes or rickshaws a month?"
+  ],
+  "instalments": [
+   "How do you keep track of each customer’s payments?",
+   "How much is overdue right now, roughly?",
+   "Who collects and how is it deposited?"
+  ],
+  "bookings and stock": [
+   "When the company delays supply, how do you keep booked customers informed?",
+   "Which models or colours run short most?"
+  ],
+  "paperwork": [
+   "How do you track where each customer’s registration file is?",
+   "How long does it usually take?"
+  ],
+  "workshop": [
+   "How many mechanics, and how are jobs written down?",
+   "Do parts used always reach the bill?"
+  ],
+  "fleet clients": [
+   "Do you service delivery or rickshaw fleets?",
+   "How quickly do they pay?"
+  ],
+  "margin": [
+   "After discounts and freebies, do you know what a bike earns you?"
+  ],
+  "leads": [
+   "Where do new buyers find you now?",
+   "Who answers the online enquiries?"
+  ],
+  "cash": [
+   "How is cash counted and checked each day?"
+  ]
+ },
+ "seasons": "Pakistan: sales rise before Eid al-Fitr and Eid al-Adha, around harvest seasons (wheat in April–May, cotton and rice in autumn) when rural buyers have cash, and before price increases or the June budget; monsoon season brings workshop work from water damage; rickshaw demand rises with rural transport needs. UAE: driven by delivery-rider fleets, with peaks in Ramadan and during major sales events; summer heat increases breakdowns and tyre/battery work. Canada: motorcycle season April–October, with winter storage and spring servicing peaks; e-bike and scooter sales rise in spring.",
+ "care": [
+  "No advice on instalment contracts, interest, Islamic finance compliance, repossession, or guarantor legal liability; note the collections and record-keeping problem only.",
+  "Never ask for or store buyers’ or guarantors’ CNIC, cheques, bank details, phone numbers or addresses.",
+  "Decline any request to register bikes with fake documents, sell stolen or non-duty-paid bikes, tamper with engine/chassis numbers, or harass defaulters.",
+  "Recovery staff behaviour: if threats or violence are mentioned, pi does not help with coercion; if anyone is in danger, point to police/emergency services.",
+  "No technical repair or safety advice (brakes, batteries on e-bikes, fires); battery fire or injury → emergency services.",
+  "Do not quote bike prices or financing figures."
+ ],
+ "build_ideas": [
+  "Instalment ledger per sale: amount, schedule, payments received, overdue days, with WhatsApp reminders to the customer.",
+  "Collection agent app recording cash collected per visit, reconciled to deposits.",
+  "Booking and stock tracker by model and colour, with supply status from the company and customer update messages.",
+  "Registration file tracker per sale with stage (submitted, with agent, ready) and collection notifications.",
+  "Workshop job cards with parts issued, linked to billing.",
+  "Parts stock register with reorder levels and supplier records.",
+  "Free service coupon log for claims with the brand.",
+  "Fleet servicing schedule and billing for delivery and rickshaw fleet clients, with ageing.",
+  "Per-unit margin view including discounts and freebies.",
+  "Online enquiry capture from Facebook and WhatsApp with follow-up reminders.",
+  "Daily cash-up against sales and collections, with owner summary on WhatsApp."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Qiston pe bikes deta hoon, 200 ke qareeb customer hain. Register mein likha hai, total baqaya kitna hai mujhe khud nahi pata."
+  },
+  {
+   "role": "pi",
+   "text": "Itne customers ka hisaab register mein rakhna waqai mushkil hai — noted. Qist ka paisa zyada tar customer khud dukaan pe deta hai ya aapka banda collect karta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Dono. Do larke recovery pe jaate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Jo paisa woh collect karte hain, woh kab aur kaise aap tak pohanchta hai?"
+  }
+ ]
+}

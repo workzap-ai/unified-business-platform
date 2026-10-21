@@ -1,0 +1,295 @@
+{
+ "key": "plastics_and_injection_moulding",
+ "name": "Plastics and injection moulding",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "plastics",
+  "injection moulding",
+  "blow moulding",
+  "extrusion",
+  "moulds",
+  "dies",
+  "saancha/ dai",
+  "cavities",
+  "cycle time",
+  "granules",
+  "dana",
+  "resin",
+  "PP",
+  "PE",
+  "HDPE",
+  "LDPE",
+  "PET",
+  "PVC",
+  "ABS",
+  "regrind",
+  "masterbatch",
+  "colour change",
+  "flash",
+  "short shot",
+  "sink marks",
+  "rejects",
+  "preforms",
+  "crates",
+  "household plastic",
+  "pipes",
+  "plastic ka maal",
+  "molds rental",
+  "OEM parts",
+  "bilastik"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Process: injection, blow moulding, extrusion (pipe, film), thermoforming, or a mix.",
+  "Products: household items, packaging (preforms, caps, containers), automotive/appliance parts, pipes and fittings, industrial.",
+  "Own products for dealers/market vs job-work/OEM parts for other manufacturers.",
+  "Number of machines (by tonnage roughly) and shifts.",
+  "Whether moulds are owned, customer-owned, or rented, and how many are active.",
+  "Raw material sourcing: imported resin via traders, local, recycled/regrind.",
+  "Power: grid, generator, solar."
+ ],
+ "scope_rule": "pi notes operational and business problems: resin price swings and shortages, machine and mould downtime, reject rates, colour and quality consistency, stock of finished items, OEM delivery schedules, dealer credit, power costs and production visibility. pi does not advise on food-contact or medical-grade compliance, material formulations or additives, recycling regulations, plastic bans, electrical or machine safety, or customs and tax. pi records roles and customer types, never names or personal details.",
+ "vocabulary": {
+  "dana/ granules": "plastic raw material pellets",
+  "resin": "polymer raw material (PP, HDPE, PET etc.)",
+  "masterbatch": "colour or additive concentrate mixed with resin",
+  "regrind": "crushed rejects or scrap reused as material",
+  "mould / saancha/ die": "the tool that shapes the part",
+  "cavity": "number of parts a mould makes per shot",
+  "cycle time": "seconds per shot",
+  "tonnage": "clamping force, indicating machine size",
+  "short shot / flash / sink marks": "common moulding defects",
+  "preform": "PET tube later blown into a bottle",
+  "job-work": "moulding parts for another company using their or your material",
+  "bilastik": "plastic (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Resin price changes every week and my price list is fixed for dealers",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Traders delay resin deliveries and the machines stand idle",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Dollar rate moves and resin cost jumps overnight",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Mould broke and the repair shop takes weeks",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "We don’t know actual cycle times vs what they should be",
+   "category": "reporting_visibility",
+   "subtype": "kpi_undefined"
+  },
+  {
+   "phrase": "Reject rate on some moulds is high",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Colour varies between batches, customer complains",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Colour changeovers waste a lot of material and time",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Regrind and scrap bags go missing",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Production per shift is written by operators, numbers look made up",
+   "category": "people_staff",
+   "subtype": "trust_honesty"
+  },
+  {
+   "phrase": "Night shift output is always lower",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Electricity bill is the biggest cost after resin",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Power cuts damage parts mid-cycle",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "OEM customer schedules change and we’re either rushing or idle",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Finished goods for dealers pile up in some items, out of stock in others",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Dealers get credit and payment is slow",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Customer-owned moulds — we lose track of which are where and their condition",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Don’t know cost per piece once rejects, power and labour are in",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Weight of parts drifts and we use more material than costed",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Packing count per carton is wrong, customer short-received",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "OEM customer wants inspection reports with each lot",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "No preventive maintenance, we fix things when they break",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Owner doesn’t know which machine or mould is profitable",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Operators leave for other factories in the same area",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "No catalogue for dealers; they ask on WhatsApp every time",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  }
+ ],
+ "questions": {
+  "raw material": [
+   "Where do you buy resin from?",
+   "How often does a delay stop the machines?",
+   "How do you know stock is running low?"
+  ],
+  "pricing": [
+   "When resin prices change, how quickly do your prices change?",
+   "Who decides that?"
+  ],
+  "machines": [
+   "How many machines are running and which give the most trouble?",
+   "How long does a typical stoppage last?"
+  ],
+  "moulds": [
+   "Which moulds break down most?",
+   "Is there a record of mould repairs?"
+  ],
+  "quality": [
+   "What are the most common defects?",
+   "Where are they caught?"
+  ],
+  "rejects and regrind": [
+   "What happens to rejects?",
+   "Is regrind weighed anywhere?"
+  ],
+  "output": [
+   "How is production per shift recorded?",
+   "Do you trust the numbers?"
+  ],
+  "costing": [
+   "Do you know cost per piece for your main items?",
+   "What’s the hardest part to estimate?"
+  ],
+  "customers": [
+   "Do you mostly make your own products or parts for other companies?",
+   "Which causes more headache?"
+  ],
+  "cash": [
+   "How long do dealers or OEM customers take to pay?",
+   "How is that tracked?"
+  ],
+  "power": [
+   "How do power cuts affect production?",
+   "Is there backup?"
+  ]
+ },
+ "seasons": "Pakistan: summer peak for water coolers, bottles and preforms for beverages (April to August); pre-Ramadan and Eid demand for household plastics and packaging; monsoon affects transport; summer load shedding and winter gas curtailment; budget in June changes resin duties; agricultural packaging around wheat (April to May) and rice harvests (October to November). UAE: beverage and food packaging demand peaks in summer and Ramadan; construction-linked pipe and fittings demand in cooler months; free zone exporters follow GCC and African demand. Canada: construction season for pipes and fittings (spring to autumn); packaging demand around the holiday season; winter energy costs.",
+ "care": [
+  "Burns, machine crush injuries, fires from heaters or electrical faults: pi stops and points to emergency services first.",
+  "No advice on food-contact, medical-grade or child-safe compliance, additives or formulations.",
+  "No help to label recycled material as virgin or misrepresent material grade; pi declines plainly.",
+  "No guidance on plastic bans, environmental rules or how to avoid them.",
+  "No customs, tax or under-invoicing help.",
+  "Never stores operator, dealer or customer personal details; uses roles.",
+  "When owners suspect operators of falsifying output, pi notes the record-keeping gap, not accusations about individuals."
+ ],
+ "build_ideas": [
+  "Machine-wise shift log on phone: mould, shots or pieces, rejects, downtime minutes and reasons.",
+  "Daily dashboard of output, reject percentage and downtime per machine and shift, sent to the owner.",
+  "Mould register: owner (own/customer), location, cavities, standard cycle time, repair history.",
+  "Resin and masterbatch stock with consumption per job and reorder alerts.",
+  "Regrind and scrap weighing log with gate pass matching.",
+  "Cost per piece calculator using resin rate, part weight, cycle time, power and reject rate.",
+  "Price list tool for dealers that updates with resin rates.",
+  "Finished goods stock by item and colour with dealer order matching.",
+  "OEM schedule board with customer delivery dates and machine allocation.",
+  "Lot-wise inspection record exportable for OEM customers.",
+  "Preventive maintenance calendar for machines and moulds with checklists.",
+  "Dealer ledger with credit limits and payment reminders.",
+  "WhatsApp catalogue for dealers with item photos and current availability."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Dana ka rate har hafte badalta hai, dealers ko purane rate pe maal de rahe hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted: resin ka rate barhta hai lekin dealers ka price list purana chal raha hai. Aap rate list kitni dafa update karte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "2-3 mahine baad, jab bohat farq aa jaye."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Kya aapko apne main items ka per piece cost abhi ke rate pe pata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Andaza hai, exact nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, per piece cost andaaze pe hai. Is mein sab se mushkil kya lagta hai — rejects, bijli ya mazdoori ka hisaab?"
+  }
+ ]
+}

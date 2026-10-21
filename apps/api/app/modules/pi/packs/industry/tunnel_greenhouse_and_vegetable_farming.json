@@ -1,0 +1,281 @@
+{
+ "key": "tunnel_greenhouse_and_vegetable_farming",
+ "name": "Tunnel, greenhouse and vegetable farming",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "tunnel farming",
+  "high tunnel / low tunnel",
+  "green house",
+  "sabzi",
+  "kheera",
+  "tamatar",
+  "shimla mirch",
+  "off-season sabzi",
+  "hydroponic",
+  "drip / drip irrigation",
+  "nursery trays",
+  "poly sheet",
+  "shade net",
+  "mandi bhejna",
+  "beopari",
+  "sabzi mandi",
+  "salad farm",
+  "Al Aweer market",
+  "sooq al khudar",
+  "mazra’a mahmiya",
+  "Canadian greenhouse / Leamington",
+  "microgreens",
+  "vertical farm",
+  "CSA box"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number and size of tunnels or greenhouses, and any open-field area",
+  "Main crops (cucumber, tomato, capsicum, leafy greens, strawberries, herbs) and how many cycles a year",
+  "Growing system: soil, drip, hydroponic, vertical",
+  "Selling route: mandi beopari, arhti, supermarkets, hotels and restaurants, direct boxes, online",
+  "Workforce size and whether a farm manager runs it",
+  "Power and water source (grid, solar, generator, well, tanker, desalinated water)",
+  "Whether they raise their own seedlings or buy from a nursery"
+ ],
+ "scope_rule": "pi notes business and operational problems: harvest and dispatch tracking, prices received versus market, wastage in transit and at buyers, supermarket and HORECA order and invoice management, labour scheduling, input and packing stock, utility and cooling costs, and owner visibility. pi does not advise on crop choice for profit, climate control settings, nutrient recipes, fertigation, pesticide or fungicide use or doses, pest and disease identification, or food-safety certification rules. It records buyer and staff roles, never names or personal numbers.",
+ "vocabulary": {
+  "tunnel": "a plastic-covered hoop structure for off-season vegetables",
+  "off-season": "growing outside the normal open-field window to catch high prices",
+  "poly sheet / shade net": "tunnel cover / sun-shading net",
+  "drip": "drip irrigation lines",
+  "nutrient tank": "mixing tank for hydroponic or fertigation systems (pi notes cost and breakdowns only)",
+  "beopari": "trader who buys at the farm gate or in the mandi",
+  "crate / tokri": "harvest crate / basket",
+  "HORECA": "hotels, restaurants and catering buyers",
+  "punnet / clamshell": "small plastic pack for berries and herbs",
+  "grade A / reject": "sortable quality classes",
+  "CSA box": "community supported agriculture subscription box (Canada)"
+ },
+ "problems": [
+  {
+   "phrase": "Cucumber price crashed the week our whole tunnel came on at once",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "I don’t know what each tunnel earns after costs",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Beopari sets the rate and I just accept it",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Supermarket rejects part of every delivery and deducts it later",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Hotel orders come on WhatsApp at midnight and we miss some",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Invoices to restaurants go unpaid for 60, 90 days",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Tomatoes rot in the van because delivery runs late",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Harvested quantity and dispatched quantity never match",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Electricity and cooling bills eat the margin in summer",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Generator diesel goes missing",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Poly sheet tore in the storm and replacement took weeks",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Seedlings from the nursery were poor and half the trays failed",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Packing punnets and labels run out before big orders",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Workers don’t follow the daily task list in each tunnel",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Labour leaves after Eid and I start from zero",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Pump or drip failure noticed only after the plants suffer",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Each buyer wants a different pack size and labelling",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Food-safety audit paperwork takes days to put together",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "I can’t see harvest per tunnel per week without calling the manager",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Box subscribers cancel and I don’t know why",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "No website, people find us only by word of mouth",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "We list on delivery apps but stock shown is wrong",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Want to add five more tunnels but not sure the last ones paid back",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Planting dates are guesswork, so everything ripens together",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Canada: seasonal staff shifts and hours are on paper",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Bank and lender want reports I can’t produce quickly",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  }
+ ],
+ "questions": {
+  "selling": [
+   "Who buys most of your produce right now?",
+   "How is the price set?",
+   "How quickly do they pay?"
+  ],
+  "buyer orders": [
+   "How do orders from shops or hotels reach you?",
+   "What goes wrong with them most often?"
+  ],
+  "rejections and wastage": [
+   "Where do you lose the most produce, at the farm, in transport, or at the buyer?",
+   "How do you find out how much?"
+  ],
+  "tunnel economics": [
+   "Do you track costs tunnel by tunnel or all together?",
+   "What would you most like to know per tunnel?"
+  ],
+  "harvest records": [
+   "Who records the daily harvest?",
+   "How does it reach you?"
+  ],
+  "utilities": [
+   "Which running cost worries you most, power, water or diesel?",
+   "How do you check it against use?"
+  ],
+  "inputs and packing": [
+   "How do you know when packing material or seedlings need ordering?",
+   "Has a shortage stopped a delivery?"
+  ],
+  "labour": [
+   "How many workers do you have across the tunnels?",
+   "How are tasks given and checked each day?"
+  ],
+  "maintenance": [
+   "How do you find out a pump or drip line has failed?",
+   "How long does a fix usually take?"
+  ],
+  "planning": [
+   "How do you decide what to plant and when?",
+   "What happened the last time several tunnels peaked together?"
+  ],
+  "direct customers": [
+   "Do you sell any produce directly to households?",
+   "How do they order and pay?"
+  ]
+ },
+ "seasons": "Pakistan: tunnel crops are planted in autumn and harvested through winter into spring (roughly November–April) to catch off-season prices; open-field vegetables flood mandis in their main seasons and depress prices. Ramadan lifts demand for salad vegetables and fruit; Eid causes labour gaps; monsoon storms damage covers. UAE: main growing season October–May; summer heat (June–September) means high cooling costs or a pause; hotel and restaurant demand rises with the winter tourism season, Dubai Shopping Festival and Ramadan iftars. Canada: greenhouse production runs most of the year with heating costs peaking in winter; farmers’ markets and CSA boxes run June–October; Thanksgiving and Christmas boost demand.",
+ "care": [
+  "No advice on pesticide, fungicide, fertiliser, nutrient solution, doses, pre-harvest intervals or disease control; pi suggests an agronomist or extension service.",
+  "No advice on food-safety, GAP or organic certification rules; pi notes only the paperwork effort.",
+  "Chemical exposure, gas build-up from heaters, electric shock from pumps, heatstroke in tunnels: pi tells them to contact emergency services (1122, 999/998, 911) immediately.",
+  "Never helps relabel produce as organic or local when it isn’t, or alter harvest dates on labels.",
+  "Does not record names, IDs or contact numbers of workers or buyers; uses roles.",
+  "Migrant and seasonal worker visa or permit questions are immigration matters; pi does not advise.",
+  "Pricing and market outlook: pi does not predict prices."
+ ],
+ "build_ideas": [
+  "Tunnel register: each tunnel with crop, planting date, expected harvest window and all costs logged against it",
+  "Daily harvest entry by WhatsApp: crates or kg per tunnel per day, with grade split",
+  "Dispatch and delivery sheet per buyer, with rejections recorded at the door and photos",
+  "Buyer ledger for supermarkets and HORECA: orders, invoices, deductions, payments due, with reminders",
+  "WhatsApp order intake for hotels and restaurants that turns messages into a confirmed order list for the morning",
+  "Planting calendar that shows which tunnels are due to peak in the same week",
+  "Packing and seedling stock tracker with reorder alerts",
+  "Utility and diesel log against generator and pump hours",
+  "Daily task checklist per tunnel for workers, with photo proof and a supervisor sign-off",
+  "Maintenance log for pumps, drips, fans and covers",
+  "Per-tunnel profit view by cycle",
+  "Subscription box system with weekly orders, skips and cancellation reasons captured",
+  "Audit document folder with a checklist of required records"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "I have 12 tunnels near Sheikhupura. Every season the cucumbers come in together and the mandi rate collapses."
+  },
+  {
+   "role": "pi",
+   "text": "That’s painful, the whole crop hitting the market in the same week. Noted. How do you decide the planting dates for each tunnel at the moment?"
+  },
+  {
+   "role": "Person",
+   "text": "Honestly we just plant when the labour is free."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, planting follows labour availability rather than a plan. Who do you mostly sell to, beoparis at the farm or the mandi directly?"
+  }
+ ]
+}

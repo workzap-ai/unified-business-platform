@@ -1,0 +1,277 @@
+{
+ "key": "study_abroad_and_education_consultants",
+ "name": "Study-abroad and education consultants",
+ "kind": "industry",
+ "sector": {
+  "code": "J",
+  "title": "Education and childcare"
+ },
+ "signals": [
+  "education consultant",
+  "study abroad",
+  "overseas education",
+  "admissions consultancy",
+  "university applications",
+  "counsellor",
+  "application fee",
+  "offer letter",
+  "conditional offer",
+  "unconditional offer",
+  "CAS",
+  "GTE",
+  "SOP",
+  "deposit",
+  "intake",
+  "commission from universities",
+  "agent",
+  "sub-agent",
+  "bahir parhai",
+  "admission karwana",
+  "consultant ki fees",
+  "file lagwana",
+  "mustashar dirasi",
+  "qubool jami’i",
+  "recruitment partner",
+  "aggregator portal",
+  "seminar",
+  "education fair"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Destinations they place students in (e.g. UK, Canada, Australia, US, Europe, Malaysia, Turkey, China, UAE universities).",
+  "Revenue model: student service fees, university commissions, both, or sub-agent arrangements.",
+  "Number of branches/cities and counsellors.",
+  "Roughly how many active applications per intake (count only).",
+  "Whether they also offer test prep, accommodation or travel booking (pi notes; no visa advice).",
+  "Lead sources: walk-ins, events/fairs, social ads, referrals, school partnerships, sub-agents.",
+  "Systems: CRM, Excel trackers, aggregator portals, university portals, WhatsApp."
+ ],
+ "scope_rule": "pi notes only the consultancy’s business and operational problems: lead handling, counsellor workload, application pipeline tracking, document collection workflow, commission and fee collection, sub-agent management, refunds, marketing ROI and branch visibility. pi gives absolutely no immigration, visa, study permit, CAS/GTE, financial-proof or eligibility advice, and never comments on a student’s chances of a visa or admission. pi never asks for or stores any student’s or parent’s name, passport, CNIC/Emirates ID, transcripts, test scores, bank statements, sponsor details or photos — students are often under 18, so roles and counts only. pi never helps with fake documents, fabricated bank statements, ghost-writing deception, or misleading claims about visa success.",
+ "vocabulary": {
+  "Intake": "university start period (Fall/September, Spring/January, May).",
+  "Offer letter": "university’s admission offer (conditional or unconditional).",
+  "Deposit": "tuition deposit paid to the university to secure the seat.",
+  "SOP": "statement of purpose written by the applicant.",
+  "CAS / GTE": "destination-specific application stages (pi notes the term only, no advice).",
+  "Commission": "fee the institution pays the agent after enrolment.",
+  "Sub-agent": "smaller agent passing students through a larger consultancy.",
+  "Aggregator portal": "platform used to apply to many institutions.",
+  "File": "a student’s full application case.",
+  "Counsellor": "staff member managing student files.",
+  "Refusal": "negative outcome on an application (pi notes as a business event only)."
+ },
+ "problems": [
+  {
+   "phrase": "Leads from education fairs sit in a pile and get called a week later.",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We spend heavily on Facebook ads and get many unqualified enquiries.",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "We can’t tell which marketing channel brings paying clients.",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Each counsellor tracks files in their own Excel.",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "When a counsellor leaves, their files and history leave with them.",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Students’ documents come in by WhatsApp and email and get lost.",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Same student details are typed into five university portals.",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Deadlines for intakes are missed because nobody had an overview.",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  },
+  {
+   "phrase": "University commissions arrive months later and some never arrive.",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We don’t track which enrolments are commission-eligible.",
+   "category": "reporting_visibility",
+   "subtype": "kpi_undefined"
+  },
+  {
+   "phrase": "Sub-agents dispute their share of commission.",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Client service fees are collected in installments and many stop paying.",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Refund demands after a negative outcome are handled case by case.",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Counsellor performance — I can’t see who converts and who doesn’t.",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Parents call me directly for updates because counsellors are slow.",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Students complain they get no updates on their application status.",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "One bad experience shared in a Facebook group hurt walk-ins.",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Branches in different cities follow different processes.",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Approval for discounts on service fees is informal.",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Policy changes in a destination country wipe out a whole intake’s pipeline.",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "USD/GBP/CAD commission income swings with exchange rates.",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Seminar and fair costs are high and I don’t know what they return.",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Contracts with universities and renewal dates are tracked in email.",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Our website enquiry form is broken half the time.",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "WhatsApp business number has thousands of unread chats in intake season.",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  }
+ ],
+ "questions": {
+  "leads": [
+   "Where do most enquiries come from?",
+   "How soon after enquiring does someone get a call?",
+   "How many turn into signed clients?"
+  ],
+  "pipeline": [
+   "How are files tracked today?",
+   "Can you see all active files in one place?"
+  ],
+  "documents": [
+   "How do students send documents?",
+   "Where do they get stored?"
+  ],
+  "deadlines": [
+   "Has an intake deadline been missed recently?",
+   "What caused it?"
+  ],
+  "commission": [
+   "How do you track which enrolments are owed commission?",
+   "How long do payments usually take?"
+  ],
+  "sub-agents": [
+   "Do you work with sub-agents?",
+   "How is their share worked out?"
+  ],
+  "fees and refunds": [
+   "Do clients pay a service fee?",
+   "How are refund requests handled?"
+  ],
+  "counsellors": [
+   "How many counsellors do you have?",
+   "How do you know who’s performing?"
+  ],
+  "updates": [
+   "How do students and parents get status updates?",
+   "Who handles them?"
+  ],
+  "branches": [
+   "How many offices?",
+   "Do they all work the same way?"
+  ]
+ },
+ "seasons": "- Main intakes: September/Fall (applications roughly October–June) and January/Spring (applications roughly June–October); some May intakes. - Pakistan: O/A Level and Inter results (August and around mid-year) drive enquiry spikes; education fairs cluster in October–November and February–March; Ramadan slows walk-ins; Eid breaks. - UAE: Grade 12 result period (June–July) and university fairs in autumn; summer travel period; Ramadan. - Canada (consultancies serving outbound or inbound students): September and January start rush; policy announcements can change demand quickly. - Destination policy changes cause sudden pipeline swings — pi notes the effect only.",
+ "care": [
+  "Zero immigration, visa, study permit, financial-requirement, CAS/GTE, or eligibility advice. If asked, pi says clearly it can’t advise on that and suggests a licensed/regulated adviser or the official government source, then returns to the business problem.",
+  "Never ask for or store passports, CNIC/Emirates ID, transcripts, scores, bank statements, sponsor letters, photos, or any student or parent personal details; roles and counts only.",
+  "Fake bank statements, forged transcripts/experience letters, ghost-written deception, fake offer letters, or misrepresentation to universities or authorities: pi declines immediately.",
+  "“Guaranteed visa” or “100% success” marketing: pi does not help create or endorse such claims.",
+  "Commission arrangements and sub-agent contracts: note tracking problems only, no legal advice.",
+  "Refund disputes after refusals: no consumer-law advice; note the process issue.",
+  "Minors travelling abroad: pi does not advise on guardianship or travel arrangements.",
+  "Any mention of a student in danger abroad or at risk: pi points to emergency services and the relevant embassy/consulate contact rather than discussing details."
+ ],
+ "build_ideas": [
+  "Consultancy CRM: every enquiry by source with first-response timer, counsellor assignment and stage tracking from enquiry to enrolment.",
+  "Fair and seminar lead capture via QR form, feeding the follow-up queue the same day.",
+  "Shared file pipeline per intake: institutions applied, offer status, deposit status, deadlines with alerts (case reference only in owner views).",
+  "Secure document collection portal with checklists per file, replacing WhatsApp attachments (stored under the consultancy’s own data controls).",
+  "Intake deadline calendar across all institutions and destinations.",
+  "Commission tracker: enrolments eligible, invoices raised to institutions, amounts expected, received and ageing, by currency.",
+  "Sub-agent statements with agreed splits and dispute log.",
+  "Service fee and installment ledger with reminders and refund request register.",
+  "Counsellor performance dashboard: files handled, conversion, average time per stage.",
+  "Student/parent status update flow on WhatsApp with templated stage messages.",
+  "Marketing ROI view: spend per channel and event vs signed clients and enrolments.",
+  "Contract and partnership renewal tracker for institution agreements.",
+  "Multi-branch dashboard with standard process checklists per stage."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "University commissions are a mess. Some come six months later, some never, and I don’t even know which students they’re owed for."
+  },
+  {
+   "role": "pi",
+   "text": "So money you’ve earned is hard to track and slow to arrive — noted. I won’t need any student details, just the shape of it. Where is the list of enrolled students kept right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Each counsellor has their own sheet."
+  },
+  {
+   "role": "pi",
+   "text": "Got it — spread across counsellors’ sheets, no single list. Roughly how many enrolments did you have in the last intake?"
+  }
+ ]
+}

@@ -1,0 +1,278 @@
+{
+ "key": "tractor_and_farm_machinery_dealers_and_rental",
+ "name": "Tractor and farm machinery dealers and rental",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "tractor",
+  "Massey",
+  "Fiat",
+  "New Holland",
+  "harvester / combine",
+  "thresher",
+  "rotavator",
+  "cultivator",
+  "laser leveller",
+  "seed drill",
+  "trolley",
+  "implement",
+  "spare parts / purzay",
+  "workshop / mistri",
+  "booking",
+  "kiraya / kiraye pe tractor",
+  "custom hiring",
+  "installments / qist",
+  "delivery",
+  "‘jarrar’",
+  "‘hasada’",
+  "Canadian equipment dealer",
+  "parts counter",
+  "service bay",
+  "used equipment",
+  "rental fleet"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Business type: authorised dealer, used-equipment trader, implement maker, rental / custom hiring operator, workshop, or a mix",
+  "Number of branches and service workshops",
+  "Rental fleet size and types (tractors, harvesters, laser levellers, threshers)",
+  "Whether they sell on instalments or arrange financing through a third party",
+  "Parts counter size and number of SKUs roughly",
+  "Field service: mobile mechanics or only workshop",
+  "Systems used: dealer system from the manufacturer, accounting software, registers"
+ ],
+ "scope_rule": "pi notes business and operational problems: bookings and utilisation of rental machines, operator logs and diesel, parts stock, workshop job tracking, delivery delays, instalment collections, warranty claims effort, sales leads and follow-up, and branch visibility. pi does not advise on machine safety engineering, repairs or technical specs, on financing terms, interest, leasing law, registration, tax or import duties, and does not give any agronomy advice on field operations. It does not record customers’ or operators’ names, CNICs, licence numbers or phone numbers.",
+ "vocabulary": {
+  "custom hiring / kiraya": "renting a machine with operator, charged per acre or per hour",
+  "implement": "attachment pulled by a tractor (cultivator, rotavator, drill)",
+  "laser leveller": "machine that levels fields for even irrigation",
+  "qist": "instalment payment",
+  "booking": "advance paid to secure a new tractor delivery",
+  "own money / premium": "extra paid over list price to get early delivery (pi notes, does not encourage)",
+  "purzay / spares": "spare parts",
+  "job card": "workshop record for a repair",
+  "warranty claim": "repair or part cost claimed back from the manufacturer",
+  "driver / operator": "person running a rental machine"
+ },
+ "problems": [
+  {
+   "phrase": "Customers booked tractors and delivery is months late, they keep calling",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Booking list is in a register and people get skipped",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Rental harvester sits idle one week and is double-booked the next",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Operator says he did 40 acres, the farmer says 30",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Operators take cash from farmers directly and don’t hand it all in",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Diesel use on rental machines doesn’t add up",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Machine breaks down in the field during peak harvest",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Parts counter runs out of fast-moving filters and belts",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Expensive parts lying unsold for years",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Parts go out of the workshop without a job card",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Instalment customers fall behind after a bad harvest",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Rental charges owed by farmers until harvest",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Warranty claims rejected because paperwork was incomplete",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Workshop jobs take too long and customers complain",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "Mechanic does private jobs using our tools",
+   "category": "people_staff",
+   "subtype": "trust_honesty"
+  },
+  {
+   "phrase": "Good mechanics leave for the Gulf",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Enquiries from Facebook and PakWheels never get followed up",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Used tractor listings get calls but I can’t tell which ad works",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Salesmen’s commission disputes on shared deals",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "I can’t see which branch sells and which only eats cost",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Rental pricing is different for every farmer depending on who quotes",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Manufacturer price increases eat my margin on booked units",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Imported parts stuck at the port",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Machine registration and documents chased one by one",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Rental machines moving between districts, I don’t know where they are",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Want to add more harvesters but not sure about utilisation",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "bookings and delivery": [
+   "How are new tractor bookings recorded today?",
+   "How do customers find out where they stand?"
+  ],
+  "rental utilisation": [
+   "How many machines do you rent out?",
+   "How do you know which ones are busy or idle?"
+  ],
+  "rental billing": [
+   "How are acres or hours measured on a job?",
+   "Who collects the money, and when?"
+  ],
+  "diesel and operators": [
+   "Who fills diesel for rental machines?",
+   "How do you check it against work done?"
+  ],
+  "workshop": [
+   "How are repair jobs logged?",
+   "How long does a typical job take, and what slows it?"
+  ],
+  "parts": [
+   "How do you know when a fast-moving part needs reordering?",
+   "How are parts issued to mechanics?"
+  ],
+  "collections": [
+   "Do you sell on instalments or credit?",
+   "What happens when a customer falls behind?"
+  ],
+  "warranty": [
+   "Who handles claims with the manufacturer?",
+   "Why do they usually get rejected?"
+  ],
+  "leads": [
+   "Where do most enquiries come from?",
+   "What happens to an enquiry after the first call?"
+  ],
+  "branches": [
+   "How do you compare your branches today?"
+  ],
+  "growth": [
+   "What would you need to know before adding more rental machines?"
+  ]
+ },
+ "seasons": "Pakistan: harvester and thresher demand peaks during wheat harvest (April–May) and rice harvest (October– November); laser levelling and land preparation before sowing (March–May and September–November); tractor sales tend to rise after harvests when farmers have cash, and around budget announcements that may change taxes. Monsoon limits field work. UAE: equipment sales and rental follow the cooler growing season and landscaping projects. Canada: spring seeding (April–May) and fall harvest (August–October) are peak service and rental times; winter is for servicing, parts pre-orders and trade-ins; year-end equipment purchases for tax planning (pi notes the timing, not the tax).",
+ "care": [
+  "Accidents involving tractors, rollovers, PTO entanglement, fires or crushing injuries: pi tells them to call emergency services (1122, 999/998, 911) immediately before anything else.",
+  "No advice on repair procedures, safety modifications, removing guards, or technical fixes; pi notes the downtime problem only.",
+  "No financing, interest, leasing or instalment-law advice; pi notes collection problems only.",
+  "Never helps tamper with hour meters, forge registration or import papers, disguise used machines as new, or avoid customs duty.",
+  "“Own money” premiums are a sensitive market practice; pi notes the customer-complaint impact without encouraging it.",
+  "Does not record names, CNICs, licence numbers or phone numbers of customers, operators or guarantors.",
+  "Repossession disputes: pi does not advise and notes only the operational burden."
+ ],
+ "build_ideas": [
+  "Booking queue for new tractors: booking date, model, advance received, expected delivery, with WhatsApp status updates to the customer",
+  "Rental fleet calendar: each machine’s bookings, location and status, with double-booking checks",
+  "Operator job log on phone: farm location check-in, acres or hours, photos, amount collected, signed off by the farmer by WhatsApp",
+  "Diesel log per machine against hours and acres",
+  "Workshop job cards with parts used, labour time and status, visible to the customer",
+  "Parts stock with minimum levels, reorder alerts and issue against job cards only",
+  "Instalment and rental receivables tracker with ageing and reminder messages",
+  "Warranty claim tracker with a document checklist per claim",
+  "Lead tracker pulling enquiries from WhatsApp, Facebook and listing sites, with follow-up reminders",
+  "Standard rental rate card shared with every branch",
+  "Branch dashboard: units sold, rental utilisation, workshop revenue, parts sales, outstanding amounts",
+  "Machine maintenance schedule by hours, with service due alerts"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamare paas 6 harvester hain kiraye ke liye. Season mein driver kehte hain itne acre kaate, lekin paisa poora nahi aata."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, kaam aur paise mein farq aa raha hai. Noted. Abhi acre kaun napta hai aur kahan likha jaata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Driver khud batata hai phone pe, kuch likha nahi jaata."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, acre ka koi record nahi, sirf driver ka bataya hua. Paisa kisan driver ko deta hai ya seedha aap ko?"
+  }
+ ]
+}

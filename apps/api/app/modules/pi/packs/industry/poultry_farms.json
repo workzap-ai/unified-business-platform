@@ -1,0 +1,291 @@
+{
+ "key": "poultry_farms",
+ "name": "Poultry farms (broiler and layer)",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "poultry farm",
+  "murghi khana",
+  "broiler",
+  "layer",
+  "flock",
+  "shed",
+  "control shed",
+  "open shed",
+  "EC shed",
+  "chooze",
+  "DOC",
+  "daana",
+  "feed",
+  "FCR",
+  "mortality",
+  "mortality zyada",
+  "anday",
+  "egg rate",
+  "tray",
+  "peti",
+  "dealer",
+  "integrator",
+  "contract farming",
+  "lifting",
+  "rate gir gaya",
+  "kaccha mal",
+  "dawajin",
+  "bayd",
+  "mazraat dawajin",
+  "cage system",
+  "brooding",
+  "litter",
+  "Golden Misri",
+  "desi murghi"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: broiler, layer, breeder, or desi/Golden; open shed vs environmentally controlled (EC) shed; cages or floor.",
+  "Capacity: number of sheds and birds per flock, flocks per year (broiler) or birds in production (layer).",
+  "Business model: own account, contract/integrator farming (chicks and feed supplied, paid per kg), or rented shed.",
+  "Who supplies chicks and feed, and on what credit terms.",
+  "Who buys: dealers, arhti, processors, retail shops, egg wholesalers, supermarkets.",
+  "Power: grid, generator, solar; how often outages hit.",
+  "Owner on site or absentee; number of shed workers and supervisors."
+ ],
+ "scope_rule": "pi notes operational and business problems: flock records, feed stock, mortality as a business loss, selling rates and payments, dealer credit, power and equipment downtime, staff and visibility. pi does not diagnose disease (for example Newcastle, bird flu, gumboro) or advise on vaccines, medicines, antibiotics, withdrawal periods, feed formulation, lighting programmes or biosecurity procedures; it suggests their vet or the company’s technical team. It never helps sell birds or eggs during withdrawal, hide disease or bypass food-safety rules. It records workers, dealers and integrators by role only and does not take ID or bank details.",
+ "vocabulary": {
+  "DOC / chooze": "day-old chicks",
+  "daana": "feed",
+  "FCR": "feed conversion ratio (kg feed per kg live weight)",
+  "lifting": "when buyers collect birds from the farm",
+  "rate": "daily live-bird or egg price, often shared on WhatsApp and printed in local papers",
+  "dealer": "middleman who supplies feed/chicks on credit and buys birds",
+  "integrator / contract farming": "company supplies chicks and feed, farmer grows for a fee",
+  "EC shed / control shed": "environmentally controlled house",
+  "peti / tray": "egg crate (30 eggs per tray)",
+  "litter": "floor bedding",
+  "dawajin": "poultry (Arabic); bayd — eggs (Arabic)",
+  "mortality": "birds that die, usually counted daily"
+ },
+ "problems": [
+  {
+   "phrase": "Mortality is shown on the board but I think workers under-report",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "Rate gir gaya jab lifting ka time aaya, sara profit chala gaya",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Dealer gives feed on credit then forces his rate when he buys the birds",
+   "category": "suppliers_purchasing",
+   "subtype": "credit_terms"
+  },
+  {
+   "phrase": "Dealer still owes me from two flocks back",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Feed bags received don’t match the bill",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Feed runs out on a Sunday and we wait two days",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "I don’t know my FCR until the flock is sold",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Generator failed at night in summer and we lost birds",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Diesel for generators is eating the margin",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Chick quality varies by hatchery and I can’t prove it",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Chicks arrive late or short in count",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Eggs break or go missing between shed and loading",
+   "category": "loss_security",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Egg count per shed doesn’t match the trays sold",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Egg prices crash in summer and we have stock piling",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Integrator’s settlement sheet is a mystery to me",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Workers skip the night round and nobody knows",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Supervisor left and the new one doesn’t follow the routine",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Lifting crew counts birds and I can’t verify weights",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Medicine and vaccine bills are huge and I can’t tie them to flocks",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "I run three farms and get updates by voice note only",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Can’t decide whether to place the next flock given rates",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Retail shops want delivery and credit, I’m losing them to competitors",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "Environment department and licence paperwork keep coming",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Want to convert to an EC shed but don’t know if the numbers work",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "setup": [
+   "Is it broiler, layer or both?",
+   "How many sheds and roughly how many birds?"
+  ],
+  "model": [
+   "Do you buy chicks and feed yourself or grow for a company?",
+   "On what terms?"
+  ],
+  "mortality": [
+   "How are daily deaths counted and reported?",
+   "When do you usually see the numbers?"
+  ],
+  "feed": [
+   "How are feed bags checked on arrival?",
+   "Has feed ever run out?"
+  ],
+  "selling": [
+   "Who usually lifts your birds or buys your eggs?",
+   "How is the rate decided on the day?",
+   "How quickly are you paid?"
+  ],
+  "dealer": [
+   "Does your dealer also give you feed or chicks on credit?",
+   "How does that affect what you get at sale?"
+  ],
+  "eggs": [
+   "How are eggs counted from shed to truck?",
+   "Where do breakages or shortages show up?"
+  ],
+  "power": [
+   "How often does power fail?",
+   "What happens to the birds when it does?"
+  ],
+  "staff": [
+   "How many workers per shed?",
+   "How do you know the night checks were done?"
+  ],
+  "costs": [
+   "Do you know your cost per bird or per egg before you sell?",
+   "Which cost changed most this year?"
+  ],
+  "multi-farm": [
+   "How do updates reach you from each farm?"
+  ],
+  "planning": [
+   "What makes you decide when to place the next flock?"
+  ]
+ },
+ "seasons": "- Pakistan: broiler demand and prices rise in winter (wedding season, colder weather) and often fall in summer; summer heat raises mortality and power costs; monsoon humidity adds disease pressure (noted only). - Ramadan raises chicken demand; Eid ul Adha typically depresses chicken demand for a week or two as homes have sacrificial meat. - Egg demand and prices are typically higher in winter and lower in summer in Pakistan. - Muharram, school holidays and Hajj season can shift demand locally. - UAE: summer heat drives cooling cost; Ramadan and tourist season (winter) lift demand; competition from imports affects prices. - Canada: supply-managed system with quotas for chicken and eggs; Thanksgiving, Christmas and Easter peaks; winter heating costs.",
+ "care": [
+  "No vaccines, medicines, antibiotics, dosing, withdrawal times or feed formula advice; suggest their vet or company technical team.",
+  "Disease outbreak or bird-flu suspicion: pi suggests contacting their vet and livestock department immediately and notes the business side later.",
+  "Never helps sell birds/eggs that should be withheld, hide mortality from integrators or insurers, or dodge environment or food rules.",
+  "Fire, gas or electrical hazards in sheds, or workers overcome by heat or ammonia: pi points to emergency services first.",
+  "Canada: no advice on quota rules or marketing board matters; notes admin effort only.",
+  "Records workers and dealers by role only; no CNIC or bank details.",
+  "Suspected lifting fraud or theft: pi notes control gaps, no covert surveillance."
+ ],
+ "build_ideas": [
+  "Flock register per shed: placement date, chick source and count, daily mortality, feed issued, weight samples.",
+  "Daily shed entry by WhatsApp or app with photo, rolled into an owner morning summary across farms.",
+  "Running FCR and cost-per-bird view from the farm’s own entries, updated daily.",
+  "Feed stock tracker: bags received vs billed, issue per shed, days of feed left, reorder alert.",
+  "Dealer/integrator ledger: chicks and feed on credit, birds lifted, weights, rates, settlement and balance.",
+  "Lifting record with bird count and weighbridge slip photo per vehicle.",
+  "Egg production log per shed with trays packed, breakages, dispatched and sold.",
+  "Night-round checklist with timestamps and generator run log; alerts if a round is missed.",
+  "Generator and equipment maintenance log with diesel use.",
+  "Daily rate log the owner can compare against their sales.",
+  "Retail customer order and delivery sheet with credit limits.",
+  "Flock-by-flock profit report the owner can compare over time."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamare 3 broiler sheds hain Sheikhupura mein, har flock mein loss ho raha hai lekin samajh nahi aata kahan."
+  },
+  {
+   "role": "pi",
+   "text": "Har flock mein loss aana bohat thaka dene wala hai. Chooze aur daana aap khud lete hain ya kisi dealer ya company se?"
+  },
+  {
+   "role": "Person",
+   "text": "Dealer se udhaar pe, aur wohi birds uthata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — daana aur chooze dealer se udhaar pe aate hain aur wohi lifting karta hai. Lifting ke din rate kaise tay hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Woh apna rate deta hai, hum kuch nahi kar sakte."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, rate dealer tay karta hai aur aapka us pe bas nahi chalta. Aapko flock ka poora hisaab kab milta hai — sale ke baad, ya beech mein bhi?"
+  }
+ ]
+}

@@ -1,0 +1,294 @@
+{
+ "key": "colleges_and_universities",
+ "name": "Colleges and universities (admin)",
+ "kind": "industry",
+ "sector": {
+  "code": "J",
+  "title": "Education and childcare"
+ },
+ "signals": [
+  "admissions office",
+  "registrar",
+  "enrolment",
+  "semester fee",
+  "fee challan",
+  "installment plan",
+  "scholarship",
+  "financial aid",
+  "need-based",
+  "merit list",
+  "entry test",
+  "transcripts",
+  "degree verification",
+  "convocation",
+  "hostel",
+  "transport",
+  "HEC",
+  "faculty",
+  "visiting faculty",
+  "timetable",
+  "credit hours",
+  "defaulters",
+  "semester fee jama",
+  "admission form",
+  "hostel allotment",
+  "rasoom dirasiya",
+  "tasjeel",
+  "CAA",
+  "MOE",
+  "international office"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: private university, degree college, affiliated college, or a branch campus; number of campuses.",
+  "Approximate enrolment and number of programmes (counts only).",
+  "Semester or annual system; fee collection channels and installment options.",
+  "Whether hostels, transport and cafeterias are run in-house or outsourced.",
+  "Faculty mix: permanent vs visiting, and roughly how many.",
+  "Current systems: campus management/ERP, LMS, Excel, paper files; whether they talk to each other.",
+  "Which office the person sits in (registrar, finance, admissions, owner/trustee)."
+ ],
+ "scope_rule": "pi notes administrative and business problems: admissions lead handling, fee and installment collection, scholarship administration effort, timetabling, visiting faculty payments, hostel and transport operations, document requests and reporting. pi never asks for or stores any student’s name, ID number, photo, CGPA, transcript, financial-aid circumstances or family details; nor faculty personal data — roles and counts only. It does not advise on accreditation, regulator (HEC, CAA/MOE, provincial ministry) compliance outcomes, academic policy, student-visa or immigration matters, or employment law. Wellbeing or safety incidents involving a student are pointed to emergency services and the institution’s student-welfare office.",
+ "vocabulary": {
+  "Registrar": "office keeping enrolment and academic records.",
+  "Merit list": "published ranked admission list.",
+  "Installment plan": "semester fee split across months.",
+  "Visiting faculty": "part-time teachers paid per course or per lecture.",
+  "Credit hours": "unit used to price and schedule courses.",
+  "Degree verification": "confirming a graduate’s degree for employers/HEC.",
+  "Hostel allotment": "assigning rooms to residential students.",
+  "Add/drop": "period when students change courses.",
+  "Semester freeze": "student pausing studies, affecting fees.",
+  "Convocation": "graduation ceremony.",
+  "Fee refund policy": "rules for returning fees on withdrawal."
+ },
+ "problems": [
+  {
+   "phrase": "Admission enquiries peak for six weeks and we can’t call everyone back.",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We spend on Facebook and newspaper ads but don’t know which brings enrolments.",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Applicants fill the online form but drop off before paying the admission fee.",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Installment students fall behind and finance only notices at exams.",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Fee payments come from five banks and matching takes the finance team days.",
+   "category": "cash_collections",
+   "subtype": "deposit_delays"
+  },
+  {
+   "phrase": "Scholarship and discount approvals sit with three people and take weeks.",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "We don’t know what each programme actually costs to run.",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Some programmes have very low enrolment and we keep running them.",
+   "category": "sales_revenue",
+   "subtype": "target_missed"
+  },
+  {
+   "phrase": "Visiting faculty claims for lectures don’t match the timetable.",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Faculty leave at semester end and recruitment starts too late.",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Timetable is built in Excel and room clashes appear in week one.",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Add/drop changes don’t reach finance, so fee bills are wrong.",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Transcript and degree verification requests pile up and take weeks.",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Same data is entered in admissions, registrar and finance separately.",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Our campus system and LMS don’t talk to each other.",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "The portal crashes on result day and registration day.",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "Monthly board reports are compiled by hand from different offices.",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "I can’t see enrolment, collections and dropout by campus in one place.",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Regulator data submissions take a whole team for weeks.",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Hostel rooms are allotted on paper and mess bills don’t reconcile.",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Hostel maintenance complaints go unanswered for days.",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Transport route changes are communicated by notice board and nobody reads them.",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Student services WhatsApp number gets hundreds of messages a day.",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Refunds for withdrawals are handled case by case with no tracking.",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Lab consumables are bought without any record of what is in stock.",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Alumni and past-student data is scattered, so we can’t reach them.",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Opening a new campus city, nothing about setup was standardised.",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  }
+ ],
+ "questions": {
+  "admissions": [
+   "Where do most applications start — website, social, walk-in, agents?",
+   "What happens between someone applying and paying?",
+   "Roughly how many drop off in that gap?"
+  ],
+  "fees": [
+   "How many students are on installments?",
+   "When do you usually find out someone is behind?",
+   "Who chases them?"
+  ],
+  "reconciliation": [
+   "How do payments reach you — which channels?",
+   "How long does matching take each month?"
+  ],
+  "approvals": [
+   "Which approvals take the longest — scholarships, refunds, discounts?",
+   "How many people sign off on each?"
+  ],
+  "programmes": [
+   "Do you know which programmes are profitable?",
+   "What makes that hard to work out today?"
+  ],
+  "faculty": [
+   "How are visiting faculty paid — per lecture or per course?",
+   "Where do disputes usually come from?"
+  ],
+  "timetable": [
+   "Who builds the timetable?",
+   "What usually goes wrong in the first week?"
+  ],
+  "records": [
+   "Which requests take longest — transcripts, verification, letters?",
+   "How many come in a typical month?"
+  ],
+  "systems": [
+   "Which systems do you use today?",
+   "Where do people re-type the same information?"
+  ],
+  "reporting": [
+   "What reports does the board or owner ask for?",
+   "How long do they take to compile?"
+  ],
+  "hostel/transport": [
+   "Are hostels and transport run in-house?",
+   "What’s the most common complaint?"
+  ]
+ },
+ "seasons": "- Pakistan: main intake Fall (August–September) with admissions June–August after intermediate results; Spring intake January–February in many universities; entry tests April–July; summer and winter breaks; Ramadan timings; convocations often in winter/spring. - UAE: Fall intake September (applications March–August), Spring intake January; summer slow; Ramadan reduced hours; strong international-applicant cycles. - Canada: September main intake (applications October–March), January intake; reading weeks in October/February; convocation June; fiscal year April–March for many institutions. - Peaks: result days, registration and add/drop weeks, semester fee due dates, convocation, regulator submission windows.",
+ "care": [
+  "Never request or retain student names, IDs, CGPA/grades, transcripts, financial-aid circumstances, or disability/health information; roles and counts only. Many first-year students may be minors.",
+  "No advice on student visas, study permits, immigration status or international-student compliance; pi notes only the administrative workload (e.g. “letters take too long”).",
+  "No advice on accreditation, regulator decisions, degree-equivalence, or academic integrity cases.",
+  "Faculty disputes, termination or contracts: note the process problem, no employment-law advice.",
+  "Requests to issue or backdate degrees, transcripts or attendance records, alter results, or fabricate enrolment letters: pi declines firmly.",
+  "Fee refund disputes: note the tracking problem; no legal advice on refund obligations.",
+  "Campus emergencies, harassment, protests turning unsafe, student self-harm mentions: pi stops, points to emergency services and the welfare office.",
+  "Covert monitoring of students’ or staff’s accounts or devices: pi declines."
+ ],
+ "build_ideas": [
+  "Admissions CRM: every enquiry and application by source, stage and counsellor with follow-up reminders and a funnel view per programme.",
+  "Applicant WhatsApp flow answering programme, eligibility and deadline FAQs, then routing to a human counsellor.",
+  "Installment and fee tracker with due-date reminders and an early-warning list finance sees weekly (account numbers, not names, in owner reports).",
+  "Multi-bank reconciliation matching challan/reference numbers to fee accounts and flagging unmatched receipts.",
+  "Approval workflow for scholarships, discounts and refunds with timestamps and a single sign-off trail.",
+  "Programme profitability view: enrolment, fee income and direct teaching cost per programme per semester.",
+  "Visiting-faculty claims matched against timetable and attendance logs before payment.",
+  "Timetable and room-allocation tool that flags clashes before publishing.",
+  "Add/drop to finance sync so fee bills update automatically.",
+  "Document request portal with queue, status and turnaround tracking.",
+  "Hostel module: room allotment, mess billing and maintenance tickets.",
+  "Owner/board dashboard: enrolment, collections, dropouts and costs by campus and programme.",
+  "Regulator submission workbook that assembles required counts from source data."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our biggest headache is installment students. Finance only realises someone hasn’t paid when admit cards are being issued."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a late warning — by then it’s a crisis rather than a reminder. Noted. Roughly how many students are on installment plans this semester?"
+  },
+  {
+   "role": "Person",
+   "text": "Around 900, out of about 3,000."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, about 900 on installments. Who’s responsible for following up with them at the moment?"
+  }
+ ]
+}

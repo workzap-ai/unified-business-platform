@@ -1,0 +1,266 @@
+{
+ "key": "juice_shakes_dessert_and_ice_cream_parlours",
+ "name": "Juice, shakes, dessert and ice-cream parlours",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "juice shop",
+  "juice corner",
+  "jooce",
+  "shakes",
+  "smoothies",
+  "falooda",
+  "kulfi",
+  "ice cream",
+  "gelato",
+  "frozen yoghurt",
+  "qulfi",
+  "waffles",
+  "crêpes",
+  "dessert bar",
+  "gola ganda",
+  "sugarcane juice",
+  "ganney ka ras",
+  "lassi",
+  "aseer booza",
+  "mahalabiya",
+  "cocktail juice",
+  "toppings",
+  "freezer",
+  "cone"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Product focus: fresh juice, shakes, ice cream (made in-house or bought), desserts, or a mix",
+  "Number of outlets and kiosks (malls, high streets, beaches)",
+  "Fruit buying: daily from the mandi/market, from a wholesaler, or frozen pulp",
+  "Freezer and display-cabinet capacity, and backup power",
+  "Delivery-app share",
+  "Opening hours and late-night trade",
+  "Staff per shift"
+ ],
+ "scope_rule": "pi notes operational problems: fruit spoilage, freezer stock, seasonal swings, recipes and portioning, staff, outlet comparison, delivery and cash. It does not give food-safety, cold-chain-compliance, sugar/health or allergen advice, nor licensing or tax advice. It never records customers’ or staff’s personal details or payment information.",
+ "vocabulary": {
+  "falooda": "layered dessert drink with vermicelli and ice cream",
+  "kulfi": "dense frozen milk dessert",
+  "gola ganda": "shaved ice with syrup",
+  "ganney ka ras": "sugarcane juice",
+  "cocktail": "in the Gulf, layered fruit and avocado juice, not alcohol",
+  "booza": "stretchy Levantine ice cream",
+  "pulp": "frozen fruit purée",
+  "scoop count": "portions per tub",
+  "topping bar": "add-ons charged per item",
+  "display freezer": "front cabinet showing flavours"
+ },
+ "problems": [
+  {
+   "phrase": "Mangoes and strawberries go soft and get thrown away",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Fruit prices change daily but our menu is fixed",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "I don’t know how many scoops we actually get from a tub",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Staff make shakes bigger than the recipe",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Freezer failed overnight and we lost all stock",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Load-shedding and generator fuel costs are huge",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Winter sales collapse",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Popular flavours run out on hot weekends",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Slow flavours sit for weeks and get freezer burn",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Cash short at night at the mall kiosk",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Staff drink and eat stock",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Ice cream melts on delivery, bad ratings",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Queue on summer evenings is so long people leave",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Kiosk staff don’t turn up on Friday nights",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Mall rent and percentage of sales eat the margin",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "Each outlet makes falooda differently",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "No idea which outlet is profitable",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Supplier of cones and cups lets us down in peak",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Instagram reels get views but I don’t know if they sell",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Cleaning and temperature checks aren’t logged",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Party and wedding dessert-stall orders come on WhatsApp and get mixed up",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Want to franchise the brand but there’s nothing written down",
+   "category": "planning_growth",
+   "subtype": "franchise_control"
+  },
+  {
+   "phrase": "Customers ask for loyalty but we have nothing",
+   "category": "customers_retention",
+   "subtype": "loyalty"
+  },
+  {
+   "phrase": "Wholesale ice-cream buyers (cafés, shops) pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  }
+ ],
+ "questions": {
+  "spoilage": [
+   "Which fruit or item gets thrown most?",
+   "How often do you buy it?"
+  ],
+  "costing": [
+   "Do you know the cost of a glass or scoop?",
+   "How often do you change prices?"
+  ],
+  "freezers": [
+   "How many freezers do you run?",
+   "What happens when power goes?"
+  ],
+  "consistency": [
+   "Do outlets follow the same recipe?",
+   "How do new staff learn it?"
+  ],
+  "seasons": [
+   "How much do sales drop in winter, roughly as you see it?",
+   "What have you tried in the slow months?"
+  ],
+  "stock": [
+   "Which flavours run out first?",
+   "Which ones sit too long?"
+  ],
+  "cash": [
+   "Where does the cash gap show up most?"
+  ],
+  "delivery": [
+   "What do delivery complaints say?"
+  ],
+  "outlets": [
+   "Can you see each outlet’s sales daily?"
+  ],
+  "events": [
+   "How do party and stall orders reach you?"
+  ]
+ },
+ "seasons": "- PK: summer (April–September) is peak for juice, falooda, kulfi, gola ganda and sugarcane; mango season (roughly June–August) drives mango shakes; Ramadan iftar brings juice and rooh afza -style drinks and late-night dessert trade; winter shifts to hot desserts, gajar ka halwa, dry-fruit shakes. - UAE: hot months raise juice and ice-cream volume but outdoor kiosks slow; cooler months lift beach and park kiosks; Ramadan evenings very busy; school holidays and long weekends in malls. - Canada: summer peak for ice cream and frozen desserts; many seasonal parlours close in winter; long weekends and heatwaves spike demand.",
+ "care": [
+  "Electrical faults with freezers, injuries from juicers or crushers, power failures in heatwaves affecting staff: pi points to emergency services if anyone is hurt.",
+  "Cold-chain, temperature-holding and food-safety rules: pi notes the record-keeping burden only.",
+  "Sugar, diabetes and “healthy” claims on menus: pi gives no health or nutrition advice.",
+  "Artificial colours or banned additives: pi does not advise, and will not help hide them.",
+  "Staff details and customer data: not collected.",
+  "Requests to reuse melted and refrozen stock to “avoid waste” for sale: pi does not advise on it and notes only the wastage problem."
+ ],
+ "build_ideas": [
+  "Daily fruit purchase log with price per kilo and yield per item, showing cost per glass",
+  "Scoop and portion yield tracker per tub/flavour",
+  "Flavour stock by outlet with reorder points and slow-mover flags",
+  "Freezer temperature and power-cut log with alerts for gaps",
+  "Recipe cards with portion sizes and photos for each item",
+  "Outlet sales dashboard with daily WhatsApp summary",
+  "Wastage log with reasons",
+  "Event and party order form with date, quantities and advance",
+  "Simple phone-number loyalty with visit counts for opted-in customers",
+  "Wholesale customer ledger with reminders",
+  "Seasonal menu planner comparing last year’s sales by month and product"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Garmiyon mein mango shake itna bikta hai ke aam khatam ho jate hain, aur kabhi itne bach jate hain ke kharab ho jate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — aam kabhi kam par jate hain aur kabhi zyada ho kar kharab ho jate hain. Aam aap kitne din baad khareedte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Roz subah mandi se."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted. Kitna lena hai ye kaun decide karta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Mera bhai, andaze se."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted. Kharab hone wale aam ka koi hisaab rakha jata hai ya nahi?"
+  }
+ ]
+}

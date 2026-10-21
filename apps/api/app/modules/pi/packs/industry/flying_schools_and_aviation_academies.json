@@ -1,0 +1,265 @@
+{
+ "key": "flying_schools_and_aviation_academies",
+ "name": "Flying schools and aviation academies",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "flying club",
+  "flight school",
+  "PPL",
+  "CPL",
+  "ATPL ground school",
+  "type rating",
+  "simulator",
+  "sim hours",
+  "solo",
+  "cross-country",
+  "instructor",
+  "CFI",
+  "dual hours",
+  "Cessna",
+  "aircraft availability",
+  "weather cancellation",
+  "student batch",
+  "fee instalment",
+  "cadet programme",
+  "pilot banna hai",
+  "ghante poore nahi hue",
+  "instructor nahi mila",
+  "madrasat tayaran",
+  "tadreeb"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of training aircraft and simulators, and owned versus leased.",
+  "Courses offered: PPL, CPL, instrument, multi-engine, ATPL theory, cabin crew, AME, drone.",
+  "Number of active students and instructors, and full-time versus part-time instructors.",
+  "Where students come from: local, overseas, airline cadet sponsorship.",
+  "Fee model: upfront package, per-hour, instalments, sponsor-paid.",
+  "Base airfield and whether it is shared with other traffic.",
+  "Systems used for scheduling, fees and records."
+ ],
+ "scope_rule": "pi notes business and operational problems: scheduling of aircraft, instructors and simulators, cancellations, fee collection, student enquiries and conversion, course progress visibility, maintenance downtime from a scheduling point of view, staff retention and reporting. pi never advises on airworthiness, flight safety, training syllabus approval, instructor or student licensing, medical fitness, or how PCAA, GCAA or Transport Canada would interpret requirements. It never stores student or instructor names, ID or passport numbers, medical certificates, licence numbers or logbook details, and refers to roles such as “PPL student” or “senior instructor”. Visa and immigration questions for overseas students are out of scope.",
+ "vocabulary": {
+  "PPL / CPL / ATPL": "private, commercial and airline transport licence stages",
+  "dual hours": "flying with an instructor",
+  "solo": "student flying alone",
+  "cross-country": "training flight to another airfield",
+  "ground school": "classroom theory",
+  "sim": "flight simulator session",
+  "CFI": "chief flying instructor",
+  "slot / booking": "a reserved training session",
+  "wx cancel": "session cancelled for weather",
+  "checkride": "test flight with an examiner",
+  "batch": "intake group of students",
+  "cadet": "student sponsored by an airline"
+ },
+ "problems": [
+  {
+   "phrase": "Students take twice as long to finish because slots keep getting cancelled",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Bookings are on a whiteboard and WhatsApp, and we double-book aircraft",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Aircraft are down for maintenance and nobody tells the students until they turn up",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Instructors leave for airline jobs as soon as they build hours",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "We can’t find enough instructors for the batch we’ve taken",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Instructor pay per hour is calculated by hand and they dispute it",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Students fall behind on instalments and keep flying anyway",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Parents call every week asking how far their child has got",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Students complain they don’t know their progress or remaining hours",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Lots of enquiries from ads, very few actually enrol",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Enquiries on Instagram and WhatsApp sit unanswered for days",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We don’t know cost per flying hour once fuel, maintenance and instructors are in",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Fuel prices jump and our package prices were fixed months ago",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Spares for training aircraft come from abroad and ground the fleet for weeks",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Sim sits idle in the mornings and is overbooked in the evenings",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Ground school attendance is on paper and hard to track",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Student records are in files and Excel, and finding hours flown takes ages",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Regulator inspections mean a week of pulling paperwork together",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Insurance and aircraft document renewal dates catch us by surprise",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Fuel uplift doesn’t match hours flown",
+   "category": "loss_security",
+   "subtype": "fuel_leakage"
+  },
+  {
+   "phrase": "Overseas students drop out mid-course and want refunds",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "We get bad reviews about delays to course completion",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Website is outdated and doesn’t show courses or fees clearly",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  },
+  {
+   "phrase": "Thinking of adding aircraft or a sim but can’t tell if utilisation justifies it",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "scheduling": [
+   "How are flying slots booked today?",
+   "What happens when a slot gets cancelled?",
+   "How do students find out?"
+  ],
+  "aircraft downtime": [
+   "How often is an aircraft unexpectedly unavailable?",
+   "Who tells the schedule when that happens?"
+  ],
+  "instructors": [
+   "How many instructors do you have against how many students?",
+   "Where do they tend to go when they leave?"
+  ],
+  "fees": [
+   "Do students pay upfront, per hour or in instalments?",
+   "What happens when instalments fall behind?"
+  ],
+  "progress": [
+   "How does a student or parent check how many hours are done?",
+   "How long does it take your team to answer?"
+  ],
+  "enquiries": [
+   "Where do most enquiries come from?",
+   "How quickly do they usually get a reply?",
+   "What share actually enrols, roughly?"
+  ],
+  "costs": [
+   "Do you know your real cost per flying hour?",
+   "Which cost has moved most this year?"
+  ],
+  "records and admin": [
+   "Where do student hours and records live?",
+   "How long does inspection prep take?"
+  ],
+  "growth": [
+   "Are you thinking of more aircraft, a sim or new courses?",
+   "What would you need to see to decide?"
+  ]
+ },
+ "seasons": "Intakes often follow the school year: after A Level and Intermediate results (August to October in Pakistan), and September/January intakes for UAE and Canadian schools; Pakistani winter fog (December to January) and summer monsoon (July to August) cause cancellations; UAE summer heat limits midday flying and shifts training to early mornings, while October to April is peak flying season; Canadian winter weather reduces flying and spring/summer is peak; Ramadan reduces daily schedules; Eid holidays pause training; airline hiring waves drive enquiry spikes and instructor departures.",
+ "care": [
+  "Flight-safety incident in progress (accident, missing student solo flight, emergency landing, injury): pi stops and directs to emergency services and the school’s emergency procedures.",
+  "pi never comments on airworthiness, flight safety, weather decisions, syllabus approval, student readiness for solo or checkride, medical fitness or licensing, and never interprets PCAA, GCAA or Transport Canada rules.",
+  "Never stores student or instructor names, CNIC/Emirates ID/passport numbers, medical certificate details, licence or logbook data; roles only.",
+  "Never helps falsify logbooks, inflate hours, backdate records or issue fake certificates.",
+  "Overseas student visas: out of scope; pi notes only the business impact (e.g. delayed starts).",
+  "Many students are young adults and parents pay; pi stays respectful and doesn’t record family details.",
+  "Refund disputes: pi notes the operational problem, gives no legal or consumer-law advice."
+ ],
+ "build_ideas": [
+  "Online booking board for aircraft, instructors and sims, preventing double bookings and showing availability by phone.",
+  "Cancellation and rebooking flow: automatic WhatsApp notices to affected students with next available slots.",
+  "Aircraft availability link from maintenance status so grounded aircraft drop off the schedule.",
+  "Student progress portal showing hours flown by type, stages completed and remaining hours (role-based, no ID data stored).",
+  "Fee and instalment tracker with reminders and a rule flag when a student flies while overdue.",
+  "Instructor hours and pay calculator from completed sessions.",
+  "Lead tracker for enquiries from ads, website and WhatsApp with follow-up reminders and conversion view.",
+  "Cost per flying hour dashboard combining fuel, maintenance, instructor and fixed costs.",
+  "Fuel uplift versus hours flown reconciliation per aircraft.",
+  "Ground school attendance capture by QR or phone check-in.",
+  "Renewal tracker for insurance, aircraft documents and school approvals.",
+  "Inspection document pack builder from stored records.",
+  "Utilisation report per aircraft and sim to support expansion decisions."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Students yaar bohat late finish kar rahe hain, aadhe slots cancel ho jate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh sakta hoon, is se students bhi pareshan aur cash flow bhi atakta hai. Noted: cancelled slots se course completion late ho rahi hai. Zyada tar cancel kis wajah se hote hain, mausam, aircraft ya instructor?"
+  },
+  {
+   "role": "Person",
+   "text": "Aircraft maintenance mein chala jata hai aur students ko pata hi nahi chalta."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, aircraft down ho to schedule tak khabar nahi pohnchti. Abhi maintenance wale schedule wale ko kaise batate hain?"
+  }
+ ]
+}

@@ -1,0 +1,264 @@
+{
+ "key": "microfinance_field_operations",
+ "name": "Microfinance field operations",
+ "kind": "industry",
+ "sector": {
+  "code": "L",
+  "title": "Finance-adjacent, energy and utilities"
+ },
+ "signals": [
+  "microfinance",
+  "MFI",
+  "field officer",
+  "loan officer",
+  "credit officer",
+  "recovery",
+  "collections",
+  "group lending",
+  "village organisation",
+  "branch manager",
+  "area manager",
+  "portfolio",
+  "PAR",
+  "overdue",
+  "disbursement",
+  "qist",
+  "wasooli",
+  "field visit",
+  "recovery officer",
+  "qarz",
+  "qarza",
+  "baaji",
+  "community organisation"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Whether they are an MFI head office, a branch/area team, or an NGO running a microfinance programme.",
+  "Number of branches and field officers.",
+  "Group lending, individual lending or both (without asking about products or rates).",
+  "How collections happen: cash in the field, branch counter, bank/wallet, mix.",
+  "What system records the work (core banking/MIS, Excel, paper registers).",
+  "Areas covered: urban, peri-urban, rural, distances officers travel.",
+  "Whether field officers use smartphones or tablets."
+ ],
+ "scope_rule": "pi notes field operations problems such as officer visibility, visit planning, cash carried by officers, register-to-system data entry, reporting lag, staff turnover and coordination between branch and head office. It never advises on loan products, interest or service charges, who should get a loan, credit scoring, recovery tactics or legal action against borrowers. It never asks for or stores borrowers’ names, CNIC, addresses, phone numbers, loan amounts per person or repayment histories, and records only aggregates or roles (“a group in one village”, “about 400 active clients per officer”). Regulation (SECP/SBP for MFBs and NBMFCs) is out of scope.",
+ "vocabulary": {
+  "Qist": "instalment",
+  "Wasooli": "collection/recovery",
+  "Field officer / FO / credit officer": "staff who form groups, disburse and collect",
+  "PAR": "portfolio at risk, share of loans overdue",
+  "Disbursement": "release of loan funds",
+  "Group / CO": "borrowers’ group or community organisation",
+  "Centre meeting": "regular group meeting where collection happens",
+  "MIS": "management information system",
+  "Day-end": "when officers return cash and records to branch",
+  "Area manager": "supervises several branches",
+  "Overdue list": "clients past due date (pi notes only counts)"
+ },
+ "problems": [
+  {
+   "phrase": "I do not know where my field officers actually are during the day",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Officers say they visited a group but the collection does not match",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Officers carry a lot of cash back to branch and it is risky",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Cash comes to branch late in the evening and deposits get pushed to the next day",
+   "category": "cash_collections",
+   "subtype": "deposit_delays"
+  },
+  {
+   "phrase": "Collections written in a register in the field are typed into the MIS days later",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Overdue figures are a week old by the time head office sees them",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Branch reports and MIS numbers never agree",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "Head office keeps asking for the same report in a different format",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Field officers leave after a year and take relationships with them",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Hard to hire officers who will travel to remote areas",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "New officers do the paperwork wrong and files get returned",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Disbursement files wait for approval at area office for days",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Documents for a file go missing between branch and head office",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Officers’ travel and fuel claims are hard to verify",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  },
+  {
+   "phrase": "Visit plans are made in a notebook, some groups get skipped",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Clients complain they were not informed of meeting changes",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Complaints from clients reach the branch manager late or not at all",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Instructions from head office get lost in WhatsApp groups",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "No way to compare branches fairly on daily activity",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Branch manager is the only one who knows how everything works",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "The MIS is old and officers cannot use it in the field",
+   "category": "tech_systems",
+   "subtype": "outdated_system"
+  },
+  {
+   "phrase": "Flood or bad weather and we cannot reach areas, plans fall apart",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Some staff are suspected of collecting and not depositing, but no proof",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Opening new branches but setting them up takes months of paperwork and training",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  }
+ ],
+ "questions": {
+  "field visibility": [
+   "How many field officers does each branch have?",
+   "How do you know which groups they visited today?",
+   "When do you find out a visit was missed?"
+  ],
+  "collection matching": [
+   "How does a collection get from the field into the system?",
+   "Where does it most often go wrong?"
+  ],
+  "cash handling": [
+   "How do officers bring cash back to the branch?",
+   "What time does it usually reach the bank?"
+  ],
+  "reporting": [
+   "Which report do you need most and don’t get on time?",
+   "How old is it by the time you see it?"
+  ],
+  "data entry": [
+   "Who types the field registers into the system?",
+   "How long does that take each day?"
+  ],
+  "staff": [
+   "How long do officers usually stay?",
+   "What is hardest for a new officer in the first month?"
+  ],
+  "approvals": [
+   "Where do files wait the longest before disbursement?"
+  ],
+  "coordination": [
+   "How do head office instructions reach field staff today?",
+   "What gets missed?"
+  ]
+ },
+ "seasons": "- PK: collections and new demand follow harvest cycles (wheat in April–May, cotton and rice in October–November) in rural areas; Eid ul Adha drives livestock-related activity; Ramadan changes centre meeting times; monsoon (July–September) and floods disrupt field access; financial year closes 30 June with heavy reporting. - Many programmes also slow during wedding season and school admission periods as clients’ cash is stretched. - UAE and Canada: microfinance field operations are uncommon; pi treats any such case the same way and notes only operations.",
+ "care": [
+  "Never advise on interest, pricing, loan sizes, eligibility, credit decisions or how to recover dues.",
+  "Never record borrowers’ personal details, loan amounts per client, or any details of client hardship.",
+  "If an owner describes harassment of borrowers, coercive recovery, or a borrower in distress, pi does not help design pressure tactics; it notes the process concern neutrally and, if there is danger to life, points to emergency services.",
+  "Suspected staff fraud: pi notes the control gap, never names or judges individuals.",
+  "Do not record officers’ live locations or personal phone numbers; note “field visibility” only.",
+  "Officer safety in remote areas or carrying cash: if someone is in immediate danger, pi stops and points to emergency services.",
+  "Regulatory and reporting obligations are out of scope beyond noting effort."
+ ],
+ "build_ideas": [
+  "Field visit app: officer’s planned groups for the day, check-in on arrival, visit completed/not completed, with simple reasons.",
+  "Collection capture on phone at the centre meeting with totals by group (not per-client data in the pack) feeding the branch day-end.",
+  "Branch day-end cash handover and deposit log with time stamps and variance flags.",
+  "Daily branch dashboard: visits planned vs done, collections vs due (aggregate), deposits made.",
+  "Area/head office comparison view across branches.",
+  "File movement tracker: where each disbursement file is, who has it, how long it has waited.",
+  "Document checklist per file type to cut returns.",
+  "Fuel and travel claim log tied to recorded visits.",
+  "Head office circulars channel with read confirmation instead of loose WhatsApp groups.",
+  "Officer onboarding checklist and short process guides.",
+  "Client complaint log at branch with escalation timers.",
+  "Disruption log for weather/flood days and rescheduled visits."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamare FOs subah nikal jate hain, shaam ko aate hain, beech mein kuch pata nahi chalta."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — din mein field officers ki visibility nahi hoti, noted. Ek branch mein taqreeban kitne FOs hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Har branch mein 8 se 10."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, 8–10 per branch. Kisi group ka visit miss ho jaye to aap ko kab aur kaise pata chalta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Jab hafte baad report aati hai ya client khud shikayat kare."
+  },
+  {
+   "role": "pi",
+   "text": "Theek, noted — miss hua visit hafte baad ya complaint se pata chalta hai. Field ki collection system mein kaise aur kis waqt enter hoti hai?"
+  }
+ ]
+}

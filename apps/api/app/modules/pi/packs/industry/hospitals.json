@@ -1,0 +1,294 @@
+{
+ "key": "hospitals",
+ "name": "Hospitals (operations and admin)",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "hospital",
+  "private hospital",
+  "trust hospital",
+  "general hospital",
+  "ward",
+  "bed occupancy",
+  "admission",
+  "discharge",
+  "ER",
+  "OPD",
+  "OT",
+  "ICU beds",
+  "billing counter",
+  "bill clear nahi hua",
+  "admit",
+  "discharge slip",
+  "mustashfa",
+  "qism",
+  "panel",
+  "TPA",
+  "pre-authorisation",
+  "claim rejection",
+  "HIS",
+  "MR department",
+  "housekeeping",
+  "biomedical"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Size: number of beds, wards, operating theatres and whether there is an emergency department",
+  "Ownership: family-owned, doctor-partners, trust/charity, investor-backed, part of a group",
+  "Payer mix: cash, corporate panel, insurance/TPA, government schemes (e.g. health card programmes in Pakistan), self-pay in Canada private clinics",
+  "Which departments are in-house versus outsourced (lab, radiology, pharmacy, cafeteria, housekeeping, security)",
+  "Current hospital information system, if any, and which modules are actually used",
+  "Number of staff roughly and whether nursing is in-house or through agencies",
+  "Single site or multiple sites"
+ ],
+ "scope_rule": "pi notes the hospital’s non-clinical operations: admissions and discharge paperwork, billing, insurance and panel receivables, bed management as a logistics problem, purchasing and stores, pharmacy stock as inventory, rosters, housekeeping and maintenance, reporting and internal coordination. pi does not touch clinical decisions, treatment pathways, infection-control protocols, drug choices, dosing, or patient safety judgements, and it does not interpret health regulations or accreditation standards. pi never asks for or records a patient’s identity, medical record number, diagnosis, room number tied to a person, or any health information. Anything that sounds like a live medical emergency is redirected to the hospital’s own emergency team or emergency services immediately.",
+ "vocabulary": {
+  "admission / admit": "patient being taken into a ward",
+  "discharge summary / discharge slip": "paperwork when the patient leaves",
+  "final bill / bill clearance": "settling the account before discharge",
+  "advance / deposit": "money taken on admission",
+  "pre-auth": "insurer approval before admission or procedure",
+  "package": "fixed-price procedure rate",
+  "panel": "corporate or institution that pays for its employees",
+  "MR / medical records": "department holding patient files",
+  "HIS": "hospital information system",
+  "biomedical": "team maintaining medical equipment",
+  "stores / central store": "main warehouse for consumables and supplies",
+  "indent": "internal request from a ward to the store",
+  "occupancy": "share of beds in use",
+  "bed turnover": "how quickly a bed is freed and readied"
+ },
+ "problems": [
+  {
+   "phrase": "Discharge takes six hours because the bill isn’t ready",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Beds are empty on paper but full in reality, nobody updates the board",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "Insurance rejections are eating our month",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Government health-card claims are stuck and we’ve already done the work",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Panel companies dispute bills months later",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Patients leave without clearing the final bill",
+   "category": "cash_collections",
+   "subtype": "bad_debt_walkouts"
+  },
+  {
+   "phrase": "Package rates don’t cover what we actually spend on some procedures",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Wards indent the same item twice and the store issues both",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Expensive consumables disappear between the store and the OT",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Pharmacy stock expires on the shelf while we buy more of it",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Suppliers short-supply and we only notice when a ward complains",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Purchase approvals sit with the MD for days",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Nursing roster is made on paper and changes every day",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Agency nurses’ hours don’t match what the agency bills us",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "We lose good nurses to the Gulf and Canada every year",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Equipment breaks and nobody knows when it was last serviced",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Electricity and generator diesel is our second biggest cost",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Every department has its own Excel and none of them agree",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "I get the monthly numbers on the 20th of the next month",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "We paid for an HIS but billing still uses the old software",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Attendants call ten numbers to find out a bill amount",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Complaints get lost between the ward, admin and the MD’s office",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  },
+  {
+   "phrase": "Housekeeping checklists are signed but rooms aren’t actually ready",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Licence, fire, waste-disposal and equipment certificates all renew at different times",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Accreditation visit means two weeks of chasing paperwork",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "OPD has grown but parking and reception haven’t",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Ambulance and referral calls come to random staff phones",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  }
+ ],
+ "questions": {
+  "discharge and billing": [
+   "Where does a discharge usually get stuck?",
+   "Who has to sign off before the bill is final?",
+   "How long does that normally take?"
+  ],
+  "bed management": [
+   "How does admin know which beds are free right now?",
+   "Who updates that, and how often?"
+  ],
+  "receivables": [
+   "Which payers owe you the most at the moment?",
+   "When a claim is rejected, what are the usual reasons?",
+   "Is anyone following up each one?"
+  ],
+  "stores and pharmacy": [
+   "How do wards request supplies from the store?",
+   "How do you find out about items going missing or expiring?"
+  ],
+  "purchasing": [
+   "Who approves purchases, and up to what level?",
+   "What usually slows that down?"
+  ],
+  "staffing": [
+   "Which roles are hardest to keep filled?",
+   "How is the nursing roster made and shared?"
+  ],
+  "maintenance": [
+   "How does a broken piece of equipment get reported?",
+   "Is there a record of when each item was last serviced?"
+  ],
+  "reporting": [
+   "What do you look at to know how the hospital did this month?",
+   "When does that reach you?"
+  ],
+  "systems": [
+   "Which parts of your HIS do people really use?",
+   "Where do they go back to paper or Excel?"
+  ],
+  "patient attendants": [
+   "How do families find out about bills or discharge timing?",
+   "Which questions do they ask most often?"
+  ],
+  "compliance admin": [
+   "Which renewals or inspections cause the most scramble?",
+   "Who keeps track of the dates?"
+  ]
+ },
+ "seasons": "- Dengue and post-monsoon infections in Pakistan (roughly August to November) and winter respiratory surges in Pakistan and Canada drive admissions and bed pressure. - Summer heat waves in Pakistan and the UAE raise emergency footfall; power load and generator costs peak at the same time. - Eid holidays thin out staff, delay insurer and panel processing, and cause pre-holiday elective surgery rushes. - Ramadan shifts OPD timings and staff rosters. - UAE: medical tourism and elective procedures pick up in the cooler months (October to April); many residents travel in July and August. - Canada: winter (December to March) is the peak for emergency and inpatient pressure; fiscal year-end on 31 March affects budgets and purchasing. - Fiscal year-end in Pakistan (30 June) brings audits, supplier reconciliations and budget approvals.",
+ "care": [
+  "Any mention of a patient deteriorating, an emergency case waiting, or a threat to someone’s life: pi stops and says to alert the hospital’s emergency team or call emergency services (1122/115, 998/999, 911) right away.",
+  "pi gives no view on clinical care, staffing ratios as a safety matter, infection control, or whether a death or complication was avoidable; those are noted only as “an incident the owner is worried about” if raised.",
+  "No patient identities, MR numbers, bed-to-patient links, diagnoses or images; pi asks the person not to share them.",
+  "Staff are referred to by role only; disputes involving named doctors or nurses are recorded without names.",
+  "Requests to inflate bills, add services not given, alter claim codes, change discharge dates or bypass inspections are refused; pi does not note them as problems to solve.",
+  "Accreditation and regulator questions (PHC, DHA, DOH, MOHAP, provincial bodies) are admin effort only; pi does not interpret standards.",
+  "Medical-legal disputes or complaints threatening legal action are noted as a complaint-handling problem; pi gives no legal advice.",
+  "Union or labour disputes are noted neutrally as staff communication or turnover issues."
+ ],
+ "build_ideas": [
+  "Bed board on screen and phone showing each bed’s status (occupied, discharge pending, cleaning, ready) by ward, with no patient details displayed",
+  "Discharge workflow tracker: each clearance step (pharmacy return, lab, final bill, insurer approval) with timestamps and who is holding it by role",
+  "Insurance and panel receivables tracker with claim ageing, rejection reasons, resubmission dates and payer-wise summaries",
+  "Ward indent and central store system with approval, issue, receipt confirmation and ward-wise consumption reports",
+  "Pharmacy and consumables expiry register with near-expiry alerts and transfer suggestions between stores",
+  "Purchase request and approval chain on WhatsApp with limits per role and a log of who approved what",
+  "Nursing and support-staff roster with swaps, leave and agency-hours reconciliation against agency invoices",
+  "Biomedical asset register: each piece of equipment, service dates, breakdowns, downtime and vendor contacts",
+  "Housekeeping room-ready checklist with photo confirmation and supervisor sign-off",
+  "Monthly management dashboard: admissions, occupancy, average length of stay as an admin metric, revenue by payer and department, receivables ageing",
+  "Attendant information line on WhatsApp for bill estimates, visiting hours and discharge status by token, without clinical content",
+  "Complaint log with owner role, deadline and closure note, visible to the MD",
+  "Compliance and renewal calendar for licences, fire safety, waste contracts and equipment certifications",
+  "Connector between the HIS billing module and the accounts system so totals agree"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our biggest headache is discharge. Patient is ready by 11 but family is still sitting at 5 waiting for the bill."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a long gap, and I can imagine the families aren’t happy about it. Noted. Where does it usually get stuck between 11 and 5?"
+  },
+  {
+   "role": "Person",
+   "text": "Mostly insurance final approval, and pharmacy returns not being entered in time."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, two holds: insurer final approval and pharmacy returns not posted. Noted. Who on your side is meant to chase the insurer once the file is sent?"
+  }
+ ]
+}

@@ -1,0 +1,303 @@
+{
+ "key": "retail_shops_and_chains",
+ "name": "Retail shops and chains (general merchandise, multi-branch)",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "branches",
+  "outlets",
+  "chain",
+  "store manager",
+  "POS",
+  "stock count",
+  "godown",
+  "warehouse",
+  "transfer",
+  "shrinkage",
+  "maal kam nikla",
+  "stock match nahi ho raha",
+  "branch se report nahi aayi",
+  "cashier ne gadbad ki",
+  "sale gir gayi",
+  "naya outlet",
+  "farq aa gaya",
+  "mahal",
+  "far3",
+  "jard",
+  "mudeer al far3"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of branches and whether there is a central warehouse or each branch buys for itself.",
+  "Rough number of SKUs and whether items are barcoded.",
+  "What POS or accounts system is used at each branch, and whether branches share one system.",
+  "Who runs each branch (owner family member vs hired manager).",
+  "Share of sales that are cash vs card vs online/WhatsApp orders.",
+  "Country and city spread (one city, several cities, cross-border).",
+  "Whether the owner visits branches daily or manages remotely."
+ ],
+ "scope_rule": "pi notes operational and business problems: stock mismatches, branch performance gaps, cash reconciliation, transfers, staffing, reporting delays and system gaps. pi does not give tax, sales-tax registration, FBR POS integration legal advice, employment law or lease advice, and does not tell the owner whether a specific person is stealing. pi records roles (branch manager, cashier, storekeeper), never staff or customer names, phone numbers or ID numbers. Questions on rent negotiations, licensing law or VAT treatment are noted as an admin pain only.",
+ "vocabulary": {
+  "godown": "storeroom or warehouse",
+  "maal": "goods, stock",
+  "farq": "difference, mismatch",
+  "munshi": "bookkeeper or clerk",
+  "khata": "ledger, usually handwritten",
+  "transfer note / gate pass": "paper slip moving stock between branches",
+  "shrinkage": "stock lost with no sale recorded",
+  "closing": "end-of-day cash and sales count",
+  "stock-taking / jard": "physical count (jard in Gulf Arabic)",
+  "dead stock": "items that have not moved for months",
+  "incharge": "person in charge of a branch or section",
+  "far3": "branch (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Every stock count, the main branch is short and nobody can explain it",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "We send maal from godown to branch, half the time the branch says it never came",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "One branch is always out of fast movers while another has a pile of the same thing",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "There’s a whole room of stuff that hasn’t sold in a year",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "I don’t know what stock I have right now without calling every branch",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "The new outlet in the mall isn’t doing anything close to the old one",
+   "category": "sales_revenue",
+   "subtype": "branch_underperforming"
+  },
+  {
+   "phrase": "Prices on the shelf and prices in the POS don’t match, customers fight at the counter",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Managers give discounts to their own people",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Closing cash never matches the POS by a few thousand",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Branch managers sit on cash for two, three days before depositing",
+   "category": "cash_collections",
+   "subtype": "deposit_delays"
+  },
+  {
+   "phrase": "I can’t tell which category actually makes money after rent and salaries",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Rent went up on two outlets and I don’t know if they’re still worth it",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "We have no idea who our regular customers are",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "We run ads for a sale but can’t tell if anyone came because of them",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Suppliers deliver short and the storekeeper signs anyway",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Purchase orders are on WhatsApp, nobody knows what’s pending",
+   "category": "suppliers_purchasing",
+   "subtype": "po_tracking"
+  },
+  {
+   "phrase": "Each branch buys whatever it feels like",
+   "category": "suppliers_purchasing",
+   "subtype": "buying_wrong_items"
+  },
+  {
+   "phrase": "Staff turnover is so high I’m training new cashiers every month",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Salespeople fight over commission on the same customer",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Opening and closing checklists are on paper and never filled",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Sales reports from branches come in a week late, in different formats",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "I can’t compare branches side by side",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Each branch has a different POS and none talk to each other",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Everything runs on one Excel file that one guy controls",
+   "category": "tech_systems",
+   "subtype": "excel_dependency"
+  },
+  {
+   "phrase": "Voids and returns at one counter are way higher than the rest",
+   "category": "loss_security",
+   "subtype": "void_refund_abuse"
+  },
+  {
+   "phrase": "CCTV is there but nobody checks it and half the cameras don’t work",
+   "category": "loss_security",
+   "subtype": "cctv_gaps"
+  },
+  {
+   "phrase": "Instructions I give in the group get lost and branches do their own thing",
+   "category": "communication_coordination",
+   "subtype": "branches_not_aligned"
+  },
+  {
+   "phrase": "Every decision still comes to me, I can’t step away for a day",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "I want to open two more branches but can barely control these three",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "People ask for online order and delivery and we have nothing",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  }
+ ],
+ "questions": {
+  "stock": [
+   "How do you find out what’s in each branch today?",
+   "When did you last do a full count, and how far off was it?",
+   "Do transfers between branches have any paper or system trail?"
+  ],
+  "branches": [
+   "Which branch worries you most right now?",
+   "What does it do differently from your best one?",
+   "Who runs it day to day?"
+  ],
+  "cash": [
+   "How does closing work at the end of the day?",
+   "How big is the gap usually, and is it always the same branch?",
+   "How soon does cash reach the bank?"
+  ],
+  "buying": [
+   "Who decides what to buy for each branch?",
+   "How do you keep track of orders you’ve placed but not received?"
+  ],
+  "margin": [
+   "Do you know which categories earn you the most after costs?",
+   "Which outlet do you suspect isn’t covering its rent?"
+  ],
+  "staff": [
+   "How many people work across the branches?",
+   "What’s the hardest role to keep filled?",
+   "How is commission worked out?"
+  ],
+  "reporting": [
+   "What report do you wish you had every morning?",
+   "Where does the data for it live today?"
+  ],
+  "systems": [
+   "What do you use at the counter?",
+   "Is it the same at every branch?"
+  ],
+  "growth": [
+   "Are you planning more outlets?",
+   "What broke last time you opened one?"
+  ]
+ },
+ "seasons": "Pakistan: Ramadan and the last ten days before Eid ul-Fitr are the biggest weeks; Eid ul-Adha; back-to-school (March–April and August); winter clothing and blanket demand Nov–Jan; 14 August; 11.11 and Black Friday (“White Friday”) online sales; wedding season Nov–Feb lifts gifting and household purchases. UAE: Ramadan and Eid, Dubai Shopping Festival (Dec–Jan), Dubai Summer Surprises, back-to-school (late August), White Friday/11.11, National Day (2 December), summer exodus dip June–August. Canada: Black Friday and Boxing Day, back-to-school, Christmas, Diwali and Eid for community-focused stores, winter weather slowing footfall.",
+ "care": [
+  "Theft suspicions: pi notes the pattern (“one counter’s voids are high”), never accuses a named person and never helps set up covert surveillance of staff.",
+  "Under-invoicing, running “two sets of books”, or hiding sales from FBR or FTA: pi declines to help and notes only legitimate reporting pain.",
+  "FBR POS integration, sales-tax or VAT questions: noted as admin effort; pi gives no tax advice.",
+  "Staff names, CNICs, salaries per person, customer phone lists: pi does not collect them; records roles.",
+  "Lease disputes and landlord issues: noted as cost pressure, no legal advice.",
+  "Shoplifting incidents involving violence or threats: pi tells the person to contact the police or emergency services first.",
+  "Owners venting about family partners: pi stays neutral and notes the operational issue (e.g. approvals, succession)."
+ ],
+ "build_ideas": [
+  "nori daily read across all branches: yesterday’s sales, cash vs card, top and bottom items, stock on hand, sent to the owner on WhatsApp each morning.",
+  "Central stock ledger with branch-level stock, reorder levels and alerts for fast movers running low.",
+  "Inter-branch transfer flow: request, dispatch, receive with a scan or tick on phone, flagging anything not received within a set time.",
+  "Dead-stock report by age and branch, with suggested transfer to branches where the item sells.",
+  "Daily closing sheet on phone: cashier enters cash count, system compares to POS, gap logged per counter and per day.",
+  "Deposit tracker showing cash held at each branch and days since last bank deposit.",
+  "Branch comparison dashboard: sales, basket size, footfall (if counted), margin, staff cost per branch.",
+  "Purchase order tracker for each supplier: ordered, received, short, pending, with delivery dates.",
+  "Void, return and discount log by counter and shift, with exception alerts.",
+  "Commission calculator linking sales to salesperson IDs at the POS.",
+  "Opening/closing checklist on WhatsApp with photo proof, missed items reported to the area manager.",
+  "Shelf-price vs POS-price audit list generated when prices change.",
+  "Customer capture at checkout (opt-in phone number) for repeat-purchase tracking and WhatsApp broadcasts.",
+  "New-branch setup template: opening stock list, staff roles, checklist, first-month targets."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Teen branches hain, har mahine stock count mein farq aata hai, khaas kar Gulshan wali mein."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted — Gulshan branch mein har count pe stock kam nikalta hai. Ye farq zyada tar kis type ke maal mein hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Cosmetics aur chhoti cheezon mein. Aur godown se jo transfer jaata hai uska bhi record theek nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, do alag cheezein lag rahi hain — chhoti cheezon mein shortage, aur godown se branch transfer ka record nahi. Transfer abhi kis tarah hota hai, parchi pe ya kisi system mein?"
+  },
+  {
+   "role": "Person",
+   "text": "Parchi pe, aur woh bhi aksar gum ho jaati hai."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, ye bhi likh liya. Jab maal branch pahunchta hai, wahan koi check karke sign karta hai ya seedha shelf pe chala jaata hai?"
+  }
+ ]
+}

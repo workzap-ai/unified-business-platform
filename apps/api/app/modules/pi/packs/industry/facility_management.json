@@ -1,0 +1,260 @@
+{
+ "key": "facility_management",
+ "name": "Facility management",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "FM",
+  "hard services",
+  "soft services",
+  "PPM",
+  "reactive maintenance",
+  "CAFM",
+  "work order",
+  "helpdesk",
+  "SLA",
+  "KPI",
+  "AMC",
+  "MEP maintenance",
+  "cleaning",
+  "security",
+  "landscaping",
+  "pest control",
+  "waste",
+  "manpower supply",
+  "maintenance staff",
+  "technician",
+  "idarat al-murafiq",
+  "TFM",
+  "IFM",
+  "building manager",
+  "punch list",
+  "asset tagging",
+  "condition survey",
+  "penalty deduction"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Services: hard (MEP, HVAC, plumbing, electrical), soft (cleaning, security, pest, landscaping, waste), or integrated FM.",
+  "Number of client sites and contracts, and site types (towers, malls, schools, hospitals, factories, communities).",
+  "Total headcount and how many are site-based vs mobile teams.",
+  "Self-delivered vs subcontracted services.",
+  "Contract types: lump sum, manpower-based, SLA/KPI-based with penalties.",
+  "Systems in use: CAFM, ERP, Excel, WhatsApp.",
+  "Country/city (labour, accommodation and safety rules differ)."
+ ],
+ "scope_rule": "pi notes operational and business problems: work order handling, SLA compliance, PPM completion, manpower deployment and attendance, subcontractor control, consumables and spare parts, client reporting, penalties and collections, and contract margins. pi gives no MEP, fire, electrical, water-safety or other safety-engineering advice, does not interpret contracts, penalty clauses or labour law, and does not advise on staff accommodation or visa matters. It never records employees’ or occupants’ names, IDs, passport/visa details, salaries or bank details; it records roles and headcounts.",
+ "vocabulary": {
+  "hard services": "technical maintenance (MEP, HVAC, lifts, fire systems)",
+  "soft services": "cleaning, security, landscaping, pest, waste, reception",
+  "IFM / TFM": "integrated / total facility management under one contract",
+  "PPM": "planned preventive maintenance",
+  "reactive / corrective": "fixing faults as reported",
+  "work order (WO)": "a recorded maintenance task",
+  "CAFM": "computer-aided facility management software",
+  "SLA": "agreed response and fix times",
+  "KPI penalty / deduction": "money deducted for missed targets",
+  "manpower contract": "billing per person supplied",
+  "helpdesk": "central point that logs and assigns requests",
+  "asset tagging": "labelling equipment for tracking"
+ },
+ "problems": [
+  {
+   "phrase": "Client complaints come by email, WhatsApp and calls and many never become work orders",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "We miss SLA response times and penalties eat our margin",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "We can’t prove the job was done on time when the client disputes it",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "PPMs are marked done on paper but weren’t actually done",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "We bought a CAFM but technicians don’t use it",
+   "category": "tech_systems",
+   "subtype": "user_adoption"
+  },
+  {
+   "phrase": "Manpower on site is less than the contract headcount and the client deducts",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Absent staff aren’t replaced quickly",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Overtime hours keep growing and we can’t bill all of it",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Staff turnover is high and every new hire needs training again",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Consumables like chemicals and tissue rolls run out at some sites and pile up at others",
+   "category": "stock_inventory",
+   "subtype": "slow_replenishment"
+  },
+  {
+   "phrase": "Spare parts are bought urgently at high prices",
+   "category": "suppliers_purchasing",
+   "subtype": "price_comparison"
+  },
+  {
+   "phrase": "Subcontractors for lifts and fire systems miss their visits",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Monthly client reports take a week to compile from different sites",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "I don’t know which contracts make money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Clients pay 120 days late but salaries go out every month",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Variations and extra works done but never invoiced",
+   "category": "cash_collections",
+   "subtype": "unbilled_work"
+  },
+  {
+   "phrase": "Supervisors don’t visit sites they’re responsible for",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Each site does things its own way",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Mobilising a new contract is chaos every time",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "Tenders need lots of past performance data we can’t find",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Asset lists we got from the client are wrong or incomplete",
+   "category": "operations_process",
+   "subtype": "asset_data_missing"
+  },
+  {
+   "phrase": "Licences, insurances and staff certifications expire unnoticed",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  }
+ ],
+ "questions": {
+  "scope": [
+   "Which services do you provide — technical, soft, or both?",
+   "How many client sites are you running?"
+  ],
+  "requests": [
+   "How do clients report a problem today?",
+   "How does that become a job for a technician?"
+  ],
+  "slas": [
+   "Which SLA targets do you miss most often?",
+   "How are penalties worked out?"
+  ],
+  "ppm": [
+   "How are planned maintenance visits scheduled?",
+   "How do you confirm they actually happened?"
+  ],
+  "manpower": [
+   "How do you check site headcount against the contract?",
+   "What happens when someone doesn’t turn up?"
+  ],
+  "consumables and parts": [
+   "How are chemicals and spares sent to sites?",
+   "Where do they run short most?"
+  ],
+  "subcontractors": [
+   "Which services do you subcontract?",
+   "How do you check their visits?"
+  ],
+  "reporting": [
+   "What do clients expect to see monthly?",
+   "How long does it take to put together?"
+  ],
+  "money": [
+   "Which contracts do you suspect are losing money?",
+   "How long do your clients usually take to pay?"
+  ],
+  "systems": [
+   "What system do you use for work orders now?",
+   "What stops the team from using it fully?"
+  ]
+ },
+ "seasons": "In the UAE, summer (May to September) drives HVAC breakdowns, chiller loads and heat-stress rules for outdoor staff (the midday outdoor-work ban mid-June to mid-September); contract renewals and budgets often align with the calendar year; Ramadan changes shift patterns. In Pakistan, summer brings AC, generator and water-pump failures and load-shedding pressure; monsoon brings roof leaks, drainage and basement flooding; staff leave around Eid creates gaps. In Canada, winter brings snow and ice management, heating failures and frozen pipes; spring brings landscaping start-up; government and institutional contracts often renew around the 1 April fiscal year.",
+ "care": [
+  "No advice on fire systems, electrical isolation, confined spaces, water tanks, legionella, or working at height; pi says qualified engineers and safety officers decide.",
+  "Fire, flooding with electrical risk, gas leaks, injury, heatstroke of a worker, someone trapped → pi stops and points to emergency services.",
+  "Penalty clauses, contract disputes, labour law, accommodation and visa matters are not advised on; pi notes the business impact.",
+  "Requests to fake attendance, falsify PPM or SLA records, invoice for unsupplied manpower, or bribe client staff to approve invoices are refused.",
+  "Never record staff names, passport or visa details, salaries or bank details; headcounts and roles only.",
+  "Worker welfare issues (unpaid wages, heat, accommodation) are noted respectfully; pi does not help work around obligations."
+ ],
+ "build_ideas": [
+  "Helpdesk on WhatsApp for client requests that creates a work order with category, location, priority and SLA clock.",
+  "Technician work-order app with arrival time, photos before/after, parts used and client sign-off.",
+  "SLA dashboard per contract showing response and fix times and projected penalties.",
+  "PPM scheduler by asset with checklists, geotagged completion and missed-visit alerts.",
+  "Site attendance with geotagged or QR check-in, matched to contracted headcount per site.",
+  "Relief and replacement roster to fill absences quickly.",
+  "Consumables and spares requisition per site with monthly usage vs budget.",
+  "Subcontractor visit tracker with proof and certificate uploads.",
+  "Monthly client report pack generated automatically per site.",
+  "Contract P&L: revenue vs manpower, materials, subcontractor cost and penalties.",
+  "Variation and extra-works register with approval and billing status.",
+  "Mobilisation checklist for new contracts (asset survey, staffing, consumables, handover).",
+  "Compliance calendar for licences, insurances and staff certifications."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We run FM for 22 buildings. The client keeps deducting penalties for late response and I can’t prove we went on time."
+  },
+  {
+   "role": "pi",
+   "text": "Understood — penalties for late response that you can’t contest because there’s no proof of timing. Noted. How does a client’s request reach your technician at the moment?"
+  },
+  {
+   "role": "Person",
+   "text": "Building manager calls our supervisor, supervisor sends the guy on WhatsApp."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — phone call to the supervisor, then dispatch on WhatsApp. Is the time the technician arrives recorded anywhere?"
+  }
+ ]
+}

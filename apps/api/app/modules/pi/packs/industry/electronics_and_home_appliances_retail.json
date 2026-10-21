@@ -1,0 +1,288 @@
+{
+ "key": "electronics_and_home_appliances_retail",
+ "name": "Electronics and home appliances retail",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "electronics",
+  "appliances",
+  "ACs",
+  "inverter AC",
+  "fridge",
+  "refrigerator",
+  "washing machine",
+  "LED TV",
+  "microwave",
+  "water dispenser",
+  "geyser",
+  "UPS",
+  "solar",
+  "installments",
+  "qist",
+  "easy installments",
+  "warranty card",
+  "installation",
+  "company ka claim",
+  "dealer",
+  "Hall Road",
+  "Saddar",
+  "Naz Plaza",
+  "kist",
+  "takseet",
+  "daman",
+  "tarkeeb"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Authorised dealer for specific brands vs multi-brand retailer vs grey-import trader.",
+  "Number of showrooms and warehouses.",
+  "Whether installment/credit sales are offered in-house or through banks/financing partners (BNPL like Tabby/Tamara in UAE, Affirm/PayBright in Canada).",
+  "Whether delivery and installation are done in-house or by brand/third-party technicians.",
+  "Categories: large appliances, small appliances, TVs, ACs, solar/UPS.",
+  "Online channels (website, Daraz, Noon, Amazon) and share of sales.",
+  "Whether serial numbers are recorded at sale."
+ ],
+ "scope_rule": "pi notes stock and serials, installment collections, delivery and installation scheduling, warranty claims handling, dealer schemes, cash, staff and reporting. pi gives no electrical installation, gas/refrigerant, safety engineering, consumer-law, financing, interest/riba rulings, or tax advice. pi never collects customer CNICs, guarantor details, cheques, bank details or addresses for installment accounts; it notes counts, roles and processes only. Requests to sell grey imports as warranty-backed, alter serial numbers or warranty cards, or avoid duties are declined.",
+ "vocabulary": {
+  "qist / kist": "installment",
+  "guarantor": "person who vouches for an installment buyer",
+  "dealer scheme / target incentive": "brand rebate for hitting volume",
+  "claim": "warranty repair or replacement request to the brand",
+  "serial number": "unique number on each unit",
+  "grey / non-warranty": "imported outside the official channel",
+  "installation": "fitting ACs, geysers, wall-mount TVs",
+  "DOA": "dead on arrival unit",
+  "display unit": "showroom model, often sold at discount",
+  "godown": "warehouse",
+  "takseet": "installments (Arabic)",
+  "daman": "warranty (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Installment customers stop paying after three or four qists",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Recovery staff collect cash and we don’t know if it’s all deposited",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Installment records are in registers, can’t see who’s late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "AC season: we sell out of inverter models and buy at a premium",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Old non-inverter models stuck in the godown",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "We don’t record serial numbers so warranty claims become arguments",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Units arrive with dents, we find out when we deliver",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Installation team is booked for a week in June, customers furious",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Installer comes late or doesn’t come and the customer blames us",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "Installers take extra money from customers",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Warranty claims with the brand take weeks and we can’t tell the customer anything",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Brand rebates and schemes are promised but we can’t track what’s due",
+   "category": "suppliers_purchasing",
+   "subtype": "credit_terms"
+  },
+  {
+   "phrase": "Dollar went up and our purchase prices jumped overnight",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Margins are thin and we don’t know the real margin after delivery and installation",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Online sellers are cheaper than our showroom price",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "People walk in, check prices, buy online",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Salesmen promise free installation or gifts that we don’t offer",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Customers call about delivery status and nobody knows",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Delivery vehicle and loaders cost a lot, some days it goes half empty",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Display models get scratched and we sell them at a loss",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Units disappear from the warehouse",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Electricity load-shedding and summer power issues increase returns",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Leads from Facebook ads on installments come in but salesmen never call back",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Daraz orders cancel because our stock isn’t updated",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Brand wants monthly sell-out reports and it takes us days",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Showrooms and warehouse use different stock lists",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Planning summer AC stock is a gamble",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  }
+ ],
+ "questions": {
+  "installments": [
+   "Do you sell on installments yourselves?",
+   "How do you see which accounts are late?",
+   "How is cash collected from them?"
+  ],
+  "stock": [
+   "Which models run out in peak season?",
+   "What’s sitting in the godown longest?"
+  ],
+  "serials and warranty": [
+   "Do you note serial numbers when you sell?",
+   "How do warranty claims go with the brands?",
+   "How do you keep customers updated?"
+  ],
+  "delivery and installation": [
+   "Who installs for you?",
+   "How far behind does it get in peak season?",
+   "What complaints come back about installers?"
+  ],
+  "margin": [
+   "Do you know the margin after delivery and installation?",
+   "How do brand schemes come into it?"
+  ],
+  "online": [
+   "Where else are people buying the same models?",
+   "What do you lose to online prices?"
+  ],
+  "leads": [
+   "Where do enquiries come from?",
+   "Who follows them up, and how quickly?"
+  ],
+  "reporting": [
+   "What do brands ask you to report?",
+   "How long does it take to prepare?"
+  ]
+ },
+ "seasons": "Pakistan: AC, fridge and water dispenser peak April–July (pre-summer and heatwaves), budget announcement in June affecting prices and buying, Ramadan and Eid (fridges, TVs, washing machines), wedding season Nov–Feb (dowry/jahez appliance packages), winter geysers and heaters Nov–Jan, solar/UPS demand spikes with load-shedding, 11.11 and White Friday online. UAE: summer AC servicing and replacement April–August, Ramadan and Eid, Dubai Shopping Festival and GITEX period promotions, White Friday, back-to-school laptops/tablets. Canada: Black Friday/Boxing Day (biggest), summer AC and fans in heatwaves, spring/fall moving season for appliances, tax-refund season spending.",
+ "care": [
+  "Installment customers’ identity documents, guarantor details, cheques: pi never asks for or stores them.",
+  "Interest, markup and Shariah questions on installments: no religious or financial advice; noted as operational design only.",
+  "Recovery practices: pi does not help with harassment, threats, or seizing goods unlawfully.",
+  "Electrical, gas refrigerant or wiring safety: no technical advice; if a fire, shock or gas leak is mentioned, pi points to emergency services.",
+  "Grey imports sold as warranty-backed, tampering with serials or warranty cards: declined.",
+  "Customs and duty evasion, under-invoicing: declined.",
+  "Consumer complaints threatening legal action: noted as complaint; no legal advice."
+ ],
+ "build_ideas": [
+  "Installment ledger: account codes, schedule, paid, due, overdue days, collector assigned; daily overdue list.",
+  "Recovery collection app: collector logs payment with receipt on WhatsApp to the customer, daily collector cash reconciliation.",
+  "Serial-number capture at purchase, sale and delivery, linked to invoice and warranty dates.",
+  "Warranty claim tracker by brand: claim raised, technician visit, part status, closed, with customer status updates.",
+  "Delivery and installation scheduler: zones, slots, installer assignment, job completion with photo and customer sign-off.",
+  "Installer job log with extra charges recorded and complaints per installer.",
+  "Receiving inspection checklist for damage with photos, linked to supplier claims.",
+  "Brand scheme/rebate tracker: target, achieved, rebate due, received.",
+  "Landed-cost and margin calculator per model including currency, delivery and installation cost.",
+  "AC season stock planner using last seasons’ sales by model and tonnage.",
+  "Lead tracker for Facebook and WhatsApp installment enquiries with follow-up reminders.",
+  "Brand sell-out report generator from POS data.",
+  "Showroom-warehouse unified stock with marketplace sync."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Qiston pe saman dete hain, lekin recovery ka koi hisaab nahi. 300 ke qareeb accounts hain."
+  },
+  {
+   "role": "pi",
+   "text": "Ye bara hissa hai aap ke business ka — noted, takreeban 300 installment accounts aur recovery ka clear record nahi. Abhi ye kahan likha jaata hai ke kis ne kitni qist di?"
+  },
+  {
+   "role": "Person",
+   "text": "Register mein, aur recovery wala apni copy rakhta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, do alag records hain. Recovery wala jo cash laata hai, woh kaise aur kab jama hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Shaam ko de deta hai, kabhi agle din."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, ye bhi likh liya. Aap ke andaze se kitne accounts aksar late hote hain?"
+  }
+ ]
+}

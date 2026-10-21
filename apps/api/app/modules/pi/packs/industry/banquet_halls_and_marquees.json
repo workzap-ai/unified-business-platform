@@ -1,0 +1,284 @@
+{
+ "key": "banquet_halls_and_marquees",
+ "name": "Banquet halls and marquees",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "banquet",
+  "banquet hall",
+  "marquee",
+  "lawn",
+  "shadi hall",
+  "wedding hall",
+  "event hall",
+  "ballroom",
+  "function hall",
+  "booking date",
+  "menu per head",
+  "per head rate",
+  "catering",
+  "decor",
+  "stage",
+  "shadi",
+  "baraat",
+  "walima",
+  "mehndi",
+  "bayana",
+  "one dish",
+  "qaaat afrah",
+  "qaaat munasabat",
+  "khaimah"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of halls, lawns or marquees and seating capacity of each.",
+  "In-house catering or outside caterers allowed, and whether decor is in-house or outsourced.",
+  "Owned land/building or leased.",
+  "Typical events: weddings, corporate dinners, conferences, birthdays, religious gatherings.",
+  "Booking channels: walk-in, phone, WhatsApp, Instagram, wedding planners, agents.",
+  "Staff structure: booking manager, kitchen, waiters (often daily-wage), decor team, security.",
+  "City and local rules on timings and menus (e.g. one-dish limits in Punjab, closing times)."
+ ],
+ "scope_rule": "pi notes operational and business problems: date double-booking, advances, menu changes, head-count disputes, kitchen wastage, waiter attendance, decor stock, generator and AC breakdowns, and slow-season cash. pi does not advise on event-timing laws, one-dish or menu restrictions, food safety rules, fire safety or occupancy limits, licensing, or tax; it notes that compliance takes effort or causes friction. pi never collects client families’ names, phone numbers, CNICs or bank details, and records roles (client, planner, waiter, chef). Any live safety issue at an event is an emergency.",
+ "vocabulary": {
+  "bayana / advance": "deposit to lock a date",
+  "per head": "price per guest for food",
+  "one dish": "legal limit on menu items at weddings in some PK provinces",
+  "baraat / walima / mehndi": "main wedding functions",
+  "slot": "lunch or dinner time block for a hall",
+  "guarantee": "minimum head count the client pays for",
+  "marquee": "large tent structure used as a venue",
+  "decor package": "stage, lighting, flowers and seating set-up",
+  "daily wage waiters": "waiters paid per event",
+  "qaat afrah": "wedding hall (Arabic)",
+  "khaimah": "tent (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Two of my managers booked the same hall for the same night",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Advance is taken in cash by the booking guy and sometimes I don’t see it for days",
+   "category": "cash_collections",
+   "subtype": "deposit_delays"
+  },
+  {
+   "phrase": "Client says 400 guests, 550 turn up, and then they argue about the extra bill",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Final payment is always argued on the night and I end up giving a discount",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Food is always over-cooked and thrown away, or it runs out",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Meat and oil prices keep rising but I quoted the client months ago",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "I don’t know per-event profit after food, staff, decor and generator",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Daily-wage waiters don’t show up on the busiest dates",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Waiters and kitchen staff take food and crockery home",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Crockery, chairs and covers go missing or get damaged every week",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Decor items are never where they should be when the team sets up",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Generator failed during a baraat and the client still talks about it",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Menu changes by the client don’t reach the kitchen",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Bookings are all in a register; if it’s lost, everything’s gone",
+   "category": "tech_systems",
+   "subtype": "no_system"
+  },
+  {
+   "phrase": "Wedding season is full but we’re empty in Ramadan and Muharram",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Corporate events and small functions would fill weekdays but we don’t market for them",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "We get hundreds of WhatsApp enquiries asking for per-head rates and most go nowhere",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "No one follows up after a family comes to see the hall",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Wedding planners bring clients but their commissions are a mess",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Timing rules mean we have to finish early and clients blame us",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Food quality isn’t the same from one event to the next",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Supplier gives us credit but then raises rates without telling us",
+   "category": "suppliers_purchasing",
+   "subtype": "credit_terms"
+  },
+  {
+   "phrase": "Electricity and gas bills in summer are crushing",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Hall inspections and licence renewals take a lot of running around",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "I’m opening a second marquee and don’t know how to manage both",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "Reviews say the AC wasn’t working and the hall was hot",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  }
+ ],
+ "questions": {
+  "bookings": [
+   "Who can confirm a date?",
+   "Where are bookings recorded?",
+   "Has a clash happened this season?"
+  ],
+  "advances": [
+   "How do clients pay the advance?",
+   "Who holds it until it reaches you?"
+  ],
+  "head count and billing": [
+   "How is the final count agreed?",
+   "When do arguments usually happen?"
+  ],
+  "kitchen": [
+   "How do you decide how much to cook?",
+   "What happens to the leftovers?"
+  ],
+  "staff": [
+   "How many waiters are daily-wage?",
+   "How do you confirm they’ll come?"
+  ],
+  "assets": [
+   "Do you count crockery and chairs after each event?",
+   "What goes missing most?"
+  ],
+  "power": [
+   "What’s your backup when power fails?",
+   "How often has it let you down?"
+  ],
+  "leads": [
+   "Where do enquiries come from?",
+   "What happens after a family visits the hall?"
+  ],
+  "money": [
+   "Do you know your profit on a typical wedding?",
+   "Which cost has jumped most this year?"
+  ],
+  "off-season": [
+   "Which months are slowest?",
+   "What do you do to fill them?"
+  ]
+ },
+ "seasons": "PK: main wedding season roughly October/November to March, with peaks around December holidays when overseas families visit; another bump after Eid ul Fitr and before Muharram; Ramadan and Muharram (first ten days) see very few weddings; summer monsoon is slow except indoor AC halls; Friday and weekend nights are premium. UAE: weddings and corporate galas peak October to April; Ramadan brings iftar and suhoor events; summer is quieter with indoor events; National Day and New Year corporate events. Canada: South Asian and Arab community weddings cluster in summer and long weekends; winter holiday parties in December.",
+ "care": [
+  "Event-timing, one-dish rules, occupancy limits and noise rules are not advised on; pi notes friction with them as a business problem only.",
+  "pi does not help evade timing rules, menu limits, inspections or taxes, and does not help with bribes to officials.",
+  "Fire, gas leak, structural collapse, electrocution or crowd crush at an event: pi stops and directs to emergency services immediately.",
+  "Food safety and hygiene complaints are noted as quality problems; no technical advice.",
+  "Client families’ names, numbers and payment details are never stored; “a wedding client” is enough.",
+  "Waiters and kitchen staff suspected of theft are recorded by role; no covert surveillance in changing or rest areas.",
+  "Planner commission disputes are noted as business problems; no legal or contract interpretation."
+ ],
+ "build_ideas": [
+  "Hall and slot booking calendar with one owner of truth, blocking a date only once an advance is logged.",
+  "Advance and payment ledger per event with receipts sent on WhatsApp and outstanding balances.",
+  "Event sheet per booking: menu, head count, decor, timings, changes, all visible to kitchen, decor and floor teams.",
+  "Head-count confirmation flow: final count agreed in writing a set number of days before.",
+  "Kitchen production planner: quantities per dish by confirmed head count, with wastage logged after each event.",
+  "Crockery, chairs and decor inventory with post-event counts and loss tracking.",
+  "Daily-wage staff roster with confirmations and per-event payouts.",
+  "Planner and agent commission ledger.",
+  "Generator and AC maintenance log with service due alerts.",
+  "Lead tracker for enquiries and hall visits with follow-up reminders.",
+  "Per-event profit report: revenue vs food, staff, decor, power.",
+  "Owner’s season dashboard: dates booked, advances held, upcoming balances."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Season shuru hai aur har doosri shadi pe guest zyada aa jate hain, phir bill pe jhagra hota hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — guaranteed count se zyada log aate hain aur final bill pe behes hoti hai. Final count abhi client se kab aur kaise tay hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Zubani, event se ek do din pehle phone pe."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, count likhit mein confirm nahi hota. Event ki raat extra guests ginta kaun hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Manager andaze se batata hai, koi pakki ginti nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh bhi note kar liya. Is season mein aisi kitni events hongi jahan payment adhoori reh gayi?"
+  }
+ ]
+}

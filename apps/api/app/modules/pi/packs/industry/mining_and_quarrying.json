@@ -1,0 +1,261 @@
+{
+ "key": "mining_and_quarrying",
+ "name": "Mining and quarrying",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "mine",
+  "quarry",
+  "crusher",
+  "stone crusher",
+  "bajri plant",
+  "coal mine",
+  "salt mine",
+  "gypsum",
+  "limestone",
+  "marble quarry",
+  "chromite",
+  "granite quarry",
+  "sand extraction",
+  "lease",
+  "kaan",
+  "pahar",
+  "thekedar",
+  "blasting",
+  "excavator",
+  "dumper",
+  "mahjar kassara",
+  "royalty",
+  "weighbridge",
+  "dispatch slip"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Mineral type (stone/aggregate, marble, coal, salt, gypsum, limestone, chromite, sand, other).",
+  "Quarry/mine operation, crushing plant, or trading/dispatch only.",
+  "Own machinery (excavators, dumpers, crushers) or hired, and fleet size.",
+  "Workforce: direct employees, labour contractors, or both.",
+  "Main buyers: construction contractors, cement plants, traders, exporters.",
+  "Daily or monthly dispatch volume (tons or truckloads).",
+  "Lease ownership or operating under someone else’s lease (operationally relevant only; pi gives no advice on it)."
+ ],
+ "scope_rule": "pi notes business and operational problems: production and dispatch counts, weighbridge records, machine downtime, diesel use, buyer credit, labour attendance, reporting from remote sites and admin effort. It gives no mining engineering, blasting, explosives, ventilation, geology, environmental, lease, royalty or permit advice. It records no workers’ names or IDs, only roles and counts. Any accident, collapse, gas, blast injury or trapped worker means pi stops immediately and points to emergency services.",
+ "vocabulary": {
+  "crusher": "machine that breaks stone into aggregate sizes",
+  "bajri / grit": "crushed stone sizes (e.g. 3/4”, 1/2”)",
+  "dumper / tipper": "trucks carrying material",
+  "excavator / loader": "digging and loading machines",
+  "weighbridge / kanta": "truck scale",
+  "dispatch slip / parchi": "slip given per load",
+  "royalty": "government charge per ton (pi does not advise on it)",
+  "lease": "mining rights over an area",
+  "thekedar": "labour or haulage contractor",
+  "face": "working area of the quarry",
+  "mahjar / kassara": "quarry / crusher (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Number of trucks dispatched doesn’t match parchis or cash received",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Weighbridge slips are handwritten and some go missing",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Diesel consumption of dumpers and excavators is way too high",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Crusher breaks down and spare parts take days to come from the city",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Site is remote, I only find out what happened at the end of the week",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Buyers take material on credit and payments drag for months",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Stockpiles of certain sizes pile up while others run out",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "I don’t know actual cost per ton including diesel, labour and maintenance",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Diesel prices go up and our rates can’t follow quickly",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Labour attendance at the site is whatever the contractor says",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Haulage contractors overcharge or make fewer trips than billed",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Machine hours from hired excavators are disputed every month",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_communication"
+  },
+  {
+   "phrase": "Buyers complain the material has too much dust or wrong size",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Dispatch delayed because trucks queue at the weighbridge",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Mobile signal is weak, supervisors send reports late",
+   "category": "tech_systems",
+   "subtype": "no_system"
+  },
+  {
+   "phrase": "Lease, royalty and permit paperwork takes a lot of my time",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Cash is collected at the site and handled by the munshi",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Material leaves at night without slips",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Skilled machine operators are hard to keep at remote sites",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Tyres and spare parts get used up faster than they should",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Rain stops work for days and orders back up",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Cement plant buyer cut volumes and we have nowhere else to sell",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Export shipments of mineral delayed at port",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Information between site, office and buyers is all on calls and WhatsApp",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  }
+ ],
+ "questions": {
+  "dispatch and slips": [
+   "Roughly how many trucks go out in a day?",
+   "How is each one recorded?",
+   "How do you check slips against cash or invoices?"
+  ],
+  "diesel and machines": [
+   "How many machines and vehicles run on the site?",
+   "How is diesel issued?",
+   "How do you check usage against work done?"
+  ],
+  "downtime": [
+   "Which machine stops most often?",
+   "How long does it take to get it running again?"
+  ],
+  "site reporting": [
+   "How do you get updates from the site now?",
+   "How often?",
+   "What do you wish you could see daily?"
+  ],
+  "buyers and credit": [
+   "Who are your main buyers?",
+   "How many buy on credit?",
+   "What’s the oldest balance?"
+  ],
+  "labour and contractors": [
+   "How is attendance recorded?",
+   "How are contractor trips or hours verified?"
+  ],
+  "stockpiles": [
+   "How do you know how much of each size is stockpiled?",
+   "Which sizes run short most?"
+  ],
+  "costing": [
+   "How do you work out your cost per ton?",
+   "How often is it updated?"
+  ]
+ },
+ "seasons": "PK construction season after monsoon and through winter–spring drives aggregate demand; monsoon rains halt quarries and block roads; extreme summer heat reduces shifts; Ramadan and Eid holidays cut working days; budget announcements (June) affect fuel and development spending. Coal and mineral demand follows industrial cycles and winter heating. UAE: aggregate demand follows construction cycles in the northern emirates; summer midday work restrictions apply to outdoor sites. Canada: many quarries operate seasonally (spring to late autumn), with winter shutdowns and spring road load restrictions limiting haulage.",
+ "care": [
+  "Accidents, collapses, gas, explosions or trapped workers: pi stops immediately and points to emergency services (1122/15 in PK, 999/998/997 in UAE, 911 in Canada).",
+  "No blasting, explosives, ventilation, slope stability, geology or safety-engineering advice of any kind.",
+  "No advice on leases, royalties, permits or environmental rules; note admin effort only.",
+  "Never help under-report tonnage, avoid royalty, mine outside a lease boundary or move material without slips — decline plainly.",
+  "Child or bonded labour concerns: pi does not help hide them and points to emergency services and authorities if anyone is in danger.",
+  "Workers’ names, CNICs and wage details are not stored; roles and counts only.",
+  "Explosives storage or purchase questions: decline and do not discuss."
+ ],
+ "build_ideas": [
+  "Digital dispatch slip: each load gets a numbered slip with truck number, size/grade, weight, buyer and payment mode, entered on a phone at the gate.",
+  "Weighbridge integration or photo capture of each reading linked to the slip.",
+  "Daily site report form for supervisors that works offline and syncs when there’s signal.",
+  "Diesel issue log per machine and vehicle with hours or trips, flagging unusual consumption.",
+  "Machine downtime and spare-parts tracker with reasons and parts on order.",
+  "Stockpile estimate board by product size, updated from production and dispatches.",
+  "Buyer credit ledger with limits, ageing and WhatsApp payment reminders.",
+  "Contractor trip and machine-hour log agreed daily by both sides.",
+  "Site cash register reconciled against dispatch slips each evening.",
+  "Labour attendance by headcount and role per shift.",
+  "Cost-per-ton estimate combining diesel, labour, maintenance and hire costs.",
+  "Owner dashboard: loads dispatched, tons sold, cash vs credit, diesel per ton, downtime hours."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Site door hai, mujhe hafte ke aakhir mein hi pata chalta hai kitne truck nikle aur kitna paisa aaya."
+  },
+  {
+   "role": "pi",
+   "text": "Door ki site par yeh andhera kaafi pareshan karta hoga. Noted — site se roz ki dispatch aur cash ki report nahi aati. Din mein taqreeban kitne truck nikalte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "40 se 60, season mein zyada."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, 40–60 a day, more in season. Har truck ki parchi abhi kaun banata hai, aur woh aap tak kaise pohanchti hai?"
+  }
+ ]
+}

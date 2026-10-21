@@ -1,0 +1,271 @@
+{
+ "key": "real_estate_agencies_and_brokers",
+ "name": "Real estate agencies and brokers",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "listing",
+  "viewing",
+  "lead",
+  "deal",
+  "commission",
+  "exclusive",
+  "mandate",
+  "Form A",
+  "Form B",
+  "Form F",
+  "MOU",
+  "Trakheesi permit",
+  "RERA card",
+  "dealer",
+  "property dealer",
+  "bayana",
+  "makaan",
+  "kothi",
+  "rent-out",
+  "simsar",
+  "dalal",
+  "Zameen",
+  "Graana",
+  "Bayut",
+  "Property Finder",
+  "Dubizzle",
+  "Realtor.ca",
+  "MLS",
+  "open house"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Sales, leasing, or both; residential, commercial, or off-plan specialists.",
+  "Number of agents and whether they are salaried, commission-only or freelancers.",
+  "Number of active listings and how many are exclusive.",
+  "Lead sources: portals, social media, referrals, walk-ins, developer allocations.",
+  "Portal spend and listing package size.",
+  "Location and licensing regime (Pakistan dealers, Dubai/Abu Dhabi brokers, Canadian brokerages under provincial regulators).",
+  "Whether the owner still personally closes most deals."
+ ],
+ "scope_rule": "pi notes operational problems: lead handling, listing quality and duplication, agent performance, commission splits, deal pipeline, portal spend, follow-up and reporting. pi does not give legal advice on titles, transfers, contracts, deposits, tenancy law or disputes between buyers and sellers, does not value properties, and does not advise clients on investment. It does not interpret regulator rules beyond noting that the business finds compliance paperwork a burden. It never records the names, phone numbers, IDs or financial details of clients, landlords, tenants or agents; it notes roles (“one senior agent”, “a landlord client”).",
+ "vocabulary": {
+  "dealer/ property dealer": "local estate agent in Pakistan",
+  "dalal/ simsar": "broker or middleman (Urdu / Arabic)",
+  "exclusive / mandate": "sole right to market a property",
+  "Form A / Form B / Form F": "Dubai listing agreements (seller, buyer) and the sale MOU",
+  "Trakheesi permit": "Dubai advertising permit required for each listed property ad",
+  "MLS": "Canadian multiple listing system used by brokerages",
+  "viewing": "showing a property to a prospect",
+  "co-broke / split": "sharing commission with another agency",
+  "quality score": "portal ranking of listing quality",
+  "chabi": "keys, used loosely for access to show a property",
+  "off-plan allocation": "units a developer gives an agency to sell"
+ },
+ "problems": [
+  {
+   "phrase": "We pay Bayut and Property Finder every month and I don’t know which agent’s listings bring any calls",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Leads from portals sit for hours before anyone calls",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Most of the leads are time-wasters or just checking prices",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "The same property is listed five times by our own agents",
+   "category": "marketing_leads",
+   "subtype": "duplicate_listings"
+  },
+  {
+   "phrase": "Listings stay up after the place is rented and clients get angry",
+   "category": "stock_inventory",
+   "subtype": "stale_listings"
+  },
+  {
+   "phrase": "Our quality scores are low so we’re buried on page five",
+   "category": "marketing_leads",
+   "subtype": "marketplace_visibility"
+  },
+  {
+   "phrase": "Two agents fight over a commission — both say it’s their client",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Agents take our leads and close the deal privately",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Good agents leave after six months and take their clients",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "I can’t tell which agents are working and which are just sitting",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Deals drop at the last stage and I don’t know why",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Commission from developers comes months after the deal",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Landlords delay paying our fee once the tenant moves in",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Summer is dead, nothing moves for three months",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Every agent keeps leads in their own phone and WhatsApp",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "When an agent leaves, their whole pipeline is gone",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "Advertising permits keep expiring and ads get taken down",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Agents’ cards and registrations are renewed at the last minute",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Viewings are booked badly — clients wait outside, keys aren’t there",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Past buyers never hear from us again",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "I don’t know my pipeline value for next month",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "We tried a CRM but agents don’t update it",
+   "category": "tech_systems",
+   "subtype": "user_adoption"
+  },
+  {
+   "phrase": "Our website enquiries go to an email nobody checks",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Opening a second office, I don’t know how to control it",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "leads": [
+   "Where do most of your enquiries come from?",
+   "How quickly does someone call a new lead back today?",
+   "Who decides which agent gets a lead?"
+  ],
+  "portals": [
+   "Which portals do you pay for?",
+   "Can you see which listings bring the calls?"
+  ],
+  "listings": [
+   "How many active listings do you have roughly?",
+   "How do you take a listing down once it’s gone?"
+  ],
+  "agents": [
+   "How many agents do you have, and how are they paid?",
+   "How do you know who is actually working leads?"
+  ],
+  "commission": [
+   "How is it decided whose client a deal is?",
+   "What usually starts a commission argument?"
+  ],
+  "pipeline": [
+   "How many deals are in progress right now?",
+   "Where do most deals fall through?"
+  ],
+  "collections": [
+   "Who owes you commission at the moment — developers, landlords, or clients?",
+   "How long does it usually take to come in?"
+  ],
+  "compliance admin": [
+   "Which permits or registrations do you have to keep renewing?",
+   "Who keeps track of the expiry dates?"
+  ],
+  "retention": [
+   "What happens with a client after the deal closes?",
+   "Do you ever get repeat or referral business from them?"
+  ],
+  "systems": [
+   "Where does an agent’s client list live — CRM, Excel or their phone?",
+   "What happens to it when they leave?"
+  ]
+ },
+ "seasons": "In the UAE, the busy season runs September to April, with a spike around year-end and Q1 when expats arrive and move; summer is slow as families travel; lease renewals bunch around school-year start in August and September. In Pakistan, activity rises before the June budget (to beat new taxes) and in the cooler months; overseas buyers visit around Eid and December; Ramadan and Muharram tend to slow deal closings. In Canada, the spring market (March to June) is the main peak, with a smaller autumn bump; rental turnover peaks in summer, and July 1 is a major moving day in Quebec.",
+ "care": [
+  "No legal advice on title checks, deposits, MOUs, transfer procedures or tenancy disputes; pi notes the operational impact and suggests a lawyer or the relevant authority for the substance.",
+  "No property valuations or investment opinions, even when asked “is this a good price?”",
+  "Requests to post fake listings, bait prices, listings without the owner’s permission, advertise without a required permit, or fake reviews are refused.",
+  "Requests to help hide cash deals, under-declare prices or route payments to avoid tax are refused.",
+  "Never record client, landlord, tenant or agent names, numbers, passports or IDs; if pasted, pi does not repeat or keep them and asks the person to describe by role.",
+  "If an agent is suspected of fraud, pi notes the business risk only; it does not investigate individuals or help covertly monitor staff phones.",
+  "Safety at viewings (an agent threatened or in danger) → pi points to emergency services."
+ ],
+ "build_ideas": [
+  "Central lead inbox pulling portal, Meta, website and WhatsApp enquiries into one queue with round-robin assignment and a response timer.",
+  "Listings register: one master record per property with status, owner’s mandate expiry and permit expiry, pushing updates to portals.",
+  "Duplicate-listing checker across the agency’s own portal ads.",
+  "Portal spend vs leads vs deals report per listing and per agent.",
+  "Agent activity board: calls logged, viewings booked, offers made, deals closed.",
+  "Lead registration timestamps and audit trail to settle commission ownership.",
+  "Commission ledger with split rules (agent, team leader, co-broke) and statements per agent.",
+  "Receivables tracker for developer and landlord commissions with reminder schedule.",
+  "Viewing scheduler with key and access checklist and WhatsApp confirmations to the client.",
+  "Licence and permit expiry calendar with alerts for agents’ registrations and ad permits.",
+  "After-sale nurture: anniversary and lease-expiry reminders to past clients for repeat and referral business.",
+  "Owner dashboard: pipeline value, deals expected this month, response times, agent leaderboard."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We’re paying for three portals and honestly I have no idea which one is bringing the deals."
+  },
+  {
+   "role": "pi",
+   "text": "Got it — portal spend is going out but you can’t link it to deals. Noted. When a lead comes in, does anyone record which portal it came from?"
+  },
+  {
+   "role": "Person",
+   "text": "Sometimes. The agents just take the call on their own phone."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, so leads land on agents’ personal phones and the source often isn’t captured. Roughly how many agents are taking portal calls right now?"
+  }
+ ]
+}

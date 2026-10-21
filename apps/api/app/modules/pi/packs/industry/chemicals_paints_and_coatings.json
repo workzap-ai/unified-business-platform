@@ -1,0 +1,256 @@
+{
+ "key": "chemicals_paints_and_coatings",
+ "name": "Chemicals, paints and coatings",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "paint factory",
+  "emulsion",
+  "enamel",
+  "distemper",
+  "primer",
+  "putty",
+  "industrial coatings",
+  "powder coating",
+  "thinner",
+  "resin",
+  "solvents",
+  "adhesives",
+  "sealants",
+  "waterproofing",
+  "tinting machine",
+  "dealer network",
+  "rang",
+  "rang ka karkhana",
+  "dukandar",
+  "dahan ( نﺎﻫد batch sheet, SDS/MSDS, drum/pail/quarter/gallon"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Decorative (house paint) vs industrial/protective coatings vs specialty chemicals/adhesives.",
+  "Sell through dealers/retailers, direct to contractors/projects, or OEM/industrial buyers.",
+  "Number of SKUs and shades, and whether tinting is done at dealers.",
+  "Raw materials imported (resins, pigments, TiO2, solvents) or bought locally.",
+  "Batch size and how many batches a week.",
+  "Own fleet or third-party transport to dealers.",
+  "Number of sales officers / territory managers."
+ ],
+ "scope_rule": "pi notes business problems: raw-material stock and cost, batch tracking, shade complaints, dealer credit, schemes, distribution, staff and reporting. It never gives formulation, chemical handling, storage, hazardous-material transport, fire-safety or environmental-compliance advice, nor comments on whether a product meets a standard. It does not record dealers’ or painters’ personal details, only roles. Any mention of a spill, fire, fumes injury or exposure means pi stops and points to emergency services.",
+ "vocabulary": {
+  "batch / lot": "one production run with its own number",
+  "shade card": "colour reference given to dealers and customers",
+  "tinting": "mixing colourant into base paint at the dealer",
+  "scheme": "dealer incentive (e.g. extra discount or gift on volume)",
+  "painter / mistri": "painters who influence brand choice",
+  "loyalty points / coupon": "painter reward coupons inside cans",
+  "drum, pail, gallon, quarter": "pack sizes",
+  "TSR / SO": "territory sales rep / sales officer",
+  "godown": "warehouse",
+  "dahan": "paint (Arabic)",
+  "claim": "dealer complaint asking credit for defective stock"
+ },
+ "problems": [
+  {
+   "phrase": "Same shade from two batches looks different and the dealer returns the whole lot",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Resin price jumped with the dollar and I can’t pass it on to dealers quickly",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Import consignment of pigment stuck at port, production stopped",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Dealers owe me a lot and some are 6 months overdue",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Schemes are being misused — dealers claim volume they didn’t buy",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Painter coupons are being redeemed twice or faked",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "I can’t trace which batch went to which dealer when a complaint comes",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Expired putty and paint sitting at dealers, they want replacement",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Sales officers report visits but I don’t know if they actually went",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Some SKUs run out every summer while slow shades pile up",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Leaking or dented cans arrive at the dealer",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Freight to far-off cities eats the margin on low-price products",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "We don’t know true cost per litre per product",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Batch sheets are handwritten and sometimes go missing",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Raw material count never matches the store register",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Dealer orders come on WhatsApp, calls and through SOs — some get missed",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Sales targets are set in a meeting but nobody tracks them weekly",
+   "category": "sales_revenue",
+   "subtype": "target_missed"
+  },
+  {
+   "phrase": "Tinting machine data at dealers isn’t visible to us",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Big brand discounts squeeze our dealer counter share",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Gas/electricity cost per batch keeps rising",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Industrial customer rejects a coating lot and we argue about who is at fault",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Factory supervisor and accounts each keep their own numbers",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Hard to find trained lab and production staff",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Contractor projects pay in stages and retention is held for months",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  }
+ ],
+ "questions": {
+  "shade/batch complaints": [
+   "How often do shade complaints come in?",
+   "Can you tell which batch a returned can came from?",
+   "How are those claims settled with the dealer?"
+  ],
+  "raw materials": [
+   "Which raw material causes the most trouble — price, availability or quality?",
+   "How much is imported?",
+   "Who decides reorder timing?"
+  ],
+  "dealer credit": [
+   "Roughly how many active dealers do you have?",
+   "How many are past their credit limit?",
+   "How is credit approved now?"
+  ],
+  "schemes and coupons": [
+   "What schemes are running at the moment?",
+   "How do you check a claim before paying it?"
+  ],
+  "field sales": [
+   "How many sales officers do you have?",
+   "How do they report visits and orders?"
+  ],
+  "stock and expiry": [
+   "Which products expire or go dead at dealers?",
+   "What happens to that stock?"
+  ],
+  "costing": [
+   "How do you calculate cost per litre today?",
+   "When was it last updated?"
+  ],
+  "distribution": [
+   "Own trucks or hired transport?",
+   "What’s the most common delivery problem?"
+  ]
+ },
+ "seasons": "PK peak painting season runs before Eid ul Fitr and Eid ul Adha (homes repainted), before winter weddings (September–December), and dry months; monsoon (July–September) slows exterior work and delays construction. UAE: peak in cooler months (October–April) and pre-Ramadan/Eid refreshes; summer midday work restrictions slow site painting; construction project cycles drive industrial coatings. Canada: exterior painting season late spring to early autumn; interior work strong in winter; spring renovation peak.",
+ "care": [
+  "No formulation, recipe, VOC, hazardous classification, storage or transport-of-dangerous-goods advice; note only the business consequence.",
+  "Spills, fires, fume exposure or burns: pi stops, says this sounds urgent and points to emergency services.",
+  "No opinions on whether a product meets PSQCA, ESMA/UAE or Canadian standards; note “certification paperwork effort” only.",
+  "Do not help mislabel, re-date expired stock or copy another brand’s packaging — decline.",
+  "Painters and dealers: record roles and towns, not names or phone numbers.",
+  "Under-invoicing or fake-import-value requests are declined plainly.",
+  "Effluent and environmental concerns: note as compliance admin effort, no advice."
+ ],
+ "build_ideas": [
+  "Batch register: batch number, raw-material lots used, date, shade, QC result, and the dealers it was dispatched to.",
+  "Complaint-to-batch tracer: enter a can’s batch code and see where else that batch went.",
+  "Raw-material stock and reorder board with import consignment tracking and expected arrival dates.",
+  "Dealer ledger with credit limits, ageing and order blocking when a limit is crossed.",
+  "Scheme engine recording eligibility, purchases and claims so payouts can be checked against actual invoices.",
+  "Painter coupon system with unique codes and one-time redemption by WhatsApp.",
+  "Sales officer app: visits with location and time, orders captured, and daily summary to the manager.",
+  "Cost-per-litre calculator updated from current raw-material rates and batch yields.",
+  "Near-expiry report by dealer and SKU, with return/replacement requests tracked.",
+  "Dispatch and freight log showing cost per route and per product family.",
+  "Order intake on WhatsApp for dealers, feeding one order book.",
+  "Owner dashboard: sales by territory, receivables, raw-material cover, open complaints."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our biggest headache is dealers saying the shade doesn’t match the shade card. Whole cartons come back."
+  },
+  {
+   "role": "pi",
+   "text": "That’s frustrating, especially when it’s a full carton. Noted — shade mismatch complaints with full carton returns. When a can comes back, can you tell which batch it came from?"
+  },
+  {
+   "role": "Person",
+   "text": "Not really. The batch number is printed but nobody records which batch went where."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, batch numbers exist but dispatches aren’t linked to them. Roughly how many of these returns do you get in a month?"
+  }
+ ]
+}

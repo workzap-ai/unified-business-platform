@@ -1,0 +1,273 @@
+{
+ "key": "freight_forwarders",
+ "name": "Freight forwarders",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "freight forwarder",
+  "forwarding",
+  "booking",
+  "rate request",
+  "quote",
+  "RFQ",
+  "spot rate",
+  "contract rate",
+  "shipping line",
+  "carrier",
+  "NVOCC",
+  "co- loader",
+  "consol",
+  "FCL",
+  "LCL",
+  "air freight",
+  "AWB",
+  "BL",
+  "HBL",
+  "MBL",
+  "DO",
+  "cut-off",
+  "VGM",
+  "transhipment",
+  "ETA",
+  "ETD",
+  "rollover",
+  "shahn",
+  "wakeel shahn",
+  "agent network",
+  "overseas agent",
+  "profit share",
+  "nomination"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Modes handled: sea FCL/LCL, air, road (GCC/Afghanistan/Central Asia), courier, project cargo.",
+  "Main lanes (e.g. Karachi–Jebel Ali, China–Karachi, Dubai–Africa, Canada–South Asia).",
+  "Whether they are an NVOCC, co-load with others, or book directly with lines.",
+  "Number of shipments per month, roughly, and number of active customers.",
+  "Overseas agent network: own branches, partners, or networks.",
+  "Team size: sales, operations/documentation, pricing, accounts.",
+  "Systems: Excel, email, CargoWise, Magaya, a local freight software, or none."
+ ],
+ "scope_rule": "pi notes operational and business problems: quoting speed, rate management, shipment visibility, documentation workload, customer updates, agent coordination, collections, margins per job and staff workload. It does not advise on Incoterms disputes, cargo liability, insurance claims, customs classification, dangerous goods rules, sanctions screening or contracts. It never helps with misdeclaring cargo, under-declaring weight or value, hiding dangerous goods, or moving goods for sanctioned parties. It records customer and agent roles (“a garment exporter customer”, “our Shanghai agent”), never names, contact details or ID documents.",
+ "vocabulary": {
+  "NVOCC": "non-vessel operating carrier that issues its own bills of lading",
+  "HBL / MBL": "house bill of lading (forwarder’s) / master bill of lading (shipping line’s)",
+  "AWB / HAWB": "air waybill / house air waybill",
+  "DO": "delivery order, released so cargo can be collected",
+  "cut-off": "deadline for cargo or documents to make a sailing",
+  "VGM": "verified gross mass declaration for containers",
+  "rollover": "cargo bumped to a later vessel",
+  "consol / co-load": "consolidating cargo or putting it with another forwarder’s consol",
+  "spot rate / contract rate": "one-off market rate vs agreed rate",
+  "profit share": "margin split with an overseas agent",
+  "nomination": "cargo where the overseas agent’s customer chooses you",
+  "detention / demurrage": "container charges for keeping it too long outside/inside port"
+ },
+ "problems": [
+  {
+   "phrase": "Customers want a quote in an hour and it takes us a day to get rates",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Rates from lines change every week and staff quote old ones",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "We quote, then never follow up, and the customer books elsewhere",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Too few new customers; we live off the same old accounts",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "Customers call all day asking ‘where is my container’",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Cargo got rolled and we found out after the customer did",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "A BL had a mistake and the cargo got held",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Same shipment details typed into five documents and the freight system",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "We don’t know profit per job until the line’s invoice arrives weeks later",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Unexpected charges from destination agents wipe out the margin",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "We pay the shipping line upfront but customers pay us in 60 days",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Overseas agents’ profit-share settlements are always disputed",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Detention charges pile up because the customer didn’t return the empty",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "All shipment info sits in one ops person’s email",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "When the ops guy is on leave, nobody can answer customers",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Good ops staff leave for bigger forwarders",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Sales gives customers promises ops can’t meet",
+   "category": "communication_coordination",
+   "subtype": "branches_not_aligned"
+  },
+  {
+   "phrase": "Agent communication across time zones means delays",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_communication"
+  },
+  {
+   "phrase": "I can’t see which customers and lanes make money",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Our freight software is old and nobody uses it fully",
+   "category": "tech_systems",
+   "subtype": "outdated_system"
+  },
+  {
+   "phrase": "Customers complain we don’t proactively update them",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "We lost a big customer and only found out when volumes dropped",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Insurance and damage claims drag on because documents are scattered",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Freight rate crashes leave us stuck with contract space we can’t fill",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Our website still says nothing about what we do",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  }
+ ],
+ "questions": {
+  "quoting": [
+   "When a customer asks for a rate, what happens step by step?",
+   "How long does a quote usually take?",
+   "How many quotes turn into bookings, roughly?"
+  ],
+  "visibility": [
+   "How do your ops team track each shipment’s status?",
+   "How do customers find out about delays now?"
+  ],
+  "documentation": [
+   "Which documents do you prepare per shipment?",
+   "Where do mistakes happen most?"
+  ],
+  "margin": [
+   "When do you know the final profit on a job?",
+   "What costs tend to surprise you?"
+  ],
+  "cash": [
+   "How long do customers take to pay, versus how fast you pay lines and agents?",
+   "Which customers or agents cause most delay?"
+  ],
+  "agents": [
+   "How do you coordinate with overseas agents day to day?",
+   "What goes wrong most with them?"
+  ],
+  "people": [
+   "If your main ops person was away a week, what would break?",
+   "How is work divided between sales and ops?"
+  ],
+  "growth": [
+   "Where do new customers come from today?",
+   "What stops you winning more?"
+  ]
+ },
+ "seasons": "Global sea freight peaks August–October ahead of Western Q4 retail and again before Chinese New Year (December–January), when space tightens and rollovers increase; post-CNY is often slack. Pakistan’s textile export peaks follow buyers’ seasons (spring/summer and autumn/winter collections); rice and fruit/vegetable exports are seasonal (mango May–August, kinnow December–March). Ramadan and Eid holidays slow Pakistani and UAE operations; Eid holidays shut ports and offices. Karachi monsoon (July–August) and port congestion disrupt. In the UAE, exhibitions and project cargo seasons; in Canada, winter weather affects rail and inland, and the holiday retail season peaks imports. Geopolitical disruptions (e.g. Red Sea diversions) change transit times without warning.",
+ "care": [
+  "Cargo liability, Incoterms disputes and claims against carriers: pi notes the operational effect and suggests legal or insurance advice.",
+  "Dangerous goods classification and packing: safety-regulated; pi does not advise and does not help hide DG cargo.",
+  "Requests to under-declare weight, misdescribe cargo or alter BLs: pi declines plainly.",
+  "Sanctions screening, embargoed destinations or restricted parties: out of scope; pi suggests compliance advice.",
+  "Customs classification or duty: refer to a licensed clearing agent.",
+  "Never stores customer contact details, consignee names, passport or bank details; uses roles.",
+  "If someone reports an incident at a port, warehouse or container with injury, pi points to emergency services first."
+ ],
+ "build_ideas": [
+  "Rate sheet manager: line and agent rates by lane, validity date, surcharges, with expiry alerts, so quotes use current rates.",
+  "Quick quote builder that produces a branded quote on WhatsApp/email and logs it.",
+  "Quote follow-up tracker showing open quotes, age and outcome.",
+  "Shipment board: every job’s milestones (booked, gated in, sailed, transhipped, arrived, DO released, delivered) with owner per job.",
+  "Automated customer status updates on WhatsApp when a milestone changes.",
+  "Single job entry that fills the HBL, invoice, arrival notice and manifest templates.",
+  "Job costing sheet: estimated vs actual cost and revenue per job, flagged when actuals exceed estimate.",
+  "Customer and agent receivables with ageing and profit-share reconciliation.",
+  "Detention/demurrage clock per container with free-time alerts to the customer.",
+  "Lane and customer profitability dashboard.",
+  "Shared ops inbox/notes so a job’s history isn’t stuck in one person’s email.",
+  "Simple lead tracker for new customer prospects and sales calls."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our biggest headache is quotes. Customer asks Karachi to Felixstowe, we email three lines, wait, then calculate. By the time we reply, they’ve booked with someone else."
+  },
+  {
+   "role": "pi",
+   "text": "That sounds frustrating — you’re losing bookings simply on quote speed. Noted. Roughly how long does a typical quote take from request to reply?"
+  },
+  {
+   "role": "Person",
+   "text": "Same day if lucky, often next day."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — usually same day to next day. Do you keep the lines’ current rates anywhere your team can see, or is it fresh emails each time?"
+  }
+ ]
+}

@@ -1,0 +1,297 @@
+{
+ "key": "livestock_traders_and_mandis",
+ "name": "Livestock traders and mandis (incl. qurbani / Eid ul Adha animals)",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "mandi",
+  "maweshi mandi",
+  "cattle market",
+  "beopari",
+  "byopari",
+  "bakra",
+  "gaye",
+  "bachhra",
+  "dumba",
+  "oont",
+  "qurbani",
+  "Bakra Eid",
+  "Eid ul Adha",
+  "hissa",
+  "ijtimai qurbani",
+  "bayana",
+  "sauda",
+  "parchi",
+  "daant",
+  "do daant",
+  "khassi",
+  "jaali note",
+  "home delivery animal",
+  "online qurbani",
+  "souq al mawashi",
+  "udhiya / adahi",
+  "halal",
+  "Al Mina",
+  "Al Ain livestock market"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Role: seasonal Eid trader, year-round trader, mandi commission agent, collective-qurbani organiser, online qurbani seller, or (UAE) importer/wholesaler or souq stall.",
+  "Animals handled per season and the mix (goats, sheep, cattle, camels).",
+  "Where animals come from: own farm, village agents, other mandis, imports (UAE).",
+  "Selling channels: physical mandi stall, own farmhouse, Instagram/Facebook/WhatsApp, Dubizzle/OLX, delivery to homes.",
+  "Whether they handle slaughter and meat distribution (collective qurbani) or only sell live animals.",
+  "Payment mix: cash, bank transfer, JazzCash/Easypaisa, advances.",
+  "Team size during peak: helpers, guards, drivers, butchers."
+ ],
+ "scope_rule": "pi notes the trading and logistics problems: buying, holding, feeding, pricing, bookings, cash, delivery, staff and losses. pi does not give religious rulings (for example whether an animal is eligible for qurbani, its age by teeth, or acceptable defects) and suggests they ask their own scholar. It does not advise on animal health or medicines, and never helps get around slaughter rules (in the UAE, Eid sacrifice must happen at licensed slaughterhouses), municipal mandi rules, import health rules or tax. It never collects buyers’ CNIC/Emirates ID, addresses beyond what the business itself records, or payment details.",
+ "vocabulary": {
+  "mandi / maweshi mandi": "livestock market",
+  "beopari": "livestock trader",
+  "bayana": "advance/deposit to hold an animal",
+  "sauda": "deal",
+  "parchi": "entry token/receipt at the mandi, or a handwritten slip",
+  "hissa": "one of seven shares in a cow/camel qurbani",
+  "ijtimai qurbani": "collective qurbani run by an organiser",
+  "daant / do daant": "teeth / two teeth (used to gauge age)",
+  "khassi": "castrated",
+  "jaali note": "counterfeit currency note",
+  "dalal": "middleman/broker",
+  "souq al mawashi": "livestock market (Arabic)",
+  "udhiya / adahi": "sacrificial animal(s) (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Fake notes ka dar hai, pichli Eid do jaali note aa gaye",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Carrying lakhs in cash at the mandi at night is dangerous",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Animals stolen from the stall while we slept",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Buyers give bayana, then vanish or argue the price later",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Same animal promised to two buyers by two helpers",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Customer says the animal delivered isn’t the one in the photo",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Delivery on Chand Raat is chaos, half the addresses are wrong",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Fodder at the mandi costs double and I don’t track how much we use",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Entry, tent, water, power and transport costs eat everything",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "I don’t know which animals made money and which I sold at a loss",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Last two days nobody buys and we’re stuck with 40 animals",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Prices crash on Eid eve and we panic-sell",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Hissa bookings are on paper, two people got the same share",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Collective qurbani customers ask where their meat is and nobody knows",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Meat distribution after slaughter is slow and complaints pour in",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Instagram and WhatsApp messages flood in and we miss serious buyers",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Facebook ads bring tyre-kickers, not buyers",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Helpers and butchers leave for better pay on Eid day itself",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "One helper sold animals and pocketed part of the cash",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "I buy from village agents on trust and get sick or underweight animals",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Imported shipment arrived late, missed the first rush",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Animals died from heat or transport and I can’t say what it cost",
+   "category": "margin_cost",
+   "subtype": "mortality_cost"
+  },
+  {
+   "phrase": "After Eid I have no list of buyers to contact next year",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Online customers transfer money and I can’t match who paid for which animal",
+   "category": "cash_collections",
+   "subtype": "payment_matching"
+  },
+  {
+   "phrase": "Mandi permits, slaughterhouse slots and paperwork take days",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "No idea how this Eid compared with last",
+   "category": "reporting_visibility",
+   "subtype": "no_season_comparison"
+  }
+ ],
+ "questions": {
+  "model": [
+   "Do you mostly sell live animals, run collective qurbani, or both?",
+   "Roughly how many animals in a season?"
+  ],
+  "cash": [
+   "How are most payments made — cash, transfer or wallets?",
+   "What happens to the cash at night?",
+   "Have fake notes been a problem?"
+  ],
+  "bookings": [
+   "How do you record a bayana today?",
+   "What happens when a buyer doesn’t come back?"
+  ],
+  "delivery": [
+   "Do you deliver animals to homes?",
+   "What usually goes wrong on delivery day?"
+  ],
+  "hisse": [
+   "How are shares in a cow or camel recorded?",
+   "How do customers find out their meat is ready?"
+  ],
+  "costs": [
+   "Do you track fodder, transport and stall costs per animal?",
+   "Which cost hurt most last Eid?"
+  ],
+  "pricing": [
+   "How do you decide when to drop prices near Eid?",
+   "Did you have animals left unsold?"
+  ],
+  "staff": [
+   "How many helpers do you take on for Eid?",
+   "How do you know what each of them sold?"
+  ],
+  "buying": [
+   "Where do your animals come from?",
+   "Do you note which agent or source each came from?"
+  ],
+  "messages": [
+   "How many enquiries do you get a day at peak?",
+   "Who replies to them?"
+  ],
+  "security": [
+   "Who watches the animals at night?"
+  ],
+  "after eid": [
+   "Do you keep any list of your buyers for next year?"
+  ]
+ },
+ "seasons": "- Eid ul Adha (moves about 11 days earlier each year on the Gregorian calendar) is the whole year for many traders: buying starts two to three months before, mandis open weeks before, and the last ten days and Chand Raat are the peak; prices often fall sharply on the last evening. - Pakistan: large city mandis on the outskirts of Karachi, Lahore and other cities run for weeks before Eid; monsoon or heatwaves during Eid season bring mud, heat stress and losses. - Smaller peaks: aqiqah (birth celebration) year-round, Ramadan and weddings for meat animals, Muharram niyaz in some areas. - UAE: livestock souqs (for example in Abu Dhabi and Al Ain) and online orders through licensed slaughterhouses peak before Eid ul Adha; imported animals arrive by sea ahead of Eid; summer heat often overlaps Eid in coming years. - Canada: Muslim community qurbani orders through farms and halal slaughter plants peak before Eid ul Adha; many order overseas qurbani instead.",
+ "care": [
+  "No religious rulings on qurbani validity, age, defects or shares; pi says that’s one for their scholar.",
+  "No animal-health advice or medicines; heat-stressed or injured animals → suggest their vet.",
+  "Large cash, robbery and fake notes: pi notes risks; if someone is in danger or was robbed just now, pi points to 15 / 1122 (Pakistan) or 999 (UAE).",
+  "UAE: never helps with slaughter outside licensed slaughterhouses or selling at unlicensed spots.",
+  "Never helps evade mandi fees, municipal rules, import health checks or taxes, or hide sick animals.",
+  "Buyers’ personal details: records counts and roles, never CNIC, Emirates ID, home addresses or card details.",
+  "Helpers suspected of theft: pi notes the control gap, no confrontation advice, no covert surveillance.",
+  "Animal cruelty: pi does not engage with methods that harm animals."
+ ],
+ "build_ideas": [
+  "Animal stock list with tag/photo, purchase price, source, location (stall/farmhouse), status (available, reserved, sold, delivered).",
+  "Bayana and booking register: advance, balance, promised delivery slot, with one animal locked to one buyer.",
+  "WhatsApp catalogue and enquiry bot that answers availability and price ranges set by the owner and passes serious buyers to a person.",
+  "Delivery planner for Eid days: routes, drivers, time slots, proof-of-delivery photo, cash or transfer confirmation.",
+  "Collective-qurbani share manager: each animal’s seven shares, slaughter time, meat-ready notification on WhatsApp.",
+  "Daily cash and transfer reconciliation per helper with end-of-night handover record.",
+  "Per-animal and per-season margin view including fodder, transport, stall, mortality.",
+  "Helper sales log so each sale is tied to a helper and payment.",
+  "Agent/source scorecard: animals bought, deaths, average margin.",
+  "Post-Eid buyer list (with consent) for next season’s broadcast.",
+  "Season comparison report: animals bought, sold, unsold, margin, vs last Eid."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Is Eid pe 120 bakre the, bayana parchi pe likhte the, do customer aik hi bakre pe lad pade."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh toh Eid ke rush mein bohat pareshani wali situation hai. Bayana kaun kaun le sakta hai — sirf aap, ya helpers bhi?"
+  },
+  {
+   "role": "Person",
+   "text": "Teen helpers bhi lete hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — teen helpers alag alag bayana lete hain aur parchi pe likhte hain, toh aik jaanwar do logon ko bik gaya. Paise ka hisaab raat ko kaise milate hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Bas andaza, unpe bharosa hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, helper wise paison ka hisaab nahi milta. Jaali note ka masla bhi kabhi hua?"
+  }
+ ]
+}

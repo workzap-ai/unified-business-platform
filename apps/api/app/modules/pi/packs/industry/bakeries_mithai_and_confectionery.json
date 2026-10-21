@@ -1,0 +1,286 @@
+{
+ "key": "bakeries_mithai_and_confectionery",
+ "name": "Bakeries, mithai and confectionery",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "bakery",
+  "mithai",
+  "sweets",
+  "mithai ki dukaan",
+  "halwai",
+  "karigar",
+  "cakes",
+  "custom cakes",
+  "bread",
+  "rusk",
+  "biscuits",
+  "nan khatai",
+  "gulab jamun",
+  "barfi",
+  "laddu",
+  "gift boxes",
+  "dabba",
+  "kilo rate",
+  "halawiyat kunafa",
+  "baklava",
+  "maamoul",
+  "chocolates",
+  "confectionery",
+  "oven",
+  "branches",
+  "factory"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Production on site, in a central factory, or both",
+  "Number of retail branches and whether they share one production unit",
+  "Product mix: bread and daily bake, cakes, mithai, Arabic sweets, chocolates, biscuits",
+  "Custom/pre-order share (birthday cakes, wedding and Eid boxes)",
+  "Corporate or wholesale customers (offices, shops, hotels) and credit given",
+  "Number of karigars and whether they’re paid per day, per batch or salary",
+  "Delivery: own riders, apps, or customer collection"
+ ],
+ "scope_rule": "pi notes operational problems: production planning, wastage, branch transfers, custom-order mix-ups, festive rush, corporate credit, staff and reporting. It does not give food-safety, shelf-life, labelling, additive or allergen advice, nor tax or licensing advice. It does not record customers’ names, addresses or phone numbers from orders, staff details, or any payment details.",
+ "vocabulary": {
+  "mithai": "traditional South Asian sweets",
+  "halwai": "sweet-maker",
+  "karigar": "skilled craftsman/baker in production",
+  "dabba": "sweet box",
+  "kilo rate": "price per kilogram for mithai",
+  "ghee/khoya/mawa": "key dairy inputs for sweets",
+  "kunafa, baklava, maamoul": "Arab and Levantine sweets",
+  "custom cake": "made-to-order with design and message",
+  "day-old": "yesterday’s bake, often discounted or returned",
+  "batch": "one production run"
+ },
+ "problems": [
+  {
+   "phrase": "Bread and buns left over every night, we sell them as rusk but it’s a loss",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Eid boxes run out at some branches while others have too many",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Factory sends to branches on a paper chit and nothing matches",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Ghee, sugar and khoya prices change weekly, kilo rate is old",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "I don’t know which sweet actually makes money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Custom cake orders come by WhatsApp, Instagram and phone, wrong names on cakes",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Customer comes for the cake and it’s not ready",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Advance payments for cake orders are noted on paper and get lost",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Weighing on the counter isn’t accurate, staff give extra to friends",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Corporate Eid orders, offices pay 60 days late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Karigars leave just before the festival and ask for more",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Same gulab jamun is different in each batch",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Taste differs between branches even though the factory is one",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Festival rush, we can’t produce enough and staff work double shifts",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Overtime in Eid week is a fight every year",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Production plan is in the head karigar’s head",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Delivery of cakes gets damaged on the way",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Bad review because the cake design didn’t match the picture",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Sales fall after Eid and wedding season",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "We don’t take online orders, people message and leave",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "Oven breaks in peak and repair takes days",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Hygiene inspection keeps me guessing what records are needed",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Shop sales and factory costs are in different registers",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Packing material supplier doesn’t deliver boxes before Eid",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Thinking of a new branch, not sure the factory can cope",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "Gas load-shedding stops production",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  }
+ ],
+ "questions": {
+  "wastage": [
+   "What’s usually left at closing?",
+   "What happens to it now?"
+  ],
+  "production": [
+   "Who decides how much to make each day?",
+   "Is it written down anywhere?"
+  ],
+  "branches": [
+   "How does stock move from the factory to shops?",
+   "How do you check what arrived?"
+  ],
+  "costing": [
+   "Do you know the cost per kilo of your main sweets?",
+   "When did you last update the kilo rate?"
+  ],
+  "custom orders": [
+   "How do cake orders come in?",
+   "What usually goes wrong — design, timing or details?"
+  ],
+  "advances": [
+   "How are advance payments recorded?",
+   "Have any gone missing?"
+  ],
+  "corporate": [
+   "How many corporate customers buy on credit?",
+   "How long do they usually take to pay?"
+  ],
+  "staff": [
+   "How many karigars do you have?",
+   "When do they usually leave?"
+  ],
+  "festival": [
+   "Which festival is your biggest?",
+   "What runs short first — stock, staff or boxes?"
+  ],
+  "quality": [
+   "Which product varies most?"
+  ],
+  "reporting": [
+   "How do you see daily sales across branches?"
+  ]
+ },
+ "seasons": "- PK: Eid ul Fitr (mithai and boxes), Eid ul Adha (smaller), Shab-e-Barat, Ramadan (pheni, khajla, iftar items), wedding season (November–March) for mithai and cakes, Diwali for Hindu customers in Sindh, Independence Day, Christmas and New Year cakes, rain season with pakoray and samosas demand. - UAE: Ramadan and Eid for Arabic sweets, dates and gift boxes; Diwali and Onam for South Asian communities; Christmas and New Year cakes; National Day; wedding season in cooler months. - Canada: Diwali, Eid, Christmas, Thanksgiving and Easter; graduation and wedding season in summer; Valentine’s for chocolates.",
+ "care": [
+  "Oven burns, gas leaks, fires or mixer injuries: pi points to emergency services immediately.",
+  "Shelf-life, preservative, colour or labelling questions: pi notes the admin problem only.",
+  "Allergen or diabetic-suitability claims: pi gives no health advice.",
+  "Customer names on cakes and phone numbers: pi does not collect or store them.",
+  "Karigar pay disputes: noted by role, no employment-law advice.",
+  "Requests for fake halal or quality certificates, or weight short-changing: pi declines.",
+  "Gift-box under-invoicing for corporate clients: pi declines."
+ ],
+ "build_ideas": [
+  "Daily production plan by product and branch, based on recent sales and day of week, with sign-off by the head karigar",
+  "Factory-to-branch dispatch and receiving app with variances highlighted",
+  "Custom-cake order system: design photo, message, date, pickup/delivery time, advance paid, with kitchen tickets and WhatsApp confirmation to the customer",
+  "Advance-payment ledger tied to each order",
+  "Leftover and wastage log with what was reworked, discounted or discarded",
+  "Recipe costing per kilo with ingredient price updates and margin flags",
+  "Festival planner: last year’s volumes, box and packaging needs, staffing, overtime plan",
+  "Corporate order and receivables tracker with reminders",
+  "Branch sales dashboard with product mix",
+  "Packaging stock tracker with reorder point ahead of festivals",
+  "Online ordering page with pre-order slots for festivals",
+  "Equipment and gas downtime log"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Eid pe har saal yehi hota hai, kuch branches mein dabbe khatam aur kuch mein bach jate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — Eid par branches mein mithai ke dabbe kahin kam, kahin zyada reh jate hain. Factory se har branch ko kitna bhejna hai, ye kaun decide karta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Main khud, andaze se."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted ke ye andaze se hota hai. Kya pichle saal ki Eid ki sale branch-wise kahin likhi hui hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Register mein thori bohot hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted. Eid ke beech mein ek branch se doosri branch maal bhejna padta hai kya?"
+  }
+ ]
+}

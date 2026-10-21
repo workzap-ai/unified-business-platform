@@ -1,0 +1,274 @@
+{
+ "key": "jewellery",
+ "name": "Jewellery (gold, diamond, artificial)",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "jewellery shop",
+  "jeweller",
+  "sunar",
+  "zewar",
+  "sarafa bazaar",
+  "gold rate",
+  "tola",
+  "karat",
+  "making charges",
+  "mazdoori",
+  "khalis sona",
+  "purana sona exchange",
+  "diamond certificate",
+  "solitaire",
+  "bridal set",
+  "jahez set",
+  "artificial jewellery",
+  "imitation",
+  "kundan",
+  "polki",
+  "dhahab",
+  "souq al dhahab",
+  "Gold Souk",
+  "mahr/ haq mehr set",
+  "karigar",
+  "hallmark"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Segment: gold, diamond, silver, artificial/imitation, or a mix.",
+  "In-house manufacturing ( karigar workshop) vs buying finished pieces from wholesalers.",
+  "Number of branches and whether stock moves between them or to exhibitions.",
+  "Whether the shop takes old gold exchange, custom orders, or instalment/booking schemes.",
+  "Sales channel mix: walk-in, Instagram/WhatsApp, website, exhibitions, wholesale to other shops.",
+  "How stock is tracked today: tags and register, POS, Excel, weight book.",
+  "Country (PK / UAE / Canada), because pricing conventions, invoicing and customer expectations differ."
+ ],
+ "scope_rule": "pi notes operational problems such as weight and piece reconciliation, custom-order tracking, karigar handovers, rate- update effort, salesperson follow-up and branch stock visibility. pi does not give investment advice on gold, forecast gold prices, value or authenticate pieces, or advise on tax treatment, VAT on gold, or anti-money-laundering obligations. Those go to the owner’s accountant or compliance adviser, and pi only records that these tasks take effort. pi never records customers’ names, ID numbers, or details of what they own or keep at home.",
+ "vocabulary": {
+  "tola": "traditional gold weight unit, about 11.66 g",
+  "ratti / masha": "smaller traditional weight units",
+  "mazdoori / making charges": "labour charge added on top of the metal value",
+  "karigar": "goldsmith or artisan who makes the pieces",
+  "khot / wastage": "metal lost in making, often charged to the customer",
+  "purana sona": "old gold brought in for exchange",
+  "sarafa": "gold market or bullion trade",
+  "bayana": "advance payment to book an order",
+  "polki / kundan": "traditional uncut-diamond and stone-setting styles",
+  "dhahab": "gold (Arabic)",
+  "imitation / artificial": "non-precious fashion jewellery",
+  "tag": "piece label showing weight, purity, code",
+  "certificate": "third-party diamond grading document"
+ },
+ "problems": [
+  {
+   "phrase": "Weight in the register and weight on the scale don’t match at month end",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Gold given to the karigar comes back with less than expected and we can’t tell why",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "We don’t know how many custom orders are pending or which are late",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Customer comes for the bridal set on the promised date and it’s not ready",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Rates change during the day and staff quote yesterday’s rate",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Making charges are negotiated by each salesman differently",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Pieces sit in the showcase for years, we’ve got old designs nobody wants",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Stock went to an exhibition and not everything came back accounted for",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Artificial jewellery has thousands of tiny items and we have no count",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Old gold exchange calculations are done on a calculator and disputes happen",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Booking advances are written in a diary and sometimes we can’t find them",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "I can’t tell my margin per piece once making and wastage are mixed in",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Top salesman left and took his customers with him",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Salesmen fight over who made the sale for commission",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Instagram DMs asking ‘price?’ all day and nobody replies properly",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Wedding season orders overwhelm the workshop",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Diamond certificates and pieces get mismatched",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Repairs and resizing jobs get lost or the customer’s piece goes missing",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "I’m scared about cash in the shop at closing",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Don’t know which branch actually sells better per square foot",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Documentation for customers and compliance takes hours every week",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Our son wants to take over but only I know the karigar accounts",
+   "category": "planning_growth",
+   "subtype": "succession_family"
+  },
+  {
+   "phrase": "Online orders for artificial jewellery get returned damaged or wrong",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  }
+ ],
+ "questions": {
+  "stock and weight": [
+   "Is this mostly gold, diamond, artificial, or a mix?",
+   "How do you track weight today, register, software or both?",
+   "When the count doesn’t match, roughly how often does that happen?"
+  ],
+  "karigar and workshop": [
+   "Do you have your own karigars or do you send work outside?",
+   "How is gold handed over and taken back today?",
+   "Where does the difference usually show up?"
+  ],
+  "custom orders": [
+   "How many custom or booked orders do you usually have running at once?",
+   "How do you and the customer know where each one stands?"
+  ],
+  "pricing": [
+   "How does the day’s rate reach the sales counter?",
+   "Who decides making charges and discounts?"
+  ],
+  "sales team": [
+   "How many people sell on the floor?",
+   "How is commission worked out today?"
+  ],
+  "customers": [
+   "How do your customers usually come back to you, walk-in, WhatsApp, Instagram?",
+   "What happens to their enquiry if nobody picks it up quickly?"
+  ],
+  "branches and exhibitions": [
+   "Do pieces move between branches or go to exhibitions?",
+   "How do you check everything came back?"
+  ],
+  "repairs": [
+   "Do you take repairs, polishing or resizing?",
+   "How do you keep track of whose piece is where?"
+  ],
+  "cash": [
+   "Is most payment cash, card, transfer or old-gold exchange?",
+   "What part of closing up the day worries you most?"
+  ],
+  "owner view": [
+   "If you wanted to know today’s stock weight across the business right now, how would you find out?"
+  ]
+ },
+ "seasons": "PK peaks in wedding season (roughly October to March, quieter in Muharram and Ramadan for weddings), and around Eid ul Fitr and Eid ul Adha for gifting and light pieces. UAE peaks during Dubai Shopping Festival (December to January), Diwali and Akshaya Tritiya for the South Asian community, Eid, and Ramadan evenings; summer is slower when residents travel. Canada sees South Asian wedding season (often summer), Diwali, Christmas and Valentine’s Day for diamonds. Gold price swings can drive surges of selling-in (old gold) or holding back on buying.",
+ "care": [
+  "Never comment on whether gold is a good buy, where rates are heading, or whether to hold or sell stock.",
+  "Never authenticate, value or grade pieces or certificates; note only the operational mismatch.",
+  "Anti-money-laundering, VAT on gold, hallmarking and dealer registration questions belong to the owner’s adviser; pi notes “compliance takes effort”, nothing more.",
+  "Refuse any request to under-invoice, split invoices to avoid reporting thresholds, hide cash sales or source gold without paperwork.",
+  "Do not record customer names, phone numbers, IDs or what jewellery a customer keeps.",
+  "Theft or robbery in progress, or a threat, means pi stops and tells them to call police (15 in PK, 999 in UAE, 911 in Canada).",
+  "Suspicions about a staff member or karigar: record the pattern and role only, never names or accusations.",
+  "Family-business tension (sons, brothers sharing dukaan) needs a gentle tone, and pi does not take sides."
+ ],
+ "build_ideas": [
+  "Piece-level stock register with tag code, gross/net weight, purity, stone details, branch, photo, and location (showcase, safe, exhibition, karigar).",
+  "Karigar ledger: metal issued, received, wastage allowed vs actual, per job, with running balance and alerts on variance.",
+  "Custom-order tracker from booking to delivery, with design photo, advance taken, promised date, stage and WhatsApp status updates to the customer.",
+  "Daily rate board: owner enters the rate once and it flows to price tags, the POS and the salesperson’s phone.",
+  "Making-charge and discount rules by category, with approval needed above set limits.",
+  "Old-gold exchange calculator with purity, deduction and printed slip, logged against the sale.",
+  "Exhibition/transfer checkout and check-in by tag scan, with a shortfall list.",
+  "Repairs and resizing job cards with photo at intake and pickup notification.",
+  "Salesperson dashboard: sales by person, commission auto-calculated, enquiries followed up.",
+  "WhatsApp/Instagram enquiry inbox with shared quick replies and catalogue links.",
+  "Dead-stock report by design age and category to plan melting or remodelling.",
+  "Owner’s daily read on phone: stock weight by branch, sales, advances held, orders due this week."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai masla ye hai ke karigar ko sona deta hoon, wapis aata hai to har dafa kuch kam hota hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, karigar ke paas jaane aur wapis aane mein weight ka farq aa raha hai. Noted. Ye hisaab abhi aap register mein rakhte hain ya kisi software mein?"
+  },
+  {
+   "role": "Person",
+   "text": "Register mein, mera munshi likhta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted. Ye farq har order mein aata hai ya kuch khaas kaam ya karigar ke saath zyada hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Zyada tar bridal sets mein."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, bridal sets mein farq zyada hai. Wedding season mein aap ke paas ek waqt mein taqreeban kitne custom orders chal rahe hote hain?"
+  }
+ ]
+}

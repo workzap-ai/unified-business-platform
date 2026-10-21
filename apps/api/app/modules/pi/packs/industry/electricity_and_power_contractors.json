@@ -1,0 +1,267 @@
+{
+ "key": "electricity_and_power_contractors",
+ "name": "Electricity and power contractors",
+ "kind": "industry",
+ "sector": {
+  "code": "L",
+  "title": "Finance-adjacent, energy and utilities"
+ },
+ "signals": [
+  "electrical contractor",
+  "power contractor",
+  "wiring contractor",
+  "MEP contractor",
+  "solar installer",
+  "solar EPC",
+  "net metering applications",
+  "substation work",
+  "HT/LT cabling",
+  "panel installation",
+  "transformer installation",
+  "bijli ka kaam",
+  "wiring",
+  "electrician",
+  "thekedar",
+  "solar lagwana",
+  "net metering ki file",
+  "kahraba",
+  "muqawil kahraba",
+  "DEWA/ADDC approvals",
+  "electrical permits",
+  "maintenance contract",
+  "BOQ"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type of work: domestic wiring, commercial/industrial MEP, utility/grid works, solar installation, maintenance contracts.",
+  "Typical job size and number of jobs or projects running at once.",
+  "Number of electricians, helpers and supervisors, and whether subcontracted.",
+  "Customer mix: homeowners, developers, main contractors, factories, government or utilities.",
+  "How quotes/BOQs, materials and job progress are tracked.",
+  "Whether they hold material stock or buy per job.",
+  "Cities or regions covered."
+ ],
+ "scope_rule": "pi notes the contractor’s operational and business problems: quoting speed, material planning and wastage, job scheduling, crew productivity, site-to-office reporting, approvals and paperwork effort, collections and retentions, and after-sales calls. It never advises on electrical design, wiring standards, load calculations, earthing, protection settings, solar system sizing, savings or payback, tariffs or net-metering eligibility, and never helps bypass utility approvals, inspections or meters. It never asks for or stores customers’ names, addresses, meter or account numbers, or workers’ ID details; it records customer types and roles. Electric shock, fire or anyone hurt is an emergency and pi points to emergency services.",
+ "vocabulary": {
+  "Thekedar": "contractor",
+  "BOQ": "bill of quantities used for quoting",
+  "HT / LT": "high-tension / low-tension",
+  "DB / panel": "distribution board",
+  "Conduit, cable tray": "wiring routes",
+  "Net metering": "utility arrangement for exporting solar power (pi notes only paperwork effort)",
+  "Inverter, panels, structure": "solar system components",
+  "Snag list": "items to fix before handover",
+  "Running bill / IPC": "interim payment claim on a project",
+  "Retention": "amount held until defects period ends",
+  "Variation order": "approved change to scope and price",
+  "Muqawil": "contractor (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Quotes take a week because only I can prepare the BOQ",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "We win jobs and then lose money because material went over the estimate",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Cable and material bought for one site gets used on another and nobody records it",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Leftover cable and fittings pile up in the store",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Copper and cable prices change weekly and quotes go out of date",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Imported inverters and panels are delayed and installations wait",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "I don’t know what each crew did today until I visit the site",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Crews arrive late and leave early on sites far away",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Same snag gets fixed two or three times",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Variation work is done on a verbal request and never billed",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Running bills are submitted late because measurements aren’t ready",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Retentions from old projects are never collected",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Main contractors pay us only after they get paid",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Approval and inspection files for utilities take ages and we lose track of where each one is",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Customers call after installation and nobody owns the after-sales visit",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Solar leads from Facebook are many but mostly people just checking",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Leads wait days before anyone calls back",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Tools and meters go missing from sites",
+   "category": "loss_security",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Good electricians leave for jobs abroad",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Site photos and progress live on different people’s phones",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "I can’t tell which jobs actually made money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Materials ordered wrong because the site list was unclear",
+   "category": "suppliers_purchasing",
+   "subtype": "buying_wrong_items"
+  },
+  {
+   "phrase": "Too many jobs at once and handovers slip",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "No proper handover documents, so customers dispute warranty",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  }
+ ],
+ "questions": {
+  "quoting": [
+   "How long does it usually take to send a quote?",
+   "Who prepares it?",
+   "What slows it down most?"
+  ],
+  "materials": [
+   "How is material for a job decided and issued?",
+   "What happens to what’s left over?"
+  ],
+  "job costs": [
+   "When do you find out a job has gone over budget?",
+   "Where do you check it?"
+  ],
+  "crews": [
+   "How many crews or electricians are working on a normal day?",
+   "How do you know what each did?"
+  ],
+  "approvals": [
+   "Roughly how many jobs are waiting on approvals or inspections at once?",
+   "How do you keep track of where each stands?"
+  ],
+  "collections": [
+   "Which is slower for you, running bills, final payments or retentions?",
+   "Who chases them?"
+  ],
+  "leads": [
+   "Where do most enquiries come from?",
+   "How long until someone gets back to them?"
+  ],
+  "after-sales": [
+   "When a customer calls after handover, who handles it?"
+  ]
+ },
+ "seasons": "- PK: solar demand peaks before and during summer and after tariff increases are announced; load-shedding months bring UPS/inverter and wiring work; construction slows in monsoon; Ramadan and Eid affect labour availability; fiscal year end (June) drives government project billing. - UAE: construction is year-round with slowdown in summer midday work ban hours (mid-June to mid-September); AC load increases maintenance calls in summer; project handovers cluster before year-end. - Canada: construction season runs spring to autumn; winter brings heating-related electrical calls and storm repairs; solar installs concentrate April–October.",
+ "care": [
+  "No electrical design, code, earthing, protection, load or solar sizing advice; these are safety-engineering matters.",
+  "No tariff, savings, payback, financing or net-metering eligibility advice; pi notes only “approval paperwork tracking”.",
+  "Electric shock, fire, burns or someone hurt: pi stops and points to emergency services.",
+  "Never help with meter tampering, illegal hook-ups (“kunda”), bypassing inspections or fake completion certificates.",
+  "No customer addresses, meter numbers or account numbers stored.",
+  "Workers’ IDs and visa details not stored; roles and counts only.",
+  "Bribery around approvals is refused."
+ ],
+ "build_ideas": [
+  "Quote builder with a reusable item library and current material rates the owner maintains, so staff can draft BOQs.",
+  "Job costing tracker: estimated vs actual material and labour per job, updated from site.",
+  "Material issue and return log per site with leftover stock returned to store.",
+  "Store stock register with minimum levels and supplier price history.",
+  "Import order tracker for inverters/panels with expected dates.",
+  "Daily site report on phone: crew present, work done, photos, issues.",
+  "Crew attendance log by site.",
+  "Variation request log with approval status and billing flag.",
+  "Running bill and retention tracker per project with due dates.",
+  "Approvals and inspection file tracker by stage with reminders.",
+  "Snag list and handover pack generator (documents, warranties, photos).",
+  "Lead inbox for solar and service enquiries with response timers and qualification notes.",
+  "After-sales ticket log with assigned technician.",
+  "Tool register with check-out/check-in by crew."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Solar ke kaam mein material hamesha estimate se zyada lag jata hai aur profit khatam."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — material estimate se zyada lagna aur munafa khatam hona, noted. Site pe material kaise issue hota hai abhi?"
+  },
+  {
+   "role": "Person",
+   "text": "Supervisor store se le jata hai, likhta kuch nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, issue ka koi record nahi hota. Kaam khatam hone ke baad bacha hua material kahan jata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Kuch wapas aata hai, kuch agli site pe chala jata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted — bacha hua material kabhi wapas, kabhi agli site pe. Ek waqt mein taqreeban kitni sites chal rahi hoti hain?"
+  }
+ ]
+}

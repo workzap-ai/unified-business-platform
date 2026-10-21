@@ -1,0 +1,258 @@
+{
+ "key": "carpets_handicrafts_and_artisan_workshops",
+ "name": "Carpets, handicrafts and artisan workshops",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "hand-knotted carpets",
+  "rugs",
+  "qaleen",
+  "dari",
+  "kilim",
+  "namda",
+  "gabba",
+  "handicrafts",
+  "truck art",
+  "onyx crafts",
+  "wooden furniture/carving",
+  "ajrak",
+  "rilli",
+  "embroidery",
+  "karigar",
+  "thekedar",
+  "ustaad",
+  "artisan",
+  "export orders",
+  "Etsy",
+  "sajjad hiraf yadawiya Lahore/Peshawar/Hyderabad crafts",
+  "Sindhi/Balochi work",
+  "exhibition"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Product type (carpets/rugs, textiles, wood, metal, onyx/stone, pottery, embroidery, mixed).",
+  "Workshop-based, home-based artisans through contractors, or a mix.",
+  "Number of artisans/looms working for them.",
+  "Sales: export buyers, local showrooms, exhibitions, tourists, online (Etsy, Instagram, own site).",
+  "Custom/made-to-order vs ready stock.",
+  "Who supplies raw materials (wool, dyes, wood, thread) — owner or artisan.",
+  "Payment to artisans: piece rate, advance, or per square foot/knot."
+ ],
+ "scope_rule": "pi notes business problems: artisan work-in-progress, advances, raw materials, order timelines, quality consistency, export admin effort, online sales, pricing and cash. It gives no labour-law, child-labour, export-regulation, customs, intellectual-property or authentication advice. It records no names, IDs or home locations of artisans, only roles and counts. If anyone is in danger or a child is being harmed, pi stops and points to emergency services and appropriate child-protection helplines.",
+ "vocabulary": {
+  "karigar": "artisan/craftsperson",
+  "ustaad": "master craftsman",
+  "thekedar": "contractor who manages artisans",
+  "peshgi": "advance paid to artisans",
+  "khaddi / loom": "weaving loom",
+  "knot count / KPSI": "knots per square inch, quality measure",
+  "naqsha / design": "pattern/design map",
+  "washing / finishing": "final wash and clipping of carpets",
+  "qaleen": "carpet",
+  "dari / kilim": "flat-woven rug",
+  "sajjad": "carpet (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Advances given to karigars and I don’t know how much work is done against them",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Contractor says 30 carpets on looms but I can’t verify",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Export order deadline missed because two artisans fell sick and nobody told me",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Same design comes out different from different looms",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Wool and dye given to artisans and some of it disappears",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Buyer rejected pieces at inspection and we had to discount",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "I don’t know actual cost per piece after advances, materials and washing",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Young people don’t want to learn the craft",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Export buyers pay 60–90 days after shipment",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Freight and courier to international customers is very expensive",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Stock of finished carpets isn’t photographed or catalogued",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Online orders come from Etsy, Instagram, WhatsApp and the website",
+   "category": "orders_fulfilment",
+   "subtype": "multi_channel_orders"
+  },
+  {
+   "phrase": "Etsy listings get few views",
+   "category": "marketing_leads",
+   "subtype": "marketplace_visibility"
+  },
+  {
+   "phrase": "International customers ask questions at night, we reply late",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Export paperwork for each shipment takes ages",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Tourist season sales drop when tourists don’t come",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Old designs sit unsold for years",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Custom size orders get measurements mixed up",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Exhibitions cost a lot and I don’t know if they pay off",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Artisans complain they were underpaid per foot",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Damage in international shipping and claims are a hassle",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Everything depends on me — designs, buyers, payments",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Currency changes make export quotes risky",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Copycats sell machine-made versions as handmade",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  }
+ ],
+ "questions": {
+  "artisans and wip": [
+   "Roughly how many artisans or looms work for you?",
+   "How do you know what each is working on?",
+   "How often do you get updates?"
+  ],
+  "advances": [
+   "How are advances recorded?",
+   "How do you match them against finished work?"
+  ],
+  "materials": [
+   "Who buys the wool, thread or wood?",
+   "How is what’s given out tracked?"
+  ],
+  "orders and deadlines": [
+   "Are most orders custom or from ready stock?",
+   "How often do deadlines slip?",
+   "What usually causes it?"
+  ],
+  "quality": [
+   "How do you check pieces before they go to the buyer?",
+   "How often are pieces rejected?"
+  ],
+  "sales channels": [
+   "Where do most sales come from — export, showroom, exhibitions or online?",
+   "Which one feels weakest?"
+  ],
+  "stock": [
+   "Do you have a catalogue of finished pieces?",
+   "How do buyers see what’s available?"
+  ],
+  "payments": [
+   "How do export buyers pay?",
+   "How long does it usually take?"
+  ]
+ },
+ "seasons": "PK: winter and wedding season (October–March) for carpets and dowry items; Eid gifting; exhibitions and Lok Virsa/craft festivals; tourist seasons in the north (summer) affected by security and weather; Ramadan slows workshops. UAE: tourism and Dubai Shopping Festival (December–January), Global Village season (October–April), Ramadan and Eid home refresh, summer lull. Canada: holiday gift season (November–December), Christmas markets, spring home-décor demand; export buyers in Europe/North America order months ahead of autumn/winter retail.",
+ "care": [
+  "Child labour concerns: pi does not help hide or arrange it; if a child is at risk, pi points to emergency services and child-protection helplines.",
+  "No labour-law, minimum-wage or contract advice for artisans; note the business problem only.",
+  "Artisans’ names, IDs, villages and phone numbers are not recorded; roles and counts only.",
+  "No customs, export-regulation or tariff advice; note admin effort.",
+  "Never help pass machine-made as hand-made, fake antiques, false origin labels or fake certificates — decline.",
+  "Endangered materials (ivory, certain woods, animal parts): pi does not help trade or describe them.",
+  "Under-invoicing exports to move money: decline plainly."
+ ],
+ "build_ideas": [
+  "Artisan WIP board: each piece on a loom or bench with design, size, start date, progress photos and expected completion.",
+  "Advance ledger per artisan role/contractor linked to pieces, showing advance versus value of work done.",
+  "Raw-material issue log: wool, dye, thread or wood issued per piece with returns recorded.",
+  "Order tracker for custom and export orders with milestones and alerts when progress lags.",
+  "Pre-shipment inspection checklist with photos per piece.",
+  "Piece costing sheet: materials, labour, washing/finishing, overheads and freight.",
+  "Finished-stock catalogue with photos, sizes, knot count and location, shareable as a link.",
+  "Unified order inbox for Etsy, Instagram, website and WhatsApp.",
+  "After-hours WhatsApp auto-acknowledgement collecting buyer questions for the morning.",
+  "Export receivables tracker with expected and actual payment dates.",
+  "Exhibition log: cost, leads collected and orders that followed.",
+  "Owner dashboard: pieces in progress, overdue pieces, advances outstanding, stock value, open orders."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Karigaron ko peshgi deta hoon, lekin pata nahi chalta kitna kaam hua hai."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh bharose aur hisaab dono ka masla ban jata hai. Noted — peshgi di gayi lekin kaam ka hisaab saaf nahi. Aap ke saath taqreeban kitne karigar ya looms kaam karte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "40 ke qareeb, zyada tar gaon mein ghar pe kaam karte hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, around 40, mostly home-based in villages. Unke kaam ki update aap tak abhi kaise pohanchti hai?"
+  }
+ ]
+}

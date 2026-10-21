@@ -1,0 +1,284 @@
+{
+ "key": "mobile_phones_and_accessories",
+ "name": "Mobile phones and accessories",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "mobiles",
+  "smartphones",
+  "iPhone",
+  "Samsung",
+  "Infinix",
+  "Tecno",
+  "Xiaomi",
+  "Oppo",
+  "Vivo",
+  "PTA approved",
+  "non-PTA",
+  "JV",
+  "box pack",
+  "used phones",
+  "kit",
+  "refurbished",
+  "accessories",
+  "chargers",
+  "covers",
+  "glass protectors",
+  "handsfree",
+  "power bank",
+  "repair",
+  "IMEI",
+  "box khula",
+  "warranty wala",
+  "Hafeez Centre",
+  "Saddar mobile market",
+  "Deira",
+  "Al Ain Centre",
+  "jawwal"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "New only, used/refurbished, or both; official distributor/dealer vs open-market trader.",
+  "Whether repair services are offered in-house.",
+  "Number of shops and whether stock is shared.",
+  "Mix of accessories vs handsets in sales.",
+  "Online selling (Daraz, OLX, Dubizzle, Facebook Marketplace, Instagram, Kijiji).",
+  "Whether IMEI numbers are recorded at purchase and sale.",
+  "Buy-back/trade-in offered."
+ ],
+ "scope_rule": "pi notes stock by IMEI, used-phone buying and resale process, repairs workflow, accessory stock, cash and wallet payments, returns, marketplace orders, and staff issues. pi gives no PTA registration, customs, tax, telecom regulation or data-privacy legal advice, and never helps bypass PTA/IMEI blocks, unlock stolen devices, change IMEIs, or launder stolen phones. pi never collects customers’ CNICs, IMEIs linked to named people, phone passcodes, iCloud/Google account details, or contents of customers’ phones.",
+ "vocabulary": {
+  "PTA approved / non-PTA": "phone registered (or not) with Pakistan’s telecom authority",
+  "JV": "phone with a SIM-lock workaround, often unstable",
+  "kit": "used phone, often without box/accessories",
+  "box pack": "new sealed phone",
+  "I MEI": "the phone’s unique ID number",
+  "official warranty": "warranty from the local distributor",
+  "China copy / master copy": "replica handset or accessory",
+  "panel / board": "screen assembly / motherboard in repairs",
+  "buy-back / exchange": "taking an old phone as part-payment",
+  "glass / protector": "screen protector",
+  "kharab": "faulty",
+  "jawwal": "mobile phone (Gulf Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "We buy used phones and later find out they’re stolen or blocked",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "We don’t keep a proper record of IMEI in and out",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Accessories stock: hundreds of small items, no idea what’s there",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Chargers and covers go missing from the counter",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Staff sell accessories and keep the cash",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "New model prices drop after we’ve stocked up",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Rupee/dirham swings change the price daily",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Old models sit unsold",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Customers return phones saying they’re faulty within days",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Repair jobs get mixed up, wrong phone given back",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Repair customers keep calling to ask if it’s ready",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Technician says a part was replaced, I can’t verify",
+   "category": "people_staff",
+   "subtype": "trust_honesty"
+  },
+  {
+   "phrase": "Spare parts quality is inconsistent, repairs come back",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Shop next door sells the same phone for less",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Salesmen quote different prices for the same phone",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Payments come via card, wallet and cash and don’t reconcile",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "Large cash in the shop all day; I’m scared of robbery",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Used-phone listings on OLX/Dubizzle get messages we can’t keep up with",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Daraz/Noon cancellations for out of stock",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Warranty claims with the distributor take weeks",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "We can’t tell profit per phone after the trade-in value",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Two shops, can’t see each other’s stock",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Records are in a notebook and the stock app nobody updates",
+   "category": "tech_systems",
+   "subtype": "user_adoption"
+  },
+  {
+   "phrase": "Distributor credit terms tightened",
+   "category": "suppliers_purchasing",
+   "subtype": "credit_terms"
+  },
+  {
+   "phrase": "Launch-day pre-orders are chaos",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "New staff don’t know how to check a used phone properly",
+   "category": "people_staff",
+   "subtype": "training"
+  }
+ ],
+ "questions": {
+  "used phones": [
+   "Do you buy used phones from walk-ins?",
+   "What checks happen before you buy?",
+   "Is the IMEI written down anywhere?"
+  ],
+  "stock": [
+   "How do you track handsets and accessories?",
+   "Can both shops see each other’s stock?"
+  ],
+  "repairs": [
+   "How many repair jobs a day?",
+   "How do you keep track of which phone is whose and its status?",
+   "How do customers find out it’s ready?"
+  ],
+  "cash": [
+   "Which payment methods do you take?",
+   "How do you check the day’s takings?"
+  ],
+  "margin": [
+   "How quickly do prices change on your main models?",
+   "Do you know profit per phone after trade-ins?"
+  ],
+  "returns": [
+   "What do customers bring back most?",
+   "How do you handle warranty claims with the distributor?"
+  ],
+  "online": [
+   "Where do you list phones online?",
+   "Who replies to the messages?"
+  ],
+  "staff": [
+   "Who handles cash and accessories when you’re away?"
+  ]
+ },
+ "seasons": "Pakistan: Eid ul-Fitr and Eid ul-Adha (gifting and upgrades), new-launch periods (September iPhone and major Android launches), 11.11 and White Friday, back-to-school/college, budget-related PTA tax changes affecting demand, wedding season gifts. UAE: Ramadan/Eid, GITEX period, Dubai Shopping Festival, White Friday, iPhone launch (strong tourist and export demand), month- end salary for labour areas. Canada: Black Friday/Boxing Day, back-to-school, iPhone launch, carrier promotions, Christmas.",
+ "care": [
+  "Stolen phones, IMEI changing, PTA bypass, JV unlocking or iCloud removal: pi declines firmly and does not help.",
+  "Customers’ devices: pi never asks for passcodes or account details, and does not help access customer data.",
+  "CNICs or Emirates IDs of sellers of used phones: pi does not collect them, even though the shop may legally need to keep them; it notes the record-keeping burden only.",
+  "Robbery risk or armed threat: pi points to police/emergency services immediately.",
+  "Battery swelling, fire or burn risk during repair: if happening, pi points to emergency services; no technical safety advice.",
+  "Smuggled or non-duty-paid stock: declined.",
+  "Counterfeit accessories sold as original: declined."
+ ],
+ "build_ideas": [
+  "IMEI-level stock register: purchase source type, date, cost, condition grade, sale date and price, warranty end.",
+  "Used-phone intake checklist on phone: condition tests, photos, IMEI captured, seller documents handled per shop policy, approval step.",
+  "Accessory stock with barcodes, low-stock alerts and counter-wise daily count.",
+  "Repair job board: job number, device type, fault, technician, parts used, status, ready message on WhatsApp.",
+  "Parts register linking each part used to a repair job and supplier, with comeback tracking.",
+  "Daily payment reconciliation across cash, cards and wallets.",
+  "Price list updated daily and shared to all salesmen and shops.",
+  "Profit per handset including trade-in value and accessories bundled.",
+  "Multi-shop stock view and transfers.",
+  "Marketplace listing manager with chat triage and stock sync.",
+  "Distributor warranty claim tracker.",
+  "Pre-order list for launches with deposits tracked and allocation by arrival."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Repair ke kaam mein bohot gadbad hai, customer aata hai to phone dhoondna parta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Haan, ye to roz ka sar dard hoga — noted, repair wale phones ka record aur jagah clear nahi. Roz takreeban kitne repair aate hain?"
+  },
+  {
+   "role": "Person",
+   "text": "25-30 honge."
+  },
+  {
+   "role": "pi",
+   "text": "Theek, likh liya. Phone lete waqt kya customer ko koi slip ya number diya jaata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Kabhi parchi de dete hain, kabhi nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, slip hamesha nahi di jaati. Customer ko kaise pata chalta hai ke phone ready hai?"
+  }
+ ]
+}

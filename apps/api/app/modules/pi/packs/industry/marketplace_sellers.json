@@ -1,0 +1,276 @@
+{
+ "key": "marketplace_sellers",
+ "name": "Marketplace sellers (Daraz, Noon, Amazon)",
+ "kind": "industry",
+ "sector": {
+  "code": "M",
+  "title": "Digital economy, social and public sector"
+ },
+ "signals": [
+  "Daraz",
+  "Daraz Mall",
+  "Noon",
+  "Amazon.ae",
+  "Amazon.ca",
+  "FBA",
+  "FBN",
+  "Fulfilled by Noon",
+  "Daraz FBD",
+  "seller centre",
+  "seller central",
+  "listing",
+  "buy box",
+  "listing suspend ho gayi",
+  "ad campaign",
+  "sponsored products",
+  "payout",
+  "statement",
+  "commission",
+  "penalty",
+  "QC reject",
+  "ratings",
+  "cancellation rate",
+  "late dispatch",
+  "account health",
+  "Prime"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Which marketplaces and countries they sell on, and whether one is dominant.",
+  "Fulfilment model: self-ship (dropship/FBM/Daraz self-delivery) versus marketplace warehouse (FBA, FBN, FBD).",
+  "Number of active SKUs, and whether they are a brand owner, reseller or private label.",
+  "Where stock comes from: own manufacturing, local wholesale, imports.",
+  "Whether they also have their own website or retail shop.",
+  "Team size and who handles listings, packing and seller-centre messages.",
+  "How they currently track payouts and fees (Excel, accountant, nothing)."
+ ],
+ "scope_rule": "pi notes operational problems in running marketplace stores: listings, stock across warehouses, dispatch SLAs, returns, payout reconciliation, fees, advertising and reporting. It does not advise on marketplace policy appeals, intellectual property disputes, brand registry legal matters, VAT/GST/sales tax, import customs or product certification rules. It never asks for seller-centre logins, two- factor codes, bank details or buyer details. It does not help with manipulating reviews, creating duplicate accounts, keyword stuffing with others’ trademarks or circumventing marketplace rules.",
+ "vocabulary": {
+  "Seller Centre / Seller Central": "the marketplace admin portal.",
+  "FBA / FBN / FBD": "stock stored and shipped by Amazon, Noon or Daraz.",
+  "Buy box": "the default seller shown on a shared listing.",
+  "SLA / late dispatch": "missing the window to hand over an order.",
+  "Payout / settlement": "money the marketplace transfers after fees.",
+  "Commission / referral fee": "marketplace’s cut per sale.",
+  "Account health": "scores that can lead to warnings or suspension.",
+  "QC reject": "listing or inbound stock rejected at quality check.",
+  "Inbound shipment": "stock sent to the marketplace warehouse.",
+  "Campaign day": "big platform sale like 11.11 or Yellow Friday.",
+  "Storage fee": "charge for unsold stock in their warehouse."
+ },
+ "problems": [
+  {
+   "phrase": "Payout is less than I expected and I can’t see why",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Fees keep changing; I don’t know my real margin per item",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Got penalised for late dispatch because orders came in overnight",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Stock sent to the FBN warehouse doesn’t match what they received",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Storage fees eating me on slow items in FBA",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Sold out on campaign day and lost ranking",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Listings got deactivated and sales just stopped",
+   "category": "customer_experience_digital",
+   "subtype": "marketplace_listing"
+  },
+  {
+   "phrase": "Another seller jumped onto my listing and took the buy box",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Our products don’t show up in search anymore",
+   "category": "marketing_leads",
+   "subtype": "marketplace_visibility"
+  },
+  {
+   "phrase": "Sponsored ads spend goes up, sales don’t",
+   "category": "marketing_leads",
+   "subtype": "ad_spend_waste"
+  },
+  {
+   "phrase": "Returns come back opened or used and I still pay fees",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Bad ratings because the courier was late, not our fault",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Same stock is listed on Daraz and our website and we oversell",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Every morning I download reports from three portals into Excel",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Buyer questions in seller centre go unanswered for days",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Packing for campaign day is chaos — wrong labels on parcels",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Supplier sends short quantities and I only find out after listing",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Import shipments stuck so we miss the season",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Price changes on 200 listings take a full day",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "We don’t know which SKUs to reorder and which to kill",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Claims for lost or damaged inventory never get filed",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Staff member handling the account left and nobody knows the process",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Pricing mistakes — listed at the wrong price during a sale",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Keeping track of product certificates and approvals for categories is a headache",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Want to go from Daraz to Amazon.ae but don’t know how we’d manage it",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "payouts": [
+   "Which marketplace’s payouts confuse you most?",
+   "What do you compare the payout against today?",
+   "How far back does the gap go?"
+  ],
+  "margin": [
+   "Do you know what’s left from one sale after commission, shipping and returns?",
+   "Which items do you suspect lose money?"
+  ],
+  "stock": [
+   "Is your stock in your own place, their warehouse, or both?",
+   "How do you know when to send more in?"
+  ],
+  "dispatch": [
+   "How are orders handed over — pickup, drop-off, or their warehouse?",
+   "When do late dispatches happen most?"
+  ],
+  "listings": [
+   "How many listings do you manage?",
+   "What usually happens before a listing goes down?"
+  ],
+  "ads": [
+   "How much of your time goes on sponsored campaigns?",
+   "How do you judge if a campaign paid off?"
+  ],
+  "returns": [
+   "How do returned items get checked when they come back?",
+   "What happens to the ones you can’t resell?"
+  ],
+  "multi-channel": [
+   "Where else do you sell the same stock?",
+   "Has overselling happened, and how often?"
+  ],
+  "reporting": [
+   "What numbers do you wish you saw daily?",
+   "Where do you pull them from now?"
+  ],
+  "team": [
+   "Who handles the seller portal day to day?",
+   "Is any of it written down?"
+  ]
+ },
+ "seasons": "Pakistan (Daraz): 11.11 (largest), 12.12, 9.9, Daraz birthday sale (around late March), Ramadan and Eid, Black/White Friday, back-to-school; summer electronics (fans, coolers, UPS) and winter heaters/blankets. UAE/KSA (Noon, Amazon.ae): White Friday and Yellow Friday (November), 11.11, Ramadan, Prime Day (usually summer), back-to-school, DSF. Canada (Amazon.ca): Prime Day, Black Friday/Cyber Monday, holiday season, Boxing Day. Marketplace warehouse inbound cut-off dates before big events are a recurring crunch.",
+ "care": [
+  "Never ask for seller-centre passwords, OTPs, API keys or bank statements.",
+  "Do not advise on suspension appeals, IP complaints or policy interpretation; note the operational impact only.",
+  "Refuse help with review manipulation, multiple accounts, fake orders or using others’ brand names.",
+  "No advice on VAT, GST or customs; record “tax filing takes us a lot of time” as an operational burden.",
+  "Do not quote typical marketplace fee levels or return rates.",
+  "Buyer data from marketplace orders belongs under marketplace rules; pi records none of it.",
+  "If someone is panicking about a suspended account, stay calm, note the effect on sales, and don’t speculate about outcomes."
+ ],
+ "build_ideas": [
+  "Payout reconciler that reads marketplace settlement reports and matches every fee, commission, penalty and refund to orders.",
+  "True-margin per SKU view combining purchase cost, fees, shipping, storage and returns.",
+  "Multi-marketplace stock sync with buffer rules to stop overselling across Daraz, Noon, Amazon and own site.",
+  "Inbound shipment tracker comparing sent versus received quantities with claim reminders.",
+  "Dispatch SLA board showing orders at risk of missing handover time, with WhatsApp alerts to packers.",
+  "Daily combined sales dashboard across marketplaces and countries.",
+  "Bulk price and stock update tool driven from one master sheet.",
+  "Reorder planner using sales velocity and lead time per SKU, flagging slow movers before storage fees build.",
+  "Returns grading log recording condition, resellable or write-off, and reason codes.",
+  "Campaign-day prep checklist: stock levels, pricing approvals, packing material, staff rota.",
+  "SOP library for seller-portal tasks so a new staff member can pick up the work."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our Noon payouts never match what we think we sold. We just accept whatever lands."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a frustrating one, especially when it’s your main channel. Noted — Noon payouts don’t match expected sales and nobody checks the difference. What do you compare the payout against at the moment, if anything?"
+  },
+  {
+   "role": "Person",
+   "text": "Nothing really. Just the order count in the dashboard."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — no line-by-line check of fees and refunds against orders. Is it mainly Noon, or do Amazon payouts have the same issue?"
+  },
+  {
+   "role": "Person",
+   "text": "Amazon is a bit better, but same story."
+  }
+ ]
+}

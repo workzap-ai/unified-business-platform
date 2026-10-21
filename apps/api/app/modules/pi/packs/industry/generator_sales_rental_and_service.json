@@ -1,0 +1,269 @@
+{
+ "key": "generator_sales_rental_and_service",
+ "name": "Generator sales, rental and service",
+ "kind": "industry",
+ "sector": {
+  "code": "L",
+  "title": "Finance-adjacent, energy and utilities"
+ },
+ "signals": [
+  "generator",
+  "genset",
+  "generator rental",
+  "generator on hire",
+  "generator service",
+  "AMC",
+  "maintenance contract",
+  "diesel generator",
+  "gas generator",
+  "silent generator",
+  "KVA",
+  "overhauling",
+  "breakdown call",
+  "generator kiraye pe",
+  "service karwani hai",
+  "janretar/ generator chal nahi raha",
+  "mazoot/diesel",
+  "mawlid kahraba",
+  "ta’jeer",
+  "ATS",
+  "changeover",
+  "event power",
+  "standby power",
+  "solar- hybrid"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Sales, rental, service/AMC, or a mix, and which is the main earner.",
+  "Size of rental fleet and range of capacities, in their own terms.",
+  "Customer mix: homes, shops, factories, telecom towers, construction sites, events, hospitals/offices.",
+  "Number of technicians and service vehicles.",
+  "Whether they hold spare parts stock and import or buy locally.",
+  "Areas or cities covered and response commitments made in contracts.",
+  "How jobs and rentals are tracked today."
+ ],
+ "scope_rule": "pi notes operational problems: rental fleet utilisation and tracking, service scheduling and response, technician accountability, parts stock, AMC renewals, collections, fuel handling on rentals, and reporting. It never advises on generator sizing, electrical installation, earthing, load calculations, exhaust or fire safety, or fuel storage rules, and never helps bypass utility, environmental or building regulations. It never asks for or stores customers’ names, site addresses, phone numbers or payment details; it records customer types and areas in general. Any carbon-monoxide, fire, electric shock or explosion scenario is an emergency and pi points to emergency services.",
+ "vocabulary": {
+  "Genset": "generator set",
+  "KVA": "capacity rating",
+  "On hire / off hire": "rental start and end",
+  "AMC": "annual maintenance contract",
+  "PM / preventive maintenance": "scheduled servicing",
+  "Breakdown call": "urgent repair request",
+  "Running hours": "hours the engine has run, used for service intervals",
+  "ATS / changeover": "switch between mains and generator",
+  "Overhauling": "major engine rebuild",
+  "Mobilisation / demob": "taking a unit to site and back",
+  "Fuel on dry / wet hire": "whether fuel is included in rental",
+  "Ta’jeer": "hire/rental (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "I don’t know exactly which generator is on which site right now",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Units come back off-hire late but the bill stops on the agreed date",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Half the fleet sits in the yard while we turn down rentals for sizes we don’t have",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Rental units come back damaged and we can’t prove the condition when they left",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Fuel on rentals goes missing and the customer and driver blame each other",
+   "category": "loss_security",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Breakdown calls come at night and nobody knows which technician is free",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "AMC customers complain the PM visit never happened",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "We forget AMC renewals and the customer goes elsewhere",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Technicians report jobs done but I don’t see the job sheets for days",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Technicians use our parts on private jobs",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Filters and spare parts are out when a breakdown happens",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Imported spare parts are stuck in customs or delayed",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Parts prices change with the dollar and our quotes go wrong",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "No idea if a rental unit earns more than it costs in maintenance",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Corporate customers pay rental and service invoices 90 days late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Same breakdown repeats on the same unit and we redo the work",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Running hours are not recorded so services are missed",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Quotes for new sets take days because the engineer is busy on site",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Enquiries spike in load-shedding season and we can’t follow them all",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Event rentals are booked on WhatsApp and double-booked",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Transport of sets to site is costly and uncoordinated",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Experienced technicians are hard to find and keep",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Warranty claims on sold sets are tracked in the owner’s memory",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Spread across two cities and the second office is a black box",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  }
+ ],
+ "questions": {
+  "fleet": [
+   "Roughly how many units are in your rental fleet?",
+   "How do you know where each one is right now?",
+   "How do you know when one is due back?"
+  ],
+  "rental billing": [
+   "How is the hire period recorded when a unit goes out and comes back?",
+   "Where does billing most often go wrong?"
+  ],
+  "condition and fuel": [
+   "What is checked when a unit leaves and returns?",
+   "Who signs for it?"
+  ],
+  "breakdowns": [
+   "How do breakdown calls reach a technician?",
+   "How do you know how long a customer waited?"
+  ],
+  "amc": [
+   "How many maintenance contracts are active?",
+   "How do you track which PM visits are due?"
+  ],
+  "parts": [
+   "Which parts run out most often?",
+   "Where do they come from?"
+  ],
+  "technicians": [
+   "How many technicians do you have?",
+   "How do job sheets reach the office?"
+  ],
+  "collections": [
+   "Which customers take longest to pay?",
+   "What do you do when they’re late?"
+  ]
+ },
+ "seasons": "- PK: load-shedding peaks in summer (May–August) drive sales, rentals and breakdowns; winter gas shortages affect gas generators; wedding season (November–February) drives event rentals; monsoon causes outages and flooding of sites; budget announcements and dollar movement affect import pricing. - UAE: summer heat raises breakdown risk for standby sets; event season (October–April) including concerts, exhibitions and Expo-style events; construction projects drive long rentals; Ramadan event and tent rentals. - Canada: winter storm outages and ice storms drive emergency rentals and home standby sales; summer festivals and construction season.",
+ "care": [
+  "No sizing, wiring, earthing, load, fuel storage, exhaust or ventilation advice; these are safety-engineering matters and out of scope.",
+  "Carbon-monoxide poisoning, fire, electric shock or explosion described: pi stops and points to emergency services.",
+  "Do not help with grid tapping, illegal connections, bypassing meters, or avoiding environmental or noise regulations.",
+  "Customer site addresses and contacts are not stored.",
+  "Staff theft of fuel or parts: control gap language only.",
+  "Imports: pi notes delays and cost exposure, never helps with under-invoicing or misdeclaring goods.",
+  "No pricing advice on what to charge for rental or service."
+ ],
+ "build_ideas": [
+  "Rental fleet register: each unit with capacity, status (yard, on hire, under repair), current site area and due-back date.",
+  "On-hire/off-hire checklist on phone with photos, running hours and fuel level at dispatch and return.",
+  "Hire billing calculator from actual out/in dates with alerts for overdue returns.",
+  "Fleet utilisation and earnings vs maintenance cost per unit.",
+  "Breakdown call intake via WhatsApp with technician assignment, response time and closure.",
+  "PM schedule driven by running hours or dates per AMC customer, with reminders and visit sign-off.",
+  "AMC renewal reminders and renewal pipeline.",
+  "Digital job sheets with parts used, linked to stock deduction.",
+  "Spare parts stock with minimum levels and supplier/import order tracking.",
+  "Repeat-fault report by unit or customer.",
+  "Event booking calendar to prevent double-booking.",
+  "Receivables tracker with statements and reminders.",
+  "Quote request tracker for sales enquiries with follow-up timers.",
+  "Branch comparison dashboard."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our rental units come back with less fuel and damaged panels, and we have nothing to show the customer."
+  },
+  {
+   "role": "pi",
+   "text": "Understood — damage and fuel differences on returns with no proof of the starting condition, noted. What is checked or written down when a unit leaves for site?"
+  },
+  {
+   "role": "Person",
+   "text": "The driver just loads it. Sometimes a delivery note."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, mostly no check at dispatch. Roughly how many units do you have out on hire in a typical month?"
+  },
+  {
+   "role": "Person",
+   "text": "About 25 out of 40."
+  },
+  {
+   "role": "pi",
+   "text": "Thanks, noted — around 25 of 40 on hire. When a unit comes back, who receives it at the yard?"
+  }
+ ]
+}

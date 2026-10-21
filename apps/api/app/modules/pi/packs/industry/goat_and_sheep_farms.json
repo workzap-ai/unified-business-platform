@@ -1,0 +1,279 @@
+{
+ "key": "goat_and_sheep_farms",
+ "name": "Goat and sheep farms",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "goat farm",
+  "bakra",
+  "bakri",
+  "bakriyan",
+  "dumba",
+  "chhatra",
+  "bheir",
+  "memna",
+  "pathora",
+  "Beetal",
+  "Teddy",
+  "Kamori",
+  "Makhi Cheeni",
+  "Rajanpuri",
+  "Barbari",
+  "Kajli",
+  "Lohi",
+  "ghanam",
+  "ma’iz",
+  "tees",
+  "kharouf",
+  "Naeemi",
+  "Najdi",
+  "Harri",
+  "Shami goat",
+  "kidding",
+  "lambing",
+  "goat milk",
+  "oon",
+  "shearing",
+  "Eid bakra farm"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Herd size and whether goats, sheep or both; breeding does/ewes vs animals for sale.",
+  "Purpose: Eid fattening, breeding stock, show/fancy breeds, meat for butchers, goat milk, wool.",
+  "Housing: stall-fed shed ( bara), grazing with a herder, or mixed; own or leased land.",
+  "Sales channels: Eid buyers direct, mandis, butchers, social media, breeders.",
+  "Staff: family, herders, a manager; owner on site or absentee.",
+  "Records today: none, register, Excel, phone notes.",
+  "Location: Punjab/Sindh/KP village, peri-urban farm, UAE ezba, Canadian hobby or commercial farm."
+ ],
+ "scope_rule": "pi notes the business side of a goat or sheep farm: kidding/lambing records, sales, feed, costs, buyers, herders, theft and visibility. pi does not diagnose disease, advise on deworming, vaccines, medicines, feed recipes, breeding technique or show preparation drugs; it suggests their vet. It does not certify breed purity or qurbani eligibility. It records herders and buyers by role only and does not collect ID numbers or bank details.",
+ "vocabulary": {
+  "bakra / bakri": "male / female goat",
+  "dumba": "fat-tailed sheep",
+  "chhatra": "ram (also used for sheep generally)",
+  "memna / pathora": "lamb / kid",
+  "bara": "animal enclosure or shed",
+  "charwaha": "herder who takes animals out to graze",
+  "chara": "fodder; pathe — leaves cut for goats",
+  "Beetal, Teddy, Makhi Cheeni": "popular Pakistani goat breeds",
+  "ghanam / ma’iz": "sheep / goats (Arabic)",
+  "tees": "billy goat (Gulf)",
+  "kharouf": "lamb (Arabic)",
+  "Naeemi / Najdi / Harri": "sheep breeds common in the Gulf",
+  "kidding / lambing": "giving birth"
+ },
+ "problems": [
+  {
+   "phrase": "Kitne bachay paida hue aur kitne mar gaye, koi hisaab nahi",
+   "category": "operations_process",
+   "subtype": "no_birth_records"
+  },
+  {
+   "phrase": "I don’t know which doe gives twins and which never kids",
+   "category": "reporting_visibility",
+   "subtype": "no_animal_performance"
+  },
+  {
+   "phrase": "Kids die in winter and I hear weeks later",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Herder says two goats were lost grazing, I can’t verify",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Animals stolen at night from the shed",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Headcount never matches between herder and manager",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Feed and chara bills keep rising, I don’t know cost per animal",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Sold Eid goats cheap because I didn’t know what I’d spent on them",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Breeding stock buyers ask for parent records and I have nothing",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Instagram reels get likes but few real buyers",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Buyers DM at all hours, I lose them because I reply late",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Some buyers take animals on promise and pay months later",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "After Eid the farm sits with costs and no income",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Bought a breeding buck that turned out poor, no record of seller",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Herders change often and new ones don’t know the animals",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Nobody checks water and feeding on time when I’m away",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Goat milk orders come on WhatsApp and get missed",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Show animals’ expenses mix with the meat herd",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Transport to the mandi or buyer kills my margin",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "UAE: registering and tagging animals takes time and I fall behind",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "I keep everything in my head and can’t hand over to my son",
+   "category": "planning_growth",
+   "subtype": "succession_family"
+  },
+  {
+   "phrase": "Want to scale to 500 goats but don’t know my real numbers",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Wool/shearing contractors’ charges are a guess each year",
+   "category": "suppliers_purchasing",
+   "subtype": "price_comparison"
+  }
+ ],
+ "questions": {
+  "herd": [
+   "Roughly how many goats or sheep do you have?",
+   "Are they mainly for Eid sale, breeding or milk?"
+  ],
+  "births": [
+   "How do you keep track of births and deaths now?",
+   "How quickly do you hear when a kid dies?"
+  ],
+  "headcount": [
+   "Who counts the animals, and how often?",
+   "Does the count usually match?"
+  ],
+  "costs": [
+   "Do you know roughly what each animal costs you to raise?",
+   "Which cost has gone up most?"
+  ],
+  "selling": [
+   "Where do most of your sales happen?",
+   "How do you set prices at Eid?"
+  ],
+  "leads": [
+   "Where do buyers find you?",
+   "Who replies to their messages?"
+  ],
+  "credit": [
+   "Do some buyers pay later?",
+   "How do you keep track of what’s owed?"
+  ],
+  "staff": [
+   "Who runs the farm day to day?",
+   "What goes wrong when you’re not there?"
+  ],
+  "breeding stock": [
+   "Do buyers ask for records of parents or births?",
+   "What do you show them now?"
+  ],
+  "security": [
+   "Have you lost animals to theft or straying?",
+   "At what time usually?"
+  ],
+  "growth": [
+   "What would you need to know before you grew the herd?"
+  ]
+ },
+ "seasons": "- Eid ul Adha dominates sales for goats and dumbas; buying of young animals and fattening start months earlier. - Kidding and lambing often cluster in late winter/spring and again in autumn depending on breeding; winter cold raises young-animal losses (noted operationally). - Ramadan, weddings (winter in Pakistan) and aqiqah create year-round meat demand. - Pakistan: summer heat and monsoon add heat stress, mud and fodder spoilage; green fodder is cheaper after rains. - UAE: Eid ul Adha and Ramadan peaks; cooler months (October–April) suit shows and outdoor work; summer midday outdoor work break affects herder schedules; imported fodder (alfalfa, Rhodes grass) price swings. - Canada: lambing/kidding in late winter–spring; Eid and Christmas/Easter lamb demand; winter barn costs.",
+ "care": [
+  "No advice on deworming, vaccination, medicines, feed rations or breeding; suggest their vet.",
+  "No ruling on qurbani suitability or breed purity; suggest their scholar or breed association.",
+  "Many deaths at once or a disease scare: suggest calling their vet or livestock department now.",
+  "Herder or worker injury, snakebite or heat illness: pi points to emergency services first.",
+  "Never helps falsify parentage, age or tags, or sell sick animals.",
+  "Records herders and buyers by role only; no ID, address or bank details.",
+  "Suspected herder theft: pi notes the control gap, no covert surveillance or confrontation advice."
+ ],
+ "build_ideas": [
+  "Herd register on phone: tag, breed, sex, date of birth, dam/sire, purchase source, status.",
+  "Kidding/lambing log with births, twins, deaths and a doe/ewe performance view from the farm’s records.",
+  "Daily headcount by herder via WhatsApp with photo and mismatch alert to the owner.",
+  "Feed and fodder log with cost per animal and per batch.",
+  "Eid sale catalogue: photos, weight, price set by owner, reserved/sold status.",
+  "Lead inbox pulling Instagram, Facebook and WhatsApp enquiries into one list with follow-up reminders.",
+  "Credit buyer ledger with due dates and polite reminders.",
+  "Breeding-stock record card that the farm can share with buyers (from its own data).",
+  "Daily care checklist (water, feed, cleaning) with timestamps.",
+  "Goat milk order and delivery sheet.",
+  "Handover pack: all herd, buyer and cost data in one place for a family successor."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mere paas 150 Beetal bakriyan hain, lekin pata hi nahi chalta kitne bachay har saal bachte hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, yeh hisaab na ho toh farm ka asal haal chhupa rehta hai. Abhi paidaish aur maut kaise likhi jati hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Charwaha batata hai phone pe, kabhi likhte hain kabhi nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — paidaish aur maut ka record charwahe ki zubani hai, kabhi likha jata hai kabhi nahi. Kisi bakri ke bachay mar jayen toh aapko kitne din baad pata chalta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Kabhi kabhi hafte baad."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, ek hafte tak ki der ho jati hai. Aap khud farm pe kitni dafa jaate hain?"
+  }
+ ]
+}

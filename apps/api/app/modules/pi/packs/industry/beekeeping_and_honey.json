@@ -1,0 +1,272 @@
+{
+ "key": "beekeeping_and_honey",
+ "name": "Beekeeping and honey",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "shehad / shahad",
+  "madhu makhi",
+  "honey farm",
+  "bee boxes / hives",
+  "beri honey",
+  "phulai",
+  "acacia",
+  "sidr",
+  "samar",
+  "sidr honey",
+  "’asal",
+  "nahl",
+  "manahil",
+  "migratory beekeeping",
+  "Swat / Karak / Chakwal",
+  "honey processing",
+  "extraction",
+  "bottling",
+  "raw honey",
+  "organic honey",
+  "adulterated / milawat",
+  "Canadian apiary",
+  "pollination contracts",
+  "blueberry / canola pollination"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of hives or colonies, and whether they migrate with flowering seasons",
+  "Honey types produced or traded (beri, sidr, acacia, phulai, multiflora, samar)",
+  "Business model: own production, buying from beekeepers, trading or importing, retail brand, export, or pollination services",
+  "Processing and bottling: in house or outsourced",
+  "Sales channels: own shop, Instagram, WhatsApp, Daraz, Amazon, supermarkets, corporate gifting",
+  "Staff and seasonal helpers",
+  "Lab testing or certification involvement (pi notes the fact only)"
+ ],
+ "scope_rule": "pi notes business and operational problems: hive and batch records, honey stock, sourcing from beekeepers, authenticity and trust issues in the market, packaging stock, pricing, online and gifting orders, delivery, collections, staff, and reporting. pi does not advise on bee health, treatments, medications, swarm control, hive management or forage choice, honey testing standards, food labelling law, organic or halal certification rules, export regulations, or health claims for honey. It does not record beekeepers’, customers’ or staff names, IDs or numbers.",
+ "vocabulary": {
+  "beri": "honey from ber (jujube) flowers, highly valued in Pakistan",
+  "sidr": "honey from sidr (lote) trees, highly valued in the Gulf",
+  "samar": "acacia-type desert honey popular in the Gulf",
+  "phulai": "honey from phulai (acacia modesta) trees",
+  "migration": "moving hives to follow flowering",
+  "frame / super": "hive components (pi notes counts only)",
+  "extraction": "removing honey from combs",
+  "batch": "a lot of honey from one harvest or source",
+  "milawat": "adulteration",
+  "raw / kacha shehad": "unprocessed honey",
+  "pollination contract": "renting hives to farmers to pollinate crops"
+ },
+ "problems": [
+  {
+   "phrase": "Customers ask if our honey is real and I have nothing to show them",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Fake honey sold cheap online is killing our sales",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "I can’t trace a jar back to which harvest or beekeeper it came from",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Buying from beekeepers, quality and price vary every time",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "I don’t know my cost per kilo after migration, transport and labour",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Moving hives costs more each season",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Hive counts on paper don’t match what’s in the field",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Boxes stolen from the field during migration",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Helpers sell some honey on the side",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Jars and labels ran out before Ramadan orders",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Expensive sidr stock sitting unsold",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Corporate gift orders get mixed up, wrong quantities and messages",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Jars break in courier delivery",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "COD money from couriers comes late",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "Orders on WhatsApp and Instagram are all over the place",
+   "category": "orders_fulfilment",
+   "subtype": "multi_channel_orders"
+  },
+  {
+   "phrase": "We don’t know which of our ads actually brings buyers",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Customers buy once and don’t return",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Prices are different on Daraz, Instagram and in the shop",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Lab test certificates and labels are a paperwork headache",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Export buyer wants documents we can’t put together fast",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Pollination contract payments from farmers are late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Records of where hives are, by season, are in my head",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Production swings year to year and I can’t plan sales",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Seasonal helpers need training every year",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "No proper website, people can’t find us",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  }
+ ],
+ "questions": {
+  "source": [
+   "Do you produce the honey yourself, buy from beekeepers, or both?",
+   "How do you check what you’re buying?"
+  ],
+  "trust": [
+   "What do customers ask before they buy?",
+   "What do you show them now?"
+  ],
+  "traceability": [
+   "If a customer had a complaint about a jar, could you tell which batch it came from?"
+  ],
+  "cost": [
+   "Do you know roughly what a kilo costs you to produce or buy?",
+   "Which cost is hardest to track?"
+  ],
+  "hives and migration": [
+   "How many hives do you run?",
+   "How do you keep track of where they are and how many came back?"
+  ],
+  "stock and packaging": [
+   "How do you know when jars and labels need ordering?",
+   "Has a shortage stopped orders?"
+  ],
+  "orders": [
+   "Where do most orders come from now?",
+   "What goes wrong between order and delivery?"
+  ],
+  "payments": [
+   "How do customers usually pay?",
+   "Which payments arrive late?"
+  ],
+  "marketing": [
+   "How do new customers find you?",
+   "Do you know which channel brings the best buyers?"
+  ],
+  "repeat": [
+   "How do you stay in touch with past customers?"
+  ],
+  "planning": [
+   "How do you plan sales when the harvest changes year to year?"
+  ]
+ },
+ "seasons": "Pakistan: beri honey harvest roughly October–November; phulai and other spring flows around March–May; migration follows flowering through KP, Punjab and Balochistan; demand peaks in winter and Ramadan. UAE: local sidr and samar honey harvests in the cooler months and early summer; demand and gifting peak in Ramadan, Eid, National Day and the winter season; corporate gifting around year-end. Canada: honey harvest July–September; blueberry and canola pollination contracts in spring and summer; holiday gifting in November–December; winter is for hive overwintering and planning.",
+ "care": [
+  "No advice on bee treatments, medications, swarm control or hive management; pi suggests a bee specialist or extension service.",
+  "No health or medical claims for honey; pi doesn’t help write them.",
+  "No advice on labelling law, testing standards, halal or organic certification, or export rules.",
+  "Never helps label adulterated or blended honey as pure, fake origin or certificates, or copy other brands’ packaging.",
+  "Severe allergic reactions to stings, swarm attacks on people, or vehicle accidents during migration: pi tells them to call emergency services (1122, 999/998, 911) immediately.",
+  "Does not record beekeepers’, customers’ or helpers’ names, IDs or numbers.",
+  "Disputes with landowners over hive placement: pi notes the operational issue only."
+ ],
+ "build_ideas": [
+  "Hive register on phone: hive count by location and season, with migration moves logged and counts checked on return",
+  "Harvest and purchase log by batch: source, honey type, weight, date, cost, and lab report photo",
+  "Batch code on every jar label, linked to its harvest record, with a scan-to-view page for customers",
+  "Cost per kilo view combining migration, transport, labour and purchase costs",
+  "Honey and packaging stock tracker with reorder alerts before Ramadan and gifting seasons",
+  "Unified order inbox for WhatsApp, Instagram, website and Daraz",
+  "Corporate gifting order form with quantities, messages and delivery addresses checked before dispatch",
+  "Courier dispatch and COD reconciliation",
+  "Single price list across channels",
+  "Customer list with seasonal reorder messages",
+  "Simple website with product pages, batch information and online ordering",
+  "Pollination contract tracker with dates, hive counts and payment status",
+  "Season dashboard comparing harvests and sales year on year"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamara beri shehad ka kaam hai, Karak se. Log online poochte hain asli hai ya nahi, aur mere paas dikhane ko kuch nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, khareedne se pehle bharosa dilana mushkil ho raha hai. Noted. Abhi shehad apni makhiyon ka hai ya doosre makhi paalne waalon se bhi lete hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Dono. Kuch apna, kuch khareedte hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, apna bhi aur khareeda hua bhi. Kya har bottle ke saath pata chal sakta hai ke woh kis batch ka hai?"
+  }
+ ]
+}

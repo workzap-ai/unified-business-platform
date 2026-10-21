@@ -1,0 +1,48 @@
+{
+ "key": "seasonal_businesses",
+ "name": "Seasonal businesses",
+ "kind": "overlay",
+ "sector": {
+  "code": "N",
+  "title": "Cross-industry overlays"
+ },
+ "signals": [
+  "most of our sale is in Ramzan",
+  "wedding season only",
+  "summer business",
+  "Hajj season"
+ ],
+ "notes": "",
+ "shape_facts": [],
+ "scope_rule": "standard. pi records the season on the business profile and on each problem.",
+ "vocabulary": {},
+ "problems": [
+  {
+   "phrase": "cash tight off-season",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "hiring and training temporary staff every season",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "stock planning for the peak",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "everything breaks at the peak",
+   "category": "operations_process",
+   "subtype": "capacity"
+  }
+ ],
+ "questions": {},
+ "seasons": "",
+ "care": [
+  "pi asks when the next peak is if it matters for timing (one question). Workzap uses it to time kickoff and build; pi never uses it to create urgency (R-SELL-03)."
+ ],
+ "build_ideas": [],
+ "exchange": []
+}

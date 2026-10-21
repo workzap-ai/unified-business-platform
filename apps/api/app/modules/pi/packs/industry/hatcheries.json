@@ -1,0 +1,266 @@
+{
+ "key": "hatcheries",
+ "name": "Hatcheries",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "hatchery",
+  "hatchery wala",
+  "setter",
+  "hatcher",
+  "incubator",
+  "anday set kiye",
+  "hatchability",
+  "fertility",
+  "candling",
+  "breeder eggs",
+  "hatching eggs",
+  "chooze",
+  "DOC",
+  "chick dispatch",
+  "chick boxes",
+  "grading",
+  "sexing",
+  "parent stock",
+  "breeder farm",
+  "fake",
+  "khali anday",
+  "clears",
+  "dead-in-shell",
+  "faqs",
+  "hadana",
+  "katakeet"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: broiler, layer, desi/Golden, duck/quail, or fish hatchery (if fish, the aquaculture pack applies too).",
+  "Capacity: number of setters/hatchers and eggs set per week.",
+  "Egg source: own breeder farms, contract breeder farms, or bought-in hatching eggs (local or imported).",
+  "Customers: farmers directly, dealers, integrators, own farms.",
+  "Dispatch: own vehicles, buyers collect, courier/bus for small orders.",
+  "Power setup: grid, generators, backup; how often outages hit.",
+  "Owner role: on site, family-run, part of a feed or integrator group."
+ ],
+ "scope_rule": "pi notes the hatchery’s operational and business problems: egg intake and setting records, hatch results, chick orders and dispatch, customer complaints, payments, power and machine downtime, staff and visibility. pi does not advise on incubation settings, vaccination of chicks, medicines, breeder nutrition or disease control; it suggests their vet or the equipment supplier. It never helps relabel chick grades or breeds, hide disease, or bypass import permits for eggs or parent stock. It records customers, drivers and staff by role only.",
+ "vocabulary": {
+  "setter / hatcher": "incubator machines for the first and last stage",
+  "hatchability": "share of eggs set that hatch",
+  "candling": "checking eggs with light for fertility",
+  "clears / khali anday": "infertile eggs",
+  "dead-in-shell": "embryos that die before hatching",
+  "DOC / chooze": "day-old chicks",
+  "grading": "sorting chicks by quality (A grade, B grade)",
+  "parent stock / breeder flock": "hens and cocks that lay hatching eggs",
+  "dispatch": "sending chicks to customers",
+  "faqs": "hatching (Arabic); katakeet — chicks (Arabic)",
+  "hadana": "incubator/hatchery (Arabic)",
+  "booking": "advance order for chicks for a date"
+ },
+ "problems": [
+  {
+   "phrase": "Hatch results are on a register, I can’t compare machines or egg sources",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Bookings are on WhatsApp and we overbook some days",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Farmers cancel bookings when the rate drops and chicks are left over",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Extra chicks sold cheap or wasted on bad days",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Customers say we sent fewer chicks than paid for",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Complaints of weak chicks come days later and we can’t trace the batch",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Breeder farm sends eggs late or with too many cracked",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Imported hatching eggs stuck at the port",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Power failed during hatch and nobody alerted me",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Machine service is always reactive, parts take weeks",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Generator diesel costs are out of control",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Dealers take chicks on credit and pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Chick price swings daily, quoting is guesswork",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Night staff skip turning checks or temperature logging",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Driver delays in summer and chicks arrive in poor shape",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Chick boxes and pads run short on busy days",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "I don’t know cost per chick including eggs, power and labour",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Lots of phone calls asking ‘is my order ready’",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Staff sell chicks on the side",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Hygiene audit before big customers takes days of paperwork",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Can’t plan setting weeks ahead because demand is unclear",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Want to add machines but don’t know true hatch performance",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "setup": [
+   "What kind of chicks do you hatch?",
+   "Roughly how many eggs do you set each week?"
+  ],
+  "eggs": [
+   "Where do your hatching eggs come from?",
+   "How are cracks or shortages recorded on arrival?"
+  ],
+  "results": [
+   "How are hatch results recorded?",
+   "Can you compare them by machine or egg source today?"
+  ],
+  "bookings": [
+   "How do customers book chicks?",
+   "What happens when someone cancels close to the date?"
+  ],
+  "dispatch": [
+   "Who delivers the chicks?",
+   "What complaints come up most after delivery?"
+  ],
+  "payment": [
+   "Do dealers or farmers buy on credit?",
+   "How far behind are payments usually?"
+  ],
+  "power": [
+   "How often does power fail?",
+   "How do you find out at night?"
+  ],
+  "machines": [
+   "How is maintenance planned?",
+   "How long does a breakdown usually last?"
+  ],
+  "costs": [
+   "Do you know your cost per chick?",
+   "What makes it hard to work out?"
+  ],
+  "staff": [
+   "How do you know night checks were done?"
+  ],
+  "planning": [
+   "How far ahead do you decide how many eggs to set?"
+  ]
+ },
+ "seasons": "- Pakistan: broiler chick demand rises ahead of winter and wedding-season meat demand and before Ramadan; it often drops before Eid ul Adha and in hot summer months when farmers delay placements. - Summer heat makes chick transport harder and raises power demand; monsoon humidity affects operations. - Desi/Golden and quail chicks see backyard demand in spring. - UAE: hatchery output aligns with domestic farm cycles; summer heat and imported egg shipments matter. - Canada: hatchery production follows quota-based farm placements; holiday turkey and chicken peaks drive planning.",
+ "care": [
+  "No incubation-setting, vaccine, medicine or disease advice; suggest vet or equipment supplier.",
+  "Disease suspicion in breeder flock or chicks: suggest vet/livestock department now.",
+  "Never helps mislabel breeds/grades, hide disease, or bypass egg/parent-stock import controls.",
+  "Fire, electrical or gas (fumigation) hazards and staff injuries: pi points to emergency services first.",
+  "Records customers and drivers by role; no ID or bank details.",
+  "Pricing: pi never suggests chick prices."
+ ],
+ "build_ideas": [
+  "Egg intake log by source and batch: count, cracked, rejected, set date, machine.",
+  "Candling and hatch result entry per batch with hatchability by machine and source, from the hatchery’s own data.",
+  "Chick booking system: date, quantity, grade, advance, with a daily capacity limit to stop overbooking.",
+  "Automatic WhatsApp updates to customers when their chicks are ready and dispatched.",
+  "Dispatch sheet with box count, driver, departure and arrival times, delivery photo.",
+  "Batch traceability so a complaint can be linked to egg source, machine and hatch date.",
+  "Machine and generator monitoring log with alert routing to on-call staff (using existing alarm outputs where available).",
+  "Maintenance schedule and parts log per machine.",
+  "Dealer credit ledger with dues and reminders.",
+  "Packing material stock tracker.",
+  "Weekly setting planner based on bookings and history."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We run a broiler hatchery near Lahore, about 4 lakh eggs a month. Bookings are a mess."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, that’s a lot of chicks to keep straight. How do customers book with you right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Phone and WhatsApp, the manager writes it in a diary."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — bookings come by phone and WhatsApp and go into the manager’s diary. What happens when more is booked for a day than you’ll hatch?"
+  },
+  {
+   "role": "Person",
+   "text": "Someone gets short and shouts at us."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, overbooking leaves some customers short on the day. When a customer cancels late, what happens to those chicks?"
+  }
+ ]
+}

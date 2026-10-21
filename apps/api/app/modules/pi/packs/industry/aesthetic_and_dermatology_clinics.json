@@ -1,0 +1,267 @@
+{
+ "key": "aesthetic_and_dermatology_clinics",
+ "name": "Aesthetic and dermatology clinics",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "aesthetic clinic",
+  "skin clinic",
+  "dermatology",
+  "derma",
+  "laser clinic",
+  "hair removal",
+  "Botox",
+  "fillers",
+  "PRP",
+  "hydrafacial",
+  "chemical peel",
+  "hair transplant",
+  "skin specialist",
+  "laser ke sessions",
+  "glow treatment",
+  "tajmeel",
+  "markaz tajmeel",
+  "jildiya",
+  "ilaj al-bashara",
+  "package",
+  "sessions",
+  "consultation",
+  "before and after",
+  "influencer",
+  "med spa"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Doctor-led, nurse/therapist-led, or salon-adjacent set-up, and who owns the business",
+  "Main service mix: lasers, injectables, facials, hair restoration, medical dermatology consultations",
+  "Number of machines (lasers, devices) and whether owned, leased or on revenue-share",
+  "Session packages and memberships versus pay-per-treatment",
+  "Branches and opening hours",
+  "How much business comes through social media, influencers and ads",
+  "Booking and client-record system used"
+ ],
+ "scope_rule": "pi notes the business side of an aesthetic or skin clinic: bookings, package sales and usage, lead handling from social media, pricing and discount control, practitioner commissions, product and consumable stock, device downtime, reviews and complaints as a service issue, and reporting. pi does not comment on which treatment suits someone, skin conditions, side-effects, product or injectable choices, dosing, device settings, or whether a result was good, and does not interpret rules on who may perform which procedure or on advertising medical treatments. pi does not ask for or keep client names, photos, before/after images, skin history or treatment records. Complaints about outcomes are noted as complaint-handling problems only.",
+ "vocabulary": {
+  "package": "prepaid bundle of sessions (e.g. six laser sessions)",
+  "membership": "monthly plan with set treatments",
+  "consultation": "first visit, often free or credited against treatment",
+  "injectables": "Botox/fillers; high-value stock (pi notes stock only)",
+  "device / machine": "laser or energy-based equipment",
+  "shots / pulses": "laser usage counted by the machine, sometimes tied to lease charges",
+  "therapist / aesthetician": "non-doctor staff delivering some services",
+  "before/after": "comparison photos used for marketing, needs consent",
+  "touch-up": "follow-up session, often free",
+  "influencer collab": "free treatment in exchange for posts",
+  "DM": "Instagram direct message enquiries",
+  "tajmeel": "beauty/cosmetic (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Instagram DMs pile up and half the leads never get a reply",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We spend a lot on Meta ads and can’t say which ones bring bookings",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Influencer collabs cost us free treatments and bring nothing",
+   "category": "marketing_leads",
+   "subtype": "ad_spend_waste"
+  },
+  {
+   "phrase": "Clients buy laser packages and never finish them",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "I don’t know how much unused package value is sitting on our books",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Staff give discounts in DMs that the counter doesn’t know about",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Free touch-ups are handed out to anyone who asks",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Injectable stock doesn’t match what was used",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Expensive products expire in the fridge",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Leased laser charges per shot and I can’t reconcile the bill",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "The main laser broke and we had to cancel a full week",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Therapists argue about commission on package sales",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Good therapists leave and take clients to a rival",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Clients complain the price was different from the ad",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Unhappy client posted on TikTok and it went everywhere",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "No-shows on long laser slots waste the machine",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "We don’t remind clients of their next session",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Two branches run different offers and confuse people",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Before/after photos are on therapists’ phones",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Ramadan is dead and pre-Eid we can’t handle the rush",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Margins on facials are tiny and I don’t know which services carry the business",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Booking software, Instagram and payments don’t connect",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Card machine and cash totals never match the bookings list",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Refund requests after a bad experience aren’t handled consistently",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  }
+ ],
+ "questions": {
+  "leads": [
+   "Where do most enquiries come from now?",
+   "Who replies to them, and how quickly?",
+   "How do you know if they booked?"
+  ],
+  "ads and influencers": [
+   "Which campaigns are you running at the moment?",
+   "How do you judge whether they worked?"
+  ],
+  "packages": [
+   "How do you track sessions used and left on each package?",
+   "What happens when someone stops coming?"
+  ],
+  "pricing and discounts": [
+   "Who is allowed to give a discount?",
+   "How do the counter and the DM team stay in sync on offers?"
+  ],
+  "stock": [
+   "How is injectable and product stock counted?",
+   "How often does it not match?"
+  ],
+  "devices": [
+   "Which machine would hurt most if it broke?",
+   "Is it owned, leased or on a per-use deal?"
+  ],
+  "staff": [
+   "How are therapists and practitioners paid?",
+   "What causes arguments?"
+  ],
+  "complaints": [
+   "When a client is unhappy, what happens next?",
+   "Who decides on a refund or redo?"
+  ],
+  "bookings": [
+   "How often do clients not turn up for long slots?"
+  ],
+  "reporting": [
+   "Which numbers do you check weekly or monthly?"
+  ]
+ },
+ "seasons": "- Pakistan wedding season (roughly October to March) and pre-Eid weeks drive bridal packages, facials, laser and injectables bookings. - Ramadan usually slows daytime bookings, with evening demand after iftar; the last ten days and Chand Raat bring a rush. - UAE: peak demand in the cooler months and around events, festivals and Dubai Shopping Festival offers; summer travel slows bookings; laser hair removal is often started in winter. - Canada: pre-summer body treatments in spring, holiday-party season in November and December, Black Friday and Boxing Day offers. - Valentine’s Day, Mother’s Day and year-end gift cards create sales spikes.",
+ "care": [
+  "If a client has a severe reaction, difficulty breathing, swelling of the face or throat, or collapses, pi stops and says to call emergency services (1122/115, 998/999, 911) or go to the nearest emergency department.",
+  "pi never recommends treatments, products, doses, device settings or aftercare, and never says whether a result is normal.",
+  "No client names, photos, before/after images or treatment details; pi asks the owner not to share them.",
+  "Questions about who is allowed to inject, licensing of practitioners or advertising rules for medical procedures are noted as admin concerns only.",
+  "Requests to source unregistered or smuggled injectables or devices, relabel products, or advertise false results are refused.",
+  "Fake reviews or paying for fake reviews is declined; pi notes only the underlying reputation problem.",
+  "Staff recorded by role (“senior therapist”, “injector”)."
+ ],
+ "build_ideas": [
+  "Unified enquiry inbox for Instagram, Facebook, TikTok, WhatsApp and website forms with response timers and booking outcome",
+  "Ad and influencer tracker linking each campaign code or collab to enquiries, bookings and revenue",
+  "Package and membership ledger: sessions bought, used, remaining, expiry, and outstanding liability value",
+  "Next-session reminder engine for package clients, with gentle rebooking prompts",
+  "Central offer and price list with start/end dates, pushed to counter and DM team",
+  "Discount and free touch-up approval log by role",
+  "Injectables and product stock register with lot numbers, expiry and usage per treatment entered at the chair",
+  "Device usage and lease reconciliation: shots counted versus vendor bill",
+  "Device maintenance and downtime log",
+  "Practitioner commission statement from completed treatments and package sales",
+  "Complaint and refund workflow with manager approval and outcome notes",
+  "Secure consented-photo storage instead of personal phones",
+  "Owner dashboard: bookings, revenue by service and branch, package liability, lead response time, no-show rate"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We get so many DMs from our Instagram ads but my team replies late and the bookings are low."
+  },
+  {
+   "role": "pi",
+   "text": "So the ads are bringing interest, but slow replies seem to be losing it. Noted. Who handles the DMs at the moment?"
+  },
+  {
+   "role": "Person",
+   "text": "The receptionist, in between clients at the front desk."
+  },
+  {
+   "role": "pi",
+   "text": "Understood, DMs are a side job for someone who’s already busy. Noted. When an enquiry does book, is there any way to tell which ad it came from?"
+  }
+ ]
+}

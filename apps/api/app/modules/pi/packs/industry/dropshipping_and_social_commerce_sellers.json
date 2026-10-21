@@ -1,0 +1,279 @@
+{
+ "key": "dropshipping_and_social_commerce_sellers",
+ "name": "Dropshipping and social-commerce sellers (Instagram, TikTok, Facebook)",
+ "kind": "industry",
+ "sector": {
+  "code": "M",
+  "title": "Digital economy, social and public sector"
+ },
+ "signals": [
+  "DM for price",
+  "inbox karein",
+  "page",
+  "Instagram page",
+  "TikTok shop",
+  "TikTok live",
+  "Facebook page",
+  "Marketplace",
+  "WhatsApp catalogue",
+  "dropshipping",
+  "supplier se direct",
+  "reseller",
+  "COD available",
+  "order book karwain",
+  "screenshot bhejein",
+  "advance payment",
+  "JazzCash/Easypaisa par bhejein",
+  "parcel ki tracking",
+  "story pe lagaya",
+  "live sale",
+  "reels",
+  "followers",
+  "talab",
+  "tawseel majani"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Main selling channel (Instagram, TikTok, Facebook page/Marketplace, WhatsApp) and whether they have any website.",
+  "Own stock versus dropshipping from a supplier/wholesaler who ships directly.",
+  "Rough daily message and order volume (if volunteered).",
+  "Payment mix: COD, bank transfer/wallet advance, card link.",
+  "Whether they sell via live sessions.",
+  "Who runs the page: founder alone, family, or a small team.",
+  "Product type (fashion, beauty, gadgets, home, food, pre-loved)."
+ ],
+ "scope_rule": "pi notes operational problems in selling through social platforms: capturing orders from DMs, confirming and tracking them, supplier coordination, payments and refunds, couriers, returns, content consistency and reporting. It does not advise on platform policy appeals, influencer contract law, tax registration, or import/customs rules, and it does not help with fake followers, fake reviews, counterfeit or replica goods, or misleading claims (especially for beauty and health products). It never asks for buyers’ names, numbers, addresses or payment screenshots, nor for page login details.",
+ "vocabulary": {
+  "DM / inbox": "direct messages where orders arrive.",
+  "Dropshipping": "supplier ships straight to the buyer; seller never holds stock.",
+  "Live / live sale": "selling during a live video stream.",
+  "Story / highlight": "temporary posts and saved story collections used as catalogues.",
+  "Advance": "prepayment via bank transfer or wallet before dispatch.",
+  "Screenshot": "buyer’s proof of transfer.",
+  "Reseller": "person selling another’s stock for a margin.",
+  "Booking": "creating a courier consignment.",
+  "Pre-order": "taking orders before stock arrives.",
+  "Article": "local term for a design/style code in fashion.",
+  "Restock": "item available again."
+ },
+ "problems": [
+  {
+   "phrase": "Orders come in DMs, comments and WhatsApp and I lose track",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Hundreds of ‘price?’ messages and most never buy",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "I can’t reply fast enough, customers go to another page",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Supplier says item is available, then it’s out of stock after I take payment",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Supplier ships late and customers blame me",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Supplier sent wrong colour directly to the customer",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "I don’t know if the supplier actually dispatched or not",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Payment screenshots — checking each one against the bank app takes hours",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "Some screenshots turned out fake",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Customers refuse COD parcels after ordering in a live",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "Refunds for cancelled pre-orders get messy",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "I don’t know my real profit after courier, returns and boosting",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "I boost posts but can’t tell which ones sold",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Posting is random — some weeks nothing goes up",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "Reach dropped suddenly and so did sales",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Live sale orders written on paper while I’m talking",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Same customer orders, cancels, orders again",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Quality from the supplier is inconsistent; complaints in comments",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Bad comments on posts hurt us",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Pre-orders: no list of who’s waiting for what",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "My sister helps with replies but we answer differently",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Everything is on my phone — if it’s lost, the business is gone",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "No idea who my repeat buyers are",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Supplier margin keeps shrinking because they raise prices without telling me",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Want to move from Instagram to a proper website",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "Can’t take a day off — everything depends on me",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  }
+ ],
+ "questions": {
+  "order capture": [
+   "Where do most orders come from — DMs, comments, WhatsApp or lives?",
+   "How do you write them down once confirmed?"
+  ],
+  "messages": [
+   "Roughly how many messages come in on a busy day?",
+   "Who replies to them?"
+  ],
+  "supplier": [
+   "Do you keep stock yourself or does the supplier ship directly?",
+   "How do you find out what the supplier actually has?"
+  ],
+  "delivery": [
+   "Who books the courier — you or the supplier?",
+   "How do you know a parcel has gone out?"
+  ],
+  "payments": [
+   "Is it mostly COD or advance?",
+   "How do you check advance payments came in?"
+  ],
+  "returns": [
+   "What usually happens when a parcel comes back?",
+   "Who carries that cost?"
+  ],
+  "margin": [
+   "After courier, returns and boosting, do you feel sure what you earn per order?",
+   "Which costs are you least sure about?"
+  ],
+  "marketing": [
+   "How often do you post or go live?",
+   "How do you tell which posts brought sales?"
+  ],
+  "records": [
+   "Where is your customer and order history kept?",
+   "What happens if the phone is lost?"
+  ],
+  "workload": [
+   "Which part of the day takes most of your time?"
+  ]
+ },
+ "seasons": "Pakistan: Ramadan and Eid ul-Fitr (peak for clothes, jewellery, beauty, Eid gifts), Eid ul-Adha, wedding season (November–March), 11.11 and White Friday, summer lawn season, winter shawls/jackets, Valentine’s and birthdays for gifting. UAE: Ramadan and Eid, DSF, White/Yellow Friday, National Day, Mother’s Day (21 March in the Arab world), summer travel dip. Canada: Black Friday, holiday season, Boxing Day, Diwali/Eid for diaspora sellers. Platform algorithm changes cause sudden drops at any time.",
+ "care": [
+  "Never ask for page logins, OTPs, wallet PINs or customers’ contact details; refer to buyers by role only.",
+  "Refuse requests for buying followers, fake reviews, replica/counterfeit goods or copying other brands’ content.",
+  "Beauty, slimming, supplement and “herbal” products: do not discuss health claims; note only the operational problem.",
+  "Fake payment screenshot cases: note fraud pattern; do not help track, expose or shame individuals.",
+  "If a seller faces harassment, threats or blackmail via DMs, encourage contacting police/cybercrime authorities (FIA Cybercrime in Pakistan, local police in UAE/Canada) and stop probing.",
+  "Many sellers are women running pages from home; respect privacy and do not ask for personal details or location.",
+  "No tax or registration advice; note “not sure about registering the business” as compliance_admin only.",
+  "Do not promise reach, followers or sales."
+ ],
+ "build_ideas": [
+  "WhatsApp Business order bot with catalogue, size/colour selection, address capture and confirmation, writing orders into one sheet.",
+  "DM-to-order capture form for Instagram/Facebook so confirmed orders land in one list rather than chats.",
+  "Live-sale order taker: number-coded items, buyers reply with code, system builds the order list in real time.",
+  "Supplier stock sheet shared with the supplier, showing availability before taking payment.",
+  "Supplier dispatch tracker with tracking number per order and WhatsApp alerts when overdue.",
+  "Advance-payment log matching wallet/bank credits against orders, flagging unmatched screenshots.",
+  "Simple per-order profit calculator including courier, returns and boosting costs.",
+  "Pre-order waitlist by item with automatic “it’s back” WhatsApp messages.",
+  "Content calendar with reminders for posts and lives.",
+  "Cloud backup of orders and customer history off the phone.",
+  "Weekly WhatsApp summary: orders, delivered, returned, cash pending.",
+  "Saved-reply library so helpers answer consistently."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mera Instagram page hai, orders DMs mein aate hain aur aadhe to bhool jati hoon."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh bohot common hai jab sab kuch ek phone pe chal raha ho. Noted — DMs mein aane wale orders track nahi ho pate aur kuch miss ho jate hain. Confirm hone ke baad order aap kahan likhti hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Notes app mein, ya kabhi screenshot le leti hoon."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — confirmed orders notes aur screenshots mein bikhre hue hain. Stock aapke paas hota hai ya supplier seedha customer ko bhejta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Supplier bhejta hai, Lahore se."
+  }
+ ]
+}

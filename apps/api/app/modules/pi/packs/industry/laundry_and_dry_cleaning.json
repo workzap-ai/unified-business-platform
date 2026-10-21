@@ -1,0 +1,286 @@
+{
+ "key": "laundry_and_dry_cleaning",
+ "name": "Laundry and dry-cleaning",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "laundry",
+  "dry cleaning",
+  "dry cleaner",
+  "wash and fold",
+  "wash and iron",
+  "press",
+  "ironing",
+  "pickup and delivery",
+  "steam press",
+  "stain removal",
+  "duvet cleaning",
+  "carpet cleaning",
+  "curtain cleaning",
+  "laundromat",
+  "coin laundry",
+  "commercial laundry",
+  "hotel linen",
+  "dhobi",
+  "istri",
+  "kapray dhulwane",
+  "laundry wala",
+  "maghsala",
+  "kawi",
+  "ghasil"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Retail drop-off shop, pickup-and-delivery service, laundromat, commercial laundry for hotels/hospitals/restaurants, or a mix.",
+  "Number of shops and whether there is a central plant processing for collection points.",
+  "Daily volume (pieces or kilos) and machine capacity (washers, dryers, presses, dry-clean machine).",
+  "Pricing: per piece, per kilo, subscriptions, B2B contracts.",
+  "Number of drivers or riders and delivery areas.",
+  "Tagging and tracking method: paper tags, barcodes, register, app.",
+  "Power and water situation (load-shedding, water tankers in PK; utility costs in UAE)."
+ ],
+ "scope_rule": "pi notes operational and business problems: lost or mixed-up garments, damage claims, tagging, turnaround times, pickup and delivery routes, machine downtime, chemical and detergent stock, B2B billing and utility costs. pi does not advise on dry-cleaning solvent handling, chemical safety, wastewater or environmental rules, boiler or machine safety, licensing or tax. pi never collects customers’ names, addresses, phone numbers or payment details, and records roles (customer, rider, presser, hotel client). Chemical spills, burns or boiler problems happening now are emergencies.",
+ "vocabulary": {
+  "dhobi": "traditional washerman (Urdu)",
+  "istri": "ironing (Urdu)",
+  "tag / tagging": "label attached to each item to match it to the order",
+  "wash & fold": "washed, dried and folded, priced by weight",
+  "press only": "ironing service without washing",
+  "dry clean": "cleaning with solvent instead of water",
+  "turnaround": "time from drop-off to ready",
+  "express": "same-day or next-day service at a higher price",
+  "plant": "central processing facility",
+  "maghsala": "laundry (Arabic)",
+  "kawi": "ironing (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Customers’ clothes get mixed up and go to the wrong person",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "A designer suit went missing and the customer wants full compensation",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Clothes come back with stains still there or shrunk",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Same item has to be rewashed or re-pressed because it failed the check",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Nobody checks garments for damage at drop-off, so we can’t prove it was already there",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Paper tags fall off in the wash",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Orders aren’t ready when promised",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Riders’ routes are a mess and pickups get missed",
+   "category": "orders_fulfilment",
+   "subtype": "rider_management"
+  },
+  {
+   "phrase": "Delivery cost per order is too high for small orders",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Riders collect cash on delivery and some doesn’t come back",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "Machines break and repair takes days",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Electricity, gas and water bills keep going up",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Detergent and chemicals are used way more than they should be",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "We run out of hangers, covers and packing material",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Customers leave clothes for months and never collect",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Hotel and restaurant clients pay 60 or 90 days late",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Hotel linen count we send never matches what they say they received",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "Lots of WhatsApp messages asking ‘is my order ready?’",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "We get orders through apps and WhatsApp and they don’t sync",
+   "category": "orders_fulfilment",
+   "subtype": "multi_channel_orders"
+  },
+  {
+   "phrase": "Pressers and washers don’t show up in peak weeks",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Staff use the machines for outside customers after hours",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "I don’t know my cost per piece or per kilo",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Customers try once and don’t come back",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Bad reviews about lost items and late delivery",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Load-shedding stops the plant in the middle of a batch",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Collection points and the plant don’t know what’s in transit",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Environmental and municipal inspections take time and paperwork",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  }
+ ],
+ "questions": {
+  "tracking items": [
+   "How do you tag items when they come in?",
+   "How often do things get mixed up or lost?",
+   "What happens when they do?"
+  ],
+  "quality and damage": [
+   "Who checks garments at drop-off?",
+   "How are damage complaints handled?"
+  ],
+  "turnaround": [
+   "What turnaround do you promise?",
+   "How often do you miss it, and why?"
+  ],
+  "pickup and delivery": [
+   "How many riders do you have?",
+   "How are routes planned?",
+   "How is cash from riders settled?"
+  ],
+  "machines and utilities": [
+   "Which machines break most?",
+   "How long are they usually down?"
+  ],
+  "b2b clients": [
+   "How many hotel or business clients do you have?",
+   "How are their counts agreed?",
+   "How long do they take to pay?"
+  ],
+  "supplies": [
+   "How do you track detergents and chemicals?",
+   "What runs out most?"
+  ],
+  "customers": [
+   "How do customers check if their order is ready?",
+   "Do you know who your regulars are?"
+  ],
+  "costs": [
+   "Do you know your cost per piece or kilo?",
+   "Which cost has risen most?"
+  ]
+ },
+ "seasons": "PK: pre-Eid weeks bring heavy wash and press demand, plus post-Eid dry cleaning of formal clothes; wedding season (November to March) for sherwanis, bridal wear and formal suits; winter brings blankets, quilts and coats; monsoon slows drying and increases demand for dryers; Ramadan nights busy. UAE: steady year-round with peaks before Eid, National Day, winter season (hotel occupancy drives B2B linen volume), and pre-Ramadan curtain and carpet cleaning; summer B2B volume dips with hotel occupancy while residents travel. Canada: winter coats and seasonal storage in spring and autumn, wedding and graduation formal wear in summer, holiday season.",
+ "care": [
+  "No advice on solvent handling, chemical safety, boiler or press safety, or wastewater rules; pi notes only operational problems.",
+  "Chemical spill, gas smell, fire, burns or boiler failure happening now: pi stops and points to emergency services.",
+  "Customer addresses, phone numbers and names are never collected; “a customer” or “a hotel client” is enough.",
+  "Damage and loss compensation disputes are noted as business problems without legal advice.",
+  "pi does not help with under-reporting cash sales or avoiding tax.",
+  "Riders and staff recorded by role; no covert monitoring of staff in private areas."
+ ],
+ "build_ideas": [
+  "Order intake app with barcode or QR tags per item, photo at drop-off to record condition, and a WhatsApp receipt.",
+  "Item tracking board: received, washing, dry-cleaning, pressing, quality check, ready, out for delivery, delivered.",
+  "“Ready” and reminder messages on WhatsApp, and uncollected-item alerts.",
+  "Pickup and delivery scheduler with rider routes by area and time slot.",
+  "Rider cash collection ledger with daily settlement and mismatch flags.",
+  "Damage and loss claim log with photos and resolution.",
+  "Machine maintenance log and downtime report.",
+  "Detergent and chemical usage log against loads processed.",
+  "B2B linen count sheet signed by both sides on pickup and delivery, with monthly invoice and ageing.",
+  "Cost-per-piece and cost-per-kilo calculator using utilities, labour and supplies.",
+  "Plant and collection-point transfer tracker.",
+  "Branch and service dashboard: volume, turnaround, complaints, revenue."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We do laundry for three hotels in Deira and every month they say we returned fewer sheets than they gave us."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, there’s a monthly linen count dispute with your hotel clients. How is the count done when your driver picks up?"
+  },
+  {
+   "role": "Person",
+   "text": "Their housekeeping writes a number on a paper and our driver just signs."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted — the count is theirs and your driver doesn’t check it. Is there a count when you deliver back?"
+  },
+  {
+   "role": "Person",
+   "text": "We count at the plant, but they don’t sign anything."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, no signed count on return. How long has this been going on?"
+  }
+ ]
+}

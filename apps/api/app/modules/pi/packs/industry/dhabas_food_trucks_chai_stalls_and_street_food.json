@@ -1,0 +1,273 @@
+{
+ "key": "dhabas_food_trucks_chai_stalls_and_street_food",
+ "name": "Dhabas, food trucks, chai stalls and street food",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "dhaba",
+  "chai dhaba",
+  "chai stall",
+  "khokha",
+  "thela",
+  "rehri",
+  "food truck",
+  "street food",
+  "paratha",
+  "anda shami",
+  "bun kabab",
+  "gol gappay",
+  "chaat",
+  "pakoray",
+  "halwa puri",
+  "roadside",
+  "truckers",
+  "highway",
+  "karak stall",
+  "cafeteria",
+  "shawarma stand",
+  "poutine truck",
+  "market stall",
+  "nashta"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Fixed spot, highway dhaba, or mobile truck/cart",
+  "Number of stalls/trucks and whether family members run them",
+  "Owned vs rented spot, and whether a daily fee is paid to a market or event organiser",
+  "Cash only vs digital wallets (Easypaisa, JazzCash, Raast, cards) vs app orders",
+  "Opening hours (breakfast, late night, 24 hours)",
+  "Where raw stock is bought (mandi, wholesaler, cash-and-carry) and how often",
+  "Staff count and whether they live on site"
+ ],
+ "scope_rule": "pi notes operational and business problems: daily cash, stock buying, wastage, staff reliability, location footfall, simple record-keeping and growing to a second spot. It does not advise on encroachment rules, vending permits, municipal licensing, food- safety rules or how to deal with officials, and never helps with bribes or avoiding inspections. It does not record names of staff, customers or officials, and never takes wallet PINs or bank details.",
+ "vocabulary": {
+  "dhaba": "roadside eatery, often on highways",
+  "khokha": "small kiosk/booth",
+  "thela/rehri": "handcart",
+  "nashta": "breakfast",
+  "dihari": "daily earning or daily wage",
+  "udhaar": "credit given to regulars",
+  "galla": "cash box",
+  "mandi": "wholesale market for vegetables, meat or grain",
+  "cafeteria": "in the Gulf, a small snack eatery",
+  "karak": "strong milk tea",
+  "commissary (Canada)": "base kitchen food trucks must use",
+  "pitch": "the spot where a truck or stall sets up"
+ },
+ "problems": [
+  {
+   "phrase": "I never know at night how much I actually earned",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Galla cash doesn’t match what I think we sold",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Regulars take udhaar and I lose track",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Easypaisa and cash get mixed up, I can’t separate",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "Milk and sugar prices jumped, cup price same",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Gas cylinder runs out mid-shift",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Leftover parathas and gravy thrown every night",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Helper takes money from the galla",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Helpers leave without notice and I’m alone",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "I buy from the mandi every morning and waste half the day",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Truck generator breaks and we lose the event",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Footfall dropped since the road was blocked/new flyover",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Rainy days nobody comes, then summer is slow too",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "People don’t know where the truck is parked today",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "Instagram post gets views but no one comes",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Taste changes when I’m not there and the helper cooks",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Customers complain about wait in the morning rush",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Want to open a second stall but can’t watch both",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Event organisers pay late for catering stalls",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Permit renewals and truck inspections, I forget dates",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Can’t get on Foodpanda/Uber Eats, don’t know how listings work",
+   "category": "customer_experience_digital",
+   "subtype": "marketplace_listing"
+  },
+  {
+   "phrase": "Trucker customers ask for bills/receipts and I have none",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Electricity bill and load-shedding are killing us",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Staff sleep at the dhaba, things go missing at night",
+   "category": "loss_security",
+   "subtype": "cctv_gaps"
+  },
+  {
+   "phrase": "Family members run it and every decision is a fight",
+   "category": "planning_growth",
+   "subtype": "succession_family"
+  }
+ ],
+ "questions": {
+  "daily earnings": [
+   "How do you know at night what the day earned?",
+   "Do you write anything down?"
+  ],
+  "cash": [
+   "Is the galla handled by you or a helper?",
+   "Are cash and Easypaisa/JazzCash kept separately?"
+  ],
+  "credit": [
+   "How many regulars take udhaar?",
+   "Where is it written?"
+  ],
+  "costs": [
+   "Which item’s price rise hurt most recently?",
+   "Have you changed your prices since?"
+  ],
+  "buying": [
+   "Where do you buy stock and how often?",
+   "Who goes?"
+  ],
+  "wastage": [
+   "What’s left over at closing most days?"
+  ],
+  "staff": [
+   "How many helpers do you have?",
+   "How long do they usually stay?"
+  ],
+  "location": [
+   "Has footfall changed recently?",
+   "What changed around you?"
+  ],
+  "truck": [
+   "How do customers find out where you are today?"
+  ],
+  "growth": [
+   "What’s stopping a second spot?"
+  ]
+ },
+ "seasons": "- PK: winter is peak for chai, halwa puri, soups and pakoray; monsoon rains bring pakoray demand but can stop stalls; Ramadan shifts trade to iftar (samosas, pakoray, chaat) and sehri; highway dhabas peak around Eid travel and long weekends; summer heat lowers daytime trade and raises cold drinks and lassi. - UAE: cooler months for outdoor stalls, markets and festival pop-ups; Ramadan night markets; summer is very slow outdoors; karak stalls steady year-round. - Canada: food-truck season roughly May–October; summer festivals and fairs; winter shutdown or reduced operation for most trucks.",
+ "care": [
+  "Gas cylinder leaks or fires, road accidents near a roadside stall, vehicle fires: pi tells the person to call emergency services first.",
+  "Encroachment, police or municipal harassment, or demands for money from officials: pi notes the business disruption only; it never advises on paying, avoiding or negotiating with officials and will not assist with bribes.",
+  "Food-safety and vending permit questions: pi notes the admin effort only.",
+  "Helpers’ names, ages and personal details: not collected; underage helpers are not something pi helps hide.",
+  "Wallet PINs, account numbers or OTPs: never asked for; if offered, pi asks them not to share.",
+  "Requests to sell expired or adulterated items: pi declines."
+ ],
+ "build_ideas": [
+  "Simple WhatsApp daily close: owner sends cash, wallet and udhaar totals, gets a running weekly view",
+  "Udhaar ledger on phone with each regular as a short label (no phone numbers unless the regular opts in) and running balance",
+  "Daily buying list from the mandi with prices, to see price changes over time",
+  "Leftover log by item to adjust next-day cooking",
+  "Gas and key-stock reminder before it runs out based on usage pattern",
+  "Food-truck location page/WhatsApp broadcast of today’s spot and hours to opted-in followers",
+  "Recipe cards for helpers with quantities",
+  "Permit and inspection due-date reminders",
+  "Simple receipt generator on phone for customers who ask for a bill",
+  "Two-stall comparison: daily sales and cash per stall"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai chai ka khokha hai, raat ko pata hi nahi chalta kitna kamaya."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — raat ko clear nahi hota ke din mein kitni kamai hui. Paise sirf galle mein aate hain, ya Easypaisa/JazzCash par bhi?"
+  },
+  {
+   "role": "Person",
+   "text": "Dono. Kuch log udhaar bhi karte hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted — cash, wallet aur udhaar teeno chalte hain. Udhaar abhi kahan likha jata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Ek copy mein, kabhi bhool bhi jata hun."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted ke copy mein hota hai aur kabhi reh jata hai. Galla zyada tar aap khud sambhalte hain ya helper bhi?"
+  }
+ ]
+}

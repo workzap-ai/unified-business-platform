@@ -1,0 +1,258 @@
+{
+ "key": "wholesale_market_traders",
+ "name": "Wholesale-market traders (e.g. Jodia Bazaar, Shah Alam Market, Deira souks)",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "mandi",
+  "wholesale",
+  "thok",
+  "Jodia Bazaar",
+  "Shah Alam Market",
+  "Azam Market",
+  "Akbari Mandi",
+  "Deira",
+  "Murshid Bazaar",
+  "Naif souk",
+  "spice souk",
+  "dukaan",
+  "gaddi",
+  "seth",
+  "munshi",
+  "khata",
+  "parchi",
+  "udhaar",
+  "bhaav/ rate",
+  "peti",
+  "bori",
+  "thaila",
+  "pallay daar",
+  "hathi/ handcart",
+  "maal utarna",
+  "souq",
+  "tajir al-jumla",
+  "deen"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "What they trade (dry fruits, spices, rice, pulses, fabric, plastics, cosmetics, electronics, textiles, toys, crockery).",
+  "Number of shops/stalls and whether there’s a separate godown, and how far.",
+  "Who the buyers are: retailers from the city, upcountry traders, exporters/re-exporters, walk-ins.",
+  "Cash vs credit split and how long credit usually runs.",
+  "How many staff: munshi, salesmen, porters, family members.",
+  "How they record sales: parchi, khata, receipt book, Excel, POS.",
+  "Where they buy: importers, manufacturers, other wholesalers, direct import."
+ ],
+ "scope_rule": "pi notes operational problems: credit and recovery, cash handling, stock and godown control, pricing, staff honesty and handoffs, record keeping and owner visibility. It does not advise on tax registration, FBR/FTA matters, market committee or landlord disputes, or financing. It never helps with unrecorded/cash-only selling to avoid tax, smuggled goods sourcing, or false invoices. It records roles (“an upcountry buyer from Multan”, “my munshi ”), never names, CNICs or phone numbers.",
+ "vocabulary": {
+  "thok": "wholesale",
+  "seth": "shop owner/boss",
+  "munshi": "clerk who writes the ledger and slips",
+  "gaddi": "the owner’s seat/counter, the cash point",
+  "parchi": "handwritten slip for an order or delivery",
+  "khata": "credit ledger by customer",
+  "bhaav / rate": "the day’s price",
+  "peti / bori / thaila": "case / sack / bag (units of sale)",
+  "pallay daar": "porter/loader",
+  "bilty": "transport receipt when goods are sent upcountry",
+  "souq": "market (Arabic); deen — debt",
+  "tajir al-jumla": "wholesale trader (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Half the market owes me money and the khata is the only record",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Upcountry buyers take maal on credit and then stop answering",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "At day end cash in the gaddi doesn’t match the parchis",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "The munshi knows everything; if he leaves I’m finished",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "I suspect a salesman gives extra weight or lower rate to his friends",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Godown and shop stock are never counted together",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Bags go missing when porters move them from godown to shop",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Rates change every day and buyers argue about what I quoted yesterday",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "I don’t know my margin on each item because buying rates keep changing",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Dry fruit gets insects in the summer if it sits too long",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Customers moving to online wholesale apps and buying direct",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Orders come on phone and WhatsApp all day and some get missed",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Wrong maal sent to an upcountry buyer, now he wants freight back",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Goods sent by transport arrive short and the adda says not their problem",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Buyers want to pay by bank transfer or Raast and I can’t track who paid",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "Cash sitting in the shop at night worries me",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Suppliers give me less credit time than I give my buyers",
+   "category": "suppliers_purchasing",
+   "subtype": "credit_terms"
+  },
+  {
+   "phrase": "I buy big lots when the rate is low and then can’t sell them",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Market shuts for strikes or rain and sales just vanish",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "My sons want to modernise but every record is in Urdu khata",
+   "category": "planning_growth",
+   "subtype": "succession_family"
+  },
+  {
+   "phrase": "I want a second shop but can’t watch both",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Rent in the market keeps going up",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "I have no list of who my regular buyers are or what they buy",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  }
+ ],
+ "questions": {
+  "credit": [
+   "Roughly how many buyers are on udhaar at any time?",
+   "How do you keep track of how old each balance is?",
+   "What usually happens before a buyer goes quiet?"
+  ],
+  "cash": [
+   "How is the day’s cash counted and matched at closing?",
+   "Who handles cash besides you?",
+   "How often is it short, and by how much roughly?"
+  ],
+  "records": [
+   "Where does a sale first get written — parchi, khata or something else?",
+   "Who writes it, and who checks it?"
+  ],
+  "stock": [
+   "How do you know what’s in the godown versus the shop right now?",
+   "When was the last time you counted both?"
+  ],
+  "rates": [
+   "How do you set the day’s rate?",
+   "How do salesmen know it, and how often do disputes come up?"
+  ],
+  "upcountry orders": [
+   "How do you send maal upcountry, and how do you confirm it arrived complete?",
+   "What goes wrong most?"
+  ],
+  "staff": [
+   "Who would know the business if the munshi was away for a month?",
+   "What do you worry about most with staff?"
+  ],
+  "growth": [
+   "What’s stopping you from adding another shop or more buyers?"
+  ]
+ },
+ "seasons": "Ramadan is the heaviest season for dry fruits, dates, spices, rice, besan, and sweets, with buyers stocking two to four weeks before. Eid ul Fitr peaks garments, cosmetics, bangles and toys; Eid ul Adha peaks spices and cooking items. Winter (November–February) lifts dry fruit, wool and blankets; wedding season the same period lifts fabrics, crockery, decor and gifts. Summer heat slows Karachi markets midday and raises spoilage risk for dry goods. Market strikes, political shutdowns and monsoon flooding hit Jodia Bazaar and old Karachi hard. In Deira, re-export and tourist trade rises in winter (October–April), around DSF (December–January) and before Eid and Nowruz; summer is slow. Diwali drives dry fruit and sweets demand for South Asian buyers in Dubai and Canada.",
+ "care": [
+  "“How do I keep sales off the books” or “avoid FBR/FTA”: pi declines and does not note it as a problem to solve.",
+  "Sourcing smuggled goods (border goods, undeclared items) or counterfeit brands: pi declines plainly.",
+  "Tax registration, invoicing rules, VAT in the UAE or sales tax in Pakistan: out of scope; suggest a tax adviser.",
+  "Suspected staff theft: pi notes the problem neutrally, no names, and does not help plan hidden cameras or confrontations.",
+  "Market committee, landlord and pagri disputes: legal; pi notes only the business effect.",
+  "Large cash held overnight: pi notes the risk; if there is a robbery in progress or threats, pi tells them to contact police (15 in Pakistan, 999 in the UAE) first.",
+  "Never stores buyers’ names, phone numbers or CNICs from the khata.",
+  "Elderly owners and family heirs disagree often; pi stays neutral."
+ ],
+ "build_ideas": [
+  "Digital khata in Urdu/English: buyer balances with ageing, entered in seconds by the munshi, viewable by the owner on phone.",
+  "WhatsApp payment reminders to buyers, approved by the owner before sending.",
+  "Daily cash closing screen: parchis total vs cash vs bank transfers vs credit, with differences flagged.",
+  "Simple slip/receipt printing from phone so every sale has a numbered record.",
+  "Shop-and-godown stock register by bag/case with transfer slips signed by porter and receiver.",
+  "Daily rate board shared with salesmen and logged per quote.",
+  "Item margin view using actual buying rates per lot.",
+  "Upcountry dispatch tracker: bilty number, transporter, buyer, cartons, confirmation of receipt.",
+  "Buyer list with what each buys and how often, for follow-up calls.",
+  "Order intake from WhatsApp into a single list so none is missed.",
+  "Owner summary each evening: sales, cash, new credit, recoveries, low stock."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Saara hisaab munshi ke paas khata mein hai, mujhe khud nahi pata market mein kitna paisa phansa hua hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — udhaar ka record sirf munshi ke khata mein hai aur aap ko total nazar nahi aata. Andaazan kitne buyers hain jin pe abhi udhaar hai?"
+  },
+  {
+   "role": "Person",
+   "text": "80-90 honge, kuch to do saal purane hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, 80–90 buyers aur kuch balances bohat purane. Noted. Purane wale zyada tar local hain ya upcountry ke?"
+  }
+ ]
+}

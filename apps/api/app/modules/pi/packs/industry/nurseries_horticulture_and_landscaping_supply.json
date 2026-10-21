@@ -1,0 +1,279 @@
+{
+ "key": "nurseries_horticulture_and_landscaping_supply",
+ "name": "Nurseries, horticulture and landscaping supply",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "nursery",
+  "plant nursery",
+  "paudhay / poday",
+  "gamlay",
+  "mitti / potting mix",
+  "khaad",
+  "indoor plants",
+  "outdoor plants",
+  "fruit plants",
+  "grass / ghaas",
+  "carpet grass",
+  "rolls",
+  "landscaping",
+  "mali",
+  "garden maintenance contract",
+  "irrigation fittings",
+  "mashtal",
+  "nabatat",
+  "tanseeq hada’iq",
+  "villa garden",
+  "compound maintenance",
+  "Canadian garden centre",
+  "sod",
+  "mulch",
+  "spring rush"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Business mix: retail nursery, wholesale growing, landscaping projects, garden maintenance contracts, supply of pots, soil and fittings",
+  "Number of sites or outlets and growing area",
+  "Own-grown plants versus bought-in or imported stock",
+  "Customer types: households, housing societies, developers, government or municipal tenders, hotels, corporate offices",
+  "Number of malis, landscapers and project crews",
+  "Sales channels: walk-in, Instagram, Facebook, WhatsApp, Daraz or other marketplaces, delivery apps",
+  "Systems: registers, POS, Excel, project spreadsheets"
+ ],
+ "scope_rule": "pi notes business and operational problems: plant stock and losses, pricing, sales channels, orders and delivery, project quotes and progress, maintenance contract scheduling, crew attendance, supplier and import issues, collections from developers and clients, and visibility for the owner. pi does not advise on plant care, watering, fertiliser or pesticide choice or doses, pest or disease treatment, plant import permits or quarantine rules, irrigation engineering, or contract law. It records customer and staff roles only, never names, addresses or phone numbers.",
+ "vocabulary": {
+  "gamla": "plant pot",
+  "paneeri": "seedlings or saplings raised for transplanting",
+  "mali": "gardener",
+  "grafted plant": "fruit tree propagated by grafting",
+  "sod / grass roll": "pre-grown turf laid as a lawn",
+  "softscape / hardscape": "planting work / paving, stones and structures",
+  "AMC / maintenance contract": "recurring garden upkeep agreement",
+  "BOQ": "bill of quantities used in landscaping quotes",
+  "retention": "part of a project payment held back until handover",
+  "shade house": "netted structure for growing plants"
+ },
+ "problems": [
+  {
+   "phrase": "Plants die in the nursery and I only find out at stock count",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "I don’t know how many of each plant I have across both sites",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Popular indoor plants sell out every spring and I reorder late",
+   "category": "stock_inventory",
+   "subtype": "slow_replenishment"
+  },
+  {
+   "phrase": "Staff sell plants at different prices to different people",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Cash sales at the counter don’t match the register",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Instagram and WhatsApp enquiries pile up and half get no reply",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "People ask for a price on WhatsApp and never come back",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Delivered plants arrive damaged and customers want refunds",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Delivery riders take too long and cost too much for small orders",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Landscaping quotes take me days to prepare",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Projects run over budget and I find out at the end",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Developers hold our retention and final payments for months",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Maintenance visits get missed and clients complain",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Malis’ attendance at client sites can’t be checked",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Crews take plants or materials from the site",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Imported plants stuck at customs and some die",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Supplier sends lower-quality pots than ordered",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Water and electricity for the nursery cost more each year",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Rent for the nursery land keeps going up",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "Tender and municipal paperwork takes forever",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "I can’t tell if retail, projects or maintenance makes the most money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "No proper website or online catalogue",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "Daraz listings show plants we don’t have any more",
+   "category": "customer_experience_digital",
+   "subtype": "marketplace_listing"
+  },
+  {
+   "phrase": "Customers come once in spring and we never hear from them again",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "I want to open a second outlet but the first isn’t organised yet",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "Summer is dead and staff costs stay the same",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  }
+ ],
+ "questions": {
+  "stock": [
+   "How do you keep track of plants across your sites?",
+   "How do you find out about losses?"
+  ],
+  "pricing and counter": [
+   "How are prices set and shown to staff?",
+   "How is the day’s cash checked?"
+  ],
+  "online enquiries": [
+   "Where do most enquiries come from now?",
+   "Who replies, and how quickly?"
+  ],
+  "delivery": [
+   "How are deliveries arranged?",
+   "What goes wrong most often?"
+  ],
+  "projects": [
+   "How do you prepare a landscaping quote today?",
+   "How do you track costs while the job is running?"
+  ],
+  "collections": [
+   "Who are your slowest payers?",
+   "What’s usually holding the payment up?"
+  ],
+  "maintenance contracts": [
+   "How are visits scheduled?",
+   "How do you know a visit actually happened?"
+  ],
+  "crews": [
+   "How many malis or crew members work on sites?",
+   "How do you check attendance and work done?"
+  ],
+  "suppliers and imports": [
+   "Where do you buy plants and pots from?",
+   "What’s gone wrong recently?"
+  ],
+  "business mix": [
+   "Which part of the business feels most profitable?",
+   "Which feels most stressful?"
+  ],
+  "growth": [
+   "What’s the next step you’re thinking about?"
+  ]
+ },
+ "seasons": "Pakistan: spring (February–April) is the main planting and sales season; monsoon (July–September) is the government and society tree plantation drive period; autumn (October–November) is a second planting season; summer heat (May– June) slows retail and raises plant losses. Housing society handovers and wedding season (November–February) drive landscaping and decor plant demand. UAE: the main landscaping and planting season runs October–April; summer (June–September) is slow with high water and cooling costs and plant stress; Ramadan, Eid, National Day and the winter events season lift corporate and villa orders. Canada: spring rush April–June (Victoria Day weekend is a classic peak), summer maintenance, fall planting and cleanup, and Christmas trees and poinsettias in December; winter is quiet.",
+ "care": [
+  "No advice on plant care, watering, fertiliser, pesticide or herbicide choice or doses, or pest and disease treatment; pi suggests a horticulturist or extension service.",
+  "No advice on plant import permits, quarantine or biosecurity rules; pi notes only the delay or paperwork problem.",
+  "Heat exhaustion of crews, falls from heights during tree work, chemical exposure, electric shock from irrigation pumps: pi tells them to call emergency services (1122, 999/998, 911) immediately.",
+  "Never helps import plants without permits, mislabel species or origin, or bypass tender rules.",
+  "Does not record customer names, villa addresses, phone numbers or staff IDs; uses roles and counts.",
+  "Tender bribery or “commission” requests: pi declines and moves on."
+ ],
+ "build_ideas": [
+  "Plant stock register by species, size and site, with losses logged with photos and reasons",
+  "Reorder alerts for fast-selling lines ahead of spring",
+  "POS or simple counter app with a fixed price list and daily cash close",
+  "WhatsApp and Instagram enquiry inbox with quick-reply catalogue and follow-up reminders",
+  "Online catalogue and ordering with delivery slot selection",
+  "Delivery tracker with photo proof at drop-off",
+  "Landscaping quote builder from a standard rate and item library, producing a branded BOQ",
+  "Project cost tracker comparing quoted versus actual materials and labour",
+  "Receivables tracker for projects, including retention amounts and release dates",
+  "Maintenance contract scheduler with visit check-in, photos and a monthly client report",
+  "Crew attendance by site check-in",
+  "Supplier and import order tracker",
+  "Business-line profit view: retail, projects, maintenance",
+  "Customer list with seasonal reminder messages"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We run a nursery and do villa landscaping in Dubai. Maintenance clients keep saying our team didn’t show up."
+  },
+  {
+   "role": "pi",
+   "text": "That’s frustrating, especially if you can’t easily prove otherwise. Noted. How are maintenance visits scheduled at the moment?"
+  },
+  {
+   "role": "Person",
+   "text": "The supervisor has a list on paper and calls the guys each morning."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, schedule on paper and calls each morning. When a visit is done, how does anyone know it actually happened?"
+  }
+ ]
+}

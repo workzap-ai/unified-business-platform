@@ -1,0 +1,291 @@
+{
+ "key": "new_car_dealerships_and_showrooms",
+ "name": "New car dealerships and showrooms",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "dealership",
+  "showroom",
+  "3S dealer",
+  "authorised dealer",
+  "booking",
+  "allocation",
+  "delivery date",
+  "own",
+  "premium",
+  "invoice",
+  "PBO",
+  "test drive",
+  "trade-in",
+  "floor plan",
+  "finance approval",
+  "leasing",
+  "gaari ki booking",
+  "delivery kab hogi",
+  "file nahi aayi",
+  "wakala",
+  "ma’rad sayyarat",
+  "tasjeel",
+  "mulkiya",
+  "demo car",
+  "walk-ins",
+  "leads from the brand portal"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Which brand(s) they represent and whether they are an authorised 3S/4S dealer (sales, service, spares) or sales-only.",
+  "Number of showrooms/branches and whether service and parts sit under the same roof.",
+  "Rough monthly units and the mix of cash buyers versus bank/leasing finance.",
+  "Whether they hold stock on floor-plan finance or sell mainly against bookings and factory allocations.",
+  "Which dealer management system (DMS) the brand mandates, and what still lives in Excel or WhatsApp.",
+  "Size of the sales team and how salespeople are paid (salary, commission, per-unit incentives).",
+  "Country and city, because registration, booking rules and buyer behaviour differ sharply between Pakistan, the UAE and Canada."
+ ],
+ "scope_rule": "pi notes operational and business problems in the showroom: lead handling, booking and delivery tracking, stock and allocation visibility, salesforce follow-up, trade-in valuation workflow, accessories upsell, after-sales handover and reporting to the owner or principal. pi does not give advice on consumer-protection law, financing contracts, interest or leasing terms, tax, customs duty, dealer agreements with the brand, or regulatory disputes, and does not comment on whether a premium or “own money” practice is lawful. pi never asks for or stores buyers’ CNIC, Emirates ID, driving licence, bank details or finance applications, and records customers and staff by role only (“a walk-in customer”, “our senior sales consultant”).",
+ "vocabulary": {
+  "Own / on money": "premium paid above list price for quicker delivery (Pakistan).",
+  "PBO": "provisional booking order issued when a customer books a car.",
+  "Allocation": "the number of units the brand assigns to the dealer per month.",
+  "3S / 4S": "sales, service, spares (and surveys/body shop) under one dealer.",
+  "Floor plan": "stock financed by a bank or the brand until sold.",
+  "DMS": "the dealer management system the brand provides.",
+  "Demo car": "a unit kept for test drives, later sold as used.",
+  "PDI": "pre-delivery inspection before handing over a new car.",
+  "Mulkiya": "UAE vehicle registration card.",
+  "Wakala": "Arabic for the brand agency or distributor.",
+  "Trade-in / part-exchange": "customer’s old car taken against the new one."
+ },
+ "problems": [
+  {
+   "phrase": "Customers keep calling asking when their car will come and nobody can tell them",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "We get leads from the brand portal, Facebook and walk-ins and half are never followed up",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Salesmen keep the leads on their own phones; when one leaves, his customers go with him",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "I don’t know which variant and colour is sitting in the yard versus promised to someone",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "The same car got promised to two customers",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Some colours sit for months while customers wait for others",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Floor-plan interest is eating us on slow units",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "We don’t actually know our profit per car after discounts, free accessories and commissions",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Salesmen give away floor mats, tinting and service packages without approval",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Commission disputes every month end over who closed which deal",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Bank finance cases get stuck and we don’t know at which step",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Trade-in valuations are all over the place depending on who does it",
+   "category": "operations_process",
+   "subtype": "quality_inconsistent"
+  },
+  {
+   "phrase": "Delivery day is chaos, the car isn’t washed, the PDI wasn’t done, the documents are missing",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Registration and number plate follow-up takes my staff whole days",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Customers buy from us but go elsewhere for service",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Accessories sales are low, nobody pitches them",
+   "category": "sales_revenue",
+   "subtype": "basket_small"
+  },
+  {
+   "phrase": "Booking deposits and payments are tracked on paper and Excel; reconciling takes days",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Allocation from the brand changes and our bookings list doesn’t match",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_communication"
+  },
+  {
+   "phrase": "Test drive bookings clash and the demo car is never fuelled or clean",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "We enter everything in the DMS and again in our own Excel",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "I only see sales numbers when the accountant sends them weeks later",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Two branches, and I can’t compare their conversion",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Ad spend on Facebook and PakWheels/Dubizzle, but no idea which gives buyers",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Google reviews mention rude salesmen and delays",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Good sales consultants leave for competitors every few months",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Demo cars and used trade-ins pile up and nobody owns selling them",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "WhatsApp is full of customer messages and some get missed",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "We’re planning a second showroom and don’t know how to control it remotely",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  }
+ ],
+ "questions": {
+  "leads": [
+   "Where do most of your enquiries come from right now?",
+   "Who follows them up, and where do they keep track?",
+   "Roughly how many go quiet without an answer?"
+  ],
+  "bookings and delivery": [
+   "How does a customer find out where their car is after booking?",
+   "Who answers those calls?",
+   "What usually causes the delays they ask about?"
+  ],
+  "stock": [
+   "How do you know what’s in the yard versus what’s already promised?",
+   "How often does a unit get double-promised or lost track of?"
+  ],
+  "margin": [
+   "After discounts, freebies and commission, do you know what each car actually made?",
+   "Who approves the extras a salesman gives?"
+  ],
+  "salesforce": [
+   "How do you see what each consultant did this week?",
+   "What happens to their leads when someone leaves?"
+  ],
+  "finance cases": [
+   "When a sale goes through a bank, how do you track where the file is?",
+   "What step usually gets stuck?"
+  ],
+  "delivery day": [
+   "What has to happen before a car is handed over?",
+   "Which of those steps most often get missed?"
+  ],
+  "after-sales": [
+   "How many buyers come back to you for their first service?",
+   "What do you think pulls them elsewhere?"
+  ],
+  "reporting": [
+   "When do you see last month’s numbers, and from whom?",
+   "Which one number would you most like daily?"
+  ],
+  "systems": [
+   "What does the brand’s system handle, and what still lives in Excel or WhatsApp?"
+  ]
+ },
+ "seasons": "Pakistan: buying rises before Eid al-Fitr and Eid al-Adha and around the wedding season (roughly October to February); budget announcements in June and changes to duties or taxes often trigger rushes or freezes in bookings; model-year changeovers and price revisions cause spikes of bookings before the effective date. UAE: Ramadan offers and Eid, Dubai Shopping Festival (December to January), year-end and model-year clearance in Q4, and quieter summer months when many residents travel. Canada: spring selling season, model-year clearance in late summer and autumn, year-end and Boxing Day events; winter slows walk- ins and raises demand for AWD.",
+ "care": [
+  "Never comment on whether premiums, “own money” or booking cancellations are legal; note only the operational pain.",
+  "Do not advise on car loans, leasing rates, Islamic finance structures, insurance or tax; note “finance cases get stuck” as a process issue.",
+  "Never ask for buyers’ CNIC, Emirates ID, licence, bank statements or finance documents; never store salespeople’s names.",
+  "If the owner asks for help with under-invoicing, fake invoices, backdated registration or bypassing the brand’s rules, decline plainly and move on.",
+  "Warranty and recall disputes are out of scope as legal matters; note the customer-communication problem only.",
+  "Salesforce and commission issues can be emotional; stay neutral, don’t take sides about specific staff.",
+  "If someone mentions a vehicle fire, crash during a test drive or injury, stop and point to emergency services first.",
+  "Avoid quoting any market figures on sales, prices or margins."
+ ],
+ "build_ideas": [
+  "Unified lead inbox pulling brand-portal, website, Facebook, PakWheels/Dubizzle and walk-in leads, assigned to a consultant with follow-up reminders.",
+  "Booking-to-delivery tracker per customer: booking, allocation, arrival, PDI, payment, registration, handover, with status visible to the team.",
+  "Automatic WhatsApp status updates to buyers at each stage of their booking.",
+  "Yard stock board by variant, colour and chassis, showing free, reserved and sold units to stop double promising.",
+  "Per-car profit sheet capturing discount, accessories given, commission and floor-plan days.",
+  "Approval flow for discounts and freebies above a set limit, with owner sign-off on WhatsApp.",
+  "Commission calculator with deal attribution rules that consultants can see.",
+  "Finance-case tracker by bank and stage with ageing alerts.",
+  "Delivery-day checklist on phone with photos (clean car, PDI, documents, accessories fitted).",
+  "Trade-in valuation form with photos and standard checks so appraisals are consistent.",
+  "Test-drive and demo-car booking calendar with fuel and cleanliness check.",
+  "Service handover: first-service reminders to new buyers routed to the dealer’s own workshop.",
+  "Owner dashboard: leads, bookings, deliveries, conversion and margin by branch and consultant, daily.",
+  "DMS export integration to remove double entry into Excel."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai sab se bara masla yeh hai ke customer roz call karta hai “meri gaari kab aayegi” aur kisi ko pata nahi hota."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, yeh bohot thaka dene wala hota hai — noted. Booking ke baad gaari ka status abhi kahan track hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Kuch DMS mein, kuch salesman ke paas WhatsApp pe, kuch mere register mein."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — teen jagah status bikhra hua hai. Ek mahine mein lagbhag kitni bookings chal rahi hoti hain jinki delivery pending hoti hai?"
+  }
+ ]
+}

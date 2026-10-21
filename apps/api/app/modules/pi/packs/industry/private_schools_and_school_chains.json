@@ -1,0 +1,304 @@
+{
+ "key": "private_schools_and_school_chains",
+ "name": "Private schools and school chains",
+ "kind": "industry",
+ "sector": {
+  "code": "J",
+  "title": "Education and childcare"
+ },
+ "signals": [
+  "school fee defaulters",
+  "fee voucher",
+  "challan",
+  "admission test",
+  "admissions season",
+  "campus",
+  "branch",
+  "section",
+  "class teacher",
+  "coordinator",
+  "principal",
+  "vice principal",
+  "substitution",
+  "timetable",
+  "report cards",
+  "PTM",
+  "annual function",
+  "transport / van",
+  "canteen",
+  "uniform shop",
+  "fees nahi aayi",
+  "defaulter list",
+  "campus head",
+  "chhuttiyan",
+  "rasoom",
+  "qism al-qubool",
+  "KHDA",
+  "ADEK",
+  "SPEA",
+  "re-enrolment",
+  "waitlist",
+  "sibling discount"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of campuses/branches and roughly how many students across them (a count, never a list).",
+  "Curriculum type (Matric/Cambridge/IB/American/British/Ontario/Alberta) and grade range (pre-primary to A Level, etc.).",
+  "Fee model: monthly, termly or annual; how fees are collected (bank challan, wallet, cash at counter, online).",
+  "Whether the school runs its own transport, canteen, uniform/book shop or outsources them.",
+  "Approximate teaching and support staff count, and how substitution is handled.",
+  "Which system is used today (school ERP, Excel, paper registers) and whether campuses share it.",
+  "Whether it is a franchise campus, owned chain, or a single standalone school."
+ ],
+ "scope_rule": "pi notes the school’s operational and business problems: fee collection and defaults, admissions follow-up, staffing and substitution, timetables, transport and canteen operations, campus-to-campus visibility, reporting load and parent communication workload. pi never asks for or stores any student’s name, photo, roll number, marks, grades, attendance record, medical or family details, or any parent’s or teacher’s personal details — it records roles and counts only. It does not advise on curriculum, pedagogy, regulator inspections (KHDA, ADEK, provincial boards), fee-cap legality, employment law or safeguarding procedures. If something touches a child’s safety, pi stops listening for business problems and points to emergency services and the school’s safeguarding lead.",
+ "vocabulary": {
+  "Challan": "printed bank fee voucher the parent pays at a bank branch.",
+  "Defaulter": "family with unpaid fees past the due date.",
+  "Coordinator": "section head who manages teachers for a block of classes.",
+  "Substitution / sub": "covering a class when the regular teacher is absent.",
+  "PTM": "parent-teacher meeting day.",
+  "Re-enrolment": "returning families confirming a seat for next year (UAE term).",
+  "Campus head": "person running one branch of a chain.",
+  "Annual charges": "once-a-year fee on top of tuition.",
+  "Sibling discount": "reduced fee for second/third child in the same family.",
+  "Van wala": "transport driver or contractor.",
+  "Waitlist": "families waiting for a seat in a full grade.",
+  "KHDA / ADEK / SPEA": "school regulators in Dubai / Abu Dhabi / Sharjah."
+ },
+ "problems": [
+  {
+   "phrase": "Every month a third of parents pay late and we chase them on WhatsApp one by one.",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Fee money comes by challan, JazzCash and cash at the counter and nobody can tell me who has actually paid.",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Discounts were given by the campus head without any record and now half the class pays different fees.",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Admissions enquiries come on Instagram, WhatsApp and walk-ins and we lose track of who was called back.",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We ran ads for admissions but I don’t know if a single admission came from them.",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Re-enrolment numbers only become clear in August, too late to plan sections.",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "One campus is always full and the other is half empty and I don’t know why.",
+   "category": "sales_revenue",
+   "subtype": "branch_underperforming"
+  },
+  {
+   "phrase": "Teachers leave mid-year and we scramble for replacements.",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Every morning the coordinator spends an hour working out substitutions on paper.",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Teacher attendance on the register doesn’t match the biometric.",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Salary sheets are made in Excel and every month there are deduction disputes.",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Report cards take two weeks because teachers send marks in separate Excel files.",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Timetable clashes happen every term when a teacher changes.",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Van routes are decided on WhatsApp and parents keep complaining about pick-up times.",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Transport fee is collected separately and doesn’t reconcile with how many children use the van.",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Canteen cash goes missing and stock of juices and snacks never matches.",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Books and uniform shop stock runs out in the first week of term every year.",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Parent groups explode with the same questions about holidays and dates.",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Parent complaints come to me directly because nobody else logs them.",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "We bought a school software but teachers still keep their own registers.",
+   "category": "tech_systems",
+   "subtype": "user_adoption"
+  },
+  {
+   "phrase": "Each campus has its own Excel, so I can’t compare them.",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "I don’t know my cost per student per campus.",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Generator and AC bills in summer eat the fee increase.",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Inspection preparation means chasing documents from every department.",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Staff contracts and licence renewal dates are tracked in someone’s diary.",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Maintenance requests for broken fans and desks get lost.",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Opening a new campus, we had no checklist and missed half the setup.",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "Our website admissions form sends emails nobody checks.",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  }
+ ],
+ "questions": {
+  "fees": [
+   "Roughly how many families are late on fees in a usual month?",
+   "How do parents pay — challan, wallet, cash, online?",
+   "Who follows up with late payers now?"
+  ],
+  "fee records": [
+   "When a parent says “I’ve paid”, how do you check it today?",
+   "How long does it take to match bank deposits to families?"
+  ],
+  "admissions": [
+   "Where do most admission enquiries come from?",
+   "What happens to an enquiry after the first call?",
+   "Do you know how many enquiries turned into admissions last season?"
+  ],
+  "campuses": [
+   "How many campuses do you run?",
+   "Is there one that worries you more than the others?",
+   "Do they all use the same system?"
+  ],
+  "teachers": [
+   "How often do teachers leave during the year?",
+   "When a teacher is absent, how is cover arranged?"
+  ],
+  "payroll": [
+   "How is the salary sheet made each month?",
+   "What do disputes usually come from — leave, lateness, deductions?"
+  ],
+  "reports": [
+   "How long does it take from exams ending to report cards going home?",
+   "Where do teachers enter marks?"
+  ],
+  "transport": [
+   "Do you run your own vans or use contractors?",
+   "What do parent complaints about transport mostly say?"
+  ],
+  "communication": [
+   "How many parent WhatsApp groups do you have roughly?",
+   "Who answers parent questions on them?"
+  ],
+  "canteen/shop": [
+   "Who handles canteen cash each day?",
+   "How do you know if stock and cash match?"
+  ],
+  "visibility": [
+   "What’s the one number you wish you could see every morning?",
+   "Who prepares the figures for you today?"
+  ]
+ },
+ "seasons": "- Pakistan: academic year usually starts in August (after summer break June–July in the Punjab/Sindh pattern) or April for some systems; admissions push January–April; summer vacation creates fee-default risk (parents skip June–July fees); winter break late December; Cambridge exam sessions May/June and October/November; Ramadan shortens timings; Eid holidays. - UAE: academic year September–June for most British/American/IB schools (some Indian/Pakistani-curriculum schools start April); re- enrolment and fee deposits around February–April; summer exodus July–August; Ramadan reduced hours; term-fee peaks each September, January, April. - Canada: September start, registration for the next year in January–March, winter break December, March break, summer camps July– August. - Year-round peaks: PTMs and report-card weeks, annual day, sports day, fee increase announcements.",
+ "care": [
+  "Never ask for or store student names, photos, roll numbers, marks, grades, attendance, health, special-needs or family details; if the owner shares them, pi does not repeat or keep them and notes only the role (“a parent of a Grade 5 student”).",
+  "Never ask for parent or teacher names, CNIC/Emirates ID, salary slips or bank details.",
+  "Fee-increase legality, regulator fee frameworks and inspection outcomes: pi notes the admin effort only, no advice.",
+  "Teacher contracts, termination and visa sponsorship: no legal or immigration advice; note the tracking problem only.",
+  "Any mention of a child harmed, missing, abused, injured or in danger: pi stops, urges contacting emergency services (15/1122 in Pakistan, 999 in the UAE, 911 in Canada) and the school’s safeguarding lead, and does not continue the business conversation until the person says it is handled.",
+  "Requests to monitor students’ or staff’s personal phones covertly, forge certificates or leaving certificates, or alter marks: pi declines.",
+  "Requests to issue fee receipts without recording income, or to hide fee income from tax: pi declines.",
+  "CCTV in classrooms: pi notes operational gaps only, never helps with covert monitoring."
+ ],
+ "build_ideas": [
+  "Fee ledger by family account number (child names not exposed in owner reports) with due dates, challan/wallet/online matching and automatic WhatsApp reminders in a set sequence.",
+  "Bank-deposit reconciliation that matches challan references and wallet transaction IDs to fee accounts and flags unmatched money.",
+  "Discount and concession register requiring approval, with a monthly report of every concession by campus.",
+  "Admissions pipeline: every enquiry from ads, WhatsApp, website and walk-in in one list with stage, follow-up date and source, plus a season-to-date conversion view.",
+  "Re-enrolment tracker showing confirmed, pending and leaving counts per grade so sections can be planned early.",
+  "Substitution board: teacher absence logged in the morning, free periods shown, cover assigned and notified on WhatsApp.",
+  "Marks-entry portal feeding report-card generation, replacing separate Excel files.",
+  "Payroll prep sheet linking biometric attendance, leave and agreed deductions with a dispute log.",
+  "Transport register: routes, vans, seats used and transport fees collected, with parent broadcast for delays.",
+  "Canteen and shop daily close: opening stock, sales, cash counted and variance per day.",
+  "Multi-campus owner dashboard: enrolment, fee collection rate, defaults, staff turnover and expenses per campus.",
+  "Parent communication hub: broadcast lists by class with a single FAQ responder for dates, holidays and fee deadlines.",
+  "Compliance and document tracker for licences, inspections, contracts and renewals with reminders.",
+  "Maintenance request log with photos of the fault (no people) and closure tracking."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamara sab se bara masla fees ka hai. Har mahine aadhe parents late karte hain aur coordinator WhatsApp pe ek ek ko remind karti hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — har mahine fees late aana aur reminders ka sara kaam haath se ho raha hai. Noted. Aam tor pe kitni families late hoti hain ek mahine mein, andaazan?"
+  },
+  {
+   "role": "Person",
+   "text": "200 mein se 70-80 to hoti hain. Aur kuch log kehte hain pay kar diya, par humein bank mein milta nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Ye bhi note kar liya — “paid” ka claim aur bank deposit match na hona, alag masla hai. Abhi jab parent kehta hai pay kar diya, to aap check kaise karte hain?"
+  }
+ ]
+}

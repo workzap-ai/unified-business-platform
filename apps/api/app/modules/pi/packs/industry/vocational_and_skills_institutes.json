@@ -1,0 +1,272 @@
+{
+ "key": "vocational_and_skills_institutes",
+ "name": "Vocational and skills institutes",
+ "kind": "industry",
+ "sector": {
+  "code": "J",
+  "title": "Education and childcare"
+ },
+ "signals": [
+  "vocational institute",
+  "technical training",
+  "TEVTA",
+  "NAVTTC",
+  "trade test",
+  "short course",
+  "certificate course",
+  "diploma",
+  "DAE",
+  "electrician course",
+  "welding",
+  "plumbing",
+  "HVAC",
+  "auto mechanic",
+  "beautician course",
+  "tailoring",
+  "IT course",
+  "freelancing course",
+  "graphic design course",
+  "hunar",
+  "course khatam",
+  "batch start",
+  "practical lab",
+  "ta’leem mihani",
+  "tadreeb",
+  "apprenticeship",
+  "Red Seal",
+  "career college",
+  "placement"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Trades/courses offered and their duration (weeks or months).",
+  "Funding mix: self-paying learners, government/donor-funded seats, employer-sponsored training.",
+  "Number of campuses, workshops/labs and roughly how many trainees per intake.",
+  "Whether they run trade tests/certifications themselves or prepare learners for an external body.",
+  "Consumables used (welding rods, wire, fabric, cosmetics, parts) and how they’re bought.",
+  "Instructor model: permanent, contract per batch, industry practitioners.",
+  "Placement or job-linkage services offered."
+ ],
+ "scope_rule": "pi notes the institute’s operational problems: enrolment, funded-programme reporting effort, attendance logistics, workshop consumables and equipment, instructor scheduling, placement tracking and cash flow. pi never asks for or stores trainees’ names, CNIC/Emirates ID/SIN, photos, assessment results or contact details, nor employers’ staff details — roles and counts only (trainees may include under-18s). It gives no advice on accreditation, funding eligibility rules, safety-engineering standards, employment law or overseas job placement/immigration. Workshop accidents or injuries are emergencies — pi stops and points to emergency services.",
+ "vocabulary": {
+  "Trade test": "practical assessment for a skill certificate.",
+  "Funded seats": "places paid for by a government or donor programme.",
+  "Stipend": "allowance paid to trainees on some funded programmes.",
+  "Consumables": "materials used up in practical work.",
+  "Practical / lab": "hands-on workshop sessions.",
+  "Placement": "getting a graduate into a job or apprenticeship.",
+  "Batch": "intake group for a course.",
+  "Dropout": "trainee who leaves before completion.",
+  "Attendance threshold": "minimum attendance required by a funder or for certification.",
+  "Toolkit": "tools given or lent to trainees."
+ },
+ "problems": [
+  {
+   "phrase": "Funded programme reports need attendance, photos and documents and it takes my staff a week each month.",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Funder payments come months late and I’m paying instructors from my pocket.",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Trainees drop out after a few weeks and the funder deducts for it.",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Attendance is on paper and we can’t prove it when audited.",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Welding rods and wire disappear from the workshop faster than classes use them.",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "We run out of consumables in the middle of a practical.",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Tools lent to trainees don’t come back.",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Machines sit broken for weeks because nobody logs repairs.",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Self-paying course enquiries come from TikTok but nobody calls them back.",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We don’t know which courses actually make money once consumables are counted.",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Consumable prices went up but course fees are fixed under the contract.",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Good instructors leave for industry jobs.",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Instructor timesheets don’t match the class schedule.",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Placement promises are made but we don’t track who got a job.",
+   "category": "reporting_visibility",
+   "subtype": "kpi_undefined"
+  },
+  {
+   "phrase": "Employers ask for trained people and we can’t quickly see who’s graduating when.",
+   "category": "sales_revenue",
+   "subtype": "no_sales_visibility"
+  },
+  {
+   "phrase": "Certificates are made in Word, one by one, and errors creep in.",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Each campus keeps its own trainee files, so head office can’t see totals.",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Workshop safety checklists are signed but not actually done.",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Same trainee info is typed into our system and the funder’s portal.",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Lab quality differs a lot between campuses.",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Corporate training invoices remain unpaid for months.",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Stipend disbursement causes queues and disputes every month.",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "We want to add new trades but don’t know what demand looks like.",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Our website still lists courses we stopped two years ago.",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  }
+ ],
+ "questions": {
+  "funding": [
+   "How much of your intake is funded versus self-paying?",
+   "What reporting does the funder require?",
+   "How long does it take to prepare each month?"
+  ],
+  "cash": [
+   "How long do funder or corporate payments usually take to arrive?",
+   "What do you do in the gap?"
+  ],
+  "dropouts": [
+   "When do trainees usually drop out?",
+   "How do you find out?"
+  ],
+  "attendance": [
+   "How is attendance recorded today?",
+   "Has proving it ever been a problem?"
+  ],
+  "consumables": [
+   "Which consumables cost you most?",
+   "Who issues them in the workshop?",
+   "How do you know usage matches classes?"
+  ],
+  "tools/equipment": [
+   "Do trainees borrow tools?",
+   "How are machine breakdowns reported?"
+  ],
+  "courses": [
+   "Which courses are busiest?",
+   "Do you know the profit on each after materials?"
+  ],
+  "instructors": [
+   "Are instructors permanent or per batch?",
+   "What’s hardest about keeping them?"
+  ],
+  "placement": [
+   "Do you track what happens to graduates?",
+   "Who asks you for that information?"
+  ],
+  "leads": [
+   "Where do self-paying learners find you?",
+   "What happens after they enquire?"
+  ]
+ },
+ "seasons": "- Pakistan: funded-programme cycles follow government/donor calls (often aligned to the July–June fiscal year, with new intakes announced through the year); intake spikes after Matric/Inter results; summer short courses for students; Ramadan reduced hours; trade demand shifts with overseas employment cycles (pi notes demand only, no immigration advice). - UAE: corporate and safety-training demand around Q1 budgets and after summer; Ramadan schedule changes; summer heat affects workshop hours. - Canada: September and January intakes for career colleges; apprenticeship in-school blocks scheduled by provinces; spring/summer construction season shifts trades demand.",
+ "care": [
+  "Never ask for trainees’ CNIC/ID numbers, photos, attendance sheets with names or results, even though funders may require them; pi notes the reporting burden only.",
+  "No advice on funding eligibility, accreditation, certification rules or what a funder will accept.",
+  "Workshop safety: pi does not give safety-engineering advice (machine guarding, electrical standards, fume control); it notes “safety checks aren’t being done” as an operational problem. Any injury, fire, electrocution or gas leak → stop and point to emergency services (1122/15/16, 999/997, 911).",
+  "Overseas job placement or work visas: no immigration advice; pi notes only the business-side workflow if relevant.",
+  "Fake attendance, ghost trainees, inflated enrolment for funding or backdated certificates: pi declines clearly.",
+  "Stipend disputes: note the process problem; no financial or legal advice.",
+  "Covert tracking of instructors or trainees: pi declines."
+ ],
+ "build_ideas": [
+  "Digital attendance by batch (QR or the biometric terminal the owner already has), producing funder-format reports automatically.",
+  "Funded-programme reporting pack generator pulling attendance, completions and dropouts into the required template.",
+  "Receivables tracker for funder and corporate payments with expected dates and cash-gap view.",
+  "Workshop consumables store: issue slips per practical session, usage per batch vs expected, and reorder alerts.",
+  "Tool lending register with check-out/check-in and missing-item report.",
+  "Equipment maintenance log with breakdown reports, repair status and downtime per machine.",
+  "Course profitability view: fees or funding per seat minus instructor and consumables cost.",
+  "Instructor timesheet matched to timetable.",
+  "Certificate generator from verified completion data, with unique verification codes.",
+  "Placement tracker: graduates’ employment outcomes recorded as counts by course.",
+  "Dropout early-warning based on attendance gaps.",
+  "Lead capture from social ads into a follow-up queue for self-paying courses.",
+  "Multi-campus dashboard: enrolment, completion, consumables spend and checklist completion per campus."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "The funded batches are killing us on paperwork. Every month we put together attendance and progress reports by hand for the programme office."
+  },
+  {
+   "role": "pi",
+   "text": "So the funded seats keep the classes full, but the reporting eats up your staff’s time every month. Noted. Roughly how many staff days does one month’s report take?"
+  },
+  {
+   "role": "Person",
+   "text": "Two people, nearly a full week."
+  },
+  {
+   "role": "pi",
+   "text": "Got it — two people for almost a week, every month. Where does the attendance data come from when they start: paper registers or something digital?"
+  }
+ ]
+}

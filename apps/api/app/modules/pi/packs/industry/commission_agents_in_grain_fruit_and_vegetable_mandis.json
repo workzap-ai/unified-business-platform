@@ -1,0 +1,270 @@
+{
+ "key": "commission_agents_in_grain_fruit_and_vegetable_mandis",
+ "name": "Commission agents (arhti) in grain, fruit and vegetable mandis",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "arhti / aarhti",
+  "commission agent",
+  "mandi",
+  "galla mandi",
+  "sabzi mandi",
+  "fruit mandi",
+  "phari / shop",
+  "boli / auction",
+  "bolidaar",
+  "kacha arhti / pakka arhti",
+  "beopari",
+  "zamindar",
+  "kisan",
+  "munshi",
+  "parchi",
+  "bahi / khata",
+  "commission",
+  "palledari / labour",
+  "market fee",
+  "udhaar",
+  "peshgi",
+  "wakeel",
+  "dallal",
+  "sooq al jumla",
+  "Al Aweer",
+  "Canadian produce terminal / food terminal"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Which mandi and which produce (grain, fruit, vegetables, or mixed)",
+  "Number of farmers and buyers they deal with, roughly",
+  "Whether they advance money to farmers ( peshgi) against future produce",
+  "Whether they also trade on own account, not just commission",
+  "Number of munshis and staff",
+  "How settlements are done: daily, weekly, after the season",
+  "Systems: bahi khata, Excel, accounting software"
+ ],
+ "scope_rule": "pi notes business and operational problems: auction and sale records, farmer settlements, buyer credit and recovery, advances, commission and deduction accuracy, cash handling, staff honesty, daily reporting, and record-keeping effort. pi does not advise on mandi rules, market committee regulations, licences, commission rates permitted by law, interest on advances, tax, or produce quality standards, and it never predicts prices. It does not store farmers’, buyers’ or labourers’ names, CNICs or phone numbers.",
+ "vocabulary": {
+  "arhti": "commission agent who sells farmers’ produce to buyers in the mandi",
+  "boli": "open auction for a lot",
+  "beopari": "trader buying from the arhti",
+  "parchi": "handwritten slip recording a sale or delivery",
+  "bahi / khata": "ledger book",
+  "peshgi": "advance given to a farmer against future produce",
+  "palledari": "unloading or loading labour charge",
+  "market fee": "fee charged by the market committee",
+  "dharat / commission": "the arhti’s cut",
+  "nag / dhaer": "a lot or heap of produce",
+  "kacha / pakka arhti": "agent dealing for farmers / agent dealing for buyers"
+ },
+ "problems": [
+  {
+   "phrase": "Farmers accuse us of selling their lot at a lower rate than the boli",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Parchis go missing and the munshi rewrites them from memory",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Buyers take maal on credit and some vanish after the season",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "I’ve given peshgi to farmers who then sell through another arhti",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "My money is stuck: I pay farmers fast but buyers pay me slow",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Cash in the phari doesn’t match the bahi at night",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Carrying large cash from the mandi worries me",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Munshi gives some buyers better rates quietly",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Deductions for palledari and fees are calculated differently each time",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Farmers want their account statement and it takes the munshi a day",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Produce rots if no buyer comes the same day",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Lots get mixed up in the phari",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Weight on the farmer’s parchi and buyer’s parchi differ",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "I don’t know my real earning after labour, fees and bad debts",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Younger farmers now sell directly to companies or online",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Fewer farmers come to my shop than before",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "Buyers from other cities order on WhatsApp and orders get missed",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Trucks to outside buyers arrive late and they cut the rate",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Labour at the shop doesn’t turn up on peak days",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "My son wants to computerise but my father trusts only the bahi",
+   "category": "planning_growth",
+   "subtype": "succession_family"
+  },
+  {
+   "phrase": "Records for market committee and tax take a lot of time",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Everything is in bahi, if it’s lost we lose everything",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "Rates and arrivals across the day are only in my head",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "UAE: importers send consignments and want a sales report we make by hand",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  }
+ ],
+ "questions": {
+  "sales records": [
+   "When a lot is sold, how is it recorded?",
+   "Who keeps the parchi?"
+  ],
+  "farmer trust": [
+   "How do farmers find out what their produce sold for?",
+   "What disputes come up most?"
+  ],
+  "settlements": [
+   "How often do you settle with farmers?",
+   "How long does preparing their account take?"
+  ],
+  "buyer credit": [
+   "How much of your selling is on credit to buyers?",
+   "How do you follow up with those who are late?"
+  ],
+  "advances": [
+   "Do you give peshgi to farmers?",
+   "How do you keep track of what’s owed back?"
+  ],
+  "cash": [
+   "How is the day’s cash checked against the bahi?",
+   "How is cash moved from the mandi?"
+  ],
+  "deductions": [
+   "How are commission, labour and fees worked out on each sale?",
+   "Do they ever get disputed?"
+  ],
+  "staff": [
+   "How many munshis work with you?",
+   "How do you check their entries?"
+  ],
+  "wastage": [
+   "What happens to produce that doesn’t sell the same day?"
+  ],
+  "outside buyers": [
+   "Do buyers from other cities order from you?",
+   "How do those orders come in?"
+  ],
+  "future": [
+   "Who in the family will run the shop next?",
+   "How do they feel about the current way of working?"
+  ]
+ },
+ "seasons": "Pakistan grain mandis peak with wheat (April–June) and rice (October–December) arrivals; fruit mandis follow mango (June–August), kinnow (December–March), apples and dates (August–October); vegetable mandis run daily with summer and winter crops, with gluts that crash prices. Ramadan lifts fruit and vegetable trade sharply; Eid holidays close mandis for days; monsoon floods cut supply routes. UAE: Al Aweer and other wholesale markets are busiest in Ramadan, Eid, and winter tourist months, with import arrivals by season of origin. Canada: produce terminals busiest in summer harvest and the holiday season.",
+ "care": [
+  "pi never predicts mandi rates or advises when to sell.",
+  "No advice on interest on peshgi, market committee rules, licences, permitted commissions or tax.",
+  "Never helps fix boli rates with buyers, under-report sales to the market committee or tax authorities, fake parchis or weights, or launder cash.",
+  "Carrying cash is a real safety risk; if there’s a robbery or threat in progress, pi tells them to call emergency services (15 or 1122 in Pakistan, 999 in the UAE, 911 in Canada) first.",
+  "Debt recovery from farmers or buyers can turn heated; pi does not suggest pressure or threats and notes only the process problem.",
+  "Does not store farmers’, buyers’ or labourers’ names, CNICs, phone numbers or land details; uses account counts and roles.",
+  "Family succession tension is personal; pi stays respectful and neutral."
+ ],
+ "build_ideas": [
+  "Digital parchi on phone: lot, farmer account code, buyer code, weight, boli rate, deductions, sent by WhatsApp to the farmer instantly",
+  "Farmer ledger with sales, deductions, peshgi and payments, and a one-tap statement",
+  "Buyer ledger with credit limits, ageing and polite reminder messages",
+  "Peshgi tracker linking advances to the produce a farmer brings in",
+  "Deduction calculator with fixed rules for commission, palledari and fees, so every parchi uses the same logic",
+  "End-of-day cash close against the day’s sales and payments, with mismatch alerts",
+  "Daily arrivals and rates log, giving the arhti their own history over seasons",
+  "WhatsApp order intake for outside buyers, linked to dispatch and truck tracking",
+  "Wastage log for unsold produce",
+  "Owner dashboard: today’s sales, commission earned, cash, receivables, and munshi-wise entries",
+  "Cloud backup so the bahi can’t be lost",
+  "Simple records export for the accountant"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mandi mein arhat ki dukaan hai, 30 saal se. Zamindar shikayat karte hain ke boli zyada lagi thi aur hum ne kam likhi."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh bharose ka masla hai, aur 30 saal ki dukaan ke liye bohat aham. Noted. Abhi boli ke waqt rate kaun likhta hai aur kahan?"
+  },
+  {
+   "role": "Person",
+   "text": "Munshi parchi pe likhta hai, phir raat ko bahi mein chadhata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, parchi se bahi tak sab haath se. Zamindar ko apni sale ka hisaab kab aur kaise milta hai?"
+  }
+ ]
+}

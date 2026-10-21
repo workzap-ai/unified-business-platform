@@ -1,0 +1,263 @@
+{
+ "key": "milk_collection_centres_and_chillers",
+ "name": "Milk collection centres and chillers",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "milk collection centre",
+  "MCC",
+  "chiller",
+  "chiller wala",
+  "bulk milk",
+  "dodhi",
+  "gawala",
+  "doodh ikattha karna",
+  "fat test",
+  "lactometer",
+  "fat aur SNF",
+  "paani mila doodh",
+  "milk tanker",
+  "bowser",
+  "processor",
+  "plant",
+  "collection route",
+  "doodh ka rate",
+  "per kilo fat",
+  "village collection point",
+  "mazra’at",
+  "markaz tajmee’ al haleeb",
+  "cooling tank",
+  "bulk cooler"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Role: independent collector/chiller owner, agent for a processor, cooperative, or a farm’s own collection point.",
+  "Volume handled per day and number of suppliers (farmers, dodhis).",
+  "Testing done at intake: fat, SNF, lactometer, adulteration strips, nothing.",
+  "Who buys the milk: processor, city gawalas, shops, dahi/sweet makers.",
+  "Payment cycles to suppliers and from buyers (daily, weekly, fortnightly, monthly).",
+  "Cooling and power: chiller capacity, generator, solar; frequency of outages.",
+  "Transport: own tankers/vehicles, hired, buyer collects."
+ ],
+ "scope_rule": "pi notes the business side of collecting, testing, chilling and selling milk: intake records, supplier payments, quality disputes, buyer rejections, cash and advances, power and transport, staff and records. pi does not advise on testing methods to “pass” a sample, preservatives, chemicals, or milk-quality standards, and never helps disguise adulteration or tamper with tests or tankers. It does not give food-authority licensing or tax advice. It records farmers, dodhis and drivers by role and count, never names, CNICs, phone numbers or bank details.",
+ "vocabulary": {
+  "MCC": "milk collection centre",
+  "chiller / bulk cooler": "tank that cools raw milk",
+  "fat / SNF": "butterfat and solids-not-fat, used to price milk",
+  "lactometer": "instrument used to check milk density",
+  "dodhi": "collector who brings milk from farms, often on a motorbike with cans",
+  "peshgi": "advance payment to a supplier",
+  "rate per kg fat": "pricing based on fat content",
+  "tanker / bowser": "truck moving bulk milk",
+  "rejection": "buyer refusing a load",
+  "paani mila": "watered (diluted) milk",
+  "route": "the daily collection circuit"
+ },
+ "problems": [
+  {
+   "phrase": "Fat readings are written by hand and farmers argue every payday",
+   "category": "cash_collections",
+   "subtype": "payment_disputes"
+  },
+  {
+   "phrase": "Suppliers say our test is wrong and move to another chiller",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Some dodhis add water and we only find out at the plant",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Plant rejected a whole tanker and deducted it from our payment",
+   "category": "quality_complaints",
+   "subtype": "rejections"
+  },
+  {
+   "phrase": "Litres collected don’t match litres dispatched",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Advances to farmers aren’t tracked properly, some never repay",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "We pay suppliers weekly but the plant pays us monthly",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Cash payments to 300 farmers on one day is a risk",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Generator broke and milk in the chiller turned",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Diesel cost for generator and tankers is unknown per litre",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Tanker reaches the plant late and gets penalised",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Driver may be skimming milk on the way",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Flush season we get more milk than we can sell",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Summer supply drops and the plant still wants volume",
+   "category": "suppliers_purchasing",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Competing collectors poach suppliers with a better rate",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Testing staff can be pressured or bribed by suppliers",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Payment slips are handwritten, farmers lose them",
+   "category": "tech_systems",
+   "subtype": "no_system"
+  },
+  {
+   "phrase": "End-of-week supplier statements take my staff two days",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Can’t see daily intake across my 5 centres",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Chiller cleaning gets skipped",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Food authority licence and hygiene paperwork overwhelms us",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Want to add a new route but don’t know if it pays",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  }
+ ],
+ "questions": {
+  "setup": [
+   "Roughly how much milk do you collect a day?",
+   "From how many farmers or dodhis ?"
+  ],
+  "testing": [
+   "What’s tested when milk arrives?",
+   "Where are the results written?"
+  ],
+  "disputes": [
+   "How often do suppliers argue about fat or rate?",
+   "What usually settles it?"
+  ],
+  "buyers": [
+   "Who buys your milk?",
+   "How often do they reject or deduct?"
+  ],
+  "volume": [
+   "Does the volume collected match what you dispatch?",
+   "Where do you think the gap is?"
+  ],
+  "payments": [
+   "How often do you pay suppliers, and how often are you paid?",
+   "How are payouts made — cash or transfer?"
+  ],
+  "advances": [
+   "Do you give advances to farmers?",
+   "How are they tracked?"
+  ],
+  "power": [
+   "How often does the chiller lose power?",
+   "What happens to the milk?"
+  ],
+  "transport": [
+   "Who drives the tanker?",
+   "How do you know when it leaves and arrives?"
+  ],
+  "multi-centre": [
+   "How do you see each centre’s intake daily?"
+  ],
+  "growth": [
+   "What would you need to know before adding a route?"
+  ]
+ },
+ "seasons": "- Pakistan: flush season in winter and spring brings surplus milk and lower prices; lean season in summer (May–August) brings shortages, higher prices and intense competition for suppliers. - Ramadan raises demand for milk, dahi and dairy sweets; Eid ul Fitr spikes sweet-shop demand. - Eid ul Adha disrupts supply (animals sold, staff away) for a week or more. - Monsoon roads and floods disrupt routes; heatwaves strain chillers and generators. - UAE: farm-based collection is smaller; summer heat and Ramadan dominate. - Canada: milk is supply-managed and collected by provincial boards; independent collection is limited, so this pack is mainly PK/UAE.",
+ "care": [
+  "Never helps mask adulteration, add preservatives, tamper with tests, readings or tankers, or “pass” a quality check; declines plainly.",
+  "No advice on testing standards, chemicals or food-authority rules beyond noting the admin effort.",
+  "Bribery of testing staff: pi notes it as an integrity problem and does not engage in arranging or hiding it.",
+  "Large cash payouts and robbery risk; if a robbery just happened or someone is in danger, pi points to 15/1122.",
+  "Electrical, ammonia/refrigerant or tanker accidents: emergency services first.",
+  "Farmer data: roles and counts only; no names, CNIC, phone or bank numbers."
+ ],
+ "build_ideas": [
+  "Intake app at the centre: supplier code, litres, fat/SNF readings entered or pulled from an existing analyser, timestamp.",
+  "Instant WhatsApp or SMS slip to each supplier after each delivery with litres, readings and amount.",
+  "Weekly/fortnightly supplier statements generated automatically with advances deducted.",
+  "Advance ledger per supplier with repayment schedule.",
+  "Dispatch log per tanker: litres loaded, seal photo, departure and arrival times, plant receipt and any rejection.",
+  "Collected vs dispatched reconciliation by day and centre.",
+  "Buyer ledger with deductions, rejections and payments.",
+  "Multi-centre owner dashboard: litres, average fat, suppliers active, cash due in and out.",
+  "Generator and chiller log with downtime and diesel use.",
+  "Cleaning and hygiene checklist with photo proof.",
+  "Route profitability view from the business’s own volumes and costs."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamara chiller hai Okara ke paas, roz 6,000 litre ikattha hota hai. Har hafte payment pe farmers se jhagra hota hai."
+  },
+  {
+   "role": "pi",
+   "text": "Har hafte ka jhagra thaka deta hai. Jhagra zyada tar fat ki reading pe hota hai ya rate pe?"
+  },
+  {
+   "role": "Person",
+   "text": "Fat pe, kehte hain hum kam likhte hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — farmers fat ki reading pe shak karte hain. Reading abhi kahan likhi jati hai, aur farmer ko kya milta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Register mein, farmer ko kuch nahi milta, bas hafte ke baad paise."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, farmer ko har delivery ki koi parchi nahi milti. Aap suppliers ko payment cash mein karte hain ya transfer?"
+  }
+ ]
+}

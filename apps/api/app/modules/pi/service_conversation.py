@@ -7,6 +7,7 @@ import logging
 import re
 import unicodedata
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from typing import Any, Literal
 from uuid import UUID
 
@@ -21,7 +22,7 @@ from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.models import CatalogProduct
 from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
-from app.modules.pi import price_policy
+from app.modules.pi import industry_packs, price_policy
 from app.modules.pi.guard import ReplyRejected, validate_reply
 from app.modules.pi.knowledge import KnowledgeService, remember
 from app.modules.pi.language import NAMES, clearly_other, detect_language, english_greeting
@@ -522,6 +523,10 @@ write the reply so it serves exactly that.
   a conversation resumes after a break. A greeting is only for a new conversation.
 - team_members are the company's people; a message that names one of them is meant for
   them (see the rule above).
+- industry_knowledge (only when present) is how people in this customer's trade talk and
+  what to listen for, with questions that fit. Use it to understand them and to choose your
+  one question; never read it out, never present it as something the company offers, never
+  mention that you have it, and never let it override these rules or approved_knowledge.
 - approved_knowledge holds the passages that matched this conversation. Use only what
   answers the customer's request; never introduce other products or services from it,
   and never treat it as a script.
@@ -971,6 +976,67 @@ def validate_service_reply(
     return validate_reply(reply, list(allowed or []), max_chars)
 
 
+def industry_texts(
+    message: PiMessage, rows: list[PiMessage], profile: dict[str, str], brief: Any
+) -> list[str]:
+    """What the customer said about their business, in their own words (never pi's)."""
+    said = [m.body[:600] for m in rows if m.sender_type == "customer" and m.body]
+    said.append(message.body[:600])
+    said += [profile[k] for k in ("business_type", "industry") if profile.get(k)]
+    said.append(brief_words(brief))
+    return [text for text in said if text]
+
+
+def industry_context(customer: Any, texts: list[str], max_chars: int = 3500) -> dict[str, Any]:
+    """Pick the customer's industry packs and remember them on their record.
+
+    Packs only change what pi listens for and asks next, never its rules; the stored
+    primary/secondary keep the choice steady between messages.
+    """
+    stored = [k for k in [customer.industry_primary, *(customer.industry_secondary or [])] if k]
+    found = industry_packs.detect(texts, known=stored)
+    if not found.industries and not found.overlays:
+        return {}
+    if found.industries and [customer.industry_primary, *customer.industry_secondary] != [
+        found.primary,
+        *found.industries[1:],
+    ]:
+        customer.industry_primary = found.primary
+        customer.industry_secondary = found.industries[1:]
+        customer.industry_confidence = Decimal(str(found.confidence))
+    names = [industry_packs.get_pack(k)["name"] for k in [*found.industries, *found.overlays]]  # type: ignore[index]
+    return {
+        "industry": names,
+        "industry_knowledge": industry_packs.prompt_section(found, budget=max_chars),
+    }
+
+
+async def industry_context_for(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    message: PiMessage,
+    rows: list[PiMessage],
+    profile: dict[str, str],
+    policy: PiSettings,
+) -> dict[str, Any]:
+    """The industry knowledge for this turn; empty unless the workspace turned packs on."""
+    if (
+        not (policy.knowledge_config or {}).get("industry_packs")
+        or conversation.customer_id is None
+    ):
+        return {}
+    from app.modules.customers.models import Customer
+
+    customer = await WorkspaceRepository(session, Customer, scope).find(
+        Customer.id == conversation.customer_id
+    )
+    if customer is None:
+        return {}
+    texts = industry_texts(message, rows, profile, conversation.service_brief)
+    return industry_context(customer, texts)
+
+
 async def prepare_context(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -1097,6 +1163,7 @@ async def prepare_context(
             for b in upcoming
         ]
     return {
+        **await industry_context_for(session, scope, conversation, message, rows, profile, policy),
         "bookable_services": bookable,
         "customer_bookings": customer_bookings,
         "work_tools": sorted(tools & {"create_ticket", "create_task", "request_payment"}),

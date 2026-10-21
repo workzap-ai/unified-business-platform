@@ -1,0 +1,257 @@
+{
+ "key": "electrical_goods",
+ "name": "Electrical goods (fans, cables, switches, lighting)",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "ceiling fan",
+  "pedestal fan",
+  "bracket fan",
+  "exhaust fan",
+  "DC inverter fan",
+  "copper winding",
+  "cables and wires",
+  "switchboards",
+  "sockets",
+  "circuit breakers",
+  "LED bulbs",
+  "tube lights",
+  "downlights",
+  "panel lights",
+  "pankha",
+  "taar",
+  "bijli ka saman",
+  "electric store",
+  "Gujrat fans",
+  "dealer",
+  "kahraba’ marawih",
+  "warranty card",
+  "distributor"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Main products: fans, cables/wires, switches/accessories, lighting — or assembled/imported range.",
+  "Manufacturer, assembler of imported kits, or brand owner using contract manufacturers.",
+  "Sales channel: dealers/electric shops, distributors, projects/contractors, online marketplaces.",
+  "Number of SKUs and models.",
+  "Warranty and after-sales handled in-house or through dealers.",
+  "Imported components (motors, LED chips, copper, PVC compound) share.",
+  "Factory location and size, and number of sales reps."
+ ],
+ "scope_rule": "pi notes business problems: stock, warranty claims, dealer credit, schemes, copper/raw material costs, production, distribution, after-sales and reporting. It gives no electrical safety, wiring, load-rating or product-certification advice and no view on whether products meet standards. It records roles of dealers, electricians and customers, not personal details. Shocks, fires or burns reported mean pi stops and points to emergency services.",
+ "vocabulary": {
+  "pankha": "fan",
+  "taar / cable": "wire",
+  "winding": "copper coil in the fan motor",
+  "claim / warranty claim": "product returned under warranty",
+  "scheme": "dealer incentive",
+  "electrician / mistri": "installers who influence purchase",
+  "coil": "90m or 100m roll of wire",
+  "gauge / mm": "wire thickness (sizes like 1.5mm, 2.5mm)",
+  "kit": "imported parts assembled locally",
+  "season": "summer fan sales period",
+  "dealer net rate": "price after dealer discounts"
+ },
+ "problems": [
+  {
+   "phrase": "Before summer everyone wants fans at once and we can’t produce enough",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "After summer, thousands of fans sit in the warehouse",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Copper prices jump and my cable price list is wrong overnight",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Warranty claims come back but we can’t tell if it’s real or customer damage",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Dealers send fans back for ‘repair’ that are actually fakes with our name",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Cable coils are short in length and dealers complain",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Each dealer has a different discount and nobody remembers what was promised",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Dealers don’t pay until the next season",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Sales reps take orders on WhatsApp and some never reach the factory",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "LED bulbs fail early and returns are eating margin",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Import container of motors or LED chips delayed, line stopped",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Daraz listings get bad reviews about delivery damage",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Online orders and dealer stock come from the same warehouse and clash",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "No idea which model is profitable after warranty costs",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Electrician loyalty scheme coupons are abused",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Copper scrap in the winding section goes missing",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Service centre tickets are in a register, nobody follows up",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Power outages at the factory stop the assembly line",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Brand is unknown outside our city",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "Serial numbers aren’t recorded, so warranty dates can’t be checked",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Assembly line workers are seasonal and need training every year",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Freight to distributors in other provinces is expensive",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Project tenders need product documents that we keep in random folders",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "I don’t know daily sales by region until month-end",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  }
+ ],
+ "questions": {
+  "seasonality": [
+   "When does your busy season start?",
+   "How early do you start building stock?",
+   "What happened to leftover stock last year?"
+  ],
+  "warranty": [
+   "How many claims come in during the season?",
+   "How do you check whether a claim is genuine?",
+   "Who pays for the repair or replacement?"
+  ],
+  "copper/raw material": [
+   "How often do you revise prices?",
+   "How do dealers find out about a new price?"
+  ],
+  "dealers": [
+   "How many active dealers do you have?",
+   "How is each one’s discount recorded?",
+   "How much is overdue?"
+  ],
+  "orders": [
+   "How do reps send orders to the factory?",
+   "Have any orders gone missing recently?"
+  ],
+  "fakes": [
+   "Where are fakes showing up?",
+   "How do you tell them apart?"
+  ],
+  "online": [
+   "Which marketplaces do you sell on?",
+   "What’s the most common complaint there?"
+  ],
+  "production": [
+   "What stops the line most — parts, power or people?"
+  ]
+ },
+ "seasons": "PK fan season builds from February/March and peaks April–July; cable and wiring demand follows construction (post-monsoon to spring) and budget/price changes; lighting and decorative lights spike before Eid, weddings and Independence Day (14 August); load-shedding drives demand for DC/inverter fans and rechargeable lights. UAE: AC and cooling-related peaks in summer, project lighting through the construction season, Ramadan and Diwali decoration lighting. Canada: holiday lighting (November– December), spring–summer renovation and construction for wiring.",
+ "care": [
+  "No electrical safety, wiring or rating advice; note only operational issues like “claims of overheating” as quality complaints.",
+  "Shocks, electrical fires or burns — pi stops and points to emergency services.",
+  "Never help put false certification marks, fake ratings or another brand’s name on products — decline.",
+  "Copper scrap or copper theft discussed: note as loss; do not help dispose of stolen copper.",
+  "Customer and electrician details in warranty registers: roles only; no names or numbers stored.",
+  "Under-invoicing imports or misdeclaring components: decline plainly."
+ ],
+ "build_ideas": [
+  "Serial-number registration: each unit’s serial, model, batch and dispatch dealer, with warranty start on sale.",
+  "Warranty claim app: dealer scans the serial, uploads photos, and the claim is checked against records.",
+  "Genuine-product check by QR or code on the box that customers or dealers can verify on WhatsApp.",
+  "Seasonal build plan: target stock by model by week, with progress against plan.",
+  "Dealer price list publisher: one live price list per dealer tier, updated when copper changes.",
+  "Dealer credit and scheme ledger with eligibility and claims checked against invoices.",
+  "Sales rep order app feeding a single order book with status back to the rep.",
+  "Service-centre ticket tracker with turnaround time and repeat-fault reporting by model.",
+  "Marketplace order bridge for Daraz/Amazon/Noon to see online and dealer allocations together.",
+  "Copper and component consumption log by production batch.",
+  "Electrician loyalty program with unique coupon codes and single redemption.",
+  "Owner dashboard: sales by region and model, stock cover, warranty rate per model, receivables."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Summer mein pankhay pooray nahi hotay, aur September ke baad godown bhara hota hai."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh season wala dabav samajh aata hai. Noted — season mein kami aur season ke baad extra stock. Aap season ki tayyari kab se shuru karte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Feb se, lekin plan zyada tar andaze se hota hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, planning mostly by estimate. Pichle saal ka bacha hua stock aakhir mein kaise nikla tha?"
+  }
+ ]
+}

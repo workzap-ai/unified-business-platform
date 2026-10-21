@@ -1,0 +1,275 @@
+{
+ "key": "used_car_dealers",
+ "name": "Used car dealers",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "used cars",
+  "second-hand",
+  "showroom",
+  "lot",
+  "yard",
+  "plot",
+  "stock",
+  "inventory",
+  "gaari khareedi",
+  "token diya",
+  "transfer",
+  "file",
+  "open letter",
+  "original file",
+  "kitni chali hai",
+  "meter",
+  "mileage",
+  "inspection",
+  "auction",
+  "consignment",
+  "trade-in",
+  "PakWheels",
+  "OLX",
+  "Dubizzle",
+  "AutoTrader",
+  "Kijiji",
+  "Facebook Marketplace",
+  "mustaamal",
+  "haraj",
+  "tasjeel",
+  "naql milkiya",
+  "carfax",
+  "safety certificate"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "How many cars they typically hold and whether stock is owned, on consignment, or partly financed by partners or investors.",
+  "Where cars come from: auctions, trade-ins, private sellers, imports, other dealers.",
+  "Whether they recondition in-house, use outside workshops, or sell as-is.",
+  "Which platforms they list on and who manages the listings and photos.",
+  "Whether they offer bank finance, instalments or warranties through third parties.",
+  "Number of lots/locations and salespeople, and whether partners share the business.",
+  "Country, since transfer, inspection and disclosure processes differ completely."
+ ],
+ "scope_rule": "pi notes operational and business problems: stock ageing, reconditioning cost tracking, listing management, lead follow-up, partner and investor accounting effort, documentation follow-up and cash flow on stock. pi does not advise on vehicle condition disclosure law, odometer rules, consumer warranties, import duties, financing or instalment contracts, tax, or how to resolve buyer disputes legally. pi never asks for or stores sellers’ or buyers’ CNIC, Emirates ID, licence numbers, registration documents, or bank details, and refers to people by role (“a private seller”, “my partner”). Any request to alter mileage, hide accident history or fake transfer papers is declined.",
+ "vocabulary": {
+  "Token": "an advance paid to hold a car before full payment.",
+  "Open letter / open transfer": "a car sold with signed transfer papers but not yet registered in the buyer’s name (Pakistan).",
+  "Original file": "the complete set of a car’s ownership and registration documents.",
+  "Plot / lot": "open yard where used cars are displayed.",
+  "Consignment": "selling a car on behalf of its owner for a fee or margin.",
+  "Recon": "reconditioning: repairs, denting/painting, detailing before sale.",
+  "Ageing": "how many days a car has been in stock.",
+  "Flip": "buying and reselling quickly.",
+  "Haraj": "Arabic for an auction or used market.",
+  "Safety": "in Canada, the safety inspection certificate needed for sale in some provinces.",
+  "Body shop/ denting-painting": "panel and paint work."
+ },
+ "problems": [
+  {
+   "phrase": "Some cars have been standing 4–5 months and I’m stuck with the money",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "I don’t know how many days each car has been in stock",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Recon costs go over and I don’t track what I spent on each car",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "I think I make money on a car but after mechanic, painter and commission it’s a loss",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "My partner and I argue about who put how much money into which car",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Investor money is mixed with the business, settling accounts is a headache",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Listings on PakWheels/Dubizzle are outdated, sold cars still showing",
+   "category": "marketing_leads",
+   "subtype": "marketplace_visibility"
+  },
+  {
+   "phrase": "Many calls, few real buyers, mostly time-pass",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "We don’t call back people who enquired last week",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Token taken, buyer disappears; or two people paid token on same car",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Car went to the workshop and nobody knows when it’s back",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Photos and descriptions are poor; the good cars look like the bad ones",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  },
+  {
+   "phrase": "Buyers come back with complaints after a week",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Pricing is gut feel; we overpay at auction then can’t sell",
+   "category": "suppliers_purchasing",
+   "subtype": "buying_wrong_items"
+  },
+  {
+   "phrase": "Transfer papers follow-up takes forever, files sit pending",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Cash comes in at the plot and doesn’t always match what was said",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Salesman sells cheaper and keeps the difference",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Keys go missing; cars moved without anyone knowing",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "I can’t see weekly how much stock money is tied up",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Expenses like fuel, parking and plot rent aren’t charged to cars",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Instalment customers pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Everything is in my diary and WhatsApp",
+   "category": "tech_systems",
+   "subtype": "no_system"
+  },
+  {
+   "phrase": "We want to open a second plot but can’t trust remote control",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "No repeat or referral business, we never stay in touch with buyers",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  }
+ ],
+ "questions": {
+  "stock": [
+   "How many cars are on the lot right now, roughly?",
+   "Which ones have been standing longest, and how long?",
+   "Where do you track that?"
+  ],
+  "buying": [
+   "Where do most of your cars come from?",
+   "How do you decide the price you pay?"
+  ],
+  "recon": [
+   "Who does the repairs and paint on your cars?",
+   "How do you keep track of what each car cost to prepare?"
+  ],
+  "margin": [
+   "Do you know the real profit on a car after all costs?",
+   "Which costs usually get forgotten?"
+  ],
+  "partners": [
+   "How is the money split between you and partners or investors?",
+   "How do you settle who’s owed what?"
+  ],
+  "listings and leads": [
+   "Where do you list your cars?",
+   "Who updates them when a car sells?",
+   "How do you follow up enquiries?"
+  ],
+  "tokens": [
+   "How do you record a token when someone holds a car?",
+   "Has it ever clashed with another buyer?"
+  ],
+  "paperwork": [
+   "Which documents follow-ups take your staff the most time?"
+  ],
+  "cash": [
+   "How does payment come in at the lot?",
+   "Who counts it and when?"
+  ],
+  "visibility": [
+   "How do you see total money tied up in stock today?"
+  ]
+ },
+ "seasons": "Pakistan: demand rises before Eid and in the wedding season, and when new-car deliveries are delayed or prices rise; budget announcements in June can move used prices. UAE: steady turnover driven by expatriates arriving and leaving, with selling pressure in summer and end of school year (June–August) as families relocate, and buying in September–October; Ramadan slows evening footfall then shifts it late. Canada: spring tax-refund season lifts buying, winter tyres and AWD demand in autumn, slow deep winter months.",
+ "care": [
+  "Firmly decline any request to roll back odometers, hide accident or flood history, forge transfer papers, or misstate import status.",
+  "Do not advise on disclosure obligations, warranties, buyer disputes or consumer law; note the complaint pattern only.",
+  "Never store sellers’ or buyers’ ID numbers, registration documents, plates linked to names, or bank details.",
+  "Partner and investor money disputes are sensitive; note the record-keeping problem, not who is right.",
+  "No advice on instalment or financing structures, interest, or tax.",
+  "If a car is suspected stolen, say pi can’t help with that and that it’s a matter for the police.",
+  "Avoid valuing any specific car or quoting market prices.",
+  "If someone reports a test-drive crash or injury, point to emergency services first."
+ ],
+ "build_ideas": [
+  "Car-by-car stock register: purchase price, source, date in, location, key location, photos, status.",
+  "Ageing board with days-in-stock alerts and a view of capital tied up per car.",
+  "Per-car cost sheet capturing recon, parts, paint, detailing, commission and sundry expenses, giving true margin on sale.",
+  "Partner/investor ledger showing each person’s capital in each car and settlement on sale.",
+  "Listing sync tool to publish and remove cars on PakWheels, Dubizzle, AutoTrader or Facebook from one place.",
+  "Lead log with call-back reminders and source tracking.",
+  "Token register that locks a car once a deposit is recorded and flags expiry.",
+  "Workshop job tracker for cars out for recon with expected return dates.",
+  "Paperwork tracker per car (files, transfers, inspections) with pending-item reminders.",
+  "Daily cash sheet for the lot, matched to sales recorded.",
+  "Simple buyer follow-up and referral messages after sale.",
+  "Weekly owner summary: cars sold, average days to sell, margin, stock value."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mere plot pe 30 ke qareeb gaariyan hain, aadhi to teen chaar mahine se khari hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — paisa stock mein phansa hua hai, yeh samajh aata hai. In gaariyon ke din aur kharcha abhi kahin likha jata hai, ya zyada tar yaad se chalta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Diary mein kuch hai, baaki yaad se."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Jab koi gaari bikti hai, aapko pata hota hai ke mechanic aur paint ke baad us pe asal kitna bacha?"
+  }
+ ]
+}

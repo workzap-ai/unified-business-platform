@@ -1,0 +1,258 @@
+{
+ "key": "mobile_wallet_and_payment_agents",
+ "name": "Mobile-wallet and payment agents (e.g. JazzCash/Easypaisa retailers)",
+ "kind": "industry",
+ "sector": {
+  "code": "L",
+  "title": "Finance-adjacent, energy and utilities"
+ },
+ "signals": [
+  "JazzCash shop",
+  "Easypaisa shop",
+  "retailer",
+  "wallet agent",
+  "branchless banking agent",
+  "cash in",
+  "cash out",
+  "bill payment",
+  "float",
+  "balance khatam",
+  "e-float",
+  "cash nahi hai",
+  "commission",
+  "money transfer counter",
+  "mobile load",
+  "easyload",
+  "franchise",
+  "retailer ID",
+  "payment agent",
+  "agent network"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Standalone agent shop or a counter inside another business (mobile shop, general store, pharmacy).",
+  "Which services they run: cash in/out, bill payments, transfers, mobile load, other.",
+  "How many wallet platforms they operate for.",
+  "Number of counters and staff, and shop hours.",
+  "How they top up e-float and how often (bank, distributor, franchise).",
+  "Typical cash on hand needed to run the day, in rough terms they choose to share.",
+  "Location type: market, bus stop, residential street, village."
+ ],
+ "scope_rule": "pi notes the shop’s operational problems: running out of e-float or cash, day-end mismatches, queues, staff handling, record keeping, fake-note losses, commission tracking and how the counter fits alongside the rest of the shop. It never advises on wallet products, fees, transaction limits, account opening rules or how to use the platform’s systems, and never comments on any customer’s eligibility. It never asks for or stores customer phone numbers, CNIC, wallet numbers, transaction IDs, PINs or OTPs, nor the agent’s own retailer login or PIN. Anything that bypasses biometric verification, splits transactions to dodge limits, or uses other people’s IDs is refused.",
+ "vocabulary": {
+  "E-float / float": "electronic balance used for cash-in and transfers",
+  "Cash in": "customer gives cash, gets wallet balance",
+  "Cash out": "customer withdraws cash from their wallet",
+  "Biometric": "fingerprint verification device for transactions",
+  "Retailer / agent ID": "the shop’s account with the platform",
+  "Super agent / distributor": "the party that supplies e-float",
+  "Easyload / load": "mobile balance top-up",
+  "Commission": "earning per transaction from the platform",
+  "Khata": "handwritten ledger kept at the counter",
+  "Jaali note": "counterfeit currency note",
+  "Day close": "matching cash and e-float at end of day"
+ },
+ "problems": [
+  {
+   "phrase": "E-float finishes by afternoon and customers go to the next shop",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "I have plenty of e-float but no physical cash for cash-outs",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Topping up float means leaving the shop to go to the bank or distributor",
+   "category": "suppliers_purchasing",
+   "subtype": "slow_replenishment"
+  },
+  {
+   "phrase": "Cash and float never balance at day close",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "The boy at the counter sometimes does transactions without writing them in the khata",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "We took a fake note on a cash-in and lost it",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Customers say ‘paisay nahi aaye’ and argue at the counter",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Commission statements are hard to match with what we actually did",
+   "category": "cash_collections",
+   "subtype": "commission_reconciliation"
+  },
+  {
+   "phrase": "I cannot tell if the wallet counter is actually worth the space and staff",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Two or three platforms, each with its own phone and app, and I lose track",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "The biometric device or network goes down and the queue builds up",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "Rush on first days of the month and before Eid, one counter cannot handle it",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Staff run the counter when I am not there and I have no idea what happened",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Keeping a lot of cash in the shop at night is scary",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Staff make mistakes sending to the wrong number and we eat the loss",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Fraud calls and people trying to trick staff into transfers",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Bill payments are done but receipts are not given, and customers come back",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Mobile load stock on different SIMs runs out without warning",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Distributor delays float on busy days",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Staff do not turn up on time on salary-disbursement days",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "The khata is the only record and it got wet / lost",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "Want to open a second counter in another market but cannot be in two places",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "People do not know we offer bill payments as well",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  }
+ ],
+ "questions": {
+  "float and cash": [
+   "Which runs out first on a busy day, e-float or cash?",
+   "At what time does it usually happen?",
+   "How do you top up today?"
+  ],
+  "day close": [
+   "How do you check cash and float at the end of the day?",
+   "How often does it not match?"
+  ],
+  "records": [
+   "Where is each transaction written down besides the platform?",
+   "Who fills it in when you are not there?"
+  ],
+  "fake notes and fraud": [
+   "How often do you get a fake note or a suspicious call?",
+   "What happens when you do?"
+  ],
+  "platforms": [
+   "How many wallet platforms do you run?",
+   "Is that one phone each or something else?"
+  ],
+  "queues": [
+   "Which days are the busiest?",
+   "How many people are serving at the counter then?"
+  ],
+  "profitability": [
+   "Do you know roughly what the counter earns against what it costs to run?",
+   "What part of that is hardest to see?"
+  ],
+  "complaints": [
+   "What is the most common complaint at the counter?",
+   "How is it usually settled?"
+  ]
+ },
+ "seasons": "- PK: first week of the month (salaries, pensions), government social payment disbursement cycles, Eid ul Fitr and Eid ul Adha, Ramadan, school fee and utility bill due dates, summer electricity bills; floods and network outages disrupt service. - UAE and Canada: equivalent bill-payment and top-up counters peak around salary days, month-end bills and before holidays.",
+ "care": [
+  "Never ask for, accept or store customer numbers, wallet numbers, CNIC, PINs, OTPs or transaction IDs; if pasted, pi says it will not keep them.",
+  "Never ask for the agent’s own login, PIN or retailer credentials.",
+  "Refuse any request about bypassing biometric checks, using one person’s ID for another’s transaction, splitting to avoid limits, or doing transactions for “friends” off-record.",
+  "Never explain fees, limits or platform policy; pi notes “customers confused about charges” only as a complaint pattern.",
+  "Counterfeit notes and fraud calls: note the business loss; for crimes in progress, pi points to police.",
+  "Robbery or threat at the shop: pi stops and points to emergency services.",
+  "Staff dishonesty concerns: record as control gaps, never name staff.",
+  "Do not record when or where cash is moved."
+ ],
+ "build_ideas": [
+  "Simple counter log on phone: transaction type and amount only (no customer data), totals by platform, replacing the khata.",
+  "Day-close sheet: opening cash and float, top-ups, closing counts, variance with reason.",
+  "Float and cash level alerts by time of day so the owner tops up before running out.",
+  "Top-up log with distributor and timing to show delays.",
+  "Weekly commission expected-vs-received view per platform from the counter log totals.",
+  "Counter profitability view: commission totals against staff time and costs entered by the owner.",
+  "Busy-hour chart from counter logs to plan a second person.",
+  "Incident log: fake notes, fraud attempts, wrong sends, downtime.",
+  "Owner’s end-of-day WhatsApp summary from each counter or shop.",
+  "Shop service board and a WhatsApp/Google Business listing listing services offered.",
+  "Staff checklist for opening and closing the counter.",
+  "Multi-shop view if the owner runs more than one counter."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mera float 3 baje tak khatam ho jata hai phir customer wapas chale jaate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — dopehar tak e-float khatam ho jana, noted. Abhi float top-up kaise karte hain aap?"
+  },
+  {
+   "role": "Person",
+   "text": "Bank jana parta hai ya distributor ko call karta hoon, kabhi kabhi wo late karta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, top-up ke liye bank ya distributor, aur distributor kabhi late. Jab aap top-up ke liye nikalte hain to counter kaun sambhalta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Mera bhatija, lekin wo khata mein theek se nahi likhta."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted — aap ki ghair mojoodgi mein record poora nahi hota. Din ke aakhir mein cash aur float kitni baar match nahi karte?"
+  }
+ ]
+}

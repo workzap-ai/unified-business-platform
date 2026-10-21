@@ -1,0 +1,296 @@
+{
+ "key": "fast_food_and_qsr_chains",
+ "name": "Fast food and QSR chains",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "QSR",
+  "fast food",
+  "burger",
+  "broast",
+  "shawarma",
+  "pizza",
+  "fries",
+  "combo",
+  "deal",
+  "drive-thru",
+  "counter",
+  "kiosk",
+  "franchise",
+  "central kitchen",
+  "commissary",
+  "speed of service",
+  "ticket time",
+  "Foodpanda/Talabat/Careem/Uber Eats",
+  "deal 1",
+  "zinger",
+  "shawarma wala",
+  "wajba far’",
+  "franchise fee"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of outlets, and how many are company-owned vs franchised",
+  "Central kitchen/commissary vs each outlet preparing its own",
+  "Channel mix: counter, drive-thru, kiosk, own app/website, delivery apps",
+  "POS and whether it is the same system across all branches",
+  "Own riders vs app riders vs third-party fleet",
+  "Opening hours and late-night/24-hour branches",
+  "Who sets prices and promotions — head office or each branch"
+ ],
+ "scope_rule": "pi notes operational problems in speed, consistency, stock, staffing, delivery, franchise control and reporting across outlets. It does not advise on franchise agreements, royalties or legal disputes with franchisees, food-safety certification, oil-disposal regulations or tax. It does not record names of crew, riders or customers, nor take card or bank details, and treats franchisee information as business-level only.",
+ "vocabulary": {
+  "QSR": "quick-service restaurant",
+  "ticket time": "time from order to handover",
+  "commissary": "central kitchen that preps and dispatches to outlets",
+  "par level": "the stock an outlet should hold before the next delivery",
+  "deal": "bundled combo (PK usage, “Deal 3”)",
+  "broast": "pressure-fried chicken",
+  "drive-thru": "car lane service",
+  "franchisee": "outlet owner operating under the brand",
+  "royalty": "fee franchisees pay the brand",
+  "crew": "counter and kitchen staff",
+  "LTO": "limited-time offer"
+ },
+ "problems": [
+  {
+   "phrase": "Peak hour ticket times go past 15 minutes and people walk out",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Each branch’s burger looks different, the franchise ones are worst",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Franchisees don’t share real sales, I only see what they report",
+   "category": "planning_growth",
+   "subtype": "franchise_control"
+  },
+  {
+   "phrase": "Commissary sends the wrong quantities, one branch runs out of buns while another throws them",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "We run out of chicken by evening on Fridays",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Oil is changed whenever the crew feels like it, cost is huge",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Deals are priced so low I don’t think we make anything on them",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Cashiers apply staff discount or deal codes for friends",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Refunds on the POS at closing time without a manager",
+   "category": "loss_security",
+   "subtype": "void_refund_abuse"
+  },
+  {
+   "phrase": "Five tablets on the counter for five apps, orders get missed",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Delivery app commissions eat the margin on delivery orders",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Riders take longer routes and ask for more fuel money",
+   "category": "orders_fulfilment",
+   "subtype": "rider_management"
+  },
+  {
+   "phrase": "Cold food complaints on delivery orders",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Missing items complaints, app deducts the refund from us",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "App payouts never match what the POS shows",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "Crew turnover is constant, every month new cashiers",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "No one checks the closing checklist at night branches",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Head office reports come a week late and in different Excel formats from each branch",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "One branch is dropping and I can’t tell whether it’s footfall or service",
+   "category": "sales_revenue",
+   "subtype": "branch_underperforming"
+  },
+  {
+   "phrase": "Our LTO launch flopped and I don’t know if it was price or awareness",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Our own app barely gets orders, everyone uses Foodpanda",
+   "category": "customer_experience_digital",
+   "subtype": "app_issues"
+  },
+  {
+   "phrase": "Loyalty stamps on paper cards, people lose them",
+   "category": "customers_retention",
+   "subtype": "loyalty"
+  },
+  {
+   "phrase": "Opening a new branch takes months and every one is set up differently",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "Food authority visits and I find out after the fact what was flagged",
+   "category": "communication_coordination",
+   "subtype": "branches_not_aligned"
+  },
+  {
+   "phrase": "Fryer down at one branch for three days because no one logged it",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Overtime claims at night branches don’t match the clock-in",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Price increase from the bun supplier came without notice",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_communication"
+  }
+ ],
+ "questions": {
+  "speed": [
+   "Where does the line slow down at peak — ordering, kitchen or handover?",
+   "Roughly how long does an order take on a busy night?"
+  ],
+  "consistency": [
+   "Which item varies most between branches?",
+   "How are recipes and portion sizes shared with outlets?"
+  ],
+  "franchise": [
+   "How do franchisees send you their sales today?",
+   "What do you wish you could see from them daily?"
+  ],
+  "stock": [
+   "Which items run out most often?",
+   "Who decides how much each branch orders from the commissary?"
+  ],
+  "delivery": [
+   "Which apps do you take orders from?",
+   "Do app orders go into the POS automatically?"
+  ],
+  "riders": [
+   "Are riders your own, the app’s, or both?",
+   "How are rider payments and fuel settled?"
+  ],
+  "cash": [
+   "Where does the mismatch show up — cash, card or app payouts?",
+   "Who checks the payout statements?"
+  ],
+  "discounts": [
+   "Who can apply a discount or refund on the POS?",
+   "Do you get a report of them?"
+  ],
+  "staff": [
+   "Which shift is hardest to staff?",
+   "How long does a new cashier take to get up to speed?"
+  ],
+  "reporting": [
+   "How do branch numbers reach you?",
+   "What one number would you check every morning?"
+  ],
+  "marketing": [
+   "How do you judge whether a deal or LTO worked?"
+  ],
+  "growth": [
+   "What makes each new branch slow to set up?"
+  ]
+ },
+ "seasons": "- PK: Ramadan shifts peak to iftar and sehri, with sehri deliveries late at night; Eid holidays spike family deals; cricket matches and PSL drive group orders; winter evenings and exam seasons lift late-night delivery; school holidays raise daytime footfall in malls. - UAE: winter months and school holidays busiest; Ramadan iftar boxes and late-night trade; summer heat pushes most volume to delivery; payday at month-end visibly lifts orders. - Canada: summer and patio traffic for standalone units; back-to-school and university terms lift campus outlets; winter storms move volume to delivery and drive-thru; major sports nights and Super Bowl weekend.",
+ "care": [
+  "Fryer fires, oil burns, robbery at the counter or a rider accident: pi tells the person to contact emergency services first (1122/15 PK, 999/998/997 UAE, 911 Canada).",
+  "Franchise disputes and royalty arguments: pi notes the visibility problem, never advises on contracts or legal action.",
+  "Food-safety incidents and allergen complaints: notes the operational issue, no medical or regulatory advice.",
+  "Crew and rider personal details: never collected; problems recorded by role and branch.",
+  "Requests to track riders’ or staff’s phones without their knowledge: pi declines.",
+  "Requests to suppress sales from franchise royalty reports or tax: pi declines.",
+  "Customer data for marketing: pi notes the need, never collects customer phone lists.",
+  "Child labour or underage staff hints: pi does not advise but does not help hide it."
+ ],
+ "build_ideas": [
+  "Multi-branch sales dashboard pulling POS data from every outlet, including franchisees, by hour and channel",
+  "Commissary order and dispatch app: each branch’s order against par levels, dispatch note, receiving confirmation, variance flags",
+  "Delivery-app consolidation screen and daily reconciliation of each app’s payout against POS records",
+  "Discount, void and refund report by branch, shift and role, with daily alerts above a threshold",
+  "Ticket-time tracker from order to handover, by hour and branch",
+  "Fryer oil log: change date, oil quantity, filter checks, cost per branch",
+  "Recipe and portion standards library with photos, sent to outlets with acknowledgement",
+  "Franchise compliance checklist with photo submissions and scoring per visit",
+  "New-branch setup checklist and template (menu, prices, equipment, rota, opening stock)",
+  "Rider log: trips, distance, fuel claims, delivery times",
+  "Simple digital loyalty via WhatsApp or phone number with visit counts",
+  "LTO tracker comparing sales of the promoted item before, during and after",
+  "Equipment breakdown log with escalation if not fixed in a set time",
+  "Crew rota and clock-in on phone with overtime summary"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We have 9 branches, 4 are franchised. I never really know what the franchise ones are selling."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — four franchised branches and you can’t see their real sales. How do they send their numbers to you now?"
+  },
+  {
+   "role": "Person",
+   "text": "Monthly Excel, whenever they feel like it."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted that it’s a monthly Excel with no fixed date. Are they on the same POS system as your own branches?"
+  },
+  {
+   "role": "Person",
+   "text": "No, two of them use their own."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, two franchisees on a different POS. Is the bigger worry royalties being under-reported, or not knowing how the brand is doing there?"
+  }
+ ]
+}

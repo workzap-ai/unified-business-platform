@@ -1,0 +1,280 @@
+{
+ "key": "kiryana_corner_shops_and_convenience_stores",
+ "name": "Kiryana, corner shops and convenience stores (incl. petrol-station marts)",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "kiryana",
+  "karyana",
+  "general store",
+  "corner shop",
+  "dukaan",
+  "mart",
+  "convenience store",
+  "forecourt shop",
+  "petrol pump shop",
+  "tuck shop",
+  "udhaar",
+  "khata",
+  "parchi",
+  "seth",
+  "wholesaler se maal",
+  "Jodia Bazaar",
+  "Akbari Mandi",
+  "Shah Alam",
+  "baqala",
+  "dukkan",
+  "groceria",
+  "dep",
+  "pump wali shop"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Single shop or several; owner-run or with a salesman/helper.",
+  "Whether the shop gives udhaar (credit) to neighbourhood customers and roughly how many accounts.",
+  "Where stock is bought: wholesale market, distributor salesmen, cash-and-carry.",
+  "Whether there is any POS or everything is in a register/khata.",
+  "Home delivery by phone/WhatsApp, and who delivers.",
+  "For petrol marts: whether the shop is run by the station owner, a tenant, or a franchise, and hours (24/7 or not).",
+  "Payment methods accepted (cash, Easypaisa/JazzCash/Raast, cards, Interac)."
+ ],
+ "scope_rule": "pi notes the operational side: udhaar tracking, stock buying, daily cash, delivery, helpers, and simple reporting. pi gives no tax, licence, tobacco-sale law, lottery law, fuel safety or loan advice. pi never collects neighbourhood customers’ names or phone numbers from the khata, nor staff ID details; it records counts and roles (“about 60 udhaar customers”, “one helper”). Requests to sell restricted goods outside the rules, or to dodge distributor or tax obligations, are declined.",
+ "vocabulary": {
+  "udhaar": "goods given on credit, paid later",
+  "khata / register": "handwritten book of credit accounts",
+  "seth": "shop owner",
+  "parchi": "handwritten slip or list",
+  "order booker": "distributor’s salesman who takes orders at the shop",
+  "scheme": "distributor offer (e.g. one carton free on ten)",
+  "cash-and-carry": "wholesale store where shops buy stock",
+  "Easypaisa / JazzCash / Raast": "mobile wallet and instant payments in Pakistan",
+  "baqala": "corner grocery in the Gulf",
+  "depanneur": "convenience store in Quebec",
+  "forecourt": "the petrol-station area; forecourt shop = station mart",
+  "thok": "wholesale"
+ },
+ "problems": [
+  {
+   "phrase": "Half the neighbourhood has udhaar and I don’t know the total",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Customers dispute the khata — they say they paid, I can’t prove anything",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "End of day the galla doesn’t match what I think I sold",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "My helper might be taking cash when I’m at the mandi",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Easypaisa and JazzCash payments get mixed up with my personal account",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "I run out of popular items because I only go to the wholesaler once a week",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Expired biscuits and juices sitting at the back",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Order bookers push stock I don’t need to hit their targets",
+   "category": "suppliers_purchasing",
+   "subtype": "buying_wrong_items"
+  },
+  {
+   "phrase": "Wholesale rates change every week and I don’t update my prices",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "I don’t know if I’m actually making money or just turning stock",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "The new mart down the road is taking my customers",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Phone orders come on WhatsApp all day and I miss some",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Delivery boy takes too long, people cancel",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Wrong items get sent in home delivery",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Pump mart night shift cash is always short",
+   "category": "people_staff",
+   "subtype": "trust_honesty"
+  },
+  {
+   "phrase": "Can’t find a reliable helper, they leave after a month",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "I’m at the shop 14 hours a day, can’t leave even for a wedding",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Shoplifting from the snack rack at the petrol mart at night",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Distributor short-delivers cartons and I find out later",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Electricity bills went up and my fridges run all day",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Load-shedding spoils dairy and ice cream",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "I never know what sold best this month",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Everything is in my head and the register; if I’m sick nobody can run it",
+   "category": "tech_systems",
+   "subtype": "no_system"
+  },
+  {
+   "phrase": "Petrol mart sales don’t line up with fuel customers, can’t tell if the shop is worth it",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "I want to start delivering through Foodpanda/Talabat but don’t know how it’d work",
+   "category": "customer_experience_digital",
+   "subtype": "marketplace_listing"
+  },
+  {
+   "phrase": "Regular customers have started buying from apps instead",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  }
+ ],
+ "questions": {
+  "udhaar": [
+   "Roughly how many customers buy on udhaar?",
+   "How do you keep track of what each one owes?",
+   "How often do people dispute their total?"
+  ],
+  "cash": [
+   "How do you check the day’s cash?",
+   "Who handles the counter when you’re away?"
+  ],
+  "buying": [
+   "Where do you buy most of your stock?",
+   "How often do you go, and how do you decide what to buy?"
+  ],
+  "stock": [
+   "Which items run out most?",
+   "Do you find expired stock often?"
+  ],
+  "orders": [
+   "How many phone or WhatsApp orders a day?",
+   "Who delivers them, and what goes wrong?"
+  ],
+  "payments": [
+   "Which payment methods do you take?",
+   "Are wallet payments easy to match to sales?"
+  ],
+  "margin": [
+   "Do you know your profit on your main items?",
+   "When wholesale rates change, how do your prices change?"
+  ],
+  "help": [
+   "How many people work with you?",
+   "What’s hardest about keeping them?"
+  ],
+  "petrol mart": [
+   "Is the shop open round the clock?",
+   "Who looks after it at night?"
+  ]
+ },
+ "seasons": "Pakistan: Ramadan (sehri/iftar items, Rooh Afza, dates, pakora besan), Chand Raat, Eid ul-Adha (spices, onions, disposables), summer cold drinks and ice, winter eggs, dry fruit and gas cylinders, salary week at month start, school reopening (stationery, juice boxes). UAE: Ramadan and Eid, summer heat driving cold drinks and water, month-end salary spikes in labour areas, National Day. Canada: summer long weekends, Halloween candy, Christmas, winter storms, lottery jackpot surges at convenience stores; Ramadan/Eid and Diwali for community stores.",
+ "care": [
+  "Udhaar khata contains neighbours’ names and numbers: pi never asks for them or for screenshots of the register.",
+  "Tobacco, vapes, lottery, alcohol (Canada) and age-restricted sales: pi notes operational issues only, never helps sell to minors or bypass rules.",
+  "Selling expired goods or changing dates: declined.",
+  "Suspicion of a helper stealing: pi notes the pattern and does not encourage confrontation or secret recording.",
+  "Robbery or armed threat at a night-time pump mart: pi says to call police/emergency services immediately (15 in Pakistan, 999 in UAE, 911 in Canada).",
+  "Fuel spillage, fire or gas smell at a station: stop and point to emergency services.",
+  "Loans to clear distributor dues: pi notes cash strain, gives no financial advice."
+ ],
+ "build_ideas": [
+  "Digital udhaar khata on phone: each customer as a short code chosen by the owner, purchases and payments logged, running balance, and an optional WhatsApp balance message the customer receives.",
+  "Monthly udhaar summary: total owed, oldest balances, accounts with no payment in 30+ days.",
+  "Simple nori sales and stock read: quick entry or barcode scan, top sellers, items running low.",
+  "Daily galla check: opening cash, wallet receipts, card total, closing cash, difference recorded each day.",
+  "Wallet/Raast/Interac payment log separated from personal transactions.",
+  "Weekly buying list built from what sold and what’s low, grouped by wholesaler.",
+  "Wholesale rate tracker that flags items where purchase price rose but selling price didn’t.",
+  "Expiry list for slow items captured when stock arrives.",
+  "WhatsApp order intake: menu of common items, order list for packing, delivery status message.",
+  "Helper shift handover: cash and key items counted at handover, noted on phone.",
+  "Simple monthly profit view by category using purchase and sale prices.",
+  "Petrol mart dashboard: shop sales by hour versus fuel transactions, night-shift cash variance."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai udhaar ka hisaab hi nahi milta. Register mein likha hota hai lekin log kehte hain humne de diya tha."
+  },
+  {
+   "role": "pi",
+   "text": "Haan, ye bohot common masla hai — noted, udhaar register mein hai lekin customers apna total maante nahi. Andazan kitne ghar udhaar pe saman lete hain?"
+  },
+  {
+   "role": "Person",
+   "text": "70-80 ghar honge."
+  },
+  {
+   "role": "pi",
+   "text": "Theek, likh liya — taqreeban 70-80 udhaar accounts. Jab koi paisa deta hai, us waqt register mein entry aap khud karte hain ya jo bhi counter pe ho?"
+  },
+  {
+   "role": "Person",
+   "text": "Jo bhi ho. Kabhi beta, kabhi helper."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, entries kai log karte hain. Mahine mein kitni dafa kisi ke hisaab pe behas hoti hai?"
+  }
+ ]
+}

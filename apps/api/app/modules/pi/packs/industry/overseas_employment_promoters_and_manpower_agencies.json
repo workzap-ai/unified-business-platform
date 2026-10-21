@@ -1,0 +1,277 @@
+{
+ "key": "overseas_employment_promoters_and_manpower_agencies",
+ "name": "Overseas employment promoters and manpower agencies",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "OEP",
+  "overseas employment promoter",
+  "Protector",
+  "Protectorate of Emigrants",
+  "Bureau of Emigration",
+  "demand letter",
+  "visa batch",
+  "visa lag gaya",
+  "protector karwana",
+  "medical",
+  "GAMCA",
+  "trade test",
+  "deployment",
+  "flight booking",
+  "Saudi",
+  "Qatar",
+  "Oman",
+  "Dubai demand",
+  "bande bhejne hain",
+  "foreign employer",
+  "sub-agent",
+  "manpower supply",
+  "recruitment agency licence",
+  "wakalat istiqdam",
+  "kafeel",
+  "labour supply contract",
+  "camp"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Licensed OEP in Pakistan, a manpower supply company in the UAE, or both ends of the corridor",
+  "Destination countries and main employer sectors (construction, hospitality, domestic, security, healthcare)",
+  "Typical batch size and number of workers deployed per month",
+  "Number of staff and whether sub-agents or field agents source workers",
+  "How demand letters and employer requirements arrive and are tracked",
+  "Whether the business also handles trade testing, training or accommodation",
+  "How workers are kept informed of their status"
+ ],
+ "scope_rule": "pi notes the agency’s operational problems: demand tracking, candidate pipeline stages, document and appointment coordination, deployment timelines, employer communication, staff and sub-agent accountability, collections from employers and record keeping. pi gives no immigration, visa, emigration-law, labour-law or medical advice, and never explains how to get any approval or clearance. pi never takes workers’ names, CNICs, passports, medical results, photos or family details, and does not record any fee charged to workers. Any request involving fake documents, visa selling, charging workers beyond what is lawful, passport retention, misrepresenting jobs or bypassing emigration procedures is declined; signs of trafficking or forced labour are pointed to the authorities.",
+ "vocabulary": {
+  "OEP": "Overseas Employment Promoter, Pakistan’s licensed recruitment agency for overseas jobs",
+  "Protector": "the emigration clearance office and stamp process before departure",
+  "Demand letter": "employer’s request specifying jobs, numbers and terms",
+  "Batch": "a group of workers processed and deployed together",
+  "GAMCA / medical": "mandatory pre-departure medical checks for GCC destinations",
+  "Trade test": "skills test for the specific job",
+  "Deployment": "worker departing to the job abroad",
+  "Sub-agent / field agent": "person who sources workers from villages and towns",
+  "Labour supply": "UAE companies that employ workers and supply them to clients",
+  "Camp": "worker accommodation in the destination country",
+  "Mobilisation": "getting a batch from selection to on-site",
+  "Kafeel": "sponsor (older Gulf term)"
+ },
+ "problems": [
+  {
+   "phrase": "A demand for 80 workers came and we couldn’t fill it in time",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "We don’t know which worker is stuck at which step — medical, test, visa, protector",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Workers call us twenty times a day asking about their status",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Documents get lost between our office, the medical centre and the embassy",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Medical appointments get missed because nobody reminded the worker",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  },
+  {
+   "phrase": "Sub-agents send unsuitable candidates who fail the trade test",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "We can’t track what each sub-agent has delivered",
+   "category": "suppliers_purchasing",
+   "subtype": "po_tracking"
+  },
+  {
+   "phrase": "Flights are booked and then the visa isn’t ready",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Workers drop out after medical and we lose the slot",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Foreign employers pay our service charges months late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We pay costs upfront for a batch and wait for the employer",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Currency moves eat our margin on employer contracts",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Licence renewal and bureau reporting is a scramble every time",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Our records for each deployed worker are in files and Excel",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Employers complain the workers we sent weren’t what they asked for",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "We get no repeat demand from some employers and don’t know why",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Few new foreign employers, we depend on two clients",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "Office staff and field agents don’t share updates",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Staff in the Lahore office and partners in Dubai work from different lists",
+   "category": "communication_coordination",
+   "subtype": "branches_not_aligned"
+  },
+  {
+   "phrase": "On the UAE side, labour supply timesheets from client sites are always late",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Worker complaints from the destination come to us and we have no process",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "We want to open new destination markets but can’t handle current volume",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Staff take side payments from candidates",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Everything goes through me, I’m the bottleneck on every batch",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  }
+ ],
+ "questions": {
+  "demand": [
+   "How do employer demands usually reach you?",
+   "How many workers does a typical demand ask for?"
+  ],
+  "pipeline": [
+   "Once you select someone, what are the main steps until they fly?",
+   "Where do people most often get stuck?"
+  ],
+  "tracking": [
+   "How do you currently see which worker is at which step?",
+   "Who updates it?"
+  ],
+  "workers’ queries": [
+   "How do workers check their status today?",
+   "How much staff time goes into answering them?"
+  ],
+  "sourcing": [
+   "Do sub-agents or field agents bring candidates?",
+   "How do you judge which ones send good people?"
+  ],
+  "timing": [
+   "How long does a batch usually take from demand to deployment?",
+   "What causes the longest delays?"
+  ],
+  "employers": [
+   "How do foreign employers pay you, and how quickly?",
+   "Do you get repeat demands from the same employers?"
+  ],
+  "compliance admin": [
+   "Which reporting or renewals take the most effort?",
+   "Who handles them?"
+  ],
+  "team": [
+   "How is work split between office staff and field agents?",
+   "Where do handovers break down?"
+  ],
+  "growth": [
+   "Which destinations or sectors do you want to grow into?",
+   "What’s holding that back?"
+  ]
+ },
+ "seasons": "- GCC demand follows project cycles; hiring often slows in summer heat and Ramadan, and picks up after Eid and in Q4–Q1. - Hajj and Umrah seasons drive hospitality and services demand in Saudi Arabia; flight availability and fares tighten around Eid and Hajj. - Pakistan: workers’ availability changes around harvest (wheat in April–May, rice/cotton in autumn) and Eid when people return home. - UAE labour supply: midday work-ban months (mid-June to mid-September) change shift patterns; winter is the main construction and events peak.",
+ "care": [
+  "No visa, emigration, labour-law or medical advice; pi never explains how to get clearances or approvals.",
+  "Never collect worker names, passports, CNICs, medical results or photos; refer to “a worker” or “a batch”.",
+  "Never discuss or record fees charged to workers; decline anything about overcharging, visa selling or “visa trading”.",
+  "Decline fake documents, altered passports, misrepresented job offers, or skipping emigration steps.",
+  "If a worker is in danger, unpaid, held against their will or has their passport withheld, pi points to the relevant authorities, embassy helplines or emergency services.",
+  "Staff taking money from candidates: note as fraud/trust problem without names.",
+  "Emotional stories from workers’ families: stay respectful, no promises."
+ ],
+ "build_ideas": [
+  "Demand register: employer, destination, job titles, numbers required, deadline and fill status",
+  "Batch pipeline board showing each worker (by reference number, not name in reports) through selection, medical, trade test, visa, clearance, ticket and departure",
+  "Automated WhatsApp status updates and appointment reminders to workers at each stage",
+  "Document movement log: who sent which file where and when it came back",
+  "Sub-agent register with candidates supplied, pass rates and drop-outs per agent",
+  "Employer billing per batch with receivables ageing and reminders in the employer’s currency",
+  "Batch cost tracker showing upfront costs against amounts due",
+  "Compliance calendar for licence renewals and periodic reporting with document checklist",
+  "Shared view for Pakistan and destination-side partners so both see the same batch status",
+  "Labour supply timesheet capture on site via phone, approved by client supervisor",
+  "Post-deployment issue log for employer and worker complaints, with owner and resolution",
+  "Owner dashboard: open demands, workers per stage, deployments this month, receivables"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Saudi se 120 ki demand aayi hai lekin pichli batch mein bhi aadhe log medical aur visa mein phanse rahe, pata hi nahi chalta kaun kahan hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — batch bari hai aur har banda kis step pe hai yeh clear nahi hota. Noted. Abhi aap har worker ka status kahan track karte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Ek register aur kuch Excel files, har staff ki apni."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, register aur alag alag Excel files. Workers apna status poochne ke liye aap se kaise contact karte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Sab WhatsApp pe, din bhar calls aur messages."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, workers ke status sawaal WhatsApp aur calls pe aate hain aur kaafi waqt lete hain — yeh bhi note kar liya. Pichli batch mein sab se zyada der kis step pe lagi thi?"
+  }
+ ]
+}

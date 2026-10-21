@@ -1,0 +1,276 @@
+{
+ "key": "importers_and_trading_houses",
+ "name": "Importers and trading houses",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "import",
+  "trading house",
+  "indent",
+  "LC",
+  "letter of credit",
+  "container",
+  "shipment",
+  "maal",
+  "maal phansa hua hai",
+  "port",
+  "clearing",
+  "demurrage",
+  "landed cost",
+  "party",
+  "udhaar",
+  "khata",
+  "godown",
+  "sample",
+  "China supplier",
+  "Alibaba",
+  "Canton Fair",
+  "bida’a",
+  "shahna",
+  "mustawrid",
+  "tajir",
+  "exchange rate",
+  "dollar rate",
+  "dollar upar chala gaya"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "What they import (product lines) and from which countries or regions.",
+  "Roughly how many containers or shipments per month, and whether FCL or LCL.",
+  "Whether they sell to wholesalers, retailers, projects/institutions, online, or a mix.",
+  "How they pay suppliers (advance, LC, open account) and how they sell (cash vs credit to parties).",
+  "Whether they hold stock in their own godown, a rented warehouse, or sell straight off the port.",
+  "Number of people in office, godown and sales, and whether family members run parts of it.",
+  "Which systems they use for stock and accounts (Excel, Tally, QuickBooks, khata)."
+ ],
+ "scope_rule": "pi notes operational and commercial problems: visibility of shipments, landed cost tracking, stock, credit to customers, supplier follow-up, cash flow strain, staff and reporting. It does not advise on HS codes, duty or tax rates, valuation, LC terms, banking or foreign-exchange decisions, sanctions or import licensing; if asked, it says that is for their clearing agent, bank or tax adviser and notes the effort as a business problem. It never helps with under-invoicing, split invoicing, misdeclaration of goods or origin, or any way around customs. It records customer and supplier roles (“a big Lahore party ”, “the Ningbo supplier”), never names, account numbers or ID documents.",
+ "vocabulary": {
+  "maal": "goods/stock",
+  "party": "a customer, usually a trade buyer on credit",
+  "indent": "order placed on behalf of a buyer with a foreign supplier, for commission",
+  "LC": "letter of credit, a bank-backed payment instrument",
+  "landed cost": "total cost of goods once in the godown, including freight, clearing and charges",
+  "demurrage": "port/shipping line charges for leaving a container too long",
+  "FCL / LCL": "full container load / less than container load (shared)",
+  "godown": "warehouse/storeroom",
+  "khata": "ledger book, usually of customer credit",
+  "rate": "selling price quoted to the market, or the exchange rate, depending on context",
+  "bida’a (Arabic)": "goods/merchandise",
+  "proforma": "supplier’s advance invoice used to arrange payment"
+ },
+ "problems": [
+  {
+   "phrase": "I don’t know my real landed cost per item until weeks after the container arrives",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "The dollar moved between order and payment and my margin disappeared",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Containers sit at port and we pay demurrage because paperwork is late",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Freight went up and I’d already quoted the party old rates",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "The supplier shipped a different grade from the sample",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Half my money is with parties on 60–90 days and they keep stretching it",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "I have to pay the supplier in advance but customers pay me late",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Some items from last year’s shipment are still sitting in the godown",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "We ran out of the fast-moving sizes while the next container was still at sea",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Godown count never matches what the office thinks we have",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Cartons go missing between port, transport and godown",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "I can’t see in one place which shipments are on the water, at port, or cleared",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Every supplier conversation is on WeChat and WhatsApp on my phone only",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Salesmen give different rates to different parties",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "A competitor imports the same item and undercuts me",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "We order based on gut feeling and buy the wrong mix",
+   "category": "suppliers_purchasing",
+   "subtype": "buying_wrong_items"
+  },
+  {
+   "phrase": "Supplier minimum order is a full container but I only need half",
+   "category": "suppliers_purchasing",
+   "subtype": "minimum_orders"
+  },
+  {
+   "phrase": "Getting quotes from three suppliers and comparing them takes days",
+   "category": "suppliers_purchasing",
+   "subtype": "price_comparison"
+  },
+  {
+   "phrase": "Accounts in Tally and stock in Excel never agree",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "I find out profit only when the accountant closes the year",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Keeping all the shipment documents organised for each container is a nightmare",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Damaged goods claims with the shipping line or insurer go nowhere because we can’t find the proof",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "My son wants to start selling online on Daraz but we have no system for it",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "I can’t plan Ramadan stock because I don’t know last year’s sales by item",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Godown staff load the wrong maal for the wrong party",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  }
+ ],
+ "questions": {
+  "landed cost and margin": [
+   "When a container lands, how do you currently work out the cost per item?",
+   "Who puts that together, and how long after arrival?",
+   "Do you know which product lines actually make you the most money?"
+  ],
+  "shipments": [
+   "How do you keep track of which shipments are where right now?",
+   "What usually causes the delays you mentioned?",
+   "What does a delay typically cost you, roughly, in charges or lost sales?"
+  ],
+  "credit and cash": [
+   "How much of your selling is on credit to parties ?",
+   "How do you track who owes what and since when?",
+   "What happens when a party goes past their usual time?"
+  ],
+  "stock": [
+   "When did you last do a full godown count, and how far off was it?",
+   "Who is allowed to take maal out of the godown?",
+   "Do you track stock by item and size, or by carton?"
+  ],
+  "buying": [
+   "How do you decide what and how much to order in the next shipment?",
+   "What went wrong with the last order you regretted?"
+  ],
+  "suppliers": [
+   "How do you follow up with suppliers on production and shipping dates?",
+   "What has gone wrong with quality, and how did you find out?"
+  ],
+  "pricing": [
+   "Who sets the selling rate, and how do salesmen know the current rate?",
+   "How often does a wrong rate get given?"
+  ],
+  "reporting": [
+   "What numbers do you look at each week, if any?",
+   "Where do they come from?"
+  ]
+ },
+ "seasons": "Pakistan and UAE importers build stock ahead of Ramadan and both Eids, ahead of winter (heaters, blankets, garments) and summer (fans, coolers, ACs, LG/solar items). Chinese New Year shuts Chinese factories for several weeks around January–February, so orders bunch up before it and shipments thin out after. Western Q4 peak (August–October) can squeeze container space and push freight. Pakistan’s federal budget in June and fiscal year-end in June change pricing and buying behaviour; Karachi monsoon (July–August) floods roads and delays port movement. Wedding season (November–February) lifts demand for household goods, crockery, fabrics and electronics. In the UAE, Dubai Shopping Festival (December–January) and back-to-school (late August– September); in Canada, back-to-school, Black Friday, Boxing Day and winter weather affecting inland freight.",
+ "care": [
+  "Any question on duty rates, HS classification, valuation, SROs, exemptions or tax: pi says it can’t advise and suggests their clearing agent or tax adviser, and notes the problem (e.g. “duty changes keep catching us out”) as business impact.",
+  "Requests to help show lower invoice values, split invoices, change the declared description or origin, or “manage” customs: pi declines plainly and does not note it as a problem to solve.",
+  "Sanctions or restricted goods questions (dual-use items, restricted destinations): out of scope; pi suggests proper legal or compliance advice.",
+  "LC, banking, FX hedging and borrowing questions: not financial advice; pi notes the cash-flow pain only.",
+  "Never asks for or records bank account numbers, LC numbers, CNIC/NTN or supplier/customer names; uses roles.",
+  "Family-business tension (brothers, sons, partners) comes up often; pi notes the coordination or succession problem neutrally and does not take sides.",
+  "Disputes with suppliers or parties that sound like legal claims: pi notes the operational effect and suggests a lawyer for the claim itself."
+ ],
+ "build_ideas": [
+  "Shipment tracker on phone: each container’s supplier, ETD/ETA, port status, clearing stage and documents checklist, with delay alerts.",
+  "Landed-cost sheet per shipment that pulls in freight, clearing and handling charges entered by staff and spreads them to items.",
+  "Item-wise margin view by product line and by party, refreshed as sales are entered.",
+  "Customer credit ledger with ageing buckets and WhatsApp payment reminders the owner approves before sending.",
+  "Credit-limit check at order entry so salesmen see when a party is over limit or overdue.",
+  "Godown stock register by item/size/carton with in/out slips, plus a cycle-count routine and variance report.",
+  "Reorder planner using past sales by item and lead time per supplier to suggest what to put in the next container.",
+  "Supplier follow-up board: production dates, sample approvals, quality issues and promised ship dates in one place.",
+  "Rate list published to salesmen’s phones, with a log of rates quoted per party.",
+  "Document vault per shipment (invoice, packing list, BL, insurance, claim photos) searchable later.",
+  "Weekly owner summary on WhatsApp: stock value, receivables, shipments in transit, top and slow items.",
+  "Connection between stock system and Tally/QuickBooks so stock and accounts stop disagreeing.",
+  "Marketplace order intake for a Daraz or Amazon channel feeding the same stock."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai container aa gaya tha pichle hafte lekin abhi tak cost nahi pata, accountant kehta hai do hafte lagenge."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — container ka maal godown mein hai lekin per-item landed cost abhi tak pata nahi. Noted. Is beech mein aap selling rate kis basis par de rahe ho?"
+  },
+  {
+   "role": "Person",
+   "text": "Andaze se. Purani shipment ka rate plus thora sa."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — rates estimate par chal rahe hain jab tak cost final nahi hoti. Kabhi aisa hua hai ke baad mein pata chala rate kam diya tha?"
+  },
+  {
+   "role": "Person",
+   "text": "Haan, last time dollar barh gaya tha, poori shipment pe margin almost zero."
+  }
+ ]
+}

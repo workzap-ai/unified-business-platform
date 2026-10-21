@@ -1,0 +1,268 @@
+{
+ "key": "quran_academies_and_madrassas",
+ "name": "Quran academies and madrassas (administration)",
+ "kind": "industry",
+ "sector": {
+  "code": "J",
+  "title": "Education and childcare"
+ },
+ "signals": [
+  "Quran academy",
+  "online Quran classes",
+  "hifz",
+  "nazra",
+  "tajweed",
+  "qaida",
+  "madrassa",
+  "darul uloom",
+  "jamia",
+  "hostel students",
+  "ustad",
+  "qari sahab",
+  "muallima",
+  "talaba",
+  "fees/hadiya",
+  "chanda",
+  "donations",
+  "Zakat",
+  "sadqa",
+  "wifaq",
+  "halaqa",
+  "tahfeez",
+  "markaz tahfeez",
+  "trial class",
+  "time zone",
+  "weekend school",
+  "Islamic school"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Model: physical madrassa/academy, online academy teaching international families, or both.",
+  "Programmes: nazra, hifz, tajweed, Arabic, Islamic studies, weekend school.",
+  "Approximate number of students and teachers (counts only) and male/female sections.",
+  "Funding: monthly fees, donations, Zakat/Sadqa, trust or masjid support.",
+  "Whether it runs a hostel, kitchen/langar or transport.",
+  "For online academies: time zones served, payment channels (cards, PayPal, Wise, bank), and teacher scheduling model.",
+  "Current tools: registers, Excel, Zoom/Google Meet, WhatsApp."
+ ],
+ "scope_rule": "pi notes administrative and business problems only: fee and donation record-keeping, teacher scheduling across time zones, class booking and cancellations, hostel and kitchen operations, payroll, parent communication and reporting to trustees or donors. pi does not give religious rulings, judge teaching methods, or advise on the religious or tax treatment of Zakat or donations, charity registration, or regulatory matters. Students are mostly children: pi never asks for or stores any student’s name, photo, progress, lesson recordings or family details, nor teachers’ personal details — roles and counts only. Any concern about a child’s safety or welfare, including in hostels, is pointed immediately to emergency services and the relevant authority.",
+ "vocabulary": {
+  "Hifz": "memorisation of the Quran.",
+  "Nazra": "reading the Quran by sight with correct pronunciation.",
+  "Qaida": "beginner’s Arabic reading primer.",
+  "Ustad / Qari sahab / Muallima": "teacher (male / reciter / female teacher).",
+  "Talaba": "students.",
+  "Wifaq / board": "madrassa examination board.",
+  "Hadiya": "fee or gift given to a teacher or institution.",
+  "Zakat / Sadqa": "obligatory and voluntary charity donations.",
+  "Langar / mess": "communal kitchen for hostel students.",
+  "Trial class": "free first online session for a new family.",
+  "Sabaq / sabqi / manzil": "new lesson / recent revision / older revision."
+ },
+ "problems": [
+  {
+   "phrase": "Donations come in cash, bank and JazzCash and we can’t give donors a clear record.",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Zakat and general donations get mixed in one register.",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Trustees ask for monthly accounts and I prepare them by hand.",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Half the families pay fees late, and asking feels awkward.",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Online students in Canada and the US cancel classes last minute and teachers still expect pay.",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Time zone changes in March and November mess up the whole schedule.",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Teachers miss online classes and the family messages me at night.",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Trial classes don’t convert because nobody follows up.",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "International card payments fail or get charged back.",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "Payment platform and bank fees eat a chunk of each fee.",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Good female teachers are hard to find for girls’ classes.",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Teachers leave and take their students to teach privately.",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Hostel kitchen ration runs out before month-end.",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Kitchen purchases are made in cash with no bills.",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  },
+  {
+   "phrase": "Hostel maintenance — water, electricity, beds — is never logged.",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "We don’t know our cost per hostel student.",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Attendance registers for many halaqas are on paper and get lost.",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "Parents want updates and we answer every one on WhatsApp personally.",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Our Facebook page brings messages from people in time zones we can’t serve.",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Utility bills for the masjid and madrassa are not separated.",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Branch academies run differently and I can’t see them together.",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Teacher salaries are calculated from WhatsApp messages about classes taken.",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Exam registration with the board needs documents collected from everyone and it’s chaos.",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "We want to grow online but the website is old and has no booking.",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  }
+ ],
+ "questions": {
+  "funding": [
+   "How is the academy funded — fees, donations, or both?",
+   "How are donations recorded today?",
+   "Who asks you for reports on them?"
+  ],
+  "fees": [
+   "How do families pay?",
+   "How many are usually late in a month?"
+  ],
+  "online scheduling": [
+   "Which countries are your online students in?",
+   "How are class times set and changed?",
+   "What happens when a class is cancelled?"
+  ],
+  "teachers": [
+   "How are teachers paid — per class or monthly?",
+   "Where do pay disagreements come from?"
+  ],
+  "trials": [
+   "How many trial classes do you run in a month roughly?",
+   "What happens after the trial?"
+  ],
+  "hostel/kitchen": [
+   "Do you run a hostel or kitchen?",
+   "Who buys ration and how is it recorded?"
+  ],
+  "records": [
+   "How is attendance kept now?",
+   "Has anything been lost?"
+  ],
+  "communication": [
+   "What do parents ask about most?",
+   "Who answers them?"
+  ],
+  "branches": [
+   "Do you have more than one location?",
+   "How do you compare them?"
+  ]
+ },
+ "seasons": "- Ramadan: big rise in enrolments, donations and Zakat; special hifz and recitation programmes; schedules shift to night; online demand from abroad spikes. - Pre-Ramadan (Shaban) and post-Eid enrolment pushes; Eid holidays cause cancellations. - Pakistan: summer vacation short courses (June–August) for school-going children; wifaq/board exam period around Shaban; Muharram and Rabi-ul-Awwal events. - UAE: summer Quran memorisation camps; Ramadan competitions; school-year rhythm September–June. - Canada/US online clients: weekend schools follow the school year; daylight-saving changes (March and November) disrupt schedules; summer camp demand. - The Islamic calendar moves about 11 days earlier each Gregorian year, so peaks shift annually.",
+ "care": [
+  "No religious rulings on Zakat eligibility, fees for teaching Quran, or anything else; pi notes the record-keeping problem only.",
+  "No tax, charity-registration or trust-law advice; no advice on the tax status of donor receipts.",
+  "Never ask for or store any child’s name, photo, video, voice recordings of recitation, progress, or hostel resident details.",
+  "Hostel children’s welfare is sensitive: any mention of abuse, harm, a missing child, severe punishment or illness → pi stops, urges emergency services (15/1122, 999, 911) and the appropriate child-protection authority, and does not continue business discussion.",
+  "Teachers’ or donors’ personal details are never recorded; donor records are discussed as structure, not names.",
+  "Requests to route donations off-book, hide funds, or issue receipts that misstate donations: pi declines.",
+  "Online classes with children: pi does not help with secret recording or monitoring; it notes the operational concern (e.g. “need to check teachers attend on time”).",
+  "Stay respectful and neutral about sect or school of thought; never comment on doctrine."
+ ],
+ "build_ideas": [
+  "Donation and fee ledger separating fund types (Zakat, Sadqa, general, fees) as categories set by the institution, with donor receipts and a monthly trustee summary.",
+  "Bank and wallet deposit matching to donation and fee entries.",
+  "Online class scheduler storing each family’s time zone and auto-adjusting for daylight-saving changes, with reminders to teacher and family.",
+  "Cancellation and make-up class log feeding teacher pay rules set by the owner.",
+  "Teacher attendance on online classes from meeting logs, with lateness alerts.",
+  "Trial-class pipeline: enquiry, trial booked, attended, follow-up, enrolled.",
+  "International payment link setup with failed-payment and chargeback tracking.",
+  "Hostel kitchen ration register: purchases, daily issue, stock left and reorder alerts.",
+  "Petty cash app with photo of receipts for cash buying.",
+  "Maintenance request log for hostel and premises.",
+  "Attendance register on phone per halaqa (counts in reports, no child names on owner dashboards).",
+  "Parent FAQ responder on WhatsApp for timings, holidays and fees.",
+  "Simple booking website for the online academy with time-zone-aware slots."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamari online academy hai, zyada bachay Canada aur America mein hain. March aur November mein time change hota hai to aadhi classes miss ho jati hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — daylight saving ke waqt schedule bigar jata hai aur classes miss hoti hain. Noted. Abhi class timings kahan record hoti hain — Excel mein, ya teachers apne paas rakhte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Har ustad ka apna WhatsApp schedule hai."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, schedule har ustad ke paas alag hai, ek jagah nahi. Ye bhi note kar liya. Aap ke paas is waqt kitne ustad online parha rahe hain?"
+  }
+ ]
+}

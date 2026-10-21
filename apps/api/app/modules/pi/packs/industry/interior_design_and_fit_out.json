@@ -1,0 +1,262 @@
+{
+ "key": "interior_design_and_fit_out",
+ "name": "Interior design and fit-out",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "fit-out",
+  "interior",
+  "joinery",
+  "carpentry",
+  "gypsum",
+  "false ceiling",
+  "partition",
+  "flooring",
+  "mood board",
+  "concept",
+  "3D render",
+  "BOQ",
+  "site measurement",
+  "design fee",
+  "turnkey",
+  "design aur execution",
+  "lakri ka kaam",
+  "carpenter",
+  "polish",
+  "rang",
+  "dekor",
+  "tasmeem",
+  "landlord NOC",
+  "mall approval",
+  "authority permit",
+  "snag",
+  "handover",
+  "millwork",
+  "renovation",
+  "reno"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Residential, commercial (offices, retail, F&B, clinics), hospitality, or mall fit-outs.",
+  "Design-only, design-and-build/turnkey, or execution-only.",
+  "Own joinery workshop or outsourced carpentry/millwork.",
+  "Number of live projects and typical project duration.",
+  "Team: designers, project managers, site supervisors, in-house trades vs subcontractors.",
+  "Import share of materials (tiles, fittings, lighting, furniture) vs local.",
+  "Country/city (mall and authority approval processes differ)."
+ ],
+ "scope_rule": "pi notes operational and business problems: design revisions and approvals, quoting accuracy, procurement and lead times, workshop and site scheduling, subcontractor coordination, change orders, client communication, billing milestones and handovers. pi gives no structural advice (e.g. removing walls), no electrical, gas, fire or MEP safety advice, and does not interpret contracts, landlord or authority requirements. It does not record clients’ names, home addresses, IDs, phone numbers or bank details; it records roles (“a villa client”, “a café client”).",
+ "vocabulary": {
+  "fit-out": "completing an interior for use (ceilings, partitions, finishes, MEP adjustments)",
+  "turnkey": "one company handles design and full execution",
+  "mood board": "visual concept of colours, materials and style",
+  "3D / render": "visual of the proposed design",
+  "joinery / millwork": "custom woodwork: wardrobes, kitchens, counters",
+  "lakri ka kaam": "woodwork; polish — wood finishing",
+  "gypsum / false ceiling": "suspended ceiling work",
+  "landlord NOC / mall approval": "permission to start fit-out in a leased unit",
+  "change order": "client-requested change after agreement",
+  "design fee": "charge for the design stage, separate from execution",
+  "shell and core": "unit handed over without interior finishes",
+  "PC sum / allowance": "provisional amount for items not yet selected"
+ },
+ "problems": [
+  {
+   "phrase": "Clients keep changing the design after we’ve started",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "We do five or six design revisions for free",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Our quotes are wrong because the site measurement was off",
+   "category": "operations_process",
+   "subtype": "quality_inconsistent"
+  },
+  {
+   "phrase": "We win the job at a price that leaves no margin",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Projects finish and I can’t say if we made money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Imported tiles and lighting take months and hold up the site",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Material delivered was the wrong shade or size",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Leftover boards, tiles and paint pile up in the store",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Joinery workshop is overloaded while site waits",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Carpenters and painters don’t show up on the day we scheduled",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Trades step on each other — painter comes before the electrician finishes",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Finishing quality varies by which team does the job",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Snag lists drag on and the client holds back the last payment",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Clients delay milestone payments but expect us to keep working",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Change orders are agreed on WhatsApp and then disputed",
+   "category": "cash_collections",
+   "subtype": "unbilled_variations"
+  },
+  {
+   "phrase": "Clients complain they don’t know what’s happening on site",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Mall approvals and permits delay our start dates",
+   "category": "compliance_admin",
+   "subtype": "permits_approvals"
+  },
+  {
+   "phrase": "Leads come from Instagram but most just want free ideas",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Our portfolio and website are out of date",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  },
+  {
+   "phrase": "Designers and PMs don’t share the latest drawings",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Warranty calls after handover go nowhere",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "I approve every purchase myself",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  }
+ ],
+ "questions": {
+  "projects": [
+   "How many projects are you running right now?",
+   "Are they mostly homes, offices, or shops and restaurants?"
+  ],
+  "design stage": [
+   "How many revisions does a client usually get?",
+   "When does design stop and execution start?"
+  ],
+  "quoting": [
+   "How do you build a quote today?",
+   "Where do the numbers usually go wrong?"
+  ],
+  "procurement": [
+   "Which materials take longest to arrive?",
+   "How do you track what’s been ordered for which project?"
+  ],
+  "workshop and site": [
+   "Do you have your own joinery workshop?",
+   "How do you plan what it makes each week?"
+  ],
+  "trades": [
+   "Which trades are in-house and which are subcontracted?",
+   "What goes wrong in the hand-over between them?"
+  ],
+  "changes": [
+   "When a client changes something mid-way, how is it recorded?",
+   "How is the extra cost agreed?"
+  ],
+  "payments": [
+   "How is payment split across the project?",
+   "Which milestone payment is hardest to collect?"
+  ],
+  "clients": [
+   "How do clients get updates on progress?",
+   "What do they complain about most?"
+  ],
+  "leads": [
+   "Where do most enquiries come from?",
+   "What share turn into paid projects, roughly?"
+  ]
+ },
+ "seasons": "In the UAE, home renovations bunch in summer when families travel (June to August), but site hours are affected by the midday outdoor-work rules for external works; commercial fit-outs push to finish before the October–March trading season and before Ramadan/Eid openings; restaurant openings target the cooler months. In Pakistan, home renovation spikes before wedding season (November to February) and before Eid; monsoon delays painting and polishing; summer heat slows work. In Canada, renovation demand peaks spring and summer; retail fit-outs aim for completion before the holiday season.",
+ "care": [
+  "Wall removal, load-bearing changes, ceiling loads, gas line moves, electrical rewiring and fire-rated materials → pi says a qualified engineer or licensed trade must decide; it notes only the process problem.",
+  "Fire, electrical incident, fall from ladder or scaffold, fumes in an enclosed space → pi stops and points to emergency services.",
+  "Contract disputes, withheld payments and liability for defects are legal; pi records the operational problem only.",
+  "Requests to skip mall/authority approvals, use non-compliant materials while showing approved samples, or fake invoices are refused.",
+  "Clients’ homes and addresses are private; pi never records them, nor clients’ names or contact details.",
+  "Copying another studio’s designs or using images without permission in a portfolio → pi does not help."
+ ],
+ "build_ideas": [
+  "Project file per job: brief, drawings with revision history, approvals, BOQ, change orders, photos in one place.",
+  "Design revision counter with client sign-off at each stage.",
+  "Quote builder with a material and labour rate library and margin shown before sending.",
+  "Site measurement form on phone with photos and dimensions feeding the quote.",
+  "Procurement tracker: each item, supplier, order date, lead time, expected delivery vs site need date.",
+  "Workshop job board for joinery: cutting lists, stages, completion dates per project.",
+  "Trade schedule per site with sequence (electrician before ceiling before paint) and WhatsApp day plans.",
+  "Change-order flow: request, cost, client approval on WhatsApp, added to the bill.",
+  "Milestone billing and collection tracker with reminders.",
+  "Client progress updates: weekly photos and status sent automatically.",
+  "Snag and warranty ticketing with photos and closure sign-off.",
+  "Lead intake from Instagram and website with qualifying questions and source tracking.",
+  "Project P&L: quoted vs actual material and labour per job."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Clients change their mind halfway. We redo the kitchen design three times and they expect the same price."
+  },
+  {
+   "role": "pi",
+   "text": "That sounds draining — repeated changes mid-project without the price moving. Noted. How are those changes agreed with the client at the moment?"
+  },
+  {
+   "role": "Person",
+   "text": "Mostly over WhatsApp, voice notes from the client."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, changes are agreed through WhatsApp voice notes. Who on your side is supposed to work out the extra cost when that happens?"
+  }
+ ]
+}

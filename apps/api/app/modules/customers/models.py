@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import (
@@ -7,6 +8,7 @@ from sqlalchemy import (
     Index,
     Integer,
     LargeBinary,
+    Numeric,
     String,
     Text,
     Uuid,
@@ -61,6 +63,12 @@ class Customer(WorkspaceRow):
     last_contacted_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    # The industry packs pi recognised from what they said (workspaces with industry_packs on).
+    industry_primary: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    industry_secondary: Mapped[list[str]] = mapped_column(
+        ARRAY(String(80)), default=list, server_default="{}"
+    )
+    industry_confidence: Mapped[Decimal | None] = mapped_column(Numeric(3, 2), nullable=True)
 
 
 class CustomerNote(WorkspaceRow):

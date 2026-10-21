@@ -1,0 +1,280 @@
+{
+ "key": "wedding_planners_and_event_management",
+ "name": "Wedding planners and event management",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "wedding planner",
+  "event planner",
+  "event management",
+  "events company",
+  "decor",
+  "stage",
+  "florist",
+  "mehndi set-up",
+  "dholki",
+  "nikkah",
+  "baraat",
+  "walima",
+  "vendor",
+  "coordinator",
+  "run sheet",
+  "moodboard",
+  "theme",
+  "budget",
+  "shadi planner",
+  "intezamat",
+  "decorator",
+  "munazzim hafalat",
+  "tanzim faaliyat",
+  "zaffa"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Typical events: weddings, engagements, birthdays, private parties, religious gatherings, destination weddings.",
+  "Number of events handled per season and per weekend.",
+  "In-house team (decor, florals, lighting, sound) vs subcontracted vendors.",
+  "Whether they own decor stock, props, furniture and lighting, and where it is stored.",
+  "Pricing model: fixed package, percentage of budget, or itemised quote.",
+  "Cities and countries served (many PK planners also do UAE and UK weddings for overseas families).",
+  "Whether they also run a venue or only plan."
+ ],
+ "scope_rule": "pi notes operational and business problems: quoting, client changes, vendor coordination, payments and advances, decor stock, team scheduling across simultaneous events, and lead follow-up. pi does not advise on contracts, event permits, noise or timing regulations, fireworks or pyrotechnics, structural rigging safety, alcohol licensing, visa matters for destination events, or tax. pi never collects the couple’s or families’ names, guest lists, contact details or payment information, and records clients, vendors and staff by role.",
+ "vocabulary": {
+  "run sheet": "minute-by-minute plan for the event day",
+  "moodboard": "visual reference for theme and decor",
+  "vendor": "supplier such as caterer, florist, photographer, sound or lighting",
+  "set-up / teardown": "installing and removing decor at the venue",
+  "advance / bayana": "deposit on confirming",
+  "change order": "client change after the quote is agreed",
+  "dholki / mayun / mehndi": "pre-wedding functions",
+  "stage backdrop": "main decor wall behind the couple",
+  "zaffa": "Gulf/Levant wedding procession with music",
+  "munazzim hafalat": "event organiser (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Clients keep changing the decor after we’ve agreed and won’t pay for the changes",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "I quote one price and by the event day my costs have gone way up",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "I genuinely don’t know which events made money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Final payment is chased for weeks after the wedding",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Vendors want full payment upfront but clients pay me in instalments",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Florist or sound vendor shows up late on the day",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Fresh flowers arrive wilted or wrong colour",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Three events on one night and my team doesn’t know who’s where",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Every client conversation is in a separate WhatsApp group and things get missed",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Only I know the full plan; if I’m sick the event falls apart",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Decor props come back broken or don’t come back at all",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "We can’t find items in the godown when we need them",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "We bought props for one theme and never used them again",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Labour team gets paid in cash per event and the numbers never add up",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  },
+  {
+   "phrase": "Lots of Instagram enquiries but most just want prices and vanish",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Follow-ups after a consultation don’t happen",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "I don’t know which posts or ads bring real bookings",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Set-up at the venue takes too long because nothing is planned in order",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Event-day checklist is in my head",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Quality depends on which team lead is on site",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Clients complain afterwards about things I never heard about on the night",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Quotes take me days to put together in Word",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Destination weddings in Dubai mean costs in two currencies and I lose on the exchange",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Freelancers I trained left and started their own company",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Permits for venues and outdoor set-ups eat a lot of time",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "We want to grow beyond weddings into corporate, but have no system",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "quotes and changes": [
+   "How do you build a quote now?",
+   "What happens when the client changes something later?",
+   "How often do those changes go unpaid?"
+  ],
+  "payments": [
+   "How do clients pay you, in what stages?",
+   "When do you pay vendors?",
+   "Where does it get tight?"
+  ],
+  "vendors": [
+   "Which vendors let you down most?",
+   "How do you confirm them before the day?"
+  ],
+  "team on the day": [
+   "How do team members know their tasks for an event?",
+   "What happens when two events overlap?"
+  ],
+  "decor stock": [
+   "Do you own most of your decor?",
+   "How do you check it back in after an event?"
+  ],
+  "communication": [
+   "Where does the client’s plan live?",
+   "Who else can see it?"
+  ],
+  "leads": [
+   "Where do enquiries come from?",
+   "What happens after the first call?"
+  ],
+  "profit": [
+   "Do you work out profit per event?",
+   "Which cost surprises you most?"
+  ],
+  "growth": [
+   "Which type of event do you want more of?",
+   "What stops you taking more?"
+  ]
+ },
+ "seasons": "PK: wedding season roughly November to March with December and the weeks after Eid ul Fitr busiest; overseas families plan December and summer weddings; Ramadan and the first ten days of Muharram are very quiet; Eid ul Adha week is slow for weddings. UAE: wedding and private events peak October to April; Ramadan iftars, Eid gatherings, National Day and New Year corporate parties; summer slower and mostly indoor. Canada: South Asian and Arab weddings mostly May to September and long weekends; winter holiday parties in December.",
+ "care": [
+  "Contracts, cancellation terms and disputes with clients or vendors are noted as problems only; pi gives no legal interpretation.",
+  "Pyrotechnics, rigging, heavy structures and electrical set-ups: no safety engineering advice. Any accident or injury on site means pi stops and points to emergency services.",
+  "Alcohol service, music licences and event permits differ by country; pi does not advise and does not help bypass them.",
+  "Guest lists, family names, phone numbers and payment details are never stored.",
+  "pi does not help create fake invoices or inflate vendor bills for clients.",
+  "Freelancer or staff disputes are recorded by role.",
+  "Currency questions are noted as business exposure; no financial advice."
+ ],
+ "build_ideas": [
+  "Quote builder with item library (decor, florals, lighting, labour), producing a branded PDF quote in minutes.",
+  "Change-order flow: client change logged, priced and approved on WhatsApp before work starts.",
+  "Event file per client: theme, moodboard, vendors, timings, payments, shared with the team.",
+  "Payment schedule tracker per event, with automated reminders before each instalment.",
+  "Vendor directory and confirmation flow with day-before WhatsApp check-ins.",
+  "Event-day run sheet and checklist app for team leads with tick-offs and photos.",
+  "Team scheduling board for overlapping events.",
+  "Decor and prop inventory with check-out/check-in per event and damage notes.",
+  "Labour and freelancer payout ledger by event.",
+  "Per-event profit report.",
+  "Lead tracker from Instagram and WhatsApp with follow-up reminders and source tags.",
+  "Post-event feedback form sent to the client."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bride’s family changed the stage design twice in the last week and now they don’t want to pay extra."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, late design changes and a dispute over the extra cost. How was the original design agreed with them?"
+  },
+  {
+   "role": "Person",
+   "text": "On WhatsApp, a few pictures and a total amount."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted — no itemised quote, just pictures and a total. Does this happen with most of your clients?"
+  },
+  {
+   "role": "Person",
+   "text": "Honestly, every second wedding."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, so it’s a pattern. When a change comes in, who on your team decides whether to charge for it?"
+  }
+ ]
+}

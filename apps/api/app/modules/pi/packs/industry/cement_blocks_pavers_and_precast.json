@@ -1,0 +1,255 @@
+{
+ "key": "cement_blocks_pavers_and_precast",
+ "name": "Cement, blocks, pavers and precast",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "block factory",
+  "concrete blocks",
+  "hollow blocks",
+  "solid blocks",
+  "pavers",
+  "tuff tiles",
+  "kerb stones",
+  "precast boundary wall",
+  "precast slabs",
+  "hollow-core",
+  "readymix/batching plant",
+  "cement dealer",
+  "bori",
+  "bajri",
+  "ret",
+  "thappa machine",
+  "curing",
+  "taraai",
+  "tabooq",
+  "bloc",
+  "ismant ( ﺖﻨﻤﺳإ cube test, transit mixer"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Block/paver plant, precast yard, readymix batching plant, or cement dealer/distributor.",
+  "Manual/semi-automatic machines vs fully automatic plant; number of machines and moulds.",
+  "Daily output (blocks, square feet of pavers, cubic metres of concrete).",
+  "Sells to contractors, individual home builders, developers, or government projects.",
+  "Own trucks/transit mixers and drivers vs hired.",
+  "Yard space for curing and finished stock.",
+  "Cement, aggregate and sand bought on credit or cash."
+ ],
+ "scope_rule": "pi notes business problems: material stock, mix consumption, breakage, curing space, orders and deliveries, contractor credit, drivers, machines and reporting. It gives no mix-design, strength, structural, curing-science or site-safety advice, and no opinion on whether products meet a standard or a test result. It records roles (contractor, driver, site engineer), not people’s names or numbers. Accidents with machines, trucks or collapses mean pi stops and points to emergency services.",
+ "vocabulary": {
+  "bori": "50 kg cement bag",
+  "bajri / crush": "crushed stone aggregate",
+  "ret / sand": "sand, often by truckload or cubic feet",
+  "taraai / curing": "keeping blocks/concrete wet as they harden",
+  "tuff tile": "interlocking paver",
+  "thappa / block machine": "block-making machine",
+  "mould / farma": "shape for pavers and precast",
+  "cube test": "strength sample test",
+  "transit mixer": "readymix truck",
+  "tabooq": "block (Gulf Arabic)",
+  "site": "the customer’s construction location"
+ },
+ "problems": [
+  {
+   "phrase": "Cement goes out of the store faster than blocks come out — something’s off",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Breakage during loading and transport, contractor refuses broken pieces",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Customer says blocks are weak and cracked, wants money back",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Curing yard is full so we have to stop production",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Cement rate went up but I already gave contractor the old rate",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Contractors take material on credit and disappear after the project",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "I don’t know actual cement used per 100 blocks",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Sand and bajri trucks deliver short but we pay full",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Readymix truck reached late, concrete set, customer angry",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Drivers do side trips and diesel usage doesn’t add up",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Diesel cost per delivery keeps climbing",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Orders come on calls, nobody writes the site address properly, wrong delivery",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Machine moulds wear out and nobody planned replacement",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Daily output count from the supervisor is just a number on WhatsApp",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Labour works on daily wage, attendance is a mess",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Rain or heat ruins a day’s batch",
+   "category": "operations_process",
+   "subtype": "quality_inconsistent"
+  },
+  {
+   "phrase": "Old design pavers lying in the yard for a year",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Government project payments come months late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Tendering paperwork takes days every time",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Few new leads — builders only come through old contacts",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "No photos of our paver designs online, customers can’t see options",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  },
+  {
+   "phrase": "Cash from walk-in buyers handled by the munshi, never matches",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Block machine operator left and output dropped",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "I don’t know which sites have pending deliveries today",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  }
+ ],
+ "questions": {
+  "material use": [
+   "How many bags of cement do you use in a day?",
+   "How do you check that against blocks produced?",
+   "Who keeps the store key?"
+  ],
+  "breakage and quality": [
+   "Where does most breakage happen — loading, transport or at site?",
+   "How are complaints about strength handled?"
+  ],
+  "capacity": [
+   "What limits output most — machines, labour or curing space?",
+   "How many days does stock sit before dispatch?"
+  ],
+  "orders and delivery": [
+   "How do orders come in?",
+   "How are deliveries scheduled each day?",
+   "How often does a truck go to the wrong place?"
+  ],
+  "credit": [
+   "How many contractors buy on credit?",
+   "What’s the oldest unpaid balance?",
+   "How is credit approved?"
+  ],
+  "trucks and diesel": [
+   "How many trucks or transit mixers do you run?",
+   "How is diesel issued and checked?"
+  ],
+  "suppliers": [
+   "Do sand and bajri loads get checked on arrival?",
+   "How?"
+  ],
+  "reporting": [
+   "How do you get the day’s production and sales numbers?"
+  ]
+ },
+ "seasons": "PK building season after monsoon through spring; monsoon (July–September) stops sites and floods yards; extreme heat (May–June) affects curing; Ramadan and Eid slowdowns; fiscal-year-end (June) government spending rush. UAE: cooler months (October–April) peak; summer midday ban slows sites; Ramadan shorter working hours. Canada: April–November construction season; winter cold-weather concreting limits and heated enclosures; spring road-restriction periods limit heavy truck loads.",
+ "care": [
+  "No mix design, strength, curing method or structural advice; note “complaints of weak blocks” only as a business problem.",
+  "Accidents (crush injuries, truck accidents, wall collapse) — stop and point to emergency services.",
+  "No opinions on test reports or standards compliance; do not help alter cube-test results or certificates — decline.",
+  "Sand/aggregate from unauthorised mining: pi does not help source or hide it.",
+  "Drivers and labour: roles and counts only, no names, licences or IDs.",
+  "Government tender bribery or “settings” requests: decline plainly."
+ ],
+ "build_ideas": [
+  "Daily production log by product type, entered from the yard on phone, with cement bags issued alongside.",
+  "Material consumption ratio report: cement, sand and aggregate used per unit produced, with exceptions flagged.",
+  "Yard stock board by product, design, colour and age, including curing status.",
+  "Order book with site location pin, quantity, delivery date and contact role.",
+  "Delivery scheduler for trucks/transit mixers with trip status from drivers.",
+  "Diesel issue and trip log per vehicle with distance, compared against expected usage.",
+  "Breakage and return register by stage (loading, transport, site).",
+  "Contractor credit ledger with limits, ageing and project-linked balances.",
+  "Incoming material check: truck photo, volume estimate and weighbridge slip logged on arrival.",
+  "Machine and mould maintenance calendar with usage counts.",
+  "Daily-wage attendance and output register for labour.",
+  "Paver design catalogue page and WhatsApp catalogue for customers to choose from."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mera masla yeh hai ke cement ki boriyan khatam ho jati hain lekin blocks utne nahi bante."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh khatakne wali baat hai. Noted — cement ka kharcha production se match nahi karta. Din mein taqreeban kitni boriyan lagti hain?"
+  },
+  {
+   "role": "Person",
+   "text": "80 se 100 boriyan, depend karta hai order pe."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Boriyan store se nikalti hain to kya kahin likha jata hai ke kis ne kitni li?"
+  }
+ ]
+}

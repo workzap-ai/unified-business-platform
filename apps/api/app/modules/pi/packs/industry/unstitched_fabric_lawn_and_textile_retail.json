@@ -1,0 +1,281 @@
+{
+ "key": "unstitched_fabric_lawn_and_textile_retail",
+ "name": "Unstitched fabric, lawn and textile retail",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "unstitched",
+  "lawn",
+  "khaddar",
+  "karandi",
+  "cambric",
+  "chiffon",
+  "linen",
+  "cotton",
+  "three-piece",
+  "two-piece",
+  "suit",
+  "volume",
+  "volume 1/2",
+  "design number",
+  "than",
+  "gaz/meter",
+  "kapra",
+  "Azam Market",
+  "Liberty",
+  "Faisalabad se maal",
+  "printed lawn",
+  "embroidered",
+  "dupatta",
+  "qumash",
+  "khayyat"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Whether the business is a brand producing its own designs, a multi-brand retailer, or a wholesaler/retailer in a cloth market.",
+  "Sold by suit (pre-cut 2/3-piece) or by metre/gaz from bolts (than), or both.",
+  "Source of fabric: own mill/printing, Faisalabad/Karachi vendors, imports (China, Japan, Turkey for UAE shops).",
+  "Number of shops and whether there is online selling.",
+  "Credit customers (boutiques, tailors, retailers buying in bulk) vs walk-in only.",
+  "Whether stitching service is offered alongside.",
+  "Markets: local only, export to UAE/UK/Canada diaspora stores."
+ ],
+ "scope_rule": "pi notes stock (by design, colour, volume, metres), cash and credit, supplier and printing delays, cutting wastage, wholesale receivables, online orders and reporting. pi does not advise on textile testing standards, dye chemical safety, export rebates, customs, trademark/design disputes or tax. It does not collect customers’, tailors’ or boutique owners’ personal details. Requests to sell replicas under another brand’s name or mis-declare shipments are declined.",
+ "vocabulary": {
+  "than": "bolt or roll of fabric",
+  "gaz": "yard (often used loosely for length sold)",
+  "suit / joda": "set of fabric for one outfit",
+  "volume": "batch of designs released in a lawn season",
+  "replica / copy": "imitation of a branded design",
+  "kora": "greige, unprocessed cloth",
+  "print / digital print": "printing method on lawn",
+  "cut piece": "leftover end of a bolt",
+  "boutique wala": "bulk buyer who resells or stitches",
+  "parchoon": "retail (as opposed to wholesale)",
+  "qumash": "fabric (Arabic)",
+  "khayyat": "tailor (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "We sell from thans by the metre and never know how much is left on each roll",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Cut pieces pile up and nobody tracks them",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Last season’s volume is still in the godown",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Best designs sell out in the first week and we can’t reorder in time",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Printing unit delays the launch every season",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Colour of the reorder doesn’t match the first batch",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Fabric shrinks or bleeds and customers come back angry",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Boutiques buy in bulk on credit and pay months later",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We don’t know which wholesale buyer owes how much",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Cash is stuck in stock before the lawn season even starts",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Yarn and dye prices went up but we priced the volume months ago",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Replicas of our prints are in Azam Market the week we launch",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Bargaining at the counter means every salesman gives different prices",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Salesmen’s commission is worked out on paper and always disputed",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Online customers say the print looks different in real life",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Online lawn launch: orders oversell stock that’s actually in the shop",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "COD parcels to small cities keep coming back",
+   "category": "orders_fulfilment",
+   "subtype": "returns_rto"
+  },
+  {
+   "phrase": "We ship to UAE and Canada stockists but tracking is a mess",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Godown and shop design numbers don’t match the register",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Theft of suits from the display",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Every season planning is just gut feel",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "We don’t know which designs or colours actually make money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Wholesale and retail sales mixed in one register",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Instagram and website photos never updated when a design sells out",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "Stitching service orders get late and customers miss their events",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "My brothers run the other shops and we don’t share numbers",
+   "category": "communication_coordination",
+   "subtype": "branches_not_aligned"
+  }
+ ],
+ "questions": {
+  "stock": [
+   "Do you sell mostly pre-cut suits or by the metre?",
+   "How do you know what’s left on each roll?",
+   "What happens to cut pieces?"
+  ],
+  "season": [
+   "When do you start buying for the next season?",
+   "What’s still left from last season?"
+  ],
+  "suppliers": [
+   "Who prints or produces your designs?",
+   "How often are they late, and by how much?",
+   "Do reorders match the first batch?"
+  ],
+  "wholesale": [
+   "How many buyers take goods on credit?",
+   "How do you keep track of what each owes?",
+   "How long do they usually take to pay?"
+  ],
+  "pricing": [
+   "Are prices fixed or do salesmen bargain?",
+   "How is their commission worked out?"
+  ],
+  "online": [
+   "Where do you sell online?",
+   "What goes wrong most with online orders?"
+  ],
+  "quality": [
+   "What complaints do customers bring back?",
+   "Is it usually one supplier or one fabric type?"
+  ],
+  "reporting": [
+   "Can you see which designs make the most money?",
+   "Are wholesale and retail sales kept separate?"
+  ]
+ },
+ "seasons": "Pakistan: lawn season launches February–April (the year’s main peak), Ramadan and Eid ul-Fitr, Eid ul-Adha, mid- summer volumes, winter khaddar/karandi/linen from September–October, wedding season Nov–Feb for festive and chiffon, end-of- season sales June–July and January. UAE: Ramadan and Eid demand from South Asian and Arab customers for fabric and tailoring, Diwali, Dubai Shopping Festival; tailoring shops peak 3–4 weeks before Eid. Canada: diaspora orders peak before Eid, Diwali and summer wedding season; shipping lead times mean orders arrive 4–8 weeks ahead.",
+ "care": [
+  "Selling replicas or using brand names: pi declines to help and notes only the competitive problem.",
+  "Export rebates, customs and under-invoicing: no advice; illegal requests declined.",
+  "Dye, chemical or wash-safety questions: pi does not give technical or safety guidance.",
+  "Wholesale buyer details (boutique owners’ names and numbers): not collected.",
+  "Family partnership disputes over shops: pi stays neutral and records the coordination or succession issue.",
+  "Fire risk in fabric godowns (overloaded wiring, smoking): if danger is mentioned, pi points to emergency services and does not give safety engineering advice.",
+  "Hoarding or price manipulation: pi does not assist."
+ ],
+ "build_ideas": [
+  "Roll-level (than) stock register: each bolt with design, colour, metres in, metres sold, metres remaining, cut pieces.",
+  "Design and volume sell-through report by week of season.",
+  "Reorder alerts for fast designs while the print run is still possible.",
+  "Printing/production tracker: designs sent, sampling approved, metres ordered, received, colour-match result.",
+  "Wholesale credit ledger per buyer code with ageing, limits and WhatsApp statements.",
+  "Separate retail and wholesale sales views with margin per design.",
+  "Season costing sheet: greige, printing, embroidery, packaging, giving cost per suit and per metre.",
+  "Fixed price list on tablets/POS with salesman-wise discount log.",
+  "Commission calculation tied to sales by salesman code.",
+  "Online catalogue sync that hides designs at zero stock.",
+  "Stitching order tracker with event date, measurements form handled by the shop, due dates and late alerts.",
+  "Export/stockist order tracker for UAE and Canada shipments with dispatch and arrival status.",
+  "Family-shop shared dashboard comparing each shop’s sales and stock."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hum than se gaz ke hisaab se bechte hain, kabhi pata hi nahi chalta ke roll mein kitna bacha hai."
+  },
+  {
+   "role": "pi",
+   "text": "Ji, samajh gaya — noted, rolls se kapra bikta hai aur har roll ka baaki hissa track nahi hota. Ek waqt mein shop mein andazan kitne rolls hote hain?"
+  },
+  {
+   "role": "Person",
+   "text": "300-400 honge, alag alag designs."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, likh liya. Jo cut pieces bach jaate hain, unka kya hota hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Ek kone mein dher lag jaata hai, kabhi sale mein nikaal dete hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, cut pieces ka koi record nahi aur woh jama hote rehte hain. Season ke end pe stock gin’ne mein kitna waqt lagta hai?"
+  }
+ ]
+}

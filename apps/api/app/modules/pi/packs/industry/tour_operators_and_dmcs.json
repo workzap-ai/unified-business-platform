@@ -1,0 +1,264 @@
+{
+ "key": "tour_operators_and_dmcs",
+ "name": "Tour operators and DMCs",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "DMC",
+  "inbound tours",
+  "outbound tours",
+  "FIT",
+  "group tour",
+  "MICE",
+  "desert safari",
+  "city tour",
+  "transfers",
+  "itinerary",
+  "contract rates",
+  "allotment",
+  "release period",
+  "net rates",
+  "B2B agents",
+  "tour guide",
+  "Hunza tour",
+  "Skardu trip",
+  "northern areas",
+  "tour package",
+  "jeep booking",
+  "guide kahan hai",
+  "barnamaj siyahi",
+  "rihla"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Inbound (DMC), outbound, domestic tourism, or a mix.",
+  "Main markets and destinations (northern Pakistan, UAE desert and city, Canadian Rockies and lakes, outbound to Turkey, Baku, Thailand, Europe).",
+  "Customer types: B2B agents, FITs, families, corporate/MICE, schools.",
+  "Own vehicles, guides and camps, or all subcontracted.",
+  "Team size and seasonal staff.",
+  "Systems used for bookings, contracts and invoicing.",
+  "Sales channels: OTAs, Viator/GetYourGuide-type platforms, Instagram, agents, website."
+ ],
+ "scope_rule": "pi notes business and operational problems: quoting speed, supplier contracts and costing, bookings and confirmations, guide and vehicle scheduling, customer communication, reviews, collections from agents, margins and reporting. pi gives no safety- engineering, mountaineering, road or weather safety advice, no visa or immigration advice, and no legal or insurance advice. It never stores travellers’ names, passport or ID numbers, health information or guides’ and drivers’ ID data, and records roles (“family of five”, “driver”, “guide”). Emergencies on tour are handed to emergency services.",
+ "vocabulary": {
+  "DMC": "destination management company handling ground services",
+  "FI T": "independent traveller, not in a group",
+  "MI CE": "meetings, incentives, conferences, events",
+  "net rate": "supplier price before markup",
+  "allotment": "rooms held for the operator",
+  "release period": "date by which unsold rooms go back to the hotel",
+  "transfer": "airport or hotel transport",
+  "voucher": "confirmation given to suppliers and guests",
+  "B2B agent": "travel agent buying from the DMC",
+  "itinerary": "day-by-day plan",
+  "no-show": "guest who doesn't turn up",
+  "KKH": "Karakoram Highway"
+ },
+ "problems": [
+  {
+   "phrase": "Agents send requests and we take a day to price the itinerary",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Hotel contract rates are in PDFs and emails, and staff use old ones",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "We forget release dates and pay for rooms we didn’t sell",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "We don’t know profit per tour after all the guides, jeeps and tips",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Fuel and jeep rates in the north go up mid-season",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "B2B agents pay after the tour, sometimes months later",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Hotel suppliers want deposits before we’ve been paid",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Drivers and guides double-booked on the same day",
+   "category": "operations_process",
+   "subtype": "resource_double_booking"
+  },
+  {
+   "phrase": "Vouchers and confirmations go out with wrong dates",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "A pickup gets missed and the guest is stranded at the airport",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Guests message the owner at midnight because they can’t reach the guide",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Changes from the agent don’t reach the driver",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "One bad guide ruins our reviews",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Reviews on TripAdvisor and Google are mixed and nobody replies",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Tour quality is different depending on which guide goes",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "We post on Instagram but bookings don’t follow",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Listings on tour platforms aren’t updated and show wrong prices",
+   "category": "marketing_leads",
+   "subtype": "marketplace_visibility"
+  },
+  {
+   "phrase": "Seasonal guides join at the last minute with no training",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Guide and driver payments are calculated from WhatsApp messages",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Cash collected by guides on tour isn’t handed over properly",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Road closures and landslides cancel tours and refunds get messy",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Booking info lives in five places: email, WhatsApp, Excel, OTA extranet, notebook",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Off-season we have staff and vehicles but no business",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Permits and NOCs for certain areas take time and hold up groups",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  }
+ ],
+ "questions": {
+  "quoting": [
+   "How do agents or guests send requests?",
+   "How long does an itinerary price take?",
+   "Where do you get the rates from?"
+  ],
+  "contracts": [
+   "Where do hotel and supplier rates live?",
+   "How do you keep track of release dates?"
+  ],
+  "margins": [
+   "Do you know the profit per tour once it’s done?",
+   "Which cost moves most mid-season?"
+  ],
+  "scheduling": [
+   "How do you assign guides and vehicles?",
+   "What happens when there’s a clash?"
+  ],
+  "on tour": [
+   "When something changes, how does it reach the driver or guide?",
+   "Who do guests call when there’s a problem?"
+  ],
+  "quality": [
+   "How do you know how a tour went?",
+   "What do guests complain about most?"
+  ],
+  "collections": [
+   "Which agents are slowest to pay?",
+   "When do suppliers need deposits?"
+  ],
+  "marketing": [
+   "Where do most bookings come from?",
+   "How do you know which channel works?"
+  ],
+  "off-season": [
+   "What do quiet months look like for you?",
+   "What would you want to do with that time?"
+  ]
+ },
+ "seasons": "Northern Pakistan peak May to October (Hunza, Skardu, Swat, Naran-Kaghan), with Babusar Pass and some roads closed in winter, and winter tourism in Murree, Malam Jabba and Naltar; Eid holiday domestic surges; UAE tourist season October to April with desert safaris, events and Dubai Shopping Festival, and quiet summer; Canada summer peak June to September, autumn colours, winter ski season, and Rockies shoulder months; outbound Pakistani and UAE travellers in summer and school holidays; MICE seasons tied to exhibitions (e.g. Gulf winter events calendar); monsoon (July to August) causing landslides and road closures in Pakistan.",
+ "care": [
+  "Any accident, injury, missing traveller, avalanche or landslide involvement, or medical emergency on tour: pi stops and points to emergency services (Rescue 1122 in Pakistan, 999/998 in the UAE, 911 in Canada) and the relevant authority.",
+  "No road, mountain, weather or activity safety advice, and no view on whether a route is safe to travel.",
+  "No visa, immigration, permit or NOC advice; pi notes delays only.",
+  "Never stores travellers’ names, passport or ID numbers, health conditions or guides’ and drivers’ ID data; roles only.",
+  "Refuses help with unlicensed operations in restricted areas, fake permits, or bribery at checkposts.",
+  "Fake reviews: pi won’t help create them.",
+  "Insurance claims and liability disputes: no legal advice, just the business problem."
+ ],
+ "build_ideas": [
+  "Itinerary and quote builder using stored contract and net rates, with markup rules and branded PDF output.",
+  "Supplier contract register with rate validity and release date alerts.",
+  "Booking file per tour holding services, vouchers, changes and payments.",
+  "Guide and vehicle allocation board preventing double bookings, with acknowledgement by WhatsApp.",
+  "Day-of-tour run sheet sent to drivers and guides, with change notifications.",
+  "Guest support line routing to the duty coordinator rather than the owner’s phone.",
+  "Post-tour feedback form per guide and tour, plus review reply reminders.",
+  "Tour profitability report per booking with actual costs.",
+  "B2B agent receivables tracker and supplier deposit schedule.",
+  "Guide and driver payment calculator from completed assignments.",
+  "Guide cash handover log with daily reconciliation.",
+  "OTA and platform listing sync checklist and booking import.",
+  "Enquiry source tracking for Instagram, website, platforms and agents."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Peak season mein guides aur jeeps double book ho jati hain, phir last minute pe bhaag daur."
+  },
+  {
+   "role": "pi",
+   "text": "Peak mein yeh bohat stressful hota hai, aur guest ko bhi pata chal jata hai. Noted: season mein guides aur gaariyan double book ho jati hain. Abhi assignments kaun karta hai aur kahan likhta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Main khud karta hoon, WhatsApp aur ek diary mein."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, sab kuch aap ke WhatsApp aur diary par chal raha hai. Peak ke dinon mein ek waqt mein kitne tours chal rahe hote hain, taqreeban?"
+  }
+ ]
+}

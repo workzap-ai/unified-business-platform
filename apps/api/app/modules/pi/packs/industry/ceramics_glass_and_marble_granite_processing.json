@@ -1,0 +1,255 @@
+{
+ "key": "ceramics_glass_and_marble_granite_processing",
+ "name": "Ceramics, glass and marble/granite processing",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "tiles factory",
+  "ceramic tiles",
+  "porcelain",
+  "sanitaryware",
+  "pottery",
+  "crockery",
+  "glass processing",
+  "tempered glass",
+  "float glass",
+  "mirror",
+  "aluminium and glass",
+  "marble factory",
+  "granite",
+  "onyx",
+  "cutting and polishing",
+  "slabs",
+  "marble ka karkhana",
+  "pathar",
+  "sang-e-marmar",
+  "shisha",
+  "Chitral/Ziarat/Botticino marble",
+  "rukham zujaj ( جﺎﺟز block, gang saw"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Ceramics/tiles/sanitaryware, pottery/handicraft ceramics, glass processing, or marble/granite/onyx processing.",
+  "Own quarry/blocks or buying blocks and slabs from traders.",
+  "Main buyers: retailers, contractors/projects, interior designers, exporters, walk-in homeowners.",
+  "Number of machines (kilns, cutters, gang saws, tempering furnace, CNC/waterjet).",
+  "Domestic or export focus.",
+  "Showroom and yard size.",
+  "Installation services offered or not."
+ ],
+ "scope_rule": "pi notes business and operational problems: breakage, grading, yield from blocks, stock of slabs and tiles, project orders, measurements, installation coordination, credit, exports admin and staff. It gives no kiln, furnace, cutting-machine, silica-dust, structural glass or installation-safety engineering advice and no view on product standards. It records roles (contractor, designer, installer), not names or contacts. Injuries from cutting, glass breakage or heavy slabs mean pi stops and points to emergency services.",
+ "vocabulary": {
+  "slab": "large cut sheet of marble or granite",
+  "block": "raw quarried stone before cutting",
+  "gang saw": "machine that cuts blocks into slabs",
+  "polish / honing": "surface finishing",
+  "grade / A-grade, B-grade": "quality sorting",
+  "breakage": "broken pieces in handling or transport",
+  "kiln / bhatti": "firing furnace for ceramics",
+  "tempered / toughened glass": "heat-treated glass",
+  "measurement / naap": "site dimensions for cutting",
+  "rukham": "marble (Arabic)",
+  "running foot / sq ft": "common selling units"
+ },
+ "problems": [
+  {
+   "phrase": "Breakage in loading and transport eats a big part of the margin",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Yield from each block is unknown, I don’t know if I’m getting value",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Slabs in the yard aren’t numbered so we can’t find what the customer selected",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Customer picks a slab and a different one gets delivered",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Site measurements are wrong and glass or stone gets cut wrong",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Tiles from two batches differ in shade and the customer refuses them",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Kiln breakdown stops a whole firing cycle",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Gas and power costs for the kiln keep rising",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Contractors take material and pay after the project",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "B-grade stock piles up and nobody buys it",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Glass orders come with sizes on WhatsApp voice notes, mistakes happen",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Installation teams don’t show up on the promised day",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Export containers rejected for quality or packing issues",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Export paperwork for each container takes days",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Imported tiles from China undercut our prices",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Skilled polishers and cutters are hard to find",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Blocks from the quarry arrive late or a different quality than promised",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Walk-in customers can’t see our full range",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  },
+  {
+   "phrase": "Interior designers ask for commissions and track records are messy",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Small offcuts and pieces are sold off without anyone recording",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Quotations for big projects take a week to prepare",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "I don’t know daily cutting output per machine",
+   "category": "reporting_visibility",
+   "subtype": "kpi_undefined"
+  },
+  {
+   "phrase": "Freight for heavy stone across the country is huge",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "After installation, cracks or chipping complaints come back months later",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  }
+ ],
+ "questions": {
+  "breakage and yield": [
+   "Where does most breakage happen?",
+   "Is it recorded anywhere?",
+   "Do you know the yield you get from a block?"
+  ],
+  "yard stock": [
+   "How are slabs or tiles identified in the yard?",
+   "How long does it take to find a particular one?"
+  ],
+  "orders and measurements": [
+   "How do measurements reach the cutting floor?",
+   "How often does something get cut wrong?"
+  ],
+  "quality and grading": [
+   "How do you grade stock?",
+   "What happens to B-grade?"
+  ],
+  "machines": [
+   "Which machine is most often down?",
+   "For how long, usually?"
+  ],
+  "credit": [
+   "Who are your credit customers — contractors, retailers, designers?",
+   "What’s overdue right now?"
+  ],
+  "installation": [
+   "Do you install yourselves?",
+   "How are teams scheduled?"
+  ],
+  "exports": [
+   "Which markets do you send to?",
+   "What causes the most trouble with containers?"
+  ]
+ },
+ "seasons": "PK construction and home-renovation peaks before Eid and the winter wedding season, slow during monsoon; Ramadan slowdown; export demand linked to Gulf and Chinese markets. UAE: busy in cooler months and project fit-out cycles; villa renovations before Ramadan/Eid; summer slowdown with midday work restrictions. Canada: spring–autumn renovation and construction; kitchen and bathroom remodel peaks in spring and before holidays.",
+ "care": [
+  "No safety engineering advice on silica dust, cutting machines, kilns, tempering or glass installation; note operational impact only.",
+  "Injuries from slabs, glass or blades: pi stops and points to emergency services.",
+  "No advice on quarry or mining permits; note admin effort only.",
+  "Never help mislabel origin, grade or under-invoice exports — decline.",
+  "Designer or contractor commission arrangements that look like kickbacks: pi does not help structure them.",
+  "Customer home addresses and contractor contacts: roles and area only."
+ ],
+ "build_ideas": [
+  "Slab and block register: each block and slab numbered, photographed, sized, graded and located in the yard.",
+  "Customer selection reservation: a chosen slab is tagged to the order so a different one can’t be dispatched.",
+  "Block yield tracker: block volume in vs saleable square feet out, by supplier and stone type.",
+  "Breakage log by stage (cutting, polishing, loading, transport, site) with photos.",
+  "Measurement capture form for site teams, sent straight to the cutting floor with sketches.",
+  "Quotation builder for projects using current price per sq ft, wastage allowance and installation.",
+  "Tile batch/shade register so orders are filled from one batch.",
+  "Machine and kiln downtime log with reasons and repair status.",
+  "Installation scheduler for teams with job photos on completion.",
+  "Contractor and designer ledger: credit, ageing and agreed commission records.",
+  "Export container checklist and document folder per shipment.",
+  "Online catalogue / WhatsApp catalogue of current yard stock with photos."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Customer yard mein aa ke slab pasand karta hai, aur delivery pe koi aur slab chala jata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh to customer ke saamne kaafi sharminda karne wala hota hoga. Noted — select kiya hua slab aur deliver hua slab alag. Yard mein slabs ki pehchan abhi kaise hoti hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Chalk se number likhte hain kabhi kabhi, warna supervisor ko yaad hota hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, chalk marks and the supervisor’s memory. Yeh mahine mein kitni dafa ho jata hai?"
+  }
+ ]
+}

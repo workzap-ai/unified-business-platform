@@ -1,0 +1,284 @@
+{
+ "key": "property_developers",
+ "name": "Property developers",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "project",
+  "phase",
+  "launch",
+  "booking",
+  "off-plan",
+  "instalment plan",
+  "possession",
+  "handover",
+  "grey structure",
+  "finishing",
+  "bayana",
+  "file",
+  "plot",
+  "kanal/ marla",
+  "qabza",
+  "naqsha pass",
+  "NOC",
+  "allotment letter",
+  "SPA",
+  "Oqood",
+  "escrow",
+  "snagging",
+  "mashroo’",
+  "taslim",
+  "construction-linked plan",
+  "pre-construction",
+  "presales",
+  "Tarion"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type of product: plots/housing society, apartments, villas/townhouses, commercial, mixed-use.",
+  "Number of live projects and phases, and where each stands (pre-launch, selling, under construction, handover).",
+  "Number of units/files in inventory and how many are sold vs open.",
+  "Sales channel mix: in-house sales team vs dealers/brokers on commission vs overseas sales events.",
+  "Payment structure: down payment plus instalments, construction-linked, post-handover plan, escrow-controlled (UAE) or deposit-trust (Canada).",
+  "Who builds: own construction arm or appointed main contractor.",
+  "Country and city, since approvals and escrow rules differ sharply between Pakistan, the UAE and Canada."
+ ],
+ "scope_rule": "pi notes operational and business problems: unit inventory, booking and instalment tracking, overdue collections, broker management, construction progress visibility, handover and snagging backlogs, buyer communication and reporting. pi does not give legal advice on titles, allotments, SPAs, escrow obligations, cancellations or buyer disputes, does not interpret authority approvals or NOCs, and does not give structural or safety-engineering advice on the build. It does not value units or advise on pricing strategy as investment advice. It never records buyers’ names, CNIC/Emirates ID/passport numbers, bank details or file numbers tied to individuals; it records roles and counts only (e.g. “about 40 buyers behind on instalments”).",
+ "vocabulary": {
+  "bayana": "token/earnest money to hold a unit or plot",
+  "file": "a tradable plot entitlement in a housing scheme before the plot is demarcated",
+  "qabza/ possession": "physical handover of a plot or unit",
+  "grey structure": "the shell built before finishing works",
+  "off-plan": "sold before completion",
+  "Oqood": "Dubai pre-registration of off-plan units",
+  "SPA": "sale and purchase agreement",
+  "escrow": "controlled project account for buyer payments (UAE)",
+  "snagging": "list of defects found before or at handover",
+  "construction-linked plan": "instalments tied to build milestones",
+  "transfer fee": "charge for reselling a file or unit to a new buyer",
+  "inventory sheet": "the master list of units and their status"
+ },
+ "problems": [
+  {
+   "phrase": "Two sales people sold the same unit to different buyers",
+   "category": "stock_inventory",
+   "subtype": "double_booking"
+  },
+  {
+   "phrase": "I don’t know exactly how many units are still open in Phase 2",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "The good floors sold out and now the ground-floor and corner units are just sitting",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Bookings dropped badly after the launch hype died",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Dealers quote different prices from our price list",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Discounts are being given on calls without my approval",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "A large share of buyers stop paying instalments after the first year",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We find out an instalment is overdue only when accounts does the month-end",
+   "category": "cash_collections",
+   "subtype": "instalment_tracking"
+  },
+  {
+   "phrase": "Construction spend is running ahead of collections",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Steel and cement went up and my per-square-foot cost is way over the plan",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "I can’t say what margin we are actually making on each tower",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Overseas buyers keep asking for progress photos and nobody sends them",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Handover is delayed and buyers are angry on social media",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Snagging complaints after handover sit for months",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "We spend on Facebook and portals but can’t tell which leads booked",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Leads from the expo go cold because nobody calls them back",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Broker commission disputes every month — who brought which client",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "The contractor says 60 percent done, my site engineer says 45",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "Site updates come as 200 photos in a WhatsApp group",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Approvals for variations wait on me personally",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Resale and transfer requests take weeks and paperwork goes missing",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Every authority and escrow report is built by hand in Excel",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Sales, accounts and construction each keep their own sheet",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Payment receipts are issued manually and some don’t match the bank",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Our website still shows sold-out units and old payment plans",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "Planning the next project, I have no clean data on what sold fastest",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  }
+ ],
+ "questions": {
+  "inventory": [
+   "How many units or files are in the project right now?",
+   "Where is the master list of what’s sold and what’s open kept?",
+   "Who is allowed to mark a unit as booked?"
+  ],
+  "sales": [
+   "How are most bookings coming in — your own team, dealers, or overseas events?",
+   "What changed around the time sales slowed?"
+  ],
+  "collections": [
+   "Roughly how many buyers are behind on instalments?",
+   "How do you find out a payment is late today?",
+   "Who follows up with them?"
+  ],
+  "cost": [
+   "Which costs have moved most against your budget?",
+   "How often do you compare actual spend to plan?"
+  ],
+  "construction progress": [
+   "Who tells you how far along the build is?",
+   "How do you check that against what you see on site?"
+  ],
+  "handover": [
+   "How many units are waiting for handover or snag fixes?",
+   "What usually holds them up?"
+  ],
+  "buyers": [
+   "What do buyers complain about most?",
+   "How do they reach you, and who answers?"
+  ],
+  "brokers": [
+   "How many dealers or brokers sell for you?",
+   "How is it decided who gets commission on a booking?"
+  ],
+  "reporting": [
+   "What report do you wish you had every Monday morning?",
+   "How long does it take your team to put together today?"
+  ],
+  "systems": [
+   "Where does your team keep bookings and receipts — software, Excel, or paper?",
+   "What breaks most often between sales and accounts?"
+  ]
+ },
+ "seasons": "In Pakistan, launches cluster in the cooler months (October to March) and around property expos; buying from overseas Pakistanis rises around Eid and the December holidays when families visit; the federal budget in June changes property taxes and withholding, causing a rush before 1 July and a pause after; monsoon (July to September) slows construction. In the UAE, the main selling season runs September to April, with Cityscape and other autumn launch events; summer brings a slowdown and the midday outdoor-work ban (mid-June to mid-September) affects site progress; Ramadan shortens working hours. In Canada, presales are strongest in spring and autumn; winter slows site work; interest-rate announcements visibly affect buyer sentiment.",
+ "care": [
+  "Title, allotment, cancellation, refund-on-default and SPA questions are legal: pi notes “dispute with a buyer over cancellation” as an operational problem and suggests a lawyer for the substance.",
+  "Any request to under-declare sale value at registration, run sales outside escrow, backdate allotments, create files without land, or pay officials for approvals is refused plainly; pi does not note it as a business problem.",
+  "Never record buyer names, ID numbers, file numbers linked to people, or bank details; counts and roles only.",
+  "Structural concerns (cracks, settlement, water ingress in slabs) are noted as a quality/after-sales problem; pi says a qualified structural engineer must assess them and gives no opinion.",
+  "Site accidents, collapse, fire or someone injured → pi stops and points to emergency services (Rescue 1122 in Pakistan, 999/998/997 in the UAE, 911 in Canada).",
+  "No investment advice, returns, rental yields or price forecasts; pi does not judge whether a project “will sell”.",
+  "Buyer anger and social media complaints are sensitive; pi records the pattern, not the individuals."
+ ],
+ "build_ideas": [
+  "Live unit inventory board per project and phase: each unit’s status (open, on hold, booked, sold, transferred) with a single lock so one unit cannot be booked twice.",
+  "Booking-to-handover file per unit: payment plan, receipts, documents checklist, status, without storing ID numbers in chat.",
+  "Instalment schedule engine with due-date reminders over WhatsApp and an overdue list by age for the collections team.",
+  "Collections vs construction-spend cash view per project, refreshed daily.",
+  "Price-list control: dealers see only the approved current price list; discounts above a threshold need owner approval on the phone.",
+  "Broker and dealer portal: lead registration with timestamps to settle “who brought the client”, commission statements.",
+  "Lead capture from portals, Meta forms and expo sheets into one queue with follow-up tasks and source tracking to booking.",
+  "Site progress log: engineer posts milestone percentage with dated photos per block; owner sees planned vs actual.",
+  "Budget vs actual cost tracker by package (structure, MEP, finishing) with alerts on overruns.",
+  "Snagging and handover tracker: defects logged per unit with photos, assigned to subcontractor, closed with sign-off.",
+  "Buyer update broadcasts: monthly progress photos and milestone news to buyers via WhatsApp.",
+  "Transfer/resale request workflow with document checklist and status.",
+  "Authority/escrow report pack generated from the same data instead of hand-built Excel.",
+  "Owner dashboard: units sold, collections due vs received, cost to date, handover backlog."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai booking to theek hai lekin log installments dena band kar dete hain, second year ke baad recovery bohat mushkil ho jati hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — buyers pehle saal ke baad instalments mein peeche reh jaate hain. Noted. Abhi aapko kaise pata chalta hai ke kisi ka instalment late ho gaya hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Accounts wala mahine ke end pe sheet dekh ke batata hai, tab tak do mahine ho chuke hote hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — late payment ka pata month-end ki sheet se hi chalta hai, kaafi der se. Is waqt taqreeban kitne buyers peeche hain, rough idea?"
+  }
+ ]
+}

@@ -1,0 +1,269 @@
+{
+ "key": "home_healthcare_and_nursing_agencies",
+ "name": "Home healthcare and nursing agencies",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "home healthcare",
+  "home nursing",
+  "nursing agency",
+  "caregiver",
+  "attendant",
+  "nurse at home",
+  "elder care at home",
+  "ghar pe nurse",
+  "attendant chahiye",
+  "mareez ki dekh bhaal",
+  "khidmat",
+  "tamreed manzili",
+  "mumarrida",
+  "ri’aya manzilia",
+  "shift",
+  "12-hour shift",
+  "24-hour live-in",
+  "staffing",
+  "placement",
+  "client family",
+  "visit",
+  "PSW",
+  "home care package"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Services offered: nurses, caregivers/attendants, physiotherapy at home, doctor visits, equipment rental, sample collection",
+  "Number of field staff and whether they are employees, contractors or placed through sub-agencies",
+  "Shift types: visits, 12-hour, 24-hour, live-in",
+  "Clients: private families, hospital discharge referrals, insurers, corporate or government contracts; in Canada, provincial home-care contracts",
+  "Cities and areas covered, and how staff travel",
+  "How staff are paid (monthly, per shift, per visit) and how clients are billed",
+  "Whether they rent or sell medical equipment (beds, oxygen concentrators, wheelchairs)"
+ ],
+ "scope_rule": "pi notes the business side of a home-care agency: rostering, matching staff to client families, attendance and visit confirmation, replacements when someone doesn’t show, billing and collections, staff pay, recruitment and turnover, equipment rental logistics, complaints and reporting. pi never gives care instructions, medication guidance, wound or device advice, or judges whether a carer’s clinical work was right. pi does not ask for or record patients’ or families’ names, addresses, conditions or medication, nor staff identity documents. Labour, visa and sponsorship rules for staff are noted only as admin effort and not interpreted.",
+ "vocabulary": {
+  "attendant / caregiver": "non-nurse carer who helps with daily needs",
+  "live-in": "carer staying in the client’s home",
+  "12-hour shift / 24-hour duty": "common booking types",
+  "replacement": "substitute when the assigned carer can’t come",
+  "placement": "matching a carer with a family",
+  "client family": "the household paying for care",
+  "PSW": "personal support worker (Canada)",
+  "visit verification": "proof a visit happened",
+  "advance / security": "upfront payment from families",
+  "rental equipment": "hospital beds, oxygen concentrators, wheelchairs",
+  "sub-agency": "another agency supplying staff",
+  "off day / relief": "rest days for live-in carers needing cover"
+ },
+ "problems": [
+  {
+   "phrase": "A nurse doesn’t turn up and I find out when the family calls angry",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "I can’t confirm staff actually stayed the full shift",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Finding a replacement at night is chaos on WhatsApp",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Families hire our carers directly behind our back",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Carers leave after a month and families blame us",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Good nurses go abroad as soon as they get the chance",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Families pay late, especially after the patient passes away or recovers",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Advance and security deposits are tracked in my head",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Insurer or hospital-referral billing is slow and needs lots of paperwork",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Staff pay is worked out shift by shift in Excel and there are always errors",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Overtime and night allowances cause arguments",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "We don’t know our margin per placement once travel and replacements are counted",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Rental beds and oxygen machines go out and we lose track of them",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Rental equipment comes back damaged and nobody checked it out properly",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Families complain the carer was on the phone all day",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Different coordinators promise different rates to families",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Enquiries come at midnight from hospitals and nobody answers",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Staff documents and police verifications expire and nobody notices",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Training records are on paper",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Coordinators keep the whole roster on their personal phones",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "I get no clear report of active placements at any time",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "We want to expand to another city but can’t supervise remotely",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Hospitals refer to us but we can’t respond fast enough",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Some staff claim travel they didn’t do",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  }
+ ],
+ "questions": {
+  "attendance": [
+   "How do you find out that a carer hasn’t arrived?",
+   "How long does it usually take to send a replacement?"
+  ],
+  "visit confirmation": [
+   "How do you know a shift was actually completed?",
+   "Who checks it?"
+  ],
+  "matching": [
+   "How do you decide which carer goes to which family?",
+   "What goes wrong most often?"
+  ],
+  "staff supply": [
+   "Which roles are hardest to find?",
+   "What usually makes carers leave?"
+  ],
+  "pay": [
+   "How are staff paid, per shift or monthly?",
+   "Where do pay disputes usually start?"
+  ],
+  "billing": [
+   "How do families or payers get billed?",
+   "Who chases late payments?"
+  ],
+  "deposits": [
+   "How are advances and deposits recorded?",
+   "How are they settled at the end?"
+  ],
+  "equipment": [
+   "How many rental items are out right now, roughly?",
+   "How do you know where each one is?"
+  ],
+  "enquiries": [
+   "How do new requests come in, and at what hours?",
+   "Who answers after hours?"
+  ],
+  "complaints": [
+   "How do families raise a complaint?",
+   "What happens after that?"
+  ],
+  "reporting": [
+   "What do you look at to know how the agency is doing this month?"
+  ]
+ },
+ "seasons": "- Ramadan and Eid: many live-in carers want leave for Eid, creating relief-staff shortages; families also need extra cover when relatives travel. - Pakistan: summer heat and winter illness raise demand for elder care; overseas children often arrange care before returning abroad after summer or December visits. - UAE: summer travel means families need cover while they are away, and staff leave and visa renewals cluster around that period. - Canada: winter weather disrupts visit routes and increases demand; provincial contract cycles and fiscal year-end on 31 March affect volumes. - Post-surgery discharges follow hospitals’ elective schedules.",
+ "care": [
+  "If a carer or family reports a patient not breathing, unresponsive, fallen with injury, or any danger to life, pi stops and tells them to call emergency services immediately (1122/115, 998/999, 911).",
+  "If a carer’s own safety is at risk at a client home, pi points to emergency services; pi does not investigate the incident.",
+  "Suspected abuse or neglect of a vulnerable person is serious; pi tells the person to contact emergency services or the relevant authorities and does not treat it as an ordinary business problem.",
+  "pi never gives care, medication, feeding, wound or equipment-use advice.",
+  "No names, addresses, conditions or medications of clients; no staff ID documents, passports, CNICs or Emirates IDs.",
+  "Questions about visas, sponsorship, labour law or contractor status are noted as admin effort only.",
+  "Requests to place unqualified staff as nurses, fake qualifications or verifications, or bill for shifts not worked are refused.",
+  "Staff and coordinators are recorded by role."
+ ],
+ "build_ideas": [
+  "Roster and placement board showing each active placement, assigned carer role, shift pattern and relief cover",
+  "Shift check-in and check-out on WhatsApp with location confirmation at start and end, with alerts for missed check-ins",
+  "Replacement request flow that pings available staff by area and skill and records who accepted",
+  "Client-family account ledger: rate agreed, advance, deposits, shifts delivered, invoices, payments and balance",
+  "Staff pay calculator from verified shifts, with night, overtime and travel allowances by rule",
+  "Staff document and training register with expiry reminders (role-based, no ID numbers stored)",
+  "Equipment rental register with serial numbers, location by placement, condition on issue and return, and rental billing",
+  "Enquiry intake form and after-hours WhatsApp responder that captures care type, area and timing for a coordinator callback",
+  "Rate card master so coordinators quote consistently",
+  "Complaint log with follow-up owner and closure note",
+  "Margin view per placement including replacements and travel",
+  "Owner dashboard: active placements, missed shifts, open complaints, receivables, staff available by area"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Sab se bara masla yeh hai ke attendant shift pe nahi pohanchta aur family raat ko 11 baje mujhe call karti hai."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh waqai mushkil hai, aur family ka bharosa bhi kam hota hai. Noted. Aapko attendant ke na pohanchne ka sab se pehle kaise pata chalta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Aksar family se hi, humare paas koi check-in nahi hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, shift shuru hone ki koi confirmation nahi aati. Noted. Replacement bhejna ho to aap available staff ko kaise dhoondte hain?"
+  }
+ ]
+}

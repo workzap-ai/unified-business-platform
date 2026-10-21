@@ -1,0 +1,298 @@
+{
+ "key": "packaging_and_corrugation",
+ "name": "Packaging and corrugation",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "packaging",
+  "corrugation",
+  "corrugated boxes",
+  "cartons",
+  "gatta",
+  "dabba",
+  "kraft",
+  "paper reels",
+  "flute",
+  "3-ply",
+  "5-ply",
+  "7-ply",
+  "liner",
+  "medium",
+  "BF",
+  "GSM",
+  "die-cutting",
+  "printing",
+  "flexo",
+  "offset",
+  "lamination",
+  "stitching",
+  "gluing",
+  "sheets",
+  "boxes",
+  "export cartons",
+  "food packaging",
+  "dabba factory",
+  "kartoon",
+  "job order",
+  "artwork",
+  "plate",
+  "die"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Products: corrugated boxes and sheets, folding cartons/printed boxes, flexible packaging, labels, or a mix.",
+  "Whether they run their own corrugator or buy sheets and convert.",
+  "Main customers: FMCG, food, pharma, textile/garment exporters, e-commerce, agriculture (fruit and vegetable boxes).",
+  "Order pattern: repeat jobs with fixed specs, or many small custom jobs.",
+  "Paper sourcing: local mills, imported reels, waste paper based.",
+  "Printing type: flexo, offset, digital, none.",
+  "How job orders and stock are tracked."
+ ],
+ "scope_rule": "pi notes operational and business problems: paper reel shortages and price swings, job order errors (size, ply, print), wastage and trim loss, plate and die management, late deliveries, customer schedule changes, credit and collections, and production visibility. pi does not advise on food-contact or pharma packaging compliance, compression or strength specifications for regulated goods, ink or adhesive chemistry, environmental rules or customs and tax. pi records roles and customer types, never names or personal details, and does not store customers’ brand artwork beyond noting it exists.",
+ "vocabulary": {
+  "gatta": "cardboard / corrugated board",
+  "dabba": "box",
+  "ply": "number of paper layers (3-ply, 5-ply)",
+  "flute": "the wavy middle layer; sizes like A, B, C, E",
+  "liner / medium": "flat outer paper / fluted paper",
+  "kraft": "strong brown paper used for liners",
+  "BF / burst factor": "paper strength grade",
+  "GSM": "paper weight per square metre",
+  "reel": "roll of paper",
+  "die / die-cutting": "tool and process for cutting box shapes",
+  "plate": "printing plate for flexo printing",
+  "trim waste": "paper cut off the edges and lost",
+  "job order": "instruction sheet for a customer order",
+  "kartoon": "carton (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Paper reel prices change every month and contracts are fixed",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Kraft paper short in the market, we can’t start the job",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Imported reels stuck at port",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Reel GSM or BF lower than ordered, boxes come out weak",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Boxes made in the wrong size or ply",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Old artwork printed instead of the new one",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Customer complains boxes collapse in stacking",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Trim and setup waste too high",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Waste paper sold, money and weight don’t match",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Dies and plates can’t be found when the repeat order comes",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Customer schedules change last-minute and we lose machine time",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Exporter needs boxes tomorrow because their shipment moved",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Delivery vehicles are never enough on peak days",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Big FMCG customers pay in 90–120 days",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Small customers ask for credit and disappear",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "We don’t know cost per box with today’s paper rate",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Quotes take a day because only one person can calculate them",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Finished boxes for one customer pile up because they didn’t lift them",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Reel stock count in the godown never matches",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Corrugator stoppages, steam or glue problems",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Operators on printing make the same mistakes again",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Job order sheet changes don’t reach the machine",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Monthly production and waste report is done in Excel by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Online sellers want small quantities and we don’t know how to price them",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Customer audits ask for records of each lot",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  }
+ ],
+ "questions": {
+  "paper": [
+   "Where do you buy reels — local mills or imported?",
+   "How often does paper shortage stop a job?",
+   "How is reel stock tracked?"
+  ],
+  "pricing": [
+   "How do paper price changes reach your customers’ prices?",
+   "How often do you revise?"
+  ],
+  "job orders": [
+   "How is a job order passed from sales to the floor?",
+   "Where do size, ply or print mistakes start?"
+  ],
+  "artwork, dies and plates": [
+   "Where are dies and plates stored?",
+   "How do you find the right one for a repeat order?"
+  ],
+  "wastage": [
+   "Do you measure trim and setup waste?",
+   "What happens to the waste paper?"
+  ],
+  "quality": [
+   "What do customers complain about most?",
+   "Is anything tested before dispatch?"
+  ],
+  "schedules": [
+   "How often do customers change delivery dates or quantities?",
+   "How do you replan?"
+  ],
+  "delivery": [
+   "Do you deliver with your own vehicles?",
+   "What happens on peak days?"
+  ],
+  "cash": [
+   "How long do your bigger customers take to pay?",
+   "How are overdues followed up?"
+  ],
+  "costing": [
+   "Who prepares quotes?",
+   "How long does one usually take?"
+  ],
+  "machines": [
+   "Which machine stops the most?",
+   "Is downtime recorded?"
+  ],
+  "reporting": [
+   "What do you look at to know how the month is going?",
+   "Who prepares it?"
+  ]
+ },
+ "seasons": "Packaging follows its customers. Pakistan: pre-Ramadan and Eid FMCG and food packaging rush; mango season (roughly May to August) and citrus/kinnow season (December to March) drive fruit boxes, especially for export; textile and garment export cartons follow export shipment peaks; wedding season sweets and gift boxes (roughly October to March); summer beverage packaging; budget in June changes paper duties. UAE: Ramadan and Eid food and gifting, Dubai Shopping Festival, e-commerce peaks (White Friday, 11.11, year-end), re-export demand. Canada: holiday e-commerce (October to December), harvest produce packaging in late summer and autumn, Black Friday and Boxing Day.",
+ "care": [
+  "Corrugator burns (steam), die-cutter and slitter injuries, paper godown fires: pi stops and points to emergency services first.",
+  "No advice on food-contact, pharma or dangerous goods packaging compliance, or box strength specifications for regulated shipments.",
+  "No help copying another brand’s packaging design or printing counterfeit branded boxes; pi declines plainly.",
+  "No help with fake invoices, under-invoicing or misdeclaring imported reels.",
+  "Never stores customer contacts, artwork files with personal data or worker identities; uses roles and customer types.",
+  "Customer disputes over weak boxes: pi notes the testing and records gap, not liability."
+ ],
+ "build_ideas": [
+  "Digital job order: size, ply, flute, paper grades, print, die and plate references, approved artwork, sent to the floor on tablet or phone.",
+  "Customer spec library for repeat jobs so reorders start from the last approved spec.",
+  "Die and plate register with storage location, condition and customer.",
+  "Reel stock register by GSM, BF, width and supplier, with consumption per job and reorder alerts.",
+  "Quote calculator using live paper rates, board area, wastage allowance and printing costs.",
+  "Production log per machine: sheets or boxes made, setup and trim waste, downtime reasons.",
+  "Waste paper weighing and sales register matched with gate passes.",
+  "Dispatch and delivery schedule with vehicle allocation.",
+  "Finished goods stock by customer with ageing and lifting reminders.",
+  "Customer ledger with ageing, credit limits and WhatsApp reminders.",
+  "Pre-dispatch QC record (dimensions, print check, any tests the customer requires).",
+  "Monthly owner report: output, waste percentage, top customers by volume and margin, overdue receivables."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Repeat order aata hai to purana die aur plate dhoondne mein aadha din lag jata hai, kabhi milta hi nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted: repeat orders pe dies aur plates dhoondne mein time lagta hai ya woh milte hi nahi. Dies aur plates abhi kahan rakhe jaate hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Ek kamre mein, customer ke naam likh kar, par aadhe pe likha mit gaya hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, labels mit gaye hain aur koi register nahi. Jab plate nahi milti, to aap nayi banwate hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Haan, aur customer ko charge bhi nahi kar sakte."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, nayi plate ka kharcha khud uthana parta hai. Yeh mahine mein taqreeban kitni dafa hota hoga?"
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "key": "businesses_in_distress",
+ "name": "Businesses in distress",
+ "kind": "overlay",
+ "sector": {
+  "code": "N",
+  "title": "Cross-industry overlays"
+ },
+ "signals": [
+  "we’re about to shut down",
+  "can’t pay salaries",
+  "losing everything"
+ ],
+ "notes": "",
+ "shape_facts": [],
+ "scope_rule": "listen and note with extra care. No financial, insolvency or legal advice. If there are signs of personal crisis or danger, R- EMER-04 applies first.",
+ "vocabulary": {},
+ "problems": [],
+ "questions": {},
+ "seasons": "",
+ "care": [
+  "slower pace, fewer questions, warmth (2.0.1). Never use distress to push the offer; offer only when the person indicates they’re ready, and state clearly that the quote is free and saying no is fine."
+ ],
+ "build_ideas": [],
+ "exchange": []
+}

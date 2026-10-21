@@ -1,0 +1,280 @@
+{
+ "key": "tyre_battery_and_auto_parts_shops",
+ "name": "Tyre, battery and auto-parts shops",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "spare parts",
+  "parts shop",
+  "purzay",
+  "spare parts ki dukaan",
+  "tyres",
+  "rims",
+  "alloy",
+  "battery",
+  "battery khatam",
+  "cell",
+  "oils",
+  "lubricants",
+  "filters",
+  "brake pads",
+  "genuine",
+  "local",
+  "Chinese",
+  "Taiwan",
+  "copy",
+  "kaccha bill",
+  "wholesale",
+  "retail",
+  "counter sale",
+  "mechanic credit",
+  "udhaar",
+  "part number",
+  "catalogue",
+  "qita’ ghiyar",
+  "etarat",
+  "battariya",
+  "zayt",
+  "Plaza / market",
+  "wheel alignment",
+  "balancing",
+  "warranty claim",
+  "core return"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "What they mainly sell: tyres, batteries, lubricants, general spare parts, a specific brand’s parts, or a mix.",
+  "Retail counter, wholesale to workshops, or both, and how much is sold on credit to mechanics.",
+  "Number of SKUs roughly and whether they use part numbers or describe items by car model.",
+  "Whether they also fit (tyre fitting, alignment, battery installation) or only sell.",
+  "Whether stock comes from local distributors, importers, or direct imports.",
+  "Number of shops/godowns and staff at the counter.",
+  "Which system is used: POS, Tally/QuickBooks, Excel, or a register."
+ ],
+ "scope_rule": "pi notes operational and business problems: stock accuracy, finding the right part, dead stock, credit to mechanics, supplier delays, pricing updates, warranty claim handling effort, counterfeit complaints, and online orders. pi does not give technical fitment advice on whether a part is safe or compatible, battery safety or disposal regulation advice, import or customs advice, or tax advice. pi never stores customers’ or mechanics’ personal details, and refers to “a workshop that buys on credit”, “my counter boy”. Any request about selling counterfeit parts as genuine or avoiding duties is declined.",
+ "vocabulary": {
+  "Genuine / OEM": "original manufacturer part.",
+  "Local / copy / Taiwan / China": "aftermarket parts of varying quality.",
+  "Udhaar / khata": "credit sales recorded in a ledger.",
+  "Kaccha bill": "informal slip rather than a proper invoice.",
+  "Godown": "storeroom or warehouse.",
+  "Part number": "manufacturer reference code for an exact part.",
+  "Fast movers / slow movers": "quick-selling versus slow-selling items.",
+  "Core": "old battery or part returned for credit or recycling.",
+  "Rate list": "the price list, often changing with currency or supplier.",
+  "Etarat": "Arabic for tyres.",
+  "DOT date": "the manufacturing date code on a tyre."
+ },
+ "problems": [
+  {
+   "phrase": "Customer asks for a part, the system says we have it, but we can’t find it",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "We run out of fast-moving filters and pads every week",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Godown is full of parts for old models nobody drives",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Physical count never matches the register",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Old tyres sitting too long, customers reject them by the manufacturing date",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Batteries lose charge on the shelf and then fail",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Mechanics owe us lakhs and pay whenever they want",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Udhaar is in a notebook and arguments start over balances",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Prices change with the dollar, my staff sell at last month’s rate",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Counter staff give discounts to their friends",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "We don’t know which brands give us the best margin",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Supplier price increases every month eat our margin",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Import shipments get delayed and we lose the season",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Distributor sends wrong items or short quantity",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Warranty claims for batteries and tyres take ages and we lose track",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Customer comes back saying the part is fake",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Returns of wrong parts aren’t put back into stock properly",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Staff take parts home or sell from the back",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Cash in the drawer doesn’t match sales",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Finding the right part for a model takes long, only one guy knows",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Online orders on Daraz/Facebook come in but we can’t keep stock in sync",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Customers message on WhatsApp with photos of parts and we miss replies",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Two shops, and stock transferred between them goes missing",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Reordering is guesswork",
+   "category": "stock_inventory",
+   "subtype": "slow_replenishment"
+  },
+  {
+   "phrase": "I don’t know daily sales until I check the register at night",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  }
+ ],
+ "questions": {
+  "stock": [
+   "How do you know what’s in the shop and godown right now?",
+   "When did the count last match?",
+   "Which items run out most often?"
+  ],
+  "dead stock": [
+   "Is there stock that hasn’t moved in a long time?",
+   "Roughly what kinds of parts?"
+  ],
+  "finding parts": [
+   "When a customer asks for a part, how do staff find it?",
+   "Is that knowledge with one person?"
+  ],
+  "credit": [
+   "How much of your selling is on credit to workshops?",
+   "How do you track what each one owes?",
+   "How long do they usually take?"
+  ],
+  "pricing": [
+   "When supplier prices change, how do your counter prices get updated?"
+  ],
+  "suppliers": [
+   "Who are your main sources — local distributors or imports?",
+   "What goes wrong most with them?"
+  ],
+  "warranty": [
+   "How do you handle a battery or tyre that comes back under warranty?",
+   "Where are those claims tracked?"
+  ],
+  "cash": [
+   "Who handles cash at the counter?",
+   "How do you check it each day?"
+  ],
+  "online": [
+   "Do you sell online or through WhatsApp?",
+   "How do you keep that stock matching the shop?"
+  ]
+ },
+ "seasons": "Pakistan: battery demand rises in winter (cold starts, especially in the north) and in the heat of summer; tyre demand around Eid travel and before monsoon; currency movements and budget changes (June) shift prices quickly. UAE: summer heat drives battery and tyre failures and AC parts; pre-summer travel checks; quieter Ramadan daytime with evening trade. Canada: winter tyre demand from September to November and swap-back in spring; battery failures peak in the cold; spring road-trip servicing.",
+ "care": [
+  "Never advise whether a part is safe, compatible or suitable for a vehicle; note the “finding the right part” problem only.",
+  "Decline any request to pass off copies as genuine, change date codes on tyres, or avoid customs duty or sales tax.",
+  "Battery acid, lead and used-oil handling regulations are out of scope; note only the operational burden.",
+  "Credit customers are recorded by role, never with phone numbers or IDs.",
+  "Don’t give any currency or pricing forecasts.",
+  "Theft by staff: note the pattern; never suggest covert surveillance of individuals.",
+  "If someone reports an acid spill injury or fire in the godown, point to emergency services immediately."
+ ],
+ "build_ideas": [
+  "nori daily read of sales and stock by item, brand and shop, sent on WhatsApp each evening.",
+  "Part catalogue with car-model lookup and shelf/bin location so any staff member can find a part.",
+  "Stock register with reorder levels and fast-mover alerts.",
+  "Dead-stock report by age and value.",
+  "Tyre and battery batch/date tracking to sell older stock first and flag ageing.",
+  "Credit ledger per workshop with statements on WhatsApp and overdue reminders.",
+  "Rate list manager that updates counter prices centrally when supplier prices change.",
+  "Discount control: limits by staff role, with approvals for exceptions.",
+  "Warranty claim tracker per battery/tyre with supplier claim status.",
+  "Inter-shop transfer log with receive confirmation.",
+  "Daily cash-up against POS sales.",
+  "WhatsApp enquiry flow capturing part photo, car model and year, routed to a counter person.",
+  "Marketplace stock sync for Daraz or a web shop."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mechanics ka udhaar barhta ja raha hai, notebook mein likha hai bas, aur har baar hisaab pe behes hoti hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — udhaar ka hisaab clear na ho to rishte bhi kharab hote hain aur paisa bhi phansta hai. Kitni workshops aap se udhaar pe maal leti hain, andaazan?"
+  },
+  {
+   "role": "Person",
+   "text": "40 ke qareeb."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Unhein apna balance kaise pata chalta hai — aap bhejte hain ya woh pooch ke aate hain?"
+  }
+ ]
+}

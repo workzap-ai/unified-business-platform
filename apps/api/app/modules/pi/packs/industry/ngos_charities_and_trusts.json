@@ -1,0 +1,284 @@
+{
+ "key": "ngos_charities_and_trusts",
+ "name": "NGOs, charities and trusts",
+ "kind": "industry",
+ "sector": {
+  "code": "M",
+  "title": "Digital economy, social and public sector"
+ },
+ "signals": [
+  "NGO",
+  "NPO",
+  "charity",
+  "trust",
+  "foundation",
+  "welfare",
+  "donors",
+  "zakat",
+  "sadaqah",
+  "fitrana",
+  "fund raising",
+  "grant",
+  "donor report",
+  "beneficiaries",
+  "mustahiq",
+  "rashan drive",
+  "volunteers",
+  "field staff",
+  "programme",
+  "project",
+  "M&E",
+  "audit",
+  "receipts",
+  "Section 42",
+  "registered with SECP/PCP",
+  "charity registration",
+  "CRA",
+  "IACAD/ Community Development Authority",
+  "khairati",
+  "jamiyat khairiya",
+  "tabarru’at"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: welfare/relief, education, health, livelihoods, environment, animal welfare, community trust.",
+  "Funding mix: individual donors, zakat, institutional grants, corporate CSR, events.",
+  "Size of operation: number of programmes, locations, field staff and volunteers.",
+  "Whether they distribute goods (ration, clothes, meals), cash support, or services.",
+  "Who they report to: board, trustees, institutional donors, regulator.",
+  "Countries of operation and fundraising (e.g., raising in UAE/Canada, spending in Pakistan).",
+  "Current systems: registers, Excel, accounting software, donor CRM, nothing."
+ ],
+ "scope_rule": "pi notes operational problems: donation recording and receipting, donor communication, fund allocation tracking, beneficiary case workflow (as process, not identity), stock of relief goods, volunteer and field coordination, reporting to donors and boards, and admin load. It does not advise on charity registration, tax-exemption status, zakat rulings or eligibility (religious questions go to their scholars), regulatory filings, cross-border fund transfer rules, or counter-terrorism financing obligations. It never collects donor or beneficiary names, CNICs, addresses, health conditions, photos or bank details, and records them only as groups (e.g., “widows supported”, “monthly donors”).",
+ "vocabulary": {
+  "Zakat": "obligatory Islamic alms with specific eligible recipients; often kept in a separate fund.",
+  "Sadaqah": "voluntary charity.",
+  "Fitrana / Fitra": "charity paid before Eid ul-Fitr prayer.",
+  "Mustahiq": "eligible recipient.",
+  "Restricted fund": "money given for a specific purpose.",
+  "Grant": "institutional funding with reporting conditions.",
+  "M&E": "monitoring and evaluation.",
+  "Ration drive": "distribution of food packs.",
+  "Case / case file": "record of one family’s support request.",
+  "Utilisation report": "showing how a grant was spent.",
+  "Board / trustees": "governing body.",
+  "Qurbani": "sacrificial animal service at Eid ul-Adha, often collected by charities."
+ },
+ "problems": [
+  {
+   "phrase": "Donations come by cash, bank, JazzCash and online — matching them is a nightmare",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Donors ask for receipts and we take weeks",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "We can’t show which donor’s money went to which project",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Zakat and general funds get mixed in one account sheet",
+   "category": "operations_process",
+   "subtype": "quality_inconsistent"
+  },
+  {
+   "phrase": "Grant reports take the whole team a month",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Monthly donors drop off and we don’t notice",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Ramadan is our biggest month and we’re never ready",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Same family gets help twice from two centres, others get nothing",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Case approvals sit with one trustee for weeks",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Ration packs short or missing at distribution",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Donated items expire in the store",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Field staff send updates on WhatsApp and nothing is recorded",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Volunteers say yes and then don’t show",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Cash collected at events — no proper count",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Admin costs are questioned by donors and we can’t break them down",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Suppliers for rations quote different prices every time",
+   "category": "suppliers_purchasing",
+   "subtype": "price_comparison"
+  },
+  {
+   "phrase": "Audit time is a scramble for receipts",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Registration renewals and filings keep sneaking up on us",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Website donation page is broken half the time",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "Fundraising campaigns — no idea which brought in money",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Founder does everything; nothing moves without him",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Staff salaries delayed when a grant tranche is late",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Overseas donors (UAE, Canada) want updates we can’t easily produce",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Board meetings are long and decisions are not followed up",
+   "category": "communication_coordination",
+   "subtype": "meetings_wasteful"
+  },
+  {
+   "phrase": "Opening a new centre and don’t know how to keep control",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  }
+ ],
+ "questions": {
+  "donations": [
+   "What are the main ways donations come in?",
+   "How do you record each one today?",
+   "How long does a receipt take?"
+  ],
+  "fund tracking": [
+   "Do you keep zakat, general and project money separately in your records?",
+   "Can you see, at any moment, how much is left in each?"
+  ],
+  "reporting": [
+   "Who do you report to — board, donors, regulator?",
+   "Which report is the most painful to prepare?"
+  ],
+  "cases": [
+   "How does a request for help move from first contact to approval?",
+   "Where does it usually wait?"
+  ],
+  "distribution": [
+   "What do you hand out — goods, cash, services?",
+   "How do you check what left the store matches what reached people?"
+  ],
+  "field": [
+   "How do field staff send you updates?",
+   "What gets lost along the way?"
+  ],
+  "volunteers": [
+   "How do you schedule volunteers?",
+   "What happens when they don’t turn up?"
+  ],
+  "donors": [
+   "How do you keep in touch with regular donors?",
+   "How would you know if one stopped?"
+  ],
+  "peaks": [
+   "How does Ramadan or Qurbani change your workload?",
+   "What broke last time?"
+  ],
+  "admin": [
+   "Which deadline or filing worries you most?",
+   "Who keeps track of it?"
+  ]
+ },
+ "seasons": "Ramadan is the peak of giving in Pakistan and the UAE (zakat often calculated and paid then, especially in the last ten nights); Fitrana collection before Eid ul-Fitr; Qurbani campaigns before Eid ul-Adha; Muharram activities for some communities. Winter appeals (blankets, heating) from November; monsoon and flood relief in Pakistan (July–September); emergency appeals after disasters at any time. Canada: year-end giving in December (tax-receipt deadline 31 December), Ramadan campaigns in diaspora communities. UAE: Year of Giving-style national campaigns, Ramadan initiatives. Grant cycles often follow donors’ financial years.",
+ "care": [
+  "Never collect beneficiary or donor identity details (names, CNIC/Emirates ID, addresses, phone numbers, health, photos), especially for children, widows, patients or refugees.",
+  "Zakat eligibility, fiqh questions and fund-mixing rulings belong to scholars; pi records only the record-keeping problem.",
+  "No advice on registration, tax exemption, donation-receipt tax rules (e.g., CRA receipting), or audit requirements.",
+  "Cross-border transfers and AML/CTF rules: pi does not advise and refuses any request to route funds around banking rules or hide donor sources.",
+  "Refuse help with inflating beneficiary numbers, fabricating reports, or misusing restricted funds.",
+  "During disasters, if someone describes people in immediate danger, point them to emergency services (1122/Rescue in Pakistan, 999 in UAE, 911 in Canada) first.",
+  "Internal theft or misappropriation by staff: note the pattern; do not ask for names or encourage accusations.",
+  "Be respectful of faith and the emotional weight of the work."
+ ],
+ "build_ideas": [
+  "Donation register capturing every channel (cash, bank, wallet, online) with fund type (zakat, sadaqah, restricted, general) and automatic receipt by WhatsApp/email.",
+  "Fund balance dashboard showing received, allocated, spent and remaining per fund and project.",
+  "Grant tracker with budget lines, spending against each, tranche schedule and report due dates.",
+  "Case workflow (intake, verification, approval, support delivered) using case codes, with role-based access and de-duplication checks.",
+  "Relief store inventory with stock in/out, expiry alerts and distribution reconciliation.",
+  "Field update form on phones (photos of activities, not people, counts, location) feeding one log.",
+  "Volunteer rota with WhatsApp confirmations and reminders.",
+  "Recurring donor tracker that flags lapsed donors and schedules thank-you updates.",
+  "Donor report generator compiling activity counts and spending into PDFs.",
+  "Compliance calendar for registrations, filings, audits and board meetings.",
+  "Event cash count sheet with two-person sign-off.",
+  "Board action tracker for decisions and follow-ups."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Ramzan mein donations bohot aati hain, cash bhi, bank bhi, JazzCash bhi. Hisaab milana mushkil ho jata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Ramzan mein yeh bojh samajh aata hai. Noted — kayi tareeqon se donations aati hain aur unka hisaab milana mushkil hota hai. Abhi har donation kahan record hoti hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Ek register mein, aur online wali Excel mein."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — cash ka register alag aur online ka Excel alag. Zakat aur general fund ka hisaab aap alag rakhte hain records mein?"
+  },
+  {
+   "role": "Person",
+   "text": "Koshish karte hain, lekin aakhir mein sab mix ho jata hai."
+  }
+ ]
+}

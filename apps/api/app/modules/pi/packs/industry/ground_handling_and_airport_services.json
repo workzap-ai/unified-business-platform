@@ -1,0 +1,264 @@
+{
+ "key": "ground_handling_and_airport_services",
+ "name": "Ground handling and airport services",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "ground handling",
+  "ramp",
+  "GSE",
+  "turnaround",
+  "pushback",
+  "baggage handling",
+  "load control",
+  "passenger services",
+  "check-in counters",
+  "lounge",
+  "meet and assist",
+  "VIP services",
+  "cargo handling",
+  "fuel handling",
+  "catering loading",
+  "aircraft cleaning",
+  "station",
+  "SLA",
+  "delay code",
+  "airside pass",
+  "ramp staff",
+  "bag miss ho gaya",
+  "duty roster",
+  "khidmat ardiya",
+  "matar"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Services offered: ramp, passenger, cargo, cleaning, lounge, meet and assist, fuelling, catering transport.",
+  "Number of airports/stations and airline customers.",
+  "Fleet of GSE (tugs, belt loaders, GPUs, buses, stairs) and owned versus leased.",
+  "Workforce size, shift pattern and share of contract or daily-wage staff.",
+  "Contract types with airlines: per turnaround, per passenger, monthly fixed.",
+  "Whether they are an airport-authority concession or sub-contractor.",
+  "Systems used for rostering, billing, GSE maintenance."
+ ],
+ "scope_rule": "pi notes business and coordination problems: rostering, overtime, turnaround billing, SLA penalties from a commercial angle, GSE downtime as a scheduling issue, staff turnover, customer complaints, baggage claims handling, and reporting. pi never advises on ramp or airside safety procedures, dangerous goods handling, aircraft loading or weight and balance, security screening, or how PCAA, GCAA, airport authorities or Transport Canada would interpret rules. It never records staff names, airside pass or ID numbers, or passenger details, and uses roles such as “ramp supervisor” or “loader”.",
+ "vocabulary": {
+  "turnaround": "servicing an aircraft between landing and departure",
+  "GSE": "ground support equipment like tugs, belt loaders, GPUs",
+  "ramp": "the apron area where aircraft are serviced",
+  "load sheet": "document of how the aircraft is loaded",
+  "SLA": "service level agreement with the airline",
+  "delay code": "standard reason code assigned to a delay",
+  "mishandled bag": "delayed, lost or damaged baggage",
+  "meet and assist": "escort service for passengers",
+  "station": "an airport where the company operates",
+  "airside pass": "permit to work in restricted areas",
+  "roster": "staff shift plan",
+  "penalty / credit note": "deduction an airline makes for missed SLA"
+ },
+ "problems": [
+  {
+   "phrase": "Airlines deduct SLA penalties and we can’t prove whose fault the delay was",
+   "category": "cash_collections",
+   "subtype": "penalty_disputes"
+  },
+  {
+   "phrase": "Turnarounds we did don’t all make it onto the invoice",
+   "category": "cash_collections",
+   "subtype": "unbilled_work"
+  },
+  {
+   "phrase": "Airlines pay 90 days late and payroll is due every month",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "We don’t know which airline contract actually makes money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Overtime is out of control during peak waves",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Roster is made in Excel and staff swap shifts on WhatsApp without telling anyone",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Contract loaders leave after a few months and we’re always training new ones",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Staff turn up late for the early bank of flights",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Belt loaders and tugs break down and we find out only when the flight arrives",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "GSE spare parts take weeks to arrive",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Fuel used by GSE vehicles doesn’t add up",
+   "category": "loss_security",
+   "subtype": "fuel_leakage"
+  },
+  {
+   "phrase": "Mishandled bag cases are on paper and passengers keep calling",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Airline station managers complain about service on WhatsApp and it’s never logged",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Each station reports differently and I can’t compare them",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Delay reports to airlines are typed up by hand after the shift",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Shift supervisors don’t hand over open issues to the next shift",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Checklists for turnarounds are signed but not really done",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Lounge and meet-and-assist bookings come by email, phone and WhatsApp and get missed",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Lounge food and consumables cost more each month without more passengers",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Airside pass and training renewal dates for staff get missed",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Items go missing from baggage and we get blamed",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Bidding for a new airport contract means weeks of putting numbers together",
+   "category": "planning_growth",
+   "subtype": "tender_preparation"
+  },
+  {
+   "phrase": "Everything goes through one ops manager’s phone",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  }
+ ],
+ "questions": {
+  "sla penalties": [
+   "How often do airlines deduct penalties?",
+   "What evidence do you have when you dispute one?"
+  ],
+  "billing": [
+   "How do completed turnarounds get onto the invoice?",
+   "Do you ever find ones that were missed?"
+  ],
+  "collections": [
+   "How long do airlines usually take to pay?",
+   "Which months feel tightest?"
+  ],
+  "rostering": [
+   "How is the roster built and shared?",
+   "What happens when staff swap shifts?"
+  ],
+  "overtime": [
+   "When does overtime spike most?",
+   "Who approves it?"
+  ],
+  "equipment": [
+   "How do you know a GSE unit is down before a flight needs it?",
+   "How long do repairs usually take?"
+  ],
+  "baggage": [
+   "How are mishandled bag cases tracked?",
+   "Who answers passengers when they call?"
+  ],
+  "stations": [
+   "How many stations do you run?",
+   "How do you compare their performance today?"
+  ],
+  "handovers": [
+   "How do shifts pass on open issues?",
+   "Where has something slipped through?"
+  ],
+  "growth": [
+   "Are you bidding for new airports or airlines?",
+   "What takes the most effort in a bid?"
+  ]
+ },
+ "seasons": "Eid ul Fitr and Eid ul Adha passenger surges; Hajj outbound and return operations with heavy baggage and Zamzam handling; Umrah peaks in Ramadan and school holidays; Gulf summer diaspora peak (June to August) and winter tourist season in the UAE; Pakistan winter fog delays causing bunched arrivals; UAE summer heat affecting ramp shifts; Canadian winter de-icing season and holiday peaks; airline schedule changes at IATA summer and winter season switches (late March and late October).",
+ "care": [
+  "Any airside accident, injury, fire, fuel spill, aircraft incident or security threat in progress is an emergency: pi stops and directs to airport emergency services and the person’s emergency procedure.",
+  "pi never advises on ramp safety procedures, dangerous goods, aircraft loading, weight and balance, de-icing or security screening, and never interprets PCAA, GCAA, airport authority or Transport Canada rules.",
+  "Never stores staff names, airside pass numbers, CNIC/Emirates ID/passport data, or passenger details; roles only.",
+  "Never helps bypass security screening, move unscreened items, or obtain passes improperly.",
+  "Contract staff and labour issues: pi notes the operational problem, no employment-law advice.",
+  "Theft from baggage: pi notes the business problem, does not help investigate individuals covertly.",
+  "Tender bids: no advice on influencing officials; pi declines any bribery angle."
+ ],
+ "build_ideas": [
+  "Turnaround log on phone: times for each step, delay reasons, photos, signed by supervisor, feeding billing automatically.",
+  "SLA evidence pack per flight to support penalty disputes.",
+  "Billing reconciliation comparing flights handled against invoices raised per airline.",
+  "Receivables tracker per airline with ageing and reminder schedule.",
+  "Contract profitability view per airline and station.",
+  "Shift roster app with swap requests, approval and attendance check-in.",
+  "Overtime tracker with approval flow and weekly report.",
+  "GSE register with daily checks, breakdown reporting, repair status and spare part orders.",
+  "GSE fuel issue log against hours used.",
+  "Mishandled baggage case tracker with status updates to passengers by template message.",
+  "Station comparison dashboard: turnarounds, delays, penalties, overtime per station.",
+  "Digital shift handover log.",
+  "Lounge and meet-and-assist booking inbox consolidating email, form and WhatsApp requests.",
+  "Staff certificate and pass renewal tracker (by role and staff number only, no ID data)."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Airlines keep cutting penalties from our invoices and we can never prove it wasn’t us."
+  },
+  {
+   "role": "pi",
+   "text": "That’s money walking out the door on every invoice. Noted: SLA penalty deductions you can’t dispute. When a delay happens, what gets recorded on the ramp at the time?"
+  },
+  {
+   "role": "Person",
+   "text": "Supervisor writes something on paper, sometimes. Mostly nothing."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, so there’s rarely a record from the moment itself. Roughly how many penalties land in a typical month?"
+  }
+ ]
+}

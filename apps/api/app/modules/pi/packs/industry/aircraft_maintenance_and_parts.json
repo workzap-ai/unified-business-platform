@@ -1,0 +1,278 @@
+{
+ "key": "aircraft_maintenance_and_parts",
+ "name": "Aircraft maintenance (MRO) and parts",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "MRO",
+  "line maintenance",
+  "base maintenance",
+  "C-check",
+  "A-check",
+  "work package",
+  "task card",
+  "AOG",
+  "rotables",
+  "consumables",
+  "expendables",
+  "core exchange",
+  "repair turnaround",
+  "back-to-birth",
+  "traceability",
+  "certificate of conformity",
+  "Form 1 / 8130",
+  "shelf life",
+  "tooling calibration",
+  "hangar slot",
+  "spare parts",
+  "parts nahi aaye",
+  "hangar khali",
+  "qita’ ghiyar"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Line maintenance, base maintenance, component shop, parts trading, or a mix.",
+  "Aircraft types and categories supported (airline, GA, helicopters, business jets).",
+  "Number of hangars, bays and stations.",
+  "Customer base: own airline, third-party operators, foreign customers.",
+  "Parts model: stocked inventory, consignment, exchange/pool, broker sourcing.",
+  "Size of the engineering and technician team and whether shifts run 24/7.",
+  "Systems used: MRO software, ERP, Excel, paper task cards."
+ ],
+ "scope_rule": "pi notes business and workflow problems: parts availability and sourcing delays, turnaround time, hangar slot planning, quoting and billing, technician scheduling, tooling and stock tracking, supplier issues and reporting. pi never comments on airworthiness, whether a repair or part is acceptable, certification, approvals, inspection standards or how a regulator (PCAA, GCAA, Transport Canada, EASA, FAA) would interpret anything. It never advises on whether a part’s paperwork is valid, and never helps with records falsification or unapproved parts. It records roles (licensed engineer, store keeper, planner), not names or licence numbers.",
+ "vocabulary": {
+  "AOG": "aircraft on ground, urgent part or fix needed",
+  "rotable": "part that is repaired and reused, tracked by serial number",
+  "consumable / expendable": "used once and replaced",
+  "core": "the old unit returned in an exchange deal",
+  "TAT": "turnaround time for a repair or check",
+  "work package": "the list of tasks for a check",
+  "task card": "instruction sheet for one job",
+  "back-to-birth": "full traceability history of a part",
+  "shelf life": "how long a part or material can be stored",
+  "tool crib": "controlled store for tools",
+  "hangar slot": "booked time for an aircraft in the hangar",
+  "findings": "extra defects found during a check"
+ },
+ "problems": [
+  {
+   "phrase": "Aircraft sit longer than planned because parts arrive late from abroad",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "AOG requests come at midnight and we can’t see what’s in stock quickly",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "System says we have the part, store says we don’t",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Shelf-life items expire on the shelf and get written off",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Serial numbers and paperwork for rotables are in folders nobody can find",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Cores for exchanges aren’t returned on time and we get charged",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Repairs sent out to shops abroad disappear for months",
+   "category": "suppliers_purchasing",
+   "subtype": "po_tracking"
+  },
+  {
+   "phrase": "Checks run over and findings aren’t billed properly",
+   "category": "cash_collections",
+   "subtype": "unbilled_work"
+  },
+  {
+   "phrase": "Customers dispute invoices because extra work wasn’t approved in writing",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We quote a check and lose money because labour hours overrun",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "No idea of real margin per check or per customer",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Freight and customs on urgent parts kill the profit",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Hangar slots get double-booked or sit empty",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Planners, stores and the floor each keep their own list",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Task cards are paper and get re-typed into the system later",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Shift handovers lose information between day and night teams",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Tools go missing or calibration due dates get missed",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Good licensed engineers keep leaving for the Gulf",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Technician hours per job are guessed, not recorded",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Overtime bills shoot up during heavy checks",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Parts brokers send quotes on WhatsApp and we can’t compare them",
+   "category": "suppliers_purchasing",
+   "subtype": "price_comparison"
+  },
+  {
+   "phrase": "Customers keep calling to ask when their aircraft will be ready",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Audit preparation takes weeks of pulling documents together",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Approval and certificate renewal dates for the shop sneak up on us",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Small consumables walk out of the store",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "We want more third-party customers but don’t know how to reach operators",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  }
+ ],
+ "questions": {
+  "parts delays": [
+   "Which parts hold you up most often?",
+   "Where do they usually come from?",
+   "How do you track them once ordered?"
+  ],
+  "stock": [
+   "When an AOG request comes in, how do you check what you have?",
+   "How often does the system disagree with the shelf?"
+  ],
+  "repairs out": [
+   "How many units do you have out for repair right now, roughly?",
+   "How do you know where each one is?"
+  ],
+  "turnaround": [
+   "How often do checks finish later than planned?",
+   "What usually causes the overrun?"
+  ],
+  "billing": [
+   "How are extra findings approved by the customer?",
+   "How long after a check does the invoice go out?"
+  ],
+  "margins": [
+   "Do you know what each check actually earned?",
+   "Which cost tends to surprise you?"
+  ],
+  "hangar planning": [
+   "How are hangar slots booked today?",
+   "What happens when a check runs over?"
+  ],
+  "staff": [
+   "Where is it hardest to keep people, engineers or technicians?",
+   "How do you see hours per job?"
+  ],
+  "handovers": [
+   "How does the night shift know what the day shift finished?",
+   "Where has something slipped before?"
+  ],
+  "reporting": [
+   "What do you look at to know how the shop is doing?",
+   "How long does it take to put together?"
+  ]
+ },
+ "seasons": "Airlines push heavy checks into low seasons, so MRO peaks often fall outside Eid, Hajj and summer travel peaks; pre-Hajj and pre-summer readiness rush; winter is check-heavy for many Gulf and Pakistani operators; Canadian operators prefer heavy maintenance in spring and autumn shoulder seasons, with winter de-icing and cold-weather line work; Ramadan reduced working hours in the UAE and Pakistan; fiscal year-end (June in Pakistan, December elsewhere) brings budget-driven work and stock counts; regulator audit cycles create preparation peaks.",
+ "care": [
+  "pi never comments on airworthiness, whether a part or repair is acceptable, inspection methods, certification or approval scope, and never interprets PCAA, GCAA, Transport Canada, EASA or FAA rules.",
+  "Never helps with falsified records, backdated sign-offs, suspected unapproved parts, altered certificates or tags; pi declines plainly and moves on.",
+  "If someone describes a flight-safety incident in progress or an aircraft about to fly with a known serious defect, pi stops and points them to their safety and emergency channels and the authority.",
+  "Hangar injuries or fires: emergency trigger; pi stops and directs to emergency services.",
+  "Never stores engineer licence numbers, staff names, or customers’ passenger data; roles only.",
+  "Export controls and sanctions on parts: pi does not advise or help route around them.",
+  "Customs and duty matters: notes delays and cost only, no customs advice."
+ ],
+ "build_ideas": [
+  "Parts register with serial/batch tracking, location bin, shelf-life dates and attached document scans, searchable from a phone.",
+  "AOG lookup: one search across own stock, consignment and preferred brokers’ last quotes.",
+  "Shelf-life expiry alerts with weekly lists of items nearing expiry.",
+  "Repair-out tracker: each unit sent to a shop, PO, expected return, status chasers.",
+  "Core return tracker for exchange deals with due dates and penalty warnings.",
+  "Check job tracker: work package, hours booked per task, findings logged and sent for customer approval by WhatsApp or email.",
+  "Quote versus actual tracker per check for labour, parts and freight.",
+  "Hangar slot planner showing bays, booked aircraft and overrun impact.",
+  "Digital shift handover log with open items and acknowledgement.",
+  "Tool crib check-out and calibration due-date tracker.",
+  "Broker quote comparison sheet populated from incoming quotes.",
+  "Customer status updates: automated progress messages on their aircraft or component.",
+  "Audit document pack builder pulling records into one folder by aircraft or part."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our biggest headache is repairs we send abroad, they just vanish for months."
+  },
+  {
+   "role": "pi",
+   "text": "That’s tough when the customer is waiting on that unit. Noted: repairs sent out to overseas shops have no clear tracking. Roughly how many units are out for repair at any one time?"
+  },
+  {
+   "role": "Person",
+   "text": "Maybe 30 to 40. One guy keeps an Excel sheet but it’s never updated."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, so it rests on one sheet and one person keeping it current. When a customer asks about a unit, how do you find out where it is today?"
+  }
+ ]
+}

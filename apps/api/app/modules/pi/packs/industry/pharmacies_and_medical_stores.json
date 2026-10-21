@@ -1,0 +1,286 @@
+{
+ "key": "pharmacies_and_medical_stores",
+ "name": "Pharmacies and medical stores",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "pharmacy",
+  "chemist",
+  "medical store",
+  "medical store wala",
+  "dawai",
+  "dawa khana",
+  "dawaon ki dukaan",
+  "saydaliya",
+  "dawa",
+  "prescription",
+  "OTC",
+  "generic",
+  "branded",
+  "distributor",
+  "short supply",
+  "expiry",
+  "batch",
+  "cold chain",
+  "fridge items",
+  "insulin",
+  "surgical items",
+  "baby milk",
+  "cosmetics in pharmacy",
+  "home delivery",
+  "insurance claims",
+  "e-prescription",
+  "pharmacist on duty",
+  "drug licence renewal",
+  "wholesale pharmacy"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: neighbourhood medical store, chain pharmacy, hospital/clinic pharmacy, wholesale/distributor.",
+  "Branch count and whether stock is held centrally.",
+  "Share of prescription vs OTC vs non-medicine (baby, cosmetics, supplements, surgical).",
+  "Insurance billing (UAE and Canada) vs cash/self-pay (PK mostly).",
+  "Delivery: own riders, apps (Talabat, Careem, Noon, Instashop, local apps), phone/WhatsApp orders.",
+  "Systems in use: pharmacy software, basic POS, register, distributor apps.",
+  "Cold-chain storage capacity."
+ ],
+ "scope_rule": "pi notes only the operational business side: stock and expiry, shortages from distributors, batch tracking effort, cold-chain monitoring as a process, insurance claim workflow, delivery orders, staffing, cash and reporting. pi gives no medical, dosing, interaction, substitution or clinical advice. It does not advise on drug regulation, controlled-substance rules, licensing, pricing regulation or insurance coding; it notes only the effort or delay. pi never asks for or records patients’ names, prescriptions, conditions, medicines dispensed to individuals or insurance member IDs. pi refuses any request to sell prescription-only or controlled medicines without proper process, falsify records, re-label expired stock or bill insurers for items not dispensed.",
+ "vocabulary": {
+  "OTC": "over-the-counter medicine, no prescription needed",
+  "Rx / prescription-only": "needs a valid prescription",
+  "generic / branded": "same molecule, different makers",
+  "short / shortage": "medicine unavailable from distributors",
+  "batch / lot": "manufacturing run, with its own expiry",
+  "near-expiry": "stock close to its expiry date",
+  "cold chain": "keeping medicines in a required temperature range",
+  "distributor / wholesaler": "supplier to pharmacies",
+  "bonus / scheme": "free units or discounts from distributors",
+  "claim / pre-approval": "insurance billing steps (UAE, Canada)",
+  "dawai / dawa": "medicine (Urdu / Arabic)",
+  "saydaliya": "pharmacy (Arabic)",
+  "drug licence": "the operating licence for the pharmacy"
+ },
+ "problems": [
+  {
+   "phrase": "Expired medicines pile up and the distributor won’t take them back",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "We only find out an item is near expiry when it’s too late",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Common medicines go short and patients go elsewhere",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Distributors deliver late or short",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Each distributor has different schemes and I can’t compare who’s cheaper",
+   "category": "suppliers_purchasing",
+   "subtype": "price_comparison"
+  },
+  {
+   "phrase": "Thousands of SKUs and the system count never matches the shelf",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Batch numbers aren’t recorded at sale, so recalls are a nightmare",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Fridge temperature log is filled in late or not at all",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Power cuts and we worry about the fridge items",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Insurance claims rejected for paperwork reasons",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Claims submission takes hours of staff time daily",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Licence renewals and inspections sneak up on us",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Can’t find or keep qualified pharmacists",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Night shift staff don’t record sales properly",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Cash at closing doesn’t match the system",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "High-value items go missing from the shelves",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "WhatsApp delivery orders get missed during rush",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Delivery apps show items we don’t have, then we cancel and get penalised",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Rider delays for urgent home deliveries",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Margins on medicines are thin and I don’t know which categories carry the shop",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Price changes from companies aren’t updated on the system",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Branches can’t see each other’s stock to transfer",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Old software is slow and crashes",
+   "category": "tech_systems",
+   "subtype": "outdated_system"
+  },
+  {
+   "phrase": "Regular customers with monthly medicines don’t come back on time",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  }
+ ],
+ "questions": {
+  "setup": [
+   "Is this a single store, a chain, or attached to a clinic or hospital?",
+   "What system do you use for stock and billing today?"
+  ],
+  "expiry": [
+   "How do you find out what’s near expiry?",
+   "What happens to stock once it expires?"
+  ],
+  "shortages and suppliers": [
+   "How many distributors do you buy from?",
+   "How do you decide who to order from each day?"
+  ],
+  "stock counts": [
+   "How often do you count stock?",
+   "How far off is the system usually?"
+  ],
+  "batches and recalls": [
+   "Is the batch recorded when stock comes in and when it’s sold?",
+   "What happened the last time there was a recall?"
+  ],
+  "cold chain": [
+   "How is the fridge temperature checked and recorded?",
+   "Who’s responsible on each shift?"
+  ],
+  "insurance": [
+   "Do you bill insurance?",
+   "How long does submission take, and what usually causes rejections?"
+  ],
+  "delivery": [
+   "How do delivery orders reach you, WhatsApp, phone or apps?",
+   "What goes wrong most often?"
+  ],
+  "staff and shifts": [
+   "How many shifts do you run?",
+   "How is the handover between them done?"
+  ],
+  "cash and loss": [
+   "How is the till checked at shift end?",
+   "Where do you think losses happen?"
+  ],
+  "owner view": [
+   "Can you see which categories bring in the most margin?"
+  ]
+ },
+ "seasons": "Across all markets, flu and cold season (winter), allergy seasons (spring), and back-to-school vitamins and supplies are peaks. In PK: monsoon and post-monsoon (dengue, diarrhoea-related demand), summer heat (ORS, sunscreen), smog season in Punjab (November to January) for masks and respiratory OTC items, and Ramadan shifting store hours to late nights. In the UAE: winter flu season, Ramadan hours, summer travel kits and sun care, and insurance-renewal periods that change claim patterns. In Canada: cold and flu season (October to March), allergy season (spring), and year-end benefit usage. Distributor shortages can strike at any time and dominate everything.",
+ "care": [
+  "No medical, dosing, interaction, substitution or “what should I give” advice, ever. If a medical emergency or overdose is described, pi tells them to call emergency services immediately (PK 1122/115, UAE 998/999, Canada 911).",
+  "Never record patient names, prescriptions, conditions, dispensed medicines per person, or insurance member IDs.",
+  "Refuse requests to sell prescription-only or controlled medicines without valid process, to backdate or alter records, to re-label expired stock, or to bill insurers for items not dispensed.",
+  "Regulatory topics (drug licensing, controlled-drug registers, pricing rules, inspections) are noted only as admin effort; pi gives no regulatory advice.",
+  "Cold-chain failures: pi records the process gap; it does not advise whether affected stock is safe to sell.",
+  "Counterfeit or smuggled medicine offers from suppliers: pi refuses to help and notes the supplier-quality concern only.",
+  "Staff suspicions recorded by role and pattern only.",
+  "Robbery or threats at the counter (a known risk for late-night pharmacies) → pi tells them to call the police or emergency services."
+ ],
+ "build_ideas": [
+  "Batch- and expiry-level stock with near-expiry alerts (e.g. 90/60/30 days) and a return-to-distributor tracker.",
+  "Distributor order comparison: price, scheme and availability per item across suppliers, with suggested split orders.",
+  "Shortage list shared with distributors on WhatsApp and tracked until filled.",
+  "Goods-received check: ordered vs delivered vs batch/expiry captured at entry.",
+  "Cycle-count tool: count a few shelves each day on phone, with variance trends.",
+  "Recall lookup by batch across branches.",
+  "Fridge temperature log on phone with reminders each shift and alerts on missed entries (records only, no safety judgement).",
+  "Insurance claim tracker: submitted, rejected (reason), resubmitted, paid, with ageing.",
+  "Licence and inspection calendar with reminders.",
+  "Unified delivery order inbox (WhatsApp, phone, apps) with stock check before acceptance and rider tracking.",
+  "Shift close and handover checklist with till reconciliation.",
+  "Refill reminder messages to regular customers who opt in (the system holds only what’s legally permitted; pi never collects it).",
+  "Branch stock visibility and transfer requests.",
+  "Owner dashboard: sales and margin by category, expiry exposure, shortages, claims outstanding."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mera sab se bara masla expiry hai. Har mahine kaafi maal expire ho jaata hai aur distributor wapis nahi leta."
+  },
+  {
+   "role": "pi",
+   "text": "Ye seedha nuqsan hai, samajh sakta hoon. Noted: har mahine expiry ka maal phansa reh jaata hai. Abhi aap ko kaise pata chalta hai ke kya expire hone wala hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Kabhi kabhi shelf check karte hain, system mein expiry nahi daalte."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, expiry system mein record nahi hoti, shelf check se pata chalta hai. Maal aate waqt batch aur expiry kahin likhi jaati hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Bill pe hoti hai, bas."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted. Aap kitne distributors se maal lete hain, taqreeban?"
+  }
+ ]
+}

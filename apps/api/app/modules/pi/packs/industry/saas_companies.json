@@ -1,0 +1,289 @@
+{
+ "key": "saas_companies",
+ "name": "SaaS companies",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "MRR",
+  "ARR",
+  "churn",
+  "trial",
+  "free trial",
+  "signups",
+  "activation",
+  "onboarding",
+  "subscription",
+  "plan upgrade",
+  "downgrade",
+  "failed payments",
+  "dunning",
+  "support tickets",
+  "feature requests",
+  "roadmap",
+  "release",
+  "uptime",
+  "users login nahi kar rahe",
+  "customers cancel kar rahe hain",
+  "Stripe",
+  "Paddle",
+  "PayFast",
+  "Intercom",
+  "HubSpot",
+  "Zendesk",
+  "product-led",
+  "demo request",
+  "ishtirak"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Product type and who it is sold to (SMEs, enterprises, consumers, specific industry)",
+  "Number of paying customers and pricing model (monthly, annual, per seat, usage-based)",
+  "Sales motion: self-serve, sales-led demos, partners/resellers",
+  "Markets served and billing currencies",
+  "Team size across product, engineering, support, sales and success",
+  "Tools used for billing, CRM, support and product analytics",
+  "Whether there is a dedicated customer success or onboarding function"
+ ],
+ "scope_rule": "pi notes the business and operational problems: signups and activation, onboarding, churn, failed payments and collections, support load, feature request handling, release coordination, sales pipeline, reporting on subscription metrics and team process. pi gives no legal, privacy-law, tax, investment or fundraising advice, and does not take customer lists, user data, API keys, passwords or employee personal details. It records customer segments and roles only. Requests to use dark patterns that trap users, collect data without consent, fake reviews or mislead investors with numbers are declined.",
+ "vocabulary": {
+  "MRR / ARR": "monthly / annual recurring revenue",
+  "Churn": "customers or revenue lost when subscriptions are cancelled",
+  "Activation": "a new user reaching the first real value in the product",
+  "Onboarding": "getting a new customer set up and using the product",
+  "Dunning": "retrying failed payments and reminding customers",
+  "Seat": "one user licence",
+  "Trial-to-paid": "share of trials that become paying customers",
+  "Expansion": "existing customers upgrading or adding seats",
+  "Customer success (CS)": "team that keeps customers using and renewing",
+  "Roadmap": "planned product features",
+  "Ticket": "a support request",
+  "NPS": "a common satisfaction survey score"
+ },
+ "problems": [
+  {
+   "phrase": "Lots of signups but very few actually start using the product",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Trials expire and we never spoke to the person",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Customers cancel after two or three months",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "We only find out a customer is unhappy when they cancel",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Card payments fail and nobody follows up",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "Annual enterprise invoices get paid months late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Local customers want to pay by bank transfer and we reconcile by hand",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "Onboarding each new client takes our team a week of calls",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Support tickets keep piling up and response time is slipping",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "The same questions come in over and over",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Feature requests are in Slack, email and WhatsApp and we lose track",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Releases break things customers rely on",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Downtime last month and customers found out before we did",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "I can’t get a clean MRR number without a day in spreadsheets",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Billing, CRM and product data don’t talk to each other",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "We spend on ads and don’t know which channel brings paying customers",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Demo requests sit for days before sales calls back",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Discounts given by sales are all over the place",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Customers on old plans pay far less for the same thing",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Cloud hosting costs grew faster than revenue",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Engineers get pulled into support all day",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Hard to hire product-minded engineers",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Product, sales and support each have their own version of the truth",
+   "category": "communication_coordination",
+   "subtype": "branches_not_aligned"
+  },
+  {
+   "phrase": "Reseller partners sell but we don’t see their pipeline",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Customer contracts and renewal dates are in a folder nobody checks",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Want to launch in the Gulf/Canada but don’t know how to support another time zone",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "signups": [
+   "Roughly how many new signups or trials come in each month?",
+   "How many of them go on to pay?"
+  ],
+  "activation": [
+   "What does a new customer need to do before they get value?",
+   "Where do most of them stall?"
+  ],
+  "churn": [
+   "How long do customers typically stay?",
+   "Do you usually know why they leave?"
+  ],
+  "payments": [
+   "How do customers pay — card, transfer, invoice?",
+   "What happens when a payment fails?"
+  ],
+  "onboarding": [
+   "Who sets up new customers?",
+   "How long does it usually take?"
+  ],
+  "support": [
+   "How do support requests come in?",
+   "What’s your typical first response time now?"
+  ],
+  "product feedback": [
+   "Where do feature requests end up?",
+   "How do you decide what to build next?"
+  ],
+  "reporting": [
+   "How do you get your MRR and churn numbers?",
+   "How long does that take?"
+  ],
+  "sales": [
+   "Is it mostly self-serve or demo-led?",
+   "How quickly are demo requests followed up?"
+  ],
+  "growth": [
+   "Which market or segment are you aiming for next?",
+   "What’s the main thing holding that back?"
+  ]
+ },
+ "seasons": "- Many B2B buyers set budgets in Q4 and sign in Q1; annual renewals cluster around original contract months. - Pakistan: fiscal year July–June affects SME and enterprise purchasing; Ramadan and Eid slow decisions; currency movements affect pricing for dollar-billed tools. - UAE: GITEX (October) and Q4 drive demos and deals; summer slow. - Canada: December and summer slow; fiscal year-ends (often March) drive procurement. - Consumer or education-focused products follow school terms and holiday sales.",
+ "care": [
+  "Never ask for user data, customer lists, API keys, admin credentials or card details.",
+  "No privacy-law, tax, fundraising, valuation or legal advice.",
+  "Decline dark patterns (hard-to-cancel flows, hidden charges), unconsented data use, fake reviews or misleading investor metrics.",
+  "Security breach or data leak: note as an operational concern; advise involving their security lead and relevant authorities; no forensics.",
+  "Customer names are not recorded; use segments (“an enterprise customer”, “SME plan users”).",
+  "Founder pressure around runway: stay practical, no financial advice."
+ ],
+ "build_ideas": [
+  "Subscription metrics dashboard pulling from the billing system: MRR, new, expansion, churned, by plan and market",
+  "Trial and onboarding tracker showing each new account’s progress through key setup steps, with nudges by email or WhatsApp",
+  "Customer health view combining usage, tickets and payment status to flag at-risk accounts",
+  "Failed payment flow: retries, reminders and a task for the team when an account stays unpaid",
+  "Bank transfer reconciliation helper matching incoming transfers to invoices",
+  "Support ticket intake with tagging, SLA timers and a weekly summary of top recurring issues",
+  "FAQ/help-centre and WhatsApp assistant answering common questions from approved content",
+  "Feature request log that captures requests from all channels, linked to customer accounts",
+  "Demo request routing with immediate acknowledgement and assignment to a salesperson",
+  "Discount and pricing register tracking which accounts are on which terms",
+  "Contract and renewal calendar for annual and enterprise customers",
+  "Release notes and status page workflow so customers hear about changes and incidents first",
+  "Partner/reseller pipeline view"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We get decent signups every month but our churn is bad. People leave after a couple of months."
+  },
+  {
+   "role": "pi",
+   "text": "That’s frustrating — the effort to win them is there, but they don’t stick — noted. Do you usually find out why someone cancels?"
+  },
+  {
+   "role": "Person",
+   "text": "Sometimes there’s a cancel reason, mostly it’s blank."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, cancellation reasons are mostly missing. After someone signs up, does anyone from your team speak to them during their first few weeks?"
+  },
+  {
+   "role": "Person",
+   "text": "Only if they open a ticket."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, contact only happens if they reach out first — I’ve noted that too. Roughly how many paying customers do you have at the moment?"
+  }
+ ]
+}

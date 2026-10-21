@@ -1,0 +1,273 @@
+{
+ "key": "perfumes_attar_and_oud",
+ "name": "Perfumes, attar and oud",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "perfume shop",
+  "attar",
+  "itr",
+  "oud",
+  "oudh",
+  "dehn al oud",
+  "bakhoor",
+  "bukhoor",
+  "mubakhar",
+  "musk",
+  "amber",
+  "mukhallat",
+  "oud muattar",
+  "tola",
+  "roll-on",
+  "shishi",
+  "decant",
+  "inspired / impression perfume",
+  "clone",
+  "EDP",
+  "EDT",
+  "tester",
+  "gift set",
+  "Arabian perfume",
+  "oriental",
+  "niche",
+  "khushboo",
+  "atar wala",
+  "refill"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: branded designer retail, Arabian/oriental house, attar and oud specialist, blending/“inspired” perfumery, or wholesale.",
+  "In-house blending/bottling vs finished goods only.",
+  "Whether they sell raw oud wood/oils by weight and grade.",
+  "Sales channels: kiosks in malls, standalone shops, souq, online, marketplaces, wholesale to other shops, export.",
+  "Number of outlets or kiosks.",
+  "Gifting and corporate orders share.",
+  "Country, since UAE oud culture, PK attar tradition and Canadian diaspora markets behave differently."
+ ],
+ "scope_rule": "pi notes operational problems such as stock of oils, bottles and finished goods, blending recipes and consistency, kiosk cash, staff sales, gifting peaks and online orders. pi does not advise on fragrance safety, skin reactions, ingredient regulation, labelling law or hazardous-goods shipping rules for alcohol-based perfumes. It does not judge whether clones or “inspired” scents infringe trademarks, and it refuses to help pass copies off as branded originals. pi never records customers’ names or contact details.",
+ "vocabulary": {
+  "attar / itr": "concentrated, usually oil-based perfume",
+  "oud / dehn al oud": "agarwood oil, often graded and priced by quality",
+  "bakhoor / bukhoor": "scented wood chips or bricks burned on charcoal",
+  "mabkhara / mubakhar": "incense burner",
+  "mukhallat": "blended oud perfume",
+  "tola": "traditional attar measure, about 12 ml",
+  "decant": "small portion poured from a large bottle",
+  "inspired / impression": "local blend that smells like a known brand",
+  "EDP / EDT": "eau de parfum / eau de toilette strengths",
+  "tester": "display bottle for sampling",
+  "grade": "oud quality level, used to set price",
+  "shishi": "small bottle"
+ },
+ "problems": [
+  {
+   "phrase": "Oils sold by tola are measured by eye and the stock never balances",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Expensive oud oil goes missing in small amounts",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Same blend smells different every batch",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Only the master blender knows the recipes",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "We run out of bottles, caps or boxes before Eid",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Kiosk cash doesn’t match the sales slips",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Staff give away too many samples and decants",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Ramadan and Eid gifting orders get mixed up",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Corporate gift orders come with custom boxes and names, and we miss deadlines",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Raw oud supplier prices jump and I keep old selling prices",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Quality of the oud from the supplier isn’t what was promised",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Courier refuses or delays perfume parcels",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Broken bottles in delivery",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Customers loved a scent and we can’t tell them when it’s back",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Each kiosk reports sales on WhatsApp in a different format",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Commission for kiosk staff causes arguments",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Kiosk staff turnover is constant",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Mall kiosk rent is eating the profit and I don’t know which kiosk pays",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "Old gift sets left after Eid",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Online shop shows items we don’t have",
+   "category": "orders_fulfilment",
+   "subtype": "multi_channel_orders"
+  },
+  {
+   "phrase": "Batch labels not kept, can’t trace a customer complaint",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Wholesale buyers take goods on credit and pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Opening a new kiosk is chaos every time",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  }
+ ],
+ "questions": {
+  "product mix": [
+   "Is this mostly branded perfume, Arabian/oud, attar, or your own blends?",
+   "Do you blend and bottle yourselves?"
+  ],
+  "oils and stock": [
+   "How are oils measured and recorded when sold loose?",
+   "When stock is counted, how far off is it usually?"
+  ],
+  "blending": [
+   "Who makes the blends today?",
+   "Is the recipe written down anywhere?"
+  ],
+  "packaging": [
+   "Do bottles, caps or boxes ever run short?",
+   "How far ahead do you order them before a season?"
+  ],
+  "outlets": [
+   "How many shops or kiosks do you run?",
+   "How does each one send you the day’s sales?"
+  ],
+  "cash": [
+   "Is cash counted and deposited daily at every outlet?",
+   "Who checks it?"
+  ],
+  "gifting": [
+   "How do gift and corporate orders come in?",
+   "How do you keep track of custom details and dates?"
+  ],
+  "suppliers": [
+   "Where do your oud and oils come from?",
+   "What goes wrong most often with them?"
+  ],
+  "online": [
+   "Do you sell online, and how do you handle shipping perfume?",
+   "What problems come up with delivery?"
+  ],
+  "customers": [
+   "When a regular asks for their favourite scent, how do you remember what it was?"
+  ]
+ },
+ "seasons": "Ramadan, Eid ul Fitr and Eid ul Adha are the biggest peaks in the UAE and PK, with corporate gifting in the run-up. In the UAE: Dubai Shopping Festival, UAE National Day (2 December), Mother’s Day (21 March in the Arab world), Valentine’s Day and weddings in the cooler months. In PK: Muharram and Rabi ul Awal see higher attar and bakhoor use for gatherings, along with wedding season and Jummah walk-ins. In Canada: Christmas and Black Friday for designer perfume, and Eid and Diwali for diaspora oud and attar. Summer heat in the Gulf affects storage and shipping.",
+ "care": [
+  "Refuse any request to sell clones as genuine branded perfume or to make fake branded labels and boxes.",
+  "Do not advise on whether “inspired” naming or packaging is legal; note the operational problem only.",
+  "No advice on ingredient safety, allergies or skin reactions; serious reactions → emergency care.",
+  "Shipping and storage of flammable alcohol-based perfume is a safety and regulatory topic; pi notes the delivery problem and does not give dangerous-goods advice. A fire or chemical incident means pi stops and points to emergency services.",
+  "Do not help bypass customs on oud wood or oils, or under-declare value.",
+  "Record staff suspicions by role and pattern, never names.",
+  "Do not record customer names or numbers; gift recipients’ details stay out of the chat."
+ ],
+ "build_ideas": [
+  "Oil stock in ml/tola per grade, deducted per sale, with weekly variance checks.",
+  "Blend recipe book with ratios, batch number, maker and date, access-controlled.",
+  "Packaging materials stock (bottles, caps, boxes, bags) with reorder alerts tied to the seasonal forecast.",
+  "Kiosk daily close on phone: sales by product, cash, card, samples given, sent to the owner automatically.",
+  "Outlet comparison: sales vs rent and staff cost per kiosk.",
+  "Gift and corporate order tracker with custom box, message, quantity, delivery date and status.",
+  "Sample/decant log per staff member, with monthly cost.",
+  "Commission calculator per salesperson from POS data.",
+  "Unified stock for online store and outlets.",
+  "Courier booking and parcel tracking with breakage claims logged.",
+  "Customer scent preference list (with consent) for restock and festival messages.",
+  "Wholesale credit ledger with ageing and WhatsApp reminders."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "I have six kiosks in malls and every evening I get sales on WhatsApp in different formats. I can’t make sense of it."
+  },
+  {
+   "role": "pi",
+   "text": "That sounds draining to sort through every night. Noted: kiosk sales come in on WhatsApp in mixed formats. What usually goes in each message, just totals or item by item?"
+  },
+  {
+   "role": "Person",
+   "text": "Some send totals, some send photos of the slip."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Is cash counted and handed over at each kiosk the same day?"
+  },
+  {
+   "role": "Person",
+   "text": "Supposed to be, but not always."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted that cash handover isn’t always same-day. Who checks the cash against the sales at the moment?"
+  }
+ ]
+}

@@ -1,0 +1,250 @@
+{
+ "key": "housing_society_and_building_management",
+ "name": "Housing society and building management (incl. owners’ associations)",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "society",
+  "maintenance charges",
+  "service charges",
+  "union",
+  "society office",
+  "anjuman",
+  "owners’ association",
+  "OA",
+  "condo board",
+  "strata",
+  "reserve fund",
+  "AGM",
+  "budget approval",
+  "facility booking",
+  "common area",
+  "gate pass",
+  "guard",
+  "chowkidar",
+  "haris",
+  "bawab",
+  "defaulters",
+  "water tanker",
+  "generator",
+  "Mollak",
+  "JOP",
+  "community management"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type: gated housing society, apartment building, mixed-use tower, master community, condo/strata corporation.",
+  "Number of units/houses and residents served.",
+  "Who manages: elected committee/board, developer, or a hired management company.",
+  "How charges are collected and at what frequency.",
+  "Staff count: guards, cleaners, plumbers, electricians, gardeners, office staff; in-house or outsourced.",
+  "Shared services run: water, generators, lifts, pools, gyms, parking, security gates.",
+  "Country (UAE jointly owned property rules, Canadian condo/strata acts, Pakistani society bylaws all differ)."
+ ],
+ "scope_rule": "pi notes operational problems: dues collection, defaulter follow-up, complaints handling, staff and vendor management, common-area maintenance, facility bookings, resident communication and committee reporting. pi does not give legal advice on bylaws, voting, disputes between owners, recovery action against defaulters, or developer handover obligations, and does not interpret association law. It gives no structural, fire, lift, electrical or water-safety engineering advice. It never records residents’ names, house numbers tied to people, phone numbers, IDs, vehicle numbers or CCTV footage details; it notes roles and counts.",
+ "vocabulary": {
+  "anjuman/ union": "residents’ welfare association",
+  "chowkidar/ haris/ bawab": "watchman or building guard",
+  "maintenance charges / service charges": "periodic dues for common services",
+  "defaulter": "owner or resident not paying dues",
+  "reserve fund / sinking fund": "savings for major repairs",
+  "AGM": "annual general meeting of owners",
+  "Mollak": "Dubai service-charge and owners’ association system",
+  "JOP": "jointly owned property (UAE)",
+  "condo board / strata council": "elected owner body (Canada)",
+  "gate pass": "visitor or vehicle entry slip",
+  "facility booking": "reserving the hall, pool, BBQ area, gym or court"
+ },
+ "problems": [
+  {
+   "phrase": "A big chunk of owners don’t pay maintenance and we keep running short",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We collect in cash at the society office and the totals never match",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Residents ask where their money goes and we can’t show them",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Generator diesel bills keep going up and I suspect it’s being siphoned",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Electricity for common areas is huge and nobody knows why",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Complaints come into the committee WhatsApp group and get buried",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "The same leaking pipe complaint has been open for two months",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Guards sleep on night duty and we only find out after something happens",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Cleaners and gardeners don’t show up and we can’t prove it",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Vendors for lifts, pumps and pest control — contracts expire and nobody notices",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Pump and generator breakdowns because no one does the scheduled service",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Water tankers — we pay for 20, I’m not sure 20 arrived",
+   "category": "suppliers_purchasing",
+   "subtype": "delivery_verification"
+  },
+  {
+   "phrase": "Every purchase needs three committee signatures and takes weeks",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "New committee takes over and the old records are gone",
+   "category": "tech_systems",
+   "subtype": "data_loss"
+  },
+  {
+   "phrase": "Visitor entries are written in a register nobody can search",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Clubhouse and hall bookings clash",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Preparing the annual accounts and budget for the AGM is a nightmare",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Notices only reach the people who read the group",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Theft of parts from the parking and no one knows which camera covers it",
+   "category": "loss_security",
+   "subtype": "cctv_gaps"
+  },
+  {
+   "phrase": "We don’t know how much we need to save for the lifts and roof in future",
+   "category": "planning_growth",
+   "subtype": "budgeting_process"
+  },
+  {
+   "phrase": "Board members and the management company blame each other",
+   "category": "communication_coordination",
+   "subtype": "accountability_unclear"
+  }
+ ],
+ "questions": {
+  "size and set-up": [
+   "How many units or houses does the society cover?",
+   "Is it run by an elected committee, the developer, or a management company?"
+  ],
+  "dues": [
+   "How are maintenance charges collected?",
+   "Roughly what share of owners are behind?",
+   "Who follows up with them?"
+  ],
+  "spending": [
+   "Which costs worry you most — power, diesel, water, staff?",
+   "How are bills checked before they’re paid?"
+  ],
+  "complaints": [
+   "How do residents report problems today?",
+   "How do you know if a complaint has actually been fixed?"
+  ],
+  "staff": [
+   "How many guards, cleaners and maintenance staff are there?",
+   "How do you check they’re on duty?"
+  ],
+  "vendors": [
+   "Which service contracts do you have running — lifts, pumps, pest control?",
+   "Who keeps track of when they’re due?"
+  ],
+  "approvals": [
+   "How are purchases approved?",
+   "Where does that usually get stuck?"
+  ],
+  "reporting": [
+   "What do owners ask to see at the AGM?",
+   "How long does it take to prepare?"
+  ],
+  "communication": [
+   "How do notices reach residents?",
+   "Who tends to miss them?"
+  ]
+ },
+ "seasons": "In Pakistan, summer (May to August) brings peak load-shedding, generator diesel spend and water shortages with tanker dependence; monsoon brings drainage, seepage and roof leak complaints; Muharram and Eid bring security arrangements and Eid-ul-Adha animal-related cleanliness and waste issues. In the UAE, summer AC load drives chiller and power costs, while service- charge budgets and invoices follow the calendar year; Ramadan changes staff timings. In Canada, the fiscal year and AGM usually fall once a year by bylaw; winter brings snow removal, heating, and frozen pipes; spring brings pool openings and landscaping contracts.",
+ "care": [
+  "Recovery against defaulters, bylaw disputes, voting validity and developer obligations are legal; pi notes the operational problem only and suggests legal advice.",
+  "Never record residents’ names, house numbers linked to people, phone numbers, car plates, IDs or CCTV images.",
+  "Requests to cut water/power to defaulters, publicly shame named residents, or covertly monitor residents are refused or redirected to the business problem only.",
+  "Lift entrapment, fire, gas leaks, electrocution, a child near an unguarded pool or water tank, flooding → pi stops and points to emergency services.",
+  "Questions about whether a structure, lift or fire system is safe → pi says a licensed inspector or engineer must assess; it records the maintenance-tracking problem.",
+  "Committee politics are sensitive; pi stays neutral and records the operational issue, not who is to blame.",
+  "Suspected staff theft (diesel, cash) → pi notes the loss pattern; no covert surveillance or accusations of named staff."
+ ],
+ "build_ideas": [
+  "Dues ledger per unit with invoices, receipts and an ageing list of defaulters, shared with the committee.",
+  "Online payment links and WhatsApp reminders for maintenance charges.",
+  "Cash counter log at the society office with daily close and bank deposit match.",
+  "Resident complaint ticketing via WhatsApp with photo, category, assignee, and closure confirmation from the resident.",
+  "Staff attendance with geotagged check-ins and guard patrol checkpoints (QR or NFC tags on rounds).",
+  "Generator and diesel log: run hours vs fuel received vs fuel used, with variance flags.",
+  "Water tanker receiving log with time, photo and quantity confirmed at the gate.",
+  "Vendor and AMC calendar for lifts, pumps, fire systems, pest control with renewal and service alerts.",
+  "Purchase request and committee approval flow on phones with spending limits.",
+  "Facility booking calendar for hall, pool, courts with rules and confirmations.",
+  "Visitor and vehicle gate-pass app replacing the paper register.",
+  "Monthly income and expense statement and AGM pack generated from the ledger; reserve fund tracker.",
+  "Notices and broadcast channel so every resident gets announcements."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamari society mein 400 ghar hain, aadhe log maintenance time pe nahi dete. Phir generator ka diesel bhi poora nahi hota."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — 400 gharon mein se kaafi log maintenance late dete hain, aur generator ka kharcha poora nahi hota. Noted. Maintenance abhi kaise collect hoti hai — office mein cash, ya bank mein?"
+  },
+  {
+   "role": "Person",
+   "text": "Zyada tar cash, office mein clerk leta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, zyada tar cash office mein clerk ke paas aata hai. Din ke end pe uska hisaab kaun milata hai?"
+  }
+ ]
+}

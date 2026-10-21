@@ -1,0 +1,290 @@
+{
+ "key": "marketing_creative_and_digital_agencies",
+ "name": "Marketing, creative and digital agencies",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "retainer",
+  "client brief",
+  "content calendar",
+  "revisions",
+  "client ne phir changes bheje",
+  "approvals",
+  "deliverables",
+  "social media management",
+  "performance marketing",
+  "ad spend",
+  "Meta Ads",
+  "Google Ads",
+  "TikTok",
+  "SEO",
+  "website project",
+  "shoot",
+  "campaign launch",
+  "creatives",
+  "rate card",
+  "scope creep",
+  "deck ready karo",
+  "account manager",
+  "studio",
+  "wakala tasweeq",
+  "influencer",
+  "pitch"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Services offered (social media, performance ads, SEO, web, branding, video, PR, influencer)",
+  "Number of active retainer clients versus one-off projects",
+  "Team size and roles (account managers, designers, copywriters, media buyers, developers), and use of freelancers",
+  "Whether the agency manages client ad spend directly or through client accounts",
+  "Markets served (Pakistan, UAE, GCC, Canada, international) and currencies billed",
+  "How tasks, approvals and deliverables are tracked today (ClickUp, Trello, Asana, Sheets, WhatsApp)",
+  "How time or effort per client is measured, if at all"
+ ],
+ "scope_rule": "pi notes the agency’s own business and operational problems: briefs, approvals, revisions, task tracking, capacity, retainer profitability, billing and collections, reporting to clients, new business and staff. pi does not give marketing strategy, ad, legal or tax advice, and does not take client names, ad account logins, passwords, client customer data or staff personal details. It records client types and roles only. Requests to buy fake followers or reviews, run deceptive ads, scrape personal data, or use content without rights are declined.",
+ "vocabulary": {
+  "Retainer": "fixed monthly fee for an agreed scope",
+  "Brief": "client’s instructions for a piece of work",
+  "Revisions / rounds": "cycles of changes on a deliverable",
+  "Content calendar": "scheduled plan of posts",
+  "Creatives": "designs, videos and ad assets",
+  "Media buying": "running and managing paid ads",
+  "ROAS / CPL": "return on ad spend / cost per lead",
+  "AM": "account manager, the client’s main contact",
+  "Scope creep": "work growing beyond what was agreed",
+  "Pitch": "presentation to win new business",
+  "Rate card": "standard pricing for services",
+  "Turnaround": "time to deliver a piece of work"
+ },
+ "problems": [
+  {
+   "phrase": "Clients send briefs on WhatsApp voice notes and details get lost",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Approvals take forever, then they want everything live tomorrow",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Unlimited revisions are killing my designers",
+   "category": "operations_process",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Retainers keep growing in work but not in fee",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "I genuinely don’t know which clients make us money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "No one logs time, so I can’t price properly",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Clients pay 60–90 days late and I still have to pay salaries",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "We front ad spend on our cards and get reimbursed late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Monthly reports to clients take two days to build manually",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Clients ask what results they’re getting and we can’t show it clearly",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Posts get missed because the calendar wasn’t updated",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  },
+  {
+   "phrase": "Designers are overloaded one week and idle the next",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Good designers leave after a year",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Quality depends on which designer gets the job",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Wrong version of a creative went live",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "We tried ClickUp but half the team still works off WhatsApp",
+   "category": "tech_systems",
+   "subtype": "user_adoption"
+  },
+  {
+   "phrase": "Clients leave after three months and we don’t know why",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Our own social media and website are neglected",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "New business only comes through referrals",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "Pitches take a week and we rarely hear back",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Freelancers miss deadlines and there’s no record of what they were given",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Every AM handles clients their own way",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "I’m still approving every post myself",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Client contracts and renewal dates are in someone’s email",
+   "category": "compliance_admin",
+   "subtype": "contracts_tracking"
+  },
+  {
+   "phrase": "Software subscriptions keep piling up and nobody knows who uses what",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "We want to open in Dubai but can’t manage two teams",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "briefs": [
+   "How do client briefs usually come in?",
+   "What gets lost most often?"
+  ],
+  "approvals": [
+   "How long does a typical approval take?",
+   "Who chases the client when it stalls?"
+  ],
+  "revisions": [
+   "Is there a limit on revision rounds in your agreements?",
+   "Is it followed in practice?"
+  ],
+  "profitability": [
+   "Do you know how much time goes into each client?",
+   "Which client feels like it costs more than it pays?"
+  ],
+  "capacity": [
+   "How do you decide who works on what this week?",
+   "How do you see if someone’s overloaded?"
+  ],
+  "cash": [
+   "How quickly do clients usually pay?",
+   "Do you ever pay ad spend before the client pays you?"
+  ],
+  "reporting": [
+   "How do you put together client reports?",
+   "How long does that take each month?"
+  ],
+  "retention": [
+   "How long do clients typically stay?",
+   "When they leave, do you know why?"
+  ],
+  "team": [
+   "Where’s turnover hurting most?",
+   "How long does a new hire take to get up to speed?"
+  ],
+  "systems": [
+   "What tool do you use for tasks?",
+   "Does the team actually use it?"
+  ],
+  "growth": [
+   "Where does new business come from now?",
+   "What would you need to take on more clients?"
+  ]
+ },
+ "seasons": "- Pakistan: Ramadan and Eid campaigns are the biggest peak (planning starts weeks before), plus 14 August, wedding season (November–February), 11.11 and White Friday sales, back-to-school and budget-time slowdowns. - UAE: Ramadan and Eid, Dubai Shopping Festival (December–January), Dubai Summer Surprises, National Day (2 December), White Friday/Black Friday, Q4 budget spend; summer is quieter. - Canada: Black Friday/Cyber Monday, holiday season, back-to-school, spring launches; clients’ Q4 budget flush. - January is commonly slow for collections and new retainers start in Q1.",
+ "care": [
+  "Never ask for ad account logins, passwords, card details or client customer lists.",
+  "No marketing, legal or tax advice; pi notes how the agency runs.",
+  "Decline fake reviews, bought followers, deceptive or misleading ads, copyright misuse or scraping personal data.",
+  "Client names are not recorded; use “a retail client”, “a real estate retainer”.",
+  "If the agency fronts ad spend on personal cards, note as a cash-flow problem without card details.",
+  "Staff burnout or conflict: note as a people problem, no counselling.",
+  "Disputes with clients over non-payment: note operationally, no legal guidance."
+ ],
+ "build_ideas": [
+  "Brief intake form (or WhatsApp flow) that turns a client request into a structured task with deadline and assets",
+  "Approval tracker per deliverable with automatic client reminders and a record of revision rounds used",
+  "Content calendar shared with clients showing status (drafted, in review, approved, scheduled, live)",
+  "Lightweight time logging per client and service, rolled up into retainer profitability",
+  "Team capacity board by person and week",
+  "Retainer scope register: what’s included per month versus what was delivered, flagging overruns",
+  "Ad spend reimbursement tracker per client with invoices and ageing",
+  "Automated monthly client report pulling from ad platforms and social analytics into a branded summary",
+  "Freelancer register with assigned work, deadlines and invoice matching",
+  "Client health view: response times, approvals, revisions, payment behaviour, renewal date",
+  "New business pipeline with pitch stage, value band and follow-up dates",
+  "Owner dashboard: active clients, overdue tasks, profitability by client, receivables, pipeline"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Honestly my biggest headache is revisions. Clients send changes at 11pm on WhatsApp and the designers redo stuff four or five times."
+  },
+  {
+   "role": "pi",
+   "text": "That’s draining for the team, and it eats time nobody is paying for — noted. Do your client agreements set a limit on revision rounds?"
+  },
+  {
+   "role": "Person",
+   "text": "They say two rounds, but nobody follows it."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, two rounds on paper but not enforced. Do you have a way to see how many rounds each piece actually went through?"
+  },
+  {
+   "role": "Person",
+   "text": "No, it’s all in WhatsApp threads."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, the revision history only lives in chats — I’ve noted that. Roughly how many active clients is the team handling right now?"
+  }
+ ]
+}

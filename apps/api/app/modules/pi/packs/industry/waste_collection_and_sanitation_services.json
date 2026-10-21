@@ -1,0 +1,267 @@
+{
+ "key": "waste_collection_and_sanitation_services",
+ "name": "Waste collection and sanitation services",
+ "kind": "industry",
+ "sector": {
+  "code": "L",
+  "title": "Finance-adjacent, energy and utilities"
+ },
+ "signals": [
+  "waste collection",
+  "garbage collection",
+  "kachra uthana",
+  "solid waste",
+  "skip hire",
+  "roll-off bins",
+  "recycling",
+  "scrap",
+  "kabari",
+  "sanitation contractor",
+  "sewerage cleaning",
+  "septic tank cleaning",
+  "desludging",
+  "gutter/nala cleaning",
+  "pest control",
+  "cleaning contractor",
+  "safai",
+  "safai wala",
+  "nafayat",
+  "haawiya",
+  "tanzeef",
+  "medical waste collection",
+  "construction debris removal"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Service type: household/community collection, commercial collection, skip/bin hire, recycling, septic/sewer services, construction debris, specialised (e.g. medical or industrial) waste.",
+  "Number of trucks, tankers, bins/skips and whether owned or leased.",
+  "Customer mix: housing societies, buildings, restaurants, factories, municipalities, construction sites.",
+  "Contract types: monthly subscription, per-trip, municipal contract.",
+  "Number of drivers, helpers and sanitation workers.",
+  "Disposal points used, in general terms.",
+  "How routes and pickups are planned and recorded."
+ ],
+ "scope_rule": "pi notes the operational and business problems: route planning, missed pickups, bin/skip tracking, driver and crew accountability, fuel and disposal costs, collections from subscribers and contracts, complaints and reporting. It never advises on hazardous, medical or industrial waste handling, classification or disposal methods, worker protective equipment or confined-space work, and never helps with illegal dumping, burning or bypassing environmental and municipal permits. It never asks for or stores customers’ names, addresses, phone numbers or workers’ ID details; it records customer types, areas in general and roles. Toxic exposure, a worker in a sewer or septic tank, fire or injury is an emergency and pi points to emergency services.",
+ "vocabulary": {
+  "Route / beat": "set of pickups a truck covers",
+  "Skip / roll-off": "large container placed at a site",
+  "Lift / pickup": "one collection",
+  "Tipping fee / dumping fee": "charge at the disposal site",
+  "Landfill / dumping site": "final disposal point",
+  "Desludging / suction": "emptying septic tanks or sewers",
+  "Kabari": "scrap/recyclables buyer",
+  "Segregation": "separating waste types",
+  "Manifest / waste transfer note": "paperwork for moving certain wastes",
+  "Society / RWA contract": "housing society service agreement",
+  "Haawiya": "container/skip (Arabic)",
+  "Tanzeef": "cleaning (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Customers complain we missed their pickup and we can’t prove we came",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Routes are in the driver’s head, so if he’s absent nobody knows the route",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Trucks do extra private jobs and use our fuel",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Fuel cost per route is a guess",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Tipping fees keep going up and we haven’t adjusted contracts",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Skips sit at sites for weeks past the hire period and we don’t bill it",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "We don’t know where every skip is right now",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Bins get damaged or stolen and we only notice at the count",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Households in societies pay late or not at all",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Collectors take cash door to door and deposits are delayed",
+   "category": "cash_collections",
+   "subtype": "deposit_delays"
+  },
+  {
+   "phrase": "Municipal contract payments take months",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Trucks break down and a whole area is missed for days",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Helpers don’t turn up, especially after Eid",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Turnover of sanitation workers is high and training is minimal",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Complaints come via society WhatsApp groups and blow up before we see them",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Society management asks for monthly service reports and we make them by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Recyclables are sold to the kabari and we never know if we got a fair weight",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Permit and licence renewals for vehicles and disposal are always last-minute",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Paperwork for each waste movement is filled by hand and gets lost",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "New contracts start before we have trucks and crew ready",
+   "category": "planning_growth",
+   "subtype": "capacity_planning"
+  },
+  {
+   "phrase": "Septic/desludging bookings come by phone and some get forgotten",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Commercial clients want photos as proof of service",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "I can’t see which contracts make money and which lose",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "No website or online booking for skip hire",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  }
+ ],
+ "questions": {
+  "pickups": [
+   "How do you know a pickup was actually done?",
+   "How does a missed pickup usually come to your attention?"
+  ],
+  "routes": [
+   "How are routes planned today?",
+   "What happens when a driver is absent?"
+  ],
+  "fleet and costs": [
+   "How many trucks or tankers run each day?",
+   "How are fuel and disposal costs recorded?"
+  ],
+  "skips and bins": [
+   "Roughly how many skips or bins do you have out?",
+   "How do you know where each one is and since when?"
+  ],
+  "collections": [
+   "Which customers are slowest to pay, households, businesses or municipal contracts?",
+   "How is cash collected from them?"
+  ],
+  "complaints": [
+   "Where do complaints usually reach you first?",
+   "How long until someone responds?"
+  ],
+  "staff": [
+   "How many workers are on the crews?",
+   "How do you handle it when several don’t turn up?"
+  ],
+  "reporting": [
+   "Which customers ask for reports or proof of service?",
+   "How do you prepare them now?"
+  ]
+ },
+ "seasons": "- PK: Eid ul Adha brings a heavy spike in animal waste collection over three days and after; monsoon (July–September) means drain/nala cleaning and blocked sewers; wedding season (November–February) increases event waste; Ramadan and Eid shift crew availability; summer heat raises odour complaints and pickup frequency demands. - UAE: winter outdoor event season (October–April) and construction cycles drive skip hire; Ramadan iftar waste; summer heat and the midday work ban affect crew schedules. - Canada: spring clean-up and renovation season (April–June) for skip/bin hire; summer construction; autumn leaf collection; winter snow affects routes and access.",
+ "care": [
+  "No advice on handling, classifying or disposing of hazardous, medical, chemical or industrial waste, protective equipment or confined- space entry.",
+  "A worker inside a sewer/septic tank in difficulty, gas exposure, fire or injury: pi stops and points to emergency services immediately.",
+  "Never help with illegal dumping, burning, mixing waste to avoid fees, or bypassing municipal and environmental permits.",
+  "Workers in sanitation are often vulnerable; pi notes staffing problems respectfully and never records workers’ names, IDs or personal circumstances.",
+  "Customer addresses and phone numbers are not stored.",
+  "Bribery around municipal contracts or permits is refused.",
+  "Theft concerns recorded as control gaps, no names."
+ ],
+ "build_ideas": [
+  "Route sheets on phone per truck with stops by area/customer reference, marked done with time and photo.",
+  "Missed-pickup report and customer-facing proof-of-service summary.",
+  "Complaint intake from WhatsApp into tickets with response timers and closure photo.",
+  "Skip and bin register: placed at which site reference, since when, hire end date and overdue alerts for billing.",
+  "Truck trip log: start/end, fuel filled, disposal trips and tipping receipts.",
+  "Cost per route/contract view using fuel, tipping, crew and maintenance entered by the owner.",
+  "Subscriber billing and collection tracker for societies and businesses with reminders and online payment links.",
+  "Collector deposit log with variance flags.",
+  "Crew attendance and daily assignment board with stand-in planning.",
+  "Vehicle maintenance reminders and breakdown log.",
+  "Recyclables sales log with weights and rates recorded at each sale.",
+  "Monthly service report generator for societies and commercial clients.",
+  "Licence, permit and vehicle document expiry reminders.",
+  "Online booking form for skip hire and desludging."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Society wale har hafte shikayat karte hain ke gaari nahi aayi, jabke driver kehta hai aaya tha."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — missed pickup ki shikayat aur driver ka kehna ke aaya tha, noted. Abhi kisi pickup ke hone ka koi record rakha jata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Nahi, bas driver ki zabani."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, sirf zabani record. Rozana kitni gaariyan chalti hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Chaar trucks, teen societies aur kuch restaurants."
+  },
+  {
+   "role": "pi",
+   "text": "Theek, chaar trucks aur teen societies plus restaurants, noted. Shikayat aap tak sab se pehle kahan se pohanchti hai?"
+  }
+ ]
+}

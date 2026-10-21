@@ -1,0 +1,265 @@
+{
+ "key": "bus_coach_and_school_transport_operators",
+ "name": "Bus, coach and school-transport operators",
+ "kind": "industry",
+ "sector": {
+  "code": "G",
+  "title": "Transport, mobility and aviation"
+ },
+ "signals": [
+  "bus service",
+  "coach",
+  "intercity",
+  "daewoo type",
+  "coaster",
+  "Hiace",
+  "van wala",
+  "pick and drop",
+  "school van",
+  "school bus",
+  "staff transport",
+  "labour transport",
+  "route",
+  "trip",
+  "seat booking",
+  "terminal",
+  "adda",
+  "conductor",
+  "hostess",
+  "charter",
+  "tour bus",
+  "Umrah/Ziyarat buses",
+  "haflat",
+  "naql al-talaba",
+  "naql al-’ummal",
+  "monthly fee",
+  "route sheet",
+  "attendance",
+  "GPS",
+  "CCTV in bus"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type of service: intercity scheduled routes, school pick-and-drop, corporate/staff transport, labour camp transport, charters and tours.",
+  "Fleet size and vehicle types (vans, coasters, mini-buses, full-size coaches) and whether owned, leased or attached by owner-drivers.",
+  "Number of routes, terminals or depots.",
+  "Who the paying customer is: individual passengers, parents, schools, companies.",
+  "How bookings and fees are collected: counter, online, monthly fees, contracts.",
+  "Driver and staff count (drivers, conductors, attendants, mechanics).",
+  "Whether the operator has its own workshop and fuel arrangements."
+ ],
+ "scope_rule": "pi notes operational and business problems: route planning effort, trip scheduling, seat booking and no-shows, fee and contract collections, fuel and maintenance cost control, driver attendance and rosters, breakdown handling process, communication with parents or clients, and reporting. pi does not advise on transport licensing, route permits, vehicle fitness standards, child-safety regulations, driver working-hour law, insurance or road-safety engineering. pi never asks for or stores students’ names, addresses, photos or pick-up points tied to children, passengers’ IDs, or drivers’ personal details, and refers to people by role (“a parent”, “the morning-shift driver”).",
+ "vocabulary": {
+  "Pick and drop": "daily home-to-school or home-to-office transport (Pakistan).",
+  "Coaster / Hiace": "common mini-bus and van types.",
+  "Adda": "bus terminal or stand (Pakistan).",
+  "Conductor / hostess": "on-board staff collecting fares or serving passengers.",
+  "Route sheet": "list of stops and timings for a route.",
+  "Charter": "whole vehicle hired for a group or event.",
+  "Attached vehicle": "owner-driver’s vehicle working under the operator’s name.",
+  "Fitness": "periodic vehicle fitness certificate.",
+  "Naql": "Arabic for transport.",
+  "Dead mileage": "kilometres driven without passengers, e.g. to the depot.",
+  "Labour transport": "bus service from worker accommodation to sites (UAE)."
+ },
+ "problems": [
+  {
+   "phrase": "Parents call every morning asking where the van is",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Monthly fees from parents come late, some never",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Schools or companies pay our invoices after months",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Drivers don’t show up and we scramble for a replacement",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Routes were made years ago, buses run half empty on some",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Too much dead mileage between depot and routes",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Fuel cost per bus is going up and I can’t tell why",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Diesel gets siphoned off",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Conductors collect fares and some cash doesn’t reach the office",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Seats double-sold on busy days",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Passengers book and don’t show; buses leave with empty seats",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Breakdowns on route, no backup vehicle plan",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Service and tyre changes are done only when something fails",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Route permit, fitness and insurance renewals are always last-minute",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Schools ask for trip and attendance reports we make by hand",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Corporate clients complain about late arrivals at shift start",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "Trackers are fitted but no one looks at them",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Attached vehicle owners argue about payments every month",
+   "category": "cash_collections",
+   "subtype": "supplier_payments_late"
+  },
+  {
+   "phrase": "Drivers leave for the Gulf or better pay",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Bookings come by phone, counter and online and aren’t combined",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "I don’t know which route actually makes money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Driver duty rosters made on paper, overtime disputes",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Holiday months — no school income but salaries and instalments continue",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Want to bid for new school or company contracts but can’t price confidently",
+   "category": "planning_growth",
+   "subtype": "budgeting_process"
+  }
+ ],
+ "questions": {
+  "service": [
+   "What kind of transport do you mainly run — school, staff, intercity or charters?",
+   "How many vehicles and routes?"
+  ],
+  "timeliness": [
+   "How do you know a vehicle left and arrived on time?",
+   "How do parents or clients find out about delays?"
+  ],
+  "collections": [
+   "How are fees or contract invoices collected?",
+   "How much tends to be overdue at a time?"
+  ],
+  "drivers": [
+   "How are drivers assigned to routes?",
+   "What happens when one doesn’t turn up?"
+  ],
+  "fuel": [
+   "How is fuel bought and recorded?",
+   "Do you know fuel per route or per bus?"
+  ],
+  "maintenance": [
+   "How do you decide when a vehicle goes for service?",
+   "How often does one break down on route?"
+  ],
+  "bookings": [
+   "For seat bookings, how do counter and online sales stay in sync?",
+   "How do you handle no-shows?"
+  ],
+  "profit": [
+   "Do you know which route earns and which loses?",
+   "Which costs do you find hardest to pin to a route?"
+  ],
+  "paperwork": [
+   "Which renewals or reports take your office the most time?"
+  ]
+ },
+ "seasons": "Pakistan: school-transport income follows the academic year (fee collection pauses or reduces in summer vacations around June–August and winter breaks); intercity demand peaks hugely before and after both Eids, and around Muharram/Chehlum for Ziyarat travel, and around long weekends; monsoon flooding and winter fog disrupt routes. UAE: school buses follow the September–June year with summer break; labour transport changes with midday work break rules in summer; Ramadan shortens school and work hours, shifting timetables; Umrah tours and holiday charters. Canada: school year September–June with snow- day cancellations; summer charters and tours; winter conditions affect schedules.",
+ "care": [
+  "Children are involved: never ask for or store children’s names, photos, addresses or stop locations tied to a child; talk in terms of routes and counts.",
+  "No advice on licensing, route permits, fitness standards, driver hours or child-safety rules; note the admin effort only.",
+  "If someone mentions an accident, a child left on a bus, a missing child or a passenger medical emergency, stop and point to emergency services immediately.",
+  "CCTV and tracking on buses: note operational needs; do not advise on covert monitoring of staff or passengers.",
+  "Decline any request to falsify fitness certificates, overload vehicles to beat rules, or forge attendance or trip records.",
+  "Do not comment on fare or fee levels or on whether contracts are fair."
+ ],
+ "build_ideas": [
+  "Route and trip board: each vehicle, driver, route and departure/arrival status for the day.",
+  "Parent or client WhatsApp alerts for departure, arrival and delays, sent per route (no child data stored by pi).",
+  "Fee and contract collections tracker with automated reminders and receipts.",
+  "Driver roster and attendance with quick replacement assignment and duty-hour log.",
+  "Fuel log per vehicle and route with consumption comparisons and anomaly flags.",
+  "Maintenance scheduler by kilometres and days, with breakdown log and backup vehicle assignment.",
+  "Seat booking system combining counter and online sales, with seat locks and no-show tracking.",
+  "Conductor cash reconciliation against tickets issued per trip.",
+  "Attached-vehicle owner statements showing trips, deductions and payouts.",
+  "Renewal tracker for permits, fitness and insurance with reminders.",
+  "Route profitability: revenue versus fuel, driver cost and dead mileage.",
+  "Monthly trip and service reports generated for schools or corporate clients."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "I run 18 school vans in Lahore. Every morning my phone doesn’t stop — parents asking where the van is."
+  },
+  {
+   "role": "pi",
+   "text": "That sounds like a rough start to every day — noted. Right now, how do you yourself find out where a van is?"
+  },
+  {
+   "role": "Person",
+   "text": "I call the driver."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. When a van is running late, how do parents usually hear about it?"
+  }
+ ]
+}

@@ -1,0 +1,275 @@
+{
+ "key": "dental_clinics",
+ "name": "Dental clinics",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "dental clinic",
+  "dentist",
+  "dental surgery",
+  "orthodontist",
+  "braces",
+  "aligners",
+  "implants",
+  "RCT",
+  "root canal",
+  "scaling",
+  "crown",
+  "daant ka doctor",
+  "dentist ke paas",
+  "daant",
+  "tabib asnan",
+  "ayadat asnan",
+  "chair",
+  "lab work",
+  "dental lab",
+  "treatment plan",
+  "recall",
+  "hygiene appointment",
+  "no- show"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of dental chairs and dentists, and whether specialists visit on certain days",
+  "Whether dentists are owners, salaried, or paid a percentage of production",
+  "In-house versus outside dental lab for crowns, dentures and aligners",
+  "Payment mix: cash, instalments for long treatments, insurance (UAE, Canada), corporate panels",
+  "Whether the clinic sells high-value treatment plans (implants, orthodontics, aligners, veneers)",
+  "Booking method and practice software used, if any",
+  "Number of branches"
+ ],
+ "scope_rule": "pi notes the business side of a dental practice: chair utilisation, bookings and no-shows, treatment-plan follow-up as a sales process, instalment collections, lab case tracking, materials stock, dentist commission disputes, marketing leads, reviews and reporting. pi does not give any view on diagnosis, treatment choice, materials suitability, sterilisation procedures, radiation safety or drug use, and does not judge clinical outcomes. pi does not ask for or keep patient names, numbers, X-rays, photos, or treatment details; it records the issue in general terms (“long treatment plans not being followed up”). Insurance and licensing questions are noted as admin effort only.",
+ "vocabulary": {
+  "chair time": "booked time on a dental chair, the main capacity unit",
+  "treatment plan": "multi-visit plan quoted to a patient",
+  "case acceptance": "whether the patient agrees to go ahead with the plan",
+  "recall": "routine check-up reminder",
+  "lab case": "crown, bridge, denture or aligner sent to a dental lab",
+  "production": "value of work done by a dentist, often the base for commission",
+  "instalments / qist": "staged payments for long treatments",
+  "RCT": "root canal treatment",
+  "ortho": "braces or aligners, usually long courses",
+  "consumables / materials": "composites, impression material, burs, gloves",
+  "autoclave log": "sterilisation record (noted only as a checklist, never assessed)",
+  "before/after": "marketing photos, which need consent"
+ },
+ "problems": [
+  {
+   "phrase": "Chairs sit empty in the mornings and we’re overbooked after 6",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "People get a full treatment quote and then just disappear",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Nobody follows up the patients who said they’ll think about it",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Braces patients stop paying instalments halfway through",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We send crowns to the lab and lose track of which case is where",
+   "category": "orders_fulfilment",
+   "subtype": "order_tracking"
+  },
+  {
+   "phrase": "Lab work comes back wrong shade or doesn’t fit and we eat the cost",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "The lab bill never matches what we sent",
+   "category": "suppliers_purchasing",
+   "subtype": "po_tracking"
+  },
+  {
+   "phrase": "Implant components are expensive and I can’t account for all of them",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Materials run out when the specialist is in",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Associate dentists argue about their percentage every month",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "I don’t know which dentist or treatment actually makes money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Recall reminders don’t go out so patients only come when in pain",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Instagram brings messages but the reception replies hours later",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We spend on ads but can’t tell which ones fill chairs",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Receptionist gives discounts without asking",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Cash payments on the counter don’t match the day’s appointments",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Insurance pre-approvals for UAE patients take forever",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Patients complain the price changed from what they were told",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Dental assistants keep leaving once trained",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Equipment servicing is always reactive, the compressor or chair breaks mid-day",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Sterilisation checklists are filled in at the end of the day in one go",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Two branches quote different prices for the same treatment",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Practice software and accounts don’t talk",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "I want a second branch but can’t keep one running without me",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Patient photos for marketing are on staff personal phones",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  }
+ ],
+ "questions": {
+  "chairs": [
+   "How many chairs do you have, and which hours are the quietest?",
+   "How are slots handed out at the moment?"
+  ],
+  "treatment plans": [
+   "After a patient gets a quote, what happens next?",
+   "Who calls them back, if anyone?",
+   "Roughly how often do they come back on their own?"
+  ],
+  "instalments": [
+   "How do you track who still owes on a long treatment?",
+   "What happens when someone stops paying?"
+  ],
+  "lab cases": [
+   "How do you know where each lab case is right now?",
+   "What happens when one comes back wrong?"
+  ],
+  "materials": [
+   "Who keeps an eye on materials and implant parts?",
+   "How do you find out something is short?"
+  ],
+  "dentist pay": [
+   "How is each dentist’s share worked out?",
+   "Where do the disagreements come from?"
+  ],
+  "leads": [
+   "Where do new patients mostly find you?",
+   "How quickly does someone reply to a new message?"
+  ],
+  "recalls": [
+   "Do patients get reminded for their check-ups?",
+   "Who does that, and how?"
+  ],
+  "front desk cash": [
+   "How is the day’s cash closed?",
+   "Who checks discounts given?"
+  ],
+  "reporting": [
+   "What numbers do you look at each month?",
+   "Which one do you wish you had?"
+  ],
+  "growth": [
+   "What would need to be true for you to open another branch?"
+  ]
+ },
+ "seasons": "- Wedding season in Pakistan (roughly October to March, with peaks around December and after Eid) drives cosmetic demand: whitening, veneers, braces started well before the date. - Eid and Ramadan: cosmetic bookings rise before Eid; Ramadan shifts clinic hours to evenings and after iftar. - UAE: residents travel in July and August, so bookings dip; demand returns in September; insurance renewals often in January reset annual dental limits. - Canada: extended-health dental benefits often reset on 1 January, so many patients rush to use remaining benefits in November and December. - Summer and winter school holidays bring children’s appointments and orthodontic starts. - Overseas Pakistanis visiting in December and summer often book high-value treatments in a short window.",
+ "care": [
+  "Severe facial swelling with difficulty breathing or swallowing, uncontrolled bleeding, or trauma: pi stops and says to go to an emergency department or call 1122/115, 998/999 or 911.",
+  "pi never comments on whether a treatment was needed, done well, or caused a complication; complaints are noted as service or communication problems.",
+  "No patient names, numbers, X-rays, intraoral photos or treatment records; pi asks the person not to send them.",
+  "Before/after photos used for marketing involve patient consent; pi notes record-keeping and storage as an admin issue and gives no legal view.",
+  "Associate dentists and staff are recorded by role only.",
+  "Requests to bill insurers for treatments not done, split invoices to get round limits, or back-date treatment are declined.",
+  "Radiation, sterilisation and infection-control matters are clinical/regulatory; pi notes only that a checklist isn’t being kept up, not what the standard should be."
+ ],
+ "build_ideas": [
+  "Chair-wise booking calendar with WhatsApp booking, reminders and a waitlist to fill cancellations",
+  "Treatment-plan pipeline: quoted, accepted, in progress, paused, completed, with follow-up tasks for reception by role",
+  "Instalment and payment-plan tracker with due-date reminders and a list of overdue balances for the manager",
+  "Lab case tracker: sent date, lab, case type, due date, received, remake, with lab-wise remake counts and invoice matching",
+  "Materials and implant components register with lot numbers, minimum levels and usage per case",
+  "Dentist production and commission statement generated from completed procedures and agreed rules",
+  "Recall reminder engine for check-ups and hygiene visits based on last visit date",
+  "Lead inbox combining Instagram, Facebook, Google and WhatsApp enquiries with response timers and source tracking",
+  "Price list and discount approval log shared across branches",
+  "Daily cash and card close with discounts listed and approved by role",
+  "Equipment maintenance log with service reminders for chairs, compressors and autoclaves",
+  "Monthly dashboard: chair utilisation, case acceptance, revenue by treatment type and dentist, recall attendance",
+  "Consent and photo storage folder with access control instead of personal phones"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We quote a lot of implant and braces cases but most never start. I don’t even know how many."
+  },
+  {
+   "role": "pi",
+   "text": "So quotes are going out but you can’t see how many turn into actual treatment. Noted. After a patient gets the quote, does anyone contact them again?"
+  },
+  {
+   "role": "Person",
+   "text": "Not really, sometimes the receptionist calls if she remembers."
+  },
+  {
+   "role": "pi",
+   "text": "Understood, follow-up depends on memory rather than a list. Noted. Roughly how many treatment quotes would you say go out in a normal week?"
+  }
+ ]
+}

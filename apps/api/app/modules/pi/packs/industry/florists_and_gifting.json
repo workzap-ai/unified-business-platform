@@ -1,0 +1,287 @@
+{
+ "key": "florists_and_gifting",
+ "name": "Florists and gifting (incl. luxury gifting and corporate gifting)",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "florist",
+  "flower shop",
+  "phool wala",
+  "phoolon ki dukaan",
+  "bouquet",
+  "arrangement",
+  "roses",
+  "fresh flowers",
+  "gajra",
+  "sehra",
+  "stage decor",
+  "event flowers",
+  "gift hamper",
+  "gift box",
+  "luxury gifting",
+  "bespoke gifts",
+  "corporate gifts",
+  "client gifts",
+  "Eid hampers",
+  "Ramadan boxes",
+  "eidi",
+  "chocolate and flowers",
+  "same-day delivery",
+  "ward",
+  "hadaya",
+  "bouquet tawseel",
+  "personalised",
+  "engraving",
+  "branded packaging"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Mix: fresh flowers, event floral decor, gift hampers/boxes, luxury bespoke gifting, corporate gifting.",
+  "Walk-in shop, online/Instagram-only studio, or both.",
+  "Flower source: local market ( phool mandi), wholesale, direct imports (e.g. from Kenya, the Netherlands, Ecuador).",
+  "Delivery: own drivers, couriers, aggregators (Talabat, Careem, Noon, Deliveroo, Instashop), same-day promise.",
+  "Corporate client share and their order patterns (bulk, branded, deadlines).",
+  "Production team size and whether they use freelancers in peaks.",
+  "Number of locations and cold storage capacity."
+ ],
+ "scope_rule": "pi notes operational problems such as perishable stock, wastage, peak-day capacity, delivery timing, custom order details, corporate quotes and approvals, packaging materials and payments. pi does not advise on plant import permits, phytosanitary rules, food safety for edible items in hampers, alcohol in gifts, or anti-bribery rules for corporate gifting. It records only the effort or problem. Recipients’ names, addresses, phone numbers and card messages are third-party personal data: pi never asks for or records them. It notes only “recipient details get copied wrongly”.",
+ "vocabulary": {
+  "bouquet / arrangement": "hand-tied or vase design",
+  "stems": "individual flowers, the unit of buying",
+  "phool mandi": "wholesale flower market",
+  "gajra": "flower bracelet or hair garland (PK)",
+  "sehra / stage decor": "wedding floral pieces and event decor",
+  "conditioning": "preparing flowers to last longer",
+  "wastage / dump": "flowers that wilt unsold",
+  "hamper / gift box": "curated set of products",
+  "corporate order": "bulk branded gifts for a company’s clients or staff",
+  "same-day / timed delivery": "delivery promised for a set slot",
+  "card message": "note written for the recipient",
+  "ward / hadaya": "roses / gifts (Arabic)",
+  "eidi": "Eid gift, often cash or presents"
+ },
+ "problems": [
+  {
+   "phrase": "Flowers wilt before we sell them and we throw away a lot",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Valentine’s Day we run out of red roses by noon",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Imported flower shipments arrive late or damaged",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Rose prices triple before Valentine’s and our prices were set earlier",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Same-day orders get delivered late and the occasion is missed",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Wrong card message or wrong address on the delivery",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Instagram, WhatsApp, website and Talabat orders all come in separately and we miss some",
+   "category": "orders_fulfilment",
+   "subtype": "multi_channel_orders"
+  },
+  {
+   "phrase": "Customers want photos before delivery and we forget",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Corporate clients want 300 branded boxes in a week and we can’t produce",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Corporate quotes go back and forth for weeks on WhatsApp and email",
+   "category": "operations_process",
+   "subtype": "approvals_slow"
+  },
+  {
+   "phrase": "Corporate clients pay 60 to 90 days later",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Packaging (boxes, ribbons, branded sleeves) runs out in peak",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Hamper items like chocolates and dates expire",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Design quality depends on which florist is on shift",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Freelancers we hire for peaks don’t follow our style",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Delivery drivers’ cost per order is more than the delivery fee",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Clients complain the bouquet looked smaller than the photo",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Bad review after a late Mother’s Day delivery",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "We don’t know margin per bouquet after flowers, labour and delivery",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Corporate clients don’t come back next Eid",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "We spend on Instagram ads before occasions and can’t tell what worked",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Pre-orders for the season are tracked in a notebook",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Card payments and bank transfers for orders are hard to match",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "I’m the only one who can approve designs, so everything waits on me",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  }
+ ],
+ "questions": {
+  "mix": [
+   "Is most of your business fresh flowers, gift boxes and hampers, events or corporate gifting?",
+   "Which brings in most of the revenue?"
+  ],
+  "wastage": [
+   "How much do you usually throw away in a normal week, roughly?",
+   "How do you decide how much to buy?"
+  ],
+  "suppliers": [
+   "Where do your flowers come from?",
+   "What goes wrong most often with them?"
+  ],
+  "orders": [
+   "Where do orders come in from?",
+   "How do they all get to the team making them?"
+  ],
+  "delivery": [
+   "Who delivers, your drivers or an app?",
+   "How often do deliveries miss the time slot?"
+  ],
+  "order details": [
+   "How are card messages and delivery details captured?",
+   "Where do mix-ups usually happen?"
+  ],
+  "corporate": [
+   "How does a corporate order go from enquiry to delivery?",
+   "Where does it slow down?"
+  ],
+  "payments": [
+   "How long do corporate clients usually take to pay?",
+   "How do you follow up?"
+  ],
+  "capacity": [
+   "On the biggest days, how many orders can the team make?",
+   "What happens when you go over that?"
+  ],
+  "packaging": [
+   "How do you keep track of boxes, ribbons and branded packaging?",
+   "When do you reorder?"
+  ],
+  "customers": [
+   "Do customers who order for one occasion come back for the next?",
+   "How do you reach them?"
+  ],
+  "owner view": [
+   "Can you see what each product or occasion actually earned?"
+  ]
+ },
+ "seasons": "Across all three countries the big days are Valentine’s Day and Mother’s Day: 21 March in the UAE and Arab world, the second Sunday of May in PK and Canada. In the UAE, Ramadan and Eid hampers and corporate gifting, UAE National Day, Diwali, Christmas and New Year corporate gifts, and graduation season (June) all peak, while summer is slow. In PK, wedding season (October to March) drives gajra, sehra and stage decor; Eid, Chaand Raat and corporate year-end/new-year gifting also peak, and summer heat raises wastage. In Canada, Christmas, Thanksgiving (October), Easter, graduation and wedding season (summer) matter. Corporate gifting clusters before Ramadan, Eid, Diwali and December.",
+ "care": [
+  "Never ask for or store recipients’ names, addresses, phone numbers or card messages.",
+  "Corporate gifting to government officials or anti-bribery limits: pi does not advise and refuses to help disguise gifts as something else or split invoices to hide value.",
+  "No advice on plant/flower import permits, phytosanitary rules or food safety of hamper items; note the operational delay only.",
+  "Alcohol in gift hampers: no advice on licensing; refuse to help supply where it would be illegal (e.g. in PK).",
+  "Surprise deliveries: never help locate a person or obtain someone’s address without consent.",
+  "Florist injuries (cuts, chemical preservatives) or driver accidents → emergency services where serious.",
+  "Delivery-driver issues recorded by role only."
+ ],
+ "build_ideas": [
+  "Unified order inbox for Instagram, WhatsApp, website and delivery apps, creating a single job card with design, delivery slot and status.",
+  "Order confirmation template capturing card message and delivery details from the customer directly, reducing re-typing errors.",
+  "Production board for peak days: orders by delivery slot, assigned florist, done/out-for-delivery.",
+  "Pre-delivery photo sent to the customer automatically on WhatsApp.",
+  "Flower buying planner from past sales by occasion and pre-orders; wastage log by stem type.",
+  "Packaging and hamper-item stock with expiry and reorder alerts.",
+  "Delivery routing by area and slot, with driver proof of delivery.",
+  "Corporate gifting portal: client approves the design mock-up, quantities, branding and delivery list (uploaded by the client, held securely), with quote versions and approval history.",
+  "Corporate receivables tracker with ageing and polite reminders.",
+  "Corporate client calendar of past occasions to prompt re-engagement before the next one.",
+  "Margin calculator per product including flowers, materials, labour and delivery.",
+  "Campaign tracking with occasion codes."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Corporate orders kill us before Eid. Clients change the design three times and then want 200 boxes in four days."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a lot of pressure to absorb at the busiest time. Noted: corporate clients change designs late and then need large quantities fast. How do those approvals happen now, on WhatsApp, email or both?"
+  },
+  {
+   "role": "Person",
+   "text": "Both, and different people from the client side."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, approvals come through multiple people and channels. When a design is finally approved, how many boxes can your team realistically make in a day?"
+  },
+  {
+   "role": "Person",
+   "text": "Maybe sixty if everyone’s in."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted. Do you bring in extra hands for those weeks, or is it the same team?"
+  }
+ ]
+}

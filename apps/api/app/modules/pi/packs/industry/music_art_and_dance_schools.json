@@ -1,0 +1,276 @@
+{
+ "key": "music_art_and_dance_schools",
+ "name": "Music, art and dance schools",
+ "kind": "industry",
+ "sector": {
+  "code": "J",
+  "title": "Education and childcare"
+ },
+ "signals": [
+  "music school",
+  "music academy",
+  "guitar classes",
+  "piano lessons",
+  "keyboard",
+  "violin",
+  "vocal training",
+  "drums",
+  "art classes",
+  "drawing and painting",
+  "calligraphy",
+  "pottery",
+  "dance studio",
+  "ballet",
+  "hip hop",
+  "Bollywood dance",
+  "kathak",
+  "recital",
+  "showcase",
+  "exhibition",
+  "grade exams",
+  "term",
+  "trial lesson",
+  "music class",
+  "guitar seekhna",
+  "dance class ki fees",
+  "ma’had musiqa",
+  "marsam",
+  "raqs",
+  "studio rental",
+  "instrument rental"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Disciplines offered and whether lessons are private, group or both.",
+  "Number of studios/rooms and branches; whether rooms are also rented out.",
+  "Learner mix: children vs adults (counts only), weekday vs weekend demand.",
+  "Billing: per term, monthly, lesson packs, pay-per-class.",
+  "Teacher model: salaried, hourly, freelance commission split.",
+  "Extra revenue: instrument/costume sales or rental, art supplies, exams entry admin, recitals and events, birthday parties, camps.",
+  "Tools: booking app, Excel, WhatsApp, paper registers."
+ ],
+ "scope_rule": "pi notes the school’s operational and business problems: bookings and timetable, lesson packs and make-up classes, teacher scheduling and pay splits, room utilisation, supplies and instrument/costume stock, recital and event logistics, marketing and retention. pi never asks for or stores learners’ names, photos, videos of performances, ages, exam results or parents’ details — many learners are children, so roles and counts only. It gives no advice on music licensing/copyright for performances, venue safety codes, child-performer rules, or employment law. Injuries in a dance class or event emergencies → pi stops and points to emergency services.",
+ "vocabulary": {
+  "Recital / showcase": "end-of-term performance for families.",
+  "Make-up class": "replacement lesson for one missed.",
+  "Lesson pack": "prepaid set of lessons (e.g. 8 or 12).",
+  "Term": "block of weeks billed together.",
+  "Grade exam": "external graded music exam (ABRSM, Trinity, RCM).",
+  "Trial lesson": "first paid or free taster.",
+  "Studio hire": "renting a room to outside teachers or groups.",
+  "Costume fee": "charge for performance outfits.",
+  "Riyaz": "practice (music/dance, Urdu).",
+  "Commission split": "share of fees paid to a freelance teacher."
+ },
+ "problems": [
+  {
+   "phrase": "Make-up class requests are endless and we can’t track who’s owed what.",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Lesson packs expire but nobody checks, so people keep coming.",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Trial lessons don’t turn into enrolments.",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Kids quit after one term.",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Weekday mornings rooms are empty, Saturdays are chaos.",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Teachers’ split percentage causes arguments every month.",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Freelance teachers cancel at short notice.",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Good piano and dance teachers are very hard to find.",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Recital planning is all on WhatsApp — costumes, rehearsals, tickets — and things get missed.",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  },
+  {
+   "phrase": "Costume orders from the tailor arrive late before the show.",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Costume fees collected don’t match what we paid out.",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Art supplies run out mid-class and are bought in a rush at retail prices.",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Rental instruments come back damaged or not at all.",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Instruments for sale sit in the store for years.",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Instrument and accessory prices jumped with the exchange rate.",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Fees are late and we feel awkward chasing parents.",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Exam entry admin — forms, fees, dates — is all done by hand.",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Instagram posts get likes but not enquiries.",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "People DM to book and we take a day to reply.",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "No online booking; parents want to choose slots themselves.",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Studio hire bookings clash with our own classes.",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "I don’t know which discipline actually makes money.",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Parents complain teaching differs between branches.",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "AC and soundproofing maintenance always falls behind.",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Summer camps sell out but I plan staff at the last minute.",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  }
+ ],
+ "questions": {
+  "bookings": [
+   "How do people book lessons today?",
+   "What happens when someone misses a class?"
+  ],
+  "packs/terms": [
+   "How do you bill — terms, packs or per class?",
+   "How do you track what’s been used?"
+  ],
+  "trials": [
+   "How many trial lessons in a typical month?",
+   "How many become regular learners?"
+  ],
+  "retention": [
+   "When do learners usually stop?",
+   "Do you know why?"
+  ],
+  "teachers": [
+   "How are teachers paid?",
+   "Where do disagreements come from?"
+  ],
+  "rooms": [
+   "Which times are packed and which are empty?",
+   "Do you rent rooms out?"
+  ],
+  "recitals/events": [
+   "How do you organise recitals?",
+   "What went wrong last time?"
+  ],
+  "supplies/instruments": [
+   "Do you rent or sell instruments, costumes or supplies?",
+   "How are they tracked?"
+  ],
+  "marketing": [
+   "Where do most new learners come from?",
+   "How fast do you reply to enquiries?"
+  ],
+  "profitability": [
+   "Which classes do you think make the most money?",
+   "What makes it hard to know?"
+  ]
+ },
+ "seasons": "- Pakistan: summer vacation (June–August) camps and workshops; winter break short courses; wedding season (November–February) drives dance choreography bookings (mehndi/sangeet); Ramadan slowdown for music/dance; Muharram sensitivity for music/dance activities. - UAE: September and January term starts; summer camps July–August; National Day and school-year-end performances; Ramadan schedule changes; winter tourist season events. - Canada: September start, January term, spring recitals (May–June), summer camps; grade exam sessions (RCM etc.) in winter/spring/summer windows; holiday concerts in December. - Exam board session windows drive entry admin peaks.",
+ "care": [
+  "Never ask for or store learners’ names, photos, recital videos, ages or exam results; event photos are the school’s matter — pi does not collect them.",
+  "Posting children’s photos/videos on social media: pi does not advise on consent law; notes “need a process for parent permissions” only as an operational point.",
+  "No advice on music copyright/performance licensing, venue capacity or fire safety, or child-performer regulations.",
+  "Dance injuries, collapses at events, crowd problems → stop, point to emergency services.",
+  "Be culturally neutral about music and dance; never comment on religious views.",
+  "Covert recording of teachers or classes: pi declines.",
+  "Requests to sell counterfeit branded instruments or fake exam certificates: pi declines."
+ ],
+ "build_ideas": [
+  "Booking calendar per room and teacher with parent self-booking, clash checks and studio-hire slots.",
+  "Lesson pack and term ledger: lessons bought, attended, missed, make-ups owed and expiry, with reminders.",
+  "Make-up class request flow under the school’s own rules.",
+  "Trial-to-enrolment tracker with follow-up prompts.",
+  "Retention view by term and discipline (counts only).",
+  "Teacher pay calculator from delivered lessons and agreed splits, with monthly statement.",
+  "Recital/event planner: checklist, rehearsal schedule, costume orders with supplier dates, ticket/seat counts and fee collection.",
+  "Instrument and costume rental register with condition notes and deposit tracking.",
+  "Supplies and retail stock tracker with reorder levels and slow-moving stock report.",
+  "Exam entry tracker: candidate counts per grade/session, deadlines, fees collected and paid.",
+  "WhatsApp enquiry auto-reply with timings, fees and booking link.",
+  "Profitability by discipline and room-hour utilisation dashboard."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Make-up classes are driving us mad. Parents say their child missed two lessons and we have no idea if that’s right."
+  },
+  {
+   "role": "pi",
+   "text": "So the dispute is about which lessons were actually missed and what’s owed — noted. How is attendance recorded in class right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Teachers are supposed to mark a sheet but half of them forget."
+  },
+  {
+   "role": "pi",
+   "text": "Got it — the record exists on paper, but it’s patchy. Roughly how many make-up requests come in during a month?"
+  }
+ ]
+}

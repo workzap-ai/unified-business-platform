@@ -1,0 +1,259 @@
+{
+ "key": "solar_panels_inverters_and_batteries",
+ "name": "Solar panels, inverters and batteries (assembly and distribution)",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "solar panels",
+  "solar plates",
+  "inverter",
+  "hybrid inverter",
+  "on-grid",
+  "off-grid",
+  "net metering",
+  "lithium battery",
+  "tubular battery",
+  "LFP",
+  "solar installation",
+  "EPC",
+  "solar system for home",
+  "solar lagwana",
+  "plates",
+  "bijli ka bill",
+  "Hall Road / Brandreth Road dealers",
+  "taqa shamsiya ( ﺔﻴﺴﻤﺷ ﺔﻗﺎﻃ alwah shamsiya ( ﺔﻴﺴﻤﺷ حاﻮﻟأ mounting structure, DB box, warranty, distributor, assembly of battery packs"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Importer/distributor, wholesaler/dealer, installer/EPC, local assembler (battery packs, inverters, structures), or a mix.",
+  "Residential, commercial/industrial, agricultural (solar tube wells), or utility-scale projects.",
+  "Number of installations per month and typical system types (on-grid, hybrid, off-grid).",
+  "Brands carried and whether the business holds stock or orders per project.",
+  "Number of installation teams and whether they are employees or subcontractors.",
+  "After-sales: in-house service team or brand/distributor handles warranty.",
+  "Cities/regions covered."
+ ],
+ "scope_rule": "pi notes business problems: stock and serial tracking, rate swings, installation scheduling, team visibility, project costing, customer follow-up, warranty claims, receivables and reporting. It does not give system sizing, electrical design, wiring, battery-safety, fire, earthing or net-metering regulatory advice, and never estimates a customer’s savings or payback. It records roles and areas, not customers’ names, addresses, electricity bill account numbers or IDs. Fires, electric shocks, battery swelling with smoke or falls from roofs mean pi stops and points to emergency services immediately.",
+ "vocabulary": {
+  "plates": "solar panels",
+  "watt / kW / kWp": "panel and system sizes",
+  "on-grid / hybrid / off-grid": "system types",
+  "net metering": "exporting power to the grid with a bi-directional meter",
+  "inverter": "converts panel output for home use",
+  "lithium / tubular": "battery types",
+  "structure / stand": "mounting frames",
+  "rate": "the day’s panel price per watt, which changes often",
+  "EPC": "design-supply-install contractor",
+  "DISCO": "Pakistani electricity distribution company",
+  "tube well solarisation": "solar pumping on farms"
+ },
+ "problems": [
+  {
+   "phrase": "Panel rates drop after we buy stock, and we lose on what’s in the godown",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Customers wait for rates to fall and keep delaying orders",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Container delayed at port and committed installations get pushed",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "We don’t record serial numbers so warranty claims become arguments",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Inverter or battery fails and the brand distributor takes months to replace",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Install teams say a job is done but the customer calls saying it isn’t working",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Net metering file stuck for months and the customer blames us",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Project costs go over — extra cable, structure, labour — and we eat it",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Customers pay the last instalment only after net metering is approved",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Leads from Facebook are mostly people asking for prices only",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Too many leads come in WhatsApp and we can’t follow up all",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Quote takes too long because we calculate each system manually",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Dealers buy on credit and some disappear",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Stock of panels, inverters and batteries never matches the system",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Panels get cracked in transport or on the roof",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Cable and small items vanish from sites",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Fake or grey-market inverters sold as original in the market",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Good installers leave to start their own business",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Team schedule is on WhatsApp and jobs clash",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Bad Google reviews after slow service visits",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Agri customers pay after harvest",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Assembly of battery packs has inconsistent quality",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "I don’t know profit per project until months later",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Expanding to new cities but can’t control the team there",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Customers don’t get any maintenance reminders and panels stay dirty, then they complain",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  }
+ ],
+ "questions": {
+  "rates and stock": [
+   "How often does your buying rate change?",
+   "How much stock do you usually hold?",
+   "How do you decide when to buy?"
+  ],
+  "leads": [
+   "Where do most enquiries come from?",
+   "How many come in a week?",
+   "Who follows them up?"
+  ],
+  "quotes": [
+   "How do you prepare a quote now?",
+   "How long does one take?"
+  ],
+  "installations": [
+   "How many teams do you run?",
+   "How do you know a job is finished properly?",
+   "How are jobs scheduled?"
+  ],
+  "project costing": [
+   "How often does a project go over budget?",
+   "What usually causes it?"
+  ],
+  "payments": [
+   "How do customers pay — upfront, in instalments, after commissioning?",
+   "What’s commonly outstanding?"
+  ],
+  "warranty and service": [
+   "How are serial numbers recorded at installation?",
+   "How are service complaints logged?"
+  ],
+  "net metering files": [
+   "Who handles the paperwork?",
+   "Where does it usually get stuck?"
+  ]
+ },
+ "seasons": "PK demand peaks ahead of and during summer (April–August) when power bills and load-shedding rise; electricity tariff hikes and budget announcements (June) cause sudden demand spikes; net-metering policy news causes rushes or pauses; agricultural solarisation tied to sowing seasons (kharif and rabi); monsoon slows rooftop work. UAE: cooler months (October–April) better for installation work; summer midday work ban on outdoor sites; commercial and industrial projects follow fiscal planning. Canada: installation season spring to autumn; winter snow limits rooftop work; incentive and rebate program changes drive demand surges.",
+ "care": [
+  "No system sizing, design, wiring, earthing or battery-safety advice; note operational issues only.",
+  "Fires, smoke, swelling batteries, shocks or roof falls: pi stops and points to emergency services.",
+  "Never estimates savings, payback or bill reductions for anyone.",
+  "No advice on net-metering rules, DISCO/DEWA/utility policies or incentive eligibility; note paperwork effort only.",
+  "Never help sell refurbished/grey-market equipment as new, swap serials, or fake warranty cards — decline.",
+  "Under-invoicing imports or misdeclaring goods: decline plainly.",
+  "Customers’ bill reference numbers, CNIC/Emirates ID and addresses are not recorded."
+ ],
+ "build_ideas": [
+  "Serial number register: every panel, inverter and battery serial captured at goods-in and linked to the customer project on installation.",
+  "Daily rate board for buying and selling rates with stock value updated, and a broadcast list for dealers.",
+  "Quote builder: system type, components, structure, cable, labour and margin with a branded PDF output.",
+  "Lead inbox for WhatsApp and Facebook enquiries with status, follow-up reminders and source tracking.",
+  "Installation job app: photos at each step, checklist sign-off, customer handover confirmation.",
+  "Team scheduler showing which team is at which site each day.",
+  "Project costing sheet: planned vs actual materials and labour per project.",
+  "Instalment and receivables tracker linked to project milestones such as commissioning and meter approval.",
+  "Net-metering file tracker showing the stage each file is at and days waiting.",
+  "Warranty and service ticket system with brand claim status.",
+  "Maintenance reminder messages on WhatsApp for customers who opt in.",
+  "Owner dashboard: leads, quotes sent, conversions, installs this month, stock value, receivables by stage."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Jab hum stock lete hain uske agle hafte rate gir jata hai, aur godown wala stock ghaate mein chala jata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh rate wala jhoola kaafi nuksan deh hai. Noted — stock lene ke baad rate girne se nuksan. Aap aam tor par kitne din ka stock rakhte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Do teen hafte ka, kabhi kabhi mahine ka."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, two to four weeks of stock. Kharidne ka faisla abhi kaun karta hai, aur kis buniyad par?"
+  }
+ ]
+}

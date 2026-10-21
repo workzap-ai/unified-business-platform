@@ -1,0 +1,269 @@
+{
+ "key": "oil_and_gas_services_contractors",
+ "name": "Oil and gas services contractors",
+ "kind": "industry",
+ "sector": {
+  "code": "L",
+  "title": "Finance-adjacent, energy and utilities"
+ },
+ "signals": [
+  "oilfield services",
+  "O&G contractor",
+  "well services",
+  "rig support",
+  "pipeline contractor",
+  "maintenance contractor",
+  "manpower supply",
+  "shutdown",
+  "turnaround",
+  "PTW",
+  "HSE",
+  "site camp",
+  "project",
+  "rig",
+  "site pe",
+  "contract labour",
+  "client ka audit",
+  "naft",
+  "ghaz",
+  "maqawil",
+  "mashroo’",
+  "timesheets",
+  "mobilisation",
+  "vendor registration",
+  "LPG distribution",
+  "CNG station services"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type of service: manpower supply, equipment rental, maintenance, fabrication, pipeline work, inspection, logistics, LPG/CNG station services.",
+  "Main clients in general terms (operators, EPC contractors, refineries, stations), without names.",
+  "Number of active projects or sites and their remoteness.",
+  "Size of workforce and mix of direct staff vs contract labour.",
+  "Equipment owned or rented.",
+  "How timesheets, job tickets and invoices are prepared today.",
+  "Countries and regions worked in."
+ ],
+ "scope_rule": "pi notes the contractor’s operational and business problems: timesheet and job-ticket flow, invoicing and payment delays, manpower scheduling and mobilisation, equipment tracking, certification and document expiry tracking, site-to-office coordination and reporting effort. It never gives HSE, process safety, engineering, well control, permit-to-work, hazardous-area or fuel-handling advice, and never interprets contracts, regulations or client HSE standards. It never asks for or stores workers’ names, ID/passport/visa details, medical fitness records or client confidential data; it records roles, counts and certificate types. Any leak, fire, explosion, H2S or injury scenario is an emergency and pi points to emergency services and site emergency procedures.",
+ "vocabulary": {
+  "PTW": "permit to work",
+  "HSE / QHSE": "health, safety and environment function",
+  "Timesheet / job ticket": "daily record of hours and work signed by the client",
+  "Mobilisation / demobilisation": "moving people and equipment to/from site",
+  "Shutdown / turnaround": "planned plant stoppage for maintenance",
+  "Call-off": "order issued under a framework contract",
+  "Rotation / hitch": "workers’ on/off cycle (e.g. 28/28)",
+  "Vendor registration / prequalification": "approval to work for a client",
+  "Certification / tickets": "workers’ safety and trade certificates",
+  "Third-party inspection": "independent equipment checks",
+  "Retention": "portion of payment held back until completion",
+  "Maqawil": "contractor (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Timesheets come back from site weeks late, so we can’t invoice",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Client rejects invoices because the signed job tickets don’t match",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "Clients pay in 90 to 120 days and we still have to pay salaries monthly",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Retention money from finished projects is never followed up",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "A worker turns up at site and his certificate has expired, so he’s sent back",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Tracking certificates, medicals and passes for hundreds of workers in Excel",
+   "category": "tech_systems",
+   "subtype": "excel_dependency"
+  },
+  {
+   "phrase": "Mobilising a crew for a shutdown takes days of calls and messages",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Don’t know which worker is on which site and rotation right now",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Rotation planning clashes and we end up paying overtime or flying people back",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Overtime claims from site don’t match what the client approved",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Equipment is moved between sites and we lose track",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Calibration and inspection due dates for tools get missed",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Consumables at site camp vanish",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Project margins only known after the project closes",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Costs overrun on fixed-price jobs and we notice too late",
+   "category": "margin_cost",
+   "subtype": "cost_overruns"
+  },
+  {
+   "phrase": "Prequalification documents for each client are rebuilt from scratch every time",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Tender submissions are a scramble before the deadline",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Site reports come by WhatsApp photos and nobody files them",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Daily progress reporting to the client takes the site engineer hours",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Purchase orders for site items get lost and suppliers deliver late",
+   "category": "suppliers_purchasing",
+   "subtype": "po_tracking"
+  },
+  {
+   "phrase": "Skilled technicians leave for better-paying contractors mid-project",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Oil price swings mean work dries up and we can’t plan headcount",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Payroll for site workers with different rates and allowances keeps having errors",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Expanding into a new country means a whole new set of paperwork",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "timesheets and invoicing": [
+   "How do signed timesheets get from site to the office today?",
+   "How long does that usually take?",
+   "What most often causes the client to reject an invoice?"
+  ],
+  "cash": [
+   "Which part hurts more, slow client payments or retention held back?",
+   "How do you keep track of what is owed?"
+  ],
+  "certifications": [
+   "Roughly how many workers’ certificates do you track?",
+   "How do you find out one is about to expire?"
+  ],
+  "manpower": [
+   "How many people are on rotation right now?",
+   "How is the rotation plan kept and shared?"
+  ],
+  "mobilisation": [
+   "When a new call-off comes in, what takes the longest to get a crew out?"
+  ],
+  "equipment": [
+   "How do you know where each piece of equipment is?",
+   "How are calibration dates tracked?"
+  ],
+  "project costs": [
+   "When do you first find out a project is going over cost?",
+   "Where do the cost figures come from?"
+  ],
+  "reporting": [
+   "Which client report takes the most time to prepare?"
+  ]
+ },
+ "seasons": "- PK: work is project- and budget-driven; government and operator budgets around the 1 July fiscal year affect awards; winter gas demand drives LPG/CNG activity and shortages; summer heat affects site working hours. - UAE: planned shutdowns are often scheduled in cooler months (October–April); summer midday work ban (mid-June to mid- September) changes site schedules; Ramadan reduces working hours; ADIPEC (November) drives tendering. - Canada: Alberta’s winter drilling season runs roughly November–March, with spring breakup (road bans, March–May) slowing field work; summer turnaround season at plants; wildfire season can stop work. - All: oil price cycles drive boom-and-bust in activity.",
+ "care": [
+  "No HSE, process safety, well control, permit-to-work, hazardous-area, H2S or engineering advice; pi notes “permit paperwork slows mobilisation” as process only.",
+  "Any leak, fire, explosion, gas exposure, injury or missing worker: pi stops and points to emergency services and site emergency response.",
+  "Workers’ passports, visas, IDs and medical fitness records are never requested or stored; pi records counts and certificate types only.",
+  "Never help forge or backdate certificates, timesheets or inspection reports, or alter signed job tickets.",
+  "Labour issues like withheld passports or unpaid wages: pi does not advise legally; it notes the process concern and does not help hide it.",
+  "Client confidential information (well data, drawings, contract values) is not recorded.",
+  "Bribery or “facilitation” requests around vendor registration or tenders are refused.",
+  "Contract interpretation and disputes are out of scope."
+ ],
+ "build_ideas": [
+  "Digital timesheet and job ticket capture at site with client sign-off, flowing straight to the invoicing queue.",
+  "Invoice and payment tracker per client and project with ageing and retention follow-up dates.",
+  "Certification and pass expiry matrix by role and certificate type with 60/30/7-day alerts (IDs stored only by the company in its own secured system).",
+  "Rotation and manpower planner showing who (by role/employee number) is on which site and when they rotate.",
+  "Mobilisation checklist per call-off: crew, certificates valid, equipment, transport, documents.",
+  "Equipment and tool register with location, status and calibration/inspection due dates.",
+  "Project cost tracker comparing budget, committed and actual by week.",
+  "Site daily report form (progress, photos, issues) compiling into the client’s format.",
+  "PO tracker for site requisitions with supplier delivery status.",
+  "Prequalification document library with version and expiry tracking.",
+  "Tender calendar with submission checklist and owner.",
+  "Overtime approval log matched to client-approved hours.",
+  "Owner dashboard across projects: billing, receivables, headcount, certificate risk."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our biggest headache is timesheets. Site sends them late, client rejects half the invoices, and we wait four months for money."
+  },
+  {
+   "role": "pi",
+   "text": "Understood — late timesheets, rejected invoices and long payment cycles, noted. How do signed timesheets get from site to your office today?"
+  },
+  {
+   "role": "Person",
+   "text": "Supervisor takes photos and sends on WhatsApp at month end, then someone types them up."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, WhatsApp photos at month end then manual typing. What is the most common reason a client rejects an invoice?"
+  },
+  {
+   "role": "Person",
+   "text": "Hours don’t match their records."
+  },
+  {
+   "role": "pi",
+   "text": "Thanks, noted. How many sites are you running timesheets for at the moment?"
+  }
+ ]
+}

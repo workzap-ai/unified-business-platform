@@ -1,0 +1,274 @@
+{
+ "key": "seed_fertiliser_and_pesticide_dealers",
+ "name": "Seed, fertiliser and pesticide dealers",
+ "kind": "industry",
+ "sector": {
+  "code": "C",
+  "title": "Agriculture, livestock and rural"
+ },
+ "signals": [
+  "dealer",
+  "beej / seed",
+  "khaad",
+  "DAP",
+  "urea",
+  "spray / zehar / dawai",
+  "agro dealer",
+  "agri-chemicals",
+  "company rep",
+  "distributor",
+  "ledger / khata",
+  "udhaar",
+  "fasal pe paisa",
+  "recovery",
+  "kissan",
+  "season ka maal",
+  "scheme / discount scheme",
+  "expiry",
+  "godown",
+  "mubeedat",
+  "asmida",
+  "bothoor",
+  "Canadian ag retail / crop inputs / co-op"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Main lines sold: seed, fertiliser, crop protection products, or all three",
+  "Number of shops or godowns and where they are",
+  "Share of sales on credit to farmers versus cash",
+  "Supplier relationships: authorised dealer for companies, distributor, or buying from wholesalers",
+  "Number of staff and whether there are field salesmen",
+  "Whether they also buy back crop from farmers against credit",
+  "Systems used: khata register, Excel, accounting software"
+ ],
+ "scope_rule": "pi notes business problems: stock, expiry, credit to farmers and recovery, company schemes and claims, supplier payment terms, godown control, staff honesty, licences and record-keeping effort, and sales visibility. pi never recommends a product, dose, mix, spray timing or crop treatment, never interprets labels, and never helps a dealer advise farmers on usage. It does not advise on licensing law, banned products, tax or credit terms, and does not store farmers’ names, CNICs or phone numbers; it records roles and counts only.",
+ "vocabulary": {
+  "khata / ledger": "running credit account per farmer",
+  "udhaar": "sale on credit, typically repaid after harvest",
+  "recovery": "collecting credit balances after harvest",
+  "scheme": "company target-linked discount or rebate",
+  "claim": "credit owed back by the company (expired stock, scheme, damage)",
+  "bori / bag": "50 kg sack of fertiliser",
+  "batch / expiry": "batch number and expiry date on seed and chemicals",
+  "dealership / authorised dealer": "official appointment by a manufacturer",
+  "season ka maal": "stock bought before a sowing season",
+  "black / blacking": "hoarding scarce fertiliser to sell above rate (pi won’t help with this)"
+ },
+ "problems": [
+  {
+   "phrase": "Half my money is stuck with farmers until the harvest",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Recovery after the harvest is getting worse every year",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Khata balances don’t match what the farmer says he owes",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Expired spray bottles sitting in the godown, company won’t take them back",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Seed for the season ran out in the first week of sowing",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Bought too much of one product before the season, now it’s dead",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Shortage in bags at stock count, can’t tell when it happened",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Batch numbers aren’t recorded, so a complaint can’t be traced",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Company scheme claims take months and some are never paid",
+   "category": "suppliers_purchasing",
+   "subtype": "credit_terms"
+  },
+  {
+   "phrase": "Company wants payment upfront but farmers buy on credit",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Fertiliser allocation from the company is late every season",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Prices change weekly and staff sell at the old rate",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Salesman gives extra discount to his own contacts",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Counter staff take cash and don’t enter it",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Farmers say a product didn’t work and blame the shop",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "New dealers in the bazaar are taking my farmers",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Field salesman visits I can’t verify",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Stock register for the licence inspection takes days to update",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Licence renewals for each product category are easy to miss",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Two shops, I don’t know which one is making money",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "Everything is in the khata, no computer",
+   "category": "tech_systems",
+   "subtype": "no_system"
+  },
+  {
+   "phrase": "Farmer orders come on WhatsApp voice notes and some get forgotten",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "I buy crop from farmers against their credit and the accounts get mixed up",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Margins vary by product and I don’t know which lines are worth stocking",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Delivery of bags to villages costs too much",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Planning next season’s stock is guesswork",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  }
+ ],
+ "questions": {
+  "credit": [
+   "Roughly how much of your selling is on udhaar?",
+   "How do you decide who gets credit?",
+   "What happens at recovery time?"
+  ],
+  "ledger accuracy": [
+   "Where are the farmer accounts kept?",
+   "How often do disputes about balances come up?"
+  ],
+  "stock and expiry": [
+   "How do you check stock against the register?",
+   "What happens to stock nearing expiry?"
+  ],
+  "season buying": [
+   "How do you decide how much to buy before a season?",
+   "What went wrong last season?"
+  ],
+  "suppliers and schemes": [
+   "Which companies or distributors do you deal with most?",
+   "How are your scheme claims tracked?"
+  ],
+  "pricing": [
+   "How do rate changes reach the counter staff?",
+   "Has selling at the wrong rate cost you?"
+  ],
+  "staff": [
+   "How many people handle cash and stock?",
+   "How do you check the day’s sales against cash?"
+  ],
+  "field sales": [
+   "Do you have salesmen visiting villages?",
+   "How do you know where they went and what they sold?"
+  ],
+  "compliance effort": [
+   "Which record or licence task takes the most time?",
+   "When did it last cause a problem?"
+  ],
+  "branches": [
+   "If you have more than one shop, how do you compare them?"
+  ]
+ },
+ "seasons": "Pakistan: Rabi input season (October–December) for wheat seed and fertiliser; Kharif input season (March–June) for cotton, rice and maize; crop protection sales peak through summer and autumn; recovery comes after wheat harvest (April–June) and after rice, cotton and sugarcane sales (October–February). Fertiliser shortages often hit at peak sowing. Fiscal year end in June brings stock-taking and tax filing effort. UAE: input demand follows the October–April growing season and landscaping work. Canada: spring pre-buy and pick-up (March–May), in-season crop protection (June–August), fall fertiliser (September–November), and early- order programmes in winter.",
+ "care": [
+  "Absolutely no product recommendations, doses, mixes, timings or label interpretation, even if the dealer asks what to tell a farmer; pi says it can’t advise and suggests the manufacturer’s agronomist or the agriculture extension department.",
+  "Pesticide poisoning, swallowing, splashes in the eye, fire or leakage in the godown: pi tells them to call emergency services (1122, 999/998, 911) and the poison information line where available, immediately.",
+  "Never helps with selling banned, counterfeit or smuggled products, relabelling expired stock, hoarding or overcharging above notified rates, or fake invoices.",
+  "Does not store farmers’ names, CNICs, phone numbers or land details; records counts and roles (e.g. “about 200 farmers on credit”).",
+  "Licensing and pesticide regulations: pi notes the admin burden only.",
+  "Debt recovery disputes can be tense; pi does not suggest pressure tactics and notes only the process problem.",
+  "Interest or markup on credit is a sensitive and legal matter; pi does not advise."
+ ],
+ "build_ideas": [
+  "Farmer credit ledger on phone: each account’s purchases, payments and balance, with a WhatsApp statement the farmer can confirm",
+  "Recovery tracker by harvest season, showing overdue balances by village and age",
+  "Stock register by product, batch and expiry, with near-expiry alerts and return-to-company lists",
+  "Daily counter sales and cash close with mismatch flags",
+  "Rate list managed centrally, pushed to counter staff and branches when prices change",
+  "Company scheme and claim tracker: targets, achievements, claims lodged, amounts received",
+  "Pre-season buying sheet from last season’s sales by product and week",
+  "Field salesman visit log with location check-in and orders taken",
+  "WhatsApp order intake that turns farmer messages into an order list for dispatch",
+  "Delivery tracker for village drops with cost per trip",
+  "Licence and inspection register with renewal reminders and printable stock records",
+  "Branch comparison dashboard: sales, margin, credit outstanding, stock value",
+  "Separate crop-buyback ledger linked to the farmer’s credit account"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mera agro dealer ka kaam hai Okara mein. Aadha maal udhaar pe jaata hai aur recovery har saal mushkil hoti ja rahi hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, aadhi sale udhaar pe aur wapsi mein der. Noted. Abhi kisanon ka hisaab kahan rakhte hain, khata register mein?"
+  },
+  {
+   "role": "Person",
+   "text": "Haan register mein, aur kai log kehte hain unka balance kam hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, balance pe ikhtilaaf bhi hota hai. Recovery zyada tar gandum ki fasal ke baad hoti hai ya alag alag waqt pe?"
+  }
+ ]
+}

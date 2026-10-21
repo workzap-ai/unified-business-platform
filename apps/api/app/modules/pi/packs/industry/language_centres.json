@@ -1,0 +1,264 @@
+{
+ "key": "language_centres",
+ "name": "Language centres",
+ "kind": "industry",
+ "sector": {
+  "code": "J",
+  "title": "Education and childcare"
+ },
+ "signals": [
+  "language centre",
+  "language institute",
+  "English classes",
+  "spoken English",
+  "English language course",
+  "Arabic classes",
+  "French classes",
+  "German",
+  "Chinese",
+  "Turkish",
+  "levels",
+  "placement test",
+  "conversation class",
+  "corporate language training",
+  "English bolna seekhain",
+  "spoken English course",
+  "level 2 shuru",
+  "ma’had lughat",
+  "dawra lugha",
+  "LINC",
+  "ESL",
+  "private lessons",
+  "group class",
+  "online class",
+  "certificate"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Languages taught and whether courses follow a levelled framework (e.g. A1–C2) or the centre’s own levels.",
+  "Learner mix: children, adults, corporate clients; group vs one-to-one.",
+  "Delivery: in-centre, online, at client offices; number of branches.",
+  "Course structure: fixed-length level courses, rolling monthly, hourly packages.",
+  "Teacher model: salaried, hourly freelance, native-speaker teachers.",
+  "Whether the centre runs government-funded or employer-funded programmes (notes only).",
+  "Tools used: booking spreadsheets, Zoom, an LMS, WhatsApp."
+ ],
+ "scope_rule": "pi notes the language centre’s operational and business problems: placement and enrolment flow, level progression and retention, scheduling of teachers and rooms, package and hour tracking, corporate invoicing, marketing and lead handling, and branch visibility. pi never asks for or stores learners’ names, nationality, test results, levels, photos or contact details, and does not record children’s details at all. It gives no immigration, visa, citizenship-test, or employment advice, and makes no claims about language test outcomes. It notes only the business side of any visa-motivated demand (“most adult learners join for migration plans”) without advising.",
+ "vocabulary": {
+  "Placement test": "short assessment to put a new learner in the right level.",
+  "Level / module": "a course step, often A1, A2, B1 etc.",
+  "Package / hours bank": "prepaid block of private lesson hours.",
+  "Conversation club": "informal speaking practice sessions.",
+  "Corporate client": "company buying training for its staff.",
+  "Native teacher": "teacher whose first language is the one taught.",
+  "Rollover": "learner continuing to the next level.",
+  "No-show": "learner missing a booked private lesson.",
+  "Spoken English": "conversational English courses (Pakistan term).",
+  "Freelance teacher": "hourly-paid teacher not on payroll."
+ },
+ "problems": [
+  {
+   "phrase": "People take the placement test and never come back to enrol.",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Learners finish level one and don’t continue to level two.",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Private lesson hour packages — nobody knows how many hours each learner has left.",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "No-shows for private lessons, and we still pay the teacher.",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Teachers are freelance and change availability every week; scheduling is a nightmare.",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "A good native teacher left and learners followed.",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Corporate clients pay sixty or ninety days late.",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Corporate training hours delivered don’t match what we invoice.",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Groups start with too few learners and lose money.",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Rooms sit empty mornings and are overbooked evenings.",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Enquiries from Instagram ads are people looking for free classes.",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "We don’t know which ads bring paying learners.",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Our WhatsApp gets the same timing and fee questions all day.",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Online and in-centre bookings are tracked in different sheets.",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Certificates are made manually and often have mistakes.",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Course books are ordered from abroad and arrive after the course starts.",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Course books are sold at the desk but stock never matches.",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Teaching quality varies a lot between teachers and branches.",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Learner feedback is collected on paper and never read.",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Discounts for groups and friends are given inconsistently.",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Teacher hours for payroll come from WhatsApp messages.",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Demand swings with migration news and we can’t plan teacher hiring.",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "No online booking — people want to pick a slot themselves.",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "I can’t see revenue by language and level.",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  }
+ ],
+ "questions": {
+  "enrolment": [
+   "Roughly how many people take a placement test in a month?",
+   "How many go on to enrol?",
+   "What happens to the ones who don’t?"
+  ],
+  "progression": [
+   "Do most learners continue to the next level?",
+   "Where do they usually drop off?"
+  ],
+  "private lessons": [
+   "How do you track hours left on packages?",
+   "What happens with no-shows?"
+  ],
+  "teachers": [
+   "Are teachers salaried or hourly?",
+   "How do you build the weekly schedule?"
+  ],
+  "corporate": [
+   "Do you train staff for companies?",
+   "How are those hours recorded and invoiced?",
+   "How long do they take to pay?"
+  ],
+  "groups": [
+   "What’s the smallest group you’ll run?",
+   "How often do groups start under that?"
+  ],
+  "leads": [
+   "Where do enquiries come from?",
+   "Which ones turn into paying learners?"
+  ],
+  "materials": [
+   "Where do course books come from?",
+   "Have delays hit a course start?"
+  ],
+  "visibility": [
+   "What numbers do you look at each week?",
+   "Who puts them together?"
+  ]
+ },
+ "seasons": "- Pakistan: spoken English demand spikes after Matric/Inter exams and in summer vacations (June–August); IELTS-adjacent English demand tracks university intake cycles; Ramadan evening classes; Eid breaks. - UAE: September and January starts; strong corporate training in Q1 and Q4 budget cycles; Arabic courses for expats around new arrivals in September; summer dip with travel; Ramadan reduced hours. - Canada: September and January intakes; demand for French and English rises around employment and settlement programme cycles; summer intensive courses; winter weather affects in-person attendance. - Policy news (migration rule changes) can swing demand suddenly; pi notes this as a planning issue without commenting on the policies.",
+ "care": [
+  "No immigration, visa, citizenship test, points or settlement advice; pi notes demand patterns only.",
+  "Never ask for learners’ names, nationality, passport/ID, test results or levels by person; record counts and roles.",
+  "Children’s classes: no child details at all.",
+  "No guarantees of language-test scores or fluency outcomes; pi does not help write such claims.",
+  "Fake certificates, inflated attendance for funded or employer programmes, or issuing level certificates without completion: pi declines.",
+  "Freelance teacher contracts and work permits: no legal or immigration advice; note the scheduling/pay problem only.",
+  "Covert recording of online lessons: pi declines."
+ ],
+ "build_ideas": [
+  "Placement-to-enrolment pipeline with follow-up reminders and reasons for not enrolling.",
+  "Level progression tracker showing rollover rates by level and teacher (aggregated).",
+  "Hours-bank system for private packages: hours bought, used, remaining, with automatic low-balance reminders.",
+  "No-show policy recorder applying the centre’s own rules to billing and teacher pay.",
+  "Teacher availability and scheduling board with room allocation and clash warnings.",
+  "Corporate training module: sessions delivered per client, attendance counts, monthly invoice and receivables ageing.",
+  "Group viability view: enrolments vs minimum size before start date.",
+  "Online booking page for private lessons and placement tests.",
+  "WhatsApp FAQ responder for timings, levels and fees, with hand-off to staff.",
+  "Course book stock and import order tracker linked to upcoming course starts.",
+  "Certificate generator from verified completion data.",
+  "Learner feedback form with summary by course and branch (no names).",
+  "Owner dashboard: revenue by language, level, branch and channel."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our private lessons are sold in packages of 10 or 20 hours, but nobody really knows how many hours each learner has left."
+  },
+  {
+   "role": "pi",
+   "text": "So packages get sold, but tracking the hours used falls through the cracks. Noted. Where are hours recorded at the moment — a sheet, a notebook, or the teachers’ messages?"
+  },
+  {
+   "role": "Person",
+   "text": "Mostly teachers tell the front desk on WhatsApp after each class."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, hours reported by WhatsApp after each lesson. Roughly how many active packages are running right now?"
+  }
+ ]
+}

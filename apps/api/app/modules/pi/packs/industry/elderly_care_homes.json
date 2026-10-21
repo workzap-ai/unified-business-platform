@@ -1,0 +1,264 @@
+{
+ "key": "elderly_care_homes",
+ "name": "Elderly care homes",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "care home",
+  "old age home",
+  "elderly home",
+  "nursing home",
+  "assisted living",
+  "retirement home",
+  "senior living",
+  "residents",
+  "buzurgon ka ghar",
+  "old home",
+  "dar ul aman",
+  "dar al-musinnin",
+  "ri’ayat kibar al-sinn",
+  "long-term care",
+  "respite stay",
+  "day care for seniors",
+  "caregivers",
+  "care staff",
+  "occupancy",
+  "waiting list",
+  "family visits",
+  "monthly fee"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of beds/rooms and current occupancy as the owner describes it",
+  "Type: residential care, nursing-level care, assisted living, day care, respite stays",
+  "Ownership: private, family-run, trust/charity, part of a group",
+  "Fee model: monthly fees, deposits, government or charity funding, provincial subsidies (Canada), family sponsors abroad",
+  "Staffing: carers, nurses, kitchen, housekeeping, laundry, maintenance; in-house or agency",
+  "Facilities: kitchen in-house or catered, laundry, transport, generator",
+  "Systems used for resident admin, billing and rosters"
+ ],
+ "scope_rule": "pi notes the business and operations of a care home: occupancy and enquiries, admissions paperwork as admin, fee billing and collections, staff rosters and turnover, kitchen and supplies purchasing, laundry and housekeeping routines, maintenance, family communication workflows, complaints handling and reporting. pi never gives care, nursing, medication, nutrition or dementia- management advice, and never judges the clinical standard of care. pi does not ask for or record residents’ names, ages, conditions, medications, room assignments tied to a person, or family members’ details. Concerns about the safety or abuse of a resident are not treated as an ordinary business problem; pi directs the person to emergency services or the proper authority.",
+ "vocabulary": {
+  "resident": "person living in the home",
+  "occupancy": "share of beds filled",
+  "respite stay": "short stay to give family carers a break",
+  "admission / assessment": "process before a resident moves in",
+  "care plan": "resident’s planned care (pi does not engage with content)",
+  "carer / attendant": "staff providing daily care",
+  "night duty": "overnight staffing",
+  "MAR": "medication record (pi notes only that a paperwork process exists)",
+  "family sponsor": "relative paying fees, often from abroad",
+  "deposit / security": "upfront amount on admission",
+  "agency staff": "temporary staff from an agency",
+  "LTC": "long-term care (Canada)",
+  "visiting hours": "time families can visit"
+ },
+ "problems": [
+  {
+   "phrase": "Families abroad pay late and it’s awkward to chase",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Fees, extras and deposits are tracked on paper",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Extras like diapers and special food aren’t billed",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "We have empty rooms but enquiries don’t convert",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "People find us through word of mouth only",
+   "category": "marketing_leads",
+   "subtype": "few_leads"
+  },
+  {
+   "phrase": "Enquiry calls are handled by whoever picks up",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Night staff don’t show up and day staff have to stay on",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Carers leave within months",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Agency staff hours don’t match the agency invoices",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "Kitchen supplies run out and someone runs to the market",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Food wastage is high and costs keep going up",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Diapers, gloves and toiletries disappear faster than they should",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Laundry gets mixed up and families complain clothes are lost",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Daily cleaning checklists are signed but not done",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Generator, AC and lift breakdowns are fixed only when they fail",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Electricity bills in summer are huge",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Families call all day asking for updates and staff get distracted",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Complaints from families get lost between shifts",
+   "category": "communication_coordination",
+   "subtype": "tasks_dropped"
+  },
+  {
+   "phrase": "Handover between shifts is verbal and things get missed",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Inspection and licence paperwork takes weeks to prepare",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "Staff training certificates and police checks aren’t tracked",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "I can’t see occupancy, income and staff cost in one place",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "We want a second home but can’t find managers we trust",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "Donations and charity income aren’t recorded properly",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  }
+ ],
+ "questions": {
+  "occupancy": [
+   "How many places do you have, and how many are filled right now?",
+   "Where do new enquiries usually come from?",
+   "What usually stops a family from going ahead?"
+  ],
+  "fees": [
+   "How are monthly fees and extras billed?",
+   "Who follows up with families who pay late?"
+  ],
+  "staffing": [
+   "Which shift is hardest to keep covered?",
+   "What happens when someone doesn’t turn up?"
+  ],
+  "turnover": [
+   "What do carers usually say when they leave?"
+  ],
+  "supplies": [
+   "Who orders food and daily supplies?",
+   "How do you know what’s being used?"
+  ],
+  "housekeeping and laundry": [
+   "How are daily cleaning and laundry tracked?",
+   "What do families complain about most?"
+  ],
+  "family communication": [
+   "How do families get updates now?",
+   "Which questions take up the most staff time?"
+  ],
+  "maintenance": [
+   "Which breakdowns hurt the most?",
+   "Is there a schedule for servicing?"
+  ],
+  "handovers": [
+   "How do shifts hand over to each other?"
+  ],
+  "reporting": [
+   "What would you like to see each month that you can’t now?"
+  ]
+ },
+ "seasons": "- Pakistan and UAE summers bring heat, high electricity costs and generator dependence; load-shedding in Pakistan affects ACs and lifts. - Winter brings more illness among residents and more staff sick days, especially in Canada and northern Pakistan; Canadian winters add heating costs and visitor disruptions. - Ramadan changes meal times (sehri and iftar) for residents and staff, affecting kitchen schedules and rosters; Eid brings staff leave requests and more family visits. - Overseas families often arrange admissions or respite stays around their summer and December visits. - Canada: provincial funding and fiscal year-end on 31 March; holiday season brings respite demand and staff holiday cover issues.",
+ "care": [
+  "If anyone mentions a resident who is unresponsive, has fallen badly, is not breathing, or is in any danger, pi stops and tells them to call emergency services immediately (1122/115, 998/999, 911).",
+  "Any mention of abuse, neglect or mistreatment of a resident is serious: pi tells the person to make sure the resident is safe, contact emergency services if there is immediate danger, and report to the relevant authority; pi does not treat it as a routine problem to log.",
+  "pi gives no advice on care, medication, nutrition, dementia, restraint or end-of-life matters.",
+  "No resident names, ages, conditions, medication, photos or room details; no family members’ details.",
+  "Questions about care-home licensing, staffing ratios or inspection standards are noted as admin effort only.",
+  "Requests to hide incidents from families or inspectors, fake training records, or employ staff without required checks are refused.",
+  "Staff recorded by role; owners may feel strongly about families or staff, and pi stays neutral."
+ ],
+ "build_ideas": [
+  "Fee and extras billing ledger per resident account (by account code), with monthly invoices, deposits, payments from local and overseas sponsors, and ageing",
+  "Extras log where staff record billable items used, feeding the monthly invoice",
+  "Enquiry and admissions pipeline: enquiry, visit, documents, decision, move-in date, with follow-up reminders",
+  "Staff roster with shift swaps, sick-call cover, agency-hours reconciliation and overtime",
+  "Digital shift handover note with tasks carried over and acknowledgement by the next shift lead",
+  "Kitchen and consumables purchasing list with par levels, weekly usage and supplier orders",
+  "Housekeeping and laundry checklists with time stamps and supervisor spot-check sign-off; labelled-laundry tracker",
+  "Maintenance schedule for generator, AC, lift and fire equipment with service history",
+  "Family update channel on WhatsApp for general notices and visiting arrangements, with a request log for staff to answer at set times",
+  "Complaint log with owner role, deadline and resolution note",
+  "Staff training and checks register with expiry reminders",
+  "Inspection document folder and checklist calendar",
+  "Owner dashboard: occupancy, income, receivables, staff cost, utility cost, open complaints"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Kai residents ki families bahar mulk mein hain, fees do do mahine late aati hai aur mujhe bar bar yaad dilana parta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh sakta hoon, yeh baat chhedna bhi mushkil hota hai. Noted. Abhi fees aur dues ka record kahan rakha jata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Ek register mein, aur kuch WhatsApp pe receipts."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, record do jagah bikhra hua hai. Noted. Families ko har mahine bill kaise bheja jata hai, ya woh khud hi bhejti hain?"
+  }
+ ]
+}

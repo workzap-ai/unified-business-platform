@@ -1,0 +1,270 @@
+{
+ "key": "sports_goods_and_fitness_equipment_retail",
+ "name": "Sports goods and fitness equipment retail",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "sports shop",
+  "sports goods",
+  "cricket bats",
+  "hard ball",
+  "tape ball",
+  "kits",
+  "football",
+  "badminton",
+  "padel",
+  "gym equipment",
+  "treadmill",
+  "dumbbells",
+  "weights",
+  "home gym",
+  "cycles",
+  "sportswear",
+  "sneakers",
+  "jerseys",
+  "Sialkot goods",
+  "khel ka saman",
+  "team kit order",
+  "club order",
+  "installation",
+  "warranty",
+  "riyadha",
+  "nadi",
+  "fitness machine service"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Mix: team sports (cricket, football, hockey), racquet sports (badminton, tennis, padel), fitness equipment, cycles, apparel and footwear.",
+  "Retail only, or also supplying clubs, schools, academies and gyms.",
+  "Whether they manufacture or customise (e.g. Sialkot sourcing, printed kits, bat knocking).",
+  "Large equipment: delivery, installation and after-sales service.",
+  "Branded authorised dealer vs multi-brand or own label.",
+  "Channels: shop, Instagram, website, Daraz, Noon, Amazon.",
+  "Size variants and how they’re tracked."
+ ],
+ "scope_rule": "pi notes operational problems such as size and variant stock, team kit orders, equipment delivery and installation, service visits, warranty claims and club credit. pi does not give training, injury, fitness or nutrition advice, or advice on equipment safety certification. If equipment injured someone, pi records the business problem and points to medical help or emergency services, without making safety judgements. It does not advise on counterfeit brand issues beyond refusing to help sell fakes. pi never records athletes’, students’ or customers’ personal details.",
+ "vocabulary": {
+  "tape ball / hard ball": "cricket ball types",
+  "knocking": "preparing a new cricket bat before use",
+  "English willow / Kashmir willow": "cricket bat wood grades",
+  "kit order": "team uniform order with sizes, names and numbers",
+  "sublimation": "printing method for jerseys",
+  "Sialkot": "major sports-goods manufacturing hub in PK",
+  "commercial vs home use": "equipment grade",
+  "installation": "assembling and setting up machines on site",
+  "AMC": "annual maintenance contract for gym equipment",
+  "size run": "the full set of sizes for one style",
+  "padel": "racquet sport, fast growing in the UAE and PK",
+  "nadi": "club (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "We always run out of the middle sizes in shoes and jerseys",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Odd sizes left at the end of every season",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Team kit orders come with names and numbers on WhatsApp and we print them wrong",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Club orders are always urgent and late",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Treadmill delivery and installation are scheduled on a paper diary",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Delivery of heavy machines costs more than we charge",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Customers call about broken machines and we lose the service requests",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Warranty claims with the brand take forever and the customer blames us",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_communication"
+  },
+  {
+   "phrase": "Gyms on AMC call and we don’t know when the last visit was",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Schools and academies buy on credit and pay late",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Sialkot supplier quality varies batch to batch",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "Imported equipment containers get delayed",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Fitness equipment sold during lockdown-type spikes, now it’s sitting",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "We can’t tell which brand or category makes money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Website shows items out of stock in the shop",
+   "category": "orders_fulfilment",
+   "subtype": "multi_channel_orders"
+  },
+  {
+   "phrase": "Instagram enquiries about price and delivery pile up",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Sales staff don’t know the equipment specs",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Technicians for installation don’t report back what they did",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Sales drop hard in the summer",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Cricket season stock arrives after the season starts",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Branded items walk out from the shop",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Discounts given to coaches and clubs aren’t tracked",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Returned shoes that were worn come back for refund",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  }
+ ],
+ "questions": {
+  "mix": [
+   "What sells most for you, team sports, fitness equipment, racquet sports or apparel?",
+   "Do you also supply clubs, schools or gyms?"
+  ],
+  "sizes and stock": [
+   "How do you track sizes for shoes and kits?",
+   "Which sizes usually run out first?"
+  ],
+  "team orders": [
+   "How do team or club orders reach you?",
+   "Where do mistakes usually happen?"
+  ],
+  "delivery and installation": [
+   "Who delivers and installs larger equipment?",
+   "How do you schedule it and confirm it’s done?"
+  ],
+  "service and warranty": [
+   "When a machine breaks, how does the customer reach you?",
+   "How do you track the claim with the brand?"
+  ],
+  "suppliers": [
+   "Do you buy locally, from Sialkot, or import?",
+   "What goes wrong most often?"
+  ],
+  "credit": [
+   "Do clubs or schools buy on credit?",
+   "How long do they usually take to pay?"
+  ],
+  "online": [
+   "Do you sell online, and does that stock match the shop?"
+  ],
+  "seasons": [
+   "Which months are busiest and quietest for you?",
+   "How do you decide how much to order before a season?"
+  ],
+  "owner view": [
+   "How do you see which category or brand is making money?"
+  ]
+ },
+ "seasons": "In PK: the cricket season (PSL in February to March, plus the winter/spring club season), the summer school holidays for academies, Ramadan night cricket and tape-ball tournaments, the January resolutions fitness bump, and Eid gifting. In the UAE: the main season runs October to April (outdoor sports, padel, cycling, marathon season), with indoor fitness lifting in summer, plus back-to-school sports kits in September, the Dubai Fitness Challenge (October to November), and Ramadan sports tournaments. In Canada: hockey season (fall to spring), summer sports, back-to-school, January fitness resolutions and Black Friday/Boxing Day for equipment.",
+ "care": [
+  "No training, injury, fitness, supplement or nutrition advice.",
+  "If someone was injured by equipment, pi points to medical help (or emergency services if serious) and records the after-sales problem without making safety or liability judgements.",
+  "Product safety certification and liability are regulatory/legal matters; note only the operational issue.",
+  "Refuse to help sell counterfeit branded goods or relabel items.",
+  "Never record players’, students’, or customers’ names, sizes linked to names, or contacts beyond noting “kit lists have names and numbers”.",
+  "Refuse under-invoicing of imports or fake invoices for clubs/schools.",
+  "Staff suspicions recorded by role only."
+ ],
+ "build_ideas": [
+  "Size-matrix stock (style × size × colour) with reorder points by size curve.",
+  "Team kit order form shared as a link: the coach fills sizes, names and numbers, the shop confirms a proof before printing.",
+  "Kit production tracker: received, printed, checked, delivered.",
+  "Delivery and installation scheduler with technician job cards, photos and customer sign-off on phone.",
+  "Service request and warranty tracker with brand claim status and customer updates.",
+  "AMC register for gyms: visit schedule, parts used, reminders.",
+  "Institutional credit ledger for clubs and schools with ageing and reminders.",
+  "Seasonal buying planner from past sales by category and month.",
+  "Unified online and shop stock.",
+  "Equipment spec cards for staff.",
+  "Margin by brand and category including delivery cost.",
+  "Returns log with condition check and reason."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Club ka order aata hai WhatsApp pe, naam aur number ke saath, aur printing mein ghalti ho jaati hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, kit order ki printing mein naam ya number ghalat ho jaate hain. Noted. Ye list aam tor pe kis shakal mein aati hai, message, photo ya Excel?"
+  },
+  {
+   "role": "Person",
+   "text": "Zyada tar coach photo bhej deta hai haath se likhi hui."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, haath se likhi list ki photo. Printing se pehle coach ko confirm karwaya jaata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Nahi, waqt nahi hota."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted. Ek mahine mein aise team orders taqreeban kitne aate hain?"
+  }
+ ]
+}

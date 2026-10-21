@@ -1,0 +1,299 @@
+{
+ "key": "furniture_manufacturing_and_woodwork",
+ "name": "Furniture manufacturing and woodwork",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "furniture",
+  "woodwork",
+  "carpentry",
+  "mistri",
+  "barhai",
+  "lakri",
+  "sheesham",
+  "deodar",
+  "kikar",
+  "oak",
+  "beech",
+  "MDF",
+  "chipboard",
+  "plywood",
+  "veneer",
+  "laminate",
+  "polish",
+  "lacquer",
+  "polish wala",
+  "upholstery",
+  "sofa",
+  "bed set",
+  "dining set",
+  "kitchen cabinets",
+  "wardrobes",
+  "joinery",
+  "fit-out",
+  "Chiniot",
+  "jahez furniture",
+  "najjar",
+  "mobilia/ athath",
+  "joinery shop"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Custom/made-to-order (home clients, interior designers, fit-out contractors), ready stock for showrooms/dealers, or both.",
+  "Product focus: home furniture, kitchens and wardrobes, office furniture, hotel/commercial fit-out, doors and joinery.",
+  "Materials mainly solid wood, MDF/board with laminate/veneer, or metal combined.",
+  "Own showroom(s), dealers, online (Instagram, Facebook, Daraz, Dubizzle, website), contractors.",
+  "Number of carpenters, polishers and upholsterers; in-house or on contract.",
+  "Whether installation and delivery are done by own team."
+ ],
+ "scope_rule": "pi notes operational and business problems: late custom orders, measurement and design errors, material wastage, wood stock and seasoning issues, polish and finish quality, installation problems, advance and balance collections, showroom stock and marketing leads. pi does not give structural, fire-rating, building code, dust extraction or machine safety advice, or advise on timber import rules, forestry permits or taxes. Customer home addresses and phone numbers are not stored; pi uses “home client”, “designer”, “contractor”.",
+ "vocabulary": {
+  "mistri/ barhai": "carpenter",
+  "lakri": "wood",
+  "sheesham": "Indian rosewood, popular solid wood in Pakistan",
+  "deodar / kikar": "local timbers",
+  "MDF / chipboard": "engineered boards",
+  "veneer / laminate": "thin surface layers on boards",
+  "seasoning": "drying timber so it doesn’t crack or warp",
+  "polish / lacquer / PU finish": "final surface coats",
+  "fit-out": "interior works for offices, shops, hotels, villas (common in the UAE)",
+  "cutting list": "list of parts to cut for a job",
+  "jahez furniture": "bridal furniture bought for weddings",
+  "najjar": "carpenter (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Customer measured their room wrong, or we did, and the wardrobe doesn’t fit",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Custom orders take two months instead of three weeks",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Client keeps changing the design after we’ve cut",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Advance taken, balance stuck for months after delivery",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Contractors hold retention money and pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Wood cracks or warps after delivery because it wasn’t seasoned",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Polish finish differs from the sample shown in the showroom",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Lots of board offcuts wasted, cutting isn’t planned",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Wood and board stock in the yard isn’t counted",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Hardware (hinges, runners, handles) runs out mid-job",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "Timber prices change every month and my quotes don’t",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "I don’t know if a custom job made money until it’s done, sometimes not even then",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Showroom pieces sit for a year",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Showroom pieces get damaged or scratched by handling and nobody is accountable",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Delivery and installation team damages walls or furniture",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Customers call for after-sales fixes and nobody tracks them",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Instagram gets lots of ‘price?’ comments but few orders",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "DMs and WhatsApp inquiries get missed",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Carpenters leave mid-job or work for others on the side",
+   "category": "people_staff",
+   "subtype": "trust_honesty"
+  },
+  {
+   "phrase": "Contract mistris charge differently every time",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Only the owner can quote, everything waits for him",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Job progress is unknown; I visit the workshop to check",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Design drawings live on someone’s phone",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Fit-out projects have penalties if late",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Wedding season orders all come at once",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Delivery charges barely cover truck and labour",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  }
+ ],
+ "questions": {
+  "custom orders": [
+   "How many custom jobs are running now?",
+   "How do you see which stage each is at?",
+   "Which stage usually slips?"
+  ],
+  "measurements": [
+   "Who takes measurements on site?",
+   "How are they recorded and shared with the workshop?"
+  ],
+  "design changes": [
+   "How often do clients change things after approval?",
+   "How is the change recorded and charged?"
+  ],
+  "quoting": [
+   "Who prepares quotes?",
+   "How long does a quote usually take to go out?"
+  ],
+  "costing": [
+   "Do you check after a job whether it made money?",
+   "What usually goes over?"
+  ],
+  "materials": [
+   "Which material runs short most — wood, board, hardware or polish?",
+   "How is the yard stock counted?"
+  ],
+  "quality": [
+   "What do customers complain about most after delivery?",
+   "Who handles those fixes?"
+  ],
+  "cash": [
+   "How much advance do you usually take?",
+   "How long does the balance take to come in?"
+  ],
+  "leads": [
+   "Where do most inquiries come from?",
+   "How quickly do they get a reply?"
+  ],
+  "showroom": [
+   "Which pieces don’t move?",
+   "How long have they been sitting?"
+  ],
+  "staff": [
+   "Are carpenters salaried, daily or per job?",
+   "What causes disputes?"
+  ],
+  "installation": [
+   "Is installation by your own team?",
+   "What goes wrong most on site?"
+  ]
+ },
+ "seasons": "Pakistan: wedding season (roughly October to March, peaking in winter) drives jahez furniture and bed sets; pre- Eid home refreshes; humid monsoon months (July to September) affect wood movement and polish drying; summer heat slows polishing; budget in June affects imported board and hardware prices. UAE: villa and apartment handovers and fit-out work peak in the cooler months (October to April); hotel and commercial fit-outs before events and year-end; summer exodus slows home orders; Ramadan reduced hours; Dubai Shopping Festival furniture sales. Canada: spring and summer renovation season for kitchens and cabinetry; moving season around July 1 (notably in Quebec); Black Friday and Boxing Day furniture sales; winter delivery delays.",
+ "care": [
+  "Saw or machine injuries, dust fires, solvent fumes: pi stops and points to emergency services.",
+  "No advice on structural strength, fire ratings, building codes, dust extraction or machine guarding.",
+  "No help with timber that is illegally sourced, or avoiding import or forestry rules; pi declines plainly.",
+  "No help with fake invoices for fit-out contracts or inflating bills; pi declines.",
+  "Never stores customers’ home addresses, phone numbers or carpenters’ identities; uses roles.",
+  "Disputes with a specific client or contractor: pi notes the process gap (no signed design, no change record), not who is right."
+ ],
+ "build_ideas": [
+  "Job tracker for custom orders: design, approval, cutting, assembly, polish, upholstery, delivery, installation, with photos at each stage.",
+  "Site measurement form on phone with sketches/photos, sent straight to the workshop.",
+  "Design approval and change-order record with client confirmation on WhatsApp.",
+  "Quote builder with saved materials and labour rates per item type.",
+  "Job costing: materials issued and labour hours per job vs quote.",
+  "Yard and store stock for timber, boards, hardware and finishes with reorder levels.",
+  "Cutting list and board optimisation output per job.",
+  "Advance and balance payment tracker with reminders.",
+  "Showroom stock with ageing and photo catalogue.",
+  "Lead inbox combining Instagram, Facebook, WhatsApp and website inquiries with follow-up reminders.",
+  "After-sales ticket log with visit scheduling.",
+  "Delivery and installation schedule with team assignment and completion photos."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Custom orders mein har dafa delay hota hai, customer naraz, aur balance bhi nahi deta."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted: custom orders late ho rahe hain aur iski wajah se balance payment bhi ruk jati hai. Abhi kitne custom orders chal rahe hain?"
+  },
+  {
+   "role": "Person",
+   "text": "15 ke qareeb."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Inmein se zyada tar kis stage pe atakte hain — cutting, polish, ya material ke intezar mein?"
+  },
+  {
+   "role": "Person",
+   "text": "Polish pe, polish wala ek hi hai aur woh doosre kaam bhi karta hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, polish pe ek hi banda hai jo bahar ka kaam bhi leta hai. Kya woh aapka mulazim hai ya per job pe kaam karta hai?"
+  }
+ ]
+}

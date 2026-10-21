@@ -1,0 +1,267 @@
+{
+ "key": "spas_and_wellness_centres",
+ "name": "Spas and wellness centres",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "spa",
+  "day spa",
+  "wellness centre",
+  "massage",
+  "therapist",
+  "hammam",
+  "Moroccan bath",
+  "sauna",
+  "steam",
+  "facial",
+  "body scrub",
+  "aromatherapy",
+  "reflexology",
+  "cupping",
+  "hijama",
+  "couples package",
+  "spa membership",
+  "gift voucher",
+  "massage centre",
+  "markaz al- afiya",
+  "muaalij",
+  "mawid"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Standalone spa, hotel spa (owned or leased), or wellness centre with additional treatments.",
+  "Number of treatment rooms, therapists and wet facilities (hammam, sauna, pool).",
+  "Service mix: massages, facials, hammam, body treatments, wellness packages, memberships.",
+  "Gender policy: ladies-only, gents-only or separate sections.",
+  "Therapist arrangements: salaried, commission, visa-sponsored staff, freelance.",
+  "Booking channels: phone, WhatsApp, website, hotel front desk, booking apps, vouchers via deal sites.",
+  "Retail products sold and suppliers."
+ ],
+ "scope_rule": "pi notes operational and business problems: room and therapist scheduling, no-shows, package and voucher tracking, consumables usage, laundry, therapist commissions, cleanliness and guest feedback. pi does not give health, medical or therapeutic advice, does not advise on which treatments suit health conditions, and does not advise on licensing of therapists, medical-adjacent treatments (such as hijama/cupping), visa or labour rules, or tax. pi never collects clients’ names, health histories, photos or contact details, and records roles only. Any suggestion of illegal services or exploitation is a hard stop.",
+ "vocabulary": {
+  "treatment room": "private room for a single or couples treatment",
+  "therapist utilisation": "share of a therapist’s time spent on paid treatments",
+  "hammam": "steam bath with scrub, popular in UAE",
+  "gift voucher": "prepaid treatment given as a gift",
+  "package / series": "bundle of sessions bought upfront",
+  "consumables": "oils, creams, disposables used per treatment",
+  "turnover time": "time to reset a room between treatments",
+  "hijama / cupping": "traditional treatment, regulated as a health service in some places",
+  "muaalij": "therapist (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Rooms are free but therapists are all booked, or the other way round",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Bookings from the hotel desk, website and WhatsApp clash",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "No-shows on weekend afternoons cost us a lot",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Gift vouchers are sold and we have no list of which ones are redeemed",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Package sessions are tracked on paper cards that clients lose",
+   "category": "customers_retention",
+   "subtype": "loyalty"
+  },
+  {
+   "phrase": "Massage oils and creams finish much faster than they should",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Towels and robes go missing and laundry costs keep growing",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Laundry vendor is late and we run out of clean towels at peak",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Therapist commission and tips calculations cause complaints",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Good therapists are hard to hire and leave quickly",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Quality of massage depends completely on which therapist you get",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Clients complain about hygiene in the steam room",
+   "category": "quality_complaints",
+   "subtype": "hygiene"
+  },
+  {
+   "phrase": "Hammam and sauna equipment breaks down",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Deal-site vouchers bring customers who never come back at full price",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Discounts are given by reception without approval",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Treatments are rung up as cheaper ones and the difference disappears",
+   "category": "loss_security",
+   "subtype": "void_refund_abuse"
+  },
+  {
+   "phrase": "Hotel takes a big share and settles late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Electricity and water costs for wet areas are huge",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "I don’t know my profit per treatment after therapist and products",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Weekdays mornings are empty",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Reviews mention rude reception and long waits",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "We have no record of client preferences, so they have to repeat themselves",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Licences and staff permit renewals keep catching us out",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Room turnaround checklist isn’t followed",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Retail products sit on shelves and expire",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  }
+ ],
+ "questions": {
+  "scheduling": [
+   "How are treatments booked now?",
+   "How do you match rooms and therapists?",
+   "Where do clashes come from?"
+  ],
+  "no-shows": [
+   "How often do people not turn up?",
+   "Do you take any deposit?"
+  ],
+  "vouchers and packages": [
+   "How do you sell vouchers or packages?",
+   "How do you track what’s been used?"
+  ],
+  "consumables and linen": [
+   "How are oils and products issued to therapists?",
+   "How do you count towels and robes?"
+  ],
+  "therapists": [
+   "How are they paid?",
+   "What causes complaints about pay?"
+  ],
+  "quality": [
+   "What do client complaints usually mention?",
+   "Who checks rooms between treatments?"
+  ],
+  "partners": [
+   "If you’re inside a hotel, how does the settlement work?",
+   "How long does it take?"
+  ],
+  "money": [
+   "Do you know which treatments make the most?",
+   "Which cost has grown most?"
+  ]
+ },
+ "seasons": "UAE: peak October to April with tourists and residents; weekends; Mother’s Day (21 March in the Arab world) and Valentine’s for vouchers; pre-wedding packages in winter; Ramadan evening demand; summer slower with staycation deals in hotel spas. PK: wedding season (November to March) for pre-bridal packages; pre-Eid; winter for hammam and steam; summer slower; Ramadan after-iftar. Canada: winter months, December holiday gift cards, Mother’s Day (May), Valentine’s; summer wellness retreats in resort areas.",
+ "care": [
+  "No medical, therapeutic or contraindication advice; questions like “is massage OK for a pregnant client” are declined politely.",
+  "Hijama/cupping and other medical-adjacent treatments: pi notes operational issues only and never advises on practice or licensing.",
+  "Any sign of trafficking, exploitation or illegal services: pi will not help, and points to authorities if someone is at risk.",
+  "Medical emergencies (fainting in sauna, burns, allergic reaction): pi stops and points to emergency services.",
+  "Never collect client names, health information, contact details or photos.",
+  "Therapists’ visa, passport or labour-permit details are never collected; renewals are noted as admin effort only.",
+  "No covert recording in treatment rooms or changing areas."
+ ],
+ "build_ideas": [
+  "Booking grid matching rooms and therapists, with WhatsApp booking, reminders and deposit option.",
+  "Voucher register with unique codes, sold/redeemed status and expiry.",
+  "Package tracker per client ID with sessions used and remaining.",
+  "Consumables issue log per treatment, compared to bookings.",
+  "Linen count tracker with laundry out/in and loss report.",
+  "Therapist utilisation and commission report, tips included.",
+  "Room turnaround and hygiene checklist with time stamps.",
+  "Wet-area equipment maintenance log.",
+  "Discount and comp approval flow.",
+  "Hotel partner settlement statement and reconciliation.",
+  "Client preference notes (non-medical, with consent).",
+  "Treatment profitability report."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We sell a lot of gift vouchers in December, but by March nobody knows which ones have been used."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, voucher redemptions aren’t being tracked. How are vouchers issued at the moment?"
+  },
+  {
+   "role": "Person",
+   "text": "Printed cards with a handwritten number, and reception writes it in a book when someone uses one."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted — handwritten numbers and a logbook. Has anyone tried to use the same voucher twice?"
+  },
+  {
+   "role": "Person",
+   "text": "Yes, at least twice that we caught."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. Do the vouchers have an expiry date written on them?"
+  }
+ ]
+}

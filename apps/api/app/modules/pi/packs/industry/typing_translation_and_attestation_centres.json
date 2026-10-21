@@ -1,0 +1,272 @@
+{
+ "key": "typing_translation_and_attestation_centres",
+ "name": "Typing, translation and attestation centres",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "typing centre",
+  "Tasheel",
+  "Amer",
+  "visa typing",
+  "labour contract typing",
+  "Emirates ID application",
+  "legal translation",
+  "certified translation",
+  "MOFA attestation",
+  "embassy attestation",
+  "HEC attestation",
+  "IBCC",
+  "notary",
+  "attestation karwani hai",
+  "documents ready kab honge",
+  "courier",
+  "PRO",
+  "markaz tibaa’a",
+  "tarjama qanuni",
+  "tasdeeq",
+  "walk-in customers",
+  "token",
+  "government fees",
+  "service charge",
+  "sworn translator"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Services offered (typing for government transactions, translation, attestation handling, document clearing, courier)",
+  "Country and whether the centre is an authorised government service partner or an independent office",
+  "Number of counters/typists and translators, and whether translators are in-house or freelance",
+  "Daily walk-in volume and share of corporate versus individual customers",
+  "How government fees are collected and paid (prepaid accounts, customer cards, cash)",
+  "How jobs and document handovers are tracked (register, token system, Excel, WhatsApp)",
+  "Whether documents are couriered between cities or embassies"
+ ],
+ "scope_rule": "pi notes the centre’s operational problems: queue and counter management, job tracking, document custody and handover, turnaround times, customer updates, translator workload, fee reconciliation, cash handling, staff accountability and repeat-corporate account management. pi gives no immigration, visa, legal, labour or attestation-procedure advice, and never explains how to obtain any government approval. pi never takes customers’ names, passport, Emirates ID, CNIC, visa or certificate details, or copies of documents; it records service types and volumes only. Requests to forge, alter or backdate documents, produce unofficial “attestations”, mistranslate deliberately, or pay officials to speed things up are declined.",
+ "vocabulary": {
+  "Typing centre": "office that prepares and submits government application forms for customers",
+  "Tasheel / Amer": "UAE government service centre networks for labour and immigration transactions",
+  "Attestation": "official verification and stamping of documents by authorities",
+  "MOFA": "Ministry of Foreign Affairs, part of the attestation chain",
+  "HEC / IBCC": "Pakistan bodies verifying degrees and school certificates",
+  "Legal / certified translation": "translation by an authorised translator for official use",
+  "Government fee": "official charge paid to the authority, separate from the centre’s service charge",
+  "Service charge": "the centre’s own fee",
+  "Token": "queue number for walk-in customers",
+  "PRO": "public relations officer who runs government errands",
+  "Courier": "sending documents between offices, embassies and cities"
+ },
+ "problems": [
+  {
+   "phrase": "Customers wait an hour at the counter and walk out",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  },
+  {
+   "phrase": "People keep calling to ask if their documents are ready",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Original documents get misplaced in the office",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "We gave a customer someone else’s documents once",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Courier pouches between us and the embassy go missing or get delayed",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Translations come back late from freelancers",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Typing errors cause applications to be rejected and redone",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Different staff quote different service charges for the same thing",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Cash at the counter doesn’t match the day’s transactions",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Government fees paid from our account don’t reconcile with what customers paid",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "Staff charge customers extra and pocket it",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Corporate clients run up balances and pay late",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "We can’t see how many jobs each typist did",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Peak mornings are chaos, afternoons are empty",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Every job is written in a register and later typed into Excel",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Jobs fall through the cracks between front desk and back office",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Bad Google reviews about waiting and rude staff",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "New staff take months to learn all the procedures",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "We have no record of which customers are repeat business",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Portal outages stop all work for hours",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "Our authorisation and trade licence renewals are always rushed",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Competition from online government apps is cutting walk-ins",
+   "category": "sales_revenue",
+   "subtype": "sales_drop"
+  },
+  {
+   "phrase": "Customers want WhatsApp updates but we don’t have a system",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Second branch does things differently and quality slips",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  }
+ ],
+ "questions": {
+  "volume": [
+   "Roughly how many customers or jobs do you handle in a day?",
+   "What are the most common services?"
+  ],
+  "waiting": [
+   "How long does a typical customer wait at peak time?",
+   "What causes the queue to build up?"
+  ],
+  "tracking": [
+   "How do you track a job from the counter until it’s handed back?",
+   "Who knows its status at any moment?"
+  ],
+  "documents": [
+   "Where are original documents kept while a job is in progress?",
+   "Has anything gone missing recently?"
+  ],
+  "customer updates": [
+   "How do customers find out their documents are ready?",
+   "How many calls a day are about status?"
+  ],
+  "translation": [
+   "Are translations done in-house or by freelancers?",
+   "How often are they late?"
+  ],
+  "money": [
+   "How are government fees and service charges recorded?",
+   "Does the day’s cash usually match?"
+  ],
+  "corporate accounts": [
+   "Do you have companies on credit?",
+   "How quickly do they settle?"
+  ],
+  "staff": [
+   "How do you see each staff member’s output?",
+   "Where do mistakes happen most?"
+  ],
+  "growth": [
+   "What’s hurting walk-ins most right now?"
+  ]
+ },
+ "seasons": "- UAE: September–October (school year start, family visas), January (new year hiring, visa renewals), post-Eid returns, and summer travel rush (June–July) for attestation before travel; Ramadan shortened hours. - Pakistan: university admissions and overseas study intakes (spring and autumn) drive HEC/IBCC attestation peaks; Gulf hiring cycles bring degree attestation surges; Hajj and Umrah seasons. - Canada: immigration and study permit cycles drive translation demand; settlement and professional licensing peaks around intake seasons. - Government system changes or amnesty periods cause sudden, short spikes.",
+ "care": [
+  "No immigration, visa, legal, labour or attestation-procedure advice; pi never explains how to get an approval.",
+  "Never take or store any customer document details, ID numbers or copies.",
+  "Decline forgery, altering documents, fake stamps or attestations, backdating, or paying officials to speed things up.",
+  "Staff overcharging customers: note as cash leakage/fraud problem without names.",
+  "Distressed customers (deadlines, family visas): pi stays calm and notes the centre’s operational problem only.",
+  "If someone mentions exploitation or passport withholding by an employer, point to the relevant authorities."
+ ],
+ "build_ideas": [
+  "Token and queue system with estimated wait times on a screen and WhatsApp",
+  "Job tracker per customer job (by reference number) with stages: received, typed, submitted, at translator, at attestation, ready, collected",
+  "Automated WhatsApp updates to the customer when a job changes stage or is ready",
+  "Document custody log: which originals are in the office, which shelf, who took them out and when",
+  "Courier and embassy dispatch tracker with expected return dates",
+  "Freelance translator assignment board with deadlines and quality notes",
+  "Standard service price list in the system so every counter charges the same, with receipts",
+  "Daily cash and fee reconciliation: service charges, government fees paid, counter cash",
+  "Corporate account ledger with statements and reminders",
+  "Staff productivity view: jobs completed, rejections and rework per person",
+  "Branch comparison: volume, wait times, rework rates",
+  "Licence and authorisation renewal calendar"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our phones don’t stop — every customer calls three times asking if their attestation is back."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a lot of staff time going into status calls — noted. How do you currently keep track of where each job is?"
+  },
+  {
+   "role": "Person",
+   "text": "A register at the counter, and the PRO tells us when things come back."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, a register plus updates from the PRO. Roughly how many jobs are in progress at any one time?"
+  },
+  {
+   "role": "Person",
+   "text": "Maybe 150 to 200."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, around 150 to 200 open jobs — I’ve noted that. When a job is ready, how does the customer find out today?"
+  }
+ ]
+}

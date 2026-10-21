@@ -1,0 +1,279 @@
+{
+ "key": "guest_houses_b_and_bs_and_holiday_home_hosts",
+ "name": "Guest houses, B&Bs and holiday-home hosts",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "guest house",
+  "B&B",
+  "bed and breakfast",
+  "holiday home",
+  "holiday homes",
+  "short let",
+  "short-term rental",
+  "Airbnb",
+  "host",
+  "superhost",
+  "Booking.com",
+  "Vrbo",
+  "check-in instructions",
+  "key handover",
+  "cleaner",
+  "turnover clean",
+  "co-host",
+  "property manager",
+  "DTCM",
+  "mehman khana",
+  "chabi",
+  "bait ijar",
+  "shaqqa fundiqiyya"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of units or rooms, and whether they are in one building or spread across the city.",
+  "Owned, leased (rent-to-rent) or managed on behalf of other owners.",
+  "Which platforms are used: Airbnb, Booking.com, Vrbo, direct WhatsApp, repeat guests, local agents.",
+  "Whether the host lives on site or runs it remotely.",
+  "Who cleans and turns units over: own staff, freelance cleaners or an agency.",
+  "Whether breakfast or meals are offered.",
+  "Country and city (PK guest houses, Dubai holiday homes, Canadian short-term rentals all run differently)."
+ ],
+ "scope_rule": "pi notes operational and business problems: calendar clashes across platforms, cleaning turnovers, key and check-in handling, guest messages, damages, owner payouts and unit-level profit. pi does not advise on holiday-home permits, municipal short- term rental bylaws, tourism fees, strata or building rules, tax treatment, or tenancy law; it records only that keeping up with them is hard. pi never stores guest names, ID or passport copies, door codes, Wi-Fi passwords or bank details, and records owners and guests by role. Insurance and damage claims are noted as business problems only.",
+ "vocabulary": {
+  "turnover": "cleaning and resetting a unit between guests",
+  "iCal sync": "calendar link that shares bookings between platforms",
+  "co-host": "person who helps manage an Airbnb listing",
+  "superhost": "Airbnb badge for high-rated hosts",
+  "security deposit": "amount held against damages",
+  "self check-in": "guest enters with a lockbox or smart lock code",
+  "rent-to-rent": "leasing a flat and subletting it short-term",
+  "holiday home permit": "UAE licence for short-term rental units",
+  "owner statement": "monthly payout report to a property owner",
+  "mehman khana": "guest house (Urdu)",
+  "chabi": "key (Urdu)",
+  "shaqqa": "apartment (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Airbnb and Booking.com don’t always sync in time, and I’ve had two guests for the same dates",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Cleaners don’t know which units are checking out today until I message them one by one",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Guests arrive and the unit isn’t ready because the cleaner was late",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "I answer guest messages at 2am because no one else does",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Same questions every day: Wi-Fi, parking, where’s the key",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Keys go missing or guests don’t return them",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Guests damage things and I can’t prove it was them",
+   "category": "customers_retention",
+   "subtype": "after_sales"
+  },
+  {
+   "phrase": "Towels, sheets and toiletries are always short in one unit and piling up in another",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "I don’t know which unit actually makes money after cleaning, bills and commission",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Electricity and DEWA bills in summer wipe out the profit on some units",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Platform commissions keep going up and my prices haven’t",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Owners I manage for ask for statements and I make them by hand in Excel",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Owner payouts are late because I’m waiting on the platform payouts",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Bookings dry up in summer and I’ve still got rent on every unit",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "One bad review about cleanliness dropped my listing in search",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "I rely fully on Airbnb; if they hide my listing I have nothing",
+   "category": "marketing_leads",
+   "subtype": "marketplace_visibility"
+  },
+  {
+   "phrase": "Repeat guests want to book direct but I’ve no system for it",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Freelance cleaners charge differently and I can’t track what I owe each",
+   "category": "people_staff",
+   "subtype": "payroll_errors"
+  },
+  {
+   "phrase": "AC breaks in one unit and the guest leaves a bad review before the technician comes",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Permit renewals and tourism fee filings for every unit are a headache",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "I don’t know my occupancy per unit across the year",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Guests leave without paying for extra nights agreed on WhatsApp",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Pricing is guesswork; I change it when I remember",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Adding more units means more chaos, not more profit",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Breakfast supplies are bought daily from the shop with no record",
+   "category": "cash_collections",
+   "subtype": "petty_cash"
+  }
+ ],
+ "questions": {
+  "calendar": [
+   "Which platforms are your units listed on?",
+   "How do bookings from one block the dates on the others?",
+   "When did a clash last happen?"
+  ],
+  "turnovers": [
+   "How do cleaners find out what to clean today?",
+   "How do you know a unit is ready?",
+   "What usually causes delays?"
+  ],
+  "guest messages": [
+   "Who handles guest messages now?",
+   "What do guests ask most often?",
+   "At what hours does it get hardest?"
+  ],
+  "keys and access": [
+   "How do guests get in?",
+   "What happens when a key goes missing?"
+  ],
+  "money per unit": [
+   "Do you track income and costs per unit?",
+   "Which costs surprise you the most?"
+  ],
+  "owners (if managing for others)": [
+   "How many owners do you report to?",
+   "How do you prepare their statements?",
+   "What do they complain about?"
+  ],
+  "damage": [
+   "How do you check a unit after a guest leaves?",
+   "What happens when you find damage?"
+  ],
+  "pricing": [
+   "How do you set prices now?",
+   "How often do you change them?"
+  ],
+  "growth": [
+   "Are you adding units?",
+   "What would break first if you doubled?"
+  ]
+ },
+ "seasons": "UAE: strong October to April with winter tourism, Dubai Shopping Festival, GITEX, Expo-type events, New Year’s Eve and Formula 1 in Abu Dhabi; summer is slow except Eid breaks with GCC families. PK: northern guest houses peak May to September and Eid holidays; city guest houses fill with wedding guests in winter and families visiting for Eid, Muharram gatherings and university events; overseas Pakistanis visit in December and summer holidays. Canada: summer is peak in tourist areas, ski towns peak in winter, city units follow conventions and festivals; many cities have tightened short-term rental rules, which affects supply.",
+ "care": [
+  "Never ask for or store door codes, lockbox codes, Wi-Fi passwords, guest names, ID or passport images or payout bank details.",
+  "Holiday-home permits, municipal STR bylaws, building/strata rules and tax on rental income are out of scope; pi notes “struggles to track permit renewals” and moves on.",
+  "If the owner wants to run unlicensed units, hide income or list without a required permit, pi does not help with that.",
+  "Hidden cameras inside guest areas are a hard no; pi does not help plan covert recording of guests.",
+  "Disputes with guests over deposits or damages are noted operationally; pi gives no legal view.",
+  "Any guest emergency (fire, gas, medical, break-in) means pi tells them to contact emergency services immediately.",
+  "Cleaners and co-hosts are recorded by role only."
+ ],
+ "build_ideas": [
+  "Unified booking calendar across Airbnb, Booking.com and direct bookings, with clash alerts.",
+  "Daily turnover list sent to each cleaner on WhatsApp, with tap-to-mark “cleaned” and photo proof.",
+  "Guest WhatsApp assistant that answers common questions (Wi-Fi location, parking, check-out time) from a unit fact sheet.",
+  "Key and access log per unit, with handover and return status.",
+  "Check-out inspection checklist with photos, linked to the booking for damage records.",
+  "Unit-level profit sheet: income per platform, commission, cleaning, utilities, supplies.",
+  "Owner statement generator for managed units, sent monthly as PDF.",
+  "Linen and amenity stock per unit with par levels and restock alerts.",
+  "Cleaner payment ledger by turnover, with running balance.",
+  "Maintenance request flow with technician assignment and status.",
+  "Direct-booking page with deposit link for repeat guests.",
+  "Permit and renewal date tracker per unit with reminders.",
+  "Occupancy and rate dashboard by unit and month."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "I’ve got 9 units in Dubai Marina and JVC and the cleaners are a mess. Half the time they don’t know who’s checking out."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, cleaners don’t have a clear list of check-outs each day. How do they find out at the moment?"
+  },
+  {
+   "role": "Person",
+   "text": "I send each one a WhatsApp in the morning, but if a booking changes overnight they miss it."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted that late changes don’t reach them. When that happens, what does the guest usually find?"
+  },
+  {
+   "role": "Person",
+   "text": "Unit not ready, they wait in the lobby, then leave a 3-star review."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, that’s hitting your reviews too. Roughly how many turnovers do you do on a busy day?"
+  }
+ ]
+}

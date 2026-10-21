@@ -1,0 +1,311 @@
+{
+ "key": "general_factories_and_workshops",
+ "name": "General factories and workshops (made-to-order and made-to-stock)",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "factory",
+  "workshop",
+  "karkhana",
+  "unit",
+  "shop floor",
+  "job card",
+  "work order",
+  "production plan",
+  "maal tayyar nahi hua",
+  "machine down",
+  "machine kharab",
+  "breakdown",
+  "bijli nahi thi",
+  "load shedding",
+  "gas band",
+  "raw material",
+  "kachcha maal",
+  "finished goods",
+  "pakka maal",
+  "backorder",
+  "lead time",
+  "dispatch",
+  "challan",
+  "bilty",
+  "rejection",
+  "rework",
+  "overtime",
+  "dihari",
+  "thekedar",
+  "LPO",
+  "warsha",
+  "masna’",
+  "mawad khaam"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Made-to-order, made-to-stock, or both (and roughly what share of each).",
+  "What they make and how many product lines or SKUs are active.",
+  "Number of workers and shifts, and whether labour is salaried, daily-wage, piece-rate or via a contractor.",
+  "Main customers: dealers, distributors, retail chains, project contractors, export buyers or government tenders.",
+  "Whether power is grid only or has a generator or solar backup.",
+  "How production is tracked today: paper job cards, Excel, accounting software, ERP or nothing.",
+  "Single site or several units/godowns."
+ ],
+ "scope_rule": "pi notes operational and business problems: late orders, material shortages, machine downtime, rework, stock that does not match, slow collections, and the owner not knowing what is happening on the floor. pi does not give machine safety engineering, electrical or fire-safety advice, labour law or minimum wage interpretation, tax or customs advice, or financing advice. pi records roles such as “line supervisor” or “store keeper”, never names, and never asks for worker ID numbers, CNICs, Emirates IDs, payroll bank details or customer contact details.",
+ "vocabulary": {
+  "karkhana": "factory or workshop",
+  "kachcha maal/ pakka maal": "raw material / finished goods",
+  "challan": "delivery note sent with goods",
+  "bilty": "goods transport receipt from a carrier",
+  "dihari": "daily wage",
+  "thekedar": "labour contractor who supplies and supervises workers",
+  "ustaad/ karigar/ shagird": "master craftsman / skilled worker / apprentice",
+  "job card": "paper slip that travels with an order through each stage",
+  "LPO": "local purchase order (common in the UAE)",
+  "udhaar": "goods on credit",
+  "warsha": "workshop (Arabic)",
+  "backorder": "ordered but not yet produced or shipped"
+ },
+ "problems": [
+  {
+   "phrase": "Order promised in two weeks, it’s week four and I don’t know which stage it’s stuck at",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Job cards go missing between cutting and assembly",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "We stopped the line because one raw material ran out and nobody told purchase",
+   "category": "stock_inventory",
+   "subtype": "raw_material_shortage"
+  },
+  {
+   "phrase": "The store says we have 200 pieces, physically there are 140",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Finished goods for made-to-stock items are piling up while the urgent order waits",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "I quote a price but don’t really know my cost per piece",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Raw material rates went up and my old quotes are still running",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Electricity and diesel for the generator are eating the margin",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "Dealers take 90 days to pay and some never clear the last bill",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "I pay suppliers in advance but customers pay me late",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Machine breaks down and we wait days for the mechanic or part",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "No record of which machine broke when or how often",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Rework is high and I can’t tell which stage causes it",
+   "category": "quality_complaints",
+   "subtype": "rework"
+  },
+  {
+   "phrase": "Customer rejected a whole lot after delivery",
+   "category": "quality_complaints",
+   "subtype": "inspection_missing"
+  },
+  {
+   "phrase": "Workers leave after Eid and new ones need weeks to learn",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Overtime is paid but output didn’t go up",
+   "category": "people_staff",
+   "subtype": "overtime"
+  },
+  {
+   "phrase": "Attendance register is filled at the end of the week from memory",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "I am the only one who knows the delivery schedule",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Orders come on WhatsApp, calls and email and some get forgotten",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Supplier delivers short and we find out during production",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_quality"
+  },
+  {
+   "phrase": "I don’t know which customers or products actually make money",
+   "category": "reporting_visibility",
+   "subtype": "owner_blind"
+  },
+  {
+   "phrase": "Month-end production report takes the accountant a week in Excel",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Scrap and offcuts are sold by the floor staff and I never see the money",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "We can’t take more orders but I don’t know our real capacity",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Purchase, store and accounts each keep their own sheet",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Getting quotes out takes days so we lose enquiries",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "No website or catalogue, buyers ask for photos every time",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  },
+  {
+   "phrase": "Renewals for trade licence, factory registration and fire certificate sneak up on us",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  }
+ ],
+ "questions": {
+  "orders": [
+   "Roughly how many orders are open right now?",
+   "How do you find out which stage an order is at?",
+   "What usually holds it up?"
+  ],
+  "raw material": [
+   "Which material runs short most often?",
+   "Who decides when to reorder?",
+   "How do you find out it’s low?"
+  ],
+  "stock": [
+   "Where does the count go wrong — raw material, work in progress or finished goods?",
+   "How often do you physically count?"
+  ],
+  "costing": [
+   "How do you work out a price when you quote?",
+   "When did you last check it against actual cost?"
+  ],
+  "machines": [
+   "Which machine stops the most?",
+   "How long does a typical breakdown keep it down?",
+   "Is there any record kept?"
+  ],
+  "quality": [
+   "Where do most rejections come from — inside the factory or at the customer?",
+   "Is anyone checking before dispatch?"
+  ],
+  "cash": [
+   "How long do your main customers usually take to pay?",
+   "Is anyone following up on overdue bills?"
+  ],
+  "staff": [
+   "How are workers paid — monthly, daily or per piece?",
+   "How is attendance recorded?"
+  ],
+  "capacity": [
+   "Are you turning down orders, or is the floor sometimes idle?",
+   "Which stage is always the bottleneck?"
+  ],
+  "reporting": [
+   "What do you look at each day to know how the factory is doing?",
+   "Who prepares it?"
+  ],
+  "coordination": [
+   "How do the floor, store and office pass information to each other?",
+   "What gets lost most often?"
+  ]
+ },
+ "seasons": "Pakistan: pre-Ramadan and pre-Eid rush for consumer goods; labour shortage for one to two weeks after both Eids as workers return to villages; summer load shedding and heat slowing output (May to August); winter gas curtailment for industry; monsoon (July to September) disrupting transport; federal budget in June changes duties and raw material rates, and the fiscal year runs July to June. UAE: Ramadan shorter working hours; midday outdoor work break 15 June to 15 September affects yards and loading; Q4 project rush before year-end; most fiscal years run January to December. Canada: construction-linked demand from spring to autumn; winter road conditions delay deliveries; late-December holiday shutdown; many government buyers on an April to March fiscal year.",
+ "care": [
+  "Injuries, fires, chemical spills, electrical faults or gas leaks: pi stops and tells them to contact emergency services (1122 or 15 in Pakistan, 999 or 997 in the UAE, 911 in Canada) before anything else.",
+  "No advice on machine guarding, fire safety, boiler or electrical safety, or how to “get through” an inspection.",
+  "No labour law, minimum wage, social security (EOBI, WPS, CPP/EI) or contractor-liability interpretation; pi notes the admin effort only.",
+  "If someone asks for help with fake invoices, under-invoicing, two sets of books or avoiding sales tax, pi declines plainly and moves on.",
+  "Never asks for worker names, IDs, phone numbers or bank details; uses roles.",
+  "Child labour or forced overtime mentioned: pi does not engage in operational optimisation of it and notes it is outside what it can help with.",
+  "Disputes with a specific customer or supplier: pi notes the business impact, not who is right."
+ ],
+ "build_ideas": [
+  "Digital job card on phone: each order’s stages (cutting, machining, assembly, finishing, packing), with the supervisor tapping when a stage is done.",
+  "Order board showing every open order, promised date, current stage and days late, sent to the owner each morning on WhatsApp.",
+  "Raw material register with minimum levels per item and an alert to purchase when stock falls below.",
+  "Simple bill of materials per product to calculate material cost per piece, updated when supplier rates change.",
+  "Finished goods stock by item and godown, with dispatch against challan.",
+  "Machine log: each breakdown, duration, cause and part replaced, with a monthly list of the worst machines.",
+  "Quality check step before dispatch with photos and rejection reasons per stage.",
+  "Attendance and piece-count capture by supervisors, feeding a weekly wage sheet.",
+  "Receivables tracker with ageing per customer and WhatsApp reminders for overdue bills.",
+  "Quotation builder using saved costings, so quotes go out the same day.",
+  "Scrap and offcut register with sales recorded against receipts.",
+  "Licence and certificate renewal calendar with reminders.",
+  "Daily owner summary: output, dispatches, shortages, breakdowns and collections."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai orders ka koi hisaab nahi, customer phone karta hai tab pata chalta hai maal abhi tak tayyar nahi hua."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, yeh kaafi frustrating hota hai. Noted: order kis stage pe hai, yeh pata nahi chalta jab tak customer na pooche. Abhi takreeban kitne orders khule hue hain?"
+  },
+  {
+   "role": "Person",
+   "text": "30–35 hongay, sab job card pe chalte hain, aadhe gum ho jate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, job cards stages ke beech gum ho jate hain. Sab se zyada order kis stage pe atakta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Finishing pe, wahan ek hi banda hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, finishing pe ek hi banda hone se bottleneck banta hai. Kya yeh roz ka masla hai ya sirf jab bade orders aate hain?"
+  }
+ ]
+}

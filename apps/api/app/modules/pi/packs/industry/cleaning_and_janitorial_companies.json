@@ -1,0 +1,257 @@
+{
+ "key": "cleaning_and_janitorial_companies",
+ "name": "Cleaning and janitorial companies",
+ "kind": "industry",
+ "sector": {
+  "code": "F",
+  "title": "Construction, real estate and facilities"
+ },
+ "signals": [
+  "cleaning",
+  "deep cleaning",
+  "janitorial",
+  "housekeeping",
+  "maid service",
+  "hourly maid",
+  "part-time maid",
+  "move-in/move-out clean",
+  "sofa cleaning",
+  "carpet shampoo",
+  "facade cleaning",
+  "window cleaning",
+  "safai",
+  "safai wala",
+  "maasi",
+  "jharu pocha",
+  "tanzeef",
+  "khadima",
+  "aamil nadhafa",
+  "contract cleaning",
+  "office cleaning",
+  "post-construction cleaning",
+  "supervisor",
+  "chemicals",
+  "consumables",
+  "shift"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Residential (hourly/maid, deep cleans), commercial contracts (offices, malls, schools, clinics), or specialist (facade, post-construction, carpet/upholstery).",
+  "Number of cleaners and supervisors; full-time vs part-time; accommodation and transport provided or not.",
+  "Number of contract sites and one-off jobs per week.",
+  "How bookings come in: app/website, WhatsApp, phone, aggregator platforms, tenders.",
+  "Equipment owned (machines, ropes/cradles for facades, vehicles).",
+  "Pricing basis: per hour, per job, monthly contract, per head.",
+  "Country/city."
+ ],
+ "scope_rule": "pi notes operational and business problems: booking and scheduling, cleaner attendance and allocation, quality checks, customer complaints, chemicals and consumables usage, transport, contract headcount, billing, collections and staff turnover. pi gives no advice on chemical mixing, hazardous materials, working at height or rope access, and does not advise on labour law, visas, accommodation rules or worker contracts. It never records cleaners’ or customers’ names, addresses, phone numbers, IDs, passport/visa details or bank details, and never stores door codes or keys information; it records roles and counts.",
+ "vocabulary": {
+  "safai/ tanzeef": "cleaning",
+  "maasi": "domestic cleaner (Pakistan)",
+  "jharu pocha": "sweeping and mopping",
+  "hourly maid / part-time maid": "cleaner booked by the hour (UAE)",
+  "deep cleaning": "thorough clean of a whole home or office",
+  "move-in / move-out clean": "cleaning between tenants",
+  "post-construction clean": "removing dust and debris after works",
+  "consumables": "tissue, soap, bin liners supplied to sites",
+  "chemicals": "cleaning agents, often diluted on site",
+  "supervisor": "oversees cleaners across sites",
+  "headcount contract": "monthly billing based on number of cleaners supplied",
+  "rope access / BMU": "facade cleaning methods at height"
+ },
+ "problems": [
+  {
+   "phrase": "Bookings come by WhatsApp, calls and the app and we double-book cleaners",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Cleaners don’t turn up and we find out when the customer calls angry",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Customers complain the bathroom wasn’t done properly",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Quality depends completely on which cleaner goes",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Cleaners take customers’ numbers and work for them directly",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Customer said something went missing from the house after the clean",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Chemicals and consumables run out fast and I suspect they go home",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Contract sites have fewer cleaners than we bill for when the client checks",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Turnover is so high we’re always hiring and training",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Transport between jobs wastes hours and fuel",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Customers book once and never again",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Ratings on the platform dropped and we get fewer jobs",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Last-minute cancellations leave cleaners idle but we still pay them",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Corporate clients pay after 60 to 90 days",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Cash collected by cleaners from homes doesn’t reach the office in full",
+   "category": "cash_collections",
+   "subtype": "cash_handling_risk"
+  },
+  {
+   "phrase": "Price competition from freelancers and apps is brutal",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "I don’t know the profit on each contract",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Supervisors don’t actually visit the sites",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Customers ask for the same cleaner and we can’t plan for it",
+   "category": "operations_process",
+   "subtype": "shift_scheduling_preferences"
+  },
+  {
+   "phrase": "Our booking page is just a form and people leave",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Tender documents for cleaning contracts take days",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Ramadan and summer make scheduling chaotic",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  }
+ ],
+ "questions": {
+  "mix": [
+   "Is most of your work homes, offices, or specialist jobs?",
+   "How many cleaners are working for you right now?"
+  ],
+  "bookings": [
+   "How do customers book today?",
+   "Who decides which cleaner goes where?"
+  ],
+  "attendance": [
+   "How do you know a cleaner reached the job on time?",
+   "What happens when one doesn’t turn up?"
+  ],
+  "quality": [
+   "How is a job checked before it’s considered done?",
+   "What do customers complain about most?"
+  ],
+  "consumables": [
+   "How are chemicals and supplies given out?",
+   "How do you know what each site or team uses?"
+  ],
+  "contracts": [
+   "How many contract sites do you have?",
+   "How does the client check the headcount?"
+  ],
+  "customers": [
+   "How many customers book again after the first time?",
+   "Do you contact them again after a job?"
+  ],
+  "payments": [
+   "How do home customers pay?",
+   "How long do corporate clients take to pay?"
+  ],
+  "staff": [
+   "How long does a typical cleaner stay with you?",
+   "What usually makes them leave?"
+  ],
+  "transport": [
+   "How do cleaners get to jobs?",
+   "How much time is lost travelling between them?"
+  ]
+ },
+ "seasons": "In Pakistan, demand spikes before Eid (especially deep cleaning before Eid-ul-Fitr), before wedding season (November to February) and with home shifting; many domestic staff go home for Eid, causing shortages; dust storms and monsoon bring extra cleaning. In the UAE, deep-clean and move-in/move-out demand peaks August–September and around New Year; Ramadan changes visiting hours and increases pre-Eid bookings; summer reduces some residential demand as families travel. In Canada, spring cleaning (March to May) and move-out season (summer, July 1 in Quebec) peak; holiday-season deep cleans in December; post- construction cleaning follows the building season.",
+ "care": [
+  "No guidance on mixing chemicals, handling bleach/acids, mould remediation hazards, or facade/rope-access work; pi says trained staff and the product’s safety instructions apply.",
+  "Chemical exposure, fall, injury, fire → pi stops and points to emergency services; poisoning → emergency services or the local poison centre.",
+  "Never record cleaners’ or customers’ names, addresses, door codes, key arrangements, phone numbers or ID/visa details.",
+  "Accusations of theft against a cleaner → pi notes the operational problem only; it does not help investigate or publicise individuals.",
+  "Requests to hire workers without valid permits, withhold passports, underpay below agreed wages, or fake headcount on invoices are refused.",
+  "Worker safety and welfare (heat, long hours, transport) is treated respectfully; pi notes the issue and does not advise on labour law."
+ ],
+ "build_ideas": [
+  "Booking system with WhatsApp flow and web page: service, date, time slot, area, add-ons, instant confirmation.",
+  "Scheduler that assigns cleaners by area and availability, prevents double-booking, and respects preferred-cleaner requests.",
+  "Cleaner app or WhatsApp check-in/check-out with geotag and before/after photos.",
+  "Job quality checklist per service type and customer rating request after each job.",
+  "No-show alert to the office the moment a cleaner hasn’t checked in on time.",
+  "Consumables and chemicals issue log per team or site, with usage vs jobs done.",
+  "Contract site headcount register with daily attendance report for the client.",
+  "Cash collection log per cleaner per day, reconciled against completed home jobs.",
+  "Repeat-booking reminders and subscription plans for regular customers.",
+  "Contract and one-off job profitability view: labour hours, transport, materials vs price.",
+  "Corporate invoicing and receivables tracker with reminders.",
+  "Staff onboarding and training checklist to shorten new-hire ramp-up."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Cleaners late jaati hain ya jaati hi nahi, aur humein tab pata chalta hai jab customer ka gussa wala call aata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — cleaner late ho ya na pohanche to pata customer ke call se hi chalta hai. Noted. Abhi aapke paas kitni cleaners kaam kar rahi hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Takreeban 45, zyada tar gharon mein jaati hain."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, takreeban 45 cleaners, zyada tar residential jobs. Unhein roz kaam ka schedule kaise bheja jata hai?"
+  }
+ ]
+}

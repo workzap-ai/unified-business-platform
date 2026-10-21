@@ -1,0 +1,268 @@
+{
+ "key": "cinemas_and_theatres",
+ "name": "Cinemas and theatres",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "cinema",
+  "cineplex",
+  "multiplex",
+  "screen",
+  "show",
+  "showtime",
+  "ticket",
+  "box office",
+  "seats",
+  "occupancy",
+  "concessions",
+  "popcorn",
+  "candy bar",
+  "distributor",
+  "film print",
+  "DCP",
+  "theatre",
+  "stage play",
+  "drama",
+  "auditorium",
+  "film",
+  "show ka time",
+  "ticket khidki",
+  "sinima",
+  "masrah",
+  "tazkara"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of screens or stages and seats per hall.",
+  "Independent single-screen, small multiplex, or theatre/auditorium hosting productions and hires.",
+  "Mix of revenue: tickets, concessions (food and drinks), advertising, private screenings, hall rentals.",
+  "Ticketing: counter only, own website, or third-party apps.",
+  "Owned building, mall lease or rented auditorium.",
+  "Content: local films, Bollywood (where permitted), Hollywood, regional, stage plays, comedy shows, concerts.",
+  "Staff structure: box office, ushers, projectionist/technician, concession team."
+ ],
+ "scope_rule": "pi notes operational and business problems: occupancy by show, ticketing and box-office cash, concession wastage and theft, film scheduling, projection and sound downtime, distributor settlements and audience communication. pi does not advise on censorship or content classification, distribution contracts, entertainment taxes, fire codes, crowd safety or licensing; it records only the business friction. pi never collects audience members’ names, contact details or card data, and records roles only.",
+ "vocabulary": {
+  "showtime": "scheduled screening time",
+  "occupancy": "share of seats filled in a show",
+  "DCP": "digital cinema package, the digital film file",
+  "KDM": "key that unlocks a film for screening on set dates",
+  "distributor share": "percentage of ticket revenue paid to the distributor",
+  "concessions / candy bar": "food and drink counter",
+  "house full": "show sold out",
+  "matinee": "daytime show",
+  "hall hire": "renting the auditorium for a private event",
+  "tazkara": "ticket (Arabic)",
+  "masrah": "theatre (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Weekday afternoon shows run nearly empty",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "I don’t know which shows actually cover their costs",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Box office cash doesn’t match ticket counts",
+   "category": "cash_collections",
+   "subtype": "cash_mismatch"
+  },
+  {
+   "phrase": "Complimentary tickets are given out too freely by staff",
+   "category": "loss_security",
+   "subtype": "void_refund_abuse"
+  },
+  {
+   "phrase": "Popcorn and drinks stock doesn’t match sales",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Concession staff give free food to friends",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Popcorn and hot food thrown away every night",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Projector or sound breaks during a show and we have to refund everyone",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "The KDM arrived late and we cancelled the first show",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Distributor settlement statements take days to prepare by hand",
+   "category": "reporting_visibility",
+   "subtype": "manual_reports"
+  },
+  {
+   "phrase": "Online ticket app numbers and our counter numbers never reconcile",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Customers call asking showtimes all day",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Our website showtimes are often wrong",
+   "category": "customer_experience_digital",
+   "subtype": "website_slow_broken"
+  },
+  {
+   "phrase": "Big releases sell out and smaller films die, and I can’t plan screens well",
+   "category": "planning_growth",
+   "subtype": "forecasting"
+  },
+  {
+   "phrase": "Reviews complain about dirty halls and broken seats",
+   "category": "quality_complaints",
+   "subtype": "hygiene"
+  },
+  {
+   "phrase": "Ushers don’t clean between shows fast enough",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "We have no idea who our regulars are",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Social posts about new films go up late or not at all",
+   "category": "marketing_leads",
+   "subtype": "social_media_inconsistent"
+  },
+  {
+   "phrase": "Mall rent and electricity have gone up but ticket prices can’t",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Night staff leave early and we close without proper checks",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "Theatre productions renting our hall pay late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Censor certificates and permissions for each release eat time",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Refund rules are applied differently by each cashier",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "I can’t compare our two locations properly",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  }
+ ],
+ "questions": {
+  "occupancy": [
+   "Which shows are weakest?",
+   "How do you decide the show schedule each week?"
+  ],
+  "box office": [
+   "How are tickets sold, counter or apps?",
+   "How is cash checked at the end of the day?"
+  ],
+  "complimentary and refunds": [
+   "Who can give a free ticket?",
+   "How are refunds handled?"
+  ],
+  "concessions": [
+   "How is concession stock counted?",
+   "What gets wasted most?"
+  ],
+  "projection and sound": [
+   "What fails most often?",
+   "Who fixes it?"
+  ],
+  "distributors": [
+   "How are settlements prepared?",
+   "How long does that take?"
+  ],
+  "audience": [
+   "How do people find your showtimes?",
+   "Do you know your regulars?"
+  ],
+  "hall hire (theatres)": [
+   "Who rents the hall?",
+   "How do they pay?"
+  ],
+  "branches": [
+   "How do you compare locations today?"
+  ]
+ },
+ "seasons": "PK: Eid ul Fitr and Eid ul Adha are the biggest release windows for local films; winter holidays and summer vacations; Ramadan and Muharram are very slow; Pakistani dramas and stage shows peak around Eid and winter; cricket tournaments pull audiences away. UAE: Eid, school holidays, summer (indoor entertainment), Hollywood blockbuster summer and December slates, Diwali-period Indian releases; Ramadan slower until late night. Canada: summer blockbusters, December holidays, March break; theatre seasons usually autumn to spring; South Asian releases around Eid and Diwali in large cities.",
+ "care": [
+  "Fire, crowd crush, medical emergency in the hall, or a security threat: pi stops and points to emergency services immediately.",
+  "No advice on censorship, content approvals, distribution contracts or entertainment tax; these are noted as admin effort only.",
+  "pi does not help with piracy, unlicensed screenings or hiding ticket sales from distributors or tax authorities.",
+  "Audience personal data and card details are never collected.",
+  "Covert recording of staff in private areas is out of bounds.",
+  "Staff misconduct recorded by role."
+ ],
+ "build_ideas": [
+  "Daily box-office and concessions summary to the owner: tickets by show, occupancy, comps, refunds, concession sales.",
+  "Reconciliation view matching counter sales, ticketing app sales and cash/card totals.",
+  "Complimentary and refund approval flow with reasons logged.",
+  "Concession stock tracker with opening/closing counts per shift and wastage log.",
+  "Show-level profit view: ticket revenue minus distributor share, plus concessions attributed.",
+  "Distributor settlement statement generator per film per week.",
+  "Equipment maintenance log for projectors and sound with downtime record.",
+  "WhatsApp showtime assistant answering “what’s on tonight” from the schedule.",
+  "Hall hire booking calendar with deposits and balances.",
+  "Cleaning turnaround checklist between shows.",
+  "Location comparison dashboard."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Hamari cinema mein weekend theek hai lekin weekdays ke shows khaali jate hain, aur candy bar ka maal bhi hisaab se nahi milta."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — weekday shows kamzor hain aur candy bar ka stock sales se match nahi karta. Pehle candy bar ki baat karein: din ke end pe stock kaun ginta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Supervisor ginta hai, lekin har roz nahi."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, ginti roz nahi hoti. Popcorn aur drinks mein se zyada farq kis mein aata hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Drinks mein. Cans gayab ho jate hain."
+  },
+  {
+   "role": "pi",
+   "text": "Yeh note kar liya. Shift badalte waqt stock ka koi handover hota hai?"
+  }
+ ]
+}

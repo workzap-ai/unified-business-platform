@@ -1,0 +1,277 @@
+{
+ "key": "food_delivery_operators_and_dark_stores",
+ "name": "Food delivery operators and dark stores",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "quick commerce",
+  "q-commerce",
+  "dark store",
+  "micro-fulfilment",
+  "15-minute delivery",
+  "grocery delivery",
+  "riders",
+  "fleet",
+  "dispatch",
+  "picker",
+  "packer",
+  "SKU",
+  "app orders",
+  "rider bhai",
+  "bike",
+  "COD",
+  "cash on delivery",
+  "tawseel mandoob",
+  "last mile",
+  "3PL",
+  "Foodpanda/Talabat/Careem/Noon/Instashop/Deliveroo",
+  "zone",
+  "slot"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Model: own app/website, operating on marketplaces, or a 3PL delivery fleet serving restaurants and shops",
+  "Number of dark stores/hubs and zones covered",
+  "Number of riders; employed, freelance, or via an agency",
+  "Bike/vehicle ownership: company, rider-owned, leased",
+  "SKU count and categories (grocery, fresh, chilled, frozen, pharmacy-adjacent)",
+  "Payment mix: COD vs prepaid, wallets",
+  "Order volume pattern by hour and day, as the owner describes it"
+ ],
+ "scope_rule": "pi notes operational problems: picking accuracy, stock accuracy, expiry, rider productivity and attendance, delivery times, COD remittance, customer complaints, marketplace integration and reporting. It does not advise on labour or gig-worker law, rider visas, vehicle licensing, traffic rules, road safety engineering, insurance, or tax. It does not record riders’ or customers’ names, phone numbers, addresses, IDs or locations, and never takes card or wallet details.",
+ "vocabulary": {
+  "dark store": "closed warehouse used only for online orders",
+  "picker/packer": "staff who collect and bag items",
+  "pick accuracy": "share of orders picked with no errors",
+  "SLA": "promised delivery time",
+  "COD": "cash on delivery",
+  "remittance": "cash handed over by riders or couriers",
+  "3PL": "third-party logistics provider",
+  "zone": "delivery area served by a hub",
+  "substitution": "replacing an out-of-stock item",
+  "batching": "combining orders on one trip"
+ },
+ "problems": [
+  {
+   "phrase": "App shows items in stock that aren’t on the shelf, then we cancel",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Fresh produce and dairy expire on the shelf",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Pickers pick wrong sizes and brands",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Missing items complaints every day",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Orders breach the delivery promise at peak hours",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Riders don’t log in for the evening rush",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "Rider COD cash comes in short or days late",
+   "category": "cash_collections",
+   "subtype": "cod_remittance"
+  },
+  {
+   "phrase": "Riders’ fuel and bike maintenance claims are inflated",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Bikes off the road for repairs too long",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Cost per delivery is higher than the fee we charge",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Rider churn is huge, we train new ones every week",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Customers order once with a promo code and never return",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Promo codes abused by the same people with new accounts",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Customer support WhatsApp is drowning",
+   "category": "customer_experience_digital",
+   "subtype": "chat_overload"
+  },
+  {
+   "phrase": "Refunds approved without checking",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "Our stock system and the marketplace listings aren’t synced",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Suppliers deliver short and late to the dark store",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "Overstock on slow SKUs takes shelf space",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Items put back on the wrong shelf",
+   "category": "stock_inventory",
+   "subtype": "wrong_location"
+  },
+  {
+   "phrase": "Stock moved between hubs disappears",
+   "category": "stock_inventory",
+   "subtype": "transfers_lost"
+  },
+  {
+   "phrase": "Rider shifts made on WhatsApp the night before",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Every hub’s numbers come from a different spreadsheet",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Rain/heat days demand spikes and we can’t cover",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Opening a new hub took months and every hub is laid out differently",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "Restaurant partners complain our riders arrive late",
+   "category": "customers_retention",
+   "subtype": "service_quality"
+  }
+ ],
+ "questions": {
+  "stock accuracy": [
+   "How often does an ordered item turn out not to be on the shelf?",
+   "How often is the hub counted?"
+  ],
+  "picking": [
+   "What’s the most common picking mistake?",
+   "How are new pickers trained?"
+  ],
+  "delivery": [
+   "When do late deliveries happen most?",
+   "What causes them, from what you see?"
+  ],
+  "riders": [
+   "How many riders do you run?",
+   "Are they employed, freelance or through an agency?"
+  ],
+  "cod": [
+   "What share of orders are cash on delivery?",
+   "How and when do riders hand in cash?"
+  ],
+  "bikes": [
+   "Who owns the bikes?",
+   "How are fuel and repairs claimed?"
+  ],
+  "expiry": [
+   "Which categories expire most?"
+  ],
+  "customers": [
+   "What do most complaints say?",
+   "Who answers them?"
+  ],
+  "promos": [
+   "How do you spot promo abuse today?"
+  ],
+  "hubs": [
+   "How many hubs, and can you compare them daily?"
+  ],
+  "suppliers": [
+   "How are deliveries to the hub checked on arrival?"
+  ]
+ },
+ "seasons": "- PK: Ramadan sehri and iftar spikes, with grocery pre-buying before Ramadan; Eid ul Adha for meat, spices and BBQ supplies; rain and heatwaves raise orders while making riding harder; cricket matches; app sale events (e.g. 11.11, 12.12). - UAE: summer heat moves almost all grocery shopping online; Ramadan and Eid; month-end payday; White Friday and DSF promotions; rain days cause sudden spikes and delays. - Canada: winter storms push orders up and slow riders; holiday season; Thanksgiving; summer weekends quieter in cities.",
+ "care": [
+  "Rider road accidents, heatstroke, robbery or assault on riders: pi stops and points to emergency services first (1122/15 PK, 999/998 UAE, 911 Canada).",
+  "Rider employment status, gig-worker rules, visas, insurance and traffic law: out of scope.",
+  "Rider location tracking: pi notes operational visibility needs only; never advises tracking personal phones covertly or outside work.",
+  "Customer addresses, phones and order histories: never collected by pi.",
+  "Pharmacy or age-restricted items: no regulatory advice.",
+  "Requests to hide rider cash shortages, charge riders unlawfully, or manipulate SLAs reported to partners: pi declines."
+ ],
+ "build_ideas": [
+  "Hub stock app with bin locations, cycle counts and variance alerts, synced to listings",
+  "Pick-and-pack screen with scan confirmation and photo of the bag before handover",
+  "Expiry tracker by batch and shelf for fresh and chilled items, with markdown or removal prompts",
+  "Rider shift planner by hub and hour, with confirmations and no-show reports",
+  "COD settlement tool per rider ID: expected vs handed in, ageing of unremitted cash",
+  "Bike maintenance and fuel claim log with approvals",
+  "Delivery time dashboard by hub, zone and hour against the promised time",
+  "Cost-per-delivery calculator from rider cost, fuel and order volume",
+  "Promo abuse flags based on repeated device/address patterns (without exposing personal data to staff)",
+  "Customer support inbox with tags and response-time tracking",
+  "Supplier receiving checklist at the hub with short-delivery records",
+  "Inter-hub transfer note with receiving confirmation",
+  "New-hub setup template: layout, SKU list, staffing plan, launch checklist",
+  "Daily hub comparison report on WhatsApp for the owner"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We run 4 dark stores in Lahore. Biggest headache is COD cash from riders."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — four dark stores, and rider COD cash is the main headache. Is the problem that cash comes in short, or that it comes in late?"
+  },
+  {
+   "role": "Person",
+   "text": "Both, but mostly late. Some riders hold it for days."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted — mostly delays. How do riders hand over cash now, and to whom?"
+  },
+  {
+   "role": "Person",
+   "text": "To the hub supervisor at end of shift, supposedly."
+  },
+  {
+   "role": "pi",
+   "text": "Thanks, noted. Is there a record of what each rider should hand in for that shift?"
+  }
+ ]
+}

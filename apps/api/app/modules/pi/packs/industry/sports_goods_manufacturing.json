@@ -1,0 +1,289 @@
+{
+ "key": "sports_goods_manufacturing",
+ "name": "Sports goods manufacturing (Sialkot cluster)",
+ "kind": "industry",
+ "sector": {
+  "code": "D",
+  "title": "Manufacturing and industry"
+ },
+ "signals": [
+  "sports goods",
+  "Sialkot",
+  "footballs",
+  "hand-stitched",
+  "thermo-bonded",
+  "machine-stitched",
+  "panels",
+  "bladders",
+  "gloves",
+  "goalkeeper gloves",
+  "boxing gloves",
+  "MMA",
+  "martial arts gear",
+  "sportswear",
+  "uniforms",
+  "team kits",
+  "sublimation",
+  "cricket bats",
+  "hockey sticks",
+  "goli",
+  "silai",
+  "stitching centres",
+  "home-based stitchers",
+  "sample",
+  "OEM",
+  "private label",
+  "buyer",
+  "Alibaba",
+  "Amazon seller",
+  "adawat riyadiya"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Main products: balls, gloves (sports, goalkeeper, boxing), martial arts gear, sportswear/sublimated kits, bats/sticks, accessories.",
+  "OEM/private label for brands and wholesalers, own brand, or both.",
+  "Channels: direct overseas buyers, Alibaba and B2B platforms, own Amazon/Etsy store, local market.",
+  "Production model: in-house, stitching centres, home-based stitchers via contractors.",
+  "Typical order size: small MOQ custom orders or big programmes.",
+  "Main buyer regions: EU, UK, US, Middle East, Australia, Canada."
+ ],
+ "scope_rule": "pi notes operational and business problems: sample turnaround, custom order errors (logos, sizes, colours), stitcher capacity and tracking, material delays, quality inconsistency, freight, buyer payments, online lead management and listing issues. pi does not advise on product certifications or match-ball standards, trademark or licensing questions, export documentation, customs, tax, or platform policy disputes. pi never stores stitchers’, workers’ or buyers’ personal details; it uses roles. pi never helps produce counterfeit branded goods.",
+ "vocabulary": {
+  "panels": "the leather or PU pieces stitched to make a ball",
+  "bladder": "inner rubber or latex part of a ball",
+  "hand-stitched / thermo-bonded": "two main ball construction methods",
+  "stitching centre": "registered site where outsourced stitchers work",
+  "OEM / private label": "making goods under the buyer’s brand",
+  "MOQ": "minimum order quantity",
+  "sublimation": "printing designs into polyester sportswear",
+  "latex palm": "grip material on goalkeeper gloves",
+  "sample charges": "fee for making a sample, often adjusted against the order",
+  "inquiry": "buyer lead, often from Alibaba or email",
+  "goli": "ball (colloquial)",
+  "silai": "stitching"
+ },
+ "problems": [
+  {
+   "phrase": "We get dozens of inquiries on Alibaba but most go nowhere",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "Reply to inquiries is slow, buyers go to the next supplier",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We pay for platform membership and don’t know what it brings",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Samples take two to three weeks and we lose the order",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Logo colour or placement wrong on a custom order",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Team kit names and numbers mixed up",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Balls sent to stitchers come back late and we can’t see who has how many",
+   "category": "stock_inventory",
+   "subtype": "no_visibility"
+  },
+  {
+   "phrase": "Panels issued vs balls returned never tally",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Stitching quality varies stitcher to stitcher",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Buyer rejected balls for shape or weight",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Latex or PU material delayed from the importer",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Courier and freight cost kill margin on small orders",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "Courier shipments stuck at customs at the buyer’s end",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Buyer asks for tracking every day and we answer manually",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Advance is paid but balance comes late or not at all",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We don’t know which product line gives the best margin",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Amazon reviews mention sizing on gloves",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Amazon listing got suppressed and we didn’t notice for a week",
+   "category": "customer_experience_digital",
+   "subtype": "marketplace_listing"
+  },
+  {
+   "phrase": "World Cup year rush then nothing",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Skilled stitchers moving to other work",
+   "category": "people_staff",
+   "subtype": "hiring_difficulty"
+  },
+  {
+   "phrase": "Order specs are scattered across email, WhatsApp and Alibaba chat",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Repeat buyers don’t come back after one order",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Website is outdated and doesn’t show our range",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  },
+  {
+   "phrase": "Exchange rate swings change what we actually earn",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Buyer audits want paperwork on stitching centres",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  }
+ ],
+ "questions": {
+  "leads": [
+   "Where do most of your inquiries come from?",
+   "How quickly does someone usually reply?",
+   "How many turn into orders?"
+  ],
+  "samples": [
+   "How long does a sample take from inquiry to dispatch?",
+   "What slows it down?"
+  ],
+  "custom orders": [
+   "Where are logos, sizes and names for each order kept?",
+   "Where do mistakes usually happen?"
+  ],
+  "stitchers": [
+   "How much work goes to outside stitchers or centres?",
+   "How do you track what each has?"
+  ],
+  "quality": [
+   "What do buyers reject most?",
+   "At what point is that checked?"
+  ],
+  "materials": [
+   "Which materials are imported?",
+   "What happens when they’re late?"
+  ],
+  "shipping": [
+   "How do orders usually ship — courier, air or sea?",
+   "Is shipping cost eating into small orders?"
+  ],
+  "payments": [
+   "What payment terms do buyers usually agree to?",
+   "How often does the balance come late?"
+  ],
+  "online selling": [
+   "Do you sell on Amazon or your own site?",
+   "What’s the biggest headache there?"
+  ],
+  "costing": [
+   "Do you know your margin per product line?",
+   "What makes it hard to see?"
+  ],
+  "repeat buyers": [
+   "How many buyers ordered again this year?",
+   "What usually stops them coming back?"
+  ]
+ },
+ "seasons": "Football production ramps before major tournaments (FIFA World Cup, Euros) and Northern Hemisphere football seasons (August to May), with orders placed months ahead; school and club team kits before autumn and spring seasons; boxing and martial arts gear steadier, with New Year fitness demand in January; cricket gear peaks before the Pakistan and South Asian season (roughly September to March) and for UK and Australian summers. Pakistan: Eid holidays pause stitching; summer heat and monsoon; budget in June. UAE: buyers and distributors serving GCC schools and clubs before the school year; winter sports events season. Canada: hockey season (September to April), soccer spring/summer, school sport in autumn.",
+ "care": [
+  "No help making counterfeit branded goods, copying licensed logos (clubs, leagues, tournaments) without rights, or faking certifications; pi declines plainly.",
+  "No advice on certification standards, product testing, or claims like “official match ball”.",
+  "No help with customs, misdeclaring value or under-invoicing.",
+  "Child labour concerns in stitching: pi does not help optimise such arrangements and notes it is outside what it can help with.",
+  "Never stores stitchers’, contractors’ or buyers’ personal details; uses roles like “stitching centre” or “US buyer”.",
+  "Platform disputes (Amazon, Alibaba): pi notes the operational impact, no advice on appeals or policy.",
+  "Injuries, fires or chemical fumes from latex/adhesives: pi stops and points to emergency services."
+ ],
+ "build_ideas": [
+  "Inquiry inbox pulling Alibaba, email, website and WhatsApp leads into one list with response timers.",
+  "Quotation and sample request tracker with status, deadlines and conversion to orders.",
+  "Custom order spec sheet per order: logo files, colours, sizes, names/numbers, approved mock-up.",
+  "Name-and-number list importer for team kits with print-ready checks.",
+  "Outsourced stitching ledger: panels issued per stitcher or centre, balls returned, rejects, payments.",
+  "QC log per lot with weight, shape and stitching checks, photos.",
+  "Material import tracker with ETAs and shortage alerts.",
+  "Shipment tracker with automatic WhatsApp/email updates to buyers.",
+  "Buyer payment tracker for advances and balances.",
+  "Product-line margin view including freight and sample costs.",
+  "Amazon listing and review monitor with alerts for suppressed listings.",
+  "Simple catalogue website or digital lookbook with inquiry form."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We get 40-50 inquiries a month on Alibaba but maybe 3 orders. Samples take too long."
+  },
+  {
+   "role": "pi",
+   "text": "Noted: plenty of inquiries, few orders, and sample time is a concern. Roughly how long does a sample take from inquiry to dispatch right now?"
+  },
+  {
+   "role": "Person",
+   "text": "Two to three weeks usually."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted two to three weeks. What usually takes the most time in that — design approval, materials, or stitching?"
+  },
+  {
+   "role": "Person",
+   "text": "Design back and forth with the buyer."
+  },
+  {
+   "role": "pi",
+   "text": "That makes sense, noted. Where do those design conversations happen — Alibaba chat, email or WhatsApp?"
+  }
+ ]
+}

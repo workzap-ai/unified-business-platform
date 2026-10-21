@@ -1,0 +1,26 @@
+{
+ "key": "existing_workzap_customers",
+ "name": "Existing Workzap customers (nori users, past projects)",
+ "kind": "overlay",
+ "sector": {
+  "code": "N",
+  "title": "Cross-industry overlays"
+ },
+ "signals": [
+  "we use nori",
+  "you built our system",
+  "our project with Workzap"
+ ],
+ "notes": "",
+ "shape_facts": [],
+ "scope_rule": "new problems are noted normally with tag existing_customer. Bugs, outages or project questions are routed ( technical_failure, existing_project), not diagnosed by pi.",
+ "vocabulary": {},
+ "problems": [],
+ "questions": {},
+ "seasons": "",
+ "care": [
+  "never promise fixes or timelines; never blame the customer’s data or staff."
+ ],
+ "build_ideas": [],
+ "exchange": []
+}

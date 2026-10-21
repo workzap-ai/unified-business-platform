@@ -1,0 +1,274 @@
+{
+ "key": "business_setup_and_pro_services",
+ "name": "Business setup and PRO services (UAE)",
+ "kind": "industry",
+ "sector": {
+  "code": "K",
+  "title": "Professional and business services"
+ },
+ "signals": [
+  "company formation",
+  "trade licence",
+  "free zone",
+  "mainland",
+  "DED",
+  "DET",
+  "initial approval",
+  "MOA",
+  "establishment card",
+  "immigration file",
+  "investor visa",
+  "employment visa",
+  "Emirates ID application",
+  "medical",
+  "labour quota",
+  "licence renewal",
+  "PRO",
+  "mandoub",
+  "rukhsa tijariya",
+  "ta’sees sharikat",
+  "golden visa enquiry",
+  "bank account opening support",
+  "ejari",
+  "flexi desk",
+  "corporate tax registration",
+  "VAT registration",
+  "government fees"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Services offered: mainland and free zone formation, renewals, visas and PRO, bank account introduction, accounting/VAT add-ons, document clearing",
+  "Number of active client companies under ongoing PRO/renewal management",
+  "Number of consultants, PROs and back-office staff",
+  "Free zones and emirates mostly worked with",
+  "How leads arrive (website, Google ads, referrals, partners, walk-ins, overseas agents)",
+  "How fees are structured (packages, government fees passed through, retainer for PRO)",
+  "How client files, deadlines and government fees are tracked today"
+ ],
+ "scope_rule": "pi notes the firm’s operational problems: lead handling, quotations, case tracking through stages, document chasing, renewal and expiry tracking, PRO scheduling, government fee reconciliation, collections, client updates and staff workload. pi gives no immigration, visa, licensing, legal, corporate tax, VAT or banking advice and never says what structure or jurisdiction a client should choose. pi never takes client names, passport, Emirates ID or visa details, licence numbers or bank information; it records case types and volumes only. Requests to create shell companies to hide ownership, provide nominee arrangements to evade rules, fake tenancy or employment, sell visas, or bribe officials are declined.",
+ "vocabulary": {
+  "Mainland / free zone": "licences issued by the emirate’s economic department versus a free zone authority",
+  "Initial approval": "first government approval before licence issue",
+  "MOA": "memorandum of association",
+  "Establishment card": "company’s immigration registration enabling visas",
+  "Quota": "number of visas a company can sponsor",
+  "PRO / mandoub": "person who runs government transactions",
+  "Ejari": "Dubai tenancy registration",
+  "Flexi desk": "shared desk package used to meet office requirements",
+  "Renewal": "annual licence, visa and card renewals",
+  "Package": "bundled setup price including licence and visas",
+  "Government fees": "fees paid to authorities, passed through to the client",
+  "Channel partner / agent": "referrer earning commission"
+ },
+ "problems": [
+  {
+   "phrase": "Leads come from ads and WhatsApp, and half never get a reply the same day",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We spend on Google ads and can’t tell which leads became clients",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Quotations are made in Word and every consultant prices differently",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Clients keep asking ‘where is my licence?’",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "We don’t know which case is stuck at which stage",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Documents missing from clients hold up every file",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Licence and visa expiries slip and clients get fined",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "Renewal revenue walks away because we didn’t remind clients in time",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Government fees we pay don’t reconcile with what we billed",
+   "category": "reporting_visibility",
+   "subtype": "reports_wrong"
+  },
+  {
+   "phrase": "We pay government fees upfront and clients pay later",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Clients disappear after the first instalment",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "PROs run around without a plan, two visits to the same office in a day",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "I can’t see what each PRO did today",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Consultants keep clients’ files in their own laptops and WhatsApp",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "When a consultant resigns, their clients go with them",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Agents argue about commissions on referred clients",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Margins are thin because packages include too much",
+   "category": "margin_cost",
+   "subtype": "margin_shrinking"
+  },
+  {
+   "phrase": "Free zone fee changes catch us out after we’ve quoted",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Portal outages delay submissions",
+   "category": "tech_systems",
+   "subtype": "system_downtime"
+  },
+  {
+   "phrase": "We type the same client data into five portals and our own sheet",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Clients complain we promised a timeline we couldn’t meet",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Bad Google reviews are hurting new leads",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Owner signs off every quote and every refund",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Want to add accounting and corporate tax services but no way to cross-sell to existing clients",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "leads": [
+   "Where do most of your leads come from?",
+   "How quickly does someone usually reply to a new enquiry?"
+  ],
+  "quoting": [
+   "Who prepares quotations?",
+   "Is pricing consistent across consultants?"
+  ],
+  "cases": [
+   "Roughly how many setups or visa cases are in progress right now?",
+   "How do you see which stage each one is at?"
+  ],
+  "documents": [
+   "How do clients send documents?",
+   "Who chases what’s missing?"
+  ],
+  "renewals": [
+   "How many companies do you manage renewals for?",
+   "How do you know what’s expiring in the next 60 days?"
+  ],
+  "fees": [
+   "Do you pay government fees before the client pays?",
+   "How are those reconciled?"
+  ],
+  "pro work": [
+   "How are PRO visits planned each day?",
+   "How do you know what got done?"
+  ],
+  "client updates": [
+   "How do clients get updates on their case?",
+   "How many follow-up calls do you get a day?"
+  ],
+  "team": [
+   "What happens to a client’s file if their consultant leaves?"
+  ],
+  "growth": [
+   "Which service would you like to sell more of to existing clients?"
+  ]
+ },
+ "seasons": "- Q4 and January bring new-year formations and licence renewals; many licences renew on anniversaries, creating steady monthly peaks for large client bases. - Summer (July–August) is quieter as clients travel; September brings returns and family visas. - Ramadan reduces government working hours and slows processing; Eid holidays close offices. - Policy announcements (new visa categories, corporate tax deadlines, free zone promotions) cause sudden enquiry spikes. - GITEX, Expo-style events and global investor interest create bursts of overseas enquiries.",
+ "care": [
+  "No immigration, visa, licensing, legal, corporate tax, VAT or banking advice; pi never recommends a structure or jurisdiction.",
+  "Never take client IDs, passports, licence numbers or bank details; refer to “a client company”.",
+  "Decline nominee arrangements to hide ownership, shell companies for concealment, fake tenancy or employment, visa selling or bribery.",
+  "Client fines due to missed renewals: note as an operational failure, no legal comment on liability.",
+  "Clients stranded without status: note the firm’s problem; if anyone is in danger, point to authorities.",
+  "Agent commission disputes: note, don’t take sides."
+ ],
+ "build_ideas": [
+  "Lead inbox combining website, ads and WhatsApp enquiries, with assignment, reply timer and source tracking",
+  "Quotation builder from a standard price list and package templates, with approval for discounts",
+  "Case tracker by client company with stages for each service (approval, licence, establishment card, visas, medical, ID), owner and next action",
+  "Document checklist per case with WhatsApp requests and reminders to clients",
+  "Expiry calendar for licences, visas, IDs, tenancy registrations and cards across all managed companies, with 90/60/30-day reminders",
+  "Renewal pipeline with automatic quote drafts sent to clients",
+  "Government fee ledger per case reconciled against client invoices and payments",
+  "PRO day planner grouping visits by location, with check-in and completion notes",
+  "Client status updates by WhatsApp at each stage",
+  "Agent/partner referral register with commission calculation",
+  "Client file vault with access by role and full history (so files stay with the firm)",
+  "Owner dashboard: leads, conversions, active cases, upcoming expiries, receivables"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We manage renewals for about 400 companies and every month a few slip and the client gets a fine."
+  },
+  {
+   "role": "pi",
+   "text": "That’s painful — it costs the client and probably the relationship too. Noted. How do you currently keep track of what’s expiring and when?"
+  },
+  {
+   "role": "Person",
+   "text": "An Excel sheet that one admin maintains."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, one sheet kept by one person. Does anyone get reminded automatically when something is coming up, or does someone have to check?"
+  },
+  {
+   "role": "Person",
+   "text": "She checks it when she has time."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, expiry checks depend on her availability — I’ve noted that. When a renewal is due, who contacts the client about it?"
+  }
+ ]
+}

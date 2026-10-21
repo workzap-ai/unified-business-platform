@@ -1,0 +1,280 @@
+{
+ "key": "catering_and_event_food",
+ "name": "Catering and event food",
+ "kind": "industry",
+ "sector": {
+  "code": "B",
+  "title": "Food and beverage"
+ },
+ "signals": [
+  "catering",
+  "caterer",
+  "degh",
+  "deg",
+  "wedding catering",
+  "shaadi",
+  "walima",
+  "mehndi",
+  "baraat",
+  "per-head rate",
+  "menu tasting",
+  "buffet",
+  "live station",
+  "corporate lunch boxes",
+  "event",
+  "banquet",
+  "khana",
+  "mandi",
+  "ouzi",
+  "buffet setup",
+  "waiters",
+  "crockery",
+  "chafing dishes",
+  "diwaniya",
+  "azeema"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Event types: weddings, corporate, religious gatherings, private parties, daily office meals",
+  "Typical event size range in guests",
+  "Own kitchen and transport vs renting",
+  "Crockery, chafing dishes and furniture owned vs hired",
+  "Permanent staff vs daily-wage waiters and cooks",
+  "Venue relationships (banquet halls, marquees, hotels) or own venue",
+  "How bookings come in: referrals, Instagram, wedding planners, halls"
+ ],
+ "scope_rule": "pi notes operational problems: booking and quote tracking, headcount changes, purchasing, crockery loss, staffing, advance payments, event-day coordination and reporting. It does not advise on food-safety rules for transport and holding, licensing for events, labour law for daily-wage staff, or tax. It never records clients’ names, guest lists, phone numbers or staff details, and treats each event by type and date.",
+ "vocabulary": {
+  "degh/deg": "large cooking pot; often a pricing unit",
+  "per head": "price per guest",
+  "walima, mehndi, baraat": "wedding functions",
+  "one-dish": "rule in Pakistan limiting wedding menus to one main dish (pi does not interpret it)",
+  "live station": "food cooked in front of guests",
+  "chafing dish": "buffet food warmer",
+  "tasting": "client sampling before booking",
+  "mandi/ouzi": "rice and meat dishes popular in Gulf events",
+  "advance/bayana": "booking deposit",
+  "daily wagers/dihari": "staff paid by the day"
+ },
+ "problems": [
+  {
+   "phrase": "Client says 500 guests, 650 show up, and we run out",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Final headcount changes the night before and we’ve already bought",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "I quote per head but never know if the event actually made money",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Meat and rice prices change between booking and event date",
+   "category": "margin_cost",
+   "subtype": "price_increases_supplier"
+  },
+  {
+   "phrase": "Leftover food after every event, huge waste",
+   "category": "margin_cost",
+   "subtype": "wastage_cost"
+  },
+  {
+   "phrase": "Plates, spoons and dishes go missing at every function",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Hired crockery gets broken and the supplier bills us",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Balance payment after the wedding takes months",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Advances are recorded in my diary only",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Bookings tracked on WhatsApp, two events same night got confirmed",
+   "category": "orders_fulfilment",
+   "subtype": "orders_lost"
+  },
+  {
+   "phrase": "Quotes take me days to send and clients go elsewhere",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Daily-wage waiters don’t turn up on the night",
+   "category": "people_staff",
+   "subtype": "attendance_lateness"
+  },
+  {
+   "phrase": "No-one knows who is in charge at the venue",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Food arrives late at the hall because of traffic",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "Hall manager and my team argue on the night",
+   "category": "communication_coordination",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Taste differs depending on which cook did the degh",
+   "category": "quality_complaints",
+   "subtype": "consistency_across_branches"
+  },
+  {
+   "phrase": "Corporate lunch boxes: wrong count delivered to offices",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Leads come from Instagram but most just ask the price and vanish",
+   "category": "marketing_leads",
+   "subtype": "lead_quality"
+  },
+  {
+   "phrase": "No portfolio or proper website",
+   "category": "marketing_leads",
+   "subtype": "website_issues"
+  },
+  {
+   "phrase": "Wedding season we’re overbooked, then four months dead",
+   "category": "sales_revenue",
+   "subtype": "seasonal_dip"
+  },
+  {
+   "phrase": "Purchasing is done by one person and I don’t trust the bills",
+   "category": "loss_security",
+   "subtype": "fraud"
+  },
+  {
+   "phrase": "Vehicle breakdowns on event days",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "I can’t take on a second team because everything runs through me",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "Post-event complaints come weeks later",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "I don’t know which venues or planners bring the most business",
+   "category": "marketing_leads",
+   "subtype": "no_tracking"
+  }
+ ],
+ "questions": {
+  "bookings": [
+   "How do you keep track of booked events now?",
+   "Has a double-booking happened?"
+  ],
+  "quotes": [
+   "How long does it take to send a quote?",
+   "What slows it down?"
+  ],
+  "headcount": [
+   "How often does the guest count change near the event?",
+   "When do you usually buy ingredients?"
+  ],
+  "margin": [
+   "Do you work out profit after each event?",
+   "Which costs are hardest to pin down?"
+  ],
+  "purchasing": [
+   "Who buys for each event?",
+   "How are those bills checked?"
+  ],
+  "crockery": [
+   "What goes missing most — plates, cutlery, dishes?",
+   "Is it counted before and after?"
+  ],
+  "staff": [
+   "How many waiters are daily-wage?",
+   "What happens when someone doesn’t show?"
+  ],
+  "event day": [
+   "Who’s in charge at the venue?",
+   "How do they reach you if something goes wrong?"
+  ],
+  "payments": [
+   "How much is usually taken as advance?",
+   "How long do balances take?"
+  ],
+  "leads": [
+   "Where do most bookings come from?"
+  ],
+  "seasons": [
+   "What do you do in the slow months?"
+  ]
+ },
+ "seasons": "- PK: wedding season roughly November–March is peak, especially winter weekends; Ramadan iftar catering for offices and mosques; Muharram niyaz and sabeel, Rabi ul Awwal milad gatherings; quieter during the first part of Muharram and Ramadan for weddings; monsoon disruptions to outdoor events. - UAE: cooler months October–April for weddings and outdoor events; Ramadan iftar and corporate suhoor events; National Day and year-end corporate functions; summer slowdown except indoor. - Canada: summer wedding season May–September; December corporate parties; Diwali and Eid community events; graduation season.",
+ "care": [
+  "Food poisoning at an event, burns, gas leaks or vehicle accidents: pi stops and points to emergency services.",
+  "Food-transport and holding rules: no advice, notes operational problem only.",
+  "Guest lists, client and staff details: never collected.",
+  "Wedding-menu legal restrictions in Pakistan: pi does not interpret or help get around them.",
+  "Daily-wage labour terms: noted as operational, no labour-law advice.",
+  "Requests to inflate bills to clients or create fake receipts: pi declines.",
+  "Underage helpers mentioned: pi does not help hide it."
+ ],
+ "build_ideas": [
+  "Event booking calendar with status (enquiry, quoted, advance received, confirmed), clash warnings and venue",
+  "Quote builder: menu items, per-head pricing logic set by the caterer, quick PDF/WhatsApp quote",
+  "Event costing sheet: purchases, staff, transport, crockery, leftovers vs quoted price",
+  "Headcount change log with cut-off reminders to the client",
+  "Purchase request and bill-photo capture per event with approval",
+  "Crockery and equipment checkout/check-in counts per event, with loss report",
+  "Staff roster per event with confirmations via WhatsApp the day before",
+  "Event-day run sheet shared with the venue lead: timings, contacts by role, setup list",
+  "Advance and balance tracker with reminders",
+  "Lead source tracker (Instagram, planner, venue, referral) and conversion",
+  "Corporate lunch-box order portal with daily counts per office",
+  "Portfolio page with event photos and enquiry form"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Shaadi season mein sab se bara masla ye hai ke guest zyada aa jate hain aur khana kam par jata hai."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — events par mehman bataye gaye se zyada aa jate hain aur khana kam par jata hai. Final guest count client aap ko kab tak confirm karta hai?"
+  },
+  {
+   "role": "Person",
+   "text": "Aksar ek din pehle, kabhi us din bhi."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, noted. Aap saman kab khareedte hain — count aane se pehle ya baad?"
+  },
+  {
+   "role": "Person",
+   "text": "Pehle hi, warna time nahi milta."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted. Count barhne par extra charge ki baat agreement mein hoti hai, ya zubani?"
+  }
+ ]
+}

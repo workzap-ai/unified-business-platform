@@ -1,0 +1,270 @@
+{
+ "key": "entertainment_centres_gaming_zones_and_play_areas",
+ "name": "Entertainment centres, gaming zones and play areas",
+ "kind": "industry",
+ "sector": {
+  "code": "H",
+  "title": "Hospitality, events and personal services"
+ },
+ "signals": [
+  "family entertainment centre",
+  "FEC",
+  "play area",
+  "soft play",
+  "kids zone",
+  "trampoline park",
+  "arcade",
+  "gaming zone",
+  "VR",
+  "bowling",
+  "go- karting",
+  "escape room",
+  "laser tag",
+  "birthday party package",
+  "token",
+  "card swipe",
+  "ride",
+  "jhoolay",
+  "game zone",
+  "khel ka zone",
+  "markaz tarfihi",
+  "al’aab"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Type of venue: soft play, arcade, trampoline, bowling, karting, VR, escape rooms, mixed FEC.",
+  "Inside a mall or standalone, and number of branches.",
+  "Pricing model: entry tickets, time-based, card/token credits, memberships, party packages.",
+  "Payment and access system: cash counter, POS, card-swipe game system, turnstiles, online booking.",
+  "Number of machines or attractions and who maintains them (in-house or vendor).",
+  "Staff count per shift and roles (cashier, attendants, party host, technician).",
+  "Main customer mix: families with small kids, teens, school trips, corporate groups."
+ ],
+ "scope_rule": "pi notes operational and business problems: footfall and conversion, token and card leakage, machine downtime, party bookings, staff and shift issues, food counter, cleanliness and mall rent pressure. pi does not advise on ride or equipment safety engineering, child-safety regulations, supervision ratios, amusement licences, insurance, gaming or prize regulations, or tax. pi never collects children’s or parents’ names, photos, birthdates or contact details; it records roles (parent, child, attendant). Any injury to a child or visitor is treated as an emergency first.",
+ "vocabulary": {
+  "FEC": "family entertainment centre",
+  "soft play": "padded indoor play structure for young children",
+  "game card / token": "prepaid credit used on arcade machines",
+  "redemption": "tickets won on games exchanged for prizes",
+  "birthday package": "party room, play time, food and host for a fixed group",
+  "downtime": "machine or ride out of service",
+  "footfall": "number of visitors entering",
+  "mall rent / revenue share": "rent plus a share of turnover paid to the mall",
+  "jhoolay": "rides or swings (Urdu)",
+  "markaz tarfihi": "entertainment centre (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Footfall in the mall is high but few families actually come in and pay",
+   "category": "sales_revenue",
+   "subtype": "conversion_low"
+  },
+  {
+   "phrase": "Weekdays are empty, weekends we can’t handle the crowd",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "Cashiers sell cards and pocket some of the money",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Card top-ups and free credits given by staff don’t match the cash",
+   "category": "loss_security",
+   "subtype": "void_refund_abuse"
+  },
+  {
+   "phrase": "Machines break down and the vendor takes a week to fix",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "I don’t know which machines earn and which just take up space",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Prize stock for redemption runs out or goes missing",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Birthday party bookings come through WhatsApp and get double-booked",
+   "category": "customer_experience_digital",
+   "subtype": "booking_appointments"
+  },
+  {
+   "phrase": "Parents complain the soft play isn’t clean",
+   "category": "quality_complaints",
+   "subtype": "hygiene"
+  },
+  {
+   "phrase": "Attendants are on their phones instead of watching the play area",
+   "category": "people_staff",
+   "subtype": "accountability"
+  },
+  {
+   "phrase": "Staff leave after a few months and we keep retraining",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Mall rent plus revenue share is eating everything",
+   "category": "margin_cost",
+   "subtype": "rent"
+  },
+  {
+   "phrase": "Electricity bill for machines and AC is huge",
+   "category": "margin_cost",
+   "subtype": "utility_costs"
+  },
+  {
+   "phrase": "We run promotions but don’t know if they bring anyone new",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Families come once and never come back",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "Memberships aren’t renewed and nobody reminds them",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Bad reviews on Google about long queues at the counter",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "School trip bookings are on paper and payments come late from the school",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Snack counter stock never matches sales",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Spare parts for imported machines take months",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Each branch reports differently so I can’t compare them",
+   "category": "reporting_visibility",
+   "subtype": "branch_comparison"
+  },
+  {
+   "phrase": "The card system doesn’t connect to our accounts software",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Daily safety checks on rides aren’t actually done",
+   "category": "operations_process",
+   "subtype": "checklists_not_done"
+  },
+  {
+   "phrase": "We’re thinking of opening in another mall but can’t see the numbers clearly",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  },
+  {
+   "phrase": "Insurance and licence renewals keep sneaking up on us",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  }
+ ],
+ "questions": {
+  "sales and footfall": [
+   "What does a busy day look like versus a quiet one?",
+   "Do you know how many people walk past versus come in?"
+  ],
+  "counter and cash": [
+   "How are cards or tickets sold?",
+   "How is the cash checked at shift end?",
+   "What doesn’t match most often?"
+  ],
+  "machines": [
+   "Which attractions break down most?",
+   "Who fixes them, and how fast?"
+  ],
+  "machine earnings": [
+   "Can you see what each machine earns?",
+   "Which ones do you suspect are dead weight?"
+  ],
+  "parties and groups": [
+   "How do people book a birthday party?",
+   "What goes wrong most with parties?"
+  ],
+  "staff": [
+   "How many attendants per shift?",
+   "What do you wish they did better?"
+  ],
+  "cleanliness and checks": [
+   "Who checks the play area before opening?",
+   "Is that written down anywhere?"
+  ],
+  "repeat visits": [
+   "Do you have memberships?",
+   "How do you remind families to come back?"
+  ],
+  "branches": [
+   "How many branches?",
+   "How do you compare them today?"
+  ]
+ },
+ "seasons": "UAE: summer is peak for indoor centres (heat drives families into malls), plus summer camps; Eid holidays, school mid-term and winter breaks; Dubai Summer Surprises; Ramadan shifts traffic late into the night. PK: Eid holidays are the biggest days, summer vacations (June to August) and winter vacations (late December), weekends and public holidays; Ramadan shifts to after-iftar; exam months drop teen traffic. Canada: winter months, March break, summer camps on rainy days, and birthday parties year-round on weekends.",
+ "care": [
+  "Any injury, fall, ride malfunction with someone hurt, lost child or fire: pi stops and points to emergency services and the venue’s own emergency procedure.",
+  "No advice on ride safety, equipment standards, supervision ratios or child-protection law; pi notes “safety checks not consistently done” as an operational problem.",
+  "Never collect children’s names, ages, photos or parents’ contact details.",
+  "CCTV on the floor is fine to note as a gap; pi does not help with covert recording in toilets or changing areas.",
+  "Prize or redemption games that resemble gambling: pi does not advise on legality and does not help design anything that bypasses regulations.",
+  "Staff misconduct is recorded by role; any concern about a child’s safety with staff is an immediate escalation to authorities."
+ ],
+ "build_ideas": [
+  "Daily sales summary from the card/POS system: cards sold, top-ups, free credits, by cashier and shift.",
+  "Machine earnings report: revenue per machine per day, ranking and downtime days.",
+  "Maintenance ticket flow for machines with vendor assignment and time-to-fix tracking.",
+  "Opening and closing safety/cleanliness checklist with photo proof and time stamps.",
+  "Party booking calendar with packages, deposits and confirmations via WhatsApp.",
+  "School and group booking tracker with invoices and payment reminders.",
+  "Redemption prize and snack counter stock tracker with counts per shift.",
+  "Membership register with renewal reminders (with consent).",
+  "Free-credit and comp approval flow with reasons logged.",
+  "Branch comparison dashboard: footfall, revenue, per-visitor spend, downtime.",
+  "Staff roster with attendance and floor-zone assignment."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our game zone in the mall does well on weekends but I’m sure some cash at the card counter is going missing."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, you suspect leakage at the card counter. How do you check the cash against the card system at the end of a shift?"
+  },
+  {
+   "role": "Person",
+   "text": "The supervisor counts it and sends me a total on WhatsApp."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted that the check is just a total sent over. Can the card system show you top-ups and free credits per cashier?"
+  },
+  {
+   "role": "Person",
+   "text": "It probably can, I’ve never looked."
+  },
+  {
+   "role": "pi",
+   "text": "Noted. When did you first feel the numbers were off?"
+  }
+ ]
+}

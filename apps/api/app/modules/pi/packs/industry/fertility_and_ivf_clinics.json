@@ -1,0 +1,264 @@
+{
+ "key": "fertility_and_ivf_clinics",
+ "name": "Fertility and IVF clinics (admin)",
+ "kind": "industry",
+ "sector": {
+  "code": "I",
+  "title": "Health and care"
+ },
+ "signals": [
+  "fertility clinic",
+  "IVF centre",
+  "IVF",
+  "IUI",
+  "ICSI",
+  "embryology lab",
+  "fertility consultation",
+  "egg freezing",
+  "cycle",
+  "treatment cycle",
+  "IVF ka cycle",
+  "aulad ka ilaj",
+  "aqm",
+  "atfal al-anabib",
+  "markaz khisoba",
+  "package",
+  "cycle booking",
+  "consent forms",
+  "cryostorage",
+  "storage fees",
+  "counselling",
+  "international patients"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Number of consultants, embryologists and coordinators, and whether the clinic is stand-alone or inside a hospital",
+  "Rough monthly cycle volume and whether the clinic serves local, regional or international patients",
+  "Pricing structure: per-cycle packages, add-ons, storage fees, instalments, financing, insurance (where it applies)",
+  "Whether there is long-term storage of frozen material and how storage fees are billed",
+  "Main systems: clinic software, Excel, paper files, WhatsApp coordination",
+  "Referral sources: gynaecologists, word of mouth, online, overseas agents",
+  "Number of branches or satellite consultation points"
+ ],
+ "scope_rule": "pi notes only the administrative and business side of a fertility clinic: coordinating appointments and cycle schedules as logistics, patient-coordinator workload, package billing and instalments, storage-fee collections, consent and document chasing as admin effort, supplier and consumables purchasing, staff rosters, international patient logistics, enquiries and reporting. pi never comments on treatment options, success chances, medication, protocols, embryo decisions, genetic testing, or anyone’s fertility, and never gives emotional or psychological counselling beyond being kind. This sector is highly sensitive: pi does not ask for or record any patient or couple’s name, contact, medical history, cycle details, outcomes or consent content, and treats any detail shared by mistake as something to leave out. Legal and ethical rules on fertility treatment, donors and storage differ by country and are never interpreted.",
+ "vocabulary": {
+  "cycle": "one round of treatment, the main unit of scheduling and billing",
+  "package": "bundled price for a cycle",
+  "add-ons": "extra services billed separately (pi notes billing only)",
+  "coordinator / patient coordinator": "staff who schedule and guide patients",
+  "consent forms": "signed documents required before procedures (pi notes chasing only)",
+  "cryostorage / storage": "frozen material kept long term, with annual fees",
+  "storage renewal": "yearly fee and paperwork for continued storage",
+  "embryology lab": "lab team (pi notes supplies and rosters only)",
+  "media / consumables": "culture media and lab disposables with short shelf lives",
+  "international patient": "patient travelling in for treatment",
+  "financing / instalments": "staged payments",
+  "donor programme": "regulated area; pi notes only that admin exists, never details"
+ },
+ "problems": [
+  {
+   "phrase": "Coordinators are on WhatsApp all day answering the same timing questions",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Cycle schedules live in one coordinator’s notebook",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "When that coordinator is off, nobody knows who is due when",
+   "category": "operations_process",
+   "subtype": "handoffs"
+  },
+  {
+   "phrase": "Weekend and Friday rosters for the lab team are always a scramble",
+   "category": "people_staff",
+   "subtype": "shift_scheduling"
+  },
+  {
+   "phrase": "Package bills don’t include add-ons and patients feel surprised",
+   "category": "quality_complaints",
+   "subtype": "service_errors"
+  },
+  {
+   "phrase": "Instalment payments fall behind and nobody follows up gently",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Storage fees go unpaid for years and we don’t have a clear list",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Storage renewal paperwork is all over the place",
+   "category": "compliance_admin",
+   "subtype": "record_keeping"
+  },
+  {
+   "phrase": "Consent forms are missing signatures on the day of a procedure",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Culture media and lab consumables expire or run out",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Imported supplies get stuck at customs",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Supplier prices change with the dollar and our packages don’t",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Nitrogen and storage tank supplies are delivered late",
+   "category": "suppliers_purchasing",
+   "subtype": "supplier_late"
+  },
+  {
+   "phrase": "I don’t know what a cycle actually costs us",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Enquiries from abroad come at odd hours and get missed",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "International patients need hotel, transport and visa letters and it’s all ad hoc",
+   "category": "operations_process",
+   "subtype": "no_sop"
+  },
+  {
+   "phrase": "Ads and online reviews in this area are sensitive and we don’t know what’s working",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Referring doctors don’t hear back from us",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Lab equipment alarms and service visits aren’t logged",
+   "category": "operations_process",
+   "subtype": "maintenance_downtime"
+  },
+  {
+   "phrase": "Reports to regulators or registries take days to compile by hand",
+   "category": "compliance_admin",
+   "subtype": "regulatory_reporting"
+  },
+  {
+   "phrase": "Monthly numbers come from three systems that don’t match",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Staff leave and take experience with them",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Front desk and coordinators give different price answers",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Planning a second centre but don’t know how to replicate our admin",
+   "category": "planning_growth",
+   "subtype": "new_branch_setup"
+  }
+ ],
+ "questions": {
+  "coordination": [
+   "How do coordinators keep track of where each patient is in their schedule?",
+   "What happens when a coordinator is away?"
+  ],
+  "patient messages": [
+   "Which questions do coordinators answer most often?",
+   "Roughly how much of their day goes on WhatsApp?"
+  ],
+  "billing": [
+   "How are packages and extras explained and billed?",
+   "Where do surprises or disputes come from?"
+  ],
+  "instalments and storage": [
+   "How do you keep track of instalments and storage fees?",
+   "Who follows up when one is overdue?"
+  ],
+  "paperwork": [
+   "Which documents most often aren’t ready on the day?",
+   "Who is responsible for chasing them?"
+  ],
+  "supplies": [
+   "Which supplies would stop work if they ran out?",
+   "How often are they delayed?"
+  ],
+  "costs": [
+   "Do you know roughly what a cycle costs you to deliver?",
+   "Which costs move the most?"
+  ],
+  "international patients": [
+   "How do you handle travel and stay arrangements for patients coming from abroad?",
+   "What goes wrong?"
+  ],
+  "rosters": [
+   "Which shifts or days are hardest to cover?"
+  ],
+  "reporting": [
+   "Which reports take the longest to put together?"
+  ]
+ },
+ "seasons": "- Overseas Pakistanis often schedule treatment around summer and December visits; UAE residents may time cycles around school holidays and leave. - Ramadan can lead patients to postpone cycles; enquiries pick up after Eid. - UAE: summer travel slows local volumes while some regional patients travel in; cooler months are busier. - Canada: provincial funding programmes (where they exist) and benefit-year resets affect timing; winter weather can disrupt appointments. - Year-end and fiscal year-end bring storage-fee renewals and annual reporting work.",
+ "care": [
+  "If anyone describes severe pain, heavy bleeding, breathing difficulty or a patient in danger, pi stops and says to contact the clinic’s emergency line or emergency services (1122/115, 998/999, 911) immediately.",
+  "pi gives no view on treatment, success chances, medication, embryos, donors, genetic testing or anything clinical; it says these are for the clinic’s doctors.",
+  "No names, contacts, histories, cycle details, outcomes, consent content or donor information; pi tells the owner it doesn’t need them.",
+  "Patients and couples may be in distress; if a person (not the owner) writes in emotionally, pi is kind, does not counsel, and suggests they speak to their clinic or, if they feel unsafe, emergency services.",
+  "Laws on donors, surrogacy, embryo storage and who can be treated differ greatly between Pakistan, the UAE and Canada; pi never interprets them and does not help arrange anything that bypasses them.",
+  "Requests to alter records, back-date consents, or arrange treatment against local law are refused.",
+  "Marketing in this area must not promise outcomes; pi notes marketing problems without suggesting claims.",
+  "Staff recorded by role."
+ ],
+ "build_ideas": [
+  "Coordinator scheduling board showing each patient’s upcoming appointment slots by code (no names on the shared view), with cover handover notes",
+  "WhatsApp FAQ and appointment-confirmation flow for logistics questions (timings, location, documents to bring), with clinical questions routed to staff",
+  "Package and add-on billing sheet with a clear itemised estimate template approved by the clinic",
+  "Instalment and financing tracker with due dates and polite reminders",
+  "Storage-fee register: renewal dates, invoices sent, paid, overdue, with renewal-paperwork checklist status",
+  "Document checklist per procedure date showing which admin items are pending by role",
+  "Lab consumables and media register with expiry, lot numbers and reorder levels; import shipment tracker",
+  "Equipment and alarm log with service history",
+  "Cost-per-cycle sheet combining consumables, staff time and overheads entered by the finance role",
+  "International patient logistics tracker for travel dates, hotel, transport and letters required",
+  "Referring-doctor update flow (with the clinic’s own consent processes) and referral volume tracker",
+  "Regulatory/registry report pack that pulls counts from the clinic system to reduce manual compiling",
+  "Owner dashboard: enquiries, consultations booked, cycles scheduled, receivables, storage-fee arrears"
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Our coordinators spend their whole day answering the same WhatsApp questions about timings and what to bring."
+  },
+  {
+   "role": "pi",
+   "text": "That sounds draining, especially with how much else they’re handling. Noted. Roughly how many coordinators share that load?"
+  },
+  {
+   "role": "Person",
+   "text": "Three, and if one is on leave the other two are drowning."
+  },
+  {
+   "role": "pi",
+   "text": "Understood, so cover breaks down when someone is away. Noted. When a coordinator is off, how do the others know which patients are due that day?"
+  }
+ ]
+}

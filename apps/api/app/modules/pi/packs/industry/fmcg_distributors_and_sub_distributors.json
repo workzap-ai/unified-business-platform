@@ -1,0 +1,273 @@
+{
+ "key": "fmcg_distributors_and_sub_distributors",
+ "name": "FMCG distributors and sub-distributors",
+ "kind": "industry",
+ "sector": {
+  "code": "E",
+  "title": "Trade, distribution and logistics"
+ },
+ "signals": [
+  "distributor",
+  "sub-distributor",
+  "principal",
+  "company",
+  "DMS",
+  "order booker",
+  "OB",
+  "salesman",
+  "route",
+  "beat",
+  "PJP",
+  "dukaan",
+  "retailer",
+  "shopkeeper",
+  "scheme",
+  "trade offer",
+  "claim",
+  "claim nahi aya",
+  "udhaar",
+  "recovery",
+  "wasooli",
+  "van sales",
+  "delivery van",
+  "Shehzore",
+  "loader",
+  "primary",
+  "secondary",
+  "target",
+  "expiry",
+  "near-expiry",
+  "mandoob",
+  "muwazzi’"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Which principals/brands they distribute and which categories (food, beverages, personal care, home care, tobacco, pharma-adjacent).",
+  "Territory size: number of routes/beats and roughly how many retailers covered.",
+  "Number of order bookers, salesmen, delivery vehicles and whether vans are owned or hired.",
+  "Cash vs credit split with retailers, and how recovery is done.",
+  "Whether the principal mandates a DMS, and what they use alongside it.",
+  "Whether they also supply sub-distributors or wholesalers.",
+  "Godown size and whether stock is held in one or several locations."
+ ],
+ "scope_rule": "pi notes operational problems: order booking, route coverage, delivery, stock and expiry, scheme claims, recovery, cash handling, staff accountability and reporting to the owner. It does not advise on the distributor agreement, legal disputes with the principal, tax/sales tax filing, or financing. It never helps with fake claims, inflated scheme submissions or diverting stock to other territories against agreements. It records roles (“order booker on route 4”, “a large retailer”) not names, phone numbers or ID cards of staff or shopkeepers.",
+ "vocabulary": {
+  "principal / company": "the brand owner the distributor works for",
+  "primary sales": "principal to distributor; secondary sales — distributor to retailer",
+  "order booker (OB)": "staff who visit shops and take orders",
+  "PJP": "permanent journey plan, the fixed weekly route schedule",
+  "beat / route": "set of shops visited on a given day",
+  "scheme / trade offer": "discount or free goods the principal funds for retailers",
+  "claim": "reimbursement the distributor files with the principal for schemes, damages or expiry",
+  "recovery / wasooli": "collecting money owed by shops",
+  "van sales": "salesman sells and collects from the van on the spot",
+  "DMS": "distributor management system, often supplied by the principal",
+  "near-expiry": "stock close to its expiry date, often sold off cheaply",
+  "mandoob": "sales rep (Gulf usage)"
+ },
+ "problems": [
+  {
+   "phrase": "Order bookers say they visited shops but I’m not sure they did",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Orders written on paper get lost or entered wrong in the DMS",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Scheme claims with the company are months behind and some get rejected",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Retailers’ udhaar keeps growing and recovery men bring back excuses",
+   "category": "cash_collections",
+   "subtype": "credit_customers"
+  },
+  {
+   "phrase": "Salesman collected cash but deposited less",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Expiry stock piles up and the company won’t take it back",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Fast SKUs run out while slow ones fill the godown",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "The company pushes primary stock at month-end to hit their target",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Delivery vans go half empty on some routes and overloaded on others",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Fuel and van maintenance eat my margin",
+   "category": "margin_cost",
+   "subtype": "freight_costs"
+  },
+  {
+   "phrase": "I don’t know which routes are actually profitable",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Targets come from the company but I can’t see daily progress",
+   "category": "sales_revenue",
+   "subtype": "target_missed"
+  },
+  {
+   "phrase": "Order bookers give the scheme to shops that don’t qualify",
+   "category": "sales_revenue",
+   "subtype": "discount_abuse"
+  },
+  {
+   "phrase": "Shops complain about short deliveries and wrong items",
+   "category": "orders_fulfilment",
+   "subtype": "packing_errors"
+  },
+  {
+   "phrase": "Order booker left and took his shops to a competitor",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "Godown stock and DMS stock never match",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "DMS is the company’s, my accounts are in Excel, nothing connects",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Damaged cartons in transit — nobody takes responsibility",
+   "category": "stock_inventory",
+   "subtype": "shrinkage_theft"
+  },
+  {
+   "phrase": "Every evening I spend two hours reconciling van cash and returns",
+   "category": "operations_process",
+   "subtype": "manual_work"
+  },
+  {
+   "phrase": "Shopkeepers WhatsApp me directly for orders and I forget some",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "New outlets aren’t being added; we cover the same shops",
+   "category": "sales_revenue",
+   "subtype": "salesforce_performance"
+  },
+  {
+   "phrase": "Sub-distributors don’t share their sales so I can’t plan",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Commission and incentive calculations cause fights every month",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "Company audit wants records and it takes a week to pull together",
+   "category": "compliance_admin",
+   "subtype": "audits"
+  },
+  {
+   "phrase": "I want to take on a second principal but can’t handle the extra load",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "order booking": [
+   "How do order bookers send you orders today — paper, DMS app, WhatsApp?",
+   "How often does an order arrive wrong or late?",
+   "How do you know a shop was actually visited?"
+  ],
+  "recovery": [
+   "Roughly how much of your secondary sales are on credit?",
+   "Who collects, and how do they report what they collected?",
+   "What happens to shops that keep delaying?"
+  ],
+  "cash": [
+   "How does van or recovery cash reach you each day?",
+   "When it’s short, how do you find out and how long after?"
+  ],
+  "claims": [
+   "How do you track scheme and damage claims with the company?",
+   "How long do they usually take to settle, and what gets rejected?"
+  ],
+  "stock and expiry": [
+   "How often do you count the godown?",
+   "How do you spot near-expiry stock before it’s too late?"
+  ],
+  "delivery": [
+   "How many vans run each day and how are loads planned?",
+   "What goes wrong most on deliveries?"
+  ],
+  "targets and reporting": [
+   "How do you see progress against the company’s target during the month?",
+   "Which numbers do you wish you had every morning?"
+  ],
+  "staff": [
+   "How are order bookers’ incentives worked out?",
+   "What disputes come up about them?"
+  ]
+ },
+ "seasons": "Ramadan is the biggest single peak in Pakistan and the UAE (beverages, dates, cooking oil, flour, sweets, sharbat), followed by Eid ul Fitr and a sharp post-Eid dip. Eid ul Adha shifts demand to spices, cooking oil and cold drinks. Summer drives beverages, ice cream and juices; winter drives tea, milk powder, soups and skincare. Principals’ month-end and quarter-end target pushes create artificial peaks and stock loading. Back-to-school lifts biscuits, juices, stationery-adjacent items. Pakistan monsoon disrupts routes; UAE summer moves shopping into malls and hypermarkets and slows small grocery trade. In Canada, ethnic-grocery distributors peak before Ramadan, Diwali and Christmas, and winter weather affects routes.",
+ "care": [
+  "Requests to inflate scheme claims, create fake retailer invoices or shift stock to another distributor’s territory: pi declines; it can note the underlying pressure (claims slow, targets unrealistic) as a business problem.",
+  "Contract disputes with the principal (termination, territory, security deposit): pi notes the operational effect only and suggests legal advice.",
+  "Sales tax and withholding questions on distributor invoices: out of scope; refer to their tax adviser.",
+  "Staff cash shortages and suspected theft: pi notes the problem, never records staff names or CNICs, and doesn’t suggest covert surveillance or punishment.",
+  "Shopkeepers’ personal details and phone numbers: never stored; “a key retailer on route 3” is enough.",
+  "Road accidents involving delivery vans: if someone is hurt, pi points to emergency services (1122 in Pakistan, 999 in the UAE, 911 in Canada) before anything else.",
+  "Pharma or tobacco distribution regulation: out of scope; pi notes only operational issues."
+ ],
+ "build_ideas": [
+  "Order-booker app (or WhatsApp flow) capturing orders at the shop with location and time stamp, feeding the godown pick list.",
+  "Route and PJP tracker showing planned vs visited shops per order booker per day.",
+  "Retailer credit ledger with ageing, limits and recovery lists per route printed or sent each morning.",
+  "Daily van settlement screen: loaded, delivered, returned, cash and credit — showing shortages immediately.",
+  "Scheme and claims tracker: each claim’s period, value, documents, status and age with the principal.",
+  "Expiry and near-expiry register by batch with alerts set days before expiry.",
+  "Reorder suggestions per SKU from secondary sales velocity and principal lead time.",
+  "Route profitability view: sales, margin, fuel and van cost per route.",
+  "Daily target tracker against the principal’s monthly targets by brand and order booker.",
+  "Incentive calculator with transparent rules each order booker can see.",
+  "Bridge between principal DMS exports and their own accounts/Excel.",
+  "Owner’s morning WhatsApp summary: yesterday’s sales, cash in, recovery, stock alerts."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Mere 6 order booker hain, aadhe din mujhe pata hi nahi hota woh kahan hain aur kitni dukaanein cover hui."
+  },
+  {
+   "role": "pi",
+   "text": "Noted — order bookers ki field visits aur coverage aap ko clear nazar nahi aati. Abhi woh orders aap tak kaise bhejte hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Kuch WhatsApp pe photo bhejte hain parchi ki, kuch shaam ko aa ke dete hain."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, orders WhatsApp photos aur shaam ki parchiyon mein aate hain. Is ki wajah se sab se zyada nuqsaan kahan hota hai — late delivery, ghalat maal, ya kuch aur?"
+  }
+ ]
+}

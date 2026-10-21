@@ -1,0 +1,280 @@
+{
+ "key": "kids_wear_toys_and_baby_stores",
+ "name": "Kids wear, toys and baby stores",
+ "kind": "industry",
+ "sector": {
+  "code": "A",
+  "title": "Retail and consumer"
+ },
+ "signals": [
+  "kids wear",
+  "baby shop",
+  "toy store",
+  "newborn",
+  "infant",
+  "toddler",
+  "diapers",
+  "formula",
+  "feeding bottles",
+  "prams",
+  "strollers",
+  "car seats",
+  "cots",
+  "school uniform",
+  "birthday gifts",
+  "bachon ke kapre",
+  "khilone",
+  "baby ka saman",
+  "age wise size",
+  "0-3 months",
+  "gift wrap",
+  "a’la’ab",
+  "malabis atfal",
+  "mustalzamat mawalid"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Mix of categories: clothing, toys, baby essentials (diapers, formula, feeding), gear (prams, car seats, cots), school items.",
+  "Number of stores and online channels (website, Instagram, Daraz, Noon, Amazon, FirstCry-style marketplaces).",
+  "Own label clothing vs imported brands vs local wholesale.",
+  "Whether consumables with expiry (formula, baby food, wipes, diapers) are sold.",
+  "Import share and countries of origin for toys and gear.",
+  "Whether gift wrapping, birthday hampers or registries are offered.",
+  "Whether school uniforms are supplied under arrangements with schools."
+ ],
+ "scope_rule": "pi notes the operational problems: age-size stock, expiry of consumables, gift and seasonal peaks, imports, online orders, returns, staff and reporting. pi gives no child health, infant feeding, product safety certification, toy-safety standard, car-seat installation, or customs advice. pi never collects children’s names, ages linked to identities, birthdays, photos, or parents’ details; it records categories and counts. Any report of a product injuring a child is treated as urgent: pi points to medical help and emergency services, and notes the recall/complaint handling as an operational issue only.",
+ "vocabulary": {
+  "age size": "clothing sized by age (0–3M, 2–3Y)",
+  "newborn set / gift set": "packaged baby clothing bundle",
+  "consumables": "diapers, wipes, formula, baby food",
+  "gear": "prams, strollers, car seats, cots, high chairs",
+  "hamper": "gift basket for births or birthdays",
+  "registry": "list of items parents want as gifts",
+  "recall": "manufacturer’s request to return an unsafe product",
+  "battery toy / RC": "electronic or remote-control toy",
+  "uniform contract": "arrangement to supply a school’s uniforms",
+  "import consignment": "shipment of imported toys or gear",
+  "khilone": "toys",
+  "a'la'ab": "toys (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Kids outgrow sizes so fast that our age-size stock never matches demand",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "Formula and baby food nearing expiry, we only notice when a mother complains",
+   "category": "stock_inventory",
+   "subtype": "expiry_wastage"
+  },
+  {
+   "phrase": "Diaper prices change every month and our shelf prices lag",
+   "category": "sales_revenue",
+   "subtype": "pricing_errors"
+  },
+  {
+   "phrase": "Toy imports stuck at customs before Eid or Christmas",
+   "category": "suppliers_purchasing",
+   "subtype": "import_delays"
+  },
+  {
+   "phrase": "Big gear like prams sits for months and blocks space",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock"
+  },
+  {
+   "phrase": "Toys with missing parts or broken in the box get returned",
+   "category": "quality_complaints",
+   "subtype": "product_defects"
+  },
+  {
+   "phrase": "Battery toys stop working within a week, customers want refunds",
+   "category": "cash_collections",
+   "subtype": "refunds"
+  },
+  {
+   "phrase": "We had a supplier recall and couldn’t find who bought the item",
+   "category": "stock_inventory",
+   "subtype": "serial_batch_tracking"
+  },
+  {
+   "phrase": "Gift buyers want exchanges and we have no proper policy",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Parents ask on WhatsApp if we have a size and we reply hours later",
+   "category": "customers_retention",
+   "subtype": "slow_response"
+  },
+  {
+   "phrase": "Birthday hamper orders get mixed up or delivered late",
+   "category": "orders_fulfilment",
+   "subtype": "pre_orders_custom"
+  },
+  {
+   "phrase": "Online orders of bulky items cost us a fortune to deliver",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_cost"
+  },
+  {
+   "phrase": "Daraz/Noon listings out of stock while we have it in store",
+   "category": "tech_systems",
+   "subtype": "integration_marketplace"
+  },
+  {
+   "phrase": "Same toy is cheaper online than in our shop",
+   "category": "sales_revenue",
+   "subtype": "channel_conflict"
+  },
+  {
+   "phrase": "Mothers buy once and never come back",
+   "category": "customers_retention",
+   "subtype": "repeat_low"
+  },
+  {
+   "phrase": "No idea who our repeat buyers are for diapers and formula",
+   "category": "customers_retention",
+   "subtype": "no_customer_data"
+  },
+  {
+   "phrase": "Ad spend for the Eid toys sale didn’t seem to bring footfall",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "School uniform orders come all in two weeks and we can’t stitch fast enough",
+   "category": "operations_process",
+   "subtype": "capacity"
+  },
+  {
+   "phrase": "School pays for uniforms late",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "Kids open and damage toys in store",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "Small toys and accessories disappear",
+   "category": "loss_security",
+   "subtype": "theft_external"
+  },
+  {
+   "phrase": "Staff can’t explain features of prams and car seats",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "We don’t know margin by category: toys vs clothing vs consumables",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Dollar/dirham rate changes make imported toys expensive overnight",
+   "category": "margin_cost",
+   "subtype": "currency_exposure"
+  },
+  {
+   "phrase": "Christmas/Eid toy buying is a guess every year",
+   "category": "planning_growth",
+   "subtype": "seasonal_planning"
+  },
+  {
+   "phrase": "Inventory is in Excel with thousands of small SKUs",
+   "category": "tech_systems",
+   "subtype": "excel_dependency"
+  }
+ ],
+ "questions": {
+  "stock": [
+   "Which ages or sizes run out most?",
+   "Which categories sit on shelves longest?"
+  ],
+  "consumables": [
+   "Do you sell formula, baby food or diapers?",
+   "How do you keep an eye on expiry dates?"
+  ],
+  "imports": [
+   "Where do your toys and gear come from?",
+   "How often do shipments arrive late for a season?"
+  ],
+  "quality": [
+   "What gets returned most?",
+   "How do you handle a supplier recall today?"
+  ],
+  "customers": [
+   "Do you know your regular buyers of consumables?",
+   "How do parents usually contact you?"
+  ],
+  "online": [
+   "Where do you sell online?",
+   "What’s the hardest part of delivering bulky items?"
+  ],
+  "school": [
+   "Do you supply any schools?",
+   "What’s the toughest part of the uniform rush?"
+  ],
+  "margin": [
+   "Which category do you think makes the most money?",
+   "How do currency changes affect your import prices?"
+  ],
+  "planning": [
+   "How do you decide what to buy for Eid or the holidays?"
+  ]
+ },
+ "seasons": "Pakistan: Eid ul-Fitr (kids’ clothes and toys peak, Eidi spending), Eid ul-Adha, back-to-school and uniforms (March– April and August), winter kids’ wear Nov–Jan, birthday-party demand year-round, summer holidays June–August for toys. UAE: Ramadan and Eid, back-to-school (late August and term changes), Dubai Shopping Festival, Christmas for expat families, summer camps and travel gear before summer. Canada: Christmas (largest toy peak), Black Friday/Boxing Day, back-to-school, Halloween costumes, winter outerwear Oct–Dec, Eid and Diwali for diaspora stores.",
+ "care": [
+  "Any child injury, choking or allergic reaction linked to a product: pi first points to emergency or medical help, then notes only the operational follow-up.",
+  "Infant feeding, formula choice or medical claims: out of scope; pi gives no advice.",
+  "Toy and car-seat safety standards and certifications: noted as admin/compliance effort, no advice.",
+  "Selling recalled, expired or counterfeit products: pi declines to help.",
+  "Children’s and parents’ personal data, photos for marketing: not collected; pi does not help use child photos without consent.",
+  "Customs on toy imports: no advice; under-declaration declined.",
+  "Infant-formula pricing rules or restrictions where they apply: noted, no legal guidance."
+ ],
+ "build_ideas": [
+  "Age-size stock grid for clothing across stores and online, with sell-through by age band.",
+  "Expiry and batch register for consumables, with alerts and a near-expiry action list.",
+  "Batch/serial capture for gear and electronic toys so recall lookups can find which sales are affected.",
+  "Price update workflow for consumables when supplier prices change.",
+  "Repeat-purchase reminders on WhatsApp for consumables (opt-in), based on purchase intervals.",
+  "WhatsApp stock-check flow: parent asks for an item/size, staff reply from a live stock lookup.",
+  "Hamper and birthday order tracker with event date, contents, delivery slot and status.",
+  "Import shipment tracker by consignment with expected arrival vs season deadline.",
+  "Returns and defect log by product and supplier with claim status.",
+  "Category margin dashboard (clothing, toys, consumables, gear) including currency-adjusted landed cost.",
+  "School uniform order board: sizes per class, production status, delivery and invoice tracking.",
+  "Marketplace stock sync for Daraz, Noon or Amazon.",
+  "Seasonal buying planner using last year’s Eid/Christmas sales by category."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "We sell formula and baby food, and last week a customer found an expired tin on the shelf. Very embarrassing."
+  },
+  {
+   "role": "pi",
+   "text": "That’s a stressful one, I’m sorry — noted, expired formula reached the shelf and a customer found it. Right now, how does the team keep track of expiry dates?"
+  },
+  {
+   "role": "Person",
+   "text": "Someone is supposed to check monthly but it doesn’t really happen."
+  },
+  {
+   "role": "pi",
+   "text": "Got it, noted — the monthly expiry check isn’t happening reliably. Roughly how many baby food and formula items do you carry?"
+  },
+  {
+   "role": "Person",
+   "text": "Maybe 150 different ones."
+  },
+  {
+   "role": "pi",
+   "text": "Thanks, I’ve added that. Do expiry dates get written down anywhere when stock arrives?"
+  }
+ ]
+}

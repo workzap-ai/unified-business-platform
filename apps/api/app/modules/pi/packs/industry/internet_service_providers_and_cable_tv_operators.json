@@ -1,0 +1,275 @@
+{
+ "key": "internet_service_providers_and_cable_tv_operators",
+ "name": "Internet service providers and cable-TV operators",
+ "kind": "industry",
+ "sector": {
+  "code": "L",
+  "title": "Finance-adjacent, energy and utilities"
+ },
+ "signals": [
+  "ISP",
+  "internet provider",
+  "fibre",
+  "FTTH",
+  "cable operator",
+  "cable TV",
+  "network",
+  "connections",
+  "subscribers",
+  "monthly bill collection",
+  "recovery",
+  "complaint",
+  "net nahi chal raha",
+  "cable band hai",
+  "bill wasooli",
+  "line man",
+  "technician",
+  "fault",
+  "router",
+  "ONU",
+  "drop",
+  "new connection",
+  "shabaka",
+  "khatt internet",
+  "wireless/WISP",
+  "headend"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Internet only, cable TV only, or both, and type of network (fibre, cable, wireless).",
+  "Number of active subscribers (rough) and areas served.",
+  "Billing method: door-to-door collection, bank/wallet, online, mix.",
+  "Number of technicians and collectors.",
+  "Whether they are a licensed operator or reseller under a larger ISP.",
+  "Systems used: billing software, RADIUS/management panel, Excel, register.",
+  "How complaints come in: phone, WhatsApp, walk-in."
+ ],
+ "scope_rule": "pi notes operational problems: complaint handling and technician dispatch, bill collection, churn, new connection installation delays, equipment stock, outages, staff accountability and reporting. It never advises on network engineering, pole or electrical work safety, licensing or spectrum, pricing of packages, or anything that involves content piracy or unlicensed channels. It never asks for or stores subscribers’ names, addresses, phone numbers, IDs, login credentials or payment details; it records only counts, areas in general terms and roles. Network security questions are outside scope.",
+ "vocabulary": {
+  "Connection": "one subscriber account",
+  "Recovery / wasooli": "collecting monthly bills",
+  "Collector / recovery boy": "staff collecting bills door to door",
+  "Lineman / technician": "field staff fixing faults and installing",
+  "Fault / complaint ticket": "reported problem",
+  "Drop / drop cable": "cable from the network to the house",
+  "ONU / router": "customer-side equipment",
+  "Splice / splicing": "joining fibre cables",
+  "Downtime / outage": "network unavailable",
+  "Churn / disconnect": "subscriber leaving",
+  "Bandwidth / upstream": "capacity bought from a larger provider",
+  "Headend": "central point where cable TV signals are received"
+ },
+ "problems": [
+  {
+   "phrase": "Complaints come on WhatsApp, calls and in person, and half get forgotten",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "I do not know how long each complaint took to fix",
+   "category": "reporting_visibility",
+   "subtype": "kpi_undefined"
+  },
+  {
+   "phrase": "Technicians go to the nearest job, not the oldest, and some customers wait days",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Can’t tell where technicians are or what they are working on",
+   "category": "communication_coordination",
+   "subtype": "field_team_visibility"
+  },
+  {
+   "phrase": "Collectors collect money but deposit days later or keep some",
+   "category": "cash_collections",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "A quarter of subscribers pay late every month and chasing them is a full-time job",
+   "category": "cash_collections",
+   "subtype": "receivables_late"
+  },
+  {
+   "phrase": "We do not know who has paid until the collector comes back with the register",
+   "category": "reporting_visibility",
+   "subtype": "reports_late"
+  },
+  {
+   "phrase": "Subscribers leave for a bigger fibre company and we find out when they stop paying",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Some connections are active on the panel but not billed",
+   "category": "loss_security",
+   "subtype": "cash_leakage"
+  },
+  {
+   "phrase": "Routers and ONUs go out with technicians and never come back from disconnected homes",
+   "category": "stock_inventory",
+   "subtype": "returns_handling"
+  },
+  {
+   "phrase": "Equipment stock count does not match what was installed",
+   "category": "stock_inventory",
+   "subtype": "count_mismatch"
+  },
+  {
+   "phrase": "Fibre, routers and splitters run out and new connections wait",
+   "category": "stock_inventory",
+   "subtype": "stockout"
+  },
+  {
+   "phrase": "New connection requests wait two weeks for installation",
+   "category": "orders_fulfilment",
+   "subtype": "delivery_late"
+  },
+  {
+   "phrase": "When the upstream goes down everyone calls at once and we cannot reply",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "No proper message to customers during an outage",
+   "category": "customers_retention",
+   "subtype": "customer_communication"
+  },
+  {
+   "phrase": "Our billing is in Excel and the network panel is separate",
+   "category": "tech_systems",
+   "subtype": "software_not_connected"
+  },
+  {
+   "phrase": "Bandwidth cost keeps going up and I don’t know per-area profitability",
+   "category": "margin_cost",
+   "subtype": "margin_unknown"
+  },
+  {
+   "phrase": "Technicians do private jobs on company time with our material",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Load-shedding damages equipment and we spend on repairs",
+   "category": "margin_cost",
+   "subtype": "hidden_costs"
+  },
+  {
+   "phrase": "New areas we expand into take months to break even and we can’t track it",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  },
+  {
+   "phrase": "Hard to keep good technicians",
+   "category": "people_staff",
+   "subtype": "turnover"
+  },
+  {
+   "phrase": "People don’t know we serve their street",
+   "category": "marketing_leads",
+   "subtype": "brand_awareness"
+  },
+  {
+   "phrase": "Customers ask for online bill payment and we only have cash collection",
+   "category": "cash_collections",
+   "subtype": "payment_methods"
+  },
+  {
+   "phrase": "Lots of bad reviews about slow fixes",
+   "category": "customers_retention",
+   "subtype": "reviews_bad"
+  },
+  {
+   "phrase": "Licence and permission renewals with authorities and the upstream provider are tracked in someone’s head",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  }
+ ],
+ "questions": {
+  "complaints": [
+   "Roughly how many complaints come in on a normal day?",
+   "Where do they arrive?",
+   "How do you know when one is fixed?"
+  ],
+  "technicians": [
+   "How many technicians do you have?",
+   "How do they get told which job to do next?"
+  ],
+  "collections": [
+   "How are bills collected right now?",
+   "How soon after collection does the money reach you?",
+   "How do you know who has not paid?"
+  ],
+  "churn": [
+   "When a subscriber leaves, how do you usually find out?",
+   "Do you know why most of them leave?"
+  ],
+  "equipment": [
+   "Who keeps track of routers and ONUs that go out with technicians?",
+   "What happens to equipment from disconnected homes?"
+  ],
+  "outages": [
+   "When the network goes down, how do customers hear about it?"
+  ],
+  "systems": [
+   "Do your billing records and your network panel talk to each other?",
+   "How do you spot a connection that is active but not billed?"
+  ],
+  "growth": [
+   "Which area is newest for you?",
+   "How do you tell if it is paying for itself?"
+  ]
+ },
+ "seasons": "- PK: summer load-shedding and heat cause equipment faults and complaint spikes (May–August); monsoon storms damage overhead lines (July–September); cricket tournaments and Ramadan raise demand and complaints about speed; students’ exams and online classes drive new connections; Eid brings collection delays and staff leave. - UAE: summer is quieter as residents travel, then a September surge with school and new arrivals. - Canada: winter storms and ice damage aerial lines; back-to-school and student move-ins (August–September) for new connections.",
+ "care": [
+  "No network engineering, electrical or pole-climbing safety advice; if someone describes an electrocution, fall or live wire down, pi stops and points to emergency services.",
+  "Never help with pirated channels, unlicensed content, illegal bandwidth resale or bypassing the regulator (PTA, TDRA, CRTC).",
+  "Never store subscriber names, addresses, phone numbers, login credentials or payment details.",
+  "Do not request network passwords, panel logins or IP details.",
+  "Collector or technician dishonesty: record as a control gap, not an accusation.",
+  "Disputes with the upstream provider or authorities: note the operational impact only.",
+  "Tracking staff: pi notes “field visibility”, never suggests covert monitoring."
+ ],
+ "build_ideas": [
+  "Complaint ticketing on WhatsApp: customer messages become numbered tickets with status updates, open/close times and area tags.",
+  "Technician job queue on phone with priority by age, assign/accept/close, and parts used.",
+  "Daily ticket dashboard: open, overdue, average fix time by area and technician.",
+  "Collection app for collectors: marks paid/unpaid per connection reference, totals per day, deposit confirmation.",
+  "Unpaid list and automated reminder messages with online payment link where available.",
+  "Reconciliation report comparing active connections on the panel with billed connections.",
+  "Equipment register: routers/ONUs issued, installed, recovered on disconnection, by serial number.",
+  "Material stock tracker with reorder alerts.",
+  "Outage broadcast template and status message to affected areas.",
+  "New connection pipeline: request, survey, install scheduled, installed, with waiting time.",
+  "Churn log with reason codes captured on disconnection.",
+  "Area profitability view from subscribers, collections and costs the owner enters.",
+  "Licence and agreement renewal reminders."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Complaints ka koi hisaab nahi, kuch WhatsApp pe, kuch call pe, aur technician apni marzi se ja raha hai."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya — complaints teen jagah se aati hain aur technician ki koi tarteeb nahi, noted. Aam din mein taqreeban kitni complaints aati hain?"
+  },
+  {
+   "role": "Person",
+   "text": "40-50, aur jab upstream down ho to 200 se upar."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, aam taur pe 40–50, outage mein 200 se zyada. Aap ke paas kitne technicians hain?"
+  },
+  {
+   "role": "Person",
+   "text": "Paanch."
+  },
+  {
+   "role": "pi",
+   "text": "Theek, paanch technicians, noted. Kisi complaint ke theek hone ka aap ko kaise pata chalta hai?"
+  }
+ ]
+}

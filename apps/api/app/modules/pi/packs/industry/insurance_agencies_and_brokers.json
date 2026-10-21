@@ -1,0 +1,269 @@
+{
+ "key": "insurance_agencies_and_brokers",
+ "name": "Insurance agencies and brokers",
+ "kind": "industry",
+ "sector": {
+  "code": "L",
+  "title": "Finance-adjacent, energy and utilities"
+ },
+ "signals": [
+  "insurance agency",
+  "broker",
+  "brokerage",
+  "policy renewals",
+  "motor insurance",
+  "health cover",
+  "takaful",
+  "life policy",
+  "agent commission",
+  "claims follow-up",
+  "quotes from insurers",
+  "renewal list",
+  "lapsed policies",
+  "bima",
+  "bima agent",
+  "policy khatam ho gayi",
+  "renewal ka time",
+  "ta’meen",
+  "wasit ta’meen",
+  "tajdeed",
+  "group medical for companies"
+ ],
+ "notes": "",
+ "shape_facts": [
+  "Agency (ties to one insurer) or broker (places business with several insurers).",
+  "Main lines: motor, health/medical, life/takaful, travel, property, commercial/group.",
+  "Retail customers, corporate clients, or both.",
+  "Number of producers/agents and whether they are salaried, commission-only or sub-agents.",
+  "How renewals and leads are tracked today (insurer portal, Excel, CRM, notebook, WhatsApp).",
+  "Number of branches or cities covered.",
+  "Whether the business also helps customers with claims paperwork and follow-up."
+ ],
+ "scope_rule": "pi notes operational problems such as missed renewals, slow quote turnaround, lost leads, commission tracking, claims follow-up chaos and staff accountability. It never advises on which policy, insurer, premium or level of cover a customer should take, never comments on whether a claim should be paid, and never interprets policy wording or regulatory requirements (SECP, CBUAE/Insurance Authority rules or provincial regulators in Canada). It never asks for policy numbers, customers’ names, CNIC/Emirates ID, medical details, vehicle registration details or bank details; it records only roles and counts (“a corporate client”, “about 200 renewals a month”).",
+ "vocabulary": {
+  "Renewal list": "policies coming up for renewal in a period",
+  "Lapsed": "policy expired without renewal",
+  "Quote / quotation": "price and terms from an insurer for a request",
+  "Producer": "salesperson who brings in business",
+  "Sub-agent": "outside agent who refers business for a share of commission",
+  "Takaful": "Islamic insurance model",
+  "Endorsement": "a change made mid-term to a policy",
+  "Claim intimation": "first notice of a claim to the insurer",
+  "Surveyor": "person who inspects damage for a claim",
+  "Group medical / GMC": "company health cover for staff",
+  "Commission statement": "insurer’s record of commission owed",
+  "Tajdeed": "renewal (Arabic)"
+ },
+ "problems": [
+  {
+   "phrase": "Renewals slip through — we only find out when the customer calls after it has lapsed",
+   "category": "customers_retention",
+   "subtype": "churn_subscription"
+  },
+  {
+   "phrase": "Renewal dates live in three Excel sheets and nobody owns the list",
+   "category": "reporting_visibility",
+   "subtype": "data_scattered"
+  },
+  {
+   "phrase": "Getting quotes from four insurers takes days of emailing and chasing",
+   "category": "operations_process",
+   "subtype": "bottleneck"
+  },
+  {
+   "phrase": "Customers go to whoever replies first, and we reply late",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "Leads from Facebook ads come in and nobody calls them back",
+   "category": "marketing_leads",
+   "subtype": "lead_followup_slow"
+  },
+  {
+   "phrase": "We spend on ads but cannot say which ones produced policies",
+   "category": "marketing_leads",
+   "subtype": "campaign_roi_unknown"
+  },
+  {
+   "phrase": "Commission from insurers does not match what we expected and reconciling it takes weeks",
+   "category": "cash_collections",
+   "subtype": "commission_reconciliation"
+  },
+  {
+   "phrase": "Insurers pay commission late and our cash is tight in between",
+   "category": "cash_collections",
+   "subtype": "cash_flow_tight"
+  },
+  {
+   "phrase": "Sub-agents argue over who brought which customer and what share they are owed",
+   "category": "people_staff",
+   "subtype": "commission_disputes"
+  },
+  {
+   "phrase": "I do not know which producer is actually bringing in business",
+   "category": "people_staff",
+   "subtype": "performance_unknown"
+  },
+  {
+   "phrase": "Claims follow-up is all on WhatsApp and the customer keeps asking us for updates we do not have",
+   "category": "communication_coordination",
+   "subtype": "info_lost_in_whatsapp"
+  },
+  {
+   "phrase": "Customers blame us when the insurer delays a claim and then leave",
+   "category": "customers_retention",
+   "subtype": "complaints"
+  },
+  {
+   "phrase": "Documents for each case are scattered across phones and email",
+   "category": "compliance_admin",
+   "subtype": "documentation"
+  },
+  {
+   "phrase": "Retyping the same customer details into every insurer’s portal",
+   "category": "operations_process",
+   "subtype": "duplicate_entry"
+  },
+  {
+   "phrase": "Corporate clients send staff additions and deletions for group medical by email and we miss some",
+   "category": "orders_fulfilment",
+   "subtype": "order_errors"
+  },
+  {
+   "phrase": "Endorsement requests sit for days because only one person handles them",
+   "category": "communication_coordination",
+   "subtype": "owner_bottleneck"
+  },
+  {
+   "phrase": "A staff member left and took the client list with them",
+   "category": "loss_security",
+   "subtype": "theft_internal"
+  },
+  {
+   "phrase": "Premium cheques and cash collected by agents reach the office late",
+   "category": "cash_collections",
+   "subtype": "deposit_delays"
+  },
+  {
+   "phrase": "No single view of how many policies we wrote this month by line",
+   "category": "reporting_visibility",
+   "subtype": "no_dashboard"
+  },
+  {
+   "phrase": "Our website has no way to request a quote, just a phone number",
+   "category": "customer_experience_digital",
+   "subtype": "no_online_ordering"
+  },
+  {
+   "phrase": "WhatsApp is flooded with quote requests at month-end and car-registration season",
+   "category": "tech_systems",
+   "subtype": "whatsapp_overload"
+  },
+  {
+   "phrase": "Licence and certification renewals for agents get forgotten",
+   "category": "compliance_admin",
+   "subtype": "licences_renewals"
+  },
+  {
+   "phrase": "New staff take months to learn how each insurer’s process works",
+   "category": "people_staff",
+   "subtype": "training"
+  },
+  {
+   "phrase": "Opening a second office but cannot see what the first one is doing",
+   "category": "planning_growth",
+   "subtype": "expansion_pains"
+  }
+ ],
+ "questions": {
+  "renewals": [
+   "Roughly how many renewals come up in a normal month?",
+   "Where do you keep track of the dates right now?",
+   "Who is meant to call the customer before it lapses?"
+  ],
+  "leads": [
+   "Where do most of your new enquiries come from?",
+   "How long does it usually take someone to get back to them?",
+   "What happens to a lead nobody picks up?"
+  ],
+  "quotes": [
+   "How many insurers do you usually go to for one request?",
+   "What part of getting a quote takes the longest?"
+  ],
+  "commission": [
+   "Is it the amount or the timing of commission that causes more trouble?",
+   "How do you check what the insurer pays against what you expected?"
+  ],
+  "sub-agents and producers": [
+   "How many people bring in business for you?",
+   "How do you decide who gets credit for a customer?"
+  ],
+  "claims": [
+   "Do you help customers follow up on claims?",
+   "Where do the updates and documents for one claim usually end up?"
+  ],
+  "corporate clients": [
+   "How do companies send you changes to their staff list?",
+   "What goes wrong when one gets missed?"
+  ],
+  "reporting": [
+   "If you wanted to know this month’s policies by line, how would you find out today?",
+   "How long would that take?"
+  ],
+  "staff": [
+   "What happens to the client relationship when an agent leaves?"
+  ]
+ },
+ "seasons": "- PK: motor renewals bunch around new-car deliveries and year-end; corporate group medical renewals often align with January or July (fiscal year starts 1 July); travel cover peaks before Hajj, Umrah seasons and summer holidays. - UAE: motor insurance is tied to annual vehicle registration renewal, so steady but spiky around end-of-month; health cover peaks around visa issuance/renewal and company renewal dates (many in January); travel cover before summer and Eid breaks. - Canada: auto renewals spread through the year; home insurance enquiries rise in spring moving season; winter claims (accidents, burst pipes) bring more claims follow-up work. - Ramadan and Eid shift working hours and slow response from insurers.",
+ "care": [
+  "Never recommend an insurer, a product, a premium level or whether someone “needs” cover; if asked, pi says it can only note the business problem.",
+  "Never interpret policy wording, exclusions or claim outcomes, and never comment on whether a claim is genuine.",
+  "Never ask for or store policy numbers, customers’ names, CNIC/Emirates ID, medical history, vehicle numbers or bank details. If someone pastes these, pi says it will not keep them and records only the role.",
+  "Medical information in group health cases is especially sensitive; pi notes only “health claims follow-up” as a process issue.",
+  "Refuse any request to backdate policies, inflate claims, alter documents or split invoices to fit cover; pi says it cannot help with that.",
+  "Regulatory and licensing questions (SECP, UAE Insurance Authority under CBUAE, Canadian provincial regulators) are out of scope; pi notes “licence renewal tracking effort” only.",
+  "Commission disputes between people: record the process problem, not who is right.",
+  "If an accident or injury emergency is described, pi points to emergency services first."
+ ],
+ "build_ideas": [
+  "Renewal register with due dates by line and owner, and WhatsApp reminders to staff 30/15/7 days before (dates, not policy data, configured by the business).",
+  "Lead inbox pulling enquiries from WhatsApp, website and ad forms into one queue with assignment and first-response timer.",
+  "Quote request tracker: one request, which insurers were asked, status of each, time to reply.",
+  "Commission expected-versus-received tracker by insurer and month, with a mismatch list.",
+  "Sub-agent and producer credit log with agreed share rules and a monthly statement.",
+  "Claims follow-up tracker with stages, next action and owner, plus a customer update template.",
+  "Corporate client change-request log for group medical additions/deletions with confirmation status.",
+  "Document checklist per case type so files are complete before submission.",
+  "Owner dashboard: policies written, renewals due/lost, leads and response time, by branch and producer.",
+  "Simple quote-request form on the website feeding the lead inbox.",
+  "Staff onboarding checklist and process notes per insurer.",
+  "Agent licence and certification expiry reminders."
+ ],
+ "exchange": [
+  {
+   "role": "Person",
+   "text": "Bhai sab se bara masla renewals ka hai, customer ki policy khatam ho jati hai aur humein pata hi nahi chalta."
+  },
+  {
+   "role": "pi",
+   "text": "Samajh gaya, renewal miss ho jana noted. Abhi renewal dates kahan rakhi jati hain — Excel mein, insurer ke portal pe, ya kisi register mein?"
+  },
+  {
+   "role": "Person",
+   "text": "Teen alag Excel hain, har agent ki apni."
+  },
+  {
+   "role": "pi",
+   "text": "Noted, dates teen jagah bikhri hui hain. Mahine mein taqreeban kitni renewals aati hain?"
+  },
+  {
+   "role": "Person",
+   "text": "150 ke qareeb, zyada motor."
+  },
+  {
+   "role": "pi",
+   "text": "Theek hai, noted — lagbhag 150 renewals, zyada motor. Renewal se pehle customer ko call karna kis ki zimmedari hoti hai?"
+  }
+ ]
+}
