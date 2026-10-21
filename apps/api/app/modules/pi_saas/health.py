@@ -83,6 +83,7 @@ PENALTY = {"problem": 20, "warning": 7, "ok": 0, "fixed": 0}
 REPLY_CODES = {
     "REPLY_LANGUAGE_MISMATCH": "reply wasn't in the customer's language",
     "INVENTED_DETAIL": "reply had a detail not in your knowledge",
+    "CONSTITUTION_BREAK": "reply broke one of pi's identity, money or privacy rules",
     "provider_failure": "AI providers were unavailable",
     "tool_failure": "a tool step failed",
     "low_confidence": "pi wasn't sure what was asked",

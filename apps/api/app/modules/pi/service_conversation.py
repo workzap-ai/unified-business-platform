@@ -22,7 +22,7 @@ from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.models import CatalogProduct
 from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
-from app.modules.pi import industry_packs, price_policy
+from app.modules.pi import constitution, industry_packs, price_policy
 from app.modules.pi.guard import ReplyRejected, validate_reply
 from app.modules.pi.knowledge import KnowledgeService, remember
 from app.modules.pi.language import NAMES, clearly_other, detect_language, english_greeting
@@ -523,6 +523,11 @@ write the reply so it serves exactly that.
   a conversation resumes after a break. A greeting is only for a new conversation.
 - team_members are the company's people; a message that names one of them is meant for
   them (see the rule above).
+- strict_voice (only when true): at most 60 words and one question, always the last
+  sentence; no exclamation marks, hype, emoji or scripted empathy (a short real reaction
+  such as "That sounds costly." is fine); say "noted", never "logged"; no jargon the
+  customer did not use; never claim to be a person; never ask for card numbers, passwords
+  or ID numbers; never type bank details or say a payment arrived; never promise a result.
 - industry_knowledge (only when present) is how people in this customer's trade talk and
   what to listen for, with questions that fit. Use it to understand them and to choose your
   one question; never read it out, never present it as something the company offers, never
@@ -1203,6 +1208,7 @@ async def prepare_context(
         "team_notes": await _team_notes(session, scope, conversation.id),
         **reply_language(conversation, message, rows),
         "tone": policy.response_rules.get("tone", "friendly"),
+        **({"strict_voice": True} if policy.response_rules.get("constitution") else {}),
         "now_local": _now_local(policy.timezone),
         "feedback_for": ((conversation.service_brief or {}).get("awaiting_feedback") or {}).get(
             "project", ""
@@ -2584,6 +2590,10 @@ async def compose_service_turn(
             '"teen concepts", "do options"), use "• " for lists instead of 1. 2. 3., '
             "drop any time or date promise, and never state a price"
         )
+    strict = bool(policy.response_rules.get("constitution"))
+    if strict and (broke := constitution.lint(turn.reply, context)):
+        text = constitution.describe(broke)
+        problem = f"{text}, and also: {problem}" if problem else text
     asks_status = bool(STATUS_ASK.search(str(context.get("latest_customer_message", ""))))
     if not turn.request_human and (missed_status := status_missed(turn.reply, context)):
         problem = f"{missed_status}, and also: {problem}" if problem else missed_status
@@ -2675,6 +2685,15 @@ async def compose_service_turn(
             for project in turn.projects:
                 if project.title in held:
                     project.status = "awaiting_confirmation"
+    if strict:
+        # Style slips that survived the rewrite are fixed in place; a hard break (identity,
+        # money, privacy, promises) is never sent.
+        turn.reply = constitution.repair(turn.reply, context)
+        if blocked := constitution.hard(constitution.lint(turn.reply, context)):
+            logger.warning(
+                "pi reply broke the constitution", extra={"rules": [v.rule for v in blocked]}
+            )
+            raise rejected_with(turn, "CONSTITUTION_BREAK")
     if expected in NAMES and mixed_line(turn.reply, str(expected)):
         turn.reply = await in_one_language(
             manager, scope, policy, conversation, turn.reply, str(expected)

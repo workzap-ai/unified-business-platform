@@ -57,6 +57,9 @@ DEFAULTS: dict[str, Any] = {
         # ai_led | mixed | human_approved (see tools.handlers._delivery_status).
         "execution_mode": "ai_led",
         "staff_summary_language": "en",
+        # pi's constitution as a reply linter (pi Brain spec Parts 1, 2, 6): AI disclosure, one
+        # short question, no hype, no money or identity slips. Off until a workspace opts in.
+        "constitution": False,
     },
     "ai_config": {
         "router_alias": "fast",

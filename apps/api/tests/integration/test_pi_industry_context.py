@@ -83,3 +83,52 @@ async def test_on_pi_gets_the_trades_knowledge_and_the_customer_keeps_it(
     await business_db.refresh(customer)
     assert customer.industry_primary == "pharmacies_and_medical_stores"
     await pi.close()
+
+
+async def turn_strict_on(api) -> None:
+    response = await api.patch(
+        "/api/v1/pi/settings/response_rules", json={"value": {"constitution": True}}
+    )
+    assert response.status_code == 200, response.text
+
+
+async def test_strict_voice_sends_a_style_slip_back_then_fixes_what_is_left(
+    api, business_db, monkeypatch
+):
+    prompts = scripted(
+        monkeypatch,
+        turn(reply="Great question! I'd be happy to help. Which shop is it?", language="en"),
+        turn(reply="Noted! Which shop is it?", language="en"),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await turn_strict_on(api)
+    await pi.process("My shop stock keeps running out", "strict-1")
+    await pi.deliver_all()
+    assert contexts(prompts)[0]["strict_voice"] is True
+    assert "no hype" in prompts[1] and "R-VOICE-05" in prompts[1]
+    reply = (await pi.reply_to("strict-1")).body
+    assert "!" not in reply and "Great question" not in reply
+    assert reply.startswith("Hi, I'm pi, an AI from Workzap.")  # first message says it is an AI
+    assert reply.endswith("Which shop is it?")
+    await pi.close()
+
+
+async def test_strict_voice_never_sends_a_payment_claim(api, business_db, monkeypatch):
+    scripted(monkeypatch, turn(reply="Payment received, thank you. Anything else?", language="en"))
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await turn_strict_on(api)
+    await pi.process("I sent the money yesterday", "strict-2")
+    await pi.deliver_all()
+    sent = [m.body for m in await pi.outbound()]
+    assert not any("Payment received" in body for body in sent)
+    await pi.close()
+
+
+async def test_the_linter_is_off_unless_the_workspace_turns_it_on(api, business_db, monkeypatch):
+    prompts = scripted(monkeypatch, turn(reply="Great question! Which shop is it?", language="en"))
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("My shop stock keeps running out", "strict-off")
+    await pi.deliver_all()
+    assert "strict_voice" not in contexts(prompts)[0]
+    assert not any("R-VOICE" in prompt or "pi's rules" in prompt for prompt in prompts)
+    await pi.close()
