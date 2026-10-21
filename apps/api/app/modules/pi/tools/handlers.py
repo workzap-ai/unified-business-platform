@@ -673,6 +673,27 @@ async def send_whatsapp_message(ctx: ToolContext, data: SendInput) -> SendOutput
     status = "queued"
     if existing is None:
         status = await _delivery_status(ctx)
+        inbound_at = ctx.conversation.last_inbound_at
+        answered = await ctx.session.get(PiMessage, ctx.run.message_id)
+        newer = (
+            await ctx.session.scalar(
+                repo.select()
+                .with_only_columns(PiMessage.id)
+                .where(
+                    PiMessage.conversation_id == ctx.conversation.id,
+                    PiMessage.direction == "inbound",
+                    PiMessage.id != answered.id,
+                    PiMessage.created_at > answered.created_at,
+                )
+                .limit(1)
+            )
+            if answered is not None and answered.created_at is not None
+            else None
+        )
+        if inbound_at is not None and newer is not None:
+            # A newer message came in while this reply was written: its own reply
+            # answers both, so this one is dropped at send (never out of order).
+            inbound_at = None
         existing = await repo.add(
             repo.new(
                 conversation_id=ctx.conversation.id,
@@ -683,7 +704,7 @@ async def send_whatsapp_message(ctx: ToolContext, data: SendInput) -> SendOutput
                 agent_key=ctx.agent_key,
                 run_id=ctx.run.id,
                 idempotency_key=key,
-                media={"service_inbound_at": ctx.conversation.last_inbound_at.isoformat()}
+                media={"service_inbound_at": inbound_at.isoformat() if inbound_at else "superseded"}
                 if ctx.conversation.service_brief and ctx.conversation.last_inbound_at
                 else {},
             )

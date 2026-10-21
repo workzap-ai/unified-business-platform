@@ -23,6 +23,7 @@ from app.modules.catalog.models import CatalogProduct
 from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
 from app.modules.pi import (
+    brain_docs,
     constitution,
     decisions,
     flow,
@@ -308,6 +309,8 @@ class ServiceTurn(BaseModel):
     # Brain mode: when asked which problems the document should cover and they chose only some,
     # the refs from noted_problems they chose.
     include_refs: list[str] = Field(default_factory=list, max_length=40)
+    # Brain mode, after "ask for changes": each change they want, in their words.
+    change_requests: list[str] = Field(default_factory=list, max_length=8)
 
     @model_validator(mode="before")
     @classmethod
@@ -363,6 +366,12 @@ class ServiceTurn(BaseModel):
             data.pop("requirements", None)
         if "problem_ops" in data:
             data["problem_ops"] = problems.tolerate_ops(data["problem_ops"])
+        changes = data.get("change_requests")
+        data["change_requests"] = (
+            [str(x)[:300] for x in changes[:8] if str(x).strip()]
+            if isinstance(changes, list)
+            else []
+        )
         refs = data.get("include_refs")
         data["include_refs"] = [str(r)[:16] for r in refs[:40]] if isinstance(refs, list) else []
         return data
@@ -841,6 +850,10 @@ decline, the approval confirmation and the payment explanation itself when it re
 person's answer, so you never write those. In S4 and S5 you only answer what they asked.
 - Cost before a quote: it depends on what is built, it is written on the quote before they
   decide, and the quote is free and not a charge. Never give a number or a range.
+- While they read the documents (S7, S8, S8b): answer only from open_quote and what is printed
+  on it, in plain words; never change a price, scope or date yourself. "Can you do it
+  cheaper?" is a change request ("lower cost"): say Workzap will look at it, with no promise.
+  In S8b, put each change they ask for in change_requests, in their words, and say nothing else.
 - If choose_problems is true they were asked whether the document should cover all the
   problems or only some: if they chose some, put those refs from noted_problems in
   include_refs, and say nothing else about it.
@@ -1075,6 +1088,10 @@ def brain_context(
             state = flow.initial_state(any(m.sender_type == "ai" for m in rows))
             conversation.flow_state = state.value
             conversation.flow_state_since = datetime.now(UTC)
+        if state == flow.State.S7_DELIVERED:  # they reacted to the documents: S7 to S8
+            state = flow.advance(state, flow.State.S8_REVIEW)
+            conversation.flow_state = state.value
+            conversation.flow_state_since = datetime.now(UTC)
         context["pi_mode"] = "brain"
         context["flow"] = flow.prompt_view(state)
     return context
@@ -1105,6 +1122,10 @@ async def brain_problems(
         context["latest_message_id"] = str(message.id)
     if brief.get("scope_asked") and not brief.get("scope_done"):
         context["choose_problems"] = True
+    if conversation.customer_id is not None:
+        quote = await brain_docs.open_quote(session, scope, conversation.customer_id)
+        if quote is not None:
+            context["open_quote"] = quote
     return context
 
 
@@ -1156,6 +1177,7 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         "problem_refs": [p["ref"] for p in noted],
         "chosen_refs": turn.include_refs,
         "changed": any(op.op != "link" for op in turn.problem_ops),
+        "change_requests": turn.change_requests,
         "brief": context.get("brief") or {},
         "open_quote": context.get("open_quote"),
     }
@@ -1202,6 +1224,12 @@ async def apply_decision(
         await raise_decision_request(
             session, scope, conversation, "review_document", "high",
             "The customer said yes to a solution document and quote for: " + "; ".join(titles),
+        )  # fmt: skip
+    if "request_revision" in decision.effects:
+        changes = (brief.get("revision_requested") or {}).get("changes") or []
+        await raise_decision_request(
+            session, scope, conversation, "review_document", "high",
+            "The customer asked for changes to the quote: " + "; ".join(changes),
         )  # fmt: skip
     if "record_approval" in decision.effects:
         brief["approval"] = {**(brief.get("approval") or {}), "at": now}
@@ -2510,6 +2538,86 @@ SAYS_WHEN = re.compile(
 )
 
 
+# "Not available" / "change it to 5th November" about the meeting they already have.
+RESCHEDULE = re.compile(
+    r"\b(?:not available|unavailable|can'?t (?:make|come|join|attend)|cannot (?:make|come|"
+    r"join|attend)|won'?t be (?:able|available)|busy (?:then|that day)|reschedul\w*|"
+    r"postpone\w*|change (?:it|the (?:time|date|day|meeting))|move (?:it|the meeting)|"
+    r"another (?:time|day|date)|different (?:time|day|date)|nahi aa (?:sakta|sakti|sakte)|"
+    r"available nahi|waqt badal\w*|time change|date change|aage kar\w*)\b",
+    re.IGNORECASE,
+)
+DATE_WORDS = re.compile(
+    r"\b(?:\d{1,2}(?:st|nd|rd|th)?\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w*|"
+    r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w*\s+\d{1,2}(?:st|nd|rd|th)?)\b",
+    re.IGNORECASE,
+)
+MEETING_REPLY = re.compile(
+    r"\b(?:meeting|call|time|day|date|reschedul\w*|move|waqt|din|mulaqat)\b", re.IGNORECASE
+)
+
+
+def meeting_change(context: dict[str, Any]) -> bool:
+    """They're talking about the meeting already arranged: they can't make it, or they
+    give a new day/time right after hearing about it."""
+    if not arranged_meeting(context):
+        return False
+    latest = str(context.get("latest_customer_message", ""))
+    if RESCHEDULE.search(latest):
+        return True
+    recent = " ".join(str(h.get("text", "")) for h in (context.get("history") or [])[-4:])
+    return bool(
+        (SAYS_WHEN.search(latest) or DATE_WORDS.search(latest))
+        and re.search(r"\bmeeting\b", recent, re.IGNORECASE)
+        and len(latest.split()) <= 12
+    )
+
+
+def meeting_change_missed(turn: "ServiceTurn", context: dict[str, Any]) -> str | None:
+    """A reply to "I'm not available" / "change it to 5th November" that isn't about
+    the meeting (it once answered with a project recap)."""
+    if not meeting_change(context) or turn.action == "booking":
+        return None
+    label = str(arranged_meeting(context).get("label") or "")
+    if MEETING_REPLY.search(turn.reply) and not re.search(
+        r"recap|anything else", turn.reply, re.IGNORECASE
+    ):
+        return None
+    return (
+        f"they're talking about their meeting on {label}: if they can't make it, say no "
+        "problem and ask which day and time suit them instead; if they gave a new day "
+        "(and time), set meeting_requested=true and meeting_time from now_local (keep the "
+        "earlier time if they only changed the day) and say you've asked the team to move "
+        "the meeting to it. Nothing else: no project recap, no 'anything else?'"
+    )
+
+
+RESCHEDULE_ASK = {
+    "en": "No problem. Which day and time would suit you instead? I'll ask the team to "
+    "move your meeting.",
+    "roman_ur": "Koi baat nahi. Aap ko kaun sa din aur waqt theek rahega? Team se "
+    "meeting move karwa denge.",
+}
+RESCHEDULE_ASKED = {
+    "en": "No problem. I've asked the team to move your meeting to {when}; they'll "
+    "confirm it here.",
+    "roman_ur": "Theek hai. Team se meeting {when} par move karne ka keh diya hai; woh "
+    "yahin confirm karenge.",
+}
+
+
+def reschedule_reply(turn: "ServiceTurn") -> str:
+    """The meeting answer, in fixed words, when the rewrite still missed it."""
+    language = "roman_ur" if turn.language == "roman_ur" else "en"
+    try:
+        when = datetime.fromisoformat(turn.meeting_time) if turn.meeting_time else None
+    except ValueError:
+        when = None
+    if when is None:
+        return RESCHEDULE_ASK[language]
+    return RESCHEDULE_ASKED[language].format(when=f"{when:%A %d %B, %I:%M %p}")
+
+
 def meeting_answer_missed(turn: "ServiceTurn", context: dict[str, Any]) -> str | None:
     """The customer answered pi's "which day and time?" and the draft ignored it."""
     asked = [h for h in context.get("history") or [] if h.get("role") == "ai"]
@@ -2912,6 +3020,8 @@ async def compose_service_turn(
         problem = f"{odd}, and also: {problem}" if problem else odd
     if early := unconfirmed_brief(turn, context):
         problem = f"{early}, and also: {problem}" if problem else early
+    if change := meeting_change_missed(turn, context):
+        problem = f"{change}, and also: {problem}" if problem else change
     if missed := meeting_answer_missed(turn, context):
         problem = f"{missed}, and also: {problem}" if problem else missed
     expected = context.get("reply_language")
@@ -3007,6 +3117,10 @@ async def compose_service_turn(
                 extra={"reason": invented(turn.reply, context, turn.action == "booking")[:120]},
             )
             raise rejected_with(turn, "INVENTED_DETAIL")
+        if meeting_change_missed(turn, context):
+            # Still not about their meeting: the fixed answer, and the team is asked.
+            turn.meeting_requested = True
+            turn.reply = reschedule_reply(turn)
         turn.reply = without_repeats(turn.reply, context)
         turn.reply = without_open_question(turn, context)
         if not turn.request_human and status_missed(turn.reply, context):

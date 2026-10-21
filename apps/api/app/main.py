@@ -46,6 +46,8 @@ from app.modules.navigation.routes import router as navigation_router
 from app.modules.notifications.routes import router as notifications_router
 from app.modules.orders.routes import router as orders_router
 from app.modules.pi.analytics import router as pi_analytics_router
+from app.modules.pi.brain_doc_routes import public_router as pi_brain_docs_router
+from app.modules.pi.brain_doc_routes import router as pi_brain_documents_router
 from app.modules.pi.config_routes import router as pi_config_router
 from app.modules.pi.inbox_routes import router as pi_inbox_router
 from app.modules.pi.kapso_routes import router as pi_kapso_router
@@ -112,6 +114,7 @@ ROUTERS = [
     pi_meeting_board_router,
     pi_customer_payment_router,
     pi_deals_router,
+    pi_brain_documents_router,
     payment_link_router,
     customer_files_router,
     pi_requests_router,
@@ -184,6 +187,7 @@ PI_APP_ROUTERS = [
     # itself is the credential.
     pi_pay_link_router,
     pi_customer_pay_link_router,
+    pi_brain_docs_router,
     pi_app_router,
     pi_read_router,
     pi_analytics_router,
@@ -195,6 +199,7 @@ PI_APP_ROUTERS = [
     pi_meeting_board_router,
     pi_customer_payment_router,
     pi_deals_router,
+    pi_brain_documents_router,
     payment_link_router,
     customer_files_router,
     pi_requests_router,

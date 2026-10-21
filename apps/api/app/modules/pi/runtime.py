@@ -1113,7 +1113,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     raise ReplyRejected(code)
                 if service_turn is not None:
                     # Fixed lines pi wrote itself (a quote's number and total, summary counts).
-                    agent_ctx.facts.extend(str(x) for x in service_context.get("fixed_lines") or [])
+                    agent_ctx.facts.extend(
+                        str(x) for x in (service_context or {}).get("fixed_lines") or []
+                    )
                 if service_appendix:
                     # Confirmed by the booking tool (not model text), so dates are allowed.
                     reply = f"{reply}\n{service_appendix}"
@@ -1236,6 +1238,11 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         outbound += [str(f) for f in forms]
         await session.commit()
     await enqueue_sends(ctx, outbound)
+    decided = getattr(service_turn, "_decision", None) if service_turn is not None else None
+    if decided is not None and "request_solution" in decided.effects:
+        from app.modules.pi_saas.jobs import enqueue_brain_documents
+
+        await enqueue_brain_documents(ctx, conversation.id)
     if proposals_for:
         from app.modules.pi_saas.jobs import enqueue_proposal
 
@@ -1433,6 +1440,17 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                     [str(b) for b in message.media["buttons"]],
                     token,
                     image=str(message.media["image"]) if message.media.get("image") else None,
+                )
+            elif message.media.get("document"):
+                # An approved solution document or quote: a PDF link with its file name.
+                document = message.media["document"]
+                message.provider_message_id = await whatsapp.send_document(
+                    connection.phone_number_id,
+                    conversation.contact_wa_id,
+                    str(document["link"]),
+                    str(document.get("filename") or "document.pdf"),
+                    message.body,
+                    token,
                 )
             elif message.media.get("image"):
                 # pi Customer's visual card: a PNG link with a short caption.

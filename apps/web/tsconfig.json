@@ -43,7 +43,11 @@
     ".next-demo/types/**/*.ts",
     ".next-demo/dev/types/**/*.ts",
     ".next-agentbeta/types/**/*.ts",
-    ".next-agentbeta/dev/types/**/*.ts"
+    ".next-agentbeta/dev/types/**/*.ts",
+    ".next-admin/types/**/*.ts",
+    ".next-admin/dev/types/**/*.ts",
+    ".next-admin-dev/types/**/*.ts",
+    ".next-admin-dev/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

@@ -10,6 +10,38 @@ from app.modules.pi.configuration import settings_row
 from app.modules.pi.models import PiConversation, PiMessage, WhatsAppConnection
 from app.modules.pi.service import PiService
 
+# One follow-up template per chat in this time, whichever sender (the older single
+# reminder here, or pi Customer's ladder) sent the last one.
+TEMPLATE_GAP = timedelta(hours=72)
+
+
+async def last_follow_up_template(
+    session: Any, conversation: PiConversation, since: datetime
+) -> datetime | None:
+    """When a follow-up template (a ladder step or the single reminder) last went, or was
+    queued, to this chat after ``since``; None when none did."""
+    rows = await session.scalars(
+        select(PiMessage)
+        .where(
+            PiMessage.tenant_id == conversation.tenant_id,
+            PiMessage.environment_id == conversation.environment_id,
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.direction == "outbound",
+            PiMessage.created_at > since,
+        )
+        .order_by(PiMessage.created_at.desc())
+        .limit(50)
+    )
+    for message in rows:
+        media = message.media or {}
+        if ("ladder" in media or "reminder" in media) and message.status not in (
+            "failed",
+            "skipped",
+        ):
+            created: datetime = message.created_at
+            return created
+    return None
+
 
 def _waiting_until(brief: dict[str, Any]) -> datetime | None:
     """Until when the customer said they are waiting on someone else (pi Customer)."""
@@ -122,6 +154,13 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
                 continue
             if _friday_prayer(policy.timezone):
                 conversation.followup_due_at = datetime.now(UTC) + timedelta(hours=1)
+                continue
+            last_template = await last_follow_up_template(
+                session, conversation, datetime.now(UTC) - TEMPLATE_GAP
+            )
+            if last_template is not None:
+                # The ladder wrote to this chat in the last 72 hours: not twice.
+                conversation.followup_due_at = last_template + TEMPLATE_GAP
                 continue
             from app.modules.pi_saas.entitlement import remaining as allowance_left
 

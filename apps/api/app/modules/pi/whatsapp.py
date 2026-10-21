@@ -585,6 +585,45 @@ class WhatsApp:
                 "DELIVERY_UNCONFIRMED", "Image delivery could not be confirmed", 503
             ) from None
 
+    async def send_document(
+        self,
+        number: str,
+        recipient: str,
+        link: str,
+        filename: str,
+        caption: str,
+        token: str,
+    ) -> str:
+        """Send a PDF by public link with its file name. Session messages only: the caller
+        checks the 24-hour window."""
+        base, headers = self._endpoint(token)
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "document",
+                    "document": {
+                        "link": link,
+                        "filename": filename[:100],
+                        "caption": caption[:1024],
+                    },
+                },
+                timeout=20,
+                follow_redirects=False,
+            )
+            check_sent(response)
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Document delivery could not be confirmed", 503
+            ) from None
+
     async def send(self, number: str, recipient: str, body: str, token: str) -> str:
         base, headers = self._endpoint(token)
         try:

@@ -162,6 +162,56 @@ async def enqueue_proposal(ctx: dict[str, Any], lead_id: UUID) -> None:
     await _enqueue(ctx, "draft_pi_proposal", str(lead_id), f"pi-proposal:{lead_id}:{minute}")
 
 
+async def enqueue_brain_documents(ctx: dict[str, Any], conversation_id: UUID) -> None:
+    await _enqueue(
+        ctx, "draft_brain_documents", str(conversation_id), f"pi-brain-docs:{conversation_id}"
+    )
+
+
+async def draft_brain_documents(ctx: dict[str, Any], conversation_id: str) -> None:
+    """The person said yes to a solution document and quote: pi drafts both for a Workzap
+    reviewer (a model call with no transaction held) and tells the team they are waiting."""
+    from app.ai.manager import build_llm_manager
+    from app.modules.pi import brain_docs
+    from app.modules.pi.models import PiConversation
+    from app.modules.pi_saas import deals
+    from app.modules.pi_saas.requests import raise_request
+
+    async with ctx["sessions"]() as session:
+        conversation = await session.get(PiConversation, UUID(conversation_id))
+        if conversation is None:
+            return
+        scope = await deals.system_scope_for(
+            session, conversation.tenant_id, conversation.environment_id
+        )
+        try:
+            made = await brain_docs.draft_offer(
+                session,
+                scope,
+                build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"]),
+                conversation.id,
+            )
+            if made is not None and conversation.customer_id is not None:
+                solution, quote = made
+                await raise_request(
+                    session,
+                    scope,
+                    conversation_id=conversation.id,
+                    customer_id=conversation.customer_id,
+                    kind="review_document",
+                    question=(
+                        f"Drafts are ready to review: solution document {solution.ref} and "
+                        f"quote {quote.ref}. Check the document, price the quote, approve both, "
+                        "then send."
+                    ),
+                    priority="high",
+                )
+            await session.commit()
+        except Exception:  # noqa: BLE001 - the team can draft again from the review screen
+            await session.rollback()
+            logger.warning("pi_brain_documents_job_failed", exc_info=True)
+
+
 async def draft_pi_proposal(ctx: dict[str, Any], lead_id: str) -> None:
     """The customer confirmed the brief: pi writes the proposal (model call with no
     transaction held), creates it under a lead lock and sends it on WhatsApp."""
@@ -312,4 +362,5 @@ JOBS: dict[str, Callable[..., Awaitable[Any]]] = {
     "process_pi_billing_event": process_pi_billing_event,
     "sweep_pi_saas": sweep_pi_saas,
     "draft_pi_proposal": draft_pi_proposal,
+    "draft_brain_documents": draft_brain_documents,
 }

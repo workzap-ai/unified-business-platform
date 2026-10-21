@@ -420,8 +420,12 @@ async def test_after_24_hours_the_code_comes_through_the_approved_template(
     policies = []
     for conversation in late:
         conversation.last_inbound_at = datetime.now(UTC) - timedelta(days=2)
+        # A business has one settings row per environment: the chat's own, as the code reads it.
         policy = await business_db.scalar(
-            select(PiSettings).where(PiSettings.tenant_id == conversation.tenant_id)
+            select(PiSettings).where(
+                PiSettings.tenant_id == conversation.tenant_id,
+                PiSettings.environment_id == conversation.environment_id,
+            )
         )
         policy.whatsapp_config = {
             **policy.whatsapp_config,

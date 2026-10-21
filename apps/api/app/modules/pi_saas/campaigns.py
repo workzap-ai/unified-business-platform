@@ -138,15 +138,16 @@ async def note_opt_out(session: AsyncSession, scope: WorkspaceScope, message: Pi
     conversation = await WorkspaceRepository(session, PiConversation, scope).get(
         message.conversation_id
     )
-    if conversation.customer_id is None:
-        return False
     note = f'Customer replied "{body[:40]}" on WhatsApp'
-    for purpose in ("marketing", "reminders"):
-        await set_consent(
-            session, scope, conversation.customer_id, purpose, False, note, message.id
-        )
+    if conversation.customer_id is not None:
+        for purpose in ("marketing", "reminders"):
+            await set_consent(
+                session, scope, conversation.customer_id, purpose, False, note, message.id
+            )
+    # Whatever they had said before ("granted", or never asked), they have now opted out.
+    # pi's free-form nudge needs no consent, so the answer must be "declined", not unknown.
     brief = dict(conversation.service_brief or {})
-    if brief.get("reminder_consent") == "granted":
+    if brief.get("reminder_consent") != "declined":
         brief["reminder_consent"] = "declined"
         conversation.service_brief = brief
     conversation.followup_due_at = None

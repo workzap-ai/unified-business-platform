@@ -179,6 +179,10 @@ TEXT: dict[str, dict[str, str]] = {
         "en": "What would you like changed?",
         "roman_ur": "Aap kya badalna chahte hain?",
     },
+    "changes_noted": {
+        "en": "Noted: {changes}. I've sent this to Workzap. They'll send a revised version here.",
+        "roman_ur": "Note kar liya: {changes}. Maine ye Workzap ko bhej diya hai. Wo yahin nayi version bhejenge.",
+    },
     "quote_declined": {
         "en": (
             "That's fine. Nothing is charged. Everything you told me stays here if you want "
@@ -345,6 +349,15 @@ def decide(
             )
         return None
 
+    if state == State.S8B_CHANGES_REQUESTED and facts.get("change_requests"):
+        changes = [str(x) for x in facts["change_requests"]]
+        return Decision(
+            text("changes_noted", language, changes="; ".join(changes)),
+            None,
+            {"revision_requested": {"changes": changes, "message_id": facts.get("message_id")}},
+            ["request_revision"],
+            why="R-DEC-03",
+        )
     quote = facts.get("open_quote")
     if state == State.S8_REVIEW and quote:
         return _review(language, message, answer, facts, quote, brief, can_approve)
