@@ -13,6 +13,8 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
+from app.modules.pi import flow
+
 AI_WORDS = re.compile(
     r"\b(?:AI|A\.I\.|artificial intelligence|bot|robot)\b|مصنوعی|الذكاء الاصطناعي|ذكاء اصطناعي",
     re.IGNORECASE,
@@ -120,6 +122,29 @@ HEADING = re.compile(r"(?m)^\s{0,3}#{1,6}\s|\*\*[^*\n]+\*\*|^\s*\|.+\|\s*$")
 EMOJI = re.compile("[\U0001f000-\U0001faff☀-➿⭐⭕✅❌]")
 ALLOWED_EMOJI = "✅"
 
+# Listening states (R-SELL-01, 02): no solution, offer, product or quote talk unless they ask.
+OFFER_WORDS = re.compile(
+    r"\bsolution documents?\b|\bsolutions?\b|\bquotes?\b|\bquotation\b|\bproposals?\b",
+    re.IGNORECASE,
+)
+PITCH_WORDS = re.compile(
+    r"\bnori\b|\b(?:we|workzap|i)(?: can| could| would| will|'ll|'d)(?: also)? "
+    r"(?:build|make|create|set up|automate|fix|solve|install|develop)\b"
+    r"|\bour (?:product|products|service|services|software|app|platform|system)\b"
+    r"|\bI(?:'d| would) recommend\b|\bworkzap can help\b",
+    re.IGNORECASE,
+)
+URGENCY = re.compile(
+    r"\blimited[- ]time\b|\blast chance\b|\boffer (?:expires|ends)\b|\bhurry\b|\bdon'?t miss\b"
+    r"|\bonly \d+ (?:days?|hours?|spots?) left\b|\bact now\b|\bspecial offer\b|\bdiscount\b",
+    re.IGNORECASE,
+)
+ASKED_FOR_HELP = re.compile(
+    r"\b(?:solution|fix|solve|build|quote|price|pricing|cost|how much|proposal|what can you do|"
+    r"can you help|can you fix|what would you build|kya kar sakte|kitna|qeemat|hal)\b",
+    re.IGNORECASE,
+)
+
 WORD_CAP = 60
 SUMMARY_CAP = 160
 DOCUMENT_CAP = 120
@@ -211,6 +236,23 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         )
     if PAYMENT_RECEIVED.search(reply) and not context.get("payment_confirmed"):
         add(Violation("R-PAY-05", "never say a payment was received until staff confirm it", True))
+
+    # No pitching while listening (R-SELL)
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    if URGENCY.search(reply):
+        add(Violation("R-SELL-03", "no urgency, scarcity or discounts to move a decision", True))
+    if state in flow.NO_OFFER:
+        requested = bool(ASKED_FOR_HELP.search(str(context.get("latest_customer_message", ""))))
+        if PITCH_WORDS.search(reply) or (OFFER_WORDS.search(reply) and not requested):
+            add(
+                Violation(
+                    "R-SELL-01",
+                    "they are still describing problems: suggest no fix, product, document or "
+                    "quote. If they asked, say only that Workzap can prepare a solution "
+                    "document once the problems are noted, then go back to listening",
+                    True,
+                )
+            )
 
     # Honesty (R-HONEST, R-PROM)
     if _promise_hits(reply):

@@ -60,6 +60,9 @@ DEFAULTS: dict[str, Any] = {
         # pi's constitution as a reply linter (pi Brain spec Parts 1, 2, 6): AI disclosure, one
         # short question, no hype, no money or identity slips. Off until a workspace opts in.
         "constitution": False,
+        # "brain" = Workzap's own pi flow (pi Brain spec): a conversation state machine, the
+        # constitution linter and listening-first rules. "standard" = the shared flow.
+        "pi_mode": "standard",
     },
     "ai_config": {
         "router_alias": "fast",

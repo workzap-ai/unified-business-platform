@@ -22,7 +22,7 @@ from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.models import CatalogProduct
 from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
-from app.modules.pi import constitution, industry_packs, price_policy
+from app.modules.pi import constitution, flow, industry_packs, price_policy
 from app.modules.pi.guard import ReplyRejected, validate_reply
 from app.modules.pi.knowledge import KnowledgeService, remember
 from app.modules.pi.language import NAMES, clearly_other, detect_language, english_greeting
@@ -528,6 +528,13 @@ write the reply so it serves exactly that.
   such as "That sounds costly." is fine); say "noted", never "logged"; no jargon the
   customer did not use; never claim to be a person; never ask for card numbers, passwords
   or ID numbers; never type bank details or say a payment arrived; never promise a result.
+- pi_mode "brain" (only when present): you are Workzap's own pi. flow.state is where the
+  chat is; follow flow.guidance and only make moves in flow.allowed_next. While they describe
+  problems (before the offer) never suggest a fix, product, service, document or quote, never
+  ask for their name or business, never qualify them as a lead and never ask for a brief to
+  be confirmed; note each problem in their words, then ask one question. If they ask directly
+  what Workzap can do, say only that Workzap can prepare a solution document once the
+  problems are noted, then go back to listening. This replaces the account-manager rules above.
 - industry_knowledge (only when present) is how people in this customer's trade talk and
   what to listen for, with questions that fit. Use it to understand them and to choose your
   one question; never read it out, never present it as something the company offers, never
@@ -981,6 +988,43 @@ def validate_service_reply(
     return validate_reply(reply, list(allowed or []), max_chars)
 
 
+def brain_context(
+    policy: PiSettings, conversation: PiConversation, rows: list[PiMessage]
+) -> dict[str, Any]:
+    """The strict voice flag and, in brain mode, the conversation's flow state for the prompt.
+    A chat that has no state yet gets its first one here (S0 until pi has replied)."""
+    if not flow.strict_voice(policy.response_rules):
+        return {}
+    context: dict[str, Any] = {"strict_voice": True}
+    if flow.brain_mode(policy.response_rules):
+        state = flow.parse(conversation.flow_state)
+        if state is None:
+            state = flow.initial_state(any(m.sender_type == "ai" for m in rows))
+            conversation.flow_state = state.value
+            conversation.flow_state_since = datetime.now(UTC)
+        context["pi_mode"] = "brain"
+        context["flow"] = flow.prompt_view(state)
+    return context
+
+
+def advance_flow(conversation: PiConversation, turn: "ServiceTurn") -> None:
+    """Move the conversation's state after pi's turn. Only the listening loop moves here;
+    offers, documents, approvals and payments move it from their own events."""
+    current = flow.parse(conversation.flow_state)
+    if current is None:
+        return
+    asked = turn.reply.rstrip().endswith(("?", "؟"))
+    target = flow.after_turn(current, asked_question=asked)
+    if target == current:
+        return
+    try:
+        conversation.flow_state = flow.advance(current, target).value
+    except flow.IllegalTransition:
+        logger.warning("pi flow move refused", extra={"from": current.value, "to": target.value})
+        return
+    conversation.flow_state_since = datetime.now(UTC)
+
+
 def industry_texts(
     message: PiMessage, rows: list[PiMessage], profile: dict[str, str], brief: Any
 ) -> list[str]:
@@ -1208,7 +1252,7 @@ async def prepare_context(
         "team_notes": await _team_notes(session, scope, conversation.id),
         **reply_language(conversation, message, rows),
         "tone": policy.response_rules.get("tone", "friendly"),
-        **({"strict_voice": True} if policy.response_rules.get("constitution") else {}),
+        **brain_context(policy, conversation, rows),
         "now_local": _now_local(policy.timezone),
         "feedback_for": ((conversation.service_brief or {}).get("awaiting_feedback") or {}).get(
             "project", ""
@@ -2460,6 +2504,8 @@ def greeting_reply(context: dict[str, Any]) -> str:
     """pi's answer to a plain "Hi": who it is the first time; for a returning customer
     with something still open, an offer to carry on with it (pi remembers)."""
     if not any(h.get("role") == "ai" for h in context.get("history") or []):
+        if context.get("pi_mode") == "brain":  # the fixed opening (R-DISC-01)
+            return flow.OPENING["roman_ur" if context.get("reply_language") == "roman_ur" else "en"]
         company = str(context.get("company") or "").strip()
         who = f"{company}'s AI assistant" if company else "your AI assistant"
         team = f"The {company} team" if company else "A real team"
@@ -2590,7 +2636,7 @@ async def compose_service_turn(
             '"teen concepts", "do options"), use "• " for lists instead of 1. 2. 3., '
             "drop any time or date promise, and never state a price"
         )
-    strict = bool(policy.response_rules.get("constitution"))
+    strict = flow.strict_voice(policy.response_rules)
     if strict and (broke := constitution.lint(turn.reply, context)):
         text = constitution.describe(broke)
         problem = f"{text}, and also: {problem}" if problem else text
@@ -2778,6 +2824,8 @@ async def save_service_turn(
 ) -> list[UUID]:
     """Save the turn. Returns the leads pi should now write a proposal for (the caller
     queues it after commit, so the model call never runs under these row locks)."""
+    if flow.brain_mode(policy.response_rules):
+        advance_flow(conversation, turn)
     if turn._greeting_only:
         conversation.language = turn.language
         return []

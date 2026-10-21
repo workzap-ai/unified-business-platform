@@ -261,3 +261,60 @@ def test_only_hard_rules_stop_a_reply_for_good():
     assert {v.rule for v in c.hard(broke)} == {"R-PAY-05"}
     assert "R-VOICE-07" in {v.rule for v in broke}
     assert "R-PAY-05" in c.describe(broke) and "exclamation" in c.describe(broke)
+
+
+def listening(state="S1_LISTENING", latest="my stock keeps running out"):
+    return context(latest=latest, flow={"state": state})
+
+
+@pytest.mark.parametrize(
+    "reply",
+    [
+        "We can build an app for that. Which shop is it?",
+        "Workzap would automate that for you.",
+        "Our software handles stock. Which shop is it?",
+        "Have you tried nori? Which shop?",
+        "Shall I send you a quote?",
+        "I'd recommend a stock system.",
+    ],
+)
+def test_no_pitching_while_listening(reply):
+    for state in ("S0_NEW", "S1_LISTENING", "S2_CLARIFYING", "S3_NOTED", "S4_SORTED_SUMMARY"):
+        found = {v.rule for v in c.lint(reply, listening(state))}
+        assert "R-SELL-01" in found, (state, reply)
+    assert {v.rule for v in c.lint(reply, listening("S5b_DECLINED"))} >= {"R-SELL-01"}
+
+
+def test_pitching_is_a_hard_break():
+    broke = c.lint("We can build an app for that.", listening())
+    assert "R-SELL-01" in {v.rule for v in c.hard(broke)}
+
+
+def test_the_offer_and_later_states_may_talk_about_a_document_and_quote():
+    offer = "Would you like a solution document and a quote for these? You can say no."
+    assert "R-SELL-01" not in {v.rule for v in c.lint(offer, listening("S5_READINESS"))}
+    assert "R-SELL-01" not in {v.rule for v in c.lint(offer, listening("S7_DELIVERED"))}
+
+
+def test_a_direct_question_gets_one_honest_line_not_a_description():
+    asked = listening(latest="can you fix this? what would you build?")
+    honest = (
+        "Workzap can prepare a solution document once the problems are noted. Which shop is it?"
+    )
+    assert "R-SELL-01" not in {v.rule for v in c.lint(honest, asked)}
+    describing = "We would build an app that fixes your stock."
+    assert "R-SELL-01" in {v.rule for v in c.lint(describing, asked)}
+
+
+def test_no_state_in_context_means_the_pitch_rule_is_not_applied():
+    assert "R-SELL-01" not in rules("Shall I send you a quote?")
+
+
+@pytest.mark.parametrize(
+    "reply",
+    ["Limited time: say yes today.", "This is your last chance.", "Only 3 days left on the offer.",
+     "We can give a discount if you decide now."],
+)  # fmt: skip
+def test_no_urgency_scarcity_or_discounts_in_any_state(reply):
+    assert "R-SELL-03" in rules(reply)
+    assert "R-SELL-03" in {v.rule for v in c.hard(c.lint(reply, listening("S7_DELIVERED")))}

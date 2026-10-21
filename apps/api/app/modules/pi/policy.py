@@ -32,6 +32,7 @@ def validate_section(section: str, value: Any) -> None:
                 )
             )
             ensure(value["service_mode"] in {"auto", "service"})
+            ensure(value.get("pi_mode", "standard") in {"standard", "brain"})
             ensure(value.get("price_disclosure", "") in ("", *PRICE_MODES))
             ensure(value.get("execution_mode", "") in ("", "human_approved", "mixed", "ai_led"))
             ensure(
