@@ -624,14 +624,31 @@ class Kapso:
         data = await self._request("GET", f"/whatsapp/phone_numbers/{phone_number_id}/health")
         body = as_dict(data.get("data")) or data
         checks = as_dict(body.get("checks"))
-        # Keep only statuses; provider error text stays out of customer views.
-        return {
+        # Statuses only, plus Meta's own plain-language note about the number's sending
+        # limit (e.g. "display name not approved yet"); raw provider errors stay out.
+        out: dict[str, Any] = {
             "status": str(body.get("status", "unknown"))[:16],
             "checks": {
                 str(k)[:40]: str(as_dict(v).get("status", v) if isinstance(v, dict) else v)[:16]
                 for k, v in list(checks.items())[:10]
             },
         }
+        details = as_dict(as_dict(checks.get("messaging_health")).get("details"))
+        if details:
+            notes: list[str] = []
+            for entity in as_list(details.get("entities")):
+                item = as_dict(entity)
+                if str(item.get("can_send_message") or "AVAILABLE") == "AVAILABLE":
+                    continue
+                for info in as_list(item.get("additional_info")):
+                    text = re.sub(r"https?://\S+", "", str(info)).strip()[:200]
+                    if text and text not in notes:
+                        notes.append(text)
+            out["messaging"] = {
+                "can_send": str(details.get("can_send_message") or "AVAILABLE")[:16],
+                "notes": notes[:3],
+            }
+        return out
 
     async def delete_number(self, phone_number_id: str) -> None:
         if not PHONE_NUMBER_ID.fullmatch(phone_number_id):
