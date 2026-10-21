@@ -82,8 +82,9 @@ GUIDANCE: dict[State, str] = {
     "getting in the way. Do not repeat what you already know.",
     S.S4_SORTED_SUMMARY: "Show what is noted and sorted, grouped, and say none of it is solved. "
     "Invite corrections. Do not offer a document in this message.",
-    S.S5_READINESS: "Ask once whether they would like a solution document and a quote. They can "
-    "say no. Accept only an explicit yes.",
+    S.S5_READINESS: "The offer was sent: a solution document and a quote, and they can say no. "
+    "Answer questions about it. Cost depends on what is built and is written on the quote; "
+    "the quote is free and is not a charge; never give a range. Do not repeat the offer.",
     S.S5B_DECLINED: "They said no. Answer questions and note new problems; do not offer again "
     "unless they raise it.",
     S.S6_PREPARING: "Workzap is preparing the document and quote. Say so; invent no content "
@@ -187,8 +188,8 @@ def after_turn(
         state = State.S1_LISTENING  # the opening went out
         if not (noted or summary):
             return state
-    if state == State.S4_SORTED_SUMMARY and noted:
-        state = State.S1_LISTENING  # a new problem after the summary: back to listening
+    if state in (State.S4_SORTED_SUMMARY, State.S5_READINESS, State.S5B_DECLINED) and noted:
+        state = State.S1_LISTENING  # a new problem after the summary or offer: back to listening
     if state in (State.S1_LISTENING, State.S2_CLARIFYING):
         if not (noted or summary):
             return State.S2_CLARIFYING if asked_question else State.S1_LISTENING

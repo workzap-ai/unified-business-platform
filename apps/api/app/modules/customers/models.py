@@ -3,6 +3,7 @@ from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     DateTime,
     Index,
@@ -69,6 +70,8 @@ class Customer(WorkspaceRow):
         ARRAY(String(80)), default=list, server_default="{}"
     )
     industry_confidence: Mapped[Decimal | None] = mapped_column(Numeric(3, 2), nullable=True)
+    # May say yes to a document and approve a quote (the owner, or an authorised admin).
+    can_approve: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
 
 
 class CustomerNote(WorkspaceRow):

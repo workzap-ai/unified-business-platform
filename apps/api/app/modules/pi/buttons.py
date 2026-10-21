@@ -46,7 +46,9 @@ def consent_buttons(body: str) -> list[str] | None:
     for language, question in CONSENT_QUESTION.items():
         if body.rstrip().endswith(question):
             return CONSENT.get(language, CONSENT["en"])
-    return None
+    from app.modules.pi import decisions
+
+    return decisions.buttons_for(body)
 
 
 def is_remind_later(text: str | None) -> bool:

@@ -1111,6 +1111,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     )
                 elif (code := price_policy.check(reply, mode)) is not None:
                     raise ReplyRejected(code)
+                if service_turn is not None:
+                    # Fixed lines pi wrote itself (a quote's number and total, summary counts).
+                    agent_ctx.facts.extend(str(x) for x in service_context.get("fixed_lines") or [])
                 if service_appendix:
                     # Confirmed by the booking tool (not model text), so dates are allowed.
                     reply = f"{reply}\n{service_appendix}"

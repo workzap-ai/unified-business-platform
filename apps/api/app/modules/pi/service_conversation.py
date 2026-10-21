@@ -22,7 +22,15 @@ from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.models import CatalogProduct
 from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
-from app.modules.pi import constitution, flow, industry_packs, price_policy, problems, taxonomy
+from app.modules.pi import (
+    constitution,
+    decisions,
+    flow,
+    industry_packs,
+    price_policy,
+    problems,
+    taxonomy,
+)
 from app.modules.pi.guard import ReplyRejected, validate_reply
 from app.modules.pi.knowledge import KnowledgeService, remember
 from app.modules.pi.language import NAMES, clearly_other, detect_language, english_greeting
@@ -238,6 +246,8 @@ class ServiceTurn(BaseModel):
     # Brain mode: the sorted summary replaced the reply; the trade question was due.
     _summary: bool = PrivateAttr(default=False)
     _asked_shape: bool = PrivateAttr(default=False)
+    # Brain mode: a fixed reply and move chosen by the decision gates (pi/decisions.py).
+    _decision: Any = PrivateAttr(default=None)
     # Filled FIRST (field order guides the model): what the customer wants right now and
     # who the message is for. Internal; it makes the reply answer the actual request.
     understanding: str = Field(default="", max_length=600)
@@ -295,6 +305,9 @@ class ServiceTurn(BaseModel):
     proposal_evidence: str = Field(default="", max_length=500)
     # Brain mode: changes to the problems pi has noted for this customer's business.
     problem_ops: list[ProblemOp] = Field(default_factory=list, max_length=12)
+    # Brain mode: when asked which problems the document should cover and they chose only some,
+    # the refs from noted_problems they chose.
+    include_refs: list[str] = Field(default_factory=list, max_length=40)
 
     @model_validator(mode="before")
     @classmethod
@@ -350,6 +363,8 @@ class ServiceTurn(BaseModel):
             data.pop("requirements", None)
         if "problem_ops" in data:
             data["problem_ops"] = problems.tolerate_ops(data["problem_ops"])
+        refs = data.get("include_refs")
+        data["include_refs"] = [str(r)[:16] for r in refs[:40]] if isinstance(refs, list) else []
         return data
 
 
@@ -820,9 +835,23 @@ Categories and sub-types:
 )
 
 
+BRAIN_DECISIONS = """
+Offer and decisions (pi_mode "brain"). The application sends the sorted summary, the offer, the
+decline, the approval confirmation and the payment explanation itself when it recognises the
+person's answer, so you never write those. In S4 and S5 you only answer what they asked.
+- Cost before a quote: it depends on what is built, it is written on the quote before they
+  decide, and the quote is free and not a charge. Never give a number or a range.
+- If choose_problems is true they were asked whether the document should cover all the
+  problems or only some: if they chose some, put those refs from noted_problems in
+  include_refs, and say nothing else about it.
+"""
+
+
 def system_for(context: dict[str, Any]) -> str:
     """The prompt: the shared rules, plus the problem-noting rules in brain mode."""
-    return SYSTEM + BRAIN_PROBLEMS if context.get("pi_mode") == "brain" else SYSTEM
+    if context.get("pi_mode") == "brain":
+        return SYSTEM + BRAIN_PROBLEMS + BRAIN_DECISIONS
+    return SYSTEM
 
 
 async def service_mode(session: AsyncSession, scope: WorkspaceScope, policy: PiSettings) -> bool:
@@ -898,7 +927,7 @@ def allowed_text(context: dict[str, Any] | None) -> list[str]:
             label, _, link = part.strip().partition(": ")
             if link:
                 books += [link, label.split(" ")[-1]]
-    summary = [str(line) for line in (context or {}).get("summary_lines") or []]
+    summary = [str(line) for line in (context or {}).get("fixed_lines") or []]
     return offered_labels(context) + customer_figures(context) + arranged + books + summary
 
 
@@ -1057,6 +1086,7 @@ async def brain_problems(
     conversation: PiConversation,
     policy: PiSettings,
     industry_known: bool,
+    message: PiMessage | None = None,
 ) -> dict[str, Any]:
     """What pi has noted so far for this customer (brain mode), for the prompt."""
     if not flow.brain_mode(policy.response_rules) or conversation.customer_id is None:
@@ -1067,6 +1097,14 @@ async def brain_problems(
     if problems.shape_question_due(len(noted), industry_known, bool(brief.get("industry_asked"))):
         context["shape_question_due"] = True
     context["problems_since_summary"] = len(noted) - int(brief.get("summary_count") or 0)
+    from app.modules.customers.models import Customer
+
+    customer = await session.get(Customer, conversation.customer_id)
+    context["can_approve"] = bool(customer.can_approve) if customer is not None else True
+    if message is not None:
+        context["latest_message_id"] = str(message.id)
+    if brief.get("scope_asked") and not brief.get("scope_done"):
+        context["choose_problems"] = True
     return context
 
 
@@ -1097,11 +1135,112 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     turn.reply = problems.summary_message(items, str(context.get("reply_language") or "en"))
     # The group counts are figures pi wrote itself: the no-digits rule must let them through.
-    context["summary_lines"] = [
-        ln for ln in turn.reply.splitlines() if any(c.isdigit() for c in ln)
-    ]
+    context["fixed_lines"] = [ln for ln in turn.reply.splitlines() if any(c.isdigit() for c in ln)]
     turn.awaiting_customer = True
     turn._summary = True
+
+
+def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """The offer and decision gates (spec 3.8, 5.5): when the person's answer is recognised the
+    reply is pi's fixed line and the move is decided here, never by the model."""
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    if state is None or turn._summary:
+        return
+    noted = context.get("noted_problems") or []
+    facts = {
+        "message_id": context.get("latest_message_id"),
+        "can_approve": context.get("can_approve", True),
+        "business": (context.get("customer_profile") or {}).get("business_name"),
+        "problem_count": len(noted),
+        "group_count": len({p["group"] for p in noted}),
+        "problem_refs": [p["ref"] for p in noted],
+        "chosen_refs": turn.include_refs,
+        "changed": any(op.op != "link" for op in turn.problem_ops),
+        "brief": context.get("brief") or {},
+        "open_quote": context.get("open_quote"),
+    }
+    decision = decisions.decide(
+        state,
+        str(context.get("latest_customer_message", "")),
+        str(context.get("reply_language") or "en"),
+        facts,
+    )
+    if decision is None:
+        return
+    turn._decision = decision
+    if decision.reply:
+        turn.reply = decision.reply
+        turn.awaiting_customer = decision.next_state not in (None, flow.State.S6_PREPARING)
+        # Figures pi wrote itself (a quote's number and total) are not a new price.
+        fixed = [ln for ln in decision.reply.splitlines() if any(c.isdigit() for c in ln)]
+        context["fixed_lines"] = [*context.get("fixed_lines", []), *fixed]
+
+
+async def apply_decision(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    decision: Any,
+    brief: dict[str, Any],
+) -> None:
+    """Record a decision: brief changes (None removes a key) and what must happen next."""
+    for key, value in decision.brief.items():
+        if value is None:
+            brief.pop(key, None)
+        else:
+            brief[key] = value
+    now = datetime.now(UTC).isoformat()
+    if "request_solution" in decision.effects and conversation.customer_id is not None:
+        book = problems.ProblemBook(session, scope, conversation.customer_id, "en")
+        wanted = set((brief.get("offer") or {}).get("problem_refs") or [])
+        titles = [
+            f"P{p.number} {p.title}"
+            for p in await book.active()
+            if not wanted or problems.short_ref(p.id) in wanted
+        ]
+        brief["offer"] = {**(brief.get("offer") or {}), "at": now}
+        await raise_decision_request(
+            session, scope, conversation, "review_document", "high",
+            "The customer said yes to a solution document and quote for: " + "; ".join(titles),
+        )  # fmt: skip
+    if "record_approval" in decision.effects:
+        brief["approval"] = {**(brief.get("approval") or {}), "at": now}
+        await raise_decision_request(
+            session, scope, conversation, "approve", "high",
+            f"The customer approved quote {brief['approval'].get('quote')} (confirmed twice).",
+        )  # fmt: skip
+    if "cancel_before_payment" in decision.effects:
+        await raise_decision_request(
+            session, scope, conversation, "other", "high",
+            "The customer cancelled after approving and before payment was confirmed.",
+        )  # fmt: skip
+
+
+async def raise_decision_request(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    kind: str,
+    priority: str,
+    question: str,
+) -> None:
+    from app.modules.pi_saas.requests import raise_request
+
+    if conversation.customer_id is None:
+        return
+    try:
+        async with session.begin_nested():
+            await raise_request(
+                session,
+                scope,
+                conversation_id=conversation.id,
+                customer_id=conversation.customer_id,
+                kind=kind,
+                question=question,
+                priority=priority,
+            )
+    except DBAPIError:
+        logger.warning("pi_decision_request_skipped", exc_info=True)
 
 
 async def note_problems(
@@ -1136,6 +1275,8 @@ async def note_problems(
         brief["summary_count"] = len(await book.active())
     if turn._asked_shape:
         brief["industry_asked"] = True
+    if turn._decision is not None:
+        await apply_decision(session, scope, conversation, turn._decision, brief)
     if brief != (conversation.service_brief or {}):
         conversation.service_brief = brief
     advance_flow(conversation, turn, noted=noted)
@@ -1147,10 +1288,18 @@ def advance_flow(conversation: PiConversation, turn: "ServiceTurn", *, noted: bo
     current = flow.parse(conversation.flow_state)
     if current is None:
         return
-    asked = turn.reply.rstrip().endswith(("?", "؟"))
-    target = flow.after_turn(
-        current, asked_question=asked, noted=noted, summary=getattr(turn, "_summary", False)
-    )
+    if current == flow.State.X_PAUSED:  # they came back: listen again (R-MEM-03)
+        current = flow.advance(current, flow.State.S1_LISTENING)
+        conversation.flow_state = current.value
+        conversation.flow_state_since = datetime.now(UTC)
+    decision = getattr(turn, "_decision", None)
+    if decision is not None:
+        target = decision.next_state or current  # a recognised answer decides the move
+    else:
+        asked = turn.reply.rstrip().endswith(("?", "؟"))
+        target = flow.after_turn(
+            current, asked_question=asked, noted=noted, summary=getattr(turn, "_summary", False)
+        )
     if target == current:
         return
     steps = flow.path(current, target)
@@ -1353,7 +1502,7 @@ async def prepare_context(
     industry = await industry_context_for(
         session, scope, conversation, message, rows, profile, policy
     )
-    brain = await brain_problems(session, scope, conversation, policy, bool(industry))
+    brain = await brain_problems(session, scope, conversation, policy, bool(industry), message)
     return {
         **industry,
         **brain,
@@ -2897,6 +3046,7 @@ async def compose_service_turn(
             raise rejected_with(turn, "CONSTITUTION_BREAK")
     if context.get("pi_mode") == "brain":
         brain_summary(turn, context)
+        brain_decision(turn, context)
     if expected in NAMES and mixed_line(turn.reply, str(expected)):
         turn.reply = await in_one_language(
             manager, scope, policy, conversation, turn.reply, str(expected)
