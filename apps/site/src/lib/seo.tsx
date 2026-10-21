@@ -36,8 +36,8 @@ export const ORGANIZATION = {
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "customer support",
-    telephone: "+1-201-471-3467",
-    url: "https://wa.me/12014713467?text=Hi%20pi",
+    telephone: "+1-711-137-4618",
+    url: "https://wa.me/17111374618?text=Hi%20pi",
     availableLanguage: "English",
   },
 };
