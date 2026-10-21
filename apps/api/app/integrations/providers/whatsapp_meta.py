@@ -339,6 +339,7 @@ class WhatsAppMetaProvider(WhatsAppProvider):
                                 else str(part.get("caption", ""))[:1024],
                                 "form": form,
                                 "media_id": str(part.get("id", ""))[:64] or None,
+                                "filename": str(part.get("filename", ""))[:200],
                                 "timestamp": str(message.get("timestamp", ""))[:16],
                                 "profile_name": profiles.get(sender, ""),
                             },

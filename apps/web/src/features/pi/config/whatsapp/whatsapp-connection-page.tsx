@@ -39,6 +39,8 @@ import { ApiError } from "@/services/api-client";
 import { piService } from "../../service";
 import type { WhatsAppConnection } from "../../types";
 import { humanizeError, piKeys } from "../shared";
+import { isDemo } from "@/lib/data-mode";
+import { WhatsAppProfileCard } from "../../workspace/whatsapp-profile-card";
 import { KapsoConnect } from "./kapso-connect";
 import { WhatsAppNav } from "./whatsapp-nav";
 
@@ -99,6 +101,7 @@ function Connection() {
       />
       <WhatsAppNav />
       <KapsoConnect onChange={() => void connection.refetch()} />
+      {isDemo ? null : <WhatsAppProfileCard />}
 
       {connection.isError ? (
         <Card>

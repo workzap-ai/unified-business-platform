@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Sequence
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
@@ -42,6 +43,35 @@ INVOICE_STATES = StateMachine(
     },
 )
 OPEN_STATUSES = ("issued", "partially_paid")
+
+
+logger = logging.getLogger("platform")
+
+
+async def _deal_paid(session: AsyncSession, scope: WorkspaceScope, invoice: Invoice) -> None:
+    """pi's deal flow: thank the customer on WhatsApp and close the lead as won. A
+    problem there never stops the payment being recorded (savepoint)."""
+    from app.modules.pi_saas.deals import after_paid
+
+    try:
+        async with session.begin_nested():
+            await after_paid(session, scope, invoice)
+    except Exception:  # noqa: BLE001 - messaging is best effort; the payment stands
+        logger.warning("deal_paid_hook_failed", extra={"invoice_id": str(invoice.id)})
+
+
+async def _receipt(
+    session: AsyncSession, scope: WorkspaceScope, invoice: Invoice, payment: Payment
+) -> None:
+    """A PDF receipt for this payment, kept and sent (billing/receipts.py). Best effort:
+    the payment is recorded whatever happens here (savepoint)."""
+    from app.modules.billing.receipts import issue
+
+    try:
+        async with session.begin_nested():
+            await issue(session, scope, invoice, payment)
+    except Exception:  # noqa: BLE001 - a receipt problem never undoes the payment
+        logger.warning("receipt_failed", extra={"payment_id": str(payment.id)}, exc_info=True)
 
 
 def balance(invoice: Invoice) -> Decimal:
@@ -355,6 +385,7 @@ class BillingService:
             },
             EntityRef("payment", payment.id),
         )
+        await _receipt(self.session, self.scope, invoice, payment)
         if invoice.status == "paid":
             await emit(
                 self.session,
@@ -363,6 +394,7 @@ class BillingService:
                 _invoice_payload(invoice),
                 EntityRef("invoice", invoice.id),
             )
+            await _deal_paid(self.session, self.scope, invoice)
         return payment
 
     async def payments_page(self, page: Pagination) -> Page[PaymentView]:

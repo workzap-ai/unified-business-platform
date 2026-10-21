@@ -37,6 +37,16 @@ export const ProviderNameSchema: z.ZodType<Pi.ProviderName> = z.union([
   z.literal("gemini"),
   z.literal("groq"),
 ]);
+export const RunStepSchema: z.ZodType<Pi.RunStep> = z.union([
+  z.literal("router"),
+  z.literal("customer_memory"),
+  z.literal("support"),
+  z.literal("requirement"),
+  z.literal("sales_order"),
+  z.literal("handoff"),
+  z.literal("team_question"),
+  z.literal("meeting_request"),
+]);
 export const ConversationSchema: z.ZodType<Pi.Conversation> = z.object({
   id: z.string(),
   customer_id: z.string(),
@@ -105,6 +115,9 @@ export const MessageSchema: z.ZodType<Pi.Message> = z.object({
       duration_s: z.union([z.undefined(), z.number()]).optional(),
       transcript: z.union([z.undefined(), z.string()]).optional(),
       description: z.union([z.undefined(), z.string()]).optional(),
+      file_kind: z.union([z.undefined(), z.literal("document")]).optional(),
+      file_id: z.union([z.undefined(), z.string()]).optional(),
+      filename: z.union([z.undefined(), z.string()]).optional(),
     }),
   ]),
   status: z.union([
@@ -142,6 +155,13 @@ export const MessageSchema: z.ZodType<Pi.Message> = z.object({
       summary: z.string(),
     }),
   ),
+  card: z
+    .union([
+      z.undefined(),
+      z.null(),
+      z.object({ kind: z.string(), image: z.string() }),
+    ])
+    .optional(),
   confirmation: z.union([
     z.null(),
     z.object({
@@ -178,14 +198,11 @@ export const AgentRunSchema: z.ZodType<Pi.AgentRun> = z.object({
       z.literal("requirement"),
       z.literal("sales_order"),
       z.literal("handoff"),
+      z.literal("team_question"),
+      z.literal("meeting_request"),
     ]),
   ),
-  provider: z.union([
-    z.null(),
-    z.literal("openai"),
-    z.literal("gemini"),
-    z.literal("groq"),
-  ]),
+  provider: z.union([z.null(), z.string()]),
   model_alias: z.union([z.null(), z.string()]),
   fallback_used: z.boolean(),
   latency_ms: z.number(),
@@ -253,6 +270,75 @@ export const ConversationContextSchema: z.ZodType<Pi.ConversationContext> =
           awaiting_customer: z
             .union([z.undefined(), z.literal(false), z.literal(true)])
             .optional(),
+          projects: z
+            .union([
+              z.undefined(),
+              z.array(
+                z.object({
+                  title: z.string(),
+                  service: z.string(),
+                  details: z.string(),
+                  status: z.union([
+                    z.literal("confirmed"),
+                    z.literal("collecting"),
+                    z.literal("awaiting_confirmation"),
+                    z.literal("with_team"),
+                  ]),
+                  missing: z.array(z.string()),
+                }),
+              ),
+            ])
+            .optional(),
+          mood: z.union([z.undefined(), z.string()]).optional(),
+          meeting_requested: z
+            .union([z.undefined(), z.literal(false), z.literal(true)])
+            .optional(),
+          knowledge_gaps: z
+            .union([z.undefined(), z.array(z.string())])
+            .optional(),
+          customer_issues: z
+            .union([
+              z.undefined(),
+              z.object({
+                at: z.union([z.undefined(), z.string()]).optional(),
+                issues: z
+                  .union([
+                    z.undefined(),
+                    z.array(
+                      z.object({
+                        title: z.string(),
+                        stage: z.union([z.undefined(), z.string()]).optional(),
+                        ball_with: z
+                          .union([z.undefined(), z.string()])
+                          .optional(),
+                        open_question: z
+                          .union([z.undefined(), z.string()])
+                          .optional(),
+                        next_step: z
+                          .union([z.undefined(), z.string()])
+                          .optional(),
+                        linked: z.union([z.undefined(), z.number()]).optional(),
+                      }),
+                    ),
+                  ])
+                  .optional(),
+                links: z
+                  .union([
+                    z.undefined(),
+                    z.array(
+                      z.object({
+                        a_title: z.string(),
+                        b_title: z.string(),
+                        type: z.string(),
+                        reason: z.union([z.undefined(), z.string()]).optional(),
+                        status: z.union([z.undefined(), z.string()]).optional(),
+                      }),
+                    ),
+                  ])
+                  .optional(),
+              }),
+            ])
+            .optional(),
         }),
       ])
       .optional(),
@@ -312,14 +398,11 @@ export const ConversationContextSchema: z.ZodType<Pi.ConversationContext> =
             z.literal("requirement"),
             z.literal("sales_order"),
             z.literal("handoff"),
+            z.literal("team_question"),
+            z.literal("meeting_request"),
           ]),
         ),
-        provider: z.union([
-          z.null(),
-          z.literal("openai"),
-          z.literal("gemini"),
-          z.literal("groq"),
-        ]),
+        provider: z.union([z.null(), z.string()]),
         model_alias: z.union([z.null(), z.string()]),
         fallback_used: z.boolean(),
         latency_ms: z.number(),
@@ -814,6 +897,10 @@ export const PiSettingsSchema: z.ZodType<Pi.PiSettings> = z.object({
     max_media_mb: z.number(),
     reminder_enabled: z.boolean(),
     reminder_after_days: z.number(),
+    check_in_enabled: z
+      .union([z.undefined(), z.literal(false), z.literal(true)])
+      .optional(),
+    check_in_after_hours: z.union([z.undefined(), z.number()]).optional(),
     reminder_templates: z.record(
       z.string(),
       z.object({ name: z.string(), language: z.string() }),

@@ -25,7 +25,7 @@ from app.core.config import Settings
 from app.modules.audit.service import record
 from app.modules.notifications.service import notify
 from app.modules.pi.knowledge import DocumentInput, KnowledgeService
-from app.modules.pi.models import KnowledgeSource, PiConversation, PiMessage
+from app.modules.pi.models import KnowledgeDocument, KnowledgeSource, PiConversation, PiMessage
 from app.modules.pi_saas.models import PiKnowledgeDraft, PiStaffRequest
 from app.shared.errors import BusinessRuleViolation
 from app.shared.scope import WorkspaceScope
@@ -33,6 +33,8 @@ from app.shared.workspace_repository import WorkspaceRepository
 
 APPROVED_SOURCE = "Approved answers"
 TEAM_SOURCE = "Team only"
+WEBSITE_SOURCE = "Website"
+WEBSITE_ORIGIN = re.compile(r"^Imported from (\S+) on ")
 WEBSITE_MAX_BYTES = 1024 * 1024
 WEBSITE_MAX_TEXT = 20_000
 
@@ -94,6 +96,21 @@ async def _source(session: AsyncSession, scope: WorkspaceScope, visible: bool) -
     return row
 
 
+async def _website_source(session: AsyncSession, scope: WorkspaceScope) -> KnowledgeSource:
+    repo = WorkspaceRepository(session, KnowledgeSource, scope)
+    row = await repo.find(KnowledgeSource.name == WEBSITE_SOURCE)
+    if row is None:
+        row = await repo.add(
+            repo.new(
+                name=WEBSITE_SOURCE,
+                kind="company_info",
+                description="Pages learned from your website, reviewed and published by your team",
+                status="active",
+            )
+        )
+    return row
+
+
 async def create_draft(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -145,12 +162,30 @@ async def publish_draft(
     from app.modules.pi_saas.entitlement import check_storage
 
     await check_storage(session, scope.tenant_id, len(draft.content.encode()))
-    source = await _source(session, scope, draft.customer_visible)
-    document = await KnowledgeService(session, scope).ingest(
+    page = WEBSITE_ORIGIN.match(draft.source_text or "") if draft.origin == "website" else None
+    knowledge = KnowledgeService(session, scope)
+    if page and draft.customer_visible:
+        # A website page lives in the "Website" source, and replaces its earlier version.
+        source = await _website_source(session, scope)
+        header = f"Source: {page.group(1)}\n\n"
+        for old in await session.scalars(
+            WorkspaceRepository(session, KnowledgeDocument, scope)
+            .select()
+            .where(
+                KnowledgeDocument.source_id == source.id,
+                KnowledgeDocument.body.startswith(header, autoescape=True),
+            )
+        ):
+            await knowledge.delete_document(old.id)
+        body = header + draft.content
+    else:
+        source = await _source(session, scope, draft.customer_visible)
+        body = draft.content
+    document = await knowledge.ingest(
         DocumentInput(
             source_id=source.id,
             title=draft.title,
-            body=draft.content,
+            body=body,
             mime_type="text/markdown",
         ),
         max_bytes,

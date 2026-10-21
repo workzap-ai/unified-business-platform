@@ -14,9 +14,9 @@ from app.ai.manager import LLMManager
 from app.modules.notifications.models import Notification
 from app.modules.orders.models import Order
 from app.modules.pi.followups import sweep_followups
-from app.modules.pi.models import PiMessage, PiSettings, WhatsAppConnection
+from app.modules.pi.models import PiMemory, PiMessage, PiSettings, WhatsAppConnection
 from app.modules.pi.runtime import send_pi_message
-from app.modules.pi.service_conversation import Requirements, ServiceTurn
+from app.modules.pi.service_conversation import Project, Requirements, ServiceTurn
 from app.modules.quotes.models import Quote
 from app.modules.sales.models import SalesLead
 
@@ -41,10 +41,16 @@ def mock_turns(monkeypatch, *turns):
     replies = iter(turns)
     contexts = []
 
+    last: list = []
+
     async def complete(self, scope, output, **kwargs):
         assert scope is not None and kwargs["purpose"] == "pi_service"
+        if kwargs["messages"][-1].text().startswith("Don't send that draft"):
+            # pi's self-check asked for a rewrite: these tests script one reply per turn.
+            return SimpleNamespace(value=last[-1], response=SimpleNamespace(attempts=[]))
         contexts.append(kwargs["messages"][-1].text())
         value = next(replies)
+        last.append(value)
         if isinstance(value, Exception):
             raise value
         return SimpleNamespace(value=value, response=SimpleNamespace(attempts=[]))
@@ -83,7 +89,9 @@ async def test_service_discovers_without_prices_and_saves_team_brief(api, busine
     )
     await pi.process("Website ki price kya hai?", "svc-one")
     await pi.deliver_all()
-    await pi.process("Necesito una tienda online, mi presupuesto es 5000 USD", "svc-two")
+    await pi.process(
+        "Necesito una tienda online, mi presupuesto es 5000 USD. Sí, envíalo.", "svc-two"
+    )
     await pi.deliver_all()
     conversation = await pi.conversation()
     assert conversation.language == "es" and "5000 USD" in conversation.summary
@@ -129,8 +137,9 @@ async def test_service_price_output_is_never_sent(api, business_db, monkeypatch,
     mock_turns(monkeypatch, turn(reply=reply))
     pi = await pi_workspace(api, business_db, business_type="service_business")
     await pi.process("Website price?", "bad-price")
-    assert (await pi.conversation()).mode == "human"
+    assert (await pi.conversation()).mode == "ai"  # never sent; the team is asked
     assert all(reply != m.body for m in await pi.outbound())
+    assert (await api.get("/api/v1/pi/requests")).json()["items"]
     await pi.close()
 
 
@@ -290,8 +299,11 @@ async def test_provider_failure_does_not_invent_a_reply(api, business_db, monkey
     mock_turns(monkeypatch, GatewayUnavailable())
     pi = await pi_workspace(api, business_db, business_type="service_business")
     await pi.process("Website chahiye", "provider-down")
-    assert (await pi.conversation()).mode == "human"
-    assert (await api.get("/api/v1/pi/handoffs")).json()[0]["reason"] == "provider_failure"
+    assert (await pi.conversation()).mode == "ai"  # nothing invented; the team is asked
+    [notice] = await pi.outbound()
+    assert notice.body.startswith("Noted. Team se confirm")  # in their language
+    desk = (await api.get("/api/v1/pi/requests")).json()["items"]
+    assert "provider_failure" in desk[0]["context"]
     await pi.close()
 
 
@@ -368,7 +380,8 @@ async def test_service_handoff_delivers_acknowledgement(api, business_db, monkey
         ),
     )
     pi = await pi_workspace(api, business_db, business_type="service_business")
-    await pi.process("Necesito hablar sobre un proyecto especial", "service-human")
+    # Asking for a person (in Spanish): the chat goes to the team.
+    await pi.process("Quiero hablar con una persona sobre un proyecto especial", "service-human")
     await pi.deliver_all()
     assert (await pi.conversation()).mode == "human"
     replies = await pi.outbound()
@@ -458,4 +471,227 @@ async def test_service_uses_approved_knowledge_and_respects_tool_switch(
     import json
 
     assert json.loads(contexts[1])["approved_knowledge"] == []
+    await pi.close()
+
+
+async def test_reply_sees_the_whole_conversation_and_matching_knowledge(
+    api, business_db, monkeypatch
+):
+    import json
+
+    contexts = mock_turns(
+        monkeypatch,
+        turn(understanding="Customer asks if hotel towels ship to Doha."),
+        turn(understanding="Follow-up: delivery time to Doha."),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    source = await create(api, "pi/knowledge/sources", {"name": "Website", "kind": "company_info"})
+    await create(
+        api,
+        "pi/knowledge/documents",
+        {
+            "source_id": source["id"],
+            "title": "Shipping",
+            "body": "We ship hotel towels to Doha with door delivery in 7 working days.",
+        },
+    )
+    await create(
+        api,
+        "pi/knowledge/documents",
+        {
+            "source_id": source["id"],
+            "title": "Retail AI",
+            "body": "Our retail analytics connects POS and ERP data.",
+        },
+    )
+    # A long Roman Urdu / English line: not every word is in the passage, it still matches.
+    await pi.process("Salam, kya aap hotel ke liye towels Doha bhej sakte hain?", "k-1")
+    first = json.loads(contexts[0])
+    titles = [k["title"] for k in first["approved_knowledge"]]
+    assert titles == ["Shipping"]  # the unrelated retail passage is not offered
+    assert first["latest_message_kind"] == "text"
+    assert first["team_members"] and all(" " not in n for n in first["team_members"])
+
+    # A short follow-up still finds what the conversation is about.
+    await pi.process("aur kitne din lagenge?", "k-2")
+    second = json.loads(contexts[1])
+    assert [k["title"] for k in second["approved_knowledge"]] == ["Shipping"]
+    kinds = {(h["role"], h["kind"]) for h in second["history"]}
+    assert ("customer", "text") in kinds and ("ai", "text") in kinds
+    assert all(len(h["at"]) == 16 for h in second["history"])
+    assert second["hours_since_previous_message"] is not None
+    await pi.close()
+
+
+async def test_unknown_answers_reach_the_team_and_a_frustrated_customer_gets_a_person(
+    api, business_db, monkeypatch
+):
+    gap = "Do you design packaging?"
+    mock_turns(
+        monkeypatch,
+        turn(reply="Team is par confirm karke yahin batayegi.", knowledge_gaps=[gap]),
+        turn(reply="Maazrat, team confirm karegi.", knowledge_gaps=[gap], mood="frustrated"),
+        turn(reply="Maazrat, team ka banda abhi baat karega.", mood="frustrated"),
+        turn(
+            reply="Of course, a person from the team will reply here.",
+            language="en",
+            request_human=True,
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("Packaging design bhi karte ho?", "gap-1")
+    await pi.deliver_all()
+    await pi.process("bataya nahi abhi tak", "gap-2")
+    await pi.deliver_all()
+    conversation = await pi.conversation()
+    assert conversation.service_brief["knowledge_gaps"] == [gap]  # asked twice, kept once
+    assert conversation.service_brief["mood"] == "frustrated"
+    assert conversation.mode != "human"  # one frustrated message is answered by pi
+    gaps = await business_db.scalar(
+        select(func.count())
+        .select_from(Notification)
+        .where(
+            Notification.kind == "pi.knowledge_gap",
+            Notification.tenant_id == conversation.tenant_id,
+        )
+    )
+    assert gaps == 1
+    await pi.process("ye kya mazaak hai", "gap-3")
+    await pi.deliver_all()
+    # Still upset, but they didn't ask for a person: pi keeps the chat and the team gets
+    # the question on its request desk (a person takes over only when asked).
+    assert (await pi.conversation()).mode != "human"
+    await pi.process("I want to talk to a human", "gap-4")
+    await pi.deliver_all()
+    assert (await pi.conversation()).mode == "human"
+    await pi.close()
+
+
+async def test_meeting_without_bookable_times_goes_on_the_desk_and_pi_keeps_the_chat(
+    api, business_db, monkeypatch
+):
+    from app.modules.pi_saas.models import PiStaffRequest
+
+    mock_turns(
+        monkeypatch,
+        turn(
+            reply="Zaroor! Aap ko kaun se din theek rahenge? Team yahin time confirm karegi.",
+            meeting_requested=True,
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("Kya hum kal meeting kar sakte hain?", "meet-1")
+    await pi.deliver_all()
+    conversation = await pi.conversation()
+    assert conversation.mode == "ai"  # the team arranges the time; pi keeps talking
+    assert conversation.service_brief["meeting_requested"] is True
+    [request] = list(
+        await business_db.scalars(
+            select(PiStaffRequest).where(PiStaffRequest.conversation_id == conversation.id)
+        )
+    )
+    assert request.kind == "meeting" and request.status == "open"
+    assert request.priority == "high" and "kal meeting" in request.question
+    kinds = set(
+        await business_db.scalars(
+            select(Notification.kind).where(Notification.tenant_id == conversation.tenant_id)
+        )
+    )
+    assert "pi.request.meeting" in kinds and "pi.handoff" not in kinds
+    await pi.close()
+
+
+async def test_one_chat_keeps_every_project_one_memory_each_and_a_real_summary(
+    api, business_db, monkeypatch
+):
+    logo = Project(title="Logo", service="Logo design", details="Bird logo, gradient colours")
+    mock_turns(
+        monkeypatch,
+        turn(summary="", projects=[logo], requirements=Requirements(service="Logo design")),
+        turn(summary="", projects=[logo], requirements=Requirements(service="Logo design")),
+        # The model forgets the logo while talking about the new website.
+        turn(
+            summary="",
+            projects=[
+                Project(
+                    title="Furniture website",
+                    service="Website",
+                    details="Categories, cart, payment gateway",
+                    status="confirmed",
+                )
+            ],
+            requirements=Requirements(service="Website", scope="Furniture e-commerce"),
+            missing=[],
+            ready_for_team=True,
+            awaiting_customer=False,
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    for i, text in enumerate(
+        ["Logo chahiye", "bird jaisa", "ab furniture website bhi, bas yehi bana do"]
+    ):
+        await pi.process(text, f"proj-{i}")
+        await pi.deliver_all()
+    conversation = await pi.conversation()
+    titles = [p["title"] for p in conversation.service_brief["projects"]]
+    assert titles == ["Logo", "Furniture website"]  # the earlier project is not lost
+    summary = conversation.summary
+    assert "Wants: Logo" in summary and "Furniture website (confirmed)" in summary
+    assert "Next step:" in summary and "Pi replied" not in summary
+    notes = list(
+        await business_db.scalars(
+            select(PiMemory.content).where(
+                PiMemory.tenant_id == conversation.tenant_id, PiMemory.kind == "requirement"
+            )
+        )
+    )
+    assert len(notes) == 2  # one per project, not one per message
+    # One deal per project: the confirmed website is ready for a proposal, the logo
+    # is still being discussed.
+    leads = {
+        lead.title: lead
+        for lead in await business_db.scalars(
+            select(SalesLead).where(SalesLead.tenant_id == conversation.tenant_id)
+        )
+    }
+    assert set(leads) == {"Logo", "Furniture website"}
+    assert leads["Furniture website"].stage == "qualified"
+    assert leads["Logo"].stage == "new"
+    assert leads["Furniture website"].requirements["scope"] == "Categories, cart, payment gateway"
+    await pi.close()
+
+
+async def test_a_repeated_customer_date_is_dropped_instead_of_stopping_pi(
+    api, business_db, monkeypatch
+):
+    # The customer gave a target date earlier; the model echoes it back. The blocked
+    # sentence is removed and the rest is sent, so pi doesn't hand off every message.
+    mock_turns(
+        monkeypatch,
+        turn(
+            reply="Note kar liya. Aap ka target 15 Oct 2026 hai. Team yahin update degi.",
+            ready_for_team=True,
+            awaiting_customer=False,
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("Website ka kaam kab tak hoga?", "date-1")
+    await pi.deliver_all()
+    conversation = await pi.conversation()
+    assert conversation.mode == "ai"  # no handoff
+    [reply] = await pi.outbound()
+    # The repeated date is dropped. The customer only asked a question, so the brief
+    # isn't sent to the team (nor the follow-up question that comes with it).
+    assert reply.body == "Note kar liya. Team yahin update degi."
+    await pi.close()
+
+
+async def test_a_real_price_still_goes_to_the_team(api, business_db, monkeypatch):
+    mock_turns(monkeypatch, turn(reply="Website 5000 rupay ki hai."))
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    await pi.process("Website kitne ki?", "price-1")
+    await pi.deliver_all()
+    assert (await pi.conversation()).mode == "ai"  # the team prices it on the desk
+    assert all("5000" not in m.body for m in await pi.outbound())
+    assert (await api.get("/api/v1/pi/requests")).json()["items"]
     await pi.close()

@@ -28,7 +28,7 @@ interface Template {
   sendable: boolean;
 }
 interface FormItem {
-  purpose: "lead" | "booking" | "feedback";
+  purpose: "lead" | "booking" | "feedback" | "business";
   name: string;
   fields: string[];
   flow_id: string | null;

@@ -5,6 +5,7 @@ import type {
   HandoffStatus,
   ProviderHealth,
   ProviderName,
+  RunStep,
 } from "../types";
 
 /** Query keys for PI workspace data. Invalidate the `["pi"]` prefix after PI mutations. */
@@ -47,12 +48,22 @@ export const AGENT_LABELS: Record<AgentKey, string> = {
   handoff: "Handoff",
 };
 
+const STEP_LABELS: Record<string, string> = {
+  team_question: "Asked the team",
+  meeting_request: "Meeting request",
+};
+
 export function agentLabel(
-  key: AgentKey | null | undefined,
+  key: RunStep | null | undefined,
   names?: Map<string, string>,
 ) {
   if (!key) return "PI";
-  return names?.get(key) ?? AGENT_LABELS[key] ?? humanize(key);
+  return (
+    names?.get(key) ??
+    AGENT_LABELS[key as AgentKey] ??
+    STEP_LABELS[key] ??
+    humanize(key)
+  );
 }
 
 export const PROVIDER_LABELS: Record<ProviderName, string> = {

@@ -255,3 +255,14 @@
     scrollbar-color: var(--sidebar-border) transparent;
   }
 }
+
+/* Face sign-in: the scanning line moves down and up inside the oval. */
+@keyframes face-scan {
+  0%,
+  100% {
+    top: 11%;
+  }
+  50% {
+    top: 86%;
+  }
+}

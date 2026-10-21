@@ -36,6 +36,8 @@ from app.modules.pi_saas.models import (
 from app.modules.pi_saas.operator import (
     CAPABILITIES,
     ROLE_PRESETS,
+    TIER_NAMES,
+    TIERS,
     Operator,
     OperatorContext,
     account_for,
@@ -73,8 +75,11 @@ async def _audit(
 @router.get("/me")
 async def me(operator: Operator) -> dict[str, Any]:
     return {
+        "member_id": operator.member_id,
         "role": operator.role,
         "role_name": ROLE_PRESETS[operator.role][0],
+        "tier": TIERS[operator.role],
+        "tier_name": TIER_NAMES[TIERS[operator.role]],
         "capabilities": sorted(operator.capabilities),
     }
 
@@ -856,7 +861,12 @@ async def operator_team(operator: Operator, session: Session) -> dict[str, Any]:
             for m, u in rows
         ],
         "roles": {
-            k: {"name": v[0], "description": v[1], "capabilities": sorted(v[2])}
+            k: {
+                "name": v[0],
+                "description": v[1],
+                "tier": TIERS[k],
+                "capabilities": sorted(v[2]),
+            }
             for k, v in ROLE_PRESETS.items()
         },
         "capabilities": list(CAPABILITIES),
@@ -880,7 +890,7 @@ async def add_operator(
             "USER_NOT_FOUND", "This person needs an Owner OS account first", 404
         )
     if user.id == operator.user_id:
-        raise BusinessRuleViolation("OWN_ROLE", "Ask another operator owner to change your role")
+        raise BusinessRuleViolation("OWN_ROLE", "Ask another super admin to change your role")
     member = await session.scalar(
         select(PiOperatorMember).where(PiOperatorMember.user_id == user.id).with_for_update()
     )
@@ -902,7 +912,7 @@ async def add_operator(
             .where(PiOperatorMember.role == "owner", PiOperatorMember.status == "active")
         )
         if int(owners or 0) <= 1:
-            raise BusinessRuleViolation("LAST_OWNER", "Keep at least one operator owner")
+            raise BusinessRuleViolation("LAST_OWNER", "Keep at least one super admin")
     if member is None:
         member = PiOperatorMember(
             user_id=user.id, role=data.role, added_by_user_id=operator.user_id
@@ -932,7 +942,7 @@ async def revoke_operator(member_id: UUID, operator: Operator, session: Session)
             .where(PiOperatorMember.role == "owner", PiOperatorMember.status == "active")
         )
         if int(owners or 0) <= 1:
-            raise BusinessRuleViolation("LAST_OWNER", "Keep at least one operator owner")
+            raise BusinessRuleViolation("LAST_OWNER", "Keep at least one super admin")
     member.status = "revoked"
     await _audit(session, operator, "operator_revoked", None, {"member": str(member_id)})
     await session.commit()

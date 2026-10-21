@@ -86,10 +86,24 @@ operator quote the customer must confirm) → 4 How Pi should help (tools, price
 automation mode) → 5 Try Pi and launch (readiness gates). Progress is saved at every step,
 and "Help me set up" notifies operators.
 
-## 3. Admin side: the operator console
+## 3. Admin side: the admin console (Super admin, Admin, Operators)
 
-Owner OS → Settings → **Pi operator console**, or `/operator` directly. It is available
-only to users with an active `PiOperatorMember` row. Grant the first owner from the
+Owner OS → account menu → **Admin console** (also Settings → Admin console), or
+`/operator` directly. It is available only to users with an active `PiOperatorMember`
+row, and it opens even when that person has no workspace of their own.
+
+There are three tiers. The stored role keys are unchanged, because of a database check
+constraint:
+- **Super admin** (`owner`): everything.
+- **Admin** (`operations_admin`): every workspace, user and Pi business, but not the operator team, plans or platform keys.
+- **Operators** (`onboarding_specialist`, `support`, `billing`, `analyst`): Pi work only.
+
+Super admins and admins can create a workspace for someone, and that person becomes its owner. They can also add, change and remove workspace members. Someone new gets an invite link.
+
+Some rules always apply:
+- Only a super admin gives, changes or removes a workspace owner.
+- Every workspace keeps one owner.
+- Nobody edits their own membership from the console. Grant the first owner from the
 server; there is deliberately no HTTP route for this:
 
 ```bash
@@ -101,11 +115,11 @@ python -m app.modules.pi_saas.bootstrap_operator admin@example.com owner
 | --- | --- |
 | Overview | **Ask Pi (Agenta)**, counts by state, 24h health, platform configuration status |
 | Pi businesses | Search/filter; detail with go-live checklist, WhatsApp connection, subscription (change plan), payment methods the business has switched on, usage, support access; pause/resume, suspend/reinstate, number quotes |
-| Workspaces | Every Owner OS workspace, including Pi businesses; suspend/reactivate (not your own workspace); members and products |
+| Workspaces | Every Owner OS workspace, including Pi businesses. Create a workspace for an owner; manage its members and their roles; suspend or reactivate it (not your own) |
 | Subscription payments | Manual bank/cash collection for Pi subscriptions (billing peer's `pi-billing` feature) |
 | Plans | Starter / Growth / Business plans and their Stripe price IDs (no prices invented) |
 | Failed work | Failed provider events and messages; replay |
-| Operator team | Add operators by role, per-capability overrides, revoke |
+| Admins & operators | Add super admins, admins and operators, change their role, revoke them; per-capability overrides |
 | Conversations | Only with a support grant the business approved; time-limited and audited on every read |
 
 ### Operator roles

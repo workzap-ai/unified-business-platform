@@ -6,7 +6,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, FlaskConical } from "lucide-react";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  FlaskConical,
+  Fingerprint,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/app/forms";
@@ -14,6 +20,16 @@ import { InlineError, Notice } from "@/components/app/states";
 import { ApiError, errorMessage } from "@/services/api-client";
 import { isDemo } from "@/lib/data-mode";
 import { useSession } from "./session-provider";
+import { authService } from "./service";
+import { FaceCamera } from "./face-camera";
+import { probeFace } from "./passkey";
+import {
+  deviceUnlockAvailable,
+  passkeyError,
+  passkeysAvailable,
+  unlockName,
+} from "./passkey";
+import type { SecondStep } from "./types";
 
 const schema = z.object({
   email: z
@@ -33,7 +49,8 @@ function safeNext(value: string | null) {
 }
 
 export function LoginForm() {
-  const { login, status } = useSession();
+  const { login, finishSignIn, status } = useSession();
+  const [step, setStep] = useState<SecondStep | null>(null);
   const router = useRouter();
   const params = useSearchParams();
   const next = safeNext(params.get("next"));
@@ -55,7 +72,11 @@ export function LoginForm() {
   async function onSubmit(values: Values) {
     setError(null);
     try {
-      await login(values);
+      const result = await login(values);
+      if ("mfa_required" in result) {
+        setStep(result); // password was right; now the face or fingerprint
+        return;
+      }
       router.replace(next);
     } catch (e) {
       setError(
@@ -65,6 +86,21 @@ export function LoginForm() {
       );
     }
   }
+
+  if (step)
+    return (
+      <SecondStepForm
+        step={step}
+        onBack={() => {
+          setStep(null);
+          form.setValue("password", "");
+        }}
+        onDone={async (session) => {
+          await finishSignIn(session);
+          router.replace(next);
+        }}
+      />
+    );
 
   return (
     <div>
@@ -166,4 +202,375 @@ export function LoginForm() {
       </p>
     </div>
   );
+}
+
+/** Step two: the person's face on the camera, or their fingerprint if they prefer. */
+function SecondStepForm({
+  step,
+  onBack,
+  onDone,
+}: {
+  step: SecondStep;
+  onBack: () => void;
+  onDone: (
+    session: Awaited<ReturnType<typeof authService.signInWithFace>>,
+  ) => Promise<void>;
+}) {
+  const hasFace = step.methods.includes("face");
+  const hasFingerprint = step.methods.includes("fingerprint");
+  const hasEmail = step.methods.includes("email");
+  const hasPin = step.methods.includes("pin");
+  // The phone's own lock first (one touch, like banking apps); the camera otherwise.
+  const [mode, setMode] = useState<Mode>(
+    hasFingerprint
+      ? "fingerprint"
+      : hasFace
+        ? "face"
+        : hasPin
+          ? "pin"
+          : "email",
+  );
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [unlock, setUnlock] = useState("fingerprint");
+  // No Windows Hello / Touch ID here: the browser would ask for a USB security key.
+  const [noDeviceLock, setNoDeviceLock] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time capability probe
+    setUnlock(passkeysAvailable() ? unlockName() : "fingerprint");
+    void deviceUnlockAvailable().then((available) => {
+      if (available) return;
+      setNoDeviceLock(true);
+      // The camera or an email code work on any computer.
+      if (hasFace) setMode("face");
+      else if (hasPin) setMode("pin");
+      else if (hasEmail) setMode("email");
+    });
+  }, [hasFace, hasPin, hasEmail]);
+
+  function explain(e: unknown, fallback: string): string {
+    if (e instanceof ApiError && e.code === "SIGN_IN_EXPIRED") {
+      onBack();
+      return "";
+    }
+    return errorMessage(e, fallback);
+  }
+
+  async function withFingerprint() {
+    setError(null);
+    setBusy(true);
+    try {
+      await onDone(await authService.signInWithFingerprint(step.ticket));
+    } catch (e) {
+      if (e instanceof ApiError) {
+        const message = explain(e, "That fingerprint didn't work.");
+        if (message) setError(message);
+      } else {
+        // Never silent: a cancelled or failed check says what to do next.
+        setError(passkeyError(e) ?? unlockFailed(unlock, step, e));
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={onBack}
+        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="size-4" aria-hidden /> Back
+      </button>
+      <h1 className="text-2xl font-semibold tracking-tight">
+        {mode === "face"
+          ? "Show your face"
+          : mode === "email"
+            ? "Enter the code from your email"
+            : mode === "pin"
+              ? "Enter your PIN"
+              : `Use your ${unlock}`}
+      </h1>
+      <p className="mt-1.5 text-sm text-muted-foreground">
+        Hi {step.name}. Your password was right; one more check keeps your
+        account safe.
+      </p>
+      <div className="mt-6">
+        {mode === "pin" ? (
+          <PinForm
+            onSubmit={(pin) => authService.signInWithPin(step.ticket, pin)}
+            onDone={onDone}
+            explain={(e) => explain(e, "That PIN isn't right.")}
+          />
+        ) : mode === "email" ? (
+          <EmailCodeForm
+            ticket={step.ticket}
+            onDone={onDone}
+            explain={(e) => explain(e, "That code didn't work.")}
+          />
+        ) : mode === "face" ? (
+          <FaceCamera
+            probe={(frame) => probeFace(step.ticket, frame)}
+            autoStart
+            action="Check my face"
+            onFrames={async (frames) => {
+              try {
+                await onDone(
+                  await authService.signInWithFace(step.ticket, frames),
+                );
+              } catch (e) {
+                const message = explain(e, "We couldn't check your face.");
+                throw new Error(message || "Enter your password again.");
+              }
+            }}
+          />
+        ) : (
+          <div className="space-y-3 text-center">
+            <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-primary-soft text-primary">
+              <Fingerprint className="size-10" aria-hidden />
+            </div>
+            {error ? <InlineError message={error} /> : null}
+            <Button
+              size="lg"
+              className="w-full"
+              loading={busy}
+              onClick={() => void withFingerprint()}
+            >
+              <Fingerprint aria-hidden /> Use {unlock}
+            </Button>
+            {noDeviceLock ? (
+              <p className="text-xs text-muted-foreground">
+                This computer has no {unlockName()} set up. In the window that
+                opens, choose “Use a phone or tablet” and scan the QR code with
+                the phone where you saved your fingerprint.
+              </p>
+            ) : null}
+          </div>
+        )}
+      </div>
+      <div className="mt-5 flex flex-col items-center gap-2 text-sm">
+        {(
+          [
+            [
+              "fingerprint",
+              hasFingerprint,
+              `Use your phone lock (${unlock}) instead`,
+            ],
+            ["face", hasFace, "Use the camera face check instead"],
+            ["pin", hasPin, "Use my PIN instead"],
+            ["email", hasEmail, "Email me a code instead"],
+          ] as const
+        )
+          .filter(([m, has]) => has && m !== mode)
+          .map(([m, , label]) => (
+            <button
+              key={m}
+              type="button"
+              className="font-medium text-primary hover:underline"
+              onClick={() => {
+                setError(null);
+                setMode(m);
+              }}
+            >
+              {label}
+            </button>
+          ))}
+      </div>
+    </div>
+  );
+}
+
+type Mode = "face" | "fingerprint" | "email" | "pin";
+
+/** The second step on any computer: the person's own 6-digit PIN. */
+function PinForm({
+  onSubmit,
+  onDone,
+  explain,
+}: {
+  onSubmit: (pin: string) => ReturnType<typeof authService.signInWithPin>;
+  onDone: (
+    session: Awaited<ReturnType<typeof authService.signInWithPin>>,
+  ) => Promise<void>;
+  explain: (e: unknown) => string;
+}) {
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  return (
+    <form
+      className="space-y-3"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setError(null);
+        setBusy(true);
+        try {
+          await onDone(await onSubmit(pin));
+        } catch (err) {
+          setPin("");
+          const message = explain(err);
+          if (message) setError(message);
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      <FormField
+        label="Your 6-digit PIN"
+        htmlFor="sign-in-pin"
+        error={error ?? undefined}
+      >
+        <Input
+          id="sign-in-pin"
+          type="password"
+          inputMode="numeric"
+          autoComplete="off"
+          maxLength={6}
+          value={pin}
+          onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+          autoFocus
+        />
+      </FormField>
+      <Button
+        type="submit"
+        size="lg"
+        className="w-full"
+        loading={busy}
+        disabled={pin.length !== 6}
+      >
+        Sign in
+      </Button>
+    </form>
+  );
+}
+
+/** The second step on any computer: a 6-digit code sent to the account's email. */
+function EmailCodeForm({
+  ticket,
+  onDone,
+  explain,
+}: {
+  ticket: string;
+  onDone: (
+    session: Awaited<ReturnType<typeof authService.signInWithEmailCode>>,
+  ) => Promise<void>;
+  explain: (e: unknown) => string;
+}) {
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function send() {
+    setError(null);
+    setBusy(true);
+    try {
+      setSentTo((await authService.sendSignInCode(ticket)).sent_to);
+      setCode("");
+    } catch (e) {
+      const message = explain(e);
+      if (message) setError(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function check() {
+    setError(null);
+    setBusy(true);
+    try {
+      await onDone(await authService.signInWithEmailCode(ticket, code.trim()));
+    } catch (e) {
+      const message = explain(e);
+      if (message) setError(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (sentTo === null) {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-muted-foreground">
+          We&apos;ll email a 6-digit code to the address on your account. It
+          works for 10 minutes.
+        </p>
+        {error ? <InlineError message={error} /> : null}
+        <Button
+          size="lg"
+          className="w-full"
+          loading={busy}
+          onClick={() => void send()}
+        >
+          Email me a code
+        </Button>
+      </div>
+    );
+  }
+  return (
+    <form
+      className="space-y-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        void check();
+      }}
+    >
+      <FormField
+        label={`Code sent to ${sentTo}`}
+        htmlFor="sign-in-code"
+        error={error ?? undefined}
+      >
+        <Input
+          id="sign-in-code"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          maxLength={6}
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+          autoFocus
+        />
+      </FormField>
+      <Button
+        type="submit"
+        size="lg"
+        className="w-full"
+        loading={busy}
+        disabled={code.length !== 6}
+      >
+        Sign in
+      </Button>
+      <button
+        type="button"
+        className="w-full text-center text-sm font-medium text-primary hover:underline"
+        disabled={busy}
+        onClick={() => void send()}
+      >
+        Send a new code
+      </button>
+    </form>
+  );
+}
+
+/** What to say when the device check closed without signing in. */
+function unlockFailed(
+  unlock: string,
+  step: { methods: string[]; devices?: string[] },
+  error: unknown,
+): string {
+  const devices = step.devices ?? [];
+  const why =
+    error instanceof Error && error.name && error.name !== "Error"
+      ? ` (${error.name})`
+      : "";
+  const where = devices.length
+    ? ` Your fingerprint key was saved on: ${devices.join(", ")}. If that isn't this computer, ${unlock} here can't use it.`
+    : "";
+  const next = step.methods.includes("email")
+    ? " Use “Email me a code” below, then add this computer in your security settings so it works next time."
+    : step.methods.includes("face")
+      ? " Use the camera face check below."
+      : " Choose “Use a phone or tablet” in the window and scan the QR code with that phone.";
+  return `${unlock} couldn't find your key on this computer${why}.${where}${next}`;
 }

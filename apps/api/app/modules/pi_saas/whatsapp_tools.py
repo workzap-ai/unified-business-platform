@@ -14,6 +14,7 @@
   - Replies still need the signed token checked in ``flows.py``.
 """
 
+import re
 from typing import Any, Literal
 
 from fastapi import APIRouter, Request
@@ -27,7 +28,7 @@ from app.modules.pi_saas.kapso import Kapso
 from app.shared.errors import BusinessRuleViolation
 from app.shared.workspace_repository import WorkspaceRepository
 
-Purpose = Literal["lead", "booking", "feedback"]
+Purpose = Literal["lead", "booking", "feedback", "business"]
 
 FORMS: dict[str, dict[str, Any]] = {
     "lead": {
@@ -50,6 +51,18 @@ FORMS: dict[str, dict[str, Any]] = {
             ("preferred_day", "Preferred day", "text", True),
             ("preferred_time", "Preferred time", "text", False),
             ("notes", "Anything else?", "text", False),
+        ],
+    },
+    "business": {
+        "name": "Business details",
+        "cta": "Share details",
+        "title": "About your business",
+        "fields": [
+            ("name", "Your name", "text", True),
+            ("business_name", "Business name", "text", True),
+            ("business_type", "What does your business do?", "text", True),
+            ("city", "City", "text", False),
+            ("role", "Your role (e.g. owner, manager)", "text", False),
         ],
     },
     "feedback": {
@@ -108,6 +121,82 @@ def flow_json(purpose: str) -> dict[str, Any]:
     }
 
 
+# Follow-up templates pi writes and submits to Meta itself (plain text, no variables,
+# Utility: they are about a request the customer started). key -> (name, text).
+FOLLOW_UPS: dict[str, dict[str, tuple[str, str]]] = {
+    "en": {
+        "reminder": (
+            "pi_reminder_en",
+            "Hi, a gentle reminder about your request with us. Reply here whenever you're "
+            "ready and we'll take it from there. Reply STOP to stop reminders.",
+        ),
+        "day3": (
+            "pi_followup_day3_en",
+            "Hi, your request with us is waiting on one quick answer from you. Reply here "
+            "when you're ready and we'll continue straight away.",
+        ),
+        "day7": (
+            "pi_followup_day7_en",
+            "Hi, we've kept your request ready for you. If anything has changed or you have "
+            "a question, just reply here and we'll help.",
+        ),
+        "day14": (
+            "pi_followup_day14_en",
+            "Hi, should we keep your request open or close it for now? Just reply here. No "
+            "problem either way.",
+        ),
+    },
+    "roman_ur": {
+        "reminder": (
+            "pi_reminder_ru",
+            "Assalam o alaikum! Aap ki request ke baare mein ek yaad-dehani. Jab theek lage "
+            "yahan reply kar dein, hum wahin se aage barhenge. Reminders band karne ke liye "
+            "STOP likhein.",
+        ),
+        "day3": (
+            "pi_followup_day3_ru",
+            "Assalam o alaikum! Aap ki request bas aap ke ek jawab ka intezar kar rahi hai. "
+            "Jab theek lage yahan reply kar dein, hum foran aage barhenge.",
+        ),
+        "day7": (
+            "pi_followup_day7_ru",
+            "Assalam o alaikum! Aap ki request hamare paas tayyar hai. Agar kuch badla hai ya "
+            "koi sawal hai to yahan reply kar dein, hum madad karenge.",
+        ),
+        "day14": (
+            "pi_followup_day14_ru",
+            "Assalam o alaikum! Kya aap ki request khuli rakhein ya abhi ke liye band kar "
+            "dein? Bas yahan reply kar dein, dono theek hain.",
+        ),
+    },
+}
+# A meeting's time and link after the 24-hour window (Utility, with variables:
+# {{1}} business, {{2}} time with zone, {{3}} link or place).
+MEETING_TEMPLATES: dict[str, tuple[str, str]] = {
+    # Meta refuses a template that starts or ends with a variable, or is mostly
+    # variables: each has an opening line and a closing line around them.
+    "en": (
+        "pi_meeting_time_en",
+        "Hi, your meeting with {{1}} is on {{2}}. Join here: {{3}} Reply here if you "
+        "need to change the time.",
+    ),
+    "roman_ur": (
+        "pi_meeting_time_ru",
+        "Assalam o alaikum! {{1}} ke saath aap ki meeting {{2}} ko hai. Join karne ka "
+        "link: {{3}} Waqt badalna ho to yahan reply kar dein.",
+    ),
+}
+MEETING_EXAMPLE = [
+    "Workzap",
+    "Saturday 17 October, 04:00 PM (Pakistan time)",
+    "https://meet.jit.si/abc",
+]
+# pi Customer's sign-in code template (Meta authentication category).
+CODE_TEMPLATE = "pi_customer_code"
+# The language each template is approved in at Meta.
+META_LANGUAGE = {"en": "en_US", "roman_ur": "ur"}
+
+
 class TemplateInput(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     name: str = Field(pattern=r"^[a-z0-9_]{1,512}$")
@@ -134,6 +223,62 @@ async def _number(session: Any, scope: Any) -> WhatsAppConnection:
     return row
 
 
+async def _refresh_meeting_templates(session: Any, scope: Any, items: list[dict[str, Any]]) -> None:
+    """Keep the saved meeting templates' Meta status current (PENDING -> APPROVED)."""
+    policy = await session.scalar(
+        WorkspaceRepository(session, PiSettings, scope).select().limit(1).with_for_update()
+    )
+    if policy is None:
+        return
+    config = dict(policy.whatsapp_config or {})
+    saved = dict(config.get("meeting_templates") or {})
+    live = {(t.get("name"), t.get("language")): t.get("status") for t in items}
+    changed = False
+    for language, template in saved.items():
+        status = live.get((template.get("name"), template.get("language")))
+        if isinstance(template, dict) and status and status != template.get("status"):
+            saved[language] = {**template, "status": status}
+            changed = True
+    if changed:
+        config["meeting_templates"] = saved
+        policy.whatsapp_config = config
+        await session.commit()
+
+
+VERTICALS = (
+    "ALCOHOL APPAREL AUTO BEAUTY EDU ENTERTAIN EVENT_PLAN FINANCE GOVT GROCERY HEALTH HOTEL "
+    "NONPROFIT ONLINE_GAMBLING OTC_DRUGS OTHER PHYSICAL_GAMBLING PROF_SERVICES RESTAURANT "
+    "RETAIL TRAVEL"
+).split()
+EMAIL_SHAPE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+class ProfileInput(BaseModel):
+    """What customers see on the business's WhatsApp profile (Meta's limits)."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    about: str = Field(min_length=1, max_length=139)
+    description: str = Field(default="", max_length=512)
+    address: str = Field(default="", max_length=256)
+    email: str = Field(default="", max_length=128)
+    vertical: Literal[
+        "ALCOHOL", "APPAREL", "AUTO", "BEAUTY", "EDU", "ENTERTAIN", "EVENT_PLAN", "FINANCE",
+        "GOVT", "GROCERY", "HEALTH", "HOTEL", "NONPROFIT", "ONLINE_GAMBLING", "OTC_DRUGS",
+        "OTHER", "PHYSICAL_GAMBLING", "PROF_SERVICES", "RESTAURANT", "RETAIL", "TRAVEL",
+    ] = "OTHER"  # fmt: skip
+    websites: list[str] = Field(default_factory=list, max_length=2)
+
+    def checked(self) -> "ProfileInput":
+        if self.email and not EMAIL_SHAPE.fullmatch(self.email):
+            raise BusinessRuleViolation("INVALID_EMAIL", "Enter a valid email address", 422)
+        for site in self.websites:
+            if not re.fullmatch(r"https?://\S{3,248}", site):
+                raise BusinessRuleViolation(
+                    "INVALID_WEBSITE", "Each website must start with http:// or https://", 422
+                )
+        return self
+
+
 def build() -> APIRouter:
     router = APIRouter(prefix="/pi/whatsapp", tags=["pi-whatsapp-tools"])
 
@@ -148,7 +293,53 @@ def build() -> APIRouter:
         items = await Kapso(request.app.state.settings, request.app.state.http).list_templates(
             number.business_account_id or ""
         )
+        await _refresh_meeting_templates(session, scope, items)
         return {"templates": items, "number": number.display_phone_number, "connected": True}
+
+    @router.get("/profile")
+    async def profile(request: Request, scope: Scope, session: Session) -> dict[str, Any]:
+        """The connected number's public WhatsApp profile."""
+        await require_pi(session, scope, "pi.read")
+        try:
+            number = await _number(session, scope)
+        except BusinessRuleViolation:
+            return {"connected": False, "number": None, "profile": None}
+        kapso = Kapso(request.app.state.settings, request.app.state.http)
+        current = await kapso.business_profile(number.phone_number_id)
+        return {
+            "connected": True,
+            "number": number.display_phone_number,
+            "profile": current,
+            "verticals": VERTICALS,
+            "can_edit": scope.can("pi.whatsapp.manage"),
+        }
+
+    @router.put("/profile")
+    async def save_profile(
+        data: ProfileInput, request: Request, scope: Scope, session: Session
+    ) -> dict[str, Any]:
+        """Change what customers see on the WhatsApp profile (about, description, address,
+        email, category, websites). The photo isn't part of this yet."""
+        await require_pi(session, scope, "pi.whatsapp.manage")
+        data.checked()
+        number = await _number(session, scope)
+        kapso = Kapso(request.app.state.settings, request.app.state.http)
+        await kapso.update_business_profile(number.phone_number_id, data.model_dump())
+        await record(
+            session,
+            "pi.whatsapp_profile_updated",
+            scope=scope,
+            entity_type="whatsapp_connection",
+            entity_id=number.id,
+        )
+        await session.commit()
+        return {
+            "connected": True,
+            "number": number.display_phone_number,
+            "profile": await kapso.business_profile(number.phone_number_id),
+            "verticals": VERTICALS,
+            "can_edit": True,
+        }
 
     @router.post("/templates", status_code=201)
     async def create_template(
@@ -173,6 +364,97 @@ def build() -> APIRouter:
         )
         await session.commit()
         return {"name": data.name, "status": state}
+
+    @router.post("/templates/follow-ups")
+    async def auto_follow_ups(request: Request, scope: Scope, session: Session) -> dict[str, Any]:
+        """pi writes its follow-up templates, submits them to Meta (Utility) and saves them
+        in the settings, then switches follow-ups on. Templates that already exist are
+        reused; each is only sent once Meta approves it (checked at send time)."""
+        await require_pi(session, scope, "pi.settings.manage")
+        number = await _number(session, scope)
+        kapso = Kapso(request.app.state.settings, request.app.state.http)
+        account = number.business_account_id or ""
+        existing = {
+            (t["name"], t["language"]): t["status"] for t in await kapso.list_templates(account)
+        }
+        statuses: dict[str, str] = {}
+        reminders: dict[str, dict[str, str]] = {}
+        ladder: dict[str, dict[str, dict[str, str]]] = {}
+        for language, steps in FOLLOW_UPS.items():
+            meta = META_LANGUAGE[language]
+            for step, (name, body) in steps.items():
+                status = existing.get((name, meta))
+                if status is None:
+                    try:
+                        status = await kapso.create_template(account, name, meta, "UTILITY", body)
+                    except BusinessRuleViolation as error:
+                        if "exist" not in error.message.lower():
+                            status = f"REJECTED: {error.message}"[:120]
+                        else:
+                            status = "PENDING"
+                statuses[f"{language}:{step}"] = status
+                if status.startswith("REJECTED"):
+                    continue
+                template = {"name": name, "language": meta}
+                if step == "reminder":
+                    reminders[language] = template
+                else:
+                    ladder.setdefault(language, {})[step] = template
+        policy = await session.scalar(
+            WorkspaceRepository(session, PiSettings, scope).select().limit(1).with_for_update()
+        )
+        if policy is None:
+            raise BusinessRuleViolation("PI_NOT_SET_UP", "Set up pi first")
+        config = dict(policy.whatsapp_config or {})
+        config["reminder_templates"] = {**(config.get("reminder_templates") or {}), **reminders}
+        config["ladder_templates"] = {**(config.get("ladder_templates") or {}), **ladder}
+        config["reminder_enabled"] = True
+        # pi Customer's sign-in code after the 24-hour window (Meta's authentication
+        # template: Meta writes the text, so one English template serves everyone).
+        code = existing.get((CODE_TEMPLATE, "en_US"))
+        if code is None:
+            try:
+                code = await kapso.create_code_template(account, CODE_TEMPLATE, "en_US")
+            except BusinessRuleViolation as error:
+                code = (
+                    "PENDING"
+                    if "exist" in error.message.lower()
+                    else f"REJECTED: {error.message}"[:120]
+                )
+        statuses["sign_in_code"] = code
+        if not code.startswith("REJECTED"):
+            config["code_template"] = {"name": CODE_TEMPLATE, "language": "en_US"}
+        meetings: dict[str, dict[str, str]] = {}
+        for language, (name, body) in MEETING_TEMPLATES.items():
+            meta = META_LANGUAGE[language]
+            status = existing.get((name, meta))
+            if status is None:
+                try:
+                    status = await kapso.create_template_with_values(
+                        account, name, meta, body, MEETING_EXAMPLE
+                    )
+                except BusinessRuleViolation as error:
+                    status = (
+                        "PENDING"
+                        if "exist" in error.message.lower()
+                        else f"REJECTED: {error.message}"[:120]
+                    )
+            statuses[f"{language}:meeting"] = status
+            if not status.startswith("REJECTED"):
+                # pi uses it only once Meta approves (refreshed when templates are listed).
+                meetings[language] = {"name": name, "language": meta, "status": status}
+        config["meeting_templates"] = {**(config.get("meeting_templates") or {}), **meetings}
+        policy.whatsapp_config = config
+        await record(
+            session,
+            "pi.whatsapp_followup_templates",
+            scope=scope,
+            entity_type="whatsapp_connection",
+            entity_id=number.id,
+            details={"templates": statuses},
+        )
+        await session.commit()
+        return {"templates": statuses, "reminders_on": True}
 
     @router.get("/forms")
     async def forms(scope: Scope, session: Session) -> dict[str, Any]:

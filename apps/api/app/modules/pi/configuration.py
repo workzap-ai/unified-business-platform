@@ -42,7 +42,7 @@ DEFAULTS: dict[str, Any] = {
             day: {"open": True, "start": "09:00", "end": "17:00"}
             for day in ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
         },
-        "outside_hours": "handoff_only",
+        "outside_hours": "reply_with_notice",
         "notice": "Our team will follow up during business hours.",
     },
     "response_rules": {
@@ -129,7 +129,25 @@ DEFAULTS: dict[str, Any] = {
         "max_media_mb": 10,
         "reminder_enabled": True,
         "reminder_after_days": 7,
+        # A free-form check-in when a customer goes quiet mid-conversation (24h window).
+        "check_in_enabled": True,
+        "check_in_after_hours": 2,
+        # After asking once in the chat, pi sends the Business details form.
+        "business_form": True,
         "reminder_templates": {},
+        # Follow-up ladder after the 24-hour window: {"en": {"day3": {name, language}, ...}}.
+        "ladder_templates": {},
+        # pi Customer's sign-in code after the 24-hour window: Meta's authentication
+        # template {name, language} ({} until "Auto follow-ups" sets it up).
+        "code_template": {},
+        # A meeting's time and link after the 24-hour window: Meta's approved Utility
+        # templates {"en": {name, language, status}} ("Auto follow-ups" sets them up).
+        "meeting_templates": {},
+        "follow_up_ladder": True,
+        # pi's picture cards (Problem Map, journey) on WhatsApp.
+        "visual_cards": True,
+        # PDFs, Word, Excel and PowerPoint files pi reads.
+        "media_documents": True,
         # No reminders between these local hours (start == end turns quiet hours off).
         "quiet_start": 21,
         "quiet_end": 9,
@@ -137,6 +155,9 @@ DEFAULTS: dict[str, Any] = {
         "flows": {},
         # PI Customer: customers can see their own conversations with this business.
         "customer_portal": True,
+        # Team board alerts on WhatsApp (pi_saas/team_alerts.py): members' numbers,
+        # on/off and an optional approved template. Edited on the team board.
+        "team_alerts": {},
     },
 }
 
@@ -212,8 +233,10 @@ async def update_settings(
         # screen that edits part of a section never wipes the rest.
         saved = getattr(row, section, None)
         value = {**default, **(saved if isinstance(saved, dict) else {}), **value}
+        # A field saved before it had a default (an older or newer screen) never breaks
+        # a save; fields with a default must keep its type.
         for key, item in value.items():
-            if type(item) is not type(default[key]):
+            if key in default and type(item) is not type(default[key]):
                 raise BusinessRuleViolation("INVALID_SETTING", "Invalid setting value")
     if section == "timezone":
         from zoneinfo import ZoneInfo, ZoneInfoNotFoundError

@@ -19,8 +19,11 @@ Safety:
   elsewhere).
 - Numbers with blocking problems are never offered: Meta test / display-name-only
   numbers, RED quality, sandbox numbers.
-- A released number is retired, not recycled, so a new owner can never receive the
-  previous business's customers' replies.
+- A released number is retired. Giving it to another business is an explicit operator
+  decision (``confirm_reuse``): the previous owner's connection is detached first (kept
+  for its history, never active again), so only the new owner can ever use the number.
+  The previous business's customers can still message it; those messages reach the new
+  owner, which the operator confirms knowingly.
 """
 
 from datetime import UTC, datetime, timedelta
@@ -52,7 +55,9 @@ from app.shared.errors import BusinessRuleViolation, Conflict, ResourceNotFound
 from app.shared.scope import WorkspaceScope
 
 POOL_KEY = "kapso_pool_customer"
-BLOCKING = frozenset({"meta_test_number", "quality_red", "sandbox", "inbound_processing_off"})
+# A pool number that was deleted in Kapso or at Meta: kept only as history, never offered.
+GONE = "deleted_in_kapso"
+BLOCKING = frozenset({"meta_test_number", "quality_red", "sandbox", "inbound_processing_off", GONE})
 # An operator may set a sandbox number aside for a workspace to test with.
 BLOCKING_WHEN_OFFERED = BLOCKING - {"sandbox"}
 
@@ -72,6 +77,8 @@ class PoolUpdate(BaseModel):
     price_label: str | None = Field(default=None, max_length=80)
     notes: str | None = Field(default=None, max_length=300)
     status: str | None = Field(default=None, pattern=r"^(available|retired)$")
+    # Needed to make a retired number available again (the operator's explicit decision).
+    confirm_reuse: bool = False
 
 
 def view(row: PiPoolNumber, *, operator: bool = False) -> dict[str, Any]:
@@ -132,6 +139,34 @@ def _apply(row: PiPoolNumber, number: PhoneNumber) -> None:
         row.country = "US"
 
 
+async def sync_gone(session: AsyncSession, live_ids: set[str]) -> int:
+    """Pool numbers Kapso no longer has (deleted there or at Meta). One nobody used is
+    removed; one that was used keeps its history but is flagged and never offered. When
+    Kapso lists nothing at all, nothing is deleted (an empty answer isn't trusted)."""
+    rows = list(
+        await session.scalars(
+            select(PiPoolNumber)
+            .where(PiPoolNumber.phone_number_id.not_in(live_ids or {""}))
+            .with_for_update()
+        )
+    )
+    for row in rows:
+        if row.status in ("available", "reserved") and live_ids:
+            await session.delete(row)
+        elif GONE not in (row.warnings or []):
+            row.warnings = [*(row.warnings or []), GONE]
+            row.notes = (row.notes + " Deleted in Kapso or Meta.").strip()[:300]
+            row.synced_at = datetime.now(UTC)
+    await session.flush()
+    return len(rows)
+
+
+async def refresh(session: AsyncSession, settings: Settings, http: httpx.AsyncClient) -> None:
+    """Drop numbers Kapso no longer has before anyone is offered one."""
+    numbers = await Kapso(settings, http).list_numbers()
+    await sync_gone(session, {n.phone_number_id for n in numbers})
+
+
 async def inventory(
     session: AsyncSession, settings: Settings, http: httpx.AsyncClient
 ) -> dict[str, Any]:
@@ -139,6 +174,7 @@ async def inventory(
     brought up to date with Kapso (new pool numbers become available)."""
     pool_id = await pool_customer(session, settings, http)
     numbers = await Kapso(settings, http).list_numbers()
+    await sync_gone(session, {n.phone_number_id for n in numbers})
     mapped = {
         c.phone_number_id: c
         for c in await session.scalars(
@@ -243,6 +279,9 @@ async def choose(
         raise Conflict("Someone just took this number. Please choose another.")
     if _blocking(row) & set(row.warnings or []):
         raise BusinessRuleViolation("NUMBER_NOT_READY", "This number isn't ready to use yet")
+    live = {n.phone_number_id for n in await Kapso(settings, http).list_numbers()}
+    if live and row.phone_number_id not in live:
+        raise Conflict("This number is no longer available. Please choose another.")
     provider_row = await connection_for(session, target)
     if provider_row.status == "connected":
         raise Conflict("This workspace already has a connected WhatsApp number")
@@ -469,11 +508,22 @@ async def update(session: AsyncSession, pool_id: UUID, data: PoolUpdate) -> PiPo
     if row is None:
         raise ResourceNotFound
     if data.status == "available" and row.status == "retired":
-        raise BusinessRuleViolation(
-            "NUMBER_RETIRED",
-            "A retired number isn't reused, so earlier customers' replies can't reach a new "
-            "business.",
-        )
+        if GONE in (row.warnings or []):
+            raise BusinessRuleViolation(
+                "NUMBER_DELETED",
+                "This number was deleted in Kapso or Meta, so it can't be reused.",
+            )
+        if not data.confirm_reuse:
+            raise BusinessRuleViolation(
+                "NUMBER_RETIRED",
+                "This number was used by another business. Its earlier customers can still "
+                "message it, and their messages would reach the next business. Confirm to "
+                "reuse it.",
+            )
+        await detach_previous_owner(session, row)
+        row.assigned_tenant_id = row.assigned_environment_id = row.assigned_at = None
+        row.offered_at = row.held_until = None
+        row.notes = (row.notes + " Reused by the operator.").strip()[:300]
     if data.status == "retired" and row.status == "assigned":
         raise Conflict("Disconnect the business from this number first")
     for field in ("country", "price_label", "notes", "status"):
@@ -481,6 +531,40 @@ async def update(session: AsyncSession, pool_id: UUID, data: PoolUpdate) -> PiPo
         if value is not None:
             setattr(row, field, value)
     return row
+
+
+async def detach_previous_owner(session: AsyncSession, row: PiPoolNumber) -> int:
+    """Take the previous business's connection off this number. Its row stays (so its
+    chats and history stay readable) but is disabled and moved to a placeholder number,
+    so the number can be linked to a new business and inbound messages find only the new
+    owner. Returns how many connections were detached."""
+    found = list(
+        await session.scalars(
+            select(WhatsAppConnection).where(
+                WhatsAppConnection.provider == "kapso",
+                WhatsAppConnection.phone_number_id == row.phone_number_id,
+            )
+        )
+    )
+    for connection in found:
+        connection.status = "disabled"
+        for prefix in range(99, 89, -1):  # 99…90: digits only, 32 characters at most
+            placeholder = f"{prefix}{row.phone_number_id[-30:]}"
+            taken = await session.scalar(
+                select(WhatsAppConnection.id).where(
+                    WhatsAppConnection.provider == "kapso",
+                    WhatsAppConnection.phone_number_id == placeholder,
+                )
+            )
+            if taken is None:
+                connection.phone_number_id = placeholder
+                break
+        else:
+            raise BusinessRuleViolation(
+                "NUMBER_REUSED_TOO_OFTEN", "This number has been reused too many times"
+            )
+    await session.flush()
+    return len(found)
 
 
 async def release_for(session: AsyncSession, provider_row: PiProviderConnection) -> None:

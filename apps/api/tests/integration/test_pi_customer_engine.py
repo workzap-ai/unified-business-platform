@@ -1,0 +1,493 @@
+# ruff: noqa: F811 - pytest fixtures imported from the portal tests
+"""pi Customer v2 engine: links between requests, the activity timeline, visual cards
+and the follow-up ladder (customer's turn and team's turn)."""
+
+import json
+from datetime import UTC, datetime, timedelta
+from types import SimpleNamespace
+
+import pytest
+from pi_saas_support import pi_client, worker_ctx
+from sqlalchemy import select
+from test_pi_customer_portal import (  # noqa: F401 - fixtures
+    CSRF_COOKIE,
+    PORTAL,
+    _business_with_chat,
+    _sign_in,
+    app,
+    provider,
+)
+
+from app.ai.manager import LLMManager
+from app.modules.notifications.models import Notification
+from app.modules.pi.models import PiConversation, PiMessage
+from app.modules.pi_customer import engine
+from app.modules.pi_customer.cards import card_token, read_card
+from app.modules.pi_customer.service import Issue, IssueLink, IssueReport
+
+pytestmark = pytest.mark.integration
+
+LINKED = IssueReport(
+    headline="Kitne staff ERP app use karenge?",
+    issues=[
+        Issue(
+            title="Furniture website",
+            stage="on_it",
+            area="Sales",
+            urgency=4,
+            impact=5,
+            data_objects=["products", "stock"],
+            root_cause="No online catalogue",
+            solution_outline="Online store",
+            outcome="Sell online",
+        ),
+        Issue(
+            title="Mobile ERP app",
+            stage="need_answer",
+            open_question="Kitne staff ERP app use karenge?",
+            area="Operations",
+            data_objects=["stock", "orders"],
+        ),
+        Issue(title="Features PDF", stage="noted", area="Operations"),
+    ],
+    links=[
+        IssueLink(
+            a=0,
+            b=1,
+            type="shared_data",
+            confidence=0.9,
+            reason="same stock",
+            benefit="One stock list, no overselling",
+        ),
+        # Unsure: waits for the team, never shown to the customer.
+        IssueLink(a=2, b=1, type="part_of", confidence=0.6, reason="part of ERP"),
+        IssueLink(a=0, b=2, type="same_cause", confidence=0.2, reason="weak"),
+    ],
+)
+
+
+def _mock(monkeypatch, report: IssueReport) -> None:
+    async def complete(self, scope, output, **kwargs):
+        return SimpleNamespace(value=report, response=SimpleNamespace(attempts=[]))
+
+    monkeypatch.setattr(LLMManager, "complete_structured", complete)
+
+
+async def _linked_chat(app, provider, db, monkeypatch):
+    business = await _business_with_chat(app, provider, db, monkeypatch)
+    customer = await _sign_in(app, provider)
+    conversation_id = (await customer.get(f"{PORTAL}/conversations")).json()[0]["id"]
+    _mock(monkeypatch, LINKED)
+    await customer.get(f"{PORTAL}/conversations/{conversation_id}/issues")
+    return business, customer, conversation_id
+
+
+async def test_links_group_solutions_and_only_sure_links_reach_the_customer(
+    app, provider, business_db, monkeypatch
+):
+    business, customer, conversation_id = await _linked_chat(
+        app, provider, business_db, monkeypatch
+    )
+    listed = (await customer.get(f"{PORTAL}/conversations")).json()[0]
+    assert [(x["a_title"], x["b_title"]) for x in listed["links"]] == [
+        ("Furniture website", "Mobile ERP app")
+    ]
+    site, erp, pdf = listed["issues"]
+    assert site["solution_id"] == erp["solution_id"] != pdf["solution_id"]
+    assert site["linked"] == 1 and pdf["linked"] == 0
+    assert site["urgency"] == 4 and site["area"] == "Sales"
+    # The team sees the unsure link in its review queue and confirms it.
+    board = (await business.get("/api/v1/pi-app/problems")).json()
+    [pending] = board["pending_links"]
+    assert pending["a_title"] == "Features PDF" and pending["b_title"] == "Mobile ERP app"
+    confirmed = await business.post(
+        "/api/v1/pi-app/problems/links",
+        json={
+            "conversation_id": conversation_id,
+            "a_title": "Mobile ERP app",
+            "b_title": "Features PDF",
+            "action": "confirm",
+        },
+    )
+    assert confirmed.status_code == 200 and confirmed.json()["pending_links"] == []
+    listed = (await customer.get(f"{PORTAL}/conversations")).json()[0]
+    assert len(listed["links"]) == 2
+    assert len({i["solution_id"] for i in listed["issues"]}) == 1  # one system fixes all
+    await business.aclose()
+    await customer.aclose()
+
+
+async def test_not_related_removes_the_line_for_good(app, provider, business_db, monkeypatch):
+    business, customer, conversation_id = await _linked_chat(
+        app, provider, business_db, monkeypatch
+    )
+    headers = {"x-csrf-token": customer.cookies[CSRF_COOKIE]}
+    gone = await customer.post(
+        f"{PORTAL}/conversations/{conversation_id}/links/not-related",
+        json={"a_title": "Mobile ERP app", "b_title": "Furniture website"},
+        headers=headers,
+    )
+    assert gone.status_code == 200
+    listed = (await customer.get(f"{PORTAL}/conversations")).json()[0]
+    assert listed["links"] == []
+    assert len({i["solution_id"] for i in listed["issues"]}) == 3
+    # pi reads the chat again (a new message) and suggests the same link: it stays gone.
+    conversation = await business_db.get(PiConversation, conversation_id)
+    await business_db.refresh(conversation)
+    conversation.last_message_at = datetime.now(UTC)
+    await business_db.commit()
+    await customer.get(f"{PORTAL}/conversations/{conversation_id}/issues")
+    listed = (await customer.get(f"{PORTAL}/conversations")).json()[0]
+    assert listed["links"] == []
+    await business.aclose()
+    await customer.aclose()
+
+
+async def test_timeline_shows_what_pi_noticed_and_what_people_did(
+    app, provider, business_db, monkeypatch
+):
+    business, customer, conversation_id = await _linked_chat(
+        app, provider, business_db, monkeypatch
+    )
+    events = (await customer.get(f"{PORTAL}/conversations/{conversation_id}/timeline")).json()
+    kinds = [e["kind"] for e in events]
+    assert kinds.count("problem.noted") == 3 and "link.found" in kinds
+    assert "client.wrote" in kinds and "pi.asked" in kinds
+    assert all(e["actor"] in ("pi", "you", "team") for e in events)
+    assert events == sorted(events, key=lambda e: e["at"], reverse=True)
+    await business.aclose()
+    await customer.aclose()
+
+
+async def test_cards_are_signed_expire_and_show_no_chat(app, provider, business_db, monkeypatch):
+    business, customer, conversation_id = await _linked_chat(
+        app, provider, business_db, monkeypatch
+    )
+    settings = app.state.settings
+    from uuid import UUID
+
+    token = card_token(settings, UUID(conversation_id), "map")
+    assert read_card(settings, token)["kind"] == "map"
+    assert read_card(settings, token[:-2] + "xx") is None  # forged
+    anonymous = pi_client(app)
+    data = (await anonymous.get(f"{PORTAL}/card/{token}")).json()
+    assert data["kind"] == "map" and len(data["issues"]) == 3 and len(data["links"]) == 1
+    assert "Website chahiye" not in json.dumps(data)
+    assert (await anonymous.get(f"{PORTAL}/card/not-a-token")).status_code == 404
+    await anonymous.aclose()
+    await business.aclose()
+    await customer.aclose()
+
+
+def test_the_most_useful_card_is_picked():
+    report = {
+        "language": "en",
+        "issues": [
+            {"title": "Website", "stage": "on_it", "ball_with": "team", "next_step": "Team: x"},
+            {
+                "title": "ERP",
+                "stage": "need_answer",
+                "ball_with": "client",
+                "open_question": "How many staff?",
+            },
+        ],
+        "links": [{"status": "auto", "a_title": "Website", "b_title": "ERP"}],
+        "new_events": [
+            {"kind": "stage.changed", "title": "ERP", "to": "need_answer"},
+            {"kind": "link.found", "announce": True, "detail": "same stock"},
+        ],
+    }
+    kind, _, caption = engine.pick_card(report)
+    assert kind == "map" and "1 connection" in caption
+    report["new_events"] = report["new_events"][:1]
+    kind, index, caption = engine.pick_card(report)
+    assert (kind, index) == ("journey", 1) and "How many staff?" in caption
+    report["new_events"] = [{"kind": "problem.noted", "title": "ERP"}]
+    assert engine.pick_card(report) is None  # "noted" alone never gets a card
+
+
+async def _age(db, conversation_id, *, client_hours=None, team_hours=None, inbound_hours=None):
+    conversation = await db.get(PiConversation, conversation_id)
+    await db.refresh(conversation)
+    now = datetime.now(UTC)
+    brief = dict(conversation.service_brief)
+    report = dict(brief["customer_issues"])
+    report["waiting"] = {
+        "client": (now - timedelta(hours=client_hours)).isoformat() if client_hours else None,
+        "team": (now - timedelta(hours=team_hours)).isoformat() if team_hours else None,
+    }
+    brief["customer_issues"] = report
+    conversation.service_brief = brief
+    if inbound_hours is not None:
+        conversation.last_inbound_at = now - timedelta(hours=inbound_hours)
+    await db.commit()
+    return conversation
+
+
+async def test_the_customer_gets_one_nudge_quoting_the_question_at_20_hours(
+    app, provider, business_db, monkeypatch
+):
+    business, customer, conversation_id = await _linked_chat(
+        app, provider, business_db, monkeypatch
+    )
+    monkeypatch.setattr(engine, "prayer_or_quiet", lambda policy, now=None: False)
+    ctx = worker_ctx(app, business_db)
+    await _age(business_db, conversation_id, client_hours=5, inbound_hours=5)
+    assert await engine.run_ladder(ctx) == []  # too early
+    await _age(business_db, conversation_id, client_hours=20.5, inbound_hours=20.5)
+    [queued] = await engine.run_ladder(ctx)
+    message = await business_db.get(PiMessage, queued)
+    assert "Kitne staff ERP app use karenge?" in message.body and "Mobile ERP app" in message.body
+    assert await engine.run_ladder(ctx) == []  # once per question
+    await business.aclose()
+    await customer.aclose()
+
+
+async def test_stop_and_waiting_on_someone_else_silence_the_ladder(
+    app, provider, business_db, monkeypatch
+):
+    business, customer, conversation_id = await _linked_chat(
+        app, provider, business_db, monkeypatch
+    )
+    monkeypatch.setattr(engine, "prayer_or_quiet", lambda policy, now=None: False)
+    ctx = worker_ctx(app, business_db)
+    headers = {"x-csrf-token": customer.cookies[CSRF_COOKIE]}
+    await customer.post(
+        f"{PORTAL}/conversations/{conversation_id}/waiting", json={"days": 5}, headers=headers
+    )
+    await _age(business_db, conversation_id, client_hours=21, inbound_hours=21)
+    assert await engine.run_ladder(ctx) == []
+    await customer.post(
+        f"{PORTAL}/conversations/{conversation_id}/waiting", json={"days": 0}, headers=headers
+    )
+    inbound = await business_db.scalar(
+        select(PiMessage).where(
+            PiMessage.conversation_id == conversation_id, PiMessage.direction == "inbound"
+        )
+    )
+    inbound.body = "band karo please"
+    await business_db.commit()
+    assert await engine.run_ladder(ctx) == []
+    conversation = await business_db.get(PiConversation, conversation_id)
+    await business_db.refresh(conversation)
+    assert conversation.service_brief["reminder_consent"] == "declined"
+    await business.aclose()
+    await customer.aclose()
+
+
+async def test_the_team_is_alerted_when_a_customer_waits_on_it(
+    app, provider, business_db, monkeypatch
+):
+    business, customer, conversation_id = await _linked_chat(
+        app, provider, business_db, monkeypatch
+    )
+    monkeypatch.setattr(engine, "prayer_or_quiet", lambda policy, now=None: False)
+    ctx = worker_ctx(app, business_db)
+    conversation = await _age(business_db, conversation_id, team_hours=25, inbound_hours=13)
+    # The analysis says "team's turn", but the customer never confirmed the brief: no
+    # "the team is working on it" to the customer, and no alert to the team.
+    brief = dict(conversation.service_brief)
+    brief["projects"] = [{"title": "Furniture website", "status": "awaiting_confirmation"}]
+    conversation.service_brief = brief
+    await business_db.commit()
+    assert await engine.run_ladder(ctx) == []
+    # Once they confirm it and it's with the team, the team owes them an update.
+    brief["projects"] = [{"title": "Furniture website", "status": "confirmed"}]
+    conversation.service_brief = dict(brief)
+    await business_db.commit()
+    queued = await engine.run_ladder(ctx)
+    kinds = [
+        (n.title, n.severity)
+        for n in await business_db.scalars(
+            select(Notification).where(
+                Notification.tenant_id == conversation.tenant_id,
+                Notification.kind == "pi.team_sla",
+            )
+        )
+    ]
+    assert sorted(kinds) == [
+        ("A customer has waited 12h for the team", "info"),
+        ("A customer has waited 24h for the team", "warning"),
+    ]
+    statuses = [await business_db.get(PiMessage, q) for q in queued]
+    assert any("Furniture website" in m.body and "update" in m.body.lower() for m in statuses)
+    await business.aclose()
+    await customer.aclose()
+
+
+def test_asking_for_the_map_and_a_third_request_get_the_map():
+    issues = [
+        {"title": "Website", "stage": "on_it", "ball_with": "team", "next_step": "Team: x"},
+        {"title": "ERP", "stage": "need_answer", "ball_with": "client", "open_question": "Q?"},
+        {"title": "PDF", "stage": "noted", "ball_with": "pi", "next_step": ""},
+    ]
+    report = {"language": "en", "issues": issues, "links": [], "new_events": []}
+    kind, _, caption = engine.pick_card(report, asked=True)
+    assert kind == "map" and "3 requests" in caption
+    report["new_events"] = [{"kind": "problem.noted", "title": "PDF"}]
+    kind, _, caption = engine.pick_card(report)
+    assert kind == "map" and '"PDF"' in caption
+    # One request asked for: its journey, not a lone dot.
+    one = {"language": "roman_ur", "issues": issues[1:2], "links": [], "new_events": []}
+    kind, index, caption = engine.pick_card(one, asked=True)
+    assert (kind, index) == ("journey", 0) and "Aap: Q?" in caption
+    for text, hit in [
+        ("map dikhao", True),
+        ("mera naqsha bhejo", True),
+        ("show my map", True),
+        ("progress dikhao please", True),
+        ("I want a website", False),
+        ("sitemap banana hai", False),
+    ]:
+        assert bool(engine.MAP_ASK.search(text)) is hit, text
+
+
+async def test_a_customer_who_asks_for_the_map_gets_it_within_a_minute(
+    app, provider, business_db, monkeypatch
+):
+    business, customer, conversation_id = await _linked_chat(
+        app, provider, business_db, monkeypatch
+    )
+    ctx = worker_ctx(app, business_db)
+    conversation = await business_db.get(PiConversation, conversation_id)
+    await business_db.refresh(conversation)
+    inbound = await business_db.scalar(
+        select(PiMessage)
+        .where(PiMessage.conversation_id == conversation_id, PiMessage.direction == "inbound")
+        .order_by(PiMessage.created_at.desc())
+    )
+    inbound.body = "Mera problem map dikhao"
+    conversation.last_inbound_at = datetime.now(UTC)  # still typing: no quiet wait
+    await business_db.commit()
+    [queued] = await engine.read_quiet_chats(ctx)
+    card = await business_db.get(PiMessage, queued)
+    assert card.media["card"] == "map" and card.media["image"].endswith("/card.png")
+    assert "/customer/card/" in card.media["image"] and "map" in card.body.lower()
+    assert await engine.read_quiet_chats(ctx) == []  # answered once per message
+    # Once WhatsApp has it, the customer's own chat shows the same picture.
+    card.status = "sent"
+    await business_db.commit()
+    detail = (await customer.get(f"{PORTAL}/conversations/{conversation_id}")).json()
+    assert [m["card_image"] for m in detail["messages"] if m.get("card_image")] == [
+        card.media["image"]
+    ]
+    await business.aclose()
+    await customer.aclose()
+
+
+async def test_no_public_address_means_no_card(app, provider, business_db, monkeypatch):
+    business, customer, conversation_id = await _linked_chat(
+        app, provider, business_db, monkeypatch
+    )
+    settings = app.state.settings.model_copy(update={"pi_app_public_url": ""})
+    conversation = await business_db.get(PiConversation, conversation_id)
+    await business_db.refresh(conversation)
+    report = {**conversation.service_brief["customer_issues"], "new_events": []}
+    scope = SimpleNamespace(tenant_id=conversation.tenant_id)
+    policy = SimpleNamespace(whatsapp_config={}, timezone="UTC")
+    assert (
+        await engine.queue_card(
+            business_db, scope, policy, conversation, report, settings=settings, asked=True
+        )
+        is None
+    )
+    await business.aclose()
+    await customer.aclose()
+
+
+def test_asking_for_the_map_tells_pis_reply_what_the_map_is():
+    settings = SimpleNamespace(pi_app_public_url="https://pi.example.com")
+    note = engine.map_request_note({"customer_portal": True}, settings, "Show my map")
+    assert "Problem Map" in note and "location" in note
+    assert engine.map_request_note({}, settings, "I need a website") == ""
+    assert engine.map_request_note({"customer_portal": False}, settings, "map dikhao") == ""
+    assert engine.map_request_note({}, SimpleNamespace(pi_app_public_url=""), "map dikhao") == ""
+
+
+def test_pis_own_whatsapp_lines_follow_the_customers_latest_language():
+    chat = SimpleNamespace(language="roman_ur")
+    assert engine.wa_language("Show my map", chat) == "en"
+    assert engine.wa_language("mujhe map dikhao", SimpleNamespace(language="en")) == "roman_ur"
+    assert engine.wa_language("أرني الخريطة", chat) == "ar"
+    assert engine.wa_language("👍", chat) == "en"  # unclear: English, never the chat's old one
+    assert engine.wa_language("https://example.com/x", chat) == "en"
+    report = {
+        "language": "auto",
+        "issues": [
+            {"title": "Site", "stage": "on_it", "ball_with": "team", "next_step": "x"},
+            {"title": "ERP", "stage": "need_answer", "ball_with": "client", "open_question": "Q?"},
+        ],
+        "links": [],
+    }
+    assert engine.pick_card(report, asked=True, language="en")[2].startswith("Here is your")
+    assert engine.pick_card(report, asked=True, language="roman_ur")[2].startswith("Yeh raha")
+    assert engine.pick_card(report, asked=True, language="ar")[2].startswith("هذه")
+    for lang in ("en", "roman_ur", "ar"):
+        assert "Q?" in engine.TEXT[lang]["nudge"]("ERP", "Q?")
+        assert "Site" in engine.TEXT[lang]["status"]("Site", "Fri 10 Oct")
+
+
+def test_the_card_carries_the_customers_language(app, provider):
+    from uuid import uuid4
+
+    settings = app.state.settings
+    token = card_token(settings, uuid4(), "map", 0, "roman_ur")
+    assert read_card(settings, token)["language"] == "roman_ur"
+    assert read_card(settings, card_token(settings, uuid4(), "map"))["language"] == ""
+
+
+def test_a_caption_never_mentions_a_connection_the_card_does_not_show():
+    report = {
+        "language": "en",
+        "issues": [{"title": "Employee tracking system", "stage": "on_it", "ball_with": "team"}],
+        # The other end of the link isn't on the map (dropped or about the service).
+        "links": [
+            {"status": "auto", "a_title": "Employee tracking system", "b_title": "Reporting app"}
+        ],
+        "new_events": [{"kind": "link.found", "announce": True, "detail": "tracking"}],
+    }
+    assert engine.pick_card(report) is None
+    report["issues"].append({"title": "Reporting app", "stage": "noted", "ball_with": "pi"})
+    assert engine.pick_card(report)[2].startswith("pi found 1 connection")
+
+
+async def test_asking_for_the_code_in_the_chat_sends_one_that_signs_in(
+    app, provider, business_db, monkeypatch
+):
+    from test_pi_customer_portal import CUSTOMER, _sent_codes
+
+    business = await _business_with_chat(app, provider, business_db, monkeypatch)
+    conversation = await business_db.scalar(
+        select(PiConversation)
+        .where(PiConversation.contact_wa_id == CUSTOMER)
+        .order_by(PiConversation.last_inbound_at.desc())
+    )
+    inbound = await business_db.scalar(
+        select(PiMessage)
+        .where(PiMessage.conversation_id == conversation.id, PiMessage.direction == "inbound")
+        .order_by(PiMessage.created_at.desc())
+    )
+    inbound.body = "I need my whatsapp code"
+    conversation.last_inbound_at = datetime.now(UTC)
+    await business_db.commit()
+    # pi's own reply is told the code is coming, so it never invents one.
+    note = engine.map_request_note({}, app.state.settings, "I need my whatsapp code")
+    assert note == engine.CODE_NOTE
+    ctx = {**worker_ctx(app, business_db), "pi_customer_codes": app.state.pi_customer_codes}
+    before = len(_sent_codes(provider, CUSTOMER))
+    await engine.read_quiet_chats(ctx)
+    codes = _sent_codes(provider, CUSTOMER)
+    assert len(codes) == before + 1
+    await engine.read_quiet_chats(ctx)
+    assert len(_sent_codes(provider, CUSTOMER)) == before + 1  # once per message
+    customer = pi_client(app)
+    verified = await customer.post(
+        f"{PORTAL}/verify", json={"phone": f"+{CUSTOMER}", "code": codes[-1]}
+    )
+    assert verified.status_code == 200, verified.text
+    stored = await business_db.scalars(
+        select(PiMessage.body).where(PiMessage.conversation_id == conversation.id)
+    )
+    assert all("PI Customer code" not in body for body in stored)
+    await business.aclose()
+    await customer.aclose()

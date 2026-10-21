@@ -210,6 +210,11 @@ async def test_invoice_checkout_and_signed_webhook_record_one_verified_payment(e
     assert first.status_code == 200, first.text
     second = await env["api"].post(url)
     assert first.json()["id"] == second.json()["id"]
+    # The payer lands on the pi app's public "payment received" page, never the API host.
+    pi_app = env["settings"].pi_app_public_url.rstrip("/")
+    assert saved["success_url"].startswith(f"{pi_app}/paid?invoice=")
+    assert saved["success_url"].endswith("&payment=returned")
+    assert saved["cancel_url"].startswith(f"{pi_app}/paid?invoice=")
     # Provider signature binds the callback, server retrieval verifies amount/currency/scope.
     from app.integrations.crypto import CredentialManager
     from app.modules.integrations.models import IntegrationConnection

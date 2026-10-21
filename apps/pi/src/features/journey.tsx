@@ -22,6 +22,7 @@ import {
 } from "@/components/ui";
 import { del, errorText, get, post, put } from "@/lib/api";
 import { dateTime } from "@/lib/format";
+import { piLink } from "@/lib/links";
 import { useAction, useBusinessKey, useCan } from "@/lib/session";
 
 // ------------------------------------------------------------------ WhatsApp access
@@ -471,7 +472,7 @@ export function NotificationsList() {
               <li key={n.id}>
                 {n.link ? (
                   <Link
-                    href={n.link}
+                    href={piLink(n.link) ?? n.link}
                     className="block hover:bg-surface-muted"
                     onClick={() => !n.read && markOne.mutate(n.id)}
                   >

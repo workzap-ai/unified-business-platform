@@ -151,6 +151,18 @@ export interface PiService {
     search?: string;
   }): Promise<KnowledgeDocument[]>;
   document(id: string): Promise<KnowledgeDocument>;
+  /** Rename and/or rewrite a document; new text is re-indexed. */
+  updateDocument(
+    id: string,
+    input: { title?: string; body?: string },
+  ): Promise<KnowledgeDocument>;
+  deleteDocument(id: string): Promise<void>;
+  updateSource(
+    id: string,
+    input: { name?: string; description?: string },
+  ): Promise<KnowledgeSource>;
+  /** Deletes the source and every document in it. */
+  deleteSource(id: string): Promise<{ deleted_documents: number }>;
   addDocument(input: {
     source_id: string;
     title: string;
@@ -158,6 +170,16 @@ export interface PiService {
     mime_type: string;
   }): Promise<KnowledgeDocument>;
   retryDocument(id: string): Promise<KnowledgeDocument>;
+  /** Read a website (same site only) and return each page's extracted knowledge. */
+  previewWebsite(input: {
+    url: string;
+    max_pages: number;
+  }): Promise<WebsitePreview>;
+  /** Save reviewed pages as documents; a page saved again replaces its old version. */
+  saveWebsitePages(input: {
+    source_id: string;
+    pages: WebsitePage[];
+  }): Promise<{ saved: number }>;
   analytics(range: AnalyticsRange): Promise<PiAnalytics>;
   settings(): Promise<PiSettings>;
   updateSettings<K extends keyof PiSettings>(
@@ -169,6 +191,13 @@ export interface PiService {
 /* Live: every method calls the PI API (see ./live.ts). States that need a connected
    WhatsApp number or AI providers (delivery, automated replies) come from the backend as
    explicit statuses and error codes; nothing is simulated in live mode. */
+export type WebsitePage = { url: string; title: string; content: string };
+export type WebsitePreview = {
+  site: string;
+  pages: WebsitePage[];
+  skipped: { url: string; reason: string }[];
+};
+
 const live = piLive;
 
 /* Demo --------------------------------------------------------------------------------- */
@@ -851,11 +880,56 @@ const demo: PiService = {
       )
       .map((d) => ({ ...d }));
   },
+  async updateDocument(id, input) {
+    await demoDelay(300);
+    const pi = demoPi();
+    const d = pi.documents.find((x) => x.id === id);
+    if (!d) throw new ApiError(404, "RESOURCE_NOT_FOUND");
+    if (input.title !== undefined) d.title = input.title;
+    if (input.body !== undefined) {
+      d.body = input.body;
+      d.byte_size = new Blob([input.body]).size;
+    }
+    return { ...d };
+  },
+  async deleteDocument(id) {
+    await demoDelay(300);
+    const pi = demoPi();
+    const index = pi.documents.findIndex((x) => x.id === id);
+    if (index < 0) throw new ApiError(404, "RESOURCE_NOT_FOUND");
+    const [doc] = pi.documents.splice(index, 1);
+    const source = pi.sources.find((s) => s.id === doc.source_id);
+    if (source) source.documents = Math.max(0, source.documents - 1);
+  },
+  async updateSource(id, input) {
+    await demoDelay(300);
+    const s = demoPi().sources.find((x) => x.id === id);
+    if (!s) throw new ApiError(404, "RESOURCE_NOT_FOUND");
+    if (input.name !== undefined) s.name = input.name;
+    if (input.description !== undefined) s.description = input.description;
+    return { ...s };
+  },
+  async deleteSource(id) {
+    await demoDelay(300);
+    const pi = demoPi();
+    const index = pi.sources.findIndex((x) => x.id === id);
+    if (index < 0) throw new ApiError(404, "RESOURCE_NOT_FOUND");
+    pi.sources.splice(index, 1);
+    const before = pi.documents.length;
+    pi.documents = pi.documents.filter((d) => d.source_id !== id);
+    return { deleted_documents: before - pi.documents.length };
+  },
   async document(id) {
     await demoDelay(100);
     const d = demoPi().documents.find((x) => x.id === id);
     if (!d) throw new ApiError(404, "RESOURCE_NOT_FOUND");
     return { ...d };
+  },
+  async previewWebsite() {
+    throw new DemoError("Reading a website needs a live workspace.");
+  },
+  async saveWebsitePages() {
+    throw new DemoError("Saving website pages needs a live workspace.");
   },
   async addDocument(input) {
     await demoDelay(400);

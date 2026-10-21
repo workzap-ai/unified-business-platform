@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Download,
+  FileDown,
   MessageCircle,
   Pencil,
   Search,
@@ -13,7 +14,13 @@ import {
 import Link from "next/link";
 import * as React from "react";
 
+import { BookMeetingButton, NextMeetingCard } from "@/features/book-meeting";
 import { MarketingConsent } from "@/features/campaigns";
+import { CustomerActivity } from "@/features/customer-activity";
+import { CustomerFiles } from "@/features/customer-files";
+import { CustomerDuplicates } from "@/features/customer-duplicates";
+import { CustomerOverview } from "@/features/customer-overview";
+import { CustomerSolution } from "@/features/customer-solution";
 
 import {
   Badge,
@@ -119,6 +126,14 @@ export function CustomersPage() {
           <>
             {list.data ? (
               <Badge tone="accent">{list.data.total} customers</Badge>
+            ) : null}
+            {can("sales.read") ? (
+              <Link
+                href="/deals"
+                className="text-sm font-medium text-accent underline"
+              >
+                Deals
+              </Link>
             ) : null}
             {can("pi.campaigns.read") ? (
               <Link
@@ -336,7 +351,10 @@ export function CustomerProfilePage({ id }: { id: string }) {
     );
   const p = profile.data;
   const requirements = p.conversations.flatMap((c) =>
-    Object.entries(c.requirements ?? {}).filter(([, v]) => v),
+    // Keys starting with "_" are internal (e.g. "_project": which deal it is).
+    Object.entries(c.requirements ?? {}).filter(
+      ([k, v]) => v && !k.startsWith("_"),
+    ),
   );
   return (
     <div className="space-y-6">
@@ -353,17 +371,35 @@ export function CustomerProfilePage({ id }: { id: string }) {
           "No contact details"
         }
         action={
-          can("pi.customers.export") ? (
-            <Button
-              variant="secondary"
-              loading={exporter.isPending}
-              onClick={() => exporter.mutate(undefined)}
-            >
-              <Download className="size-4" aria-hidden /> Export data
-            </Button>
-          ) : null
+          <>
+            <BookMeetingButton customerId={id} customerName={p.customer.name} />
+            {can("customers.read") ? (
+              <Button variant="secondary" asChild>
+                <a
+                  href={`/api/v1/pi-app/customers/${id}/pi-overview.pdf`}
+                  download
+                >
+                  <FileDown className="size-4" aria-hidden /> Share with my team
+                  (PDF)
+                </a>
+              </Button>
+            ) : null}
+            {can("pi.customers.export") ? (
+              <Button
+                variant="secondary"
+                loading={exporter.isPending}
+                onClick={() => exporter.mutate(undefined)}
+              >
+                <Download className="size-4" aria-hidden /> Export data
+              </Button>
+            ) : null}
+          </>
         }
       />
+      <CustomerDuplicates id={id} name={p.customer.name} />
+      <NextMeetingCard customerId={id} />
+      <CustomerOverview id={id} />
+      {can("customers.read") ? <CustomerSolution id={id} /> : null}
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <div className="space-y-6">
           <Card>
@@ -424,6 +460,7 @@ export function CustomerProfilePage({ id }: { id: string }) {
               </ul>
             </CardSection>
           </Card>
+          {can("customers.read") ? <CustomerActivity id={id} /> : null}
         </div>
         <div className="space-y-6">
           <Card>
@@ -466,6 +503,7 @@ export function CustomerProfilePage({ id }: { id: string }) {
               )}
             </CardSection>
           </Card>
+          {can("customers.read") ? <CustomerFiles customerId={id} /> : null}
           {can("billing.read") ? (
             <CustomerPayments
               customerId={id}

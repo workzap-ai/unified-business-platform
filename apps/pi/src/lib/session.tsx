@@ -129,6 +129,16 @@ export function useSignOut() {
     mutationFn: () => post("/auth/logout"),
     onSettled: () => {
       client.clear();
+      // pi Assistant chats are kept per person in this browser; don't leave them behind.
+      try {
+        for (let i = window.localStorage.length - 1; i >= 0; i--) {
+          const key = window.localStorage.key(i);
+          if (key?.startsWith("pi-assistant:"))
+            window.localStorage.removeItem(key);
+        }
+      } catch {
+        // storage unavailable: nothing was kept
+      }
       router.replace("/sign-in");
     },
   });

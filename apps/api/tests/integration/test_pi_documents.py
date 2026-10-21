@@ -1,0 +1,211 @@
+"""A customer sends a PDF on WhatsApp: pi reads it and answers about it, instead of
+handing it to the team. A file pi can't read gets a polite ask and a request for the
+team; a contract, proposal, quotation or RFP goes on the team's review desk."""
+
+import json
+from types import SimpleNamespace
+
+import httpx
+import pytest
+from sqlalchemy import select
+from test_pi_pipeline import pi_workspace
+from test_pi_service_conversations import mock_turns, turn
+from test_pi_teach_files import make_docx, make_pdf
+
+from app.ai.manager import LLMManager
+from app.modules.pi.documents import document_text
+from app.modules.pi.models import PiMessage
+from app.modules.pi_saas.models import PiStaffRequest
+from app.shared.errors import BusinessRuleViolation
+
+pytestmark = pytest.mark.integration
+
+
+def test_document_text_reads_pdf_word_and_text():
+    label, text = document_text(make_pdf(["Project proposal: AI dashboard for employees"]))
+    assert label == "PDF, 1 page" and "AI dashboard" in text
+    label, text = document_text(make_docx(["Scope: staff performance charts and alerts"]))
+    assert label == "Word document" and "performance charts" in text
+    assert document_text(b"Plain notes about the project scope.")[0] == "text file"
+    with pytest.raises(BusinessRuleViolation):
+        document_text(make_pdf([]))  # no text layer, like a scan
+
+
+def _serve(pi, content: bytes, mime: str = "application/pdf") -> None:
+    """The file download is faked; everything else (sending replies) uses the test's
+    normal fake WhatsApp transport."""
+    normal = pi.http._transport
+
+    async def meta(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/555666777"):
+            return httpx.Response(
+                200,
+                json={
+                    "url": "https://lookaside.fbsbx.com/media/doc",
+                    "mime_type": mime,
+                    "file_size": len(content),
+                },
+            )
+        if request.url.host == "lookaside.fbsbx.com":
+            return httpx.Response(200, content=content)
+        return await normal.handle_async_request(request)
+
+    pi.http = httpx.AsyncClient(transport=httpx.MockTransport(meta))
+    pi.ctx["http"] = pi.http
+
+
+async def test_a_pdf_proposal_is_read_and_answered(api, business_db, monkeypatch):
+    summaries = []
+
+    async def complete(self, scope, **kwargs):
+        summaries.append(kwargs["messages"][-1].text())
+        return SimpleNamespace(
+            text="Project proposal: an AI dashboard to visualise employee performance.\n"
+            "• Charts per team • Weekly alerts • Budget 5,000 USD",
+            attempts=[],
+        )
+
+    monkeypatch.setattr(LLMManager, "complete", complete)
+    contexts = mock_turns(
+        monkeypatch,
+        turn(
+            reply="Thanks, I'm pi, the company's AI assistant. I read your proposal: an AI "
+            "dashboard for employee performance with team charts and weekly alerts. Who "
+            "will use it day to day?",
+            language="en",
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    _serve(pi, make_pdf(["Project proposal: AI dashboard for employees", "Budget 5000 USD"]))
+    await pi.process(
+        "Here is my project proposal", "wamid.doc-1", kind="document", media_id="555666777"
+    )
+    await pi.deliver_all()
+
+    assert "AI dashboard for employees" in summaries[0]  # the PDF's own text was read
+    inbound = await business_db.scalar(
+        select(PiMessage).where(PiMessage.provider_message_id == "wamid.doc-1")
+    )
+    assert "Document" in inbound.body and "AI dashboard" in inbound.body
+    assert inbound.media["file_kind"] == "document"
+    conversation = await pi.conversation()
+    assert conversation.mode == "ai"  # no handoff
+    assert "AI dashboard" in contexts[0]
+    replies = [m.body for m in await pi.outbound()]
+    assert any("I read your proposal" in r for r in replies)
+    await pi.close()
+
+
+async def test_a_pdf_pi_cannot_read_keeps_the_chat(api, business_db):
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    _serve(pi, make_pdf([]))  # no text layer and no page pictures
+    await pi.process("", "wamid.doc-2", kind="document", media_id="555666777")
+    conversation = await pi.conversation()
+    assert conversation.mode == "ai"
+    assert any("couldn't open that file" in m.body for m in await pi.outbound())
+    kinds = list(
+        await business_db.scalars(
+            select(PiStaffRequest.kind).where(PiStaffRequest.conversation_id == conversation.id)
+        )
+    )
+    assert kinds == ["review_document"]
+    await pi.close()
+
+
+async def test_a_contract_goes_on_the_review_desk(api, business_db, monkeypatch):
+    async def complete(self, scope, **kwargs):
+        return SimpleNamespace(
+            text="Kind: contract\nService agreement between the customer and the company.\n"
+            "• Twelve month term • Payment terms net thirty",
+            attempts=[],
+        )
+
+    monkeypatch.setattr(LLMManager, "complete", complete)
+    mock_turns(
+        monkeypatch,
+        turn(
+            reply="Thanks, I read the service agreement: a twelve month term. The team is "
+            "reviewing it and will reply here.",
+            language="en",
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    _serve(pi, make_pdf(["Service agreement", "Payment terms: net 30, balance on delivery"]))
+    await pi.process("please sign this", "wamid.doc-3", kind="document", media_id="555666777")
+    conversation = await pi.conversation()
+    assert conversation.mode == "ai"  # "payment" and "balance" in the file don't hand off
+    [request] = list(
+        await business_db.scalars(
+            select(PiStaffRequest).where(PiStaffRequest.conversation_id == conversation.id)
+        )
+    )
+    assert request.kind == "review_document" and request.priority == "high"
+    assert request.file_id is not None and "contract" in request.question
+    inbound = await business_db.scalar(
+        select(PiMessage).where(PiMessage.provider_message_id == "wamid.doc-3")
+    )
+    assert inbound.media["doc_kind"] == "contract"
+    await pi.close()
+
+
+async def test_figures_from_the_document_can_be_repeated_but_not_its_prices(
+    api, business_db, monkeypatch
+):
+    """The real case: a 26-page brief with 100,000 feeds, October 2026 and $1.30 per
+    camera. The reply may repeat the customer's own counts and dates; the price sentence
+    is dropped; the chat stays with pi."""
+
+    async def complete(self, scope, **kwargs):
+        return SimpleNamespace(
+            text="Product brief: analytics for 100,000 camera feeds, live October 2026, "
+            "budget $1.30 per camera.",
+            attempts=[],
+        )
+
+    monkeypatch.setattr(LLMManager, "complete", complete)
+    mock_turns(
+        monkeypatch,
+        turn(
+            reply="Thanks, I'm pi, the company's AI assistant. I read your brief: analytics "
+            "for 100,000 camera feeds, going live in October 2026. You mentioned $1.30 per "
+            "camera. Which part should the team look at first?",
+            language="en",
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    _serve(pi, make_pdf(["Product brief DRAFT 2", "100,000 feeds", "October 2026"]))
+    await pi.process("", "wamid.doc-3", kind="document", media_id="555666777")
+    await pi.deliver_all()
+    assert (await pi.conversation()).mode == "ai"
+    [reply] = [m.body for m in await pi.outbound()]
+    assert "100,000 camera feeds" in reply and "October 2026" in reply
+    assert "$" not in reply and "1.30" not in reply
+    await pi.close()
+
+
+async def test_a_later_its_in_the_document_gets_the_document(api, business_db, monkeypatch):
+    async def complete(self, scope, **kwargs):
+        return SimpleNamespace(
+            text="Product brief VISION: camera analytics subscription.\n• Store traffic\n"
+            "• Theft alerts",
+            attempts=[],
+        )
+
+    monkeypatch.setattr(LLMManager, "complete", complete)
+    contexts = mock_turns(
+        monkeypatch,
+        turn(reply="Thanks, I'm pi, the company's AI assistant. I read your brief.", language="en"),
+        turn(
+            reply="From your brief: store traffic and theft alerts. Anything to add?", language="en"
+        ),
+    )
+    pi = await pi_workspace(api, business_db, business_type="service_business")
+    _serve(pi, make_pdf(["Product brief VISION", "Store traffic analytics"]))
+    await pi.process("", "wamid.doc-4", kind="document", media_id="555666777")
+    await pi.deliver_all()
+    await pi.process("I have mentioned it already in documents", "wamid.doc-5")
+    await pi.deliver_all()
+    later = json.loads(contexts[1])
+    [document] = later["shared_documents"]
+    assert "camera analytics subscription" in document and "Theft alerts" in document
+    await pi.close()

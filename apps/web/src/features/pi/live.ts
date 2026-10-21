@@ -187,6 +187,28 @@ export const piLive: PiService = {
       z.array(schema.KnowledgeDocumentSchema),
       { query: { ...params, source_id: sourceId } },
     ),
+  updateDocument: (id, input) =>
+    apiRequest(
+      "PATCH",
+      `/pi/knowledge/documents/${id}`,
+      schema.KnowledgeDocumentSchema,
+      { body: input, timeoutMs: 60_000 },
+    ),
+  deleteDocument: (id) =>
+    apiRequest("DELETE", `/pi/knowledge/documents/${id}`, null),
+  updateSource: (id, input) =>
+    apiRequest(
+      "PATCH",
+      `/pi/knowledge/sources/${id}`,
+      schema.KnowledgeSourceSchema,
+      { body: input },
+    ),
+  deleteSource: (id) =>
+    apiRequest(
+      "DELETE",
+      `/pi/knowledge/sources/${id}`,
+      z.object({ deleted_documents: z.number() }),
+    ),
   document: (id) =>
     apiRequest(
       "GET",
@@ -199,6 +221,27 @@ export const piLive: PiService = {
       "/pi/knowledge/documents",
       schema.KnowledgeDocumentSchema,
       { body: input },
+    ),
+  previewWebsite: (input) =>
+    apiRequest(
+      "POST",
+      "/pi/knowledge/website/preview",
+      z.object({
+        site: z.string(),
+        pages: z.array(
+          z.object({ url: z.string(), title: z.string(), content: z.string() }),
+        ),
+        skipped: z.array(z.object({ url: z.string(), reason: z.string() })),
+      }),
+      // Reading a whole site (and extracting each page) can take a minute or two.
+      { body: input, timeoutMs: 170_000 },
+    ),
+  saveWebsitePages: (input) =>
+    apiRequest(
+      "POST",
+      "/pi/knowledge/website/save",
+      z.object({ saved: z.number() }).passthrough(),
+      { body: input, timeoutMs: 60_000 },
     ),
   retryDocument: (id) =>
     apiRequest(

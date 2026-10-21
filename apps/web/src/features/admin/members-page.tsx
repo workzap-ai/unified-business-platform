@@ -7,6 +7,7 @@ import { z } from "zod";
 import {
   Check,
   Copy,
+  MessageCircle,
   MoreHorizontal,
   ShieldCheck,
   UserMinus,
@@ -46,7 +47,7 @@ import { StatusBadge } from "@/components/app/status-badge";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { useUrlState } from "@/hooks/use-url-state";
 import { useSession } from "@/features/auth/session-provider";
-import { ApiError, errorMessage } from "@/services/api-client";
+import { ApiError, apiRequest, errorMessage } from "@/services/api-client";
 import { adminService, type Member, type Role } from "./service";
 
 const PAGE_SIZE = 50;
@@ -388,7 +389,9 @@ function AddMemberDialog({
         ["admin", "roles"],
       ],
       success: (m) =>
-        m.invite_link ? `Invitation sent to ${m.display_name}` : `${m.display_name} added`,
+        m.invite_link
+          ? `Invitation sent to ${m.display_name}`
+          : `${m.display_name} added`,
     },
   );
   const e = form.formState.errors;
@@ -410,6 +413,7 @@ function AddMemberDialog({
             >
               <InviteLinkField link={invited.link} />
             </FormField>
+            <WhatsAppInvite name={invited.name} link={invited.link} />
           </DialogBody>
           <DialogFooter>
             <Button
@@ -442,7 +446,10 @@ function AddMemberDialog({
             try {
               const member = await add.mutateAsync(values);
               if (member.invite_link) {
-                setInvited({ name: member.display_name, link: member.invite_link });
+                setInvited({
+                  name: member.display_name,
+                  link: member.invite_link,
+                });
               } else {
                 onOpenChange(false);
               }
@@ -527,6 +534,79 @@ function AddMemberDialog({
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+const inviteSentSchema = z.object({
+  delivery: z.enum(["sent", "manual"]),
+  share: z.string(),
+});
+
+/** The invite on WhatsApp: from the pi number when they have an open chat with it,
+ * otherwise from the inviter's own WhatsApp with the message ready. */
+function WhatsAppInvite({ name, link }: { name: string; link: string }) {
+  const [phone, setPhone] = useState("");
+  const [result, setResult] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  async function send() {
+    setBusy(true);
+    setResult(null);
+    try {
+      const r = await apiRequest(
+        "POST",
+        "/team-invites/whatsapp",
+        inviteSentSchema,
+        {
+          body: { phone, name, link },
+        },
+      );
+      if (r.delivery === "sent") {
+        setResult("Sent from your pi WhatsApp number.");
+      } else {
+        setResult(
+          "They haven't messaged your pi number yet, so WhatsApp needs you to send it: your WhatsApp opened with the message ready.",
+        );
+        window.open(r.share, "_blank", "noopener");
+      }
+    } catch (e) {
+      setResult(errorMessage(e, "Couldn't prepare the WhatsApp message."));
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <FormField
+      label="Send it on WhatsApp"
+      htmlFor="invite-phone"
+      help="Their WhatsApp number with country code, e.g. +92 300 1234567."
+    >
+      <div className="flex items-center gap-2">
+        <Input
+          id="invite-phone"
+          inputMode="tel"
+          autoComplete="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="+92 300 1234567"
+          className="min-w-0 flex-1"
+        />
+        <Button
+          type="button"
+          variant="secondary"
+          className="h-9 shrink-0"
+          loading={busy}
+          disabled={phone.replace(/\D/g, "").length < 8}
+          onClick={() => void send()}
+        >
+          <MessageCircle /> Send
+        </Button>
+      </div>
+      {result ? (
+        <p className="mt-2 text-xs text-muted-foreground" role="status">
+          {result}
+        </p>
+      ) : null}
+    </FormField>
   );
 }
 

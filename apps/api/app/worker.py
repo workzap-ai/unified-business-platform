@@ -11,16 +11,25 @@ from app.core.config import get_settings
 from app.core.database import create_engine
 from app.integrations.jobs import JOBS as INTEGRATION_JOBS
 from app.integrations.jobs import integrations_sweep
+from app.modules.pi.check_in import sweep_check_ins
 from app.modules.pi.followups import sweep_followups
 from app.modules.pi.knowledge_jobs import index_document, sweep_knowledge
 from app.modules.pi.runtime import process_pi_event, send_pi_message, sweep_pi
 from app.modules.pi.semantic import embed_document
+from app.modules.pi.session_snapshot import sweep_session_snapshots
+from app.modules.pi_customer.engine import sweep_customer_journeys
 from app.modules.pi_saas.calendar_sync import JOBS as PI_CALENDAR_JOBS
 from app.modules.pi_saas.calendar_sync import sweep_pi_calendar
 from app.modules.pi_saas.campaigns import sweep_campaigns
 from app.modules.pi_saas.digests import sweep_digests
+from app.modules.pi_saas.health import heal as pi_health_heal
+from app.modules.pi_saas.health_selftest import self_test_daily as pi_health_self_test
 from app.modules.pi_saas.jobs import JOBS as PI_SAAS_JOBS
 from app.modules.pi_saas.jobs import sweep_pi_saas
+from app.modules.pi_saas.meeting_board import remind_upcoming as remind_meetings
+from app.modules.pi_saas.team_alerts import remind_due as remind_team_due
+from app.modules.pi_saas.team_alerts import send_team_alert
+from app.modules.pi_saas.team_board import sweep as sweep_team_board
 
 
 async def health_probe(ctx: dict[str, Any]) -> str:
@@ -36,9 +45,21 @@ JOB_FUNCTIONS: dict[str, Callable[..., Awaitable[Any]]] = {
     "send_pi_message": send_pi_message,
     "sweep_pi": sweep_pi,
     "sweep_followups": sweep_followups,
+    "sweep_check_ins": sweep_check_ins,
+    "sweep_session_snapshots": sweep_session_snapshots,
+    "sweep_customer_journeys": sweep_customer_journeys,
     "embed_document": embed_document,
     "index_document": index_document,
     "sweep_knowledge": sweep_knowledge,
+    # pi Health: safe self-fixes (every 5 minutes) and daily self-tests.
+    "pi_health_heal": pi_health_heal,
+    "pi_health_self_test": pi_health_self_test,
+    # Team board: the team's real work becomes cards (every 2 minutes).
+    "sweep_team_board": sweep_team_board,
+    # Team alerts on WhatsApp: a card given to someone; cards due within the hour.
+    "send_team_alert": send_team_alert,
+    "remind_team_due": remind_team_due,
+    "remind_meetings": remind_meetings,
     # Integration platform: inbound events, outbox dispatch, deliveries, sync, sweep.
     **INTEGRATION_JOBS,
     # Pi SaaS: provider/billing webhooks and lifecycle sweep.
@@ -84,12 +105,20 @@ class WorkerSettings:
     cron_jobs = [
         cron(sweep_pi, second={0, 30}, unique=True),
         cron(sweep_followups, minute=set(range(0, 60, 5)), second=10, unique=True),
+        cron(sweep_check_ins, minute=set(range(2, 60, 5)), second=30, unique=True),
+        cron(sweep_session_snapshots, minute=set(range(4, 60, 5)), second=40, unique=True),
+        cron(sweep_customer_journeys, second={50}, unique=True),
         cron(sweep_knowledge, second={20, 50}, unique=True),
         cron(integrations_sweep, second={15}, unique=True),
         cron(sweep_pi_saas, second={40}, unique=True),
         cron(sweep_pi_calendar, second={5, 35}, unique=True),
         cron(sweep_campaigns, second={25, 55}, unique=True),
         cron(sweep_digests, minute={7, 37}, second=45, unique=True),
+        cron(pi_health_heal, minute=set(range(3, 60, 5)), second=15, unique=True),
+        cron(pi_health_self_test, minute={23}, second=0, unique=True),
+        cron(sweep_team_board, minute=set(range(1, 60, 2)), second=25, unique=True),
+        cron(remind_team_due, minute={6, 21, 36, 51}, second=35, unique=True),
+        cron(remind_meetings, minute=set(range(1, 60, 5)), second=45, unique=True),
     ]
     redis_settings = RedisSettings.from_dsn(get_settings().redis_url.get_secret_value())
     queue_name = get_settings().job_queue_name

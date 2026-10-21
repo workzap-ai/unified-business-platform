@@ -44,10 +44,15 @@ class FakeProvider:
         self.fail_kapso = False
         # WhatsApp message templates visible through Kapso's Meta proxy (campaigns/reminders).
         self.templates: list[dict[str, Any]] = []
+        self.profiles: dict[str, dict[str, Any]] = {}
         self.webhooks: dict[str, list[dict[str, Any]]] = {}
         self.flows: list[dict[str, Any]] = []
         self.connected_tokens: list[str] = []
         self.setup_links: list[dict[str, Any]] = []
+        # Plan-change proration: per-subscription Stripe subscription items (for the
+        # GET that resolves the current item id) and the next upcoming-invoice preview.
+        self.subscription_items: dict[str, list[dict[str, Any]]] = {}
+        self.upcoming_invoice: dict[str, Any] = {"amount_due": 1500, "currency": "usd"}
 
     def add_number(
         self, customer_id: str, phone_number_id: str, display: str, **extra: Any
@@ -152,6 +157,18 @@ class FakeProvider:
                 name = request.url.params.get("name", "")
                 found = [t for t in self.templates if not name or t["name"] == name]
                 return httpx.Response(200, json={"data": found})
+            if "/meta/whatsapp/" in path and path.endswith("/whatsapp_business_profile"):
+                number = path.split("/whatsapp/")[1].split("/")[1]
+                if request.method == "POST":
+                    body = json.loads(request.content)
+                    self.profiles.setdefault(number, {}).update(
+                        {k: v for k, v in body.items() if k != "messaging_product"}
+                    )
+                    return httpx.Response(200, json={"success": True})
+                saved = self.profiles.get(number, {"about": "Hey there", "vertical": "OTHER"})
+                return httpx.Response(
+                    200, json={"data": [{"messaging_product": "whatsapp", **saved}]}
+                )
             if "/meta/whatsapp/" in path and path.endswith("/messages"):
                 return httpx.Response(200, json={"messages": [{"id": f"wamid.k{next(self.ids)}"}]})
             return httpx.Response(404)
@@ -162,8 +179,16 @@ class FakeProvider:
                 )
             if request.url.path == "/v1/billing_portal/sessions":
                 return httpx.Response(200, json={"url": "https://billing.stripe.com/p/1"})
+            if request.url.path == "/v1/invoices/upcoming":
+                return httpx.Response(200, json=self.upcoming_invoice)
             if request.url.path.startswith("/v1/subscriptions/"):
-                return httpx.Response(200, json={"id": "sub_1", "cancel_at_period_end": True})
+                sub_id = request.url.path.rsplit("/", 1)[-1]
+                if request.method == "GET":
+                    items = self.subscription_items.get(
+                        sub_id, [{"id": "si_default", "price": {"id": "price_default"}}]
+                    )
+                    return httpx.Response(200, json={"id": sub_id, "items": {"data": items}})
+                return httpx.Response(200, json={"id": sub_id, "cancel_at_period_end": True})
             return httpx.Response(404)
         return httpx.Response(503)
 

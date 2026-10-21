@@ -99,6 +99,7 @@ async def receive(session: AsyncSession, event: InboundEvent) -> UUID | None:
     status = event.event_type == "message.status"
     mid = str(data.get("message_id", ""))
     kind = str(data.get("type", "other"))
+    document = kind == "document"  # Stored as "other"; pi reads the file (pi.documents).
     kind = kind if kind in {"text", "interactive", *PI_MEDIA_TYPES} else "other"
     raw_key = f"{connection.phone_number_id}:{mid}" + (f":{data.get('status')}" if status else "")
     payload = {
@@ -112,7 +113,12 @@ async def receive(session: AsyncSession, event: InboundEvent) -> UUID | None:
         # "other" rather than violating the message-type constraint.
         "message_type": kind,
         "body": data.get("text", ""),
-        "media_id": data.get("media_id") if kind in PI_MEDIA_TYPES else None,
+        "media_id": data.get("media_id") if kind in PI_MEDIA_TYPES or document else None,
+        **(
+            {"file_kind": "document", "filename": str(data.get("filename") or "")[:200]}
+            if document
+            else {}
+        ),
         "form": data.get("form") if kind == "interactive" else None,
         "state": data.get("status"),
     }

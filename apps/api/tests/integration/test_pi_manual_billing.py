@@ -330,10 +330,14 @@ def test_month_end_renewal_keeps_a_calendar_month():
 
 async def test_summary_counts_verified_money_and_refunds_once(collection, api):
     _, client, tenant, _, _ = collection
+    # Platform totals can include payments committed by concurrency tests. Verify
+    # this payment's contribution without assuming an otherwise empty database.
+    baseline = (await api.get(ADMIN + "/summary")).json()
     row, _ = await request(client, months=3)
     await submit(client, row)
     before = (await api.get(ADMIN + "/summary")).json()
-    assert before["pending_count"] == 1 and Decimal(before["received_pkr"]) == 0
+    assert before["pending_count"] == baseline["pending_count"] + 1
+    assert Decimal(before["received_pkr"]) == Decimal(baseline["received_pkr"])
     await review(api, tenant, row)
     response = await api.post(
         ADMIN + f"/accounts/{tenant}/payments/{row['id']}/refund",
@@ -345,8 +349,10 @@ async def test_summary_counts_verified_money_and_refunds_once(collection, api):
     )
     assert response.status_code == 200
     summary = (await api.get(ADMIN + "/summary")).json()
-    assert Decimal(summary["received_pkr"]) == Decimal(summary["refunded_pkr"]) == 7500
-    assert Decimal(summary["net_pkr"]) == 0 and summary["pending_count"] == 0
+    assert Decimal(summary["received_pkr"]) == Decimal(baseline["received_pkr"]) + 7500
+    assert Decimal(summary["refunded_pkr"]) == Decimal(baseline["refunded_pkr"]) + 7500
+    assert Decimal(summary["net_pkr"]) == Decimal(baseline["net_pkr"])
+    assert summary["pending_count"] == baseline["pending_count"]
 
 
 async def test_manual_expiry_updates_status_and_blocks_entitlement(collection, api, business_db):

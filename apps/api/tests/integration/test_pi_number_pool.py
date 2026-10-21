@@ -196,7 +196,7 @@ async def test_pool_numbers_are_chosen_once_offered_and_retired(api, app, busine
             await api.get(f"/api/v1/operator/workspaces/{workspace.tenant_id}/whatsapp")
         ).json()
         assert panel["connection"]["status"] == "connected"
-        # Releasing retires the number; it can't be handed to someone else afterwards.
+        # Releasing retires the number; reusing it is the operator's explicit decision.
         await api.post("/api/v1/pi/whatsapp/kapso/disconnect", json={})
         row = await business_db.scalar(
             select(PiPoolNumber).where(PiPoolNumber.phone_number_id == "5000000002")
@@ -205,7 +205,31 @@ async def test_pool_numbers_are_chosen_once_offered_and_retired(api, app, busine
         reuse = await api.patch(
             f"/api/v1/operator/pi/numbers/{row.id}", json={"status": "available"}
         )
-        assert reuse.status_code == 422
+        assert reuse.status_code == 422  # not without the explicit confirmation
+        confirmed = await api.patch(
+            f"/api/v1/operator/pi/numbers/{row.id}",
+            json={"status": "available", "confirm_reuse": True},
+        )
+        assert confirmed.status_code == 200, confirmed.text
+        assert confirmed.json()["status"] == "available"
+        # The previous business's connection is detached (kept, disabled, placeholder number)
+        # so the number can go to someone else and nobody old can receive on it.
+        old = (
+            await business_db.scalars(
+                select(WhatsAppConnection).where(
+                    WhatsAppConnection.tenant_id == UUID(workspace.tenant_id)
+                )
+            )
+        ).all()
+        assert old and all(c.status == "disabled" for c in old)
+        assert all(c.phone_number_id != "5000000002" for c in old)
+        assert not await business_db.scalar(
+            select(WhatsAppConnection).where(WhatsAppConnection.phone_number_id == "5000000002")
+        )
+        again = (await second.get("/api/v1/pi-app/whatsapp/numbers")).json()
+        reused = next(n for n in again if n["display_phone_number"] == "+1 415 555 0102")
+        taken = await second.post(f"/api/v1/pi-app/whatsapp/numbers/{reused['id']}/choose", json={})
+        assert taken.status_code == 200 and taken.json()["status"] == "connected", taken.text
     finally:
         await workspace.close()
     await first.aclose()
@@ -247,3 +271,46 @@ async def test_connecting_an_existing_number_never_stores_the_token(api, app, bu
     count = await business_db.scalar(select(func.count()).select_from(PiPoolNumber))
     assert count == 1
     assert json.dumps(added.json()).find(secret[:30]) == -1
+
+
+async def test_numbers_deleted_in_kapso_are_never_offered(api, app, business_db):
+    provider = _provider(app)
+    business = pi_client(app)
+    await pi_register(business, "Gone Co")
+    await _operator(api, business_db)
+    pool_customer = (await api.get("/api/v1/operator/pi/numbers")).json()["pool_customer_id"]
+    provider.add_number(pool_customer, "5100000001", "+1 415 555 0201")
+    provider.add_number(pool_customer, "5100000002", "+1 415 555 0202")
+    provider.add_number(pool_customer, "5100000003", "+1 415 555 0203")
+    await api.get("/api/v1/operator/pi/numbers")  # the pool picks them up
+    offered = (await business.get("/api/v1/pi-app/whatsapp/numbers")).json()
+    assert len(offered) == 3
+
+    # One is taken and released (retired); then two of the three are deleted in Kapso/Meta.
+    by_name = {n["display_phone_number"]: n["id"] for n in offered}
+    taken = await business.post(
+        f"/api/v1/pi-app/whatsapp/numbers/{by_name['+1 415 555 0203']}/choose", json={}
+    )
+    assert taken.status_code == 200, taken.text
+    await business.post("/api/v1/pi-app/whatsapp/disconnect", json={})
+    provider.numbers[pool_customer] = [
+        n for n in provider.numbers[pool_customer] if n["phone_number_id"] == "5100000001"
+    ]
+
+    shown = (await business.get("/api/v1/pi-app/whatsapp/numbers")).json()
+    assert [n["display_phone_number"] for n in shown] == ["+1 415 555 0201"]
+    gone_id = by_name["+1 415 555 0202"]
+    assert await business_db.get(PiPoolNumber, UUID(gone_id)) is None  # unused: removed
+    refused = await business.post(f"/api/v1/pi-app/whatsapp/numbers/{gone_id}/choose", json={})
+    assert refused.status_code == 404
+
+    # The used one keeps its history, is flagged, and can't be reused.
+    inventory = (await api.get("/api/v1/operator/pi/numbers")).json()
+    used = next(n for n in inventory["pool"] if n["display_phone_number"] == "+1 415 555 0203")
+    assert used["status"] == "retired" and "deleted_in_kapso" in used["warnings"]
+    reuse = await api.patch(
+        f"/api/v1/operator/pi/numbers/{used['id']}",
+        json={"status": "available", "confirm_reuse": True},
+    )
+    assert reuse.status_code == 422 and reuse.json()["error"]["code"] == "NUMBER_DELETED"
+    await business.aclose()

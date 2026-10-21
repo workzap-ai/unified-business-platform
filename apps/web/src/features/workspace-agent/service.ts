@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { apiRequest } from "@/services/api-client";
+import { apiRequest, apiStream } from "@/services/api-client";
 
 const record = z.record(z.string(), z.unknown());
 export const contextSchema = z.object({
@@ -164,7 +164,16 @@ const replySchema = z.object({
   navigate: z.string().nullable().optional(),
   mode: z.string(),
   notice: z.string().optional(),
+  follow_ups: z.array(z.string()).default([]),
 });
+export type StreamEvent =
+  | { type: "thinking" }
+  | { type: "note"; text: string }
+  | { type: "step"; tool: string; label: string }
+  | { type: "step_done"; tool: string; ok: boolean }
+  | { type: "reply"; reply: z.infer<typeof replySchema> }
+  | { type: "error"; message: string };
+export type ChatTurn = { role: "user" | "assistant"; content: string };
 export type AgentContext = z.infer<typeof contextSchema>;
 export type Proposal = z.infer<typeof proposalSchema>;
 export type ToolResult = z.infer<typeof resultSchema>;
@@ -191,6 +200,25 @@ export const agentService = {
     }),
   pending: () =>
     apiRequest("GET", `${base}/proposals`, z.array(proposalSchema)),
+  /** The agent, streamed: each real step as it happens, then the validated reply. */
+  chatStream: (
+    message: string,
+    history: ChatTurn[],
+    current_page: string,
+    onEvent: (event: StreamEvent) => void,
+    signal: AbortSignal,
+  ) =>
+    apiStream<StreamEvent>(
+      `${base}/chat/stream`,
+      { message, history, current_page },
+      (event) =>
+        onEvent(
+          event.type === "reply"
+            ? { type: "reply", reply: replySchema.parse(event.reply) }
+            : event,
+        ),
+      signal,
+    ),
   chat: (
     message: string,
     history: string[],

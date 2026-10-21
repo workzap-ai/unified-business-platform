@@ -14,6 +14,7 @@ import logging
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
+from urllib.parse import urlencode
 from uuid import UUID
 
 import httpx
@@ -350,6 +351,12 @@ async def checkout(
         "metadata[tenant_id]": str(account.tenant_id),
         "metadata[plan_key]": plan.key,
     }
+    if settings.pi_billing_stripe_tax_enabled:
+        # Stripe Tax must be turned on (and registrations entered) in the user's own
+        # Stripe Dashboard first; this flag just lets us ask Stripe to calculate it, and
+        # Stripe requires a billing address to do so.
+        form["automatic_tax[enabled]"] = "true"
+        form["billing_address_collection"] = "required"
     if subscription.external_customer_id:
         form["customer"] = subscription.external_customer_id
     else:
@@ -395,6 +402,130 @@ async def checkout(
         details={"plan": plan.key},
     )
     return url
+
+
+async def _purchasable_plan(session: AsyncSession, plan_key: str) -> PiPlan:
+    plan = await session.scalar(
+        select(PiPlan).where(PiPlan.key == plan_key, PiPlan.status == "available")
+    )
+    if (
+        plan is None
+        or plan.visibility != "public"
+        or plan.monthly_price is None
+        or plan.monthly_price == 0
+        or not plan.stripe_price_id
+    ):
+        raise BusinessRuleViolation(
+            "PLAN_NOT_PURCHASABLE",
+            "This plan can't be bought online yet. Contact us and we'll set it up.",
+            409,
+        )
+    return plan
+
+
+def _require_changeable(subscription: PiSubscription, plan: PiPlan) -> None:
+    """A plan change (saved card, no new checkout) only ever applies to a Stripe
+    subscription that already has a card on file and is in a billable state."""
+    if (
+        subscription.billing_provider != "stripe"
+        or not subscription.external_subscription_id
+        or subscription.status not in {"active", "trialing", "past_due"}
+    ):
+        raise BusinessRuleViolation(
+            "PLAN_CHANGE_UNAVAILABLE",
+            "Start a new checkout to change your plan",
+            409,
+        )
+    if plan.key == subscription.plan_key and subscription.pending_plan_key is None:
+        raise BusinessRuleViolation("SAME_PLAN", "You're already on this plan", 409)
+
+
+async def _current_item_id(stripe: Stripe, subscription: PiSubscription) -> str:
+    """Our DB never stores the Stripe subscription item id, only the subscription id
+    itself, so fetch it fresh before any item-level change."""
+    data = await stripe.get(f"/v1/subscriptions/{subscription.external_subscription_id}")
+    items = as_list(as_dict(data.get("items")).get("data"))
+    item_id = str(as_dict(items[0]).get("id") or "") if items else ""
+    if not item_id:
+        raise BusinessRuleViolation("BILLING_UNAVAILABLE", "Unexpected billing response", 502)
+    return item_id
+
+
+async def preview_change_plan(
+    session: AsyncSession,
+    settings: Settings,
+    http: httpx.AsyncClient,
+    scope: WorkspaceScope,
+    account: PiBusinessAccount,
+    plan_key: str,
+) -> dict[str, Any]:
+    """The "you'll be charged $X now" preview a real product shows before confirming a
+    plan change: Stripe's own proration math for swapping this subscription's price,
+    without changing anything yet."""
+    scope.require("pi.billing.manage")
+    plan = await _purchasable_plan(session, plan_key)
+    subscription = await subscription_for(session, account.tenant_id)
+    _require_changeable(subscription, plan)
+    stripe = Stripe(settings, http)
+    item_id = await _current_item_id(stripe, subscription)
+    query = urlencode(
+        {
+            "subscription": subscription.external_subscription_id,
+            "subscription_items[0][id]": item_id,
+            "subscription_items[0][price]": plan.stripe_price_id,
+        }
+    )
+    data = await stripe.get(f"/v1/invoices/upcoming?{query}")
+    currency = str(data.get("currency") or subscription.currency).upper()[:3]
+    return {
+        "plan": plan.key,
+        "amount_due_now": str(_money(data.get("amount_due"), currency)),
+        "currency": currency,
+        "new_recurring_amount": str(plan.monthly_price),
+        "new_recurring_currency": plan.currency,
+    }
+
+
+async def change_plan(
+    session: AsyncSession,
+    settings: Settings,
+    http: httpx.AsyncClient,
+    scope: WorkspaceScope,
+    account: PiBusinessAccount,
+    plan_key: str,
+) -> PiSubscription:
+    """Switch plans on the existing Stripe subscription (saved card, no new checkout),
+    with Stripe prorating the difference. Applied optimistically here;
+    ``apply_event()``'s existing ``customer.subscription.updated`` handling (which
+    already resolves a new price to a ``PiPlan`` and updates ``plan_key``/``currency``)
+    confirms it for real once Stripe's webhook lands."""
+    scope.require("pi.billing.manage")
+    plan = await _purchasable_plan(session, plan_key)
+    subscription = await subscription_for(session, account.tenant_id)
+    _require_changeable(subscription, plan)
+    stripe = Stripe(settings, http)
+    item_id = await _current_item_id(stripe, subscription)
+    price_id = plan.stripe_price_id
+    assert price_id  # _purchasable_plan() already required this
+    await stripe.post(
+        f"/v1/subscriptions/{subscription.external_subscription_id}",
+        {
+            "items[0][id]": item_id,
+            "items[0][price]": price_id,
+            "proration_behavior": "create_prorations",
+        },
+        f"pi-change-plan:{subscription.external_subscription_id}:{plan.key}",
+    )
+    subscription.pending_plan_key = plan.key  # Confirmed later by the webhook.
+    await record(
+        session,
+        "pi_saas.plan_change_requested",
+        scope=scope,
+        entity_type="pi_subscription",
+        entity_id=subscription.id,
+        details={"plan": plan.key},
+    )
+    return subscription
 
 
 async def portal(
@@ -510,6 +641,7 @@ async def store_event(session: AsyncSession, event: dict[str, Any]) -> UUID | No
                         "amount_paid",
                         "currency",
                         "hosted_invoice_url",
+                        "invoice_pdf",
                         "period_start",
                         "period_end",
                         "parent",
@@ -783,6 +915,11 @@ async def _invoice(
             if str(obj.get("hosted_invoice_url") or "").startswith("https://")
             else None
         ),
+        "pdf_url": (
+            str(obj["invoice_pdf"])[:500]
+            if str(obj.get("invoice_pdf") or "").startswith("https://")
+            else None
+        ),
     }
     if not values["external_id"]:
         return False
@@ -838,3 +975,58 @@ async def sweep_lifecycle(session: AsyncSession) -> int:
             include_environment=False,
         )
     return len(rows)
+
+
+# Most urgent first: a subscription that is already very close to (or past) the first
+# threshold when a sweep catches it jumps straight to the more urgent template instead
+# of sending both at once. ``dunning_stage`` records the highest stage reached.
+DUNNING_STAGES: tuple[tuple[int, int, str], ...] = (
+    (2, 1, "pi_billing_dunning_1d"),
+    (1, 3, "pi_billing_dunning_3d"),
+)
+
+
+async def send_dunning_reminders(
+    session: AsyncSession, settings: Settings, http: httpx.AsyncClient | None
+) -> int:
+    """Staged reminders between the first past_due notice and the hard cutover to
+    suspended at ``grace_ends_at`` (``sweep_lifecycle``). Best-effort: a mail failure
+    inside ``send_billing_email`` never raises, so it can't block the sweep."""
+    now = datetime.now(UTC)
+    rows = list(
+        await session.scalars(
+            select(PiSubscription)
+            .where(
+                PiSubscription.status == "past_due",
+                PiSubscription.grace_ends_at.is_not(None),
+                PiSubscription.dunning_stage < len(DUNNING_STAGES),
+            )
+            .with_for_update(skip_locked=True)
+            .limit(200)
+        )
+    )
+    sent = 0
+    for row in rows:
+        assert row.grace_ends_at is not None
+        days_left = (row.grace_ends_at - now).total_seconds() / 86400
+        for stage, threshold_days, template in DUNNING_STAGES:
+            if row.dunning_stage >= stage or days_left > threshold_days:
+                continue
+            business = await account_name(session, row.tenant_id)
+            await send_billing_email(
+                session,
+                settings,
+                http,
+                row.tenant_id,
+                template,
+                {
+                    "business": business,
+                    "days_left": str(max(round(days_left), 0)),
+                    "link": f"{settings.pi_app_public_url.rstrip('/')}/settings/billing",
+                },
+            )
+            row.dunning_stage = stage
+            row.dunning_last_sent_at = now
+            sent += 1
+            break
+    return sent

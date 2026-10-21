@@ -18,7 +18,10 @@ import { NotificationCenter } from "./notification-center";
 import { Sidebar } from "./sidebar";
 import { QuickCreate, UserMenu } from "./user-menu";
 import { EnvironmentSwitcher } from "./workspace-switcher";
+import { useAdminAccess } from "@/features/operator/admin-access";
 import { WorkspaceAgentProvider } from "@/features/workspace-agent/workspace-agent";
+import { InstallPrompt } from "@/features/pwa/pwa";
+import { IncomingMessageAlert } from "@/features/pi/workspace/incoming-alert";
 
 const COLLAPSE_KEY = "platform.sidebar.collapsed";
 
@@ -66,7 +69,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  if (!session?.tenant) return <NoWorkspace />;
+  if (!session?.tenant) {
+    // Super admins and admins may run the console without a workspace of their own.
+    if (pathname?.startsWith("/operator"))
+      return (
+        <CommandMenuProvider>
+          <BreadcrumbProvider>
+            <header className="flex h-14 items-center justify-between border-b border-border bg-surface px-4">
+              <span className="text-sm font-semibold">Admin console</span>
+              <UserMenu />
+            </header>
+            <main id="main">{children}</main>
+            <InstallPrompt />
+          </BreadcrumbProvider>
+        </CommandMenuProvider>
+      );
+    return <NoWorkspace />;
+  }
   return (
     <CommandMenuProvider>
       <BreadcrumbProvider>
@@ -164,6 +183,8 @@ function ShellFrame({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+      <InstallPrompt />
+      <IncomingMessageAlert />
     </div>
   );
 }
@@ -209,6 +230,7 @@ function ShellSkeleton() {
 function NoWorkspace() {
   const { logout } = useSession();
   const router = useRouter();
+  const admin = useAdminAccess();
   return (
     <div className="flex min-h-dvh items-center justify-center p-6">
       <div className="max-w-md rounded-xl border border-border bg-surface p-8 text-center shadow-sm">
@@ -227,6 +249,14 @@ function NoWorkspace() {
           <Button onClick={() => router.push("/register")}>
             Create workspace
           </Button>
+          {admin ? (
+            <Button
+              variant="secondary"
+              onClick={() => router.push("/operator")}
+            >
+              Admin console
+            </Button>
+          ) : null}
         </div>
       </div>
     </div>

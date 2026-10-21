@@ -109,7 +109,7 @@ async def test_templates_and_one_click_forms(app, provider, business_db):
     assert footer["on-click-action"]["name"] == "complete"
     assert footer["on-click-action"]["payload"]["name"] == "${form.name}"
     forms = (await client.get("/api/v1/pi-app/pi/whatsapp/forms")).json()["forms"]
-    assert [f["flow_id"] for f in forms] == ["998877665544", None, None]
+    assert [f["flow_id"] for f in forms] == ["998877665544", None, None, None]
     await client.aclose()
 
 

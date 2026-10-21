@@ -72,7 +72,11 @@ def test_pi_is_a_top_level_product_with_its_own_subnavigation():
         "WhatsApp",
         "Knowledge",
         "Handoffs",
+        "Requests",
+        "Meetings",
+        "Team board",
         "Analytics",
+        "Health",
         "Settings",
     ]
 

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Owner OS">
+  <rect width="512" height="512" rx="112" fill="#1c6653"/>
+  <rect x="96" y="388" width="320" height="18" rx="9" fill="#9fdcc6"/>
+  <text x="256" y="322" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="232" font-weight="700" letter-spacing="-8" fill="#ffffff">OS</text>
+</svg>

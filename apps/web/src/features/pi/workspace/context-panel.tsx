@@ -17,7 +17,7 @@ import { StatusBadge } from "@/components/app/status-badge";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
 import { piService } from "../service";
-import type { AgentRun, ConversationContext } from "../types";
+import type { AgentRun, ConversationContext, ProviderName } from "../types";
 import {
   PROVIDER_LABELS,
   agentLabel,
@@ -36,6 +36,31 @@ const MEMORY_TONES = {
   preference: "primary",
   requirement: "info",
   context: "neutral",
+} as const;
+const CUSTOMER_STAGE: Record<
+  string,
+  {
+    label: string;
+    tone: "neutral" | "warning" | "info" | "success" | "primary";
+  }
+> = {
+  noted: { label: "Noted", tone: "primary" },
+  need_answer: { label: "Needs customer's answer", tone: "warning" },
+  on_it: { label: "Team's turn", tone: "info" },
+  solution_ready: { label: "Solution ready", tone: "success" },
+  building: { label: "Building", tone: "info" },
+  live: { label: "Live", tone: "success" },
+  paused: { label: "Paused", tone: "neutral" },
+  closed: { label: "Closed", tone: "neutral" },
+};
+const PROJECT_STATUS = {
+  collecting: { label: "Collecting details", tone: "neutral" },
+  awaiting_confirmation: {
+    label: "Waiting for customer's yes",
+    tone: "warning",
+  },
+  confirmed: { label: "Confirmed", tone: "success" },
+  with_team: { label: "With the team", tone: "info" },
 } as const;
 
 export function useConversationContext(id: string) {
@@ -147,6 +172,92 @@ export function ContextPanel({ conversationId }: { conversationId: string }) {
           </p>
         )}
       </section>
+
+      {!!ctx.service_brief?.customer_issues?.issues?.length && (
+        <section className="p-4" aria-labelledby="ctx-customer-view">
+          <SectionLabel>
+            <span id="ctx-customer-view">What the customer sees</span>
+          </SectionLabel>
+          <ul className="mt-2 space-y-2.5">
+            {ctx.service_brief.customer_issues.issues.map((i) => (
+              <li key={i.title} className="text-xs">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[13px] font-semibold">{i.title}</span>
+                  <Badge
+                    tone={CUSTOMER_STAGE[i.stage ?? ""]?.tone ?? "neutral"}
+                  >
+                    {CUSTOMER_STAGE[i.stage ?? ""]?.label ??
+                      humanize(i.stage ?? "noted")}
+                  </Badge>
+                  {!!i.linked && (
+                    <Badge tone="info">Linked to {i.linked}</Badge>
+                  )}
+                </div>
+                {i.ball_with === "client" && i.open_question ? (
+                  <p className="mt-1">
+                    Waiting on the customer: {i.open_question}
+                  </p>
+                ) : i.next_step ? (
+                  <p className="mt-1 text-muted-foreground">{i.next_step}</p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+          {!!ctx.service_brief.customer_issues.links?.length && (
+            <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
+              {ctx.service_brief.customer_issues.links.map((l) => (
+                <li key={`${l.a_title}-${l.b_title}`}>
+                  {l.a_title} + {l.b_title} · {humanize(l.type)}
+                  {l.status === "pending_review"
+                    ? " · needs a check in pi"
+                    : ""}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
+      {!!ctx.service_brief?.projects?.length && (
+        <section className="p-4" aria-labelledby="ctx-projects">
+          <SectionLabel>
+            <span id="ctx-projects">
+              Projects in this chat ({ctx.service_brief.projects.length})
+            </span>
+          </SectionLabel>
+          <ul className="mt-2 space-y-3">
+            {ctx.service_brief.projects.map((p) => (
+              <li key={p.title} className="text-xs">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="font-semibold text-[13px]">{p.title}</span>
+                  <Badge tone={PROJECT_STATUS[p.status]?.tone ?? "neutral"}>
+                    {PROJECT_STATUS[p.status]?.label ?? humanize(p.status)}
+                  </Badge>
+                </div>
+                {p.details && (
+                  <p className="mt-1 whitespace-pre-wrap break-words text-muted-foreground">
+                    {p.details}
+                  </p>
+                )}
+                {!!p.missing.length && (
+                  <p className="mt-1">Still needed: {p.missing.join(", ")}</p>
+                )}
+              </li>
+            ))}
+          </ul>
+          {ctx.service_brief.meeting_requested && (
+            <p className="mt-3 text-xs">
+              <Badge tone="warning">Meeting requested</Badge>
+            </p>
+          )}
+          {!!ctx.service_brief.knowledge_gaps?.length && (
+            <p className="mt-3 text-xs">
+              PI couldn&apos;t answer:{" "}
+              {ctx.service_brief.knowledge_gaps.join("; ")}
+            </p>
+          )}
+        </section>
+      )}
 
       {ctx.service_brief?.requirements && (
         <section className="p-4" aria-label="Service brief">
@@ -368,7 +479,7 @@ function RunCard({
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
         {run.provider && (
           <span>
-            {PROVIDER_LABELS[run.provider] ?? run.provider}
+            {PROVIDER_LABELS[run.provider as ProviderName] ?? run.provider}
             {run.model_alias && ` · ${humanize(run.model_alias)}`}
           </span>
         )}

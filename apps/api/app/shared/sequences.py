@@ -18,7 +18,14 @@ class DocumentSequence(WorkspaceRow):
     next_value: Mapped[int] = mapped_column(Integer, default=1, server_default="1")
 
 
-PREFIXES = {"order": "ORD", "quote": "QUO", "invoice": "INV", "payment": "PAY", "expense": "EXP"}
+PREFIXES = {
+    "order": "ORD",
+    "quote": "QUO",
+    "invoice": "INV",
+    "payment": "PAY",
+    "expense": "EXP",
+    "receipt": "RCPT",
+}
 
 
 async def next_number(session: AsyncSession, scope: WorkspaceScope, kind: str) -> str:

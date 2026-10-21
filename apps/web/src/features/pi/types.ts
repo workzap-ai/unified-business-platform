@@ -25,6 +25,8 @@ export type AgentKey =
   | "sales_order"
   | "handoff";
 export type ProviderName = "openai" | "gemini" | "groq";
+// A run's steps: the agents, plus what pi did besides replying.
+export type RunStep = AgentKey | "team_question" | "meeting_request";
 
 export type Conversation = {
   id: string;
@@ -65,6 +67,10 @@ export type Message = {
     duration_s?: number;
     transcript?: string;
     description?: string;
+    /** A document (PDF, Word…) the customer sent, kept in their files. */
+    file_kind?: "document";
+    file_id?: string;
+    filename?: string;
   } | null;
   status:
     | "received"
@@ -81,6 +87,8 @@ export type Message = {
   sent_by_label: string | null;
   created_at: string;
   tool_events: ToolEvent[];
+  /** A problem map or journey card pi sent the customer on WhatsApp. */
+  card?: { kind: string; image: string } | null;
   confirmation: {
     kind: "order_summary";
     status: "pending" | "confirmed" | "cancelled" | "expired";
@@ -96,8 +104,9 @@ export type AgentRun = {
   status: "running" | "completed" | "failed" | "handoff" | "skipped";
   intent: string | null;
   confidence: number | null;
-  agent_path: AgentKey[];
-  provider: ProviderName | null;
+  agent_path: RunStep[];
+  // Any provider the failover used (it can be newer than this list).
+  provider: string | null;
   model_alias: string | null;
   fallback_used: boolean;
   latency_ms: number;
@@ -115,6 +124,37 @@ export type ConversationContext = {
     reminder_consent?: string;
     ready_for_team?: boolean;
     awaiting_customer?: boolean;
+    // Every piece of work the customer raised in this chat.
+    projects?: {
+      title: string;
+      service: string;
+      details: string;
+      status:
+        "collecting" | "awaiting_confirmation" | "confirmed" | "with_team";
+      missing: string[];
+    }[];
+    mood?: string;
+    meeting_requested?: boolean;
+    knowledge_gaps?: string[];
+    // What the customer sees in pi Customer: their requests, whose turn, and links.
+    customer_issues?: {
+      at?: string;
+      issues?: {
+        title: string;
+        stage?: string;
+        ball_with?: string;
+        open_question?: string;
+        next_step?: string;
+        linked?: number;
+      }[];
+      links?: {
+        a_title: string;
+        b_title: string;
+        type: string;
+        reason?: string;
+        status?: string;
+      }[];
+    };
   };
   followup_due_at?: string | null;
   memory: {
@@ -402,6 +442,8 @@ export type PiSettings = {
     max_media_mb: number;
     reminder_enabled: boolean;
     reminder_after_days: number;
+    check_in_enabled?: boolean;
+    check_in_after_hours?: number;
     reminder_templates: Record<string, { name: string; language: string }>;
   };
   permissions: {

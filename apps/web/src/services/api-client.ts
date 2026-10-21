@@ -173,12 +173,18 @@ export function apiGet<T>(
   return apiRequest("GET", path, schema, { signal });
 }
 
+const SIGN_IN_CODES =
+  /^(SECOND_STEP_|PASSWORD_INCORRECT|FACE_|SIGN_IN_|TOO_MANY_FACES|NO_FINGERPRINT|PASSKEY_|ENROLL_LINK_)/;
+
 /** Operator-safe message: fixed server messages for business rules, generic otherwise. */
 export function errorMessage(
   error: unknown,
   fallback = "Something went wrong. Please try again.",
 ) {
   if (error instanceof ApiError) {
+    // Sign-in steps explain themselves ("4 tries left", "locked for 15 minutes").
+    if (error.serverMessage && SIGN_IN_CODES.test(error.code))
+      return error.serverMessage;
     if (error.code === "NETWORK_UNAVAILABLE")
       return "We couldn’t connect to the service. Check your connection and try again.";
     if (error.code === "REQUEST_TIMEOUT")
@@ -232,3 +238,61 @@ export type Page<T> = {
 export const decimal = z
   .union([z.string(), z.number()])
   .transform((v) => String(v));
+
+/**
+ * POST answered with newline-delimited JSON events (an agent's live steps). Same session,
+ * workspace and CSRF headers as `apiRequest`; calls `onEvent` for each event as it
+ * arrives and resolves when the body ends.
+ */
+export async function apiStream<E>(
+  path: string,
+  body: unknown,
+  onEvent: (event: E) => void,
+  signal?: AbortSignal,
+): Promise<void> {
+  const headers: Record<string, string> = {
+    Accept: "application/x-ndjson",
+    "Content-Type": "application/json",
+  };
+  if (expectedWorkspace) {
+    headers["X-Workspace-Tenant"] = expectedWorkspace.tenant;
+    headers["X-Workspace-Environment"] = expectedWorkspace.environment;
+  }
+  const csrf = readCookie(CSRF_COOKIE);
+  if (csrf) headers["X-CSRF-Token"] = csrf;
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${buildPath(path)}`, {
+      method: "POST",
+      credentials: "include",
+      cache: "no-store",
+      headers,
+      body: JSON.stringify(body),
+      signal,
+    });
+  } catch (error) {
+    if (signal?.aborted) throw error;
+    throw new ApiError(0, "NETWORK_UNAVAILABLE");
+  }
+  if (!response.ok || !response.body) {
+    const data: unknown = await response.json().catch(() => null);
+    const parsed = errorSchema.safeParse(data);
+    throw new ApiError(
+      response.status,
+      parsed.success ? parsed.data.error.code : "REQUEST_FAILED",
+      response.headers.get("x-request-id") ?? undefined,
+      parsed.success ? parsed.data.error.message : undefined,
+    );
+  }
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    buffer += decoder.decode(value, { stream: !done });
+    const lines = buffer.split("\n");
+    buffer = done ? "" : (lines.pop() ?? "");
+    for (const line of lines) if (line.trim()) onEvent(JSON.parse(line) as E);
+    if (done) return;
+  }
+}

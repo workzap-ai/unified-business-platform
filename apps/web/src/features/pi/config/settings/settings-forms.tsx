@@ -38,7 +38,7 @@ import {
 } from "@/components/app/forms";
 import { ErrorState, Notice } from "@/components/app/states";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
-import { errorMessage } from "@/services/api-client";
+import { apiRequest, errorMessage } from "@/services/api-client";
 import { piService } from "../../service";
 import type { PiSettings, ProviderName } from "../../types";
 import {
@@ -1275,6 +1275,8 @@ const waSchema = z.object({
   media_video: z.boolean(),
   reminder_enabled: z.boolean(),
   reminder_after_days: num().int().min(1).max(30),
+  check_in_enabled: z.boolean(),
+  check_in_after_hours: num().int().min(1).max(12),
   reminder_templates: z.record(
     z.string().regex(/^(roman_ur|[a-z]{2,3}([-_][A-Za-z0-9]{2,8})?)$/),
     z.object({
@@ -1297,6 +1299,8 @@ export function WhatsAppConfigForm({ settings }: { settings: PiSettings }) {
       media_video: settings.whatsapp_config.media_video ?? true,
       reminder_enabled: settings.whatsapp_config.reminder_enabled ?? true,
       reminder_after_days: settings.whatsapp_config.reminder_after_days ?? 7,
+      check_in_enabled: settings.whatsapp_config.check_in_enabled ?? true,
+      check_in_after_hours: settings.whatsapp_config.check_in_after_hours ?? 2,
       reminder_templates: settings.whatsapp_config.reminder_templates ?? {},
     },
   });
@@ -1366,6 +1370,32 @@ export function WhatsAppConfigForm({ settings }: { settings: PiSettings }) {
         </FormField>
       </FormSection>
       <FormSection
+        title="Pick up unfinished chats"
+        description="When a customer goes quiet in the middle of a conversation, pi writes once, remembering where you were: it asks for the business details it still doesn't know, repeats the one open question, or says what happens next. It also answers any message that was missed. Only inside WhatsApp's 24-hour window, never at night or while your team is in the chat."
+      >
+        <SwitchField
+          form={form}
+          name="check_in_enabled"
+          label="Check in on quiet customers"
+          description="One message per silence, at most two a day."
+        />
+        <FormField
+          label="Hours without a reply"
+          htmlFor="wa-check-in-hours"
+          error={err.check_in_after_hours}
+          help="1–12 hours. pi's own follow-up at about 20 hours and the day 3, 7 and 14 templates still follow."
+        >
+          <Input
+            id="wa-check-in-hours"
+            type="number"
+            min={1}
+            max={12}
+            className="w-28"
+            {...form.register("check_in_after_hours", { valueAsNumber: true })}
+          />
+        </FormField>
+      </FormSection>
+      <FormSection
         title="Follow-up reminders"
         description="One reminder after an unanswered service conversation. PI asks the customer for permission and stops after an opt-out, reply, closure or human takeover."
       >
@@ -1418,8 +1448,74 @@ function ReminderTemplatesEditor({
   const [customerLanguage, setCustomerLanguage] = useState("");
   const [name, setName] = useState("");
   const [templateLanguage, setTemplateLanguage] = useState("");
+  const [auto, setAuto] = useState<{
+    busy: boolean;
+    statuses: Record<string, string> | null;
+    error: string | null;
+  }>({ busy: false, statuses: null, error: null });
+  async function setUpAutomatically() {
+    setAuto({ busy: true, statuses: null, error: null });
+    try {
+      const result = await apiRequest(
+        "POST",
+        "/pi/whatsapp/templates/follow-ups",
+        z.object({ templates: z.record(z.string(), z.string()) }),
+      );
+      const ok = (key: string) =>
+        !String(result.templates[key] ?? "").startsWith("REJECTED");
+      onChange({
+        ...value,
+        ...(ok("en:reminder")
+          ? { en: { name: "pi_reminder_en", language: "en_US" } }
+          : {}),
+        ...(ok("roman_ur:reminder")
+          ? { roman_ur: { name: "pi_reminder_ru", language: "ur" } }
+          : {}),
+      });
+      setAuto({ busy: false, statuses: result.templates, error: null });
+    } catch (e) {
+      setAuto({
+        busy: false,
+        statuses: null,
+        error: errorMessage(e, "pi couldn't set up the templates."),
+      });
+    }
+  }
   return (
     <div className="space-y-3">
+      <div className="rounded-lg border border-primary/30 bg-primary-soft/40 p-3">
+        <p className="text-sm font-medium">Let pi set this up</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          pi writes its follow-up messages (English and Roman Urdu), submits
+          them to Meta for approval and fills them in here, with the day 3, 7
+          and 14 follow-ups. Each is sent only after Meta approves it (usually
+          minutes to a day).
+        </p>
+        <Button
+          type="button"
+          size="sm"
+          className="mt-2"
+          loading={auto.busy}
+          onClick={() => void setUpAutomatically()}
+        >
+          Set up automatically
+        </Button>
+        {auto.error && (
+          <p role="alert" className="mt-2 text-xs text-danger">
+            {auto.error}
+          </p>
+        )}
+        {auto.statuses && (
+          <ul className="mt-2 space-y-0.5 text-xs">
+            {Object.entries(auto.statuses).map(([key, status]) => (
+              <li key={key}>
+                <span className="font-medium">{key.replace(":", " · ")}</span>:{" "}
+                {status.toLowerCase()}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
       <p className="text-sm text-muted-foreground">
         Add an approved text template without variables or buttons for each
         customer language. For Roman Urdu, use customer language roman_ur and

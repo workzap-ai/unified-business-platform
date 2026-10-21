@@ -87,11 +87,23 @@ class Plan(StrictInput):
     steps: list[Step] = Field(default_factory=list, max_length=6)
 
 
+class HistoryTurn(StrictInput):
+    role: Literal["user", "assistant"]
+    content: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=6000)]
+
+
 class ChatInput(StrictInput):
     message: Text
-    # User-authored context only; previous assistant output is never trusted as business facts.
-    history: list[Text] = Field(default_factory=list, max_length=8)
+    # Earlier turns, oldest first. Plain strings (older clients) are the user's earlier
+    # requests. Earlier assistant answers are conversation context only, never trusted as
+    # business facts: the prompt makes the agent re-check figures with its tools.
+    history: list[HistoryTurn | Text] = Field(default_factory=list, max_length=40)
     current_page: str = Field(default="/", max_length=160)
+
+    def turns(self) -> list[HistoryTurn]:
+        return [
+            HistoryTurn(role="user", content=h) if isinstance(h, str) else h for h in self.history
+        ]
 
 
 class ProposalInput(StrictInput):

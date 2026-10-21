@@ -47,7 +47,8 @@ BATCH = 50
 # treating "please don't stop the order" as an opt-out.
 OPT_OUT = re.compile(
     r"^\W*(?:stop|unsubscribe|opt[\s-]?out|no more messages|band\s*karo|band\s*kar\s*do"
-    r"|mat\s*bhejo|message\s*mat\s*bhejo|بند\s*کریں|مت\s*بھیجو|توقف|إلغاء)\W*$",
+    r"|mat\s*bhejo|message\s*mat\s*bhejo|بند\s*کریں|مت\s*بھیجو|توقف|إلغاء"
+    r"|stop\s*reminders|reminders\s*band\s*karo|أوقف\s*التذكيرات)\W*$",
     re.IGNORECASE,
 )
 

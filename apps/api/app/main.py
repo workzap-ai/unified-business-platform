@@ -20,10 +20,17 @@ from app.health import router
 from app.integrations.http_errors import install_integration_handlers
 from app.modules.access.routes import router as access_router
 from app.modules.audit.routes import router as audit_router
+from app.modules.auth.mfa import pi_router as pi_mfa_router
+from app.modules.auth.mfa import router as mfa_router
+from app.modules.auth.passkeys import pi_router as pi_passkeys_router
+from app.modules.auth.passkeys import router as passkeys_router
 from app.modules.auth.routes import router as auth_router
+from app.modules.billing.receipts import router as receipts_router
 from app.modules.billing.routes import router as billing_router
 from app.modules.business_settings.routes import router as business_settings_router
 from app.modules.catalog.routes import router as catalog_router
+from app.modules.customers.file_routes import router as customer_files_router
+from app.modules.customers.merge import router as customer_merge_router
 from app.modules.customers.routes import router as customers_router
 from app.modules.environments.routes import router as environments_router
 from app.modules.finance.routes import router as finance_router
@@ -46,31 +53,44 @@ from app.modules.pi.read_routes import router as pi_read_router
 from app.modules.pi.routes import router as pi_router
 from app.modules.pi.routes import webhook_router
 from app.modules.pi_customer.routes import router as pi_customer_router
+from app.modules.pi_customer.second_step import router as pi_customer_second_step_router
 from app.modules.pi_saas.app_routes import router as pi_app_router
 from app.modules.pi_saas.assistant_routes import operator_router as pi_operator_help_router
 from app.modules.pi_saas.assistant_routes import router as pi_assistant_router
 from app.modules.pi_saas.campaign_routes import router as pi_campaign_router
 from app.modules.pi_saas.connector_routes import router as pi_connector_router
 from app.modules.pi_saas.connector_routes import web_router as pi_connector_web_router
+from app.modules.pi_saas.customer_activity import router as customer_activity_router
+from app.modules.pi_saas.customer_overview import router as customer_overview_router
 from app.modules.pi_saas.customer_payment_routes import public_router as pi_customer_pay_link_router
 from app.modules.pi_saas.customer_payment_routes import router as pi_customer_payment_router
+from app.modules.pi_saas.customer_solution import router as customer_solution_router
+from app.modules.pi_saas.deal_routes import public_router as pi_documents_router
+from app.modules.pi_saas.deal_routes import router as pi_deals_router
 from app.modules.pi_saas.digest_routes import operator_router as pi_operator_digest_router
 from app.modules.pi_saas.digest_routes import router as pi_digest_router
+from app.modules.pi_saas.health_routes import router as pi_health_router
 from app.modules.pi_saas.insights_routes import router as pi_insights_router
+from app.modules.pi_saas.meeting_board import router as pi_meeting_board_router
 from app.modules.pi_saas.operator_number_routes import router as pi_operator_number_router
 from app.modules.pi_saas.operator_routes import router as pi_operator_router
 from app.modules.pi_saas.operator_system_routes import router as pi_operator_system_router
 from app.modules.pi_saas.operator_workspace_routes import router as operator_workspace_router
+from app.modules.pi_saas.overview_pdf import router as customer_overview_pdf_router
+from app.modules.pi_saas.payment_link import router as payment_link_router
 from app.modules.pi_saas.payment_routes import client_router as pi_payment_router
 from app.modules.pi_saas.payment_routes import operator_router as pi_payment_operator_router
 from app.modules.pi_saas.payment_routes import public_router as pi_pay_link_router
 from app.modules.pi_saas.platform_config_routes import router as pi_platform_config_router
 from app.modules.pi_saas.problems_routes import router as pi_problems_router
+from app.modules.pi_saas.requests import router as pi_requests_router
 from app.modules.pi_saas.review_routes import operator_router as pi_operator_review_router
 from app.modules.pi_saas.review_routes import router as pi_review_router
 from app.modules.pi_saas.setup_routes import operator_router as pi_operator_setup_router
 from app.modules.pi_saas.setup_routes import router as pi_setup_router
 from app.modules.pi_saas.setup_routes import web_router as setup_web_router
+from app.modules.pi_saas.team_board_routes import router as pi_team_board_router
+from app.modules.pi_saas.team_whatsapp import router as team_whatsapp_router
 from app.modules.pi_saas.webhook_routes import router as pi_saas_webhook_router
 from app.modules.pi_saas.whatsapp_tools import router as pi_whatsapp_tools_router
 from app.modules.pi_saas.work_routes import router as pi_work_router
@@ -88,7 +108,19 @@ ROUTERS = [
     pi_payment_operator_router,
     pi_inbox_router,
     pi_work_router,
+    pi_team_board_router,
+    pi_meeting_board_router,
     pi_customer_payment_router,
+    pi_deals_router,
+    payment_link_router,
+    customer_files_router,
+    pi_requests_router,
+    team_whatsapp_router,
+    customer_overview_router,
+    customer_overview_pdf_router,
+    customer_solution_router,
+    customer_merge_router,
+    receipts_router,
     pi_operator_router,
     pi_operator_digest_router,
     pi_operator_number_router,
@@ -105,12 +137,15 @@ ROUTERS = [
     pi_saas_webhook_router,
     pi_read_router,
     pi_analytics_router,
+    pi_health_router,
     pi_config_router,
     pi_router,
     webhook_router,
     workflows_router,
     router,
     auth_router,
+    passkeys_router,
+    mfa_router,
     tenant_router,
     organization_router,
     environments_router,
@@ -156,7 +191,27 @@ PI_APP_ROUTERS = [
     pi_router,
     pi_inbox_router,
     pi_work_router,
+    pi_team_board_router,
+    pi_meeting_board_router,
     pi_customer_payment_router,
+    pi_deals_router,
+    payment_link_router,
+    customer_files_router,
+    pi_requests_router,
+    team_whatsapp_router,
+    customer_overview_router,
+    customer_overview_pdf_router,
+    customer_solution_router,
+    # The customer page's Activity feed (read-only) and pi Health (state, fixes, tests).
+    customer_activity_router,
+    pi_health_router,
+    customer_merge_router,
+    receipts_router,
+    pi_documents_router,
+    # The deal flow in the pi app: leads, proposals and orders (core modules, pi session).
+    sales_router,
+    quotes_router,
+    orders_router,
     # Business-owned Google Calendar / Shopify connections (Pi app only).
     pi_connector_router,
     pi_campaign_router,
@@ -174,6 +229,9 @@ PI_APP_ROUTERS = [
     # PI Customer: end customers see their own conversations (signed customer cookie,
     # never a business session): /customer-portal/...
     pi_customer_router,
+    pi_customer_second_step_router,
+    pi_passkeys_router,
+    pi_mfa_router,
 ]
 
 

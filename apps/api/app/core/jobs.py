@@ -91,6 +91,7 @@ class InlineQueue:
                 for name in (
                     "sweep_pi",
                     "sweep_followups",
+                    "sweep_customer_journeys",
                     "sweep_pi_saas",
                     "sweep_pi_calendar",
                     "sweep_pi_campaigns",

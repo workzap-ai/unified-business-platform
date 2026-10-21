@@ -6,6 +6,7 @@ import {
   BookOpenText,
   FlaskConical,
   Globe,
+  MessageCircle,
   MessageSquareText,
   PlugZap,
   SlidersHorizontal,
@@ -47,7 +48,7 @@ import {
 import { ConnectorsSection, useConnectors } from "@/features/connectors";
 import { TestConversation } from "@/features/test-pi";
 import product from "@/components/product.module.css";
-import { del, errorText, get, patch, post } from "@/lib/api";
+import { api, del, errorText, get, patch, post } from "@/lib/api";
 import { date } from "@/lib/format";
 import { useAction, useBusinessKey, useCan } from "@/lib/session";
 import type { Draft } from "@/lib/types";
@@ -111,6 +112,12 @@ export function MyPiOverview() {
       icon: BellRing,
       title: "Follow-ups",
       body: "Friendly reminders for customers who agreed to them.",
+    },
+    {
+      href: "/settings/whatsapp",
+      icon: MessageCircle,
+      title: "WhatsApp profile",
+      body: "The photo, About line and details customers see on WhatsApp.",
     },
     {
       href: "/my-pi/advanced",
@@ -318,6 +325,12 @@ function DraftCard({ draft }: { draft: Draft }) {
   );
 }
 
+type WebsiteResult = {
+  site: string;
+  drafts: Draft[];
+  skipped: { url: string; reason: string }[];
+};
+
 export function KnowledgePage() {
   const key = useBusinessKey();
   const can = useCan();
@@ -353,11 +366,44 @@ export function KnowledgePage() {
       onSuccess: () => setNote(""),
     },
   );
-  const website = useAction(() => post<Draft>("/knowledge/website", { url }), {
-    invalidate: [["drafts"]],
-    success: "We read the page. Review what pi learned below.",
-    onSuccess: () => setUrl(null),
-  });
+  const [pages, setPages] = React.useState("12");
+  const [learned, setLearned] = React.useState<WebsiteResult | null>(null);
+  const website = useAction(
+    () =>
+      api<WebsiteResult>(
+        "POST",
+        "/knowledge/website/crawl",
+        { url, max_pages: Number(pages) },
+        // Reading a whole site (and drafting each page) can take a minute or two.
+        { timeoutMs: 170_000 },
+      ),
+    {
+      invalidate: [["drafts"]],
+      success: (r) =>
+        `pi read ${r.drafts.length} ${r.drafts.length === 1 ? "page" : "pages"} from ${r.site}. Review them below.`,
+      onSuccess: (r) => {
+        setLearned(r);
+        setUrl(null);
+      },
+    },
+  );
+  const websiteDrafts = (drafts.data ?? []).filter(
+    (d) => d.origin === "website",
+  );
+  const publishAll = useAction(
+    () =>
+      post<{ published: number; failed: { id: string; message: string }[] }>(
+        "/knowledge/drafts/publish",
+        { ids: websiteDrafts.map((d) => d.id).slice(0, 50) },
+      ),
+    {
+      invalidate: [["drafts"], ["documents"], ["account"]],
+      success: (r) =>
+        r.failed.length
+          ? `Published ${r.published}. ${r.failed.length} couldn't be published: ${r.failed[0].message}`
+          : `Published ${r.published} ${r.published === 1 ? "page" : "pages"}. pi can use them now.`,
+    },
+  );
   const remove = useAction(
     (id: string) => del(`/pi/knowledge/documents/${id}`),
     {
@@ -415,41 +461,99 @@ export function KnowledgePage() {
         <Card>
           <CardSection className="space-y-3">
             <h2 className="flex items-center gap-2 font-semibold">
-              <Globe className="size-4 text-accent" aria-hidden /> Learn from a
-              web page
+              <Globe className="size-4 text-accent" aria-hidden /> Learn from
+              your website
             </h2>
             <p className="text-sm text-muted-foreground">
-              pi reads one public page. You review everything before it&apos;s
-              used.
+              pi reads your website (about, services, prices, FAQ, contact) and
+              turns each page into a draft. Menus and footers are left out.
+              Nothing is used until you publish.
             </p>
             <label htmlFor="page-url" className="sr-only">
-              Page address
+              Website address
             </label>
             <Input
               id="page-url"
               type="url"
               inputMode="url"
-              placeholder="https://"
+              placeholder="https://yourbusiness.com"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
             />
+            <div className="flex flex-wrap items-center gap-2">
+              <label htmlFor="page-count" className="text-sm">
+                Read
+              </label>
+              <Select
+                id="page-count"
+                value={pages}
+                onChange={(e) => setPages(e.target.value)}
+                className="w-auto"
+              >
+                <option value="1">just this page</option>
+                <option value="6">up to 6 pages</option>
+                <option value="12">up to 12 pages</option>
+                <option value="20">up to 20 pages</option>
+                <option value="30">up to 30 pages</option>
+              </Select>
+            </div>
             <Button
               variant="secondary"
               loading={website.isPending}
               disabled={!url.startsWith("https://")}
               onClick={() => website.mutate(undefined)}
             >
-              Read page
+              {website.isPending ? "Reading your website…" : "Read website"}
             </Button>
+            {website.isPending ? (
+              <p className="text-xs text-muted-foreground" role="status">
+                This can take a minute for bigger websites.
+              </p>
+            ) : null}
+            {learned ? (
+              <div className="rounded-lg bg-surface-muted p-3 text-sm">
+                <p>
+                  Read {learned.drafts.length}{" "}
+                  {learned.drafts.length === 1 ? "page" : "pages"} from{" "}
+                  <span className="font-medium">{learned.site}</span>. Each is a
+                  draft below.
+                </p>
+                {learned.skipped.length ? (
+                  <details className="mt-1 text-xs text-muted-foreground">
+                    <summary className="cursor-pointer">
+                      {learned.skipped.length} skipped
+                    </summary>
+                    <ul className="mt-1 space-y-0.5">
+                      {learned.skipped.map((s) => (
+                        <li key={s.url} className="break-all">
+                          {s.url} · {s.reason}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : null}
+              </div>
+            ) : null}
           </CardSection>
         </Card>
         <TeachFromFile />
       </div>
 
       <section className="mt-8" aria-labelledby="drafts-title">
-        <h2 id="drafts-title" className="mb-3 text-base font-semibold">
-          Waiting for review
-        </h2>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h2 id="drafts-title" className="text-base font-semibold">
+            Waiting for review
+          </h2>
+          {websiteDrafts.length > 1 && can("pi.knowledge.publish") ? (
+            <Button
+              size="sm"
+              loading={publishAll.isPending}
+              onClick={() => publishAll.mutate(undefined)}
+            >
+              Publish all {Math.min(websiteDrafts.length, 50)} website pages
+            </Button>
+          ) : null}
+        </div>
         {drafts.isPending ? (
           <LoadingBlock rows={2} />
         ) : drafts.isError ? (
@@ -491,11 +595,18 @@ export function KnowledgePage() {
                 >
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{doc.title}</p>
+                    {doc.body.startsWith("Source: ") ? (
+                      <p className="truncate text-xs text-accent">
+                        {doc.body.slice(8, doc.body.indexOf("\n"))}
+                      </p>
+                    ) : null}
                     <p
                       className="line-clamp-2 text-sm text-muted-foreground"
                       data-user-text
                     >
-                      {doc.body}
+                      {doc.body.startsWith("Source: ")
+                        ? doc.body.slice(doc.body.indexOf("\n") + 1).trim()
+                        : doc.body}
                     </p>
                     <div className="mt-1 flex flex-wrap gap-2">
                       <Badge
@@ -507,6 +618,9 @@ export function KnowledgePage() {
                           ? "Team only"
                           : "Customers may be told"}
                       </Badge>
+                      {doc.source_name === "Website" ? (
+                        <Badge>From your website</Badge>
+                      ) : null}
                       {doc.status !== "ready" ? (
                         <Badge tone="warning">
                           {doc.status === "failed"
@@ -555,6 +669,8 @@ interface PiSettings {
   whatsapp_config: Record<string, unknown> & {
     reminder_enabled: boolean;
     reminder_after_days: number;
+    check_in_enabled?: boolean;
+    check_in_after_hours?: number;
     reminder_templates: Record<string, { name: string; language: string }>;
   };
 }
@@ -1206,8 +1322,68 @@ function FollowUpsForm({
                 ))}
               </Select>
             </Field>
+            <div className="flex items-center justify-between gap-4 border-t border-border pt-4">
+              <div>
+                <h3 className="text-sm font-medium">
+                  Pick up unfinished chats
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  When a customer goes quiet mid-conversation, pi writes once,
+                  remembering where you were: it asks for business details it
+                  doesn&apos;t know yet, repeats the open question, or says what
+                  happens next. It also answers messages that were missed.
+                </p>
+              </div>
+              <Switch
+                id="check-in"
+                checked={config.check_in_enabled ?? true}
+                disabled={!can("pi.settings.manage")}
+                onCheckedChange={(v) =>
+                  setConfig((c) => ({ ...c, check_in_enabled: v }))
+                }
+                label="Check in on quiet customers"
+              />
+            </div>
+            <Field
+              label="Check in after"
+              htmlFor="check-in-after"
+              hint="Hours without a reply, inside WhatsApp's 24-hour window."
+            >
+              <Select
+                id="check-in-after"
+                value={String(config.check_in_after_hours ?? 2)}
+                onChange={(e) =>
+                  setConfig((c) =>
+                    c
+                      ? { ...c, check_in_after_hours: Number(e.target.value) }
+                      : c,
+                  )
+                }
+              >
+                {[1, 2, 3, 4, 6, 8, 12].map((h) => (
+                  <option key={h} value={h}>
+                    {h} hour{h === 1 ? "" : "s"}
+                  </option>
+                ))}
+              </Select>
+            </Field>
             <div>
-              <h3 className="text-sm font-medium">
+              <AutoFollowUps
+                onDone={(templates) =>
+                  setConfig((c) =>
+                    c
+                      ? {
+                          ...c,
+                          reminder_templates: {
+                            ...c.reminder_templates,
+                            ...templates,
+                          },
+                        }
+                      : c,
+                  )
+                }
+              />
+              <h3 className="mt-4 text-sm font-medium">
                 Approved WhatsApp templates
               </h3>
               <p className="text-sm text-muted-foreground">
@@ -1328,5 +1504,68 @@ export function TestPiPage() {
     >
       <TestConversation includeDraftsToggle />
     </Shell>
+  );
+}
+
+/** pi writes its follow-up templates, submits them to Meta and fills them in. */
+function AutoFollowUps({
+  onDone,
+}: {
+  onDone: (
+    templates: Record<string, { name: string; language: string }>,
+  ) => void;
+}) {
+  const [statuses, setStatuses] = React.useState<Record<string, string> | null>(
+    null,
+  );
+  const run = useAction(
+    () =>
+      post<{ templates: Record<string, string> }>(
+        "/pi/whatsapp/templates/follow-ups",
+      ),
+    {
+      success: "pi submitted its follow-up templates to Meta.",
+      onSuccess: (result) => {
+        setStatuses(result.templates);
+        const ok = (key: string) =>
+          !String(result.templates[key] ?? "").startsWith("REJECTED");
+        onDone({
+          ...(ok("en:reminder")
+            ? { en: { name: "pi_reminder_en", language: "en_US" } }
+            : {}),
+          ...(ok("roman_ur:reminder")
+            ? { roman_ur: { name: "pi_reminder_ru", language: "ur" } }
+            : {}),
+        });
+      },
+    },
+  );
+  return (
+    <div className="rounded-lg border border-accent/30 bg-accent-soft/40 p-3">
+      <p className="text-sm font-medium">Let pi set this up</p>
+      <p className="mt-0.5 text-xs text-muted-foreground">
+        pi writes its follow-up messages (English and Roman Urdu), submits them
+        to Meta for approval and fills them in here, with the day 3, 7 and 14
+        follow-ups. Each is sent only after Meta approves it.
+      </p>
+      <Button
+        size="sm"
+        className="mt-2"
+        loading={run.isPending}
+        onClick={() => run.mutate(undefined)}
+      >
+        Set up automatically
+      </Button>
+      {statuses ? (
+        <ul className="mt-2 space-y-0.5 text-xs">
+          {Object.entries(statuses).map(([key, status]) => (
+            <li key={key}>
+              <span className="font-medium">{key.replace(":", " · ")}</span>:{" "}
+              {status.toLowerCase()}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   );
 }

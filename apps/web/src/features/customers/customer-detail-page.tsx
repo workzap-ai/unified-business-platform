@@ -2,6 +2,15 @@
 
 import { useState } from "react";
 import { RecordAttachments } from "@/features/integrations/business-panels";
+import { CustomerFiles } from "./components/customer-files";
+import { CustomerPiOverview } from "./components/pi-overview";
+import { CustomerSolution } from "./components/customer-solution";
+import { CustomerActivityTab } from "./components/customer-activity";
+import { CustomerDuplicates } from "./components/customer-duplicates";
+import {
+  BookMeetingAction,
+  CustomerNextMeeting,
+} from "./components/customer-meeting";
 import Link from "next/link";
 import {
   Archive,
@@ -9,6 +18,7 @@ import {
   Bot,
   CalendarClock,
   ChevronRight,
+  Download,
   FileText,
   Mail,
   MessageSquare,
@@ -26,6 +36,7 @@ import {
   relativeTime,
 } from "@/lib/format";
 import { Button } from "@/components/ui/button";
+import { API_BASE } from "@/services/api-client";
 import {
   Card,
   CardBody,
@@ -43,7 +54,6 @@ import {
 } from "@/components/ui/overlays";
 import { PageShell, RequirePermission } from "@/components/app/page";
 import {
-  ActivityTimeline,
   PropertyList,
   RecordHeader,
   RelatedList,
@@ -60,7 +70,6 @@ import { documentsService } from "@/features/documents/service";
 import { billingService } from "@/features/billing/service";
 import type { CustomerDetail } from "@/features/business/types";
 import { customersService } from "./service";
-import { activityToEvent } from "./lib";
 import { CustomerSourceBadge, TagList } from "./components/customer-badges";
 import { CustomerEditDialog } from "./components/customer-edit-dialog";
 import {
@@ -208,6 +217,12 @@ function CustomerRecord({ customer }: { customer: CustomerDetail }) {
           </Link>
         </Button>
       )}
+      {!archived && (
+        <BookMeetingAction
+          customerId={customer.id}
+          customerName={customer.name}
+        />
+      )}
       {canWrite && (
         <Button size="sm" variant="secondary" onClick={() => setEditing(true)}>
           <Pencil /> Edit
@@ -282,7 +297,7 @@ function CustomerRecord({ customer }: { customer: CustomerDetail }) {
           />
         </TabsContent>
         <TabsContent value="activity">
-          <ActivityTab customerId={customer.id} />
+          <CustomerActivityTab customerId={customer.id} />
         </TabsContent>
         {can("orders.read") && (
           <TabsContent value="orders">
@@ -308,11 +323,15 @@ function CustomerRecord({ customer }: { customer: CustomerDetail }) {
           <NotesTab customerId={customer.id} />
         </TabsContent>
       </Tabs>
-      <RecordAttachments
-        type="customer"
-        id={customer.id}
-        permission="customers.write"
-      />
+      <div className="space-y-4">
+        <CustomerFiles customerId={customer.id} />
+        <RecordAttachments
+          type="customer"
+          id={customer.id}
+          permission="customers.write"
+          onlyWithStorage
+        />
+      </div>
 
       {canWrite && (
         <CustomerEditDialog
@@ -377,6 +396,20 @@ function OverviewTab({
 
   return (
     <div className="space-y-4">
+      <CustomerDuplicates customerId={customer.id} name={customer.name} />
+      <div className="flex justify-end">
+        <Button size="sm" variant="secondary" asChild>
+          <a
+            href={`${API_BASE}/customers/${customer.id}/pi-overview.pdf`}
+            download
+          >
+            <Download /> Share with my team (PDF)
+          </a>
+        </Button>
+      </div>
+      <CustomerNextMeeting customerId={customer.id} />
+      <CustomerPiOverview customerId={customer.id} />
+      <CustomerSolution customerId={customer.id} />
       <MetricGrid className="xl:grid-cols-4">
         <MetricCard
           label="Orders"
@@ -634,35 +667,5 @@ function RelatedRow({
         aria-hidden="true"
       />
     </Link>
-  );
-}
-
-function ActivityTab({ customerId }: { customerId: string }) {
-  const activities = useScopedQuery(
-    ["customers", "activities", customerId],
-    () => customersService.activities(customerId),
-  );
-  return (
-    <Card className="max-w-3xl">
-      <CardHeader
-        title="Activity"
-        description="Changes, notes, documents and conversations for this customer"
-      />
-      <CardBody>
-        {activities.isError ? (
-          <ErrorState
-            error={activities.error}
-            onRetry={() => void activities.refetch()}
-            compact
-          />
-        ) : (
-          <ActivityTimeline
-            events={activities.data?.items.map(activityToEvent)}
-            loading={activities.isPending}
-            empty="No activity recorded for this customer yet."
-          />
-        )}
-      </CardBody>
-    </Card>
   );
 }

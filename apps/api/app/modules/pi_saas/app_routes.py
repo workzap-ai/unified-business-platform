@@ -6,6 +6,7 @@ inbox/knowledge/settings routers are mounted under the same prefix so both editi
 one implementation. Customers never see tenant, environment or provider identifiers.
 """
 
+import asyncio
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Annotated, Any, Literal
@@ -51,7 +52,7 @@ from app.modules.business_settings.models import BusinessSettings
 from app.modules.memberships.models import Membership
 from app.modules.pi.models import PiAgentRun, PiConversation, PiHandoff, PiMessage
 from app.modules.pi.service import ACTIVE_HANDOFF, PiService
-from app.modules.pi_saas import billing, connections, onboarding, teach
+from app.modules.pi_saas import billing, connections, onboarding, teach, website_kb
 from app.modules.pi_saas.entitlement import entitlement, month, storage_used_mb, usage_for
 from app.modules.pi_saas.models import (
     PiKnowledgeDraft,
@@ -67,7 +68,12 @@ from app.modules.pi_saas.provisioning import provision_business
 from app.modules.tenants.context import active_memberships
 from app.modules.tenants.models import Tenant
 from app.modules.users.models import PlatformUser
-from app.shared.errors import BusinessRuleViolation, Conflict, Unauthenticated
+from app.shared.errors import (
+    BusinessRuleViolation,
+    Conflict,
+    ResourceNotFound,
+    Unauthenticated,
+)
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
 
@@ -275,12 +281,20 @@ async def login(
         raise HTTPException(status_code=429)
     service = AuthService(session, settings)
     try:
-        issued = await service.login(
-            data.email, data.password, request.headers.get("user-agent", ""), "pi"
-        )
+        user = await service.check_password(data.email, data.password)
     except Unauthenticated:
         await session.commit()
         raise
+    # Saved a face or a fingerprint? Then the password alone isn't enough.
+    from app.modules.auth.mfa import second_step
+
+    step = await second_step(request, session, user, "pi")
+    if step is not None:
+        await session.commit()
+        return step
+    issued = await service.finish_login(
+        user, request.headers.get("user-agent", ""), "pi", "password"
+    )
     await session.commit()
     _set_cookies(response, request, issued)
     context = await service.resolve(issued.token, "pi")
@@ -580,8 +594,6 @@ async def decide_support_access(
         .with_for_update()
     )
     if grant is None:
-        from app.shared.errors import ResourceNotFound
-
         raise ResourceNotFound
     if action == "approve":
         if grant.status != "requested":
@@ -728,7 +740,10 @@ async def whatsapp_disconnect(
 
 @router.get("/whatsapp/numbers")
 async def whatsapp_numbers(
-    scope: Scope, session: Session, environment: Literal["production", "test"] = "production"
+    request: Request,
+    scope: Scope,
+    session: Session,
+    environment: Literal["production", "test"] = "production",
 ) -> list[dict[str, Any]]:
     """Numbers from the platform pool this business can choose (or was offered)."""
     from app.modules.pi_saas import number_pool
@@ -736,6 +751,8 @@ async def whatsapp_numbers(
     scope.require("pi.whatsapp.manage")
     row = await _account(session, scope)
     target = connections.pi_target(row, environment)
+    await number_pool.refresh(session, request.app.state.settings, request.app.state.http)
+    await session.commit()
     return [
         {**number_pool.view(n), "offered_to_you": n.status == "reserved"}
         for n in await number_pool.available(session, target)
@@ -911,6 +928,7 @@ async def billing_view(request: Request, scope: Scope, session: Session) -> dict
                 "period_start": i.period_start,
                 "period_end": i.period_end,
                 "url": i.hosted_url,
+                "pdf_url": i.pdf_url,
             }
             for i in invoices
         ],
@@ -1234,6 +1252,76 @@ async def website(
     return _draft_view(draft)
 
 
+@router.post("/knowledge/website/crawl", status_code=201)
+async def learn_website(
+    data: website_kb.CrawlInput, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Read the business's website (sitemap and links, same site only), extract each page
+    and draft one knowledge entry per page. Nothing is used until the owner publishes."""
+    scope.require("pi.knowledge.manage")
+    if not await hit(request, "pi-website-crawl", str(scope.tenant_id), 6, 3600):
+        raise BusinessRuleViolation(
+            "RATE_LIMITED", "You've read your website a few times this hour. Try later.", 429
+        )
+    from app.ai.manager import build_llm_manager
+
+    settings = request.app.state.settings
+    ai = any(getattr(settings, f"{p}_api_key", None) for p in settings.provider_order())
+    manager = (
+        build_llm_manager(settings, request.app.state.http, request.app.state.sessions)
+        if ai
+        else None
+    )
+    try:
+        async with asyncio.timeout(150):
+            result = await website_kb.learn_website(
+                session,
+                scope,
+                OutboundClient(
+                    settings,
+                    request.app.state.http,
+                    resolver=getattr(request.app.state, "integration_resolver", None),
+                ),
+                manager,
+                data,
+            )
+    except TimeoutError:
+        raise BusinessRuleViolation(
+            "WEBSITE_TIMEOUT", "Your website took too long to read. Try fewer pages.", 503
+        ) from None
+    await session.commit()
+    return {
+        "site": result["site"],
+        "drafts": [_draft_view(d) for d in result["drafts"]],
+        "skipped": result["skipped"],
+    }
+
+
+class PublishMany(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    ids: list[UUID] = Field(min_length=1, max_length=50)
+
+
+@router.post("/knowledge/drafts/publish")
+async def publish_drafts(
+    data: PublishMany, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Publish several reviewed drafts at once; each becomes a knowledge document."""
+    published, failed = 0, []
+    limit = request.app.state.settings.knowledge_upload_max_bytes
+    for draft_id in dict.fromkeys(data.ids):
+        try:
+            async with session.begin_nested():
+                await teach.publish_draft(session, scope, draft_id, limit)
+            published += 1
+        except (BusinessRuleViolation, ResourceNotFound) as exc:
+            failed.append(
+                {"id": str(draft_id), "message": getattr(exc, "message", "Draft not found")}
+            )
+    await session.commit()
+    return {"published": published, "failed": failed}
+
+
 @router.get("/staff-requests")
 async def staff_requests(scope: Scope, session: Session) -> list[dict[str, Any]]:
     service = PiService(session, scope)
@@ -1270,14 +1358,19 @@ async def answer_staff_request(
     if staff_request is not None:
         # Visibility follows the conversation (members see only assigned ones).
         await PiService(session, scope).conversations.get(staff_request.conversation_id)
-    row = await teach.answer_request(
-        session, scope, request_id, data, request.app.state.settings.knowledge_upload_max_bytes
+    # pi replies to the customer itself, using the answer (the request desk).
+    from app.modules.pi_saas import requests as desk
+
+    row = await desk.answer(
+        session,
+        scope,
+        request_id,
+        data.answer,
+        save_as_knowledge=data.mode == "reusable",
+        max_bytes=request.app.state.settings.knowledge_upload_max_bytes,
     )
     await session.commit()
-    if row.reply_message_id:
-        await request.app.state.queue.enqueue(
-            "send_pi_message", str(row.reply_message_id), job_id=f"send:{row.reply_message_id}"
-        )
+    await desk.enqueue_reply(request, row.id)
     return {"id": row.id, "status": row.status}
 
 

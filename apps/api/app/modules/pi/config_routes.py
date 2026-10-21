@@ -36,6 +36,7 @@ from app.modules.pi.models import (
 from app.modules.pi.schemas import BodyInput
 from app.modules.pi.service import PiService
 from app.modules.pi.tools.catalog import TOOL_CATALOG
+from app.modules.pi_saas import website_kb
 from app.shared.errors import BusinessRuleViolation
 from app.shared.workspace_repository import WorkspaceRepository
 
@@ -409,6 +410,58 @@ async def source_status(
     return next(x for x in await sources(scope, session) if x["id"] == row.id)
 
 
+class SourceUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    name: str | None = Field(default=None, min_length=1, max_length=120)
+    description: str | None = Field(default=None, max_length=300)
+
+
+@router.patch("/knowledge/sources/{source_id}")
+async def update_source(
+    source_id: UUID, data: SourceUpdate, scope: Scope, session: Session
+) -> dict[str, Any]:
+    await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
+    row = await KnowledgeService(session, scope).sources.get(source_id, for_update=True)
+    for key, value in data.model_dump(exclude_none=True).items():
+        setattr(row, key, value)
+    await session.commit()
+    return next(x for x in await sources(scope, session) if x["id"] == row.id)
+
+
+@router.delete("/knowledge/sources/{source_id}")
+async def delete_source(source_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+    """Delete a source with all its documents. PI stops using them at once."""
+    await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
+    removed = await KnowledgeService(session, scope).delete_source(source_id)
+    await session.commit()
+    return {"deleted_documents": removed}
+
+
+class DocumentUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    body: str | None = Field(default=None, min_length=1, max_length=10 * 1024 * 1024)
+
+
+@router.patch("/knowledge/documents/{document_id}")
+async def update_document(
+    document_id: UUID, data: DocumentUpdate, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
+    title = data.title.strip() if data.title else None
+    if data.title is not None and not title:
+        raise BusinessRuleViolation("INVALID_TITLE", "Give the document a title")
+    row = await KnowledgeService(session, scope).update_document(
+        document_id, title, data.body, request.app.state.settings.knowledge_upload_max_bytes
+    )
+    await session.commit()
+    if row.status == "pending":
+        await request.app.state.queue.enqueue(
+            "index_document", str(row.id), job_id=f"index:{row.id}:{row.content_hash[:12]}"
+        )
+    return await document_view(row, scope, session)
+
+
 async def document_view(row: KnowledgeDocument, scope: Scope, session: Session) -> dict[str, Any]:
     source = await KnowledgeService(session, scope).sources.get(row.source_id)
     return {
@@ -456,6 +509,57 @@ async def documents(
         await session.scalars(query.order_by(KnowledgeDocument.created_at.desc()).limit(100))
     )
     return [await document_view(row, scope, session) for row in rows]
+
+
+def _website_tools(request: Request) -> tuple[Any, Any]:
+    from app.ai.manager import build_llm_manager
+    from app.integrations.http import OutboundClient
+
+    state = request.app.state
+    settings = state.settings
+    ai = any(getattr(settings, f"{p}_api_key", None) for p in settings.provider_order())
+    outbound = OutboundClient(
+        settings, state.http, resolver=getattr(state, "integration_resolver", None)
+    )
+    return outbound, build_llm_manager(settings, state.http, state.sessions) if ai else None
+
+
+@router.post("/knowledge/website/preview")
+async def preview_website(
+    data: website_kb.CrawlInput, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Read a website (same site only, sitemap and links) and return each page's
+    extracted knowledge for review. Nothing is saved."""
+    import asyncio
+
+    from app.core.rate_limit import hit
+
+    await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
+    if not await hit(request, "pi-website-preview", str(scope.tenant_id), 10, 3600):
+        raise BusinessRuleViolation(
+            "RATE_LIMITED", "You've read websites a few times this hour. Try later.", 429
+        )
+    outbound, manager = _website_tools(request)
+    try:
+        async with asyncio.timeout(150):
+            return await website_kb.read_website(scope, outbound, manager, data)
+    except TimeoutError:
+        raise BusinessRuleViolation(
+            "WEBSITE_TIMEOUT", "The website took too long to read. Try fewer pages.", 503
+        ) from None
+
+
+@router.post("/knowledge/website/save", status_code=201)
+async def save_website(
+    data: website_kb.SaveInput, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Save reviewed pages as documents; re-saving a page replaces its earlier version."""
+    await PiService(session, scope).require("pi.knowledge.manage", "knowledge")
+    rows = await website_kb.save_pages(
+        session, scope, data, request.app.state.settings.knowledge_upload_max_bytes
+    )
+    await session.commit()
+    return {"saved": len(rows), "documents": [await document_view(r, scope, session) for r in rows]}
 
 
 @router.get("/knowledge/documents/{document_id}")

@@ -67,6 +67,15 @@ class MemoryCodeStore:
         self.items.pop(key, None)
 
 
+def worker_code_store(ctx: dict[str, Any]) -> CodeStore | None:
+    """The same code store from a background job (the worker shares the API's Redis)."""
+    store = ctx.get("pi_customer_codes")
+    if store is not None:
+        return store  # type: ignore[no-any-return]
+    redis = ctx.get("redis")
+    return RedisCodeStore(redis) if redis is not None else None
+
+
 def code_store(request: Request) -> CodeStore:
     state = request.app.state
     store: CodeStore | None = getattr(state, "pi_customer_codes", None)

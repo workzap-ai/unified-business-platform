@@ -76,6 +76,9 @@ def validate_section(section: str, value: Any) -> None:
         if section == "whatsapp_config":
             ensure(1 <= value["max_media_mb"] <= 50)
             ensure(1 <= value["reminder_after_days"] <= 30)
+            ensure(isinstance(value.get("check_in_enabled", True), bool))
+            ensure(1 <= int(value.get("check_in_after_hours", 2)) <= 12)
+            ensure(isinstance(value.get("business_form", True), bool))
             ensure(0 <= int(value.get("quiet_start", 21)) <= 23)
             ensure(0 <= int(value.get("quiet_end", 9)) <= 23)
             from app.modules.pi_saas.flows import valid_config
@@ -90,6 +93,35 @@ def validate_section(section: str, value: Any) -> None:
                 ensure(isinstance(template, dict) and set(template) == {"name", "language"})
                 ensure(bool(re.fullmatch(r"[a-z0-9_]{1,512}", template["name"])))
                 ensure(bool(re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", template["language"])))
+            code = value.get("code_template", {})
+            ensure(isinstance(code, dict) and set(code) <= {"name", "language"})
+            if code:
+                ensure(bool(re.fullmatch(r"[a-z0-9_]{1,512}", str(code.get("name", "")))))
+                ensure(
+                    bool(re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", str(code.get("language", ""))))
+                )
+            meeting = value.get("meeting_templates", {})
+            ensure(isinstance(meeting, dict) and len(meeting) <= 50)
+            for language, template in meeting.items():
+                ensure(
+                    bool(re.fullmatch(r"roman_ur|[a-z]{2,3}(?:[-_][A-Za-z0-9]{2,8})?", language))
+                )
+                ensure(isinstance(template, dict) and {"name", "language"} <= set(template))
+                ensure(set(template) <= {"name", "language", "status"})
+                ensure(bool(re.fullmatch(r"[a-z0-9_]{1,512}", template["name"])))
+                ensure(bool(re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", template["language"])))
+                ensure(isinstance(template.get("status", ""), str))
+            ladder = value.get("ladder_templates", {})
+            ensure(isinstance(ladder, dict) and len(ladder) <= 50)
+            for language, steps in ladder.items():
+                ensure(
+                    bool(re.fullmatch(r"roman_ur|[a-z]{2,3}(?:[-_][A-Za-z0-9]{2,8})?", language))
+                )
+                ensure(isinstance(steps, dict) and set(steps) <= {"day3", "day7", "day14"})
+                for template in steps.values():
+                    ensure(isinstance(template, dict) and set(template) == {"name", "language"})
+                    ensure(bool(re.fullmatch(r"[a-z0-9_]{1,512}", template["name"])))
+                    ensure(bool(re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", template["language"])))
             if value["send_read_receipts"] or value["typing_indicator"]:
                 raise BusinessRuleViolation(
                     "UNSUPPORTED_SETTING",

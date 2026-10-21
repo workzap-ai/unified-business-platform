@@ -6,7 +6,7 @@ import { ApiError } from "@/services/api-client";
 import { isDemo } from "@/lib/data-mode";
 import { writeDemoState } from "@/demo/workspace";
 import { authService } from "./service";
-import type { LoginInput, RegisterInput, Session } from "./types";
+import type { LoginInput, RegisterInput, SecondStep, Session } from "./types";
 
 type SessionStatus = "loading" | "anonymous" | "ready" | "error";
 
@@ -17,7 +17,10 @@ type SessionContextValue = {
   can: (permission: string) => boolean;
   canAny: (...permissions: string[]) => boolean;
   scopeKey: readonly [string, string, string];
-  login: (input: LoginInput) => Promise<Session>;
+  /** Signs in, or returns the second step (face or fingerprint) still needed. */
+  login: (input: LoginInput) => Promise<Session | SecondStep>;
+  /** Adopts the session once the second step has passed. */
+  finishSignIn: (session: Session) => Promise<void>;
   register: (input: RegisterInput) => Promise<Session>;
   logout: () => Promise<void>;
   switchWorkspace: (tenantId: string, environmentId?: string) => Promise<void>;
@@ -79,9 +82,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     ] as const,
     login: async (input) => {
       const next = await authService.login(input);
+      if ("mfa_required" in next) return next;
       await adopt(next);
       return next;
     },
+    finishSignIn: adopt,
     register: async (input) => {
       const next = await authService.register(input);
       await adopt(next);
@@ -92,9 +97,13 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         await authService.logout();
       } finally {
         await purgeWorkspaceData();
-        client.removeQueries();
-        client.setQueryData(SESSION_KEY, undefined);
-        await client.invalidateQueries({ queryKey: SESSION_KEY });
+        client.removeQueries({
+          predicate: (q) => q.queryKey[0] !== SESSION_KEY[0],
+        });
+        // Reset (not just invalidate) so the signed-out state is fetched fresh; a
+        // removed or undefined-set session query kept showing the old session, and
+        // /login bounced straight back into the app.
+        await client.resetQueries({ queryKey: SESSION_KEY });
       }
     },
     switchWorkspace: async (tenantId, environmentId) => {

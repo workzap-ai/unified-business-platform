@@ -77,7 +77,8 @@ export function formatRequirement(value: unknown): string {
 }
 
 export function requirementEntries(requirements: Record<string, unknown>) {
+  // Keys starting with "_" are internal (e.g. "_project", which deal a lead is).
   return Object.entries(requirements).filter(
-    ([, v]) => v !== null && v !== undefined && v !== "",
+    ([k, v]) => !k.startsWith("_") && v !== null && v !== undefined && v !== "",
   );
 }

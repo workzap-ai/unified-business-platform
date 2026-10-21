@@ -11,6 +11,15 @@ from app.modules.pi.models import PiConversation, PiMessage, WhatsAppConnection
 from app.modules.pi.service import PiService
 
 
+def _waiting_until(brief: dict[str, Any]) -> datetime | None:
+    """Until when the customer said they are waiting on someone else (pi Customer)."""
+    raw = brief.get("customer_waiting_until")
+    try:
+        return datetime.fromisoformat(raw) if isinstance(raw, str) and raw else None
+    except ValueError:
+        return None
+
+
 def quiet_until(
     timezone: str, start: int = 21, end: int = 9, now: datetime | None = None
 ) -> datetime | None:
@@ -27,6 +36,23 @@ def quiet_until(
     if wake <= local:
         wake += timedelta(days=1)
     return wake.astimezone(UTC)
+
+
+def reminder_language(conversation: PiConversation, config: dict[str, Any]) -> str:
+    """The template language for this chat: Urdu, Hindi and Roman Urdu share the Roman Urdu
+    templates; anything without its own template uses English."""
+    language = conversation.language or "en"
+    if language in ("roman_ur", "ur", "hi"):
+        language = "roman_ur"
+    return language if language in (config.get("reminder_templates") or {}) else "en"
+
+
+def _friday_prayer(timezone: str) -> bool:
+    from app.modules.pi.policy import zone
+
+    local = datetime.now(UTC).astimezone(zone(timezone))
+    minutes = local.hour * 60 + local.minute
+    return local.weekday() == 4 and 12 * 60 + 30 <= minutes < 14 * 60 + 30
 
 
 async def sweep_followups(ctx: dict[str, Any]) -> None:
@@ -52,6 +78,12 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
             policy = await settings_row(session, scope)
             brief = conversation.service_brief or {}
             source = brief.get("source_message_id")
+            waiting = _waiting_until(brief)
+            if waiting is not None and waiting > datetime.now(UTC):
+                # The customer is waiting on someone else (a boss, a partner): don't
+                # nudge them until the pause they chose is over.
+                conversation.followup_due_at = waiting
+                continue
             if (
                 conversation.mode != "ai"
                 or conversation.status != "open"
@@ -64,7 +96,7 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
             ):
                 conversation.followup_due_at = None
                 continue
-            language = conversation.language or "en"
+            language = reminder_language(conversation, policy.whatsapp_config)
             template = policy.whatsapp_config.get("reminder_templates", {}).get(language)
             if not template or not connection or not connection.business_account_id:
                 await notify(
@@ -87,6 +119,9 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
             )
             if later is not None:
                 conversation.followup_due_at = later  # Never at night; sent next morning.
+                continue
+            if _friday_prayer(policy.timezone):
+                conversation.followup_due_at = datetime.now(UTC) + timedelta(hours=1)
                 continue
             from app.modules.pi_saas.entitlement import remaining as allowance_left
 
@@ -139,6 +174,6 @@ def reminder_allowed(
         and brief.get("reminded_source_id") != reminder.get("source_message_id")
         and conversation.last_inbound_at
         and conversation.last_inbound_at.isoformat() == reminder.get("last_inbound_at")
-        and config.get("reminder_templates", {}).get(conversation.language or "en")
+        and config.get("reminder_templates", {}).get(reminder_language(conversation, config))
         == reminder.get("template")
     )

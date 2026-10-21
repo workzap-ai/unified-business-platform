@@ -9,6 +9,7 @@ fails, a rule-based brief is built from the same facts, and the reply says so.
 
 import asyncio
 import json
+from collections.abc import Awaitable, Callable
 from typing import Annotated, Any, Literal, cast
 
 from pydantic import BaseModel, Field, StringConstraints, ValidationError
@@ -185,7 +186,11 @@ class Team:
         except (GatewayUnavailable, ValidationError, ValueError):
             return None
 
-    async def consult(self, data: TeamInput) -> dict[str, Any]:
+    async def consult(
+        self,
+        data: TeamInput,
+        emit: Callable[[dict[str, Any]], Awaitable[None]] | None = None,
+    ) -> dict[str, Any]:
         analytics, facts, signals = await self.facts()
         roles = [r for r in (data.specialists or self.available(facts, signals))]
         roles = [r for r in roles if r in self.available(facts, signals)][:5]
@@ -194,13 +199,34 @@ class Team:
         views: dict[str, SpecialistView] = {}
         mode = "rules"
         if self.enabled and roles:
-            results = await asyncio.gather(
-                *(self.specialist(r, data.question, self.pack(r, facts, signals)) for r in roles)
-            )
+
+            async def advise(role: str) -> SpecialistView | None:
+                if emit:
+                    await emit({"type": "step", "tool": f"team.{role}", "label": ROLES[role][0]})
+                view = await self.specialist(role, data.question, self.pack(role, facts, signals))
+                if emit:
+                    await emit(
+                        {"type": "step_done", "tool": f"team.{role}", "ok": view is not None}
+                    )
+                return view
+
+            results = await asyncio.gather(*(advise(r) for r in roles))
             views = {r: v for r, v in zip(roles, results, strict=True) if v is not None}
         brief: DecisionBrief | None = None
         if views:
+            if emit:
+                await emit(
+                    {
+                        "type": "step",
+                        "tool": "team.strategist",
+                        "label": "Strategist decision brief",
+                    }
+                )
             brief = await self.strategist(data.question, views, facts, signals)
+            if emit:
+                await emit(
+                    {"type": "step_done", "tool": "team.strategist", "ok": brief is not None}
+                )
             mode = "ai" if brief is not None else "rules"
         if brief is None:
             brief = rule_brief(data.question, facts, signals)

@@ -21,13 +21,26 @@ import {
   type Environment,
   type LoginInput,
   type RegisterInput,
+  type SecondStep,
   type Session,
   type Tenant,
 } from "./types";
+import { clearAgentHistory } from "@/features/workspace-agent/agent-history";
+import { fingerprintStep } from "./passkey";
 
 export interface AuthService {
   session(): Promise<Session>;
-  login(input: LoginInput): Promise<Session>;
+  /** The password step. People with a saved face or fingerprint get a second step. */
+  login(input: LoginInput): Promise<Session | SecondStep>;
+  /** Second step: three camera frames of the person's face. */
+  signInWithFace(ticket: string, frames: string[]): Promise<Session>;
+  /** Optional second step: the fingerprint (passkey) on this device. */
+  signInWithFingerprint(ticket: string): Promise<Session>;
+  /** Second step on any computer: a 6-digit code sent to the account's email. */
+  sendSignInCode(ticket: string): Promise<{ sent_to: string; minutes: number }>;
+  signInWithEmailCode(ticket: string, code: string): Promise<Session>;
+  /** Second step: the person's own 6-digit PIN. */
+  signInWithPin(ticket: string, pin: string): Promise<Session>;
   register(input: RegisterInput): Promise<Session>;
   createWorkspace(
     name: string,
@@ -49,10 +62,40 @@ export interface AuthService {
 const live: AuthService = {
   session: () =>
     apiRequest("GET", "/auth/session", sessionSchema).then(bindSession),
-  login: (input) =>
-    apiRequest("POST", "/auth/login", sessionSchema, { body: input }).then(
-      bindSession,
+  login: async (input) => {
+    const answer = await apiRequest<Record<string, unknown>>(
+      "POST",
+      "/auth/login",
+      null,
+      { body: input },
+    );
+    if (answer && answer.mfa_required === true)
+      return answer as unknown as SecondStep;
+    return bindSession(sessionSchema.parse(answer));
+  },
+  signInWithFace: (ticket, frames) =>
+    apiRequest("POST", "/auth/mfa/face", sessionSchema, {
+      body: { ticket, frames },
+    }).then(bindSession),
+  signInWithFingerprint: (ticket) =>
+    fingerprintStep(ticket, (body) =>
+      apiRequest("POST", "/auth/mfa/fingerprint", sessionSchema, { body }),
+    ).then(bindSession),
+  sendSignInCode: (ticket) =>
+    apiRequest(
+      "POST",
+      "/auth/mfa/email/start",
+      z.object({ sent_to: z.string(), minutes: z.number() }),
+      { body: { ticket } },
     ),
+  signInWithEmailCode: (ticket, code) =>
+    apiRequest("POST", "/auth/mfa/email", sessionSchema, {
+      body: { ticket, code },
+    }).then(bindSession),
+  signInWithPin: (ticket, pin) =>
+    apiRequest("POST", "/auth/mfa/pin", sessionSchema, {
+      body: { ticket, pin },
+    }).then(bindSession),
   register: (input) =>
     apiRequest("POST", "/auth/register", sessionSchema, {
       body: input,
@@ -63,8 +106,13 @@ const live: AuthService = {
       body: { name, business_type },
       timeoutMs: 90_000,
     }),
-  logout: () => apiRequest("POST", "/auth/logout", null),
-  logoutAll: () => apiRequest("POST", "/auth/logout-all", null),
+  // Agent Beta chats are kept per person in this browser; sign-out removes them.
+  logout: () =>
+    apiRequest<void>("POST", "/auth/logout", null).finally(clearAgentHistory),
+  logoutAll: () =>
+    apiRequest<void>("POST", "/auth/logout-all", null).finally(
+      clearAgentHistory,
+    ),
   selectWorkspace: (tenant_id, environment_id) =>
     apiRequest("PUT", "/auth/session/workspace", sessionSchema, {
       body: { tenant_id, environment_id: environment_id ?? null },
@@ -184,6 +232,26 @@ const demo: AuthService = {
   },
   async resendVerification() {
     await demoDelay(200);
+  },
+  async signInWithFace() {
+    await demoDelay(200);
+    throw new DemoError("Face sign-in needs a live API connection.");
+  },
+  async signInWithFingerprint() {
+    await demoDelay(200);
+    throw new DemoError("Fingerprint sign-in needs a live API connection.");
+  },
+  async sendSignInCode() {
+    await demoDelay(200);
+    throw new DemoError("Email codes need a live API connection.");
+  },
+  async signInWithEmailCode() {
+    await demoDelay(200);
+    throw new DemoError("Email codes need a live API connection.");
+  },
+  async signInWithPin() {
+    await demoDelay(200);
+    throw new DemoError("PIN sign-in needs a live API connection.");
   },
   async acceptInvite() {
     await demoDelay(300);

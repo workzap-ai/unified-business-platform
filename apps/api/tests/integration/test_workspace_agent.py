@@ -391,3 +391,76 @@ async def test_real_specialist_dispatch_preserves_scope_and_rejects_other_domain
         assert len({(user, tenant) for user, tenant, _ in fake.calls}) == 1
         assert (await owner.get("hr/employees")).json()["total"] == 0
         assert (await owner.get("customers")).json()["total"] == 0
+
+
+async def test_streamed_agent_remembers_the_chat_plans_and_shows_each_step(stack, monkeypatch):
+    import json
+
+    import app.modules.workspace_agent.routes as routes
+
+    seen: list[list[tuple[str, str]]] = []
+
+    class PlanningManager:
+        def __init__(self):
+            self.turn = 0
+
+        async def complete(self, scope, **kwargs):
+            self.turn += 1
+            seen.append([(m.role, m.text()) for m in kwargs["messages"]])
+            if self.turn == 1:
+                return LLMResponse(
+                    "I'll check customers and workspace health.",
+                    "test",
+                    "test",
+                    tool_calls=[
+                        ToolCall("1", "search", {"query": "Acme"}),
+                        ToolCall("2", "monitor", {}),
+                        ToolCall("3", "employees_create", {"rows": [employee()]}),
+                    ],
+                )
+            return LLMResponse(
+                "**Acme** is your only customer.\n\n1. Follow up today\n"
+                ">> Show Acme's orders | What needs attention?",
+                "test",
+                "test",
+            )
+
+    monkeypatch.setattr(routes, "ai_enabled", lambda request: True)
+    monkeypatch.setattr(routes, "manager", lambda request: PlanningManager())
+    async with stack.browser() as ob, stack.browser() as vb:
+        owner = bind(await stack.register(ob))
+        await owner.create("customers", {"name": "Acme Traders"})
+        viewer = bind(await stack.login(vb, await add_member(owner, ["viewer"])))
+        response = await viewer.post(
+            f"{BASE}/chat/stream",
+            {
+                "message": "aur uska status?",
+                "history": [
+                    {"role": "user", "content": "Find Acme"},
+                    {"role": "assistant", "content": "Acme Traders is a customer."},
+                ],
+                "current_page": "/customers",
+            },
+        )
+        assert response.status_code == 200, response.text
+        assert response.headers["content-type"].startswith("application/x-ndjson")
+        events = [json.loads(line) for line in response.text.splitlines() if line.strip()]
+
+    roles = [role for role, _ in seen[0]]
+    assert roles == ["system", "user", "assistant", "user"]
+    assert seen[0][2][1] == "Acme Traders is a customer." and seen[0][3][1] == "aur uska status?"
+    assert "'/customers'" in seen[0][0][1] and "Today is" in seen[0][0][1]
+    kinds = [e["type"] for e in events]
+    assert kinds[0] == "thinking" and kinds[-1] == "reply"
+    assert {"type": "note", "text": "I'll check customers and workspace health."} in events
+    steps = [e for e in events if e["type"] == "step"]
+    assert [s["tool"] for s in steps] == ["search", "monitor"]  # the ungranted write isn't run
+    assert steps[0]["label"] == "Searching for “Acme”"
+    assert all(e["ok"] for e in events if e["type"] == "step_done")
+    reply = events[-1]["reply"]
+    assert reply["mode"] == "ai" and reply["proposals"] == []
+    assert (
+        reply["message"].startswith("**Acme** is your only customer.")
+        and ">>" not in reply["message"]
+    )
+    assert reply["follow_ups"] == ["Show Acme's orders", "What needs attention?"]

@@ -146,6 +146,8 @@ export interface Message {
   error_code: string | null;
   created_at: string;
   sent_by_label?: string | null;
+  /** A problem map or journey card pi sent the customer on WhatsApp. */
+  card?: { kind: string; image: string } | null;
 }
 
 export interface History {

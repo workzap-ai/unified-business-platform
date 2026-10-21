@@ -23,6 +23,7 @@ import {
 } from "@/components/ui";
 import { del, errorText, get, post } from "@/lib/api";
 import { date } from "@/lib/format";
+import { EmailCard } from "@/features/email-connector";
 import { useAction, useBusinessKey, useCan } from "@/lib/session";
 
 export type Connector = {
@@ -267,8 +268,8 @@ export function ConnectorsSection() {
           Your accounts
         </h2>
         <p className="text-sm text-muted-foreground">
-          Connect your own calendar and store. Each account is authorized by
-          you, and you can disconnect it at any time.
+          Connect your own calendar, store and email. Each account is authorized
+          by you, and you can disconnect it at any time.
         </p>
       </div>
       {connectors.isPending ? (
@@ -283,6 +284,7 @@ export function ConnectorsSection() {
           {connectors.data.map((item) => (
             <ConnectorCard key={item.key} item={item} />
           ))}
+          <EmailCard />
         </div>
       )}
     </section>

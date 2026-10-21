@@ -75,7 +75,7 @@ def test_nulls_numbers_and_lists_are_tolerated():
     assert turn.requirements.scope == "shop, blog" and turn.requirements.audience == ""
     assert turn.missing == ["audience"] and turn.awaiting_customer is True
     assert turn.ready_for_team is False and turn.action == "none"
-    assert turn.summary.startswith("Conversation in progress")
+    assert turn.summary == ""  # compose_service_turn writes one from the brief
 
 
 def test_schema_is_accepted_by_gemini():

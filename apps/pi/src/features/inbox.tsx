@@ -2,7 +2,9 @@
 
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
+  FileText,
   ArrowLeft,
+  ArrowRight,
   Bot,
   Check,
   CheckCheck,
@@ -43,6 +45,7 @@ import {
 import { del, errorText, get, post } from "@/lib/api";
 import product from "@/components/product.module.css";
 import { dateTime, timeAgo } from "@/lib/format";
+import { IncomingSoundToggle } from "@/features/incoming-alert";
 import { useAction, useBusinessKey, useCan, useSession } from "@/lib/session";
 import type {
   Conversation,
@@ -135,6 +138,7 @@ export function InboxPage() {
               >
                 Handoffs
               </Link>
+              <IncomingSoundToggle className="me-2" />
               <span>
                 <InboxIcon size={17} aria-hidden />
               </span>
@@ -426,6 +430,22 @@ function ApprovalList({ onOpen }: { onOpen: (id: string) => void }) {
   );
 }
 
+/** The request desk has every kind of request (prices, approvals, meetings) and history. */
+function RequestDeskLink() {
+  return (
+    <Link
+      href="/requests"
+      className="flex min-h-11 items-center gap-2 border-b border-border bg-accent-soft/50 px-3 py-2 text-sm font-medium text-accent-soft-foreground hover:bg-accent-soft"
+    >
+      <MessageCircleQuestion className="size-4 shrink-0" aria-hidden />
+      <span className="min-w-0 flex-1">
+        Open the request desk: prices, approvals, meetings and answered requests
+      </span>
+      <ArrowRight className="size-4 shrink-0 rtl:rotate-180" aria-hidden />
+    </Link>
+  );
+}
+
 function QuestionList({ onOpen }: { onOpen: (id: string) => void }) {
   const key = useBusinessKey();
   const [answering, setAnswering] = React.useState<StaffRequest | null>(null);
@@ -450,16 +470,20 @@ function QuestionList({ onOpen }: { onOpen: (id: string) => void }) {
     );
   if (!questions.data.length) {
     return (
-      <EmptyState
-        icon={<MessageCircleQuestion className="size-6" aria-hidden />}
-        title="No open questions"
-      >
-        When pi doesn&apos;t know an answer, it asks you here.
-      </EmptyState>
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <RequestDeskLink />
+        <EmptyState
+          icon={<MessageCircleQuestion className="size-6" aria-hidden />}
+          title="No open questions"
+        >
+          When pi doesn&apos;t know an answer, it asks you here.
+        </EmptyState>
+      </div>
     );
   }
   return (
     <>
+      <RequestDeskLink />
       <ul className="min-h-0 flex-1 overflow-y-auto">
         {questions.data.map((q) => (
           <li key={q.id} className="border-b border-border px-3 py-3">
@@ -500,11 +524,11 @@ function AnswerDialog({
   const submit = useAction(
     () => post(`/staff-requests/${request?.id}/answer`, { answer, mode }),
     {
-      invalidate: [["questions"], ["home"], ["conversations"]],
+      invalidate: [["questions"], ["requests"], ["home"], ["conversations"]],
       success:
         mode === "reusable"
-          ? "Sent, and pi will remember this answer"
-          : "Reply sent to the customer",
+          ? "pi will reply to the customer and remember this answer"
+          : "pi will reply to the customer using your answer",
       onSuccess: () => {
         setAnswer("");
         onClose();
@@ -517,8 +541,12 @@ function AnswerDialog({
       onOpenChange={(open) => (!open ? onClose() : null)}
     >
       <DialogContent
-        title="Answer the customer"
-        description={request?.question}
+        title="Answer for pi"
+        description={
+          request?.question
+            ? `${request.question} · pi writes the reply to the customer from your answer, in their language.`
+            : undefined
+        }
       >
         <div className="space-y-4">
           <Field label="Your answer" htmlFor="answer">
@@ -830,12 +858,41 @@ function MessageBubble({
               maxLength={4000}
             />
           ) : (
-            <p className="whitespace-pre-line" data-user-text>
-              {message.body ||
-                (message.message_type !== "text"
-                  ? `[${message.message_type}]`
-                  : "")}
-            </p>
+            <>
+              {message.card && (
+                <a href={message.card.image} target="_blank" rel="noreferrer">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- signed external card */}
+                  <img
+                    src={message.card.image}
+                    alt={
+                      message.card.kind === "map"
+                        ? "Problem map sent on WhatsApp"
+                        : "Journey card sent on WhatsApp"
+                    }
+                    loading="lazy"
+                    className="mb-1.5 block w-full max-w-[260px] rounded-xl border border-border"
+                  />
+                </a>
+              )}
+              {message.media?.file_kind === "document" &&
+                typeof message.media.file_id === "string" && (
+                  <a
+                    href={`/api/v1/pi-app/customer-files/${message.media.file_id}/download`}
+                    className="mb-1.5 flex items-center gap-2 rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm font-medium text-primary hover:underline"
+                  >
+                    <FileText className="size-4 shrink-0" aria-hidden />
+                    <span className="min-w-0 truncate">
+                      {String(message.media.filename || "Document")}
+                    </span>
+                  </a>
+                )}
+              <p className="whitespace-pre-line" data-user-text>
+                {message.body ||
+                  (message.message_type !== "text"
+                    ? `[${message.message_type}]`
+                    : "")}
+              </p>
+            </>
           )}
           <p className="mt-1 flex items-center justify-end gap-1.5 text-[11px] text-muted-foreground">
             {dateTime(message.created_at)} <StatusIcon message={message} />
@@ -1031,6 +1088,13 @@ function Composer({ conversation }: { conversation: Conversation }) {
   );
 }
 
+const PROJECT_STATUS: Record<string, string> = {
+  collecting: "collecting details",
+  awaiting_confirmation: "waiting for their yes",
+  confirmed: "confirmed",
+  with_team: "with the team",
+};
+
 function CustomerPanel({
   conversation,
   brief,
@@ -1101,6 +1165,14 @@ function CustomerPanel({
   );
   const requirements = (brief?.requirements ?? {}) as Record<string, string>;
   const filled = Object.entries(requirements).filter(([, v]) => v);
+  const projects = Array.isArray(brief?.projects)
+    ? (brief.projects as {
+        title: string;
+        details?: string;
+        status?: string;
+        missing?: string[];
+      }[])
+    : [];
   return (
     <div className="space-y-6 p-4">
       <div>
@@ -1127,6 +1199,40 @@ function CustomerPanel({
           <p className="whitespace-pre-line text-sm" data-user-text>
             {conversation.summary}
           </p>
+        </section>
+      ) : null}
+      {projects.length ? (
+        <section>
+          <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Projects in this chat ({projects.length})
+          </h3>
+          <ul className="space-y-2 text-sm">
+            {projects.map((p) => (
+              <li key={p.title}>
+                <p className="font-medium" data-user-text>
+                  {p.title}{" "}
+                  <span className="text-xs font-normal text-muted-foreground">
+                    · {PROJECT_STATUS[p.status ?? ""] ?? "In progress"}
+                  </span>
+                </p>
+                {p.details ? (
+                  <p className="text-muted-foreground" data-user-text>
+                    {p.details}
+                  </p>
+                ) : null}
+                {p.missing?.length ? (
+                  <p className="text-xs">
+                    Still needed: {p.missing.join(", ")}
+                  </p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+          {brief?.meeting_requested ? (
+            <p className="mt-2 text-xs font-medium text-accent">
+              The customer asked for a meeting.
+            </p>
+          ) : null}
         </section>
       ) : null}
       {filled.length ? (

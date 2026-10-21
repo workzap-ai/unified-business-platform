@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from datetime import UTC, datetime
 from uuid import UUID
 
-from sqlalchemy import or_
+from sqlalchemy import func, literal_column, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,6 +21,8 @@ from app.modules.customers.schemas import (
 from app.shared.errors import Conflict
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository, like_pattern, to_page
+
+ACTIVITY_INSERT_ORDER = literal_column("customer_activities.ctid")
 
 
 async def log_activity(
@@ -43,6 +45,9 @@ async def log_activity(
             ref_type=ref_type,
             ref_id=ref_id,
             actor_label=scope.actor_label[:80],
+            # The moment of the event, not the transaction's start (now()): several
+            # events in one request (draft → approved → sent) keep their order.
+            created_at=func.clock_timestamp(),
         )
     )
     await session.flush()
@@ -193,7 +198,10 @@ class CustomerService:
         statement = (
             self.activities.select()
             .where(CustomerActivity.customer_id == customer_id)
-            .order_by(CustomerActivity.created_at.desc(), CustomerActivity.id)
+            # Newest first. Rows logged before clock_timestamp() share their
+            # transaction's time; ids are random, so ties fall back to insert order
+            # (the row's physical position: the table is append-only).
+            .order_by(CustomerActivity.created_at.desc(), ACTIVITY_INSERT_ORDER.desc())
         )
         rows, total = await self.activities.page(statement, page)
         return to_page(ActivityView, rows, total, page)

@@ -10,6 +10,7 @@ import {
   MessageCircle,
   Pause,
   Play,
+  ScanFace,
   ShieldCheck,
   UserPlus,
   Users,
@@ -37,7 +38,9 @@ import {
 } from "@/components/ui";
 import { BusinessReview, NotificationSettings } from "@/features/journey";
 import { WhatsAppLiveCard } from "@/features/whatsapp-live";
+import { WhatsAppProfileCard } from "@/features/whatsapp-profile";
 import { CustomerPortalCard } from "@/features/customer/portal-setting";
+import { SignInSecurity } from "@/features/security";
 import { SetupCenter } from "@/features/setup-center";
 import { WhatsAppConnect, useAccount } from "@/features/setup";
 import { GettingPaid } from "@/features/getting-paid";
@@ -64,7 +67,19 @@ const SECTIONS = [
   { href: "/settings/payments", label: "Getting paid" },
   { href: "/settings/business", label: "Business" },
   { href: "/settings/notifications", label: "Notifications" },
+  { href: "/settings/security", label: "Sign-in & security" },
 ];
+
+export function SecuritySettingsPage() {
+  return (
+    <Shell
+      title="Sign-in & security"
+      description="After your password, pi can check your face on the camera or your fingerprint."
+    >
+      <SignInSecurity />
+    </Shell>
+  );
+}
 
 export function BusinessReviewPage() {
   return (
@@ -140,7 +155,7 @@ export function SettingsOverview() {
       href: "/settings/whatsapp",
       icon: MessageCircle,
       title: "WhatsApp",
-      body: "Your connected number and its health.",
+      body: "Your connected number, its health and its public profile.",
     },
     {
       href: "/settings/team",
@@ -165,6 +180,12 @@ export function SettingsOverview() {
       icon: Building2,
       title: "Business",
       body: "Name, hours and pausing pi.",
+    },
+    {
+      href: "/settings/security",
+      icon: ScanFace,
+      title: "Sign-in & security",
+      body: "Face ID and fingerprint after your password.",
     },
   ];
   return (
@@ -330,6 +351,7 @@ export function WhatsAppPage() {
               )}
             </CardSection>
           </Card>
+          <WhatsAppProfileCard />
           <CustomerPortalCard />
           <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
             <DialogContent
@@ -519,6 +541,9 @@ function InviteDialog({ roles }: { roles: TeamView["roles"] }) {
             >
               <InviteLinkField link={invited.link ?? ""} />
             </Field>
+            {invited.link ? (
+              <WhatsAppInvite name={invited.name} link={invited.link} />
+            ) : null}
             <Button className="w-full" onClick={() => setOpen(false)}>
               Done
             </Button>
@@ -582,6 +607,66 @@ function InviteDialog({ roles }: { roles: TeamView["roles"] }) {
         </DialogContent>
       )}
     </Dialog>
+  );
+}
+
+/** The invite on WhatsApp: from the pi number when they have an open chat with it,
+ * otherwise from the inviter's own WhatsApp with the message ready. */
+function WhatsAppInvite({ name, link }: { name: string; link: string }) {
+  const [phone, setPhone] = React.useState("");
+  const [result, setResult] = React.useState<string | null>(null);
+  const send = useAction(
+    () =>
+      post<{ delivery: "sent" | "manual"; share: string }>(
+        "/team-invites/whatsapp",
+        { phone, name, link },
+      ),
+    {
+      onSuccess: (r) => {
+        if (r.delivery === "sent") {
+          setResult("Sent from your pi WhatsApp number.");
+        } else {
+          setResult(
+            "They haven't messaged your pi number yet, so WhatsApp needs you to send it: your WhatsApp opened with the message ready.",
+          );
+          window.open(r.share, "_blank", "noopener");
+        }
+      },
+    },
+  );
+  return (
+    <Field
+      label="Send it on WhatsApp"
+      htmlFor="inv-phone"
+      hint="Their WhatsApp number with country code, e.g. +92 300 1234567."
+    >
+      <div className="flex items-center gap-2">
+        <Input
+          id="inv-phone"
+          inputMode="tel"
+          autoComplete="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="+92 300 1234567"
+          className="min-w-0 flex-1"
+        />
+        <Button
+          type="button"
+          variant="secondary"
+          className="shrink-0"
+          loading={send.isPending}
+          disabled={phone.replace(/\D/g, "").length < 8}
+          onClick={() => send.mutate(undefined)}
+        >
+          <MessageCircle className="size-4" aria-hidden /> Send
+        </Button>
+      </div>
+      {result ? (
+        <p className="mt-2 text-[13px] text-muted-foreground" role="status">
+          {result}
+        </p>
+      ) : null}
+    </Field>
   );
 }
 

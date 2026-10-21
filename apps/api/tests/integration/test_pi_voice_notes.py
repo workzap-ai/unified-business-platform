@@ -145,5 +145,5 @@ async def test_voice_note_without_any_transcript_still_goes_to_the_team(
     await _run_jobs(app, provider, business_db)
     inbound = await _inbound(business_db, "wamid.v3")
     conversation = await business_db.get(PiConversation, inbound.conversation_id)
-    assert conversation.mode == "human"
+    assert conversation.mode == "ai"  # pi asks them to type it; the team is told
     await client.aclose()

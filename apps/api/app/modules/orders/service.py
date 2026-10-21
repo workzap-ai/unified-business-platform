@@ -44,6 +44,26 @@ ORDER_STATES = StateMachine(
         "cancelled": frozenset(),
     },
 )
+
+
+async def _deal_moved(
+    session: AsyncSession, scope: WorkspaceScope, order: Order, target: str
+) -> None:
+    """pi's deal flow: the customer hears the work started / shipped / was delivered.
+    Messaging is best effort: the order moves whatever happens here (savepoint)."""
+    import logging
+
+    from app.modules.pi_saas.deals import after_order_moved
+
+    try:
+        async with session.begin_nested():
+            await after_order_moved(session, scope, order, target)
+    except Exception:  # noqa: BLE001 - the order change stands
+        logging.getLogger("platform").warning(
+            "deal_order_hook_failed", extra={"order_id": str(order.id)}
+        )
+
+
 ORDER_EVENTS = {
     "confirmed": "order.confirmed",
     "cancelled": "order.cancelled",
@@ -421,6 +441,8 @@ class OrderService:
         event = ORDER_EVENTS.get(target)
         if event:
             await emit(self.session, self.scope, event, _order_payload(order), _ref(order))
+        if target in {"processing", "shipped", "delivered"}:
+            await _deal_moved(self.session, self.scope, order, target)
         return order
 
     async def _confirm_effects(self, order: Order, lines: list[OrderLine]) -> None:

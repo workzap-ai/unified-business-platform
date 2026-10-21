@@ -43,6 +43,12 @@ import { DocumentView } from "./document-view";
 import { StatusFlow, type FlowStep } from "./status-flow";
 import { useBusinessSettings, useQuote } from "./hooks";
 import { approvalReasons } from "./lib";
+import { dealService } from "@/features/sales/deal-service";
+import { SendOnWhatsAppButton } from "@/features/sales/deal-delivery-dialog";
+import { DealDocumentsCard } from "@/features/sales/deal-documents-card";
+
+/** Statuses the proposal can be sent (or resent) on WhatsApp from. */
+const WHATSAPP_SENDABLE = new Set(["draft", "approved", "sent"]);
 
 type AnyAction = QuoteAction | "convert_to_order";
 
@@ -210,7 +216,7 @@ function QuoteRecord({ id }: { id: string }) {
     return (
       <PageShell>
         <RecordHeader title="" loading />
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
           <Skeleton className="h-[480px] rounded-xl" />
           <Skeleton className="h-72 rounded-xl" />
         </div>
@@ -227,6 +233,8 @@ function QuoteRecord({ id }: { id: string }) {
   const reasons = approvalReasons(q, settings.data, q.currency);
   const confirmSpec = confirming ? ACTIONS[confirming].confirm : undefined;
   const busy = running !== null || action.isPending;
+  const canSendWhatsApp =
+    WHATSAPP_SENDABLE.has(q.status) && can("quotes.write") && can("pi.read");
 
   return (
     <PageShell>
@@ -265,6 +273,14 @@ function QuoteRecord({ id }: { id: string }) {
         }
         actions={
           <>
+            {canSendWhatsApp && (
+              <SendOnWhatsAppButton
+                noun="proposal"
+                resend={q.status === "sent"}
+                send={() => dealService.sendQuote(q.id)}
+                invalidate={[["quotes"], ["deals"], ["leads"], ["pipeline"]]}
+              />
+            )}
             {canEdit && (
               <Button variant="secondary" size="sm" asChild>
                 <Link href={`/quotes/${q.id}/edit`}>
@@ -278,7 +294,9 @@ function QuoteRecord({ id }: { id: string }) {
                 <Button
                   key={a}
                   size="sm"
-                  variant={i === 0 ? "default" : "secondary"}
+                  variant={
+                    i === 0 && !canSendWhatsApp ? "default" : "secondary"
+                  }
                   onClick={() => run(a)}
                   loading={running === a}
                   disabled={busy}
@@ -340,7 +358,7 @@ function QuoteRecord({ id }: { id: string }) {
         </Notice>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <DocumentView
           kind="Quote"
           number={q.number}
@@ -379,6 +397,10 @@ function QuoteRecord({ id }: { id: string }) {
               <StatusFlow steps={quoteSteps(q)} terminal={quoteTerminal(q)} />
             </CardBody>
           </Card>
+
+          {can("sales.read") && can("pi.read") && (
+            <DealDocumentsCard filter={{ quote_id: q.id }} />
+          )}
 
           <Card>
             <CardHeader title="Approval" icon={<Stamp />} />

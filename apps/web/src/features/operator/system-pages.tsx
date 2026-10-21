@@ -104,7 +104,7 @@ function UsersView({ me }: { me: OperatorMe }) {
       <EmptyState
         icon={Users}
         title="Not available for your role"
-        description="Ask an operator owner for user access."
+        description="Ask a super admin for user access."
       />
     );
   const pages = list.data
@@ -365,7 +365,7 @@ function AuditView({ me }: { me: OperatorMe }) {
       <EmptyState
         icon={FileClock}
         title="Not available for your role"
-        description="Ask an operator owner for audit access."
+        description="Ask a super admin for audit access."
       />
     );
   return (
@@ -517,7 +517,7 @@ function SystemStatus({ me }: { me: OperatorMe }) {
       <EmptyState
         icon={ServerCog}
         title="Not available for your role"
-        description="Ask an operator owner for system access."
+        description="Ask a super admin for system access."
       />
     );
   if (sys.isPending) return <Skeleton className="h-64 w-full" />;

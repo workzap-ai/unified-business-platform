@@ -12,12 +12,15 @@ External delivery uncertainty never triggers a blind resend.
 """
 
 import asyncio
+import logging
+import re
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.gateway import Gateway, GatewayUnavailable
@@ -33,6 +36,15 @@ from app.modules.pi.agents import AgentContext, run_specialists
 from app.modules.pi.configuration import seed_agents, settings_row
 from app.modules.pi.graph import AGENTS, RouteState, keyword_intent, route_message
 from app.modules.pi.guard import ReplyRejected, rate_limited, validate_reply
+from app.modules.pi.language import (
+    HANDOFF_NOTICES,
+    MEDIA_NOTICES,
+    MEDIA_UNREADABLE_NOTICES,
+    MEETING_NOTICES,
+    TEAM_CHECK_NOTICES,
+    detect_language,
+    notice_in,
+)
 from app.modules.pi.models import (
     PiAgent,
     PiAgentRun,
@@ -48,8 +60,12 @@ from app.modules.pi.policy import outside_hours
 from app.modules.pi.service import HANDOFF_NOTICE, PiService
 from app.modules.pi.service_conversation import (
     ServiceTurn,
+    allowed_text,
+    ask_for_meeting,
+    ask_team,
+    asks_for_meeting,
     compose_service_turn,
-    offered_labels,
+    keep_notes,
     prepare_context,
     run_service_action,
     save_service_turn,
@@ -75,7 +91,13 @@ CLARIFY_REPLY = (
     "Sorry, I didn't quite understand. Could you tell me a little more? For example, "
     "which product or service you're asking about, or your order reference."
 )
-MEDIA_NOTICE = "Thanks for the attachment. A member of our team will review it and reply here."
+logger = logging.getLogger(__name__)
+MEDIA_NOTICE = MEDIA_NOTICES["en"]
+
+
+def _localized(notices: dict[str, str], body: str | None, known: str | None) -> str:
+    """A fixed notice in the language of the customer's message (or the chat's last one)."""
+    return notice_in(notices, detect_language(body) or known)
 
 
 async def system_scope(
@@ -188,6 +210,11 @@ async def persist_inbound(
                         if payload.get("transcript")
                         else {}
                     ),
+                    **(
+                        {"file_kind": "document", "filename": payload.get("filename") or ""}
+                        if payload.get("file_kind") == "document"
+                        else {}
+                    ),
                 }
                 if payload.get("media_id")
                 else {"form_response": payload["form"]}
@@ -198,6 +225,231 @@ async def persist_inbound(
             status="received",
         )
     )
+
+
+# Hindi (Devanagari) or Urdu (Arabic) letters in a voice-note transcript.
+SOUTH_ASIAN_SCRIPT = re.compile(r"[ऀ-ॿ؀-ۿ]")
+
+
+async def roman_transcript(
+    manager: Any, scope: WorkspaceScope, text: str, conversation_id: Any
+) -> str:
+    """A voice note in Urdu or Hindi, written in Roman Urdu (Latin letters) so the team
+    and pi read it the way customers type. Arabic stays Arabic; a failure keeps the
+    original words."""
+    from app.ai.types import Message
+
+    devanagari = len(re.findall(r"[ऀ-ॿ]", text))
+    urdu = len(re.findall(r"[ٹڈڑںھہےی]", text))
+    if not text.strip() or not SOUTH_ASIAN_SCRIPT.search(text) or not (devanagari or urdu):
+        return text
+    try:
+        response = await manager.complete(
+            scope,
+            alias="fast",
+            purpose="pi_transliterate",
+            messages=[
+                Message.system(
+                    "Rewrite this voice-note transcript in Roman Urdu (Latin letters, the "
+                    "way people type Urdu on WhatsApp). Keep English words, names, numbers "
+                    "and sound notes as they are. Change only the script, never the "
+                    "meaning. Reply with the rewritten text only."
+                ),
+                Message.user(text),
+            ],
+            max_tokens=1500,
+            conversation_id=conversation_id,
+        )
+    except Exception:  # noqa: BLE001 - the original transcript is still useful
+        logger.warning("pi_transcript_roman_failed", exc_info=True)
+        return text
+    roman = str(response.text or "").strip()
+    return roman[:4000] if roman and not SOUTH_ASIAN_SCRIPT.search(roman) else text
+
+
+async def _keep_file(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    message: PiMessage,
+    content: bytes,
+    document: bool,
+) -> None:
+    """Save a WhatsApp document or photo to the customer's files; the timeline says so
+    once (a message processed again never adds a second file or entry)."""
+    from app.modules.customers.files import save_from_message
+    from app.modules.customers.models import CustomerFile
+    from app.modules.customers.service import log_activity
+
+    assert conversation.customer_id is not None
+    try:
+        # A savepoint: a database without the files table yet (migration pending) must
+        # never stop a customer's message from being read and answered.
+        async with session.begin_nested():
+            existing = await WorkspaceRepository(session, CustomerFile, scope).find(
+                CustomerFile.message_id == message.id
+            )
+    except DBAPIError:
+        logger.warning("customer_files_unavailable", exc_info=True)
+        return
+    if existing is not None:
+        return
+    kind = "document" if document else (message.message_type or "image")
+    name = str(message.media.get("filename") or "") or ("photo" if kind == "image" else kind)
+    saved = await save_from_message(
+        session,
+        scope,
+        conversation.customer_id,
+        content,
+        name,
+        conversation_id=conversation.id,
+        message_id=message.id,
+    )
+    if saved is None:
+        return
+    message.media = {**message.media, "file_id": str(saved.id)}
+    await log_activity(
+        session,
+        scope,
+        conversation.customer_id,
+        "conversation.document",
+        f"{ {'document': 'Document', 'video': 'Video'}.get(kind, 'Photo') } received on "
+        f"WhatsApp: {saved.name}",
+        "conversation",
+        conversation.id,
+    )
+
+
+async def _name_project_document(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    message: PiMessage,
+    kind: str,
+    description: str,
+) -> None:
+    """A proposal, brief, RFP, quotation or contract the customer sent is kept under a
+    clear name ("Project proposal - <title>.pdf") and listed on the chat's brief, so
+    it joins its project (Owner OS shows it on the customer's Projects)."""
+    from app.modules.customers.models import CustomerFile
+    from app.modules.pi.documents import document_title, project_file_name
+
+    file_id = message.media.get("file_id")
+    name = project_file_name(kind, description, str(message.media.get("filename") or ""))
+    if not file_id or not name:
+        return
+    try:
+        async with session.begin_nested():
+            saved = await WorkspaceRepository(session, CustomerFile, scope).find(
+                CustomerFile.id == UUID(str(file_id))
+            )
+            if saved is not None:
+                saved.name = name[:200]
+    except DBAPIError:
+        logger.warning("pi_project_document_name_skipped", exc_info=True)
+        return
+    brief = dict(conversation.service_brief or {})
+    documents = [d for d in brief.get("documents") or [] if d.get("file_id") != str(file_id)]
+    documents.append(
+        {
+            "file_id": str(file_id),
+            "name": name,
+            "kind": kind,
+            "title": document_title(description),
+            "message_id": str(message.id),
+            "at": datetime.now(UTC).isoformat(),
+        }
+    )
+    brief["documents"] = documents[-20:]
+    conversation.service_brief = brief
+
+
+# Reasons pi handles itself: it keeps the chat and puts a request on the team's desk.
+SOFT_REASONS = frozenset({"low_confidence", "provider_failure", "tool_failure", "reply_rejected"})
+
+
+async def _review_document(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    message: PiMessage,
+    kind: str,
+    description: str,
+) -> None:
+    """A proposal, RFP, quotation or contract the customer sent: the team reviews it
+    (high priority, with the file). pi keeps the chat and never agrees to its terms."""
+    from app.modules.pi_saas.requests import raise_request
+
+    if conversation.customer_id is None:
+        return
+    file_id = message.media.get("file_id")
+    label = {"rfp": "request for proposal", "quotation": "quotation"}.get(kind, kind)
+    name = str(message.media.get("filename") or "document")
+    try:
+        async with session.begin_nested():
+            await raise_request(
+                session,
+                scope,
+                conversation_id=conversation.id,
+                customer_id=conversation.customer_id,
+                kind="review_document",
+                question=f"The customer sent a {label} ({name}). Please review it; pi "
+                "confirmed the key points and told them the team is reviewing it.",
+                context=description[:2000],
+                file_id=UUID(str(file_id)) if file_id else None,
+                priority="high",
+            )
+    except DBAPIError:
+        logger.warning("pi_document_review_skipped", exc_info=True)
+
+
+async def _media_unreadable(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation_id: UUID,
+    message: PiMessage,
+    error: Exception,
+) -> list[str]:
+    """A file pi couldn't open or understand: the customer is asked for another way, the
+    team gets a "review this file" request. The chat stays with pi."""
+    from app.modules.pi_saas.requests import raise_request
+
+    service = PiService(session, scope)
+    conversation = await service.conversations.get(conversation_id, for_update=True)
+    kind = "document" if message.media.get("file_kind") == "document" else message.message_type
+    why = getattr(error, "message", "") or type(error).__name__
+    if conversation.customer_id is not None:
+        try:
+            async with session.begin_nested():
+                await raise_request(
+                    session,
+                    scope,
+                    conversation_id=conversation.id,
+                    customer_id=conversation.customer_id,
+                    kind="review_document",
+                    question=f"pi couldn't open a {kind} the customer sent ({why}). "
+                    "Please look at it in the chat.",
+                    context=(message.body or "")[:600],
+                )
+        except DBAPIError:
+            logger.warning("pi_media_request_skipped", exc_info=True)
+    key = f"media-unreadable:{message.id}"
+    if await service.messages.find(PiMessage.idempotency_key == key) is not None:
+        return []
+    text = _localized(MEDIA_UNREADABLE_NOTICES, message.body, conversation.language)
+    row = await service.messages.add(
+        service.messages.new(
+            conversation_id=conversation.id,
+            direction="outbound",
+            sender_type="system",
+            body=text,
+            status="queued",
+            idempotency_key=key,
+        )
+    )
+    conversation.last_message_at = datetime.now(UTC)
+    conversation.last_message_preview = text[:200]
+    return [str(row.id)]
 
 
 async def hand_off(
@@ -270,6 +522,7 @@ def _show_typing(
 
 async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
     outbound: list[str] = []
+    proposals_for: list[UUID] = []  # Leads pi writes a proposal for, after commit.
     async with ctx["sessions"]() as session:
         event = await session.scalar(
             select(WhatsAppWebhookEvent)
@@ -295,6 +548,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         event.attempts += 1
         message = await persist_inbound(session, event, connection, scope)
         event.status = "queued" if message else "processed"
+        released: list[str] = []
         if message is not None:
             await meter(session, scope.tenant_id, scope.environment_id, "messages_in")
             # Payment proof reaches the staff "to verify" queue even with automation off.
@@ -306,7 +560,17 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
 
             await note_form_reply(session, ctx["settings"], scope, message)
             await note_opt_out(session, scope, message)  # "STOP" withdraws consent at once
+            from app.modules.pi.buttons import note_not_related, note_remind_later
+
+            await note_remind_later(session, scope, message)  # "Remind me later": 2 days
+            await note_not_related(session, scope, message)  # "Not related" under a map
+            # They wrote, so the 24-hour window is open: send proposal/invoice links that
+            # were waiting for it.
+            from app.modules.pi_saas.deals import release_waiting
+
+            released = await release_waiting(session, scope, message)
         await session.commit()
+        await enqueue_sends(ctx, released)
         if message is None:
             return
         service = PiService(session, scope)
@@ -331,6 +595,12 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             return
         # 2. Spam / cost / loop limits, counted from durable rows.
         limited = await rate_limited(session, scope, conversation)
+        if limited and limited != "RATE_LIMIT_LOOP":
+            # A burst (several photos or voice notes at once): this one is kept in the
+            # history and pi answers them together on the next message, no handoff.
+            message.status, message.error_code, event.status = "skipped", limited, "processed"
+            await session.commit()
+            return
         if limited:
             message.status, message.error_code, event.status = "skipped", limited, "processed"
             notice = await hand_off(
@@ -344,7 +614,20 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             await session.commit()
             await enqueue_sends(ctx, outbound)
             return
+        if message.message_type == "other" and message.media.get("file_kind") != "document":
+            if not (message.body or "").strip():
+                # A sticker, a reaction or an unsupported type: nothing to answer.
+                message.status, message.error_code, event.status = (
+                    "skipped",
+                    "NOTHING_TO_ANSWER",
+                    "processed",
+                )
+                await session.commit()
+                return
+            message.message_type = "text"  # A button tap, a location or a contact card.
         body = message.body
+        # What the customer typed or said (not a document's words): keyword checks use it.
+        typed = body
         # The customer sees "read" and "typing…" right away while Pi works (best effort,
         # in the background so it never adds to the reply time).
         _show_typing(ctx, connection, message.provider_message_id)
@@ -353,7 +636,10 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         if message.message_type not in {"text", "interactive"}:
             features = (await enabled_products(session, scope)).get("pi", set())
             audio = message.message_type == "audio"
-            allowed = (
+            # PDFs and Word files are read locally (no vision feature needed); a business
+            # can switch it off with whatsapp_config.media_documents.
+            document = message.media.get("file_kind") == "document"
+            allowed = (document and bool(policy.whatsapp_config.get("media_documents", True))) or (
                 message.message_type in {"audio", "image", "video"}
                 and ("voice" if audio else "vision") in features
                 and bool(
@@ -396,16 +682,54 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 if len(content) > limit:
                     raise BusinessRuleViolation("INVALID_MEDIA", "Media is too large")
                 manager = build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"])
-                mime = normalize_mime(mime)
-                if not mime.startswith(f"{message.message_type}/"):
+                mime = mime if document else normalize_mime(mime)
+                if not document and not mime.startswith(f"{message.message_type}/"):
                     raise BusinessRuleViolation("INVALID_MEDIA", "Media type does not match")
-                if audio and provider_transcript:
-                    description = provider_transcript[:4000]
+                if (document or message.message_type in {"image", "video"}) and (
+                    conversation.customer_id
+                ):
+                    # Kept on the customer's profile (Attachments), once per message.
+                    await _keep_file(session, scope, conversation, message, content, document)
+                if document:
+                    from app.modules.pi.documents import read_document
+
+                    description = await read_document(
+                        manager,
+                        scope,
+                        content,
+                        str(message.media.get("filename") or ""),
+                        conversation_id,
+                        alias=str(policy.ai_config.get("router_alias", "fast")),
+                    )
+                    from app.modules.pi.documents import IMPORTANT_KINDS, document_kind
+
+                    doc_kind = document_kind(description)
+                    message.media = {**message.media, "doc_kind": doc_kind}
+                    await _name_project_document(
+                        session, scope, conversation, message, doc_kind, description
+                    )
+                    if doc_kind in IMPORTANT_KINDS:
+                        await _review_document(
+                            session, scope, conversation, message, doc_kind, description
+                        )
+                elif audio and provider_transcript:
+                    description = await roman_transcript(
+                        manager, scope, provider_transcript[:4000], conversation_id
+                    )
                 elif audio:
                     transcript = await manager.transcribe(
-                        scope, content, mime, conversation_id=conversation_id
+                        scope,
+                        content,
+                        mime,
+                        # Customers often mix Urdu, Hindi, Arabic and English.
+                        prompt="The speaker may use Urdu, Hindi, Arabic, English or a mix; "
+                        "write Urdu and Hindi speech in Roman Urdu (Latin letters) and "
+                        "English words as spoken.",
+                        conversation_id=conversation_id,
                     )
-                    description = transcript.text[:4000]
+                    description = await roman_transcript(
+                        manager, scope, transcript.text[:4000], conversation_id
+                    )
                 elif message.message_type == "video":
                     understood = await manager.complete(
                         scope,
@@ -440,6 +764,8 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                         conversation_id=conversation_id,
                     )
                     description = understood.text[:4000]
+                if audio:
+                    typed = f"{typed}\n{description}".strip()  # A voice note is their words.
                 body = (
                     f"Customer caption: {body}\nAttachment: {description}" if body else description
                 )[:6000]
@@ -451,16 +777,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     "transcript" if audio else "description": description,
                 }
                 await session.commit()
-            except (GatewayUnavailable, BusinessRuleViolation):
-                notice = await hand_off(
-                    session,
-                    scope,
-                    conversation_id,
-                    "low_confidence",
-                    "Media requires operator review.",
-                    notice=MEDIA_NOTICE,
-                )
-                outbound += [notice] if notice else []
+            except (GatewayUnavailable, BusinessRuleViolation) as exc:
+                logger.warning("pi_media_unreadable", exc_info=True)
+                outbound += await _media_unreadable(session, scope, conversation_id, message, exc)
                 message.status, event.status = "processed", "processed"
                 await session.commit()
                 await enqueue_sends(ctx, outbound)
@@ -473,14 +792,17 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 conversation_id,
                 "policy",
                 "Message received outside business hours.",
-                notice=str(policy.business_hours.get("notice") or HANDOFF_NOTICE),
+                notice=str(
+                    policy.business_hours.get("notice")
+                    or _localized(HANDOFF_NOTICES, body, conversation.language)
+                ),
             )
             outbound += [notice] if notice else []
             message.status, event.status = "processed", "processed"
             await session.commit()
             await enqueue_sends(ctx, outbound)
             return
-        keyword_handoff = _keyword_handoff(policy, body)
+        keyword_handoff = _keyword_handoff(policy, typed)
         # 5. Router configuration, then the network call outside any transaction.
         await seed_agents(session, scope)
         router = await WorkspaceRepository(session, PiAgent, scope).find(PiAgent.key == "router")
@@ -509,9 +831,28 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         top_k = int(policy.knowledge_config.get("top_k", 5))
         semantic_enabled = bool(policy.knowledge_config.get("semantic_enabled"))
         service_discovery = await service_mode(session, scope, policy)
-        fast_intent = keyword_intent(body)
+        fast_intent = keyword_intent(typed)
         # Service messages retain language-aware discovery; injection never reaches this model.
         service_discovery = service_discovery and not (fast_intent and fast_intent[2])
+        if service_discovery and message.message_type == "text" and "links" not in message.media:
+            # Links the customer sent (a YouTube video, a website): read them first so
+            # pi answers about what they show instead of promising to look later.
+            from app.integrations.http import OutboundClient
+            from app.modules.pi.links import links_in, read_links
+
+            if links_in(body):
+                links = await read_links(
+                    OutboundClient(
+                        ctx["settings"], ctx["http"], resolver=ctx.get("integration_resolver")
+                    ),
+                    build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"]),
+                    scope,
+                    body,
+                    conversation_id,
+                    alias=str(policy.ai_config.get("router_alias", "fast")),
+                )
+                message.media = {**message.media, "links": links}
+                await session.commit()
         service_context = (
             await prepare_context(session, scope, conversation, message, policy)
             if service_discovery
@@ -520,12 +861,18 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         if service_context is not None:
             # Payment questions go to a person unless the business collects payments
             # through Pi; disputes still do (the composer must request a human).
-            review_intents = {"human_request", "complaint", "payment", "order_status", "invoice"}
+            # Order status and invoices pi answers itself (or asks the team on the desk).
+            review_intents = {"human_request", "complaint", "payment"}
             if service_context.get("payment_methods"):
                 review_intents -= {"payment", "invoice"}
+            service_context["typed_message"] = typed[:4000]
             service_context["operator_review_required"] = bool(
                 keyword_handoff or (fast_intent and fast_intent[0] in review_intents)
             )
+            from app.modules.pi_customer.engine import map_request_note
+
+            if note := map_request_note(policy.whatsapp_config, ctx["settings"], body):
+                service_context["problem_map_request"] = note
         inbound_snapshot = conversation.last_inbound_at
         await session.commit()
         gateway = Gateway(ctx["settings"], ctx["http"])
@@ -552,6 +899,8 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 )
             except ReplyRejected as exc:
                 service_rejection = exc.code
+                if (kept := getattr(exc, "turn", None)) is not None:
+                    keep_notes(conversation, kept)
             except GatewayUnavailable:
                 decision["provider_failed"] = True
         elif keyword_handoff:
@@ -681,7 +1030,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 if agent is not None and not agent.enabled:
                     handoff_reason = "policy"
                 else:
-                    await save_service_turn(
+                    proposals_for = await save_service_turn(
                         session, scope, conversation, message, policy, service_turn
                     )
                     run.agent_path = ["router", "requirement"]
@@ -702,7 +1051,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     reply_agent = "sales_order"
                     run.agent_path = ["router", "sales_order"]
             elif service_rejection:
-                handoff_reason = "policy"
+                handoff_reason = "reply_rejected"
                 handoff_summary = "Service reply requires operator review. No price was sent."
                 run.error_code = service_rejection
             elif decision["provider_failed"]:
@@ -745,7 +1094,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     if reply is None:
                         handoff_reason = state["handoff_reason"] or "low_confidence"
         except (PermissionDenied, BusinessRuleViolation):
-            reply, handoff_reason = None, "tool_failure"
+            logger.warning("pi_turn_action_failed", exc_info=True)
+            reply = service_turn.reply if service_turn is not None else None
+            handoff_reason = "tool_failure"
             handoff_summary = "The requested action requires operator review."
         # 8. Validate, then queue through the controlled send tool.
         if reply is not None:
@@ -756,7 +1107,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 mode = price_policy.price_mode(policy.response_rules, service_turn is not None)
                 if service_turn is not None:
                     reply = validate_service_reply(
-                        reply, max_chars, mode, offered_labels(service_context)
+                        reply, max_chars, mode, allowed_text(service_context)
                     )
                 elif (code := price_policy.check(reply, mode)) is not None:
                     raise ReplyRejected(code)
@@ -780,24 +1131,83 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                         notice_message.sender_type = "system"
             except ReplyRejected as exc:
                 run.error_code = exc.code
-                handoff_reason = handoff_reason or "policy"
+                handoff_reason = handoff_reason or "reply_rejected"
                 handoff_summary = "A generated reply failed validation and was not sent."
+        if (
+            service_turn is None
+            and handoff_reason in (None, "customer_request", "low_confidence")
+            and not keyword_handoff
+            and conversation.customer_id is not None
+            and asks_for_meeting(message.body)
+        ):
+            # Any business: a meeting, call, demo or visit goes on the team's request
+            # desk and pi keeps the chat (the team's time comes back through pi).
+            await ask_for_meeting(
+                session,
+                scope,
+                conversation,
+                f"Customer asked for a meeting: {message.body[:300]}",
+                message.body,
+            )
+            if handoff_reason is not None:
+                handoff_reason = None
+                if not outbound:
+                    text = _localized(MEETING_NOTICES, message.body, conversation.language)
+                    sent = await agent_ctx.tool("router", "send_whatsapp_message", {"body": text})
+                    if sent.ok and sent.data is not None:
+                        outbound.append(str(sent.data["message_id"]))
+                run.agent_path = [*run.agent_path, "meeting_request"]
+        if service_turn is not None and service_turn.proposal_answer != "none" and outbound:
+            # They answered the proposal in the chat: the same steps as its page's buttons
+            # (accepted → order, invoice and payment link, sent after pi's reply).
+            from app.integrations.http import OutboundClient
+            from app.modules.pi_saas.deals import answer_in_chat
+
+            outbound += await answer_in_chat(
+                session,
+                scope,
+                ctx["settings"],
+                conversation.customer_id,
+                service_turn.proposal_answer,
+                service_turn.proposal_evidence,
+                http=OutboundClient(ctx["settings"], ctx["http"]),
+            )
+        if handoff_reason in SOFT_REASONS and conversation.customer_id is not None:
+            await ask_team(
+                session,
+                scope,
+                conversation,
+                f"{handoff_summary} ({handoff_reason})",
+                message.body,
+            )
+            if not outbound:
+                text = _localized(TEAM_CHECK_NOTICES, typed, conversation.language)
+                sent = await agent_ctx.tool("router", "send_whatsapp_message", {"body": text})
+                if sent.ok and sent.data is not None:
+                    outbound.append(str(sent.data["message_id"]))
+            run.agent_path = [*run.agent_path, "team_question"]
+            run.error_code = run.error_code or handoff_reason[:64]
+            handoff_reason = None
+        if handoff_reason == "reply_rejected":
+            handoff_reason = "policy"
         if handoff_reason is not None:
+            for queued in outbound:
+                # Already-queued replies still reach the customer after the handoff.
+                row = await service.messages.get(UUID(queued))
+                if row.sender_type == "ai":
+                    row.sender_type = "system"
             notice = await hand_off(
                 session,
                 scope,
                 conversation.id,
                 handoff_reason,
                 handoff_summary,
-                notice=None if outbound else HANDOFF_NOTICE,
+                notice=None
+                if outbound
+                else _localized(HANDOFF_NOTICES, message.body, conversation.language),
                 run=run,
             )
             outbound += [notice] if notice else []
-            if handoff_reason == "low_confidence" and message.message_type == "text":
-                # Ask Owner: an unanswered question becomes a staff request with context.
-                from app.modules.pi_saas.teach import ask_owner
-
-                await ask_owner(session, scope, conversation, message, handoff_summary)
             if run.agent_path[-1] != "handoff":
                 run.agent_path = [*run.agent_path, "handoff"]
         run.status = "handoff" if handoff_reason else "completed"
@@ -808,6 +1218,10 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             "processed",
             datetime.now(UTC),
         )
+        # The reminder permission question gets [Yes] [No] buttons.
+        from app.modules.pi.buttons import add_consent_buttons
+
+        await add_consent_buttons(session, scope, outbound)
         # A form Pi decided to send in this turn goes out with the reply.
         forms = await session.scalars(
             select(PiMessage.id).where(
@@ -819,6 +1233,16 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         outbound += [str(f) for f in forms]
         await session.commit()
     await enqueue_sends(ctx, outbound)
+    if proposals_for:
+        from app.modules.pi_saas.jobs import enqueue_proposal
+
+        for lead_id in proposals_for:
+            await enqueue_proposal(ctx, lead_id)
+    if service_turn is not None and service_turn.meeting_time:
+        from app.modules.pi_saas.jobs import enqueue_meeting
+
+        # pi books it in the business's Google Calendar and sends the Meet link.
+        await enqueue_meeting(ctx, conversation.id, service_turn.meeting_time)
 
 
 def _record_usage(
@@ -899,6 +1323,12 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
         policy = await settings_row(session, scope)
         reminder = message.media.get("reminder")
         campaign = message.media.get("campaign")
+        # pi Customer's follow-up ladder: an approved template after the 24-hour window.
+        ladder = message.media.get("ladder")
+        # Deal flow: "your document is ready, reply to see it" outside the window.
+        document_notice = message.media.get("document_notice")
+        # A meeting's time and link after the window: the approved meeting template.
+        meeting_notice = message.media.get("meeting_notice")
         from app.modules.pi.followups import reminder_allowed
 
         campaign_block = None
@@ -936,6 +1366,9 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             else "MESSAGE_WINDOW_CLOSED"
             if not reminder
             and not campaign
+            and not ladder
+            and not document_notice
+            and not meeting_notice
             and (
                 not conversation.last_inbound_at
                 or conversation.last_inbound_at < datetime.now(UTC) - timedelta(hours=24)
@@ -967,12 +1400,20 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             from app.integrations.whatsapp_bridge import token as connection_token
 
             token = await connection_token(session, ctx["settings"], connection)
-            if reminder or campaign:
+            if meeting_notice:
+                message.provider_message_id = await whatsapp.send_template_values(
+                    connection.phone_number_id,
+                    conversation.contact_wa_id,
+                    meeting_notice["template"],
+                    [str(v) for v in meeting_notice["values"]],
+                    token,
+                )
+            elif reminder or campaign or ladder or document_notice:
                 message.provider_message_id, message.body = await whatsapp.send_template(
                     connection.phone_number_id,
                     connection.business_account_id,
                     conversation.contact_wa_id,
-                    (reminder or campaign or {})["template"],
+                    (reminder or campaign or ladder or document_notice or {})["template"],
                     token,
                 )
                 if reminder:
@@ -980,6 +1421,25 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                         **conversation.service_brief,
                         "reminded_source_id": reminder["source_message_id"],
                     }
+            elif message.media.get("buttons"):
+                # Quick-reply buttons (one tap), with the card's image on top if any.
+                message.provider_message_id = await whatsapp.send_buttons(
+                    connection.phone_number_id,
+                    conversation.contact_wa_id,
+                    message.body,
+                    [str(b) for b in message.media["buttons"]],
+                    token,
+                    image=str(message.media["image"]) if message.media.get("image") else None,
+                )
+            elif message.media.get("image"):
+                # pi Customer's visual card: a PNG link with a short caption.
+                message.provider_message_id = await whatsapp.send_image(
+                    connection.phone_number_id,
+                    conversation.contact_wa_id,
+                    str(message.media["image"]),
+                    message.body,
+                    token,
+                )
             elif message.media.get("flow"):
                 form = message.media["flow"]
                 message.provider_message_id = await whatsapp.send_flow(
@@ -1002,9 +1462,24 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                 await meter(session, scope.tenant_id, scope.environment_id, "template_messages")
             conversation.last_message_at = connection.last_outbound_at = datetime.now(UTC)
             conversation.last_message_preview = message.body[:200]
+            # A send that went through clears an old send error, so the connection never
+            # shows a problem that's already over. Billing only counts as fixed when a
+            # paid (template) message goes out: free replies inside the window always do.
+            if connection.last_error_code and (
+                connection.last_error_code != "WHATSAPP_BILLING_PAUSED" or reminder or campaign
+            ):
+                connection.last_error_code = None
         except BusinessRuleViolation as exc:
             message.status, message.error_code = "failed", exc.code[:64]
-            if reminder:
+            # pi's own follow-ups (reminder, ladder, nudge, check-in, card): a failed one is
+            # reported to the team; the chat is never handed off for it (that would stop
+            # every later follow-up).
+            automatic = bool(
+                reminder
+                or ladder
+                or any(k in message.media for k in ("nudge", "check_in", "card", "snapshot"))
+            )
+            if automatic:
                 from app.modules.notifications.service import notify
 
                 await notify(
@@ -1018,7 +1493,7 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                     dedupe_key=f"pi-reminder-failed:{message.id}",
                 )
             connection.last_error_code, connection.last_error_at = exc.code[:64], datetime.now(UTC)
-            if not campaign:  # A failed broadcast is reported in its results, not handed off.
+            if not campaign and not automatic:  # A failed broadcast is in its results.
                 await service.handoff(
                     conversation.id,
                     "tool_failure",

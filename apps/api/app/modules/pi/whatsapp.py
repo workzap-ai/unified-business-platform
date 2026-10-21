@@ -96,6 +96,34 @@ def verify_signature(body: bytes, signature: str, settings: Settings) -> bool:
     return hmac.compare_digest(expected, signature)
 
 
+def other_text(kind: str, message: dict[str, Any]) -> str:
+    """Words for messages that aren't text or media: a template button tap is what it
+    says; a location or contact card becomes a line pi can read. Stickers and reactions
+    stay empty (pi skips them quietly)."""
+    part = message.get(kind)
+    part = part if isinstance(part, dict) else {}
+    if kind == "button":
+        return str(part.get("text") or part.get("payload") or "")[:1000]
+    if kind == "location":
+        place = ", ".join(str(part.get(k)) for k in ("name", "address") if part.get(k))
+        where = f"{part.get('latitude')}, {part.get('longitude')}"
+        return f"Location shared: {place} ({where})".replace(":  (", ": (")[:1000]
+    if kind == "contacts":
+        found = message.get("contacts")
+        cards: list[Any] = found if isinstance(found, list) else []
+        lines = []
+        for card in cards[:5]:
+            if not isinstance(card, dict):
+                continue
+            name = (card.get("name") or {}).get("formatted_name", "")
+            phones = ", ".join(
+                str(p.get("phone")) for p in card.get("phones") or [] if isinstance(p, dict)
+            )
+            lines.append(f"{name} {phones}".strip())
+        return ("Contact card shared: " + "; ".join(lines))[:1000] if lines else ""
+    return ""
+
+
 def normalize(payload: dict[str, Any]) -> list[dict[str, Any]]:
     events = []
     for entry in payload.get("entry", [])[:100]:
@@ -119,7 +147,11 @@ def normalize(payload: dict[str, Any]) -> list[dict[str, Any]]:
                 body = (
                     message.get("text", {}).get("body", "")
                     if kind == "text"
-                    else message.get(kind, {}).get("caption", "")
+                    else other_text(kind, message)
+                    if kind in {"button", "location", "contacts"}
+                    else (message.get(kind) or {}).get("caption", "")
+                    if isinstance(message.get(kind), dict)
+                    else ""
                 )
                 events.append(
                     {
@@ -134,8 +166,17 @@ def normalize(payload: dict[str, Any]) -> list[dict[str, Any]]:
                         else "other",
                         "body": str(body)[:4000],
                         "media_id": str(message.get(kind, {}).get("id", ""))[:160]
-                        if kind in {"audio", "image", "video"}
+                        if kind in {"audio", "image", "video", "document"}
                         else None,
+                        # A document is stored as "other" but keeps its file for pi to read.
+                        **(
+                            {
+                                "file_kind": "document",
+                                "filename": str(message.get(kind, {}).get("filename", ""))[:200],
+                            }
+                            if kind == "document"
+                            else {}
+                        ),
                     }
                 )
             for status in value.get("statuses", [])[:100]:
@@ -168,6 +209,14 @@ MEDIA_TYPES = frozenset(
         "audio/aac",
         "video/mp4",
         "video/3gpp",
+        # Documents pi reads (pi.documents checks the real type from the content).
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "text/plain",
+        "text/csv",
+        "audio/amr",
     }
 )
 
@@ -294,6 +343,98 @@ class WhatsApp:
                 "DELIVERY_UNCONFIRMED", "Reminder delivery could not be confirmed", 503
             ) from None
 
+    async def send_template_values(
+        self,
+        number: str,
+        recipient: str,
+        template: dict[str, str],
+        values: list[str],
+        token: str,
+    ) -> str:
+        """Send an approved template whose body has ``{{1}}``..``{{n}}`` text variables
+        (team alerts: name, task, due). Meta refuses a template that isn't approved or
+        whose variables don't match, which comes back as a refused send."""
+        if not re.fullmatch(r"[a-z0-9_]{1,512}", template.get("name", "")) or not re.fullmatch(
+            r"[a-z]{2,3}(?:_[A-Z]{2})?", template.get("language", "")
+        ):
+            raise BusinessRuleViolation("TEMPLATE_INVALID", "Invalid template")
+        base, headers = self._endpoint(token)
+        # Template variables can't hold new lines, tabs or long runs of spaces.
+        params = [{"type": "text", "text": " ".join(str(v).split())[:900] or "-"} for v in values]
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "template",
+                    "template": {
+                        "name": template["name"],
+                        "language": {"code": template["language"]},
+                        "components": [{"type": "body", "parameters": params}],
+                    },
+                },
+                timeout=15,
+                follow_redirects=False,
+            )
+            check_sent(response)
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Template delivery could not be confirmed", 503
+            ) from None
+
+    async def send_code_template(
+        self, number: str, recipient: str, template: dict[str, str], code: str, token: str
+    ) -> str:
+        """A one-time code through the business's approved authentication template: the
+        only way WhatsApp allows it more than 24 hours after the customer's last message."""
+        if (
+            not re.fullmatch(r"[a-z0-9_]{1,512}", template.get("name", ""))
+            or not re.fullmatch(r"[a-z]{2,3}(?:_[A-Z]{2})?", template.get("language", ""))
+            or not re.fullmatch(r"[0-9]{4,8}", code)
+        ):
+            raise BusinessRuleViolation("CODE_TEMPLATE_INVALID", "Invalid code template")
+        base, headers = self._endpoint(token)
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "template",
+                    "template": {
+                        "name": template["name"],
+                        "language": {"code": template["language"]},
+                        "components": [
+                            {"type": "body", "parameters": [{"type": "text", "text": code}]},
+                            {
+                                "type": "button",
+                                "sub_type": "url",
+                                "index": "0",
+                                "parameters": [{"type": "text", "text": code}],
+                            },
+                        ],
+                    },
+                },
+                timeout=15,
+                follow_redirects=False,
+            )
+            check_sent(response)
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Code delivery could not be confirmed", 503
+            ) from None
+
     async def send_flow(
         self,
         number: str,
@@ -367,6 +508,82 @@ class WhatsApp:
         except httpx.HTTPError:
             return False
         return response.status_code < 400
+
+    async def send_buttons(
+        self,
+        number: str,
+        recipient: str,
+        body: str,
+        buttons: list[str],
+        token: str,
+        image: str | None = None,
+    ) -> str:
+        """A session message with up to three quick-reply buttons (and optionally an image
+        on top). A tap comes back as a message whose text is the button's title."""
+        base, headers = self._endpoint(token)
+        interactive: dict[str, Any] = {
+            "type": "button",
+            "body": {"text": body[:1024]},
+            "action": {
+                "buttons": [
+                    {"type": "reply", "reply": {"id": f"b{n}", "title": title[:20]}}
+                    for n, title in enumerate(buttons[:3])
+                ]
+            },
+        }
+        if image:
+            interactive["header"] = {"type": "image", "image": {"link": image}}
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "interactive",
+                    "interactive": interactive,
+                },
+                timeout=20,
+                follow_redirects=False,
+            )
+            check_sent(response)
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Message delivery could not be confirmed", 503
+            ) from None
+
+    async def send_image(
+        self, number: str, recipient: str, link: str, caption: str, token: str
+    ) -> str:
+        """Send an image by public link with a caption (pi's visual cards). Session
+        messages only: the caller checks the 24-hour window."""
+        base, headers = self._endpoint(token)
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "image",
+                    "image": {"link": link, "caption": caption[:1024]},
+                },
+                timeout=20,
+                follow_redirects=False,
+            )
+            check_sent(response)
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Image delivery could not be confirmed", 503
+            ) from None
 
     async def send(self, number: str, recipient: str, body: str, token: str) -> str:
         base, headers = self._endpoint(token)

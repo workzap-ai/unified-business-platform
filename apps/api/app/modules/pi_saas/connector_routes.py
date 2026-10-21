@@ -18,7 +18,7 @@ from app.integrations.http import OutboundClient
 from app.modules.access.dependencies import Scope, Session
 from app.modules.integrations.service import Runtime
 from app.modules.pi.service import require_pi
-from app.modules.pi_saas import connectors
+from app.modules.pi_saas import connectors, email_connector
 from app.shared.errors import BusinessRuleViolation
 
 TOOLS_PAGE = "/my-pi/tools"
@@ -106,6 +106,33 @@ def build(app: Literal["pi", "web"]) -> APIRouter:
         await session.commit()
         outcome = "connected" if ok else "failed"
         return RedirectResponse(f"{page}?shopify={outcome}", status_code=302)
+
+    @router.get("/email")
+    async def email_status(request: Request, scope: Scope, session: Session) -> Any:
+        await require_pi(session, scope, "integrations.read")
+        return await email_connector.status(session, request.app.state.settings, scope)
+
+    @router.put("/email")
+    async def save_email(
+        data: email_connector.EmailInput, request: Request, scope: Scope, session: Session
+    ) -> Any:
+        await require_pi(session, scope, "integrations.manage")
+        result = await email_connector.save(session, scope, _runtime(request), data)
+        await session.commit()
+        return result
+
+    @router.post("/email/test")
+    async def test_email(request: Request, scope: Scope, session: Session) -> Any:
+        await require_pi(session, scope, "integrations.manage")
+        result = await email_connector.test(session, scope, _runtime(request))
+        await session.commit()
+        return result
+
+    @router.delete("/email", status_code=204)
+    async def disconnect_email(request: Request, scope: Scope, session: Session) -> None:
+        await require_pi(session, scope, "integrations.manage")
+        await email_connector.disconnect(session, scope, _runtime(request))
+        await session.commit()
 
     @router.post("/{key}/test")
     async def test_connector(key: str, request: Request, scope: Scope, session: Session) -> Any:

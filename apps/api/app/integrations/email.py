@@ -12,7 +12,8 @@ settings (PLATFORM_SMTP_*). Without either, sending fails with EMAIL_NOT_CONFIGU
 import html
 import re
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from email.utils import parseaddr
 from string import Template
 from typing import Any
 
@@ -22,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import Settings
 from app.integrations.catalog import REGISTRY
 from app.integrations.http import CallContext, OutboundClient
+from app.integrations.providers.resend import ResendProvider
 from app.integrations.providers.smtp import SmtpProvider
 from app.integrations.registry import (
     EmailAttachment,
@@ -107,11 +109,24 @@ TEMPLATES: dict[str, EmailTemplate] = {
         text="Hello $name,\n\nUse this link to choose a new password: $link\n"
         "This link expires in $minutes minutes and can only be used once.\n\n"
         "If you did not request this, ignore this email; your password stays unchanged.",
-        html="<p>Hello $name,</p><p><a href=\"$link\">Choose a new password</a></p>"
+        html='<p>Hello $name,</p><p><a href="$link">Choose a new password</a></p>'
         "<p>This link expires in $minutes minutes and can only be used once.</p>"
         "<p>If you did not request this, ignore this email; your password stays unchanged.</p>",
         variables=frozenset({"name", "link", "minutes", "workspace"}),
         links=frozenset({"link"}),
+    ),
+    # Account-level: the second sign-in step for people whose device has no
+    # fingerprint/face unlock. Only sent after a correct password.
+    "sign_in_code": EmailTemplate(
+        subject="Your sign-in code",
+        text="Hello $name,\n\nYour sign-in code is $code\n"
+        "It works for $minutes minutes, once, after your password.\n\n"
+        "If you are not signing in right now, change your password: someone knows it.",
+        html="<p>Hello $name,</p><p>Your sign-in code is</p>"
+        '<p style="font-size:24px;font-weight:bold;letter-spacing:4px">$code</p>'
+        "<p>It works for $minutes minutes, once, after your password.</p>"
+        "<p>If you are not signing in right now, change your password: someone knows it.</p>",
+        variables=frozenset({"name", "code", "minutes", "workspace"}),
     ),
     "verify_email": EmailTemplate(
         subject="Confirm your email address",
@@ -160,6 +175,37 @@ TEMPLATES: dict[str, EmailTemplate] = {
         "<b>$business</b>. Your Pi subscription is up to date.</p>"
         '<p><a href="$link">View your billing</a></p>',
         variables=frozenset({"name", "business", "amount", "link", "workspace"}),
+        links=frozenset({"link"}),
+    ),
+    # Staged dunning reminders sent between the first past_due notice (pi_billing_past_due,
+    # sent once right when the status flips) and the hard cutover to suspended at
+    # grace_ends_at. Escalating urgency; same account-level recipients and transport.
+    "pi_billing_dunning_3d": EmailTemplate(
+        subject="$days_left days left to update your Pi payment details",
+        text="Hello $name,\n\nWe still haven't been able to charge your card for "
+        "$business. Pi will stop replying to your customers in $days_left days unless "
+        "you update your payment details: $link\n\n"
+        "If you already paid, you can ignore this message.",
+        html="<p>Hello $name,</p><p>We still haven't been able to charge your card for "
+        "<b>$business</b>. Pi will stop replying to your customers in <b>$days_left "
+        "days</b> unless you update your payment details.</p>"
+        '<p><a href="$link">Update payment details</a></p>'
+        "<p>If you already paid, you can ignore this message.</p>",
+        variables=frozenset({"name", "business", "days_left", "link", "workspace"}),
+        links=frozenset({"link"}),
+    ),
+    "pi_billing_dunning_1d": EmailTemplate(
+        subject="Urgent: Pi stops replying tomorrow without payment",
+        text="Hello $name,\n\nThis is a final reminder: we still haven't been able to "
+        "charge your card for $business. Pi will stop replying to your customers "
+        "tomorrow unless you update your payment details right now: $link\n\n"
+        "If you already paid, you can ignore this message.",
+        html="<p>Hello $name,</p><p>This is a <b>final reminder</b>: we still haven't "
+        "been able to charge your card for <b>$business</b>. Pi will stop replying to "
+        "your customers tomorrow unless you update your payment details right now.</p>"
+        '<p><a href="$link">Update payment details</a></p>'
+        "<p>If you already paid, you can ignore this message.</p>",
+        variables=frozenset({"name", "business", "days_left", "link", "workspace"}),
         links=frozenset({"link"}),
     ),
 }
@@ -211,6 +257,41 @@ def platform_smtp_context(
     )
 
 
+def platform_resend_key(settings: Settings) -> str | None:
+    """Resend's own key in the platform SMTP settings (server smtp.resend.com,
+    password re_...). Then mail goes through Resend's HTTPS API: hosts like Railway
+    block outbound SMTP ports, HTTPS always works."""
+    host = (settings.platform_smtp_host or "").strip().lower()
+    secret = settings.platform_smtp_password
+    key = secret.get_secret_value() if secret else ""
+    return key if "resend" in host and key.startswith("re_") else None
+
+
+async def send_platform_email(
+    settings: Settings,
+    http: OutboundClient,
+    message: EmailMessage,
+    request_id: str | None = None,
+) -> SendResult:
+    """The platform's own email: Resend's API when its key is set, SMTP otherwise."""
+    key = platform_resend_key(settings)
+    if key is None:
+        return await SmtpProvider().send_email(
+            platform_smtp_context(settings, http, request_id), message
+        )
+    _, address = parseaddr(settings.platform_smtp_from or "")
+    if not address:
+        raise BusinessRuleViolation("EMAIL_NOT_CONFIGURED", "Email sending is not configured", 503)
+    ctx = ProviderContext(
+        settings=settings,
+        http=http,
+        config={"from_address": address},
+        credentials={"api_key": key},
+        call=CallContext(request_id=request_id),
+    )
+    return await ResendProvider().send_email(ctx, replace(message, from_address=address))
+
+
 async def send_platform_template(
     settings: Settings,
     http: OutboundClient,
@@ -227,8 +308,7 @@ async def send_platform_template(
     message = EmailMessage(
         to=list(to), subject=rendered.subject, text=rendered.text, html=rendered.html
     )
-    ctx = platform_smtp_context(settings, http, request_id)
-    return await SmtpProvider().send_email(ctx, message)
+    return await send_platform_email(settings, http, message, request_id)
 
 
 class EmailService:
@@ -280,7 +360,7 @@ class EmailService:
                     call=CallContext(request_id=self.scope.request_id),
                 )
                 return result
-        return await SmtpProvider().send_email(self._platform_context(), message)
+        return await send_platform_email(self.settings, self.http, message, self.scope.request_id)
 
     async def send_template(
         self,

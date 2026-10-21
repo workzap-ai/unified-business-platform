@@ -65,6 +65,7 @@ async def _board(session: Any, scope: Any) -> dict[str, Any]:
     departments, examples = await departments_for(session, scope.tenant_id, scope.environment_id)
     rows = await _rows(session, scope)
     problems: list[dict[str, Any]] = []
+    pending_links: list[dict[str, Any]] = []
     stale = 0
     for conversation, customer in rows:
         report = _fresh(conversation)
@@ -75,6 +76,19 @@ async def _board(session: Any, scope: Any) -> dict[str, Any]:
         if report is None:
             continue
         overrides = (conversation.service_brief or {}).get("issue_departments") or {}
+        for link in report.get("links") or []:
+            if isinstance(link, dict) and link.get("status") == "pending_review":
+                pending_links.append(
+                    {
+                        "conversation_id": conversation.id,
+                        "customer_name": customer,
+                        **{
+                            k: link.get(k)
+                            for k in ("a_title", "b_title", "type", "reason", "benefit")
+                        },
+                        "confidence": link.get("confidence"),
+                    }
+                )
         for index, issue in enumerate(place(report.get("issues", []), departments, overrides)):
             problems.append(
                 {
@@ -95,6 +109,7 @@ async def _board(session: Any, scope: Any) -> dict[str, Any]:
     return {
         "departments": [{**d, **counts.get(d["key"], {})} for d in departments],
         "problems": problems,
+        "pending_links": pending_links,
         "waiting_for_analysis": stale,
         "examples_learned": len(examples),
         "window_days": WINDOW_DAYS,
@@ -183,6 +198,66 @@ async def move(data: MoveInput, scope: Scope, session: Session) -> dict[str, Any
         entity_type="pi_conversation",
         entity_id=conversation.id,
         details={"department": data.department},
+    )
+    await session.commit()
+    session.expire_all()
+    return await _board(session, scope)
+
+
+class LinkReviewInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    conversation_id: UUID
+    a_title: str = Field(min_length=1, max_length=120)
+    b_title: str = Field(min_length=1, max_length=120)
+    action: str = Field(pattern=r"^(confirm|reject)$")
+
+
+@router.post("/links")
+async def review_link(data: LinkReviewInput, scope: Scope, session: Session) -> dict[str, Any]:
+    """The team approves (or turns down) a link pi wasn't sure about. Confirmed links
+    show on the customer's map; either way pi keeps the decision for that pair."""
+    from app.modules.pi_customer.service import pair_key, with_solutions
+
+    scope.require("pi.handoffs.manage")
+    conversation = await PiService(session, scope).conversations.get(data.conversation_id)
+    brief = dict(conversation.service_brief or {})
+    key = pair_key(data.a_title, data.b_title)
+    verdict = "confirmed" if data.action == "confirm" else "rejected"
+    patch: dict[str, Any] = {"link_feedback": {**(brief.get("link_feedback") or {}), key: verdict}}
+    report = brief.get("customer_issues")
+    if isinstance(report, dict):
+        links = []
+        for link in report.get("links") or []:
+            if pair_key(link.get("a_title", ""), link.get("b_title", "")) == key:
+                if verdict == "rejected":
+                    continue
+                link = {**link, "status": "confirmed", "announce": bool(link.get("benefit"))}
+            links.append(link)
+        base = [
+            {k: v for k, v in i.items() if k not in ("solution_id", "linked")}
+            for i in report.get("issues", [])
+        ]
+        patch["customer_issues"] = {**report, "links": links, "issues": with_solutions(base, links)}
+    await session.execute(
+        update(PiConversation)
+        .where(
+            PiConversation.tenant_id == conversation.tenant_id,
+            PiConversation.id == conversation.id,
+        )
+        .values(
+            service_brief=func.coalesce(PiConversation.service_brief, cast({}, JSONB)).op("||")(
+                cast(patch, JSONB)
+            )
+        )
+        .execution_options(synchronize_session=False)
+    )
+    await record(
+        session,
+        "pi.link_reviewed",
+        scope=scope,
+        entity_type="pi_conversation",
+        entity_id=conversation.id,
+        details={"pair": key, "verdict": verdict},
     )
     await session.commit()
     session.expire_all()

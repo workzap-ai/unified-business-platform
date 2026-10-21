@@ -161,6 +161,10 @@ async def _run_jobs(app, provider, db) -> None:
             await send_pi_message(ctx, *args)
         elif name == "process_pi_billing_event":
             await process_pi_billing_event(ctx, *args)
+        elif name == "pi_reply_with_team_answer":
+            from app.modules.pi_saas.requests import reply_with_answer
+
+            await reply_with_answer(ctx, *args)
 
 
 # --------------------------------------------------------------------------- tests
@@ -807,10 +811,17 @@ async def test_ask_owner_turns_unknown_questions_into_answers_and_knowledge(
     assert answered.status_code == 200 and answered.json()["status"] == "published"
     results = (await client.get("/api/v1/pi-app/pi/knowledge/search?q=Dubai")).json()
     assert results and "ship to Dubai" in results[0]["snippet"]
+    # The chat goes back to pi, which replies itself (here the AI can't write a reply,
+    # so the customer still gets the team's answer, sent by pi).
+    await _run_jobs(app, provider, business_db)
     reply = await business_db.scalar(
-        select(PiMessage).where(PiMessage.sender_type == "human", PiMessage.direction == "outbound")
+        select(PiMessage).where(
+            PiMessage.idempotency_key == f"pi-team-answer:{request.id}",
+            PiMessage.direction == "outbound",
+        )
     )
-    assert reply is not None and reply.body.startswith("Yes, we ship")
+    assert reply is not None and reply.sender_type == "ai"
+    assert reply.body.startswith("Yes, we ship")
     await client.aclose()
 
 

@@ -17,6 +17,7 @@ import {
   Select,
 } from "@/components/ui";
 import { ApiError, errorText, post } from "@/lib/api";
+import { SecondStepForm, type SecondStep } from "@/features/security";
 import { useSession } from "@/lib/session";
 import type { SessionView } from "@/lib/types";
 import s from "./public.module.css";
@@ -118,6 +119,15 @@ export function SignInForm() {
   const client = useQueryClient();
   const [error, setError] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
+  const [step, setStep] = React.useState<SecondStep | null>(null);
+
+  function signedIn(session: SessionView) {
+    client.clear();
+    client.setQueryData(["session"], session);
+    router.replace(
+      session.business ? safeNext(params.get("next")) : "/setup/new",
+    );
+  }
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -125,15 +135,16 @@ export function SignInForm() {
     setBusy(true);
     setError(null);
     try {
-      const session = await post<SessionView>("/auth/login", {
+      const answer = await post<SessionView | SecondStep>("/auth/login", {
         email: String(form.get("email") ?? ""),
         password: String(form.get("password") ?? ""),
       });
-      client.clear();
-      client.setQueryData(["session"], session);
-      router.replace(
-        session.business ? safeNext(params.get("next")) : "/setup/new",
-      );
+      if ("mfa_required" in answer) {
+        setStep(answer); // the password was right; now the face or fingerprint
+        setBusy(false);
+        return;
+      }
+      signedIn(answer);
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 401
@@ -143,6 +154,17 @@ export function SignInForm() {
       setBusy(false);
     }
   }
+
+  if (step)
+    return (
+      <AuthCard title="One more check" subtitle="Keep your business safe.">
+        <SecondStepForm
+          step={step}
+          onBack={() => setStep(null)}
+          onDone={signedIn}
+        />
+      </AuthCard>
+    );
 
   return (
     <AuthCard

@@ -455,6 +455,45 @@ class Kapso:
             raise KapsoUnavailable("PROVIDER_ERROR")
         return data if isinstance(data, dict) else {}
 
+    PROFILE_FIELDS = "about,address,description,email,profile_picture_url,websites,vertical"
+
+    async def business_profile(self, phone_number_id: str) -> dict[str, Any]:
+        """The public WhatsApp profile of a number (what customers see), via Meta."""
+        if not PHONE_NUMBER_ID.fullmatch(phone_number_id):
+            raise BusinessRuleViolation("INVALID_NUMBER", "Unknown WhatsApp number")
+        data = await self._meta(
+            "GET",
+            f"/{phone_number_id}/whatsapp_business_profile",
+            params={"fields": self.PROFILE_FIELDS},
+        )
+        rows = [r for r in as_list(data.get("data")) if isinstance(r, dict)]
+        item = rows[0] if rows else {}
+        sites = [str(w)[:256] for w in as_list(item.get("websites")) if w]
+        return {
+            "about": str(item.get("about") or "")[:139],
+            "description": str(item.get("description") or "")[:512],
+            "address": str(item.get("address") or "")[:256],
+            "email": str(item.get("email") or "")[:128],
+            "vertical": str(item.get("vertical") or "OTHER")[:24],
+            "websites": sites[:2],
+            "photo_url": str(item.get("profile_picture_url") or "")[:1000],
+        }
+
+    async def update_business_profile(self, phone_number_id: str, fields: dict[str, Any]) -> None:
+        """Change the public profile. Meta's own message is shown when it refuses a value."""
+        if not PHONE_NUMBER_ID.fullmatch(phone_number_id):
+            raise BusinessRuleViolation("INVALID_NUMBER", "Unknown WhatsApp number")
+        try:
+            await self._meta(
+                "POST",
+                f"/{phone_number_id}/whatsapp_business_profile",
+                json={"messaging_product": "whatsapp", **fields},
+            )
+        except BusinessRuleViolation as error:
+            if error.code == "TEMPLATE_REJECTED":
+                raise BusinessRuleViolation("PROFILE_REJECTED", error.message) from None
+            raise
+
     async def list_templates(self, business_account_id: str) -> list[dict[str, Any]]:
         if not re.fullmatch(r"[0-9]{5,32}", business_account_id):
             return []
@@ -512,6 +551,69 @@ class Kapso:
                 "language": language,
                 "category": category,
                 "components": [{"type": "BODY", "text": body}],
+            },
+        )
+        return str(data.get("status") or "PENDING")[:24]
+
+    async def create_template_with_values(
+        self,
+        business_account_id: str,
+        name: str,
+        language: str,
+        body: str,
+        examples: list[str],
+    ) -> str:
+        """A Utility template whose text has {{1}}..{{n}} filled at send time (the meeting
+        time and link); Meta needs one example value per variable to review it."""
+        if not re.fullmatch(r"[0-9]{5,32}", business_account_id):
+            raise BusinessRuleViolation("WHATSAPP_NOT_CONNECTED", "Connect WhatsApp first")
+        count = len(re.findall(r"\{\{\d+\}\}", body))
+        if (
+            not re.fullmatch(r"[a-z0-9_]{1,512}", name)
+            or not re.fullmatch(r"[a-z]{2,3}(_[A-Z]{2})?", language)
+            or not 1 <= len(body) <= 1024
+            or count != len(examples)
+        ):
+            raise BusinessRuleViolation("INVALID_TEMPLATE", "Invalid template text or examples")
+        data = await self._meta(
+            "POST",
+            f"/{business_account_id}/message_templates",
+            json={
+                "name": name,
+                "language": language,
+                "category": "UTILITY",
+                "components": [
+                    {"type": "BODY", "text": body, "example": {"body_text": [examples]}}
+                ],
+            },
+        )
+        return str(data.get("status") or "PENDING")[:24]
+
+    async def create_code_template(self, business_account_id: str, name: str, language: str) -> str:
+        """Meta's authentication template for one-time codes: Meta writes the text ("<code>
+        is your verification code"), adds the security line, the expiry and a copy-code
+        button. Usually approved within minutes."""
+        if not re.fullmatch(r"[0-9]{5,32}", business_account_id):
+            raise BusinessRuleViolation("WHATSAPP_NOT_CONNECTED", "Connect WhatsApp first")
+        if not re.fullmatch(r"[a-z0-9_]{1,512}", name) or not re.fullmatch(
+            r"[a-z]{2,3}(_[A-Z]{2})?", language
+        ):
+            raise BusinessRuleViolation("INVALID_TEMPLATE", "Invalid template name or language")
+        data = await self._meta(
+            "POST",
+            f"/{business_account_id}/message_templates",
+            json={
+                "name": name,
+                "language": language,
+                "category": "AUTHENTICATION",
+                "components": [
+                    {"type": "BODY", "add_security_recommendation": True},
+                    {"type": "FOOTER", "code_expiration_minutes": 10},
+                    {
+                        "type": "BUTTONS",
+                        "buttons": [{"type": "OTP", "otp_type": "COPY_CODE", "text": "Copy code"}],
+                    },
+                ],
             },
         )
         return str(data.get("status") or "PENDING")[:24]

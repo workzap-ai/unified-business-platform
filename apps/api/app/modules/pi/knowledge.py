@@ -1,4 +1,5 @@
 import hashlib
+import re
 from datetime import UTC, datetime
 from uuid import UUID
 
@@ -12,6 +13,72 @@ from app.modules.pi.models import KnowledgeChunk, KnowledgeDocument, KnowledgeSo
 from app.shared.errors import BusinessRuleViolation
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
+
+STOP_WORDS = frozenset(
+    """the and for you your are was were with this that from have has had not but can will
+    what when where which who how why our out all any about into than then them they their
+    there here just also very more most some such only own same too does did doing would
+    could should please thanks thank hello dear okay yes kya hai hain hy hai hun hoon tha
+    thi the aur bhi koi kuch yeh woh wo yeh isko usko iska uska mujhe hum aap ap apna
+    apni mera meri mere tum tera teri kar karo kro karna karein krna raha rahi rahe ke ki
+    ko se mein mai main par pe ne nahi nhi na ji acha achha theek thik bas abhi""".split()
+)
+
+
+# What a customer asks in everyday or Roman Urdu words, in the words a business's
+# English knowledge base uses ("aap kya kaam karte ho" finds the Services page).
+ASKS_ABOUT = (
+    (
+        re.compile(
+            r"\b(?:kaam|kam|karte|services?|offer|provide|what do you do|kya karte)\b", re.I
+        ),
+        "services offer",
+    ),
+    (
+        re.compile(r"\b(?:qeemat|keemat|kitne ka|kitna|kitni|rate|price|cost|charges?)\b", re.I),
+        "price pricing package",
+    ),
+    (
+        re.compile(r"\b(?:kitne din|kab tak|kitna time|how long|timeline|turnaround)\b", re.I),
+        "timeline delivery days process",
+    ),
+    (
+        re.compile(r"\b(?:kahan|kidhar|address|location|office|where are you)\b", re.I),
+        "address location office",
+    ),
+    (
+        re.compile(r"\b(?:number|contact|rabta|email|phone)\b", re.I),
+        "contact phone email",
+    ),
+    (
+        re.compile(r"\b(?:kaise|tareeqa|process|steps|how does it work)\b", re.I),
+        "process steps",
+    ),
+    (
+        re.compile(
+            r"\b(?:portfolio|samples?|examples?|pehle ka kaam|kaam dikhao|clients?)\b", re.I
+        ),
+        "portfolio projects clients",
+    ),
+)
+
+
+def with_meaning(text: str) -> str:
+    """The text with the knowledge-base words for what it asks about added in front."""
+    extra = [words for pattern, words in ASKS_ABOUT if pattern.search(text)]
+    return " ".join([*extra, text])
+
+
+def search_terms(text: str, limit: int = 16) -> str:
+    """A to_tsquery expression: up to `limit` distinct words, OR-ed, each as a prefix.
+    Only letters and digits survive, so the expression is always valid."""
+    seen: list[str] = []
+    for word in re.findall(r"[^\W_]{3,}", with_meaning(text).lower()):
+        if word not in STOP_WORDS and word not in seen:
+            seen.append(word)
+        if len(seen) >= limit:
+            break
+    return " | ".join(f"{w}:*" for w in seen)
 
 
 class DocumentInput(BaseModel):
@@ -84,6 +151,9 @@ def sniff_text(raw: bytes, max_bytes: int) -> str:
             "UNSUPPORTED_DOCUMENT_TYPE", "Upload plain text or Markdown content", 415
         )
     return text
+
+
+OVERVIEW_TITLE = r"\m(about|overview|services|who we are|what we do|company)\M"
 
 
 class KnowledgeService:
@@ -167,6 +237,57 @@ class KnowledgeService:
             details={"chunks": doc.chunk_count},
         )
 
+    async def update_document(
+        self, document_id: UUID, title: str | None, body: str | None, max_bytes: int
+    ) -> KnowledgeDocument:
+        """Rename and/or rewrite a document. New text is re-split into passages (large
+        documents are left "pending" for the background indexer)."""
+        self.scope.require("pi.knowledge.manage")
+        doc = await self.documents.get(document_id, for_update=True)
+        if title is not None:
+            doc.title = title
+        if body is not None and body != doc.body:
+            encoded = body.encode("utf-8")
+            sniff_text(encoded, max_bytes)
+            doc.body = body
+            doc.byte_size = len(encoded)
+            doc.content_hash = hashlib.sha256(encoded).hexdigest()
+            doc.status = "processing"
+            await self.reindex(doc)
+        await record(
+            self.session,
+            "pi.knowledge_updated",
+            scope=self.scope,
+            entity_type="knowledge_document",
+            entity_id=doc.id,
+            details={"title": title is not None, "text": body is not None},
+        )
+        return doc
+
+    async def delete_source(self, source_id: UUID) -> int:
+        """Delete a source and every document (and passage) in it."""
+        self.scope.require("pi.knowledge.manage")
+        source = await self.sources.get(source_id, for_update=True)
+        ids = list(
+            await self.session.scalars(
+                self.documents.select()
+                .with_only_columns(KnowledgeDocument.id)
+                .where(KnowledgeDocument.source_id == source_id)
+            )
+        )
+        for document_id in ids:
+            await self.delete_document(document_id)
+        await self.sources.delete(source)
+        await record(
+            self.session,
+            "pi.knowledge_source_deleted",
+            scope=self.scope,
+            entity_type="knowledge_source",
+            entity_id=source_id,
+            details={"documents": len(ids), "name": source.name},
+        )
+        return len(ids)
+
     async def delete_document(self, document_id: UUID) -> None:
         self.scope.require("pi.knowledge.manage")
         doc = await self.documents.get(document_id, for_update=True)
@@ -185,8 +306,17 @@ class KnowledgeService:
         )
 
     async def search(self, query: str, limit: int = 5) -> list[dict[str, str]]:
+        """Passages that share meaningful words with the query, best match first.
+
+        Any word may match (a long voice-note transcript or a Roman Urdu message rarely
+        contains every word of a passage), word prefixes count ("towel" finds "towels"),
+        and common English and Roman Urdu filler words are ignored. Passages matching
+        more of the words rank higher."""
         self.scope.require("pi.read")
-        terms = func.websearch_to_tsquery("simple", query[:500])
+        expression = search_terms(query)
+        if not expression:
+            return []
+        terms = func.to_tsquery("simple", expression)
         statement = (
             select(KnowledgeChunk.content, KnowledgeDocument.title, KnowledgeSource.name)
             .join(KnowledgeDocument, KnowledgeDocument.id == KnowledgeChunk.document_id)
@@ -201,6 +331,31 @@ class KnowledgeService:
             )
             .order_by(func.ts_rank(KnowledgeChunk.search_vector, terms).desc())
             .limit(min(max(limit, 1), 10))
+        )
+        rows = await self.session.execute(statement)
+        return [
+            {"snippet": content, "title": title, "source": source}
+            for content, title, source in rows
+        ]
+
+    async def overview(self, limit: int = 2) -> list[dict[str, str]]:
+        """The business's own "About" / "Services" passages: what pi always knows about
+        the company, even when a message shares no words with the knowledge base."""
+        self.scope.require("pi.read")
+        statement = (
+            select(KnowledgeChunk.content, KnowledgeDocument.title, KnowledgeSource.name)
+            .join(KnowledgeDocument, KnowledgeDocument.id == KnowledgeChunk.document_id)
+            .join(KnowledgeSource, KnowledgeSource.id == KnowledgeChunk.source_id)
+            .where(
+                self.chunks.predicate(),
+                self.documents.predicate(),
+                self.sources.predicate(),
+                KnowledgeDocument.status == "ready",
+                KnowledgeSource.status == "active",
+                KnowledgeDocument.title.op("~*")(OVERVIEW_TITLE),
+            )
+            .order_by(KnowledgeDocument.created_at, KnowledgeChunk.ordinal)
+            .limit(min(max(limit, 1), 4))
         )
         rows = await self.session.execute(statement)
         return [
