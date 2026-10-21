@@ -195,3 +195,17 @@ def test_the_opening_is_the_fixed_line_in_brain_mode():
     assert roman == flow.OPENING["roman_ur"]
     shared = greeting_reply({"history": [], "company": "Workzap"})
     assert "reads this chat" in shared  # the standard intro is unchanged
+
+
+def test_path_finds_the_legal_steps_between_states():
+    assert flow.path(S.S0_NEW, S.S0_NEW) == []
+    assert flow.path(S.S0_NEW, S.S1_LISTENING) == [S.S1_LISTENING]
+    assert flow.path(S.S0_NEW, S.S3_NOTED) == [S.S1_LISTENING, S.S3_NOTED]
+    assert flow.path(S.S1_LISTENING, S.S4_SORTED_SUMMARY) == [S.S3_NOTED, S.S4_SORTED_SUMMARY]
+    assert flow.path(S.S7_DELIVERED, S.S9_APPROVED) == [S.S8_REVIEW, S.S9_APPROVED]
+    assert flow.path(S.S5_READINESS, S.X_HUMAN) == [S.X_HUMAN]  # an exception is one move
+    assert flow.path(S.S13_IN_BUILD, S.S1_LISTENING) is None  # nothing leads back
+    chain = [S.S0_NEW, *(flow.path(S.S0_NEW, S.S13_IN_BUILD) or [])]
+    assert chain[-1] == S.S13_IN_BUILD
+    for step_from, step_to in zip(chain, chain[1:], strict=False):
+        assert flow.can_move(step_from, step_to)

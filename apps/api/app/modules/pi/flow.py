@@ -145,6 +145,26 @@ def advance(source: State, target: State) -> State:
     return target
 
 
+def path(source: State, target: State) -> list[State] | None:
+    """The legal steps from source to target (excluding source), found breadth-first; [] when
+    already there, None when there is no way. A turn can note a problem and show the summary
+    in one go, which is several moves."""
+    if source == target:
+        return []
+    seen = {source}
+    queue: list[tuple[State, list[State]]] = [(source, [])]
+    while queue:
+        state, steps = queue.pop(0)
+        for nxt in TRANSITIONS[state]:
+            if nxt in seen:
+                continue
+            if nxt == target:
+                return [*steps, nxt]
+            seen.add(nxt)
+            queue.append((nxt, [*steps, nxt]))
+    return [target] if target in EXCEPTIONS else None
+
+
 def allowed_next(source: State) -> list[State]:
     moves = set(TRANSITIONS[source]) | EXCEPTIONS
     moves.discard(source)
@@ -156,14 +176,26 @@ def initial_state(pi_has_replied: bool) -> State:
     return State.S1_LISTENING if pi_has_replied else State.S0_NEW
 
 
-def after_turn(source: State, *, asked_question: bool) -> State:
-    """The state after a turn, from what only the listening loop can know. Later states are
-    moved by their own events (offer, document, approval, payment), never by the model."""
-    if source == State.S0_NEW:
-        return State.S1_LISTENING  # the opening went out
-    if source in (State.S1_LISTENING, State.S2_CLARIFYING):
-        return State.S2_CLARIFYING if asked_question else State.S1_LISTENING
-    return source
+def after_turn(
+    source: State, *, asked_question: bool, noted: bool = False, summary: bool = False
+) -> State:
+    """The state after a turn, from what only the listening loop can know: a new problem was
+    noted, the sorted summary was shown, or pi asked a question. Later states are moved by
+    their own events (offer, document, approval, payment), never by the model."""
+    state = source
+    if state == State.S0_NEW:
+        state = State.S1_LISTENING  # the opening went out
+        if not (noted or summary):
+            return state
+    if state == State.S4_SORTED_SUMMARY and noted:
+        state = State.S1_LISTENING  # a new problem after the summary: back to listening
+    if state in (State.S1_LISTENING, State.S2_CLARIFYING):
+        if not (noted or summary):
+            return State.S2_CLARIFYING if asked_question else State.S1_LISTENING
+        state = State.S3_NOTED
+    if state == State.S3_NOTED and summary:
+        state = State.S4_SORTED_SUMMARY
+    return state
 
 
 def brain_mode(rules: Mapping[str, Any] | None) -> bool:

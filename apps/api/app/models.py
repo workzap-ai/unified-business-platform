@@ -43,6 +43,12 @@ from app.modules.pi.models import (
     WhatsAppConnection,
     WhatsAppWebhookEvent,
 )
+from app.modules.pi.problem_models import (
+    PiProblem,
+    PiProblemGroup,
+    PiProblemLink,
+    PiProblemRevision,
+)
 from app.modules.pi_customer.models import (
     CustomerFace,
     CustomerPasskey,
@@ -104,6 +110,10 @@ from app.shared.sequences import DocumentSequence
 from app.workflows.models import WorkflowRun
 
 __all__ = [
+    "PiProblem",
+    "PiProblemGroup",
+    "PiProblemLink",
+    "PiProblemRevision",
     "PiDealSettings",
     "PiDocument",
     "CustomerFace",

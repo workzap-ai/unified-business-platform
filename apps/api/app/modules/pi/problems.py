@@ -1,0 +1,677 @@
+"""Noting, sorting and showing problems (pi Brain spec, Part 4 and 3.3 to 3.7).
+
+The model proposes `ProblemOp`s in its turn; this module checks them (`check_ops`), applies them
+to the database (`apply_ops`), reads the noted problems back for the prompt (`noted_context`)
+and builds the S4 summary (`summary_message`). Records keep the person's own words, never
+names or card, phone or ID numbers (redacted first), and every change is a revision.
+"""
+
+import re
+from dataclasses import dataclass, field
+from decimal import Decimal
+from typing import Any, Literal
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.modules.pi import taxonomy
+from app.modules.pi.problem_models import (
+    PiProblem,
+    PiProblemGroup,
+    PiProblemLink,
+    PiProblemRevision,
+)
+from app.shared.scope import WorkspaceScope
+from app.shared.workspace_repository import WorkspaceRepository
+
+TITLE_WORDS = 8
+SUMMARY_LINE_WORDS = 10
+SUMMARY_FULL_LIST = 12  # more than this and the summary shows two lines per group
+SUMMARY_TRIGGER = 7  # problems since the last summary that make pi offer one
+MAX_USER_WORDS = 6
+FIELD_LIMITS = {"summary": 400, "workaround": 400, "trigger": 200, "who_notices": 200}
+
+# Blame and judgement words never go in a title (R, spec 4.3).
+BLAME = re.compile(
+    r"\b(?:lazy|thief|thieves|useless|stupid|idiot|cheat|cheats|liar|corrupt|incompetent|"
+    r"chor|nikamma|nikammay|kamchor|bewakoof)\b",
+    re.IGNORECASE,
+)
+SOLUTION_TITLE = re.compile(
+    r"\b(?:we need|need an?|want an?|should (?:use|buy)|get an?)\b.*\b(?:app|software|system|"
+    r"website|tool|dashboard|erp|pos)\b",
+    re.IGNORECASE,
+)
+
+REDACTIONS = (
+    (re.compile(r"\b(?:\d[ -]?){13,19}\b"), "[card number removed]"),
+    (re.compile(r"\b784-\d{4}-\d{7}-\d\b"), "[ID removed]"),
+    (re.compile(r"\b\d{5}-\d{7}-\d\b"), "[ID removed]"),
+    (re.compile(r"\b[A-Z]{2}\d{2}[A-Z0-9]{4}\d{10,}\b"), "[account removed]"),
+    (re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+"), "[email removed]"),
+    (re.compile(r"(?<!\w)\+?\d[\d ()-]{8,}\d(?!\w)"), "[phone removed]"),
+)
+
+LINK_TYPES = taxonomy.LINK_TYPES
+
+
+class ProblemNote(BaseModel):
+    """What the model says about one problem. Empty means not said (an update keeps the old)."""
+
+    model_config = ConfigDict(extra="ignore")
+    title: str = ""  # English, <= 8 words, starts with the subject, no names or blame
+    title_local: str = ""  # the same in the person's language
+    user_words: list[str] = Field(default_factory=list)  # their own words, verbatim
+    summary: str = ""
+    category: str = ""
+    subtype: str = ""
+    where: list[str] = Field(default_factory=list)
+    of_total: str = ""  # "2 of 4 shops"
+    frequency: str = ""  # daily weekly monthly seasonal once unknown
+    frequency_text: str = ""
+    since_text: str = ""
+    trigger: str = ""
+    impact_types: list[str] = Field(default_factory=list)
+    money_text: str = ""
+    severity_stated: str = ""  # only from their words: low medium high critical
+    workaround: str = ""
+    systems: list[str] = Field(default_factory=list)
+    who_notices: str = ""
+    believes_cause: str = ""
+    requested_solution: str = ""
+    tags: list[str] = Field(default_factory=list)
+    confidence: float = Field(default=0.8, ge=0, le=1)
+
+
+class ProblemOp(BaseModel):
+    """One change to the noted problems. `ref` is a problem's short ref from noted_problems."""
+
+    model_config = ConfigDict(extra="ignore")
+    op: Literal["create", "update", "merge", "split", "link", "withdraw", "rename_group"]
+    ref: str = ""  # update, split, withdraw: the problem; merge: the one kept; link: from
+    refs: list[str] = Field(default_factory=list)  # merge: the duplicates folded into ref
+    to: str = ""  # link: the other problem
+    link_type: str = ""
+    note: ProblemNote | None = None  # create and update
+    notes: list[ProblemNote] = Field(default_factory=list)  # split: the new problems
+    reason: str = ""  # update: "correction" or "enrichment"
+    name: str = ""  # rename_group: ref is the category key
+    confidence: float = Field(default=0.6, ge=0, le=1)  # link
+
+
+def tolerate_ops(raw: Any) -> list[Any]:
+    """Keep only the ops that parse, so one bad op never costs the customer their reply."""
+    if isinstance(raw, dict):
+        raw = [raw]
+    if not isinstance(raw, list):
+        return []
+    kept: list[Any] = []
+    for item in raw[:12]:
+        if isinstance(item, ProblemOp):
+            kept.append(item)
+            continue
+        if not isinstance(item, dict):
+            continue
+        try:
+            ProblemOp.model_validate(item)
+        except ValueError:
+            continue
+        kept.append(item)
+    return kept
+
+
+def redact(text: str) -> tuple[str, bool]:
+    """Remove card, ID, account, email and phone patterns; also says whether anything changed."""
+    changed = False
+    for pattern, replacement in REDACTIONS:
+        text, count = pattern.subn(replacement, text)
+        changed = changed or bool(count)
+    return text, changed
+
+
+def short_ref(problem_id: UUID) -> str:
+    return str(problem_id)[:8]
+
+
+def clean_title(title: str) -> str:
+    return " ".join(title.split()[:TITLE_WORDS]).strip(" .,:;-")
+
+
+def title_problem(title: str) -> str | None:
+    """Why a title is not allowed, or None."""
+    words = title.split()
+    if not words:
+        return "the title is empty"
+    if len(words) > TITLE_WORDS:
+        return f'the title "{title}" is over {TITLE_WORDS} words'
+    if BLAME.search(title):
+        return f'the title "{title}" blames someone: describe the symptom'
+    if SOLUTION_TITLE.search(title):
+        return f'the title "{title}" is a solution: note the problem it would fix'
+    return None
+
+
+def check_ops(ops: list[ProblemOp], known_refs: set[str], noted_in_reply: bool) -> str | None:
+    """What is wrong with the model's ops, for a rewrite, or None when they can go through."""
+    issues: list[str] = []
+    for op in ops:
+        if op.op == "create":
+            note = op.note
+            if note is None or not note.title.strip():
+                issues.append("a create op has no title")
+                continue
+            if (why := title_problem(note.title)) is not None:
+                issues.append(why)
+            if not note.user_words:
+                issues.append(f'"{note.title}" has no user_words (their own words, verbatim)')
+            if not note.category.strip():
+                issues.append(f'"{note.title}" has no category')
+            if Decimal(str(note.confidence)) < taxonomy.CONFIRM_BELOW and not noted_in_reply:
+                issues.append(
+                    f'"{note.title}" has low confidence: ask one question to confirm it first'
+                )
+        elif op.op in ("update", "withdraw", "split") and op.ref not in known_refs:
+            issues.append(f'{op.op} refers to an unknown problem ref "{op.ref}"')
+        elif op.op == "merge":
+            if op.ref not in known_refs or not op.refs or any(r not in known_refs for r in op.refs):
+                issues.append("merge needs a kept ref and the duplicate refs, all known")
+        elif op.op == "link" and (op.ref not in known_refs or op.to not in known_refs):
+            issues.append("link needs two known refs")
+        if op.op == "split" and len(op.notes) < 2:
+            issues.append("split needs at least two new problems")
+    return "; ".join(issues) if issues else None
+
+
+def scope_class(where: list[str], of_total: str) -> str:
+    """all / most / some / one / unknown, for the severity score."""
+    lowered = of_total.lower()
+    if re.search(r"\b(?:all|every|sab|har)\b", lowered):
+        return "all"
+    if re.search(r"\bmost\b", lowered):
+        return "most"
+    ratio = re.search(r"(\d+)\s*(?:of|out of)\s*(\d+)", lowered)
+    if ratio:
+        part, total = int(ratio.group(1)), max(int(ratio.group(2)), 1)
+        if part >= total:
+            return "all"
+        if part == 1:
+            return "one"
+        return "most" if part / total > 0.5 else "some"
+    if len(where) == 1:
+        return "one"
+    return "some" if len(where) > 1 else "unknown"
+
+
+def _words(values: list[str]) -> tuple[list[str], bool]:
+    out: list[str] = []
+    changed = False
+    for value in values[:MAX_USER_WORDS]:
+        cleaned, did = redact(str(value).strip()[:500])
+        changed = changed or did
+        if cleaned and cleaned not in out:
+            out.append(cleaned)
+    return out, changed
+
+
+def _snake(value: str) -> str:
+    return value if re.fullmatch(r"[a-z0-9_]{1,60}", value or "") else ""
+
+
+def _frequency(note: ProblemNote) -> str:
+    return note.frequency if note.frequency in taxonomy.FREQUENCIES else "unknown"
+
+
+@dataclass
+class Applied:
+    created: list[PiProblem] = field(default_factory=list)
+    updated: list[PiProblem] = field(default_factory=list)
+    merged: list[PiProblem] = field(default_factory=list)
+    split: list[PiProblem] = field(default_factory=list)
+    withdrawn: list[PiProblem] = field(default_factory=list)
+    links: list[PiProblemLink] = field(default_factory=list)
+    rejected: list[str] = field(default_factory=list)
+
+    @property
+    def touched(self) -> set[UUID]:
+        every = [*self.created, *self.updated, *self.merged, *self.split, *self.withdrawn]
+        return {p.id for p in every}
+
+
+class ProblemBook:
+    """The problems of one customer's business, for one conversation turn."""
+
+    def __init__(
+        self, session: AsyncSession, scope: WorkspaceScope, customer_id: UUID, language: str
+    ) -> None:
+        self.session, self.scope, self.customer_id = session, scope, customer_id
+        self.language = language
+        self.problems = WorkspaceRepository(session, PiProblem, scope)
+        self.groups = WorkspaceRepository(session, PiProblemGroup, scope)
+
+    async def active(self) -> list[PiProblem]:
+        rows = await self.session.scalars(
+            self.problems.select()
+            .where(
+                PiProblem.customer_id == self.customer_id,
+                PiProblem.status.in_(taxonomy.ACTIVE),
+            )
+            .order_by(PiProblem.number)
+        )
+        return list(rows)
+
+    async def by_ref(self) -> dict[str, PiProblem]:
+        return {short_ref(p.id): p for p in await self.active()}
+
+    async def _next_number(self) -> int:
+        top = await self.session.scalar(
+            select(func.max(PiProblem.number)).where(
+                PiProblem.tenant_id == self.scope.tenant_id,
+                PiProblem.environment_id == self.scope.environment_id,
+                PiProblem.customer_id == self.customer_id,
+            )
+        )
+        return int(top or 0) + 1
+
+    async def group_for(self, category: str) -> PiProblemGroup:
+        found = await self.groups.find(
+            PiProblemGroup.customer_id == self.customer_id, PiProblemGroup.category == category
+        )
+        if found is not None:
+            return found
+        return await self.groups.add(
+            self.groups.new(
+                customer_id=self.customer_id,
+                category=category,
+                name=taxonomy.label(category, "en"),
+            )
+        )
+
+    async def _revise(self, problem: PiProblem, diff: dict[str, Any], reason: str, by: str) -> None:
+        await self.session.flush()
+        self.session.add(
+            PiProblemRevision(
+                tenant_id=self.scope.tenant_id,
+                environment_id=self.scope.environment_id,
+                problem_id=problem.id,
+                revision=problem.revision,
+                diff=diff,
+                reason=reason,
+                by=by,
+            )
+        )
+
+    def _score(self, problem: PiProblem) -> None:
+        impact = (problem.impact or {}).get("types") or []
+        scope = scope_class(
+            (problem.scope or {}).get("where") or [], (problem.scope or {}).get("of_total") or ""
+        )
+        frequency = (problem.frequency or {}).get("normalised") or "unknown"
+        score = taxonomy.severity_score(list(impact), frequency, scope, problem.severity_stated)
+        problem.severity_score = score
+        problem.severity_inferred = taxonomy.severity_band(score)
+
+    async def create(
+        self, note: ProblemNote, message_id: UUID | None, conversation_id: UUID | None
+    ) -> tuple[PiProblem, bool]:
+        """A new problem, or (when the same title is already noted) its enrichment."""
+        title = clean_title(note.title)
+        for existing in await self.active():
+            if existing.title.casefold() == title.casefold():
+                await self.update(existing, note, "enrichment", message_id)
+                return existing, False
+        words, redacted = _words(note.user_words)
+        category = taxonomy.normalise_category(note.category.strip())
+        tags = [t[:40] for t in note.tags[:8]]
+        if category == taxonomy.OTHER and "taxonomy_review" not in tags:
+            tags.append("taxonomy_review")
+        group = await self.group_for(category)
+        problem = self.problems.new(
+            customer_id=self.customer_id,
+            conversation_id=conversation_id,
+            group_id=group.id,
+            number=await self._next_number(),
+            title=title,
+            title_local=note.title_local.strip()[:200],
+            summary=note.summary.strip()[: FIELD_LIMITS["summary"]],
+            user_words=words,
+            category=category,
+            subtype=_snake(note.subtype),
+            tags=tags,
+            scope={"where": [w[:80] for w in note.where[:8]], "of_total": note.of_total[:80]},
+            frequency={"text": note.frequency_text[:120], "normalised": _frequency(note)},
+            since={"text": note.since_text[:120]},
+            trigger=note.trigger.strip()[: FIELD_LIMITS["trigger"]],
+            impact={
+                "types": [t for t in note.impact_types if t in taxonomy.IMPACT_TYPES],
+                "money_text": note.money_text[:120],
+            },
+            severity_stated=note.severity_stated
+            if note.severity_stated in taxonomy.SEVERITIES
+            else "unknown",
+            current_workaround=note.workaround.strip()[: FIELD_LIMITS["workaround"]],
+            systems_mentioned=[s[:60] for s in note.systems[:8]],
+            who_notices=note.who_notices.strip()[: FIELD_LIMITS["who_notices"]],
+            person_believes_cause=redact(note.believes_cause.strip()[:300])[0],
+            requested_solution=redact(note.requested_solution.strip()[:300])[0],
+            status="draft",
+            confidence=Decimal(str(round(note.confidence, 2))),
+            source_message_ids=[str(message_id)] if message_id else [],
+            revision=1,
+            pii_redacted=redacted,
+            language=self.language,
+        )
+        self._score(problem)
+        await self.problems.add(problem)
+        await self._revise(problem, {"title": [None, problem.title]}, "created", "pi")
+        return problem, True
+
+    async def update(
+        self, problem: PiProblem, note: ProblemNote, reason: str, message_id: UUID | None
+    ) -> bool:
+        """Apply what the note says; returns whether anything changed."""
+        diff: dict[str, Any] = {}
+
+        def put(name: str, value: Any) -> None:
+            if getattr(problem, name) != value:
+                diff[name] = [getattr(problem, name), value]
+                setattr(problem, name, value)
+
+        if note.title.strip():
+            put("title", clean_title(note.title))
+        if note.title_local.strip():
+            put("title_local", note.title_local.strip()[:200])
+        if note.summary.strip():
+            put("summary", note.summary.strip()[: FIELD_LIMITS["summary"]])
+        if note.category.strip():
+            category = taxonomy.normalise_category(note.category.strip())
+            if category != problem.category:
+                put("category", category)
+                put("group_id", (await self.group_for(category)).id)
+        if _snake(note.subtype):
+            put("subtype", _snake(note.subtype))
+        words, redacted = _words(note.user_words)
+        merged_words = [*problem.user_words, *[w for w in words if w not in problem.user_words]]
+        put("user_words", merged_words[: MAX_USER_WORDS * 2])
+        if redacted:
+            put("pii_redacted", True)
+        if note.where or note.of_total:
+            scope = dict(problem.scope or {})
+            scope["where"] = [w[:80] for w in note.where[:8]] or scope.get("where", [])
+            scope["of_total"] = note.of_total[:80] or scope.get("of_total", "")
+            put("scope", scope)
+        if note.frequency_text or note.frequency:
+            frequency = dict(problem.frequency or {})
+            frequency["text"] = note.frequency_text[:120] or frequency.get("text", "")
+            if note.frequency in taxonomy.FREQUENCIES:
+                frequency["normalised"] = note.frequency
+            put("frequency", frequency)
+        if note.since_text:
+            put("since", {"text": note.since_text[:120]})
+        if note.impact_types or note.money_text:
+            impact = dict(problem.impact or {})
+            kinds = [t for t in note.impact_types if t in taxonomy.IMPACT_TYPES]
+            impact["types"] = kinds or impact.get("types", [])
+            impact["money_text"] = note.money_text[:120] or impact.get("money_text", "")
+            put("impact", impact)
+        if note.severity_stated in taxonomy.SEVERITIES and note.severity_stated != "unknown":
+            put("severity_stated", note.severity_stated)
+        for name, value in (
+            ("trigger", note.trigger),
+            ("current_workaround", note.workaround),
+            ("who_notices", note.who_notices),
+        ):
+            if value.strip():
+                put(name, value.strip()[:400])
+        if note.systems:
+            put("systems_mentioned", sorted({*problem.systems_mentioned, *note.systems[:8]}))
+        if note.believes_cause.strip():
+            put("person_believes_cause", redact(note.believes_cause.strip()[:300])[0])
+        if note.requested_solution.strip():
+            put("requested_solution", redact(note.requested_solution.strip()[:300])[0])
+        if message_id and str(message_id) not in problem.source_message_ids:
+            put("source_message_ids", [*problem.source_message_ids, str(message_id)])
+        if not diff:
+            return False
+        if reason == "correction":
+            put("status", "corrected")
+        self._score(problem)
+        problem.revision += 1
+        await self._revise(problem, diff, reason, "person" if reason == "correction" else "pi")
+        return True
+
+    async def merge(self, keep: PiProblem, others: list[PiProblem]) -> None:
+        for other in others:
+            if other.id == keep.id:
+                continue
+            for words in other.user_words:
+                if words not in keep.user_words:
+                    keep.user_words = [*keep.user_words, words]
+            other.status = "merged"
+            other.merged_into = keep.id
+            other.revision += 1
+            await self._revise(other, {"merged_into": [None, str(keep.id)]}, "merged", "pi")
+        keep.revision += 1
+        await self._revise(keep, {"merged": [short_ref(o.id) for o in others]}, "merged", "pi")
+
+    async def confirm_drafts(self, keep: set[UUID]) -> int:
+        """A noted line the person saw and did not object to becomes confirmed (spec 4.3)."""
+        count = 0
+        for problem in await self.active():
+            if (
+                problem.status == "draft"
+                and problem.id not in keep
+                and problem.confidence >= taxonomy.CONFIRM_BELOW
+            ):
+                problem.status = "confirmed"
+                count += 1
+        return count
+
+
+async def apply_ops(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    customer_id: UUID,
+    conversation_id: UUID | None,
+    message_id: UUID | None,
+    ops: list[ProblemOp],
+    language: str,
+) -> Applied:
+    """Apply the model's ops in order. Bad ones are skipped and listed, never raised."""
+    book = ProblemBook(session, scope, customer_id, language)
+    result = Applied()
+    refs = await book.by_ref()
+    for op in ops:
+        try:
+            if op.op == "create" and op.note and op.note.title.strip():
+                problem, fresh = await book.create(op.note, message_id, conversation_id)
+                (result.created if fresh else result.updated).append(problem)
+                refs[short_ref(problem.id)] = problem
+            elif op.op == "update" and op.ref in refs and op.note:
+                changed = await book.update(
+                    refs[op.ref],
+                    op.note,
+                    "correction" if op.reason == "correction" else "enrichment",
+                    message_id,
+                )
+                if changed:
+                    result.updated.append(refs[op.ref])
+            elif op.op == "merge" and op.ref in refs and op.refs:
+                others = [refs[r] for r in op.refs if r in refs and r != op.ref]
+                if others:
+                    await book.merge(refs[op.ref], others)
+                    result.merged.extend(others)
+                    result.updated.append(refs[op.ref])
+            elif op.op == "split" and op.ref in refs and len(op.notes) >= 2:
+                original = refs[op.ref]
+                original.status = "split"
+                original.revision += 1
+                await book._revise(original, {"status": ["draft", "split"]}, "split", "pi")
+                for note in op.notes:
+                    problem, _ = await book.create(note, message_id, conversation_id)
+                    result.created.append(problem)
+                    refs[short_ref(problem.id)] = problem
+                result.split.append(original)
+            elif op.op == "withdraw" and op.ref in refs:
+                problem = refs[op.ref]
+                problem.status = "withdrawn"
+                problem.revision += 1
+                await book._revise(
+                    problem, {"status": ["active", "withdrawn"]}, "withdrawn", "person"
+                )
+                result.withdrawn.append(problem)
+            elif op.op == "link" and op.ref in refs and op.to in refs and op.ref != op.to:
+                kind = op.link_type if op.link_type in LINK_TYPES else "same_root_suspected"
+                a, b = refs[op.ref], refs[op.to]
+                found = await session.scalar(
+                    select(PiProblemLink.id).where(
+                        PiProblemLink.tenant_id == scope.tenant_id,
+                        PiProblemLink.environment_id == scope.environment_id,
+                        PiProblemLink.from_id == a.id,
+                        PiProblemLink.to_id == b.id,
+                        PiProblemLink.type == kind,
+                    )
+                )
+                if found is None:
+                    link = PiProblemLink(
+                        tenant_id=scope.tenant_id,
+                        environment_id=scope.environment_id,
+                        from_id=a.id,
+                        to_id=b.id,
+                        type=kind,
+                        confidence=Decimal(str(round(op.confidence, 2))),
+                    )
+                    session.add(link)
+                    result.links.append(link)
+            elif op.op == "rename_group" and op.name.strip() and op.ref in taxonomy.KEYS:
+                group = await book.group_for(op.ref)
+                group.name = op.name.strip()[:120]
+                group.created_by = "person"
+            else:
+                result.rejected.append(f"{op.op}:{op.ref or op.note and op.note.title or ''}")
+        except ValueError:
+            result.rejected.append(op.op)
+    await session.flush()
+    await book.confirm_drafts(result.touched)
+    await session.flush()
+    return result
+
+
+async def noted_context(
+    session: AsyncSession, scope: WorkspaceScope, customer_id: UUID, limit: int = 40
+) -> list[dict[str, Any]]:
+    """The noted problems as compact JSON for the prompt: ref, title, group, status, gaps."""
+    book = ProblemBook(session, scope, customer_id, "en")
+    compact: list[dict[str, Any]] = []
+    for problem in (await book.active())[:limit]:
+        missing = [
+            name
+            for name, known in (
+                (
+                    "where",
+                    (problem.scope or {}).get("where") or (problem.scope or {}).get("of_total"),
+                ),
+                ("how_often", (problem.frequency or {}).get("normalised") not in (None, "unknown")),
+                (
+                    "impact",
+                    (problem.impact or {}).get("types") or (problem.impact or {}).get("money_text"),
+                ),
+                ("since", (problem.since or {}).get("text")),
+            )
+            if not known
+        ]
+        compact.append(
+            {
+                "ref": short_ref(problem.id),
+                "title": problem.title,
+                "group": problem.category,
+                "status": problem.status,
+                "missing": missing,
+            }
+        )
+    return compact
+
+
+# --- the S4 summary ---------------------------------------------------------------------
+
+SUMMARY_TEXT = {
+    "en": (
+        "Here's what I've noted and sorted so far. None of it is solved yet.",
+        "…and {n} more. I can send the full list.",
+        "Is anything wrong or missing?",
+    ),
+    "roman_ur": (
+        "Ab tak jo maine note aur sort kiya hai, ye hai. Inme se abhi kuch bhi hal nahi hua.",
+        "…aur {n} aur hain. Poori list bhej sakta hoon.",
+        "Kuch ghalat hai ya reh gaya hai?",
+    ),
+    "ur": (
+        "اب تک جو میں نے نوٹ اور ترتیب دیا ہے، یہ ہے۔ ان میں سے ابھی کچھ بھی حل نہیں ہوا۔",
+        "…اور {n} مزید ہیں۔ پوری فہرست بھیج سکتا ہوں۔",
+        "کیا کچھ غلط ہے یا رہ گیا ہے؟",
+    ),
+    "ar": (
+        "هذا ما سجلته ورتبته حتى الآن. لم يُحل أي منها بعد.",
+        "…و{n} أخرى. يمكنني إرسال القائمة كاملة.",
+        "هل هناك شيء خاطئ أو ناقص؟",
+    ),
+}  # fmt: skip
+
+
+def summary_message(problems: list[dict[str, Any]], language: str = "en") -> str:
+    """The sorted list, grouped, biggest group first (spec 3.7). Each item is
+    {category, title, score?}. Over 12 problems it shows two lines per group."""
+    intro, more, close = SUMMARY_TEXT.get(language, SUMMARY_TEXT["en"])
+    groups: dict[str, list[dict[str, Any]]] = {}
+    for item in problems:
+        groups.setdefault(item["category"], []).append(item)
+    order = sorted(groups, key=lambda key: (-len(groups[key]), taxonomy.OTHER == key, key))
+    long = len(problems) > SUMMARY_FULL_LIST
+    lines = [intro, ""]
+    hidden = 0
+    for key in order:
+        items = sorted(groups[key], key=lambda i: -float(i.get("score") or 0))
+        lines.append(f"*{taxonomy.label(key, language)}* ({len(items)})")
+        shown = items[:2] if long else items
+        hidden += len(items) - len(shown)
+        for item in shown:
+            words = str(item["title"]).split()[:SUMMARY_LINE_WORDS]
+            lines.append("• " + " ".join(words))
+        lines.append("")
+    if hidden:
+        lines.append(more.format(n=hidden))
+        lines.append("")
+    lines.append(close)
+    return "\n".join(lines)
+
+
+DONE = re.compile(
+    r"\b(?:that'?s (?:all|it|everything)|that is (?:all|it)|nothing else|no(?:thing)? more|"
+    r"i'?m done|bas(?: yahi| itna| ye ?hi| yehi)?|yahi (?:hai|sab)|aur kuch nahi|kuch aur nahi|"
+    r"nahi aur kuch|that's it for now)\b",
+    re.IGNORECASE,
+)
+WHAT_NOW = re.compile(
+    r"\b(?:what now|so what can you do|what can you do|what next|how much|how much would|"
+    r"ab kya|aage kya|kitna (?:lagega|kharcha)|kya kar sakte)\b",
+    re.IGNORECASE,
+)
+
+
+def summary_due(text: str, noted: int, since_summary: int) -> str | None:
+    """Why pi should show the sorted summary now (spec 3.7), or None."""
+    if noted < 1:
+        return None
+    if DONE.search(text):
+        return "done"
+    if WHAT_NOW.search(text):
+        return "what_now"
+    if since_summary >= SUMMARY_TRIGGER:
+        return "many"
+    return None
+
+
+def shape_question_due(noted: int, industry_known: bool, already_asked: bool) -> bool:
+    """After two problems, if pi still does not know the trade, it may ask once (spec 7.0)."""
+    return noted >= 2 and not industry_known and not already_asked

@@ -22,7 +22,7 @@ from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.models import CatalogProduct
 from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
-from app.modules.pi import constitution, flow, industry_packs, price_policy
+from app.modules.pi import constitution, flow, industry_packs, price_policy, problems, taxonomy
 from app.modules.pi.guard import ReplyRejected, validate_reply
 from app.modules.pi.knowledge import KnowledgeService, remember
 from app.modules.pi.language import NAMES, clearly_other, detect_language, english_greeting
@@ -35,6 +35,7 @@ from app.modules.pi.models import (
     PiMessage,
     PiSettings,
 )
+from app.modules.pi.problems import ProblemOp
 from app.modules.pi.tools.registry import ToolRegistry
 from app.modules.products.service import enabled_products
 from app.modules.sales.service import SalesService
@@ -234,6 +235,9 @@ class ServiceTurn(BaseModel):
     _greeting_only: bool = PrivateAttr(default=False)
     # pi keeps the chat but needs the team: a question on the request desk.
     _ask_team: bool = PrivateAttr(default=False)
+    # Brain mode: the sorted summary replaced the reply; the trade question was due.
+    _summary: bool = PrivateAttr(default=False)
+    _asked_shape: bool = PrivateAttr(default=False)
     # Filled FIRST (field order guides the model): what the customer wants right now and
     # who the message is for. Internal; it makes the reply answer the actual request.
     understanding: str = Field(default="", max_length=600)
@@ -289,6 +293,8 @@ class ServiceTurn(BaseModel):
     # their exact words; the application accepts it like the page's button would.
     proposal_answer: Literal["none", "accepted", "changes", "declined"] = "none"
     proposal_evidence: str = Field(default="", max_length=500)
+    # Brain mode: changes to the problems pi has noted for this customer's business.
+    problem_ops: list[ProblemOp] = Field(default_factory=list, max_length=12)
 
     @model_validator(mode="before")
     @classmethod
@@ -342,6 +348,8 @@ class ServiceTurn(BaseModel):
             data.pop("missing", None)
         if not isinstance(data.get("requirements"), (dict, Requirements)):
             data.pop("requirements", None)
+        if "problem_ops" in data:
+            data["problem_ops"] = problems.tolerate_ops(data["problem_ops"])
         return data
 
 
@@ -782,6 +790,41 @@ Proposals:
 """
 
 
+BRAIN_PROBLEMS = """
+Noting problems (pi_mode "brain"). Record every problem the customer describes in
+problem_ops, in the same turn you confirm it. A problem is one thing going wrong, from
+their point of view: a symptom, never a diagnosis or a solution ("We need an app" is not a
+problem: ask what it would fix and note that; keep the wish in requested_solution).
+- op "create" with a note: title (English, at most 8 words, starts with the subject, no
+  names, no blame words, no solution words), title_local (their language), user_words (their
+  own words, verbatim, one or two short quotes; never names, phone, card or ID numbers),
+  category from the list below, subtype (snake_case), where, of_total, frequency, since_text,
+  impact_types, severity_stated (only if they said it), workaround, systems, believes_cause
+  (what they think the cause is: never a judgement about a named person), confidence 0 to 1.
+- One message with several problems with different symptoms: one create each. One symptom with
+  several facets (stock out in shop B and D) is one problem.
+- Their later detail or a correction: op "update" with the ref from noted_problems and only the
+  fields that changed (reason "correction" or "enrichment"). Same symptom told twice: op
+  "merge" (ref kept, refs folded in). Different symptoms that may share a root: op "link".
+  "Never mind that one": op "withdraw".
+- Confirm each new problem in their words and language: "Thanks. I've noted it: {short title}.
+  Anything else getting in the way?" If your confidence is under 0.6, ask one question to
+  confirm instead of asking for more problems.
+- noted_problems lists what is already noted (ref, title, group, status, missing). Never ask
+  for anything not in "missing" of the problem you are on, and never re-note a problem.
+- If shape_question_due is true, ask once, naturally: "What kind of business is it?"
+Categories and sub-types:
+""" + "\n".join(
+    f"  {cat.key}: {', '.join(cat.subtypes)}" if cat.subtypes else f"  {cat.key}"
+    for cat in taxonomy.CATEGORIES
+)
+
+
+def system_for(context: dict[str, Any]) -> str:
+    """The prompt: the shared rules, plus the problem-noting rules in brain mode."""
+    return SYSTEM + BRAIN_PROBLEMS if context.get("pi_mode") == "brain" else SYSTEM
+
+
 async def service_mode(session: AsyncSession, scope: WorkspaceScope, policy: PiSettings) -> bool:
     mode = policy.response_rules.get("service_mode", "auto")
     if mode == "service":
@@ -855,7 +898,8 @@ def allowed_text(context: dict[str, Any] | None) -> list[str]:
             label, _, link = part.strip().partition(": ")
             if link:
                 books += [link, label.split(" ")[-1]]
-    return offered_labels(context) + customer_figures(context) + arranged + books
+    summary = [str(line) for line in (context or {}).get("summary_lines") or []]
+    return offered_labels(context) + customer_figures(context) + arranged + books + summary
 
 
 ARRANGED = re.compile(
@@ -1007,21 +1051,116 @@ def brain_context(
     return context
 
 
-def advance_flow(conversation: PiConversation, turn: "ServiceTurn") -> None:
+async def brain_problems(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    policy: PiSettings,
+    industry_known: bool,
+) -> dict[str, Any]:
+    """What pi has noted so far for this customer (brain mode), for the prompt."""
+    if not flow.brain_mode(policy.response_rules) or conversation.customer_id is None:
+        return {}
+    noted = await problems.noted_context(session, scope, conversation.customer_id)
+    brief = conversation.service_brief or {}
+    context: dict[str, Any] = {"noted_problems": noted}
+    if problems.shape_question_due(len(noted), industry_known, bool(brief.get("industry_asked"))):
+        context["shape_question_due"] = True
+    context["problems_since_summary"] = len(noted) - int(brief.get("summary_count") or 0)
+    return context
+
+
+def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """When the person is done, asks what now, or many problems piled up: the reply becomes the
+    sorted summary (spec 3.7), built from what is noted plus this turn's new problems."""
+    turn._asked_shape = bool(context.get("shape_question_due"))
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    if state not in (
+        flow.State.S1_LISTENING,
+        flow.State.S2_CLARIFYING,
+        flow.State.S3_NOTED,
+    ):
+        return
+    created = [op.note for op in turn.problem_ops if op.op == "create" and op.note]
+    items = [
+        {"category": p["group"], "title": p["title"], "score": p.get("score")}
+        for p in context.get("noted_problems") or []
+    ] + [
+        {
+            "category": taxonomy.normalise_category(n.category),
+            "title": problems.clean_title(n.title),
+        }
+        for n in created
+    ]
+    since = int(context.get("problems_since_summary") or 0) + len(created)
+    if not problems.summary_due(str(context.get("latest_customer_message", "")), len(items), since):
+        return
+    turn.reply = problems.summary_message(items, str(context.get("reply_language") or "en"))
+    # The group counts are figures pi wrote itself: the no-digits rule must let them through.
+    context["summary_lines"] = [
+        ln for ln in turn.reply.splitlines() if any(c.isdigit() for c in ln)
+    ]
+    turn.awaiting_customer = True
+    turn._summary = True
+
+
+async def note_problems(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    message: PiMessage,
+    turn: "ServiceTurn",
+) -> None:
+    """Save the turn's problem ops (brain mode) and move the conversation's state."""
+    noted = False
+    if turn.problem_ops and conversation.customer_id is not None:
+        applied = await problems.apply_ops(
+            session,
+            scope,
+            conversation.customer_id,
+            conversation.id,
+            message.id,
+            turn.problem_ops,
+            turn.language,
+        )
+        noted = bool(applied.created)
+        if applied.rejected:
+            logger.warning("pi problem ops skipped", extra={"ops": applied.rejected[:5]})
+    elif conversation.customer_id is not None:
+        # They saw the noted lines and moved on without objecting: those are confirmed.
+        book = problems.ProblemBook(session, scope, conversation.customer_id, turn.language)
+        await book.confirm_drafts(set())
+    brief = dict(conversation.service_brief or {})
+    if turn._summary and conversation.customer_id is not None:
+        book = problems.ProblemBook(session, scope, conversation.customer_id, turn.language)
+        brief["summary_count"] = len(await book.active())
+    if turn._asked_shape:
+        brief["industry_asked"] = True
+    if brief != (conversation.service_brief or {}):
+        conversation.service_brief = brief
+    advance_flow(conversation, turn, noted=noted)
+
+
+def advance_flow(conversation: PiConversation, turn: "ServiceTurn", *, noted: bool = False) -> None:
     """Move the conversation's state after pi's turn. Only the listening loop moves here;
     offers, documents, approvals and payments move it from their own events."""
     current = flow.parse(conversation.flow_state)
     if current is None:
         return
     asked = turn.reply.rstrip().endswith(("?", "؟"))
-    target = flow.after_turn(current, asked_question=asked)
+    target = flow.after_turn(
+        current, asked_question=asked, noted=noted, summary=getattr(turn, "_summary", False)
+    )
     if target == current:
         return
-    try:
-        conversation.flow_state = flow.advance(current, target).value
-    except flow.IllegalTransition:
+    steps = flow.path(current, target)
+    if not steps:
         logger.warning("pi flow move refused", extra={"from": current.value, "to": target.value})
         return
+    state = current
+    for step in steps:  # a turn can take several moves (S0 to S1 to S3); each one is checked
+        state = flow.advance(state, step)
+    conversation.flow_state = state.value
     conversation.flow_state_since = datetime.now(UTC)
 
 
@@ -1211,8 +1350,13 @@ async def prepare_context(
             {"booking_id": str(b.id), "label": work.label(b.starts_at, b.timezone)}
             for b in upcoming
         ]
+    industry = await industry_context_for(
+        session, scope, conversation, message, rows, profile, policy
+    )
+    brain = await brain_problems(session, scope, conversation, policy, bool(industry))
     return {
-        **await industry_context_for(session, scope, conversation, message, rows, profile, policy),
+        **industry,
+        **brain,
         "bookable_services": bookable,
         "customer_bookings": customer_bookings,
         "work_tools": sorted(tools & {"create_ticket", "create_task", "request_payment"}),
@@ -2567,7 +2711,10 @@ async def compose_service_turn(
         ServiceTurn,
         alias=policy.ai_config.get("reply_alias", "balanced"),
         purpose="pi_service",
-        messages=[Message.system(SYSTEM), Message.user(json.dumps(context, ensure_ascii=False))],
+        messages=[
+            Message.system(system_for(context)),
+            Message.user(json.dumps(context, ensure_ascii=False)),
+        ],
         temperature=float(policy.ai_config.get("temperature", "0.20")),
         max_tokens=4096,  # thinking models (Gemini 3.x) count their thinking here too
         conversation_id=conversation.id,
@@ -2578,7 +2725,9 @@ async def compose_service_turn(
     send_now(turn, context)
     meeting_yes(turn, context)
     mode = price_policy.price_mode(policy.response_rules, service=True)
-    problem = needless_question(turn.reply, context)
+    # Brain mode asks "Anything else getting in the way?" and learns who they are by listening.
+    brain = context.get("pi_mode") == "brain"
+    problem = None if brain else needless_question(turn.reply, context)
     if LATER_PROMISE.search(turn.reply) and any(
         not link.get("unreadable") for link in context.get("shared_links") or []
     ):
@@ -2608,7 +2757,7 @@ async def compose_service_turn(
     turn.reply = without_filler(turn.reply)
     if long := too_long(turn.reply, context):
         problem = f"{long}, and also: {problem}" if problem else long
-    if gap := unknown_customer(turn, context):
+    if not brain and (gap := unknown_customer(turn, context)):
         problem = f"{gap}, and also: {problem}" if problem else gap
     if odd := contradicts_itself(turn.reply, context):
         problem = f"{odd}, and also: {problem}" if problem else odd
@@ -2640,6 +2789,12 @@ async def compose_service_turn(
     if strict and (broke := constitution.lint(turn.reply, context)):
         text = constitution.describe(broke)
         problem = f"{text}, and also: {problem}" if problem else text
+    if context.get("pi_mode") == "brain" and turn.problem_ops:
+        known = {p["ref"] for p in context.get("noted_problems") or []}
+        replied = turn.reply.rstrip().endswith(("?", "\u061f"))
+        if bad := problems.check_ops(turn.problem_ops, known, replied):
+            text = f"the problem notes are wrong: {bad}"
+            problem = f"{text}, and also: {problem}" if problem else text
     asks_status = bool(STATUS_ASK.search(str(context.get("latest_customer_message", ""))))
     if not turn.request_human and (missed_status := status_missed(turn.reply, context)):
         problem = f"{missed_status}, and also: {problem}" if problem else missed_status
@@ -2651,7 +2806,7 @@ async def compose_service_turn(
             alias=policy.ai_config.get("reply_alias", "balanced"),
             purpose="pi_service",
             messages=[
-                Message.system(SYSTEM),
+                Message.system(system_for(context)),
                 Message.user(json.dumps(context, ensure_ascii=False)),
                 Message.assistant(json.dumps({"reply": turn.reply}, ensure_ascii=False)),
                 Message.user(
@@ -2740,6 +2895,8 @@ async def compose_service_turn(
                 "pi reply broke the constitution", extra={"rules": [v.rule for v in blocked]}
             )
             raise rejected_with(turn, "CONSTITUTION_BREAK")
+    if context.get("pi_mode") == "brain":
+        brain_summary(turn, context)
     if expected in NAMES and mixed_line(turn.reply, str(expected)):
         turn.reply = await in_one_language(
             manager, scope, policy, conversation, turn.reply, str(expected)
@@ -2825,7 +2982,7 @@ async def save_service_turn(
     """Save the turn. Returns the leads pi should now write a proposal for (the caller
     queues it after commit, so the model call never runs under these row locks)."""
     if flow.brain_mode(policy.response_rules):
-        advance_flow(conversation, turn)
+        await note_problems(session, scope, conversation, message, turn)
     if turn._greeting_only:
         conversation.language = turn.language
         return []
