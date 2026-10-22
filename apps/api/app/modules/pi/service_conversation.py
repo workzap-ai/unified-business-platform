@@ -31,6 +31,7 @@ from app.modules.pi import (
     flow,
     followup_policy,
     industry_packs,
+    learning_context,
     price_policy,
     problems,
     safety,
@@ -1177,6 +1178,8 @@ async def brain_problems(
     context.update(matching_the_person(conversation, message, rows or []))
     if away := days_away(message, rows or []):
         context["days_away"] = away
+    if learning_context.active(policy.response_rules):
+        context.update(await learning_context.build(session, scope, conversation, message, noted))
     return context
 
 

@@ -31,3 +31,7 @@ class PiExperience(WorkspaceRow):
     signals: Mapped[list[str]] = mapped_column(JSONB, default=list)
     reward: Mapped[int] = mapped_column(Integer, default=0)
     scored_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    arm_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)  # question arm used
+    example_ids: Mapped[list[str]] = mapped_column(
+        JSONB, default=list, server_default="[]"
+    )  # examples shown

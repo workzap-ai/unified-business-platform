@@ -18,12 +18,17 @@ Everything is behind per-workspace settings, so other workspaces keep today's be
 | `response_rules.pi_mode = "brain"` | the state machine, problem noting, offer and decision gates, documents; implies the linter |
 | `response_rules.constitution` | the reply linter alone |
 | `knowledge_config.industry_packs` | industry knowledge in the prompt, industry stored on the customer |
+| `response_rules.brain` | tunable numbers inside tested ranges (`brain_config.py`) and `learning_frozen`: learning is frozen unless it is exactly `false` |
 
 Code map (`apps/api/app/modules/pi/`): `constitution.py` (reply linter) · `flow.py` (22 states,
 legal moves) · `taxonomy.py`, `problem_models.py`, `problems.py` (problem records) ·
 `decisions.py` (yes gate, offer, approval) · `brain_docs*.py`, `brain_pdf.py`, `brain_doc_routes.py`
 (solution document and quote) · `industry_packs.py` + `packs/industry/*.json` (211 packs, built by
-`scripts/build_industry_packs.py`) · wiring in `service_conversation.py` and `runtime.py`.
+`scripts/build_industry_packs.py`) · `safety.py`, `safety_guard.py` (emergency, personal data, advice,
+boundaries, enquiries; pre-model gates) · `learning*.py`, `experience_*.py` (reward, example bank,
+question arms, nightly run; opt-in) · `brain_erase.py` (delete a customer's data) · wiring in
+`service_conversation.py` and `runtime.py`. How Knowledge, the Agents page and learning relate to
+brain mode: `docs/pi-saas/pi-brain-how-it-works.md`.
 
 ### Non-negotiables (never weaken, never make learnable)
 

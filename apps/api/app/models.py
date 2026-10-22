@@ -27,6 +27,12 @@ from app.modules.notifications.models import Notification, NotificationRead
 from app.modules.orders.models import Order, OrderLine
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
 from app.modules.pi.experience_models import PiExperience
+from app.modules.pi.learning_models import (
+    PiLearningChange,
+    PiLearningExample,
+    PiLearningRun,
+    PiQuestionArm,
+)
 from app.modules.pi.models import (
     KnowledgeChunk,
     KnowledgeDocument,
@@ -116,6 +122,10 @@ __all__ = [
     "PiBrainDocument",
     "PiBrainPayment",
     "PiExperience",
+    "PiLearningChange",
+    "PiLearningExample",
+    "PiLearningRun",
+    "PiQuestionArm",
     "PiQuarantine",
     "PiProblem",
     "PiProblemGroup",

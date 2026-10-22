@@ -8,13 +8,15 @@ how pi replies, so it runs whether or not learning is frozen.
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 from typing import Any
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import learning
+from app.modules.pi import learning, learning_bank
 from app.modules.pi.experience_models import PiExperience
-from app.modules.pi.models import PiConversation, PiMessage
+from app.modules.pi.learning_models import PiQuestionArm
+from app.modules.pi.models import PiAgentRun, PiConversation, PiMessage
 from app.shared.scope import WorkspaceScope
 
 SILENCE = timedelta(hours=24)
@@ -46,6 +48,29 @@ def outcome_of(message: PiMessage, following: PiMessage | None, now: datetime) -
         noted_confirmed=noted,
         gap_days=gap,
     )
+
+
+async def attribution(
+    session: AsyncSession, conversation: PiConversation, reply: PiMessage
+) -> tuple[UUID | None, list[str]]:
+    """Which question wording and which examples were shown when this reply was written. The
+    stamp is found through the agent run that produced the reply; the wording is credited only if
+    the reply really used it (otherwise the reward would teach the wrong lesson)."""
+    stamps = (conversation.service_brief or {}).get("learning_used") or []
+    if not stamps:
+        return None, []
+    run = await session.scalar(select(PiAgentRun).where(PiAgentRun.response_message_id == reply.id))
+    if run is None:
+        return None, []
+    stamp = next((x for x in reversed(stamps) if x.get("message_id") == str(run.message_id)), None)
+    if stamp is None:
+        return None, []
+    arm_id: UUID | None = None
+    if stamp.get("arm"):
+        arm = await session.get(PiQuestionArm, UUID(stamp["arm"]))
+        if arm is not None and learning_bank.similarity(reply.body or "", arm.text) >= 0.4:
+            arm_id = arm.id
+    return arm_id, [str(e) for e in stamp.get("examples") or []]
 
 
 async def score_new(session: AsyncSession, now: datetime | None = None, limit: int = 200) -> int:
@@ -85,6 +110,7 @@ async def score_new(session: AsyncSession, now: datetime | None = None, limit: i
         if conversation is None:
             continue
         signals = learning.signals_after(outcome_of(reply, following, now))
+        arm_id, example_ids = await attribution(session, conversation, reply)
         session.add(
             PiExperience(
                 tenant_id=reply.tenant_id,
@@ -95,6 +121,8 @@ async def score_new(session: AsyncSession, now: datetime | None = None, limit: i
                 signals=signals,
                 reward=learning.reward(signals),
                 scored_at=now,
+                arm_id=arm_id,
+                example_ids=example_ids,
             )
         )
         written += 1

@@ -112,6 +112,17 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
         except Exception:  # noqa: BLE001 - retried on the next sweep
             await session.rollback()
             logger.warning("pi_experience_scoring_failed")
+    # The nightly learning run for workspaces in brain mode (frozen ones only write a note).
+    async with ctx["sessions"]() as session:
+        try:
+            from app.modules.pi.learning_nightly import run_due
+
+            if ran := await run_due(session):
+                logger.info("pi_learning_ran", extra={"workspaces": ran})
+            await session.commit()
+        except Exception:  # noqa: BLE001 - retried on the next sweep
+            await session.rollback()
+            logger.warning("pi_learning_run_failed")
     # Proposals pi owes a customer whose job never ran or failed.
     async with ctx["sessions"]() as session:
         try:

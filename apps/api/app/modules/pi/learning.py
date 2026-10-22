@@ -145,10 +145,11 @@ MONEY_OR_RULE_TOPICS = re.compile(
     r"guarantee|promise|solution|document|proposal|workzap will|we will build)\b",
     re.IGNORECASE,
 )
+# A title with a capitalised name ("Mr Ahmed"; not "sir please"), or a named competitor. Product
+# names that are also plain words ("Busy", "Marg", "SAP") only count when capitalised.
 PERSON_OR_COMPETITOR = re.compile(
-    r"\b(?:mr|mrs|ms|dr|haji|sheikh|sir)\.? [A-Z][a-z]+|\b(?:competitor|zoho|odoo|quickbooks|"
-    r"vyapar|busy|marg|sap)\b",
-    re.IGNORECASE,
+    r"\b(?i:mr|mrs|ms|dr|haji|sheikh|sir)\.? [A-Z][a-z]+"
+    r"|\b(?i:competitor|zoho|odoo|quickbooks|vyapar)\b|\b(?:Busy|Marg|SAP)\b"
 )
 SOCIAL_PROOF = re.compile(
     r"\b(?:other (?:businesses|shops|owners|clients)|most (?:owners|businesses|shops)|"

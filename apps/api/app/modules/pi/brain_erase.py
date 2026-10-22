@@ -1,8 +1,9 @@
 """Erase what pi keeps about one person (pi Brain spec R-PRIV-06, 8.8, learning eval L11).
 
 Removed: the problems pi noted (with their revisions, links and groups), pi's memory notes, the
-encrypted quarantine copies, the learning scores of their chats, and the text of their messages
-and pi's replies (the rows stay so counts and audit trails still add up, but the words go).
+encrypted quarantine copies, the learning scores and examples from their chats, and the text of
+their messages and pi's replies (the rows stay so counts and audit trails still add up, but the
+words go). Question-arm statistics are bare counts with no personal data, so they stay.
 
 Kept on purpose: quotes, solution documents and payments (business and financial records the
 company must be able to show), and the customer's contact record in the CRM, which the customer
@@ -17,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
 from app.modules.pi.experience_models import PiExperience
+from app.modules.pi.learning_models import PiLearningExample
 from app.modules.pi.models import PiConversation, PiMemory, PiMessage
 from app.modules.pi.problem_models import (
     PiProblem,
@@ -79,6 +81,14 @@ async def erase_customer(
         await session.execute(
             delete(PiProblemGroup).where(
                 *mine(PiProblemGroup), PiProblemGroup.customer_id == customer_id
+            )
+        )
+    )
+    removed["learning_examples"] = _n(
+        await session.execute(
+            delete(PiLearningExample).where(
+                *mine(PiLearningExample),
+                PiLearningExample.source_contacts.contains([str(customer_id)]),
             )
         )
     )
