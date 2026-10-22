@@ -31,6 +31,7 @@ from app.modules.pi import (
     industry_packs,
     price_policy,
     problems,
+    safety,
     style,
     taxonomy,
 )
@@ -1128,6 +1129,8 @@ async def brain_problems(
 
     customer = await session.get(Customer, conversation.customer_id)
     context["can_approve"] = bool(customer.can_approve) if customer is not None else True
+    if customer is not None:
+        context["customer_country"] = safety.country_of(customer.phone or customer.whatsapp_id)
     if message is not None:
         context["latest_message_id"] = str(message.id)
     if brief.get("scope_asked") and not brief.get("scope_done"):
@@ -1160,6 +1163,47 @@ def matching_the_person(
         brief["repair_step"] = step
         conversation.service_brief = brief
     return found
+
+
+def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
+    """What must be answered before any model call (spec Part 6): an emergency, a message that is
+    only card or ID details, a "who are you" question, a request for advice pi cannot give. The
+    answers are fixed, in the person's language; the model never sees these turns."""
+    text = str(context.get("latest_customer_message", ""))
+    language = str(context.get("reply_language") or "en")
+    country = context.get("customer_country")
+    pii = context.get("pii") or {}
+
+    def fixed(
+        reply: str,
+        move: flow.State | None = None,
+        effects: list[str] | None = None,
+        brief: dict[str, Any] | None = None,
+        why: str = "",
+    ) -> "ServiceTurn":
+        turn = ServiceTurn(reply=reply, language=language)
+        turn._decision = decisions.Decision(reply, move, brief or {}, effects or [], why=why)
+        lines = [ln for ln in reply.splitlines() if any(c.isdigit() for c in ln)]
+        context["fixed_lines"] = [*context.get("fixed_lines", []), *lines]
+        return turn
+
+    if (kind := safety.emergency(text)) is not None:
+        return fixed(
+            safety.emergency_reply(kind, country, language),
+            flow.State.X_EMERGENCY,
+            ["emergency"],
+            {"emergency": {"kind": kind.value}},
+            "R-EMER",
+        )
+    if pii.get("only"):
+        first = safety.Pii(pii["kinds"][0])
+        table = safety.PII_TEXT.get(language, safety.PII_TEXT["en"])
+        return fixed(pii.get("notice") or table[first], why="R-PRIV-02")
+    if (who := safety.identity_asked(text, constitution.ASKS_IF_AI)) is not None:
+        return fixed(safety.identity_reply(who, language), why="R-DISC")
+    if (advice := safety.advice_asked(text)) is not None:
+        return fixed(safety.advice_reply(advice, language), why="R-ADV")
+    return None
 
 
 def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -1258,6 +1302,13 @@ async def apply_decision(
         await raise_decision_request(
             session, scope, conversation, "review_document", "high",
             "The customer said yes to a solution document and quote for: " + "; ".join(titles),
+        )  # fmt: skip
+    if "emergency" in decision.effects:
+        kind = (decision.brief.get("emergency") or {}).get("kind", "")
+        await raise_decision_request(
+            session, scope, conversation, "other", "high",
+            f"POSSIBLE EMERGENCY ({kind}): the customer wrote about it. Check the chat now. "
+            "pi told them to call the local emergency number and noted nothing else.",
         )  # fmt: skip
     if "request_revision" in decision.effects:
         changes = (brief.get("revision_requested") or {}).get("changes") or []
@@ -1361,7 +1412,10 @@ def advance_flow(conversation: PiConversation, turn: "ServiceTurn", *, noted: bo
     current = flow.parse(conversation.flow_state)
     if current is None:
         return
-    if current == flow.State.X_PAUSED:  # they came back: listen again (R-MEM-03)
+    decided = getattr(turn, "_decision", None)
+    stays = decided is not None and decided.next_state == flow.State.X_EMERGENCY
+    if current in (flow.State.X_PAUSED, flow.State.X_EMERGENCY) and not stays:
+        # They came back (R-MEM-03), or the emergency has passed: listen again.
         current = flow.advance(current, flow.State.S1_LISTENING)
         conversation.flow_state = current.value
         conversation.flow_state_since = datetime.now(UTC)
@@ -2998,6 +3052,8 @@ async def compose_service_turn(
     policy: PiSettings,
     context: dict[str, Any],
 ) -> ServiceTurn:
+    if context.get("pi_mode") == "brain" and (safe := brain_safety(context)) is not None:
+        return safe
     if (
         context.get("latest_message_kind") in (None, "text")
         and english_greeting(str(context.get("latest_customer_message", "")))
@@ -3281,6 +3337,8 @@ async def compose_service_turn(
         not turn.consent_evidence.strip() or turn.consent_evidence not in latest
     ):
         turn.consent = "unchanged"
+    if (context.get("pii") or {}).get("notice"):
+        turn.reply = f"{context['pii']['notice']} {turn.reply}"  # R-PRIV-02: said once
     return turn
 
 

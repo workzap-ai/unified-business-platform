@@ -784,6 +784,18 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 await session.commit()
                 await enqueue_sends(ctx, outbound)
                 return
+        # Brain mode: card, password, ID and account details never reach the model or the log
+        # (R-PRIV-02); the original is kept encrypted for 30 days.
+        pii_guard: dict[str, Any] | None = None
+        if policy.response_rules.get("pi_mode") == "brain":
+            from app.modules.pi import safety
+            from app.modules.pi.safety_guard import guard_inbound
+
+            pii_guard = await guard_inbound(session, scope, ctx["settings"], conversation, message)
+            if pii_guard is not None:
+                body = message.body
+                typed = safety.redact_pii(typed).text
+                await session.commit()
         # 4. Business hours and operator keywords.
         if outside_hours(policy) and policy.business_hours.get("outside_hours") == "handoff_only":
             notice = await hand_off(
@@ -874,6 +886,8 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 # the gate records, and "how do I pay?" is answered from the approved quote.
                 review_intents -= {"payment", "invoice"}
             service_context["typed_message"] = typed[:4000]
+            if pii_guard is not None:
+                service_context["pii"] = pii_guard
             service_context["operator_review_required"] = bool(
                 keyword_handoff or (fast_intent and fast_intent[0] in review_intents)
             )

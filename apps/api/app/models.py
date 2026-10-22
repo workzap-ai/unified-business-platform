@@ -50,6 +50,7 @@ from app.modules.pi.problem_models import (
     PiProblemLink,
     PiProblemRevision,
 )
+from app.modules.pi.quarantine_models import PiQuarantine
 from app.modules.pi_customer.models import (
     CustomerFace,
     CustomerPasskey,
@@ -113,6 +114,7 @@ from app.workflows.models import WorkflowRun
 __all__ = [
     "PiBrainDocument",
     "PiBrainPayment",
+    "PiQuarantine",
     "PiProblem",
     "PiProblemGroup",
     "PiProblemLink",

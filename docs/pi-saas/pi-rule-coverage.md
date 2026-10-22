@@ -17,7 +17,7 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | Rule | What | Status | Where |
 |---|---|---|---|
 | R-DISC-01 | First message says it is an AI | code | linter hard rule + `repair` adds the line; fixed opening in `greeting_reply` |
-| R-DISC-02 | "Are you human?" answered in sentence one | code | linter (English, Roman Urdu, Urdu, Arabic, "admit it") |
+| R-DISC-02 | "Are you human?" answered in sentence one | code | linter plus a fixed pre-model answer (`safety.identity_asked`) |
 | R-DISC-03 | No human name, body, gender, place | code | linter `HUMAN_CLAIM` (persona names, places, family, meals) |
 | R-DISC-04 | No "a human is reading" unless one took over | open | X_HUMAN is not driven by the inbox handover yet (P6) |
 | R-DISC-05 | Re-disclose after 30 days | open | needs last-message age in the opening (P6) |
@@ -37,16 +37,16 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-PAY-06 | A payment screenshot is thanked, never confirmed | code | `decisions` S10: "I paid", "done" or an image/document makes the payment `claimed` and tells staff |
 | R-PAY-07 | Refunds and disputes are noted and escalated | open | P6 |
 | R-PRIV-01 | Never asks for card, password, third-party details | code | linter (see R-PAY-02) |
-| R-PRIV-02 | Sensitive content redacted from records and logs | partial | `problems.redact` on `user_words`; the message log and quarantine are P6 |
+| R-PRIV-02 | Sensitive content redacted from records and logs | code | `safety.redact_pii` + `safety_guard` redact the message log; original encrypted in `pi_quarantine` (0039, 30 days, purged by the sweep); reminder once per kind; card/ID/OTP-only message gets only the reminder |
 | R-PRIV-03 | Never asks for national ID, passport, account numbers | code | linter |
 | R-PRIV-04 | Roles, not third-party names | prompt | |
 | R-PRIV-05 | One contact's chats are never shown to another | code | tenant scope and per-customer records (shared workspaces are open) |
 | R-PRIV-06 | Says what it keeps, honours deletion | open | `request_deletion` (P6) |
 | R-PRIV-07 | Learning only after redaction | open | learning loop not built |
 | R-PRIV-08 | Never pressures for detail | prompt | |
-| R-ADV-01 to 05 | No legal, medical, financial advice; no politics; no off-topic help | prompt | advice classifier is P6 |
-| R-EMER-01 to 04 | Emergency numbers, stop noting, escalate | open | emergency classifier and X_EMERGENCY are P6 |
-| R-META-01 | Not made or endorsed by WhatsApp or Meta | open | P6 (identity answers) |
+| R-ADV-01 to 05 | No legal, medical, financial advice; no politics; no off-topic help | code | `safety.advice_asked` (legal, tax, financial, medical, veterinary) answered with fixed text before the model; politics and off-topic stay prompt |
+| R-EMER-01 to 04 | Emergency numbers, stop noting, escalate | code | `safety.emergency` before the model; fixed reply with local numbers (PK, AE, CA/US, all if unknown); X_EMERGENCY; high-priority staff request; next ordinary message returns to S1 |
+| R-META-01 | Not made or endorsed by WhatsApp or Meta | code | `safety.identity_reply` (person, gender, scam, Meta, model, rules, company) |
 | R-BRAND-01 | Workzap only (never Artwing, a.hub) | code | linter, hard; PDFs use Workzap's letterhead |
 | R-ROUTE-01 to 05 | Every enquiry starts with pi | open | enquiries routing (P6) |
 

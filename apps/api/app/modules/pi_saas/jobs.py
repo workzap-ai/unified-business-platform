@@ -91,6 +91,17 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
         await expire_requests(session)
         await billing.sweep_lifecycle(session)
         await session.commit()
+    # Quarantined originals of messages that held card or ID details are deleted after 30 days.
+    async with ctx["sessions"]() as session:
+        try:
+            from app.modules.pi.safety_guard import purge_expired
+
+            if removed := await purge_expired(session):
+                logger.info("pi_quarantine_purged", extra={"count": removed})
+            await session.commit()
+        except Exception:  # noqa: BLE001 - retried on the next sweep
+            await session.rollback()
+            logger.warning("pi_quarantine_purge_failed")
     # Proposals pi owes a customer whose job never ran or failed.
     async with ctx["sessions"]() as session:
         try:
