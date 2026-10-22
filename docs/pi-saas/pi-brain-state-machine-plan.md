@@ -147,9 +147,12 @@ Learning loop (Part 8) comes after P7 and is out of scope here.
 | P4 documents and quote | done in code, review UI missing | 1de1b6c and later | migration 0037; reviewer API only (`/pi/brain-documents`), no screen yet; sending outside the 24-hour window needs a template (open) |
 | Style profile and repair strategies (spec 8.4.1, 8.4.2) | done | | `style.py`, brain-mode context and a linter length rule |
 | P5 payment and kickoff | done | | migration 0038; approval now ends in S10; claims; staff confirm API; S11 notice; kickoff booking moves to S12; no screen yet |
-| P6 X-states and safety classifiers | done (uncommitted until review) | | migration 0039; emergency, PII redaction + quarantine, advice limits, identity answers; open: opt-out reuse of `note_opt_out`, R-PRIV-06 deletion, escalation reasons |
-| P7 golden conversations G1 to G15 | partly | | G5, G10, G11, G13 covered; see `pi-rule-coverage.md` |
-| Learning loop (Part 8), step A | done | | `learning.py` (reward, never-learn, risk, Thompson bandit, freeze, drift), `pi_experiences` (0040) scored by the sweep, text-free; open: example bank (needs embeddings and the redaction gate), question arms in prompts, lexicon, pack drafting, canary/rollback, settings tuning, Brain dashboard, staff teaching buttons, problem-board image |
+| P6 X-states and safety classifiers | done | | migration 0039; emergency, PII redaction + quarantine, advice limits, identity answers, boundaries (politics, competitors, fake invoices, outcome promises, bank-detail change), enquiry routing, nori facts, Pashto, child details, burst coalescing, real erase (`brain_erase.py`); open: abuse and spam, media handling (6.10) |
+| P7 golden conversations G1 to G15 | mostly | | G1 to G4, G6 to G9, G14, G15 in `test_pi_golden.py`; G5, G10 to G13 in the brain decision and document tests; red-team RT1 to RT28 covered, RT29 needs the served-trades decision (Appendix D) |
+| Learning loop (Part 8), steps A and B | done | | `learning.py` (reward, never-learn, risk, Thompson bandit, freeze, drift), `learning_rules.py` (promotion, lexicon, canary, weekly settings step, pack rules), `pi_experiences` (0040) scored by the sweep, text-free, `/pi/brain-health`; open: the nightly jobs that apply the rules, example bank (needs an embeddings provider and the redaction gate), question arms in prompts, Brain dashboard UI, staff teaching buttons, problem-board image |
+| Staff review screen | done | | `/pi/documents` (approve, edit, new version, send, confirm transfer); not yet seen in a real browser |
+| Follow-ups (3.9.1) | partly | | `followup_policy.py`; silence nudge live in brain mode; later, document and kickoff follow-ups wait for approved WhatsApp templates |
+| Production database | done | | real Neon at 0040_pi_experiences (applied by the user from `migrations-0034-0040.sql`); `pi_mode` still off everywhere |
 
 Production still needs migrations 0034 to 0037 (the real database is at 0033) before `pi_mode` is
 turned on anywhere.
