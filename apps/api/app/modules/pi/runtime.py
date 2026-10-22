@@ -593,6 +593,18 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             event.status = "processed"
             await session.commit()
             return
+        # 1b. A burst (spec 6.10, RT18): when the person has already sent a newer message that is
+        # waiting, this one is kept in the history and the newest one answers them all, once.
+        if policy.response_rules.get("pi_mode") == "brain" and await newer_waiting(
+            session, message
+        ):
+            message.status, message.error_code, event.status = (
+                "skipped",
+                "BURST_COALESCED",
+                "processed",
+            )
+            await session.commit()
+            return
         # 2. Spam / cost / loop limits, counted from durable rows.
         limited = await rate_limited(session, scope, conversation)
         if limited and limited != "RATE_LIMIT_LOOP":
@@ -1551,6 +1563,24 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                     "Outbound delivery could not be confirmed. Review before retrying.",
                 )
         await session.commit()
+
+
+async def newer_waiting(session: Any, message: PiMessage) -> bool:
+    """A later message from this person is already in and not yet answered."""
+    later = await session.scalar(
+        select(PiMessage.id)
+        .where(
+            PiMessage.tenant_id == message.tenant_id,
+            PiMessage.environment_id == message.environment_id,
+            PiMessage.conversation_id == message.conversation_id,
+            PiMessage.direction == "inbound",
+            PiMessage.status == "received",
+            PiMessage.created_at > message.created_at,
+            PiMessage.id != message.id,
+        )
+        .limit(1)
+    )
+    return later is not None
 
 
 async def sweep_pi(ctx: dict[str, Any]) -> None:

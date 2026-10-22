@@ -153,6 +153,7 @@ class Pii(StrEnum):
     ID = "id"
     ACCOUNT = "account"
     CONTACT = "contact"
+    CHILD = "child"
 
 
 @dataclass
@@ -171,6 +172,7 @@ PLACEHOLDER = {
     Pii.ID: "[ID number removed]",
     Pii.ACCOUNT: "[account number removed]",
     Pii.CONTACT: "[contact detail removed]",
+    Pii.CHILD: "[child detail removed]",
 }
 
 CARD = re.compile(r"(?<![\d-])(?:\d[ -]?){13,19}(?![\d-])")
@@ -200,6 +202,14 @@ THIRD_PARTY = re.compile(
     r"(?:number|phone|mobile|cell|whatsapp|email|e-mail|contact)\W{0,3}(?:(?:is|are|hai)\W{0,3})?"
     r"(\+?\d[\d ()-]{7,}\d|[\w.+-]+@[\w-]+\.[\w.-]+)",
     re.IGNORECASE,
+)
+# A child's name ("my son Ali got ...", "my daughter named Sara") and their marks (RT21).
+CHILD_NAME = re.compile(
+    r"\b(?i:my|our|his|her)\s+(?i:son|daughter|child|kid|student|pupil)\s+(?i:named\s+|called\s+)?"
+    r"([A-Z][a-z]{2,})\b(?=\s+(?i:got|gets|scored|is\s+in|studies|has|was|failed|passed|ki|ka)\b|[,.])"
+)
+CHILD_MARKS = re.compile(
+    r"\b(?i:grades?|marks|score[sd]?|got|result)\b[^.\n]{0,15}?(\d{1,3}\s?%|\d{1,3}/\d{2,3}|\b[A-F][+-]?(?=\s|[.,]|$))"
 )
 FILLER_WORDS = re.compile(r"\[[^\]]+removed\]")
 
@@ -259,6 +269,14 @@ def redact_pii(text: str) -> Redaction:
         return match.group().replace(match.group(1), PLACEHOLDER[Pii.CONTACT])
 
     clean = THIRD_PARTY.sub(third, clean)
+
+    def child(match: re.Match[str]) -> str:
+        add(Pii.CHILD)
+        return match.group().replace(match.group(1), PLACEHOLDER[Pii.CHILD])
+
+    if CHILD_NAME.search(clean):  # marks only count when the talk is about someone's child
+        clean = CHILD_NAME.sub(child, clean)
+        clean = CHILD_MARKS.sub(child, clean)
     return Redaction(clean, kinds)
 
 
@@ -274,6 +292,7 @@ PII_TEXT = {
         Pii.ID: "Please don't send ID numbers here. I don't need them. I've left that out of my notes.",
         Pii.ACCOUNT: "Please don't send bank account numbers here. I don't need them, and bank details only ever come on an approved quote. I've left that out of my notes.",
         Pii.CONTACT: "I don't need other people's contact details here. They can message me directly if they'd like. I've left that out of my notes.",
+        Pii.CHILD: "Please don't share children's names or grades here. I only need the business problem, for example how results are tracked. I've left that out of my notes.",
     },
     "roman_ur": {
         Pii.CARD: "Meherbani karke yahan card number na bhejein. Mujhe in ki zaroorat nahi, aur payment is chat mein kabhi nahi hoti. Maine ise apne notes se nikaal diya hai.",
@@ -281,6 +300,7 @@ PII_TEXT = {
         Pii.ID: "Meherbani karke yahan ID number na bhejein. Mujhe in ki zaroorat nahi. Maine ise apne notes se nikaal diya hai.",
         Pii.ACCOUNT: "Meherbani karke yahan bank account number na bhejein. Mujhe in ki zaroorat nahi, bank details sirf approved quote par aati hain. Maine ise apne notes se nikaal diya hai.",
         Pii.CONTACT: "Mujhe doosron ki contact details ki zaroorat nahi. Wo chahein to mujhe seedha message kar sakte hain. Maine ise apne notes se nikaal diya hai.",
+        Pii.CHILD: "Meherbani karke yahan bachon ke naam ya marks na bhejein. Mujhe sirf business ka masla chahiye, masalan natayej ka hisaab kaise rakha jata hai. Maine ise apne notes se nikaal diya hai.",
     },
 }
 
@@ -407,9 +427,18 @@ class Identity(StrEnum):
     MODEL = "model"
     RULES = "rules"
     COMPANY = "company"
+    OFFER = "offer"
 
 
 IDENTITY_PATTERNS: tuple[tuple[Identity, re.Pattern[str]], ...] = (
+    (
+        Identity.OFFER,
+        re.compile(
+            r"\b(?:what (?:do|does) (?:you|workzap) (?:sell|offer|do)|what (?:is|are) (?:workzap|your)"
+            r"(?:'s)? (?:product|service|offer)s?|aap kya (?:bechte|karte|dete)|kya bechte ho)\b",
+            re.IGNORECASE,
+        ),
+    ),
     (
         Identity.RULES,
         re.compile(
@@ -467,6 +496,7 @@ IDENTITY_TEXT = {
         Identity.MODEL: "I'm pi, Workzap's AI. I'm here to note and sort problems in your business.",
         Identity.RULES: "I can tell you how I work: I note and sort problems, I never take payment here, and you decide on any quote. The full detail is at workzap.ai/pi/how-it-works.",
         Identity.COMPANY: "I can pass that question to the Workzap team.",
+        Identity.OFFER: "Workzap builds software for businesses. I'm not here to sell anything: I note what's getting in the way of yours, and if you want, Workzap can then prepare a solution document. What's the biggest thing right now?",
     },
     "roman_ur": {
         Identity.PERSON: "Main AI hoon, insaan nahi. Main pi hoon, Workzap ki taraf se.",
@@ -476,6 +506,7 @@ IDENTITY_TEXT = {
         Identity.MODEL: "Main pi hoon, Workzap ka AI. Main aap ke business ke masail note aur sort karne ke liye hoon.",
         Identity.RULES: "Main bata sakta hoon main kaise kaam karta hoon: masail note aur sort karta hoon, yahan kabhi payment nahi leta, aur quote par faisla aap ka hota hai. Poori tafseel workzap.ai/pi/how-it-works par hai.",
         Identity.COMPANY: "Ye sawal main Workzap ki team tak pahuncha sakta hoon.",
+        Identity.OFFER: "Workzap businesses ke liye software banata hai. Main kuch bechne nahi aaya: main aap ke business ki rukawat note karta hoon, aur aap chahein to Workzap phir solution document bana sakta hai. Abhi sab se bada masla kya hai?",
     },
 }
 
@@ -707,3 +738,18 @@ def enquiry_asked(text: str) -> Enquiry | None:
 
 def enquiry_reply(kind: Enquiry, language: str | None) -> str:
     return ENQUIRY_TEXT.get(language or "en", ENQUIRY_TEXT["en"])[kind]
+
+
+# --- a language pi cannot read yet (RT19): graceful, never mocking ---------------------------------
+
+PASHTO_LETTERS = re.compile("[\u067c\u0689\u0693\u0696\u069a\u06bc\u06cd\u06d0]")
+UNSUPPORTED_TEXT = (
+    "I can't read Pashto well yet, and I'd rather not guess. Please write to me in English or "
+    "Urdu (Roman or script) and I'll note everything you tell me. "
+    "Main abhi Pashto theek se nahi padh sakta. Meherbani karke English ya Urdu mein likhein."
+)
+
+
+def unsupported_language(text: str) -> bool:
+    """Pashto, which uses letters Urdu does not: two or more of them in the message."""
+    return len(PASHTO_LETTERS.findall(text or "")) >= 2

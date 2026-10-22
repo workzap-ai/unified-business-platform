@@ -157,7 +157,8 @@ ASKED_FOR_HELP = re.compile(
     r"\b(?:solution|fix|solve|build|quote|price|pricing|cost|how much|proposal|what can you do|"
     r"can you help|can you fix|what would you build|kya kar sakte|kitna|qeemat|hal|"
     r"can you (?:make|create|develop|build|set up)|(?:make|build|create) (?:me )?an? "
-    r"(?:app|system|software|website|tool)|app for this|kharcha|kharch)\b",
+    r"(?:app|system|software|website|tool)|app for this|kharcha|kharch|"
+    r"what (?:do|does) (?:you|workzap) (?:sell|offer|do)|your (?:products?|services?))\b",
     re.IGNORECASE,
 )
 

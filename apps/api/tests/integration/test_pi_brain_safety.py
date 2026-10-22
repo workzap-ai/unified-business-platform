@@ -146,3 +146,74 @@ async def test_a_demo_request_is_routed_to_the_team_not_noted_as_a_problem(
     [request] = (await business_db.scalars(select(PiStaffRequest))).all()
     assert "demo_request" in request.question
     await pi.close()
+
+
+async def test_an_older_message_stays_silent_when_a_newer_one_is_waiting(
+    api, business_db, monkeypatch
+):  # RT18: one answer to a burst
+    from datetime import UTC, datetime, timedelta
+
+    from app.modules.pi.models import PiMessage
+    from app.modules.pi.runtime import newer_waiting, process_pi_event
+
+    pi, prompts = await chat(api, business_db, monkeypatch)
+    await say(pi, "stock runs out", "bu-0")
+    conversation = await pi.conversation()
+    assert (await pi.inbound("also the cashiers are late", "bu-1")).status_code == 200
+    older_job = pi.app.state.queue.jobs[-1][1]
+    # A newer message from the same person is already in and waiting for its own job.
+    newer = PiMessage(
+        tenant_id=conversation.tenant_id,
+        environment_id=conversation.environment_id,
+        conversation_id=conversation.id,
+        direction="inbound",
+        sender_type="customer",
+        message_type="text",
+        body="and the cash does not match",
+        provider_message_id="bu-2",
+        status="received",
+        created_at=datetime.now(UTC) + timedelta(seconds=30),
+    )
+    business_db.add(newer)
+    await business_db.commit()
+    before = len([m for m in await pi.outbound()])
+    await process_pi_event(pi.ctx, *older_job)
+    older = (
+        await business_db.scalars(select(PiMessage).where(PiMessage.provider_message_id == "bu-1"))
+    ).one()
+    assert older.status == "skipped" and older.error_code == "BURST_COALESCED"
+    assert len(await pi.outbound()) == before  # no reply to the older message
+    assert await newer_waiting(business_db, older) is True
+    assert await newer_waiting(business_db, newer) is False
+    await pi.close()
+
+
+@pytest.mark.parametrize(
+    ("said", "expected"),
+    [
+        ("so what do you sell?", "I'm not here to sell anything"),  # RT11
+        ("زه ډېر ښه یم او زما دوکان ټول ورځ ګډوډ دی", "can't read Pashto well yet"),  # RT19
+    ],
+)
+async def test_what_do_you_sell_and_pashto_get_fixed_answers_without_the_model(
+    api, business_db, monkeypatch, said, expected
+):
+    pi, prompts = await chat(api, business_db, monkeypatch)
+    await say(pi, said, "rt-1")
+    assert expected in (await pi.reply_to("rt-1")).body
+    assert prompts == []
+    await pi.close()
+
+
+async def test_a_childs_name_and_grades_are_redacted_and_not_stored(api, business_db, monkeypatch):
+    from app.modules.pi.models import PiMessage
+
+    pi, prompts = await chat(api, business_db, monkeypatch)  # RT21
+    await say(pi, "Stock runs out. My son Ali got 85% in maths this term", "ch-1")
+    assert "children's names or grades" in (await pi.reply_to("ch-1")).body
+    stored = (
+        await business_db.scalars(select(PiMessage).where(PiMessage.provider_message_id == "ch-1"))
+    ).one()
+    assert "Ali" not in stored.body and "85%" not in stored.body
+    assert all("Ali" not in str(p) for p in prompts)
+    await pi.close()

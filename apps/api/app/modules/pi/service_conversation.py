@@ -1221,6 +1221,8 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
             {"emergency": {"kind": kind.value}},
             "R-EMER",
         )
+    if safety.unsupported_language(text):
+        return fixed(safety.UNSUPPORTED_TEXT, why="RT19")
     if pii.get("only"):
         first = safety.Pii(pii["kinds"][0])
         table = safety.PII_TEXT.get(language, safety.PII_TEXT["en"])
