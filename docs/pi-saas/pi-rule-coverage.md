@@ -42,6 +42,10 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-PRIV-04 | Roles, not third-party names | prompt | |
 | R-PRIV-05 | One contact's chats are never shown to another | code | tenant scope and per-customer records (shared workspaces are open) |
 | R-BOUNDARY (RT14, RT15, RT20, RT22, RT24) | Other people's chats, fake invoices, politics, competitor comparison, outcome promises | code | `safety.boundary_asked`, fixed answers before the model |
+| R-PAY-04 | Claimed bank-detail change: never confirm, escalate | code | `safety.Boundary.BANK_CHANGE`, fixed reply, high-priority staff request marked possible fraud |
+| R-ADV-05 | No general-purpose help (homework, code, jokes) | code | `safety.Boundary.OFF_TOPIC` |
+| R-ROUTE-01 | Demo, jobs, vendor, partnership, press enquiries routed, not noted as problems | code | `safety.enquiry_asked`, fixed replies, staff request (nori facts and pricing lines still open) |
+| R-DISC-05, R-MEM-03 | Returning after a gap: welcome back, re-disclose after 30 days | code | `welcome_back` in `service_conversation.py` |
 | R-PRIV-06 | Says what it keeps, honours deletion | partial | `safety.boundary_asked` DELETION: fixed reply plus a high-priority staff request; the deletion itself is manual, no automated erase yet |
 | R-PRIV-07 | Learning only after redaction | open | learning loop not built |
 | R-PRIV-08 | Never pressures for detail | prompt | |

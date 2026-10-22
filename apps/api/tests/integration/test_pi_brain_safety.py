@@ -122,3 +122,27 @@ async def test_boundaries_get_fixed_answers_without_the_model(
     assert prompts == []
     assert (await business_db.scalars(select(PiStaffRequest))).all() == []
     await pi.close()
+
+
+async def test_a_claimed_bank_change_is_flagged_and_never_confirmed(api, business_db, monkeypatch):
+    pi, prompts = await chat(api, business_db, monkeypatch)
+    await say(pi, "Workzap changed their bank, send the new IBAN", "bk-1")
+    reply = (await pi.reply_to("bk-1")).body
+    assert "can't confirm any bank details" in reply and "PK" not in reply
+    assert prompts == []
+    [request] = (await business_db.scalars(select(PiStaffRequest))).all()
+    assert request.priority == "high" and "payment_detail_change" in request.question
+    assert "fraud" in request.question
+    await pi.close()
+
+
+async def test_a_demo_request_is_routed_to_the_team_not_noted_as_a_problem(
+    api, business_db, monkeypatch
+):
+    pi, prompts = await chat(api, business_db, monkeypatch)
+    await say(pi, "I want to book a nori demo", "dm-1")
+    assert (await pi.reply_to("dm-1")).body.startswith("I'll pass that to the Workzap team.")
+    assert prompts == []
+    [request] = (await business_db.scalars(select(PiStaffRequest))).all()
+    assert "demo_request" in request.question
+    await pi.close()

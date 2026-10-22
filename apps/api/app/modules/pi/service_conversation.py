@@ -1140,7 +1140,21 @@ async def brain_problems(
         if quote is not None:
             context["open_quote"] = quote
     context.update(matching_the_person(conversation, message, rows or []))
+    if away := days_away(message, rows or []):
+        context["days_away"] = away
     return context
+
+
+def days_away(message: PiMessage | None, rows: list[PiMessage]) -> int:
+    """Whole days between the person's previous message and this one (0 when unknown)."""
+    if message is None or message.created_at is None:
+        return 0
+    before = [
+        m.created_at
+        for m in rows
+        if m.sender_type == "customer" and m.id != message.id and m.created_at is not None
+    ]
+    return max(0, (message.created_at - max(before)).days) if before else 0
 
 
 def matching_the_person(
@@ -1207,8 +1221,21 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
         return fixed(
             safety.boundary_reply(limit, language),
             None,
-            ["deletion_request"] if limit == safety.Boundary.DELETION else [],
+            ["deletion_request"]
+            if limit == safety.Boundary.DELETION
+            else ["escalate"]
+            if limit == safety.Boundary.BANK_CHANGE
+            else [],
+            {"escalate": "payment_detail_change"} if limit == safety.Boundary.BANK_CHANGE else {},
             why="R-BOUNDARY",
+        )
+    if (lead := safety.enquiry_asked(text)) is not None:
+        return fixed(
+            safety.enquiry_reply(lead, language),
+            None,
+            ["escalate"],
+            {"escalate": lead.value},
+            why="R-ROUTE-01",
         )
     return None
 
@@ -1317,6 +1344,19 @@ async def apply_decision(
             f"POSSIBLE EMERGENCY ({kind}): the customer wrote about it. Check the chat now. "
             "pi told them to call the local emergency number and noted nothing else.",
         )  # fmt: skip
+    if "escalate" in decision.effects:
+        reason = str(decision.brief.get("escalate") or "other")
+        fraud = reason == "payment_detail_change"
+        await raise_decision_request(
+            session,
+            scope,
+            conversation,
+            "other",
+            "high",
+            f"ENQUIRY ({reason}): pi gave the fixed line and noted nothing as a problem. "
+            "Please pick it up."
+            + (" Possible payment fraud: do not confirm any new bank details." if fraud else ""),
+        )
     if "deletion_request" in decision.effects:
         await raise_decision_request(
             session,
@@ -3019,9 +3059,56 @@ def team_summary(turn: ServiceTurn) -> str:
     return "\n".join(lines)[:4000]
 
 
+WELCOME_BACK = {
+    "en": (
+        "{who}Welcome back. Last time you told me about {n} {things}{mostly}. "
+        "Want to add to those, or is something new going on?"
+    ),
+    "roman_ur": (
+        "{who}Dobara khush amdeed. Pichli baar aap ne {n} {things} bataye the{mostly}. "
+        "Un mein kuch add karna hai, ya kuch naya hua hai?"
+    ),
+}
+
+
+def welcome_back(context: dict[str, Any]) -> str | None:
+    """Brain mode, a returning person who already has problems noted (R-MEM-03). After more than
+    30 days pi says again who it is (R-DISC-05). Nothing is asked that pi already knows."""
+    if context.get("pi_mode") != "brain":
+        return None
+    noted = context.get("noted_problems") or []
+    if not noted or not any(h.get("role") == "ai" for h in context.get("history") or []):
+        return None
+    if int(context.get("days_away") or 0) < 1:  # only after a gap, not mid-chat
+        return None
+    brief = context.get("brief") or {}
+    if brief.get("payment_notice_due") or (context.get("open_quote") or None):
+        return None
+    lang = "roman_ur" if context.get("reply_language") == "roman_ur" else "en"
+    groups = [p.get("group") for p in noted if p.get("group")]
+    top = max(set(groups), key=groups.count) if groups else None
+    mostly = ""
+    if top and len(set(groups)) > 1 and groups.count(top) * 2 >= len(groups):
+        word = taxonomy.label(top, lang).lower()
+        mostly = f", mostly {word}" if lang == "en" else f", zyada tar {word}"
+    who = ""
+    if int(context.get("days_away") or 0) > 30:
+        who = (
+            "Hi, it's pi, the AI from Workzap. "
+            if lang == "en"
+            else "Hi, main pi hoon, Workzap ka AI. "
+        )
+    else:
+        who = "Hi. " if lang == "en" else "Salam. "
+    things = ("problem" if len(noted) == 1 else "problems") if lang == "en" else "masail"
+    return WELCOME_BACK[lang].format(who=who, n=len(noted), things=things, mostly=mostly)
+
+
 def greeting_reply(context: dict[str, Any]) -> str:
     """pi's answer to a plain "Hi": who it is the first time; for a returning customer
     with something still open, an offer to carry on with it (pi remembers)."""
+    if returning := welcome_back(context):
+        return returning
     if not any(h.get("role") == "ai" for h in context.get("history") or []):
         if context.get("pi_mode") == "brain":  # the fixed opening (R-DISC-01)
             return flow.OPENING["roman_ur" if context.get("reply_language") == "roman_ur" else "en"]

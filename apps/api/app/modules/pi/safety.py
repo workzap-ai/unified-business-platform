@@ -507,6 +507,8 @@ class Boundary(StrEnum):
     OUTCOME = "outcome"
     FRAUD = "fraud"
     THIRD_PARTY = "third_party"
+    BANK_CHANGE = "bank_change"
+    OFF_TOPIC = "off_topic"
 
 
 BOUNDARY_PATTERNS: tuple[tuple[Boundary, re.Pattern[str]], ...] = (
@@ -517,6 +519,24 @@ BOUNDARY_PATTERNS: tuple[tuple[Boundary, re.Pattern[str]], ...] = (
             r"erase (?:everything|all|my (?:data|chats?|records?))|forget (?:everything|all about me)|"
             r"remove (?:all )?my (?:data|information)|mera (?:sab )?(?:data|record) (?:delete|mita)|"
             r"sab (?:kuch )?delete kar do)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.BANK_CHANGE,
+        re.compile(
+            r"\b(?:(?:new|changed?|different|updated?) (?:bank|account|iban)(?: details| account| number)?"
+            r"[^.?!]{0,40}(?:workzap|you|your)|workzap[^.?!]{0,30}(?:changed|new) (?:their )?(?:bank|account|iban)|"
+            r"send (?:me )?(?:the )?new (?:iban|account|bank)|bank (?:details|account) (?:have|has) changed)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.OFF_TOPIC,
+        re.compile(
+            r"\b(?:(?:help|write|do) (?:me )?(?:with )?(?:my |an? |the )?(?:homework|assignment|essay|poem|"
+            r"python|javascript|code|script|resume|cv)\b|tell me a (?:joke|story)|write (?:me )?(?:a |an )?"
+            r"(?:poem|song|joke|story)|solve this (?:equation|math|problem set))",
             re.IGNORECASE,
         ),
     ),
@@ -577,6 +597,8 @@ BOUNDARY_TEXT = {
         Boundary.OUTCOME: "I can't promise results. I can note the problem and Workzap can describe what it would do about it. What's the problem?",
         Boundary.FRAUD: "I can't help with false invoices or hiding income. If tracking real invoices is hard in your business, I can note that as a problem. Want me to?",
         Boundary.THIRD_PARTY: "I can't share anyone else's chats. I only keep what you tell me in this chat. What would you like to note about your business?",
+        Boundary.BANK_CHANGE: "I can't confirm any bank details in this chat. Payment details are only on your approved quote, and I've flagged your message to the Workzap team to check.",
+        Boundary.OFF_TOPIC: "That's outside what I'm for. I'm here to note what's getting in the way of your business. What's the biggest thing right now?",
     },
     "roman_ur": {
         Boundary.DELETION: "Aap ka data delete karne ki darkhwast maine Workzap ki team ko bhej di hai. Wo yahan tasdeeq kar dein ge, aur tab tak main kuch naya note nahi karunga.",
@@ -585,6 +607,8 @@ BOUNDARY_TEXT = {
         Boundary.OUTCOME: "Main nateejon ka wada nahi kar sakta. Main masla note kar sakta hoon aur Workzap bata sakta hai wo kya karega. Masla kya hai?",
         Boundary.FRAUD: "Main jali invoice ya aamdani chupane mein madad nahi kar sakta. Agar asli invoices ka hisaab rakhna mushkil hai to ise masla note kar sakta hoon. Kya karun?",
         Boundary.THIRD_PARTY: "Main kisi aur ki chat share nahi kar sakta. Main sirf wo rakhta hoon jo aap is chat mein batate hain. Business ke baare mein kya note karun?",
+        Boundary.BANK_CHANGE: "Main is chat mein bank details ki tasdeeq nahi kar sakta. Payment ki tafseel sirf aap ke approved quote par hoti hai, aur maine aap ka paigham Workzap ki team ko check ke liye bhej diya hai.",
+        Boundary.OFF_TOPIC: "Ye mere dayre se bahar hai. Main aap ke business mein rukawat note karne ke liye hoon. Abhi sab se bada masla kya hai?",
     },
 }
 
@@ -599,3 +623,87 @@ def boundary_asked(text: str) -> Boundary | None:
 
 def boundary_reply(kind: Boundary, language: str | None) -> str:
     return BOUNDARY_TEXT.get(language or "en", BOUNDARY_TEXT["en"])[kind]
+
+
+# --- enquiries that are not problems: pi is Workzap's front door (R-ROUTE-01, spec 6.9) ----------
+
+
+class Enquiry(StrEnum):
+    DEMO = "demo_request"
+    JOBS = "jobs"
+    VENDOR = "vendor"
+    PARTNERSHIP = "partnership"
+    PRESS = "press"
+
+
+ENQUIRY_PATTERNS: tuple[tuple[Enquiry, re.Pattern[str]], ...] = (
+    (
+        Enquiry.PRESS,
+        re.compile(
+            r"\b(?:journalist|press (?:release|enquiry|inquiry)|media (?:enquiry|inquiry|request)|"
+            r"interview (?:with|you|workzap)|write (?:an )?article about (?:you|workzap|nori))\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Enquiry.DEMO,
+        re.compile(
+            r"\b(?:(?:book|arrange|schedule|request|want|need|get)(?: me)?(?: a| an)? (?:nori )?demo|"
+            r"demo (?:of|for) nori|nori demo)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Enquiry.JOBS,
+        re.compile(
+            r"\b(?:job application|apply for (?:a |the )?(?:job|position|role)|are you hiring|"
+            r"any (?:vacancy|vacancies|openings)|attached (?:is )?my (?:cv|resume)|my (?:cv|resume) (?:is|for)|"
+            r"looking for (?:a )?job)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Enquiry.PARTNERSHIP,
+        re.compile(
+            r"\b(?:partner(?:ship)? with (?:you|workzap|nori)|reseller|resell (?:nori|workzap)|"
+            r"become (?:a )?(?:partner|distributor)|collaborat\w+ with (?:you|workzap))\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Enquiry.VENDOR,
+        re.compile(
+            r"\b(?:we (?:can )?(?:supply|offer|provide) (?:you|workzap)|our (?:company|agency) (?:offers|provides|supplies)|"
+            r"offer(?:ing)? you our (?:services|products)|we are (?:a )?(?:supplier|vendor|agency) (?:of|for|that))\b",
+            re.IGNORECASE,
+        ),
+    ),
+)
+ENQUIRY_TEXT = {
+    "en": {
+        Enquiry.DEMO: "I'll pass that to the Workzap team. How many shops do you have, roughly?",
+        Enquiry.JOBS: "Thanks. I'll pass your interest to the Workzap team. Please don't send ID documents here.",
+        Enquiry.VENDOR: "Thanks. I'll pass it to the Workzap team.",
+        Enquiry.PARTNERSHIP: "Thanks. I'll pass that to the Workzap team. Which company is this, and in which country?",
+        Enquiry.PRESS: "I'll pass that to the Workzap team. I can't give quotes or statements.",
+    },
+    "roman_ur": {
+        Enquiry.DEMO: "Main ye Workzap ki team tak pahuncha deta hoon. Aap ki roughly kitni dukanein hain?",
+        Enquiry.JOBS: "Shukriya. Main aap ki dilchaspi Workzap ki team tak pahuncha deta hoon. Meherbani karke yahan ID documents na bhejein.",
+        Enquiry.VENDOR: "Shukriya. Main ye Workzap ki team tak pahuncha deta hoon.",
+        Enquiry.PARTNERSHIP: "Shukriya. Main ye Workzap ki team tak pahuncha deta hoon. Ye kaun si company hai, aur kis mulk mein?",
+        Enquiry.PRESS: "Main ye Workzap ki team tak pahuncha deta hoon. Main koi quote ya bayan nahi de sakta.",
+    },
+}
+
+
+def enquiry_asked(text: str) -> Enquiry | None:
+    said = " ".join((text or "").split())
+    for kind, pattern in ENQUIRY_PATTERNS:
+        if pattern.search(said):
+            return kind
+    return None
+
+
+def enquiry_reply(kind: Enquiry, language: str | None) -> str:
+    return ENQUIRY_TEXT.get(language or "en", ENQUIRY_TEXT["en"])[kind]
