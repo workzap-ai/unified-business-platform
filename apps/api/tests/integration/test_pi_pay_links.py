@@ -196,9 +196,7 @@ async def test_manual_payment_pay_link_rate_limit(api: httpx.AsyncClient, busine
     # (module-global, since the limiter fails open for 30s after a connection error).
     rate_limit._redis_down_until = 0.0
     async with _anon_client(ctx["app"]) as anon:
-        statuses = [
-            (await anon.get(f"/api/v1/pi-app/pay/{token}")).status_code for _ in range(31)
-        ]
+        statuses = [(await anon.get(f"/api/v1/pi-app/pay/{token}")).status_code for _ in range(31)]
     assert statuses.count(429) == 1 and statuses[-1] == 429
     assert all(s == 200 for s in statuses[:30])
 

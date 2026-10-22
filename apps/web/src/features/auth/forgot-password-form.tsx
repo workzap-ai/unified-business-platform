@@ -71,8 +71,8 @@ export function ForgotPasswordForm() {
         Reset your password
       </h1>
       <p className="mt-1.5 text-sm text-muted-foreground">
-        Enter the email on your account and we&rsquo;ll send a link to choose
-        a new password.
+        Enter the email on your account and we&rsquo;ll send a link to choose a
+        new password.
       </p>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
@@ -105,7 +105,10 @@ export function ForgotPasswordForm() {
       </form>
       <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-sm text-muted-foreground">
         <ArrowLeft className="size-3.5" aria-hidden="true" />
-        <Link href="/login" className="font-medium text-primary hover:underline">
+        <Link
+          href="/login"
+          className="font-medium text-primary hover:underline"
+        >
           Back to sign in
         </Link>
       </p>

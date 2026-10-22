@@ -200,9 +200,7 @@ async def add_member(owner: Actor, role_keys: list[str], password: str = PASSWOR
     )
     token = created["invite_link"].split("token=")[1]
     saved_cookies = dict(owner.client.cookies)
-    accepted = await owner.post(
-        "auth/accept-invite", {"token": token, "new_password": password}
-    )
+    accepted = await owner.post("auth/accept-invite", {"token": token, "new_password": password})
     assert accepted.status_code == 201, accepted.text
     owner.client.cookies.clear()
     owner.client.cookies.update(saved_cookies)

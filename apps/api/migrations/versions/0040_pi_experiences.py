@@ -4,8 +4,8 @@ Revision ID: 0040_pi_experiences
 Revises: 0039_pi_quarantine
 """
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
 
 revision = "0040_pi_experiences"

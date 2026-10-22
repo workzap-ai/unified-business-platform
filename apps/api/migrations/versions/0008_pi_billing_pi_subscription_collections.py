@@ -4,8 +4,8 @@ Revision ID: 0008_pi_billing
 Revises: 0007_pi_saas
 """
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
 
 revision = "0008_pi_billing"

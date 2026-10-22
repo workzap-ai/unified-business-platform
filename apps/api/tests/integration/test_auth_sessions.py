@@ -378,9 +378,7 @@ async def test_forgot_password_is_silent_about_account_existence_and_only_emails
         owner = await stack.register(browser)
     captured_emails.clear()  # drop the sign-up verification email; not what this test checks
     async with stack.browser() as anon:
-        known = await anon.post(
-            "/api/v1/auth/forgot-password", json={"email": owner.email.upper()}
-        )
+        known = await anon.post("/api/v1/auth/forgot-password", json={"email": owner.email.upper()})
         unknown = await anon.post(
             "/api/v1/auth/forgot-password", json={"email": f"{unique('nobody')}@example.com"}
         )
@@ -481,9 +479,7 @@ async def test_member_invite_sets_a_placeholder_credential_nobody_knows(stack):
         assert created["invite_link"] and "token=" in created["invite_link"]
     async with stack.browser() as anon:
         # Nobody can sign in until the invite is accepted; there is no password to guess.
-        guess = await anon.post(
-            "/api/v1/auth/login", json={"email": email, "password": PASSWORD}
-        )
+        guess = await anon.post("/api/v1/auth/login", json={"email": email, "password": PASSWORD})
         assert guess.status_code == 401
         token = created["invite_link"].split("token=")[1]
         accepted = await anon.post(

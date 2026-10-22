@@ -31,15 +31,13 @@ async function workspace(page: Page, role = "owner") {
       : [];
   const drafts: Record<string, unknown>[] = [];
   const decisions: string[] = [];
-  await page
-    .context()
-    .addCookies([
-      {
-        name: "platform_csrf",
-        value: "test-csrf",
-        url: "http://127.0.0.1:3337",
-      },
-    ]);
+  await page.context().addCookies([
+    {
+      name: "platform_csrf",
+      value: "test-csrf",
+      url: "http://127.0.0.1:3337",
+    },
+  ]);
   await page.route("**/api/v1/**", async (route) => {
     const path = new URL(route.request().url()).pathname.replace("/api/v1", "");
     const method = route.request().method();
@@ -203,15 +201,13 @@ test("CSV upload creates a reviewable draft and cancellation does not confirm", 
 }) => {
   const state = await workspace(page);
   await page.getByLabel("Upload purpose").selectOption("employees");
-  await page
-    .getByLabel("Upload document", { exact: true })
-    .setInputFiles({
-      name: "staff.csv",
-      mimeType: "text/csv",
-      buffer: Buffer.from(
-        "full_name,job_title,employment_type,hire_date\nCSV Employee,Engineer,full_time,2026-10-01",
-      ),
-    });
+  await page.getByLabel("Upload document", { exact: true }).setInputFiles({
+    name: "staff.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(
+      "full_name,job_title,employment_type,hire_date\nCSV Employee,Engineer,full_time,2026-10-01",
+    ),
+  });
   await expect(page.getByText("Employee import preview ready.")).toBeVisible();
   await page.getByRole("button", { name: "Cancel draft" }).click();
   await expect(page.getByText("Draft cancelled.")).toBeVisible();

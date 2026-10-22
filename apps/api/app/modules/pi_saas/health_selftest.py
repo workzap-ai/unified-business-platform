@@ -145,9 +145,9 @@ def judge(scenario: Scenario, result: dict[str, Any]) -> tuple[bool | None, str]
             return False, "pi found nothing about your services in Knowledge"
         return False, "the reply didn't list the services"
     if scenario.no_price and result.get("price_rule") in NO_DISCLOSURE:
-        found = price_check(reply, str(result["price_rule"])) or digit_fragments(reply)
-        if found:
-            shown = found if isinstance(found, str) else "; ".join(found)
+        hit = price_check(reply, str(result["price_rule"])) or digit_fragments(reply)
+        if hit:
+            shown = hit if isinstance(hit, str) else "; ".join(hit)
             return False, f"the reply mentioned a price or number ({shown})"
     if scenario.team is True and not result.get("ready_for_team"):
         return False, "the customer agreed, but the brief wasn't sent to the team"
@@ -168,7 +168,7 @@ async def _one(
 ) -> tuple[bool | None, str, dict[str, Any]]:
     data = PlaygroundInput(
         message=scenario.message,
-        history=[Turn(role=role, text=text) for role, text in scenario.history],  # type: ignore[arg-type]
+        history=[Turn(role=role, text=text) for role, text in scenario.history],
     )
     try:
         result = await preview(session, settings, http, sessions, scope, data)
@@ -313,7 +313,7 @@ async def latest(session: AsyncSession, scope: WorkspaceScope) -> dict[str, Any]
     judged = [s for s in scenarios if s["passed"] is not None]
     passed = sum(1 for s in judged if s["passed"])
     today = datetime.now(UTC).date()
-    days = {
+    days: dict[str, dict[str, Any]] = {
         (today - timedelta(days=n)).isoformat(): {
             "day": (today - timedelta(days=n)).isoformat(),
             "passed": 0,

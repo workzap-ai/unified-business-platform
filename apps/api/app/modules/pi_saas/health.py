@@ -1213,7 +1213,9 @@ async def trends(session: AsyncSession, scope: WorkspaceScope) -> list[dict[str,
     return list(days.values())
 
 
-async def state(session: AsyncSession, scope: WorkspaceScope, settings: Any = None) -> dict:
+async def state(
+    session: AsyncSession, scope: WorkspaceScope, settings: Any = None
+) -> dict[str, Any]:
     from app.modules.pi_saas.health_selftest import latest
 
     checks = await run_checks(session, scope, settings)
@@ -1433,7 +1435,9 @@ async def _refresh_maps(session: AsyncSession, scope: WorkspaceScope, ctx: Conte
         await session.commit()
 
 
-async def heal_scope(session: AsyncSession, scope: WorkspaceScope, ctx: Context) -> list[dict]:
+async def heal_scope(
+    session: AsyncSession, scope: WorkspaceScope, ctx: Context
+) -> list[dict[str, Any]]:
     """The safe automatic fixes for one business. Each runs in its own savepoint, so one
     failure never stops the rest."""
     for fix in (_requeue_messages, _requeue_events, _requeue_documents, _draft_answers):

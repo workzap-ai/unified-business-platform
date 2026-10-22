@@ -606,9 +606,7 @@ async def test_connecting_requires_integration_management(business_db, api):
         await pi.close()
 
 
-async def test_a_working_calendar_is_not_hidden_by_a_newer_unfinished_attempt(
-    api, business_db
-):
+async def test_a_working_calendar_is_not_hidden_by_a_newer_unfinished_attempt(api, business_db):
     pi, remote, _, _ = await _booking_setup(api, business_db)
     try:
         working = await _connection(
