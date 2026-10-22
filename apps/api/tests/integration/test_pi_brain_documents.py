@@ -23,6 +23,20 @@ from app.modules.pi_saas.models import PiStaffRequest
 pytestmark = pytest.mark.integration
 
 DOCS = "/api/v1/pi/brain-documents"
+
+
+@pytest.fixture(autouse=True)
+def roomy_limits(monkeypatch):
+    """A whole journey (offer, approval, payment) is more than eight messages a minute."""
+    from datetime import timedelta
+
+    from app.modules.pi import guard
+
+    for name in ("CONVERSATION_BURST", "AI_REPLY_LOOP"):
+        current = getattr(guard, name)
+        monkeypatch.setattr(guard, name, guard.Limit(current.code, 500, timedelta(minutes=1)))
+
+
 OPENING = "Hi, I'm pi, an AI from Workzap."
 
 
@@ -318,7 +332,7 @@ async def test_approval_after_reading_needs_two_confirmations_on_the_real_quote(
     assert (await pi.reply_to("dc-7")).body == decisions.text("approved", "en")
     conversation = await pi.conversation()
     await business_db.refresh(conversation)
-    assert conversation.flow_state == "S9_APPROVED"
+    assert conversation.flow_state == "S10_AWAITING_PAYMENT"
     assert conversation.service_brief["approval"]["quote"] == "Q-0001"
     approve = (
         await business_db.scalars(select(PiStaffRequest).where(PiStaffRequest.kind == "approve"))
@@ -411,4 +425,115 @@ async def test_the_draft_job_ignores_a_chat_that_has_no_accepted_offer(
     conversation = await pi.conversation()
     await draft_brain_documents(pi.ctx, str(conversation.id))
     assert (await business_db.scalars(select(PiBrainDocument))).all() == []
+    await pi.close()
+
+
+async def approved_and_waiting_for_payment(api, db, monkeypatch):
+    pi, _, conversation = await accepted_offer(api, db, monkeypatch)
+    docs = await drafted(pi, db, conversation)
+    await approve_both(api, docs)
+    await api.post(f"{DOCS}/offers/{docs['quote'].offer_id}/send")
+    await pi.deliver_all()
+    await say(pi, "Approve", "pay-1")
+    await say(pi, "yes", "pay-2")
+    return pi, docs
+
+
+async def test_approval_opens_a_payment_and_only_staff_can_confirm_it(
+    api, business_db, monkeypatch
+):
+    from app.modules.pi.brain_docs_models import PiBrainPayment
+
+    pi, docs = await approved_and_waiting_for_payment(api, business_db, monkeypatch)
+    conversation = await pi.conversation()
+    await business_db.refresh(conversation)
+    assert conversation.flow_state == "S10_AWAITING_PAYMENT"
+    payment = (await business_db.scalars(select(PiBrainPayment))).one()
+    assert payment.status == "pending" and payment.quote_id == docs["quote"].id
+
+    # A question about paying is answered by the model, never treated as paying.
+    await say(pi, "how do I pay?", "pay-3")
+    assert (await pi.reply_to("pay-3")).body != decisions.text("payment_claimed", "en")
+    await business_db.refresh(payment)
+    assert payment.status == "pending"
+
+    # "I have paid" is a claim: thanked, never confirmed, and the team is told.
+    await say(pi, "I have paid the transfer", "pay-4")
+    reply = (await pi.reply_to("pay-4")).body
+    assert reply == "Thanks. The Workzap team will confirm here when the transfer arrives."
+    await business_db.refresh(payment)
+    assert payment.status == "claimed" and payment.claimed_at is not None
+    await business_db.refresh(conversation)
+    assert conversation.flow_state == "S10_AWAITING_PAYMENT"
+    told = (
+        await business_db.scalars(
+            select(PiStaffRequest).where(PiStaffRequest.question.contains("says they paid"))
+        )
+    ).all()
+    assert told and "Q-0001" in told[0].question
+    assert not any("received" in json.dumps(m).lower() for m in pi.sent)
+
+    listed = (await api.get(f"{DOCS}/payments?status=claimed")).json()["items"]
+    assert [(i["quote_ref"], i["status"], i["total"]) for i in listed] == [
+        ("Q-0001", "claimed", "450000.00")
+    ]
+    pi.sent.clear()
+    done = await api.post(f"{DOCS}/payments/{payment.id}/confirm", json={"reference": "TRX-991"})
+    assert (
+        done.status_code == 200 and done.json()["status"] == "confirmed" and done.json()["notified"]
+    )
+    await pi.deliver_all()
+    texts = [m["text"]["body"] for m in sent_of(pi, "text")]
+    assert texts == [decisions.text("payment_confirmed", "en")]
+    await business_db.refresh(payment)
+    await business_db.refresh(conversation)
+    assert payment.status == "confirmed" and payment.confirmed_by is not None
+    assert payment.reference == "TRX-991" and conversation.flow_state == "S11_PAYMENT_CONFIRMED"
+    assert conversation.service_brief["payment"]["status"] == "confirmed"
+    again = await api.post(f"{DOCS}/payments/{payment.id}/confirm", json={})
+    assert again.status_code == 409 and again.json()["error"]["code"] == "ALREADY_CONFIRMED"
+    await pi.close()
+
+
+async def test_a_confirmation_outside_the_24_hour_window_is_told_when_they_next_write(
+    api, business_db, monkeypatch
+):
+    from datetime import UTC, datetime, timedelta
+
+    from app.modules.pi.brain_docs_models import PiBrainPayment
+
+    pi, _ = await approved_and_waiting_for_payment(api, business_db, monkeypatch)
+    conversation = await pi.conversation()
+    conversation.last_inbound_at = datetime.now(UTC) - timedelta(hours=30)
+    await business_db.commit()
+    payment = (await business_db.scalars(select(PiBrainPayment))).one()
+    pi.sent.clear()
+    done = await api.post(f"{DOCS}/payments/{payment.id}/confirm", json={})
+    assert done.status_code == 200 and done.json()["notified"] is False
+    await pi.deliver_all()
+    assert sent_of(pi, "text") == []  # nothing free-form may go outside the window
+    await business_db.refresh(conversation)
+    assert conversation.service_brief["payment_notice_due"] is True
+    await say(pi, "hello", "pay-9")
+    assert (await pi.reply_to("pay-9")).body == decisions.text("payment_confirmed", "en")
+    await business_db.refresh(conversation)
+    assert "payment_notice_due" not in conversation.service_brief
+    await pi.close()
+
+
+async def test_a_kickoff_slot_after_confirmed_payment_moves_to_kickoff(
+    api, business_db, monkeypatch
+):
+    from app.modules.pi.brain_docs_models import PiBrainPayment
+    from app.modules.pi.brain_payments import kickoff_booked
+
+    pi, _ = await approved_and_waiting_for_payment(api, business_db, monkeypatch)
+    conversation = await pi.conversation()
+    assert kickoff_booked(conversation) is False  # not before payment is confirmed
+    payment = (await business_db.scalars(select(PiBrainPayment))).one()
+    await api.post(f"{DOCS}/payments/{payment.id}/confirm", json={})
+    await business_db.refresh(conversation)
+    assert kickoff_booked(conversation) is True
+    assert conversation.flow_state == "S12_KICKOFF" and "kickoff" in conversation.service_brief
+    assert kickoff_booked(conversation) is False
     await pi.close()

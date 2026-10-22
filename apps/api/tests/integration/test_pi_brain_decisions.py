@@ -176,7 +176,7 @@ async def test_approving_a_quote_takes_two_confirmations(api, business_db, monke
     await say(pi, "yes", "ap-3")
     assert (await pi.reply_to("ap-3")).body == decisions.text("approved", "en")
     conversation = await state_of(business_db, pi)
-    assert conversation.flow_state == "S9_APPROVED"
+    assert conversation.flow_state == "S10_AWAITING_PAYMENT"
     approval = conversation.service_brief["approval"]
     assert approval["quote"] == "Q-12" and len(approval["confirm_message_ids"]) == 2
     assert approval["confirm_message_ids"][0] != approval["confirm_message_ids"][1]

@@ -85,3 +85,32 @@ class PiBrainDocument(WorkspaceRow):
     def ref(self) -> str:
         base = f"{PREFIX[self.kind]}-{self.number:04d}"
         return base if self.version == 1 else f"{base}-v{self.version}"
+
+
+PAYMENT_STATUSES = ("pending", "claimed", "confirmed", "failed")
+
+
+class PiBrainPayment(WorkspaceRow):
+    """Where a transfer for an approved quote stands. Only Workzap staff set `confirmed`; a customer
+    saying they paid (or sending a screenshot) only makes it `claimed` (R-PAY-05, R-PAY-06)."""
+
+    __tablename__ = "pi_brain_payments"
+    __table_args__ = workspace_args(
+        "pi_brain_payments",
+        scoped_fk("pi_brain_payments", "customer_id", "customers"),
+        scoped_fk("pi_brain_payments", "quote_id", "pi_brain_documents"),
+        UniqueConstraint(
+            "tenant_id", "environment_id", "quote_id", name="uq_pi_brain_payments_quote"
+        ),
+        Index("ix_pi_brain_payments_status", "tenant_id", "environment_id", "status"),
+        CheckConstraint(_in("status", PAYMENT_STATUSES), name="status"),
+    )
+    customer_id: Mapped[UUID] = mapped_column(Uuid)
+    conversation_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    quote_id: Mapped[UUID] = mapped_column(Uuid)
+    status: Mapped[str] = mapped_column(String(12), default="pending", server_default="pending")
+    claimed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    confirmed_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    reference: Mapped[str] = mapped_column(String(120), default="", server_default="")
+    note: Mapped[str] = mapped_column(Text, default="", server_default="")

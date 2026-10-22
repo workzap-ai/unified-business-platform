@@ -146,7 +146,7 @@ Learning loop (Part 8) comes after P7 and is out of scope here.
 | P3 offer and decision gates | done | d4432fb | migration 0036 (`can_approve`) |
 | P4 documents and quote | done in code, review UI missing | 1de1b6c and later | migration 0037; reviewer API only (`/pi/brain-documents`), no screen yet; sending outside the 24-hour window needs a template (open) |
 | Style profile and repair strategies (spec 8.4.1, 8.4.2) | done | | `style.py`, brain-mode context and a linter length rule |
-| P5 payment and kickoff | open | | staff-only payment confirmation, kickoff slots |
+| P5 payment and kickoff | done | | migration 0038; approval now ends in S10; claims; staff confirm API; S11 notice; kickoff booking moves to S12; no screen yet |
 | P6 X-states and safety classifiers | open | | emergency, PII in the message log, advice limits, opt-out, escalation reasons |
 | P7 golden conversations G1 to G15 | partly | | G5, G10, G11, G13 covered; see `pi-rule-coverage.md` |
 | Learning loop (Part 8) | open | | reward model, example bank, question arms, nightly jobs |

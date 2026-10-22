@@ -736,7 +736,7 @@ async def send(
     for doc in fresh:
         label = CAPTION[language][doc.kind]
         ids.append(
-            await _queue(
+            await queue_message(
                 session,
                 scope,
                 conversation,
@@ -751,7 +751,7 @@ async def send(
     cover = (REVISED if revised else COVER)[language].format(n=len(solution.problem_ids))
     buttons = decisions.DECISION_BUTTONS.get(language, decisions.DECISION_BUTTONS["en"])
     ids.append(
-        await _queue(
+        await queue_message(
             session,
             scope,
             conversation,
@@ -771,7 +771,7 @@ async def send(
     return ids
 
 
-async def _queue(
+async def queue_message(
     session: AsyncSession,
     scope: WorkspaceScope,
     conversation: PiConversation,

@@ -203,7 +203,7 @@ def test_approval_needs_two_confirmations():
     assert first.brief["approval_pending"] == {"quote": "Q-12", "message_id": "m2"}
     pending = {"approval_pending": {"quote": "Q-12", "message_id": "m2"}}
     second = review("yes", brief=pending, message_id="m3")
-    assert second.next_state == S.S9_APPROVED and second.effects == ["record_approval"]
+    assert second.next_state == S.S10_AWAITING_PAYMENT and second.effects == ["record_approval"]
     assert second.brief["approval"] == {"quote": "Q-12", "confirm_message_ids": ["m2", "m3"]}
     assert second.brief["approval_pending"] is None
     assert "bank transfer" in second.reply and "don't send card details" in second.reply
@@ -263,3 +263,53 @@ def test_replies_come_in_roman_urdu_too():
 def test_the_other_states_make_no_decision():
     for state in (S.S1_LISTENING, S.S3_NOTED, S.S6_PREPARING, S.S7_DELIVERED, S.S13_IN_BUILD):
         assert go(state, "yes") is None
+
+
+# --- S10: waiting for payment (R-PAY-05, R-PAY-06) ------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "said",
+    [
+        "I have paid",
+        "done",
+        "paid already",
+        "transfer kar diya",
+        "payment ho gayi",
+        "I sent the money",
+        "bhej diya",
+    ],
+)
+def test_saying_they_paid_is_only_a_claim(said):
+    decision = go(S.S10_AWAITING_PAYMENT, said)
+    assert decision.reply == "Thanks. The Workzap team will confirm here when the transfer arrives."
+    assert decision.effects == ["payment_claimed"] and decision.next_state is None
+    assert "received" not in decision.reply.lower()
+
+
+def test_a_screenshot_is_a_claim_too():
+    for kind in ("image", "document"):
+        decision = go(S.S10_AWAITING_PAYMENT, "", message_kind=kind)
+        assert decision.effects == ["payment_claimed"]
+    assert go(S.S10_AWAITING_PAYMENT, "see this", message_kind="text") is None
+
+
+@pytest.mark.parametrize(
+    "said", ["how do I pay?", "what is the account number?", "kab tak karna hai?"]
+)
+def test_a_question_about_paying_is_not_a_claim(said):
+    assert go(S.S10_AWAITING_PAYMENT, said) is None
+
+
+def test_cancelling_beats_a_claim_and_the_notice_waits_in_s11():
+    assert go(S.S10_AWAITING_PAYMENT, "cancel, I have not paid").effects == [
+        "cancel_before_payment"
+    ]
+    notice = go(S.S11_PAYMENT_CONFIRMED, "hello", brief={"payment_notice_due": True})
+    assert notice.reply.startswith("Workzap has confirmed your transfer.")
+    assert notice.brief == {"payment_notice_due": None}
+    assert go(S.S11_PAYMENT_CONFIRMED, "hello", brief={}) is None
+    roman = d.decide(
+        S.S11_PAYMENT_CONFIRMED, "hi", "roman_ur", facts(brief={"payment_notice_due": True})
+    )
+    assert roman.reply.startswith("Workzap ne aap ka transfer confirm kar diya hai.")

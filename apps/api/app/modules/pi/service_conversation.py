@@ -24,6 +24,7 @@ from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
 from app.modules.pi import (
     brain_docs,
+    brain_payments,
     constitution,
     decisions,
     flow,
@@ -1210,6 +1211,7 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         "chosen_refs": turn.include_refs,
         "changed": any(op.op != "link" for op in turn.problem_ops),
         "change_requests": turn.change_requests,
+        "message_kind": context.get("latest_message_kind"),
         "brief": context.get("brief") or {},
         "open_quote": context.get("open_quote"),
     }
@@ -1263,8 +1265,19 @@ async def apply_decision(
             session, scope, conversation, "review_document", "high",
             "The customer asked for changes to the quote: " + "; ".join(changes),
         )  # fmt: skip
+    if "payment_claimed" in decision.effects:
+        paid = await brain_payments.claim(session, scope, conversation)
+        if paid is not None:
+            await raise_decision_request(
+                session, scope, conversation, "approve", "high",
+                f"The customer says they paid quote {(brief.get('approval') or {}).get('quote')}: "
+                "check the account, then confirm the payment.",
+            )  # fmt: skip
     if "record_approval" in decision.effects:
         brief["approval"] = {**(brief.get("approval") or {}), "at": now}
+        await brain_payments.open_for(
+            session, scope, conversation, str((brief["approval"] or {}).get("quote"))
+        )
         await raise_decision_request(
             session, scope, conversation, "approve", "high",
             f"The customer approved quote {brief['approval'].get('quote')} (confirmed twice).",
@@ -2992,6 +3005,8 @@ async def compose_service_turn(
             context.get(key)
             for key in ("check_in_now", "team_answer_now", "operator_review_required")
         )
+        # Brain mode: news the person is owed (their payment was confirmed) comes before "Hi".
+        and not (context.get("brief") or {}).get("payment_notice_due")
     ):
         # Old knowledge and the model's last language must not turn "Hi" into a pitch.
         turn = ServiceTurn(reply=greeting_reply(context), language="en")

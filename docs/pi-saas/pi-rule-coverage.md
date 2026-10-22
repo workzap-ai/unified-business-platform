@@ -33,8 +33,8 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-PAY-02 | Never asks for card, CVV, bank login, OTP, PIN, password | code | linter, hard (verbs and "what is your PIN?") |
 | R-PAY-03 | Bank details only on the approved quote | code | linter blocks IBAN and account numbers; details only in `brain_pdf.render_quote` |
 | R-PAY-04 | Changed bank details are fraud, escalate | open | P6 (escalation reasons) |
-| R-PAY-05 | "Payment received" only when staff confirm | code | linter, hard; staff-only confirmation is P5 |
-| R-PAY-06 | A payment screenshot is thanked, never confirmed | open | needs media handling (P5, P6) |
+| R-PAY-05 | "Payment received" only when staff confirm | code | linter, hard; only `POST /pi/brain-documents/payments/{id}/confirm` (billing.write) confirms |
+| R-PAY-06 | A payment screenshot is thanked, never confirmed | code | `decisions` S10: "I paid", "done" or an image/document makes the payment `claimed` and tells staff |
 | R-PAY-07 | Refunds and disputes are noted and escalated | open | P6 |
 | R-PRIV-01 | Never asks for card, password, third-party details | code | linter (see R-PAY-02) |
 | R-PRIV-02 | Sensitive content redacted from records and logs | partial | `problems.redact` on `user_words`; the message log and quarantine are P6 |
@@ -107,7 +107,8 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-DEC-03 | Ask for changes: note, confirm, send to Workzap | code | |
 | R-DEC-04 | A no is fine; nothing charged | code | |
 | R-DEC-05 | Cancel before payment is accepted | code | S10 |
-| R-KICK-01 to 03 | Kickoff after staff confirm payment | open | P5 |
+| R-KICK-01 | After staff confirm, pi tells them and offers kickoff times | code | fixed notice (also after the 24-hour window, on their next message); slots come from the existing booking tools |
+| R-KICK-02, 03 | Booked slot confirmed, reminders; no invented agenda | partial | a booking moves S11 to S12; reminders 24 h and 1 h are P6 |
 | R-COMPL-01 to 03 | Complaints are feedback, escalated | open | P6 |
 
 ## Red-team (Part 10.2) and what is not covered yet

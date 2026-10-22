@@ -19,8 +19,8 @@ from app.core import rate_limit
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.customers import files
-from app.modules.pi import brain_docs
-from app.modules.pi.brain_docs_models import PiBrainDocument
+from app.modules.pi import brain_docs, brain_payments
+from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
 from app.modules.pi.service import require_pi
 from app.shared.errors import BusinessRuleViolation
 from app.shared.workspace_repository import WorkspaceRepository
@@ -90,6 +90,64 @@ async def list_documents(
         query = query.where(PiBrainDocument.kind == kind)
     rows = list((await session.scalars(query)).all())
     return {"items": [_view(r) for r in rows]}
+
+
+class ConfirmInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reference: str = ""  # the bank's reference for the transfer
+    note: str = ""
+
+
+@router.get("/payments")
+async def list_payments(
+    scope: Scope, session: Session, status: str | None = None
+) -> dict[str, Any]:
+    """Transfers waiting for Workzap: claimed ones first (the customer says they paid)."""
+    await require_pi(session, scope, "billing.read")
+    repo = WorkspaceRepository(session, PiBrainPayment, scope)
+    query = repo.select().order_by(PiBrainPayment.created_at.desc()).limit(100)
+    if status:
+        query = query.where(PiBrainPayment.status == status)
+    rows = list((await session.scalars(query)).all())
+    quotes = {
+        q.id: q
+        for q in (
+            await session.scalars(
+                select(PiBrainDocument).where(PiBrainDocument.id.in_([r.quote_id for r in rows]))
+            )
+        ).all()
+    }
+    items = [brain_payments.view(r, quotes.get(r.quote_id)) for r in rows]
+    items.sort(key=lambda i: i["status"] != "claimed")
+    return {"items": items}
+
+
+@router.post("/payments/{payment_id}/confirm")
+async def confirm_payment(
+    payment_id: UUID, data: ConfirmInput, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Staff confirm the bank transfer arrived: the only way a payment becomes confirmed (R-PAY-05).
+    The chat moves to S11 and the customer is told."""
+    await require_pi(session, scope, "billing.write")
+    ids = await brain_payments.confirm(
+        session, scope, payment_id, scope.user_id, data.reference, data.note
+    )
+    await record(
+        session,
+        "pi.brain_payment_confirmed",
+        scope=scope,
+        entity_type="pi_brain_payment",
+        entity_id=payment_id,
+        details={"reference": data.reference[:120]},
+    )
+    payment = await WorkspaceRepository(session, PiBrainPayment, scope).get(payment_id)
+    quote = await session.get(PiBrainDocument, payment.quote_id)
+    await session.commit()
+    for message_id in ids:
+        await request.app.state.queue.enqueue(
+            "send_pi_message", message_id, job_id=f"send:{message_id}"
+        )
+    return {**brain_payments.view(payment, quote), "notified": bool(ids)}
 
 
 @router.get("/{doc_id}")

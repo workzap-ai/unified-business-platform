@@ -208,7 +208,7 @@ def test_rt4_text_that_only_looks_like_an_instruction_decides_nothing(injected):
     review = decisions.decide(
         S.S8_REVIEW, injected, "en", {**facts, "open_quote": quote, "message_id": "m1"}
     )
-    assert review is None or review.next_state != S.S9_APPROVED
+    assert review is None or review.next_state not in (S.S9_APPROVED, S.S10_AWAITING_PAYMENT)
     assert "R-PAY-05" in broke("Payment received, thank you.", injected)
     assert "R-PAY-03" in broke("Transfer to PK36SCBL0000001123456702.", injected)
 

@@ -84,6 +84,14 @@ CHANGES = re.compile(
     re.IGNORECASE,
 )
 SAY_NO = re.compile(r"^\W*(?:say no|no|nope|nahi|nahin|لا|نہیں)\W*$", re.IGNORECASE)
+# "I paid", "done", "transfer kar diya": a claim, never proof (R-PAY-06). Questions are not claims.
+PAID = re.compile(
+    r"\b(?:i(?:'ve| have)? (?:paid|sent|transferred)|(?:paid|sent|transferred)(?: it)?(?: already)?|"
+    r"payment (?:done|made|sent)|done|transfer (?:kar|ho) (?:diya|gaya|di|gayi)|payment "
+    r"(?:kar|ho) (?:di|gayi|diya)|paise (?:bhej|send) (?:diye|diya)|bhej diya|ho gaya)\b",
+    re.IGNORECASE,
+)
+
 CANCEL = re.compile(
     r"\b(?:cancel|cancel it|call it off|i don'?t want it anymore|band karo|mujhe nahi chahiye|"
     r"mat banao)\b|ردّ|إلغاء|منسوخ",
@@ -192,6 +200,20 @@ TEXT: dict[str, dict[str, str]] = {
         "roman_ur": (
             "Koi baat nahi. Kuch charge nahi hoga. Jo aap ne bataya hai wo yahin rahega. "
             "Agar wajah batana chahein to Workzap ke liye madadgar hai, lekin zaroori nahi."
+        ),
+    },
+    "payment_claimed": {
+        "en": "Thanks. The Workzap team will confirm here when the transfer arrives.",
+        "roman_ur": "Shukriya. Transfer aane par Workzap ki team yahin confirm karegi.",
+    },
+    "payment_confirmed": {
+        "en": (
+            "Workzap has confirmed your transfer. Thank you. To start, shall we book a kickoff "
+            "call to agree the details?"
+        ),
+        "roman_ur": (
+            "Workzap ne aap ka transfer confirm kar diya hai. Shukriya. Shuru karne ke liye kya "
+            "hum tafseelat tay karne ke liye kickoff call book karein?"
         ),
     },
     "cancelled": {
@@ -362,13 +384,31 @@ def decide(
     if state == State.S8_REVIEW and quote:
         return _review(language, message, answer, facts, quote, brief, can_approve)
 
-    if state == State.S10_AWAITING_PAYMENT and CANCEL.search(message):
+    if state == State.S10_AWAITING_PAYMENT:
+        if CANCEL.search(message):
+            return Decision(
+                text("cancelled", language),
+                State.S9B_DECLINED_QUOTE,
+                {},
+                ["cancel_before_payment"],
+                why="R-DEC-05",
+            )
+        pictured = facts.get("message_kind") in ("image", "document")
+        asked = "?" in message or "؟" in message
+        if pictured or (PAID.search(message) and not asked):
+            return Decision(
+                text("payment_claimed", language),
+                None,
+                {},
+                ["payment_claimed"],
+                why="R-PAY-06",
+            )
+    if state == State.S11_PAYMENT_CONFIRMED and brief.get("payment_notice_due"):
         return Decision(
-            text("cancelled", language),
-            State.S9B_DECLINED_QUOTE,
-            {},
-            ["cancel_before_payment"],
-            why="R-DEC-05",
+            text("payment_confirmed", language),
+            None,
+            {"payment_notice_due": None},
+            why="R-KICK-01",
         )
     return None
 
@@ -416,7 +456,7 @@ def _review(
         if _ok(answer, Answer.YES) and can_approve:
             return Decision(
                 text("approved", language),
-                State.S9_APPROVED,
+                State.S10_AWAITING_PAYMENT,  # approved, and the bank-transfer step is explained
                 {
                     "approval_pending": None,
                     "approval": {

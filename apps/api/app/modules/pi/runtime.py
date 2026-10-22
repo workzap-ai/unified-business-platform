@@ -865,6 +865,14 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             review_intents = {"human_request", "complaint", "payment"}
             if service_context.get("payment_methods"):
                 review_intents -= {"payment", "invoice"}
+            if (service_context.get("flow") or {}).get("state") in (
+                "S9_APPROVED",
+                "S10_AWAITING_PAYMENT",
+                "S11_PAYMENT_CONFIRMED",
+            ):
+                # Brain mode: after approval the bank transfer is the plan. "I paid" is a claim
+                # the gate records, and "how do I pay?" is answered from the approved quote.
+                review_intents -= {"payment", "invoice"}
             service_context["typed_message"] = typed[:4000]
             service_context["operator_review_required"] = bool(
                 keyword_handoff or (fast_intent and fast_intent[0] in review_intents)
@@ -1044,6 +1052,14 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                         )
                         if failed:
                             handoff_reason, handoff_summary = "tool_failure", failed
+                        elif (
+                            service_appendix
+                            and service_turn.action == "booking"
+                            and service_context.get("pi_mode") == "brain"
+                        ):
+                            from app.modules.pi.brain_payments import kickoff_booked
+
+                            kickoff_booked(conversation)  # S11 to S12 (R-KICK-02)
             elif not service_discovery:
                 reply, handoff_reason = await handle_confirmation(agent_ctx)
             if reply is not None or handoff_reason is not None:
