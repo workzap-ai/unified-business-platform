@@ -22,7 +22,23 @@ AI_WORDS = re.compile(
 OPENING = {
     "en": "Hi, I'm pi, an AI from Workzap.",
     "roman_ur": "Hi, main pi hoon, Workzap ka AI.",
+    "ur": "ہیلو، میں pi ہوں، Workzap کی طرف سے ایک مصنوعی ذہانت۔",
+    "ar": "مرحباً، أنا pi، ذكاء اصطناعي من Workzap.",
 }
+
+
+def opening_line(context: dict[str, Any]) -> str:
+    """The one-line AI disclosure in the person's language and script (R-DISC-01, R-LANG-02)."""
+    from app.modules.pi.language import ARABIC_SCRIPT, URDU_LETTERS
+
+    language = context.get("reply_language")
+    said = str(context.get("latest_customer_message", ""))
+    if language == "roman_ur":
+        return OPENING[
+            "ur" if ARABIC_SCRIPT.search(said) and URDU_LETTERS.search(said) else language
+        ]
+    return OPENING.get(str(language), OPENING["en"])
+
 
 SENTENCE = re.compile(r"(?<=[.!?؟])\s+|\n+")
 QUESTION_MARKS = ("?", "؟")
@@ -387,6 +403,5 @@ def repair(reply: str, context: dict[str, Any]) -> str:
     fixed = re.sub(r" ?" + EMOJI.pattern, drop, fixed.replace("️", ""))
     history = context.get("history") or []
     if not any(h.get("role") == "ai" for h in history) and not AI_WORDS.search(fixed):
-        line = OPENING["roman_ur" if context.get("reply_language") == "roman_ur" else "en"]
-        fixed = f"{line} {fixed}".strip()
+        fixed = f"{opening_line(context)} {fixed}".strip()
     return fixed.strip()

@@ -10,6 +10,7 @@ from app.modules.pi.problems import ProblemNote, ProblemOp
 from app.modules.pi.service_conversation import (
     BRAIN_DECISIONS,
     BRAIN_PROBLEMS,
+    BRAIN_VOICE,
     ServiceTurn,
     system_for,
 )
@@ -254,7 +255,7 @@ def test_the_listening_loop_notes_and_sorts():
 def test_the_brain_prompt_lists_every_category_and_sub_type():
     assert system_for({}) != system_for({"pi_mode": "brain"})
     prompt = system_for({"pi_mode": "brain"})
-    assert prompt.endswith(BRAIN_PROBLEMS + BRAIN_DECISIONS)
+    assert prompt.endswith(BRAIN_PROBLEMS + BRAIN_DECISIONS + BRAIN_VOICE)
     for category in taxonomy.CATEGORIES:
         assert f"{category.key}" in prompt
     assert "stock_inventory: stockout, overstock_dead_stock" in prompt

@@ -1,3 +1,4 @@
+# ruff: noqa: E501  (Arabic and Urdu lines read better unbroken)
 """Golden conversations from spec Part 10.1 that no other test covers (G4, G9, G14).
 
 The simulated person sends the "Person" lines; the model is scripted with the spec's own replies,
@@ -238,4 +239,102 @@ async def test_g6_roman_urdu_small_shop_is_noted_in_roman_urdu_with_the_system_n
     assert problem.category == "cash_collections" and problem.subtype == "credit_customers"
     assert problem.systems_mentioned == ["register"]
     assert problem.title.isascii() and problem.title_local  # English title kept internally
+    await pi.close()
+
+
+def more(context, n):
+    said = context["latest_customer_message"]
+    if "everything is a mess" in said:  # G3
+        return turn(
+            reply=f"{OPENING} That's a lot to carry. Where do you notice it most: sales, stock, "
+            "staff or cash?",
+            language="en",
+        )
+    if said.startswith("staff."):
+        return turn(
+            reply="What's one thing they don't follow that causes the most trouble?",
+            language="en",
+        )
+    if "opening checklist" in said:
+        return turn(
+            reply="Thanks. I've noted it: shops open late and not cleaned, opening checklist not "
+            "followed. Is it every shop, or some?",
+            language="en",
+            problem_ops=[
+                create(
+                    "Opening checklist not followed",
+                    "shops open late and dirty",
+                    "people_staff",
+                )
+            ],
+        )
+    if "گودام" in said:  # G7: Urdu script
+        return turn(reply="شکریہ۔ یہ کتنی بار ہوتا ہے، روزانہ یا کبھی کبھی؟", language="roman_ur")
+    if "مطعم" in said:  # G8: Arabic
+        return turn(
+            reply="مرحباً، أنا pi، ذكاء اصطناعي من Workzap. هذه مشكلة حقيقية. من أي تطبيقات تأتي الطلبات؟",
+            language="ar",
+        )
+    return turn(reply="Noted. Anything else getting in the way?", language="en")
+
+
+async def test_g3_a_vague_opener_is_not_noted_until_there_is_a_concrete_symptom(
+    api, business_db, monkeypatch
+):
+    adaptive(monkeypatch, more)
+    pi = await workspace(api, business_db)
+    await say(pi, "everything is a mess honestly", "g3-1")
+    assert (await problems_of(business_db, pi))[1] == []  # nothing noted yet
+    await say(pi, "staff. nobody follows anything", "g3-2")
+    assert (await problems_of(business_db, pi))[1] == []
+    await say(pi, "opening checklist. shops open late and dirty", "g3-3")
+    reply = (await pi.reply_to("g3-3")).body
+    assert reply.startswith("Thanks. I've noted it:") and reply.count("?") == 1
+    _, rows = await problems_of(business_db, pi)
+    assert len(rows) == 1 and rows[0].category == "people_staff"
+    for key in ("g3-1", "g3-2", "g3-3"):  # one question each, and it is the last sentence
+        body = (await pi.reply_to(key)).body
+        assert body.count("?") == 1 and body.rstrip().endswith("?")
+    await pi.close()
+
+
+async def test_g7_urdu_script_gets_an_urdu_script_reply_with_one_question(
+    api, business_db, monkeypatch
+):
+    adaptive(monkeypatch, more)
+    pi = await workspace(api, business_db)
+    await say(pi, "میرا گودام میں مال کی گنتی کبھی پوری نہیں ہوتی", "g7-1")
+    reply = (await pi.reply_to("g7-1")).body
+    assert "کتنی بار" in reply and reply.count("؟") == 1  # RTL text intact, one question
+    assert reply.startswith("ہیلو") and "main pi hoon" not in reply  # Urdu script, not Roman
+    await pi.close()
+
+
+async def test_g8_arabic_first_message_discloses_the_ai_in_arabic(api, business_db, monkeypatch):
+    adaptive(monkeypatch, more)
+    pi = await workspace(api, business_db)
+    await say(pi, "مرحباً، عندنا مطعم في دبي والطلبات من التطبيقات تضيع", "g8-1")
+    reply = (await pi.reply_to("g8-1")).body
+    assert "ذكاء اصطناعي" in reply and reply.count("؟") == 1
+    await pi.close()
+
+
+@pytest.mark.parametrize(
+    ("said", "expected"),
+    [
+        ("I saw nori. Does it work with CCTV?", "coming soon"),  # G15
+        ("What are nori's prices?", "workzap.ai/nori/pricing"),
+        ("tell me about nori", "daily read for the shop"),
+    ],
+)
+async def test_g15_nori_questions_get_honest_facts_and_no_prices(
+    api, business_db, monkeypatch, said, expected
+):
+    prompts = adaptive(monkeypatch, more)
+    pi = await workspace(api, business_db)
+    await say(pi, said, "g15-1")
+    reply = (await pi.reply_to("g15-1")).body
+    assert expected in reply and prompts == []
+    assert not any(ch.isdigit() for ch in reply)  # never a price from memory
+    assert reply.count("?") <= 1
     await pi.close()

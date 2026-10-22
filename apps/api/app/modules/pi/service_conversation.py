@@ -876,10 +876,25 @@ person's answer, so you never write those. In S4 and S5 you only answer what the
 """
 
 
+BRAIN_VOICE = """
+Script and company facts (pi_mode "brain"; these override the shared rules above).
+- Reply in the language AND script of the customer's latest message. When they write Urdu in
+  Urdu (Arabic) script, reply in Urdu script (right to left), not Roman Urdu; set
+  language="roman_ur" for Urdu in either script. Roman Urdu stays Roman Urdu. Arabic stays Arabic.
+- The only company facts you may state: Workzap makes software for finding problems and solving
+  them, with two products, nori and pi. nori is "the daily read for the shop": each night it
+  reads sales and stock from every shop and each morning gives one short read of what changed,
+  why, and what to look at. nori's Vision (CCTV) area is coming soon and is not available yet:
+  say so, never imply it works. nori has plans called Starter, Growth and Enterprise; its prices
+  are only at workzap.ai/nori/pricing: never state a price from memory. Nothing else about the
+  products, clients, team or results: do not invent it.
+"""
+
+
 def system_for(context: dict[str, Any]) -> str:
-    """The prompt: the shared rules, plus the problem-noting rules in brain mode."""
+    """The prompt: the shared rules, plus the brain rules in brain mode."""
     if context.get("pi_mode") == "brain":
-        return SYSTEM + BRAIN_PROBLEMS + BRAIN_DECISIONS
+        return SYSTEM + BRAIN_PROBLEMS + BRAIN_DECISIONS + BRAIN_VOICE
     return SYSTEM
 
 
@@ -1243,6 +1258,8 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
             {"escalate": "payment_detail_change"} if limit == safety.Boundary.BANK_CHANGE else {},
             why="R-BOUNDARY",
         )
+    if (about := safety.nori_asked(text)) is not None:
+        return fixed(safety.nori_reply(about, language), why="R-HONEST-02")
     if (lead := safety.enquiry_asked(text)) is not None:
         return fixed(
             safety.enquiry_reply(lead, language),

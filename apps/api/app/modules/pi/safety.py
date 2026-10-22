@@ -496,7 +496,7 @@ IDENTITY_TEXT = {
         Identity.MODEL: "I'm pi, Workzap's AI. I'm here to note and sort problems in your business.",
         Identity.RULES: "I can tell you how I work: I note and sort problems, I never take payment here, and you decide on any quote. The full detail is at workzap.ai/pi/how-it-works.",
         Identity.COMPANY: "I can pass that question to the Workzap team.",
-        Identity.OFFER: "Workzap builds software for businesses. I'm not here to sell anything: I note what's getting in the way of yours, and if you want, Workzap can then prepare a solution document. What's the biggest thing right now?",
+        Identity.OFFER: "Workzap makes software for finding problems and solving them. I'm not here to sell anything: I note what's getting in the way of yours, and if you want, Workzap can then prepare a solution document. What's the biggest thing right now?",
     },
     "roman_ur": {
         Identity.PERSON: "Main AI hoon, insaan nahi. Main pi hoon, Workzap ki taraf se.",
@@ -506,7 +506,7 @@ IDENTITY_TEXT = {
         Identity.MODEL: "Main pi hoon, Workzap ka AI. Main aap ke business ke masail note aur sort karne ke liye hoon.",
         Identity.RULES: "Main bata sakta hoon main kaise kaam karta hoon: masail note aur sort karta hoon, yahan kabhi payment nahi leta, aur quote par faisla aap ka hota hai. Poori tafseel workzap.ai/pi/how-it-works par hai.",
         Identity.COMPANY: "Ye sawal main Workzap ki team tak pahuncha sakta hoon.",
-        Identity.OFFER: "Workzap businesses ke liye software banata hai. Main kuch bechne nahi aaya: main aap ke business ki rukawat note karta hoon, aur aap chahein to Workzap phir solution document bana sakta hai. Abhi sab se bada masla kya hai?",
+        Identity.OFFER: "Workzap masail dhoondne aur hal karne ka software banata hai. Main kuch bechne nahi aaya: main aap ke business ki rukawat note karta hoon, aur aap chahein to Workzap phir solution document bana sakta hai. Abhi sab se bada masla kya hai?",
     },
 }
 
@@ -753,3 +753,59 @@ UNSUPPORTED_TEXT = (
 def unsupported_language(text: str) -> bool:
     """Pashto, which uses letters Urdu does not: two or more of them in the message."""
     return len(PASHTO_LETTERS.findall(text or "")) >= 2
+
+
+# --- questions about nori, answered from the approved facts only (spec 0.4, 6.9, golden G15) -------
+
+
+class Nori(StrEnum):
+    VISION = "vision"
+    PRICING = "pricing"
+    ABOUT = "about"
+
+
+NORI_PATTERNS: tuple[tuple[Nori, re.Pattern[str]], ...] = (
+    (
+        Nori.VISION,
+        re.compile(r"(?=.*\bnori\b)(?=.*\b(?:cctv|camera|cameras|vision)\b)", re.IGNORECASE),
+    ),
+    (
+        Nori.PRICING,
+        re.compile(
+            r"(?=.*\bnori\b)(?=.*\b(?:price|prices|pricing|cost|plans?|kitna|qeemat|kharcha)\b)",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Nori.ABOUT,
+        re.compile(
+            r"\b(?:tell me about nori|what(?:'s| is) nori|nori (?:kya|what)|about nori|saw nori|"
+            r"heard (?:of|about) nori)\b",
+            re.IGNORECASE,
+        ),
+    ),
+)
+NORI_TEXT = {
+    "en": {
+        Nori.VISION: "nori's Vision (CCTV) area is coming soon. It isn't available yet. nori today reads sales and stock from every shop and gives a short morning read. Is something in your shops prompting the question?",
+        Nori.PRICING: "nori has three plans: Starter, Growth and Enterprise, which differ by size and support. The prices are at workzap.ai/nori/pricing.",
+        Nori.ABOUT: "nori is Workzap's daily read for the shop. Each night it reads sales and stock from every shop, and each morning it gives one short read of what changed, why, and what to look at. There is more at workzap.ai/nori. Is something in your business prompting the question?",
+    },
+    "roman_ur": {
+        Nori.VISION: "nori ka Vision (CCTV) hissa jald aa raha hai. Abhi available nahi hai. nori aaj har dukan ki sales aur stock parh kar subah ek chhota sa read deta hai. Kya aap ki dukanon mein kuch aisa hai jis ki wajah se ye sawal aaya?",
+        Nori.PRICING: "nori ke teen plans hain: Starter, Growth aur Enterprise, jo size aur support mein farq rakhte hain. Qeematein workzap.ai/nori/pricing par hain.",
+        Nori.ABOUT: "nori Workzap ka dukan ke liye roz ka read hai. Har raat ye har dukan ki sales aur stock parhta hai, aur subah ek chhota read deta hai: kya badla, kyun, aur kis par nazar rakhni hai. Mazeed workzap.ai/nori par hai. Kya aap ke business mein kuch aisa hai jis ki wajah se ye sawal aaya?",
+    },
+}
+
+
+def nori_asked(text: str) -> Nori | None:
+    said = " ".join((text or "").split())
+    for kind, pattern in NORI_PATTERNS:
+        if pattern.search(said):
+            return kind
+    return None
+
+
+def nori_reply(kind: Nori, language: str | None) -> str:
+    return NORI_TEXT.get(language or "en", NORI_TEXT["en"])[kind]
