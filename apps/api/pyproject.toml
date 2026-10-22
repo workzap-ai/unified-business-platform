@@ -11,14 +11,14 @@ dependencies = [
   "pydantic-settings>=2.7,<3", "sqlalchemy[asyncio]>=2.0,<3",
   "alembic>=1.14,<2", "asyncpg>=0.30,<1", "pgvector>=0.3,<1",
   "redis>=5,<6", "httpx>=0.28,<1", "arq>=0.26,<0.27",
-  "argon2-cffi>=23.1,<26", "cryptography>=44,<50", "langgraph>=0.4,<2",
+  "argon2-cffi>=23.1,<26", "cryptography>=44,<51", "langgraph>=0.4,<2",
   "python-multipart>=0.0.20,<1", "email-validator>=2.2,<3",
   # IANA time zones on platforms without a system tz database (Windows, slim images).
   "tzdata>=2024.1",
   # Text extraction for "Teach Pi" PDF uploads (pure Python, no native dependencies).
   "pypdf>=5,<7",
   # QR codes for the pay-by-link flow (encodes the pay-page URL, never raw payment data).
-  "qrcode>=7.4,<9", "pillow>=11,<12", "webauthn>=2.2,<3",
+  "qrcode>=7.4,<9", "pillow>=11,<14", "webauthn>=2.2,<3",
   "opencv-python-headless>=4.10,<5",
 ]
 
