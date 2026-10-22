@@ -23,6 +23,7 @@ from app.modules.catalog.models import CatalogProduct
 from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
 from app.modules.pi import (
+    brain_config,
     brain_docs,
     brain_payments,
     constitution,
@@ -1122,6 +1123,10 @@ async def brain_problems(
     noted = await problems.noted_context(session, scope, conversation.customer_id)
     brief = conversation.service_brief or {}
     context: dict[str, Any] = {"noted_problems": noted}
+    context["brain_settings"] = {
+        key: brain_config.value(policy.response_rules, key)
+        for key in ("summary_trigger", "redisclose_days", "max_clarify")
+    }
     if problems.shape_question_due(len(noted), industry_known, bool(brief.get("industry_asked"))):
         context["shape_question_due"] = True
     context["problems_since_summary"] = len(noted) - int(brief.get("summary_count") or 0)
@@ -1263,7 +1268,11 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         for n in created
     ]
     since = int(context.get("problems_since_summary") or 0) + len(created)
-    if not problems.summary_due(str(context.get("latest_customer_message", "")), len(items), since):
+    trigger = int(
+        (context.get("brain_settings") or {}).get("summary_trigger") or problems.SUMMARY_TRIGGER
+    )
+    said = str(context.get("latest_customer_message", ""))
+    if not problems.summary_due(said, len(items), since, trigger):
         return
     turn.reply = problems.summary_message(items, str(context.get("reply_language") or "en"))
     # The group counts are figures pi wrote itself: the no-digits rule must let them through.
@@ -3092,7 +3101,8 @@ def welcome_back(context: dict[str, Any]) -> str | None:
         word = taxonomy.label(top, lang).lower()
         mostly = f", mostly {word}" if lang == "en" else f", zyada tar {word}"
     who = ""
-    if int(context.get("days_away") or 0) > 30:
+    redisclose = int((context.get("brain_settings") or {}).get("redisclose_days") or 30)
+    if int(context.get("days_away") or 0) > redisclose:
         who = (
             "Hi, it's pi, the AI from Workzap. "
             if lang == "en"

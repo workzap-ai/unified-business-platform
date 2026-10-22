@@ -659,7 +659,9 @@ WHAT_NOW = re.compile(
 )
 
 
-def summary_due(text: str, noted: int, since_summary: int) -> str | None:
+def summary_due(
+    text: str, noted: int, since_summary: int, trigger: int = SUMMARY_TRIGGER
+) -> str | None:
     """Why pi should show the sorted summary now (spec 3.7), or None."""
     if noted < 1:
         return None
@@ -667,7 +669,7 @@ def summary_due(text: str, noted: int, since_summary: int) -> str | None:
         return "done"
     if WHAT_NOW.search(text):
         return "what_now"
-    if since_summary >= SUMMARY_TRIGGER:
+    if since_summary >= trigger:
         return "many"
     return None
 

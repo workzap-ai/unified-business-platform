@@ -87,6 +87,30 @@ def _friday_prayer(timezone: str) -> bool:
     return local.weekday() == 4 and 12 * 60 + 30 <= minutes < 14 * 60 + 30
 
 
+def iftar_pause(
+    timezone: str, config: dict[str, Any], now: datetime | None = None
+) -> datetime | None:
+    """During Ramadan, no proactive message within an hour either side of Maghrib (R-FUP-04).
+    Ramadan dates come from `whatsapp_config["ramadan"]` ([{"start": "2027-02-08", "end":
+    "2027-03-09"}], set per year and country) and the local Maghrib time from
+    `whatsapp_config["maghrib"]` ("HH:MM", default 18:45). Returns when the window ends, or None.
+    """
+    from app.modules.pi.policy import zone
+
+    local = (now or datetime.now(UTC)).astimezone(zone(timezone))
+    today = local.date().isoformat()
+    spans = config.get("ramadan") or []
+    if not any(str(s.get("start", "")) <= today <= str(s.get("end", "")) for s in spans):
+        return None
+    try:
+        hour, minute = (int(x) for x in str(config.get("maghrib") or "18:45").split(":"))
+    except ValueError:
+        hour, minute = 18, 45
+    maghrib = local.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    start, end = maghrib - timedelta(hours=1), maghrib + timedelta(hours=1)
+    return end.astimezone(UTC) if start <= local < end else None
+
+
 async def sweep_followups(ctx: dict[str, Any]) -> None:
     from app.modules.pi.runtime import enqueue_sends, system_scope
 
@@ -154,6 +178,9 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
                 continue
             if _friday_prayer(policy.timezone):
                 conversation.followup_due_at = datetime.now(UTC) + timedelta(hours=1)
+                continue
+            if (iftar := iftar_pause(policy.timezone, policy.whatsapp_config)) is not None:
+                conversation.followup_due_at = iftar  # R-FUP-04: not around iftar
                 continue
             last_template = await last_follow_up_template(
                 session, conversation, datetime.now(UTC) - TEMPLATE_GAP
