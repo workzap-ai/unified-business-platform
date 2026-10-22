@@ -55,3 +55,36 @@ async def test_each_reply_is_scored_by_the_next_message_and_silence(api, busines
     assert shown["scored"] == 2 and shown["average_reward"] == -1.5
     assert shown["signals"] == {"confusion": 1, "drop_off": 1}
     await pi.close()
+
+
+async def test_the_brain_health_endpoint_shows_metrics_freeze_and_clamped_settings(
+    api, business_db, monkeypatch
+):
+    adaptive(monkeypatch, asks)
+    pi = await workspace(api, business_db)
+    await say(pi, "everything is a mess honestly", "bh-1")
+    await say(pi, "samajh nahi aaya", "bh-2")
+    await spread(business_db, pi, ["bh-1", "bh-2"])
+    await score_new(business_db)
+    await business_db.commit()
+
+    shown = (await api.get("/api/v1/pi/brain-health?days=1")).json()
+    assert shown["pi_mode"] == "brain" and shown["learning_frozen"] is True  # opt-in only
+    assert shown["metrics"]["scored"] == 1 and shown["metrics"]["signals"] == {"confusion": 1}
+    assert shown["settings"]["summary_trigger"]["value"] == 7
+
+    changed = await api.patch(
+        "/api/v1/pi/settings/response_rules",
+        json={"value": {"brain": {"learning_frozen": False, "summary_trigger": 99}}},
+    )
+    assert changed.status_code == 200, changed.text
+    after = (await api.get("/api/v1/pi/brain-health")).json()
+    assert after["learning_frozen"] is False
+    assert after["settings"]["summary_trigger"]["value"] == 10  # clamped to the tested range
+
+    for bad in ({"made_up": 1}, {"summary_trigger": "soon"}, {"learning_frozen": "no"}):
+        refused = await api.patch(
+            "/api/v1/pi/settings/response_rules", json={"value": {"brain": bad}}
+        )
+        assert refused.status_code >= 400, bad
+    await pi.close()

@@ -4,6 +4,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from app.modules.pi.brain_config import TUNABLES
 from app.modules.pi.models import PiSettings
 from app.modules.pi.price_policy import PRICE_MODES
 from app.shared.errors import BusinessRuleViolation
@@ -33,6 +34,10 @@ def validate_section(section: str, value: Any) -> None:
             )
             ensure(value["service_mode"] in {"auto", "service"})
             ensure(value.get("pi_mode", "standard") in {"standard", "brain"})
+            brain = value.get("brain", {})  # tunables and the learning switch (spec 9.9)
+            ensure(isinstance(brain, dict) and set(brain) <= {*TUNABLES, "learning_frozen"})
+            ensure(type(brain.get("learning_frozen", True)) is bool)
+            ensure(all(type(v) is int for k, v in brain.items() if k != "learning_frozen"))
             ensure(value.get("price_disclosure", "") in ("", *PRICE_MODES))
             ensure(value.get("execution_mode", "") in ("", "human_approved", "mixed", "ai_led"))
             ensure(

@@ -63,6 +63,9 @@ DEFAULTS: dict[str, Any] = {
         # "brain" = Workzap's own pi flow (pi Brain spec): a conversation state machine, the
         # constitution linter and listening-first rules. "standard" = the shared flow.
         "pi_mode": "standard",
+        # Tunable numbers inside their tested ranges and the learning switch (brain_config.py,
+        # learning.frozen). Empty = every default; learning stays frozen until set to False.
+        "brain": {},
     },
     "ai_config": {
         "router_alias": "fast",

@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.pi import learning
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.models import PiConversation, PiMessage
+from app.shared.scope import WorkspaceScope
 
 SILENCE = timedelta(hours=24)
 
@@ -101,9 +102,18 @@ async def score_new(session: AsyncSession, now: datetime | None = None, limit: i
     return written
 
 
-async def health(session: AsyncSession, since: datetime) -> dict[str, Any]:
-    """The learning metrics for a period (spec 8.13), for a status screen or a digest."""
-    rows = list(await session.scalars(select(PiExperience).where(PiExperience.scored_at >= since)))
+async def health(
+    session: AsyncSession, since: datetime, scope: WorkspaceScope | None = None
+) -> dict[str, Any]:
+    """The learning metrics for a period (spec 8.13), for a status screen or a digest.
+    With a scope, only that workspace's replies are counted."""
+    query = select(PiExperience).where(PiExperience.scored_at >= since)
+    if scope is not None:
+        query = query.where(
+            PiExperience.tenant_id == scope.tenant_id,
+            PiExperience.environment_id == scope.environment_id,
+        )
+    rows = list(await session.scalars(query))
     if not rows:
         return {"scored": 0}
     counts: dict[str, int] = defaultdict(int)
