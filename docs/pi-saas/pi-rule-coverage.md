@@ -46,7 +46,7 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-ADV-05 | No general-purpose help (homework, code, jokes) | code | `safety.Boundary.OFF_TOPIC` |
 | R-ROUTE-01 | Demo, jobs, vendor, partnership, press enquiries routed, not noted as problems | code | `safety.enquiry_asked`, fixed replies, staff request (nori facts and pricing lines still open) |
 | R-DISC-05, R-MEM-03 | Returning after a gap: welcome back, re-disclose after 30 days | code | `welcome_back` in `service_conversation.py` |
-| R-PRIV-06 | Says what it keeps, honours deletion | partial | `safety.boundary_asked` DELETION: fixed reply plus a high-priority staff request; the deletion itself is manual, no automated erase yet |
+| R-PRIV-06 | Says what it keeps, honours deletion | code | `safety.boundary_asked` DELETION: fixed reply plus a high-priority staff request; staff then call `POST /pi/brain-erasure/{customer_id}` (`brain_erase.py`): removes problems, memory notes, quarantine copies, learning scores and message text; keeps quotes, documents, payments and the CRM contact; staff tell the customer in the chat |
 | R-PRIV-07 | Learning only after redaction | open | learning loop not built |
 | R-PRIV-08 | Never pressures for detail | prompt | |
 | R-ADV-01 to 05 | No legal, medical, financial advice; no politics; no off-topic help | code | `safety.advice_asked` (legal, tax, financial, medical, veterinary) answered with fixed text before the model; politics and off-topic stay prompt |
