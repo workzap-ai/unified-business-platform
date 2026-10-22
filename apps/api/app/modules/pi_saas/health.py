@@ -1109,7 +1109,9 @@ async def learned(session: AsyncSession, scope: WorkspaceScope) -> dict[str, int
 
 
 def _day(column: Any) -> Any:
-    return func.to_char(column, literal_column("'YYYY-MM-DD'"))
+    return func.to_char(
+        func.timezone(literal_column("'UTC'"), column), literal_column("'YYYY-MM-DD'")
+    )  # UTC day
 
 
 async def fixed_recently(session: AsyncSession, scope: WorkspaceScope) -> dict[str, Any]:

@@ -259,3 +259,33 @@ def test_boundary_answers_are_short_and_end_with_one_question_or_none():
         for lang in ("en", "roman_ur"):
             text = s.boundary_reply(kind, lang)
             assert text.count("?") <= 1 and "!" not in text
+
+
+@pytest.mark.parametrize(
+    "said",
+    [
+        "Since when has it been happening?",
+        "since last month the stock runs out",
+        "we have a single branch with six cashiers",
+        "my passport is expired so I could not travel to the supplier",
+        "the passport copies are kept in the office drawer",
+        "sinking sales every week",
+    ],
+)
+def test_ordinary_words_that_start_like_an_id_label_are_not_ids(said):  # found by the learning gate
+    assert s.redact_pii(said).kinds == []
+    assert s.redact_pii(said).text == said
+
+
+@pytest.mark.parametrize(
+    ("said", "secret"),
+    [
+        ("passport number AB1234567", "AB1234567"),
+        ("my passport AB 1234567 expires soon", "1234567"),
+        ("SIN 123 456 789", "123 456 789"),
+        ("social insurance number 046 454 286", "046 454 286"),
+    ],
+)
+def test_real_id_numbers_are_still_removed(said, secret):
+    found = s.redact_pii(said)
+    assert found.kinds == [Pii.ID] and secret not in found.text

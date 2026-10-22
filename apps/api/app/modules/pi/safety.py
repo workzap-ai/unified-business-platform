@@ -184,7 +184,10 @@ CNIC = re.compile(r"\b\d{5}-\d{7}-\d\b")
 CNIC_LABELLED = re.compile(r"\bcnic\W{0,4}\d{13}\b", re.IGNORECASE)
 EMIRATES_ID = re.compile(r"\b784-?\d{4}-?\d{7}-?\d\b")
 LABELLED_ID = re.compile(
-    r"\b(?:passport|sin|social insurance)(?: (?:no|number|#))?\W{0,4}[A-Z0-9][A-Z0-9 -]{5,12}[A-Z0-9]\b",
+    # The label is a whole word ("sin" is not the start of "since" or "single") and the value holds
+    # at least one digit ("my passport is expired" is not a passport number).
+    r"\b(?:passport|sin|social insurance)\b(?: (?:no|number|#))?\W{0,4}"
+    r"(?=[A-Z0-9 -]{0,13}\d)[A-Z0-9][A-Z0-9 -]{5,12}[A-Z0-9]\b",
     re.IGNORECASE,
 )
 # "my OTP is 4421", "password: Hunter22" (said outright), or "otp 4421" (a value with a digit).

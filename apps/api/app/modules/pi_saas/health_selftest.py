@@ -288,7 +288,9 @@ def _view(item: dict[str, Any], at: datetime) -> dict[str, Any]:
 
 
 def _day(column: Any) -> Any:
-    return func.to_char(column, literal_column("'YYYY-MM-DD'"))
+    return func.to_char(
+        func.timezone(literal_column("'UTC'"), column), literal_column("'YYYY-MM-DD'")
+    )  # UTC day
 
 
 async def latest(session: AsyncSession, scope: WorkspaceScope) -> dict[str, Any]:
