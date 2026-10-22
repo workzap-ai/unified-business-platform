@@ -29,6 +29,7 @@ from app.modules.pi import (
     constitution,
     decisions,
     flow,
+    followup_policy,
     industry_packs,
     price_policy,
     problems,
@@ -4495,7 +4496,38 @@ async def remember_projects(
         await remember(session, scope, conversation.customer_id, note[:500], message_id)
 
 
+def schedule_silence_nudge(conversation: PiConversation, policy: PiSettings) -> bool:
+    """Brain mode, spec 3.9.1: someone who went quiet mid-description gets one free-form
+    "still here" line about 20 hours after their last message, inside the 24-hour window. True
+    when it was scheduled; the legacy consented reminder is skipped then."""
+    brief = dict(conversation.service_brief or {})
+    state = flow.parse(conversation.flow_state)
+    brief.pop("followup_kind", None)
+    due = None
+    if (
+        flow.brain_mode(policy.response_rules)
+        and state in (flow.State.S1_LISTENING, flow.State.S2_CLARIFYING)
+        and conversation.last_inbound_at is not None
+        and brief.get("reminder_consent") != "declined"
+    ):
+        due = followup_policy.next_followup(
+            followup_policy.Chat(
+                state=state,
+                last_inbound_at=conversation.last_inbound_at,
+                sent=dict(brief.get("followups_sent") or {}),
+            ),
+            policy.response_rules,
+        )
+    if due is not None and due.kind == "silent" and not due.needs_template:
+        brief["followup_kind"] = "silent"
+        conversation.followup_due_at = due.at
+    conversation.service_brief = brief
+    return brief.get("followup_kind") == "silent"
+
+
 def schedule_followup(conversation: PiConversation, policy: PiSettings) -> None:
+    if schedule_silence_nudge(conversation, policy):
+        return
     brief = conversation.service_brief or {}
     if (
         policy.whatsapp_config.get("reminder_enabled", True)

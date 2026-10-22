@@ -111,6 +111,77 @@ def iftar_pause(
     return end.astimezone(UTC) if start <= local < end else None
 
 
+async def _silence_nudge(
+    session: Any,
+    scope: Any,
+    conversation: PiConversation,
+    policy: Any,
+    outgoing: list[str],
+) -> None:
+    """The brain's one free-form "still here" line (spec 3.9.1). Never outside the 24-hour
+    window, at night, at Jumu'ah or around iftar; never after "stop" or once the person wrote."""
+    from app.modules.pi import flow, followup_policy
+
+    now = datetime.now(UTC)
+    brief = dict(conversation.service_brief or {})
+    last = conversation.last_inbound_at
+    sendable = (
+        conversation.mode == "ai"
+        and conversation.status == "open"
+        and policy.auto_reply_enabled
+        and last is not None
+        and now - last < followup_policy.WINDOW
+        and brief.get("reminder_consent") != "declined"
+        and flow.parse(conversation.flow_state)
+        in (flow.State.S1_LISTENING, flow.State.S2_CLARIFYING)
+        and not (brief.get("followups_sent") or {}).get("silent")
+    )
+    if not sendable:
+        conversation.followup_due_at = None
+        return
+    later = quiet_until(
+        policy.timezone,
+        int(policy.whatsapp_config.get("quiet_start", 21)),
+        int(policy.whatsapp_config.get("quiet_end", 9)),
+    )
+    if later is None and _friday_prayer(policy.timezone):
+        later = now + timedelta(hours=1)
+    if later is None:
+        later = iftar_pause(policy.timezone, policy.whatsapp_config)
+    if later is not None:
+        conversation.followup_due_at = later
+        return
+    from app.modules.pi_saas.entitlement import remaining as allowance_left
+
+    left = await allowance_left(session, scope.tenant_id, scope.environment_id, "messages_out")
+    if left is not None and left <= 0:
+        conversation.followup_due_at = now + timedelta(hours=6)
+        return
+    assert last is not None
+    service = PiService(session, scope)
+    key = f"pi-followup-silent:{conversation.id}:{last.isoformat()}"
+    if await service.messages.find(PiMessage.idempotency_key == key) is None:
+        message = await service.messages.add(
+            service.messages.new(
+                conversation_id=conversation.id,
+                direction="outbound",
+                sender_type="ai",
+                agent_key="requirement",
+                body=followup_policy.text_for("silent", conversation.language),
+                status="queued",
+                idempotency_key=key,
+                media={"followup": {"kind": "silent"}},
+            )
+        )
+        outgoing.append(str(message.id))
+    sent = dict(brief.get("followups_sent") or {})
+    sent["silent"] = 1
+    brief["followups_sent"] = sent
+    brief.pop("followup_kind", None)
+    conversation.service_brief = brief
+    conversation.followup_due_at = None
+
+
 async def sweep_followups(ctx: dict[str, Any]) -> None:
     from app.modules.pi.runtime import enqueue_sends, system_scope
 
@@ -139,6 +210,9 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
                 # The customer is waiting on someone else (a boss, a partner): don't
                 # nudge them until the pause they chose is over.
                 conversation.followup_due_at = waiting
+                continue
+            if brief.get("followup_kind") == "silent":
+                await _silence_nudge(session, scope, conversation, policy, outgoing)
                 continue
             if (
                 conversation.mode != "ai"
