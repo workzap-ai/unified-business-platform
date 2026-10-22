@@ -7,7 +7,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from sqlalchemy import select
-from test_pi_brain_problems import adaptive, create, say, workspace
+from test_pi_brain_problems import adaptive, create, problems_of, say, workspace
 from test_pi_service_conversations import turn
 
 from app.modules.pi.models import PiMessage
@@ -95,4 +95,147 @@ async def test_g14_returning_after_forty_days_says_who_it_is_and_remembers(
     assert reply.startswith("Hi, it's pi, the AI from Workzap. Welcome back.")
     assert "2 problems" in reply and reply.endswith("is something new going on?")
     assert reply.count("?") == 1
+    await pi.close()
+
+
+def noting(context, n):
+    said = context["latest_customer_message"]
+    if "best-selling" in said:  # G1
+        first = n == 1
+        return turn(
+            reply=(
+                f"{OPENING} That's a real problem. Is it happening in every shop, or only some?"
+                if first
+                else "Thanks. I've noted it: best-sellers running out, in two of four shops. "
+                "Anything else getting in the way?"
+            ),
+            language="en",
+            problem_ops=[]
+            if first
+            else [
+                create(
+                    "Best-sellers run out in two shops",
+                    "We keep running out of our best-selling items.",
+                    "stock_inventory",
+                    subtype="stockout",
+                    of_total="2 of 4 shops",
+                )
+            ],
+        )
+    if "Two of the four" in said:
+        return turn(
+            reply="Thanks. I've noted it: best-sellers running out, in two of four shops. "
+            "Anything else getting in the way?",
+            language="en",
+            problem_ops=[
+                create(
+                    "Best-sellers run out in two shops",
+                    "We keep running out of our best-selling items.",
+                    "stock_inventory",
+                    subtype="stockout",
+                    of_total="2 of 4 shops",
+                )
+            ],
+        )
+    if "Johar Town" in said:  # G2
+        return turn(
+            reply=(
+                "Thanks. I've noted three things:\n• Stock running out\n"
+                "• Cashiers late on weekends\n• Cash not matching at one branch\n"
+                "Which of these costs you the most?"
+            ),
+            language="en",
+            problem_ops=[
+                create("Stock runs out", "stock runs out"),
+                create(
+                    "Cashiers late on weekends", "my cashiers come late on weekends", "people_staff"
+                ),
+                create("Cash does not match", "the cash never matches", "cash_collections"),
+            ],
+        )
+    if "udhaar" in said:  # G6
+        return turn(
+            reply=(
+                "Wa alaikum assalam. Ye waqai masla hai. Udhaar ka hisaab abhi kaise rakhte "
+                "hain, register mein?"
+            ),
+            language="roman_ur",
+        )
+    if "haan register" in said:
+        return turn(
+            reply="Shukriya. Note kar liya: udhaar ke paise wapas nahi aate, hisaab register mein. "
+            "Aur kya cheez mushkil kar rahi hai?",
+            language="roman_ur",
+            problem_ops=[
+                create(
+                    "Credit customers do not pay back",
+                    "udhaar wale paise wapas nahi dete",
+                    "cash_collections",
+                    subtype="credit_customers",
+                    systems=["register"],
+                    title_local="udhaar ke paise wapas nahi aate",
+                )
+            ],
+        )
+    return turn(reply="Noted. Anything else getting in the way?", language="en")
+
+
+async def test_g1_the_website_example_notes_one_stock_problem_in_their_words(
+    api, business_db, monkeypatch
+):
+    prompts = adaptive(monkeypatch, noting)
+    pi = await workspace(api, business_db)
+    await say(pi, "We keep running out of our best-selling items.", "g1-1")
+    first = (await pi.reply_to("g1-1")).body
+    assert first.startswith(OPENING) and first.count("?") == 1 and first.endswith("?")
+    await say(pi, "Two of the four.", "g1-2")
+    second = (await pi.reply_to("g1-2")).body
+    assert second.startswith("Thanks. I've noted it: best-sellers running out")
+    assert second.count("?") == 1 and "solution" not in second.lower()
+    _, rows = await problems_of(business_db, pi)
+    [problem] = rows
+    assert problem.category == "stock_inventory" and problem.subtype == "stockout"
+    assert problem.scope.get("of_total") == "2 of 4 shops"
+    assert prompts  # the model was asked
+    await pi.close()
+
+
+async def test_g2_three_problems_in_one_message_are_noted_separately_with_one_question(
+    api, business_db, monkeypatch
+):
+    adaptive(monkeypatch, noting)
+    pi = await workspace(api, business_db)
+    await say(
+        pi,
+        "stock runs out, my cashiers come late on weekends and the cash never matches "
+        "at the Johar Town branch",
+        "g2-1",
+    )
+    reply = (await pi.reply_to("g2-1")).body
+    assert reply.count("•") == 3 and reply.count("?") == 1 and reply.endswith("?")
+    _, rows = await problems_of(business_db, pi)
+    assert len(rows) == 3
+    assert {r.category for r in rows} == {"stock_inventory", "people_staff", "cash_collections"}
+    assert not any("Johar" in (r.title + str(r.user_words)) for r in rows)  # no names stored
+    await pi.close()
+
+
+async def test_g6_roman_urdu_small_shop_is_noted_in_roman_urdu_with_the_system_named(
+    api, business_db, monkeypatch
+):
+    adaptive(monkeypatch, noting)
+    pi = await workspace(api, business_db)
+    await say(
+        pi,
+        "assalam o alaikum. meri kiryana ki dukan hai, udhaar wale paise wapas nahi dete",
+        "g6-1",
+    )
+    await say(pi, "haan register", "g6-2")
+    reply = (await pi.reply_to("g6-2")).body
+    assert reply.startswith("Shukriya. Note kar liya") and reply.count("?") == 1
+    _, rows = await problems_of(business_db, pi)
+    [problem] = rows
+    assert problem.category == "cash_collections" and problem.subtype == "credit_customers"
+    assert problem.systems_mentioned == ["register"]
+    assert problem.title.isascii() and problem.title_local  # English title kept internally
     await pi.close()

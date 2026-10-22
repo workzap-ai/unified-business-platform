@@ -13,7 +13,7 @@ from collections.abc import Iterable
 from typing import Any
 
 LENGTH_FACTOR = 1.5  # replies stay at or under this many times their usual length
-MIN_REPLY_WORDS = 15  # but never so short that a noted line and a question cannot fit
+MIN_REPLY_WORDS = 25  # but never so short that a noted line and a question cannot fit
 MAX_REPLY_WORDS = 60
 SHORT_ENOUGH = 12  # at or under this a person is writing "short" (and may be on voice notes)
 

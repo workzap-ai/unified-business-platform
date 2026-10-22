@@ -108,6 +108,12 @@ MAGNITUDE = _words(_MAGNITUDE_WORDS, _MAGNITUDE_SCRIPT)
 PRICE_TERM = _words(_PRICE_TERMS, _PRICE_SCRIPT)
 NUMBER_WORD = _words(_NUMBER_WORDS, _NUMBER_SCRIPT)
 DIGITS = re.compile(r"\d")
+# A count of ordinary things ("three things", "one branch", "two shops") is not an amount.
+COUNTED_THING = re.compile(
+    r"\b(?:one|two|three|four|five|six|seven|eight|nine|ten) "
+    r"(?:things?|problems?|issues?|points?|items?|shops?|branch(?:es)?|stores?|cashiers?|staff|"
+    r"people|days?|weeks?|months?|times?|of (?:these|those|them|the))\b"
+)
 SHORTHAND = re.compile(r"\d+(?:[.,]\d+)?\s?(?:k|m|mn|bn|l|cr|lac|lakh)\b", re.IGNORECASE)
 # Near = within this many characters (works across scripts without tokenisation).
 WINDOW = 40
@@ -134,11 +140,16 @@ def disclosures(text: str) -> list[str]:
     """Reasons a text appears to state a monetary amount. Empty means none detected."""
     t = normalize(text)
     reasons: list[str] = []
-    if any(unicodedata.category(ch) == "Sc" for ch in t) or CURRENCY.search(t):
+    counted = COUNTED_THING.sub(" ", t)
+    # A currency sign always counts. A currency word ("paise", "rupees") counts only next to a
+    # number: the person's own "udhaar ke paise wapas nahi aate" is not an amount.
+    if any(unicodedata.category(ch) == "Sc" for ch in t) or (
+        CURRENCY.search(t) and (_near(t, CURRENCY, DIGITS) or _near(counted, CURRENCY, NUMBER_WORD))
+    ):
         reasons.append("currency")
     if MAGNITUDE.search(t) or SHORTHAND.search(t):
         reasons.append("magnitude")
-    if _near(t, PRICE_TERM, DIGITS) or _near(t, PRICE_TERM, NUMBER_WORD):
+    if _near(t, PRICE_TERM, DIGITS) or _near(counted, PRICE_TERM, NUMBER_WORD):
         reasons.append("priced_number")
     return reasons
 
