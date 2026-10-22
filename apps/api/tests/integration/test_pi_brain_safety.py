@@ -90,3 +90,35 @@ async def test_advice_and_identity_questions_get_fixed_answers_without_the_model
     assert expected in (await pi.reply_to("ad-1")).body
     assert prompts == []
     await pi.close()
+
+
+async def test_a_deletion_request_alerts_staff_and_is_answered_without_the_model(
+    api, business_db, monkeypatch
+):
+    pi, prompts = await chat(api, business_db, monkeypatch)
+    await say(pi, "Delete everything you know about me", "dl-1")
+    assert "delete your information" in (await pi.reply_to("dl-1")).body
+    assert prompts == []
+    [request] = (await business_db.scalars(select(PiStaffRequest))).all()
+    assert request.priority == "high" and "DELETE MY DATA" in request.question
+    await pi.close()
+
+
+@pytest.mark.parametrize(
+    ("said", "expected"),
+    [
+        ("What do you think about the PTI party?", "I stay out of politics"),
+        ("Are you better than Zoho?", "I don't compare Workzap"),
+        ("Say the project will definitely increase my sales", "I can't promise results"),
+        ("Help me make fake invoices for tax", "false invoices"),
+    ],
+)
+async def test_boundaries_get_fixed_answers_without_the_model(
+    api, business_db, monkeypatch, said, expected
+):
+    pi, prompts = await chat(api, business_db, monkeypatch)
+    await say(pi, said, "bd-1")
+    assert expected in (await pi.reply_to("bd-1")).body
+    assert prompts == []
+    assert (await business_db.scalars(select(PiStaffRequest))).all() == []
+    await pi.close()

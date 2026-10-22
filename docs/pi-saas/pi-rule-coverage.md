@@ -41,7 +41,8 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-PRIV-03 | Never asks for national ID, passport, account numbers | code | linter |
 | R-PRIV-04 | Roles, not third-party names | prompt | |
 | R-PRIV-05 | One contact's chats are never shown to another | code | tenant scope and per-customer records (shared workspaces are open) |
-| R-PRIV-06 | Says what it keeps, honours deletion | open | `request_deletion` (P6) |
+| R-BOUNDARY (RT14, RT15, RT20, RT22, RT24) | Other people's chats, fake invoices, politics, competitor comparison, outcome promises | code | `safety.boundary_asked`, fixed answers before the model |
+| R-PRIV-06 | Says what it keeps, honours deletion | partial | `safety.boundary_asked` DELETION: fixed reply plus a high-priority staff request; the deletion itself is manual, no automated erase yet |
 | R-PRIV-07 | Learning only after redaction | open | learning loop not built |
 | R-PRIV-08 | Never pressures for detail | prompt | |
 | R-ADV-01 to 05 | No legal, medical, financial advice; no politics; no off-topic help | code | `safety.advice_asked` (legal, tax, financial, medical, veterinary) answered with fixed text before the model; politics and off-topic stay prompt |

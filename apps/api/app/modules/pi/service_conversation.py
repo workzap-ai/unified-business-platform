@@ -1203,6 +1203,13 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
         return fixed(safety.identity_reply(who, language), why="R-DISC")
     if (advice := safety.advice_asked(text)) is not None:
         return fixed(safety.advice_reply(advice, language), why="R-ADV")
+    if (limit := safety.boundary_asked(text)) is not None:
+        return fixed(
+            safety.boundary_reply(limit, language),
+            None,
+            ["deletion_request"] if limit == safety.Boundary.DELETION else [],
+            why="R-BOUNDARY",
+        )
     return None
 
 
@@ -1310,6 +1317,16 @@ async def apply_decision(
             f"POSSIBLE EMERGENCY ({kind}): the customer wrote about it. Check the chat now. "
             "pi told them to call the local emergency number and noted nothing else.",
         )  # fmt: skip
+    if "deletion_request" in decision.effects:
+        await raise_decision_request(
+            session,
+            scope,
+            conversation,
+            "other",
+            "high",
+            "DELETE MY DATA: the customer asked pi to delete everything it knows about them. "
+            "Confirm to them in the chat once it is done.",
+        )
     if "request_revision" in decision.effects:
         changes = (brief.get("revision_requested") or {}).get("changes") or []
         await raise_decision_request(

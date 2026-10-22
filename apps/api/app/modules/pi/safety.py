@@ -495,3 +495,107 @@ def identity_asked(text: str, asks_if_ai: re.Pattern[str]) -> Identity | None:
 def identity_reply(kind: Identity, language: str | None) -> str:
     table = IDENTITY_TEXT.get(language or "en", IDENTITY_TEXT["en"])
     return table[kind]
+
+
+# --- what pi will not do (R-PRIV-05, R-PRIV-06, R-ADV-04, spec 10.2 RT14-RT16, RT20, RT22, RT24) ---
+
+
+class Boundary(StrEnum):
+    DELETION = "deletion"
+    POLITICS = "politics"
+    COMPETITOR = "competitor"
+    OUTCOME = "outcome"
+    FRAUD = "fraud"
+    THIRD_PARTY = "third_party"
+
+
+BOUNDARY_PATTERNS: tuple[tuple[Boundary, re.Pattern[str]], ...] = (
+    (
+        Boundary.DELETION,
+        re.compile(
+            r"\b(?:delete (?:everything|all|my (?:data|chats?|records?|information))|"
+            r"erase (?:everything|all|my (?:data|chats?|records?))|forget (?:everything|all about me)|"
+            r"remove (?:all )?my (?:data|information)|mera (?:sab )?(?:data|record) (?:delete|mita)|"
+            r"sab (?:kuch )?delete kar do)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.FRAUD,
+        re.compile(
+            r"\b(?:(?:fake|false|bogus|duplicate|double) (?:invoices?|bills?|receipts?|vouchers?)|"
+            r"(?:make|create|issue|print) (?:\w+ )?(?:fake|false) (?:invoices?|bills?|receipts?)|"
+            r"jali (?:bill|invoice|receipt)|tax chori|evade tax|hide (?:income|sales) from)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.THIRD_PARTY,
+        re.compile(
+            r"\b(?:send me (?:the )?(?:chats?|messages|conversations?) (?:of|with|from) (?:my|our|his|her)?\s*\w+|"
+            r"show me (?:the )?(?:chats?|messages) (?:of|from|with) (?:my|our|his|her)?\s*\w+|"
+            r"what did (?:my|our) (?:manager|cashier|staff|employee|partner|wife|husband)[^.?!]{0,20}(?:say|tell|write))\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.OUTCOME,
+        re.compile(
+            r"\b(?:say|promise|guarantee|confirm|tell me)[^.?!]{0,30}(?:will|would)?[^.?!]{0,20}"
+            r"(?:definitely|certainly|for sure|guaranteed?|100%)[^.?!]{0,30}"
+            r"(?:increase|boost|double|grow|improve|raise|fix)\b|"
+            r"\b(?:guarantee|promise) (?:me )?(?:more )?(?:sales|profit|results|growth)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.COMPETITOR,
+        re.compile(
+            r"\b(?:are you (?:any )?(?:better|cheaper|worse) than|is (?:workzap|pi) (?:better|cheaper) than|"
+            r"compare (?:yourself|workzap|you) (?:to|with)|"
+            r"workzap (?:vs|versus)|(?:vs|versus) workzap|why (?:you|workzap) (?:and )?not)\b"
+            r"[^.?!]{0,40}",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.POLITICS,
+        re.compile(
+            r"\b(?:what do you think (?:about|of) (?:the )?(?:\w+ ){0,2}(?:party|government|election|"
+            r"minister|prime minister|president|imran|nawaz|zardari|modi|trump|biden)|"
+            r"who (?:should|will) i vote|which party (?:is|should)|your (?:political|religious) "
+            r"(?:view|opinion|views|opinions)|siyasi (?:party|jamaat)|vote (?:kis|kisko))\b",
+            re.IGNORECASE,
+        ),
+    ),
+)
+BOUNDARY_TEXT = {
+    "en": {
+        Boundary.DELETION: "I've passed your request to delete your information to the Workzap team. They'll confirm here once it's done, and I won't note anything new in the meantime.",
+        Boundary.POLITICS: "I stay out of politics and opinions. I'm here to note what's getting in the way of your business. What's the biggest thing right now?",
+        Boundary.COMPETITOR: "I don't compare Workzap with other companies. I'm here to note what's getting in the way of your business. What's the biggest thing right now?",
+        Boundary.OUTCOME: "I can't promise results. I can note the problem and Workzap can describe what it would do about it. What's the problem?",
+        Boundary.FRAUD: "I can't help with false invoices or hiding income. If tracking real invoices is hard in your business, I can note that as a problem. Want me to?",
+        Boundary.THIRD_PARTY: "I can't share anyone else's chats. I only keep what you tell me in this chat. What would you like to note about your business?",
+    },
+    "roman_ur": {
+        Boundary.DELETION: "Aap ka data delete karne ki darkhwast maine Workzap ki team ko bhej di hai. Wo yahan tasdeeq kar dein ge, aur tab tak main kuch naya note nahi karunga.",
+        Boundary.POLITICS: "Main siyasat aur rai se door rehta hoon. Main aap ke business mein rukawat note karne ke liye hoon. Abhi sab se bada masla kya hai?",
+        Boundary.COMPETITOR: "Main Workzap ka doosri companies se muqabla nahi karta. Main aap ke business mein rukawat note karne ke liye hoon. Abhi sab se bada masla kya hai?",
+        Boundary.OUTCOME: "Main nateejon ka wada nahi kar sakta. Main masla note kar sakta hoon aur Workzap bata sakta hai wo kya karega. Masla kya hai?",
+        Boundary.FRAUD: "Main jali invoice ya aamdani chupane mein madad nahi kar sakta. Agar asli invoices ka hisaab rakhna mushkil hai to ise masla note kar sakta hoon. Kya karun?",
+        Boundary.THIRD_PARTY: "Main kisi aur ki chat share nahi kar sakta. Main sirf wo rakhta hoon jo aap is chat mein batate hain. Business ke baare mein kya note karun?",
+    },
+}
+
+
+def boundary_asked(text: str) -> Boundary | None:
+    said = " ".join((text or "").split())
+    for kind, pattern in BOUNDARY_PATTERNS:
+        if pattern.search(said):
+            return kind
+    return None
+
+
+def boundary_reply(kind: Boundary, language: str | None) -> str:
+    return BOUNDARY_TEXT.get(language or "en", BOUNDARY_TEXT["en"])[kind]
