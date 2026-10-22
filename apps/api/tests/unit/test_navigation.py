@@ -75,6 +75,7 @@ def test_pi_is_a_top_level_product_with_its_own_subnavigation():
         "Requests",
         "Meetings",
         "Team board",
+        "Documents",
         "Analytics",
         "Health",
         "Settings",

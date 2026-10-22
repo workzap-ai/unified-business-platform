@@ -1166,6 +1166,31 @@
     "visible": true
   },
   {
+    "analytics_id": "nav.pi.documents",
+    "any_permissions": [
+      "quotes.write",
+      "billing.read"
+    ],
+    "badge": null,
+    "description": "",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "file-text",
+    "key": "pi-documents",
+    "keywords": [],
+    "label": "Documents",
+    "parent": "pi",
+    "required_feature": null,
+    "required_permissions": [],
+    "required_product": "pi",
+    "required_roles": [],
+    "route": "/pi/documents",
+    "section": "main",
+    "sort_order": 68,
+    "type": "page",
+    "visible": true
+  },
+  {
     "analytics_id": "nav.pi.handoffs",
     "any_permissions": [
       "pi.handoffs.manage",
