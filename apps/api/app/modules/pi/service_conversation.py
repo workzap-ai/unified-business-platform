@@ -38,7 +38,13 @@ from app.modules.pi import (
 )
 from app.modules.pi.guard import ReplyRejected, validate_reply
 from app.modules.pi.knowledge import KnowledgeService, remember
-from app.modules.pi.language import NAMES, clearly_other, detect_language, english_greeting
+from app.modules.pi.language import (
+    NAMES,
+    clearly_other,
+    detect_language,
+    english_greeting,
+    returning_greeting,
+)
 from app.modules.pi.links import link_note
 from app.modules.pi.models import (
     PiAgent,
@@ -1274,7 +1280,10 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     said = str(context.get("latest_customer_message", ""))
     if not problems.summary_due(said, len(items), since, trigger):
         return
-    turn.reply = problems.summary_message(items, str(context.get("reply_language") or "en"))
+    language = str(context.get("reply_language") or "en")
+    turn.reply = problems.summary_message(items, language)
+    if decisions.cost_asked(said):  # answer the cost question first, then the summary
+        turn.reply = f"{decisions.cost_answer(language)}\n\n{turn.reply}"
     # The group counts are figures pi wrote itself: the no-digits rule must let them through.
     context["fixed_lines"] = [ln for ln in turn.reply.splitlines() if any(c.isdigit() for c in ln)]
     turn.awaiting_customer = True
@@ -2302,12 +2311,15 @@ def contradicts_itself(reply: str, context: dict[str, Any]) -> str | None:
     return None
 
 
+BULLETS = (chr(8226), chr(183), "- ", "* ")  # list lines hold the person's own words
+
+
 def mixed_line(reply: str, expected: str) -> str | None:
     """An English reply with a Roman Urdu line in it (or the other way round)."""
     if expected not in ("en", "roman_ur"):
         return None
     for line in re.split(r"(?<=[.!?])\s+|\n", reply):
-        if len(line.split()) < 4:
+        if len(line.split()) < 4 or line.lstrip().startswith(BULLETS):
             continue
         found = detect_language(line)
         if found in ("en", "roman_ur") and found != expected:
@@ -3170,7 +3182,13 @@ async def compose_service_turn(
         return safe
     if (
         context.get("latest_message_kind") in (None, "text")
-        and english_greeting(str(context.get("latest_customer_message", "")))
+        and (
+            english_greeting(str(context.get("latest_customer_message", "")))
+            or (
+                context.get("pi_mode") == "brain"
+                and returning_greeting(str(context.get("latest_customer_message", "")))
+            )
+        )
         and not any(
             context.get(key)
             for key in ("check_in_now", "team_answer_now", "operator_review_required")
@@ -3181,6 +3199,8 @@ async def compose_service_turn(
         # Old knowledge and the model's last language must not turn "Hi" into a pitch.
         turn = ServiceTurn(reply=greeting_reply(context), language="en")
         turn._greeting_only = True
+        if any(c.isdigit() for c in turn.reply):  # the welcome-back count is pi's own figure
+            context["fixed_lines"] = [*context.get("fixed_lines", []), turn.reply]
         return turn
     result = await manager.complete_structured(
         scope,

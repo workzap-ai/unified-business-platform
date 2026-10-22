@@ -497,3 +497,30 @@ def _review(
             text("quote_declined", language), State.S9B_DECLINED_QUOTE, {}, why="R-DEC-04"
         )
     return None
+
+
+# --- "how much would it cost?" before any offer (R-OFFER-05, golden G9) ---------------------------
+
+COST_ASKED = re.compile(
+    r"\b(?:how much|kitna|kitni|kharcha|kharch|qeemat|price|cost|charges?)\b",
+    re.IGNORECASE,
+)
+COST_ANSWER = {
+    "en": (
+        "The cost depends on what would be built. It is written on the quote before you decide, "
+        "and the quote is free, not a charge."
+    ),
+    "roman_ur": (
+        "Kharcha is par depend karta hai ke kya banaya jaye. Woh quote par likha hota hai, aap ke "
+        "faisle se pehle, aur quote muft hai, koi charge nahi."
+    ),
+}
+
+
+def cost_asked(text: str) -> bool:
+    return bool(COST_ASKED.search(text or ""))
+
+
+def cost_answer(language: str | None) -> str:
+    """An honest answer with no figure and no range, given before the summary or the offer."""
+    return COST_ANSWER["roman_ur"] if language == "roman_ur" else COST_ANSWER["en"]

@@ -70,6 +70,11 @@ def english_greeting(text: str | None) -> bool:
     )
 
 
+def returning_greeting(text: str | None) -> bool:
+    """ "hi again", "hello again": a greeting from someone who has been here before (brain mode)."""
+    return bool(re.fullmatch(r"[\W_]*(?:hi|hello|hey)\s+again[\W_]*", text or "", re.IGNORECASE))
+
+
 def detect_language(text: str | None) -> str | None:
     """'en', 'roman_ur' or 'ar' when the text clearly shows one, otherwise None.
     Urdu or Hindi written in its own script is 'roman_ur': pi answers those in Roman
