@@ -26,6 +26,7 @@ from app.modules.navigation.models import NavigationPreference
 from app.modules.notifications.models import Notification, NotificationRead
 from app.modules.orders.models import Order, OrderLine
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
+from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.models import (
     KnowledgeChunk,
     KnowledgeDocument,
@@ -114,6 +115,7 @@ from app.workflows.models import WorkflowRun
 __all__ = [
     "PiBrainDocument",
     "PiBrainPayment",
+    "PiExperience",
     "PiQuarantine",
     "PiProblem",
     "PiProblemGroup",

@@ -102,6 +102,16 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
         except Exception:  # noqa: BLE001 - retried on the next sweep
             await session.rollback()
             logger.warning("pi_quarantine_purge_failed")
+    # What happened after pi's replies, scored for the learning metrics (text-free, observe only).
+    async with ctx["sessions"]() as session:
+        try:
+            from app.modules.pi.experience_scorer import score_new
+
+            await score_new(session)
+            await session.commit()
+        except Exception:  # noqa: BLE001 - retried on the next sweep
+            await session.rollback()
+            logger.warning("pi_experience_scoring_failed")
     # Proposals pi owes a customer whose job never ran or failed.
     async with ctx["sessions"]() as session:
         try:

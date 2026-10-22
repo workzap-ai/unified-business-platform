@@ -149,7 +149,7 @@ Learning loop (Part 8) comes after P7 and is out of scope here.
 | P5 payment and kickoff | done | | migration 0038; approval now ends in S10; claims; staff confirm API; S11 notice; kickoff booking moves to S12; no screen yet |
 | P6 X-states and safety classifiers | done (uncommitted until review) | | migration 0039; emergency, PII redaction + quarantine, advice limits, identity answers; open: opt-out reuse of `note_opt_out`, R-PRIV-06 deletion, escalation reasons |
 | P7 golden conversations G1 to G15 | partly | | G5, G10, G11, G13 covered; see `pi-rule-coverage.md` |
-| Learning loop (Part 8) | open | | reward model, example bank, question arms, nightly jobs |
+| Learning loop (Part 8), step A | done | | `learning.py` (reward, never-learn, risk, Thompson bandit, freeze, drift), `pi_experiences` (0040) scored by the sweep, text-free; open: example bank (needs embeddings and the redaction gate), question arms in prompts, lexicon, pack drafting, canary/rollback, settings tuning, Brain dashboard, staff teaching buttons, problem-board image |
 
 Production still needs migrations 0034 to 0037 (the real database is at 0033) before `pi_mode` is
 turned on anywhere.

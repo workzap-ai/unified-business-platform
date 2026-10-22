@@ -76,7 +76,8 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-ASK-02 to 06 | At most 3 clarifying questions; never re-ask; no sensitive asks | prompt | `noted_problems` lists what is missing |
 | R-NOTE-01 to 08, R-CORR-01 to 04 | Notes in their words, groups, corrections applied | code | `problems.py` ops with revisions; titles checked |
 | R-MEM-01, 02 | Profiles; never ask twice | partial | profile and `noted_problems`; no cross-conversation memory check |
-| R-MEM-03, 06 | Welcome back; shared workspace | open | |
+| R-MEM-03 | Welcome back after a gap | code | `welcome_back` (see R-DISC-05) |
+| R-MEM-06 | Shared workspace | open | |
 | R-MEM-04 | Corrections override, history kept | code | revisions |
 | R-CANT-01 to 03 | "I can't do that" and what next | prompt | |
 | R-OFFER-01 | Offer only after the summary is confirmed | code | `decisions` S4 |
@@ -85,7 +86,15 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-OFFER-04 | "All or only some?" once | code | `decisions` S5 |
 | R-OFFER-05 | Cost before a quote: honest, no range | code+prompt | cost questions go to the model, numbers blocked |
 | R-OFFER-06 | A member who is not the decider | code | `customers.can_approve` |
-| R-FUP-01 to 05 | Follow-up policy, quiet hours, opt-out | open | the shared ladder is not aligned to 3.9.1 (P6) |
+| R-FUP-02 | stop / opt-out ends follow-ups | code | `note_opt_out` in `pi_saas/campaigns.py` |
+| R-FUP-03 | Quiet hours 21:00-09:00, Jumu'ah | code | `quiet_until`, `_friday_prayer` in `followups.py` |
+| R-FUP-04 | No proactive message within an hour of iftar in Ramadan | code | `iftar_pause`, dates in `whatsapp_config.ramadan` (set per year and country) |
+| R-FUP-01, 05 | No pressure; follow-ups logged | open | the shared ladder is not aligned to the 3.9.1 table (20-23 h, 3 days, 2 and 7 days) |
+| Spec 8.3 reward model | Rewards never include offers, approvals or payments | code | `learning.reward`, `NEVER_REWARDED` (eval L5) |
+| Spec 8.9 never-learn list | Learned text must not break the constitution | code | `learning.never_learn` reuses the reply linter (eval L7) |
+| Spec 8.7 risk classes | Lessons about money, privacy, offers, follow-ups are HIGH | code | `learning.risk`, conservative (eval L8) |
+| Spec 8.9 kill switch | Learning frozen unless explicitly switched on | code | `learning.frozen` (eval L10); nothing consumes learned text yet |
+| Spec 8.3 scoring | Each reply scored by what followed, text-free | code | `experience_scorer.score_new`, table `pi_experiences` (0040), run by the sweep |
 
 ## Documents, decisions, payment (Part 5)
 
