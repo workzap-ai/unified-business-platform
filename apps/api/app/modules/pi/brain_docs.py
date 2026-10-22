@@ -44,8 +44,14 @@ CURRENCY = {"92": "PKR", "971": "AED", "1": "CAD"}
 MAX_COMPONENT_WORDS = 40
 MAX_SENTENCE_WORDS = 25
 
+# An amount: a currency word or symbol, a grouped figure (450,000), a figure with k/lakh/crore/
+# million, or a figure right after "cost", "price", "fee"... A year or a count ("4 shops") is not.
 MONEY_IN_TEXT = re.compile(
-    r"\b(?:rs\.?|pkr|aed|cad|usd|dirhams?|rupees?|lakhs?|crores?)\b|[$€£₹]|\b\d[\d,]{3,}\b", re.I
+    r"\b(?:rs\.?|pkr|aed|cad|usd|dirhams?|rupees?|lakhs?|crores?)\b|[$€£₹]"
+    r"|\b\d{1,3}(?:,\d{2,3})+(?:\.\d+)?\b"
+    r"|\b\d+(?:\.\d+)?\s?(?:k|m|lakh|lac|crore|million|thousand)\b"
+    r"|\b(?:cost|costs|price|priced|fee|fees|charge|charged|budget|pay|paying)\b\D{0,15}\d{3,}",
+    re.IGNORECASE,
 )
 WILL = re.compile(r"\bwill\b(?! not)", re.IGNORECASE)
 
@@ -668,6 +674,23 @@ COVER = {
 }
 
 
+REVISED = {
+    "en": (
+        "Here is the revised version you asked for.\n"
+        "A quote is an offer, not a charge. You can approve, ask for changes, or say no."
+    ),
+    "roman_ur": (
+        "Ye aap ki maangi hui nayi version hai.\n"
+        "Quote ek offer hai, charge nahi. Aap manzoor kar sakte hain, tabdeeli maang sakte hain, "
+        "ya mana kar sakte hain."
+    ),
+}
+CAPTION = {
+    "en": {"solution": "Solution document", "quote": "Quote"},
+    "roman_ur": {"solution": "Solution document", "quote": "Quote"},
+}
+
+
 async def latest_pair(
     session: AsyncSession, scope: WorkspaceScope, offer_id: UUID
 ) -> tuple[PiBrainDocument | None, PiBrainDocument | None]:
@@ -685,9 +708,17 @@ async def send(
     solution, quote = await latest_pair(session, scope, offer_id)
     if solution is None or quote is None:
         raise BusinessRuleViolation("DOCUMENTS_MISSING", "There is no solution document and quote")
-    if solution.status != "approved" or quote.status != "approved":
+    if {solution.status, quote.status} - {"approved", "sent"}:
         raise BusinessRuleViolation(
             "DOCUMENTS_NOT_APPROVED", "A reviewer must approve both before they are sent", 409
+        )
+    # A revision sends only the version that changed: the other one is already with them.
+    fresh = [d for d in (solution, quote) if d.status == "approved"]
+    if not fresh:
+        raise BusinessRuleViolation(
+            "ALREADY_SENT",
+            "These versions were already sent: make a new version to change them",
+            409,
         )
     conversation = await WorkspaceRepository(session, PiConversation, scope).get(
         solution.conversation_id  # type: ignore[arg-type]
@@ -702,20 +733,22 @@ async def send(
         )
     language = conversation.language if conversation.language in COVER else "en"
     ids: list[str] = []
-    for doc in (solution, quote):
+    for doc in fresh:
+        label = CAPTION[language][doc.kind]
         ids.append(
             await _queue(
                 session,
                 scope,
                 conversation,
-                doc.ref if language == "en" else doc.ref,
+                f"{label} {doc.ref}",
                 f"pi-brain-doc:{doc.id}",
                 {"document": {"link": doc_url(settings, doc), "filename": f"{doc.ref}.pdf"}},
             )
         )
         doc.status = "sent"
         doc.sent_at = now
-    cover = COVER[language].format(n=len(solution.problem_ids))
+    revised = len(fresh) < 2
+    cover = (REVISED if revised else COVER)[language].format(n=len(solution.problem_ids))
     buttons = decisions.DECISION_BUTTONS.get(language, decisions.DECISION_BUTTONS["en"])
     ids.append(
         await _queue(

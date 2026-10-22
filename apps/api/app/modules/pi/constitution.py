@@ -32,6 +32,8 @@ ASKS_IF_AI = re.compile(
     r"|\b(?:is this|am i (?:talking|speaking|chatting) (?:to|with)) (?:a |an )?(?:real |actual )?"
     r"(?:human|person|bot|robot|ai)\b"
     r"|\bwho am i (?:talking|speaking|chatting) (?:to|with)\b"
+    r"|\byou(?:'re| are) (?:a |an )?(?:real |actual )?(?:human|person|bot|robot|man|woman|guy|girl)\b"
+    r"|\badmit (?:it|you|that)\b|\btell me (?:you(?:'re| are)|the truth)\b"
     r"|\bkya (?:aap|ap|ye|yeh|tum|app)\b[^.?!؟]{0,20}\b(?:insaan|insan|bot|human|robot|machine)\b"
     r"|\b(?:insaan|insan|bot|robot) (?:ho|hai|hain)\b|هل أنت|هل هذا|کیا آپ[^؟?]{0,15}(?:انسان|بوٹ|روبوٹ)",
     re.IGNORECASE,
@@ -43,7 +45,13 @@ HUMAN_CLAIM = re.compile(
     r"|\bI(?: have)?(?: also)? (?:run|ran|own|owned) (?:a|my own) (?:shop|business|store|company)\b"
     r"|\bI (?:was|went|ate|slept|travelled|traveled|had)\b[^.?!]*\b(?:yesterday|last night|this morning|"
     r"at the market|lunch|dinner|breakfast)\b"
-    r"|\bI know exactly how you feel\b",
+    r"|\bI know exactly how you feel\b"
+    # A human name or a place of its own (R-DISC-03): "my name is Ayesha", "I'm Ayesha from sales",
+    # "I'm from Karachi", "I live in Dubai". pi is "pi", from Workzap.
+    r"|\bmy name is (?!pi\b)[a-z]+"
+    r"|\b(?:this is|it's|i'm|i am) (?!pi\b|an? ai\b|workzap)[a-z]+ from (?:sales|support|the team|"
+    r"marketing|accounts|karachi|lahore|dubai|toronto|islamabad)\b"
+    r"|\bI(?:'m| am) (?:also )?from (?!workzap)[a-z]{3,}\b|\bI (?:live|am based|work) in [a-z]{3,}\b",
     re.IGNORECASE,
 )
 
@@ -53,7 +61,8 @@ SENSITIVE = re.compile(
     re.IGNORECASE,
 )
 ASKING = re.compile(
-    r"\b(?:send|share|give|provide|enter|type|tell me|forward|bhej\w*|batao|bata do|de do|dein)\b|دیں|بھیج",
+    r"\b(?:send|share|give|provide|enter|type|tell me|forward|bhej\w*|batao|bata do|de do|dein)\b"
+    r"|\bwhat(?:'s| is) your\b|\b(?:i need|i'll need|may i have|can i (?:have|get)) your\b|دیں|بھیج",
     re.IGNORECASE,
 )
 REFUSING = re.compile(
@@ -74,8 +83,8 @@ PAYMENT_RECEIVED = re.compile(
 
 PROMISE = re.compile(
     r"\bguarantee[ds]?\b|\b100\s?%|\balways works\b|\bno risk\b|\brisk[- ]free\b"
-    r"|\bwill (?:definitely|certainly|surely) (?:fix|solve|work|save)\b|\bthis will (?:fix|solve)\b"
-    r"|\byou(?:'ll| will) save\b",
+    r"|\bwill (?:definitely |certainly |surely |absolutely )?(?:fix|solve|work|save|increase|boost|grow|"
+    r"double|improve)\b|\bthis will (?:fix|solve)\b|\byou(?:'ll| will) (?:save|earn)\b",
     re.IGNORECASE,
 )
 NEGATED_PROMISE = re.compile(
@@ -136,8 +145,13 @@ PITCH_WORDS = re.compile(
 )
 URGENCY = re.compile(
     r"\blimited[- ]time\b|\blast chance\b|\boffer (?:expires|ends)\b|\bhurry\b|\bdon'?t miss\b"
-    r"|\bonly \d+ (?:days?|hours?|spots?) left\b|\bact now\b|\bspecial offer\b|\bdiscount\b",
+    r"|\bonly \d+ (?:days?|hours?|spots?) left\b|\bact now\b|\bspecial offer\b",
     re.IGNORECASE,
+)
+# Offering a discount moves a decision; saying pi cannot give one does not.
+DISCOUNT = re.compile(r"\bdiscounts?\b", re.IGNORECASE)
+NEGATED_DISCOUNT = re.compile(
+    r"(?:can't|cannot|can not|won't|no|not|never|nahi|unable)\W+(?:\w+\W+){0,4}$", re.IGNORECASE
 )
 ASKED_FOR_HELP = re.compile(
     r"\b(?:solution|fix|solve|build|quote|price|pricing|cost|how much|proposal|what can you do|"
@@ -171,6 +185,13 @@ def _customer_words(context: dict[str, Any]) -> str:
 
 def _pi_replies(context: dict[str, Any]) -> list[str]:
     return [str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "ai"]
+
+
+def _offers_discount(reply: str) -> bool:
+    for match in DISCOUNT.finditer(reply):
+        if not NEGATED_DISCOUNT.search(reply[max(0, match.start() - 40) : match.start()]):
+            return True
+    return False
 
 
 def _promise_hits(reply: str) -> bool:
@@ -239,7 +260,7 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
 
     # No pitching while listening (R-SELL)
     state = flow.parse((context.get("flow") or {}).get("state"))
-    if URGENCY.search(reply):
+    if URGENCY.search(reply) or _offers_discount(reply):
         add(Violation("R-SELL-03", "no urgency, scarcity or discounts to move a decision", True))
     if state in flow.NO_OFFER:
         requested = bool(ASKED_FOR_HELP.search(str(context.get("latest_customer_message", ""))))
@@ -272,6 +293,12 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
     words = len(reply.split())
     if words > cap:
         add(Violation("R-VOICE-01", f"too long: {words} words, the limit is {cap}"))
+    elif cap == WORD_CAP and words > int(
+        (context.get("style") or {}).get("reply_up_to_words") or cap
+    ):
+        # They write short: stay near one and a half times their length (spec 8.4.1).
+        reach = context["style"]["reply_up_to_words"]
+        add(Violation("R-VOICE-01", f"they write short: about {reach} words at most, not {words}"))
     if hype := _contains(reply, HYPE):
         add(Violation("R-VOICE-05", f'no hype ("{hype}")'))
     if empathy := _contains(reply, FAKE_EMPATHY):

@@ -1,6 +1,7 @@
 """The team arranges a meeting from its request in one step: the time and link go into
 the answer, and pi tells the customer. A Google Meet link needs a connected calendar."""
 
+from datetime import date, timedelta
 from uuid import UUID
 
 import pytest
@@ -13,6 +14,8 @@ from app.shared.scope import WorkspaceScope
 
 pytestmark = pytest.mark.integration
 DESK = "/api/v1/pi/requests"
+# A meeting must be in the future: a fixed date turns these tests red once it has passed.
+SLOT = f"{date.today() + timedelta(days=14):%Y-%m-%d}T17:00"
 
 
 async def _meeting_request(pi, calendar: bool = False) -> str:
@@ -34,7 +37,7 @@ async def test_a_meeting_with_their_own_link_goes_to_pi(api, business_db):
     done = await api.post(
         f"{DESK}/{request_id}/meeting",
         json={
-            "starts_at": "2026-10-20T17:00",
+            "starts_at": SLOT,
             "duration_minutes": 45,
             "how": "link",
             "link": "https://zoom.us/j/123456789",
@@ -57,12 +60,12 @@ async def test_in_person_needs_a_place_and_no_calendar_still_gets_a_link(api, bu
     request_id = await _meeting_request(pi)
     no_place = await api.post(
         f"{DESK}/{request_id}/meeting",
-        json={"starts_at": "2026-10-20T17:00", "how": "in_person"},
+        json={"starts_at": SLOT, "how": "in_person"},
     )
     assert no_place.status_code == 422
     no_calendar = await api.post(
         f"{DESK}/{request_id}/meeting",
-        json={"starts_at": "2026-10-20T17:00", "how": "google_meet"},
+        json={"starts_at": SLOT, "how": "google_meet"},
     )
     # No calendar connected: pi makes a video-call link itself, nobody pastes anything.
     assert no_calendar.status_code == 200, no_calendar.text
@@ -89,7 +92,7 @@ async def business_db_row(pi, request_id: str) -> PiStaffRequest:
 async def test_the_teams_yes_with_a_link_arranges_the_time_the_customer_asked_for(api, business_db):
     pi = await pi_workspace(api, business_db, business_type="service_business")
     request_id = await _meeting_request(pi)
-    await _asked_for(pi, request_id, "2026-10-20T17:00")
+    await _asked_for(pi, request_id, SLOT)
     done = await api.post(
         f"{DESK}/{request_id}/answer",
         json={"answer": "Yes confirmed, use https://zoom.us/j/987654321"},
@@ -104,7 +107,7 @@ async def test_the_teams_yes_with_a_link_arranges_the_time_the_customer_asked_fo
 async def test_a_bare_yes_without_a_calendar_makes_a_video_link(api, business_db):
     pi = await pi_workspace(api, business_db, business_type="service_business")
     request_id = await _meeting_request(pi)
-    await _asked_for(pi, request_id, "2026-10-20T17:00")
+    await _asked_for(pi, request_id, SLOT)
     yes = await api.post(f"{DESK}/{request_id}/answer", json={"answer": "Yes, do confirmed"})
     assert yes.status_code == 200, yes.text
     answer = yes.json()["answer"]

@@ -8,7 +8,6 @@ from types import SimpleNamespace
 from uuid import uuid4
 
 import pytest
-
 from pydantic import SecretStr
 
 from app.core.config import Settings
@@ -75,6 +74,33 @@ def test_wont_do_is_never_empty():
 def test_prices_promises_and_jargon_are_caught(text, rule):
     draft = good(components=[Component(text=text, problems=["aaa11111"])])
     assert any(rule in i for i in bd.check_solution(draft, REFS))
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "It would cover your 4 shops and 12 staff since 2024.",
+        "A check for problem 36619855 would help.",
+        "It would take about 6 weeks.",
+    ],
+)
+def test_a_year_a_count_or_a_reference_is_not_a_price(text):
+    draft = good(components=[Component(text=text, problems=["aaa11111"])])
+    assert not any("R-DOC-09" in i for i in bd.check_solution(draft, REFS))
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "It would cost 5000 to set up.",
+        "The fee would be 25k.",
+        "It would be 2 lakh in total.",
+        "A set-up of 1,500 would be needed.",
+    ],
+)
+def test_more_ways_of_writing_a_price_are_caught(text):
+    draft = good(components=[Component(text=text, problems=["aaa11111"])])
+    assert any("R-DOC-09" in i for i in bd.check_solution(draft, REFS))
 
 
 def test_a_sentence_that_is_too_long_is_caught():
@@ -151,8 +177,17 @@ def solution_doc(**changes):
         draft, [row], business="Bright Studio", ref="SD-0001", language="en", local=False
     )
     values = dict(
-        id=uuid4(), kind="solution", number=1, version=1, status="in_review", drafted_by="pi",
-        content=content, content_en={}, language="en", customer_id=uuid4(), offer_id=uuid4(),
+        id=uuid4(),
+        kind="solution",
+        number=1,
+        version=1,
+        status="in_review",
+        drafted_by="pi",
+        content=content,
+        content_en={},
+        language="en",
+        customer_id=uuid4(),
+        offer_id=uuid4(),
     )
     return PiBrainDocument(**{**values, **changes})
 
@@ -310,6 +345,9 @@ def test_the_pdfs_carry_the_text_and_only_the_quote_carries_bank_details():
         language="en",
     )
     assert pdf.startswith(b"%PDF") and b"SD-0001" in pdf
+    assert (
+        b"pi by Workzap" in pdf and b"Bright Studio" in pdf
+    )  # Workzap letterhead, their business named (R-DOC-08)
     assert b"What Workzap would build" in pdf and b"What it won't do" in pdf
     assert b"We keep running out" in pdf  # the person's own words
     assert b"IBAN" not in pdf and b"PK36" not in pdf

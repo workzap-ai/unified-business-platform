@@ -134,3 +134,22 @@ Learning loop (Part 8) comes after P7 and is out of scope here.
 - Prod needs migrations 0033 (already on the real DB), 0034 and 0035 before the flag is turned on.
 - Roman Urdu and Urdu phrase lists (yes, banned phrases, emergency words) are thin and need
   native-speaker review before launch (spec 2.5.1).
+
+## 7. Status (2026-10-22)
+
+| Phase | State | Commit | Notes |
+|---|---|---|---|
+| Industry packs | done | 493b5ea | flag `knowledge_config.industry_packs`, migration 0033 |
+| Constitution linter | done | 623ec92 | flag `response_rules.constitution`; hardened by `test_pi_redteam.py` |
+| P1 state core | done | a3cd10f | `pi_mode`, migration 0034 |
+| P2 problems and taxonomy | done | 3234105 | migration 0035 |
+| P3 offer and decision gates | done | d4432fb | migration 0036 (`can_approve`) |
+| P4 documents and quote | done in code, review UI missing | 1de1b6c and later | migration 0037; reviewer API only (`/pi/brain-documents`), no screen yet; sending outside the 24-hour window needs a template (open) |
+| Style profile and repair strategies (spec 8.4.1, 8.4.2) | done | | `style.py`, brain-mode context and a linter length rule |
+| P5 payment and kickoff | open | | staff-only payment confirmation, kickoff slots |
+| P6 X-states and safety classifiers | open | | emergency, PII in the message log, advice limits, opt-out, escalation reasons |
+| P7 golden conversations G1 to G15 | partly | | G5, G10, G11, G13 covered; see `pi-rule-coverage.md` |
+| Learning loop (Part 8) | open | | reward model, example bank, question arms, nightly jobs |
+
+Production still needs migrations 0034 to 0037 (the real database is at 0033) before `pi_mode` is
+turned on anywhere.

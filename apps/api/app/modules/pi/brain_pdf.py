@@ -125,12 +125,14 @@ class _Page:
 
 
 def _header(doc: Document, business: str, title: str, number: str, issued: date) -> float:
+    # Workzap's letterhead only (R-DOC-08); the customer's business is named under it.
     doc.box(0, 0, WIDTH, 84, BRAND)
-    doc.text(MARGIN, 40, business, 19, True, (1, 1, 1))
-    doc.text(MARGIN, 62, title, 11, False, LIGHT)
+    doc.text(MARGIN, 40, "Workzap", 19, True, (1, 1, 1))
+    doc.text(MARGIN, 62, "pi by Workzap", 11, False, LIGHT)
     doc.text(RIGHT, 40, number, 14, True, (1, 1, 1), "right")
     doc.text(RIGHT, 62, _day(issued), 11, False, LIGHT, "right")
-    return 116.0
+    doc.text(MARGIN, 112, f"{title} - {business}", 13, True, INK)
+    return 140.0
 
 
 def render_solution(

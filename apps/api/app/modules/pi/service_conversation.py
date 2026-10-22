@@ -30,6 +30,7 @@ from app.modules.pi import (
     industry_packs,
     price_policy,
     problems,
+    style,
     taxonomy,
 )
 from app.modules.pi.guard import ReplyRejected, validate_reply
@@ -837,6 +838,11 @@ problem: ask what it would fix and note that; keep the wish in requested_solutio
 - noted_problems lists what is already noted (ref, title, group, status, missing). Never ask
   for anything not in "missing" of the problem you are on, and never re-note a problem.
 - If shape_question_due is true, ask once, naturally: "What kind of business is it?"
+- style (when present) is how this person writes: keep your reply to about style.reply_up_to_words
+  words or fewer, match style.formality and never be more familiar than they are (aap stays
+  aap), use an emoji only if style.uses_emoji, and if style.voice_notes keep it extra short.
+- repair (when present) means your last reply did not land. Do not repeat it; do what
+  repair.do says, in one short message, and ask nothing new except as it says.
 Categories and sub-types:
 """ + "\n".join(
     f"  {cat.key}: {', '.join(cat.subtypes)}" if cat.subtypes else f"  {cat.key}"
@@ -1062,7 +1068,9 @@ def validate_service_reply(
     dates stay internal in the brief. ``exact``/``starting`` modes still refuse written
     amounts that cannot be matched against approved evidence."""
     checked = reply
-    for text in allowed or []:
+    # Longest first: a short allowed figure ("2" from the customer's own message) must not eat
+    # part of a longer allowed line (a quote's number and total) before that line is matched.
+    for text in sorted(allowed or [], key=len, reverse=True):
         checked = checked.replace(text, " ")  # exact offered labels only
     if mode in price_policy.NO_DISCLOSURE and any(
         ch.isdecimal() or unicodedata.category(ch) == "Sc" for ch in checked
@@ -1104,6 +1112,7 @@ async def brain_problems(
     policy: PiSettings,
     industry_known: bool,
     message: PiMessage | None = None,
+    rows: list[PiMessage] | None = None,
 ) -> dict[str, Any]:
     """What pi has noted so far for this customer (brain mode), for the prompt."""
     if not flow.brain_mode(policy.response_rules) or conversation.customer_id is None:
@@ -1126,7 +1135,30 @@ async def brain_problems(
         quote = await brain_docs.open_quote(session, scope, conversation.customer_id)
         if quote is not None:
             context["open_quote"] = quote
+    context.update(matching_the_person(conversation, message, rows or []))
     return context
+
+
+def matching_the_person(
+    conversation: PiConversation, message: PiMessage | None, rows: list[PiMessage]
+) -> dict[str, Any]:
+    """How to answer this person (spec 8.4.1) and, if they look lost, what to try (8.4.2)."""
+    theirs = [m for m in rows if m.sender_type == "customer"]
+    latest = message.body if message is not None and message.body else ""
+    said = [m.body for m in theirs if m.body] + ([latest] if latest else [])
+    voice = sum(1 for m in theirs if m.message_type == "audio")
+    voice += 1 if message is not None and message.message_type == "audio" else 0
+    found: dict[str, Any] = {}
+    if said:
+        found["style"] = style.profile(said, voice_notes=voice, total=len(said))
+    brief = dict(conversation.service_brief or {})
+    step = style.repair_step(int(brief.get("repair_step") or 0), latest)
+    if step:
+        found["repair"] = {"step": step, "do": style.REPAIR[step]}
+    if step != int(brief.get("repair_step") or 0):
+        brief["repair_step"] = step
+        conversation.service_brief = brief
+    return found
 
 
 def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -1530,7 +1562,9 @@ async def prepare_context(
     industry = await industry_context_for(
         session, scope, conversation, message, rows, profile, policy
     )
-    brain = await brain_problems(session, scope, conversation, policy, bool(industry), message)
+    brain = await brain_problems(
+        session, scope, conversation, policy, bool(industry), message, rows
+    )
     return {
         **industry,
         **brain,
@@ -4314,6 +4348,8 @@ async def run_service_action(
             return f"\u2713 {result.data['label']} ({result.data['timezone']})", None
         return None, "The requested time could not be booked; please offer the customer another."
     if turn.action == "payment":
+        if context.get("pi_mode") == "brain":
+            return None, None  # R-PAY-01: no payment in chat; the bank details are on the quote
         methods = context.get("payment_methods", [])
         chosen = "" if turn.payment_method == "none" else turn.payment_method
         method = chosen or (methods[0] if methods else "")
