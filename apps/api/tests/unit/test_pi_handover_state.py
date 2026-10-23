@@ -36,3 +36,23 @@ def test_returning_without_a_remembered_state_goes_back_to_listening():
     c = chat("X_HUMAN")
     flow.hand_back(c)
     assert c.flow_state == "S1_LISTENING"
+
+
+def test_handing_back_marks_that_pi_must_say_who_it_is_again():
+    c = chat("S3_NOTED")
+    flow.hand_to_human(c)
+    flow.hand_back(c)
+    assert c.service_brief["handback_notice"] is True
+
+
+def test_the_first_reply_after_a_hand_back_is_the_fixed_line():
+    from app.modules.pi.service_conversation import brain_safety
+
+    context = {
+        "latest_customer_message": "ok go on",
+        "reply_language": "en",
+        "handback_notice": True,
+    }
+    reply = brain_safety(context)
+    assert reply is not None and "pi again" in reply.reply and reply.reply.count("?") == 1
+    assert brain_safety({"latest_customer_message": "ok go on", "reply_language": "en"}) is None

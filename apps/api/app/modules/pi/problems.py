@@ -8,6 +8,7 @@ names or card, phone or ID numbers (redacted first), and every change is a revis
 
 import re
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any, Literal
 from uuid import UUID
@@ -17,6 +18,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import taxonomy
+from app.modules.pi.language import amount_value, date_estimate
 from app.modules.pi.problem_models import (
     PiProblem,
     PiProblemGroup,
@@ -341,11 +343,14 @@ class ProblemBook:
             tags=tags,
             scope={"where": [w[:80] for w in note.where[:8]], "of_total": note.of_total[:80]},
             frequency={"text": note.frequency_text[:120], "normalised": _frequency(note)},
-            since={"text": note.since_text[:120]},
+            since=date_estimate(note.since_text, datetime.now(UTC).date())
+            if note.since_text
+            else {"text": ""},
             trigger=note.trigger.strip()[: FIELD_LIMITS["trigger"]],
             impact={
                 "types": [t for t in note.impact_types if t in taxonomy.IMPACT_TYPES],
                 "money_text": note.money_text[:120],
+                "money_value": amount_value(note.money_text),
             },
             severity_stated=note.severity_stated
             if note.severity_stated in taxonomy.SEVERITIES
@@ -408,12 +413,13 @@ class ProblemBook:
                 frequency["normalised"] = note.frequency
             put("frequency", frequency)
         if note.since_text:
-            put("since", {"text": note.since_text[:120]})
+            put("since", date_estimate(note.since_text, datetime.now(UTC).date()))
         if note.impact_types or note.money_text:
             impact = dict(problem.impact or {})
             kinds = [t for t in note.impact_types if t in taxonomy.IMPACT_TYPES]
             impact["types"] = kinds or impact.get("types", [])
             impact["money_text"] = note.money_text[:120] or impact.get("money_text", "")
+            impact["money_value"] = amount_value(impact["money_text"])
             put("impact", impact)
         if note.severity_stated in taxonomy.SEVERITIES and note.severity_stated != "unknown":
             put("severity_stated", note.severity_stated)
@@ -455,14 +461,15 @@ class ProblemBook:
         keep.revision += 1
         await self._revise(keep, {"merged": [short_ref(o.id) for o in others]}, "merged", "pi")
 
-    async def confirm_drafts(self, keep: set[UUID]) -> int:
-        """A noted line the person saw and did not object to becomes confirmed (spec 4.3)."""
+    async def confirm_drafts(self, keep: set[UUID], explicit: bool = False) -> int:
+        """A noted line the person saw and did not object to becomes confirmed (spec 4.3). One
+        pi was unsure of (confidence under 0.6) needs the person to say so: `explicit`."""
         count = 0
         for problem in await self.active():
             if (
                 problem.status == "draft"
                 and problem.id not in keep
-                and problem.confidence >= taxonomy.CONFIRM_BELOW
+                and (explicit or problem.confidence >= taxonomy.CONFIRM_BELOW)
             ):
                 problem.status = "confirmed"
                 count += 1
@@ -564,6 +571,18 @@ async def noted_context(
     """The noted problems as compact JSON for the prompt: ref, title, group, status, gaps."""
     book = ProblemBook(session, scope, customer_id, "en")
     compact: list[dict[str, Any]] = []
+    renamed = {
+        g.category: g.name
+        for g in await session.scalars(
+            select(PiProblemGroup).where(
+                PiProblemGroup.tenant_id == scope.tenant_id,
+                PiProblemGroup.environment_id == scope.environment_id,
+                PiProblemGroup.customer_id == customer_id,
+                PiProblemGroup.created_by == "person",
+            )
+        )
+        if g.name
+    }
     for problem in (await book.active())[:limit]:
         missing = [
             name
@@ -585,7 +604,10 @@ async def noted_context(
             {
                 "ref": short_ref(problem.id),
                 "title": problem.title,
+                "title_local": problem.title_local or "",
                 "group": problem.category,
+                "group_name": renamed.get(problem.category, ""),
+                "score": float(problem.severity_score) if problem.severity_score else None,
                 "status": problem.status,
                 "missing": missing,
             }
@@ -624,19 +646,23 @@ def summary_message(problems: list[dict[str, Any]], language: str = "en") -> str
     {category, title, score?}. Over 12 problems it shows two lines per group."""
     intro, more, close = SUMMARY_TEXT.get(language, SUMMARY_TEXT["en"])
     groups: dict[str, list[dict[str, Any]]] = {}
+    names: dict[str, str] = {}
     for item in problems:
         groups.setdefault(item["category"], []).append(item)
+        if item.get("group_name"):
+            names[item["category"]] = str(item["group_name"])
     order = sorted(groups, key=lambda key: (-len(groups[key]), taxonomy.OTHER == key, key))
     long = len(problems) > SUMMARY_FULL_LIST
     lines = [intro, ""]
     hidden = 0
     for key in order:
         items = sorted(groups[key], key=lambda i: -float(i.get("score") or 0))
-        lines.append(f"*{taxonomy.label(key, language)}* ({len(items)})")
+        lines.append(f"*{names.get(key) or taxonomy.label(key, language)}* ({len(items)})")
         shown = items[:2] if long else items
         hidden += len(items) - len(shown)
         for item in shown:
-            words = str(item["title"]).split()[:SUMMARY_LINE_WORDS]
+            own = str(item.get("title_local") or "") if language != "en" else ""
+            words = (own or str(item["title"])).split()[:SUMMARY_LINE_WORDS]
             lines.append("• " + " ".join(words))
         lines.append("")
     if hidden:
@@ -660,7 +686,11 @@ WHAT_NOW = re.compile(
 
 
 def summary_due(
-    text: str, noted: int, since_summary: int, trigger: int = SUMMARY_TRIGGER
+    text: str,
+    noted: int,
+    since_summary: int,
+    trigger: int = SUMMARY_TRIGGER,
+    quiet_replies: int = 0,
 ) -> str | None:
     """Why pi should show the sorted summary now (spec 3.7), or None."""
     if noted < 1:
@@ -671,6 +701,8 @@ def summary_due(
         return "what_now"
     if since_summary >= trigger:
         return "many"
+    if quiet_replies >= 2 and since_summary >= 1:
+        return "quiet"
     return None
 
 

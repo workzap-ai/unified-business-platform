@@ -35,7 +35,8 @@ NAME_STOP = frozenset(
     "dealer admin including incl units unit retail manufacturing general other firm practice "
     "group club house plant collection delivery distribution production processing management "
     "repair installation operations agents agent providers trade traders sales rental hire "
-    "support facility field".split()
+    "support facility field eid ramadan online payment payments client clients customer "
+    "customers contractor contractors".split()
 )
 
 # Question-bank areas are written in plain words; map a problem category to the ones that fit.
@@ -117,7 +118,8 @@ def _index() -> dict[str, dict[str, float]]:
         raw[key] = {t for t in terms if len(t) >= 3}
     names: dict[str, set[str]] = {}
     for key, pack in packs.items():
-        words = (_stem(w) for w in _fold(pack["name"]).split())
+        plain = re.sub(r"\([^)]*\)", " ", pack["name"])  # "(incl. Eid ...)" is not part of the name
+        words = (_stem(w) for w in _fold(plain).split())
         names[key] = {w for w in words if len(w) >= 3 and w not in NAME_STOP}
     frequency: dict[str, int] = {}
     for key in packs:

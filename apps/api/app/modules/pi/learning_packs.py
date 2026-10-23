@@ -145,6 +145,7 @@ async def unclassified(session: AsyncSession, scope: WorkspaceScope) -> list[tup
                 Customer.tenant_id == scope.tenant_id,
                 Customer.environment_id == scope.environment_id,
                 Customer.industry_primary.is_not(None),
+                Customer.industry_primary != "unclassified",
             )
         )
     )

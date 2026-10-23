@@ -35,8 +35,12 @@ from app.modules.pi import (
     price_policy,
     problems,
     safety,
+    spec_handbook,
     style,
     taxonomy,
+)
+from app.modules.pi import (
+    critique as critique_mod,
 )
 from app.modules.pi.guard import ReplyRejected, validate_reply
 from app.modules.pi.knowledge import KnowledgeService, remember
@@ -45,7 +49,9 @@ from app.modules.pi.language import (
     clearly_other,
     detect_language,
     english_greeting,
+    festival_wish,
     returning_greeting,
+    salam,
 )
 from app.modules.pi.links import link_note
 from app.modules.pi.models import (
@@ -879,6 +885,17 @@ person's answer, so you never write those. In S4 and S5 you only answer what the
 
 BRAIN_VOICE = """
 Script and company facts (pi_mode "brain"; these override the shared rules above).
+- In brain mode ignore the older rules above about a "brief", "projects", ready_for_team,
+  "proceeding with", sending the brief to the team, or restating the whole request in a
+  bullet list. You only listen and note problems: confirm ONE thing in the customer's own
+  words in one short line, then ask one question. Never say you are proceeding with, or
+  starting, anything.
+- spec_guidance is the pi-brain specification in its own words for this moment: follow it
+  before anything else in this prompt. emergency_numbers are the numbers to give in an
+  emergency (the emergency rule itself is handled for you).
+- In your first message say you are pi, an AI from Workzap (not "the company's AI assistant").
+  Never say or imply that a person or "the team" reads this chat unless a person has taken
+  the chat over: pi is an AI that notes what the customer says; people only see what pi passes on.
 - Reply in the language AND script of the customer's latest message. When they write Urdu in
   Urdu (Arabic) script, reply in Urdu script (right to left), not Roman Urdu; set
   language="roman_ur" for Urdu in either script. Roman Urdu stays Roman Urdu. Arabic stays Arabic.
@@ -1169,6 +1186,9 @@ async def brain_problems(
     if problems.shape_question_due(len(noted), industry_known, bool(brief.get("industry_asked"))):
         context["shape_question_due"] = True
     context["problems_since_summary"] = len(noted) - int(brief.get("summary_count") or 0)
+    context["quiet_replies"] = int(brief.get("quiet_replies") or 0)
+    context["handback_notice"] = bool(brief.get("handback_notice"))
+    context["clarify_count"] = int(brief.get("clarify_count") or 0)
     from app.modules.customers.models import Customer
 
     customer = await session.get(Customer, conversation.customer_id)
@@ -1198,6 +1218,18 @@ async def brain_problems(
                 canary_percent=brain_config.value(policy.response_rules, "canary_percent"),
             )
         )
+    # The specification itself, in its own words, for this stage and topic (spec Appendix A).
+    context["spec_guidance"] = spec_handbook.guidance(
+        conversation.flow_state or "S1_LISTENING",
+        message.body if message is not None and message.body else "",
+        conversation.language or "en",
+        can_approve=bool(context.get("can_approve", True)),
+        days_away=int(context.get("days_away") or 0),
+    )
+    country = context.get("customer_country")
+    context["emergency_numbers"] = (
+        safety.NUMBERS[country] if country in safety.NUMBERS else safety.ALL_COUNTRIES
+    )
     return context
 
 
@@ -1249,6 +1281,10 @@ ESCALATION_TEXT = {
         "REFUND or DISPUTE: the customer asks Workzap for a refund or disputes a payment. pi "
         "decided nothing and promised nothing. Please reply to them and note the outcome."
     ),
+    "price_request": (
+        "PRICE REQUEST: the customer asks for a discount or a lower price. pi cannot change "
+        "a quote and promised nothing. Please reply to them."
+    ),
     "abuse": (
         "ABUSE: the customer has been abusive. pi stayed calm and has stopped answering until a "
         "person decides (Documents and payments is not the place: use the unblock action)."
@@ -1264,6 +1300,7 @@ BOUNDARY_EFFECTS: dict[safety.Boundary, tuple[list[str], dict[str, Any]]] = {
     safety.Boundary.BANK_CHANGE: (["escalate"], {"escalate": "payment_detail_change"}),
     safety.Boundary.COMPLAINT: (["escalate"], {"escalate": "complaint"}),
     safety.Boundary.REFUND: (["escalate"], {"escalate": "refund_dispute"}),
+    safety.Boundary.DISCOUNT: (["escalate"], {"escalate": "price_request"}),
 }
 
 
@@ -1297,6 +1334,18 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
             {"emergency": {"kind": kind.value}},
             "R-EMER",
         )
+    if context.get("handback_notice"):  # a person handed the chat back: say who pi is again
+        return fixed(
+            safety.handback_reply(language), None, [], {"handback_notice": False}, "R-DISC-04"
+        )
+    for courtesy, is_wish in (("salam", salam), ("festival", festival_wish)):
+        if is_wish(text):
+            opened = any(h.get("role") == "ai" for h in context.get("history") or [])
+            line = safety.greeting_reply(courtesy, language)
+            if not opened:  # the AI disclosure comes first, whatever the greeting (R-DISC-01)
+                opening = flow.OPENING["roman_ur" if language == "roman_ur" else "en"]
+                line = f"{line.split('.')[0]}. {opening}"
+            return fixed(line, None if opened else flow.State.S1_LISTENING, why="R-LANG-08")
     if safety.unsupported_language(text):
         return fixed(safety.UNSUPPORTED_TEXT, why="RT19")
     if pii.get("only"):
@@ -1328,8 +1377,16 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
         return fixed(safety.advice_reply(advice, language), why="R-ADV")
     if (limit := safety.boundary_asked(text)) is not None:
         effects, marks = BOUNDARY_EFFECTS.get(limit, ([], {}))
+        move = flow.State.X_OUT_OF_SCOPE if limit == safety.Boundary.WRONG_NUMBER else None
+        if limit == safety.Boundary.BANK_ASK and (context.get("flow") or {}).get("state") in (
+            "S9_APPROVED",
+            "S10_AWAITING_PAYMENT",
+            "S11_PAYMENT_CONFIRMED",
+            "S12_KICKOFF",
+        ):
+            limit = safety.Boundary.BANK_ASK_APPROVED  # M3: the details are on the approved quote
         return fixed(
-            safety.boundary_reply(limit, language), None, list(effects), dict(marks), "R-BOUNDARY"
+            safety.boundary_reply(limit, language), move, list(effects), dict(marks), "R-BOUNDARY"
         )
     if (about := safety.nori_asked(text)) is not None:
         return fixed(safety.nori_reply(about, language), why="R-HONEST-02")
@@ -1357,7 +1414,13 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     created = [op.note for op in turn.problem_ops if op.op == "create" and op.note]
     items = [
-        {"category": p["group"], "title": p["title"], "score": p.get("score")}
+        {
+            "category": p["group"],
+            "title": p["title"],
+            "title_local": p.get("title_local"),
+            "group_name": p.get("group_name"),
+            "score": p.get("score"),
+        }
         for p in context.get("noted_problems") or []
     ] + [
         {
@@ -1371,7 +1434,8 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         (context.get("brain_settings") or {}).get("summary_trigger") or problems.SUMMARY_TRIGGER
     )
     said = str(context.get("latest_customer_message", ""))
-    if not problems.summary_due(said, len(items), since, trigger):
+    quiet = int(context.get("quiet_replies") or 0)
+    if not problems.summary_due(said, len(items), since, trigger, quiet):
         return
     language = str(context.get("reply_language") or "en")
     turn.reply = problems.summary_message(items, language)
@@ -1561,9 +1625,23 @@ async def note_problems(
     elif conversation.customer_id is not None:
         # They saw the noted lines and moved on without objecting: those are confirmed.
         book = problems.ProblemBook(session, scope, conversation.customer_id, turn.language)
-        await book.confirm_drafts(set())
+        await book.confirm_drafts(set(), explicit=decisions.summary_ok(message.body or ""))
     brief = dict(conversation.service_brief or {})
+    # Two replies in a row with nothing new noted also bring the summary (spec 3.7).
+    # (counted only once something has been noted, so a vague opening never triggers it)
+    quiet = (
+        int(brief.get("quiet_replies") or 0) + 1 if brief.get("had_problem") and not noted else 0
+    )
+    brief["quiet_replies"] = quiet
+    if noted:
+        brief["had_problem"] = True
+    # R-ASK-02: clarifying questions asked since the last problem was noted
+    asked = turn.reply.rstrip().endswith(("?", "؟")) and not turn._summary
+    brief["clarify_count"] = (
+        0 if noted or turn._summary else int(brief.get("clarify_count") or 0) + (1 if asked else 0)
+    )
     if turn._summary and conversation.customer_id is not None:
+        brief["quiet_replies"] = 0
         book = problems.ProblemBook(session, scope, conversation.customer_id, turn.language)
         brief["summary_count"] = len(await book.active())
     if turn._asked_shape:
@@ -1670,7 +1748,18 @@ async def industry_context_for(
     if customer is None:
         return {}
     texts = industry_texts(message, rows, profile, conversation.service_brief)
-    return industry_context(customer, texts)
+    found = industry_context(customer, texts)
+    if not found and not customer.industry_primary:
+        # Spec 7.O: no pack fits, so keep the person's own description (the nightly run
+        # clusters these into a new pack once five similar businesses have arrived).
+        described = str(profile.get("business_type") or profile.get("industry") or "").strip()
+        said = [m for m in rows if m.sender_type == "customer"]
+        if described and len(said) >= 3:
+            customer.industry_primary = "unclassified"
+            brief = dict(conversation.service_brief or {})
+            brief["industry_description"] = described[:300]
+            conversation.service_brief = brief
+    return found
 
 
 async def prepare_context(
@@ -3383,6 +3472,10 @@ async def compose_service_turn(
         )
     strict = flow.strict_voice(policy.response_rules)
     if strict and (broke := constitution.lint(turn.reply, context)):
+        # A style slip is fixed quietly, and the missing AI line is added by the application; any
+        # other hard rule that needed a rewrite is a defect worth scoring.
+        if [v for v in constitution.hard(broke) if v.rule != "R-DISC-01"]:
+            context["lint_slipped"] = True  # scored later as a rule break (spec 8.3)
         text = constitution.describe(broke)
         problem = f"{text}, and also: {problem}" if problem else text
     if context.get("pi_mode") == "brain" and turn.problem_ops:
@@ -3394,6 +3487,12 @@ async def compose_service_turn(
     asks_status = bool(STATUS_ASK.search(str(context.get("latest_customer_message", ""))))
     if not turn.request_human and (missed_status := status_missed(turn.reply, context)):
         problem = f"{missed_status}, and also: {problem}" if problem else missed_status
+    if (
+        not problem
+        and context.get("pi_mode") == "brain"
+        and critique_mod.switched_on(policy.response_rules)
+    ):
+        problem = await critique_mod.critique(manager, scope, context, turn.reply) or problem
     if problem:
         # One self-correction: show the model its draft and why it can't be sent.
         retry = await manager.complete_structured(
@@ -3496,6 +3595,8 @@ async def compose_service_turn(
             )
             raise rejected_with(turn, "CONSTITUTION_BREAK")
     if context.get("pi_mode") == "brain":
+        turn.ready_for_team = False  # no lead, proposal or team brief before the offer (R-SELL-02)
+        turn.projects = []
         brain_summary(turn, context)
         brain_decision(turn, context)
     if expected in NAMES and mixed_line(turn.reply, str(expected)):
@@ -3532,7 +3633,12 @@ async def compose_service_turn(
         confirm_summarised(turn, context)
     # Added last, so a rewrite above can never drop it.
     turn.reply = with_consent_question(turn, context)
-    turn.projects = merge_projects((context.get("brief") or {}).get("projects"), turn)
+    # Brain mode keeps no project list: it notes problems, and a project starts at the offer.
+    turn.projects = (
+        []
+        if context.get("pi_mode") == "brain"
+        else merge_projects((context.get("brief") or {}).get("projects"), turn)
+    )
     if not turn.summary.strip() or turn.summary.startswith("Conversation in progress"):
         turn.summary = team_summary(turn)
     # WhatsApp shows a list only when each point starts its own line.
@@ -3649,7 +3755,9 @@ async def save_service_turn(
         await log_request_changes(session, scope, conversation, previous, turn.projects)
     proposals_due: list[UUID] = []
     projects = [p for p in turn.projects if p.title.strip()]
-    if projects:
+    if flow.brain_mode(policy.response_rules):
+        pass  # brain mode opens no lead and writes no proposal before the offer (R-SELL-02)
+    elif projects:
         # One deal per project: each gets its own lead, brief and proposal.
         won = await won_projects(session, scope, conversation)
         existing = await chat_deal_titles(session, scope, conversation)

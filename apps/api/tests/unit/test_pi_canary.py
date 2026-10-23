@@ -40,20 +40,28 @@ def test_about_the_chosen_share_is_in():
     assert 0.07 < share < 0.13
 
 
-def test_enough_good_use_promotes():
-    assert judge(window(30, 60)) == "promote"
+def test_enough_good_use_over_four_weeks_promotes():
+    assert judge(window(30, 60), days=29) == "promote"
+
+
+def test_three_hundred_conversations_promote_sooner():
+    assert judge(window(300, 600), days=5) == "promote"
+
+
+def test_thirty_uses_in_five_days_are_not_enough():
+    assert judge(window(30, 60), days=5) == "continue"
 
 
 def test_too_few_uses_keep_watching():
-    assert judge(window(12, 60)) == "continue"
+    assert judge(window(12, 60), days=29) == "continue"
 
 
 def test_too_young_keeps_watching():
-    assert judge(window(30, 60), days=1) == "continue"
+    assert judge(window(300, 600), days=1) == "continue"
 
 
 def test_worse_than_control_is_not_promoted():
-    assert judge(window(30, 60, used_reward=0, control_reward=2)) == "continue"
+    assert judge(window(30, 60, used_reward=0, control_reward=2), days=29) == "continue"
 
 
 def test_rising_confusion_rolls_back_even_on_a_small_sample():

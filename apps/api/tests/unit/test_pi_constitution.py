@@ -200,9 +200,11 @@ def test_real_short_reactions_are_fine():
 
 
 def test_exclamation_marks_only_when_they_used_one_and_only_one():
+    # spec R-VOICE-07: only a festival greeting, only if they used one first, once per conversation
     assert "R-VOICE-07" in rules("Noted!")
-    assert "R-VOICE-07" not in rules("Noted!", latest="stock khatam ho gaya!")
-    assert "R-VOICE-07" in rules("Noted! Sorted!", latest="stock khatam ho gaya!")
+    assert "R-VOICE-07" in rules("Noted!", latest="stock khatam ho gaya!")  # not a festival
+    assert "R-VOICE-07" not in rules("Eid Mubarak!", latest="Eid Mubarak!")
+    assert "R-VOICE-07" in rules("Eid Mubarak! Sorted!", latest="Eid Mubarak!")
 
 
 def test_emoji_only_a_tick_unless_they_use_emoji():
@@ -216,7 +218,7 @@ def test_repair_removes_stray_bangs_and_emoji():
     assert c.repair("Noted! Thanks!", context()) == "Noted. Thanks."
     assert c.repair("Noted 😊", context()) == "Noted"
     assert c.repair("Noted ✅", context()) == "Noted ✅"
-    assert c.repair("Noted! Thanks!", context(latest="stock khatam!")) == "Noted! Thanks."
+    assert c.repair("Noted! Thanks!", context(latest="Eid Mubarak!")) == "Noted! Thanks."
 
 
 def test_whatsapp_formatting_only():

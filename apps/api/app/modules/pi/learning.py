@@ -40,6 +40,7 @@ REWARDS: dict[str, int] = {
     "asked_human_because_of_pi": -2,
     "opt_out": -5,
     "complaint": -5,
+    "rule_break": -5,  # pi's first draft broke a rule and had to be rewritten
 }
 # Deliberately absent, whatever a caller passes: the business outcome is reported, never rewarded.
 NEVER_REWARDED = frozenset(

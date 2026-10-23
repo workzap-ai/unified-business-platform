@@ -19,7 +19,7 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-DISC-01 | First message says it is an AI | code | linter hard rule + `repair` adds the line; fixed opening in `greeting_reply` |
 | R-DISC-02 | "Are you human?" answered in sentence one | code | linter plus a fixed pre-model answer (`safety.identity_asked`) |
 | R-DISC-03 | No human name, body, gender, place | code | linter `HUMAN_CLAIM` (persona names, places, family, meals) |
-| R-DISC-04 | No "a human is reading" unless one took over | open | X_HUMAN is not driven by the inbox handover yet (P6) |
+| R-DISC-04 | No "a human is reading" unless one took over | code | `flow.hand_to_human` / `hand_back` from the inbox actions in `service.py`; linter rule `TEAM_READS` (hard) |
 | R-DISC-05 | Re-disclose after 30 days | open | needs last-message age in the opening (P6) |
 | R-SELL-01, 02 | No fix, product, document or quote while listening | code | linter by state (S0 to S4, S5b), hard |
 | R-SELL-03 | No urgency, scarcity, discount | code | linter, hard (a refusal "I can't give a discount" is allowed) |
@@ -35,7 +35,7 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-PAY-04 | Changed bank details are fraud, escalate | open | P6 (escalation reasons) |
 | R-PAY-05 | "Payment received" only when staff confirm | code | linter, hard; only `POST /pi/brain-documents/payments/{id}/confirm` (billing.write) confirms |
 | R-PAY-06 | A payment screenshot is thanked, never confirmed | code | `decisions` S10: "I paid", "done" or an image/document makes the payment `claimed` and tells staff |
-| R-PAY-07 | Refunds and disputes are noted and escalated | open | P6 |
+| R-PAY-07 | Refunds and disputes are noted and escalated | code | `safety.Boundary.REFUND` (directed at Workzap, not refunds in the person's own business) -> staff request `refund_dispute` |
 | R-PRIV-01 | Never asks for card, password, third-party details | code | linter (see R-PAY-02) |
 | R-PRIV-02 | Sensitive content redacted from records and logs | code | `safety.redact_pii` + `safety_guard` redact the message log; original encrypted in `pi_quarantine` (0039, 30 days, purged by the sweep); reminder once per kind; card/ID/OTP-only message gets only the reminder |
 | R-PRIV-03 | Never asks for national ID, passport, account numbers | code | linter |

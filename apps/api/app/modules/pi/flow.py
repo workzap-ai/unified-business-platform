@@ -154,6 +154,7 @@ def hand_back(conversation: Any) -> None:
         return
     brief = dict(conversation.service_brief or {})
     back = parse(brief.pop("resume_state", None)) or State.S1_LISTENING
+    brief["handback_notice"] = True  # pi's first line after a person hands back (R-DISC-04)
     conversation.service_brief = brief
     conversation.flow_state = back.value
     conversation.flow_state_since = datetime.now(UTC)

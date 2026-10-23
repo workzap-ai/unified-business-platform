@@ -36,9 +36,10 @@ def validate_section(section: str, value: Any) -> None:
             ensure(value["service_mode"] in {"auto", "service"})
             ensure(value.get("pi_mode", "standard") in {"standard", "brain"})
             brain = value.get("brain", {})  # tunables and the learning switch (spec 9.9)
-            flags = {"learning_frozen", "served_industries"}
+            flags = {"learning_frozen", "served_industries", "critique"}
             ensure(isinstance(brain, dict) and set(brain) <= {*TUNABLES, *flags})
             ensure(type(brain.get("learning_frozen", True)) is bool)
+            ensure(type(brain.get("critique", False)) is bool)
             ensure(all(type(v) is int for k, v in brain.items() if k not in flags))
             served = brain.get("served_industries", [])  # regulated trades Workzap serves (7.N)
             ensure(isinstance(served, list) and set(served) <= set(REGULATED_TRADES))

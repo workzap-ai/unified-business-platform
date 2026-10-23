@@ -37,11 +37,17 @@ from app.modules.pi.configuration import seed_agents, settings_row
 from app.modules.pi.graph import AGENTS, RouteState, keyword_intent, route_message
 from app.modules.pi.guard import ReplyRejected, rate_limited, validate_reply
 from app.modules.pi.language import (
+    BRAIN_HANDOFF_NOTICES,
+    BRAIN_TEAM_CHECK_NOTICES,
     HANDOFF_NOTICES,
     MEDIA_NOTICES,
     MEDIA_UNREADABLE_NOTICES,
     MEETING_NOTICES,
     TEAM_CHECK_NOTICES,
+    TECH_DOWN_NOTICES,
+    TOOL_FAIL_NOTICES,
+    VIDEO_UNREADABLE_NOTICES,
+    VOICE_UNREADABLE_NOTICES,
     detect_language,
     notice_in,
 )
@@ -379,10 +385,12 @@ async def _review_document(
 ) -> None:
     """A proposal, RFP, quotation or contract the customer sent: the team reviews it
     (high priority, with the file). pi keeps the chat and never agrees to its terms."""
+    from app.modules.pi.safety import redact_pii
     from app.modules.pi_saas.requests import raise_request
 
     if conversation.customer_id is None:
         return
+    description = redact_pii(description).text  # card or ID details in a photo never reach staff
     file_id = message.media.get("file_id")
     label = {"rfp": "request for proposal", "quotation": "quotation"}.get(kind, kind)
     name = str(message.media.get("filename") or "document")
@@ -437,7 +445,17 @@ async def _media_unreadable(
     key = f"media-unreadable:{message.id}"
     if await service.messages.find(PiMessage.idempotency_key == key) is not None:
         return []
-    text = _localized(MEDIA_UNREADABLE_NOTICES, message.body, conversation.language)
+    notices = MEDIA_UNREADABLE_NOTICES
+    if message.message_type in ("video", "audio"):
+        from app.modules.pi import flow
+
+        if flow.brain_mode((await settings_row(session, scope)).response_rules):
+            notices = (
+                VIDEO_UNREADABLE_NOTICES
+                if message.message_type == "video"
+                else VOICE_UNREADABLE_NOTICES
+            )  # spec 6.10 and R-LANG-07
+    text = _localized(notices, message.body, conversation.language)
     row = await service.messages.add(
         service.messages.new(
             conversation_id=conversation.id,
@@ -550,6 +568,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         message = await persist_inbound(session, event, connection, scope)
         event.status = "queued" if message else "processed"
         released: list[str] = []
+        opted_out = False
         if message is not None:
             await meter(session, scope.tenant_id, scope.environment_id, "messages_in")
             # Payment proof reaches the staff "to verify" queue even with automation off.
@@ -560,7 +579,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             from app.modules.pi_saas.flows import note_form_reply
 
             await note_form_reply(session, ctx["settings"], scope, message)
-            await note_opt_out(session, scope, message)  # "STOP" withdraws consent at once
+            opted_out = await note_opt_out(session, scope, message)  # "STOP" withdraws consent
             from app.modules.pi.buttons import note_not_related, note_remind_later
 
             await note_remind_later(session, scope, message)  # "Remind me later": 2 days
@@ -578,6 +597,29 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         message_id, conversation_id = message.id, message.conversation_id
         conversation = await service.conversations.get(conversation_id)
         policy = await settings_row(session, scope)
+        from app.modules.pi import flow as brain_flow
+
+        if opted_out and brain_flow.brain_mode(policy.response_rules):
+            # R-FUP-02: after "stop" pi confirms once and writes no more.
+            from app.modules.pi import safety as brain_safety_texts
+
+            key = f"pi-optout:{conversation_id}"
+            if await service.messages.find(PiMessage.idempotency_key == key) is None:
+                confirm = await service.messages.add(
+                    service.messages.new(
+                        conversation_id=conversation_id,
+                        direction="outbound",
+                        sender_type="system",
+                        body=brain_safety_texts.opt_out_reply(conversation.language),
+                        status="queued",
+                        idempotency_key=key,
+                    )
+                )
+                released = [str(confirm.id)]
+            message.status, event.status = "processed", "processed"
+            await session.commit()
+            await enqueue_sends(ctx, released)
+            return
         # 1. Human takeover / disabled automation / inactive plan: persist only, never reply.
         plan = await entitlement(session, scope.tenant_id, scope.environment_id)
         if (
@@ -596,6 +638,13 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             return
         # 1b. A burst (spec 6.10, RT18): when the person has already sent a newer message that is
         # waiting, this one is kept in the history and the newest one answers them all, once.
+        if policy.response_rules.get("pi_mode") == "brain" and ctx.get("redis"):
+            # Wait for the person to finish typing (spec 6.10): a short burst gets one reply.
+            from app.modules.pi import brain_config
+
+            await session.commit()
+            await asyncio.sleep(brain_config.value(policy.response_rules, "debounce_seconds"))
+            await session.refresh(message)
         if policy.response_rules.get("pi_mode") == "brain" and await newer_waiting(
             session, message
         ):
@@ -823,7 +872,13 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             if pii_guard is not None:
                 body = message.body
                 typed = safety.redact_pii(typed).text
-                await session.commit()
+            # What was read from a photo, document or voice note is stored too: redact it as well.
+            media = dict(message.media or {})
+            for key in ("description", "transcript"):
+                if media.get(key):
+                    media[key] = safety.redact_pii(str(media[key])).text
+            message.media = media
+            await session.commit()
         # 4. Business hours and operator keywords.
         if outside_hours(policy) and policy.business_hours.get("outside_hours") == "handoff_only":
             notice = await hand_off(
@@ -1090,6 +1145,12 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     proposals_for = await save_service_turn(
                         session, scope, conversation, message, policy, service_turn
                     )
+                    if service_context is not None and service_context.get("lint_slipped"):
+                        slips = list((conversation.service_brief or {}).get("lint_slips") or [])
+                        conversation.service_brief = {
+                            **(conversation.service_brief or {}),
+                            "lint_slips": [*slips, str(message.id)][-30:],
+                        }
                     run.agent_path = ["router", "requirement"]
                     reply, reply_agent = service_turn.reply, "requirement"
                     if service_turn.request_human:
@@ -1124,7 +1185,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             elif decision["provider_failed"]:
                 handoff_reason = "provider_failure"
                 handoff_summary = "AI providers were unavailable for this message."
-            elif decision["injection"]:
+            elif decision["injection"] and (service_context or {}).get("pi_mode") != "brain":
                 handoff_reason = "policy"
                 handoff_summary = "Message contained instructions aimed at the assistant."
             elif decision["low_confidence"]:
@@ -1253,7 +1314,13 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 message.body,
             )
             if not outbound:
-                text = _localized(TEAM_CHECK_NOTICES, typed, conversation.language)
+                notices = TEAM_CHECK_NOTICES
+                if (service_context or {}).get("pi_mode") == "brain":
+                    notices = {
+                        "provider_failure": TECH_DOWN_NOTICES,
+                        "tool_failure": TOOL_FAIL_NOTICES,
+                    }.get(handoff_reason, BRAIN_TEAM_CHECK_NOTICES)
+                text = _localized(notices, typed, conversation.language)
                 sent = await agent_ctx.tool("router", "send_whatsapp_message", {"body": text})
                 if sent.ok and sent.data is not None:
                     outbound.append(str(sent.data["message_id"]))
@@ -1276,7 +1343,13 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 handoff_summary,
                 notice=None
                 if outbound
-                else _localized(HANDOFF_NOTICES, message.body, conversation.language),
+                else _localized(
+                    BRAIN_HANDOFF_NOTICES
+                    if (service_context or {}).get("pi_mode") == "brain"
+                    else HANDOFF_NOTICES,
+                    message.body,
+                    conversation.language,
+                ),
                 run=run,
             )
             outbound += [notice] if notice else []

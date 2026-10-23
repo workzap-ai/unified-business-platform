@@ -21,6 +21,7 @@ from typing import Any
 from sqlalchemy import select
 
 from app.modules.notifications.service import notify
+from app.modules.pi import flow
 from app.modules.pi.buttons import CARD, FOLLOW_UP
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.followups import TEMPLATE_GAP, last_follow_up_template, quiet_until
@@ -262,6 +263,8 @@ async def read_quiet_chats(ctx: dict[str, Any]) -> list[str]:
             if scope is None:
                 continue
             policy = await settings_row(session, scope)
+            if flow.brain_mode(policy.response_rules):
+                continue  # brain mode has its own follow-ups
             if not service.portal_on(policy.whatsapp_config):
                 continue
             prefs = await session.scalar(
@@ -544,6 +547,8 @@ async def run_ladder(ctx: dict[str, Any], now: datetime | None = None) -> list[s
             if scope is None:
                 continue
             policy = await settings_row(session, scope)
+            if flow.brain_mode(policy.response_rules):
+                continue
             if (
                 not service.portal_on(policy.whatsapp_config)
                 or (policy.whatsapp_config or {}).get("follow_up_ladder", True) is False

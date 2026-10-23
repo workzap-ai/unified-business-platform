@@ -23,6 +23,8 @@ MAX_LESSONS_SHOWN = 3
 MIN_LENGTH = 12
 MAX_LENGTH = 300
 SCOPE_KEYS = ("state", "language", "category")
+NEVER_SAY = "never_say"  # a lesson that only forbids a phrase (spec 8.10, "Never say this")
+MAX_NEVER_SAY = 40
 
 
 def _where(scope: WorkspaceScope) -> tuple[Any, ...]:
@@ -154,7 +156,13 @@ async def relevant(
             .order_by(PiLearningLesson.created_at)
         )
     )
-    fitting = [r for r in rows if _fits(r, state, language) and not learning.never_learn(r.text)]
+    fitting = [
+        r
+        for r in rows
+        if (r.scope or {}).get("kind") != NEVER_SAY
+        and _fits(r, state, language)
+        and not learning.never_learn(r.text)
+    ]
     fitting.sort(key=lambda r: -len(r.scope or {}))
     chosen = fitting[:MAX_LESSONS_SHOWN]
     for lesson in chosen:
@@ -164,3 +172,51 @@ async def relevant(
             .values(uses=PiLearningLesson.uses + 1)
         )
     return chosen
+
+
+async def add_never_say(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    phrase: str,
+    situation: dict[str, str] | None,
+    author_id: UUID | None,
+) -> PiLearningLesson:
+    """ "Never say this": a phrase pi's replies must not contain in this situation. It only
+    restricts, so it is live at once; it can never relax a rule."""
+    said = " ".join((phrase or "").split())
+    if not 3 <= len(said) <= 120:
+        raise BusinessRuleViolation("PHRASE_SIZE", "A phrase is 3 to 120 characters", 422)
+    lesson = PiLearningLesson(
+        tenant_id=scope.tenant_id,
+        environment_id=scope.environment_id,
+        text=said,
+        scope={
+            "kind": NEVER_SAY,
+            **{k: v for k, v in (situation or {}).items() if k in SCOPE_KEYS and v},
+        },
+        risk="LOW",
+        status="live",
+        created_by="staff",
+        author_id=author_id,
+    )
+    session.add(lesson)
+    await session.flush()
+    session.add(_log(scope, lesson, "never_say_added", "", "staff: never say this", author_id))
+    await session.flush()
+    return lesson
+
+
+async def never_say(
+    session: AsyncSession, scope: WorkspaceScope, state: str, language: str
+) -> list[str]:
+    """The phrases pi must not use in this situation (staff lists, newest last)."""
+    rows = await session.scalars(
+        select(PiLearningLesson)
+        .where(*_where(scope), PiLearningLesson.status == "live")
+        .order_by(PiLearningLesson.created_at)
+    )
+    return [
+        r.text
+        for r in rows
+        if (r.scope or {}).get("kind") == NEVER_SAY and _fits(r, state, language)
+    ][-MAX_NEVER_SAY:]

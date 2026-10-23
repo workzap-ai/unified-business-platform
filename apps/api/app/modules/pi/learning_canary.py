@@ -21,7 +21,8 @@ from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_models import PiLearningChange, PiLearningExample
 from app.shared.scope import WorkspaceScope
 
-STALE_AFTER = timedelta(days=28)
+STALE_AFTER = timedelta(days=56)  # eight weeks without a verdict
+LONG_RUN = timedelta(days=28)
 MIN_FOR_ROLLBACK = 5  # replies before a guardrail can roll back (one odd chat is not evidence)
 
 
@@ -70,9 +71,9 @@ def judge(
         and r.situation.get("language") == situation.get("language")
     ]
     canary_rates, control_rates = rates(used), rates(control)
-    verdict = learning_rules.canary_decision(
-        control_rates, canary_rates, min_conversations=min_uses
-    )
+    # Spec 9.10 rule 3: 300 conversations, or four weeks with a smaller floor.
+    needed = min_uses if age >= LONG_RUN else learning_rules.MIN_CANARY
+    verdict = learning_rules.canary_decision(control_rates, canary_rates, min_conversations=needed)
     if verdict == "rollback" and len(used) < MIN_FOR_ROLLBACK:
         verdict = "continue"
     if verdict == "promote" and age < timedelta(days=min_days):
@@ -132,7 +133,9 @@ async def evaluate(
             _move(session, scope, example, "retired", why, "rolled_back", evidence)
             result["rolled_back"] += 1
         elif now - since > STALE_AFTER:
-            _move(session, scope, example, "retired", "no verdict in 28 days", "stale", evidence)
+            _move(
+                session, scope, example, "retired", "no verdict in eight weeks", "stale", evidence
+            )
             result["stale"] += 1
     await session.flush()
     return result

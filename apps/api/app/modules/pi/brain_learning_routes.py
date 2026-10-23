@@ -21,6 +21,7 @@ from app.modules.pi import (
     learning_arms,
     learning_bank,
     learning_lessons,
+    learning_miner,
     learning_nightly,
     learning_packs,
 )
@@ -104,6 +105,7 @@ async def run_now(request: Request, scope: Scope, session: Session) -> dict[str,
         policy,
         embedder=make_embedder(state.settings, state.http),
         pack_writer=lambda s: learning_packs.make_writer(state.settings, state.http, s),
+        question_writer=lambda s: learning_miner.make_writer(state.settings, state.http, s),
     )
     await record(
         session,
@@ -418,6 +420,28 @@ async def teach(data: LessonInput, scope: Scope, session: Session) -> dict[str, 
     return _lesson(row)
 
 
+class NeverSayInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    phrase: str = Field(max_length=120)
+    state: str | None = Field(default=None, max_length=32)
+    language: str | None = Field(default=None, max_length=12)
+
+
+@router.post("/never-say", status_code=201)
+async def never_say(data: NeverSayInput, scope: Scope, session: Session) -> dict[str, Any]:
+    """ "Never say this": pi's replies in this situation may not contain the phrase."""
+    await require_pi(session, scope, PERMISSION)
+    row = await learning_lessons.add_never_say(
+        session,
+        scope,
+        data.phrase,
+        {"state": data.state or "", "language": data.language or ""},
+        scope.user_id,
+    )
+    await session.commit()
+    return _lesson(row)
+
+
 class DecisionInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     reason: str = Field(default="", max_length=300)
@@ -547,3 +571,42 @@ async def retire_pack(pack_id: UUID, scope: Scope, session: Session) -> dict[str
     await learning_packs.close(session, scope, row, scope.user_id, "retired")
     await session.commit()
     return _pack(row)
+
+
+@router.get("/queue")
+async def review_queue(scope: Scope, session: Session) -> dict[str, Any]:
+    """The weekly human queue (spec 8.6): everything that waits for a person, with the reason."""
+    await require_pi(session, scope, PERMISSION)
+    lessons_waiting = await session.scalars(
+        select(PiLearningLesson).where(
+            PiLearningLesson.tenant_id == scope.tenant_id,
+            PiLearningLesson.environment_id == scope.environment_id,
+            PiLearningLesson.status == "review",
+        )
+    )
+    packs_waiting = await session.scalars(
+        select(PiLearnedPack).where(
+            PiLearnedPack.tenant_id == scope.tenant_id,
+            PiLearnedPack.environment_id == scope.environment_id,
+            PiLearnedPack.status.in_(("draft", "shadow")),
+            PiLearnedPack.care_approved.is_(False),
+        )
+    )
+    flagged = await session.scalars(
+        select(PiLearningChange)
+        .where(
+            PiLearningChange.tenant_id == scope.tenant_id,
+            PiLearningChange.environment_id == scope.environment_id,
+            PiLearningChange.status == "review",
+        )
+        .order_by(PiLearningChange.created_at.desc())
+        .limit(50)
+    )
+    return {
+        "lessons": [_lesson(r) for r in lessons_waiting],
+        "packs": [_pack(r) for r in packs_waiting],
+        "flagged_changes": [
+            {"id": c.id, "kind": c.kind, "reason": c.reason, "created_at": c.created_at}
+            for c in flagged
+        ],
+    }

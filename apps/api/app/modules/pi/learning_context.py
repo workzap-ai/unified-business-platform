@@ -75,6 +75,9 @@ async def build(
     await learning_packs.note_shadow(session, scope, conversation.id, about)
     if pack_brief := await learning_packs.live_brief(session, scope, about):
         out["learned_pack"] = pack_brief
+    banned = await learning_lessons.never_say(session, scope, state, language)
+    if banned:
+        out["never_say"] = banned
     lessons = await learning_lessons.relevant(session, scope, state, language)
     if lessons:
         out["lessons"] = [lesson.text for lesson in lessons]

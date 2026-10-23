@@ -72,6 +72,9 @@ async def test_the_brain_health_endpoint_shows_metrics_freeze_and_clamped_settin
     assert shown["pi_mode"] == "brain" and shown["learning_frozen"] is True  # opt-in only
     assert shown["metrics"]["scored"] == 1 and shown["metrics"]["signals"] == {"confusion": 1}
     assert shown["settings"]["summary_trigger"]["value"] == 7
+    assert shown["metrics"]["rule_break_rate"] == 0.0 and "repeat_question_rate" in shown["metrics"]
+    assert shown["learning"]["waiting_for_review"] == 0
+    assert set(shown["learning"]) >= {"changes_promoted", "changes_rolled_back", "packs_by_status"}
 
     changed = await api.patch(
         "/api/v1/pi/settings/response_rules",

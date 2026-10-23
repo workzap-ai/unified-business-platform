@@ -158,3 +158,22 @@ Learning loop (Part 8) comes after P7 and is out of scope here.
 
 Production still needs migrations 0034 to 0037 (the real database is at 0033) before `pi_mode` is
 turned on anywhere.
+
+### Full-spec audit, 2026-10-23
+
+Six read-only audits compared every part of the PDF with the code. Fixed from them: refund and
+dispute escalation, X_HUMAN on handover, strict summary confirmation (no "ok but..."), the summary
+in the person's own words and group names, quiet-reply summary trigger, `rule_break` recorded for
+hard lint breaks, repeat-question and self-continued reward signals, canary at 300 conversations or
+four weeks, prompt injection ignored in brain mode, button taps in every language, the 1122 crisis
+line, media text redacted, the 6.11 failure messages, debounce in the real worker, one question
+last and the 60-word limit enforced by `repair`, natural "stop messaging me" phrases, Arabic fixed
+answers and Arabic/Urdu/Roman Urdu emergency, advice and identity patterns, pack detection (festival
+and generic words), the Part 11 commands and `pack-writer`.
+
+Still open: the 8.4.4 critique step, weekly settings tuning (`next_setting_value` has no caller),
+drift monitor, question-wording miner, grader model, the weekly human queue, metrics 8.13, Urdu-script
+as its own language code with its own fixed texts, native-speaker review of the Roman Urdu fixed
+lines (masculine verbs), kickoff slot list, wrong-number / sticker / reaction / edited-message
+handlers, M2/M3/M6/M7 deterministic replies, handover and SLA messages, the extra problem-record
+sub-fields, pattern surfacing and team links, S3 to S2 and the per-problem clarify counter.

@@ -17,6 +17,7 @@ from app.modules.pi import learning, learning_bank
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_models import PiQuestionArm
 from app.modules.pi.models import PiAgentRun, PiConversation, PiMessage
+from app.modules.pi.problem_models import PiProblem
 from app.shared.scope import WorkspaceScope
 
 SILENCE = timedelta(hours=24)
@@ -32,7 +33,14 @@ def situation_of(conversation: PiConversation, message: PiMessage) -> dict[str, 
     }
 
 
-def outcome_of(message: PiMessage, following: PiMessage | None, now: datetime) -> learning.Next:
+def outcome_of(
+    message: PiMessage,
+    following: PiMessage | None,
+    now: datetime,
+    *,
+    already_known: bool = False,
+    new_problem: bool = False,
+) -> learning.Next:
     asked = (message.body or "").rstrip().endswith(("?", "؟"))
     noted = (
         "noted" in (message.body or "").lower() or "note kar liya" in (message.body or "").lower()
@@ -47,6 +55,58 @@ def outcome_of(message: PiMessage, following: PiMessage | None, now: datetime) -
         pi_asked_a_question=asked,
         noted_confirmed=noted,
         gap_days=gap,
+        already_known=already_known,
+        new_problem=new_problem and not asked,
+    )
+
+
+async def repeated_question(
+    session: AsyncSession, reply: PiMessage, threshold: float = 0.6
+) -> bool:
+    """pi asked, in nearly the same words, something it had already asked in this chat."""
+    if not (reply.body or "").rstrip().endswith(("?", "\u061f")):
+        return False
+    earlier = await session.scalars(
+        select(PiMessage.body)
+        .where(
+            PiMessage.conversation_id == reply.conversation_id,
+            PiMessage.direction == "outbound",
+            PiMessage.sender_type == "ai",
+            PiMessage.created_at < reply.created_at,
+        )
+        .order_by(PiMessage.created_at.desc())
+        .limit(6)
+    )
+    last = learning_bank.strip_opening(reply.body or "").split("\n")[-1]
+    return any(
+        learning_bank.similarity(last, learning_bank.strip_opening(body or "").split("\n")[-1])
+        >= threshold
+        for body in earlier
+    )
+
+
+async def raised_unprompted(
+    session: AsyncSession, reply: PiMessage, following: PiMessage | None
+) -> bool:
+    """The person raised a new problem on their own: one was noted from their next message."""
+    if following is None:
+        return False
+    found = await session.scalar(
+        select(PiProblem.id)
+        .where(
+            PiProblem.conversation_id == reply.conversation_id,
+            PiProblem.created_at >= following.created_at,
+            PiProblem.created_at <= following.created_at + timedelta(minutes=10),
+        )
+        .limit(1)
+    )
+    return found is not None
+
+
+def slipped(conversation: PiConversation, run: PiAgentRun | None) -> bool:
+    """pi's first draft for this message broke a rule (the reply was rewritten)."""
+    return run is not None and str(run.message_id) in (
+        (conversation.service_brief or {}).get("lint_slips") or []
     )
 
 
@@ -109,7 +169,20 @@ async def score_new(session: AsyncSession, now: datetime | None = None, limit: i
         conversation = await session.get(PiConversation, reply.conversation_id)
         if conversation is None:
             continue
-        signals = learning.signals_after(outcome_of(reply, following, now))
+        run = await session.scalar(
+            select(PiAgentRun).where(PiAgentRun.response_message_id == reply.id)
+        )
+        signals = learning.signals_after(
+            outcome_of(
+                reply,
+                following,
+                now,
+                already_known=await repeated_question(session, reply),
+                new_problem=await raised_unprompted(session, reply, following),
+            )
+        )
+        if slipped(conversation, run):
+            signals = [*signals, "rule_break"]
         arm_id, example_ids = await attribution(session, conversation, reply)
         session.add(
             PiExperience(
@@ -158,6 +231,10 @@ async def health(
         "confusion_rate": round(counts["confusion"] / total, 3),
         "correction_rate": round(counts["correction"] / total, 3),
         "opt_out_rate": round(counts["opt_out"] / total, 3),
+        "first_time_confirmation_rate": round(counts["confirmed_first_time"] / total, 3),
+        "repeat_question_rate": round(counts["repeat_question"] / total, 3),
+        "complaint_rate": round(counts["complaint"] / total, 3),
+        "rule_break_rate": round(counts["rule_break"] / total, 3),  # must stay 0
         "average_reward_by_language": {
             lang: round(sum(vals) / len(vals), 2) for lang, vals in by_language.items()
         },

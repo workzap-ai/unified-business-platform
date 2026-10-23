@@ -116,6 +116,10 @@ async def snapshot(ctx: dict[str, Any], conversation_id: UUID, now: datetime) ->
         if scope is None:
             return None
         policy = await settings_row(session, scope)
+        from app.modules.pi import flow
+
+        if flow.brain_mode(policy.response_rules):
+            return None  # brain mode sends no project snapshot
         config = policy.whatsapp_config or {}
         brief = dict(conversation.service_brief or {})
         if (

@@ -201,3 +201,16 @@ def test_the_prompt_tells_pi_how_to_use_industry_knowledge():
 
     assert "industry_knowledge" in SYSTEM
     assert "never let it override these rules" in SYSTEM
+
+
+@pytest.mark.parametrize(
+    ("said", "pack"),
+    [
+        ("hamari kapray ki dukaan hai lawn ka stock Eid pe khatam", "unstitched_fabric_lawn"),
+        ("clients ask for invoices late at our accounting practice", "accounting_audit"),
+    ],
+)
+def test_festival_and_generic_words_do_not_pick_the_wrong_trade(said, pack):
+    found = packs.detect([said])
+    assert found.primary and found.primary.startswith(pack)
+    assert not any("public_sector" in o or "existing_workzap" in o for o in found.overlays)

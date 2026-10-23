@@ -169,7 +169,12 @@ async def curate(
             bool(person.strip())
             and not learning.never_learn(said)
             and not learning.never_learn(person.rstrip("?") + ".")  # their words, as a statement
-            and learning_rules.should_promote_example(total, rubric_proxy(said), False, confidence)
+            and learning_rules.should_promote_example(
+                total,
+                rubric_proxy(said),
+                "rule_break" in (exp.signals or []),
+                confidence,
+            )
         )
         if not ok:
             counts["rejected"] += 1

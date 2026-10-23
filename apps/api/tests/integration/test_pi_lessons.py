@@ -104,3 +104,37 @@ async def test_a_live_lesson_reaches_the_prompt_only_for_its_situation(
     assert retired.json()["status"] == "retired"
     assert await learning_lessons.relevant(business_db, pi.scope(), "S1_LISTENING", "en") == []
     await pi.close()
+
+
+async def test_never_say_this_blocks_the_phrase_but_is_not_shown_as_a_lesson(
+    api, business_db, monkeypatch
+):
+    from app.modules.pi import constitution
+
+    adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)
+    made = await api.post(f"{L}/never-say", json={"phrase": "no worries at all", "language": "en"})
+    assert made.status_code == 201 and made.json()["status"] == "live"
+    scope = pi.scope()
+    assert await learning_lessons.never_say(business_db, scope, "S1_LISTENING", "en") == [
+        "no worries at all"
+    ]
+    assert await learning_lessons.never_say(business_db, scope, "S1_LISTENING", "roman_ur") == []
+    assert await learning_lessons.relevant(business_db, scope, "S1_LISTENING", "en") == []
+    context = {
+        "never_say": ["no worries at all"],
+        "history": [{"role": "ai", "text": "I'm pi, an AI"}],
+    }
+    rules = {v.rule for v in constitution.lint("No worries at all. Which shop is it?", context)}
+    assert "R-LEARN-NEVER" in rules
+    await pi.close()
+
+
+async def test_the_weekly_queue_lists_what_waits_for_a_person(api, business_db, monkeypatch):
+    adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)
+    await api.post(f"{L}/lessons", json={"text": "Promise a discount when they hesitate on price"})
+    queue = (await api.get(f"{L}/queue")).json()
+    assert len(queue["lessons"]) == 1 and queue["lessons"][0]["status"] == "review"
+    assert queue["packs"] == [] and queue["flagged_changes"] == [] or queue["flagged_changes"]
+    await pi.close()

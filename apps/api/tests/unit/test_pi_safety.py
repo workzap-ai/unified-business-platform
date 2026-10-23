@@ -77,7 +77,7 @@ def test_emergency_replies_carry_the_local_numbers():
 def test_self_harm_is_answered_with_care_and_without_counselling():
     reply = s.emergency_reply(Emergency.SELF_HARM, "PK", "en")
     assert reply.startswith("I'm sorry things are this heavy. I'm an AI and can't help with this")
-    assert "15" in reply and "whenever you want" in reply
+    assert "1122" in reply and "whenever you want" in reply
     roman = s.emergency_reply(Emergency.FIRE, "PK", "roman_ur")
     assert roman.startswith("Main emergency mein madad nahi kar sakta.") and "16 (fire)" in roman
 

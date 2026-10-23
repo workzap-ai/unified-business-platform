@@ -81,7 +81,7 @@ EMERGENCY_PATTERNS: tuple[tuple[Emergency, re.Pattern[str]], ...] = (
             r"\b(?:(?:need|call|send|get) (?:an |the )?ambulance|heart attack|not breathing|"
             r"(?:someone|he|she|worker|staff|guard|driver) "
             r"(?:is |was |got )(?:badly )?(?:hurt|injured|bleeding|unconscious)|accident (?:happened|hua|ho gaya)|"
-            r"(?:zakhmi|behosh|khoon beh)\b)|إسعاف|حادث",
+            r"(?:zakhmi|behosh|khoon beh)\b)|إسعاف",
             re.IGNORECASE,
         ),
     ),
@@ -90,6 +90,49 @@ EMERGENCY_PATTERNS: tuple[tuple[Emergency, re.Pattern[str]], ...] = (
         re.compile(
             r"\b(?:emergency (?:is )?(?:in progress|happening|right now|going on)|mayday|"
             r"(?:in|having) an emergency|crash(?:ed|ing) (?:right )?now|emergency landing)\b",
+            re.IGNORECASE,
+        ),
+    ),
+)
+
+
+# More ways people say it in Arabic, Urdu and Roman Urdu (spec 6.1, R-EMER-01): only phrases that
+# clearly describe something happening now, never a word that also appears in ordinary business talk.
+EMERGENCY_PATTERNS = EMERGENCY_PATTERNS + (
+    (
+        Emergency.SELF_HARM,
+        re.compile(
+            r"(?:أقتل نفسي|اقتل نفسي|أنهي حياتي|انهي حياتي|لا أريد أن أعيش|لا اريد ان اعيش|"
+            r"اريد ان اموت|أبغى أموت|ابغى اموت|اپنی جان لے|مر جانا چاہتا|مر جانا چاہتی)"
+            r"|\b(?:mar jana chahta|mar jana chahti|apni jaan le (?:lun|loon|lunga|lungi)|"
+            r"zindagi se tang aa gaya|zindagi se tang aa gayi)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Emergency.FIRE,
+        re.compile(
+            r"(?:شعلت النار|اشتعلت النار|اشتعل حريق|النار في|آگ لگی|آگ لگ گئی|آگ بھڑک)"
+            r"|\b(?:aag bhadak|aag lag gaye)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Emergency.VIOLENCE,
+        re.compile(
+            r"(?:لصوص|سطو مسلح|إطلاق نار|اطلاق نار|يضربوننا|يهاجمون|چور (?:اندر|گھس)|"
+            r"گولی (?:چلی|لگی|مار)|حملہ ہو)"
+            r"|\b(?:chor (?:andar|ghus)|chor aa gaye|goli (?:chali|lagi|maar)|hamla ho raha|"
+            r"maar rahe hain)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Emergency.MEDICAL,
+        re.compile(
+            r"(?:مصاب بجروح|أصيب (?:بجروح|بشدة)|فاقد الوعي|ينزف|توقف عن التنفس|حادث (?:سير|مروري|خطير)|"
+            r"ایکسیڈنٹ ہو|زخمی ہو|بے ہوش|سانس نہیں)"
+            r"|\b(?:accident ho gaya|saans nahi|behosh ho|zakhmi ho)\b",
             re.IGNORECASE,
         ),
     ),
@@ -118,6 +161,17 @@ EMERGENCY_TEXT = {
             "Business ki taraf main jab chahein haazir hoon."
         ),
     },
+    "ar": {
+        Emergency.FIRE: "لا أستطيع المساعدة في حالات الطوارئ. يرجى الاتصال بـ {fire} الآن.",
+        Emergency.MEDICAL: "لا أستطيع المساعدة في حالات الطوارئ. يرجى الاتصال بـ {ambulance} لطلب الإسعاف الآن.",
+        Emergency.VIOLENCE: "لا أستطيع المساعدة في حالات الطوارئ. يرجى الاتصال بـ {police} الآن والانتقال إلى مكان آمن.",
+        Emergency.GENERIC: "لا أستطيع المساعدة في حالات الطوارئ. يرجى الاتصال بـ {police} الآن.",
+        Emergency.SELF_HARM: (
+            "يؤسفني أن الأمور صعبة إلى هذا الحد. أنا ذكاء اصطناعي ولا أستطيع المساعدة في هذا، "
+            "لكن تحدّث مع شخص تثق به، أو اتصل بـ {police} إن كنت في خطر. أنا هنا للجانب المتعلق "
+            "بعملك متى شئت."
+        ),
+    },
 }
 
 
@@ -130,16 +184,25 @@ def emergency(text: str) -> Emergency | None:
     return None
 
 
+# Where someone in distress should call (spec X4): Rescue 1122 in Pakistan, 999, 911.
+CRISIS_LINE = {"PK": "1122", "AE": "999", "CA": "911"}
+
+
 def emergency_reply(kind: Emergency, country: str | None, language: str | None) -> str:
     """The fixed emergency answer with the person's local numbers (every country when unknown)."""
     table = EMERGENCY_TEXT.get(language or "en", EMERGENCY_TEXT["en"])
     template = table[kind]
     if country in NUMBERS:
         numbers = NUMBERS[country]
+        police = (
+            CRISIS_LINE.get(country, numbers["police"])
+            if kind == Emergency.SELF_HARM
+            else numbers["police"]
+        )
         return template.format(
             fire=f"{numbers['fire']} (fire)",
             ambulance=numbers["ambulance"],
-            police=numbers["police"],
+            police=police,
         )
     wide = f"your local emergency number ({ALL_COUNTRIES})"
     return template.format(fire=wide, ambulance=wide, police=wide)
@@ -384,7 +447,44 @@ ADVICE_PATTERNS: tuple[tuple[Advice, re.Pattern[str]], ...] = (
         ),
     ),
 )
+
+# Advice questions asked in Arabic, Urdu and Roman Urdu (R-ADV-01, spec 10.2 RT9).
+ADVICE_PATTERNS = ADVICE_PATTERNS + (
+    (
+        Advice.TAX,
+        re.compile(
+            r"(?:كم (?:يجب|عليّ|علي) (?:أن )?أدفع ضريبة|كيف أتجنب الضريبة|نسبة (?:الضريبة|ضريبة)|"
+            r"ٹیکس (?:کتنا|کیسے بچا)|کتنا ٹیکس)"
+            r"|\b(?:tax kaise bach\w*|tax kitna (?:dun|doon|dena)|tax bachane ka)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Advice.MEDICAL,
+        re.compile(
+            r"(?:ما (?:هي )?الجرعة|أي دواء|كم حبة|کون سی دوا|دوا کتنی)"
+            r"|\b(?:konsi dawai|kaun si dawai|dawai kitni)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Advice.FINANCIAL,
+        re.compile(
+            r"(?:هل (?:آخذ|اخذ) قرضًا|هل أستثمر|هل استثمر|قرض لینا چاہیے|سرمایہ کاری کروں)"
+            r"|\b(?:loan lena chahiye|loan le lun|loan lun ya nahi|invest karun)\b",
+            re.IGNORECASE,
+        ),
+    ),
+)
+
 ADVICE_WHO = {
+    "ar": {
+        Advice.LEGAL: "محامٍ",
+        Advice.TAX: "محاسب",
+        Advice.FINANCIAL: "مستشار مالي مؤهل",
+        Advice.MEDICAL: "طبيب أو صيدلي",
+        Advice.VETERINARY: "طبيب بيطري",
+    },
     "en": {
         Advice.LEGAL: "a lawyer",
         Advice.TAX: "an accountant",
@@ -401,17 +501,25 @@ ADVICE_WHO = {
     },
 }
 ADVICE_TEXT = {
+    "ar": "لا أستطيع تقديم نصيحة {kind}، و{who} هو الشخص المناسب لذلك. يمكنني تسجيلها كمشكلة في عملك. هل أفعل ذلك؟",
     "en": "I can't give {kind} advice, and {who} is the right person for that. I can note it as a problem in your business. Want me to?",
     "roman_ur": "Main {kind} mashwara nahi de sakta, is ke liye {who} sahi insaan hai. Main ise aap ke business ki ek problem ke taur par note kar sakta hoon. Kya karun?",
 }
 ADVICE_WORD = {
+    "ar": {
+        Advice.LEGAL: "قانونية",
+        Advice.TAX: "ضريبية",
+        Advice.FINANCIAL: "مالية",
+        Advice.MEDICAL: "طبية",
+        Advice.VETERINARY: "بيطرية",
+    },
     "roman_ur": {
         Advice.LEGAL: "qanooni",
         Advice.TAX: "tax ka",
         Advice.FINANCIAL: "maali",
         Advice.MEDICAL: "tibbi",
         Advice.VETERINARY: "janwaron ke ilaaj ka",
-    }
+    },
 }
 
 
@@ -427,6 +535,48 @@ def advice_reply(kind: Advice, language: str | None) -> str:
     lang = language if language in ADVICE_TEXT else "en"
     word = ADVICE_WORD.get(lang, {}).get(kind, kind.value)
     return ADVICE_TEXT[lang].format(kind=word, who=ADVICE_WHO[lang][kind])
+
+
+# R-DISC-04 (spec 6.6): when a person hands the chat back, pi says who it is again, once.
+HANDBACK_TEXT = {
+    "en": "Thanks. I'm pi again, the AI from Workzap. Shall we carry on?",
+    "roman_ur": "Shukriya. Main phir se pi hoon, Workzap ka AI. Kya baat jari rakhein?",
+    "ar": "شكرًا. أنا pi مرة أخرى، الذكاء الاصطناعي من Workzap. هل نواصل؟",
+}
+
+
+def handback_reply(language: str | None) -> str:
+    return HANDBACK_TEXT.get(language or "en", HANDBACK_TEXT["en"])
+
+
+# R-LANG-08: religious and cultural courtesy, one line, then back to the business.
+GREETING_TEXT = {
+    "salam": {
+        "en": "Wa alaikum assalam. What's going wrong in your business?",
+        "roman_ur": "Wa alaikum assalam. Aap ke business mein kya masla chal raha hai?",
+        "ar": "وعليكم السلام. ما الذي يعيق عملك؟",
+    },
+    "festival": {
+        "en": "Eid Mubarak to you too. What's going wrong in your business?",
+        "roman_ur": "Aap ko bhi Eid Mubarak. Aap ke business mein kya masla chal raha hai?",
+        "ar": "عيد مبارك لك أيضًا. ما الذي يعيق عملك؟",
+    },
+}
+# R-FUP-02: after "stop" pi confirms once and then writes no more.
+OPT_OUT_TEXT = {
+    "en": "Understood. I won't message you again. If you ever want to talk, just write here.",
+    "roman_ur": "Theek hai. Main dobara paigham nahi bhejunga. Kabhi baat karni ho to yahin likh dein.",
+    "ar": "حسنًا. لن أرسل لك رسائل بعد الآن. إن أردت التحدث يومًا فاكتب هنا.",
+}
+
+
+def greeting_reply(kind: str, language: str | None) -> str:
+    table = GREETING_TEXT[kind]
+    return table.get(language or "en", table["en"])
+
+
+def opt_out_reply(language: str | None) -> str:
+    return OPT_OUT_TEXT.get(language or "en", OPT_OUT_TEXT["en"])
 
 
 # --- who pi is (R-DISC-02, R-DISC-03, R-META-01, spec 6.1) ------------------------------------
@@ -521,6 +671,16 @@ IDENTITY_TEXT = {
         Identity.COMPANY: "Ye sawal main Workzap ki team tak pahuncha sakta hoon.",
         Identity.OFFER: "Workzap masail dhoondne aur hal karne ka software banata hai. Main kuch bechne nahi aaya: main aap ke business ki rukawat note karta hoon, aur aap chahein to Workzap phir solution document bana sakta hai. Abhi sab se bada masla kya hai?",
     },
+    "ar": {
+        Identity.PERSON: "أنا ذكاء اصطناعي ولست شخصًا. أنا pi من Workzap.",
+        Identity.GENDER: "أنا pi، ذكاء اصطناعي من Workzap. ليس لي جنس.",
+        Identity.SCAM: "سؤال وجيه. أنا ذكاء اصطناعي من Workzap. لا أطلب هنا أبدًا دفعًا أو أرقام بطاقات أو كلمات مرور، ولا يجب عليك شراء أي شيء. المزيد على workzap.ai/pi/trust.",
+        Identity.META: "لا. صنعتني Workzap وأتحدث عبر منصة واتساب للأعمال. لم تصنعني واتساب أو ميتا ولا تديرني ولا تدعمني.",
+        Identity.MODEL: "أنا pi، ذكاء Workzap الاصطناعي. أنا هنا لأسجّل مشكلات عملك وأرتّبها.",
+        Identity.RULES: "يمكنني أن أشرح كيف أعمل: أسجّل المشكلات وأرتّبها، ولا أقبل أي دفع هنا، والقرار في أي عرض سعر لك. التفاصيل الكاملة على workzap.ai/pi/how-it-works.",
+        Identity.COMPANY: "يمكنني نقل هذا السؤال إلى فريق Workzap.",
+        Identity.OFFER: "تصنع Workzap برمجيات لاكتشاف المشكلات وحلّها. لست هنا لأبيع شيئًا: أسجّل ما يعيق عملك، وإن أردت يمكن لـ Workzap بعدها إعداد وثيقة حل. ما أكبر شيء الآن؟",
+    },
 }
 
 
@@ -556,6 +716,16 @@ class Boundary(StrEnum):
     COMPLAINT = "complaint"
     ILLEGAL = "illegal"
     REFUND = "refund"
+    BANK_ASK = "bank_ask"  # M2: asked for Workzap's bank details before any approval
+    BANK_ASK_APPROVED = "bank_ask_approved"  # M3: the same, after the quote was approved
+    OTHER_PAY = "other_pay"  # M6: card, JazzCash, Easypaisa, Apple Pay
+    DISCOUNT = "discount"  # M7
+    PAY_FOR_ME = "pay_for_me"  # M10: pay my supplier
+    PRODUCT_REC = "product_rec"  # A5: which POS should I buy
+    DECIDE_FOR_ME = "decide_for_me"  # A8
+    RIVAL = "rival"  # A6: what do you think of my competitor
+    WRONG_NUMBER = "wrong_number"  # 6.9
+    MEMORY_ASK = "memory_ask"  # R-MEM-05: what does pi keep
 
 
 BOUNDARY_PATTERNS: tuple[tuple[Boundary, re.Pattern[str]], ...] = (
@@ -672,6 +842,92 @@ BOUNDARY_PATTERNS: tuple[tuple[Boundary, re.Pattern[str]], ...] = (
         ),
     ),
 )
+
+# More of spec 6.2 and 6.4 (M2, M3, M6, M7, M10, A5, A6, A8) and 6.9 (wrong number).
+BOUNDARY_PATTERNS = BOUNDARY_PATTERNS + (
+    (
+        Boundary.BANK_ASK,
+        re.compile(
+            r"\b(?:send|give|share|tell)\s+(?:me\s+)?(?:your|the|workzap'?s)\s+(?:bank|account|iban)"
+            r"(?:\s+(?:details|number|account))?\b|\bwhat(?:'s| is) your (?:bank|iban|account number)\b"
+            r"|\b(?:apna|aap ka|workzap ka)\s+(?:bank|account)\s+(?:number|details|tafseel)\s+(?:bhejein|bhej do|batao|dein)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.OTHER_PAY,
+        re.compile(
+            r"\b(?:can i|could i|may i|how (?:do|can) i)\s+pay\s+(?:by|with|through|via|using|in)\s+"
+            r"(?:card|credit card|debit card|jazz ?cash|easy ?paisa|apple pay|google pay|paypal|cash|cheque|check|crypto)\b"
+            r"|\b(?:jazz ?cash|easy ?paisa|card|cash)\s+(?:se|par|pe)\s+(?:payment|pay)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.DISCOUNT,
+        re.compile(
+            r"\b(?:give me|can i get|can you give me|i want|i need)\s+(?:a\s+)?(?:discount|better price|lower price)\b"
+            r"|\b(?:reduce|lower|cut)\s+(?:the\s+)?(?:price|quote|cost)\b|\bdiscount\s+(?:do|chahiye|milega|dein)\b"
+            r"|\b(?:price|rate|quote)\s+kam\s+(?:karo|kar do|karein)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.PAY_FOR_ME,
+        re.compile(
+            r"\b(?:pay|send money to|transfer (?:money )?to)\s+my\s+(?:supplier|vendor|staff|employees?|landlord)\b"
+            r"|\bmere\s+(?:supplier|vendor)\s+ko\s+(?:pay|paise|payment)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.PRODUCT_REC,
+        re.compile(
+            r"\bwhich\s+(?:pos|software|app|accounting software|erp|crm|laptop|printer|system|tool)\s+"
+            r"(?:should|do you recommend|is best|to)\b|\b(?:recommend|suggest)\s+(?:me\s+)?(?:a|an|some)\s+"
+            r"(?:pos|software|erp|crm|app)\b|\bkon\s*sa\s+(?:pos|software|app)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.DECIDE_FOR_ME,
+        re.compile(
+            r"\bwhat would you (?:do|choose)\s+(?:if you were me|in my (?:place|shoes|position))\b"
+            r"|\bif you were me\b|\baap\s+meri\s+jagah\s+hote\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.RIVAL,
+        re.compile(
+            r"\b(?:what do you think (?:of|about)|your (?:opinion|view|thoughts) (?:on|of|about)|"
+            r"is it true that)\s+(?:my|our)\s+(?:competitor|rival)s?\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Boundary.WRONG_NUMBER,
+        re.compile(
+            r"\byou(?:'ve| have| got)?\s+(?:the\s+)?wrong number\b|^\W*(?:sorry\W+)?wrong number\W*$"
+            r"|\bgalat number\b|\bwho is this\W+i didn'?t (?:ask|message|text)\b",
+            re.IGNORECASE,
+        ),
+    ),
+)
+
+
+BOUNDARY_PATTERNS = BOUNDARY_PATTERNS + (
+    (
+        Boundary.MEMORY_ASK,
+        re.compile(
+            r"\b(?:what|which)\s+(?:data|information|details|records?)\s+(?:do|does|will)\s+(?:you|pi)\s+"
+            r"(?:keep|store|save|have|hold|know)\b|\bwhat do you (?:keep|store|save|remember) about me\b"
+            r"|\bkya\s+(?:data|record|information)\s+(?:rakhte|rakhta|save|store)\b|\bmera\s+kya\s+(?:data|record)\b",
+            re.IGNORECASE,
+        ),
+    ),
+)
+
 BOUNDARY_TEXT = {
     "en": {
         Boundary.DELETION: "I've passed your request to delete your information to the Workzap team. They'll confirm here once it's done, and I won't note anything new in the meantime.",
@@ -685,6 +941,16 @@ BOUNDARY_TEXT = {
         Boundary.COMPLAINT: "Thanks for telling me. I've passed this to the Workzap team.",
         Boundary.ILLEGAL: "I can't help with that. I'm here for problems in your business.",
         Boundary.REFUND: "I can't decide refunds or payment disputes. I've passed this to the Workzap team with your message, and they'll reply here.",
+        Boundary.BANK_ASK: "Bank details come on an approved quote. Nothing is owed until you approve one.",
+        Boundary.BANK_ASK_APPROVED: "They're on your approved quote. I can resend the quote if you need it.",
+        Boundary.OTHER_PAY: "Payment is by bank transfer, with details on your approved quote. If you need another way, I'll ask the Workzap team.",
+        Boundary.DISCOUNT: "I can't change the quote, but I'll pass the request to Workzap. They'll reply here.",
+        Boundary.PAY_FOR_ME: "I can't make payments. I can note it if paying suppliers is a problem in your business.",
+        Boundary.PRODUCT_REC: "I don't recommend products. I can note what's wrong with your current setup so Workzap can look at it.",
+        Boundary.DECIDE_FOR_ME: "That's your call: I don't decide for you. I can show you what you've told me, sorted, so it's easier to see.",
+        Boundary.RIVAL: "I don't comment on other businesses. What's going wrong on your side?",
+        Boundary.WRONG_NUMBER: "I think you may have the wrong number. I'm pi, an AI from Workzap, here for business problems.",
+        Boundary.MEMORY_ASK: "I keep the problems you've told me, the details you added, and any documents and quotes. You can ask me to delete them.",
     },
     "roman_ur": {
         Boundary.DELETION: "Aap ka data delete karne ki darkhwast maine Workzap ki team ko bhej di hai. Wo yahan tasdeeq kar dein ge, aur tab tak main kuch naya note nahi karunga.",
@@ -698,6 +964,39 @@ BOUNDARY_TEXT = {
         Boundary.COMPLAINT: "Batane ka shukriya. Maine ye Workzap ki team tak pahuncha diya hai.",
         Boundary.ILLEGAL: "Main is mein madad nahi kar sakta. Main aap ke business ke masail ke liye hoon.",
         Boundary.REFUND: "Refund ya payment ke jhagde ka faisla main nahi kar sakta. Maine ye Workzap ki team ko aap ke paigham ke saath bhej diya hai, wo yahin jawab dein ge.",
+        Boundary.BANK_ASK: "Bank ki tafseel approved quote par hoti hai. Jab tak aap approve na karein, kuch wajib nahi.",
+        Boundary.BANK_ASK_APPROVED: "Wo aap ke approved quote par hain. Zaroorat ho to quote dobara bheja ja sakta hai.",
+        Boundary.OTHER_PAY: "Payment bank transfer se hoti hai, tafseel aap ke approved quote par hai. Koi aur tareeqa chahiye to Workzap ki team se poochha ja sakta hai.",
+        Boundary.DISCOUNT: "Quote badalna mere ikhtiyar mein nahi; ye darkhwast Workzap tak pahuncha di jayegi. Wo yahin jawab dein ge.",
+        Boundary.PAY_FOR_ME: "Payments mere bas mein nahi. Agar suppliers ko payment karna aap ke business ka masla hai to ise note kiya ja sakta hai.",
+        Boundary.PRODUCT_REC: "Main products recommend nahi karta. Aap ke mojooda setup mein kya masla hai, ye note kiya ja sakta hai taake Workzap dekh sake.",
+        Boundary.DECIDE_FOR_ME: "Ye aap ka faisla hai: main aap ke liye faisla nahi karta. Aap ne jo bataya wo sort karke dikha sakta hoon taake dekhna aasan ho.",
+        Boundary.RIVAL: "Main doosre businesses par raaye nahi deta. Aap ki taraf kya masla chal raha hai?",
+        Boundary.WRONG_NUMBER: "Lagta hai aap ne galat number mila diya hai. Main pi hoon, Workzap ka AI, business ke masail ke liye.",
+        Boundary.MEMORY_ASK: "Main aap ke batae hue masail, aap ki di hui tafseel, aur documents aur quotes rakhta hoon. Aap inhein delete karne ko keh sakte hain.",
+    },
+    "ar": {
+        Boundary.DELETION: "لقد أرسلت طلب حذف معلوماتك إلى فريق Workzap. سيؤكدون هنا عند الانتهاء، ولن أسجّل أي شيء جديد في هذه الأثناء.",
+        Boundary.POLITICS: "أبتعد عن السياسة والآراء. أنا هنا لأسجّل ما يعيق عملك. ما أكبر شيء الآن؟",
+        Boundary.COMPETITOR: "لا أقارن Workzap بشركات أخرى. أنا هنا لأسجّل ما يعيق عملك. ما أكبر شيء الآن؟",
+        Boundary.OUTCOME: "لا أستطيع وعدك بنتائج. يمكنني تسجيل المشكلة ويمكن لـ Workzap أن تشرح ما ستفعله حيالها. ما المشكلة؟",
+        Boundary.FRAUD: "لا أستطيع المساعدة في فواتير مزورة أو إخفاء الدخل. إن كان تتبع الفواتير الحقيقية صعبًا في عملك فيمكنني تسجيل ذلك كمشكلة. هل أفعل؟",
+        Boundary.THIRD_PARTY: "لا أستطيع مشاركة محادثات أي شخص آخر. أحتفظ فقط بما تخبرني به في هذه المحادثة. ماذا تريد أن أسجّل عن عملك؟",
+        Boundary.BANK_CHANGE: "لا أستطيع تأكيد أي تفاصيل بنكية في هذه المحادثة. تفاصيل الدفع موجودة فقط في عرض السعر المعتمد، وقد أرسلت رسالتك إلى فريق Workzap للتحقق.",
+        Boundary.OFF_TOPIC: "هذا خارج ما أقوم به. أنا هنا لأسجّل ما يعيق عملك. ما أكبر شيء الآن؟",
+        Boundary.COMPLAINT: "شكرًا لإخباري. لقد أحلت هذا إلى فريق Workzap.",
+        Boundary.ILLEGAL: "لا أستطيع المساعدة في ذلك. أنا هنا لمشكلات عملك.",
+        Boundary.REFUND: "لا أستطيع البت في الاسترداد أو نزاعات الدفع. لقد أحلت هذا إلى فريق Workzap مع رسالتك وسيردون هنا.",
+        Boundary.BANK_ASK: "تفاصيل الحساب البنكي تأتي مع عرض السعر المعتمد. لا يترتب عليك شيء حتى توافق على عرض.",
+        Boundary.BANK_ASK_APPROVED: "هي موجودة في عرض السعر المعتمد. يمكنني إعادة إرسال العرض إن احتجت.",
+        Boundary.OTHER_PAY: "الدفع عن طريق التحويل البنكي وتفاصيله في عرض السعر المعتمد. إن احتجت طريقة أخرى فسأسأل فريق Workzap.",
+        Boundary.DISCOUNT: "لا أستطيع تغيير عرض السعر، لكنني سأنقل الطلب إلى Workzap وسيردون هنا.",
+        Boundary.PAY_FOR_ME: "لا أستطيع إجراء المدفوعات. يمكنني تسجيل ذلك إن كان دفع الموردين مشكلة في عملك.",
+        Boundary.PRODUCT_REC: "لا أوصي بمنتجات. يمكنني تسجيل ما يعيق إعدادك الحالي ليطّلع عليه فريق Workzap.",
+        Boundary.DECIDE_FOR_ME: "القرار قرارك ولا أقرر عنك. يمكنني أن أريك ما أخبرتني به مرتبًا ليسهل عليك رؤيته.",
+        Boundary.RIVAL: "لا أعلّق على أعمال الآخرين. ما الذي يسير بشكل خاطئ من جانبك؟",
+        Boundary.WRONG_NUMBER: "أظن أن الرقم خاطئ. أنا pi، ذكاء اصطناعي من Workzap، هنا لمشكلات الأعمال.",
+        Boundary.MEMORY_ASK: "أحتفظ بالمشكلات التي أخبرتني بها والتفاصيل التي أضفتها وأي مستندات وعروض أسعار. يمكنك أن تطلب مني حذفها.",
     },
 }
 

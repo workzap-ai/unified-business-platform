@@ -21,7 +21,9 @@ from app.modules.pi import (
     learning_arms,
     learning_bank,
     learning_canary,
+    learning_drift,
     learning_lexicon,
+    learning_miner,
     learning_packs,
 )
 from app.modules.pi.learning_embed import Embedder
@@ -31,6 +33,7 @@ from app.shared.scope import WorkspaceScope
 
 MIN_GAP = timedelta(hours=20)
 WriterFactory = Callable[[WorkspaceScope], learning_packs.Writer | None]
+QuestionWriterFactory = Callable[[WorkspaceScope], learning_miner.QuestionWriter | None]
 
 
 def scope_of(settings: PiSettings) -> WorkspaceScope:
@@ -58,12 +61,19 @@ async def run_workspace(
     now: datetime | None = None,
     embedder: Embedder | None = None,
     pack_writer: WriterFactory | None = None,
+    question_writer: QuestionWriterFactory | None = None,
 ) -> PiLearningRun:
     """One run for one workspace. Returns the run row with its digest."""
     now = now or datetime.now(UTC)
     scope = scope_of(settings)
     previous = await last_run(session, scope)
     since = previous.started_at if previous is not None else now - timedelta(days=1)
+    # Once a week: has pi's style drifted from the weeks before? If so this freezes learning.
+    drift = (
+        None
+        if learning.frozen(settings.response_rules)
+        else await learning_drift.check(session, scope, settings, now)
+    )
     run = PiLearningRun(
         tenant_id=scope.tenant_id,
         environment_id=scope.environment_id,
@@ -76,6 +86,7 @@ async def run_workspace(
     if run.frozen:
         digest["frozen"] = True  # the kill switch: no changes of any kind
     else:
+        digest["drift"] = drift
         digest["examples"] = await learning_bank.curate(session, scope, now, embedder=embedder)
         rules = settings.response_rules
         digest["examples"].update(await learning_bank.activate(session, scope, now))
@@ -93,6 +104,9 @@ async def run_workspace(
         digest["packs"]["went_live"] = await learning_packs.promote_shadows(session, scope, now)
         digest["vocabulary"] = await learning_lexicon.learn(session, scope)
         digest["arms"] = await learning_arms.learn_from(session, scope, since)
+        digest["questions"] = await learning_miner.mine(
+            session, scope, question_writer(scope) if question_writer else None
+        )
         digest["health"] = await experience_scorer.health(session, now - timedelta(days=1), scope)
     run.digest = digest
     run.finished_at = datetime.now(UTC)
@@ -105,6 +119,7 @@ async def run_due(
     now: datetime | None = None,
     embedder: Embedder | None = None,
     pack_writer: WriterFactory | None = None,
+    question_writer: QuestionWriterFactory | None = None,
 ) -> int:
     """Run every brain-mode workspace that has not run in the last 20 hours. Returns how many."""
     now = now or datetime.now(UTC)
@@ -118,6 +133,6 @@ async def run_due(
         previous = await last_run(session, scope_of(settings))
         if previous is not None and now - previous.started_at < MIN_GAP:
             continue
-        await run_workspace(session, settings, now, embedder, pack_writer)
+        await run_workspace(session, settings, now, embedder, pack_writer, question_writer)
         done += 1
     return done

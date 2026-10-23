@@ -51,14 +51,23 @@ ASKS_IF_AI = re.compile(
     r"|\byou(?:'re| are) (?:a |an )?(?:real |actual )?(?:human|person|bot|robot|man|woman|guy|girl)\b"
     r"|\badmit (?:it|you|that)\b|\btell me (?:you(?:'re| are)|the truth)\b"
     r"|\bkya (?:aap|ap|ye|yeh|tum|app)\b[^.?!؟]{0,20}\b(?:insaan|insan|bot|human|robot|machine)\b"
-    r"|\b(?:insaan|insan|bot|robot) (?:ho|hai|hain)\b|هل أنت|هل هذا|کیا آپ[^؟?]{0,15}(?:انسان|بوٹ|روبوٹ)",
+    r"|\b(?:insaan|insan|bot|robot) (?:ho|hai|hain)\b|هل أنت|هل هذا|کیا آپ[^؟?]{0,15}(?:انسان|بوٹ|روبوٹ)"
+    r"|هل (?:انت|أنت) (?:إنسان|انسان|بشر|روبوت|بوت)|من (?:انت|أنت)\b|\baap kon (?:ho|hain)\b"
+    r"|\btum kaun ho\b|آپ کون ہیں|تم کون ہو",
+    re.IGNORECASE,
+)
+
+TEAM_READS = re.compile(
+    r"\b(?:team|someone|somebody|a person|a human|staff|people)\b[^.?!\n]{0,40}"
+    r"\b(?:reads?|is reading|are reading|will read|reading|sees?|monitors?)\b[^.?!\n]{0,25}"
+    r"\b(?:this|the|your) (?:chat|conversation|messages?)\b",
     re.IGNORECASE,
 )
 
 HUMAN_CLAIM = re.compile(
     r"\bI(?:'m| am) (?:a |an )?(?:human|real person|person|man|woman|guy|girl|mum|mom|dad|father|mother)\b"
     r"|\bmy (?:family|wife|husband|kids|children|mum|mom|mother|father|brother|sister)\b"
-    r"|\bI(?: have)?(?: also)? (?:run|ran|own|owned) (?:a|my own) (?:shop|business|store|company)\b"
+    r"|\bI(?:'ve| have)?(?: also)? (?:run|ran|own|owned) (?:a|my own) (?:shop|business|store|company)\b"
     r"|\bI (?:was|went|ate|slept|travelled|traveled|had)\b[^.?!]*\b(?:yesterday|last night|this morning|"
     r"at the market|lunch|dinner|breakfast)\b"
     r"|\bI know exactly how you feel\b"
@@ -225,8 +234,26 @@ def _contains(reply: str, phrases: tuple[str, ...]) -> str | None:
     return next((p for p in phrases if p in lowered), None)
 
 
+# Phrases from the canonical bank (2.3) that must not repeat word for word (the opening and the
+# offer are fixed and exempt).
+CANONICAL = (
+    "that's a real problem", "that sounds costly", "that's worth sorting", "no rush",
+    "anything else getting in the way", "got it",
+)  # fmt: skip
+
+FESTIVAL = re.compile(
+    r"\b(?:eid|mubarak|ramadan|ramzan|kareem|christmas|diwali|new year)\b|مبارك|عيد", re.IGNORECASE
+)
+
+
 def _allowed_bangs(context: dict[str, Any]) -> int:
-    return 1 if "!" in str(context.get("latest_customer_message", "")) else 0
+    """R-VOICE-07: one exclamation mark in a whole conversation, and only for a festival greeting
+    when the person used one first."""
+    said = str(context.get("latest_customer_message", ""))
+    earlier = any(
+        "!" in str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "ai"
+    )
+    return 1 if "!" in said and FESTIVAL.search(said) and not earlier else 0
 
 
 def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
@@ -245,6 +272,16 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         add(
             Violation(
                 "R-DISC-02", "they asked if pi is a person: say it is an AI in sentence one", True
+            )
+        )
+    reply = reply.replace("\u2019", "'")
+    if (
+        TEAM_READS.search(reply)
+        and flow.parse((context.get("flow") or {}).get("state")) != flow.State.X_HUMAN
+    ):
+        add(
+            Violation(
+                "R-DISC-04", "do not imply a person is reading this chat unless one took over", True
             )
         )
     if HUMAN_CLAIM.search(reply):
@@ -341,6 +378,24 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         )
     if LOGGED.search(reply):
         add(Violation("R-VOICE-10", 'say "noted", not logged, ticketed or captured'))
+    limit = int((context.get("brain_settings") or {}).get("max_clarify") or 0)
+    if (
+        limit
+        and int(context.get("clarify_count") or 0) >= limit
+        and asked >= 1
+        and flow.parse((context.get("flow") or {}).get("state"))
+        in (flow.State.S1_LISTENING, flow.State.S2_CLARIFYING)
+    ):
+        add(
+            Violation(
+                "R-ASK-02",
+                f"you have already asked {limit} clarifying questions: note what you have and move on",
+            )
+        )
+    for phrase in context.get("never_say") or []:
+        if str(phrase).casefold() in reply.casefold():
+            add(Violation("R-LEARN-NEVER", f'staff said never to say "{phrase}" here'))
+            break
     if LECTURE.search(reply):
         add(Violation("R-VOICE-12", "never lecture: no 'you should' or best practices"))
     heard = _customer_words(context).lower()
@@ -365,6 +420,12 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         opening == " ".join(p.lower().split()[:2]) for p in previous
     ):
         add(Violation("R-VOICE-04", "do not start the same way as your last two messages"))
+    lowered = reply.lower()
+    for phrase in CANONICAL:
+        # spec 2.0.4: a canonical phrase word for word more than twice in a conversation
+        if phrase in lowered and sum(phrase in p.lower() for p in _pi_replies(context)) >= 2:
+            add(Violation("R-VOICE-04", f'say "{phrase}" in different words: it was used twice'))
+            break
     return found
 
 
@@ -401,7 +462,23 @@ def repair(reply: str, context: dict[str, Any]) -> str:
         return char if keep else ""
 
     fixed = re.sub(r" ?" + EMOJI.pattern, drop, fixed.replace("️", ""))
+    fixed = _one_question_last(fixed)
     history = context.get("history") or []
     if not any(h.get("role") == "ai" for h in history) and not AI_WORDS.search(fixed):
         fixed = f"{opening_line(context)} {fixed}".strip()
     return fixed.strip()
+
+
+def _one_question_last(reply: str) -> str:
+    """One question, last, and within the word limit (R-VOICE-01, R-VOICE-02): keep the last
+    question at the end, drop the other questions, then drop trailing statements while the reply is
+    too long. Lists and summaries (several lines) are left alone."""
+    if len(reply.splitlines()) > 1:
+        return reply
+    sentences = [x for x in _sentences(reply) if x.strip()]
+    questions = [x for x in sentences if x.rstrip().endswith(QUESTION_MARKS)]
+    statements = [x for x in sentences if x not in questions]
+    closing = questions[-1:] if questions else []
+    while len(statements) > 1 and len(" ".join([*statements, *closing]).split()) > WORD_CAP:
+        statements.pop()
+    return " ".join([*statements, *closing]).strip()

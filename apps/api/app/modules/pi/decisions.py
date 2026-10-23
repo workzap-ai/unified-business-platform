@@ -62,6 +62,19 @@ SUMMARY_OK = re.compile(
     r"[\W\w]{0,24}$",
     re.IGNORECASE,
 )
+# A "but" after the acknowledgement means something is still wrong or missing: not a confirmation.
+CORRECTING = re.compile(
+    r"\b(?:but|however|except|lekin|magar|par|wrong|missing|ghalat|reh gaya|raha)\b|\?|غلط|لكن",
+    re.IGNORECASE,
+)
+
+
+def summary_ok(message: str) -> bool:
+    """The person accepted the summary as it stands (not "ok but P2 is wrong")."""
+    said = " ".join(message.split())
+    return bool(SUMMARY_OK.match(said)) and not CORRECTING.search(said)
+
+
 ALL = re.compile(
     r"\b(?:all|everything|all of (?:them|these)|sab|sab kuch|saare|sare|sabhi|the whole list)\b|"
     r"كل|الجميع|سب|سارے",
@@ -79,11 +92,14 @@ APPROVE = re.compile(
     re.IGNORECASE,
 )
 CHANGES = re.compile(
-    r"^\W*(?:ask for changes|changes|i want changes|change it|badlav|tabdeeli|changes chahiye|"
-    r"تبدیلی|تعديل|أريد تعديلات)\W*$",
+    r"^\W*(?:ask for changes|changes|i want changes|change it|badlav|tabdeeli(?: chahiye)?|"
+    r"changes chahiye|تبدیلی|تعديل|أريد تعديلات|طلب تعديلات)\W*$",
     re.IGNORECASE,
 )
-SAY_NO = re.compile(r"^\W*(?:say no|no|nope|nahi|nahin|لا|نہیں)\W*$", re.IGNORECASE)
+SAY_NO = re.compile(
+    r"^\W*(?:say no|no(?: thanks| thank you)?|nope|nahi(?: shukriya)?|nahin(?: shukriya)?|لا|نہیں)\W*$",
+    re.IGNORECASE,
+)
 # "I paid", "done", "transfer kar diya": a claim, never proof (R-PAY-06). Questions are not claims.
 PAID = re.compile(
     r"\b(?:i(?:'ve| have)? (?:paid|sent|transferred)|(?:paid|sent|transferred)(?: it)?(?: already)?|"
@@ -301,7 +317,7 @@ def decide(
     if state == State.S4_SORTED_SUMMARY:
         if facts.get("changed") or not facts.get("problem_count"):
             return None
-        if SUMMARY_OK.match(" ".join(message.split())) or _ok(answer, Answer.YES):
+        if summary_ok(message) or (_ok(answer, Answer.YES) and not CORRECTING.search(message)):
             return Decision(
                 text("offer", language),
                 State.S5_READINESS,
