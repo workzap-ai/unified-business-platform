@@ -4,7 +4,8 @@
  "kind": "industry",
  "sector": {
   "code": "G",
-  "title": "Transport, mobility and aviation"
+  "title": "Transport, mobility and aviation",
+  "part": 1
  },
  "signals": [
   "ground handling",

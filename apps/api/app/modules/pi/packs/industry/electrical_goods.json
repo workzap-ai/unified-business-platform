@@ -4,7 +4,8 @@
  "kind": "industry",
  "sector": {
   "code": "D",
-  "title": "Manufacturing and industry"
+  "title": "Manufacturing and industry",
+  "part": 2
  },
  "signals": [
   "ceiling fan",

@@ -293,6 +293,60 @@ def _build_pack(name: str, sector: dict[str, str], body: dict[str, list[str]]) -
     }
 
 
+def sector_entry(code: str, title: str) -> dict[str, Any]:
+    """{"code": "C", "title": "...", "part": 2}; `part` only for a sector the PDF splits in two."""
+    part = re.search(r" \(part (\d)\)$", title)
+    entry: dict[str, Any] = {"code": code, "title": re.sub(r" \(part \d\)$", "", title)}
+    if part:
+        entry["part"] = int(part.group(1))
+    return entry
+
+
+def sector_key(sector: dict[str, Any]) -> str:
+    return f"{sector['code']}.{sector.get('part', 1)}"
+
+
+# The first mention of "pi" in a sector intro starts its never-rules ("pi notes the business
+# problems only. It never ..."). A short lead-in in the same sentence ("Across this sector") stays.
+PI_WORD = re.compile(r"\bpi(?:['’]s)?\b")
+
+
+def sector_rules(intro: str) -> str:
+    match = PI_WORD.search(intro)
+    if not match:
+        return ""
+    start = match.start()
+    sentence_start = max(intro.rfind(". ", 0, start) + 2, 0)
+    if 0 <= start - sentence_start <= 40:
+        start = sentence_start
+    return intro[start:].strip()
+
+
+def sector_intros(lines: list[str]) -> dict[str, dict[str, Any]]:
+    """Each sector's intro paragraph, verbatim, and the never-rules inside it.
+
+    The intro runs from the sector heading to the name of the sector's first industry (the line
+    before its "Recognise:"). Sectors N (overlays) onward have no industry intro and are skipped.
+    """
+    marks = [
+        i for i, line in enumerate(lines) if line == "Recognise:" or line.startswith("Recognise: ")
+    ]
+    found: dict[str, dict[str, Any]] = {}
+    for i, line in enumerate(lines):
+        match = SECTOR.match(line)
+        if not match or match.group(1) in "NOPQ":
+            continue
+        following = [m for m in marks if m > i]
+        if not following or any(SECTOR.match(x) for x in lines[i + 1 : following[0]]):
+            continue  # the table-of-contents list of sectors, or a heading with another after it
+        intro = unwrap(" ".join(lines[i + 1 : following[0] - 1]))
+        entry = sector_entry(match.group(1), match.group(2))
+        entry["intro"] = intro
+        entry["rules"] = sector_rules(intro)
+        found[sector_key(entry)] = entry
+    return found
+
+
 def parse(lines: list[str]) -> list[dict]:
     marks = [
         i
@@ -301,7 +355,7 @@ def parse(lines: list[str]) -> list[dict]:
     ]
     packs: list[dict] = []
     sectors = {
-        i: {"code": m.group(1), "title": re.sub(r" \(part \d\)$", "", m.group(2))}
+        i: sector_entry(m.group(1), m.group(2))
         for i, line in enumerate(lines)
         if (m := SECTOR.match(line))
     }
@@ -346,8 +400,14 @@ def main() -> None:
     parser.add_argument("pdf", type=Path)
     parser.add_argument("--out", type=Path, default=Path("app/modules/pi/packs/industry"))
     args = parser.parse_args()
-    packs = parse(clean(extract(args.pdf)))
+    lines = clean(extract(args.pdf))
+    packs = parse(lines)
     args.out.mkdir(parents=True, exist_ok=True)
+    intros = sector_intros(lines)
+    (args.out.parent / "sector_rules.json").write_text(
+        json.dumps(intros, ensure_ascii=False, indent=1) + "\n", encoding="utf-8"
+    )
+    print(f"{len(intros)} sector intros -> {args.out.parent / 'sector_rules.json'}")
     seen: dict[str, int] = {}
     for pack in packs:
         seen[pack["key"]] = seen.get(pack["key"], 0) + 1

@@ -4,7 +4,8 @@
  "kind": "industry",
  "sector": {
   "code": "C",
-  "title": "Agriculture, livestock and rural"
+  "title": "Agriculture, livestock and rural",
+  "part": 2
  },
  "signals": [
   "dealer",

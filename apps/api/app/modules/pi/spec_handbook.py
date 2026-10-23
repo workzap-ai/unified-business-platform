@@ -17,6 +17,7 @@ the learning loop. Examples and lessons sit below it and can never override it.
 
 import json
 import re
+from collections.abc import Sequence
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -175,9 +176,15 @@ def chosen_ids(
     *,
     can_approve: bool = True,
     days_away: int = 0,
+    sectors: Sequence[str] = (),
 ) -> tuple[list[str], list[str]]:
-    """(rule and guidance section ids, golden conversation ids) for this moment."""
-    rules: list[str] = list(CORE) + list(BY_STATE.get(state, ()))
+    """(rule and guidance section ids, golden conversation ids) for this moment.
+
+    `sectors` are the sector keys of the customer's industry packs ("I.1", "C.2"): their intros
+    from 7.C to 7.M carry the sector's never-rules and come right after the core sections."""
+    rules: list[str] = (
+        list(CORE) + [f"7.S.{key}" for key in sectors] + list(BY_STATE.get(state, ()))
+    )
     for pattern, ids in TOPICS:
         if pattern.search(message or ""):
             rules += ids
@@ -215,13 +222,14 @@ def guidance(
     *,
     can_approve: bool = True,
     days_away: int = 0,
+    sectors: Sequence[str] = (),
 ) -> str:
     """The specification text for this turn (empty when the handbook has not been built)."""
     book = sections()
     if not book:
         return ""
     rule_ids, golden_ids = chosen_ids(
-        state, message, language, can_approve=can_approve, days_away=days_away
+        state, message, language, can_approve=can_approve, days_away=days_away, sectors=sectors
     )
     parts = [FRAME]
     used = len(FRAME)

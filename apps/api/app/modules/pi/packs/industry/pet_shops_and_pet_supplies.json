@@ -4,7 +4,8 @@
  "kind": "industry",
  "sector": {
   "code": "A",
-  "title": "Retail and consumer"
+  "title": "Retail and consumer",
+  "part": 2
  },
  "signals": [
   "pet shop",

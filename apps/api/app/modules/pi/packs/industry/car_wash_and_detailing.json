@@ -4,7 +4,8 @@
  "kind": "industry",
  "sector": {
   "code": "G",
-  "title": "Transport, mobility and aviation"
+  "title": "Transport, mobility and aviation",
+  "part": 2
  },
  "signals": [
   "car wash",

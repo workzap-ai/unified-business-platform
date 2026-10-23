@@ -109,6 +109,27 @@ def split_overlays(item: dict[str, str]) -> list[dict[str, str]]:
     return parts
 
 
+def sector_sections(pdf: Path) -> list[dict[str, str]]:
+    """7.C to 7.M sector intros, verbatim: id "7.S.C.1" (sector C, part 1). They carry each
+    sector's never-rules (no customs advice, never record a child's name, ...)."""
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).parent))
+    import build_industry_packs as packs
+
+    found = packs.sector_intros(packs.clean(packs.extract(pdf)))
+    return [
+        {
+            "id": f"7.S.{key}",
+            "title": f"7.{item['code']} {item['title']}"
+            + (f" (part {item['part']})" if item.get("part") else ""),
+            "part": "7",
+            "text": item["intro"],
+        }
+        for key, item in found.items()
+    ]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("pdf", type=Path)
@@ -126,6 +147,7 @@ def main() -> None:
                     built += split_overlays(item)
                 else:
                     built.append(item)
+    built += sector_sections(args.pdf)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(built, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     total = sum(len(i["text"]) for i in built)
