@@ -6,7 +6,7 @@ raises. Only conversations of a workspace with response_rules.pi_mode = "brain" 
 """
 
 from collections.abc import Mapping
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import Any
 
@@ -158,6 +158,38 @@ def hand_back(conversation: Any) -> None:
     conversation.service_brief = brief
     conversation.flow_state = back.value
     conversation.flow_state_since = datetime.now(UTC)
+
+
+KICKOFF_LENGTH = timedelta(hours=1)  # a kickoff call is over this long after it starts
+
+
+def kickoff_done(conversation: Any, now: datetime | None = None) -> bool:
+    """S12 to S13 (spec 3.2: "Kickoff done" moves to "Workzap building"). The kickoff time is in
+    the brief when the slot was booked; an hour after it starts the call is over. Chats without a
+    known kickoff time stay where they are. Returns True when the chat moved."""
+    state = parse(conversation.flow_state)
+    if state != State.S12_KICKOFF:
+        return False
+    now = now or datetime.now(UTC)
+    brief = dict(conversation.service_brief or {})
+    kickoff = dict(brief.get("kickoff") or {})
+    raw = kickoff.get("at")
+    try:
+        at = datetime.fromisoformat(raw) if isinstance(raw, str) and raw else None
+    except ValueError:
+        at = None
+    if at is None:
+        return False
+    if at.tzinfo is None:
+        at = at.replace(tzinfo=UTC)
+    if now < at + KICKOFF_LENGTH:
+        return False
+    kickoff["done_at"] = now.isoformat()
+    brief["kickoff"] = kickoff
+    conversation.service_brief = brief
+    conversation.flow_state = advance(state, State.S13_IN_BUILD).value
+    conversation.flow_state_since = now
+    return True
 
 
 def can_move(source: State, target: State) -> bool:

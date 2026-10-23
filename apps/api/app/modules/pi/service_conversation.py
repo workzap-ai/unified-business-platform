@@ -1374,20 +1374,152 @@ ESCALATION_TEXT = {
     ),
 }
 
+ESCALATION_TEXT.update(
+    {
+        "payment_method": (
+            "PAYMENT METHOD (change request): the customer asked to pay another way (card, "
+            "JazzCash, Easypaisa, Apple Pay). pi said payment is by bank transfer and that it "
+            "would ask the team. Please reply to them."
+        ),
+        "company_info": (
+            "QUESTION ABOUT WORKZAP: the customer asked who owns Workzap or where its office is. "
+            "pi said it would pass the question on and gave no facts. Please reply to them."
+        ),
+        "legal_threat": (
+            "LEGAL THREAT: the customer threatened legal action. pi gave no legal advice and "
+            "promised nothing. A person must handle this."
+        ),
+        "deletion_request": (
+            "DELETE MY DATA: the customer asked pi to delete everything it knows about them. "
+            "Confirm to them in the chat once it is done."
+        ),
+        "human_requested": (
+            "HUMAN REQUESTED: the customer asked for a person. pi told them the team will reply "
+            "here and kept everything they said."
+        ),
+        "jobs": "JOB APPLICATION: pi thanked them and asked them not to send ID documents.",
+        "vendor": "SUPPLIER PITCH: pi passed it on. No follow-ups to this person.",
+        "press": "PRESS ENQUIRY: pi gave no quotes or statements. Please reply to them.",
+        "partnership": "PARTNERSHIP ENQUIRY: pi noted the company and the proposal. Please reply.",
+        "demo_request": "nori DEMO REQUEST: pi asked how many shops they have. Please reply.",
+        "enterprise_lead": "ENTERPRISE LEAD: pi asked how many shops they have. Please reply.",
+    }
+)
+
 BOUNDARY_EFFECTS: dict[safety.Boundary, tuple[list[str], dict[str, Any]]] = {
     safety.Boundary.DELETION: (["deletion_request"], {}),
     safety.Boundary.BANK_CHANGE: (["escalate"], {"escalate": "payment_detail_change"}),
     safety.Boundary.COMPLAINT: (["escalate"], {"escalate": "complaint"}),
     safety.Boundary.REFUND: (["escalate"], {"escalate": "refund_dispute"}),
     safety.Boundary.DISCOUNT: (["escalate"], {"escalate": "price_request"}),
+    # M6: pi told them it would ask the team, so a request is raised (a change request).
+    safety.Boundary.OTHER_PAY: (["escalate"], {"escalate": "payment_method"}),
+    # M3: pi told them it can resend the approved quote, so it does.
+    safety.Boundary.BANK_ASK_APPROVED: (["resend_quote"], {}),
 }
+
+
+def escalation_question(reason: str) -> str:
+    """What the team reads on the ticket for this reason."""
+    return ESCALATION_TEXT.get(
+        reason,
+        f"ENQUIRY ({reason}): pi gave the fixed line and noted nothing as a problem. "
+        "Please pick it up.",
+    )
+
+
+DISCLOSURE_LINE = {
+    "en": "Hi, I'm pi, an AI from Workzap.",
+    "roman_ur": "Hi, main pi hoon, Workzap ka AI.",
+    "ar": "مرحبًا، أنا pi، ذكاء اصطناعي من Workzap.",
+}
+SAYS_AI = re.compile(r"\b(?:AI|A\.I\.|artificial intelligence)\b|ذكاء اصطناعي|Workzap ka AI")
+LEGAL_THREAT = re.compile(
+    r"\b(?:i(?:'ll| will| am going to|'m going to) "
+    r"(?:sue|take (?:you|workzap) to court|go to court)|"
+    r"my (?:lawyer|attorney|solicitor)|legal (?:action|notice) against (?:you|workzap)|"
+    r"see you in court|consumer court|court case|qanooni karwai|vakeel)\b",
+    re.IGNORECASE,
+)
+
+
+DISCLOSURE_TAIL = {
+    "en": "I'm pi, an AI from Workzap.",
+    "roman_ur": "Main pi hoon, Workzap ka AI.",
+    "ar": "أنا pi، ذكاء اصطناعي من Workzap.",
+}
+
+
+def redisclose_due(context: dict[str, Any]) -> bool:
+    """The person is back after more than the re-disclosure gap (30 days by default, R-DISC-05)."""
+    limit = int((context.get("brain_settings") or {}).get("redisclose_days") or 30)
+    return int(context.get("days_away") or 0) > limit
+
+
+def with_disclosure(
+    reply: str, context: dict[str, Any], language: str, *, after: bool = False
+) -> str:
+    """A fixed reply that is pi's first message in the chat still says pi is an AI (R-DISC-01). In
+    front of the reply, except for an emergency (after=True), whose words stay first and whole."""
+    if any(h.get("role") == "ai" for h in context.get("history") or []) and not redisclose_due(
+        context
+    ):
+        return reply
+    if SAYS_AI.search(reply):
+        return reply
+    if after:
+        return f"{reply}\n{DISCLOSURE_TAIL.get(language, DISCLOSURE_TAIL['en'])}"
+    return f"{DISCLOSURE_LINE.get(language, DISCLOSURE_LINE['en'])} {reply}"
 
 
 def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
     """What must be answered before any model call (spec Part 6): an emergency, a message that is
     only card or ID details, a "who are you" question, a request for advice pi cannot give. The
-    answers are fixed, in the person's language; the model never sees these turns."""
-    text = str(context.get("latest_customer_message", ""))
+    answers are fixed, in the person's language; the model never sees these turns.
+
+    A burst (spec 6.10) is looked at whole: an emergency anywhere in it wins, then the newest
+    message's own gate, then the safety gates (bank change, refund, threats, enquiries) of the
+    earlier ones. `burst_texts` holds the earlier messages' text, oldest first."""
+    earlier = [str(t) for t in context.get("burst_texts") or [] if str(t).strip()]
+    for said in earlier:
+        if safety.emergency(said) is not None:
+            return _brain_gate(context, said, earlier_message=True)
+    if (turn := _brain_gate(context, str(context.get("latest_customer_message", "")))) is not None:
+        return turn
+    for said in earlier:
+        if (turn := _brain_gate(context, said, earlier_message=True)) is not None:
+            return turn
+    return None
+
+
+def burst_escalations(texts: list[str]) -> list[tuple[str, str]]:
+    """The staff escalations the earlier messages of a burst call for, as (reason, text): a claimed
+    bank change, a refund, a complaint, a deletion request, an enquiry, a threat. Whatever pi
+    ends up saying to the burst, none of these may be lost."""
+    found: list[tuple[str, str]] = []
+    for said in texts:
+        if safety.emergency(said) is not None:
+            continue  # an emergency anywhere in a burst gets the emergency reply (and its alert)
+        if (limit := safety.boundary_asked(said)) is not None:
+            _, marks = BOUNDARY_EFFECTS.get(limit, ([], {}))
+            if "escalate" in marks:
+                found.append((str(marks["escalate"]), said))
+            elif limit == safety.Boundary.DELETION:
+                found.append(("deletion_request", said))
+        if (lead := safety.enquiry_asked(said)) is not None:
+            found.append((lead.value, said))
+        if (rude := safety.abuse_asked(said)) is not None and rude == safety.Abuse.THREAT:
+            found.append(("abuse_threat", said))
+        if LEGAL_THREAT.search(said):
+            found.append(("legal_threat", said))
+    return found
+
+
+def _brain_gate(
+    context: dict[str, Any], text: str, *, earlier_message: bool = False
+) -> "ServiceTurn | None":
+    """One message through the pre-model gates. For an earlier message of a burst only the gates
+    that raise something for the team or stop the flow apply (not greetings or identity)."""
     language = str(context.get("reply_language") or "en")
     country = context.get("customer_country")
     pii = context.get("pii") or {}
@@ -1399,6 +1531,7 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
         brief: dict[str, Any] | None = None,
         why: str = "",
     ) -> "ServiceTurn":
+        reply = with_disclosure(reply, context, language, after=why == "R-EMER")
         turn = ServiceTurn(reply=reply, language=language)
         turn._decision = decisions.Decision(reply, move, brief or {}, effects or [], why=why)
         lines = [ln for ln in reply.splitlines() if any(c.isdigit() for c in ln)]
@@ -1413,25 +1546,28 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
             {"emergency": {"kind": kind.value}},
             "R-EMER",
         )
-    if context.get("handback_notice"):  # a person handed the chat back: say who pi is again
+    chat_level = not earlier_message  # greetings, identity, advice: only for the newest message
+    if chat_level and context.get("handback_notice"):  # a person handed the chat back
         return fixed(
             safety.handback_reply(language), None, [], {"handback_notice": False}, "R-DISC-04"
         )
     for courtesy, is_wish in (("salam", salam), ("festival", festival_wish)):
-        if is_wish(text):
+        if chat_level and is_wish(text):
             opened = any(h.get("role") == "ai" for h in context.get("history") or [])
             line = safety.greeting_reply(courtesy, language)
             if not opened:  # the AI disclosure comes first, whatever the greeting (R-DISC-01)
                 opening = flow.OPENING["roman_ur" if language == "roman_ur" else "en"]
                 line = f"{line.split('.')[0]}. {opening}"
             return fixed(line, None if opened else flow.State.S1_LISTENING, why="R-LANG-08")
-    if safety.unsupported_language(text):
+    if chat_level and safety.unsupported_language(text):
         return fixed(safety.UNSUPPORTED_TEXT, why="RT19")
-    if pii.get("only"):
+    if chat_level and pii.get("only"):
         first = safety.Pii(pii["kinds"][0])
         table = safety.PII_TEXT.get(language, safety.PII_TEXT["en"])
         return fixed(pii.get("notice") or table[first], why="R-PRIV-02")
-    if (rude := safety.abuse_asked(text)) is not None:
+    if (rude := safety.abuse_asked(text)) is not None and (
+        chat_level or rude == safety.Abuse.THREAT
+    ):
         strikes = int((context.get("brief") or {}).get("abuse_strikes") or 0)
         step = safety.abuse_step(rude, strikes, language)
         move = {
@@ -1442,7 +1578,7 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
         if step.escalate:
             marks["escalate"] = step.escalate
         return fixed(step.text, move, ["escalate"] if step.escalate else [], marks, "R-ABUSE")
-    if (trade := safety.not_served(text, context.get("served_industries"))) is not None:
+    if chat_level and (trade := safety.not_served(text, context.get("served_industries"))):
         return fixed(
             safety.not_served_reply(language),
             flow.State.X_OUT_OF_SCOPE,
@@ -1450,13 +1586,29 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
             {"declined_trade": trade},
             "R-7N",
         )
-    if (who := safety.identity_asked(text, constitution.ASKS_IF_AI)) is not None:
+    if chat_level and (who := safety.identity_asked(text, constitution.ASKS_IF_AI)) is not None:
+        if who == safety.Identity.COMPANY:
+            # E7: only facts in an approved company profile; otherwise the question goes to the
+            # team (pi said it would), so a request is raised.
+            return fixed(
+                safety.identity_reply(who, language),
+                None,
+                ["escalate"],
+                {"escalate": "company_info"},
+                "R-HONEST-01",
+            )
         return fixed(safety.identity_reply(who, language), why="R-DISC")
-    if (advice := safety.advice_asked(text)) is not None:
+    if chat_level and (advice := safety.advice_asked(text)) is not None:
+        if advice == safety.Advice.LEGAL and LEGAL_THREAT.search(text):
+            return fixed(
+                safety.advice_reply(advice, language),
+                None,
+                ["escalate"],
+                {"escalate": "legal_threat"},
+                "R-ADV",
+            )
         return fixed(safety.advice_reply(advice, language), why="R-ADV")
     if (limit := safety.boundary_asked(text)) is not None:
-        effects, marks = BOUNDARY_EFFECTS.get(limit, ([], {}))
-        move = flow.State.X_OUT_OF_SCOPE if limit == safety.Boundary.WRONG_NUMBER else None
         if limit == safety.Boundary.BANK_ASK and (context.get("flow") or {}).get("state") in (
             "S9_APPROVED",
             "S10_AWAITING_PAYMENT",
@@ -1464,10 +1616,17 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
             "S12_KICKOFF",
         ):
             limit = safety.Boundary.BANK_ASK_APPROVED  # M3: the details are on the approved quote
-        return fixed(
-            safety.boundary_reply(limit, language), move, list(effects), dict(marks), "R-BOUNDARY"
-        )
-    if (about := safety.nori_asked(text)) is not None:
+        effects, marks = BOUNDARY_EFFECTS.get(limit, ([], {}))
+        if chat_level or effects:
+            move = flow.State.X_OUT_OF_SCOPE if limit == safety.Boundary.WRONG_NUMBER else None
+            return fixed(
+                safety.boundary_reply(limit, language),
+                move,
+                list(effects),
+                dict(marks),
+                "R-BOUNDARY",
+            )
+    if chat_level and (about := safety.nori_asked(text)) is not None:
         return fixed(safety.nori_reply(about, language), why="R-HONEST-02")
     if (lead := safety.enquiry_asked(text)) is not None:
         return fixed(
@@ -1534,9 +1693,16 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     if state is None or turn._summary:
         return
     noted = context.get("noted_problems") or []
+    known = context.get("brief") or {}
     facts = {
         "message_id": context.get("latest_message_id"),
-        "can_approve": context.get("can_approve", True),
+        # R-OFFER-06: a person who said they are not the decision-maker cannot ask for or approve
+        # a quote (the customer record says so, or they said so in this chat).
+        "can_approve": bool(context.get("can_approve", True)) and not known.get("non_decider"),
+        # The reminder permission question rides on the offer's yes and on "later" (spec 3.9.1).
+        "ask_consent": bool(context.get("followups_enabled"))
+        and known.get("reminder_consent") not in ("granted", "declined")
+        and not known.get("consent_asked"),
         "business": (context.get("customer_profile") or {}).get("business_name"),
         "problem_count": len(noted),
         "group_count": len({p["group"] for p in noted}),
@@ -1592,36 +1758,33 @@ async def apply_decision(
             session, scope, conversation, "review_document", "high",
             "The customer said yes to a solution document and quote for: " + "; ".join(titles),
         )  # fmt: skip
+    said = conversation.last_message_preview or ""
     if "emergency" in decision.effects:
         kind = (decision.brief.get("emergency") or {}).get("kind", "")
-        await raise_decision_request(
-            session, scope, conversation, "other", "high",
+        await raise_escalation(
+            session, scope, conversation, "emergency",
             f"POSSIBLE EMERGENCY ({kind}): the customer wrote about it. Check the chat now. "
             "pi told them to call the local emergency number and noted nothing else.",
+            said,
         )  # fmt: skip
     if "escalate" in decision.effects:
         reason = str(decision.brief.get("escalate") or "other")
-        await raise_decision_request(
+        await raise_escalation(
             session,
             scope,
             conversation,
-            "other",
-            "high",
-            ESCALATION_TEXT.get(
-                reason,
-                f"ENQUIRY ({reason}): pi gave the fixed line and noted nothing as a problem. "
-                "Please pick it up.",
-            ),
+            reason,
+            escalation_question(reason),
+            said,
         )
     if "deletion_request" in decision.effects:
-        await raise_decision_request(
+        await raise_escalation(
             session,
             scope,
             conversation,
-            "other",
-            "high",
-            "DELETE MY DATA: the customer asked pi to delete everything it knows about them. "
-            "Confirm to them in the chat once it is done.",
+            "deletion_request",
+            escalation_question("deletion_request"),
+            said,
         )
     if "request_revision" in decision.effects:
         changes = (brief.get("revision_requested") or {}).get("changes") or []
@@ -1651,6 +1814,21 @@ async def apply_decision(
             session, scope, conversation, "other", "high",
             "The customer cancelled after approving and before payment was confirmed.",
         )  # fmt: skip
+
+
+async def raise_escalation(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    reason: str,
+    question: str,
+    said: str = "",
+) -> None:
+    """A brain escalation (spec 6.6): a ticket of its own kind and priority with the chat's
+    summary, open problems and last 20 messages attached (see pi_saas.requests)."""
+    from app.modules.pi_saas.requests import raise_escalation as raise_ticket
+
+    await raise_ticket(session, scope, conversation, reason, question, said)
 
 
 async def raise_decision_request(
@@ -3381,9 +3559,11 @@ WELCOME_BACK = {
 }
 
 
-def welcome_back(context: dict[str, Any]) -> str | None:
+def welcome_back(context: dict[str, Any], *, ask: bool = True) -> str | None:
     """Brain mode, a returning person who already has problems noted (R-MEM-03). After more than
-    30 days pi says again who it is (R-DISC-05). Nothing is asked that pi already knows."""
+    30 days pi says again who it is (R-DISC-05). Nothing is asked that pi already knows. With
+    ask=False only the greeting and the count (no question): it goes in front of an answer to
+    a real message, which has its own question."""
     if context.get("pi_mode") != "brain":
         return None
     noted = context.get("noted_problems") or []
@@ -3412,7 +3592,8 @@ def welcome_back(context: dict[str, Any]) -> str | None:
     else:
         who = "Hi. " if lang == "en" else "Salam. "
     things = ("problem" if len(noted) == 1 else "problems") if lang == "en" else "masail"
-    return WELCOME_BACK[lang].format(who=who, n=len(noted), things=things, mostly=mostly)
+    line = WELCOME_BACK[lang].format(who=who, n=len(noted), things=things, mostly=mostly)
+    return line if ask else line.rsplit(". ", 1)[0] + "."
 
 
 def greeting_reply(context: dict[str, Any]) -> str:
@@ -3487,6 +3668,8 @@ async def compose_service_turn(
     ):
         # Old knowledge and the model's last language must not turn "Hi" into a pitch.
         turn = ServiceTurn(reply=greeting_reply(context), language="en")
+        if context.get("pi_mode") == "brain":  # back after 30+ days, nothing noted: say who pi is
+            turn.reply = with_disclosure(turn.reply, context, str(context.get("reply_language")))
         turn._greeting_only = True
         if any(c.isdigit() for c in turn.reply):  # the welcome-back count is pi's own figure
             context["fixed_lines"] = [*context.get("fixed_lines", []), turn.reply]
@@ -3779,6 +3962,20 @@ async def compose_service_turn(
         turn.consent = "unchanged"
     if (context.get("pii") or {}).get("notice"):
         turn.reply = f"{context['pii']['notice']} {turn.reply}"  # R-PRIV-02: said once
+    if context.get("pi_mode") == "brain" and not turn._greeting_only:
+        # R-MEM-03, R-DISC-05: someone back after a gap is welcomed and, after more than 30 days,
+        # told again that this is pi, the AI, even when they open with a real message. In code,
+        # not in the prompt; the count is pi's own figure.
+        back = welcome_back(context, ask=False)
+        if back and not turn.request_human:
+            if SAYS_AI.search(turn.reply):  # the reply already says it: keep it only once
+                back = back.replace("Hi, it's pi, the AI from Workzap. ", "").replace(
+                    "Hi, main pi hoon, Workzap ka AI. ", ""
+                )
+            turn.reply = f"{back} {turn.reply}"
+            context["fixed_lines"] = [*context.get("fixed_lines", []), back]
+        elif redisclose_due(context) and not SAYS_AI.search(turn.reply):
+            turn.reply = with_disclosure(turn.reply, context, str(turn.language or "en"))
     return turn
 
 
@@ -4224,6 +4421,17 @@ async def ask_team(
     from app.modules.pi_saas.requests import raise_request
 
     if conversation.customer_id is None:
+        return
+    if flow.parse(conversation.flow_state) is not None:
+        # Brain mode (spec 6.6): pi can't help, a ticket of its own reason with the chat attached.
+        await raise_escalation(
+            session,
+            scope,
+            conversation,
+            "cant_help",
+            f"pi could not help with this. {summary} The customer said: {latest[:600]}",
+            latest,
+        )
         return
     try:
         async with session.begin_nested():

@@ -169,7 +169,9 @@ def test_a_team_member_cannot_say_yes_for_the_business():
     assert decision.next_state is None and decision.effects == []
     assert "The owner of Bright Studio needs to say yes" in decision.reply
     assert "workzap.ai/pi/talk-to-pi" in decision.reply
-    assert decision.brief == {"offer_wanted_by_member": True}
+    assert decision.brief == {"offer_wanted_by_member": True, "non_decider_asked": True}
+    # R-OFFER-06: asked once whether the decision-maker should receive the document.
+    assert decision.reply.endswith("how would you like to involve them?")
 
 
 def test_adding_a_problem_while_the_offer_waits_changes_nothing_here():

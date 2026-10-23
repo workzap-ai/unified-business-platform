@@ -30,13 +30,16 @@ async def test_an_emergency_gets_the_local_numbers_and_a_staff_alert(api, busine
     await pi.process("Fire in my shop!!", "em-1", sender=PK)
     await pi.deliver_all()
     reply = await pi.reply_to("em-1")
-    assert reply.body == "I can't help with emergencies. Please call 16 (fire) now."
+    assert reply.body == (
+        "I can't help with emergencies. Please call 16 (fire) now.\nI'm pi, an AI from Workzap."
+    )
     assert prompts == []  # the model never saw it
     conversation = await pi.conversation()
     await business_db.refresh(conversation)
     assert conversation.flow_state == "X_EMERGENCY"
     [request] = (await business_db.scalars(select(PiStaffRequest))).all()
-    assert request.priority == "high" and "POSSIBLE EMERGENCY (fire)" in request.question
+    assert request.priority == "urgent" and request.kind == "emergency"
+    assert "POSSIBLE EMERGENCY (fire)" in request.question
     # The next ordinary message ends the emergency state and the chat listens again.
     await pi.process("Sorry, all fine now. Best-sellers run out in two shops", "em-2", sender=PK)
     await pi.deliver_all()
@@ -62,7 +65,7 @@ async def test_an_aircraft_emergency_stops_the_flow_and_notes_nothing(
     assert conversation.flow_state == "X_EMERGENCY"
     assert (await business_db.scalars(select(PiProblem))).all() == []  # nothing noted
     [request] = (await business_db.scalars(select(PiStaffRequest))).all()
-    assert request.priority == "high"
+    assert request.priority == "urgent" and request.kind == "emergency"
     await pi.close()
 
 
@@ -153,7 +156,8 @@ async def test_a_claimed_bank_change_is_flagged_and_never_confirmed(api, busines
     assert "can't confirm any bank details" in reply and "PK" not in reply
     assert prompts == []
     [request] = (await business_db.scalars(select(PiStaffRequest))).all()
-    assert request.priority == "high" and "payment_detail_change" in request.question
+    assert request.priority == "urgent" and request.kind == "payment_detail_change"
+    assert "payment_detail_change" in request.question
     assert "fraud" in request.question
     await pi.close()
 
@@ -163,10 +167,12 @@ async def test_a_demo_request_is_routed_to_the_team_not_noted_as_a_problem(
 ):
     pi, prompts = await chat(api, business_db, monkeypatch)
     await say(pi, "I want to book a nori demo", "dm-1")
-    assert (await pi.reply_to("dm-1")).body.startswith("I'll pass that to the Workzap team.")
+    assert (await pi.reply_to("dm-1")).body.startswith(
+        "Hi, I'm pi, an AI from Workzap. I'll pass that to the Workzap team."
+    )
     assert prompts == []
     [request] = (await business_db.scalars(select(PiStaffRequest))).all()
-    assert "demo_request" in request.question
+    assert request.kind == "demo_request" and request.priority == "high"
     await pi.close()
 
 

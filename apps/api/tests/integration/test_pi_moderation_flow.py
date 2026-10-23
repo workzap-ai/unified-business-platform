@@ -38,9 +38,9 @@ async def test_repeated_insults_end_in_a_hand_over_and_then_silence_until_a_pers
     for n in range(1, 6):
         await say(pi, "you are stupid", f"ab-{n}")
         sent.append((await pi.reply_to(f"ab-{n}")).body)
-    assert sent[0].startswith("I'm here to help with the business problems")
+    assert sent[0].startswith("Hi, I'm pi, an AI from Workzap. I'm here to help with the business")
     assert "pass this chat to the Workzap team" in sent[2]  # the one warning
-    assert sent[3] == sent[0]  # calm again, no second warning
+    assert sent[0].endswith(sent[3])  # calm again, no second warning (the disclosure is once)
     assert sent[4] == "I'm passing this chat to the Workzap team."
     assert prompts == []  # the model never saw any of it
     conversation = await state_of(business_db, pi)
@@ -96,7 +96,9 @@ async def test_spam_is_answered_once_and_then_ignored_until_they_write_about_the
     adaptive(monkeypatch, neutral)
     pi = await workspace(api, business_db)
     await say(pi, "earn $500 daily from home, click this link", "sp-1")
-    assert (await pi.reply_to("sp-1")).body == "I'm here for problems in your business."
+    assert (await pi.reply_to("sp-1")).body == (
+        "Hi, I'm pi, an AI from Workzap. I'm here for problems in your business."
+    )
     assert (await state_of(business_db, pi)).flow_state == "X_OUT_OF_SCOPE"
     before = len(await replies(business_db))
     await pi.process("join my whatsapp group for guaranteed returns", "sp-2")
@@ -115,10 +117,11 @@ async def test_a_complaint_about_workzap_is_thanked_passed_on_and_not_noted_as_a
     pi = await workspace(api, business_db)
     await say(pi, "I want to complain about Workzap", "cp-1")
     assert (await pi.reply_to("cp-1")).body == (
-        "Thanks for telling me. I've passed this to the Workzap team."
+        "Hi, I'm pi, an AI from Workzap. Thanks for telling me. I've passed this to the Workzap team."
     )
     [request] = (await business_db.scalars(select(PiStaffRequest))).all()
     assert request.question.startswith("COMPLAINT") and request.priority == "high"
+    assert request.kind == "complaint_about_workzap"
     assert prompts == []
     await pi.close()
 
@@ -183,7 +186,7 @@ async def test_a_regulated_trade_is_declined_once_when_workzap_does_not_serve_it
     await serve(api, [])  # leadership decided: no regulated trade is served
     await say(pi, "I run a licensed arms and ammunition dealer, stock counts are off", "tr-1")
     assert (await pi.reply_to("tr-1")).body == (
-        "Workzap doesn't take on work in this area, so I can't help with this one."
+        "Hi, I'm pi, an AI from Workzap. Workzap doesn't take on work in this area, so I can't help with this one."
     )
     assert prompts == []
     conversation = await state_of(business_db, pi)
