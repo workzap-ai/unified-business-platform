@@ -17,7 +17,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from app.modules.pi.industry_words import TRADE_WORDS
+from app.modules.pi.industry_words import TRADE_PHRASES, TRADE_WORDS
 
 PACKS_DIR = Path(__file__).parent / "packs" / "industry"
 MAX_PACKS = 3  # industries per business, primary first
@@ -27,6 +27,8 @@ STRONG_TERM = 5.0  # one rare term is not enough alone unless the person states 
 # catch-all packs match on everyday words, so they need more evidence than a specific one
 GENERIC = {"general_factories_and_workshops", "retail_shops_and_chains"}
 GENERIC_MIN_SCORE = 9.0
+UNNAMED_MIN_SCORE = 8.0  # two terms, none of them a word of the trade's name: total weight needed
+UNNAMED_MIN_TERM = 4.5  # ... and the heavier of the two must be at least this rare
 KNOWN_BONUS = 4.0  # packs already stored for the business stay eligible without new evidence
 PHRASE_BOOST = 1.5
 NAME_BOOST = 2.2
@@ -37,7 +39,9 @@ NAME_BOOST = 2.2
 # often as the right one, and picked one for everyday text that names no trade at all.
 STATEMENT = re.compile(
     r"\b(?:i|we)(?:'m|'re| am| are)?\s+(?:\w+\s+){0,2}?"
-    r"(?:run|own|have|manage|operate|work in|working in|am in|are in|am an?|are an?)\b"
+    r"(?:run|own|have|manage|operate|work in|working in|am in|are in|am an?|are an?|"
+    r"sell|install|service|rent|make|manufacture|supply|provide|offer|repair|export|import|"
+    r"build|grow|produce|deal in|do)\b"
     r"|\b(?:my|our)\s+(?:\w+\s+){0,2}?(?:business|company|work|shop|firm|factory|clinic|store|farm|school)\b"
     # a role in the trade counts too: "I'm the store manager at a pharmacy chain" (golden G13)
     r"|\b(?:i'm|i am|we're|we are)\s+(?:the |a |an )?(?:\w+\s+){0,2}?"
@@ -51,7 +55,10 @@ STATEMENT = re.compile(
     r"|\b(?:میرا|میری|میرے|ہمارا|ہماری|ہمارے)\b|(?:چلاتا|چلاتی|چلاتے)\s+(?:ہوں|ہیں)"
     r"|\bکا\s+(?:کاروبار|کام)\b"
     r"|\b(?:chalata|chalati|chalate|chalaata)\s+(?:hun|hoon|hain)\b"
-    r"|\bka\s+(?:kaam|karobar|business)\b",
+    r"|\bka\s+(?:kaam|karobar|business)\b"
+    r"|\b(?:bechta|bechti|bechte|banata|banati|banate|karta|karti|karte)\s+(?:hun|hoon|hain)\b"
+    r"|\b(?:نبيع|نصنع|نقدم|نؤجر|نركب|نصلح|أبيع|ابيع|أصنع|اصنع)\b"
+    r"|(?:بیچتے|بناتے|کرتے)\s+ہیں",
     re.IGNORECASE,
 )
 
@@ -64,6 +71,15 @@ NAME_STOP = frozenset(
     "support facility field eid ramadan online payment payments client clients customer "
     "customers contractor contractors chain chains network networks outlet outlets branch "
     "branches".split()  # how a business is arranged, not what trade it is
+)
+
+# Words that are part of a pack's name but are everyday English in their own right: "call" is half
+# of "call centres" and also "he called me", "used" is half of "used car dealers" and also "we used
+# to", "driving us mad" is not a driving school. Measured on the packs' own exchanges they named the
+# wrong trade far more often than the right one, so a name word on this list is not evidence alone.
+AMBIGUOUS_NAME_WORDS = frozenset(
+    "call used private abroad material design building book patient seller air driving lot "
+    "part front desk class lesson order record data".split()
 )
 
 # Question-bank areas are written in plain words; map a problem category to the ones that fit.
@@ -165,7 +181,9 @@ def _core_name_words() -> dict[str, set[str]]:
     for key, pack in load_packs().items():
         plain = re.sub(r"\([^)]*\)", " ", pack["name"])  # "(incl. Eid ...)" is not part of the name
         words = (_stem(w) for w in _fold(plain).split())
-        names[key] = {w for w in words if len(w) >= 3 and w not in NAME_STOP}
+        names[key] = {
+            w for w in words if len(w) >= 3 and w not in NAME_STOP and w not in AMBIGUOUS_NAME_WORDS
+        }
     return names
 
 
@@ -174,9 +192,10 @@ def _name_words() -> dict[str, set[str]]:
     """pack key -> the words that name the trade: its own name, and the same trade in Arabic and
     Urdu script (`industry_words`)."""
     names = {key: set(words) for key, words in _core_name_words().items()}
-    for key, trade_words in TRADE_WORDS.items():
-        if key in names:
-            names[key] |= {n for n in (_normal(w) for w in trade_words) if len(n) >= 3}
+    for table in (TRADE_WORDS, TRADE_PHRASES):
+        for key, trade_words in table.items():
+            if key in names:
+                names[key] |= {n for n in (_normal(w) for w in trade_words) if len(n) >= 3}
     return names
 
 
@@ -231,11 +250,17 @@ def _evidence(text: str) -> dict[str, tuple[float, int, float, str]]:
 _CLAUSE_SPLIT = re.compile(r"[.!?؟۔،,;:\n]+|\b(?:and|but|while|aur|lekin|magar)\b", re.IGNORECASE)
 
 
+_TRADE_VERBS = "sell|rent|make|install|repair|service|supply|import|export|build|buy|hire"
+_VERB_PAIR = re.compile(rf"\b({_TRADE_VERBS})\s+and\s+({_TRADE_VERBS})\b", re.IGNORECASE)
+
+
 def _statement_clauses(text: str) -> list[str]:
     """The folded clauses of `text` (padded with spaces) in which the person states their own
     trade or role. A statement elsewhere in the message does not vouch for a trade word:
     "I have a toothache, is there a dental clinic nearby" is not a dental clinic."""
     found = []
+    # "we sell and install AC units" is one statement, not two clauses
+    text = _VERB_PAIR.sub(lambda m: f"{m.group(1)} {m.group(2)}", text)
     for clause in _CLAUSE_SPLIT.split(text):
         if clause and clause.strip():
             folded = _normal(clause)
@@ -272,7 +297,14 @@ def _qualifies(
     """Enough evidence to load the pack: two different terms, or one rare word that names the
     trade inside an explicit statement of it ("I run a pharmacy", "our accounting practice")."""
     floor = GENERIC_MIN_SCORE if key in GENERIC else MIN_SCORE
-    return total >= floor and (count >= 2 or (strongest >= STRONG_TERM and named and stated))
+    if total < floor:
+        return False
+    if strongest >= STRONG_TERM and named and stated:
+        return True
+    # Two terms is enough when one of them names the trade. Two everyday words ("load" and
+    # "driver", "khata" and "udhaar") are not: measured on the packs' own exchanges they picked
+    # the wrong trade as often as the right one, so they must also carry real weight.
+    return count >= 2 and (named or (total >= UNNAMED_MIN_SCORE and strongest >= UNNAMED_MIN_TERM))
 
 
 def detect(
@@ -307,7 +339,8 @@ def detect(
         (
             (scores[key], key)
             for key, ev in evidence.items()
-            if _qualifies(
+            if (key in known and scores[key] >= MIN_SCORE)  # stored packs stay eligible
+            or _qualifies(
                 key,
                 scores[key],
                 ev[1],
@@ -382,8 +415,147 @@ def build_ideas(pack: dict[str, Any]) -> list[str]:
     return list(pack.get("build_ideas", []))
 
 
+SECTOR_RULES_PATH = Path(__file__).parent / "packs" / "sector_rules.json"
+
+
+@lru_cache(maxsize=1)
+def sector_intros() -> dict[str, dict[str, Any]]:
+    """Each sector's intro from the specification, keyed "C.1", "C.2", "I.1" (built with packs)."""
+    if not SECTOR_RULES_PATH.exists():
+        return {}
+    loaded: dict[str, dict[str, Any]] = json.loads(SECTOR_RULES_PATH.read_text(encoding="utf-8"))
+    return loaded
+
+
+def sector_key(pack: dict[str, Any]) -> str:
+    sector = pack.get("sector") or {}
+    return f"{sector.get('code', '')}.{sector.get('part', 1)}"
+
+
+def sector_rules(pack: dict[str, Any]) -> str:
+    """The never-rules of the pack's sector, as the specification words them (7.C to 7.M). They
+    bind every pack of the sector, however the pack itself was reached (primary or secondary)."""
+    return str(sector_intros().get(sector_key(pack), {}).get("rules") or "")
+
+
+_SENTENCE = re.compile(r"(?<=[.!?])\s+(?=[A-Z“\"(])")
+_PROHIBITION = re.compile(
+    r"\b(?:never|no|not|nor|without|refuse[sd]?|declines?|stops?|stop|avoid|don'?t|only)\b", re.I
+)
+
+
+def _sentences(text: str) -> list[str]:
+    return [s.strip() for s in _SENTENCE.split(" ".join(text.split())) if s.strip()]
+
+
+def _clip_sentences(text: str, limit: int) -> str:
+    """Whole sentences up to `limit` characters, never a cut sentence. When they do not all fit,
+    the sentences that forbid something go first and the rest are dropped: a prohibition is never
+    the part that was clipped."""
+    text = " ".join(text.split())
+    if len(text) <= limit:
+        return text
+    sentences = _sentences(text)
+    order = sorted(range(len(sentences)), key=lambda i: (not _PROHIBITION.search(sentences[i]), i))
+    kept: set[int] = set()
+    used = 0
+    for i in order:
+        if used + len(sentences[i]) + 1 <= limit or not kept:
+            kept.add(i)
+            used += len(sentences[i]) + 1
+    return " ".join(sentences[i] for i in sorted(kept))
+
+
 def _clip(text: str, limit: int) -> str:
+    """Clip at a word with an ellipsis. For lists of words and phrases, never for rules."""
     return text if len(text) <= limit else text[: limit - 1].rsplit(" ", 1)[0] + "…"
+
+
+COUNTRY_MARKS = {
+    "PK": re.compile(r"\b(?:pakistan\w*|pk|karachi|lahore|punjab|sindh)\b", re.I),
+    "AE": re.compile(r"\b(?:uae|dubai|emirates|sharjah|abu dhabi)\b", re.I),
+    "CA": re.compile(r"\b(?:canada|canadian|ontario|alberta|toronto)\b", re.I),
+}
+_SEASON_SPLIT = re.compile(r"\s+-\s+|;\s+")
+
+
+def seasons_for(seasons: Any, country: str | None, limit: int = 760) -> str:
+    """The pack's seasons text for this customer: the parts that name no country, and the parts
+    for their country, each whole (never cut); every country's first part when it is not known."""
+    text = str(seasons or "").strip().lstrip("- ")
+    parts = [p.strip(" .") for p in _SEASON_SPLIT.split(text) if p.strip(" .")]
+    tagged: list[tuple[int, str | None]] = []
+    for index, part in enumerate(parts):
+        named = [c for c, mark in COUNTRY_MARKS.items() if mark.search(part)]
+        tagged.append((index, named[0] if len(named) == 1 else None))
+    if country in COUNTRY_MARKS:
+        order = [i for i, c in tagged if c == country] + [i for i, c in tagged if c is None]
+        wanted = {i for i, c in tagged if c in (None, country)}
+    else:
+        firsts: list[int] = []
+        seen: set[str] = set()
+        for i, c in tagged:
+            if c and c not in seen:
+                seen.add(c)
+                firsts.append(i)
+        order = firsts + [i for i, c in tagged if c is None] + [i for i, _ in tagged]
+        wanted = set(range(len(parts)))
+    kept: list[int] = []
+    used = 0
+    for i in order:
+        if i in kept or i not in wanted:
+            continue
+        size = len(parts[i]) + 2
+        if used + size > limit and kept:
+            continue
+        kept.append(i)
+        used += size
+    return "; ".join(parts[i] for i in sorted(kept))
+
+
+def pick_questions(
+    pack: dict[str, Any], categories: Sequence[str] = (), rotation: int = 0, limit: int = 6
+) -> list[str]:
+    """The questions to offer pi. For what was just noted: the questions for those problem
+    categories. Otherwise the opening question of the first area and of three more areas, the
+    three moving on each turn so every area (cash, people, growth ...) gets its turn."""
+    asked: list[str] = []
+    for category in categories:
+        for question in questions_for(pack, category)[:3]:
+            if question not in asked:
+                asked.append(question)
+    if asked:
+        return asked[:limit]
+    bank = [qs for qs in pack.get("questions", {}).values() if qs]
+    if not bank:
+        return []
+    rest = bank[1:]
+    picked = [bank[0][0]]
+    if rest:
+        start = (max(rotation, 0) * 3) % len(rest)
+        picked += [rest[(start + n) % len(rest)][0] for n in range(min(3, len(rest)))]
+    return picked
+
+
+def pick_problems(
+    pack: dict[str, Any], categories: Sequence[str] = (), rotation: int = 0, limit: int = 12
+) -> list[dict[str, str]]:
+    """The "heard as" phrases: those of the noted categories, else a spread across categories
+    that moves on each turn (not the first dozen in the order of the PDF)."""
+    problems = list(pack.get("problems", []))
+    if categories:
+        return [p for p in problems if p["category"] in categories][:limit]
+    by_category: dict[str, list[dict[str, str]]] = {}
+    for item in problems:
+        by_category.setdefault(item["category"], []).append(item)
+    lanes = list(by_category.values())
+    spread: list[dict[str, str]] = []
+    for depth in range(max((len(lane) for lane in lanes), default=0)):
+        spread += [lane[depth] for lane in lanes if depth < len(lane)]
+    if not spread:
+        return []
+    start = (max(rotation, 0) * 4) % len(spread)
+    return (spread[start:] + spread[:start])[:limit]
 
 
 def brief(
@@ -391,37 +563,45 @@ def brief(
     categories: Sequence[str] = (),
     max_chars: int = 2400,
     with_example: bool = False,
+    *,
+    country: str | None = None,
+    rotation: int = 0,
+    include_sector: bool = True,
 ) -> str:
     """Prompt text for one pack: how to listen and classify. Never includes build ideas.
 
-    Lines are added most useful first (care rules, the questions, scope, then the trade's
-    words and problem phrases) and any that no longer fit are dropped whole.
+    Lines are added most important first and any that no longer fit are dropped whole, so a rule
+    is never cut: the sector's never-rules, then the pack's care rules, then its scope rule, then
+    the questions, seasons for the customer's country, the trade's words and the problem phrases.
+    `categories` are the problem categories just noted, `rotation` moves the spread of questions
+    and phrases on each turn.
     """
     candidates: list[str] = []
-    for item in pack.get("care", [])[:8]:
-        candidates.append("Care: " + _clip(item, 260))
-    asked: list[str] = []
-    for category in categories or (None,):
-        asked += questions_for(pack, category)[: 3 if categories else 4]
+    if include_sector and (rules := sector_rules(pack)):
+        candidates.append("Sector rules, never: " + rules)
+    for item in pack.get("care", [])[:10]:
+        candidates.append("Care: " + _clip_sentences(item, 480))
+    if pack.get("scope_rule"):
+        candidates.append("Scope: " + _clip_sentences(pack["scope_rule"], 1000))
+    asked = pick_questions(pack, categories, rotation)
     if asked:
         candidates.append("Questions, one at a time: " + " | ".join(asked))
-    if pack.get("scope_rule"):
-        candidates.append("Scope: " + _clip(pack["scope_rule"], 360))
-    if pack.get("seasons"):
-        candidates.append("Seasons and peaks: " + _clip(str(pack["seasons"]).lstrip("- "), 420))
-    if pack.get("shape_facts") and not categories:
-        shape = "; ".join(_clip(f, 90) for f in pack["shape_facts"][:4])
-        candidates.append("Learn only from what they say: " + shape)
+    if pack.get("seasons") and (text := seasons_for(pack["seasons"], country)):
+        candidates.append("Seasons and peaks: " + text)
+    if pack.get("shape_facts"):
+        facts = pack["shape_facts"][: 3 if categories else 7]
+        candidates.append(
+            "Learn only from what they say: " + "; ".join(_clip(f, 140) for f in facts)
+        )
     words = list(pack.get("vocabulary", {}).items())[:14]
     if words:
         candidates.append("Their words: " + "; ".join(f"{w} = {_clip(m, 60)}" for w, m in words))
     local = list(pack.get("signal_glosses", {}).items())[:12]
     if local:
         candidates.append("Local words: " + "; ".join(f"{w} = {_clip(m, 50)}" for w, m in local))
-    found = [p for p in pack.get("problems", []) if not categories or p["category"] in categories]
-    for item in found[:14]:
+    for item in pick_problems(pack, categories, rotation):
         candidates.append(
-            f"Heard as {item['category']}/{item['subtype']}: {_clip(item['phrase'], 110)}"
+            f"Heard as {item['category']}/{item['subtype']}: {_clip(item['phrase'], 120)}"
         )
     if with_example and pack.get("exchange"):
         turns = " / ".join(f"{t['role']}: {_clip(t['text'], 140)}" for t in pack["exchange"][:4])
@@ -435,21 +615,58 @@ def brief(
     return "\n".join(lines)
 
 
+def core_size(pack: dict[str, Any], include_sector: bool = True) -> int:
+    """Characters the pack's rules need (sector rules, care, scope) so a smaller room can be
+    widened to keep every one of them."""
+    return len(
+        brief(pack, max_chars=10_000, with_example=False, include_sector=include_sector).split(
+            "\nQuestions"
+        )[0]
+    )
+
+
+PRIMARY_ROOM = 5200
+SECONDARY_ROOM = 2000
+DEFAULT_BUDGET = 10_500  # was 9000: three packs whose rules are all long no longer lose any
+
+
 def prompt_section(
     detection: Detection,
     categories: Sequence[str] = (),
-    budget: int = 9000,
+    budget: int = DEFAULT_BUDGET,
+    *,
+    country: str | None = None,
+    rotation: int = 0,
 ) -> str:
-    """The INDUSTRY KNOWLEDGE block: primary pack fullest, then the others, then overlays."""
+    """The INDUSTRY KNOWLEDGE block: primary pack fullest, then the others, then overlays.
+
+    A pack's rules are never what is dropped for room: a secondary pack's room grows to hold its
+    care and scope rules (and its sector's rules once, for the first pack of that sector).
+    """
     packs = load_packs()
     keys = [*detection.industries, *detection.overlays]
     blocks: list[str] = []
     used = 0
+    shown_sectors: set[str] = set()
     for position, key in enumerate(keys):
-        room = min(5200 if position == 0 else 2000, budget - used)
+        pack = packs[key]
+        sector = sector_key(pack)
+        first_of_sector = sector not in shown_sectors
+        base = PRIMARY_ROOM if position == 0 else SECONDARY_ROOM
+        needed = core_size(pack, first_of_sector) + 300
+        room = min(max(base, needed) if position else base, budget - used)
         if room < 300:
             break
-        block = brief(packs[key], categories, max_chars=room, with_example=position == 0)
+        block = brief(
+            pack,
+            categories,
+            max_chars=room,
+            with_example=position == 0,
+            country=country,
+            rotation=rotation,
+            include_sector=first_of_sector,
+        )
+        shown_sectors.add(sector)
         blocks.append(block)
         used += len(block)
     return "\n\n".join(blocks)

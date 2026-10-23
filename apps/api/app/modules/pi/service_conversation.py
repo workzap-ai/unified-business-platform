@@ -6,6 +6,7 @@ import json
 import logging
 import re
 import unicodedata
+from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any, Literal
@@ -1855,11 +1856,20 @@ def industry_texts(
     return [text for text in said if text]
 
 
-def industry_context(customer: Any, texts: list[str], max_chars: int = 9000) -> dict[str, Any]:
+def industry_context(
+    customer: Any,
+    texts: list[str],
+    max_chars: int = industry_packs.DEFAULT_BUDGET,
+    categories: Sequence[str] = (),
+    country: str | None = None,
+) -> dict[str, Any]:
     """Pick the customer's industry packs and remember them on their record.
 
     Packs only change what pi listens for and asks next, never its rules; the stored
-    primary/secondary keep the choice steady between messages.
+    primary/secondary keep the choice steady between messages. `categories` are the problem
+    categories pi has just noted (the questions and "heard as" phrases then fit them) and
+    `country` the customer's (seasons are shown for it); with nothing noted the questions
+    and phrases rotate through the pack's areas turn by turn.
     """
     stored = [k for k in [customer.industry_primary, *(customer.industry_secondary or [])] if k]
     found = industry_packs.detect(texts, known=stored)
@@ -1876,7 +1886,9 @@ def industry_context(customer: Any, texts: list[str], max_chars: int = 9000) -> 
     return {
         "industry": names,
         "industry_keys": list(found.industries),
-        "industry_knowledge": industry_packs.prompt_section(found, budget=max_chars),
+        "industry_knowledge": industry_packs.prompt_section(
+            found, categories, budget=max_chars, country=country, rotation=len(texts)
+        ),
     }
 
 
@@ -1903,7 +1915,19 @@ async def industry_context_for(
     if customer is None:
         return {}
     texts = industry_texts(message, rows, profile, conversation.service_brief)
-    found = industry_context(customer, texts)
+    categories: list[str] = []
+    if flow.brain_mode(policy.response_rules):
+        # what was just noted decides which questions and "heard as" phrases are shown
+        noted = await problems.noted_context(session, scope, conversation.customer_id)
+        for item in noted:
+            if item.get("group") and item["group"] not in categories:
+                categories.append(item["group"])
+    found = industry_context(
+        customer,
+        texts,
+        categories=categories[-3:],  # the latest few groups
+        country=safety.country_of(customer.phone or customer.whatsapp_id),
+    )
     if not found and not customer.industry_primary:
         # Spec 7.O: no pack fits, so keep the person's own description (the nightly run
         # clusters these into a new pack once five similar businesses have arrived).
