@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import learning_lessons, learning_packs, learning_rules
 from app.modules.pi.learning_models import PiLearningLesson
-from app.modules.pi.problem_models import PiProblem
+from app.modules.pi.problem_models import PiProblem, PiProblemRevision
 from app.shared.scope import WorkspaceScope
 
 MAX_WORDS = 3
@@ -33,16 +33,28 @@ def lesson_text(term: str, category: str) -> str:
 async def learn(session: AsyncSession, scope: WorkspaceScope) -> dict[str, int]:
     """New vocabulary lessons from the problems noted so far. Returns counts."""
     rows = await session.execute(
-        select(PiProblem.customer_id, PiProblem.category, PiProblem.user_words).where(
+        select(PiProblem.id, PiProblem.customer_id, PiProblem.category, PiProblem.user_words).where(
             PiProblem.tenant_id == scope.tenant_id,
             PiProblem.environment_id == scope.environment_id,
         )
     )
-    seen: list[tuple[str, str, str]] = []
-    for customer_id, category, words in rows:
+    corrected_by_staff = {  # only a staff-chosen category counts: a title typo confirms nothing
+        problem_id
+        for problem_id, diff in await session.execute(
+            select(PiProblemRevision.problem_id, PiProblemRevision.diff).where(
+                PiProblemRevision.tenant_id == scope.tenant_id,
+                PiProblemRevision.environment_id == scope.environment_id,
+                PiProblemRevision.by == "staff",
+            )
+        )
+        if "category" in (diff or {})
+    }
+    seen: list[tuple[str, str, str, int]] = []
+    for problem_id, customer_id, category, words in rows:
+        weight = learning_rules.STAFF_WEIGHT if problem_id in corrected_by_staff else 1
         for word in words or []:
             if (term := phrase(str(word))) is not None:
-                seen.append((term, str(customer_id), category))
+                seen.append((term, str(customer_id), category, weight))
     found = learning_rules.lexicon_terms(seen)
     have = set(
         await session.scalars(

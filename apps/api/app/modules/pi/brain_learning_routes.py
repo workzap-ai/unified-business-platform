@@ -20,10 +20,12 @@ from app.modules.pi import (
     learning,
     learning_arms,
     learning_bank,
+    learning_grader,
     learning_lessons,
     learning_miner,
     learning_nightly,
     learning_packs,
+    taxonomy,
 )
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.learning_embed import make_embedder
@@ -36,6 +38,8 @@ from app.modules.pi.learning_models import (
     PiQuestionArm,
 )
 from app.modules.pi.models import PiConversation, PiMessage
+from app.modules.pi.problem_models import PiProblem, PiProblemRevision
+from app.modules.pi.problems import redact
 from app.modules.pi.service import require_pi
 from app.shared.errors import BusinessRuleViolation, ResourceNotFound
 
@@ -106,6 +110,7 @@ async def run_now(request: Request, scope: Scope, session: Session) -> dict[str,
         embedder=make_embedder(state.settings, state.http),
         pack_writer=lambda s: learning_packs.make_writer(state.settings, state.http, s),
         question_writer=lambda s: learning_miner.make_writer(state.settings, state.http, s),
+        grader=lambda s: learning_grader.make_grader(state.settings, state.http, s),
     )
     await record(
         session,
@@ -610,3 +615,66 @@ async def review_queue(scope: Scope, session: Session) -> dict[str, Any]:
             for c in flagged
         ],
     }
+
+
+class ProblemCorrection(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    title: str | None = Field(default=None, max_length=120)
+    category: str | None = Field(default=None, max_length=40)
+    subtype: str | None = Field(default=None, pattern=r"^[a-z][a-z0-9_]{1,59}$")
+
+
+@router.post("/problems/{problem_id}/correct")
+async def correct_problem(
+    problem_id: UUID, data: ProblemCorrection, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Staff fix a noted problem's title, category or sub-type (spec 8.10). It is stored as a
+    staff revision: the vocabulary learner weighs it five times a customer's word."""
+    await require_pi(session, scope, PERMISSION)
+    row = await session.get(PiProblem, problem_id)
+    if (
+        row is None
+        or row.tenant_id != scope.tenant_id
+        or row.environment_id != scope.environment_id
+    ):
+        raise ResourceNotFound
+    if data.category is not None and data.category not in taxonomy.BY_KEY:
+        raise BusinessRuleViolation(
+            "UNKNOWN_CATEGORY", "That is not one of the fixed problem categories", 422
+        )
+    diff: dict[str, Any] = {}
+    if data.title is not None and data.title.strip() and data.title.strip() != row.title:
+        title = redact(data.title.strip())[0]
+        diff["title"] = [row.title, title]
+        row.title = title
+    if data.category is not None and data.category != row.category:
+        diff["category"] = [row.category, data.category]
+        row.category = data.category
+    if data.subtype is not None and data.subtype != row.subtype:
+        diff["subtype"] = [row.subtype, data.subtype]
+        row.subtype = data.subtype
+    if not diff:
+        return {"id": row.id, "changed": False}
+    row.status = "corrected"
+    row.revision += 1
+    session.add(
+        PiProblemRevision(
+            tenant_id=scope.tenant_id,
+            environment_id=scope.environment_id,
+            problem_id=row.id,
+            revision=row.revision,
+            diff=diff,
+            reason="staff_correction",
+            by="staff",
+        )
+    )
+    await record(
+        session,
+        "pi.problem.staff_correction",
+        scope=scope,
+        entity_type="pi_problem",
+        entity_id=row.id,
+        details={"fields": sorted(diff)},
+    )
+    await session.commit()
+    return {"id": row.id, "changed": True, "fields": sorted(diff)}

@@ -38,11 +38,17 @@ Built after reading Part 8: critique step (switch `brain.critique`, off by defau
 (`/pi/brain-learning/queue`), more 8.13 metrics, handback line, refund, bank-details, discount,
 payment-method and wrong-number answers, video notice.
 
-Still not built: weekly settings tuning (job 7), grader model (job 1 rubric), voice variants (job 6),
-the problem-board image / interactive list / progress card (8.11.2), Urdu script as its own language
-code, kickoff slot list, sticker and reaction handling, edited/deleted messages, long-message split,
-extra problem-record fields, pattern surfacing and team links, S3 to S2 and the clarify counter,
-5x staff-correction weight, learning from document diffs, link-threshold tuning.
+Built after re-reading Part 8 (2026-10-23): settings tuning (job 7, `learning_tuning.py`, timing
+settings only, one step a week), the grader model (job 1, `learning_grader.py`, switch
+`brain.grader`, off by default), the 5x weight of a staff correction and the staff route
+`POST /pi/brain-learning/problems/{id}/correct`.
+
+Still not built: voice variants (job 6), the problem-board image / interactive list / progress card
+(8.11.2), Urdu script as its own language code, kickoff slot list, sticker and reaction handling,
+edited/deleted messages, long-message split, pattern surfacing and team links, S3 to S2 and the
+clarify counter, learning from document diffs, win/loss notes, link-threshold tuning. A staff
+screen for correcting problems is not built either (only the API). None of these changes the
+constitution, and learning stays frozen until it is switched on per workspace.
 
 ## Part 7 coverage check (2026-10-23)
 

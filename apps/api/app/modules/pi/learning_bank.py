@@ -20,7 +20,14 @@ from uuid import UUID
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import constitution, learning, learning_canary, learning_rules, safety
+from app.modules.pi import (
+    constitution,
+    learning,
+    learning_canary,
+    learning_grader,
+    learning_rules,
+    safety,
+)
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_embed import Embedder
 from app.modules.pi.learning_models import PiLearningChange, PiLearningExample
@@ -116,12 +123,28 @@ async def _answered(session: AsyncSession, reply: PiMessage) -> PiMessage | None
     return found
 
 
+async def _transcript(session: AsyncSession, conversation_id: UUID) -> list[tuple[str, str]]:
+    """The conversation as (who, redacted text), oldest first, for the grader."""
+    rows = await session.scalars(
+        select(PiMessage)
+        .where(PiMessage.conversation_id == conversation_id)
+        .order_by(PiMessage.created_at.desc())
+        .limit(learning_grader.MAX_MESSAGES)
+    )
+    return [  # the newest messages, oldest first: a break late in a long chat must be seen
+        ("person" if m.direction == "inbound" else "pi", safety.redact_pii(m.body or "").text)
+        for m in reversed(list(rows))
+        if (m.body or "").strip()
+    ]
+
+
 async def curate(
     session: AsyncSession,
     scope: WorkspaceScope,
     now: datetime | None = None,
     limit: int = 200,
     embedder: Embedder | None = None,
+    grader: learning_grader.Grader | None = None,
 ) -> dict[str, int]:
     """New candidates from yesterday's good listening-loop replies. Returns counts."""
     now = now or datetime.now(UTC)
@@ -145,6 +168,7 @@ async def curate(
     )
     counts = {"looked_at": len(rows), "added": 0, "rejected": 0}
     fresh: list[PiLearningExample] = []
+    graded: dict[UUID, learning_grader.Grade | None] = {}
     for exp in rows:
         if exp.situation.get("state") not in LISTENING_STATES:
             continue  # fixed lines (offer, summary, documents) are never examples
@@ -165,14 +189,36 @@ async def curate(
         asked = await _answered(session, reply)
         person, said = (asked.body if asked is not None else ""), strip_opening(reply.body)
         confidence = min(redaction_confidence(said), redaction_confidence(person))
+        rubric, defect = rubric_proxy(said), False
+        if grader is not None and bool(person.strip()):
+            if exp.conversation_id not in graded:
+                graded[exp.conversation_id] = await grader(
+                    await _transcript(session, exp.conversation_id)
+                )
+                if (g := graded[exp.conversation_id]) is not None and g.rule_break:
+                    counts["defects"] = counts.get("defects", 0) + 1
+                    session.add(
+                        PiLearningChange(
+                            tenant_id=scope.tenant_id,
+                            environment_id=scope.environment_id,
+                            kind="grader_defect",
+                            risk="high",
+                            target_id=exp.conversation_id,
+                            evidence={"reasons": g.reasons},
+                            status="review",
+                            reason="the grader found a rule break: " + "; ".join(g.reasons)[:240],
+                        )
+                    )
+            if (g := graded[exp.conversation_id]) is not None:
+                rubric, defect = min(rubric, g.mean), g.rule_break
         ok = (
             bool(person.strip())
             and not learning.never_learn(said)
             and not learning.never_learn(person.rstrip("?") + ".")  # their words, as a statement
             and learning_rules.should_promote_example(
                 total,
-                rubric_proxy(said),
-                "rule_break" in (exp.signals or []),
+                rubric,
+                defect or "rule_break" in (exp.signals or []),
                 confidence,
             )
         )

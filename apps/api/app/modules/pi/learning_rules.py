@@ -64,21 +64,30 @@ LEXICON_BUSINESSES = 5
 LEXICON_AGREEMENT = 0.90
 
 
-def lexicon_terms(observations: Iterable[tuple[str, str, str]]) -> dict[str, str]:
-    """(term, business, category) seen in messages, after corrections. A term is added when at least
-    5 different businesses used it and at least 90% of the time it ended up in one category."""
-    by_term: dict[str, list[tuple[str, str]]] = {}
-    for term, business, category in observations:
-        by_term.setdefault(term.strip().lower(), []).append((business, category))
+STAFF_WEIGHT = 5  # a staff correction counts five times a customer's word (spec 8.10)
+
+
+def lexicon_terms(
+    observations: Iterable[tuple[str, str, str] | tuple[str, str, str, int]],
+) -> dict[str, str]:
+    """(term, business, category[, weight]) seen in messages, after corrections. A term is added
+    when at least 5 different businesses used it and at least 90% of the weighted votes put it in
+    one category. A staff-corrected problem votes with weight 5 for the category staff chose; the
+    business count is never weighted, so one correction cannot admit a term on its own."""
+    by_term: dict[str, list[tuple[str, str, int]]] = {}
+    for item in observations:
+        term, business, category = item[0], item[1], item[2]
+        weight = item[3] if len(item) > 3 else 1
+        by_term.setdefault(term.strip().lower(), []).append((business, category, weight))
     added: dict[str, str] = {}
     for term, seen in by_term.items():
-        if len({business for business, _ in seen}) < LEXICON_BUSINESSES:
+        if len({business for business, _, _ in seen}) < LEXICON_BUSINESSES:
             continue
         counts: dict[str, int] = {}
-        for _, category in seen:
-            counts[category] = counts.get(category, 0) + 1
+        for _, category, weight in seen:
+            counts[category] = counts.get(category, 0) + weight
         top, hits = max(counts.items(), key=lambda kv: kv[1])
-        if hits / len(seen) >= LEXICON_AGREEMENT:
+        if hits / sum(counts.values()) >= LEXICON_AGREEMENT:
             added[term] = top
     return added
 

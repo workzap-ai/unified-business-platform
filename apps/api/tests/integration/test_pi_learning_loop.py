@@ -261,3 +261,114 @@ async def test_a_failing_embedder_never_breaks_the_turn(api, business_db, monkey
     [example] = (await business_db.scalars(select(PiLearningExample))).all()
     assert example.embedding is None
     await pi.close()
+
+
+def stub_grader(grade):
+
+    seen: list[int] = []
+
+    async def grader(transcript):
+        seen.append(len(transcript))
+        return grade
+
+    return grader, seen
+
+
+async def test_the_grader_model_decides_whether_a_good_chat_becomes_an_example(
+    api, business_db, monkeypatch
+):
+    from app.modules.pi import learning_grader
+
+    adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)
+    await learning_on(api)
+    await good_chat(pi, business_db)
+    await score_new(business_db)
+    scope = pi.scope()
+
+    broke = learning_grader.Grade(rule_break=True, mean=2.0, reasons=["asked two questions"])
+    grader, seen = stub_grader(broke)
+    counts = await learning_bank.curate(business_db, scope, grader=grader)
+    assert counts["added"] == 0 and counts["defects"] == 1  # excluded and logged as a defect
+    assert seen and seen[0] >= 2  # the whole conversation went to the grader
+    defects = [
+        c for c in await business_db.scalars(select(PiLearningChange)) if c.kind == "grader_defect"
+    ]
+    assert len(defects) == 1 and defects[0].status == "review"
+
+    weak = learning_grader.Grade(rule_break=False, mean=1.2, reasons=[])
+    grader, _ = stub_grader(weak)
+    assert (await learning_bank.curate(business_db, scope, grader=grader))["added"] == 0
+
+    fine = learning_grader.Grade(rule_break=False, mean=1.9, reasons=[])
+    grader, _ = stub_grader(fine)
+    assert (await learning_bank.curate(business_db, scope, grader=grader))["added"] == 1
+    await pi.close()
+
+
+async def test_an_unavailable_grader_falls_back_to_the_text_check(api, business_db, monkeypatch):
+    adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)
+    await learning_on(api)
+    await good_chat(pi, business_db)
+    await score_new(business_db)
+    grader, _ = stub_grader(None)
+    assert (await learning_bank.curate(business_db, pi.scope(), grader=grader))["added"] == 1
+    await pi.close()
+
+
+async def test_the_grader_and_the_tuning_stay_silent_while_learning_is_frozen(
+    api, business_db, monkeypatch
+):
+    from app.modules.pi import learning_grader
+
+    adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)  # frozen by default
+    await good_chat(pi, business_db)
+    await score_new(business_db)
+    settings = await business_db.scalar(select(PiSettings))
+    settings.response_rules = {**(settings.response_rules or {}), "brain": {"grader": True}}
+    assert learning_grader.switched_on(settings.response_rules)
+    asked: list[int] = []
+
+    def factory(scope):
+        asked.append(1)
+        return None
+
+    run = await learning_nightly.run_workspace(business_db, settings, grader=factory)
+    assert run.frozen is True and run.digest == {"frozen": True}
+    assert asked == [] and (await business_db.scalars(select(PiLearningChange))).all() == []
+
+
+def test_the_grader_is_off_unless_it_is_switched_on():
+    from app.modules.pi import learning_grader
+
+    assert not learning_grader.switched_on({})
+    assert not learning_grader.switched_on({"brain": {"learning_frozen": False}})
+
+
+async def test_a_break_late_in_a_long_chat_still_reaches_the_grader(api, business_db, monkeypatch):
+    adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)
+    await good_chat(pi, business_db)
+    conversation = await pi.conversation()
+    from app.modules.pi.models import PiMessage
+
+    for n in range(60):
+        business_db.add(
+            PiMessage(
+                tenant_id=conversation.tenant_id,
+                environment_id=conversation.environment_id,
+                conversation_id=conversation.id,
+                direction="inbound" if n % 2 == 0 else "outbound",
+                sender_type="customer" if n % 2 == 0 else "ai",
+                body=f"filler {n}" if n < 59 else "LAST MESSAGE",
+                message_type="text",
+                status="processed",
+                provider_message_id=f"filler-{n}",
+                created_at=datetime.now(UTC) + timedelta(minutes=5, seconds=n),
+            )
+        )
+    await business_db.flush()
+    transcript = await learning_bank._transcript(business_db, conversation.id)
+    assert len(transcript) == 40 and transcript[-1][1] == "LAST MESSAGE"

@@ -159,3 +159,34 @@ async def test_erasing_a_customer_removes_the_examples_made_from_their_chats(
     assert await count(business_db, PiLearningExample) == 0
     assert await count(business_db, PiProblem) == 1  # the other customer's note is untouched
     await pi.close()
+
+
+async def test_staff_can_correct_a_problem_and_it_is_kept_as_a_staff_revision(
+    api, business_db, monkeypatch
+):
+    from app.modules.pi.problem_models import PiProblemRevision
+
+    adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)
+    await good_chat(pi, business_db)
+    problem = (await business_db.scalars(select(PiProblem))).first()
+    assert problem is not None
+    pid = problem.id
+    bad = await api.post(f"{L}/problems/{pid}/correct", json={"category": "nonsense"})
+    assert bad.status_code == 422, bad.text
+    done = await api.post(
+        f"{L}/problems/{pid}/correct",
+        json={"category": "cash_collections", "title": "Customers pay late"},
+    )
+    assert done.status_code == 200, done.text
+    assert done.json()["fields"] == ["category", "title"] or "category" in done.json()["fields"]
+    business_db.expire_all()
+    revision = await business_db.scalar(
+        select(PiProblemRevision).where(
+            PiProblemRevision.problem_id == pid, PiProblemRevision.by == "staff"
+        )
+    )
+    assert revision is not None and revision.reason == "staff_correction"
+    again = await api.post(f"{L}/problems/{pid}/correct", json={"category": "cash_collections"})
+    assert again.json()["changed"] is False
+    await pi.close()

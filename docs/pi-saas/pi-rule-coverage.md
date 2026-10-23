@@ -97,6 +97,9 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | Spec 8.5 job 9, 9.10 rule 3 | New examples are canaried and rolled back on a guardrail | code | `learning_canary.py` (eval L9) |
 | Spec 8.7, 8.10 | High-risk lessons need a second person | code | `learning_lessons.decide` refuses the author |
 | Spec 8.5 job 5, 8.6 | Drafted packs never go live without a person's care approval and a shadow run | code | `learning_packs.py`, `learning_rules.pack_may_go_live` |
+| Spec 8.5 job 7, 9.10 | Timing settings move one step a week, one at a time; undone when a guardrail rises; rule settings never tuned | code | `learning_tuning.py` (only timing settings), `learning_rules.next_setting_value`, `breached` |
+| Spec 8.5 job 1 | A separate grader model scores whole conversations; a rule break excludes them and is logged as a defect | code (off unless `brain.grader` is true) | `learning_grader.py`, `learning_bank.curate` |
+| Spec 8.10 | A staff correction of a problem counts 5x a customer word in vocabulary learning, and cannot admit a term alone | code | `brain_learning_routes.correct_problem`, `learning_rules.lexicon_terms` |
 | Spec 8.3 scoring | Each reply scored by what followed, text-free | code | `experience_scorer.score_new`, table `pi_experiences` (0040), run by the sweep |
 
 ## Documents, decisions, payment (Part 5)

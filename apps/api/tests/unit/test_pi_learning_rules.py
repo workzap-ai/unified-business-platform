@@ -92,3 +92,14 @@ def test_listening_sections_can_go_live_but_care_sections_never_do():  # L12
     assert not r.pack_may_go_live("Anything else", 500, 2.0, 1.0)  # unknown sections are held
     assert r.needs_human_review("Scope rule") and r.needs_human_review("Handle with care")
     assert not r.needs_human_review("Words")
+
+
+def test_a_staff_correction_counts_five_times_but_cannot_admit_a_term_alone():
+    mixed = [("udhaar", f"b{i}", "cash_collections") for i in range(6)]
+    mixed += [("udhaar", f"c{i}", "staff_hr") for i in range(1)]
+    assert r.lexicon_terms(mixed) == {}  # 6 of 7 is 86%: not enough
+    staff = [("udhaar", f"b{i}", "cash_collections", 5 if i == 0 else 1) for i in range(6)]
+    staff += [("udhaar", "c0", "staff_hr")]
+    assert r.lexicon_terms(staff) == {"udhaar": "cash_collections"}  # 10 of 11 is 91%
+    lone = [("udhaar", "b0", "cash_collections", 5)]
+    assert r.lexicon_terms(lone) == {}  # one business, however it is weighted

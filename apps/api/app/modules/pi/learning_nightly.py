@@ -22,9 +22,11 @@ from app.modules.pi import (
     learning_bank,
     learning_canary,
     learning_drift,
+    learning_grader,
     learning_lexicon,
     learning_miner,
     learning_packs,
+    learning_tuning,
 )
 from app.modules.pi.learning_embed import Embedder
 from app.modules.pi.learning_models import PiLearningRun
@@ -34,6 +36,7 @@ from app.shared.scope import WorkspaceScope
 MIN_GAP = timedelta(hours=20)
 WriterFactory = Callable[[WorkspaceScope], learning_packs.Writer | None]
 QuestionWriterFactory = Callable[[WorkspaceScope], learning_miner.QuestionWriter | None]
+GraderFactory = Callable[[WorkspaceScope], learning_grader.Grader | None]
 
 
 def scope_of(settings: PiSettings) -> WorkspaceScope:
@@ -62,6 +65,7 @@ async def run_workspace(
     embedder: Embedder | None = None,
     pack_writer: WriterFactory | None = None,
     question_writer: QuestionWriterFactory | None = None,
+    grader: GraderFactory | None = None,
 ) -> PiLearningRun:
     """One run for one workspace. Returns the run row with its digest."""
     now = now or datetime.now(UTC)
@@ -87,7 +91,15 @@ async def run_workspace(
         digest["frozen"] = True  # the kill switch: no changes of any kind
     else:
         digest["drift"] = drift
-        digest["examples"] = await learning_bank.curate(session, scope, now, embedder=embedder)
+        digest["examples"] = await learning_bank.curate(
+            session,
+            scope,
+            now,
+            embedder=embedder,
+            grader=grader(scope)
+            if grader and learning_grader.switched_on(settings.response_rules)
+            else None,
+        )
         rules = settings.response_rules
         digest["examples"].update(await learning_bank.activate(session, scope, now))
         digest["canary"] = await learning_canary.evaluate(
@@ -107,6 +119,7 @@ async def run_workspace(
         digest["questions"] = await learning_miner.mine(
             session, scope, question_writer(scope) if question_writer else None
         )
+        digest["tuning"] = await learning_tuning.tune(session, scope, settings, now)
         digest["health"] = await experience_scorer.health(session, now - timedelta(days=1), scope)
     run.digest = digest
     run.finished_at = datetime.now(UTC)
@@ -120,6 +133,7 @@ async def run_due(
     embedder: Embedder | None = None,
     pack_writer: WriterFactory | None = None,
     question_writer: QuestionWriterFactory | None = None,
+    grader: GraderFactory | None = None,
 ) -> int:
     """Run every brain-mode workspace that has not run in the last 20 hours. Returns how many."""
     now = now or datetime.now(UTC)
@@ -133,6 +147,6 @@ async def run_due(
         previous = await last_run(session, scope_of(settings))
         if previous is not None and now - previous.started_at < MIN_GAP:
             continue
-        await run_workspace(session, settings, now, embedder, pack_writer, question_writer)
+        await run_workspace(session, settings, now, embedder, pack_writer, question_writer, grader)
         done += 1
     return done
