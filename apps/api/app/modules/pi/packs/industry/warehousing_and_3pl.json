@@ -37,6 +37,9 @@
   "forklift",
   "loader"
  ],
+ "signal_glosses": {
+  "mustawda’": "warehouse, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Size and type of space (ambient, racked, bonded, free zone) and number of sites.",

@@ -35,6 +35,11 @@
   "weekend school",
   "Islamic school"
  ],
+ "signal_glosses": {
+  "halaqa": "study circle, Arabic",
+  "tahfeez": "memorisation, Arabic",
+  "markaz tahfeez": "Quran memorisation centre, Gulf"
+ },
  "notes": "",
  "shape_facts": [
   "Model: physical madrassa/academy, online academy teaching international families, or both.",

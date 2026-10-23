@@ -32,6 +32,12 @@
   "marsa",
   "rihlat sayd"
  ],
+ "signal_glosses": {
+  "yakht": "yacht",
+  "qarib": "boat",
+  "marsa": "marina",
+  "rihlat sayd": "fishing trip"
+ },
  "notes": "",
  "shape_facts": [
   "Number, size and type of vessels (yachts, speedboats, dhows, fishing boats, jet skis).",

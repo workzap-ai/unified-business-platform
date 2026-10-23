@@ -42,6 +42,9 @@
   "OEM parts",
   "bilastik"
  ],
+ "signal_glosses": {
+  "bilastik": "plastic, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Process: injection, blow moulding, extrusion (pipe, film), thermoforming, or a mix.",

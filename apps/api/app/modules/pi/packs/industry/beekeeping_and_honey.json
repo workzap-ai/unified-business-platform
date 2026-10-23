@@ -32,6 +32,11 @@
   "pollination contracts",
   "blueberry / canola pollination"
  ],
+ "signal_glosses": {
+  "’asal": "honey",
+  "nahl": "bees",
+  "manahil": "apiaries"
+ },
  "notes": "",
  "shape_facts": [
   "Number of hives or colonies, and whether they migrate with flowering seasons",

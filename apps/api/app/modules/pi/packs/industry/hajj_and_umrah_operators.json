@@ -32,6 +32,11 @@
   "mu’tamir",
   "baqa"
  ],
+ "signal_glosses": {
+  "hamla": "Hajj group",
+  "mu’tamir": "Umrah pilgrim",
+  "baqa": "stay"
+ },
  "notes": "",
  "shape_facts": [
   "Umrah only, Hajj (private scheme or government-allocated quota), or both.",

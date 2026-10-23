@@ -30,6 +30,11 @@
   "rehla khassa",
   "tayyara khassa"
  ],
+ "signal_glosses": {
+  "Part 135-style ops": "as people say it",
+  "rehla khassa": "private trip",
+  "tayyara khassa": "private aircraft"
+ },
  "notes": "",
  "shape_facts": [
   "Whether they are an operator (own certificate), an aircraft manager, a broker, or an owner with a managed aircraft.",

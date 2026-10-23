@@ -32,6 +32,9 @@
   "service charge",
   "tips"
  ],
+ "signal_glosses": {
+  "hotel": "PK usage for eatery"
+ },
  "notes": "",
  "shape_facts": [
   "Number of outlets and whether each has its own kitchen or a central kitchen supplies them",

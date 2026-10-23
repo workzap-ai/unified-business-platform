@@ -43,3 +43,15 @@ the problem-board image / interactive list / progress card (8.11.2), Urdu script
 code, kickoff slot list, sticker and reaction handling, edited/deleted messages, long-message split,
 extra problem-record fields, pattern surfacing and team links, S3 to S2 and the clarify counter,
 5x staff-correction weight, learning from document diffs, link-threshold tuning.
+
+## Part 7 coverage check (2026-10-23)
+
+Every industry and overlay section of the PDF was compared word by word with its pack file (all 222).
+Real content words in the PDF that are in no field of the pack: 20, in 14 packs (before the fixes:
+about 190 in 110 packs). What is still missing is a few English glosses of Arabic terms whose
+glyphs the PDF stores unreadably (for example the meaning of `azeema`). The pack builder now keeps
+local-word glosses (`signal_glosses`, 372 in 159 packs), quoted signals with their following words
+(`L plate`), and treats a lost ")" as a list separator. What pi receives per turn: up to 5,200
+characters for the primary industry (all care rules, seasons, 14 words, 14 problem phrases,
+questions, scope, local words, one voice example) and 2,000 for each secondary one.
+Still true: nobody read pages 37-417 page by page; the comparison above is by words, not meaning.

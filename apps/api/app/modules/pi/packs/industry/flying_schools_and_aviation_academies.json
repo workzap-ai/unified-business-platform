@@ -32,6 +32,11 @@
   "madrasat tayaran",
   "tadreeb"
  ],
+ "signal_glosses": {
+  "ghante poore nahi hue": "hours not complete",
+  "madrasat tayaran": "flight school",
+  "tadreeb": "training"
+ },
  "notes": "",
  "shape_facts": [
   "Number of training aircraft and simulators, and owned versus leased.",

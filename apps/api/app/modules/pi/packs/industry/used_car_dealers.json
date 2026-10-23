@@ -41,6 +41,11 @@
   "carfax",
   "safety certificate"
  ],
+ "signal_glosses": {
+  "mustaamal": "used",
+  "haraj": "auction",
+  "naql milkiya": "ownership transfer"
+ },
  "notes": "",
  "shape_facts": [
   "How many cars they typically hold and whether stock is owned, on consignment, or partly financed by partners or investors.",

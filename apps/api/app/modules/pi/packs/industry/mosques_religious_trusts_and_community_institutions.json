@@ -36,6 +36,16 @@
   "membership dues",
   "mujtama"
  ],
+ "signal_glosses": {
+  "madrasa": "admin side",
+  "intezamia committee": "management committee",
+  "mutawalli": "trustee/custodian",
+  "chanda": "contributions",
+  "tameer": "construction",
+  "awqaf": "endowments; also Awqaf department in UAE/Pakistan",
+  "membership dues": "Canada",
+  "mujtama": "community, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Type of institution and whether it is run by a registered trust, society, local committee, or government department (e.g., state-run mosques in UAE).",

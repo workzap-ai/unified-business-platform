@@ -33,6 +33,11 @@
   "rihla",
   "ta’kheer"
  ],
+ "signal_glosses": {
+  "tayyara": "aircraft",
+  "rihla": "flight",
+  "ta’kheer": "delay"
+ },
  "notes": "",
  "shape_facts": [
   "Fleet size and type mix, and whether aircraft are owned, dry-leased or wet-leased.",

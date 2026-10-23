@@ -37,6 +37,9 @@
   "demo request",
   "ishtirak"
  ],
+ "signal_glosses": {
+  "ishtirak": "subscription"
+ },
  "notes": "",
  "shape_facts": [
   "Product type and who it is sold to (SMEs, enterprises, consumers, specific industry)",

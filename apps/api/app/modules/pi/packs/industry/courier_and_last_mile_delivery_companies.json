@@ -37,6 +37,11 @@
   "van",
   "fuel allowance"
  ],
+ "signal_glosses": {
+  "mandoob tawseel": "delivery rep, Arabic",
+  "tawseel": "delivery",
+  "sha’hna": "shipment"
+ },
  "notes": "",
  "shape_facts": [
   "Cities and areas covered, and whether intercity or only intra-city.",

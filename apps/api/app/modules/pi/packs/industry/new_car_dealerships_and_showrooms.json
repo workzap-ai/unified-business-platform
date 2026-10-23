@@ -14,7 +14,7 @@
   "booking",
   "allocation",
   "delivery date",
-  "own",
+  "own / “on” money",
   "premium",
   "invoice",
   "PBO",
@@ -34,6 +34,12 @@
   "walk-ins",
   "leads from the brand portal"
  ],
+ "signal_glosses": {
+  "PBO": "provisional booking order",
+  "wakala": "agency",
+  "ma’rad sayyarat": "car showroom",
+  "tasjeel": "registration"
+ },
  "notes": "",
  "shape_facts": [
   "Which brand(s) they represent and whether they are an authorised 3S/4S dealer (sales, service, spares) or sales-only.",

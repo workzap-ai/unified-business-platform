@@ -20,7 +20,7 @@
   "theory test",
   "licence test",
   "learner permit",
-  "L",
+  "L plate",
   "dual control",
   "simulator",
   "female instructor",
@@ -34,6 +34,14 @@
   "G1/G2",
   "Class 5"
  ],
+ "signal_glosses": {
+  "madrasat al-qiyada": "driving school",
+  "mudarrib": "instructor",
+  "ikhtibar": "test",
+  "rukhsa": "licence",
+  "G1/G2": "Ontario",
+  "Class 5": "Alberta"
+ },
  "notes": "",
  "shape_facts": [
   "Type: small independent school with a few cars, a franchise branch, or a large licensed driving institute (UAE).",

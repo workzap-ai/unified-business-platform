@@ -43,6 +43,11 @@
   "trade counter",
   "site delivery"
  ],
+ "signal_glosses": {
+  "sariya": "steel bar",
+  "mawad bina": "building materials, Arabic",
+  "adawat": "tools"
+ },
  "notes": "",
  "shape_facts": [
   "Mix: general hardware, paint, sanitary/plumbing, electrical, heavy building materials (cement, steel, blocks).",

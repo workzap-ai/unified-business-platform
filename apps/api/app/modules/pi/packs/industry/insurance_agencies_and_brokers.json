@@ -29,6 +29,11 @@
   "tajdeed",
   "group medical for companies"
  ],
+ "signal_glosses": {
+  "ta’meen": "Arabic: insurance",
+  "wasit ta’meen": "broker",
+  "tajdeed": "renewal"
+ },
  "notes": "",
  "shape_facts": [
   "Agency (ties to one insurer) or broker (places business with several insurers).",

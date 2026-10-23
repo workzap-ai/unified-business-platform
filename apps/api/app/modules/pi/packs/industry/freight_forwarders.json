@@ -41,6 +41,10 @@
   "profit share",
   "nomination"
  ],
+ "signal_glosses": {
+  "shahn": "shipping, Arabic",
+  "wakeel shahn": "shipping agent"
+ },
  "notes": "",
  "shape_facts": [
   "Modes handled: sea FCL/LCL, air, road (GCC/Afghanistan/Central Asia), courier, project cargo.",

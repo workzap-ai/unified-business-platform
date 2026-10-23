@@ -33,6 +33,10 @@
   "khidmat ardiya",
   "matar"
  ],
+ "signal_glosses": {
+  "khidmat ardiya": "ground services",
+  "matar": "airport"
+ },
  "notes": "",
  "shape_facts": [
   "Services offered: ramp, passenger, cargo, cleaning, lounge, meet and assist, fuelling, catering transport.",

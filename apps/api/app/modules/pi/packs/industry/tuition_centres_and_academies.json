@@ -31,6 +31,10 @@
   "after-school",
   "demo class"
  ],
+ "signal_glosses": {
+  "mudarris khususi": "private tutor, Arabic",
+  "dawra taqwiya": "tutoring course, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Number of branches and rooms, and roughly how many batches run per week.",

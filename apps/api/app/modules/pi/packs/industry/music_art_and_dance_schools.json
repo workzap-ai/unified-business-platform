@@ -39,6 +39,12 @@
   "studio rental",
   "instrument rental"
  ],
+ "signal_glosses": {
+  "grade exams": "ABRSM, Trinity, RCM",
+  "ma’had musiqa": "music institute, Arabic",
+  "marsam": "art studio, Arabic",
+  "raqs": "dance, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Disciplines offered and whether lessons are private, group or both.",

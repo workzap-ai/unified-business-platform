@@ -45,6 +45,11 @@
   "Montreal",
   "Halifax"
  ],
+ "signal_glosses": {
+  "wakeel bahri": "shipping agent, Arabic",
+  "mina’": "port",
+  "safina": "ship"
+ },
  "notes": "",
  "shape_facts": [
   "Services offered: line agency, port/husbandry agency, stevedoring, CFS, empty depot, crew services, bunkering coordination.",

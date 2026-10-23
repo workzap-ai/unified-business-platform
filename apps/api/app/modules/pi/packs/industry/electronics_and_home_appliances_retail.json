@@ -35,6 +35,11 @@
   "daman",
   "tarkeeb"
  ],
+ "signal_glosses": {
+  "takseet": "Arabic: installments",
+  "daman": "Arabic: warranty",
+  "tarkeeb": "installation"
+ },
  "notes": "",
  "shape_facts": [
   "Authorised dealer for specific brands vs multi-brand retailer vs grey-import trader.",

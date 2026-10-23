@@ -40,6 +40,11 @@
   "waitlist",
   "sibling discount"
  ],
+ "signal_glosses": {
+  "PTM": "parent-teacher meeting",
+  "rasoom": "fees, Arabic",
+  "qism al-qubool": "admissions, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Number of campuses/branches and roughly how many students across them (a count, never a list).",

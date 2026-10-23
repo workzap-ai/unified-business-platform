@@ -32,6 +32,10 @@
   "standby power",
   "solar-hybrid"
  ],
+ "signal_glosses": {
+  "mawlid kahraba": "Arabic: generator",
+  "ta’jeer": "hire/rental"
+ },
  "notes": "",
  "shape_facts": [
   "Sales, rental, service/AMC, or a mix, and which is the main earner.",

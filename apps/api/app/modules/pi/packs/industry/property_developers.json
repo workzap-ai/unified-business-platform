@@ -36,6 +36,10 @@
   "presales",
   "Tarion"
  ],
+ "signal_glosses": {
+  "mashroo’": "project",
+  "taslim": "handover"
+ },
  "notes": "",
  "shape_facts": [
   "Type of product: plots/housing society, apartments, villas/townhouses, commercial, mixed-use.",

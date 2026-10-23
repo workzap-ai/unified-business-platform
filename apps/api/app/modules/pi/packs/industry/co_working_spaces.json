@@ -33,6 +33,9 @@
   "landlord",
   "fit-out"
  ],
+ "signal_glosses": {
+  "maktab mushtarak": "shared office"
+ },
  "notes": "",
  "shape_facts": [
   "Number of locations, total desks/offices, and meeting rooms",

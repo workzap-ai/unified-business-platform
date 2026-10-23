@@ -31,6 +31,11 @@
   "bothoor",
   "Canadian ag retail / crop inputs / co-op"
  ],
+ "signal_glosses": {
+  "mubeedat": "pesticides",
+  "asmida": "fertilisers",
+  "bothoor": "seeds"
+ },
  "notes": "",
  "shape_facts": [
   "Main lines sold: seed, fertiliser, crop protection products, or all three",

@@ -31,6 +31,12 @@
   "medical waste collection",
   "construction debris removal"
  ],
+ "signal_glosses": {
+  "pest control": "sanitation side",
+  "nafayat": "Arabic: waste",
+  "haawiya": "container/skip",
+  "tanzeef": "cleaning"
+ },
  "notes": "",
  "shape_facts": [
   "Service type: household/community collection, commercial collection, skip/bin hire, recycling, septic/sewer services, construction debris, specialised (e.g. medical or industrial) waste.",

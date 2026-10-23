@@ -31,6 +31,9 @@
   "maintenance contract",
   "BOQ"
  ],
+ "signal_glosses": {
+  "kahraba": "Arabic: electricity"
+ },
  "notes": "",
  "shape_facts": [
   "Type of work: domestic wiring, commercial/industrial MEP, utility/grid works, solar installation, maintenance contracts.",

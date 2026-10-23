@@ -35,6 +35,11 @@
   "quote",
   "booking"
  ],
+ "signal_glosses": {
+  "naql athath": "furniture moving, Arabic",
+  "sharikat naql": "moving company",
+  "tootna": "breakage"
+ },
  "notes": "",
  "shape_facts": [
   "Local, intercity, international, office/commercial or a mix.",

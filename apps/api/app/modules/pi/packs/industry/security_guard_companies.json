@@ -35,6 +35,9 @@
   "CCTV monitoring",
   "mobile patrol"
  ],
+ "signal_glosses": {
+  "haris amn": "security guard"
+ },
  "notes": "",
  "shape_facts": [
   "Number of guards and number of client sites/posts",

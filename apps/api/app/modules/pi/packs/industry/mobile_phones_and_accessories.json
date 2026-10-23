@@ -37,8 +37,11 @@
   "Saddar mobile market",
   "Deira",
   "Al Ain Centre",
-  "jawwal"
+  "jawwal / “mobile”"
  ],
+ "signal_glosses": {
+  "jawwal / “mobile”": "Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "New only, used/refurbished, or both; official distributor/dealer vs open-market trader.",

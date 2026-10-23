@@ -36,6 +36,11 @@
   "seminar",
   "education fair"
  ],
+ "signal_glosses": {
+  "intake": "Fall, Spring, September, January",
+  "mustashar dirasi": "education consultant, Arabic",
+  "qubool jami’i": "university admission, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Destinations they place students in (e.g. UK, Canada, Australia, US, Europe, Malaysia, Turkey, China, UAE universities).",

@@ -30,6 +30,9 @@
   "family visits",
   "monthly fee"
  ],
+ "signal_glosses": {
+  "dar ul aman": "shelter, different service"
+ },
  "notes": "",
  "shape_facts": [
   "Number of beds/rooms and current occupancy as the owner describes it",

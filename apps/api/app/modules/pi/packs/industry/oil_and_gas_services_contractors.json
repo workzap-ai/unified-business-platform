@@ -34,6 +34,11 @@
   "LPG distribution",
   "CNG station services"
  ],
+ "signal_glosses": {
+  "naft": "Arabic: oil",
+  "maqawil": "contractor",
+  "mashroo’": "project"
+ },
  "notes": "",
  "shape_facts": [
   "Type of service: manpower supply, equipment rental, maintenance, fabrication, pipeline work, inspection, logistics, LPG/CNG station services.",

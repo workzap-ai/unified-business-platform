@@ -33,6 +33,11 @@
   "online class",
   "certificate"
  ],
+ "signal_glosses": {
+  "levels": "A1–C2",
+  "ma’had lughat": "language institute, Arabic",
+  "dawra lugha": "language course, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Languages taught and whether courses follow a levelled framework (e.g. A1–C2) or the centre’s own levels.",

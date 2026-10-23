@@ -36,6 +36,10 @@
   "heat pump",
   "duct cleaning"
  ],
+ "signal_glosses": {
+  "mukayyif": "AC",
+  "sayyana": "maintenance"
+ },
  "notes": "",
  "shape_facts": [
   "Sales of units, installation, repair/servicing, AMCs, or a mix.",

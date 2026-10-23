@@ -41,6 +41,11 @@
   "snow removal",
   "AMC"
  ],
+ "signal_glosses": {
+  "hammam sibaha": "swimming pool",
+  "zira’a": "agriculture/planting",
+  "bustani": "gardener"
+ },
  "notes": "",
  "shape_facts": [
   "Landscaping only, pools only, or both; design-and-build vs maintenance.",

@@ -41,6 +41,11 @@
   "masna’",
   "mawad khaam"
  ],
+ "signal_glosses": {
+  "warsha": "workshop",
+  "masna’": "factory",
+  "mawad khaam": "raw materials"
+ },
  "notes": "",
  "shape_facts": [
   "Made-to-order, made-to-stock, or both (and roughly what share of each).",

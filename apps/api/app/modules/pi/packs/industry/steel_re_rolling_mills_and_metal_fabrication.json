@@ -27,8 +27,14 @@
   "laser cutting",
   "structural steel",
   "gates/grills",
-  "hadeed ( steel trading, weighbridge, kanta"
+  "hadeed",
+  "steel trading",
+  "weighbridge",
+  "kanta"
  ],
+ "signal_glosses": {
+  "sarya": "rebar"
+ },
  "notes": "",
  "shape_facts": [
   "Re-rolling mill, melting (furnace) unit, steel trader, or fabrication workshop — or a mix.",

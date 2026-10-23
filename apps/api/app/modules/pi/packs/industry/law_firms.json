@@ -33,6 +33,11 @@
   "conflict check",
   "trust account"
  ],
+ "signal_glosses": {
+  "muhami": "lawyer",
+  "qadiya": "case",
+  "maktab muhamah": "law office"
+ },
  "notes": "",
  "shape_facts": [
   "Practice areas (litigation, corporate, family, property, banking, immigration-related admin)",

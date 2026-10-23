@@ -38,6 +38,10 @@
   "licensed childcare",
   "ECE"
  ],
+ "signal_glosses": {
+  "hadana": "nursery/daycare, Arabic",
+  "rawdat atfal": "kindergarten, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Type: daycare, nursery/preschool, Montessori, or home-based; number of centres.",

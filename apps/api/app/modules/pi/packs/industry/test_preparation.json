@@ -40,6 +40,10 @@
   "online test series",
   "recorded lectures"
  ],
+ "signal_glosses": {
+  "daurat": "courses, Arabic",
+  "imtihan tajribi": "mock exam, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Which tests they prepare for, and whether courses are fixed-date cohorts or rolling.",

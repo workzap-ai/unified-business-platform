@@ -31,6 +31,10 @@
   "borehole",
   "desalinated water delivery"
  ],
+ "signal_glosses": {
+  "mai": "Arabic: water",
+  "qarooraat": "bottles"
+ },
  "notes": "",
  "shape_facts": [
   "Tanker delivery, RO/filtration plant with bottled/gallon delivery, walk-in refill counter, or a mix.",

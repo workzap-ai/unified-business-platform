@@ -256,6 +256,9 @@ def brief(
     words = list(pack.get("vocabulary", {}).items())[:14]
     if words:
         candidates.append("Their words: " + "; ".join(f"{w} = {_clip(m, 60)}" for w, m in words))
+    local = list(pack.get("signal_glosses", {}).items())[:12]
+    if local:
+        candidates.append("Local words: " + "; ".join(f"{w} = {_clip(m, 50)}" for w, m in local))
     found = [p for p in pack.get("problems", []) if not categories or p["category"] in categories]
     for item in found[:14]:
         candidates.append(

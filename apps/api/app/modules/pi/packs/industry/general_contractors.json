@@ -41,6 +41,10 @@
   "change order",
   "progress claim"
  ],
+ "signal_glosses": {
+  "mawqi’": "site",
+  "muqawil": "contractor"
+ },
  "notes": "",
  "shape_facts": [
   "Type of work: residential, commercial, industrial, infrastructure/civil, government.",

@@ -40,6 +40,10 @@
   "407 ETR",
   "one-way"
  ],
+ "signal_glosses": {
+  "ta’jeer sayyarat": "car rental",
+  "sa’iq": "driver"
+ },
  "notes": "",
  "shape_facts": [
   "Fleet size and ownership: owned, financed, or managed vehicles belonging to investors.",

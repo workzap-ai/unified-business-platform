@@ -35,6 +35,10 @@
   "takhfeedat",
   "ard"
  ],
+ "signal_glosses": {
+  "takhfeedat": "discounts",
+  "ard": "offer"
+ },
  "notes": "",
  "shape_facts": [
   "Store size (rough floor area or number of checkouts) and number of stores.",

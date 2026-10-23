@@ -27,8 +27,16 @@
   "taraai",
   "tabooq",
   "bloc",
-  "ismant ( cube test, transit mixer"
+  "ismant",
+  "cube test",
+  "transit mixer"
  ],
+ "signal_glosses": {
+  "bori": "cement bag",
+  "bajri": "crushed stone",
+  "ret": "sand",
+  "tabooq": "block"
+ },
  "notes": "",
  "shape_facts": [
   "Block/paver plant, precast yard, readymix batching plant, or cement dealer/distributor.",

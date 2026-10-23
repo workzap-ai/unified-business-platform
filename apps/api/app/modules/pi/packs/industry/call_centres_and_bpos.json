@@ -36,6 +36,9 @@
   "client audit",
   "ramp-up"
  ],
+ "signal_glosses": {
+  "markaz ittisal": "call centre"
+ },
  "notes": "",
  "shape_facts": [
   "Number of seats and agents, and number of shifts (day/night)",

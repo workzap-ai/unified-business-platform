@@ -32,6 +32,9 @@
   "market stall",
   "nashta"
  ],
+ "signal_glosses": {
+  "cafeteria": "Gulf small eatery"
+ },
  "notes": "",
  "shape_facts": [
   "Fixed spot, highway dhaba, or mobile truck/cart",

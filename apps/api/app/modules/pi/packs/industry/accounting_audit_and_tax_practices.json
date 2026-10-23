@@ -34,6 +34,10 @@
   "muhasib",
   "tadqeeq"
  ],
+ "signal_glosses": {
+  "muhasib": "accountant",
+  "tadqeeq": "audit"
+ },
  "notes": "",
  "shape_facts": [
   "Mix of services: bookkeeping, audit, tax filing, VAT/corporate tax, payroll, advisory",

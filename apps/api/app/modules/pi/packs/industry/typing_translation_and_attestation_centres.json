@@ -33,6 +33,11 @@
   "service charge",
   "sworn translator"
  ],
+ "signal_glosses": {
+  "markaz tibaa’a": "typing centre",
+  "tarjama qanuni": "legal translation",
+  "tasdeeq": "attestation"
+ },
  "notes": "",
  "shape_facts": [
   "Services offered (typing for government transactions, translation, attestation handling, document clearing, courier)",

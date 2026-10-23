@@ -34,6 +34,10 @@
   "spare parts",
   "OEM"
  ],
+ "signal_glosses": {
+  "mas’ad": "lift",
+  "TSSA": "Ontario"
+ },
  "notes": "",
  "shape_facts": [
   "Services: new installations, maintenance/AMC, repairs, modernisation, inspections support.",

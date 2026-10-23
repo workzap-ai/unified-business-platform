@@ -26,8 +26,14 @@
   "rang",
   "rang ka karkhana",
   "dukandar",
-  "dahan ( batch sheet, SDS/MSDS, drum/pail/quarter/gallon"
+  "dahan",
+  "batch sheet",
+  "SDS/MSDS",
+  "drum/pail/quarter/gallon"
  ],
+ "signal_glosses": {
+  "putty": "wall putty"
+ },
  "notes": "",
  "shape_facts": [
   "Decorative (house paint) vs industrial/protective coatings vs specialty chemicals/adhesives.",

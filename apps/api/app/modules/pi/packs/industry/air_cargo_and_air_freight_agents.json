@@ -33,6 +33,11 @@
   "shahn jawwi",
   "bolisa"
  ],
+ "signal_glosses": {
+  "maal phans gaya": "goods stuck",
+  "shahn jawwi": "air freight",
+  "bolisa": "waybill"
+ },
  "notes": "",
  "shape_facts": [
   "Role: freight forwarder, cargo GSA for an airline, consolidator, courier, customs broker, or a mix.",

@@ -228,3 +228,20 @@ def test_only_the_primary_pack_brings_a_voice_example():
     section = packs.prompt_section(found, budget=9000)
     assert section.count("Example of the voice") == 1
     assert len(section) <= 9000
+
+
+def test_signals_are_clean_list_items():
+    for key, pack in packs.load_packs().items():
+        for signal in pack["signals"]:
+            assert "(" not in signal and ")" not in signal, (key, signal)
+            assert len(signal) <= 90, (key, signal)
+
+
+def test_local_word_glosses_say_what_the_word_means():
+    pack = packs.get_pack("seed_fertiliser_and_pesticide_dealers")
+    assert pack["signal_glosses"]["asmida"] == "fertilisers"
+    text = packs.brief(pack, max_chars=5200)
+    assert "asmida = fertilisers" in text
+    for key, other in packs.load_packs().items():
+        for word, meaning in other.get("signal_glosses", {}).items():
+            assert meaning[:1].isalpha(), (key, word, meaning)

@@ -33,6 +33,12 @@
   "’alaf",
   "Canadian feed mill / grain handling"
  ],
+ "signal_glosses": {
+  "chokar": "bran",
+  "mat’han": "mill",
+  "tahin": "flour",
+  "’alaf": "feed"
+ },
  "notes": "",
  "shape_facts": [
   "Mill type: flour, rice (husking, polishing, parboiling), feed (poultry, cattle, fish), or combination",

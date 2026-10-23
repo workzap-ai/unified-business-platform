@@ -38,6 +38,13 @@
   "proforma",
   "sample room"
  ],
+ "signal_glosses": {
+  "tajir": "trader",
+  "i’adat tasdeer": "re-export",
+  "bida’a": "goods",
+  "hawala": "often mentioned — out of scope",
+  "mandoob": "PRO/runner"
+ },
  "notes": "",
  "shape_facts": [
   "What they trade (electronics, mobile phones, auto parts, tyres, textiles, foodstuffs, cosmetics, general goods) and from where.",

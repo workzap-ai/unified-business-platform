@@ -37,6 +37,10 @@
   "career college",
   "placement"
  ],
+ "signal_glosses": {
+  "ta’leem mihani": "vocational education, Arabic",
+  "tadreeb": "training, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Trades/courses offered and their duration (weeks or months).",

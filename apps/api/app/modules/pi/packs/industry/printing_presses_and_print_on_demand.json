@@ -23,8 +23,17 @@
   "chapai",
   "press wala",
   "Urdu Bazaar",
-  "mutba’a ( proof approval, reprint, print-on-demand, Etsy/Shopify POD orders, job card"
+  "mutba’a",
+  "proof approval",
+  "reprint",
+  "print-on-demand",
+  "Etsy/Shopify POD orders",
+  "job card"
  ],
+ "signal_glosses": {
+  "wedding cards": "shaadi card",
+  "plate": "CTP"
+ },
  "notes": "",
  "shape_facts": [
   "Offset, digital, large-format, screen/DTF, or a mix — and how many machines of each.",

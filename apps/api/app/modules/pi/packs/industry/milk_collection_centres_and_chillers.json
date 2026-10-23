@@ -32,6 +32,7 @@
   "cooling tank",
   "bulk cooler"
  ],
+ "signal_glosses": {},
  "notes": "",
  "shape_facts": [
   "Role: independent collector/chiller owner, agent for a processor, cooperative, or a farm’s own collection point.",

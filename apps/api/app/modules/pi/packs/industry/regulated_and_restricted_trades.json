@@ -18,6 +18,11 @@
   "adult services",
   "crypto exchanges"
  ],
+ "signal_glosses": {
+  "licensed alcohol retail": "UAE",
+  "licensed arms and ammunition dealers": "Pakistan",
+  "cannabis": "Canada, licensed"
+ },
  "notes": "",
  "shape_facts": [],
  "scope_rule": "pi notes only ordinary, lawful operational problems (stock counts, staff schedules, reporting) for licensed businesses, and only where Workzap has decided it serves that trade (config served_industries). It never helps with anything that facilitates illegal sales, avoids licensing or age checks, launders money or evades regulators. For trades Workzap does not serve, pi says so politely: “Workzap doesn’t take on work in this area, so I can’t help with this one.”",

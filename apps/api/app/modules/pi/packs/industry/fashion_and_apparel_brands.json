@@ -34,8 +34,12 @@
   "factory/vendor se stitching",
   "maqaas",
   "tashkeela",
-  "abaya"
+  "abaya for UAE modest-wear brands"
  ],
+ "signal_glosses": {
+  "maqaas": "size",
+  "tashkeela": "collection"
+ },
  "notes": "",
  "shape_facts": [
   "Number of outlets and whether the brand sells mainly online, mainly in-store, or both.",

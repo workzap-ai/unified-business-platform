@@ -34,6 +34,7 @@
   "housekeeping",
   "biomedical"
  ],
+ "signal_glosses": {},
  "notes": "",
  "shape_facts": [
   "Size: number of beds, wards, operating theatres and whether there is an emergency department",

@@ -35,6 +35,10 @@
   "VAT registration",
   "government fees"
  ],
+ "signal_glosses": {
+  "rukhsa tijariya": "trade licence",
+  "ta’sees sharikat": "company setup"
+ },
  "notes": "",
  "shape_facts": [
   "Services offered: mainland and free zone formation, renewals, visas and PRO, bank account introduction, accounting/VAT add-ons, document clearing",

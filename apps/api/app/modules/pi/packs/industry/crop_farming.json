@@ -37,6 +37,11 @@
   "crop insurance",
   "custom harvesting"
  ],
+ "signal_glosses": {
+  "CPR": "cane receipt",
+  "mazra’a / ’izba": "farm",
+  "qamh": "wheat"
+ },
  "notes": "",
  "shape_facts": [
   "Total area farmed, and how much is owned, leased ( theka) or sharecropped ( batai)",

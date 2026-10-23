@@ -32,6 +32,12 @@
   "membership",
   "building/basement wash"
  ],
+ "signal_glosses": {
+  "PPF": "paint protection film",
+  "ghaseel sayyarat": "car wash",
+  "tilmee’": "polishing",
+  "building/basement wash": "UAE residential"
+ },
  "notes": "",
  "shape_facts": [
   "Format: fixed site with bays, automatic/tunnel wash, mobile/doorstep service, or a detailing studio.",

@@ -41,6 +41,10 @@
   "ESA",
   "permit"
  ],
+ "signal_glosses": {
+  "fanni": "technician",
+  "ESA": "Ontario"
+ },
  "notes": "",
  "shape_facts": [
   "Disciplines covered: electrical, plumbing/drainage, HVAC, firefighting/fire alarm, ELV/low current, BMS.",

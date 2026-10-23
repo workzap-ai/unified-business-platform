@@ -31,6 +31,9 @@
   "zone",
   "slot"
  ],
+ "signal_glosses": {
+  "tawseel mandoob": "delivery rep"
+ },
  "notes": "",
  "shape_facts": [
   "Model: own app/website, operating on marketplaces, or a 3PL delivery fleet serving restaurants and shops",

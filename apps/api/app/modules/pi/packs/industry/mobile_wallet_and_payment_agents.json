@@ -28,6 +28,9 @@
   "payment agent",
   "agent network"
  ],
+ "signal_glosses": {
+  "agent network": "Canada/UAE equivalents: bill payment counter, money services counter in a convenience store"
+ },
  "notes": "",
  "shape_facts": [
   "Standalone agent shop or a counter inside another business (mobile shop, general store, pharmacy).",

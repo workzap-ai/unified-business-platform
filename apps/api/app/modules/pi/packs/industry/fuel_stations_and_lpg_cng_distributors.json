@@ -40,6 +40,9 @@
   "ADNOC/ENOC style card",
   "shift handover"
  ],
+ "signal_glosses": {
+  "mahattat wuqud": "fuel station"
+ },
  "notes": "",
  "shape_facts": [
   "Whether they run a fuel station, CNG station, LPG cylinder distribution/agency, or several.",

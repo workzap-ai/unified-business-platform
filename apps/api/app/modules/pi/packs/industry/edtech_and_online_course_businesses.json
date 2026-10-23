@@ -39,6 +39,10 @@
   "churn",
   "completion rate"
  ],
+ "signal_glosses": {
+  "daurat online": "online courses, Arabic",
+  "mansa ta’limiya": "learning platform, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Product type: recorded courses, live cohorts, subscription/membership, app, tutoring marketplace, or B2B/school SaaS.",

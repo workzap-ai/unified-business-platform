@@ -35,6 +35,10 @@
   "engineer visit",
   "hardware supply"
  ],
+ "signal_glosses": {
+  "da’m tiqni": "technical support",
+  "amn sibrani": "cybersecurity"
+ },
  "notes": "",
  "shape_facts": [
   "Services: helpdesk/AMC, managed infrastructure, cloud/M365 administration, hardware supply, security testing, monitoring/SOC, compliance support",

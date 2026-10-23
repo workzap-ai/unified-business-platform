@@ -29,6 +29,12 @@
   "jard",
   "mudeer al far3"
  ],
+ "signal_glosses": {
+  "mahal": "Gulf: shop",
+  "far3": "branch",
+  "jard": "stocktake",
+  "mudeer al far3": "branch manager"
+ },
  "notes": "",
  "shape_facts": [
   "Number of branches and whether there is a central warehouse or each branch buys for itself.",

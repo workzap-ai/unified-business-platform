@@ -31,6 +31,13 @@
   "jazma",
   "maqaas"
  ],
+ "signal_glosses": {
+  "number": "size",
+  "jori": "pair",
+  "na’al": "Arabic: sandals",
+  "jazma": "Arabic: shoes",
+  "maqaas": "size"
+ },
  "notes": "",
  "shape_facts": [
   "Own brand (manufactured or sourced) vs multi-brand retailer vs franchise of a known brand.",

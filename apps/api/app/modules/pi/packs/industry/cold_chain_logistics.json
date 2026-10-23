@@ -38,6 +38,11 @@
   "mubarrad",
   "HACCP"
  ],
+ "signal_glosses": {
+  "tabreed": "cooling, Arabic",
+  "mubarrad": "refrigerated",
+  "HACCP": "mentioned"
+ },
  "notes": "",
  "shape_facts": [
   "What they store or carry: fruit/vegetables, potatoes, meat, poultry, seafood, dairy, frozen foods, ice cream, pharma.",

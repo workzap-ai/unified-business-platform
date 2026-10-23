@@ -33,6 +33,11 @@
   "qumash",
   "khayyat"
  ],
+ "signal_glosses": {
+  "than": "bolt",
+  "qumash": "Arabic: fabric",
+  "khayyat": "tailor"
+ },
  "notes": "",
  "shape_facts": [
   "Whether the business is a brand producing its own designs, a multi-brand retailer, or a wholesaler/retailer in a cloth market.",

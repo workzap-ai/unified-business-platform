@@ -130,14 +130,53 @@ def split_commas(text: str) -> list[str]:
     return [p.strip(" .;") for p in parts if p.strip(" .;")]
 
 
+def _close_open_brackets(text: str) -> str:
+    """A "(" whose ")" was lost with an Arabic gloss separates two list items."""
+    out = []
+    for at, char in enumerate(text):
+        if char == "(":
+            rest = text[at + 1 :]
+            close = rest.find(")")
+            nxt = rest.find("(")
+            if close < 0 or (0 <= nxt < close):
+                out.append(",")
+                continue
+        out.append(char)
+    return "".join(out)
+
+
+def _signal_term(part: str) -> str:
+    """The word to listen for: a quoted signal keeps the words after it (“L” plate)."""
+    quoted = re.match(r"^“([^”]+)”(.*)$", part)
+    if quoted:
+        rest = re.sub(r"\s*\([^)]*\)", "", quoted.group(2)).strip()
+        return f"{quoted.group(1)} {rest}".strip()
+    return re.sub(r"\s*\([^)]*\)", "", part).strip()
+
+
 def signals(text: str) -> list[str]:
     found: list[str] = []
-    for part in split_commas(unwrap(text).replace(GAP, ",")):
-        quoted = re.match(r"^“([^”]+)”", part)
-        term = (quoted.group(1) if quoted else re.sub(r"\s*\([^)]*\)", "", part)).strip()
+    for part in split_commas(_close_open_brackets(unwrap(text).replace(GAP, ","))):
+        term = _signal_term(part)
         if term and term.lower() not in (s.lower() for s in found):
             found.append(term)
     return found
+
+
+def signal_glosses(text: str) -> dict[str, str]:
+    """ "asmida (fertilisers)" in the signal list: what the local word means."""
+    glosses: dict[str, str] = {}
+    for part in split_commas(_close_open_brackets(unwrap(text).replace(GAP, ","))):
+        meaning = re.search(r"\(([^()]+)\)\s*$", part)
+        term = _signal_term(part)
+        if (
+            meaning
+            and term
+            and meaning.group(1).strip()[:1].isalpha()
+            and meaning.group(1).strip().lower() != term.lower()
+        ):
+            glosses.setdefault(term, meaning.group(1).strip())
+    return glosses
 
 
 def bullets(lines: list[str]) -> list[str]:
@@ -240,6 +279,7 @@ def _build_pack(name: str, sector: dict[str, str], body: dict[str, list[str]]) -
         "kind": "overlay" if sector["code"] == "N" else "industry",
         "sector": sector,
         "signals": signals(" ".join(body.get("recognise", []))),
+        "signal_glosses": signal_glosses(" ".join(body.get("recognise", []))),
         "notes": " ".join(body.get("notes", [])),
         "shape_facts": bullets(body.get("shape_facts", [])),
         "scope_rule": " ".join(body.get("scope_rule", [])),

@@ -36,6 +36,9 @@
   "condition survey",
   "penalty deduction"
  ],
+ "signal_glosses": {
+  "idarat al-murafiq": "facility management"
+ },
  "notes": "",
  "shape_facts": [
   "Services: hard (MEP, HVAC, plumbing, electrical), soft (cleaning, security, pest, landscaping, waste), or integrated FM.",

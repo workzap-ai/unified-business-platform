@@ -42,6 +42,11 @@
   "ship-breaking",
   "Gadani"
  ],
+ "signal_glosses": {
+  "khurda": "scrap, Arabic",
+  "nifayat": "waste, Arabic",
+  "i’adat tadweer": "recycling"
+ },
  "notes": "",
  "shape_facts": [
   "What they handle: ferrous/non-ferrous metal, paper/cardboard, plastics, e-waste, construction waste, general/municipal or commercial waste.",

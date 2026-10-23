@@ -33,6 +33,11 @@
   "board feet",
   "woodlot"
  ],
+ "signal_glosses": {
+  "poplar / safeda": "eucalyptus",
+  "khashab": "wood",
+  "manshar": "sawmill"
+ },
  "notes": "",
  "shape_facts": [
   "Business type: farm forestry grower, timber trader, sawmill, imported wood and board dealer, or a mix",

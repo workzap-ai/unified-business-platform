@@ -11,6 +11,7 @@
   "you built our system",
   "our project with Workzap"
  ],
+ "signal_glosses": {},
  "notes": "",
  "shape_facts": [],
  "scope_rule": "new problems are noted normally with tag existing_customer. Bugs, outages or project questions are routed ( technical_failure, existing_project), not diagnosed by pi.",

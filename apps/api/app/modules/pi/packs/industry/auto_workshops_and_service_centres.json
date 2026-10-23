@@ -38,6 +38,10 @@
   "appointment",
   "fleet account"
  ],
+ "signal_glosses": {
+  "warsha/ karaj": "garage",
+  "qita’ ghiyar": "spare parts"
+ },
  "notes": "",
  "shape_facts": [
   "Type of workshop: general mechanical, body and paint, electrical/AC, tyre, quick service, or authorised dealer service.",

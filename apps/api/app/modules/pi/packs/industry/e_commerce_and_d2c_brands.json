@@ -38,6 +38,10 @@
   "tawseel",
   "talabiya"
  ],
+ "signal_glosses": {
+  "tawseel": "delivery",
+  "talabiya": "order"
+ },
  "notes": "",
  "shape_facts": [
   "Main storefront (Shopify, WooCommerce, custom) and whether they also sell on marketplaces or Instagram.",

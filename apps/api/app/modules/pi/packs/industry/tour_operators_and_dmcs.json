@@ -32,6 +32,10 @@
   "barnamaj siyahi",
   "rihla"
  ],
+ "signal_glosses": {
+  "barnamaj siyahi": "tour programme",
+  "rihla": "trip"
+ },
  "notes": "",
  "shape_facts": [
   "Inbound (DMC), outbound, domestic tourism, or a mix.",

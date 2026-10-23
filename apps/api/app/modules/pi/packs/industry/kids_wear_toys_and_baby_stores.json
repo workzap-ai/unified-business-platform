@@ -32,6 +32,11 @@
   "malabis atfal",
   "mustalzamat mawalid"
  ],
+ "signal_glosses": {
+  "a’la’ab": "Arabic: toys",
+  "malabis atfal": "Arabic: kids’ clothes",
+  "mustalzamat mawalid": "baby essentials"
+ },
  "notes": "",
  "shape_facts": [
   "Mix of categories: clothing, toys, baby essentials (diapers, formula, feeding), gear (prams, car seats, cots), school items.",

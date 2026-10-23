@@ -40,6 +40,10 @@
   "kilometres",
   "tracker"
  ],
+ "signal_glosses": {
+  "kabtin": "captain",
+  "mushghil": "operator"
+ },
  "notes": "",
  "shape_facts": [
   "Fleet size and type: cars, rickshaws, bikes, vans; owned outright, on instalments, or leased.",

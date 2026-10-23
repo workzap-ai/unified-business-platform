@@ -35,6 +35,11 @@
   "maktab siyaha",
   "hajz"
  ],
+ "signal_glosses": {
+  "tadhkira": "ticket",
+  "maktab siyaha": "travel office",
+  "hajz": "booking"
+ },
  "notes": "",
  "shape_facts": [
   "IATA-accredited, or buying through a consolidator or sub-agent arrangement.",

@@ -34,6 +34,9 @@
   "wireless/WISP",
   "headend"
  ],
+ "signal_glosses": {
+  "shabaka": "Arabic: network"
+ },
  "notes": "",
  "shape_facts": [
   "Internet only, cable TV only, or both, and type of network (fibre, cable, wireless).",

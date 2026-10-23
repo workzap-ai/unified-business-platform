@@ -28,6 +28,11 @@
   "branch till",
   "cash in transit"
  ],
+ "signal_glosses": {
+  "hawala": "pi treats as a red-flag term",
+  "sarraf": "Arabic: money changer",
+  "tahweel": "transfer"
+ },
  "notes": "",
  "shape_facts": [
   "Licensed exchange company, franchise/branch, or authorised sub-agent/payout location of a larger company.",

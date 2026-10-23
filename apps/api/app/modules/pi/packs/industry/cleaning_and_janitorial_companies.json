@@ -34,6 +34,10 @@
   "consumables",
   "shift"
  ],
+ "signal_glosses": {
+  "tanzeef": "cleaning",
+  "aamil nadhafa": "cleaner"
+ },
  "notes": "",
  "shape_facts": [
   "Residential (hourly/maid, deep cleans), commercial contracts (offices, malls, schools, clinics), or specialist (facade, post-construction, carpet/upholstery).",

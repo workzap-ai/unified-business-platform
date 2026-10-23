@@ -32,6 +32,11 @@
   "peak wave",
   "transit passengers"
  ],
+ "signal_glosses": {
+  "liquor and tobacco": "where permitted",
+  "souq hurra": "duty-free market, Arabic",
+  "matar": "airport, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Format: duty-free operator, specialist concession inside an airport, landside convenience/souvenir shop, or a supplier/brand selling into travel retail.",

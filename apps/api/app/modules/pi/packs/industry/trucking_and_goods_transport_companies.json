@@ -43,6 +43,13 @@
   "cross-border",
   "TIR"
  ],
+ "signal_glosses": {
+  "kiraya": "freight charge",
+  "khali wapsi": "empty return",
+  "cleaner": "driver’s helper",
+  "shahin naql": "truck, Arabic",
+  "naql": "transport"
+ },
  "notes": "",
  "shape_facts": [
   "Fleet size and types (Mazda/Shehzore, 10/22-wheelers, flatbeds, containers, reefers, tankers) and how many owned vs attached/hired.",

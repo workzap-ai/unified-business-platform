@@ -34,6 +34,10 @@
   "used equipment",
   "rental fleet"
  ],
+ "signal_glosses": {
+  "‘jarrar’": "tractor",
+  "‘hasada’": "harvester"
+ },
  "notes": "",
  "shape_facts": [
   "Business type: authorised dealer, used-equipment trader, implement maker, rental / custom hiring operator, workshop, or a mix",

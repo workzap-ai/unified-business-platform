@@ -7,6 +7,7 @@
   "title": "Cross-industry overlays"
  },
  "signals": [],
+ "signal_glosses": {},
  "notes": "pi adjusts its listening: B2B owners talk about accounts, credit, orders, tenders and relationships; B2C owners talk about footfall, reviews, delivery, repeat customers and ads. The same symptom maps differently: “payments late” in B2B → cash_collections/receivables_late; in B2C e-commerce → often cash_collections/cod_remittance. Store business.model = b2b | b2c | both.",
  "shape_facts": [],
  "scope_rule": "",

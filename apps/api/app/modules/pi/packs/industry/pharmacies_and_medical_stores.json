@@ -37,6 +37,10 @@
   "drug licence renewal",
   "wholesale pharmacy"
  ],
+ "signal_glosses": {
+  "saydaliya": "pharmacy, Arabic",
+  "dawa": "medicine"
+ },
  "notes": "",
  "shape_facts": [
   "Type: neighbourhood medical store, chain pharmacy, hospital/clinic pharmacy, wholesale/distributor.",

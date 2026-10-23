@@ -33,6 +33,17 @@
   "trust qabristan",
   "funeral package"
  ],
+ "signal_glosses": {
+  "ghusl": "ritual washing",
+  "kafan": "shroud",
+  "qabristan": "graveyard",
+  "qabar": "grave",
+  "gorkan": "gravedigger",
+  "ambulance / mayyat gari": "hearse",
+  "maqbara": "cemetery, Arabic",
+  "dafn": "burial",
+  "pre-need plans": "Canada"
+ },
  "notes": "",
  "shape_facts": [
   "What they do: full funeral service, ghusl/kafan service, hearse/ambulance service, cold storage, repatriation, graveyard/cemetery administration, or a combination.",

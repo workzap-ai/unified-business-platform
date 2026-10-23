@@ -32,6 +32,10 @@
   "near expiry",
   "chemist"
  ],
+ "signal_glosses": {
+  "batch manufacturing record": "BMR",
+  "medical rep": "MR/PSO"
+ },
  "notes": "",
  "shape_facts": [
   "Own brands, toll/contract manufacturing for others, or both.",

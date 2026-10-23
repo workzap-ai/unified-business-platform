@@ -39,6 +39,13 @@
   "jamiyat khairiya",
   "tabarru’at"
  ],
+ "signal_glosses": {
+  "Section 42": "PK",
+  "CRA": "Canada",
+  "IACAD/ Community Development Authority": "UAE",
+  "jamiyat khairiya": "charitable society, Arabic",
+  "tabarru’at": "donations"
+ },
  "notes": "",
  "shape_facts": [
   "Type: welfare/relief, education, health, livelihoods, environment, animal welfare, community trust.",

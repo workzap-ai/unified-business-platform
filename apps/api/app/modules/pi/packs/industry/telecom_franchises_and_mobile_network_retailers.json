@@ -34,6 +34,12 @@
   "distributor",
   "BA"
  ],
+ "signal_glosses": {
+  "MNP": "port-in",
+  "khatt": "Arabic/Gulf: line/SIM",
+  "shareeha": "SIM",
+  "BA": "brand ambassador"
+ },
  "notes": "",
  "shape_facts": [
   "Operator franchise, independent retailer, or distributor with a retailer network.",

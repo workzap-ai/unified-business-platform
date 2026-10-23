@@ -40,6 +40,10 @@
   "mobilia/ athath",
   "joinery shop"
  ],
+ "signal_glosses": {
+  "najjar": "carpenter, Arabic",
+  "mobilia/ athath": "furniture, Arabic"
+ },
  "notes": "",
  "shape_facts": [
   "Custom/made-to-order (home clients, interior designers, fit-out contractors), ready stock for showrooms/dealers, or both.",

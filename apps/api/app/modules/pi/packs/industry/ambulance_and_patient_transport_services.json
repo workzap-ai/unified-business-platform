@@ -30,6 +30,7 @@
   "fuel",
   "standby at events"
  ],
+ "signal_glosses": {},
  "notes": "",
  "shape_facts": [
   "Emergency response, non-emergency patient transport, or both (pi only handles the business operations of either)",

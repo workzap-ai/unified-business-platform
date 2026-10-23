@@ -36,6 +36,14 @@
   "dollar rate",
   "dollar upar chala gaya"
  ],
+ "signal_glosses": {
+  "maal phansa hua hai": "goods stuck",
+  "party": "customer",
+  "bida’a": "goods",
+  "shahna": "shipment",
+  "mustawrid": "importer",
+  "tajir": "trader"
+ },
  "notes": "",
  "shape_facts": [
   "What they import (product lines) and from which countries or regions.",

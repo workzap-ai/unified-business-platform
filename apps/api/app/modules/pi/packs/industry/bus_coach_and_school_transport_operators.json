@@ -38,6 +38,11 @@
   "GPS",
   "CCTV in bus"
  ],
+ "signal_glosses": {
+  "haflat": "buses",
+  "naql al-talaba": "student transport",
+  "naql al-’ummal": "worker transport"
+ },
  "notes": "",
  "shape_facts": [
   "Type of service: intercity scheduled routes, school pick-and-drop, corporate/staff transport, labour camp transport, charters and tours.",

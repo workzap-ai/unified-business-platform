@@ -39,6 +39,12 @@
   "delivery order",
   "maal release nahi hua"
  ],
+ "signal_glosses": {
+  "GD": "goods declaration",
+  "takhlees": "clearance, Arabic",
+  "mukhallis": "clearing agent",
+  "jumruk": "customs"
+ },
  "notes": "",
  "shape_facts": [
   "Which ports/terminals and airports they work at, and which country (Pakistan, UAE, Canada).",

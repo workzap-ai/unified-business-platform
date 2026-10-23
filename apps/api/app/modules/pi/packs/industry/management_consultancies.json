@@ -33,6 +33,10 @@
   "subcontractor",
   "associate consultant"
  ],
+ "signal_glosses": {
+  "istishari": "consultancy",
+  "mashrou": "project"
+ },
  "notes": "",
  "shape_facts": [
   "Service lines (strategy, operations, HR advisory, financial advisory, digital transformation, training)",

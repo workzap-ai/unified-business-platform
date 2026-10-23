@@ -32,6 +32,9 @@
   "weighbridge",
   "dispatch slip"
  ],
+ "signal_glosses": {
+  "mahjar kassara": "crusher"
+ },
  "notes": "",
  "shape_facts": [
   "Mineral type (stone/aggregate, marble, coal, salt, gypsum, limestone, chromite, sand, other).",

@@ -35,6 +35,10 @@
   "hypermarket",
   "Daraz/Noon/Amazon"
  ],
+ "signal_glosses": {
+  "wakeel": "agent",
+  "muwazzi’": "distributor"
+ },
  "notes": "",
  "shape_facts": [
   "Own factory, contract manufacturer (toll packing), or importer/brand owner",

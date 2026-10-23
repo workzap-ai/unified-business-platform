@@ -31,6 +31,9 @@
   "dep",
   "pump wali shop"
  ],
+ "signal_glosses": {
+  "dep": "depanneur in Quebec"
+ },
  "notes": "",
  "shape_facts": [
   "Single shop or several; owner-run or with a salesman/helper.",
