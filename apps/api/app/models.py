@@ -60,6 +60,15 @@ from app.modules.pi.problem_models import (
     PiProblemRevision,
 )
 from app.modules.pi.quarantine_models import PiQuarantine
+from app.modules.pi.solution_models import (
+    PiBuildFit,
+    PiCatalogueProposal,
+    PiIdeaArm,
+    PiIdeaFeedback,
+    PiIdeaSource,
+    PiSolutionMemory,
+    PiSolutionVersion,
+)
 from app.modules.pi_customer.models import (
     CustomerFace,
     CustomerPasskey,
@@ -130,6 +139,13 @@ __all__ = [
     "PiLearningExample",
     "PiLearningRun",
     "PiQuestionArm",
+    "PiBuildFit",
+    "PiCatalogueProposal",
+    "PiIdeaArm",
+    "PiIdeaFeedback",
+    "PiIdeaSource",
+    "PiSolutionMemory",
+    "PiSolutionVersion",
     "PiQuarantine",
     "PiProblem",
     "PiProblemGroup",

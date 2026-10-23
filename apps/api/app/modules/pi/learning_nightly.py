@@ -12,6 +12,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import select
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import (
@@ -27,6 +28,7 @@ from app.modules.pi import (
     learning_links,
     learning_miner,
     learning_packs,
+    learning_solutions_grow,
     learning_tuning,
     learning_voice,
 )
@@ -38,6 +40,7 @@ from app.shared.scope import WorkspaceScope
 MIN_GAP = timedelta(hours=20)
 WriterFactory = Callable[[WorkspaceScope], learning_packs.Writer | None]
 QuestionWriterFactory = Callable[[WorkspaceScope], learning_miner.QuestionWriter | None]
+IdeaWriterFactory = Callable[[WorkspaceScope], learning_solutions_grow.IdeaWriter | None]
 VoiceWriterFactory = Callable[[WorkspaceScope], learning_voice.Writer | None]
 GraderFactory = Callable[[WorkspaceScope], learning_grader.Grader | None]
 
@@ -70,6 +73,7 @@ async def run_workspace(
     question_writer: QuestionWriterFactory | None = None,
     grader: GraderFactory | None = None,
     voice_writer: VoiceWriterFactory | None = None,
+    idea_writer: IdeaWriterFactory | None = None,
 ) -> PiLearningRun:
     """One run for one workspace. Returns the run row with its digest."""
     now = now or datetime.now(UTC)
@@ -127,6 +131,13 @@ async def run_workspace(
         digest["voice"].update(
             await learning_voice.mine(session, scope, voice_writer(scope) if voice_writer else None)
         )
+        try:  # a savepoint: before migration 0043 is applied the solution tables do not exist
+            async with session.begin_nested():
+                digest["solutions"] = await learning_solutions_grow.run_all(
+                    session, scope, since, now, idea_writer(scope) if idea_writer else None
+                )
+        except ProgrammingError:
+            digest["solutions"] = {"skipped": "solution tables are not migrated yet"}
         digest["tuning"] = await learning_tuning.tune(session, scope, settings, now)
         digest["links"] = await learning_links.tune(session, scope, settings, now)
         digest["health"] = await experience_scorer.health(session, now - timedelta(days=1), scope)
@@ -144,6 +155,7 @@ async def run_due(
     question_writer: QuestionWriterFactory | None = None,
     grader: GraderFactory | None = None,
     voice_writer: VoiceWriterFactory | None = None,
+    idea_writer: IdeaWriterFactory | None = None,
 ) -> int:
     """Run every brain-mode workspace that has not run in the last 20 hours. Returns how many."""
     now = now or datetime.now(UTC)
@@ -158,7 +170,15 @@ async def run_due(
         if previous is not None and now - previous.started_at < MIN_GAP:
             continue
         await run_workspace(
-            session, settings, now, embedder, pack_writer, question_writer, grader, voice_writer
+            session,
+            settings,
+            now,
+            embedder,
+            pack_writer,
+            question_writer,
+            grader,
+            voice_writer,
+            idea_writer,
         )
         done += 1
     return done

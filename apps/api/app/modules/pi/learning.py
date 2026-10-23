@@ -42,9 +42,36 @@ REWARDS: dict[str, int] = {
     "complaint": -5,
     "rule_break": -5,  # pi's first draft broke a rule and had to be rewritten
 }
+# What the person does after pi gave them ideas (Addendum 2, Part 3.2). It adds to the reward model
+# and scores the ideas themselves. Whether they accept the offer, approve a quote or pay is not here
+# and never will be: pi learns to give better ideas, not to push harder.
+IDEA_REWARDS: dict[str, int] = {
+    "idea_will_try": 3,
+    "idea_followup": 2,
+    "idea_more": 2,
+    "idea_worked": 5,  # they come back and say it worked: the strongest signal
+    "idea_new_problems": 1,
+    "idea_ok_only": 0,
+    "idea_already_doing": -1,  # to that idea in that industry, and recorded for this business
+    "idea_not_possible": -2,
+    "idea_generic": -3,  # and the idea is flagged as generic
+    "idea_confused": -2,
+    "idea_impatient": -3,
+    "idea_no_help": -2,  # tried it and it did not help: the idea's fit is reviewed
+}
+REWARDS.update(IDEA_REWARDS)
 # Deliberately absent, whatever a caller passes: the business outcome is reported, never rewarded.
 NEVER_REWARDED = frozenset(
-    {"offer_accepted", "approved", "paid", "payment", "quote_approved", "yes"}
+    {
+        "offer_accepted",
+        "offer_declined",
+        "approved",
+        "paid",
+        "payment",
+        "quote_approved",
+        "quote_accepted",
+        "yes",
+    }
 )
 
 THANKS = re.compile(
@@ -153,13 +180,30 @@ PERSON_OR_COMPETITOR = re.compile(
     r"|\b(?i:competitor|zoho|odoo|quickbooks|vyapar)\b|\b(?:Busy|Marg|SAP)\b"
 )
 SOCIAL_PROOF = re.compile(
-    r"\b(?:other (?:businesses|shops|owners|clients)|most (?:owners|businesses|shops)|"
+    r"\b(?:other (?:businesses|shops|owners|clients|customers)|our (?:other )?(?:customers|clients)|"
+    r"most (?:owners|businesses|shops)|"
     r"hundreds of|thousands of|everyone is|trusted by|many (?:businesses|clients))\b",
     re.IGNORECASE,
 )
 INJECTION = re.compile(
     r"\b(?:ignore (?:all |the |your )?(?:previous|above|prior|rules|instructions)|disregard (?:the )?(?:rules|instructions)|"
     r"you are now|system prompt|new instructions?:|override)\b",
+    re.IGNORECASE,
+)
+# Text that tries to loosen the value line (Addendum 2, Part 1 and 3.8): more ideas, the how for
+# free, step-by-step help. It is never learned, whoever writes it.
+VALUE_LINE_ATTEMPT = re.compile(
+    r"\b(?:give|share|offer|send|allow|raise|increase|up to|more than|at least)\b[^.?!]{0,30}\b"
+    r"(?:3|three|4|four|5|five|six|many|more|unlimited|all)\b[^.?!]{0,15}\bideas?\b"
+    r"|\bideas? (?:per|a|each) (?:message|problem|conversation)\b"
+    r"|\b(?:no|without a?) limit on (?:the )?ideas?\b"
+    r"|\bstep[- ]by[- ]step (?:instructions?|guide|plan|steps)\b"
+    r"|\bgive (?:away )?the how\b|\b(?:full|complete) (?:plan|steps) (?:for free|in the chat)\b"
+    r"|\bskip the (?:offer|solution document)\b"
+    r"|\b(?:change|raise|loosen|remove|increase) (?:the )?(?:value line|free (?:part|ideas|limit))\b"
+    r"|\bmore for free\b|\b(?:explain|show|teach|tell)(?: them)?(?: all)?(?: the)? (?:steps|how)\b"
+    r"|\bname (?:the|a|an) (?:tool|app|software|vendor)s?\b"
+    r"|\brecommend (?:a|the) (?:tool|app|software)\b",
     re.IGNORECASE,
 )
 # A neutral listening-state context so the reply linter can judge a piece of learned text.
@@ -191,6 +235,8 @@ def never_learn(text: str) -> list[str]:
         why.append("social proof (R-SELL-03)")
     if INJECTION.search(said):
         why.append("tries to give pi instructions")
+    if VALUE_LINE_ATTEMPT.search(said):
+        why.append("instructions to change the value line (R-VAL, R-BUILD)")
     if safety.redact_pii(said).kinds:
         why.append("contains personal data (R-PRIV-07)")
     return why

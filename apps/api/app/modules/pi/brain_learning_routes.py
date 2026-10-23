@@ -25,6 +25,7 @@ from app.modules.pi import (
     learning_miner,
     learning_nightly,
     learning_packs,
+    learning_solutions_grow,
     learning_voice,
     taxonomy,
 )
@@ -113,6 +114,7 @@ async def run_now(request: Request, scope: Scope, session: Session) -> dict[str,
         question_writer=lambda s: learning_miner.make_writer(state.settings, state.http, s),
         grader=lambda s: learning_grader.make_grader(state.settings, state.http, s),
         voice_writer=lambda s: learning_voice.make_writer(state.settings, state.http, s),
+        idea_writer=lambda s: learning_solutions_grow.make_writer(state.settings, state.http, s),
     )
     await record(
         session,

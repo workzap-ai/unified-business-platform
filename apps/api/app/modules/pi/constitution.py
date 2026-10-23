@@ -379,6 +379,13 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
     if any(not NOT_SOLVED.search(s) for s in _sentences(reply) if SOLVED.search(s)):
         add(Violation("R-LANG-01", "sorted means noted and grouped, never solved"))
 
+    # The value line (R-VAL, R-BUILD): checked whenever pi was handed free ideas or a follow-up.
+    if "solution_ideas" in context or "solution_followup" in context:
+        from app.modules.pi import solution_rules  # local: it imports learning, which imports this
+
+        for why in solution_rules.check_sample_reply(reply, _customer_words(context)):
+            add(Violation("R-VAL-01", f"free ideas: {why}", True))
+
     # Voice (R-VOICE)
     asked = sum(reply.count(mark) for mark in QUESTION_MARKS)
     stripped = reply.rstrip().rstrip(ALLOWED_EMOJI).rstrip()

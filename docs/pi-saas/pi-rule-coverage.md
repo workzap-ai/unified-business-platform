@@ -146,3 +146,26 @@ and opinion limits), RT14 (other people's chats), RT15 (illegal requests), RT16 
 and opt-out), RT18 (burst debounce), RT19 (languages not supported), RT29 (served trades).
 Golden conversations G1 to G15 (Part 10.1) are built as scripted tests as their phases land:
 G5, G10, G11 and G13 are covered by `test_pi_brain_decisions.py` and `test_pi_brain_documents.py`.
+
+## Solutions that learn (Addendum 2, Part 3)
+
+Switched on per workspace with `response_rules.brain.solution_mode = true` (off by default; needs
+migration 0043, `docs/pi-saas/migrations-0043.sql`, and learning not frozen for the nightly jobs).
+
+| Rule | What is enforced | Where |
+|---|---|---|
+| R-VAL-01, 02 | Two ideas per message, four per chat before the offer | `value_line.py`; `solution_ideas.choose` caps at two; `solution_context` stops at four |
+| R-VAL-03, 04, 05 | One line, no how-to, no settings, templates or systems | `solution_rules.check_idea` on every seed, owner, miner and drafted idea |
+| R-VAL-06, 07 | Never learnable, not even by a reviewer's lesson | `learning.never_learn` (`VALUE_LINE_ATTEMPT`), `value_line.may_learn` |
+| R-BUILD-01 to 06 | Catalogue builds only, no tool words, "would" not "will" | `solution_rules.check_build_line`; build fit is stored apart (`PiBuildFit`) and never rewarded |
+| Part 3.2 | Offer, approval and payment never enter the solution score | `solution_score.score_of`, `learning.NEVER_REWARDED`, tests in `test_pi_solution_rules.py` |
+| Part 3.3 | Never repeat an idea to a business; swap kind after "already doing"; follow-up counts as the one question | `solution_ideas`, `PiSolutionMemory`, prompt bullet `solution_followup` |
+| Part 3.4 | S1 to S8 inside the nightly gate; nothing runs while learning is frozen | `learning_solutions.py`, `learning_solutions_grow.py`, `learning_nightly.run_workspace` |
+| Part 3.5 | Money or regulated ideas wait in review; catalogue proposals decided by a person | `PiIdeaArm.status = "review"`, `solution_routes.py` |
+| Part 3.7 | Versions `solutions/{industry}@1.N`, per-industry rollback | `solution_versions.py`, `POST /pi/solutions/{industry}/rollback` |
+| R-PRIV-07 | Evidence and regression cases hold redacted text only; erasing a customer removes solution memory and feedback | `solution_rules.redacted`, `brain_erase.py` |
+
+Open: Part 1 (the reply linter checks RVAL01 to 07 and RBUILD01 to 06 on the model's reply, the "how
+exactly?" handling and the free-rider signal) is not built; until it is, the two-idea limit is
+enforced by what pi is handed, not by checking what pi wrote. The Solutions panel in the web app
+(API is ready) and build-fit confirmation from delivered projects are not built either.

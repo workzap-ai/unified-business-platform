@@ -14,6 +14,7 @@ from typing import Any
 from uuid import UUID
 
 from sqlalchemy import delete, or_, select, update
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
@@ -27,6 +28,7 @@ from app.modules.pi.problem_models import (
     PiProblemRevision,
 )
 from app.modules.pi.quarantine_models import PiQuarantine
+from app.modules.pi.solution_models import PiIdeaFeedback, PiSolutionMemory
 from app.shared.scope import WorkspaceScope
 
 ERASED = "[deleted at the customer's request]"
@@ -53,6 +55,24 @@ async def erase_customer(
         )
     )
     removed: dict[str, int] = {}
+    try:  # the solution tables arrive with migration 0043
+        async with session.begin_nested():
+            removed["solution_memory"] = _n(
+                await session.execute(
+                    delete(PiSolutionMemory).where(
+                        *mine(PiSolutionMemory), PiSolutionMemory.customer_id == customer_id
+                    )
+                )
+            )
+            removed["idea_feedback"] = _n(
+                await session.execute(
+                    delete(PiIdeaFeedback).where(
+                        *mine(PiIdeaFeedback), PiIdeaFeedback.customer_id == customer_id
+                    )
+                )
+            )
+    except ProgrammingError:
+        pass
     if problem_ids:
         removed["links"] = _n(
             await session.execute(

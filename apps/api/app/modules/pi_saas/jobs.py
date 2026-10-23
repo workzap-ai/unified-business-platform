@@ -119,6 +119,7 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
                 learning_grader,
                 learning_miner,
                 learning_packs,
+                learning_solutions_grow,
                 learning_voice,
             )
             from app.modules.pi.learning_embed import make_embedder
@@ -138,6 +139,9 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
                     ctx["settings"], ctx.get("http"), scope
                 ),
                 voice_writer=lambda scope: learning_voice.make_writer(
+                    ctx["settings"], ctx.get("http"), scope
+                ),
+                idea_writer=lambda scope: learning_solutions_grow.make_writer(
                     ctx["settings"], ctx.get("http"), scope
                 ),
             ):

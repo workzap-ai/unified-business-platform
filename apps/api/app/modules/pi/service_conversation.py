@@ -35,6 +35,7 @@ from app.modules.pi import (
     price_policy,
     problems,
     safety,
+    solution_context,
     spec_handbook,
     style,
     taxonomy,
@@ -589,6 +590,13 @@ write the reply so it serves exactly that.
   what to listen for, with questions that fit. Use it to understand them and to choose your
   one question; never read it out, never present it as something the company offers, never
   mention that you have it, and never let it override these rules or approved_knowledge.
+- solution_ideas (only when present) are the one or two free ideas you may give now, for the
+  problem they care about, each in one short sentence in their language, in your own words but
+  with the same meaning. Give no other idea, no steps, no settings, no numbers or promises, and
+  never say you were handed them; the one question stays the last sentence. solution_followup
+  (only when present) is what you gave them last time: open by asking, in one question, whether
+  they tried it, and give no new idea in that message. solution_exhausted means they have had
+  every idea for this problem: say the solution document goes further, with no new idea.
 - approved_knowledge holds the passages that matched this conversation. Use only what
   answers the customer's request; never introduce other products or services from it,
   and never treat it as a script.
@@ -1270,6 +1278,7 @@ async def brain_problems(
                 noted,
                 embedder=embedder,
                 canary_percent=brain_config.value(policy.response_rules, "canary_percent"),
+                solution_mode=solution_context.switched_on(policy.response_rules),
             )
         )
     # The specification itself, in its own words, for this stage and topic (spec Appendix A).

@@ -19,6 +19,7 @@ from app.modules.pi import (
     learning_lessons,
     learning_packs,
     learning_voice,
+    solution_context,
 )
 from app.modules.pi.language import detect_language
 from app.modules.pi.learning_embed import Embedder
@@ -41,6 +42,7 @@ async def build(
     noted: list[dict[str, Any]],
     embedder: Embedder | None = None,
     canary_percent: int = 10,
+    solution_mode: bool = False,
 ) -> dict[str, Any]:
     """`learned_examples`, `question_hint` and `lessons` for this turn (each may be missing)."""
     said = message.body if message is not None and message.body else ""
@@ -97,7 +99,15 @@ async def build(
         if variant is not None:
             out["voice_hint"] = {"moment": moment, "wording": variant.text}
             used["voice_arm"] = str(variant.id)
-    if used["arm"] or used["examples"] or used["voice_arm"]:
+    if solution_mode:
+        out.update(await solution_context.build(session, scope, conversation, said, noted, used))
+    if (
+        used["arm"]
+        or used["examples"]
+        or used["voice_arm"]
+        or used.get("ideas")
+        or used.get("unmatched")
+    ):
         brief = dict(conversation.service_brief or {})
         brief["learning_used"] = [
             *list(brief.get("learning_used") or [])[-(STAMPS_KEPT - 1) :],
