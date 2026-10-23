@@ -19,7 +19,7 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -371,6 +371,16 @@ async def _name_project_document(
     conversation.service_brief = brief
 
 
+# Brain mode: a file pi could not open (the shared notice in language.py has "Thanks!", which
+# breaks R-VOICE-07, and puts its question before the last sentence).
+BRAIN_MEDIA_UNREADABLE_NOTICES = {
+    "en": "Thanks. I couldn't open that file here, so I've passed it to the team. Could you "
+    "describe it in a few words, or send it as a PDF or a screenshot?",
+    "roman_ur": "Shukriya. Yeh file yahan open nahi ho saki, is liye maine team ko bhej di hai. "
+    "Kya aap thora sa likh kar bata sakte hain, ya PDF/screenshot bhej dein?",
+    "ar": "شكرًا. لم أتمكن من فتح هذا الملف هنا، لذلك أرسلته إلى الفريق. "
+    "هل يمكنك وصفه باختصار أو إرساله كملف PDF أو لقطة شاشة؟",
+}
 # Reasons pi handles itself: it keeps the chat and puts a request on the team's desk.
 SOFT_REASONS = frozenset({"low_confidence", "provider_failure", "tool_failure", "reply_rejected"})
 
@@ -446,10 +456,11 @@ async def _media_unreadable(
     if await service.messages.find(PiMessage.idempotency_key == key) is not None:
         return []
     notices = MEDIA_UNREADABLE_NOTICES
-    if message.message_type in ("video", "audio"):
-        from app.modules.pi import flow
+    from app.modules.pi import flow
 
-        if flow.brain_mode((await settings_row(session, scope)).response_rules):
+    if flow.brain_mode((await settings_row(session, scope)).response_rules):
+        notices = BRAIN_MEDIA_UNREADABLE_NOTICES  # no "!" (R-VOICE-07), the one question last
+        if message.message_type in ("video", "audio"):
             notices = (
                 VIDEO_UNREADABLE_NOTICES
                 if message.message_type == "video"
@@ -507,6 +518,159 @@ async def hand_off(
         )
     )
     return str(message.id)
+
+
+async def guard_on_arrival(
+    session: AsyncSession,
+    ctx: dict[str, Any],
+    scope: WorkspaceScope,
+    event: WhatsAppWebhookEvent,
+    message: PiMessage,
+    policy: PiSettings,
+) -> dict[str, Any] | None:
+    """Brain mode: every inbound message is redacted (card, password, ID and account numbers) the
+    moment it is stored, whatever happens to it next: answered, skipped in a burst, kept silent
+    for a human or by moderation (R-PRIV-02). What the reply needs (kinds found, the reminder,
+    whether only the removed details were left) is kept on the message for the burst's answer."""
+    from app.modules.pi import flow as brain_flow
+    from app.modules.pi.safety_guard import guard_inbound
+
+    if not brain_flow.brain_mode(policy.response_rules):
+        return None
+    if (message.media or {}).get("pii"):  # a retry: already redacted when it arrived
+        return dict(message.media["pii"])
+    conversation = await PiService(session, scope).conversations.get(message.conversation_id)
+    original = message.body or ""
+    found = await guard_inbound(session, scope, ctx["settings"], conversation, message)
+    if (message.body or "") != original:
+        # The conversation list and the stored webhook event must not keep the original.
+        conversation.last_message_preview = (message.body or "")[:200]
+        payload = dict(event.payload or {})
+        if "body" in payload:
+            payload["body"] = message.body
+            event.payload = payload
+    if found is not None:
+        message.media = {**(message.media or {}), "pii": found}
+    return found
+
+
+BURST_CODES = ("BURST_COALESCED", "RATE_LIMIT_CONVERSATION")
+
+
+async def burst_before(session: AsyncSession, message: PiMessage) -> list[PiMessage]:
+    """The earlier messages of this person's burst (spec 6.10): inbound, skipped so that one answer
+    covers them all, and not yet answered. Oldest first, already redacted."""
+    answered = await session.scalar(
+        select(func.max(PiMessage.created_at)).where(
+            PiMessage.tenant_id == message.tenant_id,
+            PiMessage.environment_id == message.environment_id,
+            PiMessage.conversation_id == message.conversation_id,
+            PiMessage.direction == "outbound",
+        )
+    )
+    query = select(PiMessage).where(
+        PiMessage.tenant_id == message.tenant_id,
+        PiMessage.environment_id == message.environment_id,
+        PiMessage.conversation_id == message.conversation_id,
+        PiMessage.direction == "inbound",
+        PiMessage.status == "skipped",
+        PiMessage.error_code.in_(BURST_CODES),
+        PiMessage.id != message.id,
+        PiMessage.created_at < message.created_at,
+    )
+    if answered is not None:
+        query = query.where(PiMessage.created_at > answered)
+    rows = await session.scalars(query.order_by(PiMessage.created_at).limit(20))
+    return list(rows)
+
+
+def burst_pii(latest: dict[str, Any] | None, earlier: list[PiMessage]) -> dict[str, Any] | None:
+    """The personal-data result for a whole burst: every kind found in any message, each reminder
+    once, and "only" when nothing but removed details was said anywhere in it."""
+    from app.modules.pi import safety
+
+    guards: list[dict[str, Any]] = [m.media["pii"] for m in earlier if (m.media or {}).get("pii")]
+    if latest:
+        guards.append(latest)
+    if not guards:
+        return None
+    kinds: list[str] = []
+    notices: list[str] = []
+    for guard in guards:
+        kinds += [k for k in guard.get("kinds", []) if k not in kinds]
+        if guard.get("notice"):
+            notices.append(str(guard["notice"]))
+    substantive = any(safety.substantive(m.body or "") for m in earlier)
+    return {
+        "kinds": kinds,
+        "notice": " ".join(notices),
+        "only": bool(latest and latest.get("only")) and not substantive,
+    }
+
+
+async def resend_approved_quote(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    ctx: dict[str, Any],
+    conversation: PiConversation,
+    message: PiMessage,
+) -> list[str]:
+    """M3: after approval they asked for the bank details, which are only in the approved quote, and
+    pi said it can resend it. The approved quote's PDF goes out again, through the same queue as
+    the first delivery. Nothing is typed by pi; no quote means nothing is sent."""
+    from app.modules.pi import brain_docs
+    from app.modules.pi.brain_docs_models import PiBrainDocument
+
+    quote = await session.scalar(
+        WorkspaceRepository(session, PiBrainDocument, scope)
+        .select()
+        .where(
+            PiBrainDocument.conversation_id == conversation.id,
+            PiBrainDocument.kind == "quote",
+            PiBrainDocument.status == "sent",
+        )
+        .order_by(PiBrainDocument.sent_at.desc())
+        .limit(1)
+    )
+    if quote is None:
+        return []
+    language = conversation.language if conversation.language in brain_docs.CAPTION else "en"
+    return [
+        await brain_docs.queue_message(
+            session,
+            scope,
+            conversation,
+            f"{brain_docs.CAPTION[language]['quote']} {quote.ref}",
+            f"pi-brain-resend:{quote.id}:{message.id}",
+            {
+                "document": {
+                    "link": brain_docs.doc_url(ctx["settings"], quote),
+                    "filename": f"{quote.ref}.pdf",
+                }
+            },
+        )
+    ]
+
+
+INJECTION_SIGNAL = "signal.injection_attempt"
+
+
+async def log_injection(
+    session: AsyncSession, scope: WorkspaceScope, message: PiMessage, source: str
+) -> None:
+    """E8 (spec 6.1): an instruction aimed at pi in a message or a file is ignored and logged as
+    signal.injection_attempt; the chat carries on normally."""
+    from app.modules.audit.service import record
+
+    logger.warning(INJECTION_SIGNAL, extra={"message_id": str(message.id), "source": source})
+    await record(
+        session,
+        f"pi.{INJECTION_SIGNAL}",
+        scope=scope,
+        entity_type="pi_message",
+        entity_id=message.id,
+        details={"source": source},
+    )
 
 
 async def enqueue_sends(ctx: dict[str, Any], message_ids: list[str]) -> None:
@@ -569,7 +733,13 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         event.status = "queued" if message else "processed"
         released: list[str] = []
         opted_out = False
+        early_guard: dict[str, Any] | None = None
         if message is not None:
+            # Brain mode: redact before anything stores, reads or logs the text, for every
+            # message whatever becomes of it (a burst's older ones, a human's chat, silence).
+            early_guard = await guard_on_arrival(
+                session, ctx, scope, event, message, await settings_row(session, scope)
+            )
             await meter(session, scope.tenant_id, scope.environment_id, "messages_in")
             # Payment proof reaches the staff "to verify" queue even with automation off.
             from app.modules.pi_saas.campaigns import note_opt_out
@@ -863,12 +1033,23 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 return
         # Brain mode: card, password, ID and account details never reach the model or the log
         # (R-PRIV-02); the original is kept encrypted for 30 days.
-        pii_guard: dict[str, Any] | None = None
+        pii_guard: dict[str, Any] | None = early_guard  # found when the message arrived
         if policy.response_rules.get("pi_mode") == "brain":
             from app.modules.pi import safety
             from app.modules.pi.safety_guard import guard_inbound
 
-            pii_guard = await guard_inbound(session, scope, ctx["settings"], conversation, message)
+            # The caption was redacted on arrival; this catches what a voice note or a photo said.
+            read_later = await guard_inbound(session, scope, ctx["settings"], conversation, message)
+            if read_later is not None:
+                pii_guard = (
+                    read_later
+                    if pii_guard is None
+                    else {
+                        "kinds": [*pii_guard["kinds"], *read_later["kinds"]],
+                        "notice": f"{pii_guard['notice']} {read_later['notice']}".strip(),
+                        "only": bool(pii_guard["only"] and read_later["only"]),
+                    }
+                )
             if pii_guard is not None:
                 body = message.body
                 typed = safety.redact_pii(typed).text
@@ -927,8 +1108,25 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         semantic_enabled = bool(policy.knowledge_config.get("semantic_enabled"))
         service_discovery = await service_mode(session, scope, policy)
         fast_intent = keyword_intent(typed)
-        # Service messages retain language-aware discovery; injection never reaches this model.
-        service_discovery = service_discovery and not (fast_intent and fast_intent[2])
+        brain_on = policy.response_rules.get("pi_mode") == "brain"
+        if brain_on:
+            # E8: an instruction aimed at pi (in the message or in a file) is ignored and logged,
+            # and the chat carries on normally: it still goes through the brain, never a handoff.
+            in_file = message.message_type not in {"text", "interactive"} and bool(
+                (keyword_intent(body) or ("", 0.0, False))[2]
+            )
+            if (fast_intent and fast_intent[2]) or in_file:
+                await log_injection(session, scope, message, "file" if in_file else "message")
+            # R-OFFER-06: someone who says they are not the decision-maker cannot ask for or
+            # approve a quote; remembered for this chat from the moment they say it.
+            from app.modules.pi import decisions as brain_decisions
+
+            known = dict(conversation.service_brief or {})
+            if not known.get("non_decider") and brain_decisions.non_decider(typed):
+                conversation.service_brief = {**known, "non_decider": True}
+        # Service messages retain language-aware discovery; injection never reaches this model
+        # (in brain mode it does, as ordinary text: the model is told to ignore instructions).
+        service_discovery = service_discovery and (brain_on or not (fast_intent and fast_intent[2]))
         if service_discovery and message.message_type == "text" and "links" not in message.media:
             # Links the customer sent (a YouTube video, a website): read them first so
             # pi answers about what they show instead of promising to look later.
@@ -960,6 +1158,37 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             if service_discovery
             else None
         )
+        if service_context is not None and brain_on:
+            # A burst gets one answer (spec 6.10): the earlier messages are part of the chat the
+            # model reads, and the safety gates and the team's escalations see every one of them.
+            earlier = await burst_before(session, message)
+            if earlier:
+                from app.modules.pi.service_conversation import (
+                    burst_escalations,
+                    escalation_question,
+                )
+
+                texts = [m.body or "" for m in earlier]
+                service_context["burst_texts"] = texts
+                service_context["history"] = [
+                    *service_context.get("history", []),
+                    *(
+                        {
+                            "role": "customer",
+                            "kind": m.message_type,
+                            "at": f"{m.created_at:%Y-%m-%d %H:%M}",
+                            "text": (m.body or "")[:1500],
+                        }
+                        for m in earlier
+                    ),
+                ]
+                pii_guard = burst_pii(pii_guard, earlier)
+                from app.modules.pi_saas.requests import raise_escalation
+
+                for reason, said in burst_escalations(texts):
+                    await raise_escalation(
+                        session, scope, conversation, reason, escalation_question(reason), said
+                    )
         if service_context is not None:
             # Payment questions go to a person unless the business collects payments
             # through Pi; disputes still do (the composer must request a human).
@@ -1290,6 +1519,15 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     if sent.ok and sent.data is not None:
                         outbound.append(str(sent.data["message_id"]))
                 run.agent_path = [*run.agent_path, "meeting_request"]
+        sent_decision = getattr(service_turn, "_decision", None) if service_turn else None
+        if (
+            sent_decision is not None
+            and "resend_quote" in sent_decision.effects
+            and outbound
+            and conversation.customer_id is not None
+        ):
+            # M3: pi said it can resend the approved quote (where the bank details are): it does.
+            outbound += await resend_approved_quote(session, scope, ctx, conversation, message)
         if service_turn is not None and service_turn.proposal_answer != "none" and outbound:
             # They answered the proposal in the chat: the same steps as its page's buttons
             # (accepted → order, invoice and payment link, sent after pi's reply).
@@ -1330,6 +1568,21 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         if handoff_reason == "reply_rejected":
             handoff_reason = "policy"
         if handoff_reason is not None:
+            if (service_context or {}).get("pi_mode") == "brain" and conversation.customer_id:
+                # Spec 6.6: a person was asked for. The ticket carries the chat's summary, open
+                # problems and last 20 messages (redacted); the SLA sweep flags it if unclaimed.
+                from app.modules.pi.service_conversation import escalation_question
+                from app.modules.pi_saas.requests import raise_escalation
+
+                if handoff_reason == "customer_request":
+                    await raise_escalation(
+                        session,
+                        scope,
+                        conversation,
+                        "human_requested",
+                        escalation_question("human_requested"),
+                        typed,
+                    )
             for queued in outbound:
                 # Already-queued replies still reach the customer after the handoff.
                 row = await service.messages.get(UUID(queued))

@@ -23,7 +23,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.notifications.service import notify
 from app.modules.pi import flow, followup_policy
 from app.modules.pi.configuration import settings_row
-from app.modules.pi.followups import _friday_prayer, iftar_pause, quiet_until
+from app.modules.pi.followups import (
+    _friday_prayer,
+    iftar_pause,
+    jumuah_country,
+    person_zone,
+    quiet_until,
+)
 from app.modules.pi.models import PiConversation, PiMessage, PiSettings, WhatsAppConnection
 from app.modules.pi.problem_models import PiProblem
 from app.modules.pi.service import PiService
@@ -94,16 +100,21 @@ def marked_sent(brief: dict[str, Any], kind: str) -> dict[str, Any]:
     return {**brief, "followups_sent": sent}
 
 
-def blocked_by_time(policy: PiSettings, now: datetime) -> datetime | None:
-    """When the quiet hours, Jumu'ah or the iftar pause end, or None when sending is fine now."""
+def blocked_by_time(
+    policy: PiSettings, now: datetime, contact_wa_id: str | None = None
+) -> datetime | None:
+    """When the quiet hours (21:00-09:00), Jumu'ah (Friday 12:00-14:30, PK and UAE numbers only)
+    or the iftar pause end, or None when sending is fine now. All by the zone of the person's
+    number (+92 PK, +971 UAE, +1 Canada by area code; else the workspace zone), R-FUP-03/04."""
     config = policy.whatsapp_config
+    tz = person_zone(contact_wa_id, policy.timezone)
     later = quiet_until(
-        policy.timezone, int(config.get("quiet_start", 21)), int(config.get("quiet_end", 9)), now
+        tz, int(config.get("quiet_start", 21)), int(config.get("quiet_end", 9)), now
     )
-    if later is None and _friday_prayer(policy.timezone):
+    if later is None and jumuah_country(contact_wa_id) and _friday_prayer(tz):
         later = now + timedelta(hours=1)
     if later is None:
-        later = iftar_pause(policy.timezone, config, now)
+        later = iftar_pause(tz, config, now)
     return later
 
 
@@ -265,10 +276,12 @@ async def _one(session: AsyncSession, conversation: PiConversation, now: datetim
     policy = await settings_row(session, scope)
     if not flow.brain_mode(policy.response_rules) or not policy.auto_reply_enabled:
         return None
+    if flow.kickoff_done(conversation, now):  # S12 to S13: the kickoff call has happened
+        return None
     chat = chat_of(conversation, await _noted(session, conversation))
     if chat is None:
         return None
     due = followup_policy.next_followup(chat, policy.response_rules, now)
-    if due is None or blocked_by_time(policy, now) is not None:
+    if due is None or blocked_by_time(policy, now, conversation.contact_wa_id) is not None:
         return None
     return await send_one(session, scope, conversation, policy, due, chat, now)

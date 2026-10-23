@@ -69,9 +69,14 @@ async def test_yes_asks_all_or_some_then_all_starts_preparing(api, business_db, 
     await say(pi, "yes", "of-5")
     assert (await pi.reply_to("of-5")).body == "Should it cover all of these, or only some?"
     await say(pi, "all of them", "of-6")
-    assert (await pi.reply_to("of-6")).body == decisions.text("preparing", "en")
+    prepared = await pi.reply_to("of-6")
+    # Spec 3.9.1: the document follow-ups go out after the 24-hour window, which needs the
+    # person's yes, so the reminder permission is asked once, with the offer's yes.
+    assert prepared.body == f"{decisions.text('preparing', 'en')} {decisions.CONSENT_ASK['en']}"
+    assert (prepared.media or {}).get("buttons") == ["Yes, message me", "No thanks"]
     conversation, rows = await problems_of(business_db, pi)
     assert conversation.flow_state == "S6_PREPARING"
+    assert conversation.service_brief["consent_asked"]
     offer = conversation.service_brief["offer"]
     assert offer["problem_refs"] == [str(r.id)[:8] for r in rows]
     assert offer["yes_message_id"] and offer["confirm_message_id"] and offer["at"]

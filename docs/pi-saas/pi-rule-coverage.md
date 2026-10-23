@@ -20,7 +20,7 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-DISC-02 | "Are you human?" answered in sentence one | code | linter plus a fixed pre-model answer (`safety.identity_asked`) |
 | R-DISC-03 | No human name, body, gender, place | code | linter `HUMAN_CLAIM` (persona names, places, family, meals) |
 | R-DISC-04 | No "a human is reading" unless one took over | code | `flow.hand_to_human` / `hand_back` from the inbox actions in `service.py`; linter rule `TEAM_READS` (hard) |
-| R-DISC-05 | Re-disclose after 30 days | open | needs last-message age in the opening (P6) |
+| R-DISC-05 | Re-disclose after 30 days | code | `welcome_back(ask=False)`, `redisclose_due` and `with_disclosure` in `service_conversation.py`, also when the person opens with a real message |
 | R-SELL-01, 02 | No fix, product, document or quote while listening | code | linter by state (S0 to S4, S5b), hard |
 | R-SELL-03 | No urgency, scarcity, discount | code | linter, hard (a refusal "I can't give a discount" is allowed) |
 | R-SELL-04 | Direct "can you fix this?" gets one honest line | code+prompt | linter lets the line through when asked; wording is the prompt's |
@@ -85,9 +85,9 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-OFFER-03 | Only an explicit yes starts anything | code | `decisions.classify` at 0.9, hedges refused |
 | R-OFFER-04 | "All or only some?" once | code | `decisions` S5 |
 | R-OFFER-05 | Cost before a quote: honest, no range | code+prompt | cost questions go to the model, numbers blocked |
-| R-OFFER-06 | A member who is not the decider | code | `customers.can_approve` |
+| R-OFFER-06 | A member who is not the decider | code | `customers.can_approve`, and `decisions.non_decider` ("I work at", "my boss decides") sets `brief.non_decider`; `_member` asks once whether the decision-maker should receive the document |
 | R-FUP-02 | stop / opt-out ends follow-ups | code | `note_opt_out` in `pi_saas/campaigns.py` |
-| R-FUP-03 | Quiet hours 21:00-09:00, Jumu'ah | code | `quiet_until`, `_friday_prayer` in `followups.py` |
+| R-FUP-03 | Quiet hours 21:00-09:00 in the person's zone (+92, +971, +1 by area code); Jumu'ah Friday 12:00-14:30 for PK/UAE numbers only | code | `blocked_until`, `person_zone`, `_friday_prayer` in `followups.py`; `blocked_by_time` in `brain_followups.py` |
 | R-FUP-04 | No proactive message within an hour of iftar in Ramadan | code | `iftar_pause`, dates in `whatsapp_config.ramadan` (set per year and country) |
 | R-FUP-01, 05 | No pressure; follow-ups logged | code | `followup_policy.py` (table 3.9.1, a test keeps every text pressure-free), sent by `brain_followups.py` and `followups._silence_nudge`; outside 24 h only approved templates (`followup_templates`, meeting template), staff told when one is missing |
 | Spec 8.3 reward model | Rewards never include offers, approvals or payments | code | `learning.reward`, `NEVER_REWARDED` (eval L5) |

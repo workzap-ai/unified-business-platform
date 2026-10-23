@@ -80,12 +80,69 @@ def reminder_language(conversation: PiConversation, config: dict[str, Any]) -> s
     return language if language in (config.get("reminder_templates") or {}) else "en"
 
 
-def _friday_prayer(timezone: str) -> bool:
+# Canadian area codes by time zone (R-FUP-03: "local for +1 by area code"). Anything else in +1
+# falls back to the workspace's own zone.
+_CANADA_ZONES: dict[str, list[str]] = {
+    "America/Toronto": (
+        "226 249 289 343 365 416 437 519 548 613 647 705 807 905 514 438 450 579 581 819 873 "
+        "418 367"
+    ).split(),
+    "America/Winnipeg": ("204 431 306 639").split(),
+    "America/Edmonton": ("403 587 780 825 368").split(),
+    "America/Vancouver": ("236 250 604 672 778").split(),
+    "America/Halifax": ("902 782 506").split(),
+    "America/St_Johns": ("709 879").split(),
+}
+
+
+def person_zone(contact_wa_id: str | None, default: str) -> str:
+    """The time zone of the person a proactive message goes to, from their number (R-FUP-03):
+    +92 Pakistan, +971 UAE, +1 Canada by area code. Any other number: the workspace's zone."""
+    digits = "".join(c for c in (contact_wa_id or "") if c.isdigit())
+    if digits.startswith("971"):
+        return "Asia/Dubai"
+    if digits.startswith("92"):
+        return "Asia/Karachi"
+    if digits.startswith("1") and len(digits) >= 4:
+        for name, codes in _CANADA_ZONES.items():
+            if digits[1:4] in codes:
+                return name
+    return default
+
+
+def jumuah_country(contact_wa_id: str | None) -> bool:
+    """Jumu'ah (Friday prayers) applies to Pakistan and UAE numbers only (R-FUP-03)."""
+    digits = "".join(c for c in (contact_wa_id or "") if c.isdigit())
+    return digits.startswith(("92", "971"))
+
+
+def _friday_prayer(timezone: str, now: datetime | None = None) -> bool:
+    """Friday 12:00 to 14:30 local (R-FUP-03)."""
     from app.modules.pi.policy import zone
 
-    local = datetime.now(UTC).astimezone(zone(timezone))
+    local = (now or datetime.now(UTC)).astimezone(zone(timezone))
     minutes = local.hour * 60 + local.minute
-    return local.weekday() == 4 and 12 * 60 + 30 <= minutes < 14 * 60 + 30
+    return local.weekday() == 4 and 12 * 60 <= minutes < 14 * 60 + 30
+
+
+def blocked_until(
+    policy: Any, contact_wa_id: str | None, now: datetime | None = None
+) -> datetime | None:
+    """When quiet hours (21:00-09:00 where the person is), Jumu'ah (PK/UAE numbers only) or the
+    iftar pause end; None when a proactive message may go now. Zone comes from the number."""
+    config = policy.whatsapp_config
+    tz = person_zone(contact_wa_id, policy.timezone)
+    when = now or datetime.now(UTC)
+    later = quiet_until(
+        tz, int(config.get("quiet_start", 21)), int(config.get("quiet_end", 9)), when
+    )
+    if later is None and jumuah_country(contact_wa_id):
+        prayers = _friday_prayer(tz, now) if now is not None else _friday_prayer(tz)
+        if prayers:
+            later = when + timedelta(hours=1)
+    if later is None:
+        later = iftar_pause(tz, config, when)
+    return later
 
 
 def iftar_pause(
@@ -140,15 +197,7 @@ async def _silence_nudge(
     if not sendable:
         conversation.followup_due_at = None
         return
-    later = quiet_until(
-        policy.timezone,
-        int(policy.whatsapp_config.get("quiet_start", 21)),
-        int(policy.whatsapp_config.get("quiet_end", 9)),
-    )
-    if later is None and _friday_prayer(policy.timezone):
-        later = now + timedelta(hours=1)
-    if later is None:
-        later = iftar_pause(policy.timezone, policy.whatsapp_config)
+    later = blocked_until(policy, conversation.contact_wa_id)
     if later is not None:
         conversation.followup_due_at = later
         return
@@ -243,19 +292,11 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
                 # Revisit configuration without starving other tenants' due reminders.
                 conversation.followup_due_at = datetime.now(UTC) + timedelta(hours=1)
                 continue
-            later = quiet_until(
-                policy.timezone,
-                int(policy.whatsapp_config.get("quiet_start", 21)),
-                int(policy.whatsapp_config.get("quiet_end", 9)),
-            )
+            later = blocked_until(policy, conversation.contact_wa_id)
             if later is not None:
-                conversation.followup_due_at = later  # Never at night; sent next morning.
-                continue
-            if _friday_prayer(policy.timezone):
-                conversation.followup_due_at = datetime.now(UTC) + timedelta(hours=1)
-                continue
-            if (iftar := iftar_pause(policy.timezone, policy.whatsapp_config)) is not None:
-                conversation.followup_due_at = iftar  # R-FUP-04: not around iftar
+                # Never at night (sent next morning), at Jumu'ah or around iftar (R-FUP-03/04),
+                # by the person's own zone.
+                conversation.followup_due_at = later
                 continue
             last_template = await last_follow_up_template(
                 session, conversation, datetime.now(UTC) - TEMPLATE_GAP
@@ -306,6 +347,13 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
         await brain_followups.sweep(ctx)  # documents, paused and kickoff follow-ups (brain mode)
     except Exception:  # noqa: BLE001 - the older reminders above must never depend on this
         logging.getLogger("app.pi.followups").warning("pi_brain_followups_failed", exc_info=True)
+    try:
+        from app.modules.pi_saas import requests as team_requests
+
+        # Spec 6.6: a ticket nobody claimed in time is flagged again, with one honest line.
+        await team_requests.flag_unclaimed(ctx)
+    except Exception:  # noqa: BLE001 - never blocks the reminders above
+        logging.getLogger("app.pi.followups").warning("pi_unclaimed_flag_failed", exc_info=True)
 
 
 def reminder_allowed(

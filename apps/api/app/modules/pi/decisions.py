@@ -180,6 +180,20 @@ TEXT: dict[str, dict[str, str]] = {
             "haan kehna hoga, wo mujhe seedha workzap.ai/pi/talk-to-pi par message kar sakte hain."
         ),
     },
+    "member_ask": {
+        "en": (
+            "I can note that you'd like one. The owner of {business} needs to say yes to a "
+            "quote, and they can message me directly at workzap.ai/pi/talk-to-pi, or I can "
+            "give you that link to pass on. Should the decision-maker receive the document, "
+            "and how would you like to involve them?"
+        ),
+        "roman_ur": (
+            "Main note kar leta hoon ke aap ye chahte hain. {business} ke owner ko quote par "
+            "haan kehna hoga, wo mujhe seedha workzap.ai/pi/talk-to-pi par message kar sakte "
+            "hain, ya main wo link aap ko de dun. Kya document faisla karne wale ko bhejna "
+            "chahiye, aur aap unhein kaise shamil karna chahenge?"
+        ),
+    },
     "confirm_approval": {
         "en": "Just to confirm: you approve quote {quote} for {total}. Is that right?",
         "roman_ur": "Bas confirm karne ke liye: aap quote {quote} {total} ke liye manzoor karte hain. Theek hai?",
@@ -248,9 +262,27 @@ TEXT: dict[str, dict[str, str]] = {
 }
 
 
+# The reminder permission question, word for word as service_conversation.CONSENT_QUESTION (a test
+# keeps them equal): the document and paused follow-ups go out after the 24-hour window, which is
+# only allowed with this yes (spec 3.9.1). Asked when the offer is accepted or the person says
+# "later", the two moments a follow-up can start.
+CONSENT_ASK = {
+    "en": "Can I message you here when there's an update, or if we need anything from you?",
+    "roman_ur": "Kya hum aap ko yahan message kar sakte hain jab koi update ho, ya hamein "
+    "aap se kuch chahiye ho?",
+}
+
+
 def text(key: str, language: str | None, **values: str) -> str:
     options = TEXT[key]
     return options.get(language or "en", options["en"]).format(**values)
+
+
+def with_consent(reply: str, language: str | None, facts: dict[str, Any]) -> str:
+    """Add the reminder permission question to a fixed reply, once, when it is still unknown."""
+    if not facts.get("ask_consent") or "?" in reply:
+        return reply
+    return f"{reply.rstrip()} {CONSENT_ASK.get(language or 'en', CONSENT_ASK['en'])}"
 
 
 def buttons_for(body: str) -> list[str] | None:
@@ -323,6 +355,14 @@ def decide(
     can_approve = facts.get("can_approve", True)
     answer = classify(message)
 
+    if (
+        not can_approve
+        and OFFER_REQUEST.search(message)
+        and state
+        in (State.S3_NOTED, State.S4_SORTED_SUMMARY, State.S5_READINESS, State.S5B_DECLINED)
+    ):
+        return _member(language, facts, brief)  # "send the quote" from a non-decider (R-OFFER-06)
+
     if state == State.S4_SORTED_SUMMARY:
         if facts.get("changed") or not facts.get("problem_count"):
             return None
@@ -353,19 +393,14 @@ def decide(
             return _decline(language)
         if _ok(answer, Answer.LATER):
             return Decision(
-                text("later", language),
+                with_consent(text("later", language), language, facts),
                 State.X_PAUSED,
                 {"paused_from": State.S5_READINESS.value},
                 why="later",
             )
         if _ok(answer, Answer.YES):
             if not can_approve:
-                return Decision(
-                    text("member", language, business=facts.get("business") or "your business"),
-                    None,
-                    {"offer_wanted_by_member": True},
-                    why="R-OFFER-06",
-                )
+                return _member(language, facts, brief)
             if int(facts.get("group_count") or 0) >= 2 and not brief.get("scope_asked"):
                 return Decision(
                     text("ask_all_or_some", language),
@@ -454,6 +489,46 @@ def decide(
     return None
 
 
+def _member(language: str | None, facts: dict[str, Any], brief: dict[str, Any]) -> Decision:
+    """A person who is not the decision-maker asks for the document or says yes to it
+    (R-OFFER-06, spec 4.9): pi notes it, says the owner must say yes, and asks once whether the
+    decision-maker should receive the document and how they would like to involve them, without
+    asking for that person's number."""
+    business = facts.get("business") or "your business"
+    key = "member" if brief.get("non_decider_asked") else "member_ask"
+    return Decision(
+        text(key, language, business=business),
+        None,
+        {"offer_wanted_by_member": True, "non_decider_asked": True},
+        why="R-OFFER-06",
+    )
+
+
+# A person who is not the one who decides (spec 2.6, 4.9): "I work at ...", "my boss decides",
+# "I'm not the owner". Conservative on purpose: an owner is never silently demoted.
+NON_DECIDER = re.compile(
+    r"\bi(?:'m| am)? (?:only |just )?work(?:ing)? (?:at|for|in)\b(?![^.?!\n]{0,20}\b(?:my own|my)\b)"
+    r"|\b(?:my|our) (?:boss|manager|owner|director|ceo|md|supervisor|superior|principal)\b"
+    r"[^.?!\n]{0,50}\b(?:decides?|decision|asked me|told me|sent me|wants|will decide|approves?|"
+    r"has to approve|needs to approve|has to say yes)\b"
+    r"|\b(?:boss|owner|manager|director|ceo) (?:decides|will decide|has to decide|approves)\b"
+    r"|\bi(?:'m| am) not (?:the |an? )?(?:owner|decision[- ]?maker|boss|authori[sz]ed)\b"
+    r"|\bnot (?:my|up to me)\b[^.?!\n]{0,12}\bdecision\b|\bit(?:'s| is) not my decision\b"
+    r"|\bi(?:'m| am) (?:just )?(?:an? |the )?(?:employee|staff member|team member|intern|"
+    r"receptionist|assistant|accountant)\b"
+    r"|\b(?:mere|hamare|meri|hamari) (?:boss|malik|sahab|manager|owner)\b[^.?!\n]{0,50}"
+    r"\b(?:decide|faisla|poochna|puchna|kehte|batayenge|manzoori)\b"
+    r"|\b(?:malik|boss|sahab) se (?:poochna|puchna|pooch)\b"
+    r"|مديري|رئيسي في العمل|صاحب الشركة هو من يقرر",
+    re.IGNORECASE,
+)
+
+
+def non_decider(message: str) -> bool:
+    """The person says they are not the one who decides (R-OFFER-06)."""
+    return bool(NON_DECIDER.search(" ".join((message or "").split())))
+
+
 def _decline(language: str | None) -> Decision:
     return Decision(
         text("declined", language), State.S5B_DECLINED, {"offer_declined": True}, why="R-SELL-05"
@@ -468,7 +543,7 @@ def _prepare(
     yes_id: str | None = None,
 ) -> Decision:
     return Decision(
-        text("preparing", language),
+        with_consent(text("preparing", language), language, facts),
         State.S6_PREPARING,
         {
             **extra,
