@@ -165,3 +165,62 @@ async def test_ordinary_talk_that_sounds_rude_about_someone_else_is_just_a_probl
     assert (await state_of(business_db, pi)).flow_state != "X_BLOCKED"
     assert (await business_db.scalars(select(PiStaffRequest))).all() == []
     await pi.close()
+
+
+async def serve(api, trades):
+    response = await api.patch(
+        "/api/v1/pi/settings/response_rules",
+        json={"value": {"brain": {"served_industries": trades}}},
+    )
+    assert response.status_code == 200, response.text
+
+
+async def test_a_regulated_trade_is_declined_once_when_workzap_does_not_serve_it(
+    api, business_db, monkeypatch
+):
+    prompts = adaptive(monkeypatch, neutral)
+    pi = await workspace(api, business_db)
+    await serve(api, [])  # leadership decided: no regulated trade is served
+    await say(pi, "I run a licensed arms and ammunition dealer, stock counts are off", "tr-1")
+    assert (await pi.reply_to("tr-1")).body == (
+        "Workzap doesn't take on work in this area, so I can't help with this one."
+    )
+    assert prompts == []
+    conversation = await state_of(business_db, pi)
+    assert conversation.flow_state == "X_OUT_OF_SCOPE"
+    assert conversation.service_brief["declined_trade"] == "arms"
+    before = len(await replies(business_db))
+    await pi.process("so can you help with my stock counts?", "tr-2")
+    await pi.deliver_all()
+    assert len(await replies(business_db)) == before  # declined once, then quiet
+    unblocked = await api.post(f"/api/v1/pi/brain-moderation/{conversation.id}/unblock")
+    assert unblocked.status_code == 200
+    await business_db.refresh(conversation)
+    assert "declined_trade" not in conversation.service_brief
+    await pi.close()
+
+
+async def test_a_served_regulated_trade_or_an_unset_list_gets_normal_help(
+    api, business_db, monkeypatch
+):
+    adaptive(monkeypatch, neutral)
+    pi = await workspace(api, business_db)
+    # Never set: leadership has not decided, so pi helps as usual.
+    await say(pi, "I run a licensed arms dealer and stock counts are off", "tr-3")
+    assert (await pi.reply_to("tr-3")).body.endswith("Anything else getting in the way?")
+    await serve(api, ["arms"])  # now served on purpose
+    await say(pi, "my arms dealer shop also has staff schedule problems", "tr-4")
+    assert (await pi.reply_to("tr-4")).body == "Noted. Anything else getting in the way?"
+    await pi.close()
+
+
+@pytest.mark.parametrize("bad", [["nonsense"], "arms", [1], {"arms": True}])
+async def test_the_served_list_only_accepts_known_trades(api, business_db, monkeypatch, bad):
+    adaptive(monkeypatch, neutral)
+    pi = await workspace(api, business_db)
+    refused = await api.patch(
+        "/api/v1/pi/settings/response_rules",
+        json={"value": {"brain": {"served_industries": bad}}},
+    )
+    assert refused.status_code >= 400, bad
+    await pi.close()

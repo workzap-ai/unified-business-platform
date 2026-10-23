@@ -610,7 +610,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         if policy.response_rules.get("pi_mode") == "brain":
             from app.modules.pi import safety as moderation
 
-            if moderation.stay_silent(conversation.flow_state, message.body or ""):
+            if moderation.stay_silent(
+                conversation.flow_state, message.body or "", conversation.service_brief
+            ):
                 message.status, message.error_code, event.status = (
                     "skipped",
                     "MODERATION_SILENT",

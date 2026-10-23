@@ -38,6 +38,7 @@ async def unblock(conversation_id: UUID, scope: Scope, session: Session) -> dict
     row.flow_state_since = datetime.now(UTC)
     brief = dict(row.service_brief or {})
     brief.pop("abuse_strikes", None)
+    brief.pop("declined_trade", None)
     row.service_brief = brief
     await record(
         session,

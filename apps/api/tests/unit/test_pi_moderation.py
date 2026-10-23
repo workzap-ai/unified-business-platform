@@ -130,3 +130,53 @@ def test_a_location_pin_keeps_only_the_fact_that_one_was_shared():
         s.redact_pii("meet me at the shop in Johar Town").text
         == "meet me at the shop in Johar Town"
     )
+
+
+@pytest.mark.parametrize(
+    ("said", "trade"),
+    [
+        ("I run a licensed arms and ammunition dealer in Lahore", "arms"),
+        ("we own a vape and tobacco shop", "tobacco"),
+        ("our forex exchange bureau has cash that never matches", "money_services"),
+        ("I run a crypto exchange", "crypto"),
+        ("a licensed alcohol retail store in Dubai", "alcohol"),
+        ("our casino floor staff are always late", "gambling"),
+    ],
+)
+def test_regulated_trades_are_recognised_from_what_the_person_says(said, trade):
+    assert s.regulated_trade(said) == trade
+
+
+@pytest.mark.parametrize(
+    "said",
+    [
+        "I run a pharmacy and stock counts are wrong",
+        "customers pay with crypto sometimes and it is slow",
+        "we sell toy guns and costumes for kids",
+        "the shop sells hardware and paint",
+    ],
+)
+def test_ordinary_businesses_are_not_taken_for_regulated_trades(said):
+    assert s.regulated_trade(said) is None
+
+
+def test_nothing_is_declined_until_leadership_has_set_the_served_list():
+    said = "I run a licensed arms dealer"
+    assert s.not_served(said, None) is None  # never decided: pi helps as usual
+    assert s.not_served(said, []) == "arms"  # decided, and arms is not on the list
+    assert s.not_served(said, ["arms"]) is None  # a served trade
+    assert s.not_served(said, ["tobacco"]) == "arms"
+    assert s.not_served("stock runs out in two shops", []) is None  # not regulated at all
+
+
+def test_the_decline_says_so_politely_and_promises_nothing():
+    assert s.not_served_reply("en") == (
+        "Workzap doesn't take on work in this area, so I can't help with this one."
+    )
+    assert s.not_served_reply("roman_ur")
+
+
+def test_a_declined_trade_stays_silent_until_a_person_clears_it():
+    brief = {"declined_trade": "arms"}
+    assert s.stay_silent("X_OUT_OF_SCOPE", "my stock counts are off", brief)
+    assert not s.stay_silent("X_OUT_OF_SCOPE", "my stock counts are off", {})

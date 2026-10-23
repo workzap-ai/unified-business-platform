@@ -7,6 +7,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from app.modules.pi.brain_config import TUNABLES
 from app.modules.pi.models import PiSettings
 from app.modules.pi.price_policy import PRICE_MODES
+from app.modules.pi.safety import REGULATED_TRADES
 from app.shared.errors import BusinessRuleViolation
 
 
@@ -35,9 +36,12 @@ def validate_section(section: str, value: Any) -> None:
             ensure(value["service_mode"] in {"auto", "service"})
             ensure(value.get("pi_mode", "standard") in {"standard", "brain"})
             brain = value.get("brain", {})  # tunables and the learning switch (spec 9.9)
-            ensure(isinstance(brain, dict) and set(brain) <= {*TUNABLES, "learning_frozen"})
+            flags = {"learning_frozen", "served_industries"}
+            ensure(isinstance(brain, dict) and set(brain) <= {*TUNABLES, *flags})
             ensure(type(brain.get("learning_frozen", True)) is bool)
-            ensure(all(type(v) is int for k, v in brain.items() if k != "learning_frozen"))
+            ensure(all(type(v) is int for k, v in brain.items() if k not in flags))
+            served = brain.get("served_industries", [])  # regulated trades Workzap serves (7.N)
+            ensure(isinstance(served, list) and set(served) <= set(REGULATED_TRADES))
             ensure(value.get("price_disclosure", "") in ("", *PRICE_MODES))
             ensure(value.get("execution_mode", "") in ("", "human_approved", "mixed", "ai_led"))
             ensure(

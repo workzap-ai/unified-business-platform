@@ -1154,6 +1154,8 @@ async def brain_problems(
     noted = await problems.noted_context(session, scope, conversation.customer_id)
     brief = conversation.service_brief or {}
     context: dict[str, Any] = {"noted_problems": noted}
+    served = (policy.response_rules.get("brain") or {}).get("served_industries")
+    context["served_industries"] = served if isinstance(served, list) else None
     context["brain_settings"] = {
         key: brain_config.value(policy.response_rules, key)
         for key in ("summary_trigger", "redisclose_days", "max_clarify")
@@ -1291,6 +1293,14 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
         if step.escalate:
             marks["escalate"] = step.escalate
         return fixed(step.text, move, ["escalate"] if step.escalate else [], marks, "R-ABUSE")
+    if (trade := safety.not_served(text, context.get("served_industries"))) is not None:
+        return fixed(
+            safety.not_served_reply(language),
+            flow.State.X_OUT_OF_SCOPE,
+            [],
+            {"declined_trade": trade},
+            "R-7N",
+        )
     if (who := safety.identity_asked(text, constitution.ASKS_IF_AI)) is not None:
         return fixed(safety.identity_reply(who, language), why="R-DISC")
     if (advice := safety.advice_asked(text)) is not None:

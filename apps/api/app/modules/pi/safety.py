@@ -11,6 +11,7 @@ model, so none of them can be talked out of the rule.
 import re
 from dataclasses import dataclass, field
 from enum import StrEnum
+from typing import Any
 
 # --- where the person is ---------------------------------------------------------------------
 
@@ -963,9 +964,78 @@ def abuse_step(kind: Abuse, strikes: int, language: str | None) -> AbuseStep:
     return AbuseStep(table["calm"], count, None, None)
 
 
-def stay_silent(state: str | None, text: str) -> bool:
-    """Whether pi says nothing at all: a chat a person has to clear (blocked), or more spam and
-    abuse after pi already answered it once."""
+def stay_silent(state: str | None, text: str, brief: dict[str, Any] | None = None) -> bool:
+    """Whether pi says nothing at all: a chat a person has to clear (blocked), more spam and
+    abuse after pi already answered it once, or a trade Workzap does not serve (declined once)."""
     if state == "X_BLOCKED":
         return True
+    if state == "X_OUT_OF_SCOPE" and (brief or {}).get("declined_trade"):
+        return True
     return state == "X_OUT_OF_SCOPE" and abuse_asked(text) is not None
+
+
+# --- regulated and restricted trades: only where Workzap has decided to serve them (spec 7.N) ------
+
+REGULATED_TRADES: dict[str, re.Pattern[str]] = {
+    "tobacco": re.compile(
+        r"\b(?:tobacco|vape|vaping|e-?liquid|cigarettes?|hookah (?:shop|lounge))\b", re.IGNORECASE
+    ),
+    "alcohol": re.compile(
+        r"\b(?:liquor|licensed alcohol|alcohol (?:retail|shop|store)|wine shop|spirits? (?:shop|store))\b",
+        re.IGNORECASE,
+    ),
+    "arms": re.compile(
+        r"\b(?:arms and ammunition|ammunition dealer|arms dealer|gun shop|firearms?|"
+        r"licensed arms|weapons? (?:shop|dealer))\b",
+        re.IGNORECASE,
+    ),
+    "bullion": re.compile(r"\b(?:gold bullion|bullion (?:dealer|trader|shop))\b", re.IGNORECASE),
+    "money_services": re.compile(
+        r"\b(?:money exchange|currency exchange|forex (?:exchange|dealer|bureau|shop)|"
+        r"remittance (?:business|shop|agent)|hawala|money transfer (?:business|shop|agent))\b",
+        re.IGNORECASE,
+    ),
+    "controlled_medicines": re.compile(
+        r"\b(?:controlled medicines?|controlled drugs?|narcotics?|opioids?)\b", re.IGNORECASE
+    ),
+    "gambling": re.compile(
+        r"\b(?:casino|betting (?:shop|business)|gambling|bookmaker|lottery (?:business|shop))\b",
+        re.IGNORECASE,
+    ),
+    "cannabis": re.compile(r"\b(?:cannabis|marijuana|dispensary)\b", re.IGNORECASE),
+    "adult": re.compile(
+        r"\b(?:adult (?:services|store|shop|entertainment)|escort agency)\b", re.IGNORECASE
+    ),
+    "crypto": re.compile(
+        r"\b(?:crypto(?:currency)? exchange|bitcoin exchange|crypto trading (?:platform|business))\b",
+        re.IGNORECASE,
+    ),
+}
+
+NOT_SERVED_TEXT = {
+    "en": "Workzap doesn't take on work in this area, so I can't help with this one.",
+    "roman_ur": "Workzap is shobe mein kaam nahi leta, is liye main is mein madad nahi kar sakta.",
+}
+
+
+def regulated_trade(text: str) -> str | None:
+    """Which regulated trade the message says the person's business is in, if any."""
+    said = " ".join((text or "").split())
+    for trade, pattern in REGULATED_TRADES.items():
+        if pattern.search(said):
+            return trade
+    return None
+
+
+def not_served(text: str, served: list[str] | None) -> str | None:
+    """The regulated trade pi must decline, or None. `served` is the workspace's configured list
+    of served trades; when it was never set (None) leadership has not decided yet and nothing is
+    declined. Once it is set, a regulated trade that is not on it is declined."""
+    if served is None:
+        return None
+    trade = regulated_trade(text)
+    return trade if trade is not None and trade not in served else None
+
+
+def not_served_reply(language: str | None) -> str:
+    return NOT_SERVED_TEXT.get(language or "en", NOT_SERVED_TEXT["en"])
