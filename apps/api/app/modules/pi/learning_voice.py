@@ -44,13 +44,24 @@ SEEDS: dict[str, dict[str, list[str]]] = {
             "That sounds costly.",
             "That's worth sorting.",
             "Got it.",
-        ]
+        ],
+        "roman_ur": [
+            "Ye sach mein masla hai.",
+            "Is mein nuqsan ho sakta hai.",
+            "Is par kaam banta hai.",
+            "Samajh gaya.",
+        ],
     },
     "correct": {
         "en": [
             "You're right, I've changed it.",
             "Fixed, it now says the new wording.",
-        ]
+        ],
+        "roman_ur": [
+            "Aap sahi keh rahe hain, badal diya.",
+            "Theek kar diya, ab naya lafz likha hai.",
+            "Samajh gaya, ab sahi likh diya.",
+        ],
     },
 }
 MIN_USES = 30  # before a variant's rate means anything

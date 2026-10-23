@@ -16,9 +16,9 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import learning_rules
+from app.modules.pi import learning_gate, learning_rules
 from app.modules.pi.experience_models import PiExperience
-from app.modules.pi.learning_models import PiLearningChange, PiLearningExample
+from app.modules.pi.learning_models import PiLearningChange, PiLearningExample, PiLearningLesson
 from app.shared.scope import WorkspaceScope
 
 STALE_AFTER = timedelta(days=56)  # eight weeks without a verdict
@@ -60,13 +60,16 @@ def judge(
     *,
     min_days: int,
     min_uses: int,
+    field: str = "example_ids",
 ) -> tuple[str, dict[str, Any]]:
-    """promote, rollback or continue for one canary, from the experiences since it started."""
-    used = [r for r in window if example_id in (r.example_ids or [])]
+    """promote, rollback or continue for one canary, from the experiences since it started.
+    `field` is the experience column that names what was shown (examples or lessons)."""
+    used = [r for r in window if example_id in (getattr(r, field, None) or [])]
     control = [
         r
         for r in window
         if not r.example_ids
+        and not getattr(r, "lesson_ids", None)
         and r.situation.get("state") == situation.get("state")
         and r.situation.get("language") == situation.get("language")
     ]
@@ -125,6 +128,8 @@ async def evaluate(
             min_days=min_days,
             min_uses=min_uses,
         )
+        if verdict == "promote" and not await learning_gate.allows(session, scope):
+            verdict, evidence["held"] = "continue", "the release gate is failing"
         if verdict == "promote":
             _move(session, scope, example, "active", "canary held up", "promoted", evidence)
             result["promoted"] += 1
@@ -139,6 +144,85 @@ async def evaluate(
             result["stale"] += 1
     await session.flush()
     return result
+
+
+async def evaluate_lessons(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    now: datetime,
+    *,
+    min_days: int,
+    min_uses: int,
+) -> dict[str, int]:
+    """The same canary decision for low-risk lessons (spec 8.5 jobs 8 and 9): a lesson that raises
+    a guardrail is retired at once, one that holds up goes live for everyone."""
+    where = (
+        PiExperience.tenant_id == scope.tenant_id,
+        PiExperience.environment_id == scope.environment_id,
+    )
+    canaries = list(
+        await session.scalars(
+            select(PiLearningLesson).where(
+                PiLearningLesson.tenant_id == scope.tenant_id,
+                PiLearningLesson.environment_id == scope.environment_id,
+                PiLearningLesson.status == "canary",
+            )
+        )
+    )
+    result = {"canaries": len(canaries), "promoted": 0, "rolled_back": 0, "stale": 0}
+    for lesson in canaries:
+        since = lesson.canary_since or lesson.created_at
+        window = list(
+            await session.scalars(
+                select(PiExperience).where(*where, PiExperience.scored_at >= since)
+            )
+        )
+        sit = {k: str(v) for k, v in (lesson.scope or {}).items() if k in ("state", "language")}
+        verdict, evidence = judge(
+            str(lesson.id),
+            sit,
+            window,
+            now - since,
+            min_days=min_days,
+            min_uses=min_uses,
+            field="lesson_ids",
+        )
+        if verdict == "promote" and not await learning_gate.allows(session, scope):
+            verdict, evidence["held"] = "continue", "the release gate is failing"
+        before, outcome, reason = lesson.status, "", ""
+        if verdict == "promote":
+            lesson.status, outcome, reason = "live", "promoted", "canary held up"
+            result["promoted"] += 1
+        elif verdict == "rollback":
+            lesson.status, outcome = "retired", "rolled_back"
+            reason = "guardrail rose: " + ", ".join(map(str, evidence["breached"]))
+            lesson.reason = reason[:300]
+            result["rolled_back"] += 1
+        elif now - since > STALE_AFTER:
+            lesson.status, outcome, reason = "retired", "stale", "no verdict in eight weeks"
+            result["stale"] += 1
+        if outcome:
+            session.add(
+                PiLearningChange(
+                    tenant_id=scope.tenant_id,
+                    environment_id=scope.environment_id,
+                    kind=f"lesson_canary_{outcome}",
+                    target_id=lesson.id,
+                    before={"status": before},
+                    after={"status": lesson.status, "text": lesson.text},
+                    evidence={**evidence, "signature": signature(lesson.text)},
+                    status="rolled_back" if outcome == "rolled_back" else "live",
+                    reason=reason[:300],
+                )
+            )
+    await session.flush()
+    return result
+
+
+def signature(text: str) -> str:
+    """What identifies "the same change" across rollbacks: the text, ignoring case and
+    punctuation (used by the weekly queue's rolled-back-twice rule, spec 8.6)."""
+    return " ".join("".join(c for c in (text or "").lower() if c.isalnum() or c.isspace()).split())
 
 
 def _move(
@@ -162,7 +246,7 @@ def _move(
             target_id=example.id,
             before={"status": before},
             after={"status": status},
-            evidence=dict(evidence),
+            evidence={**evidence, "signature": signature(example.reply_text)},
             status="rolled_back" if outcome == "rolled_back" else "live",
             reason=reason[:300],
         )

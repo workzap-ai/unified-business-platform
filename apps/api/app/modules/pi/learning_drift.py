@@ -1,7 +1,10 @@
 """Drift monitor (pi Brain spec 8.9, eval L13).
 
-Once a week, pi's recent replies are compared with a reference window from the weeks before
-(the "frozen reference pi"). If the style drifted (longer messages, more questions, more emoji,
+Once a week, pi's recent replies are compared with a reference window from the weeks before, and
+with a frozen reference that never moves, so slow creep (a little longer every week) is caught as
+well as a sudden jump. The frozen reference is stored once: the golden conversations' replies set
+the baseline for questions, emoji and language, and the first full week of real replies sets the
+baseline for length. If the style drifted (longer messages, more questions, more emoji,
 more English where the person writes Urdu) learning is frozen, a change is logged and staff are
 told. The freeze stops every automatic change; pi keeps working on the last good versions.
 """
@@ -15,7 +18,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import constitution, learning
+from app.modules.pi import constitution, learning, learning_seed, spec_handbook
 from app.modules.pi.language import detect_language
 from app.modules.pi.learning_models import PiLearningChange
 from app.modules.pi.models import PiConversation, PiMessage, PiSettings
@@ -69,6 +72,79 @@ def drift(reference: Stats, current: Stats) -> list[str]:
     return found
 
 
+REFERENCE_KIND = "drift_reference"
+MIN_GOLDEN = 5
+
+
+def golden_stats() -> Stats:
+    """The style numbers of pi's replies in the golden conversations (spec 10.1)."""
+    rows: list[tuple[str, str]] = []
+    for gid, item in spec_handbook.sections().items():
+        if not (gid.startswith("G") and gid[1:].isdigit()):
+            continue
+        for person, reply in learning_seed.pairs(learning_seed.split_turns(item.get("text", ""))):
+            rows.append((reply, detect_language(person) or "en"))
+    return stats(rows)
+
+
+def drift_from_frozen(golden: Stats, first_window: Stats | None, current: Stats) -> list[str]:
+    """What drifted from the frozen reference: more questions, emoji or English for Roman Urdu
+    people than the golden replies show, or replies longer than the first real week."""
+    found: list[str] = []
+    if current.replies < MIN_REPLIES:
+        return found
+    if golden.replies >= MIN_GOLDEN:
+        if current.many_questions - golden.many_questions > QUESTION_RISE:
+            found.append("more replies with several questions than the frozen reference")
+        if current.emoji - golden.emoji > EMOJI_RISE:
+            found.append("more emoji than the frozen reference")
+        if current.english_to_urdu - golden.english_to_urdu > ENGLISH_RISE:
+            found.append("more English for Roman Urdu people than the frozen reference")
+    if (
+        first_window is not None
+        and first_window.replies >= MIN_REPLIES
+        and learning.drifted([round(current.words)], [round(first_window.words)], LENGTH_LIMIT)
+    ):
+        found.append("replies longer than the frozen reference")
+    return found
+
+
+async def _frozen_reference(
+    session: AsyncSession, scope: WorkspaceScope, current: Stats
+) -> tuple[Stats, Stats | None]:
+    """The stored frozen reference (made once). The first week with enough replies is added to it
+    once, and never changed after."""
+    row = await session.scalar(
+        select(PiLearningChange)
+        .where(
+            PiLearningChange.tenant_id == scope.tenant_id,
+            PiLearningChange.environment_id == scope.environment_id,
+            PiLearningChange.kind == REFERENCE_KIND,
+        )
+        .limit(1)
+    )
+    if row is None:
+        golden = golden_stats()
+        row = PiLearningChange(
+            tenant_id=scope.tenant_id,
+            environment_id=scope.environment_id,
+            kind=REFERENCE_KIND,
+            risk="low",
+            before={},
+            after={},
+            evidence={"golden": golden.__dict__, "first_window": None},
+            status="live",
+            reason="frozen drift reference stored once",
+        )
+        session.add(row)
+    evidence = dict(row.evidence or {})
+    if evidence.get("first_window") is None and current.replies >= MIN_REPLIES:
+        evidence["first_window"] = current.__dict__
+        row.evidence = evidence
+    first = evidence.get("first_window")
+    return Stats(**evidence["golden"]), Stats(**first) if first else None
+
+
 async def _window(
     session: AsyncSession, scope: WorkspaceScope, start: datetime, end: datetime
 ) -> Stats:
@@ -120,6 +196,8 @@ async def check(
         now - timedelta(days=CURRENT_DAYS),
     )
     found = drift(reference, current)
+    golden, first_window = await _frozen_reference(session, scope, current)
+    found += [d for d in drift_from_frozen(golden, first_window, current) if d not in found]
     session.add(
         PiLearningChange(
             tenant_id=scope.tenant_id,

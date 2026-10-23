@@ -20,6 +20,15 @@ async def count(db, model_):
     return await db.scalar(select(func.count()).select_from(model_))
 
 
+async def live_examples(db):
+    """Examples made from real chats (seeds from packs and golden conversations are not)."""
+    return await db.scalar(
+        select(func.count())
+        .select_from(PiLearningExample)
+        .where(PiLearningExample.source == "live")
+    )
+
+
 async def test_the_question_leaderboard_lists_the_seeded_wordings(api, business_db, monkeypatch):
     adaptive(monkeypatch, model)
     pi = await workspace(api, business_db)
@@ -148,7 +157,7 @@ async def test_erasing_a_customer_removes_the_examples_made_from_their_chats(
     first_chat = await pi.conversation()  # the customer the example came from
     await pi.process("stock runs out at my branch", "lr-9", sender=SECOND)
     await deliver_everything(pi, business_db)
-    assert await count(business_db, PiLearningExample) == 1
+    assert await live_examples(business_db) == 1
     assert await count(business_db, PiProblem) == 2
     erased = await api.post(
         f"/api/v1/pi/brain-erasure/{first_chat.customer_id}", json={"confirm": True}
@@ -156,7 +165,7 @@ async def test_erasing_a_customer_removes_the_examples_made_from_their_chats(
     assert erased.status_code == 200, erased.text
     assert erased.json()["removed"]["learning_examples"] == 1
     business_db.expire_all()
-    assert await count(business_db, PiLearningExample) == 0
+    assert await live_examples(business_db) == 0
     assert await count(business_db, PiProblem) == 1  # the other customer's note is untouched
     await pi.close()
 

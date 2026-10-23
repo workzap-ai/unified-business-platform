@@ -15,7 +15,18 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Boolean, DateTime, Float, Index, Integer, Numeric, String, Text, Uuid
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    Float,
+    Index,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    UniqueConstraint,
+    Uuid,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -29,7 +40,9 @@ class PiLearningExample(WorkspaceRow):
         scoped_fk("pi_learning_examples", "message_id", "pi_messages"),
         Index("ix_pi_learning_examples_status", "status", "language"),
     )
-    message_id: Mapped[UUID] = mapped_column(Uuid)  # pi's reply this was made from
+    # pi's reply this was made from; empty for a seed made from a pack or golden conversation
+    message_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    source: Mapped[str] = mapped_column(String(16), default="live", server_default="live")
     situation: Mapped[dict[str, str]] = mapped_column(JSONB, default=dict)
     language: Mapped[str] = mapped_column(String(12), default="en")
     person_text: Mapped[str] = mapped_column(Text, default="")  # redacted
@@ -58,6 +71,8 @@ class PiQuestionArm(WorkspaceRow):
     status: Mapped[str] = mapped_column(String(12), default="testing")
     traffic_cap: Mapped[float] = mapped_column(Float, default=1.0)
     created_by: Mapped[str] = mapped_column(String(12), default="seed")
+    # The industry pack key this wording is for ("" = every industry, spec 8.2 situation key).
+    industry: Mapped[str] = mapped_column(String(80), default="", server_default="")
 
 
 class PiLearningChange(WorkspaceRow):
@@ -108,6 +123,7 @@ class PiLearningLesson(WorkspaceRow):
     decided_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     reason: Mapped[str] = mapped_column(String(300), default="")
     uses: Mapped[int] = mapped_column(Integer, default=0)
+    canary_since: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class PiLearnedPack(WorkspaceRow):
@@ -128,3 +144,29 @@ class PiLearnedPack(WorkspaceRow):
     status: Mapped[str] = mapped_column(String(12), default="draft")
     care_approved: Mapped[bool] = mapped_column(Boolean, default=False)
     decided_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+
+
+class PiReplyAudit(WorkspaceRow):
+    """The full audit stamp of one pi reply (spec 8.9 "Full audit"): which prompt, pack versions,
+    lessons, examples, question wordings and linter result produced it, so any reply can be traced
+    to why pi said it. One row per reply message; holds identifiers only, never text."""
+
+    __tablename__ = "pi_reply_audits"
+    __table_args__ = workspace_args(
+        "pi_reply_audits",
+        scoped_fk("pi_reply_audits", "message_id", "pi_messages"),
+        UniqueConstraint(
+            "tenant_id", "environment_id", "message_id", name="uq_pi_reply_audits_msg"
+        ),
+        Index("ix_pi_reply_audits_created", "created_at"),
+    )
+    message_id: Mapped[UUID] = mapped_column(Uuid)  # pi's reply
+    conversation_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    run_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)  # the pi_agent_runs row
+    prompt_version: Mapped[str] = mapped_column(String(32), default="")
+    pack_versions: Mapped[dict[str, str]] = mapped_column(JSONB, default=dict)
+    lesson_ids: Mapped[list[str]] = mapped_column(JSONB, default=list)
+    example_ids: Mapped[list[str]] = mapped_column(JSONB, default=list)
+    arm_ids: Mapped[list[str]] = mapped_column(JSONB, default=list)
+    linter: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    frozen: Mapped[bool] = mapped_column(Boolean, default=True)

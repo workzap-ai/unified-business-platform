@@ -20,11 +20,13 @@ from app.modules.pi import (
     learning,
     learning_arms,
     learning_bank,
+    learning_gate,
     learning_grader,
     learning_lessons,
     learning_miner,
     learning_nightly,
     learning_packs,
+    learning_review,
     learning_solutions_grow,
     learning_voice,
     taxonomy,
@@ -53,6 +55,7 @@ def _example(e: PiLearningExample) -> dict[str, Any]:
     return {
         "id": e.id,
         "status": e.status,
+        "source": e.source,
         "language": e.language,
         "situation": e.situation,
         "person": e.person_text,
@@ -69,6 +72,7 @@ def _arm(a: PiQuestionArm) -> dict[str, Any]:
     return {
         "id": a.id,
         "slot": a.slot,
+        "industry": a.industry,
         "language": a.language,
         "text": a.text,
         "status": a.status,
@@ -407,6 +411,8 @@ class LessonInput(BaseModel):
     state: str | None = Field(default=None, max_length=32)
     language: str | None = Field(default=None, max_length=12)
     category: str | None = Field(default=None, max_length=40)
+    industry: str | None = Field(default=None, max_length=80)
+    person_type: str | None = Field(default=None, max_length=24)
 
 
 @router.post("/lessons", status_code=201)
@@ -422,6 +428,8 @@ async def teach(data: LessonInput, scope: Scope, session: Session) -> dict[str, 
             "state": data.state or "",
             "language": data.language or "",
             "category": data.category or "",
+            "industry": data.industry or "",
+            "person_type": data.person_type or "",
         },
         scope.user_id,
     )
@@ -611,14 +619,37 @@ async def review_queue(scope: Scope, session: Session) -> dict[str, Any]:
         .order_by(PiLearningChange.created_at.desc())
         .limit(50)
     )
+    twice = await learning_review.rolled_back_twice(session, scope)
+    gate = await learning_gate.last_result(session, scope)
     return {
         "lessons": [_lesson(r) for r in lessons_waiting],
         "packs": [_pack(r) for r in packs_waiting],
+        "rolled_back_twice": twice,
+        "release_gate": (
+            {"status": gate.status, "reason": gate.reason, "at": gate.created_at}
+            if gate is not None
+            else None
+        ),
         "flagged_changes": [
             {"id": c.id, "kind": c.kind, "reason": c.reason, "created_at": c.created_at}
             for c in flagged
         ],
     }
+
+
+@router.post("/queue/rolled-back/looked-at")
+async def looked_at(
+    data: DecisionInput, signature: str, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """A person looked at a change that was rolled back twice: it stops blocking the miner."""
+    await require_pi(session, scope, PERMISSION)
+    ids: list[UUID] = []
+    for item in await learning_review.rolled_back_twice(session, scope):
+        if item["signature"] == signature:
+            ids += item["change_ids"]
+    done = await learning_review.decide(session, scope, ids, scope.user_id)
+    await session.commit()
+    return {"looked_at": done, "reason": data.reason}
 
 
 class LinkDecision(BaseModel):

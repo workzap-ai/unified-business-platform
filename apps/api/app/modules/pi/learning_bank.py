@@ -24,8 +24,11 @@ from app.modules.pi import (
     constitution,
     learning,
     learning_canary,
+    learning_gate,
     learning_grader,
+    learning_review,
     learning_rules,
+    learning_situation,
     safety,
 )
 from app.modules.pi.experience_models import PiExperience
@@ -151,6 +154,7 @@ async def curate(
     seen = select(PiLearningExample.message_id).where(
         PiLearningExample.tenant_id == scope.tenant_id,
         PiLearningExample.environment_id == scope.environment_id,
+        PiLearningExample.message_id.is_not(None),  # a NULL in NOT IN would match nothing
     )
     rows = list(
         await session.scalars(
@@ -222,6 +226,10 @@ async def curate(
                 confidence,
             )
         )
+        if ok and await learning_review.blocked(
+            session, scope, "example", learning_canary.signature(said)
+        ):
+            ok = False  # rolled back twice and not yet looked at (spec 8.6)
         if not ok:
             counts["rejected"] += 1
             continue
@@ -288,6 +296,9 @@ async def activate(
             )
         )
     )
+    held = not await learning_gate.allows(session, scope)  # job 9: nothing starts while it fails
+    if held:
+        ripe = []
     for example in ripe:
         learning_canary.start(example, now)  # a small share of chats first (spec 9.10 rule 3)
         session.add(
@@ -316,7 +327,7 @@ async def activate(
             session.add(_log(scope, "example_retired", example.id, "active", "retired", "balance"))
             retired += 1
     await session.flush()
-    return {"activated": len(ripe), "retired_for_balance": retired}
+    return {"activated": len(ripe), "retired_for_balance": retired, "held_by_gate": int(held)}
 
 
 async def retire_poor(session: AsyncSession, scope: WorkspaceScope) -> int:
@@ -363,17 +374,28 @@ async def retire_poor(session: AsyncSession, scope: WorkspaceScope) -> int:
     return gone
 
 
-def _backoff(state: str, language: str, turn_kind: str) -> list[dict[str, str]]:
-    """Broader and broader situations (spec 8.2): drop the kind of turn, then the state."""
-    return [
-        {"state": state, "language": language, "turn_kind": turn_kind},
-        {"state": state, "language": language},
-        {"language": language},
-    ]
+def _backoff(
+    state: str,
+    language: str,
+    turn_kind: str,
+    industry: str = "",
+    category: str = "",
+    person_type: str = "",
+) -> list[dict[str, str]]:
+    """Broader and broader situations (spec 8.2): drop the person type, the problem category, the
+    kind of turn, the state, then the industry. The language stays in every level."""
+    return learning_situation.backoff(
+        state=state,
+        language=language,
+        turn_kind=turn_kind,
+        industry=industry,
+        category=category,
+        person_type=person_type,
+    )
 
 
 def _matches(example: PiLearningExample, level: dict[str, str]) -> bool:
-    return all(example.situation.get(k) == v for k, v in level.items())
+    return learning_situation.fits(example.situation, level)
 
 
 async def retrieve(
@@ -390,13 +412,19 @@ async def retrieve(
     embedder: Embedder | None = None,
     conversation_id: UUID | str | None = None,
     canary_percent: int = 0,
+    industry: str = "",
+    category: str = "",
+    person_type: str = "",
 ) -> list[PiLearningExample]:
     """The best active examples for this situation (plus canaries, for the canary share of
     conversations): only matching or backed-off situations (eval L1), never from the same person,
-    one per business, ranked by how alike the person's words are, then by reward. Anything that
-    no longer passes the never-learn list is left out."""
+    one per business, ranked by how alike the person's words are, then by reward. An example filed
+    under an industry is shown only for that industry (or, at the last step, its sector); a general
+    one fits everyone. Anything that no longer passes the never-learn list is left out."""
     if state not in LISTENING_STATES:
         return []
+    industry = learning_situation.clean_industry(industry)
+    sector = learning_situation.sector_of(industry)
     active = list(
         await session.scalars(
             select(PiLearningExample).where(
@@ -411,11 +439,14 @@ async def retrieve(
         conversation_id, canary_percent
     )
     active = [e for e in active if e.status == "active" or shown_canary]
-    for level in _backoff(state, language, turn_kind):
+    levels = _backoff(state, language, turn_kind, industry, category, person_type)
+    for number, level in enumerate(levels):
+        last = number == len(levels) - 1
         pool = [
             e
             for e in active
             if _matches(e, level)
+            and learning_situation.industry_allowed(e.situation, industry, sector, sector_ok=last)
             and not (exclude_contact and exclude_contact in (e.source_contacts or []))
             and not learning.never_learn(e.reply_text)
         ]
@@ -429,7 +460,8 @@ async def retrieve(
             alike = similarity(said, e.person_text)
             if vector is not None and e.embedding and len(vector) == len(e.embedding):
                 alike = max(alike, cosine(vector, e.embedding))
-            return alike + 0.05 * min(e.reward, 6)
+            own = 0.15 if industry and e.situation.get("industry") == industry else 0.0
+            return alike + 0.05 * min(e.reward, 6) + own
 
         chosen: list[PiLearningExample] = []
         seen: set[str] = set()

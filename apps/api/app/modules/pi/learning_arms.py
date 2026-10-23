@@ -33,12 +33,12 @@ ORDER = ("scope", "frequency", "impact", "since")
 SEEDS: dict[str, dict[str, list[str]]] = {
     "scope": {
         "en": [
-            "Is it every shop, or only some?",
+            "Is it everywhere in the business, or only in some places?",
             "Where do you notice it most?",
-            "Which shop or team does it hit hardest?",
+            "Which team or place does it hit hardest?",
         ],
         "roman_ur": [
-            "Ye har dukan mein hota hai, ya sirf kuch mein?",
+            "Ye har jagah hota hai, ya sirf kuch jagah?",
             "Ye sab se zyada kahan nazar aata hai?",
         ],
     },
@@ -54,11 +54,11 @@ SEEDS: dict[str, dict[str, list[str]]] = {
     },
     "impact": {
         "en": [
-            "What does it cost you: time, sales, or stress?",
+            "What does it cost you: time, money, or stress?",
             "Roughly how much does it hurt: a little, or a lot?",
         ],
         "roman_ur": [
-            "Is se aap ka kya nuqsan hota hai: waqt, sales, ya pareshani?",
+            "Is se aap ka kya nuqsan hota hai: waqt, paisa, ya pareshani?",
             "Ye kitna nuqsan karta hai: thora, ya bohat?",
         ],
     },
@@ -73,6 +73,18 @@ SEEDS: dict[str, dict[str, list[str]]] = {
         ],
     },
 }
+
+
+# Generic seed wordings that said "shop" for every industry; retired when found (spec 8.2).
+LEGACY_SEEDS = frozenset(
+    {
+        "Is it every shop, or only some?",
+        "Which shop or team does it hit hardest?",
+        "Ye har dukan mein hota hai, ya sirf kuch mein?",
+        "What does it cost you: time, sales, or stress?",
+        "Is se aap ka kya nuqsan hota hai: waqt, sales, ya pareshani?",
+    }
+)
 
 
 def slot_for(missing: list[str]) -> str | None:
@@ -95,6 +107,15 @@ async def ensure_seeded(session: AsyncSession, scope: WorkspaceScope) -> int:
         for a in await session.scalars(select(PiQuestionArm).where(*_scoped(scope)))
     }
     added = 0
+    for row in await session.scalars(
+        select(PiQuestionArm).where(
+            *_scoped(scope),
+            PiQuestionArm.created_by == "seed",
+            PiQuestionArm.status != "retired",
+            PiQuestionArm.text.in_(LEGACY_SEEDS),
+        )
+    ):
+        row.status = "retired"
     for slot, by_language in SEEDS.items():
         for language, texts in by_language.items():
             for text in texts:
@@ -128,9 +149,11 @@ async def choose(
     slot: str,
     language: str,
     rng: random.Random | None = None,
+    industry: str = "",
 ) -> PiQuestionArm | None:
     """Thompson sampling among the live wordings for this slot and language (English when the
-    language has none)."""
+    language has none). Wordings for the person's industry compete with the general ones; a
+    wording for another industry is never used (spec 8.2 situation key)."""
     for lang in dict.fromkeys([language, "en"]):
         rows = list(
             await session.scalars(
@@ -139,6 +162,7 @@ async def choose(
                     PiQuestionArm.slot == slot,
                     PiQuestionArm.language == lang,
                     PiQuestionArm.status != "retired",
+                    PiQuestionArm.industry.in_(("", industry) if industry else ("",)),
                 )
             )
         )
@@ -169,7 +193,13 @@ async def record(
 
 
 async def propose(
-    session: AsyncSession, scope: WorkspaceScope, slot: str, language: str, text: str, by: str
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    slot: str,
+    language: str,
+    text: str,
+    by: str,
+    industry: str = "",
 ) -> tuple[PiQuestionArm | None, list[str]]:
     """A new wording (from staff or a miner). It must pass the never-learn list and be a question;
     it starts as "testing" with 10% of the traffic until it has 50 uses. Returns the arm, or None
@@ -180,6 +210,8 @@ async def propose(
         why.append("unknown question slot")
     if not wording.endswith(("?", "؟")):
         why.append("a question ends with a question mark")
+    if by in ("miner", "pi") and await _was_retired(session, scope, slot, language, wording):
+        why.append("a person retired this wording: the miner does not propose it again (8.6)")
     if why:
         return None, why
     arm = PiQuestionArm(
@@ -191,6 +223,7 @@ async def propose(
         status="testing",
         traffic_cap=0.10,
         created_by=by,
+        industry=industry,
     )
     session.add(arm)
     await session.flush()
@@ -209,6 +242,25 @@ async def propose(
     )
     await session.flush()
     return arm, []
+
+
+def _norm(text: str) -> str:
+    return " ".join("".join(c for c in text.lower() if c.isalnum() or c.isspace()).split())
+
+
+async def _was_retired(
+    session: AsyncSession, scope: WorkspaceScope, slot: str, language: str, wording: str
+) -> bool:
+    """The same wording (ignoring case and punctuation) was already retired in this slot."""
+    gone = await session.scalars(
+        select(PiQuestionArm.text).where(
+            *_scoped(scope),
+            PiQuestionArm.slot == slot,
+            PiQuestionArm.language == language,
+            PiQuestionArm.status == "retired",
+        )
+    )
+    return _norm(wording) in {_norm(t) for t in gone}
 
 
 def was_useful(signals: list[str]) -> bool:
