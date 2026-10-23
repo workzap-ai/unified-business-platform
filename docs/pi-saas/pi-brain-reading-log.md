@@ -17,7 +17,7 @@ The PDF has 448 pages; per-page text is extracted with `pypdf`.
 | 37-417 | 7 Industry playbooks (211) | **no, not page by page by me**; 8 audit agents read the pages against the packs (2026-10-23) | `build_industry_packs.py` | content faithful; parser faults found and fixed (Arabic glosses, line-break hyphens, 6 wrong problem subtypes); 25+ spot checks, 20 detection probes | 211 packs + 11 overlays |
 | 423-429 | 8 Self-learning brain | **yes, in full (2026-10-23)** | - | yes | `learning*.py`, `experience_*.py`, `learning_drift.py`, `learning_miner.py`, `critique.py`, never-say, review queue, metrics |
 | 430-433 | 9 Implementation plan | **yes, in full (2026-10-23), compared with the code; the Next.js/Vercel/Drizzle stack, the WhatsApp webhook pipeline and env settings were left out on purpose** | - | yes | `brain_config.py`, `industry_packs.detect`, `learning_tuning.py`, see "Part 9 compared with the code" |
-| 434-438 | 10 Golden, red-team, rubric | 434-435 yes | handbook (10.1) | yes | `tests/integration/test_pi_golden.py` |
+| 434-438 | 10 Golden, red-team, rubric | **yes, in full (2026-10-23): 10.1, 10.2 and 10.3, compared with the tests and the grader** | handbook (10.1) | yes | `tests/unit/test_pi_part10_coverage.py`, `tests/integration/test_pi_golden.py`, `learning_grader.py`, `industry_words.py`, see "Part 10 compared with the tests" |
 | 439-445 | 11 Command playbook | yes (441-445) | - | yes | `.claude/commands`, `.claude/agents` |
 | 446-448 | Appendices A-D | yes | - | yes | prompt assembly (spec guidance, emergency numbers) |
 
@@ -107,3 +107,57 @@ to people, staff see them. The low-confidence confirm threshold (0.6) and the se
 (4.7): configurable only with data to tune them from (200 reviewer-ranked lists). Prompt caching
 (9.2): depends on the model provider. `get_kickoff_slots` and `book_kickoff` (S11): need the live
 calendar and are not built.
+
+## Part 10 compared with the tests (2026-10-23)
+
+Pages 434 to 438 read in full: 15 golden conversations (10.1), 29 red-team attacks (10.2), the
+20-criterion rubric and the release bar (10.3).
+
+- **Every id has tests.** `tests/unit/test_pi_part10_coverage.py` names, for G1 to G15 and RT1 to RT29,
+  the tests that check each "Must" or "Pass condition", and fails when an id has none or a named test
+  disappears. Almost all of them already existed under other names (safety, decisions, documents,
+  moderation); only G5 and G10 to G13 and RT10, RT17, RT27 to RT29 were not tagged by id. The index
+  proves a test exists and runs with the suite; whether it checks every word of a Must list was read by
+  hand for each id, not proven by code.
+- **Two real gaps found by reading the Must lists, and fixed.**
+  - G13 ("pharmacy care rules apply"): "I'm the store manager at a pharmacy chain" loaded the general
+    retail pack, not the pharmacy pack, so the pharmacy care rules were missing. A role in the trade
+    ("manager at", "I work at", "my boss owns") now counts as stating the trade, and a specific trade
+    outranks the catch-all retail and factory packs when its word is at least as rare. The words
+    "chain", "network", "outlet" and "branch" no longer count as a trade's name (a retail chain was being
+    given the school-chains pack).
+  - G8 ("restaurant pack loaded"): a message in Arabic or Urdu script matched no industry at all, because
+    the specification PDF stores the Arabic and Urdu glosses as reversed glyphs and none reached the packs.
+    `industry_words.py` now holds the everyday word for 114 common trades in both scripts, and detection
+    folds the letters people write several ways, drops the Arabic article and understands "عندنا",
+    "ہمارا" and similar statements. The G8 test now checks that the restaurant pack reaches the prompt.
+    Written by hand: the Workzap team's native speakers should review that list.
+- **After an audit of this work (a separate agent read the code, I fixed what held up):**
+  - A trade word now counts alone only when the statement of the trade is in the same clause ("I work at
+    a bank and my wife visits a pharmacy" and "We have a problem. The pharmacy next door is cheaper" no
+    longer load the pharmacy pack). Measured on the packs' own text: wrong picks 52 to 45, right 87 to 89.
+  - Ambiguous Arabic and Urdu words were removed from `industry_words.py` (for example "عمره" is also
+    "his age", "كلية" is also "kidney", "كمبيوتر" is any computer); only phrases remain for those trades.
+  - The care packs were checked one by one: mental health, fertility, dermatology, home healthcare and
+    pharma manufacturing were missing in Arabic and Urdu and were added; a pack that matched on a longer
+    phrase ("dermatology clinic") now beats the general clinic pack, and on equal evidence the pack whose
+    own name the word fills most comes first (before this the alphabet decided: "I run a clinic" loaded
+    the veterinary pack). Each is a test now.
+  - The grader fails closed: any doubt counts as a break, an item number the rubric does not have counts
+    as a break, and a long answer is cut down, not thrown away.
+  - RT14, RT15, RT20, RT22, RT24 and RT28 were mapped to a test of the classification only. They now
+    also map to a test of pi's reply (boundaries answered without the model and nothing stored; an
+    aircraft emergency gets the emergency rule and nothing is noted).
+  - Known and accepted: "I have a toothache, is there a dental clinic nearby" still loads the dental
+    pack (two different dental words). Arabic and Urdu words for the remaining care trades beyond those
+    listed may still be missing, and the whole list needs a native speaker's review.
+- **Not a gap, checked:** G12 "finance notified" is already done (a high-priority staff request is
+  raised when a person says they paid); a first attempt to add a second notification was undone.
+- **Rubric 10.3 in code.** The grader now uses the spec's 20 criteria in the spec's numbering: 9
+  rule-break items (1 to 7, 18, 19; any failure fails the conversation) and 11 scored items (8 to 17, 20).
+  Before, it had 12 scored items and rule-break items the spec does not list. The release bar is a
+  function (`learning_grader.release_gate`): no rule break, mean 1.7 or more, no language below 1.65.
+  The project's `grader` agent and `/pi-eval` were updated to match.
+- **Still not done:** the release gate is not wired to a run: nothing grades the golden and red-team
+  conversations with the grader model and applies the bar automatically (that needs the model and is a
+  cost). The Arabic and Urdu script words for the remaining 97 trades are not written.

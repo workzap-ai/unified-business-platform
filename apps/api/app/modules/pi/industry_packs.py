@@ -17,6 +17,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from app.modules.pi.industry_words import TRADE_WORDS
+
 PACKS_DIR = Path(__file__).parent / "packs" / "industry"
 MAX_PACKS = 3  # industries per business, primary first
 MIN_SCORE = 4.0  # below this a pack is not evidence enough to load
@@ -37,7 +39,17 @@ STATEMENT = re.compile(
     r"\b(?:i|we)(?:'m|'re| am| are)?\s+(?:\w+\s+){0,2}?"
     r"(?:run|own|have|manage|operate|work in|working in|am in|are in|am an?|are an?)\b"
     r"|\b(?:my|our)\s+(?:\w+\s+){0,2}?(?:business|company|work|shop|firm|factory|clinic|store|farm|school)\b"
+    # a role in the trade counts too: "I'm the store manager at a pharmacy chain" (golden G13)
+    r"|\b(?:i'm|i am|we're|we are)\s+(?:the |a |an )?(?:\w+\s+){0,2}?"
+    r"(?:manager|owner|director|partner|employee|supervisor|accountant)\s+(?:at|of|in|for)\b"
+    r"|\b(?:i|we)\s+(?:work|worked|working)\s+(?:at|in|for)\b"
+    r"|\b(?:my|our)\s+(?:boss|father|brother|family|uncle|partner)\s+(?:\w+\s+){0,2}?"
+    r"(?:own|owns|run|runs|manage|manages)\b"
     r"|\b(?:mera|meri|hamara|hamari|humara|humari)\b"
+    # Arabic and Urdu script: "we have", "I own", "I run", "my", "our", "the business of"
+    r"|\b(?:عندي|عندنا|لدي|لدينا|أملك|املك|نملك|أدير|ادير|ندير|صاحب|مالك)\b"
+    r"|\b(?:میرا|میری|میرے|ہمارا|ہماری|ہمارے)\b|(?:چلاتا|چلاتی|چلاتے)\s+(?:ہوں|ہیں)"
+    r"|\bکا\s+(?:کاروبار|کام)\b"
     r"|\b(?:chalata|chalati|chalate|chalaata)\s+(?:hun|hoon|hain)\b"
     r"|\bka\s+(?:kaam|karobar|business)\b",
     re.IGNORECASE,
@@ -50,7 +62,8 @@ NAME_STOP = frozenset(
     "group club house plant collection delivery distribution production processing management "
     "repair installation operations agents agent providers trade traders sales rental hire "
     "support facility field eid ramadan online payment payments client clients customer "
-    "customers contractor contractors".split()
+    "customers contractor contractors chain chains network networks outlet outlets branch "
+    "branches".split()  # how a business is arranged, not what trade it is
 )
 
 # Question-bank areas are written in plain words; map a problem category to the ones that fit.
@@ -102,9 +115,33 @@ def get_pack(key: str) -> dict[str, Any] | None:
     return load_packs().get(key)
 
 
+# Arabic and Urdu script: one shape for the letters people write several ways, so "مطعم", "المطعم"
+# and the Urdu spelling of the same word meet. Vowel marks and the tatweel are dropped.
+_MARKS = re.compile("[ً-ٰٟۖ-ۜ۟-۪ۤۧۨ-ۭـ]")
+_SCRIPT_FOLD = str.maketrans(
+    {
+        "أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا", "ة": "ه", "ۃ": "ه", "ى": "ي", "ی": "ي",
+        "ے": "ي", "ې": "ي", "ہ": "ه", "ھ": "ه", "ک": "ك", "ں": "ن", "ؤ": "و", "ئ": "ي",
+    }
+)  # fmt: skip
+_ARABIC_LETTER = re.compile("[؀-ۿ]")
+_ARABIC_PREFIXES = ("وال", "بال", "فال", "كال", "لل", "ال")  # "and the", "with the", ..., "the"
+
+
 def _fold(text: str) -> str:
     text = unicodedata.normalize("NFKC", text).lower().replace("’", "'")
+    text = _MARKS.sub("", text).translate(_SCRIPT_FOLD)
     return re.sub(r"[^\w']+", " ", text).replace("'", "").strip()
+
+
+def _arabic_stem(word: str) -> str:
+    """Drop the article and a joining "و" ("والطلبات" -> "طلبات", "ومطعم" -> "مطعم")."""
+    if not _ARABIC_LETTER.search(word):
+        return word
+    for prefix in _ARABIC_PREFIXES:
+        if word.startswith(prefix) and len(word) - len(prefix) >= 3:
+            return word[len(prefix) :]
+    return word[1:] if word.startswith("و") and len(word) >= 5 else word
 
 
 def _stem(word: str) -> str:
@@ -118,17 +155,28 @@ def _stem(word: str) -> str:
 
 
 def _normal(text: str) -> str:
-    return " ".join(_stem(word) for word in _fold(text).split())
+    return " ".join(_stem(_arabic_stem(word)) for word in _fold(text).split())
 
 
 @lru_cache(maxsize=1)
-def _name_words() -> dict[str, set[str]]:
-    """pack key -> the words of its name that identify the trade."""
+def _core_name_words() -> dict[str, set[str]]:
+    """pack key -> the words of its own name that identify the trade."""
     names: dict[str, set[str]] = {}
     for key, pack in load_packs().items():
         plain = re.sub(r"\([^)]*\)", " ", pack["name"])  # "(incl. Eid ...)" is not part of the name
         words = (_stem(w) for w in _fold(plain).split())
         names[key] = {w for w in words if len(w) >= 3 and w not in NAME_STOP}
+    return names
+
+
+@lru_cache(maxsize=1)
+def _name_words() -> dict[str, set[str]]:
+    """pack key -> the words that name the trade: its own name, and the same trade in Arabic and
+    Urdu script (`industry_words`)."""
+    names = {key: set(words) for key, words in _core_name_words().items()}
+    for key, trade_words in TRADE_WORDS.items():
+        if key in names:
+            names[key] |= {n for n in (_normal(w) for w in trade_words) if len(n) >= 3}
     return names
 
 
@@ -180,6 +228,31 @@ def _evidence(text: str) -> dict[str, tuple[float, int, float, str]]:
     return found
 
 
+_CLAUSE_SPLIT = re.compile(r"[.!?؟۔،,;:\n]+|\b(?:and|but|while|aur|lekin|magar)\b", re.IGNORECASE)
+
+
+def _statement_clauses(text: str) -> list[str]:
+    """The folded clauses of `text` (padded with spaces) in which the person states their own
+    trade or role. A statement elsewhere in the message does not vouch for a trade word:
+    "I have a toothache, is there a dental clinic nearby" is not a dental clinic."""
+    found = []
+    for clause in _CLAUSE_SPLIT.split(text):
+        if clause and clause.strip():
+            folded = _normal(clause)
+            # on the folded text too, so vowel marks or a joining "و" do not hide an Arabic one
+            if STATEMENT.search(clause) or STATEMENT.search(folded):
+                found.append(f" {folded} ")
+    return found
+
+
+def _name_share(key: str, normal: str) -> float:
+    """How much of the pack's name the person's words fill: 1.0 when all of its name words are
+    there."""
+    names = _core_name_words()[key]
+    padded = f" {normal} "
+    return len([w for w in names if f" {w} " in padded]) / len(names) if names else 0.0
+
+
 def _possessed(text: str, term: str) -> bool:
     """The person owns the trade word: "our accounting practice", "my pharmacy"."""
     return (
@@ -214,8 +287,15 @@ def detect(
     """
     packs = load_packs()
     joined = " . ".join(texts)
-    stated = STATEMENT.search(joined) is not None
     normal = _normal(joined)
+    statement_clauses = _statement_clauses(joined)
+
+    def stated_for(term: str) -> bool:
+        """The person states their trade or role in the same clause as this trade word."""
+        return bool(term) and (
+            any(f" {term} " in clause for clause in statement_clauses) or _possessed(normal, term)
+        )
+
     evidence = _evidence(joined)
     scores = {key: ev[0] for key, ev in evidence.items()}
     for key in known:
@@ -233,11 +313,39 @@ def detect(
                 ev[1],
                 ev[2],
                 bool(ev[3]),
-                stated or _possessed(normal, ev[3]),
+                stated_for(ev[3]),
             )
         ),
+        # On equal evidence the pack whose name the matched word fills most comes first ("clinic"
+        # is half of "clinics and gp practices", a fifth of the veterinary pack's name); the
+        # alphabet only settles what is still tied.
+        key=lambda r: (round(r[0], 6), _name_share(r[1], normal), r[1]),
         reverse=True,
     )
+    # A pack that matched on a longer phrase beats the pack whose word is only part of that phrase:
+    # "dermatology clinic" is the aesthetic and dermatology pack, not the general clinic. (Without
+    # this the choice between them fell to the alphabet.)
+    trade_term = {key: evidence[key][3].split() for _, key in ranked if evidence[key][3]}
+    ranked = [
+        r
+        for r in ranked
+        if r[1] not in trade_term  # only packs that matched on a trade word can be outranked
+        or not any(
+            other != r[1] and set(trade_term[r[1]]) < set(words)
+            for other, words in trade_term.items()
+        )
+    ]
+    # A catch-all pack matches everyday words ("store", "chain"). When the person states their own
+    # trade or role and the word names a specific trade, that trade comes first: "the store manager
+    # at a pharmacy chain" is a pharmacy (golden G13). Telling problems alone never reorders.
+    common = max((evidence[r[1]][2] for r in ranked if r[1] in GENERIC), default=0.0)
+    if any(
+        r[1] not in GENERIC
+        and stated_for(evidence[r[1]][3])
+        and evidence[r[1]][2] >= common  # a trade word at least as rare as the catch-all's best
+        for r in ranked
+    ):
+        ranked = [r for r in ranked if r[1] not in GENERIC] + [r for r in ranked if r[1] in GENERIC]
     chosen: list[str] = []
     overlays: list[str] = []
     for value, key in ranked:
