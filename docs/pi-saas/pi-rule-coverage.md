@@ -165,7 +165,26 @@ migration 0043, `docs/pi-saas/migrations-0043.sql`, and learning not frozen for 
 | Part 3.7 | Versions `solutions/{industry}@1.N`, per-industry rollback | `solution_versions.py`, `POST /pi/solutions/{industry}/rollback` |
 | R-PRIV-07 | Evidence and regression cases hold redacted text only; erasing a customer removes solution memory and feedback | `solution_rules.redacted`, `brain_erase.py` |
 
-Open: Part 1 (the reply linter checks RVAL01 to 07 and RBUILD01 to 06 on the model's reply, the "how
-exactly?" handling and the free-rider signal) is not built; until it is, the two-idea limit is
-enforced by what pi is handed, not by checking what pi wrote. The Solutions panel in the web app
-(API is ready) and build-fit confirmation from delivered projects are not built either.
+Open: the Solutions panel in the web app (the API is ready) and build-fit confirmation from delivered
+projects are not built. Part 1 is built for the live chat in the next section.
+
+## The value line in the live chat (Addendum 2, Part 1)
+
+Same flag as above (`response_rules.brain.solution_mode`, and learning not frozen, because the ideas are
+handed over by the learning context). Off, nothing here changes: pi listens until the offer.
+
+| Rule | What is enforced | Where |
+|---|---|---|
+| Part 1.6, G4 | Someone who asks for a fix gets the ideas in that reply, even while pi is still listening (S1 to S3); a cost question is not a request | `solution_ask.asked_for_ideas`, the `asked` gate in `solution_context._build` |
+| R-SELL-01 (relaxed) | Pitch and document words are allowed only in a reply that was asked for (`solution_asked`) or answers "how exactly?" (`solution_howto`); R-VAL-01 stays hard | `constitution.lint` |
+| Part 1.4 | "How exactly?", "step by step", "which app?": the detail is the solution document, named by the entry's `free_stops`; no steps (R-VAL-04), no app recommended (R-VAL-05) | `solution_ask.covers`, prompt block `BRAIN_ASK`, `constitution._value_line` |
+| Part 1.4, R-OFFER-01 | The application adds the offer after such a reply and moves the chat to S5; the model never makes it, so a later "haan" is the explicit-yes gate | `service_conversation.brain_offer` |
+| Part 1.5 | `signal.possible_free_rider` after three "how exactly?", two declines or a client/agency mention: stored in the brief and logged, pi's tone never changes | `solution_ask.free_rider`, `note_problems` |
+| R-BUILD-03, 04 | The Workzap line once per problem, a bridge opener not repeated in a chat, "automatically" once | `solution_ask.bridge`, `constitution._value_line` (soft: the draft is sent back once, and if it repeats it is sent) |
+| R-BUILD-01, 05, 06 | No tool words unless the person used them; at most two builds in a message; "would", never "will" | `constitution._value_line` (soft, as above) |
+| R-SELL-01, R-OFFER-03, R-OFFER-05 (hard) | Even a reply that was asked for may not pitch nori or a product, recommend, mention a quote or make the offer itself, or name an amount | `constitution._given_turn_limits` |
+| Part 4 | 211 industries, 2103 problems, two quick ideas each, parsed and validated (nothing invented); view-first builds capped and re-ranked where an action is listed | `scripts/build_industry_solutions.py`, `packs/solutions/` |
+
+Open: R-BUILD-02 "actions before views" is applied to the data, but 27 industries still lead with a view
+build for more than one problem in four (reported by the builder, not rewritten); sector neighbours and the
+generic Addendum 1 library (Part 2.1 steps 3 and 4) are not in the repository.

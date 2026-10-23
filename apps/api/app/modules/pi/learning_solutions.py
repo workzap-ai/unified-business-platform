@@ -137,7 +137,11 @@ async def settle(
     reaction = None
     # At the readiness step pi asks about the solution document: a "yes" or "makes sense" there
     # answers the offer, not the ideas, and an offer never scores (Part 3.2).
-    asked_offer = stamp.get("state") == "S5_READINESS" or "document" in (reply.body or "").lower()
+    asked_offer = (
+        stamp.get("state") == "S5_READINESS"
+        or bool(stamp.get("offer_appended"))
+        or "document" in (reply.body or "").lower()
+    )
     for message_id, text in [] if asked_offer else nexts:
         reaction = solution_score.classify(text)
         if reaction is not None:

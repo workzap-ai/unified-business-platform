@@ -194,3 +194,11 @@ def ideas(industry_key: str, problem: dict[str, Any]) -> list[Idea]:
         Idea(f"{industry_key}:{problem['id']}:q{n}", industry_key, problem["id"], text)
         for n, text in enumerate(problem.get("quick_ideas") or [], start=1)
     ]
+
+
+def never_say(industry_keys: list[str]) -> list[str]:
+    """What must never be said in these industries (Part 2.2), for the prompt and the reviewers."""
+    lines: list[str] = []
+    for key in industry_keys:
+        lines += (load(key) or {}).get("never_say", [])
+    return lines

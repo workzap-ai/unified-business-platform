@@ -35,6 +35,7 @@ from app.modules.pi import (
     price_policy,
     problems,
     safety,
+    solution_ask,
     solution_context,
     spec_handbook,
     style,
@@ -961,10 +962,40 @@ Script and company facts (pi_mode "brain"; these override the shared rules above
 """
 
 
+BRAIN_ASK = """
+They asked for a fix, or for the detail (Addendum 2, the value line; this overrides the lines above
+about asking directly for a fix for THIS reply). The one question of this reply is the offer the
+application adds after it, so you ask none.
+- solution_asked is true: they asked for a solution. Say yes plainly first ("Theek hai, seedha
+  solution." / "Sure."), then give the solution_ideas as a short numbered list: at most two, one
+  line each (what plus why, about 25 words), in your own words and their language. No steps, no
+  settings, no wording to copy, no app or tool to use, no numbers, never a third idea even if they
+  ask for more. Never say you were handed them.
+- solution_build is the Workzap line, said as what the owner would notice (who gets what, when).
+  If it has refer_back, say in a few words that it is the same one as before, or leave it out. Else
+  say it once, after the ideas, as: opener + says (the opener may be empty). Say "Workzap would" or
+  "could", never "will". Do not use the words dashboard, system, software, platform, ERP, module,
+  automation, integration, CRM, portal, analytics or app unless the person used them first, and say
+  "automatically" or "khud-ba-khud" at most once in the whole chat.
+- Ask no question in this reply and do not make the offer yourself: the application adds the
+  offer for a solution document and a quote right after your reply. End on the Workzap line.
+- solution_howto is present: they asked "how exactly?", "step by step" or "which app?". Say plainly
+  that the detail is in the solution document and name what it covers (solution_howto.covers, two
+  or three things, in your own words); no steps, no tool, no template. If which_app is true say you
+  do not recommend specific apps and that Workzap would set the whole thing up for them. Never
+  apologise for not giving more, never make them feel stingy. No question: the application adds
+  the offer.
+- solution_never_say (when present) are things never to say in this industry.
+"""
+
+
 def system_for(context: dict[str, Any]) -> str:
     """The prompt: the shared rules, plus the brain rules in brain mode."""
     if context.get("pi_mode") == "brain":
-        return SYSTEM + BRAIN_PROBLEMS + BRAIN_DECISIONS + BRAIN_VOICE
+        asked = context.get("solution_asked") or "solution_howto" in context
+        return (
+            SYSTEM + BRAIN_PROBLEMS + BRAIN_DECISIONS + BRAIN_VOICE + (BRAIN_ASK if asked else "")
+        )
     return SYSTEM
 
 
@@ -1515,8 +1546,11 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     said = str(context.get("latest_customer_message", ""))
     quiet = int(context.get("quiet_replies") or 0)
     quiet_limit = int((context.get("brain_settings") or {}).get("quiet_before_summary") or 2)
-    if not problems.summary_due(said, len(items), since, trigger, quiet, quiet_limit):
+    why = problems.summary_due(said, len(items), since, trigger, quiet, quiet_limit)
+    if not why:
         return
+    if context.get("solution_asked") or "solution_howto" in context:
+        return  # solution mode: they asked for a fix, so they get the ideas (Part 1.6)
     language = str(context.get("reply_language") or "en")
     turn.reply = problems.summary_message(items, language)
     if decisions.cost_asked(said):  # answer the cost question first, then the summary
@@ -1525,6 +1559,26 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     context["fixed_lines"] = [ln for ln in turn.reply.splitlines() if any(c.isdigit() for c in ln)]
     turn.awaiting_customer = True
     turn._summary = True
+
+
+def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """After free ideas on request, or a "how exactly?" answer, the application makes the offer
+    itself and moves the chat to S5 (Part 1.4 and 1.6), so a later "haan" goes through the
+    explicit-yes gate. The model never writes the offer."""
+    if turn._summary or turn._decision is not None:
+        return
+    if not (context.get("solution_asked") or "solution_howto" in context):
+        return
+    state = (context.get("flow") or {}).get("state")
+    created = [op for op in turn.problem_ops if op.op == "create"]
+    if state not in solution_ask.OFFERABLE or not (context.get("noted_problems") or created):
+        return
+    language = str(context.get("reply_language") or "en")
+    turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language)}"
+    turn.awaiting_customer = True
+    turn._decision = decisions.Decision(
+        None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
+    )
 
 
 def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -1573,6 +1627,8 @@ async def apply_decision(
     brief: dict[str, Any],
 ) -> None:
     """Record a decision: brief changes (None removes a key) and what must happen next."""
+    if decision.brief.get("offer_declined"):
+        brief["declines"] = int(brief.get("declines") or 0) + 1
     for key, value in decision.brief.items():
         if value is None:
             brief.pop(key, None)
@@ -1738,6 +1794,12 @@ async def note_problems(
         brief["summary_count"] = len(await book.active())
     if turn._asked_shape:
         brief["industry_asked"] = True
+    if solution_ask.free_rider(brief, message.body or "") and not brief.get("free_rider"):
+        brief["free_rider"] = True  # signal.possible_free_rider: dashboard only (Part 1.5)
+        logger.info(
+            "pi_signal",
+            extra={"signal": "possible_free_rider", "conversation_id": str(conversation.id)},
+        )
     if turn._decision is not None:
         await apply_decision(session, scope, conversation, turn._decision, brief)
     if brief != (conversation.service_brief or {}):
@@ -1813,6 +1875,7 @@ def industry_context(customer: Any, texts: list[str], max_chars: int = 9000) -> 
     names = [industry_packs.get_pack(k)["name"] for k in [*found.industries, *found.overlays]]  # type: ignore[index]
     return {
         "industry": names,
+        "industry_keys": list(found.industries),
         "industry_knowledge": industry_packs.prompt_section(found, budget=max_chars),
     }
 
@@ -2000,7 +2063,11 @@ async def prepare_context(
         "returning_customer": returning,
         "approved_knowledge": knowledge,
         "operator_guidance": version.instructions if version else "",
-        "brief": conversation.service_brief,
+        "brief": {
+            k: v
+            for k, v in (conversation.service_brief or {}).items()
+            if k not in ("free_rider", "howto_asked", "declines")
+        },
         "conversation_summary": conversation.summary or "",
         "history": [
             {
@@ -3701,6 +3768,7 @@ async def compose_service_turn(
         turn.projects = []
         brain_summary(turn, context)
         brain_decision(turn, context)
+        brain_offer(turn, context)
     if expected in NAMES and mixed_line(turn.reply, str(expected)):
         turn.reply = await in_one_language(
             manager, scope, policy, conversation, turn.reply, str(expected)

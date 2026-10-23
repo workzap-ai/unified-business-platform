@@ -20,6 +20,7 @@ from app.modules.pi import (
     flow,
     learning_bank,
     learning_rules,
+    solution_ask,
     solution_ideas,
     solutions,
     value_line,
@@ -93,9 +94,12 @@ async def _build(
         if back is not None:
             conversation.service_brief = {**brief, "solution_followup_done": True}
             return {"solution_followup": back}
-    if (conversation.flow_state or "") not in GIVING or not noted:
-        return {}
-    if given_so_far(conversation) >= value_line.IDEAS_BEFORE_OFFER:
+    # Part 1.6: someone who asks for a fix gets the ideas in that reply, even while pi is still
+    # listening; Part 1.4: "how exactly?" gets the offer and what the document covers.
+    asked = solution_ask.asked_for_ideas(said)
+    howto = solution_ask.asked_howto(said)
+    state = conversation.flow_state or ""
+    if not noted or not (state in GIVING or ((asked or howto) and state in solution_ask.ASKABLE)):
         return {}
     latest = noted[-1]
     problem = solution_ideas.match_problem(
@@ -104,6 +108,23 @@ async def _build(
         "",
         str(latest.get("title") or ""),
     )
+    offerable = (conversation.flow_state or "") in solution_ask.OFFERABLE
+    if howto:
+        brief = dict(conversation.service_brief or {})
+        line = solution_ask.bridge(brief, problem, language)
+        brief = solution_ask.remember_bridge(brief, line)
+        brief["howto_asked"] = int(brief.get("howto_asked") or 0) + 1
+        conversation.service_brief = brief
+        return {
+            "solution_howto": {
+                "covers": solution_ask.covers(problem),
+                "which_app": solution_ask.asked_which_app(said),
+            },
+            "solution_build": solution_ask.public(line),
+            "solution_never_say": solutions.never_say([industry])[:6],
+        }
+    if given_so_far(conversation) >= value_line.IDEAS_BEFORE_OFFER:
+        return {}
     if problem is None:
         words = " ".join(str(latest.get("title") or "").lower().split()[:8])
         if words and learning_bank.redaction_confidence(words) >= learning_rules.PROMOTE_REDACTION:
@@ -136,8 +157,24 @@ async def _build(
         now=now or datetime.now(UTC),
     )
     used["recorded"] = True
-    conversation.service_brief = {
-        **(conversation.service_brief or {}),
-        "ideas_given": given_so_far(conversation) + len(choice.arms),
-    }
-    return {"solution_ideas": [a.text for a in choice.arms]}
+    line = (
+        solution_ask.bridge(dict(conversation.service_brief or {}), problem, language)
+        if asked
+        else None
+    )
+    conversation.service_brief = solution_ask.remember_bridge(
+        {
+            **(conversation.service_brief or {}),
+            "ideas_given": given_so_far(conversation) + len(choice.arms),
+        },
+        line,
+    )
+    out: dict[str, Any] = {"solution_ideas": [a.text for a in choice.arms]}
+    if asked:
+        out["solution_never_say"] = solutions.never_say([industry])[:6]
+    if line:
+        out["solution_build"] = solution_ask.public(line)
+    if asked:
+        out["solution_asked"] = True
+        used["offer_appended"] = offerable  # settle never scores a turn that carries the offer
+    return out

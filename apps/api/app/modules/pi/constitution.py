@@ -298,6 +298,103 @@ def _relists(reply: str, context: dict[str, Any]) -> bool:
     )
 
 
+# A reply that was asked for may carry the ideas, the Workzap line and, for "how exactly?", the
+# solution document. It may not pitch a product, recommend, offer a quote itself (the application
+# adds the offer) or name an amount: those stay hard.
+GIVEN_PITCH = re.compile(
+    r"\bnori\b|\bour (?:product|products|service|services|software|platform|system|app)\b"
+    r"|\bI(?:'d| would) recommend\b",
+    re.IGNORECASE,
+)
+GIVEN_OFFER = re.compile(r"\bquotes?\b|\bquotation\b|\bproposals?\b", re.IGNORECASE)
+SOLUTION_DOCUMENT = re.compile(r"\bsolution documents?\b", re.IGNORECASE)
+AMOUNT_WORDS = re.compile(
+    r"\b\d[\d,.]*\s*(?:k|lakh|lac|crore|rupees?|dollars?|dirhams?|usd|pkr|aed)\b"
+    r"|\b(?:rupees|dollars|dirhams|lakhs?|crores?)\b",
+    re.IGNORECASE,
+)
+WORKZAP_WILL = re.compile(r"\bWorkzap will\b|\bho jayega\b", re.IGNORECASE)
+VALUE_LINE_RULES = (
+    ("more than two", "R-VAL-01"),
+    ("how-to", "R-VAL-04"),
+    ("tool words", "R-BUILD-01"),
+    ("automatically", "R-BUILD-04"),
+    ("personal data", "R-PRIV-07"),
+    ("claim", "R-PROM-01"),
+)
+
+
+def _given_turn_limits(reply: str, context: dict[str, Any], add: Any) -> None:
+    """What a reply to a request for a fix or for the detail still may not say."""
+    if GIVEN_PITCH.search(reply):
+        add(
+            Violation(
+                "R-SELL-01",
+                "no product, no nori, no recommendation: only the ideas "
+                "and what Workzap would do for them",
+                True,
+            )
+        )
+    if GIVEN_OFFER.search(reply) or (
+        context.get("solution_asked") and SOLUTION_DOCUMENT.search(reply)
+    ):
+        add(
+            Violation(
+                "R-OFFER-03",
+                "do not make the offer or mention a quote yourself: the "
+                "application adds the offer after your reply",
+                True,
+            )
+        )
+    if AMOUNT_WORDS.search(reply):
+        add(Violation("R-OFFER-05", "never an amount, a range or a price before the quote", True))
+    if WORKZAP_WILL.search(reply):
+        add(Violation("R-BUILD-06", '"would" or "could", never "will": no promised results'))
+
+
+def _value_line(reply: str, context: dict[str, Any], add: Any) -> None:
+    """Addendum 2, 1.4 and 1.9: a "how exactly?" answer names what the document covers and gives no
+    steps or app; a Workzap line never repeats its opener or "automatically" within a chat."""
+    from app.modules.pi import solution_rules, solutions  # local: they import this module's users
+
+    said = _customer_words(context)
+    howto = context.get("solution_howto")
+    if howto:
+        for why in solution_rules.check_sample_reply(reply, said):
+            rule = next((r for key, r in VALUE_LINE_RULES if key in why), "R-VAL-04")
+            add(Violation(rule, f"how exactly: {why}", True))
+        if howto.get("which_app") and solution_rules.VENDOR.search(reply):
+            add(
+                Violation(
+                    "R-VAL-05", "do not recommend an app: the whole set-up is the build", True
+                )
+            )
+    earlier = " ".join(_pi_replies(context)).lower()
+    if solutions.AUTOMATIC.search(reply) and solutions.AUTOMATIC.search(earlier):
+        add(Violation("R-BUILD-04", 'say "automatically" at most once in a conversation'))
+    lowered = reply.lower()
+    for opener in solutions.BRIDGE_OPENERS:
+        for line in (opener["en"], opener["roman_ur"]):
+            if line and line.lower() in lowered and line.lower() in earlier:
+                add(Violation("R-BUILD-04", "that bridge opener was already used in this chat"))
+    tools = solutions.banned_tool_words(reply, said)
+    if tools:
+        add(
+            Violation(
+                "R-BUILD-01", f"say what they would notice, not the tool ({', '.join(tools)})"
+            )
+        )
+    phrases = {
+        line.lower()
+        for entry in solutions.CATALOGUE.values()
+        for line in (entry["en"], entry["roman_ur"])
+    }
+    if sum(1 for phrase in phrases if phrase in lowered) > 2:
+        add(
+            Violation("R-BUILD-05", "one build in a message, two at most, never a list of features")
+        )
+
+
 def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
     """Every constitution or voice rule the draft breaks (empty when it is fine to send)."""
     found: list[Violation] = []
@@ -362,7 +459,13 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         add(Violation("R-SELL-03", "no urgency, scarcity or discounts to move a decision", True))
     if state in flow.NO_OFFER:
         requested = bool(ASKED_FOR_HELP.search(str(context.get("latest_customer_message", ""))))
-        if PITCH_WORDS.search(reply) or (OFFER_WORDS.search(reply) and not requested):
+        # Solution mode (Addendum 2, 1.4 and 1.6): they asked for a fix or for the detail, so
+        # this reply may carry the ideas, the Workzap line and the document. The value-line
+        # checks below still apply.
+        given = bool(context.get("solution_asked")) or "solution_howto" in context
+        if given:
+            _given_turn_limits(reply, context, add)
+        elif PITCH_WORDS.search(reply) or (OFFER_WORDS.search(reply) and not requested):
             add(
                 Violation(
                     "R-SELL-01",
@@ -372,6 +475,9 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                     True,
                 )
             )
+
+    if "solution_howto" in context or context.get("solution_asked"):
+        _value_line(reply, context, add)
 
     # Honesty (R-HONEST, R-PROM)
     if _promise_hits(reply):
