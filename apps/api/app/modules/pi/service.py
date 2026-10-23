@@ -10,6 +10,7 @@ from app.modules.audit.service import record
 from app.modules.customers.models import Customer
 from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
+from app.modules.pi import flow
 from app.modules.pi.models import (
     PiAgentRun,
     PiConversation,
@@ -270,6 +271,7 @@ class PiService:
         await self.require("pi.handoffs.manage")
         conversation = await self.conversations.get(conversation_id, for_update=True)
         conversation.mode = "human"
+        flow.hand_to_human(conversation)
         conversation.followup_due_at = None
         await self.cancel_pending(conversation.id)
         existing = await self.handoffs.find(
@@ -317,6 +319,7 @@ class PiService:
         elif action == "takeover":
             # Durable flag: the pipeline, tools, sender and sweeper all check it.
             conversation.mode = "human"
+            flow.hand_to_human(conversation)
             conversation.followup_due_at = None
             conversation.assigned_user_id = self.scope.user_id
             await self.cancel_pending(conversation.id)
@@ -344,6 +347,7 @@ class PiService:
                     details={"via": "return-to-ai"},
                 )
             conversation.mode = "ai"
+            flow.hand_back(conversation)
             conversation.assigned_user_id = None
         await self.session.flush()
         await record(
@@ -435,6 +439,7 @@ class PiService:
             handoff.started_at = now
             conversation = await self.conversations.get(handoff.conversation_id, for_update=True)
             conversation.mode = "human"
+            flow.hand_to_human(conversation)
             conversation.assigned_user_id = handoff.assigned_user_id
         if action == "resolve":
             if not note.strip():
@@ -452,6 +457,7 @@ class PiService:
             if other:
                 raise BusinessRuleViolation("HANDOFF_OPEN", "An active handoff already exists")
             conversation.mode = "human"
+            flow.hand_to_human(conversation)
             handoff.resolved_at = handoff.closed_at = None
         handoff.status = target
         await self.session.flush()

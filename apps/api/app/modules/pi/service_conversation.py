@@ -1245,6 +1245,10 @@ ESCALATION_TEXT = {
         "COMPLAINT about pi or Workzap: pi thanked them and passed it on, and noted it as "
         "feedback, not as a business problem. Please follow up."
     ),
+    "refund_dispute": (
+        "REFUND or DISPUTE: the customer asks Workzap for a refund or disputes a payment. pi "
+        "decided nothing and promised nothing. Please reply to them and note the outcome."
+    ),
     "abuse": (
         "ABUSE: the customer has been abusive. pi stayed calm and has stopped answering until a "
         "person decides (Documents and payments is not the place: use the unblock action)."
@@ -1259,6 +1263,7 @@ BOUNDARY_EFFECTS: dict[safety.Boundary, tuple[list[str], dict[str, Any]]] = {
     safety.Boundary.DELETION: (["deletion_request"], {}),
     safety.Boundary.BANK_CHANGE: (["escalate"], {"escalate": "payment_detail_change"}),
     safety.Boundary.COMPLAINT: (["escalate"], {"escalate": "complaint"}),
+    safety.Boundary.REFUND: (["escalate"], {"escalate": "refund_dispute"}),
 }
 
 

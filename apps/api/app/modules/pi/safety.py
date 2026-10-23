@@ -555,9 +555,23 @@ class Boundary(StrEnum):
     OFF_TOPIC = "off_topic"
     COMPLAINT = "complaint"
     ILLEGAL = "illegal"
+    REFUND = "refund"
 
 
 BOUNDARY_PATTERNS: tuple[tuple[Boundary, re.Pattern[str]], ...] = (
+    (
+        # A refund or dispute with Workzap itself (R-PAY-07), not refunds in the person's own
+        # business, which are a problem to note.
+        Boundary.REFUND,
+        re.compile(
+            r"\b(?:i (?:want|need|demand|would like) (?:a |my |the )?(?:refund|money back)"
+            r"|(?:give|send) (?:me )?(?:a |my )?(?:refund|money back)"
+            r"|refund (?:me|my (?:money|payment|transfer))"
+            r"|(?:dispute|contest) (?:the |this |my )?(?:payment|charge|invoice|transfer)"
+            r"|charge ?back|apne paise wapis|paise wapis (?:do|karo|chahiye)|refund chahiye)\b",
+            re.IGNORECASE,
+        ),
+    ),
     (
         # A complaint about pi or Workzap (not about a cashier or a supplier): R-COMPL-01.
         Boundary.COMPLAINT,
@@ -670,6 +684,7 @@ BOUNDARY_TEXT = {
         Boundary.OFF_TOPIC: "That's outside what I'm for. I'm here to note what's getting in the way of your business. What's the biggest thing right now?",
         Boundary.COMPLAINT: "Thanks for telling me. I've passed this to the Workzap team.",
         Boundary.ILLEGAL: "I can't help with that. I'm here for problems in your business.",
+        Boundary.REFUND: "I can't decide refunds or payment disputes. I've passed this to the Workzap team with your message, and they'll reply here.",
     },
     "roman_ur": {
         Boundary.DELETION: "Aap ka data delete karne ki darkhwast maine Workzap ki team ko bhej di hai. Wo yahan tasdeeq kar dein ge, aur tab tak main kuch naya note nahi karunga.",
@@ -682,6 +697,7 @@ BOUNDARY_TEXT = {
         Boundary.OFF_TOPIC: "Ye mere dayre se bahar hai. Main aap ke business mein rukawat note karne ke liye hoon. Abhi sab se bada masla kya hai?",
         Boundary.COMPLAINT: "Batane ka shukriya. Maine ye Workzap ki team tak pahuncha diya hai.",
         Boundary.ILLEGAL: "Main is mein madad nahi kar sakta. Main aap ke business ke masail ke liye hoon.",
+        Boundary.REFUND: "Refund ya payment ke jhagde ka faisla main nahi kar sakta. Maine ye Workzap ki team ko aap ke paigham ke saath bhej diya hai, wo yahin jawab dein ge.",
     },
 }
 

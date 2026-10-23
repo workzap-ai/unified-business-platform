@@ -6,6 +6,7 @@ raises. Only conversations of a workspace with response_rules.pi_mode = "brain" 
 """
 
 from collections.abc import Mapping
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
@@ -132,6 +133,30 @@ def parse(value: str | None) -> State | None:
         return State(value) if value else None
     except ValueError:
         return None
+
+
+def hand_to_human(conversation: Any) -> None:
+    """A person took the chat over (R-DISC-04): remember the state and sit in X_HUMAN. Chats that
+    never entered brain mode have no state and are left alone."""
+    state = parse(conversation.flow_state)
+    if state is None or state == State.X_HUMAN:
+        return
+    brief = dict(conversation.service_brief or {})
+    brief["resume_state"] = state.value
+    conversation.service_brief = brief
+    conversation.flow_state = State.X_HUMAN.value
+    conversation.flow_state_since = datetime.now(UTC)
+
+
+def hand_back(conversation: Any) -> None:
+    """The chat went back to pi: return to the state it was in (listening if unknown)."""
+    if parse(conversation.flow_state) != State.X_HUMAN:
+        return
+    brief = dict(conversation.service_brief or {})
+    back = parse(brief.pop("resume_state", None)) or State.S1_LISTENING
+    conversation.service_brief = brief
+    conversation.flow_state = back.value
+    conversation.flow_state_since = datetime.now(UTC)
 
 
 def can_move(source: State, target: State) -> bool:

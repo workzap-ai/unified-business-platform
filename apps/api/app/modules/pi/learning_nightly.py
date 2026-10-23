@@ -21,6 +21,7 @@ from app.modules.pi import (
     learning_arms,
     learning_bank,
     learning_canary,
+    learning_lexicon,
     learning_packs,
 )
 from app.modules.pi.learning_embed import Embedder
@@ -90,6 +91,7 @@ async def run_workspace(
             session, scope, pack_writer(scope) if pack_writer else None, now
         )
         digest["packs"]["went_live"] = await learning_packs.promote_shadows(session, scope, now)
+        digest["vocabulary"] = await learning_lexicon.learn(session, scope)
         digest["arms"] = await learning_arms.learn_from(session, scope, since)
         digest["health"] = await experience_scorer.health(session, now - timedelta(days=1), scope)
     run.digest = digest

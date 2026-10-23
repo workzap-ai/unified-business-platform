@@ -15,6 +15,10 @@ from app.modules.pi.service_conversation import greeting_reply, welcome_back
         ("help me with my homework", s.Boundary.OFF_TOPIC),
         ("tell me a joke", s.Boundary.OFF_TOPIC),
         ("write me a poem about tea", s.Boundary.OFF_TOPIC),
+        ("I want a refund for the payment I made", s.Boundary.REFUND),  # R-PAY-07
+        ("please refund my money, this is not what I paid for", s.Boundary.REFUND),
+        ("I will dispute the payment with my bank", s.Boundary.REFUND),
+        ("mujhe apne paise wapis chahiye", s.Boundary.REFUND),
     ],
 )
 def test_bank_change_and_off_topic(said, kind):
@@ -45,6 +49,8 @@ def test_enquiries_that_are_not_problems(said, kind):
         "demo stock is mixed with real stock",
         "staff leave without telling us",
         "the bank changed our account number and reconciliation is a mess",
+        "customers ask for a refund and we cannot track them",
+        "refunds take too long at our counter",
     ],
 )
 def test_ordinary_business_talk_is_not_an_enquiry_or_a_bank_change(said):
