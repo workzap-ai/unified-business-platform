@@ -330,8 +330,8 @@ async def test_pi_stays_quiet_for_12_hours_after_a_person_replied(
         ("2026-11-04T15:59:00+00:00", "Asia/Karachi", False),  # 20:59
         ("2026-11-04T03:59:00+00:00", "Asia/Karachi", True),  # 08:59: still quiet
         ("2026-11-04T04:00:00+00:00", "Asia/Karachi", False),  # 09:00: over
-        ("2026-11-06T07:29:00+00:00", "Asia/Karachi", False),  # Friday 12:29
-        ("2026-11-06T07:30:00+00:00", "Asia/Karachi", True),  # Friday 12:30: prayers
+        ("2026-11-06T06:59:00+00:00", "Asia/Karachi", False),  # Friday 11:59
+        ("2026-11-06T07:00:00+00:00", "Asia/Karachi", True),  # Friday 12:00: prayers (spec 3.9)
         ("2026-11-06T09:29:00+00:00", "Asia/Karachi", True),  # Friday 14:29
         ("2026-11-06T09:30:00+00:00", "Asia/Karachi", False),  # Friday 14:30: over
         ("2026-11-05T07:30:00+00:00", "Asia/Karachi", False),  # Thursday 12:30: no prayers

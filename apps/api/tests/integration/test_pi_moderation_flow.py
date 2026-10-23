@@ -117,7 +117,8 @@ async def test_a_complaint_about_workzap_is_thanked_passed_on_and_not_noted_as_a
     pi = await workspace(api, business_db)
     await say(pi, "I want to complain about Workzap", "cp-1")
     assert (await pi.reply_to("cp-1")).body == (
-        "Hi, I'm pi, an AI from Workzap. Thanks for telling me. I've passed this to the Workzap team."
+        "Hi, I'm pi, an AI from Workzap. "
+        "Thanks for telling me. I've passed this to the Workzap team."
     )
     [request] = (await business_db.scalars(select(PiStaffRequest))).all()
     assert request.question.startswith("COMPLAINT") and request.priority == "high"
@@ -186,7 +187,8 @@ async def test_a_regulated_trade_is_declined_once_when_workzap_does_not_serve_it
     await serve(api, [])  # leadership decided: no regulated trade is served
     await say(pi, "I run a licensed arms and ammunition dealer, stock counts are off", "tr-1")
     assert (await pi.reply_to("tr-1")).body == (
-        "Hi, I'm pi, an AI from Workzap. Workzap doesn't take on work in this area, so I can't help with this one."
+        "Hi, I'm pi, an AI from Workzap. "
+        "Workzap doesn't take on work in this area, so I can't help with this one."
     )
     assert prompts == []
     conversation = await state_of(business_db, pi)

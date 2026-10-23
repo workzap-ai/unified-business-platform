@@ -268,12 +268,12 @@ VOICE_UNREADABLE_NOTICES = {
 }
 # A file pi couldn't open: ask for another way, keep the chat.
 MEDIA_UNREADABLE_NOTICES = {
-    "en": "Thanks! I couldn't open that file here. Could you describe it in a few words, "
-    "or send it as a PDF or a screenshot? I've also passed it to the team.",
-    "roman_ur": "Shukriya! Yeh file yahan open nahi ho saki. Kya aap thora sa likh kar "
-    "bata sakte hain, ya PDF/screenshot bhej dein? Maine team ko bhi bhej di hai.",
-    "ar": "شكرًا! لم أتمكن من فتح هذا الملف هنا. هل يمكنك وصفه باختصار أو إرساله كملف PDF "
-    "أو لقطة شاشة؟ لقد أرسلته أيضًا إلى الفريق.",
+    "en": "Thanks. I couldn't open that file here, and I've passed it to the team. "
+    "Could you describe it in a few words, or send it as a PDF or a screenshot?",
+    "roman_ur": "Shukriya. Yeh file yahan open nahi ho saki, aur maine team ko bhej di hai. "
+    "Kya aap thora sa likh kar bata sakte hain, ya PDF/screenshot bhej dein?",
+    "ar": "شكرًا. لم أتمكن من فتح هذا الملف هنا، وقد أرسلته إلى الفريق. "
+    "هل يمكنك وصفه باختصار أو إرساله كملف PDF أو لقطة شاشة؟",
 }
 MEETING_NOTICES = {
     "en": "Happy to set up a meeting. Which days and times suit you? "

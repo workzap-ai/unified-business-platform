@@ -176,7 +176,7 @@ TEXT: dict[str, dict[str, Any]] = {
 
 
 def prayer_or_quiet(policy: Any, now: datetime | None = None) -> bool:
-    """No sends at night (business quiet hours) or during Friday prayers (12:30-14:30)."""
+    """No sends at night (business quiet hours) or during Friday prayers (12:00-14:30)."""
     from app.modules.pi.policy import zone
 
     config = policy.whatsapp_config or {}
@@ -186,7 +186,7 @@ def prayer_or_quiet(policy: Any, now: datetime | None = None) -> bool:
         return True
     local = (now or datetime.now(UTC)).astimezone(zone(policy.timezone))
     minutes = local.hour * 60 + local.minute
-    return local.weekday() == 4 and 12 * 60 + 30 <= minutes < 14 * 60 + 30
+    return local.weekday() == 4 and 12 * 60 <= minutes < 14 * 60 + 30
 
 
 async def sweep_customer_journeys(ctx: dict[str, Any]) -> None:

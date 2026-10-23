@@ -146,7 +146,9 @@ async def note_opt_out(session: AsyncSession, scope: WorkspaceScope, message: Pi
     body = (message.body or "").strip()
     if message.direction != "inbound" or len(body) > 80:
         return False
-    if not (OPT_OUT.match(body) or OPT_OUT_PHRASE.search(body)):
+    from app.modules.pi import safety
+
+    if not (OPT_OUT.match(body) or OPT_OUT_PHRASE.search(body) or safety.opt_out_asked(body)):
         return False
     conversation = await WorkspaceRepository(session, PiConversation, scope).get(
         message.conversation_id

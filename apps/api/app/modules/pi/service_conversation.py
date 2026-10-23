@@ -1320,6 +1320,11 @@ async def brain_problems(
         conversation.language or "en",
         can_approve=bool(context.get("can_approve", True)),
         days_away=int(context.get("days_away") or 0),
+        sectors=[
+            industry_packs.sector_key(pack)
+            for key in context.get("industry_keys") or []
+            if (pack := industry_packs.get_pack(key)) is not None
+        ],
     )
     country = context.get("customer_country")
     context["emergency_numbers"] = (

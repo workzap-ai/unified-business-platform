@@ -219,7 +219,7 @@ async def _requests(session: AsyncSession, scope: WorkspaceScope) -> list[Card]:
             row.customer_id,
             row.conversation_id,
             _line(row.context_summary or row.question, 1000),
-            priority="high" if row.priority == "high" else "normal",
+            priority="high" if row.priority in ("high", "urgent") else "normal",
         )
         for row in rows
     ]
