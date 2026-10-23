@@ -177,3 +177,12 @@ def test_dates_keep_the_words_and_flag_what_is_ambiguous():
     assert date_estimate("yesterday", today)["confidence"] == "high"
     eid = date_estimate("Eid ke baad", today)
     assert eid["date"] is None and eid["season"] is True and eid["text"] == "eid ke baad"
+
+
+@pytest.mark.parametrize(
+    "said",
+    ["can I get just the quote", "send the quote without the document", "sirf quote bhej do"],
+)
+def test_a_quote_without_the_document_has_the_fixed_answer(said):
+    assert s.boundary_asked(said) == s.Boundary.QUOTE_ONLY  # R-QUOTE-09
+    assert "come together" in s.boundary_reply(s.Boundary.QUOTE_ONLY, "en")

@@ -11,6 +11,7 @@ the model should answer (a question, a correction, a cost question).
 
 import re
 from dataclasses import dataclass, field
+from datetime import date
 from enum import StrEnum
 from typing import Any
 
@@ -232,6 +233,14 @@ TEXT: dict[str, dict[str, str]] = {
             "hum tafseelat tay karne ke liye kickoff call book karein?"
         ),
     },
+    "expired_quote": {
+        "en": "That quote is past its valid-until date, so it can't be approved as it stands. I've asked Workzap to send a refreshed one.",
+        "roman_ur": "Is quote ki valid-until tareekh guzar chuki hai, isliye ye is haal mein approve nahi ho sakta. Maine Workzap se naya quote bhejne ko kaha hai.",
+    },
+    "after_payment": {
+        "en": "I'll pass this to the Workzap team now. They'll reply here.",
+        "roman_ur": "Ye Workzap ki team ko bhej diya gaya hai. Wo yahin jawab dein ge.",
+    },
     "cancelled": {
         "en": "That's fine. Nothing is charged. I've told Workzap.",
         "roman_ur": "Koi baat nahi. Kuch charge nahi hoga. Maine Workzap ko bata diya hai.",
@@ -400,6 +409,22 @@ def decide(
     if state == State.S8_REVIEW and quote:
         return _review(language, message, answer, facts, quote, brief, can_approve)
 
+    if state in (State.S11_PAYMENT_CONFIRMED, State.S12_KICKOFF) and CANCEL.search(message):
+        return Decision(
+            text("after_payment", language),
+            None,
+            {"escalate": "cancel_after_payment"},
+            ["escalate"],
+            why="R-DEC-05",
+        )
+    if state == State.S9_APPROVED and CANCEL.search(message):
+        return Decision(
+            text("cancelled", language),
+            State.S9B_DECLINED_QUOTE,
+            {},
+            ["cancel_before_payment"],
+            why="R-DEC-05",
+        )
     if state == State.S10_AWAITING_PAYMENT:
         if CANCEL.search(message):
             return Decision(
@@ -458,6 +483,15 @@ def _prepare(
     )
 
 
+def _expired(quote: dict[str, Any]) -> bool:
+    """The quote's own valid-until date has passed."""
+    raw = quote.get("valid_until")
+    try:
+        return bool(raw) and date.fromisoformat(str(raw)[:10]) < date.today()
+    except ValueError:
+        return False
+
+
 def _review(
     language: str | None,
     message: str,
@@ -487,6 +521,14 @@ def _review(
             text("approval_dropped", language), None, {"approval_pending": None}, why="R-DEC-01"
         )
     stripped = " ".join(message.split())
+    if (APPROVE.match(stripped) or _ok(answer, Answer.YES)) and _expired(quote):
+        return Decision(
+            text("expired_quote", language),
+            None,
+            {"escalate": "quote_expired"},
+            ["escalate"],
+            why="R-QUOTE-05",
+        )
     if APPROVE.match(stripped):
         if not can_approve:
             return Decision(

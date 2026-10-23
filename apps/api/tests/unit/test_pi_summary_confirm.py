@@ -38,3 +38,18 @@ def test_two_quiet_replies_bring_the_summary_once_something_is_unsummarised():
     assert problems.summary_due("ok", 3, 1, 7, quiet_replies=2) == "quiet"
     assert problems.summary_due("ok", 3, 1, 7, quiet_replies=1) is None
     assert problems.summary_due("ok", 3, 0, 7, quiet_replies=2) is None  # nothing new to show
+
+
+def test_the_reading_grade_check_tells_plain_text_from_dense_text():
+    from app.modules.pi import brain_docs
+
+    plain = " ".join(["A stock check tells each shop when a best seller is low."] * 6)
+    dense = " ".join(
+        [
+            "Comprehensive reconciliation infrastructure would substantially accelerate "
+            "organisational decision-making across heterogeneous distribution environments."
+        ]
+        * 3
+    )
+    assert brain_docs.reading_grade(plain) < brain_docs.MAX_READING_GRADE
+    assert brain_docs.reading_grade(dense) > brain_docs.MAX_READING_GRADE

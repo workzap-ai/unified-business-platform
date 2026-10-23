@@ -77,6 +77,12 @@ class ProblemNote(BaseModel):
     trigger: str = ""
     impact_types: list[str] = Field(default_factory=list)
     money_text: str = ""
+    currency: str = ""  # PKR, AED or CAD, from where they are or what they said (R-LANG-05)
+    time_text: str = ""  # "two hours every day"
+    people_affected: str = ""  # "all cashiers", "about 10 customers a week"
+    products: str = ""  # "best-sellers"
+    channel: str = ""  # "in-store", "WhatsApp orders"
+    frequency_pattern: str = ""  # "worse on weekends"
     severity_stated: str = ""  # only from their words: low medium high critical
     workaround: str = ""
     systems: list[str] = Field(default_factory=list)
@@ -133,6 +139,16 @@ def redact(text: str) -> tuple[str, bool]:
     return text, changed
 
 
+def _tokens(title: str) -> set[str]:
+    return {w for w in re.findall(r"[a-z\u0600-\u06ff]{3,}", title.lower())}
+
+
+def same_symptom(a: str, b: str, threshold: float = 0.8) -> bool:
+    """Two titles that say the same thing in nearly the same words (spec 4.4, merge)."""
+    left, right = _tokens(a), _tokens(b)
+    return bool(left and right) and len(left & right) / len(left | right) >= threshold
+
+
 def short_ref(problem_id: UUID) -> str:
     return str(problem_id)[:8]
 
@@ -176,6 +192,9 @@ def check_ops(ops: list[ProblemOp], known_refs: set[str], noted_in_reply: bool) 
                 )
         elif op.op in ("update", "withdraw", "split") and op.ref not in known_refs:
             issues.append(f'{op.op} refers to an unknown problem ref "{op.ref}"')
+        elif op.op == "update" and op.note is not None and op.note.title.strip():
+            if (why := title_problem(op.note.title)) is not None:
+                issues.append(why)
         elif op.op == "merge":
             if op.ref not in known_refs or not op.refs or any(r not in known_refs for r in op.refs):
                 issues.append("merge needs a kept ref and the duplicate refs, all known")
@@ -183,6 +202,12 @@ def check_ops(ops: list[ProblemOp], known_refs: set[str], noted_in_reply: bool) 
             issues.append("link needs two known refs")
         if op.op == "split" and len(op.notes) < 2:
             issues.append("split needs at least two new problems")
+        if op.op == "split":
+            for part in op.notes:
+                if (why := title_problem(part.title)) is not None:
+                    issues.append(why)
+                elif not part.user_words:
+                    issues.append(f'"{part.title}" has no user_words (their own words, verbatim)')
     return "; ".join(issues) if issues else None
 
 
@@ -319,8 +344,11 @@ class ProblemBook:
     ) -> tuple[PiProblem, bool]:
         """A new problem, or (when the same title is already noted) its enrichment."""
         title = clean_title(note.title)
+        category_now = taxonomy.normalise_category(note.category.strip())
         for existing in await self.active():
-            if existing.title.casefold() == title.casefold():
+            same = existing.title.casefold() == title.casefold()
+            alike = existing.category == category_now and same_symptom(existing.title, title)
+            if same or alike:
                 await self.update(existing, note, "enrichment", message_id)
                 return existing, False
         words, redacted = _words(note.user_words)
@@ -341,8 +369,17 @@ class ProblemBook:
             category=category,
             subtype=_snake(note.subtype),
             tags=tags,
-            scope={"where": [w[:80] for w in note.where[:8]], "of_total": note.of_total[:80]},
-            frequency={"text": note.frequency_text[:120], "normalised": _frequency(note)},
+            scope={
+                "where": [w[:80] for w in note.where[:8]],
+                "of_total": note.of_total[:80],
+                "products": note.products[:120],
+                "channel": note.channel[:60],
+            },
+            frequency={
+                "text": note.frequency_text[:120],
+                "normalised": _frequency(note),
+                "pattern": note.frequency_pattern[:120],
+            },
             since=date_estimate(note.since_text, datetime.now(UTC).date())
             if note.since_text
             else {"text": ""},
@@ -351,6 +388,9 @@ class ProblemBook:
                 "types": [t for t in note.impact_types if t in taxonomy.IMPACT_TYPES],
                 "money_text": note.money_text[:120],
                 "money_value": amount_value(note.money_text),
+                "currency": note.currency.strip().upper()[:3],
+                "time_text": note.time_text[:120],
+                "people_affected": note.people_affected[:120],
             },
             severity_stated=note.severity_stated
             if note.severity_stated in taxonomy.SEVERITIES
@@ -401,21 +441,29 @@ class ProblemBook:
         put("user_words", merged_words[: MAX_USER_WORDS * 2])
         if redacted:
             put("pii_redacted", True)
-        if note.where or note.of_total:
+        if note.where or note.of_total or note.products or note.channel:
             scope = dict(problem.scope or {})
+            scope["products"] = note.products[:120] or scope.get("products", "")
+            scope["channel"] = note.channel[:60] or scope.get("channel", "")
             scope["where"] = [w[:80] for w in note.where[:8]] or scope.get("where", [])
             scope["of_total"] = note.of_total[:80] or scope.get("of_total", "")
             put("scope", scope)
-        if note.frequency_text or note.frequency:
+        if note.frequency_text or note.frequency or note.frequency_pattern:
             frequency = dict(problem.frequency or {})
+            frequency["pattern"] = note.frequency_pattern[:120] or frequency.get("pattern", "")
             frequency["text"] = note.frequency_text[:120] or frequency.get("text", "")
             if note.frequency in taxonomy.FREQUENCIES:
                 frequency["normalised"] = note.frequency
             put("frequency", frequency)
         if note.since_text:
             put("since", date_estimate(note.since_text, datetime.now(UTC).date()))
-        if note.impact_types or note.money_text:
+        if note.impact_types or note.money_text or note.time_text or note.people_affected:
             impact = dict(problem.impact or {})
+            impact["currency"] = note.currency.strip().upper()[:3] or impact.get("currency", "")
+            impact["time_text"] = note.time_text[:120] or impact.get("time_text", "")
+            impact["people_affected"] = note.people_affected[:120] or impact.get(
+                "people_affected", ""
+            )
             kinds = [t for t in note.impact_types if t in taxonomy.IMPACT_TYPES]
             impact["types"] = kinds or impact.get("types", [])
             impact["money_text"] = note.money_text[:120] or impact.get("money_text", "")
@@ -476,6 +524,24 @@ class ProblemBook:
         return count
 
 
+async def _taxonomy_review(
+    session: AsyncSession, scope: WorkspaceScope, problem: PiProblem
+) -> None:
+    """A problem that fits no category goes to a person (spec 4.6): the category list is theirs."""
+    from app.modules.notifications.service import notify
+
+    await notify(
+        session,
+        scope,
+        "pi.taxonomy_review",
+        "pi noted a problem that fits no category",
+        f"{problem.title}. Choose the right category, or tell pi's team if one is missing.",
+        link="/pi/inbox",
+        permission="pi.read",
+        dedupe_key=f"pi-taxonomy:{problem.id}",
+    )
+
+
 async def apply_ops(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -495,6 +561,8 @@ async def apply_ops(
                 problem, fresh = await book.create(op.note, message_id, conversation_id)
                 (result.created if fresh else result.updated).append(problem)
                 refs[short_ref(problem.id)] = problem
+                if fresh and problem.category == taxonomy.OTHER:
+                    await _taxonomy_review(session, scope, problem)  # 4.6 rule 4
             elif op.op == "update" and op.ref in refs and op.note:
                 changed = await book.update(
                     refs[op.ref],
@@ -605,6 +673,7 @@ async def noted_context(
                 "ref": short_ref(problem.id),
                 "title": problem.title,
                 "title_local": problem.title_local or "",
+                "where": list((problem.scope or {}).get("where") or [])[:4],
                 "group": problem.category,
                 "group_name": renamed.get(problem.category, ""),
                 "score": float(problem.severity_score) if problem.severity_score else None,
@@ -709,3 +778,26 @@ def summary_due(
 def shape_question_due(noted: int, industry_known: bool, already_asked: bool) -> bool:
     """After two problems, if pi still does not know the trade, it may ask once (spec 7.0)."""
     return noted >= 2 and not industry_known and not already_asked
+
+
+PATTERN_AT = 3  # problems in one group, or at one place, before pi may point it out
+
+
+def pattern_hint(noted: list[dict[str, Any]], already_said: list[str]) -> dict[str, Any] | None:
+    """A pattern worth saying once (spec 4.8): a group of three or more problems, or one place that
+    appears in three or more problems across groups. None when nothing new is worth saying."""
+    by_group: dict[str, int] = {}
+    by_place: dict[str, int] = {}
+    for item in noted:
+        by_group[item["group"]] = by_group.get(item["group"], 0) + 1
+        for place in {str(w).strip().casefold() for w in item.get("where") or [] if str(w).strip()}:
+            by_place[place] = by_place.get(place, 0) + 1
+    for group, count in sorted(by_group.items(), key=lambda kv: -kv[1]):
+        key = f"group:{group}"
+        if count >= PATTERN_AT and key not in already_said:
+            return {"kind": "group", "group": group, "count": count, "key": key}
+    for place, count in sorted(by_place.items(), key=lambda kv: -kv[1]):
+        key = f"place:{place}"
+        if count >= PATTERN_AT and key not in already_said:
+            return {"kind": "location", "where": place, "count": count, "key": key}
+    return None

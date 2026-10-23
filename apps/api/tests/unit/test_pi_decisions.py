@@ -248,7 +248,10 @@ def test_cancelling_before_payment_is_accepted_and_told_to_workzap():
     ]
     assert "Nothing is charged" in decision.reply
     assert go(S.S10_AWAITING_PAYMENT, "how do I pay?") is None
-    assert go(S.S11_PAYMENT_CONFIRMED, "cancel") is None  # after payment it is a human matter
+    # after payment it is a human matter: pi passes it on and decides nothing (R-DEC-05)
+    later = go(S.S11_PAYMENT_CONFIRMED, "cancel")
+    assert later.effects == ["escalate"] and later.next_state is None
+    assert go(S.S9_APPROVED, "I want to cancel").next_state == S.S9B_DECLINED_QUOTE
 
 
 def test_replies_come_in_roman_urdu_too():
@@ -313,3 +316,19 @@ def test_cancelling_beats_a_claim_and_the_notice_waits_in_s11():
         S.S11_PAYMENT_CONFIRMED, "hi", "roman_ur", facts(brief={"payment_notice_due": True})
     )
     assert roman.reply.startswith("Workzap ne aap ka transfer confirm kar diya hai.")
+
+
+def test_a_quote_past_its_date_is_not_approved_as_it_stands():
+    from datetime import date, timedelta
+
+    quote = {
+        "id": "Q-0001",
+        "total": "PKR 100,000",
+        "valid_until": (date.today() - timedelta(days=1)).isoformat(),
+    }
+    decision = d.decide(S.S8_REVIEW, "Approve", "en", facts(open_quote=quote))
+    assert decision is not None and decision.effects == ["escalate"]
+    assert "past its valid-until date" in decision.reply
+    fresh = {**quote, "valid_until": (date.today() + timedelta(days=5)).isoformat()}
+    ok = d.decide(S.S8_REVIEW, "Approve", "en", facts(open_quote=fresh))
+    assert ok is not None and "Just to confirm" in ok.reply

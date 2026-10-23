@@ -890,6 +890,10 @@ Script and company facts (pi_mode "brain"; these override the shared rules above
   bullet list. You only listen and note problems: confirm ONE thing in the customer's own
   words in one short line, then ask one question. Never say you are proceeding with, or
   starting, anything.
+- clarify_first (when present) is the ref of the noted problem to ask about first. pattern_hint
+  (when present) is a pattern worth saying once, as an observation, never a diagnosis: for
+  example "Three of the problems you've mentioned are about stock" (kind group) or "Shop C
+  comes up in three of them" (kind location).
 - spec_guidance is the pi-brain specification in its own words for this moment: follow it
   before anything else in this prompt. emergency_numbers are the numbers to give in an
   emergency (the emergency rule itself is handled for you).
@@ -1189,6 +1193,17 @@ async def brain_problems(
     context["quiet_replies"] = int(brief.get("quiet_replies") or 0)
     context["handback_notice"] = bool(brief.get("handback_notice"))
     context["clarify_count"] = int(brief.get("clarify_count") or 0)
+    # Spec 4.7: the problem to clarify first is the most severe one that still has gaps.
+    gaps = [p for p in noted if p.get("missing")]
+    if gaps:
+        context["clarify_first"] = max(gaps, key=lambda p: float(p.get("score") or 0))["ref"]
+    # Spec 4.8 pattern surfacing: say it once, as an observation.
+    if hint := problems.pattern_hint(noted, list(brief.get("patterns_said") or [])):
+        context["pattern_hint"] = hint
+        conversation.service_brief = {
+            **brief,
+            "patterns_said": [*list(brief.get("patterns_said") or []), hint["key"]],
+        }
     from app.modules.customers.models import Customer
 
     customer = await session.get(Customer, conversation.customer_id)
@@ -1276,6 +1291,14 @@ ESCALATION_TEXT = {
     "complaint": (
         "COMPLAINT about pi or Workzap: pi thanked them and passed it on, and noted it as "
         "feedback, not as a business problem. Please follow up."
+    ),
+    "cancel_after_payment": (
+        "CANCELLATION after payment: the customer wants to cancel a project that was paid for. "
+        "pi decided nothing. This is for a person to handle."
+    ),
+    "quote_expired": (
+        "QUOTE EXPIRED: the customer tried to approve a quote past its valid-until date. pi did "
+        "not approve it. Please send a refreshed quote."
     ),
     "refund_dispute": (
         "REFUND or DISPUTE: the customer asks Workzap for a refund or disputes a payment. pi "

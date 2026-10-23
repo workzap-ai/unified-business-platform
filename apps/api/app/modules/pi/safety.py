@@ -726,6 +726,7 @@ class Boundary(StrEnum):
     RIVAL = "rival"  # A6: what do you think of my competitor
     WRONG_NUMBER = "wrong_number"  # 6.9
     MEMORY_ASK = "memory_ask"  # R-MEM-05: what does pi keep
+    QUOTE_ONLY = "quote_only"  # R-QUOTE-09: a quote without the document
 
 
 BOUNDARY_PATTERNS: tuple[tuple[Boundary, re.Pattern[str]], ...] = (
@@ -928,6 +929,19 @@ BOUNDARY_PATTERNS = BOUNDARY_PATTERNS + (
     ),
 )
 
+
+BOUNDARY_PATTERNS = BOUNDARY_PATTERNS + (
+    (
+        Boundary.QUOTE_ONLY,
+        re.compile(
+            r"\b(?:just|only|sirf)\s+(?:the\s+|a\s+)?(?:quote|quotation|price)\b(?!\s+and\b)"
+            r"|\bquote\s+(?:without|bina|baghair)\s+(?:the\s+)?(?:document|doc)\b"
+            r"|\bwithout\s+the\s+(?:solution\s+)?document\b",
+            re.IGNORECASE,
+        ),
+    ),
+)
+
 BOUNDARY_TEXT = {
     "en": {
         Boundary.DELETION: "I've passed your request to delete your information to the Workzap team. They'll confirm here once it's done, and I won't note anything new in the meantime.",
@@ -951,6 +965,7 @@ BOUNDARY_TEXT = {
         Boundary.RIVAL: "I don't comment on other businesses. What's going wrong on your side?",
         Boundary.WRONG_NUMBER: "I think you may have the wrong number. I'm pi, an AI from Workzap, here for business problems.",
         Boundary.MEMORY_ASK: "I keep the problems you've told me, the details you added, and any documents and quotes. You can ask me to delete them.",
+        Boundary.QUOTE_ONLY: "The quote is for building what's in the document, so they come together. I can only ask Workzap for both.",
     },
     "roman_ur": {
         Boundary.DELETION: "Aap ka data delete karne ki darkhwast maine Workzap ki team ko bhej di hai. Wo yahan tasdeeq kar dein ge, aur tab tak main kuch naya note nahi karunga.",
@@ -974,6 +989,7 @@ BOUNDARY_TEXT = {
         Boundary.RIVAL: "Main doosre businesses par raaye nahi deta. Aap ki taraf kya masla chal raha hai?",
         Boundary.WRONG_NUMBER: "Lagta hai aap ne galat number mila diya hai. Main pi hoon, Workzap ka AI, business ke masail ke liye.",
         Boundary.MEMORY_ASK: "Main aap ke batae hue masail, aap ki di hui tafseel, aur documents aur quotes rakhta hoon. Aap inhein delete karne ko keh sakte hain.",
+        Boundary.QUOTE_ONLY: "Quote us cheez ka hota hai jo document mein likhi hai, isliye dono saath aate hain. Dono hi Workzap se manga ja sakte hain.",
     },
     "ar": {
         Boundary.DELETION: "لقد أرسلت طلب حذف معلوماتك إلى فريق Workzap. سيؤكدون هنا عند الانتهاء، ولن أسجّل أي شيء جديد في هذه الأثناء.",
@@ -997,6 +1013,7 @@ BOUNDARY_TEXT = {
         Boundary.RIVAL: "لا أعلّق على أعمال الآخرين. ما الذي يسير بشكل خاطئ من جانبك؟",
         Boundary.WRONG_NUMBER: "أظن أن الرقم خاطئ. أنا pi، ذكاء اصطناعي من Workzap، هنا لمشكلات الأعمال.",
         Boundary.MEMORY_ASK: "أحتفظ بالمشكلات التي أخبرتني بها والتفاصيل التي أضفتها وأي مستندات وعروض أسعار. يمكنك أن تطلب مني حذفها.",
+        Boundary.QUOTE_ONLY: "عرض السعر خاص ببناء ما في المستند، لذلك يأتيان معًا. يمكنني طلب الاثنين من Workzap.",
     },
 }
 

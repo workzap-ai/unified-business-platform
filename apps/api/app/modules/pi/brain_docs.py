@@ -177,7 +177,33 @@ def check_solution(draft: SolutionDraft, refs: set[str]) -> list[str]:
             if re.search(rf"\b{re.escape(term)}s?\b", text, re.IGNORECASE):
                 issues.append(f'"{text[:50]}" uses "{term}" (R-DOC-05)')
                 break
+    plain = " ".join(texts)
+    grade = reading_grade(plain)
+    if len(plain.split()) >= 30 and grade > MAX_READING_GRADE:
+        issues.append(
+            f"the document reads at about grade {grade:.0f}: use shorter sentences and everyday "
+            f"words (the target is grade {MAX_READING_GRADE}, R-DOC-05)"
+        )
     return issues
+
+
+MAX_READING_GRADE = 9
+
+
+def _syllables(word: str) -> int:
+    groups = re.findall(r"[aeiouy]+", word.lower())
+    count = len(groups) - (1 if word.lower().endswith("e") and len(groups) > 1 else 0)
+    return max(1, count)
+
+
+def reading_grade(text: str) -> float:
+    """Flesch-Kincaid grade for English text (R-DOC-05: plain words, reading age about 12)."""
+    sentences = [s for s in re.split(r"[.!?]+", text) if s.strip()]
+    words = re.findall(r"[A-Za-z']+", text)
+    if not sentences or not words:
+        return 0.0
+    syllables = sum(_syllables(w) for w in words)
+    return 0.39 * len(words) / len(sentences) + 11.8 * syllables / len(words) - 15.59
 
 
 def check_content(content: dict[str, Any], refs: set[str] | None = None) -> list[str]:

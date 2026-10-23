@@ -107,7 +107,9 @@ async def test_a_noted_problem_is_saved_grouped_scored_and_moves_the_chat_to_not
     )
     assert problem.status == "draft" and problem.revision == 1
     assert problem.user_words == ["We keep running out of our best-selling items."]
-    assert problem.scope == {"where": ["Shop B", "Shop D"], "of_total": "2 of 4 shops"}
+    assert problem.scope["where"] == ["Shop B", "Shop D"]
+    assert problem.scope["of_total"] == "2 of 4 shops"
+    assert set(problem.scope) == {"where", "of_total", "products", "channel"}  # spec 4.2
     assert problem.frequency["normalised"] == "weekly"
     assert float(problem.severity_score) == 19.5  # 3 x 2.5 x 2 x 1.3
     assert problem.severity_inferred == "high"
