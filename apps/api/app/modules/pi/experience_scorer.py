@@ -13,7 +13,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import learning, learning_bank
+from app.modules.pi import learning, learning_bank, learning_situation
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_models import PiQuestionArm
 from app.modules.pi.models import PiAgentRun, PiConversation, PiMessage
@@ -23,14 +23,52 @@ from app.shared.scope import WorkspaceScope
 SILENCE = timedelta(hours=24)
 
 
-def situation_of(conversation: PiConversation, message: PiMessage) -> dict[str, str]:
-    """The situation key (spec 8.2) with what is known here: state, language, kind of turn."""
+def situation_of(
+    conversation: PiConversation,
+    message: PiMessage,
+    *,
+    industry: str | None = None,
+    category: str | None = None,
+) -> dict[str, str]:
+    """The situation key (spec 8.2): state, language, kind of turn, and (when known) the
+    industry, the category of the problem being talked about and the kind of person. The parts that
+    are not known are left out; old rows with only the first three parts stay readable."""
     body = (message.body or "").rstrip()
     return {
         "state": conversation.flow_state or "",
         "language": conversation.language or "en",
         "turn_kind": "question" if body.endswith(("?", "؟")) else "statement",
+        **learning_situation.extras(
+            industry, category, (conversation.service_brief or {}).get("customer_profile")
+        ),
     }
+
+
+# What pi says when it has written a problem down, in each language it speaks. English "noted" is
+# the working word; Roman Urdu "note kar liya"; Urdu and Arabic script have their own.
+NOTED_PHRASES = (
+    "noted",
+    "note kar liya",
+    "note kar li",
+    "note kar diya",
+    "likh liya",
+    "نوٹ کر لیا",
+    "نوٹ کر لی",
+    "نوٹ کرلیا",
+    "درج کر لیا",
+    "لکھ لیا",
+    "تم تسجيل",
+    "سجلت",
+    "دونت",
+    "تم تدوين",
+    "لاحظت",
+)
+
+
+def says_noted(text: str) -> bool:
+    """pi's message tells the person it wrote the problem down, in any language pi replies in."""
+    said = (text or "").lower()
+    return any(phrase in said for phrase in NOTED_PHRASES)
 
 
 def outcome_of(
@@ -42,9 +80,7 @@ def outcome_of(
     new_problem: bool = False,
 ) -> learning.Next:
     asked = (message.body or "").rstrip().endswith(("?", "؟"))
-    noted = (
-        "noted" in (message.body or "").lower() or "note kar liya" in (message.body or "").lower()
-    )
+    noted = says_noted(message.body or "")
     if following is None:
         return learning.Next(
             None, (now - message.created_at).total_seconds() / 3600, pi_asked_a_question=asked
@@ -112,25 +148,30 @@ def slipped(conversation: PiConversation, run: PiAgentRun | None) -> bool:
 
 async def attribution(
     session: AsyncSession, conversation: PiConversation, reply: PiMessage
-) -> tuple[UUID | None, list[str]]:
-    """Which question wording and which examples were shown when this reply was written. The
-    stamp is found through the agent run that produced the reply; the wording is credited only if
-    the reply really used it (otherwise the reward would teach the wrong lesson)."""
+) -> tuple[UUID | None, list[str], list[str]]:
+    """Which question wording, which examples and which lessons were shown when this reply was
+    written. The stamp is found through the agent run that produced the reply; the wording is
+    credited only if the reply really used it (otherwise the reward would teach the wrong
+    lesson)."""
     stamps = (conversation.service_brief or {}).get("learning_used") or []
     if not stamps:
-        return None, []
+        return None, [], []
     run = await session.scalar(select(PiAgentRun).where(PiAgentRun.response_message_id == reply.id))
     if run is None:
-        return None, []
+        return None, [], []
     stamp = next((x for x in reversed(stamps) if x.get("message_id") == str(run.message_id)), None)
     if stamp is None:
-        return None, []
+        return None, [], []
     arm_id: UUID | None = None
     if stamp.get("arm"):
         arm = await session.get(PiQuestionArm, UUID(stamp["arm"]))
         if arm is not None and learning_bank.similarity(reply.body or "", arm.text) >= 0.4:
             arm_id = arm.id
-    return arm_id, [str(e) for e in stamp.get("examples") or []]
+    return (
+        arm_id,
+        [str(e) for e in stamp.get("examples") or []],
+        [str(x) for x in stamp.get("lessons") or []],
+    )
 
 
 async def score_new(session: AsyncSession, now: datetime | None = None, limit: int = 200) -> int:
@@ -183,19 +224,24 @@ async def score_new(session: AsyncSession, now: datetime | None = None, limit: i
         )
         if slipped(conversation, run):
             signals = [*signals, "rule_break"]
-        arm_id, example_ids = await attribution(session, conversation, reply)
+        arm_id, example_ids, lesson_ids = await attribution(session, conversation, reply)
+        industry = await learning_situation.industry_of(session, conversation)
+        category = await learning_situation.category_of(
+            session, reply.conversation_id, reply.created_at
+        )
         session.add(
             PiExperience(
                 tenant_id=reply.tenant_id,
                 environment_id=reply.environment_id,
                 message_id=reply.id,
                 conversation_id=reply.conversation_id,
-                situation=situation_of(conversation, reply),
+                situation=situation_of(conversation, reply, industry=industry, category=category),
                 signals=signals,
                 reward=learning.reward(signals),
                 scored_at=now,
                 arm_id=arm_id,
                 example_ids=example_ids,
+                lesson_ids=lesson_ids,
             )
         )
         written += 1

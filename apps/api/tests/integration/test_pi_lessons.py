@@ -15,7 +15,9 @@ pytestmark = pytest.mark.integration
 L = "/api/v1/pi/brain-learning"
 
 
-async def test_a_low_risk_lesson_is_live_and_a_high_risk_one_waits(api, business_db, monkeypatch):
+async def test_a_low_risk_lesson_starts_as_a_canary_and_a_high_risk_one_waits(
+    api, business_db, monkeypatch
+):
     adaptive(monkeypatch, model)
     pi = await workspace(api, business_db)
     low = await api.post(
@@ -26,7 +28,7 @@ async def test_a_low_risk_lesson_is_live_and_a_high_risk_one_waits(api, business
         },
     )
     assert low.status_code == 201, low.text
-    assert low.json()["risk"] == "LOW" and low.json()["status"] == "live"
+    assert low.json()["risk"] == "LOW" and low.json()["status"] == "canary"  # job 8 and 9
     high = await api.post(
         f"{L}/lessons", json={"text": "Tell people the refund is always paid within two days"}
     )
@@ -92,6 +94,10 @@ async def test_a_live_lesson_reaches_the_prompt_only_for_its_situation(
             "language": "ur",
         },
     )
+    from sqlalchemy import update
+
+    # The canary held up (the nightly run promotes it): both are now live for everyone.
+    await business_db.execute(update(PiLearningLesson).values(status="live"))
     await say(pi, "stock runs out in two shops", "ls-1")
     first = next(json.loads(p) for p in prompts if p.startswith("{"))
     assert first["lessons"] == ["When stock is mentioned, ask which shop runs out first"]

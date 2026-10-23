@@ -23,11 +23,13 @@ from app.modules.pi import (
     learning_bank,
     learning_canary,
     learning_drift,
+    learning_gate,
     learning_grader,
     learning_lexicon,
     learning_links,
     learning_miner,
     learning_packs,
+    learning_seed,
     learning_solutions_grow,
     learning_tuning,
     learning_voice,
@@ -99,6 +101,17 @@ async def run_workspace(
         digest["frozen"] = True  # the kill switch: no changes of any kind
     else:
         digest["drift"] = drift
+        # Job 9, step 2: replay recent conversations against the release bar. While the last
+        # result fails, nothing new starts a canary or is promoted (and the digest says so).
+        gate = await learning_gate.replay(session, scope)
+        if gate.conversations:
+            await learning_gate.record(session, scope, gate)
+        digest["gate"] = gate.as_dict()
+        industries = await learning_seed.customer_industries(session, scope)
+        digest["seeds"] = {
+            "examples": await learning_seed.seed_examples(session, scope, industries),
+            "arms": await learning_seed.seed_arms(session, scope, industries),
+        }
         digest["examples"] = await learning_bank.curate(
             session,
             scope,
@@ -111,6 +124,13 @@ async def run_workspace(
         rules = settings.response_rules
         digest["examples"].update(await learning_bank.activate(session, scope, now))
         digest["canary"] = await learning_canary.evaluate(
+            session,
+            scope,
+            now,
+            min_days=brain_config.value(rules, "canary_min_days"),
+            min_uses=brain_config.value(rules, "canary_min_uses"),
+        )
+        digest["lessons"] = await learning_canary.evaluate_lessons(
             session,
             scope,
             now,

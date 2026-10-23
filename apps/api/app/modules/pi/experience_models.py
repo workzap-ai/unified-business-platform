@@ -35,3 +35,6 @@ class PiExperience(WorkspaceRow):
     example_ids: Mapped[list[str]] = mapped_column(
         JSONB, default=list, server_default="[]"
     )  # examples shown
+    lesson_ids: Mapped[list[str]] = mapped_column(
+        JSONB, default=list, server_default="[]"
+    )  # lessons shown

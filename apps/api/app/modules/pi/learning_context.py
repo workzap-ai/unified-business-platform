@@ -18,6 +18,7 @@ from app.modules.pi import (
     learning_bank,
     learning_lessons,
     learning_packs,
+    learning_situation,
     learning_voice,
     solution_context,
 )
@@ -56,7 +57,17 @@ async def build(
         "arm": None,
         "voice_arm": None,
         "examples": [],
+        "lessons": [],
     }
+    profile = (conversation.service_brief or {}).get("customer_profile") or {}
+    industry = await learning_situation.industry_of(session, conversation)
+    category = (
+        await learning_situation.category_of(session, conversation.id)
+        if conversation.id is not None
+        else ""
+    )
+    person_type = learning_situation.person_type_of(profile)
+    used["industry"] = industry
     examples = await learning_bank.retrieve(
         session,
         scope,
@@ -67,6 +78,9 @@ async def build(
         embedder=embedder,
         conversation_id=conversation.id,
         canary_percent=canary_percent,
+        industry=industry,
+        category=category,
+        person_type=person_type,
     )
     if examples:
         out["learned_examples"] = [
@@ -74,7 +88,6 @@ async def build(
         ]
         used["examples"] = [str(e.id) for e in examples]
         await learning_bank.touch(session, examples)
-    profile = (conversation.service_brief or {}).get("customer_profile") or {}
     about = " . ".join([said, str(profile.get("business_type") or "")])
     await learning_packs.note_shadow(session, scope, conversation.id, about)
     if pack_brief := await learning_packs.live_brief(session, scope, about):
@@ -82,14 +95,25 @@ async def build(
     banned = await learning_lessons.never_say(session, scope, state, language)
     if banned:
         out["never_say"] = banned
-    lessons = await learning_lessons.relevant(session, scope, state, language)
+    lessons = await learning_lessons.relevant(
+        session,
+        scope,
+        state,
+        language,
+        industry=industry,
+        category=category,
+        person_type=person_type,
+        conversation_id=conversation.id,
+        canary_percent=canary_percent,
+    )
     if lessons:
         out["lessons"] = [lesson.text for lesson in lessons]
+        used["lessons"] = [str(lesson.id) for lesson in lessons]
     latest = noted[-1] if noted else None
     slot = learning_arms.slot_for(list(latest.get("missing") or [])) if latest else None
     if slot is not None:
         await learning_arms.ensure_seeded(session, scope)
-        arm = await learning_arms.choose(session, scope, slot, language)
+        arm = await learning_arms.choose(session, scope, slot, language, industry=industry)
         if arm is not None:
             out["question_hint"] = {"slot": slot, "wording": arm.text}
             used["arm"] = str(arm.id)
@@ -105,6 +129,7 @@ async def build(
         used["arm"]
         or used["examples"]
         or used["voice_arm"]
+        or used["lessons"]
         or used.get("ideas")
         or used.get("unmatched")
     ):
