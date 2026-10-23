@@ -22,6 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import constitution, learning, learning_rules, safety
 from app.modules.pi.experience_models import PiExperience
+from app.modules.pi.learning_embed import Embedder
 from app.modules.pi.learning_models import PiLearningChange, PiLearningExample
 from app.modules.pi.models import PiConversation, PiMessage
 from app.shared.scope import WorkspaceScope
@@ -116,7 +117,11 @@ async def _answered(session: AsyncSession, reply: PiMessage) -> PiMessage | None
 
 
 async def curate(
-    session: AsyncSession, scope: WorkspaceScope, now: datetime | None = None, limit: int = 200
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    now: datetime | None = None,
+    limit: int = 200,
+    embedder: Embedder | None = None,
 ) -> dict[str, int]:
     """New candidates from yesterday's good listening-loop replies. Returns counts."""
     now = now or datetime.now(UTC)
@@ -139,6 +144,7 @@ async def curate(
         )
     )
     counts = {"looked_at": len(rows), "added": 0, "rejected": 0}
+    fresh: list[PiLearningExample] = []
     for exp in rows:
         if exp.situation.get("state") not in LISTENING_STATES:
             continue  # fixed lines (offer, summary, documents) are never examples
@@ -169,24 +175,29 @@ async def curate(
             counts["rejected"] += 1
             continue
         conversation = await session.get(PiConversation, exp.conversation_id)
-        session.add(
-            PiLearningExample(
-                tenant_id=exp.tenant_id,
-                environment_id=exp.environment_id,
-                message_id=exp.message_id,
-                situation=exp.situation,
-                language=exp.situation.get("language", "en"),
-                person_text=person[:500],
-                reply_text=said[:500],
-                reward=total,
-                status="candidate",
-                source_contacts=[str(conversation.customer_id)]
-                if conversation is not None and conversation.customer_id
-                else [],
-                redaction_confidence=Decimal(str(confidence)),
-            )
+        example = PiLearningExample(
+            tenant_id=exp.tenant_id,
+            environment_id=exp.environment_id,
+            message_id=exp.message_id,
+            situation=exp.situation,
+            language=exp.situation.get("language", "en"),
+            person_text=person[:500],
+            reply_text=said[:500],
+            reward=total,
+            status="candidate",
+            source_contacts=[str(conversation.customer_id)]
+            if conversation is not None and conversation.customer_id
+            else [],
+            redaction_confidence=Decimal(str(confidence)),
         )
+        session.add(example)
+        fresh.append(example)
         counts["added"] += 1
+    if embedder is not None and fresh:
+        vectors = await embedder([e.person_text for e in fresh])
+        for example, vector in zip(fresh, vectors or [], strict=False):
+            example.embedding = vector
+        counts["embedded"] = len(vectors or [])
     await session.flush()
     return counts
 
@@ -324,6 +335,7 @@ async def retrieve(
     k: int = 3,
     query_embedding: list[float] | None = None,
     exclude_contact: str | None = None,
+    embedder: Embedder | None = None,
 ) -> list[PiLearningExample]:
     """The best active examples for this situation: only matching or backed-off situations (eval
     L1), never from the same person, one per business, ranked by how alike the person's words
@@ -350,11 +362,14 @@ async def retrieve(
         ]
         if not pool:
             continue
+        if query_embedding is None and embedder is not None and any(e.embedding for e in pool):
+            got = await embedder([said])  # only asked when there is something to compare with
+            query_embedding = got[0] if got else None
 
-        def score(e: PiLearningExample) -> float:
+        def score(e: PiLearningExample, vector: list[float] | None = query_embedding) -> float:
             alike = similarity(said, e.person_text)
-            if query_embedding is not None and e.embedding:
-                alike = max(alike, cosine(query_embedding, e.embedding))
+            if vector is not None and e.embedding and len(vector) == len(e.embedding):
+                alike = max(alike, cosine(vector, e.embedding))
             return alike + 0.05 * min(e.reward, 6)
 
         chosen: list[PiLearningExample] = []

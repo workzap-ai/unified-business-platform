@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import learning, learning_arms, learning_bank
 from app.modules.pi.language import detect_language
+from app.modules.pi.learning_embed import Embedder
 from app.modules.pi.models import PiConversation, PiMessage
 from app.shared.scope import WorkspaceScope
 
@@ -31,6 +32,7 @@ async def build(
     conversation: PiConversation,
     message: PiMessage | None,
     noted: list[dict[str, Any]],
+    embedder: Embedder | None = None,
 ) -> dict[str, Any]:
     """`learned_examples` and `question_hint` for this turn (either may be missing)."""
     said = message.body if message is not None and message.body else ""
@@ -51,6 +53,7 @@ async def build(
         language=language,
         said=said,
         exclude_contact=str(conversation.customer_id) if conversation.customer_id else None,
+        embedder=embedder,
     )
     if examples:
         out["learned_examples"] = [

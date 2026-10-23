@@ -14,6 +14,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import experience_scorer, learning, learning_arms, learning_bank
+from app.modules.pi.learning_embed import Embedder
 from app.modules.pi.learning_models import PiLearningRun
 from app.modules.pi.models import PiSettings
 from app.shared.scope import WorkspaceScope
@@ -41,7 +42,10 @@ async def last_run(session: AsyncSession, scope: WorkspaceScope) -> PiLearningRu
 
 
 async def run_workspace(
-    session: AsyncSession, settings: PiSettings, now: datetime | None = None
+    session: AsyncSession,
+    settings: PiSettings,
+    now: datetime | None = None,
+    embedder: Embedder | None = None,
 ) -> PiLearningRun:
     """One run for one workspace. Returns the run row with its digest."""
     now = now or datetime.now(UTC)
@@ -60,7 +64,7 @@ async def run_workspace(
     if run.frozen:
         digest["frozen"] = True  # the kill switch: no changes of any kind
     else:
-        digest["examples"] = await learning_bank.curate(session, scope, now)
+        digest["examples"] = await learning_bank.curate(session, scope, now, embedder=embedder)
         digest["examples"].update(await learning_bank.activate(session, scope, now))
         digest["examples"]["retired_poor"] = await learning_bank.retire_poor(session, scope)
         digest["arms"] = await learning_arms.learn_from(session, scope, since)
@@ -71,7 +75,9 @@ async def run_workspace(
     return run
 
 
-async def run_due(session: AsyncSession, now: datetime | None = None) -> int:
+async def run_due(
+    session: AsyncSession, now: datetime | None = None, embedder: Embedder | None = None
+) -> int:
     """Run every brain-mode workspace that has not run in the last 20 hours. Returns how many."""
     now = now or datetime.now(UTC)
     rows = list(
@@ -84,6 +90,6 @@ async def run_due(session: AsyncSession, now: datetime | None = None) -> int:
         previous = await last_run(session, scope_of(settings))
         if previous is not None and now - previous.started_at < MIN_GAP:
             continue
-        await run_workspace(session, settings, now)
+        await run_workspace(session, settings, now, embedder)
         done += 1
     return done

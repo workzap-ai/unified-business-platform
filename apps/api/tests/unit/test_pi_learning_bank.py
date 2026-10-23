@@ -99,3 +99,17 @@ def test_learning_context_is_active_only_when_switched_on_explicitly():
     assert not learning_context.active({"pi_mode": "brain", "brain": {"learning_frozen": True}})
     assert not learning_context.active({"pi_mode": "standard", "brain": {"learning_frozen": False}})
     assert not learning_context.active(None)
+
+
+def test_embeddings_are_only_used_when_the_platform_has_them(settings):
+    from app.modules.pi.learning_embed import make_embedder
+
+    assert make_embedder(settings, None) is None  # no HTTP client
+    off = settings.model_copy(update={"semantic_search_enabled": False})
+    assert make_embedder(off, object()) is None  # not switched on
+    no_model = settings.model_copy(update={"semantic_search_enabled": True, "openai_models": {}})
+    assert make_embedder(no_model, object()) is None  # no embedding model configured
+    on = settings.model_copy(
+        update={"semantic_search_enabled": True, "openai_models": {"embedding": "some-model"}}
+    )
+    assert make_embedder(on, object()) is not None

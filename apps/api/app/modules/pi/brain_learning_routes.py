@@ -10,7 +10,7 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 
@@ -18,6 +18,7 @@ from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.pi import learning, learning_arms, learning_bank, learning_nightly
 from app.modules.pi.configuration import settings_row
+from app.modules.pi.learning_embed import make_embedder
 from app.modules.pi.learning_models import (
     PiLearningChange,
     PiLearningExample,
@@ -84,11 +85,14 @@ async def runs(scope: Scope, session: Session, limit: int = 14) -> dict[str, Any
 
 
 @router.post("/run")
-async def run_now(scope: Scope, session: Session) -> dict[str, Any]:
+async def run_now(request: Request, scope: Scope, session: Session) -> dict[str, Any]:
     """Run the learning now for this workspace. Does nothing while learning is frozen."""
     await require_pi(session, scope, PERMISSION)
     policy = await settings_row(session, scope)
-    run = await learning_nightly.run_workspace(session, policy)
+    state = request.app.state
+    run = await learning_nightly.run_workspace(
+        session, policy, embedder=make_embedder(state.settings, state.http)
+    )
     await record(
         session,
         "pi.brain_learning_run",

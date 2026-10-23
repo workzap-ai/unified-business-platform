@@ -1147,6 +1147,7 @@ async def brain_problems(
     industry_known: bool,
     message: PiMessage | None = None,
     rows: list[PiMessage] | None = None,
+    embedder: Any = None,
 ) -> dict[str, Any]:
     """What pi has noted so far for this customer (brain mode), for the prompt."""
     if not flow.brain_mode(policy.response_rules) or conversation.customer_id is None:
@@ -1181,7 +1182,11 @@ async def brain_problems(
     if away := days_away(message, rows or []):
         context["days_away"] = away
     if learning_context.active(policy.response_rules):
-        context.update(await learning_context.build(session, scope, conversation, message, noted))
+        context.update(
+            await learning_context.build(
+                session, scope, conversation, message, noted, embedder=embedder
+            )
+        )
     return context
 
 
@@ -1658,6 +1663,7 @@ async def prepare_context(
     conversation: PiConversation,
     message: PiMessage,
     policy: PiSettings,
+    embedder: Any = None,
 ) -> dict[str, Any]:
     tools = await ToolRegistry(session).enabled_tools(scope, "requirement")
     rows = list(
@@ -1781,7 +1787,7 @@ async def prepare_context(
         session, scope, conversation, message, rows, profile, policy
     )
     brain = await brain_problems(
-        session, scope, conversation, policy, bool(industry), message, rows
+        session, scope, conversation, policy, bool(industry), message, rows, embedder
     )
     return {
         **industry,

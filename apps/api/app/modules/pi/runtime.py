@@ -45,6 +45,7 @@ from app.modules.pi.language import (
     detect_language,
     notice_in,
 )
+from app.modules.pi.learning_embed import make_embedder
 from app.modules.pi.models import (
     PiAgent,
     PiAgentRun,
@@ -893,7 +894,14 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 message.media = {**message.media, "links": links}
                 await session.commit()
         service_context = (
-            await prepare_context(session, scope, conversation, message, policy)
+            await prepare_context(
+                session,
+                scope,
+                conversation,
+                message,
+                policy,
+                embedder=make_embedder(ctx["settings"], ctx.get("http")),
+            )
             if service_discovery
             else None
         )

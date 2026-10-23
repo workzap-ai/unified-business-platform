@@ -174,3 +174,89 @@ async def test_an_example_that_holds_a_name_or_a_number_is_never_made(
     assert counts["added"] == 0  # "Johar Town" in their words keeps the whole exchange out
     assert (await business_db.scalars(select(PiLearningExample))).all() == []
     await pi.close()
+
+
+def fake_embedder(calls):
+    """A stand-in embedding space: stock-like words point one way, everything else the other."""
+
+    async def run(texts):
+        calls.append(list(texts))
+        stock = ("stock", "inventory", "shelves")
+        return [[1.0, 0.0] if any(w in t.lower() for w in stock) else [0.0, 1.0] for t in texts]
+
+    return run
+
+
+async def test_embeddings_choose_by_meaning_when_the_words_do_not_overlap(
+    api, business_db, monkeypatch
+):
+    from decimal import Decimal
+
+    adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)
+    await learning_on(api)
+    await good_chat(pi, business_db)
+    scope = pi.scope()
+    await score_new(business_db)
+    calls = []
+    counts = await learning_bank.curate(business_db, scope, embedder=fake_embedder(calls))
+    assert counts["added"] == 1 and counts["embedded"] == 1
+    [stock] = (await business_db.scalars(select(PiLearningExample))).all()
+    assert stock.embedding == [1.0, 0.0]  # "stock runs out in two shops"
+    # A second example about something else, with a higher reward, so words alone would pick it.
+    other = PiLearningExample(
+        tenant_id=stock.tenant_id,
+        environment_id=stock.environment_id,
+        message_id=stock.message_id,
+        situation=stock.situation,
+        language="en",
+        person_text="cashiers come late on weekends",
+        reply_text="Is it every shop, or only some?",
+        reward=6,
+        status="active",
+        source_contacts=["someone-else"],
+        redaction_confidence=Decimal("1.0"),
+        embedding=[0.0, 1.0],
+    )
+    stock.status = "active"
+    business_db.add(other)
+    await business_db.flush()
+    args = dict(
+        state=stock.situation["state"],
+        language="en",
+        said="the inventory finishes early on the shelves",
+        k=1,
+    )
+    by_words = await learning_bank.retrieve(business_db, scope, **args)
+    assert [e.person_text for e in by_words] == [
+        "cashiers come late on weekends"
+    ]  # no overlap: reward wins
+    asked = []
+    by_meaning = await learning_bank.retrieve(
+        business_db, scope, embedder=fake_embedder(asked), **args
+    )
+    assert [e.person_text for e in by_meaning] == ["stock runs out in two shops"]
+    assert asked == [["the inventory finishes early on the shelves"]]  # one call, for the message
+    # No examples with an embedding means no call is made at all.
+    stock.embedding = other.embedding = None
+    none_asked = []
+    await learning_bank.retrieve(business_db, scope, embedder=fake_embedder(none_asked), **args)
+    assert none_asked == []
+    await pi.close()
+
+
+async def test_a_failing_embedder_never_breaks_the_turn(api, business_db, monkeypatch):
+    adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)
+    await learning_on(api)
+    await good_chat(pi, business_db)
+    await score_new(business_db)
+
+    async def broken(texts):
+        return None  # what make_embedder returns when the provider call fails
+
+    counts = await learning_bank.curate(business_db, pi.scope(), embedder=broken)
+    assert counts["added"] == 1 and counts.get("embedded") == 0
+    [example] = (await business_db.scalars(select(PiLearningExample))).all()
+    assert example.embedding is None
+    await pi.close()
