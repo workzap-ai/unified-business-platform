@@ -30,6 +30,10 @@ from app.modules.pi.language import (
         ("मुझे वेबसाइट चाहिए", "roman_ur"),
         ("أريد موقعا إلكترونيا", "ar"),
         ("ok", None),
+        ("no", None),  # Roman Urdu speakers answer "no" too: the chat keeps its language
+        ("Yes please", None),
+        ("nahi", "roman_ur"),
+        ("no, I don't", "en"),
         ("👍", None),
         ("", None),
         ("Website", None),
@@ -61,3 +65,16 @@ def test_fixed_notices_follow_the_language() -> None:
     assert notice_in(HANDOFF_NOTICES, "en").startswith("Thanks for your message")
     assert notice_in(HANDOFF_NOTICES, "fr") == HANDOFF_NOTICES["en"]
     assert notice_in(HANDOFF_NOTICES, None) == HANDOFF_NOTICES["en"]
+
+
+def test_a_bare_no_after_voice_notes_keeps_their_language() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import reply_language
+
+    def said(body: str, kind: str = "text") -> SimpleNamespace:
+        return SimpleNamespace(sender_type="customer", message_type=kind, body=body)
+
+    rows = [said("Hum Facebook ad chalate hain, footfall nahi aata", "audio"), said("hello")]
+    found = reply_language(SimpleNamespace(), said("no"), rows)  # type: ignore[arg-type]
+    assert found["reply_language"] == "roman_ur"

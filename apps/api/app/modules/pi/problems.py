@@ -756,16 +756,62 @@ DONE = re.compile(
 )
 WHAT_NOW = re.compile(
     r"\b(?:what now|so what can you do|what can you do|what next|how much|how much would|"
-    r"ab kya|aage kya|kitna (?:lagega|kharcha)|kya kar sakte)\b",
+    r"ab kya|aage kya|kitna (?:lagega|kharcha)|kya kar sakte)\b"
+    # Pushing for the fix, always addressed to pi ("jaldi solution do", "sawal hi poochti
+    # rahogi?", "just give me the solution"): the same "so what can you do?", so pi shows what it
+    # noted instead of asking more. A customer describing THEIR customers asking too many
+    # questions, or saying "koi hal hai nahi", is still describing a problem.
+    r"|\bkuch kar sakte (?:ho|hain? ya nahi)\b"
+    r"|\bkya solution (?:hai|he|hy)\b|\b(?:tumhare|aapke|apke) paas (?:koi )?(?:solution|hal)\b"
+    r"|\bsolution (?:do|dein|de do|dedo|batao|btao|bataen|chahiye)\b"
+    r"|\bsawal(?:at)? hi (?:pooch|puch)\w*\s+(?:rah|rh)(?:o|oge|ogi|ega|egi)\b"
+    r"|\b(?:aap|ap|tum) (?:itne|kitne) sawal\b"
+    r"|\b(?:give|tell) me (?:a |the |your )?(?:solution|fix|answer)\W*$"
+    r"|\bwhy (?:so|are you asking so) many questions\b"
+    r"|\byou (?:ask|keep asking|are asking) (?:too|so) many questions\b"
+    r"|\bstop asking (?:me|questions)\b|\benough (?:with )?(?:the |of the )?questions\b"
+    r"|\bdo you have a (?:solution|fix)\b",
     re.IGNORECASE,
 )
 
 
 SHOW_ME = re.compile(
     r"\b(?:show me (?:what|everything|all)|what (?:have|did) you (?:noted?|got|written|understood)|"
-    r"dikhao|kya (?:kya )?note kiya)\b",
+    r"dikhao|kya (?:kya )?note kiya)\b"
+    # "I already told you" (R-MEM-02): show what is noted instead of asking again. Only when it
+    # is said to pi; "I already told the supplier" is part of the story.
+    r"|\balready (?:told|said|mentioned)(?: it)? (?:to )?you\b"
+    r"|\btold you (?:above|before|earlier)\b"
+    r"|\bscroll up\b|\b(?:look at|read) (?:the |our )?(?:chat|conversation)\b"
+    r"|\bup(?:p?e|a)?r (?:bata\w*|bta\w*|likha|likh\w*)|\bdekho (?:ye |yeh |is )?chat\b"
+    r"|\bchat (?:dekho|dekh lo|dekhen|dekhein|parho|padho)\b"
+    r"|^\W*(?:main |mai |maine )?(?:aap ko |apko |aapko )?(?:pehle|phele|pehly) (?:hi )?"
+    r"(?:bata|bta|likh)\w* (?:chuka|chuki|diya|dia)\b"
+    r"|\b(?:aap ko|apko|aapko|tumhe) (?:\w+ )?(?:bata|bta) (?:chuka|chuki|diya|dia)\b",
     re.IGNORECASE,
 )
+
+# "That's wrong, I never said that" about something pi attributed to them (R-CORR-01): pi
+# withdraws or corrects that note and says so; it never answers that it did not understand.
+# "Galat order deliver ho jata hai" is a problem, not a correction: the word must stand alone.
+CORRECTED = re.compile(
+    r"^\W*(?:galat|ghalat|glt|ghlt|wrong|not true)\W*(?:$|(?:hai|he|h|baat|wo|woh|ye|yeh|nahi)\b)"
+    r"|\b(?:maine|main ne|mai ne|ma ?ny|mein ne|mene|meine) (?:aisa|asa|esa|ye|yeh)"
+    r"(?: (?:kuch|kch))?(?: (?:bhi|bh))? (?:nahi|nhi|nh|nahin|nai) (?:kaha|kha|bola|likha)\b"
+    r"|\bi (?:never|didn'?t|did not) (?:say|said) (?:that|this|so|it|anything)\b"
+    r"|\bthat'?s not what i said\b",
+    re.IGNORECASE,
+)
+
+
+def says_wrong(text: str) -> bool:
+    """They say pi got something wrong, whether or not anything is noted yet."""
+    return bool(CORRECTED.search(" ".join((text or "").split())))
+
+
+def corrects_noted(text: str, noted: int) -> bool:
+    """They say something already noted is wrong (there must be a note to correct)."""
+    return noted > 0 and says_wrong(text)
 
 
 def summary_due(

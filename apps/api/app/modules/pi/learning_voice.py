@@ -62,7 +62,9 @@ USED_SHARE = 0.75  # of a variant's words that must be in the reply for it to co
 MAX_WORDS = 14
 
 CORRECTION = re.compile(
-    r"^\W*(?:no|nahi|nahin|nope|actually|galat|wrong)\b|\b(?:i meant|it'?s actually)\b",
+    r"^\W*(?:(?:no|nahi|nahin|nope|actually)\b"
+    r"|(?:galat|ghalat|glt|wrong)\W*(?:$|(?:hai|he|h|baat|wo|woh|ye|yeh)\b))"
+    r"|\b(?:i meant|it'?s actually|i never said)\b",
     re.IGNORECASE,
 )
 Writer = Callable[[str, str, list[str]], Awaitable[list[str]]]

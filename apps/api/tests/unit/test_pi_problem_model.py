@@ -220,6 +220,15 @@ def test_the_summary_speaks_the_persons_language():
         ("so what can you do?", "what_now"),
         ("how much would it cost", "what_now"),
         ("ab kya karna hai", "what_now"),
+        ("Aap jaldi solution do na mujhe, sawal hi poochti rahogi kya?", "what_now"),
+        ("Batao kuch kar sakte hain ya nahi kar sakte?", "what_now"),
+        ("Kya solution hai tumhare paas?", "what_now"),
+        ("just give me the solution", "what_now"),
+        ("why so many questions", "what_now"),
+        ("Can you tell me the solution", "what_now"),
+        ("Upper btaiya tw hua Dekho chat", "show"),
+        ("I already told you", "show"),
+        ("pehle bata chuka hoon", "show"),
     ],
 )
 def test_when_the_summary_is_due(said, why):
@@ -260,3 +269,54 @@ def test_the_brain_prompt_lists_every_category_and_sub_type():
         assert f"{category.key}" in prompt
     assert "stock_inventory: stockout, overstock_dead_stock" in prompt
     assert "user_words" in prompt and "problem_ops" in prompt
+
+
+@pytest.mark.parametrize(
+    "said",
+    ["Glt ma ny asa kch bh NH kha", "galat, wo nahi", "maine aisa nahi kaha", "I never said that"],
+)
+def test_saying_a_note_is_wrong_is_a_correction(said):
+    assert problems.corrects_noted(said, noted=1)
+    assert not problems.corrects_noted(said, noted=0)  # nothing noted: nothing to correct
+
+
+def test_an_ordinary_answer_is_not_a_correction():
+    assert not problems.corrects_noted("haan, roz hota hai", noted=2)
+    assert not problems.corrects_noted("the cashier is wrong about the cash", noted=2)
+
+
+@pytest.mark.parametrize(
+    "said",
+    [
+        "customers ask too many questions on WhatsApp",
+        "customer itne sawal karte hain",
+        "customer sawal hi poochte rehte hain",
+        "they never stop asking about delivery",
+        "online order kar sakte hain ya nahi, pata nahi chalta",
+        "koi hal hai nahi abhi tak",
+        "suppliers never give me a fix date",
+        "I already told the supplier twice",
+        "staff check the chat late",
+        "maine supplier ko pehle bata diya tha",
+        "main staff ko bata chuka hoon",
+        "Galat order deliver ho jata hai",
+        "Ghalat bill banta hai",
+        "Wrong items get packed every week",
+        "I didn't mention it, but delivery is also slow",
+    ],
+)
+def test_describing_a_problem_never_cuts_listening_short(said):
+    assert problems.summary_due(said, noted=2, since_summary=2) is None
+    assert not problems.says_wrong(said)
+
+
+@pytest.mark.parametrize(
+    "said", ["Upar bataya tha", "upar likha hai dekho", "Aap ko pehle bata chuka hoon"]
+)
+def test_upar_and_told_you_phrasings_show_the_summary(said):
+    assert problems.summary_due(said, noted=2, since_summary=2) == "show"
+
+
+def test_said_wrong_needs_no_note_but_withdrawing_does():
+    assert problems.says_wrong("Glt ma ny asa kch bh NH kha")
+    assert not problems.corrects_noted("Glt ma ny asa kch bh NH kha", noted=0)

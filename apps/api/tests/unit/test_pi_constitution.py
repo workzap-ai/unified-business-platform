@@ -320,3 +320,66 @@ def test_no_state_in_context_means_the_pitch_rule_is_not_applied():
 def test_no_urgency_scarcity_or_discounts_in_any_state(reply):
     assert "R-SELL-03" in rules(reply)
     assert "R-SELL-03" in {v.rule for v in c.hard(c.lint(reply, listening("S7_DELIVERED")))}
+
+
+def test_while_listening_pi_does_not_list_back_what_it_already_confirmed():
+    earlier = {
+        "role": "ai",
+        "text": "• Aapka dhanda nahi chal raha hai.\n• Footfall nahi hai.\nKya bechte hain?",
+    }
+    relist = "• Footfall nahi hai.\nAap ab customers kaise laate hain?"
+    said = context(
+        latest="Kapron ki dukaan hai, footfall chahiye",
+        history=[AI_TURN, earlier],
+        flow={"state": "S1_LISTENING"},
+    )
+    assert "R-VOICE-09" in {v.rule for v in c.lint(relist, said)}
+
+
+def test_a_short_answer_gets_no_list_of_its_story():
+    reply = (
+        "• No footfall.\n• Facebook ads and SMS.\n• Shops in Defence.\n"
+        "Anything else getting in the way?"
+    )
+    assert "R-VOICE-09" in {v.rule for v in c.lint(reply, listening(latest="no"))}
+    assert "R-VOICE-09" in {
+        v.rule for v in c.lint("• Stock out\n• Stock out\nWhich shop?", listening())
+    }
+
+
+def test_several_new_problems_in_one_message_may_be_listed():
+    said = (
+        "stock runs out, my cashiers come late on weekends and the cash never matches at one branch"
+    )
+    reply = (
+        "Thanks. I've noted three things:\n• Stock running out\n"
+        "• Cashiers late on weekends\n• Cash not matching\nWhich of these costs you the most?"
+    )
+    assert "R-VOICE-09" not in {v.rule for v in c.lint(reply, listening(latest=said))}
+    assert "R-VOICE-09" not in {v.rule for v in c.lint(reply, context(latest="no"))}  # no state
+
+
+def test_a_correction_is_never_met_with_i_did_not_understand():
+    reply = "Maaf kijiye, aap ki baat samajh nahi aayi. Kis maslay par baat karni hai?"
+    assert "R-CORR-02" in {v.rule for v in c.lint(reply, context(said_wrong=True))}
+    assert "R-CORR-02" not in {v.rule for v in c.lint(reply, context())}
+    fixed = "Aap sahi keh rahe hain, wo hata diya. Stock kis cheez ka kam ho raha hai?"
+    assert "R-CORR-02" not in {v.rule for v in c.lint(fixed, context(said_wrong=True))}
+
+
+def test_no_stiff_apology():
+    assert "R-VOICE-04" in rules("Mujhe maazrat chahiye. Kaunsi shop hai?")
+
+
+def test_a_complaint_about_the_questions_gets_no_document_talk_but_a_direct_ask_does():
+    reply = (
+        "Workzap can prepare a solution document once the problems are noted. Is that everything?"
+    )
+    asked = listening(latest="Kya solution hai tumhare paas?")
+    assert "R-SELL-01" not in {v.rule for v in c.lint(reply, asked)}
+    pushed = listening(latest="Batao kuch kar sakte hain ya nahi kar sakte?")
+    assert "R-SELL-01" not in {v.rule for v in c.lint(reply, pushed)}
+    complaint = listening(latest="sawal hi poochti rahogi kya?")
+    assert "R-SELL-01" in {v.rule for v in c.hard(c.lint(reply, complaint))}
+    pitch = "We can build an app for that. Is that everything?"
+    assert "R-SELL-01" in {v.rule for v in c.hard(c.lint(pitch, asked))}

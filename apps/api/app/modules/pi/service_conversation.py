@@ -890,6 +890,26 @@ Script and company facts (pi_mode "brain"; these override the shared rules above
   bullet list. You only listen and note problems: confirm ONE thing in the customer's own
   words in one short line, then ask one question. Never say you are proceeding with, or
   starting, anything.
+- Never list back what you confirmed before, and never turn their story into points: where
+  the shops are or what they sell is context, not a problem. A "• " list is only for three or
+  more separate problems in THIS message. A short answer ("no", "haan") gets one short line.
+- said_wrong (when present): they say something you noted or said about them is wrong
+  ("glt", "maine aisa nahi kaha", "I never said that"). Never say you did not understand: say
+  they are right in one short line ("Aap sahi keh rahe hain."). If corrects_noted is also
+  present and one noted problem is what they mean, withdraw or update that problem in
+  problem_ops and say so ("wo hata diya"); if none of the noted problems is what they mean,
+  change nothing in problem_ops. If they say they already told you, use what they said
+  earlier in the chat; never ask them to describe it again.
+- Apologise rarely and plainly: "Maaf kijiye" in Roman Urdu, "Sorry" in English; never
+  "Mujhe maazrat chahiye".
+- If they ask directly for a fix ("solution do", "kuch kar sakte ho?", "can you tell me the
+  solution"), do not ask another digging question and do not describe a solution: say in one
+  line that Workzap can prepare a solution document once the problems are noted, then ask
+  whether anything else is getting in the way or whether that is everything.
+- If they only complain about the questions ("sawal hi poochti rahogi?", "why so many
+  questions"), stop digging and say nothing about a document, a solution or a quote: say
+  sorry in one short line, then ask whether anything else is getting in the way or whether
+  that is everything.
 - clarify_first (when present) is the ref of the noted problem to ask about first. pattern_hint
   (when present) is a pattern worth saying once, as an observation, never a diagnosis: for
   example "Three of the problems you've mentioned are about stock" (kind group) or "Shop C
@@ -1208,6 +1228,10 @@ async def brain_problems(
     context["quiet_replies"] = int(brief.get("quiet_replies") or 0)
     context["handback_notice"] = bool(brief.get("handback_notice"))
     context["clarify_count"] = int(brief.get("clarify_count") or 0)
+    if message is not None and problems.says_wrong(message.body or ""):
+        context["said_wrong"] = True  # R-CORR-02: never "I didn't understand"
+        if noted:
+            context["corrects_noted"] = True  # R-CORR-01: fix the note they mean
     # Spec 4.7: the problem to clarify first is the most severe one that still has gaps.
     gaps = [p for p in noted if p.get("missing")]
     if gaps:
@@ -2174,6 +2198,11 @@ def looks_foreign(text: str) -> bool:
     return bool(re.search(r"[À-ÖØ-öø-ÿ]", text) or FOREIGN_WORDS.search(text))
 
 
+# A media message's body can be "Customer caption: ...\nAttachment: ...": the labels are system
+# English, never the customer's language.
+CAPTION_LABELS = re.compile(r"^Customer caption: |\nAttachment: .*$", re.S)
+
+
 def reply_language(
     conversation: PiConversation, message: PiMessage, rows: list[PiMessage]
 ) -> dict[str, str]:
@@ -2187,7 +2216,12 @@ def reply_language(
         and looks_foreign(texts[0])
     ):
         return {}  # A real message in another language (e.g. Spanish): the model matches it.
-    texts += [m.body for m in rows if m.sender_type == "customer" and m.message_type == "text"]
+    # A voice note's body is its transcript: their own words, so it counts like a text.
+    texts += [
+        CAPTION_LABELS.sub("", m.body)
+        for m in rows
+        if m.sender_type == "customer" and m.message_type in ("text", "audio") and m.body
+    ]
     language = next(
         (found for found in map(detect_language, texts[:3]) if found),
         # Nothing clear in their recent messages ("ok", an emoji, a link): English, the

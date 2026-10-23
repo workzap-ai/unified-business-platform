@@ -52,7 +52,7 @@ THANKS = re.compile(
     re.IGNORECASE,
 )
 CORRECTION = re.compile(
-    r"^\W*(?:no[, ]|nahi|nahin|galat|wrong|that'?s not|its not|it'?s not|not what i)"
+    r"^\W*(?:no[, ]|nahi|nahin|(?:galat|ghalat|glt|wrong)\W*(?:$|(?:hai|he|h|baat|wo|woh|ye|yeh)\b)|that'?s not|its not|it'?s not|not what i)"
     r"|\b(?:not what i meant|galat likha|actually it'?s|actually its|you got it wrong|that is wrong)\b",
     re.IGNORECASE,
 )

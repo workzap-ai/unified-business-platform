@@ -45,6 +45,9 @@ ENGLISH = frozenset(
 )
 # Words both sides use all the time ("me", "to", "is", "main", "hi", "do") and nouns
 # Roman Urdu borrows ("website", "design", "price") never count.
+# English words Roman Urdu speakers also answer with on their own: a bare "no" or "yes"
+# is no sign of English, so the chat keeps its language.
+BORROWED_ANSWERS = frozenset("no yes please thanks thank sorry okay".split())
 
 URDU_LETTERS = re.compile(r"[ٹڈڑںےھہۓ]")
 PERSIAN_LETTERS = re.compile(r"[پچگژک]")
@@ -181,6 +184,8 @@ def detect_language(text: str | None) -> str | None:
             return "roman_ur"
         return None if PERSIAN_LETTERS.search(text) else "ar"
     words = LATIN_WORD.findall(text.lower())
+    if len(words) <= 2 and set(words) <= BORROWED_ANSWERS:
+        return None  # "no", "yes please", "thanks": the chat keeps its language
     urdu = sum(word in ROMAN_URDU for word in words)
     english = sum(word in ENGLISH for word in words)
     if urdu > english:

@@ -62,20 +62,20 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-VOICE-01 | Short (60, summary 160, document cover 120 words) | code | linter, soft |
 | R-VOICE-02, R-ASK-01 | One question, and it is last | code | linter, soft |
 | R-VOICE-03 | No jargon they did not use | code | linter |
-| R-VOICE-04 | Mirror language and register; no same opening twice | code | language guards (`reply_language`) and linter on openings |
+| R-VOICE-04 | Mirror language and register; no same opening twice | code | language guards (`reply_language`) and linter on openings; "mujhe maazrat chahiye" is flagged (say "Maaf kijiye") |
 | R-VOICE-05, 06 | No hype, no scripted empathy, no template phrases | code | linter |
 | R-VOICE-07, 08 | No "!", no emoji (except a tick, or theirs) | code | linter; `repair` fixes it |
-| R-VOICE-09, 10, 12 | WhatsApp formatting; "noted" not "logged"; never lecture | code | linter |
+| R-VOICE-09, 10, 12 | WhatsApp formatting; "noted" not "logged"; never lecture | code | linter; R-VOICE-09 also flags a list while listening that repeats a point or has more points than the latest message could hold (not in S4) |
 | R-VOICE-11, 13, 14 | Their names for things; contractions; British spelling | prompt | |
 | R-LANG-01 | "Sorted" is not "solved" | code | linter; summary text |
-| R-LANG-02 | Language per message | code | existing language detection and guards |
+| R-LANG-02 | Language per message | code | existing language detection and guards; a bare "no" or "yes please" keeps the chat language, and voice-note transcripts count in `reply_language` |
 | R-LANG-03 | Their words kept, English title for Workzap | code | `ProblemNote` (`user_words`, `title`, `title_local`) |
 | R-LANG-04, 06 | Lakh and crore, dates like "kal" | open | |
 | R-LANG-05 | Currency from the country | code | quote currency from the number (PKR, AED, CAD) |
 | R-LANG-07, 08 | Voice notes; religious courtesy | partial | transcription exists; courtesy is prompt |
 | R-ASK-02 to 06 | At most 3 clarifying questions; never re-ask; no sensitive asks | prompt | `noted_problems` lists what is missing |
-| R-NOTE-01 to 08, R-CORR-01 to 04 | Notes in their words, groups, corrections applied | code | `problems.py` ops with revisions; titles checked |
-| R-MEM-01, 02 | Profiles; never ask twice | partial | profile and `noted_problems`; no cross-conversation memory check |
+| R-NOTE-01 to 08, R-CORR-01 to 04 | Notes in their words, groups, corrections applied | code | `problems.py` ops with revisions; titles checked. R-CORR-02: `says_wrong` sets `said_wrong` and the linter flags "I did not understand" as an answer to it; `corrects_noted` (a note exists) tells the prompt to withdraw the problem they mean |
+| R-MEM-01, 02 | Profiles; never ask twice | partial | profile and `noted_problems`; "I already told you" shows the sorted summary (`SHOW_ME`); no cross-conversation memory check |
 | R-MEM-03 | Welcome back after a gap | code | `welcome_back` (see R-DISC-05) |
 | R-MEM-06 | Shared workspace | open | |
 | R-MEM-04 | Corrections override, history kept | code | revisions |

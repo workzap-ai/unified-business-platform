@@ -180,7 +180,8 @@ NEGATED_DISCOUNT = re.compile(
 )
 ASKED_FOR_HELP = re.compile(
     r"\b(?:solution|fix|solve|build|quote|price|pricing|cost|how much|proposal|what can you do|"
-    r"can you help|can you fix|what would you build|kya kar sakte|kitna|qeemat|hal|"
+    r"can you help|can you fix|what would you build|(?:kya|kuch) kar sakte|"
+    r"kar sakte (?:ho|hain) ya nahi|(?:kya|koi) hal (?:hai|he)|kitna|qeemat|hal|"
     r"can you (?:make|create|develop|build|set up)|(?:make|build|create) (?:me )?an? "
     r"(?:app|system|software|website|tool)|app for this|kharcha|kharch|"
     r"what (?:do|does) (?:you|workzap) (?:sell|offer|do)|your (?:products?|services?))\b",
@@ -261,6 +262,40 @@ def _allowed_bangs(context: dict[str, Any]) -> int:
         "!" in str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "ai"
     )
     return 1 if "!" in said and FESTIVAL.search(said) and not earlier else 0
+
+
+NOT_UNDERSTOOD = re.compile(
+    r"\b(?:samajh|samjh|samjha|samja) (?:nahi|nhi|nahin)"
+    r"(?: (?:aayi|aaya|aai|aya|ayi|paya|payi|saka|saki|aa raha|aa rahi))?\b"
+    r"|\bdid(?:n'?t| not) (?:understand|follow|get)\b|\bdon'?t (?:understand|follow)\b",
+    re.IGNORECASE,
+)
+STIFF_APOLOGY = re.compile(r"\bmaa?zrat\b|\bmaazerat\b", re.IGNORECASE)
+BULLET = ("•", "- ")
+WORDS_PER_POINT = 4  # a list point needs about this many of their words in the latest message
+
+
+def _points(text: str) -> list[str]:
+    return [
+        " ".join(re.findall(r"\w+", line.lower()))
+        for line in text.splitlines()
+        if line.lstrip().startswith(BULLET)
+    ]
+
+
+def _relists(reply: str, context: dict[str, Any]) -> bool:
+    """A list while listening that repeats itself, repeats an earlier list, or has more points
+    than their latest message could hold ("no" answered with four points)."""
+    points = _points(reply)
+    if not points:
+        return False
+    earlier = {p for said in _pi_replies(context) for p in _points(said)}
+    latest = len(str(context.get("latest_customer_message", "")).split())
+    return (
+        len(set(points)) < len(points)
+        or any(p in earlier for p in points)
+        or (len(points) >= 2 and latest < WORDS_PER_POINT * len(points))
+    )
 
 
 def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
@@ -361,6 +396,28 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         else normal_cap
     )
     words = len(reply.split())
+    if (
+        state in flow.LISTENING
+        and state != flow.State.S4_SORTED_SUMMARY  # a corrected summary repeats its lines
+        and _relists(reply, context)
+    ):
+        add(
+            Violation(
+                "R-VOICE-09",
+                "do not list back what you already confirmed or restate their whole story: "
+                "confirm only the new problem this message adds, in one short line",
+            )
+        )
+    if context.get("said_wrong") and NOT_UNDERSTOOD.search(reply):
+        add(
+            Violation(
+                "R-CORR-02",
+                "they corrected something you noted: say they are right and that it is "
+                "fixed or removed, never that you did not understand",
+            )
+        )
+    if STIFF_APOLOGY.search(reply):
+        add(Violation("R-VOICE-04", 'say "Maaf kijiye", not "mujhe maazrat chahiye"'))
     if words > cap:
         add(Violation("R-VOICE-01", f"too long: {words} words, the limit is {cap}"))
     elif cap == normal_cap and words > int(
