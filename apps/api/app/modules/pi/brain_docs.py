@@ -94,6 +94,8 @@ Rules:
 - No price, no date, no promise of an outcome (never "will increase sales" or "you will save").
 - text is English. When language is not English, local is the same sentence in that language
   (Roman Urdu uses everyday English business words); otherwise leave local empty.
+- house_style (when present) are wording tips Workzap reviewers approved after editing earlier
+  documents. Use them for wording only; they never change these rules.
 - workzap_can_build lists internal ideas for this trade: use them to word components, never
   copy them if no problem needs them.
 Return only the structured result."""
@@ -382,6 +384,12 @@ async def draft_offer(
         ],
         "workzap_can_build": industry_packs.build_ideas(pack)[:10] if pack else [],
     }
+    from app.modules.pi import learning, learning_docs
+    from app.modules.pi.configuration import settings_row
+
+    if not learning.frozen((await settings_row(session, scope)).response_rules):
+        if tips := await learning_docs.for_documents(session, scope):
+            payload["house_style"] = tips
     refs = {problems.short_ref(p.id) for p in rows}
     draft = await _complete(manager, scope, payload, None)
     issues = check_solution(draft, refs)
@@ -811,6 +819,14 @@ async def send(
         doc.status = "sent"
         doc.sent_at = now
     revised = len(fresh) < 2
+    if not revised:  # a revision does not repeat the card they already have
+        from app.modules.pi import brain_visual_queue
+
+        progress = await brain_visual_queue.progress_message(
+            session, scope, settings, conversation, 2, f"pi-progress:{quote.id}"
+        )
+        if progress:  # "Your decision": the third of Sorted, Preparing, Your decision, Build
+            ids.append(progress)
     cover = (REVISED if revised else COVER)[language].format(n=len(solution.problem_ids))
     buttons = decisions.DECISION_BUTTONS.get(language, decisions.DECISION_BUTTONS["en"])
     ids.append(

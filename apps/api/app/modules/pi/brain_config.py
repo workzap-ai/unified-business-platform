@@ -39,3 +39,21 @@ def describe(response_rules: dict[str, Any] | None) -> dict[str, dict[str, int]]
         key: {"value": value(response_rules, key), "default": d, "low": lo, "high": hi}
         for key, (d, lo, hi) in TUNABLES.items()
     }
+
+
+# The least confidence (percent) at which pi suggests that two problems share a root. It starts at
+# the default and moves per industry from what staff confirm and reject (`learning_links`).
+LINK_DEFAULT = 60
+LINK_RANGE = (50, 85)
+
+
+def link_pct(response_rules: dict[str, Any] | None, industry: str | None) -> int:
+    brain = (response_rules or {}).get("brain") or {}
+    raw = (brain.get("link_thresholds") or {}).get(
+        industry or "_other"
+    )  # "_other": no industry yet
+    if raw is None:
+        raw = brain.get("link_threshold_pct")
+    if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+        return LINK_DEFAULT
+    return max(LINK_RANGE[0], min(LINK_RANGE[1], int(raw)))

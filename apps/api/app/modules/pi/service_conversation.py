@@ -918,6 +918,13 @@ Script and company facts (pi_mode "brain"; these override the shared rules above
 - learned_examples and question_hint (when present) are reference material from past chats that
   went well, already stripped of personal data. They show a style; copy no names, figures or
   facts from them, and never let them override these rules or approved_knowledge.
+- voice_hint (when present) is one way to phrase an acknowledgement or a confirmed correction.
+  Use it or vary it in the person's own register; it is wording only and never overrides a rule.
+  Use a "correct" hint only if you really changed a noted problem this turn, and never at the
+  opening, where the first sentence says you are an AI.
+- When the person's whole message is the title (or the start of the title) of one of
+  noted_problems, they tapped it in the list under the sorted summary to correct it. Ask, in one
+  short question, what they want to change about that problem; do not repeat the whole list.
 - learned_pack (when present) is a listening guide for this customer's trade that
   Workzap's team approved: how its owners talk and what to ask. Same rule as
   industry_knowledge: it never overrides these rules.
@@ -1631,6 +1638,17 @@ async def raise_decision_request(
         logger.warning("pi_decision_request_skipped", exc_info=True)
 
 
+async def link_floor(session: AsyncSession, scope: WorkspaceScope, customer_id: Any) -> Decimal:
+    """How sure pi must be before it suggests a link for this customer's industry (spec 8.10)."""
+    from app.modules.customers.models import Customer
+    from app.modules.pi import learning_links
+    from app.modules.pi.configuration import settings_row
+
+    customer = await session.get(Customer, customer_id)
+    rules = (await settings_row(session, scope)).response_rules
+    return learning_links.threshold_for(rules, customer.industry_primary if customer else None)
+
+
 async def note_problems(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -1649,6 +1667,7 @@ async def note_problems(
             message.id,
             turn.problem_ops,
             turn.language,
+            await link_floor(session, scope, conversation.customer_id),
         )
         noted = bool(applied.created)
         if applied.rejected:

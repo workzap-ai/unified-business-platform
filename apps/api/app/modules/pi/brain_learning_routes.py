@@ -25,6 +25,7 @@ from app.modules.pi import (
     learning_miner,
     learning_nightly,
     learning_packs,
+    learning_voice,
     taxonomy,
 )
 from app.modules.pi.configuration import settings_row
@@ -38,7 +39,7 @@ from app.modules.pi.learning_models import (
     PiQuestionArm,
 )
 from app.modules.pi.models import PiConversation, PiMessage
-from app.modules.pi.problem_models import PiProblem, PiProblemRevision
+from app.modules.pi.problem_models import PiProblem, PiProblemLink, PiProblemRevision
 from app.modules.pi.problems import redact
 from app.modules.pi.service import require_pi
 from app.shared.errors import BusinessRuleViolation, ResourceNotFound
@@ -111,6 +112,7 @@ async def run_now(request: Request, scope: Scope, session: Session) -> dict[str,
         pack_writer=lambda s: learning_packs.make_writer(state.settings, state.http, s),
         question_writer=lambda s: learning_miner.make_writer(state.settings, state.http, s),
         grader=lambda s: learning_grader.make_grader(state.settings, state.http, s),
+        voice_writer=lambda s: learning_voice.make_writer(state.settings, state.http, s),
     )
     await record(
         session,
@@ -613,6 +615,101 @@ async def review_queue(scope: Scope, session: Session) -> dict[str, Any]:
         "flagged_changes": [
             {"id": c.id, "kind": c.kind, "reason": c.reason, "created_at": c.created_at}
             for c in flagged
+        ],
+    }
+
+
+class LinkDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    decision: str = Field(pattern="^(confirm|reject)$")
+
+
+@router.get("/links")
+async def suggested_links(scope: Scope, session: Session) -> dict[str, Any]:
+    """Links pi suggested between problems that wait for a person (spec 8.10)."""
+    await require_pi(session, scope, PERMISSION)
+    rows = await session.execute(
+        select(PiProblemLink, PiProblem.title)
+        .join(PiProblem, PiProblem.id == PiProblemLink.from_id)
+        .where(
+            PiProblemLink.tenant_id == scope.tenant_id,
+            PiProblemLink.environment_id == scope.environment_id,
+            PiProblemLink.status == "suggested",
+        )
+        .order_by(PiProblemLink.created_at)
+        .limit(100)
+    )
+    return {
+        "items": [
+            {
+                "id": link.id,
+                "type": link.type,
+                "confidence": float(link.confidence),
+                "from": title,
+                "to_id": link.to_id,
+            }
+            for link, title in rows
+        ]
+    }
+
+
+@router.post("/links/{link_id}/decide")
+async def decide_link(
+    link_id: UUID, data: LinkDecision, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Confirm or reject a suggested link. The decisions tune how readily pi suggests links in
+    that industry."""
+    await require_pi(session, scope, PERMISSION)
+    link = await session.get(PiProblemLink, link_id)
+    if (
+        link is None
+        or link.tenant_id != scope.tenant_id
+        or link.environment_id != scope.environment_id
+    ):
+        raise ResourceNotFound
+    if link.status != "suggested":
+        raise BusinessRuleViolation("LINK_DECIDED", "This link was already decided", 409)
+    link.status = "confirmed" if data.decision == "confirm" else "rejected"
+    await record(
+        session,
+        "pi.problem_link_decided",
+        scope=scope,
+        entity_type="pi_problem_link",
+        entity_id=link.id,
+        details={"status": link.status},
+    )
+    await session.commit()
+    return {"id": link.id, "status": link.status}
+
+
+@router.get("/problems")
+async def noted_problems(scope: Scope, session: Session, limit: int = 50) -> dict[str, Any]:
+    """The problems pi noted most recently, with the fixed categories to correct them to."""
+    await require_pi(session, scope, PERMISSION)
+    rows = await session.scalars(
+        select(PiProblem)
+        .where(
+            PiProblem.tenant_id == scope.tenant_id,
+            PiProblem.environment_id == scope.environment_id,
+            PiProblem.status.in_(taxonomy.ACTIVE),
+        )
+        .order_by(PiProblem.updated_at.desc())
+        .limit(max(1, min(limit, 100)))
+    )
+    return {
+        "categories": [
+            {"key": c.key, "label": taxonomy.label(c.key, "en")} for c in taxonomy.CATEGORIES
+        ],
+        "items": [
+            {
+                "id": p.id,
+                "title": p.title,
+                "category": p.category,
+                "subtype": p.subtype,
+                "status": p.status,
+                "words": (p.user_words or [])[:1],
+            }
+            for p in rows
         ],
     }
 

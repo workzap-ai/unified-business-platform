@@ -144,3 +144,45 @@ async def test_a_value_set_by_hand_is_not_undone(wire):
 
 def test_a_change_needs_as_many_replies_as_a_canary():
     assert learning_tuning.MIN_REPLIES == learning_rules.MIN_CANARY
+
+
+def test_document_lessons_refuse_names_and_chat_lessons_need_no_kind():
+    from app.modules.pi import learning_docs as d
+
+    assert d._unsafe("Say it the way Mr Khan likes it rather than the old way.")
+    assert d._unsafe("Lost to Zoho because they were cheaper at the start.")
+    assert not d._unsafe("When writing a solution document, say “takings” rather than “sales”.")
+
+
+def test_phrase_pairs_only_come_from_word_replacements_never_from_numbers():
+    from app.modules.pi import learning_docs as d
+
+    before = ["A daily read would show each shop's sales every morning."]
+    after = ["A daily read would show each shop's takings every morning."]
+    assert d.phrase_pairs(before, after) == [("sales", "takings")]
+    assert (
+        d.phrase_pairs(before, ["A daily read would show each shop's sales every 9 morning."]) == []
+    )
+    assert d.phrase_pairs(before, ["Something quite different that shares nothing."]) == []
+    assert d.phrase_pairs(before, before) == []
+    price = ["It would cost 5000 rupees per month."]
+    assert d.phrase_pairs(price, ["It would cost 6000 rupees per month."]) == []
+
+
+def test_voice_moments_and_what_counts_as_used():
+    from app.modules.pi import learning_voice as v
+
+    assert v.moment_of("no, it is three shops", "S2_CLARIFYING") == "correct"
+    assert v.moment_of("Actually it was last month", "S3_NOTED") == "correct"
+    assert v.moment_of("stock runs out in two shops", "S1_LISTENING") == "acknowledge"
+    assert v.moment_of("no thanks", "S2_CLARIFYING") is None  # a short "no" is an answer
+    assert v.moment_of("no, it is three shops", "S2_CLARIFYING", has_notes=False) is None
+    assert v.moment_of("ok", "S2_CLARIFYING") is None  # too short to acknowledge
+    assert v.moment_of("stock runs out in two shops", "S6_DECIDING") is None  # not listening
+    assert v.used_in("That sounds costly. Which shop is it?", "That sounds costly.")
+    assert not v.used_in("Which shop is it?", "That sounds costly.")
+    assert v.valid("acknowledge", "That sounds like a headache.") == []
+    assert v.valid("acknowledge", "Is it a problem?")  # a question
+    assert v.valid("acknowledge", "Fine")  # one word
+    assert v.valid("opening", "Hi, I'm pi.")  # a fixed line is never varied
+    assert set(v.SEEDS) == {"acknowledge", "correct"}

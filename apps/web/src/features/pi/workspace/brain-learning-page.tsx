@@ -19,12 +19,14 @@ import {
   brainLearningService,
   type LearnedPack,
   type Lesson,
+  type NotedProblem,
 } from "../brain-learning-service";
 
 const TABS = [
   { key: "overview", label: "Overview" },
   { key: "examples", label: "Examples" },
   { key: "questions", label: "Questions" },
+  { key: "problems", label: "Problems" },
   { key: "lessons", label: "Teach pi" },
   { key: "packs", label: "Industry packs" },
   { key: "changes", label: "Changes" },
@@ -77,6 +79,7 @@ function BrainLearningView() {
       {tab === "overview" && <Overview />}
       {tab === "examples" && <Examples />}
       {tab === "questions" && <Questions />}
+      {tab === "problems" && <Problems />}
       {tab === "lessons" && <Lessons />}
       {tab === "packs" && <Packs />}
       {tab === "changes" && <Changes />}
@@ -660,6 +663,157 @@ function PackCard({ pack: p }: { pack: LearnedPack }) {
               </Button>
             </div>
           )}
+        </CardBody>
+      </Card>
+    </li>
+  );
+}
+
+function Problems() {
+  const noted = useScopedQuery([...KEY, "problems"], () =>
+    brainLearningService.problems(),
+  );
+  const links = useScopedQuery([...KEY, "links"], () =>
+    brainLearningService.links(),
+  );
+  const decide = useScopedMutation(
+    (v: { id: string; decision: "confirm" | "reject" }) =>
+      brainLearningService.decideLink(v.id, v.decision),
+    { invalidate: [KEY], success: "Saved" },
+  );
+  if (noted.isError)
+    return (
+      <ErrorState error={noted.error} onRetry={() => void noted.refetch()} />
+    );
+  if (noted.isPending) return <Pending />;
+  const { categories, items } = noted.data;
+  return (
+    <div className="space-y-6">
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold">Suggested links</h2>
+        <p className="text-xs text-muted-foreground">
+          pi thinks these problems may share a root. Confirming or rejecting
+          teaches it how readily to suggest links for each kind of business.
+        </p>
+        {links.data && links.data.items.length === 0 && (
+          <p className="text-[13px] text-muted-foreground">Nothing waiting.</p>
+        )}
+        <ul className="space-y-1.5">
+          {(links.data?.items ?? []).map((l) => (
+            <li
+              key={l.id}
+              className="flex flex-wrap items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 text-[13px]"
+            >
+              <Badge tone="neutral">{l.type.replaceAll("_", " ")}</Badge>
+              <span>{l.from}</span>
+              <span className="text-xs text-muted-foreground">
+                {Math.round(l.confidence * 100)}% sure
+              </span>
+              <span className="ml-auto flex gap-1.5">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  loading={decide.isPending}
+                  onClick={() =>
+                    decide.mutate({ id: l.id, decision: "confirm" })
+                  }
+                >
+                  Confirm
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  loading={decide.isPending}
+                  onClick={() =>
+                    decide.mutate({ id: l.id, decision: "reject" })
+                  }
+                >
+                  Reject
+                </Button>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold">Noted problems</h2>
+        <p className="text-xs text-muted-foreground">
+          Fix a title or an area. A correction counts five times a
+          customer&apos;s word when pi learns vocabulary.
+        </p>
+        {items.length === 0 ? (
+          <EmptyState
+            icon={BrainCircuit}
+            title="No problems noted yet"
+            description="Problems pi notes in brain mode show up here."
+          />
+        ) : (
+          <ul className="space-y-3">
+            {items.map((p) => (
+              <ProblemRow key={p.id} problem={p} categories={categories} />
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function ProblemRow({
+  problem: p,
+  categories,
+}: {
+  problem: NotedProblem;
+  categories: { key: string; label: string }[];
+}) {
+  const [title, setTitle] = useState(p.title);
+  const [category, setCategory] = useState(p.category);
+  const save = useScopedMutation(
+    () =>
+      brainLearningService.correctProblem(p.id, {
+        ...(title.trim() !== p.title ? { title: title.trim() } : {}),
+        ...(category !== p.category ? { category } : {}),
+      }),
+    { invalidate: [KEY], success: "Corrected" },
+  );
+  const changed = title.trim() !== p.title || category !== p.category;
+  return (
+    <li>
+      <Card>
+        <CardBody className="space-y-2">
+          {p.words[0] && (
+            <p className="text-xs text-muted-foreground">
+              They said: “{p.words[0]}”
+            </p>
+          )}
+          <div className="grid gap-2 sm:grid-cols-[1fr_14rem_auto]">
+            <Input
+              aria-label="Problem title"
+              value={title}
+              maxLength={120}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <select
+              aria-label="Area"
+              className="h-9 rounded-md border border-border bg-surface px-2 text-[13px]"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              {categories.map((c) => (
+                <option key={c.key} value={c.key}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+            <Button
+              size="sm"
+              disabled={!changed || !title.trim()}
+              loading={save.isPending}
+              onClick={() => save.mutate(undefined)}
+            >
+              Save
+            </Button>
+          </div>
         </CardBody>
       </Card>
     </li>

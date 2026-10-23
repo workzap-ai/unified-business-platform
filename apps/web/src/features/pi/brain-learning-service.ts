@@ -104,6 +104,30 @@ export const learnedPackSchema = z.object({
 });
 export type LearnedPack = z.infer<typeof learnedPackSchema>;
 
+export const notedProblemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  category: z.string(),
+  subtype: z.string().catch(""),
+  status: z.string().catch("draft"),
+  words: z.array(z.string()).catch([]),
+});
+export type NotedProblem = z.infer<typeof notedProblemSchema>;
+
+export const notedProblemsSchema = z.object({
+  categories: z.array(z.object({ key: z.string(), label: z.string() })),
+  items: z.array(notedProblemSchema),
+});
+
+export const suggestedLinkSchema = z.object({
+  id: z.string(),
+  type: z.string(),
+  confidence: z.number().catch(0),
+  from: z.string(),
+  to_id: z.string(),
+});
+export type SuggestedLink = z.infer<typeof suggestedLinkSchema>;
+
 const base = "/pi/brain-learning";
 const items = <T extends z.ZodTypeAny>(schema: T) =>
   z.object({ items: z.array(schema) });
@@ -165,4 +189,20 @@ export const brainLearningService = {
     apiRequest("POST", `${base}/packs/${id}/reject`, learnedPackSchema),
   retirePack: (id: string) =>
     apiRequest("POST", `${base}/packs/${id}/retire`, learnedPackSchema),
+  problems: () => apiRequest("GET", `${base}/problems`, notedProblemsSchema),
+  correctProblem: (id: string, change: { title?: string; category?: string }) =>
+    apiRequest(
+      "POST",
+      `${base}/problems/${id}/correct`,
+      z.object({ id: z.string(), changed: z.boolean() }),
+      { body: change },
+    ),
+  links: () => apiRequest("GET", `${base}/links`, items(suggestedLinkSchema)),
+  decideLink: (id: string, decision: "confirm" | "reject") =>
+    apiRequest(
+      "POST",
+      `${base}/links/${id}/decide`,
+      z.object({ id: z.string(), status: z.string() }),
+      { body: { decision } },
+    ),
 };

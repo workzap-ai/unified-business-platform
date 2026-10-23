@@ -6,12 +6,13 @@ opens from the WhatsApp message (/api/v1/pi-app/brain-docs/{token}/{name}); the 
 token is the only key.
 """
 
+import json
 from typing import Any
 from urllib.parse import quote as quote_name
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Request, Response
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 
 from app.ai.manager import build_llm_manager
@@ -19,8 +20,9 @@ from app.core import rate_limit
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.customers import files
-from app.modules.pi import brain_docs, brain_payments
+from app.modules.pi import brain_docs, brain_payments, learning_docs
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
+from app.modules.pi.configuration import settings_row
 from app.modules.pi.service import require_pi
 from app.shared.errors import BusinessRuleViolation
 from app.shared.workspace_repository import WorkspaceRepository
@@ -164,7 +166,12 @@ async def edit_document(
     await require_pi(session, scope, "quotes.write")
     doc = await _doc(session, scope, doc_id)
     patch = data.model_dump(exclude_none=True)
+    before, drafted_by = json.loads(json.dumps(doc.content)), doc.drafted_by
     brain_docs.edit(doc, patch)
+    rules = (await settings_row(session, scope)).response_rules
+    await learning_docs.learn_from_edit(
+        session, scope, doc, before, drafted_by, rules, scope.user_id
+    )
     await record(
         session,
         "pi.brain_document_edited",
@@ -175,6 +182,36 @@ async def edit_document(
     )
     await session.commit()
     return _view(doc, await brain_docs.blockers(session, scope, doc))
+
+
+class OutcomeInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    result: str = Field(pattern="^(won|lost|stalled)$")
+    note: str = Field(default="", max_length=300)
+
+
+@router.post("/{doc_id}/outcome")
+async def quote_outcome(
+    doc_id: UUID, data: OutcomeInput, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Win/loss note on a quote (spec 8.10): it improves later documents and quotes, never what pi
+    says in a chat."""
+    await require_pi(session, scope, "quotes.write")
+    doc = await _doc(session, scope, doc_id)
+    rules = (await settings_row(session, scope)).response_rules
+    offered = await learning_docs.record_outcome(
+        session, scope, doc, data.result, data.note, rules, scope.user_id
+    )
+    await record(
+        session,
+        "pi.brain_quote_outcome",
+        scope=scope,
+        entity_type="pi_brain_document",
+        entity_id=doc.id,
+        details={"ref": doc.ref, "result": data.result, "lesson_offered": offered},
+    )
+    await session.commit()
+    return {**_view(doc), "lesson_offered": offered}
 
 
 @router.post("/{doc_id}/approve")

@@ -24,9 +24,11 @@ from app.modules.pi import (
     learning_drift,
     learning_grader,
     learning_lexicon,
+    learning_links,
     learning_miner,
     learning_packs,
     learning_tuning,
+    learning_voice,
 )
 from app.modules.pi.learning_embed import Embedder
 from app.modules.pi.learning_models import PiLearningRun
@@ -36,6 +38,7 @@ from app.shared.scope import WorkspaceScope
 MIN_GAP = timedelta(hours=20)
 WriterFactory = Callable[[WorkspaceScope], learning_packs.Writer | None]
 QuestionWriterFactory = Callable[[WorkspaceScope], learning_miner.QuestionWriter | None]
+VoiceWriterFactory = Callable[[WorkspaceScope], learning_voice.Writer | None]
 GraderFactory = Callable[[WorkspaceScope], learning_grader.Grader | None]
 
 
@@ -66,6 +69,7 @@ async def run_workspace(
     pack_writer: WriterFactory | None = None,
     question_writer: QuestionWriterFactory | None = None,
     grader: GraderFactory | None = None,
+    voice_writer: VoiceWriterFactory | None = None,
 ) -> PiLearningRun:
     """One run for one workspace. Returns the run row with its digest."""
     now = now or datetime.now(UTC)
@@ -119,7 +123,12 @@ async def run_workspace(
         digest["questions"] = await learning_miner.mine(
             session, scope, question_writer(scope) if question_writer else None
         )
+        digest["voice"] = await learning_voice.learn_from(session, scope, since, now)
+        digest["voice"].update(
+            await learning_voice.mine(session, scope, voice_writer(scope) if voice_writer else None)
+        )
         digest["tuning"] = await learning_tuning.tune(session, scope, settings, now)
+        digest["links"] = await learning_links.tune(session, scope, settings, now)
         digest["health"] = await experience_scorer.health(session, now - timedelta(days=1), scope)
     run.digest = digest
     run.finished_at = datetime.now(UTC)
@@ -134,6 +143,7 @@ async def run_due(
     pack_writer: WriterFactory | None = None,
     question_writer: QuestionWriterFactory | None = None,
     grader: GraderFactory | None = None,
+    voice_writer: VoiceWriterFactory | None = None,
 ) -> int:
     """Run every brain-mode workspace that has not run in the last 20 hours. Returns how many."""
     now = now or datetime.now(UTC)
@@ -147,6 +157,8 @@ async def run_due(
         previous = await last_run(session, scope_of(settings))
         if previous is not None and now - previous.started_at < MIN_GAP:
             continue
-        await run_workspace(session, settings, now, embedder, pack_writer, question_writer, grader)
+        await run_workspace(
+            session, settings, now, embedder, pack_writer, question_writer, grader, voice_writer
+        )
         done += 1
     return done

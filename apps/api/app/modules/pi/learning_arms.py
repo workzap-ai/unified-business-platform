@@ -116,7 +116,7 @@ async def ensure_seeded(session: AsyncSession, scope: WorkspaceScope) -> int:
     return added
 
 
-def _as_arm(row: PiQuestionArm) -> learning.Arm:
+def as_arm(row: PiQuestionArm) -> learning.Arm:
     return learning.Arm(
         row.text, row.alpha, row.beta, row.uses, row.traffic_cap if row.status == "testing" else 1.0
     )
@@ -143,7 +143,7 @@ async def choose(
             )
         )
         if rows:
-            picked = learning.choose_arm([_as_arm(r) for r in rows], rng)
+            picked = learning.choose_arm([as_arm(r) for r in rows], rng)
             return next(r for r in rows if r.text == picked.text)
     return None
 
@@ -159,7 +159,7 @@ async def record(
         or row.environment_id != scope.environment_id
     ):
         return None
-    arm = _as_arm(row)
+    arm = as_arm(row)
     learning.update_arm(arm, useful)
     row.alpha, row.beta, row.uses = arm.alpha, arm.beta, arm.uses
     if row.status == "testing" and arm.traffic_cap >= 1.0:
@@ -275,7 +275,7 @@ async def _live(
 
 
 def _clearly_worse(arm: PiQuestionArm, best: PiQuestionArm) -> bool:
-    return learning.arm_should_retire(_as_arm(arm), _as_arm(best))
+    return learning.arm_should_retire(as_arm(arm), as_arm(best))
 
 
 __all__ = ["choose", "ensure_seeded", "learn_from", "propose", "record", "slot_for", "was_useful"]

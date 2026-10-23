@@ -372,3 +372,83 @@ async def test_a_break_late_in_a_long_chat_still_reaches_the_grader(api, busines
     await business_db.flush()
     transcript = await learning_bank._transcript(business_db, conversation.id)
     assert len(transcript) == 40 and transcript[-1][1] == "LAST MESSAGE"
+
+
+async def test_a_voice_hint_is_offered_only_while_learning_is_on(api, business_db, monkeypatch):
+    from app.modules.pi import learning_voice
+
+    prompts = adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)  # frozen: no hint
+    await say(pi, "stock runs out in two shops", "vh-1")
+    assert all("voice_hint" not in json.loads(p) for p in prompts if p.startswith("{"))
+    await learning_on(api)
+    await pi.process("stock runs out at my branch", "vh-2", sender=SECOND)
+    await deliver_everything(pi, business_db)
+    await pi.process("it also happens in the other shops", "vh-3", sender=SECOND)
+    await deliver_everything(pi, business_db)
+    contexts = [json.loads(p) for p in prompts if p.startswith("{")]
+    seen = next(c for c in contexts if c["latest_customer_message"].startswith("it also happens"))
+    assert seen["voice_hint"]["moment"] == "acknowledge"
+    assert seen["voice_hint"]["wording"] in learning_voice.SEEDS["acknowledge"]["en"]
+    from app.modules.pi.models import PiConversation
+
+    business_db.expire_all()
+    stamps = [
+        stamp
+        for c in await business_db.scalars(select(PiConversation))
+        for stamp in (c.service_brief or {}).get("learning_used") or []
+    ]
+    assert any(stamp.get("voice_arm") for stamp in stamps)
+    await pi.close()
+
+
+async def test_a_variant_worse_than_the_canonical_wording_for_two_weeks_is_retired_and_replaced(
+    api, business_db, monkeypatch
+):
+    from app.modules.pi import learning_voice as v
+    from app.modules.pi.learning_models import PiQuestionArm
+
+    adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)
+    scope = pi.scope()
+    await v.ensure_seeded(business_db, scope)
+    arms = {
+        a.text: a
+        for a in await business_db.scalars(
+            select(PiQuestionArm).where(PiQuestionArm.slot == v.slot_of("acknowledge"))
+        )
+    }
+    canonical = arms["That's a real problem."]
+    canonical.alpha, canonical.beta, canonical.uses = 41.0, 11.0, 50
+    arms["Got it."].alpha, arms["Got it."].beta, arms["Got it."].uses = 11.0, 41.0, 50
+    arms["That sounds costly."].alpha, arms["That sounds costly."].beta = 39.0, 13.0
+    arms["That sounds costly."].uses = 50
+    now = datetime.now(UTC)
+    first = await v.retire_worse(business_db, scope, now)
+    assert first == {"flagged": 1, "retired": 0}  # worse, but only just noticed
+    assert (await v.retire_worse(business_db, scope, now + timedelta(days=7)))["retired"] == 0
+    later = await v.retire_worse(business_db, scope, now + timedelta(days=15))
+    assert later["retired"] == 1 and arms["Got it."].status == "retired"
+    assert canonical.status != "retired" and arms["That sounds costly."].status != "retired"
+
+    asked: list[str] = []
+
+    async def writer(moment, language, current):
+        asked.append(moment)
+        return ["Sounds like a headache.", "Is that a problem?", "Ok"]
+
+    await v.mine(business_db, scope, writer)
+    assert asked == ["correct"]  # acknowledge has three live variants: enough; correct has two
+    arms["That's worth sorting."].status = "retired"
+    mined = await v.mine(business_db, scope, writer)
+    assert "acknowledge" in asked
+    assert mined["proposed"] >= 1
+    new = (
+        await business_db.scalars(
+            select(PiQuestionArm).where(
+                PiQuestionArm.created_by == "miner", PiQuestionArm.status == "testing"
+            )
+        )
+    ).first()
+    assert new is not None and new.traffic_cap == 0.10
+    await pi.close()

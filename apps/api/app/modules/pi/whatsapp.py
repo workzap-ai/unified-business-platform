@@ -556,6 +556,61 @@ class WhatsApp:
                 "DELIVERY_UNCONFIRMED", "Message delivery could not be confirmed", 503
             ) from None
 
+    async def send_list(
+        self,
+        number: str,
+        recipient: str,
+        body: str,
+        button: str,
+        rows: list[dict[str, str]],
+        token: str,
+    ) -> str:
+        """A session message with a tap-to-choose list (at most ten rows). A tap comes back as a
+        message whose text is the row's title."""
+        base, headers = self._endpoint(token)
+        interactive: dict[str, Any] = {
+            "type": "list",
+            "body": {"text": body[:1024]},
+            "action": {
+                "button": button[:20],
+                "sections": [
+                    {
+                        "title": "Problems",
+                        "rows": [
+                            {
+                                "id": str(r["id"])[:200],
+                                "title": str(r["title"])[:24],
+                                "description": str(r.get("description", ""))[:72],
+                            }
+                            for r in rows[:10]
+                        ],
+                    }
+                ],
+            },
+        }
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "interactive",
+                    "interactive": interactive,
+                },
+                timeout=20,
+                follow_redirects=False,
+            )
+            check_sent(response)
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Message delivery could not be confirmed", 503
+            ) from None
+
     async def send_image(
         self, number: str, recipient: str, link: str, caption: str, token: str
     ) -> str:

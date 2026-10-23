@@ -52,6 +52,7 @@ from app.modules.pi.brain_erase_routes import router as pi_brain_erase_router
 from app.modules.pi.brain_health_routes import router as pi_brain_health_router
 from app.modules.pi.brain_learning_routes import router as pi_brain_learning_router
 from app.modules.pi.brain_moderation_routes import router as pi_brain_moderation_router
+from app.modules.pi.brain_visual_routes import public_router as pi_brain_visuals_router
 from app.modules.pi.config_routes import router as pi_config_router
 from app.modules.pi.inbox_routes import router as pi_inbox_router
 from app.modules.pi.kapso_routes import router as pi_kapso_router
@@ -196,6 +197,7 @@ PI_APP_ROUTERS = [
     pi_pay_link_router,
     pi_customer_pay_link_router,
     pi_brain_docs_router,
+    pi_brain_visuals_router,
     pi_app_router,
     pi_read_router,
     pi_analytics_router,

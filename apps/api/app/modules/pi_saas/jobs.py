@@ -115,7 +115,12 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
     # The nightly learning run for workspaces in brain mode (frozen ones only write a note).
     async with ctx["sessions"]() as session:
         try:
-            from app.modules.pi import learning_grader, learning_miner, learning_packs
+            from app.modules.pi import (
+                learning_grader,
+                learning_miner,
+                learning_packs,
+                learning_voice,
+            )
             from app.modules.pi.learning_embed import make_embedder
             from app.modules.pi.learning_nightly import run_due
 
@@ -130,6 +135,9 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
                     ctx["settings"], ctx.get("http"), scope
                 ),
                 grader=lambda scope: learning_grader.make_grader(
+                    ctx["settings"], ctx.get("http"), scope
+                ),
+                voice_writer=lambda scope: learning_voice.make_writer(
                     ctx["settings"], ctx.get("http"), scope
                 ),
             ):

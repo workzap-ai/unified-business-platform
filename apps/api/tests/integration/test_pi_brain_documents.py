@@ -258,7 +258,7 @@ async def test_approved_documents_go_out_as_two_pdfs_and_the_three_buttons(
     await business_db.refresh(approved)
     assert approved.file_id is not None and approved.approved_by is not None
     sent = await api.post(f"{DOCS}/offers/{docs['quote'].offer_id}/send")
-    assert sent.status_code == 200 and sent.json()["queued"] == 3
+    assert sent.status_code == 200 and sent.json()["queued"] == 4  # + the progress card
     await pi.deliver_all()
     documents = sent_of(pi, "document")
     assert [d["document"]["filename"] for d in documents] == ["SD-0001.pdf", "Q-0001.pdf"]
@@ -554,8 +554,95 @@ async def test_a_document_in_their_language_comes_with_an_english_copy(
     await business_db.refresh(approved)
     assert approved.content.get("en_file_id")
     sent = await api.post(f"{DOCS}/offers/{docs['quote'].offer_id}/send")
-    assert sent.status_code == 200 and sent.json()["queued"] == 5
+    assert sent.status_code == 200 and sent.json()["queued"] == 6  # + the progress card
     await pi.deliver_all()
     names = [d["document"]["filename"] for d in sent_of(pi, "document")]
     assert names == ["SD-0001.pdf", "SD-0001-EN.pdf", "Q-0001.pdf", "Q-0001-EN.pdf"]
+    await pi.close()
+
+
+async def _edited_first_component(api, solution):
+    components = [dict(c) for c in solution.content["components"]]
+    words = components[0]["text"].split()
+    words[-1] = "entirely."
+    components[0]["text"] = " ".join(words)
+    patch = [{"text": c["text"], "refs": c["refs"]} for c in components]
+    done = await api.patch(f"{DOCS}/{solution.id}", json={"components": patch})
+    assert done.status_code == 200, done.text
+    return components[0]["text"]
+
+
+async def test_a_reviewers_edit_teaches_the_drafter_but_never_the_chat(
+    api, business_db, monkeypatch
+):
+    from test_pi_learning_loop import learning_on
+
+    from app.modules.pi import learning_docs, learning_lessons
+    from app.modules.pi.learning_models import PiLearningLesson
+
+    pi, _, conversation = await accepted_offer(api, business_db, monkeypatch)
+    await learning_on(api)
+    docs = await drafted(pi, business_db, conversation)
+    await _edited_first_component(api, docs["solution"])
+    business_db.expire_all()
+    [lesson] = (await business_db.scalars(select(PiLearningLesson))).all()
+    assert (
+        "rather than" in lesson.text and "entirely." not in lesson.text or "entirely" in lesson.text
+    )
+    assert lesson.status == "review" and lesson.risk == "HIGH"  # templates wait for a second person
+    assert lesson.scope == {"kind": learning_docs.DOCUMENT}
+    from app.modules.pi.learning_models import PiLearningChange
+
+    logged = [c for c in await business_db.scalars(select(PiLearningChange))]
+    proposed = [c for c in logged if c.kind == "lesson_proposed"]
+    assert len(proposed) == 1 and "high risk" in proposed[0].reason  # the log tells the truth
+    scope = pi.scope()
+    assert await learning_docs.for_documents(business_db, scope) == []  # not approved yet
+    lesson.status = "live"  # a second person approved it
+    await business_db.flush()
+    assert await learning_docs.for_documents(business_db, scope) == [lesson.text]
+    assert await learning_lessons.relevant(business_db, scope, "S2_CLARIFYING", "en") == []
+    await pi.close()
+
+
+async def test_nothing_is_learned_from_a_document_edit_while_learning_is_frozen(
+    api, business_db, monkeypatch
+):
+    from app.modules.pi.learning_models import PiLearningLesson
+
+    pi, _, conversation = await accepted_offer(api, business_db, monkeypatch)
+    docs = await drafted(pi, business_db, conversation)  # frozen: the default
+    await _edited_first_component(api, docs["solution"])
+    business_db.expire_all()
+    assert (await business_db.scalars(select(PiLearningLesson))).all() == []
+    await pi.close()
+
+
+async def test_a_win_or_loss_note_is_kept_on_the_quote_and_offered_as_a_lesson(
+    api, business_db, monkeypatch
+):
+    from test_pi_learning_loop import learning_on
+
+    from app.modules.pi.learning_models import PiLearningLesson
+
+    pi, _, conversation = await accepted_offer(api, business_db, monkeypatch)
+    await learning_on(api)
+    docs = await drafted(pi, business_db, conversation)
+    quote_id = docs["quote"].id
+    bad = await api.post(f"{DOCS}/{docs['solution'].id}/outcome", json={"result": "won"})
+    assert bad.status_code == 422, bad.text  # only quotes have outcomes
+    refused = await api.post(f"{DOCS}/{quote_id}/outcome", json={"result": "maybe"})
+    assert refused.status_code == 422
+    done = await api.post(
+        f"{DOCS}/{quote_id}/outcome",
+        json={"result": "lost", "note": "They wanted the weekly report first, call 0300 1234567"},
+    )
+    assert done.status_code == 200, done.text
+    assert done.json()["lesson_offered"] is True
+    business_db.expire_all()
+    quote = await business_db.get(PiBrainDocument, quote_id)
+    assert quote.content["outcome"]["result"] == "lost"
+    assert "1234567" not in quote.content["outcome"]["note"]  # the phone number was redacted
+    [lesson] = (await business_db.scalars(select(PiLearningLesson))).all()
+    assert lesson.status == "review" and "1234567" not in lesson.text
     await pi.close()

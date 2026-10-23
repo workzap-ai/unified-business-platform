@@ -18,6 +18,7 @@ from app.modules.pi import (
     learning_bank,
     learning_lessons,
     learning_packs,
+    learning_voice,
 )
 from app.modules.pi.language import detect_language
 from app.modules.pi.learning_embed import Embedder
@@ -51,6 +52,7 @@ async def build(
         "at": datetime.now(UTC).isoformat(),
         "message_id": str(message.id) if message is not None else None,
         "arm": None,
+        "voice_arm": None,
         "examples": [],
     }
     examples = await learning_bank.retrieve(
@@ -89,7 +91,13 @@ async def build(
         if arm is not None:
             out["question_hint"] = {"slot": slot, "wording": arm.text}
             used["arm"] = str(arm.id)
-    if used["arm"] or used["examples"]:
+    if moment := learning_voice.moment_of(said, state, has_notes=bool(noted)):
+        await learning_voice.ensure_seeded(session, scope)
+        variant = await learning_voice.choose(session, scope, moment, language)
+        if variant is not None:
+            out["voice_hint"] = {"moment": moment, "wording": variant.text}
+            used["voice_arm"] = str(variant.id)
+    if used["arm"] or used["examples"] or used["voice_arm"]:
         brief = dict(conversation.service_brief or {})
         brief["learning_used"] = [
             *list(brief.get("learning_used") or [])[-(STAMPS_KEPT - 1) :],

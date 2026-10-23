@@ -1367,6 +1367,12 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         from app.modules.pi.buttons import add_consent_buttons
 
         await add_consent_buttons(session, scope, outbound)
+        if service_turn is not None and getattr(service_turn, "_summary", False):
+            from app.modules.pi import brain_visual_queue
+
+            outbound = await brain_visual_queue.attach_board(
+                session, scope, ctx["settings"], conversation, outbound, service_turn.language
+            )
         # A form Pi decided to send in this turn goes out with the reply.
         forms = await session.scalars(
             select(PiMessage.id).where(
@@ -1571,6 +1577,17 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                         **conversation.service_brief,
                         "reminded_source_id": reminder["source_message_id"],
                     }
+            elif message.media.get("list"):
+                # The sorted summary as a tap-to-correct list (spec 8.11.2).
+                options = message.media["list"]
+                message.provider_message_id = await whatsapp.send_list(
+                    connection.phone_number_id,
+                    conversation.contact_wa_id,
+                    message.body,
+                    str(options["button"]),
+                    list(options["rows"]),
+                    token,
+                )
             elif message.media.get("buttons"):
                 # Quick-reply buttons (one tap), with the card's image on top if any.
                 message.provider_message_id = await whatsapp.send_buttons(

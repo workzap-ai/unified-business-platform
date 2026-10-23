@@ -550,6 +550,7 @@ async def apply_ops(
     message_id: UUID | None,
     ops: list[ProblemOp],
     language: str,
+    link_min: Decimal = Decimal(0),
 ) -> Applied:
     """Apply the model's ops in order. Bad ones are skipped and listed, never raised."""
     book = ProblemBook(session, scope, customer_id, language)
@@ -596,7 +597,13 @@ async def apply_ops(
                     problem, {"status": ["active", "withdrawn"]}, "withdrawn", "person"
                 )
                 result.withdrawn.append(problem)
-            elif op.op == "link" and op.ref in refs and op.to in refs and op.ref != op.to:
+            elif (
+                op.op == "link"
+                and op.ref in refs
+                and op.to in refs
+                and op.ref != op.to
+                and Decimal(str(round(op.confidence, 2))) >= link_min
+            ):
                 kind = op.link_type if op.link_type in LINK_TYPES else "same_root_suspected"
                 a, b = refs[op.ref], refs[op.to]
                 found = await session.scalar(
@@ -754,6 +761,13 @@ WHAT_NOW = re.compile(
 )
 
 
+SHOW_ME = re.compile(
+    r"\b(?:show me (?:what|everything|all)|what (?:have|did) you (?:noted?|got|written|understood)|"
+    r"dikhao|kya (?:kya )?note kiya)\b",
+    re.IGNORECASE,
+)
+
+
 def summary_due(
     text: str,
     noted: int,
@@ -768,6 +782,8 @@ def summary_due(
         return "done"
     if WHAT_NOW.search(text):
         return "what_now"
+    if SHOW_ME.search(text):
+        return "show"
     if since_summary >= trigger:
         return "many"
     if quiet_replies >= 2 and since_summary >= 1:

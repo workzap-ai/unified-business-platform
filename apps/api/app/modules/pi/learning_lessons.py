@@ -23,6 +23,7 @@ MAX_LESSONS_SHOWN = 3
 MIN_LENGTH = 12
 MAX_LENGTH = 300
 SCOPE_KEYS = ("state", "language", "category")
+DOCUMENT_KIND = "document_drafter"  # lessons for the document drafter, never shown in the chat
 NEVER_SAY = "never_say"  # a lesson that only forbids a phrase (spec 8.10, "Never say this")
 MAX_NEVER_SAY = 40
 
@@ -63,9 +64,12 @@ async def propose(
     situation: dict[str, str] | None,
     author_id: UUID | None,
     created_by: str = "staff",
+    kind: str | None = None,
 ) -> PiLearningLesson:
     """Add a lesson. Refused when it is the wrong size or breaks the never-learn list for a reason
-    no reviewer could fix (personal data, instructions aimed at pi's rules)."""
+    no reviewer could fix (personal data, instructions aimed at pi's rules). A `kind` marks a
+    lesson that is not for the chat (document wording): it is always HIGH and always waits for a
+    second person, and the change log says so."""
     said = " ".join((text or "").split())
     if not MIN_LENGTH <= len(said) <= MAX_LENGTH:
         raise BusinessRuleViolation(
@@ -74,12 +78,15 @@ async def propose(
     refused = [w for w in learning.never_learn(said) if "personal data" in w or "instructions" in w]
     if refused:
         raise BusinessRuleViolation("LESSON_REFUSED", "; ".join(refused), 422)
-    risk = learning.risk(said)
+    risk = "HIGH" if kind else learning.risk(said)
     lesson = PiLearningLesson(
         tenant_id=scope.tenant_id,
         environment_id=scope.environment_id,
         text=said,
-        scope={k: v for k, v in (situation or {}).items() if k in SCOPE_KEYS and v},
+        scope={
+            **{k: v for k, v in (situation or {}).items() if k in SCOPE_KEYS and v},
+            **({"kind": kind} if kind else {}),
+        },
         risk=risk,
         status="live" if risk == "LOW" else "review",
         created_by=created_by,
@@ -159,7 +166,7 @@ async def relevant(
     fitting = [
         r
         for r in rows
-        if (r.scope or {}).get("kind") != NEVER_SAY
+        if not (r.scope or {}).get("kind")  # only plain lessons: any kind is for something else
         and _fits(r, state, language)
         and not learning.never_learn(r.text)
     ]

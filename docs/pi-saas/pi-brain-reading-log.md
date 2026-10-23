@@ -43,12 +43,22 @@ settings only, one step a week), the grader model (job 1, `learning_grader.py`, 
 `brain.grader`, off by default), the 5x weight of a staff correction and the staff route
 `POST /pi/brain-learning/problems/{id}/correct`.
 
-Still not built: voice variants (job 6), the problem-board image / interactive list / progress card
-(8.11.2), Urdu script as its own language code, kickoff slot list, sticker and reaction handling,
-edited/deleted messages, long-message split, pattern surfacing and team links, S3 to S2 and the
-clarify counter, learning from document diffs, win/loss notes, link-threshold tuning. A staff
-screen for correcting problems is not built either (only the API). None of these changes the
-constitution, and learning stays frozen until it is switched on per workspace.
+Built after that (same day): voice variants (job 6, `learning_voice.py`, moments "acknowledge" and
+"correct", English seeds, canonical wording is the baseline, retired after two weeks worse, no
+fallback to another language), learning from document edits and win/loss notes on quotes
+(`learning_docs.py`, always HIGH, for the drafter only, never the chat), link confirm/reject and
+the per-industry link threshold (`learning_links.py`, `/links`, `/links/{id}/decide`), the problem
+board picture, the tap-to-correct list and the progress card (`brain_visuals.py`,
+`brain_visual_queue.py`, `brain_visual_routes.py`; English and Roman Urdu only, drawn with a Latin
+font), and a Problems tab on the Brain screen (correct a title or area, confirm or reject links).
+
+Still not built: Roman Urdu seed phrasings for voice variants (written by a native speaker, then
+added), pictures in Arabic or Urdu script (needs a font and text shaping), Urdu script as its own
+language code, kickoff slot list, sticker and reaction handling, edited/deleted messages,
+long-message split, pattern surfacing and team links, S3 to S2 and the clarify counter. Not
+verified against real WhatsApp: the list message and the picture link are tested with a fake
+provider only. None of this changes the constitution, and learning stays frozen until it is
+switched on per workspace.
 
 ## Part 7 coverage check (2026-10-23)
 

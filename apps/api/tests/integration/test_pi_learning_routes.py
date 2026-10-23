@@ -190,3 +190,16 @@ async def test_staff_can_correct_a_problem_and_it_is_kept_as_a_staff_revision(
     again = await api.post(f"{L}/problems/{pid}/correct", json={"category": "cash_collections"})
     assert again.json()["changed"] is False
     await pi.close()
+
+
+async def test_staff_see_the_noted_problems_with_the_categories_to_correct_them_to(
+    api, business_db, monkeypatch
+):
+    adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)
+    await good_chat(pi, business_db)
+    listed = (await api.get(f"{L}/problems")).json()
+    assert listed["items"] and listed["items"][0]["title"]
+    keys = {c["key"] for c in listed["categories"]}
+    assert {"cash_collections", "stock_inventory", "people_staff"} <= keys
+    await pi.close()
