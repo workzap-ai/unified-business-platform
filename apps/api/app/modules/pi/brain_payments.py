@@ -142,7 +142,7 @@ async def confirm(
     return ids
 
 
-def kickoff_booked(conversation: PiConversation) -> bool:
+def kickoff_booked(conversation: PiConversation, starts_at: str | None = None) -> bool:
     """A kickoff slot was booked after payment was confirmed: S11 to S12 (R-KICK-02)."""
     state = flow.parse(conversation.flow_state)
     if state != flow.State.S11_PAYMENT_CONFIRMED:
@@ -151,6 +151,8 @@ def kickoff_booked(conversation: PiConversation) -> bool:
     conversation.flow_state_since = datetime.now(UTC)
     brief = dict(conversation.service_brief or {})
     brief["kickoff"] = {"booked_at": datetime.now(UTC).isoformat()}
+    if starts_at:  # when the call is, so the 24-hour and 1-hour reminders can be sent
+        brief["kickoff"]["at"] = starts_at
     conversation.service_brief = brief
     return True
 

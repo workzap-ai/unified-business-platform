@@ -115,11 +115,18 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
     # The nightly learning run for workspaces in brain mode (frozen ones only write a note).
     async with ctx["sessions"]() as session:
         try:
+            from app.modules.pi import learning_packs
             from app.modules.pi.learning_embed import make_embedder
             from app.modules.pi.learning_nightly import run_due
 
             embedder = make_embedder(ctx["settings"], ctx.get("http"))
-            if ran := await run_due(session, embedder=embedder):
+            if ran := await run_due(
+                session,
+                embedder=embedder,
+                pack_writer=lambda scope: learning_packs.make_writer(
+                    ctx["settings"], ctx.get("http"), scope
+                ),
+            ):
                 logger.info("pi_learning_ran", extra={"workspaces": ran})
             await session.commit()
         except Exception:  # noqa: BLE001 - retried on the next sweep

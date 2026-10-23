@@ -118,13 +118,13 @@ def breached(control: Rates, canary: Rates) -> list[str]:
     ]
 
 
-def canary_decision(control: Rates, canary: Rates) -> str:
+def canary_decision(control: Rates, canary: Rates, min_conversations: int = MIN_CANARY) -> str:
     """ "rollback" the moment any guardrail rises (eval L9, even on a small sample), "promote" when
     the canary has enough conversations, is at least as good, and every guardrail holds,
     otherwise "continue"."""
     if breached(control, canary):
         return "rollback"
-    if canary.conversations >= MIN_CANARY and canary.reward >= control.reward:
+    if canary.conversations >= min_conversations and canary.reward >= control.reward:
         return "promote"
     return "continue"
 

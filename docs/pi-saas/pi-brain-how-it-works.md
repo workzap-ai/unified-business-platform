@@ -59,5 +59,29 @@ payments. Staff can see and control all of it: `/pi/brain-learning/*` (runs, cha
 arms, run now) and `/pi/brain-health`. Erasing a customer removes the examples made from their
 chats.
 
-What is not built yet: a text embedding for similarity (examples are matched by shared words),
-automatic pack drafting, a canary rollout, a lessons store, and a screen for any of this.
+Also in the learning loop:
+
+- **Canary.** A candidate a day old becomes a *canary*: only 10% of conversations (a stable hash of
+  the conversation id) may be shown it. Each night its replies are compared with replies from the
+  same state and language that used no example. Any guardrail rising (rule break, opt-out,
+  complaint, confusion, correction) rolls it back; enough use (30 replies, 3 days) at least as good
+  as the control promotes it; no verdict in 28 days retires it (`learning_canary.py`).
+- **Teach pi (lessons).** Staff add short tips in plain words. Tips about wording and order go live
+  at once; anything touching money, privacy, offers, follow-ups, approvals or advice (or refused by
+  the never-learn list) waits for a *different* person to approve it (`learning_lessons.py`).
+- **Drafted industry packs.** When five different businesses fit none of the 211 packs, the nightly
+  run (at most weekly) asks the model for a draft from their descriptions and problem kinds (no
+  names or numbers). A person approves the listening sections (it then runs in shadow, counted but
+  never shown) and separately writes the care sections. It goes live only after 20 shadow
+  conversations that score at least as well as pi without a pack (`learning_packs.py`).
+- **Embeddings** choose examples by meaning when the platform has an embedding model.
+- **Screen:** Owner OS, pi, Brain (`/pi/brain`): health, nightly digests, examples, question
+  wordings, lessons, packs and the change log.
+
+Follow-ups in brain mode (`brain_followups.py`, run by the follow-up sweep): the paused chat
+(3 days), the solution document and quote (2 and 7 days) and the kickoff reminders (24 h and 1 h
+before). Inside the 24-hour window they are plain text; outside it only an approved template can go:
+`whatsapp_config.followup_templates` (language, then `paused` or `documents`, each `{name,
+language}`; needs the person's reminder consent) or the existing meeting template for kickoff.
+A missing template tells staff what to add. Never at night, at Jumu'ah or around iftar, never after
+"stop", never twice for the same step.

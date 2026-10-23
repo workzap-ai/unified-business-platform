@@ -1166,6 +1166,30 @@
     "visible": true
   },
   {
+    "analytics_id": "nav.pi.brain",
+    "any_permissions": [],
+    "badge": null,
+    "description": "",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "brain-circuit",
+    "key": "pi-brain",
+    "keywords": [],
+    "label": "Brain",
+    "parent": "pi",
+    "required_feature": null,
+    "required_permissions": [
+      "pi.settings.manage"
+    ],
+    "required_product": "pi",
+    "required_roles": [],
+    "route": "/pi/brain",
+    "section": "main",
+    "sort_order": 72,
+    "type": "page",
+    "visible": true
+  },
+  {
     "analytics_id": "nav.pi.documents",
     "any_permissions": [
       "quotes.write",

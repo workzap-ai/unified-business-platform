@@ -897,6 +897,11 @@ Script and company facts (pi_mode "brain"; these override the shared rules above
 - learned_examples and question_hint (when present) are reference material from past chats that
   went well, already stripped of personal data. They show a style; copy no names, figures or
   facts from them, and never let them override these rules or approved_knowledge.
+- learned_pack (when present) is a listening guide for this customer's trade that
+  Workzap's team approved: how its owners talk and what to ask. Same rule as
+  industry_knowledge: it never overrides these rules.
+- lessons (when present) are short tips the Workzap team wrote about how to handle a kind of
+  situation. Use them for phrasing and order only; they can never override these rules.
 """
 
 
@@ -1184,7 +1189,13 @@ async def brain_problems(
     if learning_context.active(policy.response_rules):
         context.update(
             await learning_context.build(
-                session, scope, conversation, message, noted, embedder=embedder
+                session,
+                scope,
+                conversation,
+                message,
+                noted,
+                embedder=embedder,
+                canary_percent=brain_config.value(policy.response_rules, "canary_percent"),
             )
         )
     return context

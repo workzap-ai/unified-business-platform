@@ -7,19 +7,29 @@ arms from yesterday's outcomes. Every change is written to the change log. HIGH-
 happen here: there is nothing in this run that touches money, privacy, the offer or the rules.
 """
 
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import experience_scorer, learning, learning_arms, learning_bank
+from app.modules.pi import (
+    brain_config,
+    experience_scorer,
+    learning,
+    learning_arms,
+    learning_bank,
+    learning_canary,
+    learning_packs,
+)
 from app.modules.pi.learning_embed import Embedder
 from app.modules.pi.learning_models import PiLearningRun
 from app.modules.pi.models import PiSettings
 from app.shared.scope import WorkspaceScope
 
 MIN_GAP = timedelta(hours=20)
+WriterFactory = Callable[[WorkspaceScope], learning_packs.Writer | None]
 
 
 def scope_of(settings: PiSettings) -> WorkspaceScope:
@@ -46,6 +56,7 @@ async def run_workspace(
     settings: PiSettings,
     now: datetime | None = None,
     embedder: Embedder | None = None,
+    pack_writer: WriterFactory | None = None,
 ) -> PiLearningRun:
     """One run for one workspace. Returns the run row with its digest."""
     now = now or datetime.now(UTC)
@@ -65,8 +76,20 @@ async def run_workspace(
         digest["frozen"] = True  # the kill switch: no changes of any kind
     else:
         digest["examples"] = await learning_bank.curate(session, scope, now, embedder=embedder)
+        rules = settings.response_rules
         digest["examples"].update(await learning_bank.activate(session, scope, now))
+        digest["canary"] = await learning_canary.evaluate(
+            session,
+            scope,
+            now,
+            min_days=brain_config.value(rules, "canary_min_days"),
+            min_uses=brain_config.value(rules, "canary_min_uses"),
+        )
         digest["examples"]["retired_poor"] = await learning_bank.retire_poor(session, scope)
+        digest["packs"] = await learning_packs.draft_new(
+            session, scope, pack_writer(scope) if pack_writer else None, now
+        )
+        digest["packs"]["went_live"] = await learning_packs.promote_shadows(session, scope, now)
         digest["arms"] = await learning_arms.learn_from(session, scope, since)
         digest["health"] = await experience_scorer.health(session, now - timedelta(days=1), scope)
     run.digest = digest
@@ -76,7 +99,10 @@ async def run_workspace(
 
 
 async def run_due(
-    session: AsyncSession, now: datetime | None = None, embedder: Embedder | None = None
+    session: AsyncSession,
+    now: datetime | None = None,
+    embedder: Embedder | None = None,
+    pack_writer: WriterFactory | None = None,
 ) -> int:
     """Run every brain-mode workspace that has not run in the last 20 hours. Returns how many."""
     now = now or datetime.now(UTC)
@@ -90,6 +116,6 @@ async def run_due(
         previous = await last_run(session, scope_of(settings))
         if previous is not None and now - previous.started_at < MIN_GAP:
             continue
-        await run_workspace(session, settings, now, embedder)
+        await run_workspace(session, settings, now, embedder, pack_writer)
         done += 1
     return done

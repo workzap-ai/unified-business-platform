@@ -16,12 +16,21 @@ from sqlalchemy import select
 
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
-from app.modules.pi import learning, learning_arms, learning_bank, learning_nightly
+from app.modules.pi import (
+    learning,
+    learning_arms,
+    learning_bank,
+    learning_lessons,
+    learning_nightly,
+    learning_packs,
+)
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.learning_embed import make_embedder
 from app.modules.pi.learning_models import (
+    PiLearnedPack,
     PiLearningChange,
     PiLearningExample,
+    PiLearningLesson,
     PiLearningRun,
     PiQuestionArm,
 )
@@ -91,7 +100,10 @@ async def run_now(request: Request, scope: Scope, session: Session) -> dict[str,
     policy = await settings_row(session, scope)
     state = request.app.state
     run = await learning_nightly.run_workspace(
-        session, policy, embedder=make_embedder(state.settings, state.http)
+        session,
+        policy,
+        embedder=make_embedder(state.settings, state.http),
+        pack_writer=lambda s: learning_packs.make_writer(state.settings, state.http, s),
     )
     await record(
         session,
@@ -332,3 +344,206 @@ async def retire_arm(arm_id: UUID, scope: Scope, session: Session) -> dict[str, 
     )
     await session.commit()
     return _arm(row)
+
+
+def _lesson(row: PiLearningLesson) -> dict[str, Any]:
+    return {
+        "id": row.id,
+        "text": row.text,
+        "scope": row.scope,
+        "risk": row.risk,
+        "status": row.status,
+        "created_by": row.created_by,
+        "author_id": row.author_id,
+        "decided_by": row.decided_by,
+        "reason": row.reason,
+        "uses": row.uses,
+        "created_at": row.created_at,
+    }
+
+
+async def _own_lesson(session: Session, scope: Scope, lesson_id: UUID) -> PiLearningLesson:
+    row = await session.get(PiLearningLesson, lesson_id)
+    if (
+        row is None
+        or row.tenant_id != scope.tenant_id
+        or row.environment_id != scope.environment_id
+    ):
+        raise ResourceNotFound
+    return row
+
+
+@router.get("/lessons")
+async def lessons(scope: Scope, session: Session, status: str | None = None) -> dict[str, Any]:
+    """Teach pi: every lesson, with the ones waiting for a second person first."""
+    await require_pi(session, scope, PERMISSION)
+    query = select(PiLearningLesson).where(
+        PiLearningLesson.tenant_id == scope.tenant_id,
+        PiLearningLesson.environment_id == scope.environment_id,
+    )
+    if status:
+        query = query.where(PiLearningLesson.status == status)
+    rows = list(
+        await session.scalars(query.order_by(PiLearningLesson.created_at.desc()).limit(200))
+    )
+    rows.sort(key=lambda r: r.status != "review")
+    return {"items": [_lesson(r) for r in rows]}
+
+
+class LessonInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    text: str = Field(max_length=400)
+    state: str | None = Field(default=None, max_length=32)
+    language: str | None = Field(default=None, max_length=12)
+    category: str | None = Field(default=None, max_length=40)
+
+
+@router.post("/lessons", status_code=201)
+async def teach(data: LessonInput, scope: Scope, session: Session) -> dict[str, Any]:
+    """Teach pi something in plain words. Low-risk tips go live; anything touching money, privacy,
+    the offer, follow-ups, approval or advice waits for a different person to approve it."""
+    await require_pi(session, scope, PERMISSION)
+    row = await learning_lessons.propose(
+        session,
+        scope,
+        data.text,
+        {
+            "state": data.state or "",
+            "language": data.language or "",
+            "category": data.category or "",
+        },
+        scope.user_id,
+    )
+    await session.commit()
+    return _lesson(row)
+
+
+class DecisionInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reason: str = Field(default="", max_length=300)
+
+
+@router.post("/lessons/{lesson_id}/approve")
+async def approve_lesson(
+    lesson_id: UUID, data: DecisionInput, scope: Scope, session: Session
+) -> dict[str, Any]:
+    await require_pi(session, scope, PERMISSION)
+    row = await _own_lesson(session, scope, lesson_id)
+    await learning_lessons.decide(session, scope, row, True, scope.user_id, data.reason)
+    await session.commit()
+    return _lesson(row)
+
+
+@router.post("/lessons/{lesson_id}/reject")
+async def reject_lesson(
+    lesson_id: UUID, data: DecisionInput, scope: Scope, session: Session
+) -> dict[str, Any]:
+    await require_pi(session, scope, PERMISSION)
+    row = await _own_lesson(session, scope, lesson_id)
+    await learning_lessons.decide(session, scope, row, False, scope.user_id, data.reason)
+    await session.commit()
+    return _lesson(row)
+
+
+@router.post("/lessons/{lesson_id}/retire")
+async def retire_lesson(
+    lesson_id: UUID, data: DecisionInput, scope: Scope, session: Session
+) -> dict[str, Any]:
+    await require_pi(session, scope, PERMISSION)
+    row = await _own_lesson(session, scope, lesson_id)
+    await learning_lessons.retire(
+        session, scope, row, scope.user_id, data.reason or "retired by staff"
+    )
+    await session.commit()
+    return _lesson(row)
+
+
+def _pack(row: PiLearnedPack) -> dict[str, Any]:
+    return {
+        "id": row.id,
+        "key": row.key,
+        "title": row.title,
+        "status": row.status,
+        "care_approved": row.care_approved,
+        "content": row.content,
+        "businesses": (row.evidence or {}).get("businesses", 0),
+        "descriptions": (row.evidence or {}).get("descriptions", []),
+        "shadow_conversations": len((row.evidence or {}).get("shadow_ids") or []),
+        "created_at": row.created_at,
+    }
+
+
+async def _own_pack(session: Session, scope: Scope, pack_id: UUID) -> PiLearnedPack:
+    row = await session.get(PiLearnedPack, pack_id)
+    if (
+        row is None
+        or row.tenant_id != scope.tenant_id
+        or row.environment_id != scope.environment_id
+    ):
+        raise ResourceNotFound
+    return row
+
+
+@router.get("/packs")
+async def packs(scope: Scope, session: Session) -> dict[str, Any]:
+    """Industry packs pi drafted for trades no built-in pack covers."""
+    await require_pi(session, scope, PERMISSION)
+    rows = await session.scalars(
+        select(PiLearnedPack)
+        .where(
+            PiLearnedPack.tenant_id == scope.tenant_id,
+            PiLearnedPack.environment_id == scope.environment_id,
+        )
+        .order_by(PiLearnedPack.created_at.desc())
+        .limit(100)
+    )
+    return {"items": [_pack(r) for r in rows]}
+
+
+@router.post("/packs/{pack_id}/approve-listening")
+async def approve_pack_listening(pack_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+    """The listening sections look right: the pack runs in shadow (counted, never shown)."""
+    await require_pi(session, scope, PERMISSION)
+    row = await _own_pack(session, scope, pack_id)
+    await learning_packs.approve_listening(session, scope, row, scope.user_id)
+    await session.commit()
+    return _pack(row)
+
+
+class CareInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    care: list[str] = Field(min_length=1, max_length=6)
+    scope_rule: str = Field(max_length=600)
+
+
+@router.post("/packs/{pack_id}/approve-care")
+async def approve_pack_care(
+    pack_id: UUID, data: CareInput, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """A person writes what pi must refuse or protect in this trade. A pack never goes live
+    without it."""
+    await require_pi(session, scope, PERMISSION)
+    row = await _own_pack(session, scope, pack_id)
+    await learning_packs.approve_care(
+        session, scope, row, scope.user_id, data.care, data.scope_rule
+    )
+    await session.commit()
+    return _pack(row)
+
+
+@router.post("/packs/{pack_id}/reject")
+async def reject_pack(pack_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+    await require_pi(session, scope, PERMISSION)
+    row = await _own_pack(session, scope, pack_id)
+    await learning_packs.close(session, scope, row, scope.user_id, "rejected")
+    await session.commit()
+    return _pack(row)
+
+
+@router.post("/packs/{pack_id}/retire")
+async def retire_pack(pack_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+    await require_pi(session, scope, PERMISSION)
+    row = await _own_pack(session, scope, pack_id)
+    await learning_packs.close(session, scope, row, scope.user_id, "retired")
+    await session.commit()
+    return _pack(row)

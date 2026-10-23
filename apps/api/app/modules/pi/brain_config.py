@@ -18,6 +18,9 @@ TUNABLES: dict[str, tuple[int, int, int]] = {
     "document_followup_first_days": (2, 1, 3),
     "document_followup_second_days": (7, 5, 10),
     "redisclose_days": (30, 14, 60),
+    "canary_percent": (10, 5, 50),  # share of conversations that see a new example first
+    "canary_min_days": (3, 2, 14),  # at least this long before a canary can be promoted
+    "canary_min_uses": (30, 20, 300),  # replies that used it before it can be promoted
 }
 
 

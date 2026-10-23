@@ -26,7 +26,8 @@ legal moves) · `taxonomy.py`, `problem_models.py`, `problems.py` (problem recor
 (solution document and quote) · `industry_packs.py` + `packs/industry/*.json` (211 packs, built by
 `scripts/build_industry_packs.py`) · `safety.py`, `safety_guard.py` (emergency, personal data, advice,
 boundaries, enquiries; pre-model gates) · `learning*.py`, `experience_*.py` (reward, example bank,
-question arms, nightly run; opt-in) · `brain_erase.py` (delete a customer's data) · wiring in
+question arms, nightly run, canary, lessons, drafted packs; opt-in) · `brain_followups.py`
+(documents, paused, kickoff follow-ups) · `brain_erase.py` (delete a customer's data) · wiring in
 `service_conversation.py` and `runtime.py`. How Knowledge, the Agents page and learning relate to
 brain mode: `docs/pi-saas/pi-brain-how-it-works.md`.
 

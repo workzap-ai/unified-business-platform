@@ -28,8 +28,10 @@ from app.modules.orders.models import Order, OrderLine
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_models import (
+    PiLearnedPack,
     PiLearningChange,
     PiLearningExample,
+    PiLearningLesson,
     PiLearningRun,
     PiQuestionArm,
 )
@@ -122,7 +124,9 @@ __all__ = [
     "PiBrainDocument",
     "PiBrainPayment",
     "PiExperience",
+    "PiLearnedPack",
     "PiLearningChange",
+    "PiLearningLesson",
     "PiLearningExample",
     "PiLearningRun",
     "PiQuestionArm",

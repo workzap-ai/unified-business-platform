@@ -1,5 +1,6 @@
 """One consented template reminder per unanswered service enquiry turn."""
 
+import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -299,6 +300,12 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
             conversation.followup_due_at = None
         await session.commit()
     await enqueue_sends(ctx, outgoing)
+    from app.modules.pi import brain_followups
+
+    try:
+        await brain_followups.sweep(ctx)  # documents, paused and kickoff follow-ups (brain mode)
+    except Exception:  # noqa: BLE001 - the older reminders above must never depend on this
+        logging.getLogger("app.pi.followups").warning("pi_brain_followups_failed", exc_info=True)
 
 
 def reminder_allowed(

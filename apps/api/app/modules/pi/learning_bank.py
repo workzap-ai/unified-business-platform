@@ -20,7 +20,7 @@ from uuid import UUID
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import constitution, learning, learning_rules, safety
+from app.modules.pi import constitution, learning, learning_canary, learning_rules, safety
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_embed import Embedder
 from app.modules.pi.learning_models import PiLearningChange, PiLearningExample
@@ -220,8 +220,9 @@ def _log(
 async def activate(
     session: AsyncSession, scope: WorkspaceScope, now: datetime | None = None
 ) -> dict[str, int]:
-    """Candidates a day old (and never flagged) go live; then the bank is balanced: one example
-    per business per situation, at most 30 per situation (the best by reward stay)."""
+    """Candidates a day old (and never flagged) become canaries, which the nightly canary check
+    promotes or rolls back; then the bank is balanced: one example per business per situation, at
+    most 30 per situation (the best by reward stay)."""
     now = now or datetime.now(UTC)
     where = (
         PiLearningExample.tenant_id == scope.tenant_id,
@@ -237,9 +238,9 @@ async def activate(
         )
     )
     for example in ripe:
-        example.status = "active"
+        learning_canary.start(example, now)  # a small share of chats first (spec 9.10 rule 3)
         session.add(
-            _log(scope, "example_activated", example.id, "candidate", "active", "a day old")
+            _log(scope, "example_activated", example.id, "candidate", "canary", "a day old")
         )
     await session.flush()
     active = list(
@@ -336,10 +337,13 @@ async def retrieve(
     query_embedding: list[float] | None = None,
     exclude_contact: str | None = None,
     embedder: Embedder | None = None,
+    conversation_id: UUID | str | None = None,
+    canary_percent: int = 0,
 ) -> list[PiLearningExample]:
-    """The best active examples for this situation: only matching or backed-off situations (eval
-    L1), never from the same person, one per business, ranked by how alike the person's words
-    are, then by reward. Anything that no longer passes the never-learn list is left out."""
+    """The best active examples for this situation (plus canaries, for the canary share of
+    conversations): only matching or backed-off situations (eval L1), never from the same person,
+    one per business, ranked by how alike the person's words are, then by reward. Anything that
+    no longer passes the never-learn list is left out."""
     if state not in LISTENING_STATES:
         return []
     active = list(
@@ -347,11 +351,15 @@ async def retrieve(
             select(PiLearningExample).where(
                 PiLearningExample.tenant_id == scope.tenant_id,
                 PiLearningExample.environment_id == scope.environment_id,
-                PiLearningExample.status == "active",
+                PiLearningExample.status.in_(("active", "canary")),
                 PiLearningExample.language == language,
             )
         )
     )
+    shown_canary = conversation_id is not None and learning_canary.in_canary(
+        conversation_id, canary_percent
+    )
+    active = [e for e in active if e.status == "active" or shown_canary]
     for level in _backoff(state, language, turn_kind):
         pool = [
             e

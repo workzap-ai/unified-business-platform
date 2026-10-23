@@ -12,7 +12,13 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import learning, learning_arms, learning_bank
+from app.modules.pi import (
+    learning,
+    learning_arms,
+    learning_bank,
+    learning_lessons,
+    learning_packs,
+)
 from app.modules.pi.language import detect_language
 from app.modules.pi.learning_embed import Embedder
 from app.modules.pi.models import PiConversation, PiMessage
@@ -33,8 +39,9 @@ async def build(
     message: PiMessage | None,
     noted: list[dict[str, Any]],
     embedder: Embedder | None = None,
+    canary_percent: int = 10,
 ) -> dict[str, Any]:
-    """`learned_examples` and `question_hint` for this turn (either may be missing)."""
+    """`learned_examples`, `question_hint` and `lessons` for this turn (each may be missing)."""
     said = message.body if message is not None and message.body else ""
     language = detect_language(said) or conversation.language or "en"
     language = language if language in ("en", "roman_ur", "ar") else "en"
@@ -54,6 +61,8 @@ async def build(
         said=said,
         exclude_contact=str(conversation.customer_id) if conversation.customer_id else None,
         embedder=embedder,
+        conversation_id=conversation.id,
+        canary_percent=canary_percent,
     )
     if examples:
         out["learned_examples"] = [
@@ -61,6 +70,14 @@ async def build(
         ]
         used["examples"] = [str(e.id) for e in examples]
         await learning_bank.touch(session, examples)
+    profile = (conversation.service_brief or {}).get("customer_profile") or {}
+    about = " . ".join([said, str(profile.get("business_type") or "")])
+    await learning_packs.note_shadow(session, scope, conversation.id, about)
+    if pack_brief := await learning_packs.live_brief(session, scope, about):
+        out["learned_pack"] = pack_brief
+    lessons = await learning_lessons.relevant(session, scope, state, language)
+    if lessons:
+        out["lessons"] = [lesson.text for lesson in lessons]
     latest = noted[-1] if noted else None
     slot = learning_arms.slot_for(list(latest.get("missing") or [])) if latest else None
     if slot is not None:

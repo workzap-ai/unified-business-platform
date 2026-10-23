@@ -41,6 +41,7 @@ class PiLearningExample(WorkspaceRow):
     redaction_confidence: Mapped[Decimal] = mapped_column(Numeric(4, 3), default=Decimal("0"))
     embedding: Mapped[list[float] | None] = mapped_column(JSONB, nullable=True)
     retired_reason: Mapped[str] = mapped_column(String(200), default="")
+    canary_since: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class PiQuestionArm(WorkspaceRow):
@@ -85,3 +86,45 @@ class PiLearningRun(WorkspaceRow):
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     frozen: Mapped[bool] = mapped_column(Boolean, default=False)
     digest: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class PiLearningLesson(WorkspaceRow):
+    """A short piece of situational guidance in plain words (spec 8.2 lessons, 8.10 Teach pi).
+
+    LOW-risk lessons (phrasing, order, vocabulary) go live; anything touching money, privacy, the
+    offer, follow-ups, approval or advice is HIGH and waits for a second person (`review`).
+    """
+
+    __tablename__ = "pi_learning_lessons"
+    __table_args__ = workspace_args(
+        "pi_learning_lessons", Index("ix_pi_learning_lessons_status", "status")
+    )
+    text: Mapped[str] = mapped_column(Text)
+    scope: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)  # state, language, category
+    risk: Mapped[str] = mapped_column(String(8), default="high")
+    status: Mapped[str] = mapped_column(String(12), default="review")
+    created_by: Mapped[str] = mapped_column(String(12), default="staff")
+    author_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    decided_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    reason: Mapped[str] = mapped_column(String(300), default="")
+    uses: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class PiLearnedPack(WorkspaceRow):
+    """An industry pack pi drafted for businesses that fit no existing pack (spec 8.5 job 5).
+
+    Listening sections may be used once a person approves them; the care sections (what pi refuses
+    and protects) always wait for a person and are never live on their own.
+    """
+
+    __tablename__ = "pi_learned_packs"
+    __table_args__ = workspace_args(
+        "pi_learned_packs", Index("ix_pi_learned_packs_status", "status")
+    )
+    key: Mapped[str] = mapped_column(String(60))
+    title: Mapped[str] = mapped_column(String(120))
+    content: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    evidence: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    status: Mapped[str] = mapped_column(String(12), default="draft")
+    care_approved: Mapped[bool] = mapped_column(Boolean, default=False)
+    decided_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)

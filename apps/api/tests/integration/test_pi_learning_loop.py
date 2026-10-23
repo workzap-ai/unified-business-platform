@@ -89,7 +89,8 @@ async def test_a_good_chat_becomes_an_example_that_a_different_customer_is_shown
     later = datetime.now(UTC) + timedelta(hours=25)
     assert (await learning_bank.activate(business_db, scope, later))["activated"] == 1
     await business_db.refresh(example)
-    assert example.status == "active"
+    assert example.status == "canary" and example.canary_since is not None
+    example.status = "active"  # the canary check (its own tests) has promoted it
     kinds = [c.kind for c in await business_db.scalars(select(PiLearningChange))]
     assert "example_activated" in kinds
 

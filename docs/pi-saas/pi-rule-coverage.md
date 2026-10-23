@@ -47,7 +47,7 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-ROUTE-01 | Demo, jobs, vendor, partnership, press enquiries routed, not noted as problems | code | `safety.enquiry_asked`, fixed replies, staff request (nori facts and pricing lines still open) |
 | R-DISC-05, R-MEM-03 | Returning after a gap: welcome back, re-disclose after 30 days | code | `welcome_back` in `service_conversation.py` |
 | R-PRIV-06 | Says what it keeps, honours deletion | code | `safety.boundary_asked` DELETION: fixed reply plus a high-priority staff request; staff then call `POST /pi/brain-erasure/{customer_id}` (`brain_erase.py`): removes problems, memory notes, quarantine copies, learning scores and message text; keeps quotes, documents, payments and the CRM contact; staff tell the customer in the chat |
-| R-PRIV-07 | Learning only after redaction | open | learning loop not built |
+| R-PRIV-07 | Learning only after redaction | code | `learning_bank.redaction_confidence` >= 0.98, `learning.never_learn`; lessons and pack drafts go through `clean_text` / `never_learn` too |
 | R-PRIV-08 | Never pressures for detail | prompt | |
 | R-ADV-01 to 05 | No legal, medical, financial advice; no politics; no off-topic help | code | `safety.advice_asked` (legal, tax, financial, medical, veterinary) answered with fixed text before the model; politics and off-topic stay prompt |
 | R-EMER-01 to 04 | Emergency numbers, stop noting, escalate | code | `safety.emergency` before the model; fixed reply with local numbers (PK, AE, CA/US, all if unknown); X_EMERGENCY; high-priority staff request; next ordinary message returns to S1 |
@@ -89,11 +89,14 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-FUP-02 | stop / opt-out ends follow-ups | code | `note_opt_out` in `pi_saas/campaigns.py` |
 | R-FUP-03 | Quiet hours 21:00-09:00, Jumu'ah | code | `quiet_until`, `_friday_prayer` in `followups.py` |
 | R-FUP-04 | No proactive message within an hour of iftar in Ramadan | code | `iftar_pause`, dates in `whatsapp_config.ramadan` (set per year and country) |
-| R-FUP-01, 05 | No pressure; follow-ups logged | open | the shared ladder is not aligned to the 3.9.1 table (20-23 h, 3 days, 2 and 7 days) |
+| R-FUP-01, 05 | No pressure; follow-ups logged | code | `followup_policy.py` (table 3.9.1, a test keeps every text pressure-free), sent by `brain_followups.py` and `followups._silence_nudge`; outside 24 h only approved templates (`followup_templates`, meeting template), staff told when one is missing |
 | Spec 8.3 reward model | Rewards never include offers, approvals or payments | code | `learning.reward`, `NEVER_REWARDED` (eval L5) |
 | Spec 8.9 never-learn list | Learned text must not break the constitution | code | `learning.never_learn` reuses the reply linter (eval L7) |
 | Spec 8.7 risk classes | Lessons about money, privacy, offers, follow-ups are HIGH | code | `learning.risk`, conservative (eval L8) |
-| Spec 8.9 kill switch | Learning frozen unless explicitly switched on | code | `learning.frozen` (eval L10); nothing consumes learned text yet |
+| Spec 8.9 kill switch | Learning frozen unless explicitly switched on | code | `learning.frozen` (eval L10); the nightly run, examples, lessons, packs and wordings all stop while frozen |
+| Spec 8.5 job 9, 9.10 rule 3 | New examples are canaried and rolled back on a guardrail | code | `learning_canary.py` (eval L9) |
+| Spec 8.7, 8.10 | High-risk lessons need a second person | code | `learning_lessons.decide` refuses the author |
+| Spec 8.5 job 5, 8.6 | Drafted packs never go live without a person's care approval and a shadow run | code | `learning_packs.py`, `learning_rules.pack_may_go_live` |
 | Spec 8.3 scoring | Each reply scored by what followed, text-free | code | `experience_scorer.score_new`, table `pi_experiences` (0040), run by the sweep |
 
 ## Documents, decisions, payment (Part 5)

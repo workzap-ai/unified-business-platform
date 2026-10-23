@@ -1108,7 +1108,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                         ):
                             from app.modules.pi.brain_payments import kickoff_booked
 
-                            kickoff_booked(conversation)  # S11 to S12 (R-KICK-02)
+                            kickoff_booked(
+                                conversation, service_turn.booking_start
+                            )  # S11 to S12 (R-KICK-02)
             elif not service_discovery:
                 reply, handoff_reason = await handle_confirmation(agent_ctx)
             if reply is not None or handoff_reason is not None:
