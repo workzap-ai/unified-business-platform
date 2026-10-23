@@ -1300,6 +1300,14 @@ ESCALATION_TEXT = {
         "QUOTE EXPIRED: the customer tried to approve a quote past its valid-until date. pi did "
         "not approve it. Please send a refreshed quote."
     ),
+    "existing_project": (
+        "EXISTING PROJECT: a customer asks about a project Workzap runs. pi answered nothing from "
+        "memory. Please reply to them."
+    ),
+    "technical_failure": (
+        "TECHNICAL FAILURE: an existing customer reports a bug or outage. pi did not diagnose it. "
+        "Please route to support."
+    ),
     "refund_dispute": (
         "REFUND or DISPUTE: the customer asks Workzap for a refund or disputes a payment. pi "
         "decided nothing and promised nothing. Please reply to them and note the outcome."

@@ -42,7 +42,7 @@
   "Imported APIs share and main source countries.",
   "Plant count and whether in-house warehouse and QC lab exist."
  ],
- "scope_rule": "pi notes operational and business problems only: stock of materials and finished goods, batch traceability as a record- keeping matter, distributor credit, field-force visibility, near-expiry returns, reporting and staff. It never gives medical, dosing, formulation, stability, GMP-interpretation, regulatory registration or pricing-law advice, and never comments on whether a product is safe or effective. It records no patient, doctor or chemist personal data, and no prescriptions — only roles. Reports of adverse reactions or harm to anyone mean pi says this needs medical help and points to emergency services and the relevant regulator channel, and notes nothing clinical.",
+ "scope_rule": "pi notes operational and business problems only: stock of materials and finished goods, batch traceability as a record-keeping matter, distributor credit, field-force visibility, near-expiry returns, reporting and staff. It never gives medical, dosing, formulation, stability, GMP-interpretation, regulatory registration or pricing-law advice, and never comments on whether a product is safe or effective. It records no patient, doctor or chemist personal data, and no prescriptions — only roles. Reports of adverse reactions or harm to anyone mean pi says this needs medical help and points to emergency services and the relevant regulator channel, and notes nothing clinical.",
  "vocabulary": {
   "API": "active pharmaceutical ingredient",
   "excipient": "inactive ingredient",

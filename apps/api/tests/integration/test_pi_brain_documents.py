@@ -537,3 +537,25 @@ async def test_a_kickoff_slot_after_confirmed_payment_moves_to_kickoff(
     assert conversation.flow_state == "S12_KICKOFF" and "kickoff" in conversation.service_brief
     assert kickoff_booked(conversation) is False
     await pi.close()
+
+
+async def test_a_document_in_their_language_comes_with_an_english_copy(
+    api, business_db, monkeypatch
+):
+    """R-DOC-07: the team works from English, so an English PDF is kept and sent as well."""
+    pi, _, conversation = await accepted_offer(api, business_db, monkeypatch)
+    docs = await drafted(pi, business_db, conversation)
+    for doc in docs.values():
+        doc.language = "roman_ur"
+        doc.content_en = dict(doc.content)
+    await business_db.commit()
+    await approve_both(api, docs)
+    approved = await business_db.get(PiBrainDocument, docs["solution"].id)
+    await business_db.refresh(approved)
+    assert approved.content.get("en_file_id")
+    sent = await api.post(f"{DOCS}/offers/{docs['quote'].offer_id}/send")
+    assert sent.status_code == 200 and sent.json()["queued"] == 5
+    await pi.deliver_all()
+    names = [d["document"]["filename"] for d in sent_of(pi, "document")]
+    assert names == ["SD-0001.pdf", "SD-0001-EN.pdf", "Q-0001.pdf", "Q-0001-EN.pdf"]
+    await pi.close()

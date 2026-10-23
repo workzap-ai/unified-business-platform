@@ -242,7 +242,7 @@
   "Robbery or threats at the counter (a known risk for late-night pharmacies) → pi tells them to call the police or emergency services."
  ],
  "build_ideas": [
-  "Batch- and expiry-level stock with near-expiry alerts (e.g. 90/60/30 days) and a return-to-distributor tracker.",
+  "Batch-and expiry-level stock with near-expiry alerts (e.g. 90/60/30 days) and a return-to-distributor tracker.",
   "Distributor order comparison: price, scheme and availability per item across suppliers, with suggested split orders.",
   "Shortage list shared with distributors on WhatsApp and tracked until filled.",
   "Goods-received check: ordered vs delivered vs batch/expiry captured at entry.",

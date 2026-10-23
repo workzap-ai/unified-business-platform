@@ -41,7 +41,7 @@
   "Whether breakfast or meals are offered.",
   "Country and city (PK guest houses, Dubai holiday homes, Canadian short-term rentals all run differently)."
  ],
- "scope_rule": "pi notes operational and business problems: calendar clashes across platforms, cleaning turnovers, key and check-in handling, guest messages, damages, owner payouts and unit-level profit. pi does not advise on holiday-home permits, municipal short- term rental bylaws, tourism fees, strata or building rules, tax treatment, or tenancy law; it records only that keeping up with them is hard. pi never stores guest names, ID or passport copies, door codes, Wi-Fi passwords or bank details, and records owners and guests by role. Insurance and damage claims are noted as business problems only.",
+ "scope_rule": "pi notes operational and business problems: calendar clashes across platforms, cleaning turnovers, key and check-in handling, guest messages, damages, owner payouts and unit-level profit. pi does not advise on holiday-home permits, municipal short-term rental bylaws, tourism fees, strata or building rules, tax treatment, or tenancy law; it records only that keeping up with them is hard. pi never stores guest names, ID or passport copies, door codes, Wi-Fi passwords or bank details, and records owners and guests by role. Insurance and damage claims are noted as business problems only.",
  "vocabulary": {
   "turnover": "cleaning and resetting a unit between guests",
   "iCal sync": "calendar link that shares bookings between platforms",

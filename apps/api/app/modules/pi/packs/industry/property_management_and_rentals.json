@@ -232,7 +232,7 @@
   "Automated WhatsApp rent reminders and receipts to tenants (no ID data stored in chat).",
   "Cash collection log for caretakers with handover confirmation to the office.",
   "Owner statements generated monthly per property: rent in, expenses out, net payable.",
-  "Maintenance ticketing: tenant reports via a WhatsApp flow with photos, ticket assigned, contractor closes with photo proof, repeat- fault flag.",
+  "Maintenance ticketing: tenant reports via a WhatsApp flow with photos, ticket assigned, contractor closes with photo proof, repeat-fault flag.",
   "Contractor job and invoice matching so bills are paid only against closed tickets.",
   "Make-ready checklist per unit after move-out with each trade’s task and target days.",
   "Lease and renewal calendar with alerts at chosen lead times.",

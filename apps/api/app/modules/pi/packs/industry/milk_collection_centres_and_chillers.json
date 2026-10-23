@@ -124,7 +124,7 @@
   },
   {
    "phrase": "Summer supply drops and the plant still wants volume",
-   "category": "suppliers_purchasing",
+   "category": "stock_inventory",
    "subtype": "raw_material_shortage"
   },
   {

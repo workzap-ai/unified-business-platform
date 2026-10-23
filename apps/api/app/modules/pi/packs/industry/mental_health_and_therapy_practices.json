@@ -93,7 +93,7 @@
   },
   {
    "phrase": "No-show fees are never actually charged",
-   "category": "cash_collections",
+   "category": "loss_security",
    "subtype": "cash_leakage"
   },
   {

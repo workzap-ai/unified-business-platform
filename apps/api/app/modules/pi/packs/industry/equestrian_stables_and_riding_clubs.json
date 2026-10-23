@@ -48,7 +48,7 @@
   "Owner profile: family, club committee, private owner, hotel or resort.",
   "Location: Pakistan city clubs, rural tent-pegging stables, UAE desert-edge stables, Canadian boarding barns."
  ],
- "scope_rule": "pi notes the business side: lesson and livery bookings, memberships and fees, feed/bedding stock, horse workload scheduling, staff, events, payments, and safety-record admin. pi never gives veterinary, farrier, nutrition, medication, training or riding- technique advice, and never comments on whether a horse is fit to ride or compete; it suggests their vet, farrier or instructor. It never helps get around competition rules, doping controls, passports/microchips, import/export or insurance requirements. It records riders (including children), owners and grooms by role, not names, and never stores ID or card details.",
+ "scope_rule": "pi notes the business side: lesson and livery bookings, memberships and fees, feed/bedding stock, horse workload scheduling, staff, events, payments, and safety-record admin. pi never gives veterinary, farrier, nutrition, medication, training or riding-technique advice, and never comments on whether a horse is fit to ride or compete; it suggests their vet, farrier or instructor. It never helps get around competition rules, doping controls, passports/microchips, import/export or insurance requirements. It records riders (including children), owners and grooms by role, not names, and never stores ID or card details.",
  "vocabulary": {
   "livery": "boarding a client’s horse for a monthly fee (full, part, DIY)",
   "saees/ groom": "person caring for horses daily",
@@ -142,7 +142,7 @@
   },
   {
    "phrase": "Instagram brings enquiries but few convert to bookings",
-   "category": "marketing_leads",
+   "category": "sales_revenue",
    "subtype": "conversion_low"
   },
   {

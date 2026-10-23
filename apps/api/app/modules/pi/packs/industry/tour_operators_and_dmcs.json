@@ -42,7 +42,7 @@
   "Systems used for bookings, contracts and invoicing.",
   "Sales channels: OTAs, Viator/GetYourGuide-type platforms, Instagram, agents, website."
  ],
- "scope_rule": "pi notes business and operational problems: quoting speed, supplier contracts and costing, bookings and confirmations, guide and vehicle scheduling, customer communication, reviews, collections from agents, margins and reporting. pi gives no safety- engineering, mountaineering, road or weather safety advice, no visa or immigration advice, and no legal or insurance advice. It never stores travellers’ names, passport or ID numbers, health information or guides’ and drivers’ ID data, and records roles (“family of five”, “driver”, “guide”). Emergencies on tour are handed to emergency services.",
+ "scope_rule": "pi notes business and operational problems: quoting speed, supplier contracts and costing, bookings and confirmations, guide and vehicle scheduling, customer communication, reviews, collections from agents, margins and reporting. pi gives no safety-engineering, mountaineering, road or weather safety advice, no visa or immigration advice, and no legal or insurance advice. It never stores travellers’ names, passport or ID numbers, health information or guides’ and drivers’ ID data, and records roles (“family of five”, “driver”, “guide”). Emergencies on tour are handed to emergency services.",
  "vocabulary": {
   "DMC": "destination management company handling ground services",
   "FI T": "independent traveller, not in a group",

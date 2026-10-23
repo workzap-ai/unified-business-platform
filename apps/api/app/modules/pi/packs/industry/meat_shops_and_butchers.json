@@ -231,7 +231,7 @@
  ],
  "build_ideas": [
   "Carcass yield tracker: purchase weight, cuts produced, bone/fat/trim weight, cost per saleable kg",
-  "Daily price board manager: buying rate in, suggested board price per cut using the owner’s margin rule, WhatsApp broadcast to opted- in customers",
+  "Daily price board manager: buying rate in, suggested board price per cut using the owner’s margin rule, WhatsApp broadcast to opted-in customers",
   "Scale-to-sales reconciliation at day end",
   "Cold-room temperature and power-cut log with alerts",
   "Credit ledger for restaurant and caterer accounts with statements and reminders",

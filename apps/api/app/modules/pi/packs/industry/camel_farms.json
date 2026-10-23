@@ -224,7 +224,7 @@
    "How often do you see the farm yourself?"
   ]
  },
- "seasons": "- UAE: cool season (October–April) is the main racing and heritage-festival period, including large festivals in Abu Dhabi’s Al Dhafra region and racing at tracks such as Al Marmoom and Al Wathba; summer (June–September) is off-season with heat, water and staff- hour constraints. - UAE: Ramadan raises camel milk and laban demand; National Day (2 December) and winter tourism lift desert-camp and heritage activity. - Camel calving tends to cluster in the cooler months; milk supply follows. - Cholistan: herders migrate with water; after monsoon rains (July–September) the tobas fill and grazing improves; dry season (spring– early summer) brings water scarcity and movement toward canal areas. - Cholistan Jeep Rally and local melas (often February) bring camel trading and visitors; Eid ul Adha brings some camel qurbani and hissa sales.",
+ "seasons": "- UAE: cool season (October–April) is the main racing and heritage-festival period, including large festivals in Abu Dhabi’s Al Dhafra region and racing at tracks such as Al Marmoom and Al Wathba; summer (June–September) is off-season with heat, water and staff-hour constraints. - UAE: Ramadan raises camel milk and laban demand; National Day (2 December) and winter tourism lift desert-camp and heritage activity. - Camel calving tends to cluster in the cooler months; milk supply follows. - Cholistan: herders migrate with water; after monsoon rains (July–September) the tobas fill and grazing improves; dry season (spring– early summer) brings water scarcity and movement toward canal areas. - Cholistan Jeep Rally and local melas (often February) bring camel trading and visitors; Eid ul Adha brings some camel qurbani and hissa sales.",
  "care": [
   "No medicine, doping, performance-enhancer, training-method, breeding or embryo advice; suggest their vet.",
   "Never helps evade racing/competition rules, doping tests, microchip/registration or milk-quality checks.",
@@ -251,27 +251,27 @@
  "exchange": [
   {
    "role": "Person",
-   "text": "ﺐﺒﺴﻟا فﺮﻋأ ﺎﻣو ﻞﻘﻳ ﺐﻴﻠﺤﻟاو ،بﻮﻠﺣ ﺔﻗﺎﻧ ٠٦ ﻲﻟاﻮﺣ ﺎﻬﻴﻓ ﻦﻴﻌﻟا ﻲﻓ ﺔﺑﺰﻋ يﺪﻨﻋ."
+   "text": "."
   },
   {
    "role": "pi",
-   "text": "؟ﺲﺑ عﻮﻤﺠﻤﻟا ﻻو ،ﺎﻬﻟﺎﺤﻟ ﺔﻗﺎﻧ ﻞﻜﻟ سﺎﻘﻨﻳ ﺐﻴﻠﺤﻟا. ﺢﺿاو ﻞﺠﺳ ﻲﻓ ﺎﻣ اذإ ًﺎﺻﻮﺼﺧ ﻖﻠﻘﻳ اﺬﻫ ءﻲﺸﻟا ،ﻚﻤﻬﻓأ"
+   "text": "."
   },
   {
    "role": "Person",
-   "text": "بﺎﺴﺗاﻮﻟﺎﺑ ﻪﺒﺘﻜﻳ ﻲﻋاﺮﻟا ،ﺲﺑ عﻮﻤﺠﻤﻟا."
+   "text": "."
   },
   {
    "role": "pi",
-   "text": "؟حوﺮﻳ ﻦﻳو ﺐﻠﺤﻟا ﺪﻌﺑ ﺐﻴﻠﺤﻟا. ﺔﻗﺎﻧ ﻞﻜﻟ ﺐﻣ ،بﺎﺴﺗاﻮﻟا ﻖﻳﺮﻃ ﻦﻋ ﻲﻣﻮﻳ عﻮﻤﺠﻤﻛ ﻞﺠﺴﺘﻳ ﺐﻴﻠﺤﻟا — ﻆﺣﻼﻣ ،ﻢﺗ"
+   "text": ". —"
   },
   {
    "role": "Person",
-   "text": "ﻪﻨﻣ ءﺰﺟ نﻮﻌﺟﺮﻳ ًﺎﻧﺎﻴﺣأو ،ﻊﻨﺼﻤﻟ."
+   "text": "."
   },
   {
    "role": "pi",
-   "text": "؟بﻮﺘﻜﻣ ﻞﻜﺸﺑ ﻪﺘﻴﻤﻛو ﺾﻓﺮﻟا ﺐﺒﺳ ﻚﻠﺻﻮﻳ ﻞﻫ. ًﺎﻧﺎﻴﺣأ ﺐﻴﻠﺤﻟا ﻦﻣ ءﺰﺟ ﺾﻓﺮﻳ ﻊﻨﺼﻤﻟا نأ ﻆﺣﻼﻣ ،ﻢﺗ"
+   "text": "."
   }
  ]
 }

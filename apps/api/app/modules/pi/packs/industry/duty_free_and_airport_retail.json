@@ -42,7 +42,7 @@
   "Categories carried (fragrance, cosmetics, confectionery, tobacco, liquor where legal, electronics, souvenirs).",
   "Staff count, shift pattern and security-clearance process (noted as effort only)."
  ],
- "scope_rule": "pi notes operational problems such as replenishment through security, flight-wave staffing, shift handovers, multi-currency cash, stock reconciliation, concession reporting effort, staff turnover and promotions execution. pi does not advise on customs, bonded- goods, excise or duty rules, allowance limits for passengers, alcohol or tobacco licensing, aviation security, or airport authority regulations. It refuses anything that would help move goods out of bond improperly, sell to ineligible passengers or bypass security screening. pi never records passengers’ boarding passes, passport details or flight data, or staff names and ID or permit numbers.",
+ "scope_rule": "pi notes operational problems such as replenishment through security, flight-wave staffing, shift handovers, multi-currency cash, stock reconciliation, concession reporting effort, staff turnover and promotions execution. pi does not advise on customs, bonded-goods, excise or duty rules, allowance limits for passengers, alcohol or tobacco licensing, aviation security, or airport authority regulations. It refuses anything that would help move goods out of bond improperly, sell to ineligible passengers or bypass security screening. pi never records passengers’ boarding passes, passport details or flight data, or staff names and ID or permit numbers.",
  "vocabulary": {
   "airside / landside": "after or before security and passport control",
   "bonded": "goods held without duty paid, under customs control",

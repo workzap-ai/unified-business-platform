@@ -45,7 +45,7 @@
   "Whether the store runs a loyalty card.",
   "Supplier payment terms commonly used (cash, 15/30/60 days, consignment)."
  ],
- "scope_rule": "pi notes operational problems in buying, receiving, shelf availability, fresh wastage, checkout, cash, staff and reporting. pi does not give food safety, hygiene certification, halal certification, pricing law or tax advice, and does not advise on weights-and- measures compliance beyond noting it as admin effort. pi does not collect loyalty member details, cashier names or supplier bank details. Food poisoning reports or fire/electrical hazards trigger an immediate pointer to the relevant authorities or emergency services.",
+ "scope_rule": "pi notes operational problems in buying, receiving, shelf availability, fresh wastage, checkout, cash, staff and reporting. pi does not give food safety, hygiene certification, halal certification, pricing law or tax advice, and does not advise on weights-and-measures compliance beyond noting it as admin effort. pi does not collect loyalty member details, cashier names or supplier bank details. Food poisoning reports or fire/electrical hazards trigger an immediate pointer to the relevant authorities or emergency services.",
  "vocabulary": {
   "trade offer / scheme": "distributor discount or free goods linked to volume",
   "near-expiry": "stock close to its use-by or best-before date",
@@ -245,7 +245,7 @@
    "How did you find out?"
   ]
  },
- "seasons": "Pakistan: pre-Ramadan stock-up (dates, besan, Rooh Afza, oil, flour), Ramadan iftar rush and Chand Raat; Eid ul- Adha (spices, masala, disposables); summer beverages and ice; winter dry fruit; month-start salary week peaks; flour and sugar price shocks. UAE: Ramadan stock-up and post-iftar shopping, Eid, Dubai Shopping Festival promotions, summer slowdown with residents away, back-to-school lunchbox items, National Day; payday spikes at month end. Canada: Thanksgiving, Christmas, Ramadan/Eid and Diwali for ethnic grocers, summer BBQ season, winter storms driving stock-up, month-start payday.",
+ "seasons": "Pakistan: pre-Ramadan stock-up (dates, besan, Rooh Afza, oil, flour), Ramadan iftar rush and Chand Raat; Eid ul-Adha (spices, masala, disposables); summer beverages and ice; winter dry fruit; month-start salary week peaks; flour and sugar price shocks. UAE: Ramadan stock-up and post-iftar shopping, Eid, Dubai Shopping Festival promotions, summer slowdown with residents away, back-to-school lunchbox items, National Day; payday spikes at month end. Canada: Thanksgiving, Christmas, Ramadan/Eid and Diwali for ethnic grocers, summer BBQ season, winter storms driving stock-up, month-start payday.",
  "care": [
   "Expired or relabelled goods: pi will not help repackage, relabel or re-date products; it notes only the wastage and claim process.",
   "Food poisoning complaints or contamination: pi notes the complaint process and points to the local food authority; no medical advice.",

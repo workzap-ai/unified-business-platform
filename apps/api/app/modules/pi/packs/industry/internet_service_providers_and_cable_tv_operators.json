@@ -82,7 +82,7 @@
   },
   {
    "phrase": "Collectors collect money but deposit days later or keep some",
-   "category": "cash_collections",
+   "category": "loss_security",
    "subtype": "cash_leakage"
   },
   {

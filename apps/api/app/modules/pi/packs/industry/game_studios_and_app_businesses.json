@@ -51,7 +51,7 @@
   "Number of live titles/products being maintained.",
   "Where payments come from (store payouts, ad networks, foreign clients) — business pattern only."
  ],
- "scope_rule": "pi notes operational and business problems: project delivery, sprint and bug management, team capacity, client billing, revenue visibility across stores and ad networks, live-ops coordination, user support load and reporting. It does not advise on IP ownership, publishing contract terms, data-protection law, app-store policy appeals, foreign remittance rules, export-of-services tax regimes, or securities/fundraising matters. It never asks for source code, API keys, store console logins, bank or payout details, or end- user personal data, and records team members by role.",
+ "scope_rule": "pi notes operational and business problems: project delivery, sprint and bug management, team capacity, client billing, revenue visibility across stores and ad networks, live-ops coordination, user support load and reporting. It does not advise on IP ownership, publishing contract terms, data-protection law, app-store policy appeals, foreign remittance rules, export-of-services tax regimes, or securities/fundraising matters. It never asks for source code, API keys, store console logins, bank or payout details, or end-user personal data, and records team members by role.",
  "vocabulary": {
   "DAU/MAU": "daily/monthly active users.",
   "Retention (D1/D7/D30)": "share of users returning after days.",

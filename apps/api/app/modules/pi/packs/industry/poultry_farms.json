@@ -125,7 +125,7 @@
   },
   {
    "phrase": "Eggs break or go missing between shed and loading",
-   "category": "loss_security",
+   "category": "stock_inventory",
    "subtype": "shrinkage_theft"
   },
   {

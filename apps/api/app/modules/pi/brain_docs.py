@@ -134,9 +134,10 @@ def read_doc_token(settings: Settings, token: str) -> UUID | None:
         return None
 
 
-def doc_url(settings: Settings, doc: PiBrainDocument) -> str:
+def doc_url(settings: Settings, doc: PiBrainDocument, english: bool = False) -> str:
     base = settings.pi_app_public_url.rstrip("/")
-    return f"{base}/api/v1/pi-app/brain-docs/{doc_token(settings, doc.id)}/{doc.ref}.pdf"
+    name = f"{doc.ref}-EN.pdf" if english else f"{doc.ref}.pdf"
+    return f"{base}/api/v1/pi-app/brain-docs/{doc_token(settings, doc.id)}/{name}"
 
 
 # --- the rules (R-DOC-01..09) ------------------------------------------------------------------
@@ -574,19 +575,24 @@ async def blockers(session: AsyncSession, scope: WorkspaceScope, doc: PiBrainDoc
 
 
 async def render_pdf(
-    session: AsyncSession, scope: WorkspaceScope, doc: PiBrainDocument
+    session: AsyncSession, scope: WorkspaceScope, doc: PiBrainDocument, english: bool = False
 ) -> tuple[bytes, str]:
-    language = doc.language if doc.language in brain_pdf.PDF_LANGUAGES else "en"
-    content = doc.content if language == doc.language else (doc.content_en or doc.content)
+    language = (
+        "en" if english else (doc.language if doc.language in brain_pdf.PDF_LANGUAGES else "en")
+    )
+    content = (
+        (doc.content_en or doc.content) if english or language != doc.language else doc.content
+    )
     customer = await WorkspaceRepository(session, Customer, scope).get(doc.customer_id)
     business = content.get("business") or customer.company or "Your business"
     issued = (doc.approved_at or datetime.now(UTC)).date()
+    suffix = "-EN" if english else ""
     if doc.kind == "solution":
         return (
             brain_pdf.render_solution(
                 content, business=business, ref=doc.ref, issued=issued, language=language
             ),
-            f"{doc.ref}.pdf",
+            f"{doc.ref}{suffix}.pdf",
         )
     solution = await session.get(PiBrainDocument, doc.solution_id) if doc.solution_id else None
     connection = await WorkspaceRepository(session, WhatsAppConnection, scope).find()
@@ -604,7 +610,7 @@ async def render_pdf(
             banks=await bank_accounts(session, scope),
             phone=connection.display_phone_number if connection else None,
         ),
-        f"{doc.ref}.pdf",
+        f"{doc.ref}{suffix}.pdf",
     )
 
 
@@ -636,6 +642,21 @@ async def approve(
         ref_id=doc.id,
     )
     doc.file_id = saved.id
+    if doc.language != "en" and doc.content_en:
+        # R-DOC-07: the team works from English, so an English copy is kept and sent too.
+        english, english_name = await render_pdf(session, scope, doc, english=True)
+        copy = await files.save(
+            session,
+            scope,
+            doc.customer_id,
+            english,
+            english_name,
+            "upload",
+            conversation_id=doc.conversation_id,
+            ref_type="brain_document",
+            ref_id=doc.id,
+        )
+        doc.content = {**doc.content, "en_file_id": str(copy.id)}
     return doc
 
 
@@ -771,6 +792,22 @@ async def send(
                 {"document": {"link": doc_url(settings, doc), "filename": f"{doc.ref}.pdf"}},
             )
         )
+        if doc.content.get("en_file_id"):  # R-DOC-07: an English copy next to theirs
+            ids.append(
+                await queue_message(
+                    session,
+                    scope,
+                    conversation,
+                    f"{label} {doc.ref} (English)",
+                    f"pi-brain-doc-en:{doc.id}",
+                    {
+                        "document": {
+                            "link": doc_url(settings, doc, english=True),
+                            "filename": f"{doc.ref}-EN.pdf",
+                        }
+                    },
+                )
+            )
         doc.status = "sent"
         doc.sent_at = now
     revised = len(fresh) < 2

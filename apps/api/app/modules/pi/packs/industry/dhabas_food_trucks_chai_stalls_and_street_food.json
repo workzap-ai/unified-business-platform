@@ -42,7 +42,7 @@
   "Where raw stock is bought (mandi, wholesaler, cash-and-carry) and how often",
   "Staff count and whether they live on site"
  ],
- "scope_rule": "pi notes operational and business problems: daily cash, stock buying, wastage, staff reliability, location footfall, simple record-keeping and growing to a second spot. It does not advise on encroachment rules, vending permits, municipal licensing, food- safety rules or how to deal with officials, and never helps with bribes or avoiding inspections. It does not record names of staff, customers or officials, and never takes wallet PINs or bank details.",
+ "scope_rule": "pi notes operational and business problems: daily cash, stock buying, wastage, staff reliability, location footfall, simple record-keeping and growing to a second spot. It does not advise on encroachment rules, vending permits, municipal licensing, food-safety rules or how to deal with officials, and never helps with bribes or avoiding inspections. It does not record names of staff, customers or officials, and never takes wallet PINs or bank details.",
  "vocabulary": {
   "dhaba": "roadside eatery, often on highways",
   "khokha": "small kiosk/booth",

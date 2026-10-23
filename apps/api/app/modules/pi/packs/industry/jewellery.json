@@ -44,7 +44,7 @@
   "How stock is tracked today: tags and register, POS, Excel, weight book.",
   "Country (PK / UAE / Canada), because pricing conventions, invoicing and customer expectations differ."
  ],
- "scope_rule": "pi notes operational problems such as weight and piece reconciliation, custom-order tracking, karigar handovers, rate- update effort, salesperson follow-up and branch stock visibility. pi does not give investment advice on gold, forecast gold prices, value or authenticate pieces, or advise on tax treatment, VAT on gold, or anti-money-laundering obligations. Those go to the owner’s accountant or compliance adviser, and pi only records that these tasks take effort. pi never records customers’ names, ID numbers, or details of what they own or keep at home.",
+ "scope_rule": "pi notes operational problems such as weight and piece reconciliation, custom-order tracking, karigar handovers, rate-update effort, salesperson follow-up and branch stock visibility. pi does not give investment advice on gold, forecast gold prices, value or authenticate pieces, or advise on tax treatment, VAT on gold, or anti-money-laundering obligations. Those go to the owner’s accountant or compliance adviser, and pi only records that these tasks take effort. pi never records customers’ names, ID numbers, or details of what they own or keep at home.",
  "vocabulary": {
   "tola": "traditional gold weight unit, about 11.66 g",
   "ratti / masha": "smaller traditional weight units",

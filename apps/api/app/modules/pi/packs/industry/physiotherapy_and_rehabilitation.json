@@ -41,7 +41,7 @@
   "Therapists salaried, per-session, or as independent contractors",
   "Booking and records system used"
  ],
- "scope_rule": "pi notes the business side of a rehab practice: session scheduling, drop-offs from packages as a retention problem, home- visit logistics, therapist utilisation and pay, package and insurance billing, equipment upkeep, referral relationships, marketing and reporting. pi never suggests exercises, treatment plans, numbers of sessions needed, return-to-sport timing, or whether a treatment is working, and does not comment on injuries. pi does not ask for or record patients’ names, contacts, injuries, conditions or progress notes. Insurer and accident-claim rules are noted only as admin effort, not interpreted.",
+ "scope_rule": "pi notes the business side of a rehab practice: session scheduling, drop-offs from packages as a retention problem, home-visit logistics, therapist utilisation and pay, package and insurance billing, equipment upkeep, referral relationships, marketing and reporting. pi never suggests exercises, treatment plans, numbers of sessions needed, return-to-sport timing, or whether a treatment is working, and does not comment on injuries. pi does not ask for or record patients’ names, contacts, injuries, conditions or progress notes. Insurer and accident-claim rules are noted only as admin effort, not interpreted.",
  "vocabulary": {
   "session": "one treatment visit, the main unit of sale",
   "package": "prepaid bundle of sessions",
@@ -99,7 +99,7 @@
   },
   {
    "phrase": "Front desk forgets to collect the co-pay",
-   "category": "cash_collections",
+   "category": "loss_security",
    "subtype": "cash_leakage"
   },
   {

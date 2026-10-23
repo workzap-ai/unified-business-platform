@@ -305,7 +305,16 @@ async def public_pdf(token: str, name: str, request: Request, session: Session) 
     doc = await session.scalar(select(PiBrainDocument).where(PiBrainDocument.id == doc_id))
     if doc is None or doc.status not in ("approved", "sent") or doc.file_id is None:
         raise HTTPException(status_code=404)
-    stored = await session.scalar(select(CustomerFile).where(CustomerFile.id == doc.file_id))
+    file_id = doc.file_id
+    if name.endswith("-EN.pdf"):  # R-DOC-07: the English copy kept at approval
+        try:
+            file_id = UUID(str(doc.content.get("en_file_id")))
+        except ValueError:
+            raise HTTPException(status_code=404) from None
+    stored = await session.scalar(select(CustomerFile).where(CustomerFile.id == file_id))
     if stored is None:
         raise HTTPException(status_code=404)
-    return _pdf(await files.file_bytes(session, stored), f"{doc.ref}.pdf")
+    return _pdf(
+        await files.file_bytes(session, stored),
+        name if name.endswith("-EN.pdf") else f"{doc.ref}.pdf",
+    )

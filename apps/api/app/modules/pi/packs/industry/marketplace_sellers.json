@@ -44,7 +44,7 @@
   "Team size and who handles listings, packing and seller-centre messages.",
   "How they currently track payouts and fees (Excel, accountant, nothing)."
  ],
- "scope_rule": "pi notes operational problems in running marketplace stores: listings, stock across warehouses, dispatch SLAs, returns, payout reconciliation, fees, advertising and reporting. It does not advise on marketplace policy appeals, intellectual property disputes, brand registry legal matters, VAT/GST/sales tax, import customs or product certification rules. It never asks for seller-centre logins, two- factor codes, bank details or buyer details. It does not help with manipulating reviews, creating duplicate accounts, keyword stuffing with others’ trademarks or circumventing marketplace rules.",
+ "scope_rule": "pi notes operational problems in running marketplace stores: listings, stock across warehouses, dispatch SLAs, returns, payout reconciliation, fees, advertising and reporting. It does not advise on marketplace policy appeals, intellectual property disputes, brand registry legal matters, VAT/GST/sales tax, import customs or product certification rules. It never asks for seller-centre logins, two-factor codes, bank details or buyer details. It does not help with manipulating reviews, creating duplicate accounts, keyword stuffing with others’ trademarks or circumventing marketplace rules.",
  "vocabulary": {
   "Seller Centre / Seller Central": "the marketplace admin portal.",
   "FBA / FBN / FBD": "stock stored and shipped by Amazon, Noon or Daraz.",

@@ -46,7 +46,7 @@
   "Size of QA and team leader structure",
   "Owned site, rented floor, or work-from-home agents"
  ],
- "scope_rule": "pi notes the operational problems of running the centre: attendance and adherence, scheduling, attrition, training, QA, SLA performance, client reporting, billing, technology and power/internet uptime. pi gives no labour-law, telemarketing-regulation, data- protection or tax advice, and never asks for agents’ names, CNICs, salaries, call recordings, end-customer data or client logins. It records roles and volumes only. Requests to run deceptive sales scripts, robocall without consent, spoof caller IDs, misuse customer data or covertly monitor staff outside lawful policy are declined.",
+ "scope_rule": "pi notes the operational problems of running the centre: attendance and adherence, scheduling, attrition, training, QA, SLA performance, client reporting, billing, technology and power/internet uptime. pi gives no labour-law, telemarketing-regulation, data-protection or tax advice, and never asks for agents’ names, CNICs, salaries, call recordings, end-customer data or client logins. It records roles and volumes only. Requests to run deceptive sales scripts, robocall without consent, spoof caller IDs, misuse customer data or covertly monitor staff outside lawful policy are declined.",
  "vocabulary": {
   "Seat": "one workstation or agent position billed to a client",
   "AHT": "average handling time per call",

@@ -14,6 +14,7 @@ import re
 import sys
 import unicodedata
 from pathlib import Path
+from typing import Any
 
 SECTIONS = {
     "Recognise": "recognise",
@@ -52,11 +53,38 @@ def extract(pdf: Path) -> str:
     return text[start:end]
 
 
+ARABIC_CHARS = r"\u0600-\u06ff\u0750-\u077f\ufb50-\ufdff\ufe70-\ufeff"
+ARABIC = rf"[{ARABIC_CHARS}]"
+GAP = "\u2016"  # marks where a lost ")" and its separator were
+
+
+def strip_arabic(line: str) -> str:
+    """The PDF prints an Arabic gloss as "( <reversed glyphs>,)", split over lines, with the
+    closing bracket and the separator after it lost. Remove the glyphs and keep the structure:
+    a closed gloss that ends a list item becomes its comma, an open one becomes a GAP marker
+    that the signal and vocabulary parsers read as the separator."""
+    if not re.search(ARABIC, line):
+        return line
+    arab = rf"{ARABIC}[\s{ARABIC_CHARS}]*"
+    line = re.sub(rf"\(\s*{arab}\s*,\s*\)", ",", line)  # "( x,)"  ->  ","
+    line = re.sub(rf"\(\s*{arab}\s*\.\s*\)", ".", line)  # "( x.)"  ->  "."
+    line = re.sub(rf"\(\s*{arab}\s*\)", "", line)  # "( x)"   ->  nothing
+    line = re.sub(rf"\(\s*{arab}\s*,", "(", line)  # "( x, branch)" -> "( branch)"
+    line = re.sub(rf"\(\s*{arab}", GAP, line)  # "( x" (the ")" was lost) -> a gap
+    line = re.sub(arab, "", line)  # any bare run (a heading such as the retail names)
+    return re.sub(r"\s+", " ", line).strip()
+
+
+def unwrap(text: str) -> str:
+    """A hyphen at a line break is a compound word, not a hyphen and a space."""
+    return re.sub(r"(?<=[A-Za-z])- (?=[A-Za-z])", "-", text)
+
+
 def clean(text: str) -> list[str]:
     text = text.replace("\t", " ").replace("=====PAGE=====", "")
     text = re.sub(r"-\s*\n\*([^*\n]+)\*\n\s*—\s*", r"- *\1* — ", text)
     text = text.replace(CLOSE, "”").replace("ʼ", "’")
-    lines = [re.sub(r"\s+", " ", line).strip() for line in text.split("\n")]
+    lines = [strip_arabic(re.sub(r"\s+", " ", line).strip()) for line in text.split("\n")]
     return merge([line for line in lines if line])
 
 
@@ -104,7 +132,7 @@ def split_commas(text: str) -> list[str]:
 
 def signals(text: str) -> list[str]:
     found: list[str] = []
-    for part in split_commas(text):
+    for part in split_commas(unwrap(text).replace(GAP, ",")):
         quoted = re.match(r"^“([^”]+)”", part)
         term = (quoted.group(1) if quoted else re.sub(r"\s*\([^)]*\)", "", part)).strip()
         if term and term.lower() not in (s.lower() for s in found):
@@ -127,10 +155,30 @@ def bullets(lines: list[str]) -> list[str]:
 def vocabulary(lines: list[str]) -> dict[str, str]:
     words: dict[str, str] = {}
     for item in bullets(lines):
-        match = re.match(r"^\*?([^*]+?)\*?\s+—\s+(.+)$", item)
-        if match:
-            words[match.group(1).strip()] = match.group(2).strip()
+        item = item.replace(GAP, "—")  # the dash was lost with the Arabic gloss
+        match = re.match(r"^\*?([^*]+?)\*?\s*—\s*(.+)$", item)
+        if not match:
+            continue
+        term, meaning = match.group(1).strip(), match.group(2).strip()
+        # two terms on one bullet ("chhota gosht = mutton; bara gosht — beef") stay together
+        words[unwrap(term)] = unwrap(meaning)
     return words
+
+
+# The specification files these under a category the taxonomy does not put them in: the
+# subtype is right, the category is a slip. The pack follows the taxonomy.
+FIX_SUBTYPE = {
+    ("communication_coordination", "handoffs"): ("operations_process", "handoffs"),
+    ("marketing_leads", "conversion_low"): ("sales_revenue", "conversion_low"),
+    ("cash_collections", "cash_leakage"): ("loss_security", "cash_leakage"),
+    ("loss_security", "shrinkage_theft"): ("stock_inventory", "shrinkage_theft"),
+    ("suppliers_purchasing", "raw_material_shortage"): (
+        "stock_inventory",
+        "raw_material_shortage",
+    ),
+    ("suppliers_purchasing", "slow_replenishment"): ("stock_inventory", "slow_replenishment"),
+    ("operations_process", "rework"): ("quality_complaints", "rework"),
+}
 
 
 def problems(lines: list[str]) -> list[dict[str, str]]:
@@ -140,7 +188,10 @@ def problems(lines: list[str]) -> list[dict[str, str]]:
         phrase = re.sub(r"^[\s;.\-]+|\s*\([^)]*\)\s*$", "", match.group(1)).strip()
         phrase = re.sub(r"^\([^)]*\)\s*-?\s*", "", phrase).strip(' “”"')
         if phrase:
-            found.append({"phrase": phrase, "category": match.group(2), "subtype": match.group(3)})
+            category, subtype = FIX_SUBTYPE.get(
+                (match.group(2), match.group(3)), (match.group(2), match.group(3))
+            )
+            found.append({"phrase": phrase, "category": category, "subtype": subtype})
     return found
 
 
@@ -168,6 +219,21 @@ def exchange(lines: list[str]) -> list[dict[str, str]]:
 
 
 def build_pack(name: str, sector: dict[str, str], body: dict[str, list[str]]) -> dict:
+    pack = _build_pack(name, sector, body)
+    return _unwrapped(pack)
+
+
+def _unwrapped(value: Any) -> Any:
+    if isinstance(value, str):
+        return unwrap(value)
+    if isinstance(value, list):
+        return [_unwrapped(v) for v in value]
+    if isinstance(value, dict):
+        return {k: _unwrapped(v) for k, v in value.items()}
+    return value
+
+
+def _build_pack(name: str, sector: dict[str, str], body: dict[str, list[str]]) -> dict:
     return {
         "key": slug(name),
         "name": name,

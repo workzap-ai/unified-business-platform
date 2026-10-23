@@ -42,7 +42,7 @@
   "Head chef/kitchen ownership (partner-chef vs salaried) and headcount per shift",
   "Whether the owner is on the floor daily or managing remotely"
  ],
- "scope_rule": "pi notes operational and business problems: food cost and wastage, staff and shift issues, covers and table turnover, delivery-app headaches, reviews, cash and card reconciliation, and visibility across branches. It does not give food-safety, hygiene- certification, allergen-labelling or licensing advice, does not interpret municipality or food-authority rules, and does not advise on tax (sales tax, VAT, service-charge treatment). It never records names or contact details of staff or guests, never takes card or bank details, and records complaints by role (“a guest”, “the night-shift cashier”) only.",
+ "scope_rule": "pi notes operational and business problems: food cost and wastage, staff and shift issues, covers and table turnover, delivery-app headaches, reviews, cash and card reconciliation, and visibility across branches. It does not give food-safety, hygiene-certification, allergen-labelling or licensing advice, does not interpret municipality or food-authority rules, and does not advise on tax (sales tax, VAT, service-charge treatment). It never records names or contact details of staff or guests, never takes card or bank details, and records complaints by role (“a guest”, “the night-shift cashier”) only.",
  "vocabulary": {
   "covers": "number of guests served",
   "comp": "a dish or bill given free, usually by a manager",

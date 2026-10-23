@@ -157,7 +157,7 @@
   },
   {
    "phrase": "Handset theft from display or by staff",
-   "category": "loss_security",
+   "category": "stock_inventory",
    "subtype": "shrinkage_theft"
   },
   {

@@ -10,11 +10,11 @@ The PDF has 448 pages; per-page text is extracted with `pypdf`.
 | 12-13 | 1 Constitution | **yes, in full (2026-10-23)** | handbook | yes | `constitution.py`, linter, gates |
 | 14-18 | 2 Voice and languages | **yes, in full (2026-10-23)** | handbook | yes | linter voice rules, `style.py`, `language.py` |
 | 19-22 | 3 Conversation engine | **yes, in full (2026-10-23)** | handbook | yes | `flow.py`, `decisions.py`, `followup_policy.py` |
-| 23-26 | 4 Problem model, taxonomy | earlier sessions | taxonomy (code) | yes | `problems.py`, `taxonomy.py` |
-| 27-29 | 5 Documents, quote, payment | earlier sessions | handbook | yes | `brain_docs*.py`, `brain_payments.py` |
+| 23-26 | 4 Problem model, taxonomy | **yes, in full (2026-10-23)** | taxonomy (code) | yes | `problems.py`, `taxonomy.py` |
+| 27-29 | 5 Documents, quote, payment | **yes, in full (2026-10-23)** | handbook | yes | `brain_docs*.py`, `brain_payments.py` |
 | 30-34 | 6 Safety, edge cases | **yes, in full (2026-10-23)** | handbook | yes | `safety.py`, `safety_guard.py`, `brain_followups.py` |
 | 35-36, 418-422 | 7.0 and 7.N to 7.Q (overlays, unlisted industry, angles, size) | **yes, in full (2026-10-23)**; now in pi's prompt |
-| 37-417 | 7 Industry playbooks (211) | **no, not page by page** | `build_industry_packs.py` | 25+ spot checks, 20 detection probes | 211 packs + 11 overlays |
+| 37-417 | 7 Industry playbooks (211) | **no, not page by page by me**; 8 audit agents read the pages against the packs (2026-10-23) | `build_industry_packs.py` | content faithful; parser faults found and fixed (Arabic glosses, line-break hyphens, 6 wrong problem subtypes); 25+ spot checks, 20 detection probes | 211 packs + 11 overlays |
 | 423-429 | 8 Self-learning brain | **yes, in full (2026-10-23)** | - | yes | `learning*.py`, `experience_*.py`, `learning_drift.py`, `learning_miner.py`, `critique.py`, never-say, review queue, metrics |
 | 430-433 | 9 Implementation plan | partly (tool table, 9.2) | - | yes | `brain_config.py`, routes |
 | 434-438 | 10 Golden, red-team, rubric | 434-435 yes | handbook (10.1) | yes | `tests/integration/test_pi_golden.py` |

@@ -65,7 +65,7 @@
   },
   {
    "phrase": "Topping up float means leaving the shop to go to the bank or distributor",
-   "category": "suppliers_purchasing",
+   "category": "stock_inventory",
    "subtype": "slow_replenishment"
   },
   {

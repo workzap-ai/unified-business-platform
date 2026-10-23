@@ -186,3 +186,26 @@ def test_dates_keep_the_words_and_flag_what_is_ambiguous():
 def test_a_quote_without_the_document_has_the_fixed_answer(said):
     assert s.boundary_asked(said) == s.Boundary.QUOTE_ONLY  # R-QUOTE-09
     assert "come together" in s.boundary_reply(s.Boundary.QUOTE_ONLY, "en")
+
+
+@pytest.mark.parametrize(
+    ("said", "kind"),
+    [
+        ("nori is down for us since morning", s.Enquiry.TECHNICAL),
+        ("the dashboard is not loading", s.Enquiry.TECHNICAL),
+        ("any update on our project with Workzap?", s.Enquiry.EXISTING_PROJECT),
+        ("status of my project please", s.Enquiry.EXISTING_PROJECT),
+    ],
+)
+def test_existing_customers_are_routed_not_diagnosed(said, kind):
+    assert s.enquiry_asked(said) == kind  # spec 6.9
+    for language in ("en", "roman_ur"):
+        assert s.enquiry_reply(kind, language)
+
+
+@pytest.mark.parametrize(
+    "said",
+    ["our shop dashboard in the office is slow to load stock", "the project manager is late"],
+)
+def test_ordinary_talk_about_dashboards_and_projects_is_not_an_enquiry(said):
+    assert s.enquiry_asked(said) is None

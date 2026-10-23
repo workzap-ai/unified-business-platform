@@ -30,11 +30,11 @@
   },
   {
    "phrase": "teams in different time zones miss handoffs",
-   "category": "communication_coordination",
+   "category": "operations_process",
    "subtype": "handoffs"
   },
   {
-   "phrase": "inter- company stock transfers untracked",
+   "phrase": "inter-company stock transfers untracked",
    "category": "stock_inventory",
    "subtype": "transfers_lost"
   }

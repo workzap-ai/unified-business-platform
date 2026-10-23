@@ -40,7 +40,7 @@
   "Equipment owned vs leased (espresso machine, grinders)",
   "Whether the owner works the bar"
  ],
- "scope_rule": "pi notes operational problems: milk and pastry wastage, bean and cup stock, barista consistency and turnover, slow queues, loyalty, laptop sitters, delivery apps and cash. It does not give food-safety, allergen, caffeine-health or licensing advice, nor tax or lease- law advice. It does not store customer names, numbers or loyalty data, staff details, or payment details, and records issues by role.",
+ "scope_rule": "pi notes operational problems: milk and pastry wastage, bean and cup stock, barista consistency and turnover, slow queues, loyalty, laptop sitters, delivery apps and cash. It does not give food-safety, allergen, caffeine-health or licensing advice, nor tax or lease-law advice. It does not store customer names, numbers or loyalty data, staff details, or payment details, and records issues by role.",
  "vocabulary": {
   "shot": "a single espresso extraction",
   "dial in": "adjusting grind and recipe each morning",

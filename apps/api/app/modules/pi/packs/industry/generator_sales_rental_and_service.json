@@ -30,7 +30,7 @@
   "changeover",
   "event power",
   "standby power",
-  "solar- hybrid"
+  "solar-hybrid"
  ],
  "notes": "",
  "shape_facts": [
@@ -80,7 +80,7 @@
   },
   {
    "phrase": "Fuel on rentals goes missing and the customer and driver blame each other",
-   "category": "loss_security",
+   "category": "stock_inventory",
    "subtype": "shrinkage_theft"
   },
   {

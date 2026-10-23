@@ -1039,9 +1039,28 @@ class Enquiry(StrEnum):
     VENDOR = "vendor"
     PARTNERSHIP = "partnership"
     PRESS = "press"
+    EXISTING_PROJECT = "existing_project"  # 6.9: a question about a project Workzap runs
+    TECHNICAL = "technical_failure"  # 6.9: a nori bug or outage from an existing customer
 
 
 ENQUIRY_PATTERNS: tuple[tuple[Enquiry, re.Pattern[str]], ...] = (
+    (
+        Enquiry.TECHNICAL,
+        re.compile(
+            r"\b(?:nori|your (?:app|system|dashboard)|the (?:app|dashboard))\b[^.?!\n]{0,40}"
+            r"\b(?:is down|not working|stopped working|crashed|has a bug|buggy|won'?t (?:open|load)|"
+            r"not loading|outage)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Enquiry.EXISTING_PROJECT,
+        re.compile(
+            r"\b(?:status|update|progress|any news)\b[^.?!\n]{0,25}\b(?:my|our|the)\b[^.?!\n]{0,20}"
+            r"\bproject\b|\b(?:our|my) project with workzap\b|\bproject (?:ka|ki) (?:status|update)\b",
+            re.IGNORECASE,
+        ),
+    ),
     (
         Enquiry.PRESS,
         re.compile(
@@ -1091,6 +1110,8 @@ ENQUIRY_TEXT = {
         Enquiry.VENDOR: "Thanks. I'll pass it to the Workzap team.",
         Enquiry.PARTNERSHIP: "Thanks. I'll pass that to the Workzap team. Which company is this, and in which country?",
         Enquiry.PRESS: "I'll pass that to the Workzap team. I can't give quotes or statements.",
+        Enquiry.EXISTING_PROJECT: "I'll pass that to the Workzap team, who have your project. They'll reply here.",
+        Enquiry.TECHNICAL: "I'm sorry that's happening. I've passed it to the Workzap support team now. They'll reply here.",
     },
     "roman_ur": {
         Enquiry.DEMO: "Main ye Workzap ki team tak pahuncha deta hoon. Aap ki roughly kitni dukanein hain?",
@@ -1098,6 +1119,8 @@ ENQUIRY_TEXT = {
         Enquiry.VENDOR: "Shukriya. Main ye Workzap ki team tak pahuncha deta hoon.",
         Enquiry.PARTNERSHIP: "Shukriya. Main ye Workzap ki team tak pahuncha deta hoon. Ye kaun si company hai, aur kis mulk mein?",
         Enquiry.PRESS: "Main ye Workzap ki team tak pahuncha deta hoon. Main koi quote ya bayan nahi de sakta.",
+        Enquiry.EXISTING_PROJECT: "Ye Workzap ki team ko bhej diya gaya hai, jin ke paas aap ka project hai. Wo yahin jawab dein ge.",
+        Enquiry.TECHNICAL: "Afsos ke aisa ho raha hai. Ye Workzap ki support team ko bhej diya gaya hai. Wo yahin jawab dein ge.",
     },
 }
 
