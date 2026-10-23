@@ -33,6 +33,8 @@ async def guard_inbound(
     original = message.body or ""
     found = safety.redact_pii(original)
     if not found.changed:
+        if found.text != original:  # a location pin: keep only that one was shared, no reminder
+            message.body = found.text
         return None
     manager = CredentialManager(settings)
     if manager.configured:

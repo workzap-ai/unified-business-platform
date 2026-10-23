@@ -214,6 +214,8 @@ CHILD_NAME = re.compile(
 CHILD_MARKS = re.compile(
     r"\b(?i:grades?|marks|score[sd]?|got|result)\b[^.\n]{0,15}?(\d{1,3}\s?%|\d{1,3}/\d{2,3}|\b[A-F][+-]?(?=\s|[.,]|$))"
 )
+CONTACT_CARD = re.compile(r"\s*Contact card shared:", re.IGNORECASE)
+LOCATION_PIN = re.compile(r"^\s*Location shared:.*", re.IGNORECASE | re.DOTALL)
 FILLER_WORDS = re.compile(r"\[[^\]]+removed\]")
 
 
@@ -237,6 +239,13 @@ def redact_pii(text: str) -> Redaction:
     def add(kind: Pii) -> None:
         if kind not in kinds:
             kinds.append(kind)
+
+    # A shared contact card is other people's details (R-PRIV-04, spec 6.10): none of it is kept.
+    if CONTACT_CARD.match(text or ""):
+        add(Pii.CONTACT)
+        return Redaction("[contact card removed]", kinds)
+    # A location pin is not kept as exact coordinates either; pi never asks for one.
+    text = LOCATION_PIN.sub("[a location was shared]", text or "")
 
     def cards(match: re.Match[str]) -> str:
         digits = re.sub(r"\D", "", match.group())
@@ -543,9 +552,34 @@ class Boundary(StrEnum):
     THIRD_PARTY = "third_party"
     BANK_CHANGE = "bank_change"
     OFF_TOPIC = "off_topic"
+    COMPLAINT = "complaint"
+    ILLEGAL = "illegal"
 
 
 BOUNDARY_PATTERNS: tuple[tuple[Boundary, re.Pattern[str]], ...] = (
+    (
+        # A complaint about pi or Workzap (not about a cashier or a supplier): R-COMPL-01.
+        Boundary.COMPLAINT,
+        re.compile(
+            r"\bi (?:want|would like) to complain\b"
+            r"|\b(?:complaint|complain|shikayat)\b[^.?!\n]{0,30}\b(?:about|against|ki|par)?\s*"
+            r"(?:pi|workzap|your (?:service|team|company|bot)|this (?:bot|service|chat))\b"
+            r"|\b(?:not happy|unhappy|disappointed) with (?:pi|workzap|your (?:service|team|bot)|"
+            r"this (?:bot|service))\b|\bworkzap ki shikayat\b|\breport (?:you|this bot)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        # Something illegal that pi must not help with and must not note as a problem to solve.
+        Boundary.ILLEGAL,
+        re.compile(
+            r"\b(?:track|spy on|monitor) (?:my |our )?(?:staff|employees|workers|wife|husband)\b"
+            r"[^.?!\n]{0,20}\b(?:secretly|covertly|without (?:them|their) knowing)\b"
+            r"|\bread (?:their|my staff'?s?|employees') (?:whatsapp|messages|chats)\b"
+            r"|\bhack\b[^.?!\n]{0,20}\b(?:account|whatsapp|phone)\b",
+            re.IGNORECASE,
+        ),
+    ),
     (
         Boundary.DELETION,
         re.compile(
@@ -633,6 +667,8 @@ BOUNDARY_TEXT = {
         Boundary.THIRD_PARTY: "I can't share anyone else's chats. I only keep what you tell me in this chat. What would you like to note about your business?",
         Boundary.BANK_CHANGE: "I can't confirm any bank details in this chat. Payment details are only on your approved quote, and I've flagged your message to the Workzap team to check.",
         Boundary.OFF_TOPIC: "That's outside what I'm for. I'm here to note what's getting in the way of your business. What's the biggest thing right now?",
+        Boundary.COMPLAINT: "Thanks for telling me. I've passed this to the Workzap team.",
+        Boundary.ILLEGAL: "I can't help with that. I'm here for problems in your business.",
     },
     "roman_ur": {
         Boundary.DELETION: "Aap ka data delete karne ki darkhwast maine Workzap ki team ko bhej di hai. Wo yahan tasdeeq kar dein ge, aur tab tak main kuch naya note nahi karunga.",
@@ -643,6 +679,8 @@ BOUNDARY_TEXT = {
         Boundary.THIRD_PARTY: "Main kisi aur ki chat share nahi kar sakta. Main sirf wo rakhta hoon jo aap is chat mein batate hain. Business ke baare mein kya note karun?",
         Boundary.BANK_CHANGE: "Main is chat mein bank details ki tasdeeq nahi kar sakta. Payment ki tafseel sirf aap ke approved quote par hoti hai, aur maine aap ka paigham Workzap ki team ko check ke liye bhej diya hai.",
         Boundary.OFF_TOPIC: "Ye mere dayre se bahar hai. Main aap ke business mein rukawat note karne ke liye hoon. Abhi sab se bada masla kya hai?",
+        Boundary.COMPLAINT: "Batane ka shukriya. Maine ye Workzap ki team tak pahuncha diya hai.",
+        Boundary.ILLEGAL: "Main is mein madad nahi kar sakta. Main aap ke business ke masail ke liye hoon.",
     },
 }
 
@@ -812,3 +850,122 @@ def nori_asked(text: str) -> Nori | None:
 
 def nori_reply(kind: Nori, language: str | None) -> str:
     return NORI_TEXT.get(language or "en", NORI_TEXT["en"])[kind]
+
+
+# --- abuse, harassment, spam, complaints, illegal asks (spec 6.7, 6.8) --------------------------
+
+
+class Abuse(StrEnum):
+    INSULT = "insult"
+    THREAT = "threat"
+    SEXUAL = "sexual_or_hate"
+    SPAM = "spam"
+
+
+ABUSE_PATTERNS: tuple[tuple[Abuse, re.Pattern[str]], ...] = (
+    (
+        Abuse.THREAT,
+        re.compile(
+            r"\b(?:i(?:'ll| will)|i'm going to|i am going to)\s+(?:kill|hurt|beat|burn|destroy|shoot|stab|ruin)\b"
+            r"[^.?!\n]{0,40}\b(?:you|workzap|your staff|your team)\b"
+            r"|\b(?:maar dunga|maar dalunga|jaan se maar|dekh lunga tumhe|tumhe nahi chhodunga|"
+            r"i know where you (?:live|work))\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Abuse.SEXUAL,
+        re.compile(
+            r"\b(?:send (?:me )?nudes?|sex chat|porn|xxx|naked pics?|sexy (?:pics?|girl)|suck my|"
+            r"nigger|faggot)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        # An offer from a stranger, not a business that happens to deal in money or crypto.
+        Abuse.SPAM,
+        re.compile(
+            r"\b(?:earn \$?\d+|make money (?:fast|online)|guaranteed returns|investment opportunity|"
+            r"click (?:this|the) link|join my (?:whatsapp )?group|loan approved|buy followers|"
+            r"seo services|you(?:'ve| have) won|lottery winner|double your (?:money|bitcoin)|"
+            r"cheap (?:viagra|pills))\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Abuse.INSULT,
+        re.compile(
+            r"\b(?:you(?:'re| are)?|u|tum|tu|aap)\s+(?:are\s+|r\s+|ho\s+)?(?:a\s+|an\s+)?"
+            r"(?:stupid|useless|idiot|dumb|moron|trash|garbage|worthless|ullu|gadha|bewakoof|nikamma)\b"
+            r"|\b(?:this|the)\s+bot\s+is\s+(?:useless|stupid|trash|garbage|dumb)\b"
+            r"|^\W*(?:just\s+)?shut up\b|\byou\s+shut up\b"  # not "the shop shut up early"
+            r"|\b(?:fuck you|fuck off|stupid bot|useless bot|dumb bot|bakwas bot|chup kar|"
+            r"bhenchod|madarchod|chutiya)\b",
+            re.IGNORECASE,
+        ),
+    ),
+)
+
+
+def abuse_asked(text: str) -> Abuse | None:
+    said = " ".join((text or "").split())
+    for kind, pattern in ABUSE_PATTERNS:
+        if pattern.search(said):
+            return kind
+    return None
+
+
+ABUSE_TEXT = {
+    "en": {
+        "calm": "I'm here to help with the business problems when you're ready.",
+        "warn": "I'm happy to keep helping with your business. If this continues I'll have to pass this chat to the Workzap team.",
+        "refuse": "I can't continue with that. I'm here for problems in your business.",
+        "spam": "I'm here for problems in your business.",
+        "pass": "I'm passing this chat to the Workzap team.",
+    },
+    "roman_ur": {
+        "calm": "Main business ke masail mein madad ke liye hoon, jab aap tayyar hon.",
+        "warn": "Main aap ke business mein madad karne ko tayyar hoon. Agar ye jari raha to mujhe ye chat Workzap ki team ko dena paray gi.",
+        "refuse": "Main is par aage nahi chal sakta. Main aap ke business ke masail ke liye hoon.",
+        "spam": "Main aap ke business ke masail ke liye hoon.",
+        "pass": "Main ye chat Workzap ki team ko de raha hoon.",
+    },
+}
+
+
+@dataclass(frozen=True)
+class AbuseStep:
+    text: str
+    strikes: int
+    move: str | None  # "X_BLOCKED" or "X_OUT_OF_SCOPE": the state to go to
+    escalate: str | None  # the staff reason, when someone must look
+
+
+def abuse_step(kind: Abuse, strikes: int, language: str | None) -> AbuseStep:
+    """What pi says and does for one abusive message, given the strikes so far (spec 6.7): an
+    insult gets a calm line, a warning on the third strike and a hand-over on the fifth; a threat
+    gets one warning and an escalation, then a hand-over; sexual content or hate gets one refusing
+    line; spam gets one line and then silence."""
+    table = ABUSE_TEXT.get(language or "en", ABUSE_TEXT["en"])
+    if kind == Abuse.SPAM:
+        return AbuseStep(table["spam"], strikes, "X_OUT_OF_SCOPE", None)
+    if kind == Abuse.THREAT:
+        if strikes >= 3:
+            return AbuseStep(table["pass"], strikes + 1, "X_BLOCKED", "abuse_threat")
+        return AbuseStep(table["warn"], 3, None, "abuse_threat")
+    count = strikes + 1
+    if count >= 5:
+        return AbuseStep(table["pass"], count, "X_BLOCKED", "abuse")
+    if kind == Abuse.SEXUAL:
+        return AbuseStep(table["refuse"], count, None, "abuse" if count == 3 else None)
+    if count == 3:
+        return AbuseStep(table["warn"], count, None, None)
+    return AbuseStep(table["calm"], count, None, None)
+
+
+def stay_silent(state: str | None, text: str) -> bool:
+    """Whether pi says nothing at all: a chat a person has to clear (blocked), or more spam and
+    abuse after pi already answered it once."""
+    if state == "X_BLOCKED":
+        return True
+    return state == "X_OUT_OF_SCOPE" and abuse_asked(text) is not None

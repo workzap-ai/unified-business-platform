@@ -1217,6 +1217,33 @@ def matching_the_person(
     return found
 
 
+ESCALATION_TEXT = {
+    "payment_detail_change": (
+        "ENQUIRY (payment_detail_change): someone claims Workzap's bank details changed. pi "
+        "confirmed nothing and noted nothing. Possible payment fraud: do not confirm any new "
+        "bank details."
+    ),
+    "complaint": (
+        "COMPLAINT about pi or Workzap: pi thanked them and passed it on, and noted it as "
+        "feedback, not as a business problem. Please follow up."
+    ),
+    "abuse": (
+        "ABUSE: the customer has been abusive. pi stayed calm and has stopped answering until a "
+        "person decides (Documents and payments is not the place: use the unblock action)."
+    ),
+    "abuse_threat": (
+        "THREAT: the customer threatened Workzap or its staff. pi warned once and will not "
+        "continue. A person must decide what happens next."
+    ),
+}
+
+BOUNDARY_EFFECTS: dict[safety.Boundary, tuple[list[str], dict[str, Any]]] = {
+    safety.Boundary.DELETION: (["deletion_request"], {}),
+    safety.Boundary.BANK_CHANGE: (["escalate"], {"escalate": "payment_detail_change"}),
+    safety.Boundary.COMPLAINT: (["escalate"], {"escalate": "complaint"}),
+}
+
+
 def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
     """What must be answered before any model call (spec Part 6): an emergency, a message that is
     only card or ID details, a "who are you" question, a request for advice pi cannot give. The
@@ -1253,21 +1280,25 @@ def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
         first = safety.Pii(pii["kinds"][0])
         table = safety.PII_TEXT.get(language, safety.PII_TEXT["en"])
         return fixed(pii.get("notice") or table[first], why="R-PRIV-02")
+    if (rude := safety.abuse_asked(text)) is not None:
+        strikes = int((context.get("brief") or {}).get("abuse_strikes") or 0)
+        step = safety.abuse_step(rude, strikes, language)
+        move = {
+            "X_BLOCKED": flow.State.X_BLOCKED,
+            "X_OUT_OF_SCOPE": flow.State.X_OUT_OF_SCOPE,
+        }.get(step.move or "")
+        marks: dict[str, Any] = {"abuse_strikes": step.strikes}
+        if step.escalate:
+            marks["escalate"] = step.escalate
+        return fixed(step.text, move, ["escalate"] if step.escalate else [], marks, "R-ABUSE")
     if (who := safety.identity_asked(text, constitution.ASKS_IF_AI)) is not None:
         return fixed(safety.identity_reply(who, language), why="R-DISC")
     if (advice := safety.advice_asked(text)) is not None:
         return fixed(safety.advice_reply(advice, language), why="R-ADV")
     if (limit := safety.boundary_asked(text)) is not None:
+        effects, marks = BOUNDARY_EFFECTS.get(limit, ([], {}))
         return fixed(
-            safety.boundary_reply(limit, language),
-            None,
-            ["deletion_request"]
-            if limit == safety.Boundary.DELETION
-            else ["escalate"]
-            if limit == safety.Boundary.BANK_CHANGE
-            else [],
-            {"escalate": "payment_detail_change"} if limit == safety.Boundary.BANK_CHANGE else {},
-            why="R-BOUNDARY",
+            safety.boundary_reply(limit, language), None, list(effects), dict(marks), "R-BOUNDARY"
         )
     if (about := safety.nori_asked(text)) is not None:
         return fixed(safety.nori_reply(about, language), why="R-HONEST-02")
@@ -1395,16 +1426,17 @@ async def apply_decision(
         )  # fmt: skip
     if "escalate" in decision.effects:
         reason = str(decision.brief.get("escalate") or "other")
-        fraud = reason == "payment_detail_change"
         await raise_decision_request(
             session,
             scope,
             conversation,
             "other",
             "high",
-            f"ENQUIRY ({reason}): pi gave the fixed line and noted nothing as a problem. "
-            "Please pick it up."
-            + (" Possible payment fraud: do not confirm any new bank details." if fraud else ""),
+            ESCALATION_TEXT.get(
+                reason,
+                f"ENQUIRY ({reason}): pi gave the fixed line and noted nothing as a problem. "
+                "Please pick it up.",
+            ),
         )
     if "deletion_request" in decision.effects:
         await raise_decision_request(
@@ -1519,8 +1551,11 @@ def advance_flow(conversation: PiConversation, turn: "ServiceTurn", *, noted: bo
     if current is None:
         return
     decided = getattr(turn, "_decision", None)
-    stays = decided is not None and decided.next_state == flow.State.X_EMERGENCY
-    if current in (flow.State.X_PAUSED, flow.State.X_EMERGENCY) and not stays:
+    decided_next = decided.next_state if decided is not None else None
+    stays = decided_next == flow.State.X_EMERGENCY
+    if current in (flow.State.X_PAUSED, flow.State.X_EMERGENCY, flow.State.X_OUT_OF_SCOPE) and (
+        not stays and decided_next not in (flow.State.X_BLOCKED, flow.State.X_OUT_OF_SCOPE)
+    ):
         # They came back (R-MEM-03), or the emergency has passed: listen again.
         current = flow.advance(current, flow.State.S1_LISTENING)
         conversation.flow_state = current.value

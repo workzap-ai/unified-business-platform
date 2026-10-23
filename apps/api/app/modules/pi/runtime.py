@@ -605,6 +605,19 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             )
             await session.commit()
             return
+        # 1c. Moderation (spec 6.7): a blocked chat (a person decides) and spam or abuse that pi
+        # already answered once get no reply at all.
+        if policy.response_rules.get("pi_mode") == "brain":
+            from app.modules.pi import safety as moderation
+
+            if moderation.stay_silent(conversation.flow_state, message.body or ""):
+                message.status, message.error_code, event.status = (
+                    "skipped",
+                    "MODERATION_SILENT",
+                    "processed",
+                )
+                await session.commit()
+                return
         # 2. Spam / cost / loop limits, counted from durable rows.
         limited = await rate_limited(session, scope, conversation)
         if limited and limited != "RATE_LIMIT_LOOP":
