@@ -120,11 +120,20 @@ def test_the_grader_needs_all_twelve_scores_and_any_rule_break_excludes():
     from app.modules.pi import learning_grader as g
 
     assert g.interpret(g.Grading(scores=[2.0] * 5)) is None  # a short answer is not trusted
-    ok = g.interpret(g.Grading(scores=[2.0] * 12))
+    ok = g.interpret(g.Grading(scores=[2.0] * 11))
     assert ok is not None and ok.mean == 2.0 and not ok.rule_break
-    broke = g.interpret(g.Grading(scores=[1.0] * 12, rule_breaks=["quoted a price"]))
+    broke = g.interpret(
+        g.Grading(scores=[1.0] * 11, rule_break_items=[3, 99], rule_break_notes=["quoted a price"])
+    )
     assert broke is not None and broke.rule_break and broke.mean == 1.0
-    clamped = g.interpret(g.Grading(scores=[9.0] * 12))
+    assert broke.reasons == [
+        "#3 No solution, offer or pitch before readiness: quoted a price",
+        "#99 not a rubric item",  # an unknown number is still a break: doubt fails closed
+    ]
+    many = g.interpret(g.Grading(scores=[2.0] * 11, rule_break_items=[2] * 40))
+    assert many is not None and many.rule_break and len(many.reasons) == 1  # not thrown away
+    assert "any doubt counts as a break" in g.SYSTEM
+    clamped = g.interpret(g.Grading(scores=[9.0] * 11))
     assert clamped is not None and clamped.mean == 2.0
     assert g.switched_on({"brain": {"grader": True}}) and not g.switched_on({"brain": {}})
     assert not g.switched_on({"brain": {"grader": "yes"}})

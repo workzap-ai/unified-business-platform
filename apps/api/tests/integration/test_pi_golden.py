@@ -4,6 +4,7 @@
 The simulated person sends the "Person" lines; the model is scripted with the spec's own replies,
 so these tests check that the code lets the spec's wording through and keeps the state right."""
 
+import json
 from datetime import UTC, datetime, timedelta
 
 import pytest
@@ -311,11 +312,20 @@ async def test_g7_urdu_script_gets_an_urdu_script_reply_with_one_question(
 
 
 async def test_g8_arabic_first_message_discloses_the_ai_in_arabic(api, business_db, monkeypatch):
-    adaptive(monkeypatch, more)
+    prompts = adaptive(monkeypatch, more)
     pi = await workspace(api, business_db)
+    on = await api.patch(
+        "/api/v1/pi/settings/knowledge_config", json={"value": {"industry_packs": True}}
+    )
+    assert on.status_code == 200, on.text
     await say(pi, "مرحباً، عندنا مطعم في دبي والطلبات من التطبيقات تضيع", "g8-1")
     reply = (await pi.reply_to("g8-1")).body
     assert "ذكاء اصطناعي" in reply and reply.count("؟") == 1
+    # The restaurant pack is loaded for a message in Arabic script (G8 "Must").
+    seen = [json.loads(p) for p in prompts if p.startswith("{")]
+    names = [c.get("industry") or [] for c in seen]
+    assert any(n and n[0].startswith("Restaurants") for n in names), names
+    assert any("Restaurants" in str(c.get("industry_knowledge")) for c in seen)
     await pi.close()
 
 

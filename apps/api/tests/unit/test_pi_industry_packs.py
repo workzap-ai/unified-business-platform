@@ -325,3 +325,113 @@ def test_one_word_statements_of_the_trade_are_still_enough(said, key):
 def test_a_single_rare_word_without_a_statement_is_not_enough():
     assert packs.detect(["pharmacy"]).industries == []
     assert packs.detect(["the dentist said so"]).industries == []
+
+
+@pytest.mark.parametrize(
+    "said",
+    [
+        "I'm the store manager at a pharmacy chain. My boss asked me to tell you our problems.",
+        "I am the manager of a pharmacy",
+        "I work at a pharmacy chain as store manager",
+    ],
+)
+def test_a_manager_in_a_pharmacy_chain_gets_the_pharmacy_care_rules(said):
+    """Golden G13: pharmacy care rules apply even though the speaker is not the owner, and the
+    catch-all "retail shops and chains" pack does not take the chat over."""
+    found = packs.detect([said])
+    assert found.primary == "pharmacies_and_medical_stores"
+    text = packs.brief(packs.get_pack(found.primary), max_chars=5200)
+    assert "Care:" in text
+
+
+def test_a_shop_owner_who_names_no_specific_trade_stays_with_the_catch_all_pack():
+    assert packs.detect(["I own a chain of retail shops with many branches"]).primary == (
+        "retail_shops_and_chains"
+    )
+    assert packs.detect(["we told our manager about it"]).industries == []
+
+
+@pytest.mark.parametrize(
+    ("said", "key"),
+    [
+        ("مرحباً، عندنا مطعم في دبي والطلبات من التطبيقات تضيع", "restaurants"),  # golden G8
+        ("عندي صيدلية والمخزون ينفد", "pharmacies_and_medical_stores"),
+        ("أنا أملك مخبز صغير", "bakeries_mithai_and_confectionery"),
+        ("عندنا مصنع ملابس", "garment_and_knitwear_export_units"),
+        ("میرا ریسٹورنٹ ہے", "restaurants"),
+        ("ہم گارمنٹس کا کاروبار کرتے ہیں", "garment_and_knitwear_export_units"),
+        ("ہمارا ہوٹل ہے", "hotels"),
+    ],
+)
+def test_a_person_who_writes_in_arabic_or_urdu_script_gets_an_industry(said, key):
+    """Before this, a message in either script matched no industry at all: the packs hold only
+    English and Roman Urdu words."""
+    assert packs.detect([said]).primary == key
+
+
+@pytest.mark.parametrize(
+    "said",
+    [
+        "الطلبات تضيع والموظفين يتأخرون",  # orders get lost and staff come late
+        "مرحبا كيف حالك",  # hello, how are you
+        "ذهب إلى السوق",  # he went to the market ("ذهب" also means gold)
+        "میں نے کل کھانا کھایا",  # I ate yesterday
+        "مال ختم ہو جاتا ہے اور عملہ دیر سے آتا ہے",  # stock runs out and staff come late
+    ],
+)
+def test_ordinary_arabic_and_urdu_talk_picks_no_industry(said):
+    assert packs.detect([said]).industries == []
+
+
+def test_the_script_words_belong_to_real_packs_and_match_however_they_are_written():
+    from app.modules.pi.industry_words import TRADE_WORDS
+
+    assert set(TRADE_WORDS) <= set(packs.load_packs())
+    # with or without the article, vowel marks, or the Urdu or Arabic form of the same letter
+    for said in ("عندنا المطعم", "عِندنا مطعمٌ", "وعندنا مطعم"):
+        assert packs.detect([said]).primary == "restaurants", said
+
+
+@pytest.mark.parametrize(
+    ("said", "key"),
+    [
+        ("I run a dental clinic", "dental_clinics"),
+        ("I run a vet clinic for animals", "veterinary_clinics_and_animal_health_suppliers"),
+        ("عندنا عيادة اسنان", "dental_clinics"),
+        ("عندنا عيادة بيطرية", "veterinary_clinics_and_animal_health_suppliers"),
+        ("عندنا عيادة نفسية", "mental_health_and_therapy_practices"),
+        ("عندي عيادة جلدية", "aesthetic_and_dermatology_clinics"),
+        ("I run a skin and dermatology clinic", "aesthetic_and_dermatology_clinics"),
+        ("I run a clinic", "clinics_and_gp_practices"),
+        ("I run a school", "private_schools_and_school_chains"),
+    ],
+)
+def test_a_care_trade_wins_over_the_general_pack_that_shares_one_of_its_words(said, key):
+    """The care packs carry the stricter rules (no diagnosis, no treatment advice), so a dental,
+    veterinary, mental health or dermatology clinic must not end up with the general clinic pack
+    because of the alphabet."""
+    assert packs.detect([said]).primary == key
+
+
+@pytest.mark.parametrize(
+    "said",
+    [
+        "I work at a bank and my wife visits a pharmacy",
+        "We have a problem. The pharmacy next door is cheaper",
+        "I have a lot of work and a pharmacy owner is my friend",
+        "عندي ولد عمره 5 سنوات",  # I have a son aged 5 ("عمره" is also "umrah")
+        "عندي مشكلة في الكلية",  # I have a problem with my kidney ("كلية" is also "college")
+        "عندي كمبيوتر قديم",  # I have an old computer
+    ],
+)
+def test_a_statement_elsewhere_or_an_everyday_word_does_not_name_a_trade(said):
+    """One trade word is enough only when the person states their trade in the same clause."""
+    assert packs.detect([said]).industries == []
+
+
+def test_a_statement_must_sit_in_the_same_clause_as_the_trade_word():
+    assert packs.detect(["I run a pharmacy"]).primary == "pharmacies_and_medical_stores"
+    assert packs.detect(["Hello. I run a pharmacy, stock is a mess"]).primary == (
+        "pharmacies_and_medical_stores"
+    )
+    assert packs.detect(["I run a business. The pharmacy next door is cheaper"]).industries == []
