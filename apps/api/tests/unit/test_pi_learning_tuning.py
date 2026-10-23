@@ -72,7 +72,7 @@ async def test_a_step_is_undone_when_a_guardrail_rose(wire):
     key = "debounce_seconds"
     default = brain_config.TUNABLES[key][0]
     settings = SimpleNamespace(response_rules={"brain": {key: default + 1}})
-    latest = {key: change("setting_tuned", key, default, default + 1, +1, days_ago=8)}
+    latest = {key: change("setting_tuned", key, default, default + 1, +1, days_ago=29)}
     wire(latest, [rates(1.0), rates(1.5, opt_out=0.05)])
     out, session = await run(settings)
     assert out["reverted"] == key and out["to"] == default
@@ -85,7 +85,7 @@ async def test_a_step_stays_and_continues_when_nothing_got_worse(wire):
     key = "debounce_seconds"
     default = brain_config.TUNABLES[key][0]
     settings = SimpleNamespace(response_rules={"brain": {key: default + 1}})
-    latest = {key: change("setting_tuned", key, default, default + 1, +1, days_ago=8)}
+    latest = {key: change("setting_tuned", key, default, default + 1, +1, days_ago=29)}
     wire(latest, [rates(1.0), rates(1.2)])
     out, _ = await run(settings)
     assert out == {"tuned": key, "from": default + 1, "to": default + 2}
@@ -134,7 +134,7 @@ async def test_a_value_set_by_hand_is_not_undone(wire):
     key = "debounce_seconds"
     default = brain_config.TUNABLES[key][0]
     settings = SimpleNamespace(response_rules={"brain": {key: default + 3}})  # staff chose this
-    latest = {key: change("setting_tuned", key, default, default + 1, +1, days_ago=8)}
+    latest = {key: change("setting_tuned", key, default, default + 1, +1, days_ago=29)}
     wire(latest, [rates(1.0), rates(0.2, opt_out=0.2)])
     out, session = await run(settings)
     assert out == {"tuned": None, "left_alone": key}
@@ -142,8 +142,9 @@ async def test_a_value_set_by_hand_is_not_undone(wire):
     assert [r.kind for r in session.added] == ["setting_reverted"]  # the trial is closed
 
 
-def test_a_change_needs_as_many_replies_as_a_canary():
-    assert learning_tuning.MIN_REPLIES == learning_rules.MIN_CANARY
+def test_a_change_needs_as_many_conversations_as_a_canary_and_four_weeks():
+    assert learning_tuning.MIN_CONVERSATIONS == learning_rules.MIN_CANARY
+    assert learning_tuning.TRIAL == timedelta(days=28)  # spec 9.10 rule 3
 
 
 def test_document_lessons_refuse_names_and_chat_lessons_need_no_kind():
@@ -186,3 +187,14 @@ def test_voice_moments_and_what_counts_as_used():
     assert v.valid("acknowledge", "Fine")  # one word
     assert v.valid("opening", "Hi, I'm pi.")  # a fixed line is never varied
     assert set(v.SEEDS) == {"acknowledge", "correct"}
+
+
+async def test_a_trial_is_not_judged_before_four_weeks_even_with_plenty_of_data(wire):
+    key = "debounce_seconds"
+    default = brain_config.TUNABLES[key][0]
+    settings = SimpleNamespace(response_rules={"brain": {key: default + 1}})
+    latest = {key: change("setting_tuned", key, default, default + 1, +1, days_ago=10)}
+    wire(latest, [rates(1.0), rates(0.1, opt_out=0.5)])  # terrible numbers, but too early to say
+    out, session = await run(settings)
+    assert out == {"tuned": None, "waiting": True} and not session.added
+    assert settings.response_rules["brain"][key] == default + 1

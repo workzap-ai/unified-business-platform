@@ -1,11 +1,11 @@
 """Settings tuning (pi Brain spec 8.5 job 7, 9.10).
 
-Timing settings move one step at a time, at most once a week per setting and one setting per run,
-so a change can be told apart from the one before it. A step stays only if the reward did not fall
-and no guardrail (rule breaks, opt-outs, complaints, confusion, corrections) rose against the week
-before; otherwise it is undone and the next try goes the other way. Only timing settings are here:
-nothing that belongs to a rule (one question, disclosure, the quote) and nothing that decides how
-changes are judged (the canary numbers).
+Timing settings move one step at a time and one setting at a time, so a change can be told apart
+from the one before it. A step stays only if, after four weeks and at least 300 conversations, the
+reward did not fall and no guardrail (rule breaks, opt-outs, complaints, confusion, corrections)
+rose against the four weeks before; otherwise it is undone and the next try goes the other way.
+Only timing settings are here: nothing that belongs to a rule (one question, disclosure, the
+quote) and nothing that decides how changes are judged (the canary numbers).
 """
 
 from datetime import datetime, timedelta
@@ -34,7 +34,11 @@ STEP = {  # how far one move goes, in the setting's own unit
     "document_followup_first_days": 1,
     "document_followup_second_days": 1,
 }
-MIN_REPLIES = learning_rules.MIN_CANARY  # as many replies as a canary needs (spec 9.10 rule 3)
+# Spec 9.10 rule 3: no decision before 300 conversations on each side or 4 weeks, whichever comes
+# later. A step is therefore judged after both, and the week before it is compared with the
+# four weeks it ran, never with a week of chance.
+MIN_CONVERSATIONS = learning_rules.MIN_CANARY
+TRIAL = timedelta(days=28)
 KINDS = ("setting_tuned", "setting_reverted")
 
 
@@ -51,7 +55,8 @@ async def _rates(
             )
         )
     )
-    if len(rows) < MIN_REPLIES:
+    conversations = len({r.conversation_id for r in rows})
+    if conversations < MIN_CONVERSATIONS:
         return None
     n = len(rows)
 
@@ -59,7 +64,7 @@ async def _rates(
         return sum(1 for r in rows if signal in r.signals) / n
 
     return learning_rules.Rates(
-        conversations=n,
+        conversations=conversations,
         reward=sum(r.reward for r in rows) / n,
         rule_break=share("rule_break"),
         opt_out=share("opt_out"),
@@ -130,15 +135,16 @@ async def tune(
 ) -> dict[str, Any]:
     """At most one step this run. Returns what happened, for the digest."""
     latest = await _latest(session, scope)
-    # One trial at a time, so its effect can be told apart: while a step is still inside its
-    # week nothing else moves, and a trial that is ready to be judged goes before a new one.
+    # One trial at a time, so its effect can be told apart: while a step is still inside its four
+    # weeks nothing else moves, and a trial that is ready to be judged goes before a new one.
     trials = {k: c for k, c in latest.items() if c.kind == "setting_tuned" and k in TUNED}
-    if any(now - c.created_at < learning_rules.ONE_WEEK for c in trials.values()):
+    if any(now - c.created_at < TRIAL for c in trials.values()):
         return {"tuned": None, "waiting": True}
     due = [
         key
         for key in TUNED
-        if key not in latest or now - latest[key].created_at >= learning_rules.ONE_WEEK
+        if key not in latest
+        or now - latest[key].created_at >= (TRIAL if key in trials else learning_rules.ONE_WEEK)
     ]
     due.sort(
         key=lambda k: (
@@ -152,9 +158,7 @@ async def tune(
         if last is not None and last.kind == "setting_tuned":
             before = int(last.before["value"])
             direction = int(last.after.get("direction", 1))
-            control = await _rates(
-                session, scope, last.created_at - timedelta(days=7), last.created_at
-            )
+            control = await _rates(session, scope, last.created_at - TRIAL, last.created_at)
             trial = await _rates(session, scope, last.created_at, now)
             if control is None or trial is None:
                 return {"tuned": None, "waiting": True}  # too few replies to judge it yet
@@ -196,8 +200,8 @@ async def tune(
                 return {"reverted": key, "to": back, "why": reason}
         else:
             direction = int(last.after.get("direction", 1)) if last is not None else 1
-            if await _rates(session, scope, now - timedelta(days=7), now) is None:
-                continue  # no week of data yet to measure against
+            if await _rates(session, scope, now - TRIAL, now) is None:
+                continue  # not 300 conversations over four weeks yet to measure against
             evidence = {}
         step = STEP[key] if direction > 0 else -STEP[key]
         new = _clamp(key, current + step)

@@ -33,6 +33,18 @@ from app.modules.pi_customer.engine import STOP, prayer_or_quiet
 
 pytestmark = pytest.mark.integration
 
+
+@pytest.fixture(autouse=True)
+def any_hour_any_day(monkeypatch):
+    """The reminder sweep tests use the real clock. Without this they fail on a Friday around
+    midday (the Jumu'ah pause) and at night (quiet hours), when a reminder is correctly held back.
+    The quiet-hour and prayer rules themselves are tested with fixed times below."""
+    from app.modules.pi import followups
+
+    monkeypatch.setattr(followups, "quiet_until", lambda *a, **k: None)
+    monkeypatch.setattr(followups, "_friday_prayer", lambda tz: False)
+
+
 # A Wednesday at 11:00 UTC: not quiet hours, not Friday prayers.
 NOW = datetime(2026, 11, 4, 11, 0, tzinfo=UTC)
 TEMPLATES = {

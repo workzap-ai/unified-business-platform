@@ -16,7 +16,7 @@ The PDF has 448 pages; per-page text is extracted with `pypdf`.
 | 35-36, 418-422 | 7.0 and 7.N to 7.Q (overlays, unlisted industry, angles, size) | **yes, in full (2026-10-23)**; now in pi's prompt |
 | 37-417 | 7 Industry playbooks (211) | **no, not page by page by me**; 8 audit agents read the pages against the packs (2026-10-23) | `build_industry_packs.py` | content faithful; parser faults found and fixed (Arabic glosses, line-break hyphens, 6 wrong problem subtypes); 25+ spot checks, 20 detection probes | 211 packs + 11 overlays |
 | 423-429 | 8 Self-learning brain | **yes, in full (2026-10-23)** | - | yes | `learning*.py`, `experience_*.py`, `learning_drift.py`, `learning_miner.py`, `critique.py`, never-say, review queue, metrics |
-| 430-433 | 9 Implementation plan | partly (tool table, 9.2) | - | yes | `brain_config.py`, routes |
+| 430-433 | 9 Implementation plan | **yes, in full (2026-10-23), compared with the code; the Next.js/Vercel/Drizzle stack, the WhatsApp webhook pipeline and env settings were left out on purpose** | - | yes | `brain_config.py`, `industry_packs.detect`, `learning_tuning.py`, see "Part 9 compared with the code" |
 | 434-438 | 10 Golden, red-team, rubric | 434-435 yes | handbook (10.1) | yes | `tests/integration/test_pi_golden.py` |
 | 439-445 | 11 Command playbook | yes (441-445) | - | yes | `.claude/commands`, `.claude/agents` |
 | 446-448 | Appendices A-D | yes | - | yes | prompt assembly (spec guidance, emergency numbers) |
@@ -71,3 +71,39 @@ local-word glosses (`signal_glosses`, 372 in 159 packs), quoted signals with the
 characters for the primary industry (all care rules, seasons, 14 words, 14 problem phrases,
 questions, scope, local words, one voice example) and 2,000 for each secondary one.
 Still true: nobody read pages 37-417 page by page; the comparison above is by words, not meaning.
+
+## Part 9 compared with the code (2026-10-23)
+
+Left out on purpose: the Next.js, Vercel and Drizzle stack (9.1, 9.7, 9.8 on the old stack), the
+WhatsApp webhook pipeline and environment settings (9.9). Everything else was checked line by line.
+
+Already in code, nothing to change: the output linter checks of 9.5 (disclosure, one question and
+last, word caps, banned words, no solution talk while listening, no currency unless an approved
+quote, no bank details, no password or card requests, no "payment received", no "solved", brand,
+human-identity claims, WhatsApp markdown), the state guards of 9.4 (explicit yes at 0.9, `can_approve`,
+send only approved documents), the classifiers of 9.6, 20 recent messages in the prompt (9.2), and the
+tuning guardrails of 9.10 rules 1, 2 and 4 (no rule numbers tuned, opt-out and complaints stop a
+change, every change is logged with its evidence).
+
+Changed because of the comparison:
+
+- **Industry detection (7.0, 9.8 step 9).** Measured on the packs' own text: when a person said
+  nothing that names a trade, the old detector picked the wrong industry about twice as often as the
+  right one (right 83, wrong 119 of 211) and picked an industry for 5 of 10 everyday complaints
+  that name none. It trusted any single rare word. Now one word is enough only when it is part of
+  the industry's name and the person states their trade ("I run a pharmacy", "hamara garments ka
+  kaam hai", "our accounting practice"); otherwise two different terms are needed. Result: right
+  83 to 87, wrong 119 to 52 (the rest now pick nothing, 9 to 72: pi may ask once instead), everyday
+  complaints 5 to 0, explicit statements unchanged (206 of 211, and every one-word statement tested
+  still works). Three probe conversations per industry are now
+  tests (`tests/unit/test_pi_industry_packs.py`).
+- **9.10 rule 3 (minimum sample).** Settings tuning judged a step after one week. It now needs 300
+  different conversations on each side and four weeks, whichever comes later.
+- **9.10 numbers made configurable inside the spec's range:** "anything else?" replies before a
+  summary (2, range 1 to 3), and the word caps (60, 160, 120, plus or minus 30%).
+
+Not changed, and why: the link-suggestion threshold to show a person (0.75): pi does not show links
+to people, staff see them. The low-confidence confirm threshold (0.6) and the severity weights
+(4.7): configurable only with data to tune them from (200 reviewer-ranked lists). Prompt caching
+(9.2): depends on the model provider. `get_kickoff_slots` and `book_kickoff` (S11): need the live
+calendar and are not built.

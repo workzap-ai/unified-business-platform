@@ -245,3 +245,83 @@ def test_local_word_glosses_say_what_the_word_means():
     for key, other in packs.load_packs().items():
         for word, meaning in other.get("signal_glosses", {}).items():
             assert meaning[:1].isalpha(), (key, word, meaning)
+
+
+# --- spec 9.8 milestone 9: three probe conversations per industry ------------------------------
+
+EVERYDAY = [
+    "my customers pay late and the staff come late",
+    "stock runs out and I do not know what to reorder",
+    "sales are down this month and I cannot tell why",
+    "we waste a lot of time on paperwork every day",
+    "I have too many whatsapp groups and nothing is tracked",
+    "my team does not follow up with leads",
+    "cash does not match at the end of the day",
+    "suppliers deliver late and prices keep changing",
+    "I want to grow my business but things are messy",
+    "customers complain and I hear about it late",
+]
+
+
+def probes(pack: dict) -> dict[str, str]:
+    """Three ways a person of this trade might talk, made from the pack's own spec text."""
+    person = " ".join(t["text"] for t in pack.get("exchange", []) if t.get("role") == "Person")
+    phrases = [p["phrase"] for p in pack.get("problems", [])]
+    return {
+        "states the trade": f"I run a {pack['name'].lower()}. {phrases[0]}",
+        "tells their story": person[:400],
+        "lists two problems": " ".join(phrases[:2]),
+    }
+
+
+def test_every_industry_has_three_probe_conversations():
+    for pack in industries():
+        made = probes(pack)
+        assert len(made) == 3 and all(text.strip() for text in made.values()), pack["key"]
+
+
+def test_a_person_who_states_their_trade_gets_that_pack():
+    right = sum(
+        packs.detect([probes(p)["states the trade"]]).primary == p["key"] for p in industries()
+    )
+    assert right / len(industries()) >= 0.95, right
+
+
+def test_everyday_complaints_that_name_no_trade_pick_no_industry():
+    wrong = [text for text in EVERYDAY if packs.detect([text]).industries]
+    assert wrong == []
+
+
+def test_when_pi_picks_a_pack_from_the_problems_alone_it_is_usually_right():
+    """Spec 7.0: unclear after two problems, pi may ask once. A wrong industry is worse than no
+    industry, so precision matters more than recall here."""
+    right = wrong = 0
+    for p in industries():
+        for name in ("tells their story", "lists two problems"):
+            primary = packs.detect([probes(p)[name]]).primary
+            right += primary == p["key"]
+            wrong += primary is not None and primary != p["key"]
+    assert right / (right + wrong) >= 0.60, (right, wrong)
+
+
+@pytest.mark.parametrize(
+    ("said", "key"),
+    [
+        ("I run a pharmacy", "pharmacies_and_medical_stores"),
+        ("we have a bakery", "bakeries_mithai_and_confectionery"),
+        ("I own a dental clinic", "dental_clinics"),
+        ("hamara garments ka kaam hai", "garment_and_knitwear_export_units"),
+        ("main pharmacy chalata hun", "pharmacies_and_medical_stores"),
+        (
+            "clients ask for invoices late at our accounting practice",
+            "accounting_audit_and_tax_practices",
+        ),
+    ],
+)
+def test_one_word_statements_of_the_trade_are_still_enough(said, key):
+    assert packs.detect([said]).primary == key
+
+
+def test_a_single_rare_word_without_a_statement_is_not_enough():
+    assert packs.detect(["pharmacy"]).industries == []
+    assert packs.detect(["the dentist said so"]).industries == []

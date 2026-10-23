@@ -774,6 +774,7 @@ def summary_due(
     since_summary: int,
     trigger: int = SUMMARY_TRIGGER,
     quiet_replies: int = 0,
+    quiet_limit: int = 2,
 ) -> str | None:
     """Why pi should show the sorted summary now (spec 3.7), or None."""
     if noted < 1:
@@ -786,7 +787,7 @@ def summary_due(
         return "show"
     if since_summary >= trigger:
         return "many"
-    if quiet_replies >= 2 and since_summary >= 1:
+    if quiet_replies >= quiet_limit and since_summary >= 1:
         return "quiet"
     return None
 

@@ -21,13 +21,27 @@ PACKS_DIR = Path(__file__).parent / "packs" / "industry"
 MAX_PACKS = 3  # industries per business, primary first
 MIN_SCORE = 4.0  # below this a pack is not evidence enough to load
 SECONDARY_SHARE = 0.75  # a secondary pack needs this share of the primary's score
-STRONG_TERM = 5.0  # one rare term (e.g. "pharmacy") is enough on its own; common ones need company
+STRONG_TERM = 5.0  # one rare term is not enough alone unless the person states their trade (below)
 # catch-all packs match on everyday words, so they need more evidence than a specific one
 GENERIC = {"general_factories_and_workshops", "retail_shops_and_chains"}
 GENERIC_MIN_SCORE = 9.0
 KNOWN_BONUS = 4.0  # packs already stored for the business stay eligible without new evidence
 PHRASE_BOOST = 1.5
 NAME_BOOST = 2.2
+
+# An explicit statement of the trade (spec 7.0: "I run a pharmacy", "hamara garments ka kaam hai").
+# One word that names an industry is trusted on its own only inside such a statement: measured on
+# the packs' own exchanges, trusting any single rare word picked the wrong industry about twice as
+# often as the right one, and picked one for everyday text that names no trade at all.
+STATEMENT = re.compile(
+    r"\b(?:i|we)(?:'m|'re| am| are)?\s+(?:\w+\s+){0,2}?"
+    r"(?:run|own|have|manage|operate|work in|working in|am in|are in|am an?|are an?)\b"
+    r"|\b(?:my|our)\s+(?:\w+\s+){0,2}?(?:business|company|work|shop|firm|factory|clinic|store|farm|school)\b"
+    r"|\b(?:mera|meri|hamara|hamari|humara|humari)\b"
+    r"|\b(?:chalata|chalati|chalate|chalaata)\s+(?:hun|hoon|hain)\b"
+    r"|\bka\s+(?:kaam|karobar|business)\b",
+    re.IGNORECASE,
+)
 
 NAME_STOP = frozenset(
     "and the for with shops shop services service companies company businesses business "
@@ -108,6 +122,17 @@ def _normal(text: str) -> str:
 
 
 @lru_cache(maxsize=1)
+def _name_words() -> dict[str, set[str]]:
+    """pack key -> the words of its name that identify the trade."""
+    names: dict[str, set[str]] = {}
+    for key, pack in load_packs().items():
+        plain = re.sub(r"\([^)]*\)", " ", pack["name"])  # "(incl. Eid ...)" is not part of the name
+        words = (_stem(w) for w in _fold(plain).split())
+        names[key] = {w for w in words if len(w) >= 3 and w not in NAME_STOP}
+    return names
+
+
+@lru_cache(maxsize=1)
 def _index() -> dict[str, dict[str, float]]:
     """pack key -> {normalised signal: weight}; rare signals weigh more than common ones."""
     packs = load_packs()
@@ -116,11 +141,7 @@ def _index() -> dict[str, dict[str, float]]:
         terms = {_normal(term) for term in pack.get("signals", [])}
         terms |= {_normal(word) for word in pack.get("vocabulary", {})}
         raw[key] = {t for t in terms if len(t) >= 3}
-    names: dict[str, set[str]] = {}
-    for key, pack in packs.items():
-        plain = re.sub(r"\([^)]*\)", " ", pack["name"])  # "(incl. Eid ...)" is not part of the name
-        words = (_stem(w) for w in _fold(plain).split())
-        names[key] = {w for w in words if len(w) >= 3 and w not in NAME_STOP}
+    names = _name_words()
     frequency: dict[str, int] = {}
     for key in packs:
         for term in raw[key] | names[key]:
@@ -140,25 +161,45 @@ def _index() -> dict[str, dict[str, float]]:
     return index
 
 
-def _evidence(text: str) -> dict[str, tuple[float, int, float]]:
-    """pack key -> (summed weight, distinct terms matched, strongest single weight)."""
+def _evidence(text: str) -> dict[str, tuple[float, int, float, str]]:
+    """pack key -> (summed weight, distinct terms matched, strongest single weight, that
+    strongest term when it is a word of the pack's own name, else "")."""
     padded = f" {_normal(text)} "
-    found: dict[str, tuple[float, int, float]] = {}
+    names = _name_words()
+    found: dict[str, tuple[float, int, float, str]] = {}
     for key, weights in _index().items():
-        hits = [weight for term, weight in weights.items() if f" {term} " in padded]
+        hits = [(weight, term) for term, weight in weights.items() if f" {term} " in padded]
         if hits:
-            found[key] = (sum(hits), len(hits), max(hits))
+            strongest, term = max(hits)
+            found[key] = (
+                sum(w for w, _ in hits),
+                len(hits),
+                strongest,
+                term if term in names[key] else "",
+            )
     return found
+
+
+def _possessed(text: str, term: str) -> bool:
+    """The person owns the trade word: "our accounting practice", "my pharmacy"."""
+    return (
+        bool(term)
+        and re.search(rf"\b(?:my|our)\s+(?:\w+\s+){{0,2}}{re.escape(term)}\b", text) is not None
+    )
 
 
 def score(text: str) -> dict[str, float]:
     """Evidence for every pack in `text` (only packs with some match)."""
-    return {key: round(total, 2) for key, (total, _, _) in _evidence(text).items()}
+    return {key: round(ev[0], 2) for key, ev in _evidence(text).items()}
 
 
-def _qualifies(key: str, total: float, count: int, strongest: float) -> bool:
+def _qualifies(
+    key: str, total: float, count: int, strongest: float, named: bool, stated: bool
+) -> bool:
+    """Enough evidence to load the pack: two different terms, or one rare word that names the
+    trade inside an explicit statement of it ("I run a pharmacy", "our accounting practice")."""
     floor = GENERIC_MIN_SCORE if key in GENERIC else MIN_SCORE
-    return total >= floor and (count >= 2 or strongest >= STRONG_TERM)
+    return total >= floor and (count >= 2 or (strongest >= STRONG_TERM and named and stated))
 
 
 def detect(
@@ -172,18 +213,28 @@ def detect(
     for the business; they get a bonus so the primary does not flip on one stray word.
     """
     packs = load_packs()
-    evidence = _evidence(" . ".join(texts))
-    scores = {key: total for key, (total, _, _) in evidence.items()}
+    joined = " . ".join(texts)
+    stated = STATEMENT.search(joined) is not None
+    normal = _normal(joined)
+    evidence = _evidence(joined)
+    scores = {key: ev[0] for key, ev in evidence.items()}
     for key in known:
         if key in packs:
             scores[key] = scores.get(key, 0.0) + KNOWN_BONUS
-            total, count, strongest = evidence.get(key, (0.0, 0, 0.0))
-            evidence[key] = (scores[key], max(count, 2), strongest)  # stored packs stay eligible
+            _, count, strongest, named = evidence.get(key, (0.0, 0, 0.0, ""))
+            evidence[key] = (scores[key], max(count, 2), strongest, named)  # stored stay eligible
     ranked = sorted(
         (
             (scores[key], key)
             for key, ev in evidence.items()
-            if _qualifies(key, scores[key], ev[1], ev[2])
+            if _qualifies(
+                key,
+                scores[key],
+                ev[1],
+                ev[2],
+                bool(ev[3]),
+                stated or _possessed(normal, ev[3]),
+            )
         ),
         reverse=True,
     )

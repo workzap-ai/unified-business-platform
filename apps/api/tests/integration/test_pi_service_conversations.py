@@ -23,6 +23,16 @@ from app.modules.sales.models import SalesLead
 pytestmark = pytest.mark.integration
 
 
+@pytest.fixture(autouse=True)
+def any_hour_any_day(monkeypatch):
+    """These tests use the real clock. Without this they fail on a Friday around midday (the
+    Jumu'ah pause) and at night (quiet hours), when a reminder is correctly held back."""
+    from app.modules.pi import followups
+
+    monkeypatch.setattr(followups, "quiet_until", lambda *a, **k: None)
+    monkeypatch.setattr(followups, "_friday_prayer", lambda tz: False)
+
+
 def turn(**changes):
     data = dict(
         reply="Aapki website ka main maqsad kya hai?",

@@ -192,6 +192,13 @@ SUMMARY_CAP = 160
 DOCUMENT_CAP = 120
 
 
+def _cap(context: dict[str, Any], key: str, default: int) -> int:
+    """A word limit: the workspace's own value (kept within +-30% of the default by
+    `brain_config`) or the default. These are the only voice numbers spec 9.10 lets it tune."""
+    value = (context.get("brain_settings") or {}).get(key)
+    return value if isinstance(value, int) and not isinstance(value, bool) else default
+
+
 @dataclass(frozen=True)
 class Violation:
     rule: str
@@ -345,11 +352,18 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
     elif asked == 1 and not stripped.endswith(QUESTION_MARKS):
         add(Violation("R-VOICE-02", "the question must be the last sentence"))
     bullets = sum(1 for line in reply.splitlines() if line.lstrip().startswith(("•", "- ")))
-    cap = SUMMARY_CAP if bullets >= 3 else DOCUMENT_CAP if "http" in reply else WORD_CAP
+    normal_cap = _cap(context, "word_cap", WORD_CAP)
+    cap = (
+        _cap(context, "summary_word_cap", SUMMARY_CAP)
+        if bullets >= 3
+        else _cap(context, "document_word_cap", DOCUMENT_CAP)
+        if "http" in reply
+        else normal_cap
+    )
     words = len(reply.split())
     if words > cap:
         add(Violation("R-VOICE-01", f"too long: {words} words, the limit is {cap}"))
-    elif cap == WORD_CAP and words > int(
+    elif cap == normal_cap and words > int(
         (context.get("style") or {}).get("reply_up_to_words") or cap
     ):
         # They write short: stay near one and a half times their length (spec 8.4.1).
@@ -462,14 +476,14 @@ def repair(reply: str, context: dict[str, Any]) -> str:
         return char if keep else ""
 
     fixed = re.sub(r" ?" + EMOJI.pattern, drop, fixed.replace("️", ""))
-    fixed = _one_question_last(fixed)
+    fixed = _one_question_last(fixed, _cap(context, "word_cap", WORD_CAP))
     history = context.get("history") or []
     if not any(h.get("role") == "ai" for h in history) and not AI_WORDS.search(fixed):
         fixed = f"{opening_line(context)} {fixed}".strip()
     return fixed.strip()
 
 
-def _one_question_last(reply: str) -> str:
+def _one_question_last(reply: str, cap: int = WORD_CAP) -> str:
     """One question, last, and within the word limit (R-VOICE-01, R-VOICE-02): keep the last
     question at the end, drop the other questions, then drop trailing statements while the reply is
     too long. Lists and summaries (several lines) are left alone."""
@@ -479,6 +493,6 @@ def _one_question_last(reply: str) -> str:
     questions = [x for x in sentences if x.rstrip().endswith(QUESTION_MARKS)]
     statements = [x for x in sentences if x not in questions]
     closing = questions[-1:] if questions else []
-    while len(statements) > 1 and len(" ".join([*statements, *closing]).split()) > WORD_CAP:
+    while len(statements) > 1 and len(" ".join([*statements, *closing]).split()) > cap:
         statements.pop()
     return " ".join([*statements, *closing]).strip()

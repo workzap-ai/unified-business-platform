@@ -13,6 +13,10 @@ TUNABLES: dict[str, tuple[int, int, int]] = {
     "debounce_seconds": (10, 5, 20),
     "max_clarify": (3, 1, 3),
     "summary_trigger": (7, 5, 10),
+    "quiet_before_summary": (2, 1, 3),  # "anything else?" replies with nothing new, then a summary
+    "word_cap": (60, 42, 78),  # a normal message, +-30% (spec 9.10)
+    "summary_word_cap": (160, 112, 208),  # the sorted summary
+    "document_word_cap": (120, 84, 156),  # a message that carries a link
     "followup_silence_hours": (20, 4, 23),
     "paused_followup_days": (3, 2, 7),
     "document_followup_first_days": (2, 1, 3),

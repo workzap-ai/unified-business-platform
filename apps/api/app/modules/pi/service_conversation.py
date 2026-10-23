@@ -1192,7 +1192,15 @@ async def brain_problems(
     context["served_industries"] = served if isinstance(served, list) else None
     context["brain_settings"] = {
         key: brain_config.value(policy.response_rules, key)
-        for key in ("summary_trigger", "redisclose_days", "max_clarify")
+        for key in (
+            "summary_trigger",
+            "redisclose_days",
+            "max_clarify",
+            "quiet_before_summary",
+            "word_cap",
+            "summary_word_cap",
+            "document_word_cap",
+        )
     }
     if problems.shape_question_due(len(noted), industry_known, bool(brief.get("industry_asked"))):
         context["shape_question_due"] = True
@@ -1473,7 +1481,8 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     )
     said = str(context.get("latest_customer_message", ""))
     quiet = int(context.get("quiet_replies") or 0)
-    if not problems.summary_due(said, len(items), since, trigger, quiet):
+    quiet_limit = int((context.get("brain_settings") or {}).get("quiet_before_summary") or 2)
+    if not problems.summary_due(said, len(items), since, trigger, quiet, quiet_limit):
         return
     language = str(context.get("reply_language") or "en")
     turn.reply = problems.summary_message(items, language)
