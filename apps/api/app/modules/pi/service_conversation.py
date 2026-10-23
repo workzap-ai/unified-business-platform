@@ -1732,7 +1732,7 @@ def industry_texts(
     return [text for text in said if text]
 
 
-def industry_context(customer: Any, texts: list[str], max_chars: int = 3500) -> dict[str, Any]:
+def industry_context(customer: Any, texts: list[str], max_chars: int = 9000) -> dict[str, Any]:
     """Pick the customer's industry packs and remember them on their record.
 
     Packs only change what pi listens for and asks next, never its rules; the stored

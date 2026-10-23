@@ -231,6 +231,7 @@ def brief(
     pack: dict[str, Any],
     categories: Sequence[str] = (),
     max_chars: int = 2400,
+    with_example: bool = False,
 ) -> str:
     """Prompt text for one pack: how to listen and classify. Never includes build ideas.
 
@@ -238,8 +239,8 @@ def brief(
     words and problem phrases) and any that no longer fit are dropped whole.
     """
     candidates: list[str] = []
-    for item in pack.get("care", [])[:5]:
-        candidates.append("Care: " + _clip(item, 220))
+    for item in pack.get("care", [])[:8]:
+        candidates.append("Care: " + _clip(item, 260))
     asked: list[str] = []
     for category in categories or (None,):
         asked += questions_for(pack, category)[: 3 if categories else 4]
@@ -247,17 +248,22 @@ def brief(
         candidates.append("Questions, one at a time: " + " | ".join(asked))
     if pack.get("scope_rule"):
         candidates.append("Scope: " + _clip(pack["scope_rule"], 360))
+    if pack.get("seasons"):
+        candidates.append("Seasons and peaks: " + _clip(str(pack["seasons"]).lstrip("- "), 420))
     if pack.get("shape_facts") and not categories:
         shape = "; ".join(_clip(f, 90) for f in pack["shape_facts"][:4])
         candidates.append("Learn only from what they say: " + shape)
-    words = list(pack.get("vocabulary", {}).items())[:8]
+    words = list(pack.get("vocabulary", {}).items())[:14]
     if words:
         candidates.append("Their words: " + "; ".join(f"{w} = {_clip(m, 60)}" for w, m in words))
     found = [p for p in pack.get("problems", []) if not categories or p["category"] in categories]
-    for item in found[:8]:
+    for item in found[:14]:
         candidates.append(
             f"Heard as {item['category']}/{item['subtype']}: {_clip(item['phrase'], 110)}"
         )
+    if with_example and pack.get("exchange"):
+        turns = " / ".join(f"{t['role']}: {_clip(t['text'], 140)}" for t in pack["exchange"][:4])
+        candidates.append("Example of the voice, never a script: " + turns)
     lines = [f"{pack['name']}:"]
     used = len(lines[0])
     for line in candidates:
@@ -270,7 +276,7 @@ def brief(
 def prompt_section(
     detection: Detection,
     categories: Sequence[str] = (),
-    budget: int = 6000,
+    budget: int = 9000,
 ) -> str:
     """The INDUSTRY KNOWLEDGE block: primary pack fullest, then the others, then overlays."""
     packs = load_packs()
@@ -278,10 +284,10 @@ def prompt_section(
     blocks: list[str] = []
     used = 0
     for position, key in enumerate(keys):
-        room = min(2400 if position == 0 else 1200, budget - used)
+        room = min(5200 if position == 0 else 2000, budget - used)
         if room < 300:
             break
-        block = brief(packs[key], categories, max_chars=room)
+        block = brief(packs[key], categories, max_chars=room, with_example=position == 0)
         blocks.append(block)
         used += len(block)
     return "\n\n".join(blocks)

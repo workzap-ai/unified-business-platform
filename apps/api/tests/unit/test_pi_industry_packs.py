@@ -214,3 +214,17 @@ def test_festival_and_generic_words_do_not_pick_the_wrong_trade(said, pack):
     found = packs.detect([said])
     assert found.primary and found.primary.startswith(pack)
     assert not any("public_sector" in o or "existing_workzap" in o for o in found.overlays)
+
+
+def test_the_brief_carries_seasons_and_all_care_rules():
+    pack = packs.get_pack("dental_clinics")
+    text = packs.brief(pack, max_chars=5200)
+    assert "Seasons and peaks:" in text
+    assert text.count("Care: ") == min(8, len(pack["care"]))
+
+
+def test_only_the_primary_pack_brings_a_voice_example():
+    found = packs.detect(["we have a bakery and also do home delivery with riders"])
+    section = packs.prompt_section(found, budget=9000)
+    assert section.count("Example of the voice") == 1
+    assert len(section) <= 9000
