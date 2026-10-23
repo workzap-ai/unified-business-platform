@@ -1,0 +1,219 @@
+{
+  "industry": "milk_collection_centres_and_chillers",
+  "name": "Milk collection centres and chillers",
+  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_payment_disputes",
+      "n": 1,
+      "words": "Fat readings are written by hand and farmers argue every payday",
+      "category": "cash_collections",
+      "subtype": "payment_disputes",
+      "quick_ideas": [
+        "Give each supplier a slip with litres and readings at every delivery",
+        "Take the reading in front of the supplier so there's nothing to doubt later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "credit_ledger — each delivery entered at intake, with a WhatsApp slip sent to the supplier automatically (with their permission) and weekly statements built on their own.",
+        "tool_words": []
+      },
+      "ask_first": "What's tested when milk arrives today?",
+      "free_stops": "The intake entry, slip and statement setup go in the solution document."
+    },
+    {
+      "id": "p2_churn_subscription",
+      "n": 2,
+      "words": "Suppliers say our test is wrong and move to another chiller",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Keep a weekly list of active suppliers so anyone who stops shows up",
+        "Ask those who left, politely, what made them go."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "supplier activity tracked daily, with suppliers who've dropped off flagged automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Roughly how many suppliers deliver to you?",
+      "free_stops": "When a supplier counts as dropped and the follow-up flow stay in the solution document."
+    },
+    {
+      "id": "p3_rejections",
+      "n": 3,
+      "words": "Plant rejected a whole tanker and deducted it from our payment",
+      "category": "quality_complaints",
+      "subtype": "rejections",
+      "quick_ideas": [
+        "Get every rejection in writing with the reason",
+        "Note which routes' milk went into that tanker so problems can be traced."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "each tanker's load, sources, seal photo and plant result logged, with rejections linked back to routes automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Does the plant give you the rejection reason in writing?",
+      "free_stops": "How loads are traced back to routes is detailed in the solution document."
+    },
+    {
+      "id": "p4_count_mismatch",
+      "n": 4,
+      "words": "Litres collected don't match litres dispatched",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Total intake and dispatch at the same time every day",
+        "Look for which centre or shift the gap comes from."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "dashboards_reports — collected vs dispatched reconciled automatically by day and centre.",
+        "tool_words": []
+      },
+      "ask_first": "Where do you think the gap happens?",
+      "free_stops": "The reconciliation rules go in the solution document."
+    },
+    {
+      "id": "p5_credit_customers",
+      "n": 5,
+      "words": "Advances to farmers aren't tracked properly, some never repay",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Write each advance and its agreed repayment in one register",
+        "Show the remaining balance on every payment slip."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an advance ledger per supplier that deducts repayments from each payout automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many suppliers have advances right now?",
+      "free_stops": "The deduction rules and ledger layout stay in the solution document."
+    },
+    {
+      "id": "p6_cash_flow_tight",
+      "n": 6,
+      "words": "We pay suppliers weekly but the plant pays us monthly",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "Map out the next few weeks' money in and money out by date",
+        "Talk to your accountant before taking any finance to bridge the gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a running view of cash due in and out by date, updated daily from intake and buyer records.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is the plant your only buyer?",
+      "free_stops": "How the cash view is built goes in the solution document."
+    },
+    {
+      "id": "p7_cash_handling_risk",
+      "n": 7,
+      "words": "Cash payments to 300 farmers on one day is a risk",
+      "category": "cash_collections",
+      "subtype": "cash_handling_risk",
+      "quick_ideas": [
+        "Offer bank or wallet payment to suppliers willing to use it",
+        "Spread payouts across days by route."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "every payout recorded by route and method, with cash out checked against statements automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How are most suppliers paid now?",
+      "free_stops": "The payout schedule and checks are set out in the solution document."
+    },
+    {
+      "id": "p8_maintenance_downtime",
+      "n": 8,
+      "words": "Generator broke and milk in the chiller turned",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Check the generator starts every day",
+        "Note every outage and any milk lost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a generator and chiller log with downtime and diesel use, flagged to the owner the same day.",
+        "tool_words": []
+      },
+      "ask_first": "How often does the chiller lose power?",
+      "free_stops": "The log and flag rules stay in the solution document."
+    },
+    {
+      "id": "p9_theft_internal",
+      "n": 9,
+      "words": "Driver may be skimming milk on the way",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Record litres loaded and seal number at every departure",
+        "Compare with the plant's receipt every day, openly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a dispatch log with litres, seal photo and times, matched to the plant receipt automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who drives the tanker, and how do you know when it leaves and arrives?",
+      "free_stops": "The dispatch log and matching rules go in the solution document."
+    },
+    {
+      "id": "p10_branch_comparison",
+      "n": 10,
+      "words": "Can't see daily intake across my 5 centres",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Ask each centre for the same few numbers every day",
+        "Put them side by side once a week."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "an automatic morning read across all centres with litres, average readings, active suppliers and cash due in and out.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How do the centres report to you now?",
+      "free_stops": "Which numbers go in and how centres are compared is worked out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about testing methods, preservatives or chemicals, or how to pass a quality check. Anything that helps mask adulteration or tamper with tests, readings or tankers. Anything that arranges or hides bribery of testing staff. Food-authority licensing or tax advice. Collecting farmers' names, CNICs, phone or bank numbers into pi's own notes."
+  ],
+  "sample_reply": {
+    "person": "Okara ke paas chiller hai, roz 6,000 litre aata hai, aur har hafte farmers fat ki reading pe lad padte hain. Koi tareeqa?",
+    "pi": "Ji haan, readings ko saaf aur saamne rakhne ke tareeqe hain, aur shuruaat isi hafte ho sakti hai. 1 Har delivery pe supplier ko litre aur reading wali aik parchi dein. 2 Reading supplier ke saamne li jaye, taake baad mein shak ki gunjaish na rahe. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har delivery darj ho, supplier ko unki ijazat se WhatsApp pe foran slip mile, aur hafte ki statement khud ban jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

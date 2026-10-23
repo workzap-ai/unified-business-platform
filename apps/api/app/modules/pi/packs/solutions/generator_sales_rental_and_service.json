@@ -1,0 +1,237 @@
+{
+  "industry": "generator_sales_rental_and_service",
+  "name": "Generator sales, rental and service",
+  "sector": "7.L Finance-adjacent, energy and utilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_wrong_location",
+      "n": 1,
+      "words": "I do not know exactly which generator is on which site right now",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Make one list of every unit with its status (yard, on hire, under repair) and site area, so the fleet is visible in one place",
+        "Update it every time a unit moves, so it stays true."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "dashboards_reports A rental fleet register showing each unit's capacity, status, site area and due-back date, updated from dispatch and return checks.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many units are in your rental fleet?",
+      "free_stops": "Register fields and update flow are in the solution document."
+    },
+    {
+      "id": "p2_pricing_errors",
+      "n": 2,
+      "words": "Units come back off-hire late but the bill stops on the agreed date",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Record the actual return date on every off-hire, so billing uses the real date",
+        "List units past their due-back date every Monday, so overdue hires are chased."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Hire billing from actual out and in dates with automatic alerts for overdue returns.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Billing rules are in the solution document; pi gives no advice on what to charge."
+    },
+    {
+      "id": "p3_handoffs",
+      "n": 3,
+      "words": "Rental units come back damaged or with less fuel and we cannot prove the condition when they left",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Take photos and note running hours and fuel level at every dispatch, so there is a starting record",
+        "Get the customer's site contact to sign at delivery and return, so both sides agree."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "An on-hire and off-hire checklist on phone with photos, running hours and fuel level, compared automatically at return.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Checklist items are in the solution document."
+    },
+    {
+      "id": "p4_bottleneck",
+      "n": 4,
+      "words": "Breakdown calls come at night and nobody knows which technician is free",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Set a written on-call rota for nights and weekends, so there is always a named person",
+        "Note the time each breakdown call came in and was attended, so response times are on record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "booking_scheduling Breakdown call intake via WhatsApp with technician assignment from the on-call rota, response time and closure.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Intake flow and rota logic are in the solution document."
+    },
+    {
+      "id": "p5_service_quality",
+      "n": 5,
+      "words": "AMC customers complain the PM visit never happened",
+      "category": "customers_retention",
+      "subtype": "service_quality",
+      "quick_ideas": [
+        "List every active AMC with its next PM due date, so visits are planned, not remembered",
+        "Get a customer sign-off at every visit, so you have proof it happened."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "field_checks A PM schedule by running hours or dates per AMC customer, with reminders and visit sign-off on phone.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Schedule rules are in the solution document."
+    },
+    {
+      "id": "p6_churn_subscription",
+      "n": 6,
+      "words": "We forget AMC renewals and the customer goes elsewhere",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Add the renewal date to the AMC list, so expiries are visible",
+        "Contact customers well before expiry, so renewal is a conversation, not a surprise."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "AMC renewal reminders and a renewal pipeline showing which contracts are due, in talks or lost.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing is in the solution document."
+    },
+    {
+      "id": "p7_reports_late",
+      "n": 7,
+      "words": "Technicians report jobs done but I do not see job sheets for days",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "Ask for a photo of each signed job sheet the same day, so the office knows it is done",
+        "Check open job sheets each morning, so nothing sits for a week."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Digital job sheets with parts used, linked to stock deduction and visible to the office as soon as they are closed.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Job sheet design is in the solution document."
+    },
+    {
+      "id": "p8_stockout",
+      "n": 8,
+      "words": "Filters and spare parts are out when a breakdown happens",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "List the parts used most often in breakdowns, so you know what must never run out",
+        "Set a minimum for each and check it weekly, so you reorder in time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Spare parts stock with minimum levels and alerts, with import or supplier order tracking.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Minimum levels and tracking are in the solution document."
+    },
+    {
+      "id": "p9_margin_unknown",
+      "n": 9,
+      "words": "I have no idea if a rental unit earns more than it costs in maintenance",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Total hire income and repair cost per unit for the last few months, so you see which units carry the fleet",
+        "Mark the units that keep coming back for the same fault, so repeat costs stand out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "Fleet utilisation and earnings against maintenance cost per unit, with a repeat-fault report.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Cost allocation is in the solution document."
+    },
+    {
+      "id": "p10_receivables_late",
+      "n": 10,
+      "words": "Corporate customers pay rental and service invoices very late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid invoice with its age, so you know who to chase first",
+        "Send statements on a fixed day each month, so payment has a rhythm."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A receivables tracker with statements and automatic reminders by customer.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder rules are in the solution document."
+    },
+    {
+      "id": "p11_order_errors",
+      "n": 11,
+      "words": "Event rentals booked on WhatsApp get double-booked",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Keep one booking calendar for all event units, so every booking is checked against it",
+        "Confirm a booking only once it is on the calendar."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "An event booking calendar that blocks clashes and confirms bookings to the customer.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Calendar set-up is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on generator sizing, wiring, earthing, load calculations, exhaust, ventilation or fuel storage. Anything that helps with grid tapping, illegal connections, bypassing meters or avoiding environmental or noise rules. Anything on what to charge for rental or service. Anything that helps under-invoice or misdeclare imports. Anything other than emergency services when carbon monoxide, fire, shock or explosion is described."
+  ],
+  "sample_reply": {
+    "person": "Our rental units come back with less fuel and damaged panels and we can never prove it. What can we do?",
+    "pi": "Yes, this is fixable, and you can start this week on your own. 1 Take photos and note running hours and fuel level every time a unit leaves the yard, so there is a starting record. 2 Get the site contact to sign at delivery and at return, so both sides agree on the condition. Workzap can do this automatically for you: a dispatch and return checklist on phone that compares the two records for every unit and shows you which hires came back short. Shall I have a solution document and quote prepared for you? You are free to say no.",
+    "language": "english"
+  }
+}

@@ -1,0 +1,222 @@
+{
+  "industry": "marketing_creative_and_digital_agencies",
+  "name": "Marketing, creative and digital agencies",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_info_lost_in_whatsapp",
+      "n": 1,
+      "words": "Clients send briefs on WhatsApp voice notes and details get lost",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Have the account manager write each new brief back to the client once for confirmation, so both sides agree what was asked",
+        "Keep this week's briefs in one shared place, so designers aren't digging through chats."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "brief intake that turns a client request into a structured task with deadline and assets, confirmed back to the client automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many active clients is the team handling?",
+      "free_stops": "the intake fields and confirmation flow are set out in the solution document."
+    },
+    {
+      "id": "p2_approvals_slow",
+      "n": 2,
+      "words": "Approvals take forever, then they want everything live tomorrow",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "Put an approval-needed-by date on everything you send this week, so delays are visible",
+        "List what is waiting on clients today, so the AMs know who to chase."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an approval tracker per deliverable with automatic client reminders and a daily list of what's stuck and for how long.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "reminder timings and escalation are worked out in the solution document."
+    },
+    {
+      "id": "p3_rework",
+      "n": 3,
+      "words": "Unlimited revisions are killing my designers",
+      "category": "operations_process",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Count revision rounds on this week's deliverables, so you see where the extra work goes",
+        "Share that count with your heaviest client once, so the conversation is based on facts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "every deliverable tracked with revision rounds counted against what the agreement allows, flagged when it goes over.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how rounds are counted and flagged is kept for the solution document."
+    },
+    {
+      "id": "p4_hidden_costs",
+      "n": 4,
+      "words": "Retainers keep growing in work but not in fee",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "Write down once what each retainer includes per month, so drift is easy to spot",
+        "Compare last month's delivery against it for your two biggest clients, so you know where to start."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a retainer scope register comparing what's included with what was delivered each month, flagging overruns as they happen.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "how scope is defined and compared is designed in the solution document."
+    },
+    {
+      "id": "p5_margin_unknown",
+      "n": 5,
+      "words": "I genuinely don't know which clients make us money",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Ask the team to note time per client for one month, so you get a first real comparison",
+        "Put that next to each retainer fee once, so the loss-makers show up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "light time logging per client and service, rolled up daily into profitability by client.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "how time is logged without slowing the team is worked out in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "We front ad spend on our cards and get reimbursed late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every client's outstanding ad spend once, so the size of the gap is clear",
+        "Raise the largest one with that client this week, so reimbursement starts moving."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an ad spend reimbursement tracker per client with invoices, ageing and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the reimbursement and reminder flow is set out in the solution document."
+    },
+    {
+      "id": "p7_manual_reports",
+      "n": 7,
+      "words": "Monthly reports to clients take two days to build manually",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Pick one report layout for all clients, so the team stops rebuilding from scratch",
+        "Note which numbers clients actually read, so you can cut the rest."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "dashboards_reports — monthly client reports pulled automatically from the ad platforms and social analytics into a branded summary.",
+        "tool_words": [
+          "platform",
+          "analytics"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "which sources are connected and the report design are kept for the solution document."
+    },
+    {
+      "id": "p8_tasks_dropped",
+      "n": 8,
+      "words": "Posts get missed because the calendar wasn't updated",
+      "category": "communication_coordination",
+      "subtype": "tasks_dropped",
+      "quick_ideas": [
+        "Check next week's content calendar against what's actually ready, so gaps are caught now",
+        "Name one owner per client calendar, so updates aren't left to chance."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a shared content calendar with status for every post from drafted to live, alerting the owner when a scheduled post isn't approved in time.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the status stages and alerts are worked out in the solution document."
+    },
+    {
+      "id": "p9_capacity",
+      "n": 9,
+      "words": "Designers are overloaded one week and idle the next",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Put every designer's tasks for the next two weeks on one board, so overloads show",
+        "Move one task from the busiest person, so the team feels the change."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a team capacity board by person and week that updates as tasks are assigned.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how workload is measured per person is designed in the solution document."
+    },
+    {
+      "id": "p10_churn_subscription",
+      "n": 10,
+      "words": "Clients leave after three months and we don't know why",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Ask your last few departed clients one polite question about why, so you get real reasons",
+        "Book a check-in call with each newer client, so problems surface early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a client health view combining approvals, revisions, response times and payment behaviour to flag at-risk clients.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "the health signals and thresholds are kept for the solution document."
+    }
+  ],
+  "never_say": [
+    "That ads, posts or campaigns will deliver any result, ROAS or follower count. Anything about fake reviews, bought followers, deceptive ads, scraping personal data or using content without rights. Marketing strategy, legal or tax advice. Requests for ad account logins, passwords, card details or client customer lists."
+  ],
+  "sample_reply": {
+    "person": "Revisions are my biggest headache. Clients send changes late at night and the designers redo work again and again. What can I do?",
+    "pi": "Yes, there's a way to get this under control, starting this week. 1 Count the revision rounds on this week's deliverables, so you can see exactly where the extra work goes. 2 Share that count with your heaviest client once, so the conversation is based on facts. Workzap can do this automatically for you: every deliverable tracked with rounds counted against the agreement, and clients reminded about approvals. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

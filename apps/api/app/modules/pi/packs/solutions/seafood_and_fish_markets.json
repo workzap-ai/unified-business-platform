@@ -1,0 +1,198 @@
+{
+  "industry": "seafood_and_fish_markets",
+  "name": "Seafood and fish markets",
+  "sector": "7.B Food and beverage",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_expiry_wastage",
+      "n": 1,
+      "words": "Fish not sold by afternoon loses value, by night it's gone",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Note what's unsold each evening by species, so buying follows what moves",
+        "Mark down earlier in the day rather than at night, while the fish still has value."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "an unsold stock and markdown log by species and day, with buying suggestions from the trend.",
+        "tool_words": []
+      },
+      "ask_first": "How much is usually unsold at the end of the day?",
+      "free_stops": "The markdown timing and buying rules per species stay for the solution document."
+    },
+    {
+      "id": "p2_margin_unknown",
+      "n": 2,
+      "words": "After cleaning, weight drops and I don't know my real cost",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Weigh a few fish of each main species before and after cleaning, so you know the real yield",
+        "Work out cost per cleaned kilo from that, because selling prices should follow it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a daily buying log by species with yield after cleaning and cost per kilo worked out automatically against your margin rule.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you track weight before and after cleaning now?",
+      "free_stops": "The yield and pricing method per species is detailed in the solution document."
+    },
+    {
+      "id": "p3_price_increases_supplier",
+      "n": 3,
+      "words": "Auction prices change every morning and I can't keep up my retail price",
+      "category": "margin_cost",
+      "subtype": "price_increases_supplier",
+      "quick_ideas": [
+        "Write down the auction price for each species daily, so you see the pattern",
+        "Set your selling price each morning from that day's cost, not yesterday's."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "today's prices worked out from the auction cost and sent each morning to trade and retail customers who opted in.",
+        "tool_words": []
+      },
+      "ask_first": "Who decides the selling price each day?",
+      "free_stops": "The daily pricing rule and broadcast set-up are in the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "Restaurants and hotels pay months late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every trade account with its balance and oldest unpaid invoice, so you chase the oldest first",
+        "Send each account a statement, because many delays are simply unnoticed balances."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a restaurant and hotel ledger by account label with statements and automatic payment reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How do you keep track of what each one owes today?",
+      "free_stops": "The credit terms and reminder schedule are set out in the solution document."
+    },
+    {
+      "id": "p5_supplier_payments_late",
+      "n": 5,
+      "words": "Ledger with boat owners for advances is all in a register",
+      "category": "cash_collections",
+      "subtype": "supplier_payments_late",
+      "quick_ideas": [
+        "Total each boat's advance and settlements once, so both sides agree on the balance",
+        "Record every settlement on the day of the landing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a boat advance ledger by boat label with settlements per landing and running balances.",
+        "tool_words": []
+      },
+      "ask_first": "How many boats do you advance money to?",
+      "free_stops": "How advances and settlements are tracked per landing stays for the solution document."
+    },
+    {
+      "id": "p6_whatsapp_overload",
+      "n": 6,
+      "words": "WhatsApp orders from restaurants overnight — someone misses one",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Ask trade customers to send orders by a fixed time, so the morning list is complete",
+        "Make one person build the dispatch list each morning."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "trade orders taken through a WhatsApp form into one consolidated morning dispatch list.",
+        "tool_words": []
+      },
+      "ask_first": "How many trade orders come in on a normal night?",
+      "free_stops": "The order form and dispatch flow are detailed in the solution document."
+    },
+    {
+      "id": "p7_documentation",
+      "n": 7,
+      "words": "Export documents take days and we miss the vessel",
+      "category": "compliance_admin",
+      "subtype": "documentation",
+      "quick_ideas": [
+        "List the documents each shipment needs and who prepares each, so nothing waits on an unknown owner",
+        "Note vessel cut-off dates the moment an order is confirmed. For the rules themselves, check with your clearing agent."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an export shipment tracker with buyer order, packing, document checklist status and vessel cut-off dates.",
+        "tool_words": []
+      },
+      "ask_first": "Are export documents handled in-house or by an agent?",
+      "free_stops": "The shipment tracking steps and checklist set-up stay for the solution document."
+    },
+    {
+      "id": "p8_count_mismatch",
+      "n": 8,
+      "words": "Stock in cold store doesn't match the book, and freezers break down",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Do one full cold-store count against the book, so you know the gap",
+        "Note every freezer or ice failure with date and loss."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a cold-store stock book with in and out and count variance, plus a freezer and ice downtime log.",
+        "tool_words": []
+      },
+      "ask_first": "Who records stock going in and out of the cold store?",
+      "free_stops": "The count routine and variance checks are in the solution document."
+    },
+    {
+      "id": "p9_branch_comparison",
+      "n": 9,
+      "words": "Two stalls, I don't know which is profitable or which fish makes money",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Put each stall's sales and buying side by side for a week",
+        "Compare margin by species once, because the best seller may not earn the most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a short morning read of each stall's sales, buying, unsold stock and margin by species.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do both stalls buy from the same source?",
+      "free_stops": "How profit by stall and species is worked out goes in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about fishing seasons, species bans or export certification. Customs, sanitary or food-safety rules — refer to their clearing agent or the authority. Help mislabelling species or origin, or over-glazing to add weight. Help under-invoicing exports or moving cash informally. That margins will improve by any amount or currency moves can be avoided."
+  ],
+  "sample_reply": {
+    "person": "Every morning I buy at the auction and restaurants pay so late, some owe for three months. What's the solution?",
+    "pi": "Yes, slow payments can be brought under control, and you can start this week. 1 List every restaurant and hotel account with its balance and oldest unpaid date, so you chase the oldest first. 2 Send each one a statement, because many delays are balances nobody has looked at. Workzap can do this automatically for you, keeping a ledger for every trade account with statements and reminders going out on time. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

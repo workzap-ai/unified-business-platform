@@ -1,0 +1,197 @@
+{
+  "industry": "law_firms",
+  "name": "Law firms (operations and admin)",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_tasks_dropped",
+      "n": 1,
+      "words": "We missed a hearing because the date was only in the munshi's diary",
+      "category": "communication_coordination",
+      "subtype": "tasks_dropped",
+      "quick_ideas": [
+        "Copy the next month's hearing dates once into a shared calendar with the responsible lawyer named, so the diary is no longer the only copy",
+        "Name a backup clerk for when the munshi is away, so dates keep being updated."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "workflow_automation — a shared hearing diary by matter that the clerk updates from his phone after each hearing, with a morning WhatsApp summary of today's and tomorrow's dates to every lawyer.",
+        "tool_words": []
+      },
+      "ask_first": "Is the diary kept on paper, or already in a sheet?",
+      "free_stops": "how adjournments are captured and who receives which alerts are set out in the solution document."
+    },
+    {
+      "id": "p2_manual_work",
+      "n": 2,
+      "words": "The cause list is checked by hand every evening",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Make one list of active matters grouped by court, so the evening check is against a fixed list rather than memory",
+        "Give the check to one named person at a fixed time, so it is never skipped."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "an evening routine that lists the firm's active matters by court for the clerk to tick off, records that the check was done, and sends any matter fixed for tomorrow to the responsible lawyer.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how the list is kept current and how results reach lawyers are worked out in the solution document."
+    },
+    {
+      "id": "p3_wrong_location",
+      "n": 3,
+      "words": "Physical files go missing between chambers and court",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Start a simple out-and-in register for files at reception, so you know who took a file and when",
+        "Do one shelf count of active files, so you know what is missing today."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a file check-out and check-in log on phone showing who holds each physical file and since when, flagging files that went to court and haven't come back.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the labelling and check-in routine are designed in the solution document."
+    },
+    {
+      "id": "p4_customer_communication",
+      "n": 4,
+      "words": "Clients keep calling to ask what happened at the last hearing",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Agree that the lawyer sends a short update after each hearing this week, so clients stop needing to call",
+        "Tell clients once when they can expect updates, so calls drop."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a post-hearing note drafted from the diary entry and sent to the client by WhatsApp once the lawyer approves it.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the approval step and message format are kept for the solution document."
+    },
+    {
+      "id": "p5_margin_unknown",
+      "n": 5,
+      "words": "Associates' time is never recorded, so we underbill",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Ask associates to note time on fixed-fee matters for one month, so you see which ones are losing money",
+        "Compare that once against the fee agreed, so the worst matters stand out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "simple time capture per matter rolled up daily into fee versus effort, with fixed-fee matters flagged as they run over.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "how time is captured and how matters are compared are worked out in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Clients pay the first instalment then disappear, and court fees we paid never come back",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List once, per matter, the fee agreed, what has been paid and what you spent on the client's behalf, so the real balance is clear",
+        "Send each client with a balance one statement this week, so the amount is in front of them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a balance per matter that includes court fees and disbursements, adds them to invoices automatically and sends reminders on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how expenses are logged and the reminder sequence are set out in the solution document."
+    },
+    {
+      "id": "p7_info_lost_in_whatsapp",
+      "n": 7,
+      "words": "Drafts go back and forth on WhatsApp and we lose the final version",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Create one folder per active matter and move current drafts there, so the latest version has one home",
+        "Mark the final version clearly once it is agreed, so nobody works from an old copy."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a template and draft register per matter with version history, so every draft is saved in one place and the final is locked.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the template library and versioning rules are designed in the solution document."
+    },
+    {
+      "id": "p8_documentation",
+      "n": 8,
+      "words": "Limitation dates and filing deadlines are tracked in someone's head",
+      "category": "compliance_admin",
+      "subtype": "documentation",
+      "quick_ideas": [
+        "Add a deadline column to your matter list and fill it once for every active matter, so dates are written down",
+        "Review that column with the partners once, so nothing urgent is hidden."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a deadline tracker with escalating alerts to the responsible lawyer and then the partner as each date approaches.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the escalation steps and timings are kept for the solution document."
+    },
+    {
+      "id": "p9_lead_followup_slow",
+      "n": 9,
+      "words": "Leads from our website just sit in an inbox",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Go through the inbox once and reply to every unanswered enquiry, so no warm lead is wasted",
+        "Name one person who owns new enquiries, so replies stop depending on who looks."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "every enquiry from the website, phone and WhatsApp recorded, assigned and followed up on time, with the source noted so you see which channels bring paying clients.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the assignment rules and follow-up timings are set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any legal view, comment on a case's merits, strategy or likely outcome. Any interpretation of law, court procedure or limitation rules. Anything touching backdating, forged documents or influencing courts, police or officials. Regulatory advice on trust or client accounts. That hearings will never be missed again. Requests for client names, opposing parties, case numbers or case facts."
+  ],
+  "sample_reply": {
+    "person": "Dates are our biggest problem. Everything is in the munshi's diary and we've missed hearings when he's away. Can you suggest a fix?",
+    "pi": "Yes, this can be fixed, and you can start this week. 1 Copy the next month of hearing dates once into a shared calendar with the responsible lawyer named on each, so the diary is no longer the only copy. 2 Name a backup clerk for when the munshi is on leave, so dates keep being updated. Workzap can do this automatically for you: a shared diary the clerk updates from his phone after every hearing, with a morning summary to each lawyer. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

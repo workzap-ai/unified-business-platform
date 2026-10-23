@@ -1,0 +1,217 @@
+{
+  "industry": "photography_and_videography_studios",
+  "name": "Photography and videography studios",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_delivery_late",
+      "n": 1,
+      "words": "We're months behind on editing and clients keep calling",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "List every pending project with its current stage, so you see where they pile up",
+        "Clear the oldest ones first, since they cause the most calls."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a project board from shot to delivered, with ageing per project and stage updates sent to clients automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many projects are waiting right now?",
+      "free_stops": "Stage definitions and client update flow are in the solution document."
+    },
+    {
+      "id": "p2_bottleneck",
+      "n": 2,
+      "words": "Albums from last season still not delivered",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Find which stage holds most albums, so you fix the real bottleneck",
+        "Remind clients who haven't sent selections, since their delay is often the biggest."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "album tracking with automatic selection reminders and lab order dates.",
+        "tool_words": []
+      },
+      "ask_first": "How many album designers do you have?",
+      "free_stops": "Album workflow stays for the solution document."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Clients delay the balance until they get the album",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Tie balance stages to milestones before final delivery, so the last payment isn't the biggest",
+        "List every unpaid balance, so you know the real total."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a payment schedule per booking with reminders before delivery milestones.",
+        "tool_words": []
+      },
+      "ask_first": "When do clients pay the balance now?",
+      "free_stops": "Milestone and reminder rules go in the solution document."
+    },
+    {
+      "id": "p4_shift_scheduling",
+      "n": 4,
+      "words": "Two weddings the same night and not enough shooters",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Put every booking and its assigned team on one calendar, so clashes show early",
+        "Confirm freelancers for peak dates now, since peak-season cancellations hurt most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a booking calendar with team assignment, clash warnings and freelancer confirmations.",
+        "tool_words": []
+      },
+      "ask_first": "How many shooters are freelance?",
+      "free_stops": "Roster setup is in the solution document."
+    },
+    {
+      "id": "p5_data_loss",
+      "n": 5,
+      "words": "A hard drive crashed and we lost a wedding's footage",
+      "category": "tech_systems",
+      "subtype": "data_loss",
+      "quick_ideas": [
+        "Check that every current project has a second copy, since one drive is one failure away from loss",
+        "Note where each project lives, so files can be found."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a file storage register showing where each project is kept, with backup confirmation per project.",
+        "tool_words": []
+      },
+      "ask_first": "Where do files go after a shoot?",
+      "free_stops": "Register setup and backup checks stay for the solution document."
+    },
+    {
+      "id": "p6_shrinkage_theft",
+      "n": 6,
+      "words": "Cameras, lenses and batteries go missing after events",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Check gear out to the event lead and back in, so every item has an owner",
+        "Note anything missing at return, to see which events lose kit."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "equipment check-out and check-in per event, flagging items not returned.",
+        "tool_words": []
+      },
+      "ask_first": "How many teams go out on a busy night?",
+      "free_stops": "Equipment list setup is in the solution document."
+    },
+    {
+      "id": "p7_pre_orders_custom",
+      "n": 7,
+      "words": "Clients ask for more edits than the package includes",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Write down what each package includes, so extras are clear",
+        "Agree extra requests and their cost before doing them, so they're paid for."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a package scope sheet and change-request log with extras approved on WhatsApp.",
+        "tool_words": []
+      },
+      "ask_first": "How do you handle extra requests now?",
+      "free_stops": "Scope sheet and approval flow go in the solution document."
+    },
+    {
+      "id": "p8_conversion_low",
+      "n": 8,
+      "words": "Instagram DMs ask prices but few book",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Keep all enquiries in one list, so none slip while you're shooting",
+        "Follow up once with this month's unbooked enquiries, since many just need a nudge."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an enquiry tracker from Instagram and WhatsApp with automatic follow-ups.",
+        "tool_words": []
+      },
+      "ask_first": "Do you share prices before a call?",
+      "free_stops": "Follow-up timing stays for the solution document."
+    },
+    {
+      "id": "p9_margin_unknown",
+      "n": 9,
+      "words": "I don't know my real profit per wedding",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out one recent wedding's true cost, to see what you kept",
+        "Note the cost hardest to predict, since that's where quotes go wrong."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "profit per shoot: package price against freelancers, editing, albums and travel.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you price per package or per day?",
+      "free_stops": "Cost capture is in the solution document."
+    },
+    {
+      "id": "p10_owner_bottleneck",
+      "n": 10,
+      "words": "Only I talk to clients and it's killing me",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Hand one type of client question to a team member, so not everything comes to you",
+        "Keep each project's notes in one place, so others can answer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "automatic client updates at each stage so you only handle the exceptions.",
+        "tool_words": []
+      },
+      "ask_first": "Who else on your team could handle clients?",
+      "free_stops": "Update flow stays for the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on copyright, model releases, image rights, drone permissions or contracts. Collecting clients' photos, videos, names or contacts through pi. Help with covert photography or misuse of images; serious concerns go to authorities. Help creating fake invoices or backdated contracts."
+  ],
+  "sample_reply": {
+    "person": "Pichle season ki kai albums abhi tak deliver nahi hui, log roz phone karte hain. Kya hal hai?",
+    "pi": "Ji, is backlog ko saaf karna mumkin hai. 1 Har pending project ka stage ek list mein likha jaye, taake pata chale kaam kahan ruka hai. 2 Sab se purane projects pehle nikale jayein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har project ka stage board par dikhe aur client ko har marhale par WhatsApp update khud jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

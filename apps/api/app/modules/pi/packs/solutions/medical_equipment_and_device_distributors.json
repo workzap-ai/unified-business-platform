@@ -1,0 +1,217 @@
+{
+  "industry": "medical_equipment_and_device_distributors",
+  "name": "Medical equipment and device distributors",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_expiry_wastage",
+      "n": 1,
+      "words": "Consumables expire in the warehouse while we wait for a tender",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Pull one list of stock by expiry date, so near-expiry items are known",
+        "Share it with the sales team, so they push those items first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "an inventory with lot, serial and expiry by warehouse, sending near-expiry alerts and \"sell first\" lists to sales every week.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have more than one warehouse?",
+      "free_stops": "Alert windows and list rules are in the solution document."
+    },
+    {
+      "id": "p2_serial_batch_tracking",
+      "n": 2,
+      "words": "We can't trace which lot went to which hospital quickly",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Try tracing one lot from your current records, so you know how long it takes",
+        "Start writing lot numbers on every delivery note, so the link exists."
+      ],
+      "workzap_build": {
+        "keys": [
+          "erp_nori_platform"
+        ],
+        "text": "a traceability lookup from lot or serial to customer, invoice and delivery date in one search.",
+        "tool_words": []
+      },
+      "ask_first": "Are lot numbers recorded at dispatch today?",
+      "free_stops": "How lot capture fits your dispatch is in the solution document; recall procedures are for your principal and regulator."
+    },
+    {
+      "id": "p3_count_mismatch",
+      "n": 3,
+      "words": "Consignment stock at hospitals is never reconciled",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "List consignment and demo items out with location and date, so you know what's out there",
+        "Do one count at your largest consignment site, so the gap is sized."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "field_checks — a consignment and demo register with expected return dates and reconciliation visits done by phone.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many sites hold consignment stock?",
+      "free_stops": "Visit schedule and reconciliation steps are in the solution document."
+    },
+    {
+      "id": "p4_import_delays",
+      "n": 4,
+      "words": "Shipments stuck at port for weeks",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "List open shipments with stage and expected date, so stuck ones are visible",
+        "Ask your clearing agent for a weekly status, so you hear before customers do."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an import tracker from PO to principal, LC, shipping, port, clearing and warehouse receipt, with alerts on stalled stages.",
+        "tool_words": []
+      },
+      "ask_first": "Which stage usually holds shipments up?",
+      "free_stops": "Stage definitions are in the solution document; customs rules are for your clearing agent."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Government hospitals pay six months late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List receivables by customer type with age, so the long ones stand out",
+        "Give one person follow-up ownership, so every invoice is chased."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a receivables tracker by customer type with ageing, follow-up notes and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Which customer type owes you the most right now?",
+      "free_stops": "Follow-up steps are in the solution document; financing questions are for your accountant."
+    },
+    {
+      "id": "p6_target_missed",
+      "n": 6,
+      "words": "We miss tender deadlines because nobody tracks them",
+      "category": "sales_revenue",
+      "subtype": "target_missed",
+      "quick_ideas": [
+        "Put all open tenders and deadlines in one shared calendar, so none are missed",
+        "List the documents each tender needs, so preparation starts early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a tender calendar with document checklists, owners by role and deadline alerts.",
+        "tool_words": []
+      },
+      "ask_first": "How many tenders do you bid on in a typical month?",
+      "free_stops": "Checklist set-up is in the solution document; tender rules are for your adviser."
+    },
+    {
+      "id": "p7_pricing_errors",
+      "n": 7,
+      "words": "Quotes are made in Word and nobody knows which version went out",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Save every quote sent in one shared folder with date and customer type, so the latest is known",
+        "Note the exchange rate used on each quote, so changes can be traced."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a quotation builder with current principal prices, exchange-rate input and version history.",
+        "tool_words": []
+      },
+      "ask_first": "Who prepares quotes today?",
+      "free_stops": "Pricing logic is in the solution document."
+    },
+    {
+      "id": "p8_churn_subscription",
+      "n": 8,
+      "words": "AMCs expire and nobody tells the customer to renew",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "List all AMCs with end dates, so upcoming renewals are visible",
+        "Contact the ones ending soonest, so renewals aren't lost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "service management with installations, PM schedules, AMC contracts, renewal reminders and engineer calendars.",
+        "tool_words": []
+      },
+      "ask_first": "How many engineers do you have?",
+      "free_stops": "Reminder timing and engineer scheduling are in the solution document."
+    },
+    {
+      "id": "p9_field_team_visibility",
+      "n": 9,
+      "words": "Sales reps say they visited hospitals, I can't verify",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Ask reps to share a short visit list each day, so you see the pattern",
+        "Review it weekly with each rep, so visits link to outcomes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a field visit log with check-in location and visit notes, with weekly visits per rep.",
+        "tool_words": []
+      },
+      "ask_first": "How many reps are in the field?",
+      "free_stops": "Check-in rules are in the solution document."
+    },
+    {
+      "id": "p10_manual_reports",
+      "n": 10,
+      "words": "Principal wants monthly reports in their format and it takes days",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Note which numbers each principal asks for, so the overlap is clear",
+        "Keep one master sales sheet, so every report starts from the same data."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a principal report pack generated from sales and stock data in each principal's format.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many principals do you report to?",
+      "free_stops": "Report mapping is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on clinical use, safety, suitability or recall procedures for devices. Interpretations of DRAP, MOHAP or Health Canada registration, customs or tender rules. Help with kickbacks, fake documents, under-invoicing or selling unregistered or expired products. Legal views on principal agreements; point to a lawyer. Ideas that record customer staff names or any patient data. Promises about winning tenders."
+  ],
+  "sample_reply": {
+    "person": "Government hospitals pay us after 68 months, and meanwhile we pay our principals in advance. How do we manage this?",
+    "pi": "Yes, this gap can be managed better, and you can start this week. 1 List receivables by customer type with how long each has been open, so the oldest are clear. 2 Give one person ownership of follow- up, so every invoice is chased on time. Workzap can do this automatically for you with a receivables tracker that ages every invoice and sends reminders, and your accountant can advise on the financing side. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

@@ -1,0 +1,197 @@
+{
+  "industry": "beverage_juice_and_water_bottling_plants",
+  "name": "Beverage, juice and water bottling plants",
+  "sector": "7.B Food and beverage",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_returns_handling",
+      "n": 1,
+      "words": "Thousands of 19-litre bottles are out there and we don't know who has them",
+      "category": "stock_inventory",
+      "subtype": "returns_handling",
+      "quick_ideas": [
+        "Count bottles in the plant and on vans once, so you know how many are really out",
+        "Have drivers note empties collected at every stop, so each account has a balance."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a returnable bottle and dispenser register by account number, with delivered, returned and balance counts updated from every route.",
+        "tool_words": []
+      },
+      "ask_first": "Do customers pay a deposit for the bottle today?",
+      "free_stops": "The bottle register and deposit tracking rules are in the solution document."
+    },
+    {
+      "id": "p2_cash_leakage",
+      "n": 2,
+      "words": "Drivers sell bottles for cash and don't hand it all in",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Settle each van at the end of the route against what was loaded, so a gap belongs to one route",
+        "Rotate who checks the settlement, so it isn't always the same pair."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "an end-of-route settlement showing cash expected against handed in by driver label, with variances flagged daily.",
+        "tool_words": []
+      },
+      "ask_first": "How do drivers settle cash now?",
+      "free_stops": "The settlement routine and variance checks stay for the solution document."
+    },
+    {
+      "id": "p3_fraud",
+      "n": 3,
+      "words": "Coupon books — drivers mark coupons used that weren't",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Ask a few home customers to confirm their coupon balance, so you see if there's a real gap",
+        "Collect used coupons at settlement, not later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a digital prepaid bottle balance per account in place of paper coupons, updated at each delivery.",
+        "tool_words": []
+      },
+      "ask_first": "How are coupons checked today?",
+      "free_stops": "How the prepaid balance replaces paper coupons is detailed in the solution document."
+    },
+    {
+      "id": "p4_orders_lost",
+      "n": 4,
+      "words": "Orders for home delivery come on WhatsApp and calls, some get missed",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Put every order into one list by area and day, so drivers work from one sheet",
+        "Confirm each order back to the customer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "customer ordering through a WhatsApp flow or web page with delivery-day slots, feeding each driver's route.",
+        "tool_words": []
+      },
+      "ask_first": "How many vans run daily?",
+      "free_stops": "The ordering flow and route set-up are in the solution document."
+    },
+    {
+      "id": "p5_churn_subscription",
+      "n": 5,
+      "words": "Customers stop ordering and keep our bottles and dispensers",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "List accounts that haven't ordered recently, so you can ask them back or collect bottles",
+        "Ask why they stopped, because the reason is often fixable."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "subscription schedules for home and office customers with pause and stop handling and automatic bottle-return reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Do you track dispensers placed with customers?",
+      "free_stops": "The reminder and win-back plan stays for the solution document."
+    },
+    {
+      "id": "p6_raw_material_shortage",
+      "n": 6,
+      "words": "Preforms and caps run out and the line stops",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "List each input with its supplier lead time, so you order in time",
+        "Check stock of the input that stopped the line last."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "preform, cap and label stock with reorder points and alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Which input runs short most?",
+      "free_stops": "The reorder points per input are set in the solution document."
+    },
+    {
+      "id": "p7_maintenance_downtime",
+      "n": 7,
+      "words": "Line breakdowns every week, no maintenance schedule",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Note every stop with time, machine and cause, so the worst offender shows",
+        "Put a basic service date on each key machine."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a line maintenance schedule and downtime log with reasons and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "What stops the line most often?",
+      "free_stops": "The maintenance schedule stays for the solution document."
+    },
+    {
+      "id": "p8_inspection_missing",
+      "n": 8,
+      "words": "QC records are filled at the end of the week, not each batch",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Fill QC records at the time of each batch, so they reflect what happened",
+        "Have the shift lead sign each one. For what tests are required, talk to the authority or a qualified lab."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a batch QC log on a tablet with time stamps and sign-off.",
+        "tool_words": []
+      },
+      "ask_first": "How are QC checks recorded now?",
+      "free_stops": "The QC log set-up is detailed in the solution document."
+    },
+    {
+      "id": "p9_no_dashboard",
+      "n": 9,
+      "words": "Office customers pay late, and I don't know profit per route",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "List each route's sales, diesel and driver cost for a week, so you see which routes earn",
+        "Send overdue office customers a statement."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "and credit_ledger — a route profitability report (sales, diesel, driver cost, breakages) and an office receivables ledger with reminders.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How long do office customers take to pay?",
+      "free_stops": "The route profit method and reminder schedule are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about water-quality standards, test parameters or treatment chemicals. Licensing or food-authority advice; contamination or recall steps — point to the authority and qualified advisers. Covert tracking of drivers' personal phones. Help refilling competitors' branded bottles, faking test reports or skipping licensing. That losses will fall by a set amount."
+  ],
+  "sample_reply": {
+    "person": "We do 19-litre water delivery in Sharjah and Ajman. Bottles just disappear. What can we do?",
+    "pi": "Yes, you can get control of your bottles, and you can start this week. 1 Count the bottles in the plant and on vans once, so you know how many are really out. 2 Have drivers note empties collected at every stop, so each account has a balance. Workzap can do this automatically for you, with a bottle and dispenser register by account number updated from every route, showing delivered, returned and outstanding. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

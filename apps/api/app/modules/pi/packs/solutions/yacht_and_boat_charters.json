@@ -1,0 +1,230 @@
+{
+  "industry": "yacht_and_boat_charters",
+  "name": "Yacht and boat charters",
+  "sector": "7.G Transport, mobility and aviation (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_booking_appointments",
+      "n": 1,
+      "words": "Same yacht booked twice for Friday evening",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Put every booking for the coming weeks on one calendar per vessel, so clashes show now",
+        "Let only one person confirm bookings for now, so two staff can't sell the same slot."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a central booking calendar per vessel that takes bookings from staff, website and platforms and blocks double bookings automatically.",
+        "tool_words": [
+          "platform"
+        ]
+      },
+      "ask_first": "How many boats and booking channels do you run?",
+      "free_stops": "How platforms and staff bookings feed the calendar is set out in the solution document."
+    },
+    {
+      "id": "p2_channel_conflict",
+      "n": 2,
+      "words": "Brokers sell our boats cheaper than we do",
+      "category": "sales_revenue",
+      "subtype": "channel_conflict",
+      "quick_ideas": [
+        "Check what each broker is currently showing for your boats, so you see the gaps",
+        "Share one current rate sheet with every broker, so nobody is working from old prices."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a channel rate sheet shared with brokers, with regular price-parity checks flagging anyone below your rates.",
+        "tool_words": []
+      },
+      "ask_first": "How many brokers sell your boats?",
+      "free_stops": "The parity rules and broker sharing are designed in the solution document."
+    },
+    {
+      "id": "p3_utilisation_imbalance",
+      "n": 3,
+      "words": "Weekdays empty, weekends overbooked",
+      "category": "sales_revenue",
+      "subtype": "utilisation_imbalance",
+      "quick_ideas": [
+        "Put last month's bookings by day and boat side by side, so the gaps are clear",
+        "Ask turned-away weekend guests if a weekday would suit, so you test demand."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "dashboards_reports"
+        ],
+        "text": "a utilisation view per boat and day, with opted-in weekday offers to past guests when the calendar looks empty.",
+        "tool_words": [],
+        "reordered_from": [
+          "dashboards_reports",
+          "customer_messaging"
+        ]
+      },
+      "ask_first": "Are your weekday guests mostly residents or tourists?",
+      "free_stops": "The offer timing and audience are worked out in the solution document."
+    },
+    {
+      "id": "p4_refunds",
+      "n": 4,
+      "words": "Weather cancellations mean refund or rescheduling fights",
+      "category": "cash_collections",
+      "subtype": "refunds",
+      "quick_ideas": [
+        "Write down your current cancellation and reschedule terms in one place, so staff give the same answer",
+        "Check that guests see those terms before paying, so expectations are set."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital",
+          "workflow_automation"
+        ],
+        "text": "an online booking and deposit link showing clear terms, with no-sail rescheduling offered automatically (the sail or no-sail decision stays with your captain).",
+        "tool_words": []
+      },
+      "ask_first": "Do you prefer to reschedule or refund when a trip is called off?",
+      "free_stops": "The reschedule flow and how terms are shown are designed in the solution document; the terms themselves are worth checking with your lawyer."
+    },
+    {
+      "id": "p5_margin_unknown",
+      "n": 5,
+      "words": "Fuel cost per trip isn't tracked, so hourly prices don't cover it",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Record fuel and engine hours for each trip this week, so you see real fuel cost per hour per boat",
+        "Compare that with your hourly price, so you know which boats are tight."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "a fuel log per trip against engine hours, giving fuel cost per hour per boat and flagging use that doesn't match.",
+        "tool_words": []
+      },
+      "ask_first": "Who fills up the boats today, crew or the marina?",
+      "free_stops": "The logging and matching rules are set out in the solution document."
+    },
+    {
+      "id": "p6_lead_followup_slow",
+      "n": 6,
+      "words": "Instagram enquiries go unanswered for hours",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Note how long the last few enquiries waited for a reply, so you see the real gap",
+        "Make one person responsible for first replies at peak times, so nothing waits."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup",
+          "attribution_codes"
+        ],
+        "text": "one enquiry inbox across Instagram and WhatsApp with response times tracked and ad source tagged on every booking.",
+        "tool_words": []
+      },
+      "ask_first": "Which channel brings most enquiries?",
+      "free_stops": "The inbox setup and source tagging are designed in the solution document."
+    },
+    {
+      "id": "p7_shift_scheduling",
+      "n": 7,
+      "words": "Captains and crew get the schedule last minute",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Share next week's schedule with crew today, so you see if earlier notice helps",
+        "Ask crew to confirm their trips, so no-shows surface early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling",
+          "workflow_automation"
+        ],
+        "text": "a charter run sheet sent to captain and crew for every trip with time, guest count and add-ons, plus freelance pay calculated from completed trips.",
+        "tool_words": []
+      },
+      "ask_first": "Are your crew employed or freelance?",
+      "free_stops": "The run sheet content and pay rules are set out in the solution document."
+    },
+    {
+      "id": "p8_service_errors",
+      "n": 8,
+      "words": "Add-ons like cakes and decor promised but not delivered",
+      "category": "quality_complaints",
+      "subtype": "service_errors",
+      "quick_ideas": [
+        "Check last month's complaints for which add-ons went wrong, so you see the pattern",
+        "Confirm every add-on with the supplier the day before, so misses are caught early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "an add-on and catering order flow from booking to supplier, with confirmation and the order on the crew's run sheet.",
+        "tool_words": []
+      },
+      "ask_first": "Is catering in-house or from outside suppliers?",
+      "free_stops": "The order flow and supplier confirmations are designed in the solution document."
+    },
+    {
+      "id": "p9_payout_reconciliation",
+      "n": 9,
+      "words": "Platform payouts late and with deductions we don't understand",
+      "category": "cash_collections",
+      "subtype": "payout_reconciliation",
+      "quick_ideas": [
+        "Match one month's platform payouts against your bookings, so you see what's missing",
+        "List the deductions you don't recognise, so you can query them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a deposit and payment ledger per booking, reconciled automatically against each platform's payouts with differences flagged.",
+        "tool_words": [
+          "platform"
+        ]
+      },
+      "ask_first": "How many platforms sell your charters?",
+      "free_stops": "The matching rules per platform are worked out in the solution document."
+    },
+    {
+      "id": "p10_manual_reports",
+      "n": 10,
+      "words": "Managed yacht owners want monthly statements made by hand",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Agree with each owner what their statement shows, so the format stops changing",
+        "Fix one statement date, so owners know when to expect it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "revenue and utilisation per vessel, with monthly owner statements produced automatically from bookings and costs.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many managed yachts do you run?",
+      "free_stops": "The statement structure and cost allocation are designed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any maritime safety, seaworthiness, weather or sea-state go/no-go, life-jacket or equipment advice; that stays with the captain and the authorities. Any reading of maritime authority, coast guard or Transport Canada rules, or help operating without licences or above capacity. Legal views on alcohol on board or on cancellation terms; suggest they talk to their lawyer. Tax or financial advice for managed yacht owners. Fake reviews or misleading photos, and any storage of guests' names, passport or Emirates ID numbers, card details or crew licence data."
+  ],
+  "sample_reply": {
+    "person": "Two groups showed up for the same yacht last Friday because sales staff each keep their own sheet and platforms send emails. How do we stop this?",
+    "pi": "Yes, this can be stopped, and the first step is one calendar per boat. 1. Put every upcoming booking onto a single calendar per vessel this week, so any clash shows up now rather than on the dock. 2. Let one person confirm bookings until that's in place, so two staff can't sell the same slot. Workzap can do this automatically for you: one booking calendar per vessel that takes bookings from staff, your website and the platforms, and blocks a second booking for the same slot. Shall I put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

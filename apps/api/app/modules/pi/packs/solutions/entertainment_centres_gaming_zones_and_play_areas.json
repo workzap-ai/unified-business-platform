@@ -1,0 +1,218 @@
+{
+  "industry": "entertainment_centres_gaming_zones_and_play_areas",
+  "name": "Entertainment centres, gaming zones and play areas",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_theft_internal",
+      "n": 1,
+      "words": "Cashiers sell cards and pocket some of the money",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Pull one week's card sales by cashier and compare with cash handed in, to see where gaps sit",
+        "Count the drawer with the next cashier at every shift change, so each gap belongs to one shift."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily match of card sales, top-ups and cash by cashier and shift, with gaps flagged to the owner automatically across branches.",
+        "tool_words": []
+      },
+      "ask_first": "Can your card system show sales per cashier?",
+      "free_stops": "How card-system data is pulled in and the mismatch rules are in the solution document."
+    },
+    {
+      "id": "p2_void_refund_abuse",
+      "n": 2,
+      "words": "Free credits given by staff don't match the cash",
+      "category": "loss_security",
+      "subtype": "void_refund_abuse",
+      "quick_ideas": [
+        "Decide who may give free credits and for what, so it stops being anyone's call",
+        "Look over last week's free credits once by staff member, to see whether one name stands out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a free-credit approval flow with reasons logged and a daily total by staff and shift.",
+        "tool_words": []
+      },
+      "ask_first": "Who can issue free credits today?",
+      "free_stops": "Approval levels and the daily comp report stay for the solution document."
+    },
+    {
+      "id": "p3_maintenance_downtime",
+      "n": 3,
+      "words": "Machines break and the vendor takes a week to fix",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Write down every machine that's down and since when, so you have facts to show the vendor",
+        "Agree a response time with the vendor in writing, so delays have a yardstick."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "maintenance tickets per machine with vendor assignment and time-to-fix measured automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Is maintenance in-house or by the machine vendor?",
+      "free_stops": "Ticket flow and downtime reporting per machine are in the solution document."
+    },
+    {
+      "id": "p4_no_dashboard",
+      "n": 4,
+      "words": "I don't know which machines earn and which just take up space",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Rank one month of earnings per machine once, to see which ones carry the floor",
+        "Note how often the bottom ones were down, since some are weak only because they're broken."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a machine earnings report showing revenue and downtime days per machine every day.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many machines or attractions do you have?",
+      "free_stops": "Ranking rules and how card data is mapped to machines stay for the solution document."
+    },
+    {
+      "id": "p5_booking_appointments",
+      "n": 5,
+      "words": "Birthday party bookings come through WhatsApp and get double-booked",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Keep all party bookings in one calendar owned by one person, so two people can't promise the same room",
+        "Treat a party as booked only once the deposit is in, so holds don't block real bookings."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a party booking calendar with packages, deposits and automatic WhatsApp confirmations and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How many party rooms do you have?",
+      "free_stops": "Package setup and deposit rules go in the solution document."
+    },
+    {
+      "id": "p6_checklists_not_done",
+      "n": 6,
+      "words": "Daily safety and cleanliness checks aren't actually done",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Ask the opening supervisor for photos of the play area before doors open, so you see it yourself",
+        "Make one person accountable for checks each shift, so they don't fall between people."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "an opening and closing checklist with photo proof and time stamps, with missed checks counted per branch.",
+        "tool_words": []
+      },
+      "ask_first": "Who opens the venue each morning?",
+      "free_stops": "Checklist items are set by you; the photo and time-stamp flow is in the solution document."
+    },
+    {
+      "id": "p7_repeat_low",
+      "n": 7,
+      "words": "Families come once and never come back",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Ask parents at the counter if they'd like to hear about offers, and keep numbers only with their permission, so you have someone to invite back",
+        "Pick one reason to bring families back, such as school holidays, since a reason works better than a reminder."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "and loyalty_repeat — a consented parent list with visit history and WhatsApp messages for holidays and new attractions.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have memberships or only walk-in tickets?",
+      "free_stops": "Messaging plan and repeat-visit rewards are planned in the solution document."
+    },
+    {
+      "id": "p8_count_mismatch",
+      "n": 8,
+      "words": "Snack counter and prize stock never match sales",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count snack and prize stock at the start and end of one shift, to see where it goes",
+        "Give one person responsibility for counter stock, so losses have an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a stock tracker with counts per shift compared to sales, with mismatches and low stock flagged automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Which items go missing most?",
+      "free_stops": "Count routine and mismatch rules stay for the solution document."
+    },
+    {
+      "id": "p9_receivables_late",
+      "n": 9,
+      "words": "School trip bookings are on paper and schools pay late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every school booking with what each owes, so you know the real total",
+        "Send each school one written statement, since school offices pay against paperwork."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a group booking tracker with invoices and automatic payment reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How many schools book with you in a term?",
+      "free_stops": "Invoice and reminder setup is in the solution document."
+    },
+    {
+      "id": "p10_branch_comparison",
+      "n": 10,
+      "words": "Each branch reports differently so I can't compare them",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Agree the same few numbers every branch sends daily, so you compare like with like",
+        "Put one week side by side once, to see which branch needs attention."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read per branch with sales, footfall, spend per visitor and downtime, and the one thing to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many branches do you run?",
+      "free_stops": "Which numbers and where they come from is defined in the solution document."
+    }
+  ],
+  "never_say": [
+    "Ride or equipment safety, supervision ratios or child-protection law advice. Anything about the legality of prize or redemption games. Collecting children's names, ages, photos or parents' details. Any recording in toilets or changing areas. Any injury, lost child or fire: emergency services and the venue's own procedure first; any concern about a child's safety with staff goes to the authorities."
+  ],
+  "sample_reply": {
+    "person": "I'm sure some cash at our game zone card counter is going missing. What can I do?",
+    "pi": "Yes, this can be checked and tightened quickly. 1 Pull one week of card sales by cashier from your card system and compare it with the cash handed in, to see where the gaps sit. 2 Count the drawer together with the next cashier at every shift change, so each gap belongs to one shift. Workzap can do this automatically for you: a daily match of card sales, top-ups and cash by cashier, with any gap sent to you on WhatsApp. Shall I prepare a solution document and quote for you? You can say no.",
+    "language": "english"
+  }
+}

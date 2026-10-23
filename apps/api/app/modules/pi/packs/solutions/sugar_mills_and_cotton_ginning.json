@@ -1,0 +1,223 @@
+{
+  "industry": "sugar_mills_and_cotton_ginning",
+  "name": "Sugar mills and cotton ginning",
+  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_bottleneck",
+      "n": 1,
+      "words": "Trolleys queue for two days at the cane yard and growers are furious",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Note arrival and weighment times for a day, so you see where the longest wait is",
+        "Give each trolley a numbered token at arrival."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A yard token system sending each trolley a WhatsApp token with queue position and expected weighment time.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "Where does the longest wait happen today?",
+      "free_stops": "How tokens and timing are managed goes in the solution document."
+    },
+    {
+      "id": "p2_complaints",
+      "n": 2,
+      "words": "Growers say our weighbridge cheats them",
+      "category": "customers_retention",
+      "subtype": "complaints",
+      "quick_ideas": [
+        "Give every grower their weight and deductions in writing at weighment, so trust starts with a record",
+        "Let growers see the scale reading."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "A weighment record that sends each grower their weights and deductions by WhatsApp instantly, with their permission.",
+        "tool_words": []
+      },
+      "ask_first": "How do growers see their weights now?",
+      "free_stops": "How weighment messages are generated is part of the solution document."
+    },
+    {
+      "id": "p3_duplicate_entry",
+      "n": 3,
+      "words": "CPR records and payment records are kept separately and don't match",
+      "category": "operations_process",
+      "subtype": "duplicate_entry",
+      "quick_ideas": [
+        "Match one week of CPRs to payments by hand, so you see the size of the gap",
+        "Use the same grower code in both records."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "CPR-to-payment reconciliation connecting weighment and accounts, with outstanding by grower code and centre.",
+        "tool_words": []
+      },
+      "ask_first": "Which systems hold CPRs and payments?",
+      "free_stops": "How the two systems connect is detailed in the solution document."
+    },
+    {
+      "id": "p4_fraud",
+      "n": 4,
+      "words": "Purchase centre staff are taking money from growers to jump the queue",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Make queue order visible to growers, so jumping the line is noticed",
+        "Give growers a channel to report concerns to head office."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A purchase centre dashboard showing arrivals, weights, queue order and issues reported at every centre.",
+        "tool_words": [
+          "dashboard"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "How many purchase centres do you run?",
+      "free_stops": "What the dashboard tracks is kept for the solution document."
+    },
+    {
+      "id": "p5_maintenance_downtime",
+      "n": 5,
+      "words": "Mill stopped for a day in peak crushing because of a breakdown",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Record every stoppage with section, cause and duration, so repeat causes are visible",
+        "Review the list with section heads weekly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A downtime log by section and cause, with the season's total visible to management daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How are breakdowns recorded now?",
+      "free_stops": "The downtime log design goes in the solution document."
+    },
+    {
+      "id": "p6_shrinkage_theft",
+      "n": 6,
+      "words": "Molasses sales record is loose, tankers go out without a clear count",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Weigh every tanker in and out and keep the slip, so each load has a figure",
+        "Release tankers only against a gate pass."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "A tanker dispatch log with weights in and out and gate passes, flagging gaps.",
+        "tool_words": []
+      },
+      "ask_first": "Who authorises tanker releases?",
+      "free_stops": "How tanker records are matched is part of the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Spinning mills pay for lint months later",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every buyer's balance by age, so follow-up is in order",
+        "Assign one person to follow up weekly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A buyer lifting and receivables tracker with ageing and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How long do buyers usually take to pay?",
+      "free_stops": "Reminder rules are set out in the solution document."
+    },
+    {
+      "id": "p8_supplier_quality",
+      "n": 8,
+      "words": "Phutti quality varies and trash deductions cause arguments",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_quality",
+      "quick_ideas": [
+        "Record each trash and moisture deduction in writing with a photo, so the decision is visible",
+        "Share it with the supplier at the time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A phutti intake log with moisture and trash deductions recorded with photos and shared with the supplier.",
+        "tool_words": []
+      },
+      "ask_first": "Who decides the deduction now?",
+      "free_stops": "How deductions are recorded and shared goes in the solution document."
+    },
+    {
+      "id": "p9_manual_reports",
+      "n": 9,
+      "words": "Board wants daily crushing reports, we compile them by hand",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Fix one report format and the time it goes out, so it isn't rebuilt daily",
+        "Note which figures take longest to gather."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A daily crushing or ginning report generated automatically for owners and the board.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How long does the report take now?",
+      "free_stops": "Report contents and data sources are kept for the solution document."
+    },
+    {
+      "id": "p10_training",
+      "n": 10,
+      "words": "Seasonal staff need training every year from scratch",
+      "category": "people_staff",
+      "subtype": "training",
+      "quick_ideas": [
+        "Write down the five things every new seasonal person must know, so training is consistent",
+        "Ask experienced staff what new people get wrong most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A seasonal onboarding checklist with a short training pack on phone and supervisor sign-off.",
+        "tool_words": []
+      },
+      "ask_first": "How many people do you add each season?",
+      "free_stops": "The onboarding content and flow are detailed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on cane support prices, cane laws, grower payment obligations, sugar pricing, export or import policy. Advice on cotton grading standards, factory safety engineering, environmental or effluent rules, tax or credit. Any help manipulating weighbridges, under-recording cane, issuing fake CPRs, hoarding, mis-declaring stock or evading sales tax. Comment on politically sensitive topics such as sugar prices or government action. Storing growers', middlemen's, buyers' or workers' names, CNICs, bank details or numbers."
+  ],
+  "sample_reply": {
+    "person": "Rahim Yar Khan mein ginning factory hai. Phutti waale trash ki katauti pe har dafa larte hain, koi hal batao.",
+    "pi": "Ji, is ka hal mumkin hai aur yeh is hafte se shuru ho sakta hai. 1 Har gaari ki trash aur nami ki katauti photo ke saath likh kar usi waqt supplier ko dikha dein, taake faisla saaf nazar aaye. 2 Katauti ka tareeqa supplier ke saath pehle se tay kar ke likh lein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har gaari ki aamad, wazan aur katauti photo ke saath darj ho aur supplier ko foran WhatsApp pe pohanch jaaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

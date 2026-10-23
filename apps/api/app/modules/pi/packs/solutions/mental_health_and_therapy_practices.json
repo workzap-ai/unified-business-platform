@@ -1,0 +1,197 @@
+{
+  "industry": "mental_health_and_therapy_practices",
+  "name": "Mental-health and therapy practices (admin)",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_booking_appointments",
+      "n": 1,
+      "words": "Late cancellations leave practitioners with empty hours",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Count late cancellations per practitioner for a week, so the loss is measured",
+        "Make sure every client has seen the cancellation policy, so it is clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "online booking per practitioner with reminders and a policy acknowledgement at booking, tracking cancellations automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How do clients cancel now?",
+      "free_stops": "Reminder timing and policy flow are in the solution document."
+    },
+    {
+      "id": "p2_capacity",
+      "n": 2,
+      "words": "We have a long waitlist but some practitioners still have gaps",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "List waitlist requests by service type, language and availability, so matches are easier",
+        "Compare that with practitioners' open hours, so gaps can be offered."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a waitlist and matching board showing open requests and time on list, offering freed slots to matched clients.",
+        "tool_words": []
+      },
+      "ask_first": "Who does matching today?",
+      "free_stops": "Matching rules are in the solution document."
+    },
+    {
+      "id": "p3_data_scattered_intake",
+      "n": 3,
+      "words": "Intake forms come in on paper, email and WhatsApp",
+      "category": "tech_systems",
+      "subtype": "data_scattered_intake",
+      "quick_ideas": [
+        "Stop accepting intake details over WhatsApp, so sensitive information isn't scattered",
+        "Pick one secure route for forms, so admin checks one place."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "workflow_automation — a digital intake form with secure submission and a completeness check for the admin role.",
+        "tool_words": []
+      },
+      "ask_first": "Who checks forms are complete?",
+      "free_stops": "Form set-up and security are in the solution document; record-keeping rules are for your adviser."
+    },
+    {
+      "id": "p4_commission_disputes",
+      "n": 4,
+      "words": "Associates argue about the fee split and room charges",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Put each associate's split and room charge on one signed page, so there is one reference",
+        "Share a monthly session count, so both sides agree the base."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an associate pay and room-rental statement from completed sessions.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do associates rent rooms or work on a split?",
+      "free_stops": "Statement rules are in the solution document."
+    },
+    {
+      "id": "p5_cash_leakage",
+      "n": 5,
+      "words": "No-show fees are never actually charged",
+      "category": "cash_collections",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "List this month's no-shows with fee status, so the amount is known",
+        "Agree who decides on waivers, so it is consistent."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a no-show and late-cancellation log with fee status and waiver approvals.",
+        "tool_words": []
+      },
+      "ask_first": "Is the fee in your written policy now?",
+      "free_stops": "Fee rules are in the solution document."
+    },
+    {
+      "id": "p6_service_errors",
+      "n": 6,
+      "words": "Online session links get sent to the wrong person",
+      "category": "quality_complaints",
+      "subtype": "service_errors",
+      "quick_ideas": [
+        "Send links only from the practice account, so personal phones aren't used",
+        "Add a check of the contact before sending, so errors are caught."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a scheduler that sends session links only to the booked contact and logs every send.",
+        "tool_words": []
+      },
+      "ask_first": "Which tool do you use for online sessions?",
+      "free_stops": "Send rules are in the solution document; confidentiality duties are for your adviser."
+    },
+    {
+      "id": "p7_manual_work",
+      "n": 7,
+      "words": "Insurance receipts and corporate invoices are made by hand",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Time how long receipts take each week, so the cost is known",
+        "List corporate accounts with balances, so late payers stand out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "credit_ledger — a receipt and invoice generator with payment tracking and ageing.",
+        "tool_words": []
+      },
+      "ask_first": "Which payers are slowest?",
+      "free_stops": "Document format is in the solution document."
+    },
+    {
+      "id": "p8_lead_followup_slow",
+      "n": 8,
+      "words": "Enquiries sit in the inbox for days",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Check reply times on last week's enquiries, so the delay is measured",
+        "Name one person for daily replies, so each enquiry has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an enquiry inbox with response timers and source tracking, routing anything urgent to staff with an emergency-signpost message.",
+        "tool_words": []
+      },
+      "ask_first": "How do enquiries reach you now?",
+      "free_stops": "Routing rules are in the solution document."
+    },
+    {
+      "id": "p9_licences_renewals",
+      "n": 9,
+      "words": "Practitioners' licence and supervision renewals aren't tracked",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List each practitioner's renewal dates by role, so expiries are visible",
+        "Set reminders for the nearest dates, so none slip."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a licence and supervision calendar with reminders by role.",
+        "tool_words": []
+      },
+      "ask_first": "Who tracks renewals today?",
+      "free_stops": "Reminder schedule is in the solution document; requirements are for your regulator."
+    }
+  ],
+  "never_say": [
+    "Any therapy, counselling, diagnosis, crisis or medication advice, including \"what staff should say\". Anything about a client's situation, even in general terms. Interpretations of confidentiality or record-keeping law. Help sharing records without consent or issuing letters without proper sessions. Ideas that record client names, reasons for seeking help or session content. If anyone mentions suicide, self-harm or danger: emergency services first (and 988 in Canada)."
+  ],
+  "sample_reply": {
+    "person": "Late cancellations are killing us. Therapists lose hours every week and we never charge the fee. What can we do?",
+    "pi": "Yes, this can be brought under control, and you can start this week. 1 Count late cancellations per therapist for a week, so the lost time is measured. 2 Make sure every client has seen the cancellation policy, so it is clear before it is needed. Workzap can do this automatically for you with online booking, reminders, policy acknowledgement and a log of fees due. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

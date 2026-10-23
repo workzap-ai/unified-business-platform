@@ -1,0 +1,220 @@
+{
+  "industry": "tour_operators_and_dmcs",
+  "name": "Tour operators and DMCs",
+  "sector": "7.G Transport, mobility and aviation (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_conversion_low",
+      "n": 1,
+      "words": "Agents send requests and we take a day to price the itinerary",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Time your next few itinerary quotes and note what holds them up, so you fix the slowest step",
+        "Keep current hotel and transport rates for your top routes in one place, so pricing doesn't start with a search."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "an itinerary and quote builder using stored contract and net rates with markup rules, producing a branded PDF quickly and tracking which quotes convert.",
+        "tool_words": []
+      },
+      "ask_first": "Requests zyada B2B agents se aati hain ya direct guests se?",
+      "free_stops": "The rate structure and markup rules are set out in the solution document."
+    },
+    {
+      "id": "p2_resource_double_booking",
+      "n": 2,
+      "words": "Guides and vehicles double-booked on the same day",
+      "category": "operations_process",
+      "subtype": "resource_double_booking",
+      "quick_ideas": [
+        "Put next week's guide and vehicle assignments on one shared calendar, so clashes show",
+        "Let one person make assignments for now, so two people aren't booking the same jeep."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a guide and vehicle allocation board that blocks double bookings, with each assignment acknowledged by WhatsApp.",
+        "tool_words": []
+      },
+      "ask_first": "Peak mein ek waqt mein kitne tours chal rahe hote hain?",
+      "free_stops": "The allocation rules and acknowledgement flow are designed in the solution document."
+    },
+    {
+      "id": "p3_wastage_cost",
+      "n": 3,
+      "words": "We forget release dates and pay for rooms we didn't sell",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "List every allotment with its release date once, so the next ones are visible",
+        "Give one person ownership of release decisions, so dates aren't missed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a supplier contract register with rate validity and automatic release-date alerts showing unsold rooms.",
+        "tool_words": []
+      },
+      "ask_first": "Kitne hotels ke saath allotment hai?",
+      "free_stops": "Alert timing and the register layout are worked out in the solution document."
+    },
+    {
+      "id": "p4_margin_unknown",
+      "n": 4,
+      "words": "Profit per tour unknown after guides, jeeps and tips",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Take one finished tour and list every cost against the price, so you see which line surprises",
+        "Note which costs moved mid-season, so you know what to watch."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a tour profitability report per booking with actual costs, updated as costs are entered, by tour type and season.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Mid-season kaun si cost sab se zyada barhti hai?",
+      "free_stops": "The cost categories and report are designed in the solution document."
+    },
+    {
+      "id": "p5_info_lost_in_whatsapp",
+      "n": 5,
+      "words": "Changes from the agent don't reach the driver",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Keep one booking file per tour where every change is written first, so there's one version",
+        "Ask drivers and guides to confirm each change, so you know it landed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a booking file per tour with a day-of-tour run sheet sent to drivers and guides, and change notifications they acknowledge.",
+        "tool_words": []
+      },
+      "ask_first": "Changes abhi driver tak kaise pohnchti hain?",
+      "free_stops": "The run sheet and change flow are set out in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "B2B agents pay months after the tour",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List what each agent owes by age once, so you know who to chase first",
+        "Line up supplier deposit dates against agent payments, so you see the tight weeks."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "dashboards_reports"
+        ],
+        "text": "a B2B agent receivables tracker with automatic reminders, alongside a supplier deposit schedule.",
+        "tool_words": []
+      },
+      "ask_first": "Sab se late kaun se agents pay karte hain?",
+      "free_stops": "Reminder timing and the cash view are worked out in the solution document."
+    },
+    {
+      "id": "p7_reviews_bad",
+      "n": 7,
+      "words": "Reviews are mixed and nobody replies",
+      "category": "customers_retention",
+      "subtype": "reviews_bad",
+      "quick_ideas": [
+        "Read your last month's reviews once and note which guide or tour each is about, so you see the pattern",
+        "Reply to the unanswered ones, so future guests see you care."
+      ],
+      "workzap_build": {
+        "keys": [
+          "reviews_collection"
+        ],
+        "text": "a post-tour feedback form per guide and tour, asking happy guests for a review with their permission and reminding you to reply to every review.",
+        "tool_words": []
+      },
+      "ask_first": "Reviews zyada Google pe aate hain ya TripAdvisor pe?",
+      "free_stops": "The feedback questions and request timing are designed in the solution document."
+    },
+    {
+      "id": "p8_cash_leakage",
+      "n": 8,
+      "words": "Cash collected by guides on tour isn't handed over properly",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Match last week's guide collections against bookings once, so you see the gap",
+        "Agree a fixed handover point after every tour, so cash doesn't sit with guides."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a guide cash handover log reconciled daily against bookings, by guide.",
+        "tool_words": []
+      },
+      "ask_first": "Guides tour pe kitna cash collect karte hain, kaun se services ka?",
+      "free_stops": "The reconciliation rules are set out in the solution document."
+    },
+    {
+      "id": "p9_campaign_roi_unknown",
+      "n": 9,
+      "words": "Instagram posts don't turn into bookings",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Ask every new booking this week where they found you, so you see what really works",
+        "Note which posts brought enquiries, so you post more of what lands."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes",
+          "lead_followup"
+        ],
+        "text": "source codes on every channel and enquiry tracking, showing which channel brings bookings each week.",
+        "tool_words": []
+      },
+      "ask_first": "Bookings zyada Instagram se aati hain ya agents se?",
+      "free_stops": "How codes are set per channel is designed in the solution document."
+    },
+    {
+      "id": "p10_seasonal_planning",
+      "n": 10,
+      "words": "Off-season we have staff and vehicles but no business",
+      "category": "planning_growth",
+      "subtype": "seasonal_planning",
+      "quick_ideas": [
+        "List what quiet months look like in bookings and fixed costs once, so the gap is clear",
+        "Ask past guests and agents what off-season trips they'd consider, so you test demand."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "dashboards_reports"
+        ],
+        "text": "opted-in off-season offers to past guests and agents, with a monthly view of bookings against fixed costs.",
+        "tool_words": []
+      },
+      "ask_first": "Off-season mein kaun se mahine sab se khaali hote hain?",
+      "free_stops": "The offer timing and audience groups are worked out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any road, mountain, weather or activity safety advice, or a view on whether a route is safe to travel. Visa, immigration, permit or NOC advice; only the delay. Anything that helps with unlicensed operations in restricted areas, fake permits or bribery at checkposts. Fake reviews of any kind. Legal or insurance advice on claims, and any storage of travellers' names, passports, health details or guides' and drivers' ID data."
+  ],
+  "sample_reply": {
+    "person": "Peak season mein guides aur jeeps double book ho jati hain, sab kuch main WhatsApp aur diary pe karta hoon. Koi tareeqa batayein.",
+    "pi": "Ji haan, is ka hal mumkin hai, aur pehla qadam sab assignments ek jagah laana hai. 1. Agle hafte ke saare guide aur gaadi assignments ek shared calendar par daal dein, taa ke clash foran nazar aaye. 2. Filhaal assignments sirf ek banda kare, taa ke do log ek hi jeep book na karein. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: ek allocation board jo double booking hone hi na de, aur har driver aur guide WhatsApp par apni assignment confirm kare. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

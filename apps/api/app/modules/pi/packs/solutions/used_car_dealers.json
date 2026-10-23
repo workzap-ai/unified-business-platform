@@ -1,0 +1,224 @@
+{
+  "industry": "used_car_dealers",
+  "name": "Used car dealers",
+  "sector": "7.G Transport, mobility and aviation (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_overstock_dead_stock",
+      "n": 1,
+      "words": "Some cars have been standing for months and my money is stuck",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "Write down when each car came onto the plot and sort oldest first, so the stuck money is in front of you",
+        "Make a decision this week on each of the oldest few, so they stop drifting."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "an ageing board for every car with days- in-stock alerts and the money tied up in each, updated daily across plots.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many cars are on the lot right now?",
+      "free_stops": "Ageing thresholds and the weekly review routine are in the solution document."
+    },
+    {
+      "id": "p2_margin_unknown",
+      "n": 2,
+      "words": "After mechanic, painter and commission, a car I thought was profitable is a loss",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Keep every bill for a car together the day it's paid, so nothing is forgotten at sale",
+        "Total a car's costs before agreeing its selling price, so you know your floor."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "dashboards_reports"
+        ],
+        "text": "a car-by-car cost sheet capturing purchase, recon, parts, paint and commission, showing true margin the moment it sells.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The cost headings and how plot expenses are shared across cars are in the solution document."
+    },
+    {
+      "id": "p3_record_keeping",
+      "n": 3,
+      "words": "My partner and I argue about who put money into which car",
+      "category": "compliance_admin",
+      "subtype": "record_keeping",
+      "quick_ideas": [
+        "Write down each partner's money in each car as it happens, so there's one record to point to",
+        "Both look at it together once a week, so disagreements surface early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a partner and investor ledger showing each person's capital in each car and their settlement on sale, visible to everyone involved.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Settlement rules and who sees what are in the solution document."
+    },
+    {
+      "id": "p4_marketplace_visibility",
+      "n": 4,
+      "words": "Sold cars are still showing on PakWheels and Dubizzle",
+      "category": "marketing_leads",
+      "subtype": "marketplace_visibility",
+      "quick_ideas": [
+        "Give one person the job of taking listings down the hour a car sells, so buyers don't call for nothing",
+        "Refresh photos of your best cars, so they stand out from the weak ones."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "a listing tool that publishes and removes cars on the platforms you use from one place, tied to the stock register.",
+        "tool_words": [
+          "platform"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "Which platforms connect and how is covered in the solution document."
+    },
+    {
+      "id": "p5_lead_followup_slow",
+      "n": 5,
+      "words": "We don't call back last week's enquiries",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Note every enquiry with the car asked about, so you can call back the serious ones",
+        "Call back anyone whose car is still available, in one sitting, so it actually gets done."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup",
+          "attribution_codes"
+        ],
+        "text": "a lead log with call-back reminders and the source of each enquiry, showing which platforms bring real buyers.",
+        "tool_words": [
+          "platform"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "Follow-up timings and source tracking are in the solution document."
+    },
+    {
+      "id": "p6_order_errors",
+      "n": 6,
+      "words": "Token taken, buyer vanishes, or two people paid token on the same car",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Record every token with the car and how long the hold lasts, so nobody else sells it",
+        "Tell the buyer the hold's end date in writing, so expiry is clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "stock_alerts"
+        ],
+        "text": "a token register that locks a car once a deposit is recorded and alerts when the hold runs out.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Hold rules and alerts are set in the solution document."
+    },
+    {
+      "id": "p7_handoffs",
+      "n": 7,
+      "words": "Car went to the workshop and nobody knows when it's back",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "List every car out for recon with its workshop and promised date, so you know who to chase",
+        "Call the overdue ones first, so delays don't stretch."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a recon tracker with expected return dates and overdue alerts for every car out.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Workshop stages and alert timings are in the solution document."
+    },
+    {
+      "id": "p8_cash_leakage",
+      "n": 8,
+      "words": "Cash at the plot doesn't always match what was agreed",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Give a signed receipt for every payment, so each amount is on paper",
+        "Count cash against sales and tokens at closing, so gaps show the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily cash sheet for each lot matched automatically to sales and tokens recorded.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The cash-up steps and approvals are in the solution document."
+    },
+    {
+      "id": "p9_documentation",
+      "n": 9,
+      "words": "Transfer papers take forever and files sit pending",
+      "category": "compliance_admin",
+      "subtype": "documentation",
+      "quick_ideas": [
+        "List every car with pending paperwork and its next step, so nothing is forgotten",
+        "Keep all files in one locked place, so they don't wander."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a paperwork tracker per car with reminders on pending steps, holding only the status, never documents or ID numbers.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The steps tracked per country are in the solution document."
+    },
+    {
+      "id": "p10_wrong_location",
+      "n": 10,
+      "words": "Keys go missing and cars are moved without anyone knowing",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Keep keys on one board with a sign-out sheet, so you know who has which",
+        "Count keys against cars at closing, so a missing one is spotted that day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a phone check-out for keys and cars with time and location, and an evening count sent to the owner.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How check-outs are recorded per role is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about rolling back odometers, hiding accident or flood history, or forging transfer papers; decline plainly. Advice on disclosure duties, warranties, consumer law or buyer disputes; refer to a lawyer. Valuations of a specific car or market prices. Advice on instalments, financing or tax; refer to the accountant. Storing sellers' or buyers' IDs, registration documents or bank details. Taking sides in partner money disputes; if a car may be stolen, that is for the police."
+  ],
+  "sample_reply": {
+    "person": "Plot pe aadhi gaariyan mahino se khari hain, koi tareeqa batao ke paisa nikle aur pata chale kis gaari pe kya laga.",
+    "pi": "Haan, dono ka hal nikal sakta hai, aur shuruaat is hafte ho sakti hai. 1 Har gaari ki plot pe aane ki tareekh likh kar purani se nayi tarteeb mein rakhein, taake phansa hua paisa saamne ho. 2 Har gaari ke bill usi din ek jagah jama karein, taake bechte waqt asal kharcha maloom ho. Workzap yeh sab aap ke liye automatically kar sakta hai: har gaari ke din, kharcha aur munafa roz dikhe aur purani gaariyon pe alert aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

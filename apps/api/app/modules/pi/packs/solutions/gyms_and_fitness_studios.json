@@ -1,0 +1,218 @@
+{
+  "industry": "gyms_and_fitness_studios",
+  "name": "Gyms and fitness studios",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_customer_communication",
+      "n": 1,
+      "words": "Renewals expire and nobody calls the member",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "List the memberships ending this month, so you know who to contact",
+        "Have the front desk reach those members once before expiry, since renewing is easier than winning them back."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a member register that sends renewal reminders on WhatsApp automatically before expiry and tracks who renewed.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many active members do you have?",
+      "free_stops": "Reminder timing and renewal tracking are in the solution document."
+    },
+    {
+      "id": "p2_churn_subscription",
+      "n": 2,
+      "words": "January joiners stop coming by March and never renew",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Find members who haven't visited in a while from your entry records, since they're the ones about to leave",
+        "Have a trainer check in with them once, because a personal call means more than an offer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "a churn watch listing members who haven't visited for a set number of days, refreshed daily for a call.",
+        "tool_words": []
+      },
+      "ask_first": "How do members get in, card, register or turnstile?",
+      "free_stops": "The inactivity rules and call list flow stay for the solution document."
+    },
+    {
+      "id": "p3_cash_leakage",
+      "n": 3,
+      "words": "Front desk lets in people whose membership has expired",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Check this week's entries against the expiry list once, to see how often it happens",
+        "Make the expiry check part of every entry, so it doesn't depend on memory."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "an access check linking the turnstile or desk to membership status, flagging expired entries automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Does your gym software connect to the turnstile?",
+      "free_stops": "How access and membership data connect is in the solution document."
+    },
+    {
+      "id": "p4_theft_internal",
+      "n": 4,
+      "words": "Trainers take PT clients privately",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Make sure all PT is sold and paid at the desk, so private deals stand out",
+        "Compare PT sessions seen on the floor with sessions paid, to see whether there's a gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a PT session log with client sign-off, matched to paid packs every day.",
+        "tool_words": []
+      },
+      "ask_first": "How is PT sold now?",
+      "free_stops": "Sign-off method and matching rules stay for the solution document."
+    },
+    {
+      "id": "p5_commission_disputes",
+      "n": 5,
+      "words": "PT commission causes arguments every month",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write down the commission rule each trainer is on, so there's one version",
+        "Share each trainer's session count before payday, so disputes come up early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "automatic monthly commission per trainer from signed-off sessions.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Are trainers salaried, on commission or freelance?",
+      "free_stops": "Commission logic and statement layout go in the solution document."
+    },
+    {
+      "id": "p6_maintenance_downtime",
+      "n": 6,
+      "words": "Machines are out of order for weeks",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List every broken machine with the date it broke, so downtime is visible",
+        "Agree a fix date with your technician, so repairs have a deadline."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an equipment log with downtime days per machine and repair status.",
+        "tool_words": []
+      },
+      "ask_first": "Who repairs your machines?",
+      "free_stops": "Ticket flow and downtime reporting are in the solution document."
+    },
+    {
+      "id": "p7_lead_followup_slow",
+      "n": 7,
+      "words": "Leads from free trials aren't followed up",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Keep one list of this month's trial users who agreed to be contacted, so none slip",
+        "Have one person follow up each once, since trials go cold quickly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "a trial-to-member tracker with automatic follow-up reminders and conversion counts.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most enquiries come from?",
+      "free_stops": "Follow-up timing and lead flow stay for the solution document."
+    },
+    {
+      "id": "p8_cash_mismatch",
+      "n": 8,
+      "words": "Fees in cash and transfer and I can't reconcile them",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Match this month's payments to members once, to see what's unaccounted for",
+        "Record the payment method for every fee taken, so transfers can be traced."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "cash, card and transfers matched to members daily, with gaps flagged.",
+        "tool_words": []
+      },
+      "ask_first": "How do most members pay?",
+      "free_stops": "Matching rules are in the solution document."
+    },
+    {
+      "id": "p9_booking_appointments",
+      "n": 9,
+      "words": "Class bookings via WhatsApp lead to overbooked classes",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Keep each class's list in one place with a set limit, so it can't be overbooked",
+        "Make one person own class bookings, so WhatsApp promises don't clash."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a class schedule with WhatsApp booking, capacity limits and a waitlist.",
+        "tool_words": []
+      },
+      "ask_first": "How many classes run a week?",
+      "free_stops": "Booking flow and waitlist rules go in the solution document."
+    },
+    {
+      "id": "p10_branch_comparison",
+      "n": 10,
+      "words": "Each branch reports different numbers",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Agree the same few numbers from each branch, so you compare like with like",
+        "Put one month side by side, to see which branch needs attention."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read per branch: active members, new joins, renewals, churn, revenue.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many branches do you run?",
+      "free_stops": "Which numbers and their sources are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Fitness, diet, supplement, steroid or injury advice. Collecting members' health data, weights, measurements, photos or biometrics. Any recording in changing rooms or ladies-only areas. Help selling unregistered or prohibited supplements. Consumer-law advice on cancellations; collapse or serious injury means emergency services first."
+  ],
+  "sample_reply": {
+    "person": "Renewals are a mess, memberships expire and nobody calls anyone. Can you suggest a fix?",
+    "pi": "Yes, this is very fixable. 1 List the memberships ending this month, so you know exactly who to contact. 2 Have the front desk reach each of those members once before their plan ends. Workzap can do this automatically for you: renewal reminders sent on WhatsApp before every expiry, with a daily view of who renewed and who didn't. Shall I prepare a solution document and quote for you? You can say no.",
+    "language": "english"
+  }
+}

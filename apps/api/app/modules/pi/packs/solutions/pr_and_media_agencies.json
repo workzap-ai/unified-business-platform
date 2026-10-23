@@ -1,0 +1,218 @@
+{
+  "industry": "pr_and_media_agencies",
+  "name": "PR and media agencies",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_no_customer_data",
+      "n": 1,
+      "words": "Our media list is out of date and journalists keep changing outlets",
+      "category": "customers_retention",
+      "subtype": "no_customer_data",
+      "quick_ideas": [
+        "Check your top outlets once and update roles and beats, so pitches reach the right desk",
+        "Mark when each entry was last confirmed, so stale ones stand out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "an agency-owned media register with outlet, role, beat and last contact, prompting the team to refresh entries that haven't been confirmed recently.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the register structure and refresh routine are set out in the solution document."
+    },
+    {
+      "id": "p2_turnover",
+      "n": 2,
+      "words": "Each account manager keeps their own contacts, and they leave with them",
+      "category": "people_staff",
+      "subtype": "turnover",
+      "quick_ideas": [
+        "Ask each AM to add their working outlet contacts to the shared list, so the agency holds the relationships",
+        "Note who owns each relationship, so handovers are possible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "the shared media register with access controls and a log of every pitch and contact, so relationships stay with the agency.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "access rights and what is logged are worked out in the solution document."
+    },
+    {
+      "id": "p3_manual_reports",
+      "n": 3,
+      "words": "We spend days compiling coverage reports",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Start logging coverage the day it appears, so month-end isn't a hunt",
+        "Agree one report layout for all clients, so nobody rebuilds it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a coverage log with links, screenshots and outlet type that builds each client's monthly report automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "the report layout and how coverage is captured are kept for the solution document."
+    },
+    {
+      "id": "p4_duplicate_entry",
+      "n": 4,
+      "words": "Coverage gets mixed up between clients in our records",
+      "category": "operations_process",
+      "subtype": "duplicate_entry",
+      "quick_ideas": [
+        "Tag every clipping with its client when it's saved, so it can't land in the wrong report",
+        "Check last month's reports once for mix-ups, so you know the scale."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a pitch and coverage tracker per client, so each clipping is tied to the story and client it came from.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how pitches link to coverage is designed in the solution document."
+    },
+    {
+      "id": "p5_approvals_slow",
+      "n": 5,
+      "words": "Press releases go through six rounds of client approval and news goes stale",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "Ask each client to name one approver, so drafts stop circulating",
+        "Put an approve-by time on every release, so delays are visible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an approval workflow for releases with timestamps and automatic client nudges as the deadline nears.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the approval steps and nudge timings are set out in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "We pay outlets for ads and the client pays us months later",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every booking you've paid for but not yet billed or collected, so the gap is clear",
+        "Chase the oldest one this week, so money starts moving."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a media-buying ledger per client with bookings, outlet invoices, client billing and payment status.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how bookings flow into client billing is kept for the solution document."
+    },
+    {
+      "id": "p7_hidden_costs",
+      "n": 7,
+      "words": "Retainer clients expect unlimited events and crisis support",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "Write down once what each retainer includes, so extras are recognisable",
+        "List the extras delivered last quarter for one client, so you have facts for the renewal talk."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a retainer scope tracker comparing agreed activities against delivered work each month.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "how activities are logged and compared is worked out in the solution document."
+    },
+    {
+      "id": "p8_cost_overruns",
+      "n": 8,
+      "words": "Event suppliers deliver late and budgets overrun",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Put the next event's suppliers, deliverables and deadlines on one sheet, so slips show early",
+        "Compare budget and actuals once for the last event, so you see where it ran over."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an event planner with supplier deliverables, deadlines and budget versus actual updated as costs come in.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the event stages and budget tracking are designed in the solution document."
+    },
+    {
+      "id": "p9_shift_scheduling",
+      "n": 9,
+      "words": "Weekend crises land on me personally, there's no rota",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Draw up one out-of-hours rota for the next month, so cover is shared",
+        "Agree who the rota person calls next, so escalation is clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "an out-of-hours rota with the escalation chain and reminders to whoever is on duty.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "rota rules and the escalation chain are set out in the solution document."
+    },
+    {
+      "id": "p10_no_visibility",
+      "n": 10,
+      "words": "Products we send to influencers and media aren't tracked",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "List every product sent out this month with recipient type and date, so you know what is out",
+        "Mark which ones have had a follow-up, so nothing is forgotten."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a seeding tracker showing products sent, follow-up dates and whether coverage came back.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the follow-up rules are kept for the solution document."
+    }
+  ],
+  "never_say": [
+    "Any legal, defamation, regulatory or crisis-response advice. That a story will get coverage or that PR will deliver a measurable result. Anything involving fake news, smear campaigns, fake reviews, undisclosed paid coverage where unlawful, or bribing officials. Requests for journalists' personal numbers, client confidential plans or unannounced news. If a crisis involves danger to people, point to emergency services first."
+  ],
+  "sample_reply": {
+    "person": "We lose the first week of every month just compiling coverage reports. Is there a better way?",
+    "pi": "Yes, there is, and you can start this week. 1 Log each piece of coverage the day it appears, tagged with its client, so month-end stops being a hunt. 2 Agree one report layout for every client, so nobody rebuilds it from scratch. Workzap can do this automatically for you: a coverage log that builds each client's monthly report on its own. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

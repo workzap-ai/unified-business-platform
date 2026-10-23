@@ -1,0 +1,217 @@
+{
+  "industry": "spas_and_wellness_centres",
+  "name": "Spas and wellness centres",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_capacity",
+      "n": 1,
+      "words": "Rooms free but therapists booked, or the other way round",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Plan one week matching rooms with therapist shifts, to see where they fall out of step",
+        "Note where gaps keep appearing, since those are the hours to fix."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a booking grid matching rooms and therapists, with utilisation measured daily.",
+        "tool_words": []
+      },
+      "ask_first": "How many treatment rooms and therapists?",
+      "free_stops": "Grid rules and utilisation reporting are in the solution document."
+    },
+    {
+      "id": "p2_booking_appointments",
+      "n": 2,
+      "words": "Bookings from hotel desk, website and WhatsApp clash",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Route every booking to one calendar owned by one person, so channels can't double-book",
+        "Check that calendar before confirming, so clashes are caught early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "all channels feeding one booking grid, with automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Are you inside a hotel?",
+      "free_stops": "Channel connections go in the solution document."
+    },
+    {
+      "id": "p3_refunds",
+      "n": 3,
+      "words": "Gift vouchers sold with no record of redemptions",
+      "category": "cash_collections",
+      "subtype": "refunds",
+      "quick_ideas": [
+        "List every voucher sold this season with its number, so you know what's out there",
+        "Check the list before redeeming any voucher, so none is used twice."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a voucher register with unique codes, sold and redeemed status and expiry.",
+        "tool_words": []
+      },
+      "ask_first": "Do vouchers have an expiry now?",
+      "free_stops": "Code setup and redemption flow stay for the solution document."
+    },
+    {
+      "id": "p4_loyalty",
+      "n": 4,
+      "words": "Package sessions tracked on paper cards clients lose",
+      "category": "customers_retention",
+      "subtype": "loyalty",
+      "quick_ideas": [
+        "Copy every active package into one list, so clients' lost cards don't matter",
+        "Update it at each session, so the balance is always clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "a package tracker per client ID with sessions used and remaining.",
+        "tool_words": []
+      },
+      "ask_first": "How many active packages are there?",
+      "free_stops": "Tracker setup is in the solution document."
+    },
+    {
+      "id": "p5_count_mismatch",
+      "n": 5,
+      "words": "Oils and creams finish faster than they should",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Issue consumables from one person, so usage has an owner",
+        "Compare stock used with treatments done, to see how big the gap is."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a consumables issue log per treatment compared to bookings.",
+        "tool_words": []
+      },
+      "ask_first": "Which products run out fastest?",
+      "free_stops": "Usage norms go in the solution document."
+    },
+    {
+      "id": "p6_shrinkage_theft",
+      "n": 6,
+      "words": "Towels and robes go missing and laundry costs grow",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Count linen once this week, so you know what you have",
+        "Count laundry out and in on the next run, to see where it disappears."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a linen tracker with laundry counts and loss report.",
+        "tool_words": []
+      },
+      "ask_first": "Is laundry in-house or a vendor?",
+      "free_stops": "Count routine stays for the solution document."
+    },
+    {
+      "id": "p7_commission_disputes",
+      "n": 7,
+      "words": "Therapist commission and tips cause complaints",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write down each therapist's commission and tips rule, so there's one version",
+        "Share session tallies before payday, so complaints come up early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a utilisation and commission report per therapist, tips included.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How are therapists paid?",
+      "free_stops": "Commission logic is in the solution document."
+    },
+    {
+      "id": "p8_void_refund_abuse",
+      "n": 8,
+      "words": "Treatments rung up as cheaper ones",
+      "category": "loss_security",
+      "subtype": "void_refund_abuse",
+      "quick_ideas": [
+        "Spot-check bills against the booking grid, to see whether it's happening",
+        "Make discounts need your OK, so cheaper billing stands out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "discount and comp approvals with reasons logged.",
+        "tool_words": []
+      },
+      "ask_first": "Who handles billing?",
+      "free_stops": "Approval rules stay for the solution document."
+    },
+    {
+      "id": "p9_receivables_late",
+      "n": 9,
+      "words": "Hotel takes a big share and settles late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Reconcile last month's hotel bookings with what was settled, to see what's missing",
+        "Agree a fixed settlement date with the hotel, so waiting has a limit."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a hotel settlement statement and reconciliation each month.",
+        "tool_words": []
+      },
+      "ask_first": "How long does settlement usually take?",
+      "free_stops": "Statement content is in the solution document."
+    },
+    {
+      "id": "p10_checklists_not_done",
+      "n": 10,
+      "words": "Room turnaround checklist isn't followed",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Name one person to check each room between treatments, so it isn't left to whoever is free",
+        "Spot-check a few rooms yourself, to see the real standard."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a turnaround and hygiene checklist with time stamps.",
+        "tool_words": []
+      },
+      "ask_first": "How long is turnaround between treatments?",
+      "free_stops": "Checklist steps stay for the solution document."
+    }
+  ],
+  "never_say": [
+    "Medical, therapeutic or contraindication advice. Anything on hijama or cupping practice or licensing. Help with illegal services; signs of exploitation go to authorities. Collecting client health information, names or photos, or therapists' visa details. Any recording in treatment or changing rooms; medical emergencies mean emergency services first."
+  ],
+  "sample_reply": {
+    "person": "We sell lots of gift vouchers in December but nobody knows which have been used. What can we do?",
+    "pi": "Yes, this can be sorted before the next season. 1 List every voucher sold this season with its number, so you know what's out there. 2 Check that list before redeeming any voucher, so none is used twice. Workzap can do this automatically for you: a voucher register with unique codes that shows sold, redeemed and expired status in real time. Shall I prepare a solution document and quote for you? You can say no.",
+    "language": "english"
+  }
+}

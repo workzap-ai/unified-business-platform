@@ -1,0 +1,237 @@
+{
+  "industry": "quran_academies_and_madrassas",
+  "name": "Quran academies and madrassas (administration)",
+  "sector": "7.J Education and childcare",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_record_keeping",
+      "n": 1,
+      "words": "Donations come in cash, bank and JazzCash and we can't give donors a clear record",
+      "category": "compliance_admin",
+      "subtype": "record_keeping",
+      "quick_ideas": [
+        "Give a numbered receipt for every cash donation from now on, so each one has a trace",
+        "Write this month's donations into one register by channel, so you see the full picture once."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "workflow_automation A donation and fee ledger with receipts and bank and wallet matching every day, producing the monthly trustee summary automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The ledger structure and receipt flow are kept for the document."
+    },
+    {
+      "id": "p2_cash_mismatch",
+      "n": 2,
+      "words": "Zakat and general donations get mixed in one register",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Ask your trustees to confirm the fund categories they want kept apart, so records follow their decision",
+        "For how each fund should be treated, ask your scholar and your accountant."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "Every entry tagged to a fund category the institution sets, with balances per fund kept separate automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How funds are tagged and reported is in the document."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Half the families pay fees late, and asking feels awkward",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Send reminders from the academy's number rather than the teacher's, so it isn't personal",
+        "Use one polite standard reminder for everyone, so no family feels singled out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "customer_messaging Fee reminders by family reference sent automatically each month, with a paid/unpaid count for the office.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reminder timing and wording are kept for the document."
+    },
+    {
+      "id": "p4_shift_scheduling",
+      "n": 4,
+      "words": "Daylight-saving changes in March and November mess up the schedule",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Keep one master schedule with each family's city, so a time change can be checked in one place",
+        "Remind families before each change, so classes aren't missed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A scheduler that stores each family's time zone, adjusts for daylight saving and sends reminders to ustad and family automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Are class times kept in one place or by each teacher?",
+      "free_stops": "How time zones and reminders are handled is in the document."
+    },
+    {
+      "id": "p5_payroll_errors",
+      "n": 5,
+      "words": "Online families cancel last minute and teachers still expect pay",
+      "category": "people_staff",
+      "subtype": "payroll_errors",
+      "quick_ideas": [
+        "Write one cancellation rule and share it with families and teachers, so everyone knows it",
+        "List this month's cancellations once, so pay can be settled fairly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A cancellation and make-up log that applies your pay rules automatically each month.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the rules feed teacher pay is kept for the document."
+    },
+    {
+      "id": "p6_attendance_lateness",
+      "n": 6,
+      "words": "Teachers miss online classes and families message me at night",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Ask teachers to check in with the office when each class starts, so misses show up the same day",
+        "Name one person for parents to contact, so messages stop coming to you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "dashboards_reports Class start times taken from meeting logs, with lateness alerts and a weekly count per teacher, without any recording of children.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How attendance is pulled from meeting logs is in the document."
+    },
+    {
+      "id": "p7_lead_followup_slow",
+      "n": 7,
+      "words": "Trial classes don't convert because nobody follows up",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Put this month's trials into one list, so you see who never heard back",
+        "Make one person own follow-ups, so every trial gets a reply."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Every enquiry tracked from trial to enrolment, with automatic follow-up reminders and monthly conversion counts.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The follow-up timings are kept for the document."
+    },
+    {
+      "id": "p8_payment_methods",
+      "n": 8,
+      "words": "International card payments fail or get charged back",
+      "category": "cash_collections",
+      "subtype": "payment_methods",
+      "quick_ideas": [
+        "List which families had failed payments this month, so you see the scale",
+        "Offer a second payment option, so a failed card doesn't mean a lost month."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "Payment links connected to the fee ledger, with failed payments and chargebacks tracked automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The payment setup and retry flow are in the document."
+    },
+    {
+      "id": "p9_stockout",
+      "n": 9,
+      "words": "Hostel kitchen ration runs out before month-end",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Count ration in store once, so you know how many days it will last",
+        "Write down the daily issue for one week, so usage is known."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A ration register of purchases, daily issue and stock left, with reorder alerts before it runs out.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reorder levels are kept for the document."
+    },
+    {
+      "id": "p10_petty_cash",
+      "n": 10,
+      "words": "Kitchen purchases are made in cash with no bills",
+      "category": "cash_collections",
+      "subtype": "petty_cash",
+      "quick_ideas": [
+        "Ask for a photo of every receipt or a written note for each purchase this week, so spending has a trail",
+        "Give the buyer a fixed float, so cash is counted against it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Petty cash entered by phone with receipt photos and a weekly summary to trustees.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The approval and reporting flow is in the document."
+    },
+    {
+      "id": "p11_manual_reports",
+      "n": 11,
+      "words": "Trustees ask for monthly accounts and I prepare them by hand",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Agree with trustees the few figures they want each month, so the report has a fixed shape",
+        "Keep this month's figures in one place as they happen, so month-end is quicker."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A trustee summary of fees, donations by fund, kitchen and utilities, produced automatically each month.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How the summary is put together is kept for the document."
+    }
+  ],
+  "never_say": [
+    "Any religious ruling on Zakat eligibility, fees for teaching Quran or anything else; pi says \"ask your scholar\". Tax, charity-registration or trust-law advice; pi says \"talk to your accountant or lawyer\". Any idea that records a child's name, photo, recitation recording, progress or hostel details. Help routing donations off-book or issuing receipts that misstate donations. Any comment on sect, doctrine or school of thought. Business talk after a hostel welfare concern; pi points to 15/1122, 999 or 911 and the child-protection authority."
+  ],
+  "sample_reply": {
+    "person": "Hamari online academy ke zyada bachay Canada aur America mein hain. March aur November mein time badalta hai to classes miss hoti hain, koi hal batayein.",
+    "pi": "Ji haan, is ka hal mumkin hai aur agli time change se pehle tayyari ho sakti hai. 1 Ek master schedule rakhein jis mein har family ka shehar likha ho, taake time change ek hi jagah check ho. 2 Change se pehle families ko yaad dila dein, taake class miss na ho. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai — har family ka time zone yaad rakhna, daylight saving pe timing adjust karna aur ustad aur family dono ko reminder bhejna. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

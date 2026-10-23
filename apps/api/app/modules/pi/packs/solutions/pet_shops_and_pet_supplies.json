@@ -1,0 +1,220 @@
+{
+  "industry": "pet_shops_and_pet_supplies",
+  "name": "Pet shops and pet supplies",
+  "sector": "7.A Retail and consumer (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_stockout",
+      "n": 1,
+      "words": "Regular customers' food brand runs out and they switch to another shop",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "List the brands your regulars buy most, because those are the ones you can't run out of",
+        "Compare distributor lead time with how fast they sell, because it sets your real reorder point."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "food stock by brand and size with reorder alerts based on sales speed and lead time.",
+        "tool_words": []
+      },
+      "ask_first": "Is it mostly imported brands that run out?",
+      "free_stops": "reorder levels per brand are worked out in the solution document."
+    },
+    {
+      "id": "p2_repeat_low",
+      "n": 2,
+      "words": "Customers order every month but we don't remind them, so they go elsewhere",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Ask regulars if they'd like a reminder when they're due, saving numbers only with their permission",
+        "Note each regular's usual cycle, because timing matters more than frequency."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "loyalty_repeat"
+        ],
+        "text": "repeat-order reminders timed to each opted-in customer's cycle, with one-tap reorder.",
+        "tool_words": []
+      },
+      "ask_first": "How do regulars reorder today?",
+      "free_stops": "reminder timing and reorder flow are kept for the solution document."
+    },
+    {
+      "id": "p3_expiry_wastage",
+      "n": 3,
+      "words": "Bags of food expire in the storeroom",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Do one expiry sweep and move the earliest stock forward, because new stock often sells first",
+        "List what expires soon, so it can be moved in time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "expiry tracking with first-expiry-first-out alerts across branches.",
+        "tool_words": []
+      },
+      "ask_first": "Who checks expiry dates now?",
+      "free_stops": "alert timing is detailed in the solution document."
+    },
+    {
+      "id": "p4_booking_appointments",
+      "n": 4,
+      "words": "Grooming bookings clash and groomers are double-booked",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Move all bookings into one shared diary, because clashes come from separate books",
+        "Note how long each service really takes, because slots are often set too short."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a grooming and boarding calendar with groomer schedules and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How are appointments booked today?",
+      "free_stops": "slot design and reminder flow go in the solution document."
+    },
+    {
+      "id": "p5_checklists_not_done",
+      "n": 5,
+      "words": "Tank cleaning and feeding schedules get skipped when staff are off",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Write down every daily care task and who owns it, because gaps appear when nobody is named",
+        "Have staff sign off once a day, because it shows what was missed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a daily care checklist on phone with staff sign-off and an alert to the owner when tasks are missed.",
+        "tool_words": []
+      },
+      "ask_first": "Who looks after the animals each day?",
+      "free_stops": "the checklist and alert setup are kept for the solution document."
+    },
+    {
+      "id": "p6_delivery_cost",
+      "n": 6,
+      "words": "Delivery orders for heavy litter bags cost more than they earn",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_cost",
+      "quick_ideas": [
+        "Work out what one delivery actually costs you, because it shows which orders lose money",
+        "Group deliveries by area, because fewer trips cost less."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "dashboards_reports"
+        ],
+        "text": "a delivery planner grouping orders by area with rider assignment and cost per delivery.",
+        "tool_words": []
+      },
+      "ask_first": "Who delivers, your riders or a courier?",
+      "free_stops": "routing and delivery pricing rules go in the solution document."
+    },
+    {
+      "id": "p7_wastage_cost",
+      "n": 7,
+      "words": "Fish and birds die in the shop and we don't track the loss",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Record every loss for a month, because it shows the real cost",
+        "Note conditions alongside, because patterns help you and your vet see what's going on."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "a live-stock loss log with monthly cost.",
+        "tool_words": []
+      },
+      "ask_first": "Do you sell live animals regularly?",
+      "free_stops": "the log and reporting design are kept for the solution document."
+    },
+    {
+      "id": "p8_integration_marketplace",
+      "n": 8,
+      "words": "Delivery app listings show wrong stock",
+      "category": "tech_systems",
+      "subtype": "integration_marketplace",
+      "quick_ideas": [
+        "Check your top items on each app once, because it shows how far they've drifted",
+        "Make one person own app stock, because otherwise nobody updates."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "stock synced to Talabat, Noon or Instashop listings so items you don't have aren't shown.",
+        "tool_words": []
+      },
+      "ask_first": "Which apps do you sell on?",
+      "free_stops": "connections per app are detailed in the solution document."
+    },
+    {
+      "id": "p9_import_delays",
+      "n": 9,
+      "words": "Imported food stuck at customs, shelves empty for weeks",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "List expected shipments with dates, because it shows where gaps are coming",
+        "Keep a local alternative in mind for key lines, because regulars need something on the shelf."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a supplier tracker for imported shipments with expected dates and alerts.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you import directly or through distributors?",
+      "free_stops": "tracking setup is kept for the solution document."
+    },
+    {
+      "id": "p10_no_customer_data",
+      "n": 10,
+      "words": "Customer data is only on staff phones",
+      "category": "customers_retention",
+      "subtype": "no_customer_data",
+      "quick_ideas": [
+        "Move regulars into a shop record, with their permission, because the relationship then stays with the shop",
+        "Agree a rule that shop orders use the shop number, because personal phones leave with staff."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "a shop-owned consented customer list with visits and purchases.",
+        "tool_words": []
+      },
+      "ask_first": "How many staff take orders on their own phones?",
+      "free_stops": "setup and consent flow go in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any veterinary, diet, dosing, medication or breeding advice; for an animal in distress, say contact a vet urgently. Advice on animal import or export permits, licensing or welfare law. Help with trade in protected, wild or illegally imported animals. Anything requiring customers' names, addresses or pet records in the chat. For serious bites, fire or chemical exposure, anything other than \"call emergency services\"."
+  ],
+  "sample_reply": {
+    "person": "My regulars buy the same premium food every month, but when it's out they just go elsewhere. What can I do?",
+    "pi": "Yes, this can be fixed. 1. List the brands your regulars buy most, because those are the ones you can't run out of. 2. Compare your distributor's delivery time with how fast each sells, which shows when you really need to reorder. Workzap can do this automatically for you: stock alerts based on real sales speed, and reminders to regulars who opt in when their food is due. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

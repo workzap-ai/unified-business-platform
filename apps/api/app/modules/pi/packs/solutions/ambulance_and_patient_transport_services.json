@@ -1,0 +1,219 @@
+{
+  "industry": "ambulance_and_patient_transport_services",
+  "name": "Ambulance and patient-transport services",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_whatsapp_overload",
+      "n": 1,
+      "words": "Calls come on five phones and two get missed during peak",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "List every number calls arrive on, so you see the spread",
+        "Move booking requests to one main number with one dispatcher per shift, so calls have an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "one call-intake line routing WhatsApp and calls into a dispatch log with time stamps for call, dispatch, arrival and clear.",
+        "tool_words": []
+      },
+      "ask_first": "How many dispatchers work at peak?",
+      "free_stops": "Routing and log design are in the solution document."
+    },
+    {
+      "id": "p2_no_dashboard",
+      "n": 2,
+      "words": "Dispatcher doesn't know which vehicle is free right now",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Keep a whiteboard of vehicle statuses updated by crews, so the dispatcher sees them",
+        "Agree a few simple statuses, so updates mean the same."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "integration — a live fleet board showing each vehicle as available, on trip, restocking or off-road, using your existing GPS trackers.",
+        "tool_words": [
+          "integration"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "Do all vehicles have trackers?",
+      "free_stops": "Tracker connection is mapped in the solution document."
+    },
+    {
+      "id": "p3_theft_internal",
+      "n": 3,
+      "words": "Drivers take personal detours and the km don't add up",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Compare a week of register km with tracker data, so gaps are measured",
+        "Tell crews openly that km will be checked, so expectations are clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a trip sheet on the driver's phone with start and end km and times, checked against the tracker with exceptions flagged daily.",
+        "tool_words": []
+      },
+      "ask_first": "Who looks at the tracker data now?",
+      "free_stops": "Exception rules are in the solution document."
+    },
+    {
+      "id": "p4_fraud",
+      "n": 4,
+      "words": "Fuel cards are misused",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Match last month's fuel slips against km travelled per vehicle, so outliers show",
+        "Keep fuel cards with the vehicle log, so each fill is linked to a trip."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a fuel log reconciled with km per vehicle, with exceptions flagged.",
+        "tool_words": []
+      },
+      "ask_first": "Is fuel paid by card, cash or pump account?",
+      "free_stops": "Reconciliation method is in the solution document."
+    },
+    {
+      "id": "p5_maintenance_downtime",
+      "n": 5,
+      "words": "Vehicles go off-road for weeks because nobody schedules servicing",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List each vehicle's last service date and km, so overdue ones are visible",
+        "Book the next service for the most overdue, so one is fixed now."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a maintenance scheduler with service-due alerts by km and date and off-road reasons logged.",
+        "tool_words": []
+      },
+      "ask_first": "How many vehicles are off-road today?",
+      "free_stops": "Service intervals are set with your mechanic in the solution document."
+    },
+    {
+      "id": "p6_checklists_not_done",
+      "n": 6,
+      "words": "Oxygen cylinders aren't refilled after a trip",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Check every vehicle's restock once, so you know the current gap",
+        "Make the crew lead sign off restock before the vehicle is marked available, so it has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "stock_alerts — a post-trip restock checklist on the phone with oxygen and consumables counts, signed off by role.",
+        "tool_words": []
+      },
+      "ask_first": "Who restocks vehicles now?",
+      "free_stops": "Checklist items come from your medical lead; the flow is in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Hospitals and insurers pay trip bills months late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List unpaid trips by customer with age, so the oldest are clear",
+        "Send each customer one statement, so the balance is agreed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "trip billing with invoices and receivables ageing per customer, with scheduled reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Do you bill per trip, per km or by contract?",
+      "free_stops": "Billing rules are in the solution document."
+    },
+    {
+      "id": "p8_cash_handling_risk",
+      "n": 8,
+      "words": "Cash collected by crews reaches the office late or short",
+      "category": "cash_collections",
+      "subtype": "cash_handling_risk",
+      "quick_ideas": [
+        "Match a week of cash trips with cash received, so gaps are sized",
+        "Set one hand- in time per shift, so cash doesn't sit with crews."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "daily crew cash close against trips billed as cash, flagging gaps.",
+        "tool_words": []
+      },
+      "ask_first": "How often do crews hand in cash now?",
+      "free_stops": "Hand-in steps are in the solution document."
+    },
+    {
+      "id": "p9_shift_scheduling",
+      "n": 9,
+      "words": "Crew rosters fall apart when someone calls in sick",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Keep a standby list for each shift, so cover is ready",
+        "Record sick calls and cover time, so patterns show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a crew roster with sick-call cover requests and an overtime log.",
+        "tool_words": []
+      },
+      "ask_first": "How many crews run per shift?",
+      "free_stops": "Cover rules are in the solution document."
+    },
+    {
+      "id": "p10_licences_renewals",
+      "n": 10,
+      "words": "Vehicle fitness, insurance and permits expire without warning",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List every vehicle's renewal dates, so the nearest are visible",
+        "Set reminders for those, so none slip."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a compliance calendar for fitness, insurance, permits and equipment certificates with reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Who tracks renewals today?",
+      "free_stops": "Reminder schedule is in the solution document; requirements are for the licensing authority."
+    }
+  ],
+  "never_say": [
+    "Any clinical, first-aid, triage or transport-protocol advice. That pi can dispatch or arrange an ambulance; for a live emergency, call 1122/115, 998/999 or 911. Help falsifying trip sheets, inflating km or running unlicensed vehicles. Interpretations of ambulance-service regulations. Ideas that record patient names, addresses or conditions, or staff licence numbers. Covert tracking of staff; checks should be known to crews."
+  ],
+  "sample_reply": {
+    "person": "Fuel ka kharcha har mahine barh raha hai aur trips utni hi hain. Lagta hai drivers gaari personal kaam ke liye use karte hain. Koi hal?",
+    "pi": "Ji, is ka hal mumkin hai aur shuruat isi hafte ho sakti hai. 1 Ek hafte ke register km ko tracker data se milayein, taake farq saamne aa jaye. 2 Crew ko saaf bata dein ke km check honge, taake sab ko pata ho. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: driver ke phone pe trip sheet, tracker aur fuel se roz ka milaan, aur har farq ka alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

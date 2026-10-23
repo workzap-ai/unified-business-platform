@@ -1,0 +1,219 @@
+{
+  "industry": "hotels",
+  "name": "Hotels",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_software_not_connected",
+      "n": 1,
+      "words": "Booking.com shows rooms we've already sold to walk-ins",
+      "category": "tech_systems",
+      "subtype": "software_not_connected",
+      "quick_ideas": [
+        "Make one person per shift responsible for closing walk-in rooms on the OTAs, so it isn't left to whoever is busy",
+        "Hold one room back from the OTAs on your next peak night, so a late update doesn't become a double booking."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "a room board where a walk-in sold at the desk closes the room on every channel automatically, with a clash alert and a weekly count of near-misses.",
+        "tool_words": []
+      },
+      "ask_first": "Do you use a channel manager now, or does someone update each OTA by hand?",
+      "free_stops": "The way the room board and OTA feed connect, and the clash rules, go in the solution document."
+    },
+    {
+      "id": "p2_cash_mismatch",
+      "n": 2,
+      "words": "Cash at reception never matches what the register says",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Count the cash together with the incoming shift at handover, so any gap belongs to one shift",
+        "Ask for a photo of the signed count each shift, so you see a mismatch the same day, not at month end."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a shift handover on the phone that matches cash, card and open folios against the register every shift and flags gaps to the owner automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many shifts run at the desk in 24 hours?",
+      "free_stops": "The handover fields, mismatch rules and how card and folio totals are pulled in stay for the solution document."
+    },
+    {
+      "id": "p3_discount_abuse",
+      "n": 3,
+      "words": "Front desk gives discounts to friends and I only find out at month end",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Tell the desk that any discount outside the usual rates needs your OK before check-in, so nothing is given silently",
+        "Go through last month's discounted nights once to see who gave them and why."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a discount request the desk sends from the phone, approved with one tap, with every approval logged and totalled by agent each morning.",
+        "tool_words": []
+      },
+      "ask_first": "Who besides you can approve a lower rate today?",
+      "free_stops": "The approval levels and the daily discount report layout are set out in the solution document."
+    },
+    {
+      "id": "p4_handoffs",
+      "n": 4,
+      "words": "Rooms aren't ready by check-in because housekeeping doesn't know which are vacated",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Have the desk tell housekeeping the moment a key comes back, so cleaning starts on vacated rooms first",
+        "Share tomorrow's expected check-outs with housekeeping tonight, so they can plan the morning."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a housekeeping app where check-out, cleaned and inspected statuses flow to the desk automatically, with turnaround time measured per room and per shift.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Roughly how many rooms turn over on a busy day?",
+      "free_stops": "The status flow, who taps what, and the turnaround reporting stay for the solution document."
+    },
+    {
+      "id": "p5_maintenance_downtime",
+      "n": 5,
+      "words": "Guests complain about AC, hot water and locks, and maintenance only hears from reviews",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Keep one maintenance book at the desk where every complaint is written and signed off when fixed, so nothing is lost between shifts",
+        "Walk the rooms once this week with maintenance to list faults before guests find them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "maintenance tickets raised from the desk or housekeeping with a photo, assigned automatically, closed only when the desk confirms, with time-to-fix measured.",
+        "tool_words": []
+      },
+      "ask_first": "Is maintenance in-house or a contractor you call?",
+      "free_stops": "Ticket categories, assignment rules and the downtime report are detailed in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Corporate clients stay on credit and pay three months later",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every corporate account with what it owes and how old each bill is, so you know where to start",
+        "Check that list before confirming new bookings for an account that is already behind."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a corporate ledger with ageing per client and automatic monthly statements and reminders, without anyone remembering to send them.",
+        "tool_words": []
+      },
+      "ask_first": "How many corporate accounts are on credit right now?",
+      "free_stops": "Credit limits, reminder timing and statement format go in the solution document."
+    },
+    {
+      "id": "p7_owner_blind",
+      "n": 7,
+      "words": "Night shift is a black box",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Ask the night agent for one short end-of-shift update covering occupancy, cash and any incident, so mornings start with facts",
+        "Read last week's night entries in one sitting to see what keeps repeating."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read on WhatsApp built automatically from the night's data: occupancy, average rate, revenue by channel, cash and discounts, with the one thing to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "What do you look at first each morning now?",
+      "free_stops": "Which numbers go in the read and where each is pulled from is in the solution document."
+    },
+    {
+      "id": "p8_chat_overload",
+      "n": 8,
+      "words": "Half our WhatsApp rate enquiries go unanswered",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Give one person per shift clear ownership of the WhatsApp number, so enquiries never sit unseen",
+        "Go back through this week's unanswered chats once and reply, to see how many were real bookings."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "and website_digital — a WhatsApp booking flow that answers common questions, takes dates and a deposit, and flags any enquiry left unanswered, measured daily.",
+        "tool_words": []
+      },
+      "ask_first": "Do most enquiries come from guests or from travel agents?",
+      "free_stops": "The booking flow, answers and follow-up rules are designed in the solution document."
+    },
+    {
+      "id": "p9_shrinkage_theft",
+      "n": 9,
+      "words": "Linen and towels keep disappearing",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Do one full linen count by floor this week, so you know what you actually have",
+        "Count what goes to and comes back from the laundry on the next run, to see where it disappears."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a linen tracker with par levels per floor and laundry out and in counts, alerting automatically when stock falls or returns don't match.",
+        "tool_words": []
+      },
+      "ask_first": "Is laundry done in-house or by a vendor?",
+      "free_stops": "Par levels and the count routine are set in the solution document."
+    },
+    {
+      "id": "p10_forecasting",
+      "n": 10,
+      "words": "Group and wedding blocks get released at the last minute",
+      "category": "planning_growth",
+      "subtype": "forecasting",
+      "quick_ideas": [
+        "Put a release date on every block you currently hold, so rooms go back to sale on time",
+        "Check pickup with each organiser once before that date."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a group block tracker that reminds organisers and the desk automatically and shows pickup against each block.",
+        "tool_words": []
+      },
+      "ask_first": "Do you take a deposit when you hold a block?",
+      "free_stops": "Release and reminder timing per block type stays for the solution document."
+    }
+  ],
+  "never_say": [
+    "What must be filed for guest registration, C-forms or police and tourism reporting. Advice on tourism or municipality fees, tax treatment, licensing or star classification. Fire, gas, lift or electrical safety guidance; in live danger, call 15/1122 PK, 999/997/998 UAE or 911 (Canada). Help with unrecorded room sales, unregistered guests or splitting bills to reduce tax. Interpretation of OTA or management contracts. Any suggestion of monitoring guests or staff in rooms."
+  ],
+  "sample_reply": {
+    "person": "Walk-in aata hai to Booking.com pe room khula reh jata hai, weekend pe double booking ho jati hai. Iska koi hal batao.",
+    "pi": "Ji, is ka hal bilkul mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Har shift mein ek banda zimmedar ho jo walk-in ke baad OTAs pe room band kare, taake yeh kisi ki yaad par na chhora jaye. 2 Agli weekend ki raat ek room OTAs se rok kar rakhein, taake der se update hone par double booking na bane. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: desk pe room bikte hi har channel pe band ho jaye aur clash par foran alert aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

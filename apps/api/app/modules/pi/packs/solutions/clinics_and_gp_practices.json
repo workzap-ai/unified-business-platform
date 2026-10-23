@@ -1,0 +1,238 @@
+{
+  "industry": "clinics_and_gp_practices",
+  "name": "Clinics and GP practices",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_booking_appointments",
+      "n": 1,
+      "words": "Patients book on WhatsApp and half of them never turn up",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Send tomorrow's booked patients a one-time confirmation of time and place, so cancellations surface the night before",
+        "Mark every no-show in the register for a week, so you can see which sessions suffer most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "doctor-wise WhatsApp booking that sends reminders automatically every day, takes confirm and cancel replies, fills freed slots from a waitlist and tracks no- shows by doctor and branch, with no medical details in any message.",
+        "tool_words": []
+      },
+      "ask_first": "Are most of your no-shows in the morning sessions or the evening clinic?",
+      "free_stops": "The reminder timing, wording and waitlist rules are set out in the solution document."
+    },
+    {
+      "id": "p2_capacity",
+      "n": 2,
+      "words": "Mornings the waiting area is packed and by 3pm it's empty",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Count tokens issued per hour for one week, so the real peak is on paper rather than a feeling",
+        "Book follow-up visits into the quiet afternoon, so the morning is kept for new patients."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "dashboards_reports — a live queue board showing waiting count and average wait per doctor with no patient identifiers, plus a daily view of visits by hour across branches.",
+        "tool_words": []
+      },
+      "ask_first": "Is the morning rush mostly walk-ins or booked patients?",
+      "free_stops": "How slots are re-shaped per doctor and how the board is set up stays for the solution document."
+    },
+    {
+      "id": "p3_cash_mismatch",
+      "n": 3,
+      "words": "Cash at the counter never matches the number of parchis",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Do one shift close by matching the last parchi number against cash, card and panel visits, so you see the size of the gap",
+        "Have two people sign that close, so no single person carries the count."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily close on the phone that matches visits issued against cash, card and panel totals by shift and receptionist role, at every branch, and flags gaps to the owner each evening.",
+        "tool_words": []
+      },
+      "ask_first": "How many front-desk shifts do you run in a day?",
+      "free_stops": "The close format and the rules for what counts as a variance go in the solution document."
+    },
+    {
+      "id": "p4_discount_abuse_free_visits",
+      "n": 4,
+      "words": "Receptionist gives free follow-ups to people she knows",
+      "category": "loss_security",
+      "subtype": "discount_abuse_free_visits",
+      "quick_ideas": [
+        "Write down which visits are free and for how long, so the rule is clear to everyone",
+        "Ask for a reason against each free visit this week, so you can see how often it happens."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an approval log where every free or discounted visit needs a reason and sign-off from a set role, with a weekly total per branch sent to the owner.",
+        "tool_words": []
+      },
+      "ask_first": "Who is allowed to approve a free visit today?",
+      "free_stops": "The approval levels and reporting layout are kept for the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Insurance claims keep coming back rejected and nobody tracks why",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List this month's rejected claims by reference with the reason given, so the most common gap shows up",
+        "Give one person ownership of resubmissions, so nothing waits for whoever is free."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "dashboards_reports — a claims tracker showing submitted, pending, rejected with reason, resubmitted and paid, with ageing by payer updated daily and no patient health details on screen.",
+        "tool_words": []
+      },
+      "ask_first": "Is claim billing done by your own staff or an outside biller?",
+      "free_stops": "The status flow and payer-wise reports are detailed in the solution document."
+    },
+    {
+      "id": "p6_credit_customers",
+      "n": 6,
+      "words": "Panel companies pay us three, four months late",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Send each panel company one statement of its open balance, so the amount is agreed on both sides",
+        "Note how long each company actually takes to pay, so renewals are discussed with facts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a panel ledger that issues monthly statements automatically, tracks balances per company and sends reminders to each panel's accounts contact on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many panel companies do you work with?",
+      "free_stops": "Statement timing and reminder sequence are set in the solution document."
+    },
+    {
+      "id": "p7_commission_disputes",
+      "n": 7,
+      "words": "The visiting consultant says we owe him more than our register shows",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Put each visiting doctor's agreed fee-share rule on one page both sides sign, so there is one reference",
+        "Share this week's visit count with each consultant, so differences come up early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a payout calculator that applies each doctor's rules to recorded visits and procedures and produces a month-end statement both sides can check.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is the share worked on visits, on fees collected, or both?",
+      "free_stops": "How the rules are captured and edge cases handled stays for the solution document."
+    },
+    {
+      "id": "p8_stockout",
+      "n": 8,
+      "words": "We run out of gloves, syringes and strips and find out mid-clinic",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Do one count of your top consumables and mark a minimum level on the shelf, so low stock is visible",
+        "Pull out anything near expiry in the procedure room, so it is used first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a consumables register with minimum levels and expiry dates that sends reorder and near-expiry alerts to the purchasing role at every branch.",
+        "tool_words": []
+      },
+      "ask_first": "Who places orders with the supplier at the moment?",
+      "free_stops": "The minimum levels and alert rules are worked out in the solution document."
+    },
+    {
+      "id": "p9_whatsapp_overload",
+      "n": 9,
+      "words": "Clinic WhatsApp number has hundreds of unread messages",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Clear the backlog once by sorting messages into bookings, billing and complaints, so you see what people actually want",
+        "Give one person fixed reply times, so messages have an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "workflow_automation — a shared inbox that tags every message, tracks response time, answers routine logistics and routes anything urgent to staff with an emergency- number notice.",
+        "tool_words": []
+      },
+      "ask_first": "How many people reply from the clinic number now?",
+      "free_stops": "The tags, routing and automatic answers are designed in the solution document."
+    },
+    {
+      "id": "p10_reviews_bad",
+      "n": 10,
+      "words": "Patients complain on Google that they waited two hours",
+      "category": "customers_retention",
+      "subtype": "reviews_bad",
+      "quick_ideas": [
+        "Reply politely to recent reviews without mentioning any visit details, so readers see the clinic cares",
+        "Tell waiting patients when a doctor is running late, so the wait is expected."
+      ],
+      "workzap_build": {
+        "keys": [
+          "reviews_collection"
+        ],
+        "text": "a feedback request after each visit, sent with the patient's permission, that routes unhappy replies to the manager and invites satisfied patients to leave a real review.",
+        "tool_words": []
+      },
+      "ask_first": "Are most complaints about the evening clinic?",
+      "free_stops": "Timing and routing of the feedback request are set in the solution document."
+    },
+    {
+      "id": "p11_no_dashboard",
+      "n": 11,
+      "words": "I don't know which doctor actually brings in the money",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Total last month's visits and fees by doctor and shift once, so you have a starting picture",
+        "Compare the evening clinic's takings with its staff cost for that month, so you know where you stand."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read on the owner's phone with visits by doctor, branch and shift, revenue by cash, panel and insurance, and the one number to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you run one branch or more?",
+      "free_stops": "Which numbers appear and how they are pulled is set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about diagnoses, prescriptions, referrals or whether a doctor's decision was right. Suggestions to adjust claim codes, back-date visits or issue sick notes without a visit. Interpretations of DHA, DOH, MOHAP, PMDC or provincial college rules; point to the regulator or an adviser. Ideas that put a patient's name with a condition, test or result in any message. Who is right in a doctor-pay dispute. Promises that waiting times or no-shows will fall by any amount."
+  ],
+  "sample_reply": {
+    "person": "Bhai shaam ko clinic mein bohat rush hota hai, log do do ghante wait karte hain aur phir Google pe ganday reviews. Koi hal batao.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruat isi hafte ki ja sakti hai. 1 Ek hafte tak har ghante ke tokens likhein, taake asal rush ka waqt saamne aa jaye. 2 Doctor late hon to reception waiting patients ko bata de, taake log bina khabar ke na baithe rahein. Workzap yeh sab aap ke liye khud-ba-khud bana sakta hai: WhatsApp booking, reminders aur har doctor ki waiting dikhane wala board, roz ke hisaab ke saath aur bina kisi patient ki detail ke. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

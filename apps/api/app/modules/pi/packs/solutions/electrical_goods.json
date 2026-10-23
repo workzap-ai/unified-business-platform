@@ -1,0 +1,202 @@
+{
+  "industry": "electrical_goods",
+  "name": "Electrical goods (fans, cables, switches, lighting)",
+  "sector": "7.D Manufacturing and industry (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_seasonal_planning",
+      "n": 1,
+      "words": "Before summer everyone wants fans and we can't produce enough",
+      "category": "planning_growth",
+      "subtype": "seasonal_planning",
+      "quick_ideas": [
+        "Look back at last season's sales by model and week — shows when demand really starts",
+        "Set a target stock by model before the season — turns guesses into a plan."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a seasonal build plan by model and week with progress against plan every day.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "When do you start building stock for the season?",
+      "free_stops": "How targets are set from history is in the solution document."
+    },
+    {
+      "id": "p2_overstock_dead_stock",
+      "n": 2,
+      "words": "After summer, thousands of fans sit in the warehouse",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "List leftover stock by model and age — shows what to clear first",
+        "Offer dealers early-order terms for next season's carry-over — moves stock sooner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "stock cover by model with alerts when production is running ahead of sales late in the season.",
+        "tool_words": []
+      },
+      "ask_first": "What happened to leftover stock last year?",
+      "free_stops": "Cover levels and alert timing are in the solution document."
+    },
+    {
+      "id": "p3_price_increases_supplier",
+      "n": 3,
+      "words": "Copper prices jump and my cable price list is wrong overnight",
+      "category": "margin_cost",
+      "subtype": "price_increases_supplier",
+      "quick_ideas": [
+        "Put an issue date on every price list — dealers know which one is current",
+        "Recost your top cable sizes at today's copper rate — shows where you're losing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "one live price list per dealer tier, sent to dealers automatically when copper rates change.",
+        "tool_words": []
+      },
+      "ask_first": "How do dealers find out about new prices today?",
+      "free_stops": "Pricing rules and the publishing set-up are in the solution document."
+    },
+    {
+      "id": "p4_after_sales",
+      "n": 4,
+      "words": "Warranty claims come back but we can't tell if they're real",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "Start recording the serial and dispatch dealer for every unit — gives you a date to check claims against",
+        "Ask for photos with each claim — screens out obvious misuse."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a warranty claim app where dealers scan the serial and upload photos, checked against dispatch records.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Are serial numbers printed on every unit?",
+      "free_stops": "The serial capture and claim-check rules are in the solution document."
+    },
+    {
+      "id": "p5_fraud",
+      "n": 5,
+      "words": "Dealers send back fakes with our name for repair",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Keep a few genuine and fake samples side by side for your service desk — staff learn the differences",
+        "Record where fakes are showing up — shows which areas need attention."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a genuine-product check where a code on the box can be verified on WhatsApp by dealers or customers.",
+        "tool_words": []
+      },
+      "ask_first": "Which areas are fakes showing up in?",
+      "free_stops": "The code system design is in the solution document."
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "Each dealer has a different discount and nobody remembers what was promised",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Write every dealer's agreed discount in one list — ends \"I was promised\"",
+        "Group dealers into a few tiers — makes it simpler to manage."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a dealer ledger with tier, discount, scheme and credit on one record, applied automatically to orders.",
+        "tool_words": []
+      },
+      "ask_first": "How many active dealers do you have?",
+      "free_stops": "Tier rules are worked out in the solution document."
+    },
+    {
+      "id": "p7_orders_lost",
+      "n": 7,
+      "words": "Sales reps take orders on WhatsApp and some never reach the factory",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Make one order number the only channel — nothing gets lost in personal chats",
+        "Confirm every order back to the rep — catches misses the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a rep order app feeding one order book, with status sent back to the rep.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many reps are in the field?",
+      "free_stops": "The order flow is in the solution document."
+    },
+    {
+      "id": "p8_slow_response",
+      "n": 8,
+      "words": "Service centre tickets are in a register and nobody follows up",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Go through open tickets once and close or chase each one — clears the backlog",
+        "Note fault type per model — shows which models fail most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a service ticket tracker with turnaround time and repeat faults by model.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many tickets come in during the season?",
+      "free_stops": "The ticket flow and reports are in the solution document."
+    },
+    {
+      "id": "p9_reports_late",
+      "n": 9,
+      "words": "I don't know daily sales by region until month-end",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "Ask for a weekly regional total — gets you closer than month-end",
+        "Choose the few numbers you want daily — keeps it focused."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read of sales by region and model, stock cover, warranty claims and receivables.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Where is sales data entered today?",
+      "free_stops": "Which figures feed the daily read is in the solution document."
+    }
+  ],
+  "never_say": [
+    "No electrical safety, wiring, load-rating or certification advice. Never say a product meets or fails a standard. Never help put false certification marks, fake ratings or another brand's name on products; decline. Shocks, electrical fires or burns: stop and point to emergency services. Never help dispose of stolen copper or under-invoice imports; decline. No customer or electrician names or numbers in registers; roles only."
+  ],
+  "sample_reply": {
+    "person": "Koi hal batao. Summer mein pankhay pooray nahi hotay aur September ke baad godown bhara hota hai.",
+    "pi": "Ji, is ka hal mumkin hai, aur pichle season ka data hi kaafi madad karega. 1 Pichle saal ki sales model aur hafte ke hisaab se dekhein, taake pata chale demand asal mein kab shuru hoti hai. 2 Season se pehle har model ka stock target tay karein, taake planning andaze se na ho. Workzap yeh aap ke liye khud-ba- khud chala sakta hai: model-wise season build plan jo roz dikhaye ke plan ke muqable kahan khade hain. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

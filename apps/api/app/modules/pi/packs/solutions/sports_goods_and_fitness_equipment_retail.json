@@ -1,0 +1,226 @@
+{
+  "industry": "sports_goods_and_fitness_equipment_retail",
+  "name": "Sports goods and fitness equipment retail",
+  "sector": "7.A Retail and consumer (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_order_errors",
+      "n": 1,
+      "words": "Team kit orders come with names and numbers on WhatsApp and we print them wrong",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Get the coach to confirm the final list before printing, because most errors come from handwritten photos",
+        "Note the cause of last season's misprints, because it shows where mistakes begin."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "job_tracking"
+        ],
+        "text": "the coach fills sizes, names and numbers through a link, approves a proof, and the kit is tracked from printing to delivery.",
+        "tool_words": []
+      },
+      "ask_first": "How many team orders come in a month?",
+      "free_stops": "the order form and proof-approval flow are kept for the solution document."
+    },
+    {
+      "id": "p2_stockout",
+      "n": 2,
+      "words": "We always run out of middle sizes in shoes and jerseys",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Check which sizes sold out first last season, because it shows your real size curve",
+        "Order by that curve instead of equal sizes, because odd sizes are what get left."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "size-matrix stock (style, size, colour) with reorder alerts by size.",
+        "tool_words": []
+      },
+      "ask_first": "How do you track sizes today?",
+      "free_stops": "the size curve and reorder rules go in the solution document."
+    },
+    {
+      "id": "p3_delivery_late",
+      "n": 3,
+      "words": "Treadmill delivery and installation are scheduled on a paper diary",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Put every pending delivery on one list with the promised date, because late ones become visible",
+        "Have technicians report back after each install, because the shop often doesn't know it's done."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "field_checks"
+        ],
+        "text": "an installation scheduler with technician job cards, photos and customer sign-off on phone.",
+        "tool_words": []
+      },
+      "ask_first": "Who delivers and installs, your own team or outside?",
+      "free_stops": "scheduling rules and the sign-off flow are kept for the solution document."
+    },
+    {
+      "id": "p4_after_sales",
+      "n": 4,
+      "words": "Customers call about broken machines and service requests get lost",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "List every open service request and warranty claim with its date, because it shows what's overdue",
+        "Make one person own service calls, because shared phones lose them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a service and warranty tracker with brand claim status and customer updates.",
+        "tool_words": []
+      },
+      "ask_first": "Do you handle repairs or send them to the brand?",
+      "free_stops": "the service flow and claim tracking are detailed in the solution document."
+    },
+    {
+      "id": "p5_maintenance_downtime",
+      "n": 5,
+      "words": "Gyms on AMC call and we don't know when the last visit was",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List every AMC customer with their last visit date, because it shows who is due",
+        "Note parts used on each visit, because it explains costs later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling",
+          "job_tracking"
+        ],
+        "text": "an AMC register with visit schedule, parts used and automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How many gyms are on AMC?",
+      "free_stops": "the visit planning setup is kept for the solution document."
+    },
+    {
+      "id": "p6_credit_customers",
+      "n": 6,
+      "words": "Schools and academies buy on credit and pay late",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Total what each institution owes and for how long, because it shows who to chase first",
+        "Agree credit limits before the season, because they're easier set early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an institutional credit ledger with ageing and automatic WhatsApp reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How long do they usually take to pay?",
+      "free_stops": "limits and reminder timing go in the solution document."
+    },
+    {
+      "id": "p7_supplier_late",
+      "n": 7,
+      "words": "Cricket season stock arrives after the season starts",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_late",
+      "quick_ideas": [
+        "Write down when last season's stock arrived against when you needed it, because it shows the real lead time",
+        "Order earlier for your biggest lines, because the season doesn't wait."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "a seasonal buying planner from past sales by month, with order-by reminders.",
+        "tool_words": [],
+        "reordered_from": [
+          "dashboards_reports",
+          "stock_alerts"
+        ]
+      },
+      "ask_first": "Do you buy locally, from Sialkot, or import?",
+      "free_stops": "the buying calendar is worked out in the solution document."
+    },
+    {
+      "id": "p8_multi_channel_orders",
+      "n": 8,
+      "words": "Website shows items out of stock in the shop",
+      "category": "orders_fulfilment",
+      "subtype": "multi_channel_orders",
+      "quick_ideas": [
+        "Check your top items across shop and online once, because it shows how far apart they are",
+        "Make one person own stock numbers, because otherwise nobody updates."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "unified online and shop stock so sizes sold in one place disappear from the other.",
+        "tool_words": []
+      },
+      "ask_first": "Which online channels do you sell on?",
+      "free_stops": "channel connections are kept for the solution document."
+    },
+    {
+      "id": "p9_discount_abuse",
+      "n": 9,
+      "words": "Discounts given to coaches and clubs aren't tracked",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Review a month of discounts by customer type, because it shows what's really given away",
+        "Agree set rates for coaches and clubs, because case-by-case deals drift."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "dashboards_reports"
+        ],
+        "text": "discount rules by customer type with approval above limits and a monthly report.",
+        "tool_words": []
+      },
+      "ask_first": "Who can give discounts today?",
+      "free_stops": "rates and approval routing go in the solution document."
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "We can't tell which brand or category makes money",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out margin on your top few items including delivery, because heavy items often lose money",
+        "Separate delivery cost from the sale price, because it hides inside totals."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "margin by brand and category including delivery, updated monthly.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you charge delivery separately?",
+      "free_stops": "the margin model is set up in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any training, injury, fitness, supplement or nutrition advice. Safety or liability judgements about equipment; if someone was injured, point to medical help or emergency services. Advice on product safety certification; say \"check with your adviser\". Help selling counterfeit branded goods or relabelling items. Help with under-invoiced imports or fake invoices for clubs or schools."
+  ],
+  "sample_reply": {
+    "person": "Club ke kit orders WhatsApp pe haath se likhi list ki photo mein aate hain aur printing mein naam number ghalat ho jaate hain. Koi hal?",
+    "pi": "Ji haan, is ka seedha hal hai. 1. Printing se pehle coach se final list confirm karwa lein, kyun ke zyada tar ghaltiyan haath se likhi photo se aati hain. 2. Pichle season ki ghalat printing ki wajah likh lein, taake pata chale ghalti kahan se shuru hoti hai. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai: coach ek link pe size, naam aur number bhare, proof approve kare aur kit printing se delivery tak track ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

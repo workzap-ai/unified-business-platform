@@ -1,0 +1,216 @@
+{
+  "industry": "equestrian_stables_and_riding_clubs",
+  "name": "Equestrian, stables and riding clubs",
+  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_booking_appointments",
+      "n": 1,
+      "words": "Lessons booked on WhatsApp get double-booked",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Take bookings on one number only",
+        "Keep one shared schedule instead of a whiteboard and two phones."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "lesson booking with instructor and horse assigned, blocking double bookings and sending confirmations automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who takes bookings now?",
+      "free_stops": "The booking rules and confirmation flow go in the solution document."
+    },
+    {
+      "id": "p2_capacity",
+      "n": 2,
+      "words": "Same horses used too many lessons a day, no record",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Note how many sessions each horse does a day",
+        "Agree a limit per horse with your instructor and vet."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a horse workload tracker that counts sessions per horse and stops bookings past the stable's own limit.",
+        "tool_words": []
+      },
+      "ask_first": "How many horses are used for lessons?",
+      "free_stops": "How limits are applied to bookings stays in the solution document."
+    },
+    {
+      "id": "p3_complaints",
+      "n": 3,
+      "words": "Instructors cancel last minute and parents get angry",
+      "category": "customers_retention",
+      "subtype": "complaints",
+      "quick_ideas": [
+        "Keep a note of every cancellation and who made it",
+        "Have a standby instructor for busy days."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "customer_messaging — an instructor schedule with a cancellation log and automatic messages to affected parents.",
+        "tool_words": []
+      },
+      "ask_first": "How often do cancellations happen in a month?",
+      "free_stops": "The cancellation process and messaging go in the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "Livery owners pay late and we keep feeding their horses",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Send each owner a clear monthly statement",
+        "Agree one due date for everyone."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "livery billing with balances and reminders sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many horses are on livery?",
+      "free_stops": "Reminder timing and statement layout are set out in the solution document."
+    },
+    {
+      "id": "p5_unbilled_work",
+      "n": 5,
+      "words": "Extras for livery horses (farrier, vet, transport) never get billed",
+      "category": "sales_revenue",
+      "subtype": "unbilled_work",
+      "quick_ideas": [
+        "Note each extra the day it happens",
+        "Add the month's extras to the livery bill."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "credit_ledger — extras logged as they happen and added to each owner's invoice automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who arranges the farrier and vet visits?",
+      "free_stops": "How extras are logged and invoiced stays in the solution document."
+    },
+    {
+      "id": "p6_prepaid_balance_tracking",
+      "n": 6,
+      "words": "Package lessons used up but nobody tracks the balance",
+      "category": "cash_collections",
+      "subtype": "prepaid_balance_tracking",
+      "quick_ideas": [
+        "Keep a count of lessons used per package",
+        "Tell parents when a few lessons are left."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "loyalty_repeat — package balances that update with every lesson, with renewal reminders sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Do most riders pay per lesson or in packages?",
+      "free_stops": "The balance and renewal rules go in the solution document."
+    },
+    {
+      "id": "p7_stockout",
+      "n": 7,
+      "words": "Hay and shavings run out unexpectedly",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Count hay and bedding once a week",
+        "Note how long a delivery usually lasts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "hay, feed and bedding stock with reorder alerts and cost per horse kept automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who orders hay and bedding now?",
+      "free_stops": "Reorder points and the cost view are set out in the solution document."
+    },
+    {
+      "id": "p8_checklists_not_done",
+      "n": 8,
+      "words": "Daily care checklists aren't done when I'm away",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Write the daily routine down once, the way you already run it",
+        "Ask for a photo when each block is done."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a daily care checklist per stable block with timestamps and photos, flagging missed items automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many grooms work each day?",
+      "free_stops": "The checklist and flag rules stay in the solution document."
+    },
+    {
+      "id": "p9_seasonal_dip",
+      "n": 9,
+      "words": "Summer in Dubai, lessons drop to almost nothing",
+      "category": "sales_revenue",
+      "subtype": "seasonal_dip",
+      "quick_ideas": [
+        "Look at early-morning or indoor sessions and school-holiday camps",
+        "Get in touch with past riders, with their permission, before the season turns."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "messages to past riders and parents sent automatically ahead of camps and the new season.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have an indoor or covered arena?",
+      "free_stops": "Timing and audience for the messages go in the solution document."
+    },
+    {
+      "id": "p10_documentation",
+      "n": 10,
+      "words": "Waivers and rider forms are paper and some are missing",
+      "category": "compliance_admin",
+      "subtype": "documentation",
+      "quick_ideas": [
+        "Check which current riders have no form on file",
+        "For what the forms should say, talk to your lawyer or insurer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "digital rider forms tied to each booking, with missing forms flagged before the lesson.",
+        "tool_words": []
+      },
+      "ask_first": "Where are forms kept today?",
+      "free_stops": "The form flow and booking checks stay in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any veterinary, farrier, feeding, medication, training or riding-technique advice, or any view on whether a horse is fit to ride or compete. Anything that helps with doping, false passports or microchips, illegal import or export, or hiding injuries. Children's names, schools or photos; riders are recorded by role and age group only. Legal or insurance advice on waivers; anything to do with gambling on events. Promised booking or income levels."
+  ],
+  "sample_reply": {
+    "person": "We have a riding school in Lahore with 18 horses, mostly kids. Weekend bookings are chaos and some horses end up doing six lessons. What can we do?",
+    "pi": "Yes, both of these can be sorted, starting this weekend. 1. Bring all bookings into one shared schedule on one number, so the same slot can't be given twice. 2. Agree a daily limit per horse with your instructor and vet, and keep a count against it. Workzap can do this automatically for you: lesson booking that assigns instructor and horse, blocks double bookings and stops any horse going past its limit. Shall I put together a solution document and quote for you, or would you rather not?",
+    "language": "english"
+  }
+}

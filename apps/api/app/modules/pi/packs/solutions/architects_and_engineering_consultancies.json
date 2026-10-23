@@ -1,0 +1,219 @@
+{
+  "industry": "architects_and_engineering_consultancies",
+  "name": "Architects and engineering consultancies",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_scope_creep",
+      "n": 1,
+      "words": "Clients ask for endless changes and we don't charge for them",
+      "category": "margin_cost",
+      "subtype": "scope_creep",
+      "quick_ideas": [
+        "Log every extra request with a rough effort estimate",
+        "Raise it with the client before starting the work."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A scope-change log with effort estimate, client approval and additional fee, tracked for every project.",
+        "tool_words": []
+      },
+      "ask_first": "When a client asks for extra work, what happens?",
+      "free_stops": "The approval flow and fee link are in the solution document."
+    },
+    {
+      "id": "p2_margin_unknown",
+      "n": 2,
+      "words": "We have no idea how many hours each project actually takes",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Ask the team to log hours by project for one week",
+        "Compare that week against the fee for the largest project."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "Simple timesheets on phone or web by project and stage, with fee used against budget shown every day.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How are timesheets filled in today?",
+      "free_stops": "Timesheet structure and fee-burn alerts are in the solution document."
+    },
+    {
+      "id": "p3_invoicing_delays",
+      "n": 3,
+      "words": "Stage invoices go out late because nobody tells accounts",
+      "category": "cash_collections",
+      "subtype": "invoicing_delays",
+      "quick_ideas": [
+        "List all stages completed but not yet invoiced",
+        "Make marking a stage complete the trigger to tell accounts the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A project register where completing a stage raises the invoice task automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who decides a stage is complete?",
+      "free_stops": "Stage definitions and invoice triggers are in the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "Clients pay design fees months late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Put all unpaid fees in one list by age",
+        "Name one person to follow up each week."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Fee receivables with ageing and reminders on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "How long do clients take to pay?",
+      "free_stops": "Reminder timing and escalation are in the solution document; fee disputes go to a lawyer."
+    },
+    {
+      "id": "p5_capacity",
+      "n": 5,
+      "words": "Some staff are overloaded while others have little to do",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Map each person's projects for the next few weeks on one page",
+        "Review it in a short weekly meeting."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A resource planner showing each person's load for the coming weeks, by team.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How do you see who has capacity today?",
+      "free_stops": "Planning rules and views are in the solution document."
+    },
+    {
+      "id": "p6_service_errors",
+      "n": 6,
+      "words": "We issued the wrong drawing revision to site",
+      "category": "quality_complaints",
+      "subtype": "service_errors",
+      "quick_ideas": [
+        "Keep one register of current revisions per project",
+        "Record every issue to site with date and recipient."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A drawing register with revision control and a transmittal log of what went to whom and when.",
+        "tool_words": []
+      },
+      "ask_first": "Where are the current drawings kept?",
+      "free_stops": "Revision rules and transmittal flow are in the solution document."
+    },
+    {
+      "id": "p7_permits_approvals",
+      "n": 7,
+      "words": "Approval files sit at the authority and we can't track them",
+      "category": "compliance_admin",
+      "subtype": "permits_approvals",
+      "quick_ideas": [
+        "List every submission with date, authority and last comment",
+        "Review the oldest ones weekly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "An authority approval tracker with submission dates, comments, resubmissions and status for every file.",
+        "tool_words": []
+      },
+      "ask_first": "Which authorities do you submit to most?",
+      "free_stops": "Status stages and alerts are in the solution document."
+    },
+    {
+      "id": "p8_slow_response",
+      "n": 8,
+      "words": "RFIs from the contractor pile up and responses are late",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Log each RFI with date received and owner",
+        "Set a response target and check it weekly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "An RFI and site-visit log with response deadlines and report templates.",
+        "tool_words": []
+      },
+      "ask_first": "How are RFIs tracked now?",
+      "free_stops": "Deadlines and report formats are in the solution document."
+    },
+    {
+      "id": "p9_conversion_low",
+      "n": 9,
+      "words": "Fee proposals take days and we win few",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Note why each recent proposal was won or lost",
+        "Reuse a past proposal as a base for similar projects."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A proposal tracker with win/loss reasons and lead source, and a proposal builder drawing on past project data.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Where do most new projects come from?",
+      "free_stops": "Proposal structure and win/loss analysis are in the solution document."
+    },
+    {
+      "id": "p10_licences_renewals",
+      "n": 10,
+      "words": "Professional registrations and insurance renewals are missed",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "Put every registration and insurance expiry in one calendar",
+        "Give one person ownership."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A renewal calendar with alerts well ahead of every expiry.",
+        "tool_words": []
+      },
+      "ask_first": "Who keeps track of expiry dates today?",
+      "free_stops": "Alert timing is set in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any opinion on structural adequacy, loads, fire escapes, seismic matters or MEP sizing; that is for the registered engineer. Any help stamping drawings without review, lending a stamp, backdating approvals or paying to speed up a naqsha pass. Any view on professional liability, contracts or fee disputes; suggest legal advice. Any recording of staff salaries, names or personal details. Anything other than emergency services and the authority for an immediate building danger."
+  ],
+  "sample_reply": {
+    "person": "How do we stop working for free? We charge a lump-sum fee and clients keep adding floors and changing layouts.",
+    "pi": "Yes, this can be fixed, and you can begin this week. 1 Log every extra request with a rough effort estimate, so the extra work is visible. 2 Raise each one with the client before starting, so the fee conversation happens up front. Workzap can do this automatically for you: a scope-change log with client approval, and timesheets showing fee used against budget on every project. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

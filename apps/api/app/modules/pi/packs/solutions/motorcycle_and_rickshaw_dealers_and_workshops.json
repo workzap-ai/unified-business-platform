@@ -1,0 +1,204 @@
+{
+  "industry": "motorcycle_and_rickshaw_dealers_and_workshops",
+  "name": "Motorcycle and rickshaw dealers and workshops",
+  "sector": "7.G Transport, mobility and aviation (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_credit_customers",
+      "n": 1,
+      "words": "Instalment records are in registers and I don't know the total outstanding",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Write up each instalment customer's balance on one list, so you see the total",
+        "Mark who is overdue, so recovery starts with them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an instalment ledger per sale with schedule, payments and overdue days, and WhatsApp reminders to customers who have agreed.",
+        "tool_words": []
+      },
+      "ask_first": "Do customers pay at the shop, or does your staff collect?",
+      "free_stops": "Ledger and reminder set-up are in the solution document; instalment terms are for your accountant or lawyer."
+    },
+    {
+      "id": "p2_cash_leakage",
+      "n": 2,
+      "words": "Recovery staff collect cash and don't deposit it all",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Give a receipt for every collection, so each amount is on paper",
+        "Match collections to deposits daily, so gaps show the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation",
+          "field_checks"
+        ],
+        "text": "collection records per visit reconciled to deposits each day.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The collection steps are in the solution document."
+    },
+    {
+      "id": "p3_documentation",
+      "n": 3,
+      "words": "Customers keep asking when their number plate will be ready",
+      "category": "compliance_admin",
+      "subtype": "documentation",
+      "quick_ideas": [
+        "List every file with its stage, so you can answer quickly",
+        "Check with the agent on pending files weekly, so they move."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "customer_messaging"
+        ],
+        "text": "a registration file tracker with stages and a message when it's ready.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "File stages are in the solution document."
+    },
+    {
+      "id": "p4_supplier_late",
+      "n": 4,
+      "words": "Booked customers wait months for supply",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_late",
+      "quick_ideas": [
+        "List bookings by model and colour with expected supply, so you know who is waiting",
+        "Update waiting customers when supply news comes, so they hear it from you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "customer_messaging"
+        ],
+        "text": "a booking and stock tracker by model and colour with customer updates.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Tracker set-up is in the solution document."
+    },
+    {
+      "id": "p5_shrinkage_theft",
+      "n": 5,
+      "words": "Spare parts go missing from the workshop",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Issue parts only against a job card, so every part has a home",
+        "Count fast movers once this week, so you know the gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "stock_alerts"
+        ],
+        "text": "job cards with parts issued linked to billing, and a parts register with reorder levels.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Issue rules are in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Delivery fleet service bills take ages to get paid",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List each fleet client's open bills by age, so you know who to chase",
+        "Agree a payments contact at each, so chasing goes to the right person."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "booking_scheduling"
+        ],
+        "text": "fleet servicing schedule and billing with ageing.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Billing set-up is in the solution document."
+    },
+    {
+      "id": "p7_lead_quality",
+      "n": 7,
+      "words": "Facebook enquiries asking \"price\" never turn into sales",
+      "category": "marketing_leads",
+      "subtype": "lead_quality",
+      "quick_ideas": [
+        "Reply with an invitation to visit, so the enquiry becomes a conversation",
+        "Note which enquiries visit, so you see what works."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "online enquiry capture from Facebook and WhatsApp with follow-up reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Follow-up timings are in the solution document."
+    },
+    {
+      "id": "p8_margin_unknown",
+      "n": 8,
+      "words": "I don't know profit per bike after discounts and free helmets",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Note discounts and freebies on recent sales, so you see where margin goes",
+        "Go over it with your accountant, so figures are read correctly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "per-unit margin including discounts and freebies.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which costs are included is in the solution document."
+    },
+    {
+      "id": "p9_owner_blind",
+      "n": 9,
+      "words": "Everything is in my head and my register",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Write down three numbers every evening: sales, collections, cash, so you have a daily picture",
+        "Keep a week of them side by side, so trends show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read",
+          "cash_reconciliation"
+        ],
+        "text": "a daily cash-up against sales and collections, with the owner's summary on WhatsApp.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "What the daily read includes is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on instalment contracts, interest, Islamic finance, repossession or guarantor liability. Requests for buyers' or guarantors' CNIC, cheques, bank details or addresses. Help with fake documents, stolen or non-duty-paid bikes, tampering with numbers, or harassing defaulters. Technical repair or safety advice; battery fire or injury goes to emergency services. Bike prices or financing figures. Anything supporting threats by recovery staff; if anyone is in danger, point to police."
+  ],
+  "sample_reply": {
+    "person": "Qiston pe bikes deta hoon, register mein likha hai, total baqaya kitna hai mujhe khud nahi pata. Koi solution?",
+    "pi": "Haan, is ka hal bilkul mumkin hai, aur is hafte shuruaat ho sakti hai. 1 Har qist wale customer ka baqaya ek list pe likh lein, taake total saamne ho. 2 Jo late hain un pe nishan laga dein, taake recovery wahin se shuru ho. Workzap yeh sab aap ke liye automatically kar sakta hai: har sale ka qist khata, overdue din aur customer ki ijazat se WhatsApp yaad dehani. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

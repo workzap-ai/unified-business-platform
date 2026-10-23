@@ -1,0 +1,219 @@
+{
+  "industry": "tractor_and_farm_machinery_dealers_and_rental",
+  "name": "Tractor and farm machinery dealers and rental",
+  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_delivery_late",
+      "n": 1,
+      "words": "Customers booked tractors and delivery is months late, they keep calling",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Put every booking in one list by booking date with its expected delivery, so you can answer calls from facts",
+        "Send each waiting customer one honest status update."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "A booking queue that tracks every booking from advance to delivery and sends customers WhatsApp status updates automatically as things change.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many bookings are waiting right now?",
+      "free_stops": "How the queue and status updates are set up goes in the solution document."
+    },
+    {
+      "id": "p2_capacity",
+      "n": 2,
+      "words": "Rental harvester sits idle one week and is double-booked the next",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Put every machine's bookings on one shared calendar, so clashes and gaps are visible",
+        "Take bookings through one person only during peak season."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A rental fleet calendar with each machine's bookings, location and status, blocking double bookings and showing idle days.",
+        "tool_words": []
+      },
+      "ask_first": "How many machines do you rent out?",
+      "free_stops": "Calendar rules and the utilisation view are part of the solution document."
+    },
+    {
+      "id": "p3_cash_mismatch",
+      "n": 3,
+      "words": "Operator says he did 40 acres, the farmer says 30",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Ask operators to send a WhatsApp message with photo when each job ends, so there is a record at the time",
+        "Get the farmer to confirm the area in that same message thread."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "An operator job log with location check-in, acres or hours, photos and the farmer's WhatsApp confirmation, for every job.",
+        "tool_words": []
+      },
+      "ask_first": "Who measures the acres today?",
+      "free_stops": "How jobs are logged and confirmed is detailed in the solution document."
+    },
+    {
+      "id": "p4_cash_leakage",
+      "n": 4,
+      "words": "Operators take cash from farmers directly and don't hand it all in",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Ask farmers to pay into one account or to the office where possible, so less cash moves through operators",
+        "Match every job against money handed in at week end."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A daily match of each operator's jobs against cash handed in or received, flagging gaps by machine.",
+        "tool_words": []
+      },
+      "ask_first": "Do farmers mostly pay the operator or the office?",
+      "free_stops": "How jobs and collections are matched goes in the solution document."
+    },
+    {
+      "id": "p5_theft_internal",
+      "n": 5,
+      "words": "Diesel use on rental machines doesn't add up",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Record every fill with machine and hour reading for one week, so fills can be checked against work done",
+        "Have one person authorise all fills."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A diesel log per machine set against hours and acres, flagging fills that don't fit the work done.",
+        "tool_words": []
+      },
+      "ask_first": "Who fills diesel for the rental machines?",
+      "free_stops": "The matching rules are kept for the solution document."
+    },
+    {
+      "id": "p6_maintenance_downtime",
+      "n": 6,
+      "words": "Machine breaks down in the field during peak harvest",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Note each machine's hours and last service date on one list, so the most overdue get attention before the season",
+        "Keep the commonly failing parts in stock ahead of peak."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A maintenance schedule by machine hours with service-due alerts, and a breakdown history per machine.",
+        "tool_words": []
+      },
+      "ask_first": "Do you service the fleet yourselves?",
+      "free_stops": "How service schedules and alerts are set for your fleet goes in the solution document."
+    },
+    {
+      "id": "p7_stockout",
+      "n": 7,
+      "words": "Parts counter runs out of fast-moving filters and belts",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "List the parts you ran out of in the last season, so you know which ones matter",
+        "Set a minimum shelf level for those few and check it weekly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Parts stock with minimum levels and automatic reorder alerts, with parts issued only against job cards.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many parts lines do you carry?",
+      "free_stops": "Minimum levels and the issue process are set out in the solution document."
+    },
+    {
+      "id": "p8_receivables_late",
+      "n": 8,
+      "words": "Instalment customers fall behind after a bad harvest",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every instalment due this month and who is late, so follow-up is planned rather than reactive",
+        "Contact late customers early and politely; for terms or repossession questions, talk to your lawyer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "An instalment and rental receivables tracker with ageing and reminder messages before and after each due date.",
+        "tool_words": []
+      },
+      "ask_first": "Do you finance instalments yourselves or through a third party?",
+      "free_stops": "Reminder timing and the tracker setup are part of the solution document."
+    },
+    {
+      "id": "p9_lead_followup_slow",
+      "n": 9,
+      "words": "Enquiries from Facebook and PakWheels never get followed up",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Write every enquiry into one list with the date and where it came from, so none is lost",
+        "Give one salesperson the job of calling back each day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "A lead tracker that pulls enquiries from WhatsApp, Facebook and listing sites and reminds salespeople to follow up on time.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most enquiries come from now?",
+      "free_stops": "How enquiries are captured and followed up is detailed in the solution document."
+    },
+    {
+      "id": "p10_branch_comparison",
+      "n": 10,
+      "words": "I can't see which branch sells and which only eats cost",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Put one month of units sold, rental, workshop and parts income per branch side by side",
+        "Add each branch's main costs to the same sheet."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A branch dashboard showing sales, rental utilisation, workshop revenue, parts and outstanding amounts every day.",
+        "tool_words": [
+          "dashboard"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "How many branches and workshops do you have?",
+      "free_stops": "What the dashboard measures is kept for the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on repair procedures, safety modifications, removing guards or technical specs. Advice on financing, interest, leasing law, instalment law, repossession, registration, tax or import duties. Any agronomy advice on field operations. Any help tampering with hour meters, forging registration or import papers, passing used machines off as new or avoiding customs duty. Encouraging \"own money\" premiums; recording customers', operators' or guarantors' names, CNICs or licence numbers."
+  ],
+  "sample_reply": {
+    "person": "Hamare 6 harvester kiraye pe chalte hain. Driver acre zyada batate hain aur paisa kam aata hai, iska kya hal hai?",
+    "pi": "Haan, is ka hal mumkin hai aur kaam is hafte shuru ho sakta hai. 1 Har kaam khatam hote hi driver se WhatsApp pe photo ke saath acre ka paigham mangwayein, aur kisan se usi thread mein tasdeeq le lein, taake waqt pe record ban jaaye. 2 Hafte ke aakhir mein har machine ke kaam ko jama hue paise se mila lein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har kaam ka location, acre, tasdeeq aur wasooli roz darj ho aur farq pe alert aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

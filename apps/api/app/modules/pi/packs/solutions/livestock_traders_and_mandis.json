@@ -1,0 +1,218 @@
+{
+  "industry": "livestock_traders_and_mandis",
+  "name": "Livestock traders and mandis (incl. qurbani / Eid ul Adha animals)",
+  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_fraud",
+      "n": 1,
+      "words": "Fake notes ka dar hai, pichli Eid do jaali note aa gaye",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Ask for larger payments by bank transfer, JazzCash or Easypaisa and confirm receipt before the animal leaves",
+        "Let one trusted role receive all cash, so notes are checked in one place."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "cash and transfers logged per helper as they happen, with an automatic end-of-night handover record.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how much comes in cash compared with transfers?",
+      "free_stops": "The handover routine and how transfers are matched go in the solution document."
+    },
+    {
+      "id": "p2_theft_internal",
+      "n": 2,
+      "words": "One helper sold animals and pocketed part of the cash",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Tie every sale to the helper who made it",
+        "Count cash with each helper every night."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "cash_reconciliation — a helper sales log linking each sale to a helper, animal and payment, with the nightly count checked automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many helpers take payments at peak?",
+      "free_stops": "How sales are logged per helper is set out in the solution document."
+    },
+    {
+      "id": "p3_order_errors",
+      "n": 3,
+      "words": "Same animal promised to two buyers by two helpers",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Keep one master list of animals by tag, not separate parchis",
+        "Record every bayana in one place only."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a bayana register where an animal locks to one buyer the moment an advance is entered, visible to every helper.",
+        "tool_words": []
+      },
+      "ask_first": "Who is allowed to take a bayana today?",
+      "free_stops": "The locking rules and who can enter a bayana stay in the solution document."
+    },
+    {
+      "id": "p4_pre_orders_custom",
+      "n": 4,
+      "words": "Buyers give bayana, then vanish or argue the price later",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Write the agreed price and balance due date on the slip, with a copy for the buyer",
+        "Keep a waiting list so a released animal can sell quickly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "customer_messaging — bookings with agreed price and due date, and automatic WhatsApp reminders to buyers who agreed to receive them.",
+        "tool_words": []
+      },
+      "ask_first": "Is the agreed price written anywhere when the bayana is taken?",
+      "free_stops": "The booking terms and reminder schedule go in the solution document."
+    },
+    {
+      "id": "p5_delivery_late",
+      "n": 5,
+      "words": "Delivery on Chand Raat is chaos, half the addresses are wrong",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Confirm every address with a location pin before the last days",
+        "Group deliveries by area for each driver."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "workflow_automation — an Eid delivery planner with routes, slots, proof-of-delivery photos and payment confirmation, updated live for the owner.",
+        "tool_words": []
+      },
+      "ask_first": "How many deliveries do you do on the last two days?",
+      "free_stops": "Route planning and the delivery-day flow are detailed in the solution document."
+    },
+    {
+      "id": "p6_duplicate_entry",
+      "n": 6,
+      "words": "Hissa bookings are on paper, two people got the same share",
+      "category": "operations_process",
+      "subtype": "duplicate_entry",
+      "quick_ideas": [
+        "Keep one sheet per animal, filled by one person only",
+        "Confirm each customer's animal and hissa number to them in writing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "customer_messaging — a collective-qurbani share manager that stops double shares and sends each customer a meat-ready message automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How do customers find out their meat is ready now?",
+      "free_stops": "The share sheet and messaging flow go in the solution document."
+    },
+    {
+      "id": "p7_whatsapp_overload",
+      "n": 7,
+      "words": "Instagram and WhatsApp messages flood in and we miss serious buyers",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Put price range, location and timings where buyers see them before asking",
+        "Label chats so serious buyers aren't buried."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an enquiry assistant that answers availability and the price ranges you set, day and night, and passes serious buyers to a person.",
+        "tool_words": []
+      },
+      "ask_first": "Who replies to messages at peak?",
+      "free_stops": "What the assistant answers and when it hands over stays in the solution document."
+    },
+    {
+      "id": "p8_margin_unknown",
+      "n": 8,
+      "words": "I don't know which animals made money and which I sold at a loss",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Note each animal's purchase price and source",
+        "Add up the season's fodder, transport and stall costs so they can be counted against sales."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a per-animal and per-season margin view that updates automatically as purchases, costs and sales are entered.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Are costs kept by animal, by stall, or only as one total?",
+      "free_stops": "How shared costs are spread per animal is worked out in the solution document."
+    },
+    {
+      "id": "p9_overstock_dead_stock",
+      "n": 9,
+      "words": "Last two days nobody buys and we're stuck with 40 animals",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "Note animals sold and left each night so a slow pace shows early",
+        "Line up regular butchers before Eid who can take what's left."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a daily read of animals bought, reserved, sold and left, compared automatically with the same day last Eid.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Did you have unsold animals last Eid as well?",
+      "free_stops": "The season comparison and what it tracks go in the solution document."
+    },
+    {
+      "id": "p10_no_customer_data",
+      "n": 10,
+      "words": "After Eid I have no list of buyers to contact next year",
+      "category": "customers_retention",
+      "subtype": "no_customer_data",
+      "quick_ideas": [
+        "With their permission, save each buyer's number and what they bought",
+        "Ask happy buyers for a real Google review."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a consent-based buyer list that messages past buyers automatically when new animals arrive before next Eid.",
+        "tool_words": []
+      },
+      "ask_first": "Do most buyers come back to you each year?",
+      "free_stops": "The broadcast timing and list setup stay in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any religious ruling on qurbani validity, age by daant, defects or shares; that's one for their scholar. Any animal-health or medicine advice for heat-stressed or injured animals; suggest their vet. Anything that helps slaughter outside licensed slaughterhouses in the UAE, sell at unlicensed spots, or evade mandi fees, municipal rules, import checks or tax. Any request for buyers' CNIC, Emirates ID, card details or home addresses beyond what the business itself records. Confrontation or covert surveillance advice about helpers, or promises of Eid prices or sales."
+  ],
+  "sample_reply": {
+    "person": "Is Eid pe teen helpers parchi pe bayana lete rahe aur aik bakra do logon ko bik gaya. Iska koi hal batao.",
+    "pi": "Ji haan, yeh masla agli Eid se pehle theek kiya ja sakta hai. 1 Alag alag parchiyon ke bajaye har jaanwar ki aik hi master list rakhein, tag aur photo ke saath. 2 Bayana sirf aik jagah darj ho, taake koi jaanwar do dafa na bike. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: bayana darj hote hi jaanwar aik khareedar ke naam lock ho jaye, aur har helper ki sale aur paisa roz alag nazar aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

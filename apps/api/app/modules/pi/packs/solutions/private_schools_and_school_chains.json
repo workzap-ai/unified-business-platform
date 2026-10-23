@@ -1,0 +1,240 @@
+{
+  "industry": "private_schools_and_school_chains",
+  "name": "Private schools and school chains",
+  "sector": "7.J Education and childcare",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_receivables_late",
+      "n": 1,
+      "words": "Parents pay late every month and we chase them one by one",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Give every family a fee account number once, so payments and reminders never need a child's name",
+        "Send this month's reminder once to a broadcast list of parent numbers given with their permission, instead of one chat per parent, so the coordinator gets her mornings back."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "customer_messaging A fee ledger by family account number that sends reminders automatically on a set schedule every month and shows each campus head a daily defaulter count, not a list of children.",
+        "tool_words": []
+      },
+      "ask_first": "Do most parents pay by challan, wallet or cash at the counter?",
+      "free_stops": "The reminder sequence, its timing and the escalation rules go in the solution document."
+    },
+    {
+      "id": "p2_cash_mismatch",
+      "n": 2,
+      "words": "Challan, JazzCash and counter cash — nobody can tell who has actually paid",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Ask parents to quote the family account number on every challan and wallet payment, so each deposit can be traced to a family",
+        "Match one week of bank statement against the fee register by hand, so you can see how big the gap really is."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "integration Challan references and wallet transaction IDs matched to fee accounts every day across all campuses, with money that has no account, and accounts marked paid with no money, flagged each morning.",
+        "tool_words": [
+          "integration"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "How the matching rules handle part payments, siblings and wrong references is kept for the document."
+    },
+    {
+      "id": "p3_discount_abuse",
+      "n": 3,
+      "words": "Campus heads gave discounts with no record",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Ask each campus head to list current concessions by family account number once, so you see the full picture",
+        "Write down which concession types the school actually allows, so anything else stands out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Every concession goes through owner approval before it reaches the fee ledger, with a monthly report by campus.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The approval levels and the monthly concession report format are set out in the document."
+    },
+    {
+      "id": "p4_lead_followup_slow",
+      "n": 4,
+      "words": "Admissions enquiries come from Instagram, WhatsApp and walk-ins and we lose track",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Put this season's enquiries into one list, with each parent's number only if they gave permission, so nothing sits in three places",
+        "Make one named person responsible for callbacks, so every enquiry has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Every enquiry from ads, WhatsApp, the website and walk-ins captured automatically, with stage, source and follow-up reminders, plus a season-to-date view of enquiries turning into admissions per campus.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The pipeline stages and follow-up timings are kept for the document."
+    },
+    {
+      "id": "p5_campaign_roi_unknown",
+      "n": 5,
+      "words": "We ran admission ads but don't know if one admission came from them",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Ask every new admission family where they heard of the school, so you have a rough source count",
+        "Run each campus's next ad with its own WhatsApp number or link, so enquiries can be told apart."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "Every enquiry tagged by the ad and campus that brought it, measured all season down to admissions.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the links and codes are set up per ad and campus is in the document."
+    },
+    {
+      "id": "p6_forecasting",
+      "n": 6,
+      "words": "Re-enrolment only becomes clear in August",
+      "category": "planning_growth",
+      "subtype": "forecasting",
+      "quick_ideas": [
+        "Ask current families once in February–March whether they are staying, leaving or unsure, so you have counts per grade early",
+        "Plan sections from confirmed counts plus the waitlist count, not from last year's numbers."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A re-enrolment tracker that updates confirmed, pending and leaving counts per grade and campus as parents reply.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How the tracker follows up on unsure families is kept for the document."
+    },
+    {
+      "id": "p7_shift_scheduling",
+      "n": 7,
+      "words": "The coordinator spends an hour every morning on substitutions",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Ask teachers to report absence to one school number by a fixed time, so cover starts early",
+        "Print each teacher's free periods for the term once, so cover can be picked at a glance."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "Absences logged each morning, free periods matched automatically and the cover teacher told on WhatsApp, with a count of cover load per teacher by campus.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The cover rules and fairness balancing are set out in the document."
+    },
+    {
+      "id": "p8_manual_reports",
+      "n": 8,
+      "words": "Report cards take two weeks because marks come in separate Excel files",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Agree one shared format for marks this term, so files can be combined without retyping",
+        "Keep marks on the school's own drive, not on teachers' phones, so access stays controlled."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Marks entered once by teachers and report cards produced automatically, with access limited to staff who need it.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The entry screens, checks and report-card layout are kept for the document."
+    },
+    {
+      "id": "p9_delivery_late",
+      "n": 9,
+      "words": "Van routes are decided on WhatsApp and parents complain about pick-up times",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Write down every route with its stops and times once, so there is one agreed version",
+        "Compare seats used per van with transport fees collected this month, so gaps show up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "cash_reconciliation A transport register of routes, seats and fees that reconciles every month, with a one-tap delay message to parents on the affected route.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How route changes and delay alerts flow to parents is set out in the document."
+    },
+    {
+      "id": "p10_cash_leakage",
+      "n": 10,
+      "words": "Canteen cash goes missing and juice and snack stock never matches",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Count canteen stock and cash together at closing once this week, so you know how big the gap is",
+        "Have cash handed over daily instead of weekly, so less sits uncounted."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "stock_alerts A daily canteen close comparing stock sold with cash counted, with an alert to the owner when gaps repeat.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The variance limits and alert rules are kept for the document."
+    },
+    {
+      "id": "p11_branch_comparison",
+      "n": 11,
+      "words": "Each campus has its own Excel, so I can't compare them",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Pick the five numbers you most want from every campus, so the comparison has a shape",
+        "Ask all campuses for those numbers once, on the same date, so they line up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "One owner screen updated daily with enrolment, fee collection, defaults, staff turnover and expenses per campus, side by side.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do all campuses use the same school system today?",
+      "free_stops": "Which figures feed the screen and how they are pulled from each campus is in the document."
+    }
+  ],
+  "never_say": [
+    "Any promise about fees recovered, admissions gained or defaulters reduced. Anything on fee-increase legality, KHDA/ADEK/SPEA or board inspections, or curriculum; pi says \"check with your regulator or lawyer\". Advice on teacher contracts, termination or visa sponsorship; pi notes the tracking problem and says \"talk to your lawyer\". Any idea that asks for, stores or repeats a student's name, photo, roll number, marks, attendance, health or family details. Help with altered marks, forged leaving certificates, unrecorded fee receipts or covert monitoring of staff or students. Business talk after a child safety concern; pi points to 15/1122, 999 or 911 and the school's safeguarding lead."
+  ],
+  "sample_reply": {
+    "person": "Fees ka koi solution batayein. Har mahine coordinator ek ek parent ko WhatsApp pe yaad dilati hai aur phir bhi aadhi class late hoti hai.",
+    "pi": "Ji haan, is ka hal mumkin hai aur shuruaat is hafte se ho sakti hai. 1 Har family ko ek fee account number de dein, taake payment aur reminder mein kisi bachay ka naam na aaye. 2 Is mahine ka reminder ek dafa broadcast list pe bhejein, un parents ke numbers pe jo unhon ne ijazat se diye hain, taake coordinator ka waqt bache. Workzap ye sab aap ke liye khud-ba-khud kar sakta hai — har mahine reminders, challan aur JazzCash payments ka roz ka match, aur har campus ka defaulter count. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

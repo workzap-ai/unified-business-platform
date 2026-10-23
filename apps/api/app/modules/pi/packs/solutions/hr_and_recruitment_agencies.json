@@ -1,0 +1,217 @@
+{
+  "industry": "hr_and_recruitment_agencies",
+  "name": "HR and recruitment agencies",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_approvals_slow",
+      "n": 1,
+      "words": "Clients take weeks to give interview feedback and candidates go elsewhere",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "Agree a feedback date with the client each time you send a shortlist, so there is something to hold them to",
+        "List every shortlist currently waiting on feedback, so you know which clients to chase today."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a feedback chaser that reminds the client automatically when a shortlist has had no response after a set number of days, with a daily list of stalled shortlists for the account manager.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many open roles are you working on right now?",
+      "free_stops": "chaser timings and escalation per client are set out in the solution document."
+    },
+    {
+      "id": "p2_service_errors",
+      "n": 2,
+      "words": "Candidates accept and then don't show up on day one",
+      "category": "quality_complaints",
+      "subtype": "service_errors",
+      "quick_ideas": [
+        "Call each candidate due to join in the next fortnight once, so you hear about doubts before day one",
+        "Keep one backup candidate warm for each of those roles, so a drop-out doesn't reset the search."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a candidate pipeline per job order through offered, confirmed, joined and in guarantee, with check-in tasks before the joining date created automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the check-in points and backup rules are worked out in the solution document."
+    },
+    {
+      "id": "p3_duplicate_entry",
+      "n": 3,
+      "words": "The same candidate is in our system three times with different CVs",
+      "category": "operations_process",
+      "subtype": "duplicate_entry",
+      "quick_ideas": [
+        "Clean one active role's candidate list of duplicates, so you see how big the problem is",
+        "Agree that everyone searches before adding a candidate, so new duplicates slow down."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "duplicate detection when a candidate is added, with the source and the recruiter who added them recorded at the same moment.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how matches are detected and how credit is recorded is kept for the solution document."
+    },
+    {
+      "id": "p4_turnover",
+      "n": 4,
+      "words": "Recruiters keep their best candidates in their own phones, and the pipeline leaves with them",
+      "category": "people_staff",
+      "subtype": "turnover",
+      "quick_ideas": [
+        "Ask each recruiter to move their active candidates into the shared list, with the candidates' permission, so the agency holds the pipeline",
+        "Review that list with the team once, so gaps show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "one shared pipeline per job order owned by the agency, so every candidate, stage and note stays when a recruiter leaves.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "access rights and how the pipeline is structured are designed in the solution document."
+    },
+    {
+      "id": "p5_commission_disputes",
+      "n": 5,
+      "words": "Recruiters argue over who sourced the placed candidate",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write down one clear rule for who gets credit, so arguments have something to refer to",
+        "Note the source recruiter on every current placement, so this month's commission is settled."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "dashboards_reports — source and recruiter credit recorded the moment a candidate enters, with a commission view each recruiter can see.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the credit rules and commission view are set out in the solution document."
+    },
+    {
+      "id": "p6_performance_unknown",
+      "n": 6,
+      "words": "I can't see how many CVs each recruiter sent this week",
+      "category": "people_staff",
+      "subtype": "performance_unknown",
+      "quick_ideas": [
+        "Ask each recruiter for one weekly count of CVs sourced, shortlisted and interviews arranged, so you get a first picture",
+        "Look at those counts side by side once, so you see where help is needed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a recruiter activity board updated every day from the pipeline, showing CVs, shortlists, interviews and placements per person.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "which activities to measure and how is worked out in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Clients delay paying placement fees until after probation",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every placement with its joining date and invoice status, so missing invoices show",
+        "Check each client's fee terms once, so you know when payment is actually due."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "fee invoicing triggered by the joining date, with receivables ageing, guarantee end dates and reminders sent on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the invoicing triggers and reminder sequence are kept for the solution document."
+    },
+    {
+      "id": "p8_payroll_errors",
+      "n": 8,
+      "words": "Contract staff timesheets come in wrong and we pay the wrong amount",
+      "category": "people_staff",
+      "subtype": "payroll_errors",
+      "quick_ideas": [
+        "Ask each client supervisor to confirm this week's hours in writing, so payroll uses agreed figures",
+        "Note last month's corrections once, so you see which sites cause errors."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "timesheets captured on phone, approved by the client supervisor, and fed into both payroll and client billing.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the approval flow and how it links to payroll are set out in the solution document."
+    },
+    {
+      "id": "p9_campaign_roi_unknown",
+      "n": 9,
+      "words": "Job board subscriptions cost a lot and we don't know which one works",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Note the source of each placement from the last few months, so you get a first view of which boards deliver",
+        "Ask new applicants where they saw the role, so the gap fills from today."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "separate application links per job board and channel, so every placement shows where it came from.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how sources are tagged and reported is designed in the solution document."
+    },
+    {
+      "id": "p10_whatsapp_overload",
+      "n": 10,
+      "words": "Our WhatsApp is flooded with candidates asking for updates",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Send one update to every candidate on active roles, so the backlog of questions drops",
+        "Agree fixed hours for answering status queries, so recruiters get time back."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "automatic WhatsApp updates to candidates, with their permission, each time they move to a new stage.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "which stages trigger an update is worked out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any visa, work permit, immigration or labour-law advice, or salary benchmarking as advice. Anything involving fake experience letters, forged degrees or false references. Help with filtering candidates by religion, nationality or gender where unlawful, or charging candidates unlawful fees. That candidates will always join or that time-to-fill will drop by any amount. Requests for candidate CVs, names, numbers, ID or salary details."
+  ],
+  "sample_reply": {
+    "person": "Clients feedback dene mein hafte laga dete hain aur candidates nikal jate hain. Koi hal batayein.",
+    "pi": "Ji haan, is ka hal mumkin hai aur is hafte se kaam shuru kiya ja sakta hai. 1 Har shortlist ke saath client se feedback ki ek tareekh tay karein, taake follow up ka buniyaad ho. 2 Aaj ek dafa woh sab shortlists likh lein jin ka feedback ruka hua hai, taake pata ho ke kis client ko pehle yaad dilana hai. Workzap yeh aap ke liye automatically kar sakta hai: feedback ruke to client ko khud reminder, aur candidates ko har stage pe unki ijazat se update. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

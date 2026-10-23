@@ -1,0 +1,218 @@
+{
+  "industry": "overseas_employment_promoters_and_manpower_agencies",
+  "name": "Overseas employment promoters and manpower agencies",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_no_dashboard",
+      "n": 1,
+      "words": "We don't know which worker is stuck at which step — medical, test, visa, clearance",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "List the current batch once by reference number with each worker's step, so the stuck cases show on one page",
+        "Name one person to keep that list current, so it doesn't split into everyone's own files."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "dashboards_reports — a batch board that shows every worker by reference number through selection, medical, trade test, visa, clearance, ticket and departure, with the owner's daily count per stage.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many workers are in your current batch?",
+      "free_stops": "the stages and who updates them are set out in the solution document."
+    },
+    {
+      "id": "p2_whatsapp_overload",
+      "n": 2,
+      "words": "Workers call us twenty times a day about their status",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Send each worker in the batch one clear update on where they stand, so the backlog of calls drops",
+        "Fix set hours for status questions, so the office gets time to work."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "automatic WhatsApp status updates to workers, with their permission, each time they move to the next step.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "which steps send updates and in what language is worked out in the solution document."
+    },
+    {
+      "id": "p3_transfers_lost",
+      "n": 3,
+      "words": "Documents get lost between our office, the medical centre and the embassy",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Start a simple sent-and-returned register for files leaving the office, so you know what is out and where",
+        "Check once which files are out right now, so you can chase anything overdue."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a document movement log showing which file went where, when, and flagging anything sent but not returned.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the logging routine and overdue rules are kept for the solution document."
+    },
+    {
+      "id": "p4_tasks_dropped",
+      "n": 4,
+      "words": "Medical appointments get missed because nobody reminded the worker",
+      "category": "communication_coordination",
+      "subtype": "tasks_dropped",
+      "quick_ideas": [
+        "Call every worker with an appointment in the next week once, so this week's slots are protected",
+        "Keep the appointment dates on one list, so nobody relies on memory."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "appointment tracking per worker with automatic WhatsApp reminders before each one, and a list of no-shows for the office.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "reminder timings and how no-shows are followed up are set out in the solution document."
+    },
+    {
+      "id": "p5_supplier_quality",
+      "n": 5,
+      "words": "Sub-agents send unsuitable candidates who fail the trade test",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_quality",
+      "quick_ideas": [
+        "Give each sub-agent the demand's written requirements once, so they know exactly what to send",
+        "Note pass and drop-out per sub-agent for the last batch, so you see who sends good people."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a sub-agent register with candidates supplied, pass rates and drop-outs per agent, updated with every batch.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "how sub-agents are scored is designed in the solution document."
+    },
+    {
+      "id": "p6_handoffs",
+      "n": 6,
+      "words": "Flights are booked and then the visa isn't ready",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Agree a rule that no ticket is booked until a worker's earlier step is marked done, so bookings stop jumping ahead",
+        "Check this batch once for tickets booked too early, so you can act now."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a handoff check where ticketing only opens for a worker once the earlier stage is confirmed on the batch board.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the handoff rules between teams are worked out in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Foreign employers pay our service charges months late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every deployed batch with its invoice status, so unbilled batches show",
+        "Chase the oldest one this week, so collections start moving."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "employer billing per batch with receivables ageing and reminders in the employer's currency.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the billing points and reminder sequence are kept for the solution document."
+    },
+    {
+      "id": "p8_regulatory_reporting",
+      "n": 8,
+      "words": "Licence renewal and bureau reporting is a scramble every time",
+      "category": "compliance_admin",
+      "subtype": "regulatory_reporting",
+      "quick_ideas": [
+        "Write down every renewal and reporting date for the year once, so none comes as a surprise",
+        "Confirm the exact requirements with your consultant or the authority, so the checklist is right."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a compliance calendar with a document checklist and reminders well before each date.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the calendar setup and checklists are designed in the solution document."
+    },
+    {
+      "id": "p9_branches_not_aligned",
+      "n": 9,
+      "words": "Our Pakistan office and partners in Dubai work from different lists",
+      "category": "communication_coordination",
+      "subtype": "branches_not_aligned",
+      "quick_ideas": [
+        "Agree one master list for the current batch that both sides use, so there is one version",
+        "Hold one call to reconcile the two lists, so mismatches surface."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a shared batch view for both ends of the corridor, so the office and destination partners see the same status every day.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "access for each side and what they see is set out in the solution document."
+    },
+    {
+      "id": "p10_owner_bottleneck",
+      "n": 10,
+      "words": "Everything goes through me, I'm the bottleneck on every batch",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Note for one day every decision people bring to you, so you see which ones could be delegated",
+        "Hand one routine decision to a senior staff member, so the load starts to move."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an owner screen each morning with open demands, workers per stage, deployments and receivables, so you check exceptions instead of everything.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "which items reach the owner and which are handled by staff is worked out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any visa, emigration, labour-law or medical advice, or how to get clearances or approvals. Anything about fees charged to workers, visa selling or \"visa trading\". Anything involving fake documents, altered passports, misrepresented jobs or skipping emigration steps. That deployment dates or approvals will be met. Requests for worker names, passports, CNICs, medical results or photos. If a worker is unsafe, unpaid or has their passport held, point to the relevant authorities, embassy helplines or emergency services."
+  ],
+  "sample_reply": {
+    "person": "Badi demand aayi hai lekin pichli batch mein pata hi nahi chalta tha kaun banda kis step pe hai. Is ka koi solution hai?",
+    "pi": "Ji haan, is ka hal mumkin hai aur is hafte se shuruaat ki ja sakti hai. 1 Maujooda batch ko ek dafa reference number ke saath ek list mein likhein, har worker ka step bhi, taake phanse hue log foran nazar aayein. 2 Us list ki zimmedari ek hi bande ko dein, taake har staff ki apni file na bane. Workzap yeh aap ke liye automatically kar sakta hai: har worker ka stage roz ek board pe, aur workers ko unki ijazat se har step pe WhatsApp update. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "industry": "charter_and_private_aviation",
+  "name": "Charter and private aviation",
+  "sector": "7.G Transport, mobility and aviation (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_conversion_low",
+      "n": 1,
+      "words": "We lose broker requests because quotes take hours",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Time your next few quotes and note which step eats the most time, so you fix the right part",
+        "Keep your most-used destination fees in one place, so you stop looking them up each time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a quote builder where you pick aircraft and route and it produces a branded PDF in minutes, with quote times and win rates tracked per broker.",
+        "tool_words": []
+      },
+      "ask_first": "Which part of building a quote takes the longest?",
+      "free_stops": "How block time, positioning and fees are calculated in the builder is set out in the solution document."
+    },
+    {
+      "id": "p2_empty_leg_unsold",
+      "n": 2,
+      "words": "Empty legs fly empty",
+      "category": "marketing_leads",
+      "subtype": "empty_leg_unsold",
+      "quick_ideas": [
+        "Post your next positioning flight to brokers and repeat clients the moment it's confirmed, so you see whether timing is the issue",
+        "Note which past empty legs sold and how early they were shared, so you learn what works."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "an empty-leg broadcaster that sends every available leg to your opted-in broker and client list and website automatically as soon as it's entered, with sales tracked.",
+        "tool_words": []
+      },
+      "ask_first": "How often do you have positioning flights in a typical month?",
+      "free_stops": "Who receives which legs and when is decided in the solution document."
+    },
+    {
+      "id": "p3_margin_unknown",
+      "n": 3,
+      "words": "Real trip profit unknown until bills arrive weeks later",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Take one finished trip and put quoted and actual costs side by side, so you see which line usually slips",
+        "Ask handling agents for estimates before departure, so surprises surface earlier."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "dashboards_reports"
+        ],
+        "text": "a trip file that compares quoted against actual costs as each invoice arrives and shows live margin per trip and per aircraft.",
+        "tool_words": []
+      },
+      "ask_first": "Which cost surprises you most often, handling, fuel or catering?",
+      "free_stops": "The cost categories and margin view are designed in the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "Owner billing for managed aircraft is late and disputed",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Agree with each owner what their statement will show, so disputes about format stop",
+        "Fix one statement date and keep to it, so owners know when to expect it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "dashboards_reports"
+        ],
+        "text": "monthly owner statements built automatically from trip and cost records, with supporting invoices attached and payment status tracked.",
+        "tool_words": []
+      },
+      "ask_first": "How many managed aircraft do you bill owners for?",
+      "free_stops": "The statement structure and cost allocation are kept for the solution document."
+    },
+    {
+      "id": "p5_info_lost_in_whatsapp",
+      "n": 5,
+      "words": "Last-minute client changes on WhatsApp don't reach ops and crew",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Keep one shared sheet per trip where every change is written first, so there's one version of the truth",
+        "Ask ops and crew to confirm each change, so you know it landed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "one trip file holding schedule, catering, handling and crew notes, notifying everyone involved automatically whenever anything changes and recording who has seen it.",
+        "tool_words": []
+      },
+      "ask_first": "Who usually receives the client's change first, you, their PA or ops?",
+      "free_stops": "The change-notification flow is set out in the solution document."
+    },
+    {
+      "id": "p6_shift_scheduling",
+      "n": 6,
+      "words": "Freelance crew availability lives in my head",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Ask freelancers for next month's free dates once, so you have it on paper",
+        "Put them on one shared calendar by role, so anyone in ops can check."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a crew availability board where freelancers mark free dates and accept assignments by phone, kept current every day (duty rules stay with your ops team).",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many freelance crew do you call on?",
+      "free_stops": "How assignments and acceptance work is designed in the solution document."
+    },
+    {
+      "id": "p7_credit_customers",
+      "n": 7,
+      "words": "Payment from new clients arrives after the flight, or not at all",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Go through past clients once and mark who paid late, so terms are given on evidence",
+        "Decide which clients pay before departure, so the rule is clear to sales."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a client balance ledger with due dates, automatic reminders and late-payer flags, checked every day.",
+        "tool_words": []
+      },
+      "ask_first": "Do most clients pay before the flight or after today?",
+      "free_stops": "The reminder timing and credit rules are worked out in the solution document."
+    },
+    {
+      "id": "p8_cost_overruns",
+      "n": 8,
+      "words": "Handling and fuel invoices abroad come in higher than quoted",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Check your last few trips' invoices against the confirmed quotes, so you know which airports overcharge",
+        "Note fuel prices paid by airport, so you can compare next time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an invoice checker comparing every handling and fuel bill with the agreed quote and flagging differences before payment, with a running fuel price view by airport.",
+        "tool_words": []
+      },
+      "ask_first": "Are the overruns mostly from a few airports or spread across many?",
+      "free_stops": "The checking rules and comparison view are set out in the solution document."
+    },
+    {
+      "id": "p9_fleet_utilisation_low",
+      "n": 9,
+      "words": "Aircraft idle while we turn down trips on the other one",
+      "category": "sales_revenue",
+      "subtype": "fleet_utilisation_low",
+      "quick_ideas": [
+        "List last month's turned-down requests and why, so you see what demand you're missing",
+        "Put both aircraft on one calendar, so gaps are visible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a utilisation view showing flying hours, revenue and idle days per aircraft, updated daily, with turned-down requests logged alongside.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Are the aircraft different sizes, so clients can't switch easily?",
+      "free_stops": "How turned-down demand is captured and reported is part of the solution document."
+    },
+    {
+      "id": "p10_no_customer_data",
+      "n": 10,
+      "words": "Repeat VIP clients feel we don't remember their preferences",
+      "category": "customers_retention",
+      "subtype": "no_customer_data",
+      "quick_ideas": [
+        "Write down what you already know about each repeat account's preferences, by account role not personal details, so it isn't only in one head",
+        "Review it before the next repeat trip, so the client notices."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "account preference notes shown automatically to ops whenever a repeat client books, with no ID or itinerary data stored.",
+        "tool_words": []
+      },
+      "ask_first": "Who handles repeat clients today, one person or whoever is free?",
+      "free_stops": "Which preferences are captured and how they surface is designed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about airworthiness, operational approvals, crew duty limits, weather or go/no-go decisions, or what PCAA, GCAA or Transport Canada allow. Help with charters flown without the right approvals, keeping passengers or cargo off manifests, or getting around permits or sanctions. Tax, VAT or customs advice on aircraft ownership or imports; suggest they talk to their accountant. Clinical comments on medevac work; only scheduling and billing. Anything that asks for or stores client, passenger or crew names, passports, visas or VIP itineraries."
+  ],
+  "sample_reply": {
+    "person": "We keep missing broker requests because I build every quote in Excel myself. What can we do about it?",
+    "pi": "Yes, quote time can come down a lot without changing how you price. 1. Time your next few quotes and note which step takes longest, so you fix the slow part first. 2. Keep your most-used destination fees in one place, so you stop hunting for them on every request. Workzap can do this automatically for you: pick the aircraft and route, and a branded quote is ready to send in minutes, with quote times tracked per broker. Shall I put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

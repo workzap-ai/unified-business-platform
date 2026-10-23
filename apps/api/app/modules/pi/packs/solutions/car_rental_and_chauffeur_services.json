@@ -1,0 +1,203 @@
+{
+  "industry": "car_rental_and_chauffeur_services",
+  "name": "Car rental and chauffeur services",
+  "sector": "7.G Transport, mobility and aviation (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_order_errors",
+      "n": 1,
+      "words": "The same car got booked to two customers",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Keep one booking calendar for the whole fleet, so every booking is checked against it",
+        "Let only one person confirm bookings, so clashes are caught."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a fleet availability calendar showing every car's bookings, off-hire and returns, which blocks double bookings.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Calendar rules and handovers are in the solution document."
+    },
+    {
+      "id": "p2_checklists_not_done",
+      "n": 2,
+      "words": "Cars come back with scratches the customer says were already there",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Photograph every car at check-out and check-in, so condition is on record",
+        "Note fuel and kilometres at both ends, so there's no argument later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a check-out and check-in app with timed photos, fuel and kilometre readings, signed on phone.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "The inspection steps are in the solution document; liability is for your lawyer."
+    },
+    {
+      "id": "p3_refunds",
+      "n": 3,
+      "words": "Fines and tolls arrive after the deposit is released",
+      "category": "cash_collections",
+      "subtype": "refunds",
+      "quick_ideas": [
+        "Note how long fines usually take to appear, so you can see whether your deposit hold matches",
+        "Match each fine to its rental by car and time, so you know who it belongs to."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration",
+          "credit_ledger"
+        ],
+        "text": "fines and tolls matched to the rental by time and car, with a deposit tracker showing hold, release and deductions.",
+        "tool_words": []
+      },
+      "ask_first": "How do you find out about fines on your cars today?",
+      "free_stops": "How matching and deposit rules work is in the solution document; contracts are for your lawyer."
+    },
+    {
+      "id": "p4_no_visibility",
+      "n": 4,
+      "words": "I don't know which cars are free tomorrow without calling everyone",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "List every car with where it is and when it's next free, so you can answer quickly",
+        "Update it at each return, so it stays current."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a live fleet view of free, booked and off-hire cars by category.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "What the fleet view shows is in the solution document."
+    },
+    {
+      "id": "p5_maintenance_downtime",
+      "n": 5,
+      "words": "Cars miss services because nobody tracks kilometres",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Write each car's kilometres and next service on one list, so due cars are visible",
+        "Check registration and insurance dates at the same time, so a car isn't stuck."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "workflow_automation"
+        ],
+        "text": "a service and renewal scheduler by kilometres and dates, with off-hire alerts.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Service intervals and alerts are in the solution document."
+    },
+    {
+      "id": "p6_attendance_lateness",
+      "n": 6,
+      "words": "Chauffeurs come late for airport pickups",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Ask chauffeurs to confirm the evening before each pickup, so gaps are found early",
+        "Keep a backup driver on call for early pickups, so one absence doesn't miss a flight."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a chauffeur duty roster with pickup confirmations and duty- hour logs.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Roster and confirmation rules are in the solution document."
+    },
+    {
+      "id": "p7_manual_work",
+      "n": 7,
+      "words": "Corporate bills are made by hand from log sheets",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Log each corporate trip as it happens, so month end isn't a rebuild",
+        "Use the same layout for every client, so bills are quicker."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "credit_ledger"
+        ],
+        "text": "corporate bills generated from logged trips, with statements and ageing.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Billing and statement set-up are in the solution document."
+    },
+    {
+      "id": "p8_orders_lost",
+      "n": 8,
+      "words": "Bookings from WhatsApp, calls, website and agents get lost",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Put every booking into one list, whatever the channel, so nothing is missed",
+        "Reply to after-hours messages first thing each morning, so they're not forgotten."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "booking capture from every channel, including after hours, into one list with confirmations.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Channel set-up and replies are in the solution document."
+    },
+    {
+      "id": "p9_margin_unknown",
+      "n": 9,
+      "words": "I don't know profit per car after fuel, service and insurance",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Pick a few cars and list what they earned and cost last month, so you see which earn their keep",
+        "Go over that with your accountant, so the figures are read correctly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "per-car profit and utilisation by car and category, updated daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which costs are included and how is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on rental contracts, liability, insurance excess or contesting fines. Help moving fines to the wrong person, falsifying accident records or avoiding tolls. Requests for passports, IDs, licences or card details. Covert tracking of drivers' phones. Advice on licensing, investors' returns or financing. After an accident or passenger emergency, anything before pointing to emergency services."
+  ],
+  "sample_reply": {
+    "person": "Fines keep showing up weeks after we've released the deposit. Any solution for this?",
+    "pi": "Yes, there's a way to get on top of this, and you can start this week. 1 Note how long fines usually take to appear, so you can see whether your deposit hold matches. 2 Match each fine to its rental by car and time, so you know who it belongs to. Workzap can do this automatically for you: every fine and toll matched to its rental and each deposit tracked from hold to release. Shall I get a solution document and quote prepared for you? You're free to say no.",
+    "language": "english"
+  }
+}

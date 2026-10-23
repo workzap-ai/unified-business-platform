@@ -1,0 +1,218 @@
+{
+  "industry": "scrap_recycling_and_waste_management",
+  "name": "Scrap, recycling and waste management",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_fraud",
+      "n": 1,
+      "words": "Weigher and seller could be adjusting the kanta together",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Have a second person openly re-weigh a few loads, so you see whether figures hold",
+        "Get the scale's calibration checked by the weighbridge service."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A digital weighing slip with weight, grade, rate, load photo and time stamp, logged and matched to cash paid.",
+        "tool_words": []
+      },
+      "ask_first": "Where is the weight written first — on a parchi, a register, or both?",
+      "free_stops": "The slip design and checks are set in the solution document."
+    },
+    {
+      "id": "p2_cash_mismatch",
+      "n": 2,
+      "words": "Cash paid out for scrap doesn't match the weight in the yard",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Match one day's cash paid against weighed intake, so you see the size of the gap",
+        "Make every payout need a slip."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "Daily reconciliation of scrap purchases against weighed intake, flagging differences.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reconciliation steps are laid out in the solution document."
+    },
+    {
+      "id": "p3_no_visibility",
+      "n": 3,
+      "words": "Yard stock by grade is a guess",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Mark separate areas for each grade, so stock can be estimated per grade",
+        "Do one rough count this week."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "Yard stock by grade updated from purchases, sorting output and sales.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How stock by grade is kept current is designed in the solution document."
+    },
+    {
+      "id": "p4_theft_external",
+      "n": 4,
+      "words": "Copper and aluminium go missing from the yard",
+      "category": "loss_security",
+      "subtype": "theft_external",
+      "quick_ideas": [
+        "Keep high-value grades in a locked area, so access is limited",
+        "Count them weekly, so losses show quickly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Scheduled counts of high-value grades with photos, flagging gaps against the register.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The count routine is set in the solution document."
+    },
+    {
+      "id": "p5_margin_unknown",
+      "n": 5,
+      "words": "I don't know my real margin per grade after sorting loss",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Weigh one batch before and after sorting, so you see the real yield",
+        "Compare buying rate with latest selling price per grade."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A sorting yield and margin view by grade, alongside a daily buying rate board.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How yield and margin are calculated is set in the solution document."
+    },
+    {
+      "id": "p6_inspection_missing",
+      "n": 6,
+      "words": "Mills deduct for moisture or impurities and we can't argue",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Photograph and weigh each load before dispatch, so you have your own record",
+        "Note every deduction reason, so patterns show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A sales log per buyer with deductions and photos recorded.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "What is recorded per load is designed in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Mills and exporters pay late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List buyer balances by age, so the oldest are chased first",
+        "Confirm deductions in writing, so disputes don't delay payment."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Receivables ageing per buyer with reminders queued for the owner to approve.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing is in the solution document."
+    },
+    {
+      "id": "p8_order_tracking",
+      "n": 8,
+      "words": "Collection trucks miss pickups and skips sit full at sites",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "Keep one list of every skip's location and placement date, so overdue ones show",
+        "Ask commercial clients to message one number when a skip is full."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "booking_scheduling"
+        ],
+        "text": "A skip register and pickup schedule with driver confirmation photos and client \"full\" requests on WhatsApp.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The register and schedule design are in the solution document."
+    },
+    {
+      "id": "p9_manual_reports",
+      "n": 9,
+      "words": "Billing commercial clients and giving them collection records is manual and late",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "List last month's pickups per client, so you see what should have been billed",
+        "Ask clients which records they need."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Monthly invoices and collection records per client generated automatically from logged pickups.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "What records are produced is set in the solution document."
+    },
+    {
+      "id": "p10_maintenance_downtime",
+      "n": 10,
+      "words": "Baler or shredder breaks and everything stops",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Write down when each machine was last serviced, so overdue ones show",
+        "Keep the technician's contact handy."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "An equipment maintenance log for balers, shredders, weighbridge and trucks, with service reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Service intervals and reminders are set in the solution document."
+    }
+  ],
+  "never_say": [
+    "Help buying, processing or moving possibly stolen metal (cables, manhole covers, utility property), or ways to avoid checks. Handling or disposal of hazardous materials (batteries, e-waste, chemicals, medical waste, asbestos). Help with illegal dumping, open burning or mislabelling waste. Environmental permits, scrap export rules or emissions; suggest the authority or a consultant. Storing sellers' CNICs or vehicle numbers, or planning covert surveillance of staff. For fires, explosions, chemical exposure or machine injuries, emergency services come first."
+  ],
+  "sample_reply": {
+    "person": "Mujhe shak hai kanta pe gadbad hoti hai, khareed ke waqt jo wazan likha jata hai bechte waqt utna nahi nikalta. Is ka kya hal hai?",
+    "pi": "Ji haan, wazan ke record ko pakka kiya ja sakta hai, aur shuruaat isi hafte ho sakti hai. 1 Kuch loads khule taur par doosre banday se dobara tulwayein, taake dikhe figures sahi hain ya nahi. 2 Weighbridge service se kanta ki calibration check karwa lein, taake mashin par shak na rahe. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: har khareed ki digital parchi wazan, grade, photo aur waqt ke saath bane aur roz cash se apne aap match ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

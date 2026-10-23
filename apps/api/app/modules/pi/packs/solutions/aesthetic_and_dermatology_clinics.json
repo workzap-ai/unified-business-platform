@@ -1,0 +1,220 @@
+{
+  "industry": "aesthetic_and_dermatology_clinics",
+  "name": "Aesthetic and dermatology clinics",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_lead_followup_slow",
+      "n": 1,
+      "words": "Instagram DMs pile up and half the leads never get a reply",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Check how long last week's DMs waited for a first reply, so the delay is measured",
+        "Give DMs to one person at fixed times rather than the busy receptionist, so they have an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "one inbox for Instagram, Facebook, TikTok, WhatsApp and website forms with response timers and booking outcome, measured daily per branch.",
+        "tool_words": []
+      },
+      "ask_first": "Who handles the DMs today?",
+      "free_stops": "Routing and response rules are set in the solution document."
+    },
+    {
+      "id": "p2_campaign_roi_unknown",
+      "n": 2,
+      "words": "We spend a lot on Meta ads and can't say which ones bring bookings",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Ask every new booking where they heard of you, so you get a rough split",
+        "List the campaigns running now, so each can be matched to bookings."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "a code or link per campaign and influencer collab, tied to enquiries, bookings and revenue automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many campaigns or collabs are running this month?",
+      "free_stops": "How codes are set up per campaign is in the solution document."
+    },
+    {
+      "id": "p3_churn_subscription",
+      "n": 3,
+      "words": "Clients buy laser packages and never finish them",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "List open packages with sessions left and last visit, so stalled ones are visible",
+        "Contact those overdue for their next session, with their permission, so they rebook."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "loyalty_repeat — a package ledger with next-session reminders sent automatically to consenting clients, with completion tracked by branch.",
+        "tool_words": []
+      },
+      "ask_first": "Do packages have an expiry date?",
+      "free_stops": "Reminder timing and rebooking flow are in the solution document."
+    },
+    {
+      "id": "p4_no_dashboard",
+      "n": 4,
+      "words": "I don't know how much unused package value is sitting on our books",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Total sessions sold but not used across all packages, so the figure is known",
+        "Ask your accountant how to record it, so the books reflect it properly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an owner dashboard showing package liability, bookings, revenue by service and branch, updated daily.",
+        "tool_words": [
+          "dashboard"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you sell memberships as well as packages?",
+      "free_stops": "The liability calculation is set out in the solution document."
+    },
+    {
+      "id": "p5_pricing_errors",
+      "n": 5,
+      "words": "Staff give discounts in DMs that the counter doesn't know about",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Put current offers with start and end dates in one shared list, so DM team and counter match",
+        "Name who may give a discount, so there is one rule."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a central offer and price list pushed to the counter and DM team, with discount and free touch-up approvals logged by role.",
+        "tool_words": []
+      },
+      "ask_first": "Do both branches run the same offers?",
+      "free_stops": "Approval levels are in the solution document."
+    },
+    {
+      "id": "p6_count_mismatch",
+      "n": 6,
+      "words": "Injectable stock doesn't match what was used",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count injectable stock against this week's treatments once, so the gap is known",
+        "Keep high-value stock in one locked fridge, so access is limited."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "an injectables and product register with lot, expiry and usage entered per treatment reference, flagging mismatches and near-expiry stock.",
+        "tool_words": []
+      },
+      "ask_first": "Who records usage at the chair today?",
+      "free_stops": "Register fields and checks are in the solution document."
+    },
+    {
+      "id": "p7_hidden_costs",
+      "n": 7,
+      "words": "Leased laser charges per shot and I can't reconcile the bill",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "Note the machine's shot counter at the start and end of each day for a week, so usage is on record",
+        "Compare it with the vendor bill, so differences show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "cash_reconciliation — daily device counter entries by phone with a monthly check against the vendor bill.",
+        "tool_words": []
+      },
+      "ask_first": "Is the device leased or on revenue-share?",
+      "free_stops": "The reconciliation method is in the solution document; lease terms are for your lawyer."
+    },
+    {
+      "id": "p8_commission_disputes",
+      "n": 8,
+      "words": "Therapists argue about commission on package sales",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Put the commission rule for package sales on one signed page, so there's one reference",
+        "Share each therapist's weekly sales, so differences come up early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a practitioner commission statement from completed treatments and package sales.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is commission paid on sale or on session delivered?",
+      "free_stops": "Rule details are in the solution document."
+    },
+    {
+      "id": "p9_reviews_bad",
+      "n": 9,
+      "words": "Unhappy client posted on TikTok and it went everywhere",
+      "category": "customers_retention",
+      "subtype": "reviews_bad",
+      "quick_ideas": [
+        "Reply publicly and politely without discussing any treatment details, and offer a private conversation, so the response is on record",
+        "Agree who decides refunds or redos, so complaints are handled the same way."
+      ],
+      "workzap_build": {
+        "keys": [
+          "reviews_collection"
+        ],
+        "text": "job_tracking — a complaint and refund workflow with manager approval, and feedback requests that route unhappy clients to the manager before they post.",
+        "tool_words": []
+      },
+      "ask_first": "Who handles complaints today?",
+      "free_stops": "The complaint steps are in the solution document; legal concerns go to your lawyer."
+    },
+    {
+      "id": "p10_record_keeping",
+      "n": 10,
+      "words": "Before/after photos are on therapists' phones",
+      "category": "compliance_admin",
+      "subtype": "record_keeping",
+      "quick_ideas": [
+        "Move all photos to one clinic-controlled folder, so they leave personal phones",
+        "Ask your lawyer about consent requirements, so you know the rule."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a secure consented-photo store with access control.",
+        "tool_words": []
+      },
+      "ask_first": "Do you collect written consent today?",
+      "free_stops": "Access set-up is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Which treatment suits someone, or anything about side-effects, products, doses or device settings. Whether a result is normal or good. Interpretations of who may inject or rules on advertising medical procedures. Help sourcing unregistered injectables, relabelling products or advertising false results. Fake reviews of any kind. Ideas that put client names, photos or treatment details in messages."
+  ],
+  "sample_reply": {
+    "person": "We get so many DMs from our Instagram ads but my team replies late and bookings are low. What's the fix?",
+    "pi": "Yes, this is a common fix, and you can start this week. 1 Check how long last week's DMs waited for a reply, so you know the real delay. 2 Give DMs to one person at fixed times instead of the front desk, so they have an owner. Workzap can do this automatically for you with one inbox for all channels, response timers and codes that show which ad brought each booking. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

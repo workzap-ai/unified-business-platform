@@ -1,0 +1,204 @@
+{
+  "industry": "driving_schools",
+  "name": "Driving schools",
+  "sector": "7.G Transport, mobility and aviation (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_booking_appointments",
+      "n": 1,
+      "words": "Students cancel at the last minute and instructors sit idle",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Agree a cancellation rule and tell students when they book, so it's clear upfront",
+        "Remind students the day before, so they cancel earlier or turn up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "lesson booking with automatic reminders and the cancellation rule recorded on each booking.",
+        "tool_words": []
+      },
+      "ask_first": "Is there any rule students agree to about cancelling today?",
+      "free_stops": "Reminder timing and the rule set-up are in the solution document."
+    },
+    {
+      "id": "p2_handoffs",
+      "n": 2,
+      "words": "Double bookings on the same car and instructor",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Keep one booking diary for all cars and instructors, so every booking is checked",
+        "Let one person confirm bookings, so clashes are caught."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a lesson calendar by instructor and car that blocks double bookings, with WhatsApp self-booking.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Calendar rules are in the solution document."
+    },
+    {
+      "id": "p3_performance_unknown",
+      "n": 3,
+      "words": "I don't know how many lessons each instructor gave",
+      "category": "people_staff",
+      "subtype": "performance_unknown",
+      "quick_ideas": [
+        "Log every lesson with start and end time, so lessons can be counted",
+        "Total each instructor's lessons weekly, so pay and workload are clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "dashboards_reports"
+        ],
+        "text": "an instructor lesson log confirmed by the student, feeding pay or commission automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How confirmation and pay calculations work is in the solution document."
+    },
+    {
+      "id": "p4_data_scattered",
+      "n": 4,
+      "words": "We don't track how many lessons each student has left",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Keep a package card per student showing lessons bought and taken, so both sides know",
+        "Update it after every lesson, so refunds are clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a package tracker showing lessons bought, taken and remaining, with payment status, holding no personal details beyond what's needed.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Package tracking set-up is in the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Students pay part and disappear",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List students with unpaid balances, so you know the gap",
+        "Remind each once, so it's raised early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "payment status per package with automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder steps are in the solution document; refund obligations are for your lawyer."
+    },
+    {
+      "id": "p6_lead_followup_slow",
+      "n": 6,
+      "words": "Enquiries on Instagram and WhatsApp get late replies",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Give one person the job of replying at set times, so enquiries aren't left",
+        "Note where each enquiry came from, so you see which channel works."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup",
+          "attribution_codes"
+        ],
+        "text": "an enquiry inbox from Instagram, WhatsApp and website with response tracking and source.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Inbox and source set-up are in the solution document."
+    },
+    {
+      "id": "p7_consistency_across_branches",
+      "n": 7,
+      "words": "Instructors teach differently and students get confused",
+      "category": "quality_complaints",
+      "subtype": "consistency_across_branches",
+      "quick_ideas": [
+        "Agree the skills a course covers in order, so instructors share one plan",
+        "Note what each lesson covered, so the next instructor picks up from there."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a progress card per student listing skills covered, shared between instructors.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The progress card structure is in the solution document."
+    },
+    {
+      "id": "p8_cost_overruns",
+      "n": 8,
+      "words": "Fuel and repairs on training cars keep rising",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Record each fill and repair per car, so costs are visible by car",
+        "Compare cars of the same type, so outliers show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "a car log for fuel, kilometres, damage and service schedule.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the log is kept is in the solution document."
+    },
+    {
+      "id": "p9_capacity",
+      "n": 9,
+      "words": "Weekend and evening slots are full, weekday mornings empty",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Look at last month's bookings by time slot, so you see the empty hours",
+        "Offer quiet slots to students with flexible schedules, so they fill."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "dashboards_reports"
+        ],
+        "text": "a utilisation view of empty slots, with offers sent to students who have agreed to messages.",
+        "tool_words": [],
+        "reordered_from": [
+          "dashboards_reports",
+          "customer_messaging"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "How offers are targeted is in the solution document."
+    }
+  ],
+  "never_say": [
+    "How to pass tests, bypass test steps, or get a licence improperly; decline fake certificates, bribes or proxy test-takers. Advice on licensing rules, instructor certification or insurance. Storing students' names, phone numbers or personal details beyond what the owner needs. Judging harassment or misconduct complaints; if anyone is in danger, point to police or emergency services. Whether a refund is legally owed. After a lesson crash with injuries, anything before pointing to emergency services."
+  ],
+  "sample_reply": {
+    "person": "Students book on WhatsApp and cancel an hour before. My instructors sit doing nothing. Any solution?",
+    "pi": "Yes, there's a fix for this, and you can start this week. 1 Agree a cancellation rule and tell students when they book, so it's clear upfront. 2 Remind students the day before, so they cancel earlier or turn up. Workzap can do this automatically for you: lesson booking with reminders and your cancellation rule recorded on each booking. Shall I get a solution document and quote prepared for you? You're free to say no.",
+    "language": "english"
+  }
+}

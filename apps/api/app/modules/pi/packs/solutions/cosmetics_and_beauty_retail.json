@@ -1,0 +1,242 @@
+{
+  "industry": "cosmetics_and_beauty_retail",
+  "name": "Cosmetics and beauty retail",
+  "sector": "7.A Retail and consumer (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_stockout",
+      "n": 1,
+      "words": "Best-selling shades go out of stock and we only notice when customers ask",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Pick out your top-selling shades, because those are the ones worth watching closely",
+        "Set a minimum quantity for each, because it gives staff a clear point to reorder."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "shade-level stock with barcode scanning and a WhatsApp alert the moment a best seller drops below its minimum, across shop and online.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many products and shades do you carry?",
+      "free_stops": "minimum levels and reorder rules are worked out in the solution document."
+    },
+    {
+      "id": "p2_expiry_wastage",
+      "n": 2,
+      "words": "Products expire before we sell them",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Do one expiry sweep and move the earliest dates to the front, because new stock is often sold first",
+        "List what expires in the coming months, so you can bundle it in time without touching any dates."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "batch and expiry tracking with near-expiry lists early enough to plan bundles or clearance.",
+        "tool_words": []
+      },
+      "ask_first": "Who checks expiry dates now?",
+      "free_stops": "alert timing and clearance planning are kept for the solution document."
+    },
+    {
+      "id": "p3_returns_rto",
+      "n": 3,
+      "words": "COD parcels get refused and the courier charges us both ways",
+      "category": "orders_fulfilment",
+      "subtype": "returns_rto",
+      "quick_ideas": [
+        "Confirm COD orders with the buyer before dispatch, because unconfirmed orders are the ones most often refused",
+        "List last month's refusals by area, because it shows where the problem sits."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "workflow_automation"
+        ],
+        "text": "every COD order confirmed automatically before dispatch, with each parcel tracked as confirmed, delivered or refused.",
+        "tool_words": []
+      },
+      "ask_first": "Is most of your online business COD?",
+      "free_stops": "the confirmation flow and its wording are kept for the solution document."
+    },
+    {
+      "id": "p4_cod_remittance",
+      "n": 4,
+      "words": "Courier COD money comes late and doesn't match",
+      "category": "cash_collections",
+      "subtype": "cod_remittance",
+      "quick_ideas": [
+        "Match one month of courier payments against your parcel list, because it shows exactly what's missing",
+        "Ask each courier for a parcel-wise statement, because totals hide gaps."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "COD reconciliation showing dispatched, delivered, refused, remitted and outstanding per courier, updated daily.",
+        "tool_words": []
+      },
+      "ask_first": "How many couriers do you use?",
+      "free_stops": "the reconciliation setup per courier goes in the solution document."
+    },
+    {
+      "id": "p5_chat_overload",
+      "n": 5,
+      "words": "Instagram DMs are full of ‘price?' and ‘is this original?'",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Count a day's DMs and how many became orders, because it shows what the inbox is worth",
+        "Make one person responsible for replies, because shared inboxes get ignored."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "one inbox for Instagram and WhatsApp where every chat is answered consistently and turned into a tracked order.",
+        "tool_words": []
+      },
+      "ask_first": "Who replies to messages today?",
+      "free_stops": "reply flows and catalogue links are kept for the solution document."
+    },
+    {
+      "id": "p6_campaign_roi_unknown",
+      "n": 6,
+      "words": "We pay influencers and don't know what we got",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Give your next influencer their own code, because it's the simplest way to tie orders to them",
+        "List what each influencer was given, so you can compare later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "unique codes and links per influencer or campaign, with the orders each one brought in, reported automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Do you pay influencers or send PR boxes, or both?",
+      "free_stops": "code setup and campaign reporting go in the solution document."
+    },
+    {
+      "id": "p7_multi_channel_orders",
+      "n": 7,
+      "words": "Website and shop stock never match, so we oversell",
+      "category": "orders_fulfilment",
+      "subtype": "multi_channel_orders",
+      "quick_ideas": [
+        "Check your fastest items across every channel once, because it shows how far apart they've drifted",
+        "Make one person own stock numbers, because shared ownership means nobody updates."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration",
+          "order_capture"
+        ],
+        "text": "one stock count shared by shop, website, Instagram and marketplaces like Daraz or Noon, with all orders in one pick-pack list.",
+        "tool_words": []
+      },
+      "ask_first": "Which marketplaces do you sell on?",
+      "free_stops": "channel connections and stock rules are kept for the solution document."
+    },
+    {
+      "id": "p8_packing_errors",
+      "n": 8,
+      "words": "Customers complain we sent the wrong shade",
+      "category": "orders_fulfilment",
+      "subtype": "packing_errors",
+      "quick_ideas": [
+        "Store look-alike shades apart, because most mix-ups happen on the shelf",
+        "Check a day's packed orders before sealing, because it shows where errors creep in."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "field_checks"
+        ],
+        "text": "a pick-pack list with a barcode shade check and a packing photo saved against each order.",
+        "tool_words": []
+      },
+      "ask_first": "Who packs orders today?",
+      "free_stops": "the packing check process goes in the solution document."
+    },
+    {
+      "id": "p9_wastage_cost",
+      "n": 9,
+      "words": "Testers get used up or stolen, and small items walk out",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Count your testers and high-risk small items once, because you'll see the real loss",
+        "Move the most-taken items near the counter, because visibility deters."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a tester log and short daily spot-count on phone, with monthly cost written off by category and branch.",
+        "tool_words": []
+      },
+      "ask_first": "Where do you think most of the loss happens?",
+      "free_stops": "the count rotation and loss reporting are kept for the solution document."
+    },
+    {
+      "id": "p10_repeat_low",
+      "n": 10,
+      "words": "Customers buy once in a sale and never come back",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Start asking at billing if customers want restock news, saving numbers only with their permission",
+        "Note which products bring people back, because those are the ones to announce."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "loyalty_repeat"
+        ],
+        "text": "a consented customer list with WhatsApp messages for restocks and sales, and repeat buyers recognised.",
+        "tool_words": []
+      },
+      "ask_first": "Do you keep any record of who buys from you?",
+      "free_stops": "the messaging plan and loyalty rules go in the solution document."
+    },
+    {
+      "id": "p11_void_refund_abuse",
+      "n": 11,
+      "words": "Staff give their own discounts to friends",
+      "category": "loss_security",
+      "subtype": "void_refund_abuse",
+      "quick_ideas": [
+        "Review one month of discounts and voids by staff role, because patterns show quickly",
+        "Set clear discount limits by role, because grey areas invite misuse."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "dashboards_reports"
+        ],
+        "text": "discount rules with caps, owner approval above limits and a weekly report by role.",
+        "tool_words": []
+      },
+      "ask_first": "Who can give discounts at the till now?",
+      "free_stops": "limits and approval routing are kept for the solution document."
+    }
+  ],
+  "never_say": [
+    "Any advice on ingredients, product safety, allergies, skin conditions or what suits someone; for swelling or breathing difficulty, say seek emergency care. Whether a product is genuine, or help selling \"first copy\" goods as originals. Help to relabel, repack or change expiry dates. Advice on import permits or cosmetic registration; say \"check with your clearing agent or adviser\". Any promise that a campaign or influencer will bring sales."
+  ],
+  "sample_reply": {
+    "person": "Instagram pe orders bohat aate hain lekin COD ke aadhe parcel wapis aa jaate hain. Koi solution hai?",
+    "pi": "Ji haan, is ke liye kaafi kuch kiya ja sakta hai. 1. Dispatch se pehle har COD order customer se confirm karwa lein, kyun ke bina confirmation wale parcel hi zyada wapis aate hain. 2. Pichle mahine ke wapis aaye parcels area ke hisaab se dekh lein, taake pata chale masla kahan hai. Workzap ye kaam aap ke liye khud- ba-khud kar sakta hai: har COD order pe confirmation apne aap jaye aur har parcel ka status aur courier ki payment ek jagah nazar aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

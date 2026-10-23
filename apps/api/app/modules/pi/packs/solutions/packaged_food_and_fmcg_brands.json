@@ -1,0 +1,203 @@
+{
+  "industry": "packaged_food_and_fmcg_brands",
+  "name": "Packaged food and FMCG brands",
+  "sector": "7.B Food and beverage",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_no_dashboard",
+      "n": 1,
+      "words": "I only see primary sales, I don't know what actually sold in the market",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Ask your largest distributors for secondary sales and stock once, so you see the gap",
+        "Use one simple format for all, so their numbers can be compared."
+      ],
+      "workzap_build": {
+        "keys": [
+          "erp_nori_platform"
+        ],
+        "text": "a distributor portal where every distributor submits secondary sales and stock weekly in one format, feeding your dashboard.",
+        "tool_words": [
+          "portal",
+          "dashboard"
+        ]
+      },
+      "ask_first": "Do any distributors send secondary sales now?",
+      "free_stops": "The portal and data format distributors use are set out in the solution document."
+    },
+    {
+      "id": "p2_expiry_wastage",
+      "n": 2,
+      "words": "Expired stock comes back from the market and we eat the cost",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "List near-expiry stock at your factory and top distributors, so you can move it before it returns",
+        "Note which SKUs come back most, so production of those is reviewed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a near-expiry radar showing stock by batch and expiry at the factory and distributors, with alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Which SKUs return most?",
+      "free_stops": "The expiry tracking and action rules are detailed in the solution document."
+    },
+    {
+      "id": "p3_approvals_slow",
+      "n": 3,
+      "words": "Distributor claims for schemes take months, and I'm not sure schemes reach the retailer",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "List every open claim with its date and amount, so the oldest are cleared first",
+        "Ask for evidence with each claim, so verification isn't starting from zero."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a scheme and claim tracker with rules, evidence, approval status and ageing.",
+        "tool_words": []
+      },
+      "ask_first": "How long do claims usually take to settle?",
+      "free_stops": "The claim evidence rules and approval flow stay for the solution document."
+    },
+    {
+      "id": "p4_performance_unknown",
+      "n": 4,
+      "words": "Order bookers fake visits, shops say nobody came",
+      "category": "people_staff",
+      "subtype": "performance_unknown",
+      "quick_ideas": [
+        "Call a few shops on a beat to confirm visits, so you see whether there's a real gap",
+        "Review each booker's orders by shop, because missing shops show quickly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "an order booker app with beat plan, shop check-in with location and photo during work hours, order capture and visit history, with bookers told how it works.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How do you know bookers visited their shops now?",
+      "free_stops": "The beat plan and check-in rules are in the solution document."
+    },
+    {
+      "id": "p5_forecasting",
+      "n": 5,
+      "words": "Some SKUs always out of stock in the market, others rot, and production is on gut feel",
+      "category": "planning_growth",
+      "subtype": "forecasting",
+      "quick_ideas": [
+        "Compare last month's production with secondary sales by SKU, so you see what's over- and under-made",
+        "Note the SKUs that run out most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a weekly production plan built from recent secondary sales and current stock.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How do you decide what to produce each week?",
+      "free_stops": "The planning logic is detailed in the solution document."
+    },
+    {
+      "id": "p6_raw_material_shortage",
+      "n": 6,
+      "words": "Packaging film and cartons run out and the line stops",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "List each raw and packaging material with its supplier lead time, so you know when to order",
+        "Check stock of the ones that stopped the line before."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "raw and packaging stock with reorder points tied to supplier lead times, with alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Which material runs short most?",
+      "free_stops": "The reorder points per material stay for the solution document."
+    },
+    {
+      "id": "p7_margin_unknown",
+      "n": 7,
+      "words": "I don't know margin by SKU after schemes and returns",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out the margin on your top SKUs once including schemes, returns and freight, so the real picture shows",
+        "Review the thinnest SKUs first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a SKU margin view including schemes, returns, freight and listing fees, refreshed every month.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which SKUs do you think make the least?",
+      "free_stops": "The margin model is set out in the solution document."
+    },
+    {
+      "id": "p8_receivables_late",
+      "n": 8,
+      "words": "Supermarkets pay late and deduct for returns",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid invoice by supermarket with its age, so you chase the oldest first",
+        "Match deductions to returns notes, so disputes have evidence."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a modern-trade receivables tracker with invoice ageing and deductions.",
+        "tool_words": []
+      },
+      "ask_first": "How long do supermarkets usually take to pay?",
+      "free_stops": "The tracking and dispute steps are in the solution document."
+    },
+    {
+      "id": "p9_serial_batch_tracking",
+      "n": 9,
+      "words": "Batch on the shelf has a defect and I can't trace which line or shift",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Note line, shift and date for every batch, so a complaint can be traced",
+        "Check QC is recorded at the time on every shift. For recall steps, go to the authority and qualified advisers."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "batch traceability from raw material lot to line, shift and dispatch, with a QC checklist on a tablet.",
+        "tool_words": []
+      },
+      "ask_first": "If a complaint comes in now, can you trace the batch?",
+      "free_stops": "The traceability set-up is detailed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about food registration, labelling, nutrition claims, halal certification or authority approvals. Recall steps — point to the authority and qualified advisers. Advice on distributor contracts, exclusivity or competition law. Help with price-fixing, under-invoicing or relabelling expired stock. That sales or margins will improve by any amount."
+  ],
+  "sample_reply": {
+    "person": "We sell through 14 distributors. I see what I sell to them, but no clue what they sell to shops. Need a solution before Ramadan.",
+    "pi": "Yes, you can see what's moving in the market, and the first step can happen this week. 1 Ask your largest distributors for secondary sales and godown stock once, so you see the size of the gap before Ramadan. 2 Give them all one simple format, so their numbers can be compared. Workzap can do this automatically for you, with a distributor portal where every distributor submits sales and stock weekly in one format, feeding a dashboard of stock in the market by SKU and city. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "industry": "sports_clubs_academies_and_turf_court_rentals",
+  "name": "Sports clubs, academies and turf/court rentals",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_booking_appointments",
+      "n": 1,
+      "words": "Two teams turn up for the same slot because bookings are on WhatsApp",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Keep every slot in one calendar owned by one person, so two people can't sell the same hour",
+        "Treat a slot as booked only once it's written there, so WhatsApp promises don't clash."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a slot calendar per court or turf with WhatsApp booking, automatic confirmations and clash blocking.",
+        "tool_words": []
+      },
+      "ask_first": "How many courts or turfs do you have?",
+      "free_stops": "Booking flow and slot rules per court go in the solution document."
+    },
+    {
+      "id": "p2_conversion_low",
+      "n": 2,
+      "words": "People book late-night slots and don't show",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Ask for an advance on peak slots, so a booking means commitment",
+        "Keep a list of groups who didn't show, so you know who to ask for an advance next time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a no-show tracker per group with an advance link on peak slots, and freed slots offered to a waitlist automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Do you take any advance for slots now?",
+      "free_stops": "Advance rules and waitlist handling are in the solution document."
+    },
+    {
+      "id": "p3_cash_handling_risk",
+      "n": 3,
+      "words": "Slot advances collected by the ground boy sometimes never reach me",
+      "category": "cash_collections",
+      "subtype": "cash_handling_risk",
+      "quick_ideas": [
+        "Give players one account for advances, so money lands in one place",
+        "Match this week's bookings with money received once, to see what never reached you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily match of booked slots against payments received, flagging gaps.",
+        "tool_words": []
+      },
+      "ask_first": "How do most players pay?",
+      "free_stops": "Matching rules and payment flow stay for the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "Academy parents pay late and I don't know who has paid",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Make one list of students by batch with this month's fee status, so you know who's paid",
+        "Remind unpaid parents once, since many simply forget."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an academy register by student ID number with fee status and automatic reminders to parents.",
+        "tool_words": []
+      },
+      "ask_first": "How many students are enrolled?",
+      "free_stops": "Register setup and reminder timing are in the solution document."
+    },
+    {
+      "id": "p5_commission_disputes",
+      "n": 5,
+      "words": "Coaches claim more sessions than they ran",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Note each batch's session as it happens this week, so there's a record besides the coach's word",
+        "Compare it with coach claims at month end, to see where the gap is."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "coach check-in per batch with automatic monthly payout calculation.",
+        "tool_words": []
+      },
+      "ask_first": "Are coaches paid per session or salaried?",
+      "free_stops": "Check-in method and payout rules go in the solution document."
+    },
+    {
+      "id": "p6_utility_costs",
+      "n": 6,
+      "words": "Floodlight bill is huge and I don't know if late slots cover it",
+      "category": "margin_cost",
+      "subtype": "utility_costs",
+      "quick_ideas": [
+        "Note lights-on and lights-off times against booked slots for a week, to see whether late slots pay for the lights",
+        "Check for lights running with no booking, since that is pure cost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a utility log per slot showing cost against slot revenue.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you have a separate meter for floodlights?",
+      "free_stops": "How usage is logged and costed is in the solution document."
+    },
+    {
+      "id": "p7_maintenance_downtime",
+      "n": 7,
+      "words": "Generator or lights fail mid-match and we give refunds",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List every failure this month and its cause, to see what keeps breaking",
+        "Agree pre-evening checks with your electrician, so faults show before the match."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an asset tracker for turf, nets, lights and generator with replacement dates and service reminders.",
+        "tool_words": []
+      },
+      "ask_first": "What fails most often?",
+      "free_stops": "Asset list and service schedule stay for the solution document."
+    },
+    {
+      "id": "p8_churn_subscription",
+      "n": 8,
+      "words": "Students drop out after two or three months",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Ask parents of recent leavers why they stopped, to find the pattern",
+        "Share a short progress note with current parents, since parents who see progress tend to stay."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "monthly progress notes from coaches to parents and alerts when attendance drops.",
+        "tool_words": []
+      },
+      "ask_first": "When do students usually leave?",
+      "free_stops": "Note template and drop-off rules are in the solution document."
+    },
+    {
+      "id": "p9_manual_work",
+      "n": 9,
+      "words": "Tournament registrations and fixtures are on paper and WhatsApp groups",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Keep one list of entered teams with fee status, so no team plays unpaid",
+        "Publish fixtures in one place, so the WhatsApp group stops being the record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a tournament module for registrations, entry fees, fixtures and results posted to WhatsApp.",
+        "tool_words": [
+          "module"
+        ]
+      },
+      "ask_first": "How many teams enter a typical tournament?",
+      "free_stops": "Module setup stays for the solution document."
+    },
+    {
+      "id": "p10_checklists_not_done",
+      "n": 10,
+      "words": "Night staff don't lock up or switch off lights",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Ask for a closing photo of lights and locks each night, so you see it yourself",
+        "Name one person accountable per night, so it doesn't fall between people."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a closing checklist with time-stamped photos and missed checks counted.",
+        "tool_words": []
+      },
+      "ask_first": "What time do you close?",
+      "free_stops": "Checklist steps and timing are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Training, injury, nutrition, heat safety or medical advice. Collecting children's names, ages, photos or medical notes. Investigating coach conduct with children; this goes to the appropriate authorities. Anything related to betting. Advice on land, lease or permits; injuries on site mean emergency services first."
+  ],
+  "sample_reply": {
+    "person": "Ramzan mein raat ke slots full hote hain lekin aadhi teams aati hi nahi. Kya karoon?",
+    "pi": "Ji, is ka hal mumkin hai, aur isi Ramzan se shuru ho sakta hai. 1 Peak slots par advance liya jaye, taake booking sirf naam na rahe. 2 Na aane wali teams ki list rakhi jaye, taake agli baar faisla aasaan ho. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: WhatsApp par booking ke saath advance link, aur khaali slot waitlist ko foran offer ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

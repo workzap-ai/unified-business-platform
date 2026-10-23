@@ -1,0 +1,220 @@
+{
+  "industry": "salons_and_barbers",
+  "name": "Salons and barbers",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_booking_appointments",
+      "n": 1,
+      "words": "Clients book on WhatsApp and Instagram and we double-book stylists",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Keep one appointment book per stylist, owned by one person, so two people can't promise the same slot",
+        "Confirm bookings only once they're written there, so DMs don't clash."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "an appointment book per stylist with WhatsApp booking, automatic reminders and clash blocking.",
+        "tool_words": []
+      },
+      "ask_first": "How many stylists or chairs do you have?",
+      "free_stops": "Booking flow and reminder timing go in the solution document."
+    },
+    {
+      "id": "p2_conversion_low",
+      "n": 2,
+      "words": "Saturday no-shows leave chairs empty",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Confirm Saturday bookings the day before, so no-shows are spotted early",
+        "Keep a short walk-in waitlist, so a freed chair gets filled."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "automatic reminders and no-show tracking per client, with freed slots offered to the waitlist.",
+        "tool_words": []
+      },
+      "ask_first": "Do you take advances for any services?",
+      "free_stops": "Reminder and no-show rules are in the solution document."
+    },
+    {
+      "id": "p3_commission_disputes",
+      "n": 3,
+      "words": "Commission calculations cause fights every month",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Record every service against the stylist at billing, so the month-end tally isn't rebuilt from memory",
+        "Share each stylist's tally weekly, so disputes come up early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "daily sales by stylist with automatic monthly commission statements.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Salary, commission, chair rent or a mix?",
+      "free_stops": "Commission logic and billing setup stay for the solution document."
+    },
+    {
+      "id": "p4_count_mismatch",
+      "n": 4,
+      "words": "Colour and keratin products run out faster than services billed",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Compare this month's product bought with services billed, to see how big the gap is",
+        "Issue expensive products from one person, so usage has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a back-bar usage log per service compared to stock, with reorder and mismatch alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Which products go missing most?",
+      "free_stops": "Usage norms per service and alert rules are in the solution document."
+    },
+    {
+      "id": "p5_void_refund_abuse",
+      "n": 5,
+      "words": "Services are rung up cheaper than what was done",
+      "category": "loss_security",
+      "subtype": "void_refund_abuse",
+      "quick_ideas": [
+        "Spot-check a few bills against what you saw on the floor, to see whether it's happening",
+        "Make any price change need your OK, so cheaper billing stands out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a counter billing app with price-change approvals logged.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Who does the billing at the counter?",
+      "free_stops": "Approval rules stay for the solution document."
+    },
+    {
+      "id": "p6_cash_mismatch",
+      "n": 6,
+      "words": "Cash at the counter never matches the day's services",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Do one end-of-day count against services billed, so gaps show the same day",
+        "Note the payment method for every bill, so transfers can be traced."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily cash-up matching services, cash, cards and transfers.",
+        "tool_words": []
+      },
+      "ask_first": "How many payment methods do you accept?",
+      "free_stops": "Cash-up steps are in the solution document."
+    },
+    {
+      "id": "p7_order_errors",
+      "n": 7,
+      "words": "Bridal advances taken and then dates clash",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Keep a separate bridal register with date and advance, so bridal dates have one home",
+        "Check it before confirming any bridal booking, so clashes are caught before money is taken."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "and credit_ledger — a bridal register with date lock, advance log and trial scheduling.",
+        "tool_words": []
+      },
+      "ask_first": "How far ahead do brides book?",
+      "free_stops": "Register setup and trial flow go in the solution document."
+    },
+    {
+      "id": "p8_repeat_low",
+      "n": 8,
+      "words": "Clients come once and don't return",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Ask clients at payment if they'd like offers, keeping numbers only with their permission, so you have someone to invite back",
+        "Pick one reason to invite them back, such as a festival, since a reason works better than a reminder."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "and loyalty_repeat — a consented client list with visit history and festive reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Do you keep any client list now?",
+      "free_stops": "Messaging plan and loyalty rules are in the solution document."
+    },
+    {
+      "id": "p9_theft_internal",
+      "n": 9,
+      "words": "Staff do home services for my clients privately",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Offer home service officially, so clients book through you",
+        "Make all bookings go through one number, so private arrangements stand out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "home-service bookings tracked through the salon with stylist assignment.",
+        "tool_words": []
+      },
+      "ask_first": "Do you offer home service now?",
+      "free_stops": "Home-service flow stays for the solution document."
+    },
+    {
+      "id": "p10_branch_comparison",
+      "n": 10,
+      "words": "Two branches, and I can't see which is doing better",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Agree the same few numbers from each branch daily, so you compare like with like",
+        "Compare one week side by side, to see which branch needs attention."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read per branch: services, revenue, average bill, product cost.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do both branches bill the same way?",
+      "free_stops": "Which numbers and sources go in the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on skin reactions, allergies, burns or chemical treatments; the client should get medical help. Collecting clients' names, photos, numbers or skin details. Any recording in ladies salons beyond noting counter CCTV gaps. Help selling counterfeit or unregistered products. Employment-law advice on staff disputes."
+  ],
+  "sample_reply": {
+    "person": "Mere parlour mein stylists ki commission har mahine jhagre ka masla ban jati hai. Is ka hal batayein.",
+    "pi": "Ji, is jhagre ko khatam karna mumkin hai. 1 Billing ke waqt har service stylist ke naam ke saath darj ki jaye, taake hisaab baad mein yaad se na bane. 2 Har stylist ko hafte mein ek dafa us ka tally dikhaya jaye, taake farq jaldi saamne aaye. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har service se commission khud jure aur mahine ke aakhir mein statement tayyar mile. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

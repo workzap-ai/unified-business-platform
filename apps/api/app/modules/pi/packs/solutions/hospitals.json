@@ -1,0 +1,242 @@
+{
+  "industry": "hospitals",
+  "name": "Hospitals (operations and admin)",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_bottleneck",
+      "n": 1,
+      "words": "Discharge takes six hours because the bill isn't ready",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Time-stamp each clearance step on a few discharges, so the slowest step is visible",
+        "Start bill preparation when the discharge decision is made, so billing isn't the last thing to begin."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a discharge tracker showing every clearance step with time stamps and which role is holding it, on every ward, with daily average discharge time and no patient details beyond a reference.",
+        "tool_words": []
+      },
+      "ask_first": "Which step usually takes longest, the insurer or internal returns?",
+      "free_stops": "The step list, escalation rules and who sees what are laid out in the solution document."
+    },
+    {
+      "id": "p2_reports_wrong",
+      "n": 2,
+      "words": "Beds are empty on paper but full in reality, nobody updates the board",
+      "category": "reporting_visibility",
+      "subtype": "reports_wrong",
+      "quick_ideas": [
+        "Do one ward walk-round comparing the board with reality, so you know how far off it is",
+        "Agree a few simple bed statuses everyone uses, so updates mean the same thing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "dashboards_reports — a bed board on screen and phone updated by ward and housekeeping roles, showing each bed's status by ward in real time with no patient names.",
+        "tool_words": []
+      },
+      "ask_first": "Does your HIS have a bed module staff could use?",
+      "free_stops": "Status definitions and who updates when are set in the solution document."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Insurance rejections are eating our month",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List this month's rejections by reference and reason, so the top paperwork gap shows up",
+        "Give each rejected claim a resubmission date, so none are forgotten."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "dashboards_reports — an insurance, panel and health-card receivables tracker with claim ageing, rejection reasons and resubmission dates, summarised by payer every day.",
+        "tool_words": []
+      },
+      "ask_first": "Are government health-card claims handled by the same team?",
+      "free_stops": "The status flow and payer reports are detailed in the solution document."
+    },
+    {
+      "id": "p4_bad_debt_walkouts",
+      "n": 4,
+      "words": "Patients leave without clearing the final bill",
+      "category": "cash_collections",
+      "subtype": "bad_debt_walkouts",
+      "quick_ideas": [
+        "Share a running estimate with attendants midway through a stay, so the final bill isn't a surprise",
+        "List open balances by reference, so follow-up starts within days."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "customer_messaging — a running account per admission reference with advance, charges and balance, and bill updates sent only to the registered contact with their permission.",
+        "tool_words": []
+      },
+      "ask_first": "Do you take an advance at admission for cash patients?",
+      "free_stops": "When estimates go out and how balances are chased is set in the solution document."
+    },
+    {
+      "id": "p5_count_mismatch",
+      "n": 5,
+      "words": "Wards indent the same item twice and the store issues both",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Check one week of indents for repeats, so you see how often it happens",
+        "Ask wards to sign for each issue, so receipt is confirmed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a ward indent and store system with approval, issue and receipt confirmation that flags repeat indents and items sent but not received, with ward-wise consumption reports.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "Does each ward keep its own stock cupboard?",
+      "free_stops": "The approval chain and flag rules are designed in the solution document."
+    },
+    {
+      "id": "p6_expiry_wastage",
+      "n": 6,
+      "words": "Pharmacy stock expires on the shelf while we buy more of it",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Pull one near-expiry list from the pharmacy, so purchasing sees it before ordering",
+        "Check other stores for the same item before buying, so stock moves first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "transfer_tracking — an expiry register that sends near-expiry alerts and suggests transfers between stores before new orders, across all sites.",
+        "tool_words": []
+      },
+      "ask_first": "Is the pharmacy run in-house or outsourced?",
+      "free_stops": "Alert timing and transfer rules stay for the solution document."
+    },
+    {
+      "id": "p7_approvals_slow",
+      "n": 7,
+      "words": "Purchase approvals sit with the MD for days",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "List what is waiting and for how long, so the delay is visible",
+        "Agree which small purchases don't need the MD, so the queue shrinks."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a purchase request and approval chain on WhatsApp with limits per role, automatic reminders and a log of who approved what and when.",
+        "tool_words": []
+      },
+      "ask_first": "Do requests wait for quotes or simply for the MD's time?",
+      "free_stops": "The approval limits and reminder flow are set in the solution document."
+    },
+    {
+      "id": "p8_shift_scheduling",
+      "n": 8,
+      "words": "Nursing roster is made on paper and changes every day",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Publish next week's roster in one shared place, so everyone works from the same version",
+        "Record agency hours daily, so the agency invoice can be checked."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "cash_reconciliation — a roster with swaps and leave handled by the supervisor role, and agency hours checked against agency invoices every month.",
+        "tool_words": []
+      },
+      "ask_first": "How many of your nurses come through agencies?",
+      "free_stops": "Swap rules and the invoice check are detailed in the solution document."
+    },
+    {
+      "id": "p9_maintenance_downtime",
+      "n": 9,
+      "words": "Equipment breaks and nobody knows when it was last serviced",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List major equipment with last service date and vendor contact, so gaps are visible",
+        "Send all breakdown reports to one number, so the biomedical team hears first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a biomedical asset register with service-due reminders, breakdown reports, downtime tracking and vendor response times.",
+        "tool_words": []
+      },
+      "ask_first": "Is maintenance in-house or with vendors?",
+      "free_stops": "The register fields and reminder schedule are set in the solution document."
+    },
+    {
+      "id": "p10_data_scattered",
+      "n": 10,
+      "words": "Every department has its own Excel and none of them agree",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Agree a short list of monthly numbers each department sends, so everyone reports the same things",
+        "Name one owner per number, so disputes have one answer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "integration — a management dashboard with admissions, occupancy, revenue by payer and department and receivables, with HIS billing connected to accounts so totals agree daily.",
+        "tool_words": [
+          "integration",
+          "dashboard"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "Which number do you most need earlier?",
+      "free_stops": "Data sources and connections are mapped in the solution document."
+    },
+    {
+      "id": "p11_tasks_dropped",
+      "n": 11,
+      "words": "Complaints get lost between the ward, admin and the MD's office",
+      "category": "communication_coordination",
+      "subtype": "tasks_dropped",
+      "quick_ideas": [
+        "Put this month's open complaints in one list with an owner role, so each has someone responsible",
+        "Review that list once with the MD, so stuck ones are seen."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a complaint log with owner role, deadline, reminders and closure notes, visible to the MD, with no patient health details recorded.",
+        "tool_words": []
+      },
+      "ask_first": "Who is meant to close a complaint today?",
+      "free_stops": "Deadlines and escalation steps are set in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any view on clinical care, staffing ratios as a safety matter, infection control or whether a complication was avoidable. Suggestions to inflate bills, add services not given, alter claim codes or change discharge dates. Interpretations of PHC, DHA, DOH, MOHAP or accreditation standards. Legal advice on complaints threatening legal action; point to the hospital's lawyer. Ideas that link a bed or room to a named patient, or put health information in messages. Promises that discharge will take a set number of hours."
+  ],
+  "sample_reply": {
+    "person": "Discharge is our biggest headache. Patient is ready by 11 but the family is still sitting at 5 waiting for the bill. What can we do?",
+    "pi": "Yes, this can be improved, and you can start this week. 1 Time-stamp each clearance step on a few discharges, so you can see exactly where the hours go. 2 Start the bill when the discharge decision is made, so billing isn't the last thing to begin. Workzap can do this automatically for you with a discharge tracker that shows every step and which role is holding it, measured daily on every ward and without patient details on screen. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

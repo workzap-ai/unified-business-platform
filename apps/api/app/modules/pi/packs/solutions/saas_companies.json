@@ -1,0 +1,222 @@
+{
+  "industry": "saas_companies",
+  "name": "SaaS companies",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_conversion_low",
+      "n": 1,
+      "words": "Lots of signups but very few actually start using the product",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Decide once what \"first real value\" means in your product, so you know what activation looks like",
+        "Look at last month's signups and note where most stopped, so you know which step to fix."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "customer_messaging — an onboarding tracker showing each new account's progress through key setup steps, with nudges by email or WhatsApp, with their permission, when someone stalls.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is your sales mostly self-serve or demo-led?",
+      "free_stops": "which steps to track and when nudges go out are set out in the solution document."
+    },
+    {
+      "id": "p2_lead_followup_slow",
+      "n": 2,
+      "words": "Trials expire and we never spoke to the person",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Contact everyone whose trial ends this week, so you hear from them before it lapses",
+        "Name one owner for trial follow-up, so it isn't left to chance."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "every trial recorded and assigned, with follow-up tasks timed to the trial's stage and an owner's daily list.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "follow-up timing and assignment rules are kept for the solution document."
+    },
+    {
+      "id": "p3_churn_subscription",
+      "n": 3,
+      "words": "Customers cancel after two or three months",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Call a few recent cancellers and ask one question about why, so you get real reasons",
+        "Note those reasons in one place, so patterns show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a customer health view combining usage, tickets and payment status to flag at-risk accounts before they cancel.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "the health signals and thresholds are worked out in the solution document."
+    },
+    {
+      "id": "p4_payment_methods",
+      "n": 4,
+      "words": "Card payments fail and nobody follows up",
+      "category": "cash_collections",
+      "subtype": "payment_methods",
+      "quick_ideas": [
+        "List every account with a failed payment this month, so you know what's at stake",
+        "Contact each one personally once, so recoverable accounts are saved."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a failed payment flow with retries, reminders and a task for the team when an account stays unpaid.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the retry and reminder sequence is set out in the solution document."
+    },
+    {
+      "id": "p5_payment_methods",
+      "n": 5,
+      "words": "Local customers pay by bank transfer and we reconcile by hand",
+      "category": "cash_collections",
+      "subtype": "payment_methods",
+      "quick_ideas": [
+        "Match this month's transfers to invoices once, so open balances are clear",
+        "Ask transfer customers to quote their invoice number, so matching gets easier."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "a reconciliation helper matching incoming transfers to invoices and flagging anything unmatched.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how bank data and invoices are connected is kept for the solution document."
+    },
+    {
+      "id": "p6_manual_work",
+      "n": 6,
+      "words": "Onboarding each new client takes our team a week of calls",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Write down once the steps every new client goes through, so you see which could be self-serve",
+        "Note the questions asked on every onboarding call, so you know what to cover in advance."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an onboarding checklist per account with automatic reminders to the customer and the team at each step.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the onboarding steps and reminder timings are designed in the solution document."
+    },
+    {
+      "id": "p7_chat_overload",
+      "n": 7,
+      "words": "The same support questions come in over and over",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Tag last month's tickets by topic once, so you see the top repeat questions",
+        "Write approved answers for the top few, so replies are consistent."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a help-centre and WhatsApp assistant answering common questions from your approved content, with a weekly summary of top recurring issues.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the content set and hand-off to humans are worked out in the solution document."
+    },
+    {
+      "id": "p8_info_lost_in_whatsapp",
+      "n": 8,
+      "words": "Feature requests are in Slack, email and WhatsApp and we lose track",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Gather this quarter's requests into one list, so nothing is lost",
+        "Note which customer segment asked for each, so priorities are clearer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "a feature request log that captures requests from every channel and links them to customer accounts.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "which channels are connected and how requests are grouped is kept for the solution document."
+    },
+    {
+      "id": "p9_manual_reports",
+      "n": 9,
+      "words": "I can't get a clean MRR number without a day in spreadsheets",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Write down once how you define new, expansion and churned revenue, so everyone counts the same way",
+        "Build last month's figure once by hand, so you have a baseline."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "integration — a subscription metrics screen pulling from your billing system each day, showing MRR, new, expansion and churn by plan and market.",
+        "tool_words": [
+          "integration",
+          "system"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "metric definitions and data connections are set out in the solution document."
+    },
+    {
+      "id": "p10_lead_followup_slow",
+      "n": 10,
+      "words": "Demo requests sit for days before sales calls back",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Reply to every waiting demo request today, so warm leads aren't lost",
+        "Agree who picks up new requests, so ownership is clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "demo requests acknowledged immediately and routed to a salesperson, with reminders until contact is made.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the routing rules and timings are kept for the solution document."
+    }
+  ],
+  "never_say": [
+    "Any privacy-law, tax, fundraising, valuation or legal advice. Dark patterns such as hard-to-cancel flows or hidden charges, or using data without consent. Fake reviews or misleading investor metrics. That churn will fall or MRR will grow by any amount. Requests for customer lists, user data, API keys, admin credentials or card details."
+  ],
+  "sample_reply": {
+    "person": "Signups are decent but churn is bad. People leave after a couple of months. Any ideas?",
+    "pi": "Yes, there's plenty that can be done, starting this week. 1 Call a few recent cancellers and ask one question about why, so you get real reasons instead of blank fields. 2 Decide what \"first real value\" looks like in your product, so you can see who never got there. Workzap can do this automatically for you: a customer health view that flags at-risk accounts early, plus onboarding nudges when new users stall. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

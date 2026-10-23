@@ -1,0 +1,202 @@
+{
+  "industry": "solar_panels_inverters_and_batteries",
+  "name": "Solar panels, inverters and batteries (assembly and distribution)",
+  "sector": "7.D Manufacturing and industry (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_price_increases_supplier",
+      "n": 1,
+      "words": "Panel rates drop after we buy and we lose on stock in the godown",
+      "category": "margin_cost",
+      "subtype": "price_increases_supplier",
+      "quick_ideas": [
+        "Note stock on hand and the rate you bought at — shows your real exposure",
+        "Buy closer to confirmed orders — less stock exposed to rate drops."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a daily rate board for buying and selling rates with stock value updated.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How much stock do you usually hold?",
+      "free_stops": "The buying rules and exposure view are in the solution document."
+    },
+    {
+      "id": "p2_serial_batch_tracking",
+      "n": 2,
+      "words": "We don't record serial numbers so warranty claims become arguments",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Record serials of every panel, inverter and battery at installation — links equipment to the project",
+        "Photograph serial labels — proof for claims."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "job_tracking"
+        ],
+        "text": "a serial register captured at goods-in and linked to the customer project on installation.",
+        "tool_words": []
+      },
+      "ask_first": "Who records serials now, if anyone?",
+      "free_stops": "The capture steps are in the solution document."
+    },
+    {
+      "id": "p3_field_team_visibility",
+      "n": 3,
+      "words": "Install teams say a job is done but the customer says it isn't working",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Ask for photos at handover — shows the job as left",
+        "Get customer confirmation at handover — settles disputes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "an installation job app with photos at each step, checklist sign-off and customer confirmation.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many installation teams do you run?",
+      "free_stops": "The checklist content is in the solution document."
+    },
+    {
+      "id": "p4_lead_followup_slow",
+      "n": 4,
+      "words": "Too many WhatsApp leads and we can't follow up all",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "List every open enquiry with its status — shows who's waiting",
+        "Give one person ownership of follow-ups — nothing dropped."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "a lead inbox for WhatsApp and Facebook enquiries with status, reminders and source tracking.",
+        "tool_words": []
+      },
+      "ask_first": "How many enquiries come in a week?",
+      "free_stops": "The follow-up flow is in the solution document."
+    },
+    {
+      "id": "p5_manual_work",
+      "n": 5,
+      "words": "Quote takes too long because we calculate each system manually",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Keep a current component price sheet — speeds every quote",
+        "Reuse past quotes as templates for common systems — cuts time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a quote builder covering components, structure, cable, labour and margin with branded output.",
+        "tool_words": []
+      },
+      "ask_first": "Who prepares quotes now?",
+      "free_stops": "The quote logic is in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Customers pay the last instalment only after net metering is approved",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every pending final payment with its file stage — shows what's holding cash",
+        "Note days waiting for each file — gives facts to chase."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "job_tracking"
+        ],
+        "text": "an instalment tracker linked to milestones and a net-metering file tracker showing days at each stage.",
+        "tool_words": []
+      },
+      "ask_first": "Who handles net-metering paperwork?",
+      "free_stops": "The milestone and file-tracking set-up is in the solution document."
+    },
+    {
+      "id": "p7_cost_overruns",
+      "n": 7,
+      "words": "Project costs go over and we eat it",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Compare planned versus actual materials on recent projects — shows where it goes over",
+        "Note extras approved at site — they should be charged."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "project costing with planned versus actual materials and labour per project.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "What usually causes the overrun?",
+      "free_stops": "The costing method is in the solution document."
+    },
+    {
+      "id": "p8_shift_scheduling",
+      "n": 8,
+      "words": "Team schedule is on WhatsApp and jobs clash",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Put the coming week's jobs on one board by team — shows clashes",
+        "Confirm the next day with each team in the evening — fewer surprises."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a team scheduler showing which team is at which site each day.",
+        "tool_words": []
+      },
+      "ask_first": "Are installers employees or subcontractors?",
+      "free_stops": "The scheduling set-up is in the solution document."
+    },
+    {
+      "id": "p9_customer_communication",
+      "n": 9,
+      "words": "Customers get no maintenance reminders and then complain",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "List past installations with their dates — shows who is due",
+        "Contact a few, with their permission — shows customers you care."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "maintenance reminders on WhatsApp for customers who opt in.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have customers' permission to message them?",
+      "free_stops": "Reminder timing is in the solution document."
+    }
+  ],
+  "never_say": [
+    "No system sizing, electrical design, wiring, earthing or battery-safety advice. Never estimate savings, payback or bill reductions. No advice on net-metering rules, DISCO/DEWA/utility policies or incentive eligibility. Fires, smoke, swelling batteries, shocks or roof falls: stop and point to emergency services. Never help sell grey-market or refurbished equipment as new, swap serials, fake warranty cards or under-invoice imports; decline. No bill reference numbers, CNIC/Emirates ID or addresses stored."
+  ],
+  "sample_reply": {
+    "person": "Koi hal hai? Warranty claim pe har dafa behes hoti hai kyun ke serial number kahin likha hi nahi hota.",
+    "pi": "Ji, is ka hal seedha hai. 1 Har installation par panels, inverter aur battery ke serial note karein, taake har cheez project se jude. 2 Serial labels ki photo le lein, taake claim par saboot ho. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: serial register jo goods-in par serial le aur installation par customer project se jod de, phir claim aate hi record saamne ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

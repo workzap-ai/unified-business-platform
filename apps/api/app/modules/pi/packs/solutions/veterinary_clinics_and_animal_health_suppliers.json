@@ -1,0 +1,218 @@
+{
+  "industry": "veterinary_clinics_and_animal_health_suppliers",
+  "name": "Veterinary clinics and animal-health suppliers",
+  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_whatsapp_overload",
+      "n": 1,
+      "words": "Reception phone and WhatsApp don't stop, we miss bookings",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Put bookings on one channel the whole team can see",
+        "Answer common questions (hours, location, services) where clients look first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a WhatsApp booking assistant that takes requests by service, confirms them and passes them to reception, around the clock.",
+        "tool_words": []
+      },
+      "ask_first": "How do clients book with you now?",
+      "free_stops": "What the assistant handles and when it hands over stays in the solution document."
+    },
+    {
+      "id": "p2_repeat_low",
+      "n": 2,
+      "words": "Pet owners forget boosters and we don't remind them",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Keep due dates in one list rather than in paper files",
+        "Remind the next week's clients, with their permission."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "booking_scheduling — booster and recheck reminders sent automatically from the due dates the clinic enters.",
+        "tool_words": []
+      },
+      "ask_first": "Where are due dates kept today?",
+      "free_stops": "Reminder timing and wording are set out in the solution document."
+    },
+    {
+      "id": "p3_booking_appointments",
+      "n": 3,
+      "words": "No-shows waste our surgery slots",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Confirm surgery bookings the day before",
+        "Keep a short list of clients who can come in at short notice."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "appointment reminders and confirmations sent automatically, with freed slots offered to the waiting list.",
+        "tool_words": []
+      },
+      "ask_first": "How far ahead are surgeries booked?",
+      "free_stops": "The reminder sequence and waiting-list flow go in the solution document."
+    },
+    {
+      "id": "p4_expiry_wastage",
+      "n": 4,
+      "words": "Vaccines lost when the fridge failed over the weekend",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Make one person responsible for checking the fridge out of hours",
+        "Ask your equipment supplier about a temperature alarm."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "custom_build — fridge temperature alerts from a sensor routed to on-call staff, with every incident logged.",
+        "tool_words": []
+      },
+      "ask_first": "How would you find out today if the fridge failed on a Sunday?",
+      "free_stops": "Sensor connection and alert routing are detailed in the solution document."
+    },
+    {
+      "id": "p5_expiry_wastage",
+      "n": 5,
+      "words": "Medicines expire on the shelf because nobody checks dates",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Do one shelf check for near-expiry stock",
+        "Put the soonest-expiring items at the front."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a pharmacy stock list with batch and expiry dates and near-expiry alerts sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who looks after pharmacy stock?",
+      "free_stops": "Alert timing and stock setup stay in the solution document."
+    },
+    {
+      "id": "p6_void_refund_abuse",
+      "n": 6,
+      "words": "Assistants give medicines without billing them",
+      "category": "loss_security",
+      "subtype": "void_refund_abuse",
+      "quick_ideas": [
+        "Make it a rule that nothing leaves before it's on the bill",
+        "Check a few fast-moving items against bills each week, openly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a billing checklist linking each consultation to items used, with daily stock-vs-bills gaps flagged automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Is there one dispensing point or several?",
+      "free_stops": "How items link to bills is set out in the solution document."
+    },
+    {
+      "id": "p7_credit_customers",
+      "n": 7,
+      "words": "Farm clients take visits and medicine on credit, months behind",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Send each farm client a statement of what's owed",
+        "Set your own credit limit per farm."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a farm client ledger with statements and reminders sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many farm clients buy on credit?",
+      "free_stops": "Statement layout and reminder rules go in the solution document."
+    },
+    {
+      "id": "p8_unbilled_work",
+      "n": 8,
+      "words": "Vets in the field don't log every visit, so we don't bill it",
+      "category": "sales_revenue",
+      "subtype": "unbilled_work",
+      "quick_ideas": [
+        "Ask field vets to report each visit the same day",
+        "Match visits to invoices every week."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a field-visit app where each visit, items used and travel are logged and the invoice goes out by WhatsApp automatically.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many vets go on farm calls?",
+      "free_stops": "The visit log and invoicing flow stay in the solution document."
+    },
+    {
+      "id": "p9_reviews_bad",
+      "n": 9,
+      "words": "Google reviews complain about waiting time",
+      "category": "customers_retention",
+      "subtype": "reviews_bad",
+      "quick_ideas": [
+        "Tell clients the expected wait when they arrive",
+        "Reply calmly to each review."
+      ],
+      "workzap_build": {
+        "keys": [
+          "reviews_collection"
+        ],
+        "text": "real clients asked for a review automatically after their visit, so feedback reflects everyone, not just the unhappy few.",
+        "tool_words": []
+      },
+      "ask_first": "What do unhappy clients mention most?",
+      "free_stops": "The timing and flow of review requests go in the solution document."
+    },
+    {
+      "id": "p10_shift_scheduling",
+      "n": 10,
+      "words": "Weekend and night emergency rota causes fights",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Publish the rota well in advance so swaps are visible",
+        "Agree one fair rule for weekends."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a rota planner that spreads night and weekend cover and sends shift reminders automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many vets share the rota?",
+      "free_stops": "The rota rules and swap process are set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any diagnosis, treatment, dosing, prescribing or drug advice, even to a vet asking. Anything on drug scheduling, prescription rules or registration. Anything that helps sell unregistered, smuggled, expired or restricted medicines, relabel stock or falsify controlled-drug records. Fake or incentivised reviews; review requests go only to real clients. Storing pet owners' or farmers' personal details or medical record contents in pi's notes."
+  ],
+  "sample_reply": {
+    "person": "I run a small-animal clinic in Dubai with two vets. Clients keep forgetting vaccine boosters and then blame us. Can you help?",
+    "pi": "Yes, this is very fixable, and you can start this week. 1. Move due dates out of paper files into one list the team can see. 2. Each week, remind the clients who are due, with their permission. Workzap can do this automatically for you: booster and recheck reminders sent on WhatsApp from the due dates you enter, with bookings passed straight to reception. Shall I put together a solution document and quote for you, or would you rather not?",
+    "language": "english"
+  }
+}

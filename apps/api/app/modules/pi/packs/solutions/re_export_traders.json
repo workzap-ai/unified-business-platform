@@ -1,0 +1,258 @@
+{
+  "industry": "re_export_traders",
+  "name": "Re-export traders Dubai / Jebel Ali)",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_no_visibility",
+      "n": 1,
+      "words": "Stock is split across Jebel Ali, Al Ras and Sharjah and no one knows exact quantities",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Ask each warehouse for a count of your top items on the same day, so you see one true picture",
+        "Make one person own the combined stock sheet, so there is one version."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "transfer_tracking"
+        ],
+        "text": "A multi-warehouse register showing live availability by location, updated as goods move.",
+        "tool_words": []
+      },
+      "ask_first": "How many locations do you keep stock in?",
+      "free_stops": "How movements are captured at each site is designed in the solution document."
+    },
+    {
+      "id": "p2_count_mismatch",
+      "n": 2,
+      "words": "A buyer comes to pick goods and we've already sold them to someone else",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Mark goods as held once a buyer confirms, so nobody else promises them",
+        "Check the stock sheet, not a phone call, before confirming."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "Reservations on the stock register so confirmed goods are held automatically and released only when loaded or cancelled.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The hold and release rules are set in the solution document."
+    },
+    {
+      "id": "p3_overstock_dead_stock",
+      "n": 3,
+      "words": "Old models of phones and electronics lose value every week they sit",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "List items by how long they've been in stock, so the oldest are offered first",
+        "Offer the oldest lots to your regular buyers this week, before they lose more value."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Ageing alerts for fast-depreciating items, sent automatically as stock passes set ages.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Ageing thresholds per category are set in the solution document."
+    },
+    {
+      "id": "p4_whatsapp_overload",
+      "n": 4,
+      "words": "Regular buyers order on WhatsApp voice notes in several languages and things get missed",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Reply to each voice-note order with a written summary for the buyer to confirm, so both sides agree",
+        "Keep one order sheet per buyer, so nothing lives only in a chat."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "An order book per buyer that turns WhatsApp orders into tracked lines through to loading and container.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The intake and confirmation flow are in the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "We gave goods on credit to an agent and payment keeps getting pushed",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every agent balance by age, so you know who to chase first",
+        "Agree who approves new credit for agents with an open balance."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A credit ledger with ageing and approval rules per agent, with reminders queued for the owner to approve.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Approval rules and reminder timing are in the solution document."
+    },
+    {
+      "id": "p6_payment_methods",
+      "n": 6,
+      "words": "Payment comes in many ways and matching it to invoices is hard",
+      "category": "cash_collections",
+      "subtype": "payment_methods",
+      "quick_ideas": [
+        "Ask buyers to quote the proforma reference on every payment, so it matches an invoice",
+        "For questions about how payments may be received, talk to your bank or a compliance adviser."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "Payments logged against proformas daily, with unmatched receipts flagged.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The matching rules are set out in the solution document."
+    },
+    {
+      "id": "p7_cash_handling_risk",
+      "n": 7,
+      "words": "Too much cash collected from walk-in buyers in the showroom",
+      "category": "cash_collections",
+      "subtype": "cash_handling_risk",
+      "quick_ideas": [
+        "Set a fixed daily closing and deposit time, so cash doesn't build up",
+        "Have two people count at closing, so the figure is trusted."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A showroom cash log with daily closing and deposit tracking, flagging days when deposit doesn't match sales.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The closing and deposit steps are laid out in the solution document."
+    },
+    {
+      "id": "p8_margin_unknown",
+      "n": 8,
+      "words": "I don't know which market is actually profitable after freight and discounts",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out one recent shipment's margin to each main market, so you have a first comparison",
+        "Note which costs surprised you, so you know what to track."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A margin view by market, buyer and product, including freight and discounts per shipment, refreshed as sales are entered.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How costs are assigned to markets is worked out in the solution document."
+    },
+    {
+      "id": "p9_turnover",
+      "n": 9,
+      "words": "My salesmen keep their own buyers, and when one leaves his buyers go with him",
+      "category": "people_staff",
+      "subtype": "turnover",
+      "quick_ideas": [
+        "Move buyer chats to a company WhatsApp number, so the relationship sits with the business",
+        "Start a company buyer list, with buyers' permission, so contacts don't leave with staff."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "A company-owned buyer database with purchase history and last contact, shared across the sales team.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Who sees what, and how the list is kept current, is in the solution document."
+    },
+    {
+      "id": "p10_manual_work",
+      "n": 10,
+      "words": "Buyers ask for photos, videos and prices of the same items again and again",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Gather current photos and videos of your main lines in one place, so salesmen stop reshooting",
+        "Update prices in one list, so everyone sends the same figure."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "A catalogue with photos, videos and current prices that salesmen can send in one tap, kept up to date from stock.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the catalogue is structured and updated is in the solution document."
+    },
+    {
+      "id": "p11_lead_followup_slow",
+      "n": 11,
+      "words": "We don't follow up with buyers who visited once and didn't buy",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "List the buyers who visited recently without ordering, so none are forgotten",
+        "Give each one to a named salesperson, so follow-up has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Every visit and enquiry recorded, with follow-up reminders sent automatically to the right salesperson.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The follow-up timing and steps are set in the solution document."
+    },
+    {
+      "id": "p12_packing_errors",
+      "n": 12,
+      "words": "Wrong cartons get loaded, and buyers dispute quantities with no loading photos",
+      "category": "orders_fulfilment",
+      "subtype": "packing_errors",
+      "quick_ideas": [
+        "Count cartons against the order before each container is closed, so errors are caught at the door",
+        "Photograph the loading, so you have proof if a buyer disputes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A loading checklist with carton counts and photos per container, shared with the buyer on WhatsApp.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The checklist and photo steps are designed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on sanctions, restricted end-users or destinations, dual-use goods or export controls; that needs proper compliance or legal advice. Help changing a declared destination, consignee, value or description; pi declines plainly. Anything on hawala, cash couriers, splitting cash or third-party payments. UAE VAT, corporate tax or free-zone rules; refer to a tax adviser. Storing buyer passports, Emirates IDs, trade licence numbers or bank details; visa and labour questions are for proper advisers. Promises that buyer demand will return; if there's a robbery or threat at the showroom, call 999 first."
+  ],
+  "sample_reply": {
+    "person": "We keep stock in Jebel Ali and Al Ras, and twice this month we confirmed goods to a buyer that weren't there. What can we do about it?",
+    "pi": "Yes, this can be fixed, and you can start this week. 1. Mark goods as held the moment a buyer confirms, so nobody else can promise them. 2. Make the stock sheet, not a call to the warehouse, the only basis for confirming. Workzap can do this automatically for you: one register across both warehouses with live availability, holding promised goods until they're loaded. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "industry": "dhabas_food_trucks_chai_stalls_and_street_food",
+  "name": "Dhabas, food trucks, chai stalls and street food",
+  "sector": "7.B Food and beverage",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_owner_blind",
+      "n": 1,
+      "words": "I never know at night how much I actually earned",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Write down cash, wallet and udhaar totals at closing every night, so the day has a number",
+        "Note the day's buying next to it, so you see earnings and not just takings."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a WhatsApp daily close where you send the totals and get a running weekly view of earnings back automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you write anything down at closing now?",
+      "free_stops": "How the daily close and weekly view are set up is in the solution document."
+    },
+    {
+      "id": "p2_cash_mismatch",
+      "n": 2,
+      "words": "Galla cash doesn't match what I think we sold, and Easypaisa and cash get mixed up",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Keep wallet payments and cash counted separately at closing, so each side can be checked",
+        "Have one person handle the galla per shift, so a gap belongs to one shift."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily close separating cash and wallet payments by stall, with gaps shown by shift.",
+        "tool_words": []
+      },
+      "ask_first": "Do you handle the galla yourself, or a helper too?",
+      "free_stops": "The closing routine and shift handover rules are set out in the solution document."
+    },
+    {
+      "id": "p3_credit_customers",
+      "n": 3,
+      "words": "Regulars take udhaar and I lose track",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Keep all udhaar in one copy with a short label for each regular, so it's never on loose slips",
+        "Total each regular's balance every week, so it doesn't quietly grow."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an udhaar ledger on phone with each regular as a short label and a running balance, with reminders only to regulars who agreed to share their number.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many regulars take udhaar?",
+      "free_stops": "The udhaar rules and reminder approach stay for the solution document."
+    },
+    {
+      "id": "p4_price_increases_supplier",
+      "n": 4,
+      "words": "Milk and sugar prices jumped, cup price same",
+      "category": "margin_cost",
+      "subtype": "price_increases_supplier",
+      "quick_ideas": [
+        "Work out what one cup costs you today from this week's prices, so you know if the price still works",
+        "Note mandi prices each time you buy, so price rises don't surprise you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a daily buying list with prices that shows price changes over time and your cost per cup or plate automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which item's price rise hurt most recently?",
+      "free_stops": "The costing and price-review approach is detailed in the solution document."
+    },
+    {
+      "id": "p5_wastage_cost",
+      "n": 5,
+      "words": "Leftover parathas and gravy thrown every night",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Note what's left at closing for a week, so tomorrow's cooking follows real sales",
+        "Cook the slow items in smaller batches through the day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a leftover log by item on phone that shows the weekly pattern and suggests next-day quantities.",
+        "tool_words": []
+      },
+      "ask_first": "What's left over at closing most days?",
+      "free_stops": "How cooking quantities are set by day and season goes in the solution document."
+    },
+    {
+      "id": "p6_stockout",
+      "n": 6,
+      "words": "Gas cylinder runs out mid-shift",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Note the date each cylinder is started, so you learn how long one lasts",
+        "Keep a spare on site, so a running-out doesn't stop service."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a reminder for gas and key stock before it runs out, based on your own usage pattern.",
+        "tool_words": []
+      },
+      "ask_first": "How often do you buy gas now?",
+      "free_stops": "The usage tracking and reminder set-up stay for the solution document."
+    },
+    {
+      "id": "p7_consistency_across_branches",
+      "n": 7,
+      "words": "Taste changes when I'm not there and the helper cooks",
+      "category": "quality_complaints",
+      "subtype": "consistency_across_branches",
+      "quick_ideas": [
+        "Write down quantities for your main items with the helper, so the recipe isn't only in your head",
+        "Taste-check once at each shift change."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "recipe cards for helpers with quantities, shared to every stall and new helper.",
+        "tool_words": []
+      },
+      "ask_first": "Which item changes most when you're not there?",
+      "free_stops": "The recipe cards and helper training steps are in the solution document."
+    },
+    {
+      "id": "p8_brand_awareness",
+      "n": 8,
+      "words": "People don't know where the truck is parked today",
+      "category": "marketing_leads",
+      "subtype": "brand_awareness",
+      "quick_ideas": [
+        "Post today's spot and hours every morning on Instagram or WhatsApp status, so regulars can find you",
+        "Ask regulars if they'd like a daily location message, with their permission."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a daily broadcast of today's spot and hours to followers who opted in.",
+        "tool_words": []
+      },
+      "ask_first": "How do customers find out where you are today?",
+      "free_stops": "How the daily broadcast and opt-in list are set up is in the solution document."
+    },
+    {
+      "id": "p9_expansion_pains",
+      "n": 9,
+      "words": "Want to open a second stall but can't watch both",
+      "category": "planning_growth",
+      "subtype": "expansion_pains",
+      "quick_ideas": [
+        "Get the first stall's daily close and recipes written down, so it can run without you",
+        "Note what you personally do every day, because that's what the second stall will miss."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a two-stall comparison of daily sales and cash per stall, on your phone every night.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "What's stopping a second spot right now?",
+      "free_stops": "The plan for running both stalls is detailed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about encroachment rules, vending permits, municipal licensing or food-safety rules. Any advice on paying, avoiding or negotiating with officials; never help with bribes or dodging inspections. Asking for wallet PINs, account numbers or OTPs. Help selling expired or adulterated items, or hiding underage helpers. That earnings will go up by any amount."
+  ],
+  "sample_reply": {
+    "person": "Bhai chai ka khokha hai, raat ko pata hi nahi chalta kitna kamaya. Cash, Easypaisa aur udhaar sab chalta hai. Koi tareeqa batao.",
+    "pi": "Ji haan, roz ki kamai saaf dekhna bilkul mumkin hai, aur shuruaat aaj raat se ho sakti hai. 1 Closing par cash, wallet aur udhaar teeno ka total alag alag likhein, taake din ka ek number ho. 2 Saara udhaar ek hi copy mein har regular ke chhote naam ke saath rakhein, taake koi parchi gum na ho. Workzap ye aap ke liye automatically kar sakta hai: aap raat ko WhatsApp par total bhejein aur hafte bhar ki kamai aur har regular ka udhaar balance khud ban kar aap ke paas aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

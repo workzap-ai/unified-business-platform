@@ -1,0 +1,238 @@
+{
+  "industry": "water_tanker_and_ro_filtration_plant_operators",
+  "name": "Water tanker and RO/filtration plant operators",
+  "sector": "7.L Finance-adjacent, energy and utilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_orders_lost",
+      "n": 1,
+      "words": "Orders come on five phones and some tankers never get booked",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Move all orders to one booking number and one written list, so none sit on a personal phone",
+        "Give each order a slot and status, so you can see what is still unbooked."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "WhatsApp order intake that turns messages into bookings with time slot, area, size and status updates to the customer.",
+        "tool_words": []
+      },
+      "ask_first": "How do most orders reach you today?",
+      "free_stops": "Intake flow and status messages are in the solution document."
+    },
+    {
+      "id": "p2_order_tracking",
+      "n": 2,
+      "words": "Customers keep calling to ask where the tanker is",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "Ask drivers to message the office when they leave for each delivery, so the office can answer",
+        "Tell customers their slot when booking, so expectations are set."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "Automatic on-the-way and delivered updates to customers from the driver's marked status.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Update triggers and wording are in the solution document."
+    },
+    {
+      "id": "p3_cash_mismatch",
+      "n": 3,
+      "words": "The trips a driver claims do not match what I collect",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Give each driver the day's booked trips in writing, so trips and cash can be matched",
+        "Count cash against those trips the same evening, so gaps are fresh."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "field_checks A driver trip log with trips, cash collected and diesel filled, matched automatically against bookings each evening.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Matching rules are in the solution document; pi records the control gap, never names drivers."
+    },
+    {
+      "id": "p4_theft_internal",
+      "n": 4,
+      "words": "Drivers do extra private trips with our tanker",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Note the start and end reading of each tanker every day, so distance is on record",
+        "Compare it with booked trips weekly, so unexplained running shows."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Daily start and end readings with photos on phone, compared with booked trips and flagged when they do not fit.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The check design is in the solution document."
+    },
+    {
+      "id": "p5_margin_unknown",
+      "n": 5,
+      "words": "Diesel costs keep climbing and I cannot see cost per trip",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Record diesel, driver pay and source cost for one week, so you have real figures",
+        "Divide by trips made, so you have a first cost per trip; talk to your accountant on how to read it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A cost-per-trip view combining diesel, driver pay, source cost and maintenance entered by the owner, by tanker and area.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Cost allocation is in the solution document; pi gives no pricing advice."
+    },
+    {
+      "id": "p6_returns_handling",
+      "n": 6,
+      "words": "Empty bottles do not come back and we keep buying new ones",
+      "category": "stock_inventory",
+      "subtype": "returns_handling",
+      "quick_ideas": [
+        "Count bottles out with each regular customer once, so you know where they are",
+        "Collect an empty for every full delivered, so the count stays level."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "stock_alerts A bottle circulation ledger per customer reference with bottles out, empties returned and deposit taken, flagging customers holding too many.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Ledger design and deposit tracking are in the solution document."
+    },
+    {
+      "id": "p7_credit_customers",
+      "n": 7,
+      "words": "Buildings and offices on credit pay two months late",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List every credit customer with what they owe and since when, so you know your exposure",
+        "Send statements on a fixed date each month, so payment has a rhythm."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A credit customer ledger with monthly statements and automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Statement and reminder rules are in the solution document."
+    },
+    {
+      "id": "p8_maintenance_downtime",
+      "n": 8,
+      "words": "The plant stops when a pump or membrane fails and orders pile up",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Write down when each part was last serviced or changed, so you know what is due",
+        "Keep a log of every stoppage and its cause, so repeat failures show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "workflow_automation A plant maintenance and filter-change log with due-date reminders and a downtime record.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Maintenance schedule set-up is in the solution document; pi gives no treatment or specification advice."
+    },
+    {
+      "id": "p9_inspection_missing",
+      "n": 9,
+      "words": "A customer says the water tasted different and we had no log of when filters were changed",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Start a dated filter-change and cleaning log at the plant, so you can answer questions with records",
+        "Record each quality complaint with date and batch, so patterns can be checked; if anyone is unwell, point them to medical help."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Daily plant checks on phone with photos and time stamps, linked to quality complaints.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Check items are in the solution document; testing and treatment questions go to a qualified water specialist."
+    },
+    {
+      "id": "p10_seasonal_planning",
+      "n": 10,
+      "words": "Summer demand jumps and we cannot add tankers fast enough",
+      "category": "planning_growth",
+      "subtype": "seasonal_planning",
+      "quick_ideas": [
+        "Look back at last summer's orders by week, so you know when the rush starts",
+        "Line up backup drivers and vehicles before that week, so you are not hiring in the rush."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "booking_scheduling A demand-by-week view from bookings with a driver and vehicle schedule for peak weeks.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Planning method is in the solution document."
+    },
+    {
+      "id": "p11_churn_subscription",
+      "n": 11,
+      "words": "Regular subscription customers drop off and we do not notice until they have gone",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "List regular customers and their usual delivery day, so a missed week stands out",
+        "Call anyone who has skipped twice, so you hear why."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "customer_messaging A subscription schedule with reminders to customers who agreed to messages and missed-delivery flags to the owner.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Schedule and flag rules are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on water quality testing, treatment chemistry, filter or membrane specifications, health effects or safe limits. Anything that helps use illegal hydrants, take water from mains, tamper with meters or avoid licensing. Any request for customer names, addresses, phone numbers or payment details. Any advice on vehicle safety or roadworthiness. Any health reassurance; illness after drinking water goes to medical help."
+  ],
+  "sample_reply": {
+    "person": "Garmiyon mein orders bohat aate hain, aadhe likhe nahi jate aur customer naraz hote hain. Koi tareeqa batayein.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1 Saare orders ek booking number aur ek likhi hui list pe le aayein, taake koi order kisi ke phone mein na reh jaye. 2 Har order ko slot aur status dein, taake pata ho kaun sa abhi book nahi hua. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: WhatsApp ka har message booking ban jaye, tanker assign ho, aur customer ko khud update mile ke tanker nikal chuka hai. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "industry": "restaurants",
+  "name": "Restaurants (casual and fine dining)",
+  "sector": "7.B Food and beverage",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_margin_unknown",
+      "n": 1,
+      "words": "Food cost keeps going up but I don't know which dishes are eating the margin",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Cost your top few dishes once from this week's supplier bills, so you see which plates have the thinnest gap",
+        "Weigh one portion of each during service, because portions drifting from the recipe is often where margin goes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a recipe costing sheet that picks up every new purchase price automatically and flags any dish the moment a price rise pushes it below your target margin, across all branches.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you have written recipes with quantities, or is it in the chef's head?",
+      "free_stops": "The full costing method, target margins per dish and the repricing approach go in the solution document."
+    },
+    {
+      "id": "p2_wastage_cost",
+      "n": 2,
+      "words": "Kitchen throws away trays of rice and gravy at night and nobody records it",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Have the closing cook note what is thrown away for a week, because you can't cut what you haven't seen",
+        "Make the most-wasted item in smaller batches, since big pre-service batches are usually the cause."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a kitchen tablet wastage log by item, reason and shift that totals itself and shows the weekly trend by dish and branch in your morning read.",
+        "tool_words": []
+      },
+      "ask_first": "Is most of the waste cooked food at closing, or raw stock going bad?",
+      "free_stops": "How to set batch sizes by day and season from the wastage data stays for the solution document."
+    },
+    {
+      "id": "p3_stockout",
+      "n": 3,
+      "words": "Every weekend we run out of the mutton karahi by 9pm, and the storeroom count never matches",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Do one full storeroom count before Friday, so you know where the weekend actually starts",
+        "Give the count to one fixed role, because shared responsibility is why counts drift."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a storeroom count on phone with par levels that alerts you on WhatsApp before the weekend when a key item is low, and compares stock issued against dishes sold every day.",
+        "tool_words": []
+      },
+      "ask_first": "Who does the storeroom count now, and how often?",
+      "free_stops": "The par levels for each item and the issue-and-count routine are set out in the solution document."
+    },
+    {
+      "id": "p4_cash_mismatch",
+      "n": 4,
+      "words": "Closing cash is short almost every night, and I think voids after cash payment are why",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Allow voids and comps only with a manager's approval, so every cancellation has an owner",
+        "Count the till together at shift change, because a gap is easier to place when each shift signs off its own."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a nightly close per branch matching cash, card and app takings to sales, with voids and comps by shift and role and any void after payment flagged automatically.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Is the gap usually in cash, or in card and app payments too?",
+      "free_stops": "The full closing procedure and the void-pattern checks are kept for the solution document."
+    },
+    {
+      "id": "p5_software_not_connected",
+      "n": 5,
+      "words": "Talabat/Foodpanda orders come on a separate tablet and staff forget to punch them into the POS",
+      "category": "tech_systems",
+      "subtype": "software_not_connected",
+      "quick_ideas": [
+        "Make one person own the tablets at peak, so app orders have a clear handler",
+        "Compare one night's app order list with the POS, so you see how big the gap really is."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "app orders pulled into one screen beside POS sales automatically, with each app's payout checked against what was sold every day.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Which apps do you take orders from?",
+      "free_stops": "Which apps can be linked and how the reconciliation works is detailed in the solution document."
+    },
+    {
+      "id": "p6_branch_underperforming",
+      "n": 6,
+      "words": "Our second branch does half the covers of the first and the biryani tastes different there",
+      "category": "sales_revenue",
+      "subtype": "branch_underperforming",
+      "quick_ideas": [
+        "Eat at the weaker branch at peak as a guest, because service and wait time show up there first",
+        "Put your signature dishes' recipes in writing for both kitchens, so taste stops depending on the cook."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a branch comparison screen updated every day with covers, average bill, food cost, wastage and review score side by side.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Does each branch have its own kitchen, or does a central kitchen supply them?",
+      "free_stops": "Which numbers to compare and how to read the gaps between branches goes in the solution document."
+    },
+    {
+      "id": "p7_shift_scheduling",
+      "n": 7,
+      "words": "Rota is on WhatsApp and every day someone says they didn't know their shift",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Publish next week's rota on a fixed day and ask each person to confirm, so \"I didn't know\" stops being an answer",
+        "Keep a short list of on-call cooks and waiters for Eid and wedding season, when people leave."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a rota sent to each staff member on WhatsApp automatically, with confirmations, swap requests and a list for the manager of who hasn't confirmed.",
+        "tool_words": []
+      },
+      "ask_first": "Which role is hardest to keep — cooks, waiters or cashiers?",
+      "free_stops": "The rota rules, swap approvals and cover planning for peak seasons stay in the solution document."
+    },
+    {
+      "id": "p8_booking_appointments",
+      "n": 8,
+      "words": "Reservations come by phone, Instagram and WhatsApp and we double-book tables",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Keep one booking list at the host stand that every channel writes into, so there is only one truth",
+        "Confirm every booking back to the guest, so mistakes surface before the night."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a booking page and WhatsApp booking flow feeding one reservation list, with automatic reminders to guests and clash warnings.",
+        "tool_words": []
+      },
+      "ask_first": "How often does a double-booking happen in a normal week?",
+      "free_stops": "How the booking flow, table layout and reminders are set up is covered in the solution document."
+    },
+    {
+      "id": "p9_reviews_bad",
+      "n": 9,
+      "words": "Google reviews say the food was cold and service slow, and we have no record of regulars",
+      "category": "customers_retention",
+      "subtype": "reviews_bad",
+      "quick_ideas": [
+        "Reply to recent reviews and own the problem, because future guests read the replies",
+        "Ask happy guests at the table for a review, since real happy guests rarely think to post."
+      ],
+      "workzap_build": {
+        "keys": [
+          "reviews_collection"
+        ],
+        "text": "and customer_messaging — review requests sent automatically to guests who agreed to be contacted, a review inbox with reply status, and an opt-in guest list for Ramadan and Eid offers.",
+        "tool_words": []
+      },
+      "ask_first": "Who replies to reviews now?",
+      "free_stops": "The review-request timing and the opt-in guest list setup are kept for the solution document."
+    },
+    {
+      "id": "p10_reports_late",
+      "n": 10,
+      "words": "I only find out the month was bad when the accountant sends figures weeks later",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "Ask each manager for sales, covers and cash over or short every night, so you see the trend while it's happening",
+        "Compare this week with the same week last month, because one day alone tells you little."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a short morning read on WhatsApp with each branch's covers, sales by channel, voids, cash vs card vs app and wastage, and the one thing to look at today.",
+        "tool_words": [
+          "app"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "What number do you check first when you hear how a day went?",
+      "free_stops": "Which numbers make up the morning read and how they are pulled from your systems is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about food-safety rules, hygiene grades, allergen labelling, halal certification or licences — point to the relevant authority or a qualified consultant. How to treat sales tax, VAT or service charge — that is for their accountant. Any suggestion of hidden cameras or covert monitoring of staff, or naming a staff member as a thief. Any help with fake reviews, removing competitors' reviews, or \"two sets of bills\". That a change will raise covers, cut food cost or close the cash gap by any amount."
+  ],
+  "sample_reply": {
+    "person": "Bhai do branches hain, raat ko cash roz short aata hai aur kitchen mein wastage ka koi hisaab nahi. Koi solution batao.",
+    "pi": "Ji haan, dono cheezen control mein laayi ja sakti hain, aur shuruaat isi hafte ho sakti hai. 1 Void aur comp sirf manager ki approval se hon, taake har cancellation ka koi zimmedar ho. 2 Ek hafte tak closing cook phenka hua khana likhe, kyunke jo nazar nahi aata wo kam nahi hota. Workzap ye sab aap ke liye automatically kar sakta hai: har branch ka raat ka cash, card aur app payments sales se khud milaye, payment ke baad ke voids alag dikhaye, aur wastage ka hisaab subah aap ke WhatsApp par aa jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

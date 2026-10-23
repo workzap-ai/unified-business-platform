@@ -1,0 +1,217 @@
+{
+  "industry": "music_art_and_dance_schools",
+  "name": "Music, art and dance schools",
+  "sector": "7.J Education and childcare",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_manual_work",
+      "n": 1,
+      "words": "Make-up class requests are endless and we can't track who's owed what",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Write one make-up rule and share it with parents, so requests are judged the same way",
+        "List the make-ups owed today, so you have a starting point."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A lesson ledger that tracks missed and make-up lessons under your rules, with parents booking make-ups themselves.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the rules and booking work is kept for the document."
+    },
+    {
+      "id": "p2_pricing_errors",
+      "n": 2,
+      "words": "Lesson packs expire but nobody checks",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Check every active pack's lessons used and expiry once, so you know where you stand",
+        "Tell families their pack status before renewing, so expiry isn't a surprise."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Packs and terms tracked with lessons used and expiry, with renewal reminders sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reminder timing is in the document."
+    },
+    {
+      "id": "p3_conversion_low",
+      "n": 3,
+      "words": "Trial lessons don't turn into enrolments",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "List this month's trials and who joined, so you see the gap",
+        "Make one person follow up after every trial, so none are forgotten."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Every trial tracked to enrolment, with automatic follow-up reminders and conversion by discipline.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The follow-up timing is kept for the document."
+    },
+    {
+      "id": "p4_churn_subscription",
+      "n": 4,
+      "words": "Kids quit after one term",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Count who stayed from last term by discipline, so you see where the drop is",
+        "Ask leaving families for their one main reason, so you know what to fix."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "Retention tracked by term and discipline as counts, with next- term reminders sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The retention reports and reminders are in the document."
+    },
+    {
+      "id": "p5_capacity",
+      "n": 5,
+      "words": "Weekday rooms are empty, Saturdays are chaos",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Map room use by hour for one week, so empty slots are visible",
+        "Choose one empty slot to fill, such as an adult class or studio hire, so the room earns."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "dashboards_reports A room and teacher calendar with self-booking, studio-hire slots and room-hour use measured.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How slots and pricing for hire are set up is kept for the document."
+    },
+    {
+      "id": "p6_commission_disputes",
+      "n": 6,
+      "words": "Teachers' split causes arguments every month",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write down each teacher's agreed split once, so there is one record",
+        "Show each teacher their lesson count before pay, so disagreements surface early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "Teacher pay worked out automatically from delivered lessons and agreed splits, with a monthly statement.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The pay rules are in the document."
+    },
+    {
+      "id": "p7_tasks_dropped",
+      "n": 7,
+      "words": "Recital planning is all on WhatsApp and things get missed",
+      "category": "communication_coordination",
+      "subtype": "tasks_dropped",
+      "quick_ideas": [
+        "List every recital task with an owner and date once, so nothing is assumed",
+        "Confirm costume delivery dates with the tailor now, so late orders show early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A recital planner with tasks, rehearsals, costume orders, seat counts and fees, with reminders sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The planner stages are kept for the document."
+    },
+    {
+      "id": "p8_shrinkage_theft",
+      "n": 8,
+      "words": "Rental instruments come back damaged or not at all",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Number every rental instrument and note its condition once, so damage can be traced",
+        "List who has which instrument today by family reference, so missing ones show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A rental register with condition notes, deposits and return reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How condition and deposits are tracked is in the document."
+    },
+    {
+      "id": "p9_receivables_late",
+      "n": 9,
+      "words": "Fees are late and chasing parents feels awkward",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Send reminders from the school's number, not the teacher's, so it isn't personal",
+        "Use one standard reminder for everyone, so no family feels singled out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "customer_messaging Fee reminders sent automatically each term or month, with an overdue count for the office.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reminder timing and wording are kept for the document."
+    },
+    {
+      "id": "p10_slow_response",
+      "n": 10,
+      "words": "People DM to book and we take a day to reply",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Put timings and how to book on one page you can share, so replies are quicker",
+        "Name one person to answer DMs at set times, so none wait overnight."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "website_digital Automatic WhatsApp replies with a booking link, and a booking page where parents choose slots.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reply flow and booking page are in the document."
+    }
+  ],
+  "never_say": [
+    "Anything on music copyright or performance licensing, venue capacity or fire safety, or child-performer rules. Consent-law advice on posting children's photos; pi only notes \"need a parent-permission process\". Any idea that records learners' names, photos, recital videos, ages or exam results. Promises of exam grades, or help with fake certificates or counterfeit instruments. Any religious or cultural judgement about music or dance. Business talk after an injury or event emergency; pi points to emergency services."
+  ],
+  "sample_reply": {
+    "person": "Make-up classes are driving us mad. Parents say lessons were missed and we have no way to check. What would you suggest?",
+    "pi": "Yes, this can be sorted, and you can start this week. 1 Write one make-up rule and share it with parents, so every request is judged the same way. 2 List the make-ups owed today, so you have a clean starting point. Workzap can do this automatically for you, tracking every missed and make-up lesson under your rule and letting parents book make-ups themselves. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

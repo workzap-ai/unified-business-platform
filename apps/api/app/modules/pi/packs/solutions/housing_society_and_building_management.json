@@ -1,0 +1,219 @@
+{
+  "industry": "housing_society_and_building_management",
+  "name": "Housing society and building management (incl. owners' associations)",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_receivables_late",
+      "n": 1,
+      "words": "Owners don't pay maintenance and we keep running short",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Make one list of dues by unit and how long each is pending, so the committee sees the real picture",
+        "Send one clear notice of the payment date and how to pay, so \"I didn't know\" goes away."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "customer_messaging"
+        ],
+        "text": "A dues ledger per unit with WhatsApp reminders and payment links to residents who opted in, and a defaulter ageing list for the committee every month.",
+        "tool_words": []
+      },
+      "ask_first": "How are maintenance charges collected today?",
+      "free_stops": "Reminder timing and the committee view are in the solution document; recovery action is for a lawyer."
+    },
+    {
+      "id": "p2_cash_mismatch",
+      "n": 2,
+      "words": "We collect cash at the society office and the totals never match",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Use numbered receipts for every payment, so each one leaves a trace",
+        "Have a second person count and sign the day's cash at closing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A cash counter log with a daily close matched to receipts and bank deposits, with any gap flagged the same day.",
+        "tool_words": []
+      },
+      "ask_first": "Who checks the clerk's cash at the end of the day?",
+      "free_stops": "The closing routine and variance rules are set out in the solution document."
+    },
+    {
+      "id": "p3_theft_internal",
+      "n": 3,
+      "words": "Generator diesel bills keep going up",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Record diesel received and generator run hours side by side for a week, so usage can be compared",
+        "Have a second person sign every diesel delivery."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "stock_alerts"
+        ],
+        "text": "A generator log of run hours against fuel received and used, with variance flags every day, noting patterns rather than accusing anyone.",
+        "tool_words": []
+      },
+      "ask_first": "Who receives the diesel when it arrives?",
+      "free_stops": "The comparison method and alert thresholds are in the solution document."
+    },
+    {
+      "id": "p4_delivery_verification",
+      "n": 4,
+      "words": "Water tankers — we pay for twenty, I'm not sure twenty arrived",
+      "category": "suppliers_purchasing",
+      "subtype": "delivery_verification",
+      "quick_ideas": [
+        "Ask the gate to note time and a photo of every tanker, so arrivals are counted",
+        "Match the gate count against the supplier bill before paying."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A tanker receiving log at the gate with time, photo and quantity, matched to supplier bills automatically each month.",
+        "tool_words": []
+      },
+      "ask_first": "How many tankers do you order in a typical week?",
+      "free_stops": "The gate flow and bill-matching logic are in the solution document."
+    },
+    {
+      "id": "p5_info_lost_in_whatsapp",
+      "n": 5,
+      "words": "Complaints come into the committee WhatsApp group and get buried",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Set one complaints number separate from the group, so requests aren't lost in chat",
+        "Keep one list of open complaints with dates, so the oldest are visible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Complaint tickets through WhatsApp with photo, category and assignee, closed only when the resident confirms the fix.",
+        "tool_words": []
+      },
+      "ask_first": "How do you know if a complaint has actually been fixed?",
+      "free_stops": "Categories, assignment and closure rules are in the solution document."
+    },
+    {
+      "id": "p6_attendance_lateness",
+      "n": 6,
+      "words": "Guards sleep on night duty and cleaners don't show up",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Set fixed patrol points the guard must visit each night, so rounds are checkable",
+        "Keep a simple daily attendance sheet signed by the supervisor."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Guard rounds with checkpoint tags and staff check-ins on phone, so every shift is recorded and missed rounds are flagged daily, openly and with staff informed.",
+        "tool_words": []
+      },
+      "ask_first": "How many guards, cleaners and maintenance staff are there?",
+      "free_stops": "Checkpoint placement and the alert set-up are in the solution document."
+    },
+    {
+      "id": "p7_contracts_tracking",
+      "n": 7,
+      "words": "Lift, pump and pest-control contracts expire and nobody notices",
+      "category": "compliance_admin",
+      "subtype": "contracts_tracking",
+      "quick_ideas": [
+        "List every vendor contract with its end date and service frequency in one place",
+        "Give one committee member ownership of renewals."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A vendor and AMC calendar that alerts ahead of renewals and service visits; safety judgements stay with licensed inspectors.",
+        "tool_words": []
+      },
+      "ask_first": "Which service contracts do you have running?",
+      "free_stops": "Alert timing and vendor records are designed in the solution document."
+    },
+    {
+      "id": "p8_approvals_slow",
+      "n": 8,
+      "words": "Every purchase needs three committee signatures and takes weeks",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "Agree a small-spend limit the manager can approve alone, so routine buys move",
+        "Put pending requests in one list the committee reviews weekly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A purchase request and approval flow on members' phones with spending limits and a record of every decision.",
+        "tool_words": []
+      },
+      "ask_first": "Where do approvals usually get stuck?",
+      "free_stops": "Limits, approval chains and records are set out in the solution document."
+    },
+    {
+      "id": "p9_manual_reports",
+      "n": 9,
+      "words": "Residents ask where their money goes and the AGM accounts are a nightmare",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Share a simple monthly income and expense summary, so questions come before the AGM, not at it",
+        "Keep bills and receipts in one folder per month."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A monthly income and expense statement and AGM pack built from the ledger, with a reserve fund tracker.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "What do owners ask to see at the AGM?",
+      "free_stops": "Report layout and reserve tracking are in the solution document; your accountant signs off the accounts."
+    },
+    {
+      "id": "p10_booking_appointments",
+      "n": 10,
+      "words": "Clubhouse and hall bookings clash",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Keep one booking calendar for each facility, so double bookings show at once",
+        "Publish the booking rules once, so residents know how it works."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A facility booking calendar for hall, pool and courts with rules and automatic confirmations.",
+        "tool_words": []
+      },
+      "ask_first": "Which facilities do residents book most?",
+      "free_stops": "Booking rules and confirmation flow are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any advice on recovery action, bylaws, voting validity or developer obligations; that needs legal advice. Any help cutting water or power to defaulters, publicly naming residents or covertly monitoring them. Any view on whether a lift, structure, fire system or water tank is safe; a licensed inspector or engineer decides. Anything that records residents' names, house numbers linked to people, car plates, IDs or CCTV images. Any blame in committee politics, or accusations against named staff over diesel or cash."
+  ],
+  "sample_reply": {
+    "person": "Hamari society mein 400 ghar hain, maintenance aadhe log time pe nahi dete aur cash ka hisaab bhi nahi milta. Koi hal batayen.",
+    "pi": "Ji haan, is ka hal mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Har ghar ke dues aur kitne mahine se pending hain, is ki ek list bana lein, taake committee ko asal tasveer nazar aaye. 2 Office ka cash har din band hone pe doosra banda gin ke sign kare, taake farq usi din pakda jaye. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har ghar ka dues ledger, ijazat dene walon ko WhatsApp reminder, aur roz ka cash milaan. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

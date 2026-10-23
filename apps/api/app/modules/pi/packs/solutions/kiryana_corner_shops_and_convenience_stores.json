@@ -1,0 +1,199 @@
+{
+  "industry": "kiryana_corner_shops_and_convenience_stores",
+  "name": "Kiryana, corner shops and convenience stores (incl. petrol-station marts)",
+  "sector": "7.A Retail and consumer (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_credit_customers",
+      "n": 1,
+      "words": "Aadhe mohalle ka udhaar hai aur total ka pata nahi",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Add up every udhaar balance once, so you know the real total",
+        "Mark the oldest unpaid accounts, because those are the ones most at risk."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a phone udhaar khata with short customer codes, running balances, and a monthly list of accounts with no recent payment.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many udhaar accounts do you have?",
+      "free_stops": "How accounts are coded, limits set and reminders sent is in the solution document."
+    },
+    {
+      "id": "p2_receivables_late",
+      "n": 2,
+      "words": "Customer kehte hain humne de diya tha, prove nahi hota",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Write date and amount for every payment, so a line-through is never the only proof",
+        "Let only one person make payment entries, so the khata has one handwriting and one owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "every payment logged with date, and an optional WhatsApp balance message the customer receives (with their permission), so both sides see the same number.",
+        "tool_words": []
+      },
+      "ask_first": "Who writes entries in the khata today?",
+      "free_stops": "How payments are recorded and balance messages are sent is in the solution document."
+    },
+    {
+      "id": "p3_cash_mismatch",
+      "n": 3,
+      "words": "Shaam ko galla match nahi karta",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Write down opening cash every morning, so the evening count has a starting point",
+        "Note Easypaisa, JazzCash and card totals apart from cash, so one doesn't hide the other."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily galla check on phone with opening cash, wallet and card receipts and closing cash, the difference saved every day.",
+        "tool_words": []
+      },
+      "ask_first": "Which payment methods do you take?",
+      "free_stops": "The galla check steps and how wallet payments are matched are in the solution document."
+    },
+    {
+      "id": "p4_cash_leakage",
+      "n": 4,
+      "words": "Jab mandi jaana hota hai, helper counter sambhalta hai aur cash kam lagta hai",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Count cash together at handover, so both people agree on the starting number",
+        "Have wallet payments go to a shop account, not a personal number, so every rupee shows up in one place."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a shift handover on phone where cash and key items are counted and saved at every change.",
+        "tool_words": []
+      },
+      "ask_first": "How many hours a day is the helper alone at the counter?",
+      "free_stops": "Which items are counted at handover and how differences are reported are in the solution document."
+    },
+    {
+      "id": "p5_stockout",
+      "n": 5,
+      "words": "Wholesaler ke paas hafte mein ek dafa jaana hota hai, popular cheezein khatam ho jaati hain",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Keep a \"khatam\" list at the counter all week, so the next buying trip covers what really ran out",
+        "Ask the order booker to visit for your top items in between, so you aren't empty for days."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a weekly buying list built automatically from what sold and what's low, grouped by wholesaler.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have any POS or barcode scanner?",
+      "free_stops": "How sales and stock are captured to build the list is in the solution document."
+    },
+    {
+      "id": "p6_price_increases_supplier",
+      "n": 6,
+      "words": "Wholesale rate har hafte badalta hai, apni price update nahi hoti",
+      "category": "margin_cost",
+      "subtype": "price_increases_supplier",
+      "quick_ideas": [
+        "Check your top items' new wholesale rates against your selling prices once, so you find where profit has gone thin",
+        "Pick one fixed day for price updates, so it actually happens."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "a rate tracker that flags items where the purchase price rose but the selling price didn't.",
+        "tool_words": []
+      },
+      "ask_first": "Do you keep your wholesale bills?",
+      "free_stops": "How rates are recorded and flagged is in the solution document."
+    },
+    {
+      "id": "p7_whatsapp_overload",
+      "n": 7,
+      "words": "WhatsApp pe orders saara din aate hain, kuch miss ho jaate hain",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Write each order on a numbered parchi as it arrives, so nothing lives only in chat",
+        "Count missed or late orders for a week, so you know how big the leak is."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "WhatsApp order intake with common items, a packing list and delivery status messages, every order tracked to the door.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many WhatsApp orders a day?",
+      "free_stops": "The order menu, packing flow and status messages are in the solution document."
+    },
+    {
+      "id": "p8_trust_honesty",
+      "n": 8,
+      "words": "Pump mart ki night shift ka cash hamesha kam hota hai",
+      "category": "people_staff",
+      "subtype": "trust_honesty",
+      "quick_ideas": [
+        "Count cash and key items at every shift change with both people present, so gaps belong to a shift",
+        "Compare shop sales with fuel customers for a few nights, so you see whether the shop is under-recording."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation",
+          "dashboards_reports"
+        ],
+        "text": "shop sales by hour against fuel transactions and night-shift cash variance, every day.",
+        "tool_words": []
+      },
+      "ask_first": "Is the shop open round the clock?",
+      "free_stops": "How fuel and shop data are matched and variances reported is in the solution document."
+    },
+    {
+      "id": "p9_owner_bottleneck",
+      "n": 9,
+      "words": "Shop pe 14 ghante lagte hain, shaadi pe bhi nahi ja sakte",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Write down the few things only you know (rates, wholesaler numbers, udhaar limits), so someone else can run a day",
+        "Let a family member run one quiet afternoon, so you see what actually breaks."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a short morning read of sales, cash, wallets, udhaar and low stock, so you see the shop without standing in it.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Who helps at the shop besides you?",
+      "free_stops": "What goes into the daily read and how it's captured at the counter is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on tax, shop licences, tobacco, lottery or alcohol sale law. How to sell age-restricted goods to minors or change expiry dates. To confront or secretly record a helper. Loan or financing advice for clearing distributor dues. To ask for or store neighbours' names and numbers from the khata; in a robbery, fuel or gas emergency, call 15, 999 or 911 first."
+  ],
+  "sample_reply": {
+    "person": "Bhai udhaar ka hisaab hi nahi milta, 7080 ghar hain, log kehte hain humne de diya tha. Koi hal batao.",
+    "pi": "Ji bilkul, iska hal hai, aur shuruaat aaj se ho sakti hai. 1 Is hafte ek dafa saare udhaar balance jor lein, taa ke asal total saamne aaye. 2 Paisa lene ki entry sirf ek banda kare, tareekh aur raqam ke saath, taa ke behas ke waqt saboot ho. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai: phone pe digital udhaar khata jis mein har payment tareekh ke saath ho, aur customer ki ijazat se usko WhatsApp pe apna balance mil jaaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

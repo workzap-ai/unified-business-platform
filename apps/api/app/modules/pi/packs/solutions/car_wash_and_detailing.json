@@ -1,0 +1,219 @@
+{
+  "industry": "car_wash_and_detailing",
+  "name": "Car wash and detailing",
+  "sector": "7.G Transport, mobility and aviation (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_service_errors",
+      "n": 1,
+      "words": "A car gets scratched and the customer says we did it",
+      "category": "quality_complaints",
+      "subtype": "service_errors",
+      "quick_ideas": [
+        "Photograph every car before work starts, so its condition is on record",
+        "Point out existing marks to the customer at drop-off, so it's agreed upfront."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "before-and-after photos per car saved against each job with time stamp, at every site and van.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The photo routine and storage are in the solution document."
+    },
+    {
+      "id": "p2_field_team_visibility",
+      "n": 2,
+      "words": "Basement washers mark cars done that weren't washed",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Ask for a photo of each finished car instead of a tick, so there's proof of work",
+        "Spot-check a few cars each week, so the team knows proof matters."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a job list per washer with photo proof of each car, location and time, summarised for the owner each morning.",
+        "tool_words": []
+      },
+      "ask_first": "How does a washer show today that a car was done?",
+      "free_stops": "How the job list and proof are set up is in the solution document."
+    },
+    {
+      "id": "p3_churn_subscription",
+      "n": 3,
+      "words": "Subscription customers say they didn't get their washes",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Record each wash against the customer's package, so there's a count to share",
+        "Send customers their monthly count, with their permission, so questions are answered before complaints."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat",
+          "customer_messaging"
+        ],
+        "text": "a subscription record of washes used, renewal date and payment status, with automatic monthly summaries.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Package tracking and summary timing are in the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "Monthly package payments come late or not at all",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List who has paid this month and who hasn't, so you know the gap",
+        "Remind late payers once, so it's raised early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "package payment tracking with automatic reminders and receipts.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder steps are in the solution document."
+    },
+    {
+      "id": "p5_capacity",
+      "n": 5,
+      "words": "Weekend queues are so long people drive away",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Count how many cars leave without being served on a busy day, so you see the size of it",
+        "Offer regular customers a booked slot, so walk-ins spread out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "WhatsApp booking with time slots per service and bay, confirmations and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Slot rules per service are in the solution document."
+    },
+    {
+      "id": "p6_chat_overload",
+      "n": 6,
+      "words": "Bookings come on WhatsApp, Instagram and calls and get mixed up",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Put every booking into one diary, whatever the channel, so there's one list",
+        "Give one person the job of confirming bookings, so nothing is assumed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "booking_scheduling"
+        ],
+        "text": "one place where bookings from every channel land, confirmed and reminded automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Channel set-up and confirmation flow are in the solution document."
+    },
+    {
+      "id": "p7_wastage_cost",
+      "n": 7,
+      "words": "Shampoo, wax and cloth usage keeps going up",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Issue consumables from one store, so you know what goes out",
+        "Compare what was used against cars washed this week, so you get a first picture."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "a consumables issue log with usage per car and alerts on unusual use.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How usage is measured per service is in the solution document."
+    },
+    {
+      "id": "p8_cash_leakage",
+      "n": 8,
+      "words": "Walk-in cash doesn't match the car count",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Give a numbered token or slip for every car, so cars can be counted",
+        "Count cash against slips at closing, so gaps show the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily cash-up matched to cars washed per site.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The cash-up steps are in the solution document."
+    },
+    {
+      "id": "p9_no_sop",
+      "n": 9,
+      "words": "Each washer does it his own way",
+      "category": "operations_process",
+      "subtype": "no_sop",
+      "quick_ideas": [
+        "Agree what \"done\" means for each service level, so everyone works to one standard",
+        "Show it to new washers on day one, so training is consistent."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "service checklists on phone per wash level, ticked by the washer, with quality visible by site.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The checklists themselves are in the solution document."
+    },
+    {
+      "id": "p10_repeat_low",
+      "n": 10,
+      "words": "Coating customers don't come back for maintenance",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Tell each coating customer when maintenance is due, so they leave with a date",
+        "Ask permission to remind them, so you can follow up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "automatic maintenance reminders for ceramic and PPF customers.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on water discharge, chemical storage or environmental permits. Who is liable for damage, or insurance advice. Anything on workers' visas, housing, wages or hours; refer to a lawyer or labour adviser. Covert tracking of workers; field proof is about the job, not the person. Storing building access codes, parking details or addresses. Typical pricing for coatings or packages."
+  ],
+  "sample_reply": {
+    "person": "We do basement washes across several buildings in Dubai. Customers say their car wasn't washed and my guys say it was. What can I do?",
+    "pi": "Yes, this can be sorted, and you can start this week. 1 Ask for a photo of each finished car instead of a tick, so there's proof of work. 2 Spot-check a few cars yourself each week, so the team knows the proof matters. Workzap can do this automatically for you: a job list per washer with photo, time and location for every car, and a morning summary to you. Shall I get a solution document and quote prepared for you? You're free to say no.",
+    "language": "english"
+  }
+}

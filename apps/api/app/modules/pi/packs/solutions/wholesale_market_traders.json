@@ -1,0 +1,243 @@
+{
+  "industry": "wholesale_market_traders",
+  "name": "Wholesale-market traders (e.g. Jodia Bazaar, Shah Alam Market, Deira souks)",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_credit_customers",
+      "n": 1,
+      "words": "Half the market owes me money and the khata is the only record",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Have the munshi total all khata balances once, sorted by age, so you see what is really out",
+        "Photograph the khata pages, so the record isn't one book that can be lost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A digital khata in Urdu or English that the munshi fills in seconds and the owner sees on phone, with every balance aged daily.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many buyers are on udhaar at any time?",
+      "free_stops": "How the khata moves across and is kept in step is planned in the solution document."
+    },
+    {
+      "id": "p2_receivables_late",
+      "n": 2,
+      "words": "Upcountry buyers take maal on credit and then stop answering",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Send the bill and bilty photo on the day of dispatch, so the buyer acknowledges the amount while it's fresh",
+        "Hold the next consignment for buyers with an old balance until part is paid."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "customer_messaging"
+        ],
+        "text": "Buyer balances with ageing and WhatsApp reminders queued automatically for the owner to approve, sent only with the buyer's permission.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing and hold rules are set in the solution document."
+    },
+    {
+      "id": "p3_cash_mismatch",
+      "n": 3,
+      "words": "At day end cash in the gaddi doesn't match the parchis",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Use numbered parchi books, so every sale has a record that can be counted",
+        "Have one person count and another check at closing, so the count is trusted."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A daily closing screen comparing parchis, cash, bank transfers and new credit, flagging any difference automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The closing steps and checks are laid out in the solution document."
+    },
+    {
+      "id": "p4_accountability",
+      "n": 4,
+      "words": "The munshi knows everything; if he leaves I'm finished",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Have a second person learn one part of the munshi's work, so the business isn't one person deep",
+        "Keep a weekly copy of the main records, so they exist outside one head and one book."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "nori_daily_read"
+        ],
+        "text": "Records kept in a system the owner can read any time, with an evening summary of sales, cash, new credit and recoveries.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "Which records move first, and how, is planned in the solution document."
+    },
+    {
+      "id": "p5_transfers_lost",
+      "n": 5,
+      "words": "Bags go missing when porters move them from godown to shop",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Count bags at both ends for a few days, so you learn where the loss happens",
+        "Use a slip signed by the porter and the receiver, so each move has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "A godown-to-shop log by bag and case that flags any transfer where sent and received don't match.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The slip and count flow are designed in the solution document."
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "Rates change every day and buyers argue about what I quoted yesterday",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Send the day's bhaav to salesmen as a dated message, so there is a record of each day's rate",
+        "Write the rate on every parchi, so disputes can be settled from paper."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A daily rate board shared with salesmen, with every quote logged by buyer role and date.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The rate board and quote log setup are in the solution document."
+    },
+    {
+      "id": "p7_margin_unknown",
+      "n": 7,
+      "words": "I don't know my margin on each item because buying rates keep changing",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Note the buying rate on each lot as it arrives, so selling rate can be compared to it",
+        "Check your top few items' margin once, so you know which ones carry the shop."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "An item margin view using the actual buying rate of each lot, updated as sales are entered.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How lots are matched to sales is set in the solution document."
+    },
+    {
+      "id": "p8_expiry_wastage",
+      "n": 8,
+      "words": "Dry fruit gets insects in the summer if it sits too long",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Note the arrival date on each lot, so the oldest is sold first",
+        "For storage conditions, ask your supplier or a food storage specialist."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Lot ageing alerts that warn automatically when stock has sat too long, ahead of the summer months.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Alert rules per item are set in the solution document."
+    },
+    {
+      "id": "p9_whatsapp_overload",
+      "n": 9,
+      "words": "Orders come on phone and WhatsApp all day and some get missed",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Give buyers one order number, so orders don't scatter across phones",
+        "Make one person confirm each order back, so the buyer knows it was received."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "WhatsApp and phone orders gathered into one list, tracked until the maal is sent.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The intake and confirmation flow are in the solution document."
+    },
+    {
+      "id": "p10_payment_methods",
+      "n": 10,
+      "words": "Buyers pay by bank transfer and I can't track who paid",
+      "category": "cash_collections",
+      "subtype": "payment_methods",
+      "quick_ideas": [
+        "Ask buyers to put their bill number in the transfer reference, so payments match bills",
+        "Check transfers once at closing, so the khata is updated the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation",
+          "credit_ledger"
+        ],
+        "text": "Incoming transfers matched to bills and buyer balances each day, with unmatched payments flagged.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The matching rules are set in the solution document."
+    },
+    {
+      "id": "p11_no_customer_data",
+      "n": 11,
+      "words": "I have no list of who my regular buyers are or what they buy",
+      "category": "customers_retention",
+      "subtype": "no_customer_data",
+      "quick_ideas": [
+        "Pull your top buyers and what they buy from the khata, so you know who matters most",
+        "Ask regulars, with their permission, whether they'd like a call before the season."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat",
+          "customer_messaging"
+        ],
+        "text": "A buyer list with purchases and frequency that prompts follow-up before Ramadan, winter and wedding season.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the list is built and used is planned in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about keeping sales off the books or avoiding FBR or FTA; pi declines and does not treat it as a problem to solve. Help sourcing smuggled, undeclared or counterfeit goods. Tax registration, invoicing rules, UAE VAT or Pakistan sales tax; refer to a tax adviser. Hidden cameras, confrontations or naming staff suspected of theft. Views on market committee, landlord or pagri disputes; and storing buyers' names, numbers or CNICs. If there is a robbery or threat, police 15, 999 come first."
+  ],
+  "sample_reply": {
+    "person": "Roz shaam ko gaddi ka cash parchiyon se nahi milta. Is ka kya hal hai?",
+    "pi": "Ji haan, roz ka closing saaf kiya ja sakta hai, aur shuruaat isi hafte ho sakti hai. 1 Numbered parchi books istemaal karein, taake har sale ka record gina ja sake. 2 Closing par ek banda gine aur doosra check kare, taake ginti par bharosa ho. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: parchi, cash, transfer aur udhaar roz ek screen par milein aur farq apne aap nazar aaye, phone par bhi. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

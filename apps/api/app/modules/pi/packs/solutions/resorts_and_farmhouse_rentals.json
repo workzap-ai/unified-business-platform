@@ -1,0 +1,217 @@
+{
+  "industry": "resorts_and_farmhouse_rentals",
+  "name": "Resorts and farmhouse rentals",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_order_errors",
+      "n": 1,
+      "words": "Two families came on the same date because the caretaker and I both took bookings",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Decide that only one person confirms dates, so clashes have one source",
+        "Treat a date as booked only once the advance is in, so holds don't pile up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "one calendar for all properties, shared read-only with the caretaker, where a date confirms automatically only after the advance is logged.",
+        "tool_words": []
+      },
+      "ask_first": "How many farmhouses or chalets do you run?",
+      "free_stops": "The booking flow and how advances lock dates are in the solution document."
+    },
+    {
+      "id": "p2_cash_handling_risk",
+      "n": 2,
+      "words": "The advance goes to whoever they called, and I can't track who got what",
+      "category": "cash_collections",
+      "subtype": "cash_handling_risk",
+      "quick_ideas": [
+        "Give guests one payment account for every advance, so money lands in one place",
+        "Write down every advance currently held against its date, to see what's outstanding."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an advance and deposit ledger per booking, updated automatically, showing who received each payment and what balance is due.",
+        "tool_words": []
+      },
+      "ask_first": "Do guests pay advances mostly by transfer or in cash?",
+      "free_stops": "Ledger fields and how payments are matched to bookings stay for the solution document."
+    },
+    {
+      "id": "p3_theft_internal",
+      "n": 3,
+      "words": "Caretaker takes cash bookings on the side",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Let regular enquirers know bookings are confirmed only through your number, so side bookings have no cover",
+        "Compare diesel use or meter readings with booked days once, to spot unbooked use."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a daily caretaker check-in with photo and location, matched automatically against the booking calendar so unbooked use stands out.",
+        "tool_words": []
+      },
+      "ask_first": "How often are you on site in a week?",
+      "free_stops": "Which signals are matched and how flags are raised is in the solution document."
+    },
+    {
+      "id": "p4_cash_leakage",
+      "n": 4,
+      "words": "Generator diesel bills are huge and I suspect fuel is going missing",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Note litres bought and generator hours for the next few bookings, to see what normal use looks like",
+        "Photograph the hour meter before and after one big event."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a diesel and generator log with photo readings that compares fuel to hours run every day and flags mismatches.",
+        "tool_words": []
+      },
+      "ask_first": "Does the generator have a working hour meter?",
+      "free_stops": "The fuel-per-hour checks and alert rules are set in the solution document."
+    },
+    {
+      "id": "p5_checklists_not_done",
+      "n": 5,
+      "words": "Pre-arrival checks for pool, power and cleaning are never done properly",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Ask the caretaker for a photo of the pool, power and rooms before the next guests arrive, so you see it yourself",
+        "Hand over only after those photos come in."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a pre-arrival checklist with photo proof and time stamps for every booking, sent to the owner automatically, with missed checks counted.",
+        "tool_words": []
+      },
+      "ask_first": "What has gone wrong most often when guests arrive?",
+      "free_stops": "The checklist items and timings stay for the solution document."
+    },
+    {
+      "id": "p6_lead_followup_slow",
+      "n": 6,
+      "words": "Enquiries come on Instagram, WhatsApp and phone and I lose track",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Keep every enquiry in one list with the date asked for, so none slip",
+        "Go back once to everyone who asked this week and didn't book."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an enquiry tracker pulling Instagram and WhatsApp enquiries into one list with automatic follow-up reminders and a count of what converted.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most enquiries come from now?",
+      "free_stops": "Follow-up timing and source tracking are designed in the solution document."
+    },
+    {
+      "id": "p7_after_sales",
+      "n": 7,
+      "words": "Guests break things and I can't tell which group did it",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "Have each area photographed right after check-out, before cleaning, so damage is tied to one group",
+        "Mention the security deposit in every booking confirmation."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a post-checkout inspection with photos linked automatically to each booking.",
+        "tool_words": []
+      },
+      "ask_first": "Do you take a refundable security deposit now?",
+      "free_stops": "The inspection checklist and how it links to deposits stay for the solution document."
+    },
+    {
+      "id": "p8_margin_unknown",
+      "n": 8,
+      "words": "I don't know if the farmhouse is profitable",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Put last month's bookings and every cost on one page, to see the real picture once",
+        "Separate costs that come with each booking from fixed ones like salaries."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a monthly profit view per property, pulling bookings, fuel, salaries, repairs and supplies automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is the land owned or leased?",
+      "free_stops": "How costs are split per booking and per property is in the solution document."
+    },
+    {
+      "id": "p9_seasonal_dip",
+      "n": 9,
+      "words": "Every weekend is full but weekdays are empty",
+      "category": "sales_revenue",
+      "subtype": "seasonal_dip",
+      "quick_ideas": [
+        "Think of one weekday group (school trips, corporate retreats) your place suits, since they book differently from families",
+        "Let past guests who agreed to hear from you know about weekday dates."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "regular WhatsApp messages to past guests (with their permission) about weekday and off-season packages, with replies tracked.",
+        "tool_words": []
+      },
+      "ask_first": "Which months are your slowest?",
+      "free_stops": "Which groups to target and the messaging plan go in the solution document."
+    },
+    {
+      "id": "p10_attendance_lateness",
+      "n": 10,
+      "words": "Staff don't turn up on Eid days, exactly when we're busiest",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Make the Eid roster now and get each person's confirmation, so gaps show early",
+        "Line up a backup for each key role."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a peak-day roster with automatic confirmations and reminders, showing who has and hasn't confirmed.",
+        "tool_words": []
+      },
+      "ask_first": "Which role is hardest to cover on Eid?",
+      "free_stops": "Roster structure and reminder timing stay for the solution document."
+    }
+  ],
+  "never_say": [
+    "Pool safety, water treatment or chemical advice; lifeguard requirements. Advice on land use, zoning, event licences or tax. Help with hiding cash bookings or avoiding tax. Anything that helps organise illegal events (alcohol, gambling) in that jurisdiction. Care or dosing advice for horses or livestock; talk to a vet. In any drowning, shock, injury or fire, call 1122/15 PK, 999/998/997 UAE or 911 Canada) first."
+  ],
+  "sample_reply": {
+    "person": "Chowkidar meri gair-mojoodgi mein bookings le leta hai, advance bhi kabhi usay milta hai kabhi mujhe. Koi solution batao.",
+    "pi": "Ji, is ko control karna mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Tay kar dein ke date sirf ek number se confirm hogi, taake clash ka ek hi zariya rahe. 2 Har advance ke liye ek hi account diya jaye, taake paisa ek jagah aaye. Workzap yeh sab aap ke liye khud-ba-khud chala sakta hai: ek calendar jo chowkidar dekh sake lekin badal na sake, aur date sirf advance darj hone par pakki ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

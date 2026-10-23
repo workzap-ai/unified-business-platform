@@ -1,0 +1,245 @@
+{
+  "industry": "new_car_dealerships_and_showrooms",
+  "name": "New car dealerships and showrooms",
+  "sector": "7.G Transport, mobility and aviation (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_order_tracking",
+      "n": 1,
+      "words": "Customers keep calling to ask when their car will come",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "Put every pending booking on one list with its current stage, so whoever picks up the phone gives the same answer",
+        "Give status calls to one person for the week, so customers stop being passed around the floor."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "customer_messaging"
+        ],
+        "text": "a booking-to-delivery tracker where each stage is ticked by the team and the buyer automatically gets a WhatsApp update every time their car moves forward.",
+        "tool_words": []
+      },
+      "ask_first": "Where does a booking's status live today: the DMS, a register or salesmen's phones?",
+      "free_stops": "The exact stages, who ticks each one and when customers are messaged go into the solution document."
+    },
+    {
+      "id": "p2_lead_followup_slow",
+      "n": 2,
+      "words": "Leads from the portal, Facebook and walk-ins are never followed up",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Gather this week's leads from every source onto one list with a consultant against each, so you can see how many went quiet",
+        "Go through the untouched ones with the team once, so the gap becomes visible to everyone."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "one inbox pulling portal, website, Facebook, PakWheels/Dubizzle and walk-in leads, assigning each to a consultant and chasing follow-ups every day, with a view of who is falling behind.",
+        "tool_words": [
+          "portal"
+        ]
+      },
+      "ask_first": "Which source sends you the most enquiries right now?",
+      "free_stops": "Assignment rules, follow-up timings and the escalation path are set out in the solution document."
+    },
+    {
+      "id": "p3_accountability",
+      "n": 3,
+      "words": "Salesmen keep leads on their own phones and take them when they leave",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Move customer chats onto one showroom WhatsApp Business number, so conversations belong to the business",
+        "Review a departing consultant's open leads before their last day, so nobody is dropped."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "a showroom-owned customer record where every call, test drive and quotation is logged against the business and can be handed to another consultant in one step.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How handovers and access are set up per role is covered in the solution document."
+    },
+    {
+      "id": "p4_order_errors",
+      "n": 4,
+      "words": "The same car got promised to two customers",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Mark every unit in the yard as free, reserved or sold on one board, so nobody promises a car without checking",
+        "Let only one person mark a car reserved, so there is a single point of truth."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "a live yard board by variant, colour and chassis that blocks a second reservation on the same unit across all branches.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the board links to bookings and allocations is detailed in the solution document."
+    },
+    {
+      "id": "p5_overstock_dead_stock",
+      "n": 5,
+      "words": "Some colours sit for months while customers wait for others",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "List the units that have been in the yard longest, so the slow ones are in front of you",
+        "Compare that list with what customers are waiting for, so the mismatch is clear before the next order to the brand."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "a stock-age view with alerts on slow units and floor-plan days, set against open bookings by variant and colour.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The ageing thresholds and how they feed ordering are in the solution document."
+    },
+    {
+      "id": "p6_margin_unknown",
+      "n": 6,
+      "words": "We don't know our real profit per car after discounts, freebies and commission",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Take a handful of recent deliveries and note what was given away on each, so you see where margin goes",
+        "Go over that list with your accountant, so the numbers are read correctly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a per-car profit view captured at delivery, showing discount, free accessories, commission and floor-plan days by model and consultant, every day.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which costs are captured and how they roll up is set out in the solution document."
+    },
+    {
+      "id": "p7_discount_abuse",
+      "n": 7,
+      "words": "Salesmen give away extras without approval",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Decide what a consultant may give without asking, so the limit is clear",
+        "Ask for any extra beyond that to come to you in writing, so approvals sit in one place."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an approval flow that sends any discount or freebie above the limit to the owner on WhatsApp for a one-tap decision, logged against the car.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Limits by role and the approval path are in the solution document."
+    },
+    {
+      "id": "p8_approvals_slow",
+      "n": 8,
+      "words": "Bank finance cases get stuck and we don't know at which step",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "List every open finance case with its bank and current step, so you see where they pile up",
+        "Chase the oldest ones first, so the longest waits get attention."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a finance-case tracker by bank and stage with ageing alerts every day, holding only status and never buyer documents.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The stage list and alert timings are in the solution document."
+    },
+    {
+      "id": "p9_checklists_not_done",
+      "n": 9,
+      "words": "Delivery day is chaos: car not washed, PDI not done, documents missing",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Agree what must be done before a car is handed over, so the team works from one list",
+        "Check it the day before rather than on the morning, so gaps can still be fixed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a phone handover checklist with photos for each step, so a car can't be marked ready until everything is done, with the owner seeing every delivery.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The checklist itself and photo rules are in the solution document."
+    },
+    {
+      "id": "p10_after_sales",
+      "n": 10,
+      "words": "Customers buy from us but go elsewhere for service",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "Book the first service at handover, so the customer leaves with a date",
+        "Introduce the service advisor on delivery day, so the workshop has a face."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "booking_scheduling"
+        ],
+        "text": "automatic first-service reminders to new buyers, with their permission, with a booking link into your own workshop.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing and booking flow are in the solution document."
+    },
+    {
+      "id": "p11_reports_late",
+      "n": 11,
+      "words": "I only see sales numbers when the accountant sends them weeks later",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "Choose the one number you most want daily, so reporting starts small",
+        "Ask each branch for it every evening for a week, so you can compare them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read",
+          "integration"
+        ],
+        "text": "a short morning read of leads, bookings, deliveries and margin by branch and consultant, pulled from a DMS export so nothing is retyped in Excel.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which numbers are pulled and how branches are compared is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on whether \"own money\", premiums or booking cancellations are legal or fair. Advice on car loans, leasing rates, Islamic finance, insurance, duties or tax; refer to the bank, accountant or lawyer. Comment on warranty or recall disputes beyond customer communication. Requests for buyers' CNIC, Emirates ID, licence or bank documents, or salespeople's names. Help with under-invoicing, fake invoices or backdated registration. Market figures on sales, prices or margins."
+  ],
+  "sample_reply": {
+    "person": "Bhai koi solution batao, customer roz call karta hai ke gaari kab aayegi aur showroom mein kisi ko pata hi nahi hota.",
+    "pi": "Haan, is ka hal bilkul mumkin hai, aur shuruaat is hafte aap khud kar sakte hain. 1 Har pending booking ek hi list pe uski maujooda stage ke saath rakhein, taake jo bhi phone uthaye ek hi jawab de. 2 Is hafte status calls sirf ek bande ke zimme kar dein, taake customer idhar udhar na ghoome. Workzap yeh sab aap ke liye automatically kar sakta hai: booking se delivery tak har stage track ho aur customer ko khud WhatsApp update jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

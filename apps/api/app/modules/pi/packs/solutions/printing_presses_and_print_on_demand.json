@@ -1,0 +1,217 @@
+{
+  "industry": "printing_presses_and_print_on_demand",
+  "name": "Printing presses and print-on-demand",
+  "sector": "7.D Manufacturing and industry (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_rework",
+      "n": 1,
+      "words": "Customer approved the proof on WhatsApp, now wants a free reprint",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Lock one approved proof version per job in writing before the run — removes any doubt over which file was signed off",
+        "Agree on the quote who pays for a reprint after approval — settles the argument before it starts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a proof approval link on every job that locks the approved version and time to the job card automatically, so no one has to remember.",
+        "tool_words": []
+      },
+      "ask_first": "Are these reprint demands mostly from corporate jobs or walk-in customers?",
+      "free_stops": "The approval flow, quote terms and how disputes are handled stay in the solution document."
+    },
+    {
+      "id": "p2_bottleneck",
+      "n": 2,
+      "words": "I don't know which jobs are stuck at lamination or die-cutting right now",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Walk the floor once and list every open job by stage — shows exactly where work is piling up",
+        "Chase the oldest open jobs first — clears the ones customers are angriest about."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "digital job cards updated by phone at each stage, showing open and late jobs every day across machines and outside vendors.",
+        "tool_words": []
+      },
+      "ask_first": "Is finishing done in-house or sent to outside vendors?",
+      "free_stops": "The stage set-up, who updates what and the late-job rules are in the solution document."
+    },
+    {
+      "id": "p3_price_increases_supplier",
+      "n": 3,
+      "words": "Paper rates changed again and last month's quotes are now loss-making",
+      "category": "margin_cost",
+      "subtype": "price_increases_supplier",
+      "quick_ideas": [
+        "Put a validity date on every quote — stops old rates binding you when paper moves",
+        "Recheck your most common job types against today's paper rate — shows which quotes are now losing money."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a quote calculator that uses current paper and board rates, colours, quantity and finishing, and shows the margin on every quote.",
+        "tool_words": []
+      },
+      "ask_first": "How often is your paper dealer changing rates at the moment?",
+      "free_stops": "The costing logic and rate set-up behind the calculator stay in the solution document."
+    },
+    {
+      "id": "p4_wastage_cost",
+      "n": 4,
+      "words": "Setting wastage is huge and nobody records it",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Note setting sheets on each job card for one week — gives you a first real picture",
+        "Agree a rough allowance per job type with your senior operator — gives everyone a benchmark."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a phone wastage log per job, machine and operator every day, compared against the allowance with a weekly trend.",
+        "tool_words": []
+      },
+      "ask_first": "Is most wastage on offset setting or on digital and large-format?",
+      "free_stops": "How allowances are set and how exceptions are reviewed are in the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Corporate clients pay after 90 days, sometimes 120",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Send each corporate client a statement of open invoices — often clears delays caused by missing paperwork",
+        "Take an advance on new corporate jobs — reduces how much you carry."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a receivables ledger showing each customer's advance, balance and age, with reminders sent automatically on set dates.",
+        "tool_words": []
+      },
+      "ask_first": "Is the delay usually paperwork on their side or simply slow payment?",
+      "free_stops": "The reminder schedule and escalation steps are in the solution document."
+    },
+    {
+      "id": "p6_count_mismatch",
+      "n": 6,
+      "words": "Board stock in the godown never matches the register",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count your most-used board types once and compare with the register — shows how big the gap really is",
+        "Issue paper only against a job card number — ties every ream to a job."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a paper and board register by GSM, size and brand with consumption per job and an alert before you run short mid-job.",
+        "tool_words": []
+      },
+      "ask_first": "Who issues paper from the godown today?",
+      "free_stops": "The count routine and reorder levels are worked out in the solution document."
+    },
+    {
+      "id": "p7_info_lost_in_whatsapp",
+      "n": 7,
+      "words": "Job files are in ten WhatsApp chats and the operator printed the old version",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Keep only the final approved file in one place per job — the operator can't pick the wrong one",
+        "Make one person the receiver of all customer files — stops files scattering across chats."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "each job card holds its approved file, so the operator always opens the version the customer signed off.",
+        "tool_words": []
+      },
+      "ask_first": "Do customers send files straight to operators or to the counter?",
+      "free_stops": "The file-handling set-up for the shop floor is in the solution document."
+    },
+    {
+      "id": "p8_cash_mismatch",
+      "n": 8,
+      "words": "Advances taken in cash at the counter don't always reach the books",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Give a numbered receipt for every advance — creates a trail for each advance",
+        "Match receipts against the till one evening — shows whether the gap is real and how big."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a counter cash and advance register matched with the till and each job's balance every day.",
+        "tool_words": []
+      },
+      "ask_first": "How many people take cash at the counter?",
+      "free_stops": "The daily matching rules and who signs off are in the solution document."
+    },
+    {
+      "id": "p9_lead_followup_slow",
+      "n": 9,
+      "words": "Leads come in on Instagram at night and nobody replies till noon",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Make one person responsible for clearing overnight enquiries first thing — nothing waits till noon",
+        "Keep recent work visible on your profile — customers decide faster."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "every Instagram and WhatsApp enquiry recorded, with reminders until it is answered and response times measured.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many enquiries come in each week?",
+      "free_stops": "Reply flows and follow-up timing are in the solution document."
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "I can't tell which customer or job type actually makes money",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Compare actual cost with the quote on a handful of recent jobs — shows which types lose",
+        "Ask your accountant for a simple overhead figure per job — makes the comparison fair."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "job costing rolled up by customer and job type on one screen, updated as jobs close.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is any costing done today, or only the selling price?",
+      "free_stops": "The cost categories and report layout are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Never advise whether a customer may print a brand logo, trademark or copyrighted design. Never comment on election or political printing limits. Never help print fake degrees, IDs, stamps, receipts, certificates, currency or counterfeit packaging; decline plainly. No colour-management engineering or chemical, solvent or machine-safety advice; injuries or fire go to emergency services 1122/15 PK, 999/997/998 UAE, 911 Canada). Never collect wedding guest lists, student data, names printed on cards, or customer artwork. Never record named accusations about operators side-printing."
+  ],
+  "sample_reply": {
+    "person": "Bhai reprints ne tang kar diya hai. Corporate party proof OK kar ke baad mein rang ka masla nikaal deti hai. Koi hal batao.",
+    "pi": "Ji, is ka hal bilkul mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Har job ka ek approved proof version likhit mein lock karein, taake baad mein behes na ho ke kaunsi file OK hui thi. 2 Quote par pehle se tay kar lein ke approval ke baad reprint ka kharcha kaun uthayega. Workzap yeh sab aap ke liye khud-ba- khud chala sakta hai: har job par proof approval link jo approved file aur waqt job card ke saath lock kar de, aur har job ka status roz phone par. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

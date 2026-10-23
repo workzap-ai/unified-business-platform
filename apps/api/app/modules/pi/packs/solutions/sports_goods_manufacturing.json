@@ -1,0 +1,219 @@
+{
+  "industry": "sports_goods_manufacturing",
+  "name": "Sports goods manufacturing Sialkot cluster)",
+  "sector": "7.D Manufacturing and industry (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_lead_followup_slow",
+      "n": 1,
+      "words": "Reply to inquiries is slow, buyers go to the next supplier",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "List every open inquiry from Alibaba, email and WhatsApp with the date it came in, so you see what is waiting",
+        "Make one person responsible for first replies, so inquiries stop sitting between people"
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "One inquiry inbox pulling Alibaba, email, website and WhatsApp leads into one list, with response timers and follow-up reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most of your inquiries come from?",
+      "free_stops": "How leads flow in and how follow-ups are timed is set out in the solution document."
+    },
+    {
+      "id": "p2_campaign_roi_unknown",
+      "n": 2,
+      "words": "We pay for platform membership and don't know what it brings",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Tag this year's orders by where the buyer first came from, so you see which channel brings real orders",
+        "Compare inquiries against orders for each channel"
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "dashboards_reports Source tracking on every inquiry and order, showing which platform or channel actually brings business.",
+        "tool_words": [
+          "platform"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "How sources are tagged and reported is covered in the solution document."
+    },
+    {
+      "id": "p3_conversion_low",
+      "n": 3,
+      "words": "Samples take two to three weeks and we lose the order",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "List open sample requests with date and stage, so you see where they stall",
+        "Note what held up the last lost sample (design back and forth, material or stitching), so that step gets attention"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A quotation and sample tracker with status, deadlines and conversion to orders, flagging samples running late.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Sample stages and approval flow are set out in the solution document."
+    },
+    {
+      "id": "p4_order_errors",
+      "n": 4,
+      "words": "Logo colour or placement wrong on a custom order",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Put each current order's logo file, colours, sizes and approved mock-up in one folder, so production works from one source",
+        "Get the approved mock-up confirmed in writing before cutting, so the spec is fixed"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "workflow_automation A custom order spec sheet per order with logo files, colours, sizes, names and numbers and the approved mock-up, checked before production.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How specs are captured and checked before print is kept for the solution document."
+    },
+    {
+      "id": "p5_no_visibility",
+      "n": 5,
+      "words": "Balls sent to stitchers come back late and we can't see who has how many",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Reconcile what each stitching centre has from you today, so you know what is outstanding",
+        "Ask for a count on the next return, so differences are agreed on the spot"
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "An outsourced stitching ledger for panels issued per centre, balls returned, rejects and payments, flagging overdue and short returns.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How issues and returns are recorded and reconciled is covered in the solution document."
+    },
+    {
+      "id": "p6_product_defects",
+      "n": 6,
+      "words": "Buyer rejected balls for shape or weight",
+      "category": "quality_complaints",
+      "subtype": "product_defects",
+      "quick_ideas": [
+        "Check weight and shape on a sample from the next lot before packing, so problems are caught inside",
+        "Note which stitching centre the rejected lot came from"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A QC log per lot with weight, shape and stitching checks and photos, linked to the stitching centre.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Check points and how they are tied to centres are set out in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Advance is paid but balance comes late or not at all",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every buyer with advance received and balance due, so you see what is outstanding",
+        "Agree the balance date with each buyer before the next shipment"
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A buyer payment tracker for advances and balances with scheduled reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing and how balances are tied to shipments are kept for the solution document."
+    },
+    {
+      "id": "p8_customer_communication",
+      "n": 8,
+      "words": "Buyer asks for tracking every day and we answer manually",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Keep one list of open shipments with tracking numbers, so answers take seconds",
+        "Send each buyer their tracking once at dispatch"
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "A shipment tracker that sends buyers updates automatically by WhatsApp or email, with their permission.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Which updates go out and when is set out in the solution document."
+    },
+    {
+      "id": "p9_repeat_low",
+      "n": 9,
+      "words": "Repeat buyers don't come back after one order",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "List buyers who ordered once last year, so you know who to reconnect with",
+        "Note any complaint from their order, so you know what to fix first"
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "customer_messaging A buyer list with order history and timely reorder reminders, sent with their permission.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Timing and content of reorder messages are kept for the solution document."
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "We don't know which product line gives the best margin",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Put freight and sample costs next to the price for your last few orders per line, so the real margin shows",
+        "Compare small and large orders separately"
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "custom_build A product-line margin view including freight and sample costs.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How freight, samples and currency effects are built in is detailed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any help making counterfeit branded goods or using club, league or tournament logos without rights. Any advice on certification standards, product testing or claims like \"official match ball\". Customs, tax, misdeclared value or under-invoicing help. Any help optimising child labour in stitching. Advice on Amazon or Alibaba appeals or platform policy. Any promise of more orders or better conversion."
+  ],
+  "sample_reply": {
+    "person": "We get lots of Alibaba inquiries but very few orders, and samples take too long. What would you suggest?",
+    "pi": "Yes, there is a lot that can be done here, starting this week. 1 List every open inquiry with the date it arrived and give one person responsibility for first replies, so buyers are not left waiting. 2 Note what held up your last lost sample, so that step gets attention first. Workzap can do this automatically for you: one inbox for Alibaba, email and WhatsApp leads with reply timers, and a sample tracker that flags anything running late. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

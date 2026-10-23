@@ -1,0 +1,196 @@
+{
+  "industry": "furniture_and_home_decor_retail",
+  "name": "Furniture and home décor retail",
+  "sector": "7.A Retail and consumer (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_delivery_late",
+      "n": 1,
+      "words": "Custom orders take double the promised time",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Look at a few late orders to see which stage they slipped at, because delays usually start in one place",
+        "Build a buffer into promised dates, so customers hear a date you can keep."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a made-to-order board with stages and promised date, with late alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Which stage usually holds things up?",
+      "free_stops": "The stages and alert rules are in the solution document."
+    },
+    {
+      "id": "p2_order_tracking",
+      "n": 2,
+      "words": "I don't know which order is at which stage",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "List every open order with its stage once, so you see the whole workshop at a glance",
+        "Ask outside vendors for a return date on each piece, so outsourced work stops disappearing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "every order tracked from design to assembly, including outside polish and upholstery.",
+        "tool_words": []
+      },
+      "ask_first": "How many orders are running now?",
+      "free_stops": "How vendors update stages is in the solution document."
+    },
+    {
+      "id": "p3_info_lost_in_whatsapp",
+      "n": 3,
+      "words": "Customer approved fabric on WhatsApp but says she chose another",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Save approval photos in one folder per order, so they can be found later",
+        "Ask for a clear written approval on each choice, so a thumbs-up isn't the only record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "approval on WhatsApp with sample photos and a saved, timed approval.",
+        "tool_words": []
+      },
+      "ask_first": "How do customers approve today?",
+      "free_stops": "How approvals are captured is in the solution document."
+    },
+    {
+      "id": "p4_raw_material_shortage",
+      "n": 4,
+      "words": "Wood, foam or fabric runs out mid-order",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "List materials needed for open orders once, so shortfalls show before work starts",
+        "Check that list against stock, so you buy before the carpenter is waiting."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a material list per order with shortfalls flagged before work begins.",
+        "tool_words": []
+      },
+      "ask_first": "Which materials run short most?",
+      "free_stops": "How requirements are worked out is in the solution document."
+    },
+    {
+      "id": "p5_product_defects",
+      "n": 5,
+      "words": "Furniture gets damaged in delivery",
+      "category": "quality_complaints",
+      "subtype": "product_defects",
+      "quick_ideas": [
+        "Photograph pieces before they leave, so you know whether damage happened in transit",
+        "Note every damage by team and cause, so the pattern is clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "delivery photos, customer sign-off and a damage log by team and cause.",
+        "tool_words": []
+      },
+      "ask_first": "Do you deliver in-house?",
+      "free_stops": "The delivery check steps are in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Balance payment is delayed after delivery",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every order's balance due once, so you know what's outstanding",
+        "Mention the balance when booking delivery, so payment isn't a surprise at the door."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "advance and balance per order with reminders before delivery.",
+        "tool_words": []
+      },
+      "ask_first": "Which payments are hardest to collect?",
+      "free_stops": "The reminder timing is in the solution document."
+    },
+    {
+      "id": "p7_conversion_low",
+      "n": 7,
+      "words": "Lots of visitors, few orders",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Count visitors and orders for a week, so you know the real gap",
+        "Ask visitors if they'd like a follow-up, with their permission, because big purchases are rarely decided on the first visit."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an opt-in visitor list with reminders for salespeople.",
+        "tool_words": []
+      },
+      "ask_first": "What happens after someone visits without buying?",
+      "free_stops": "How follow-ups are timed and assigned is in the solution document."
+    },
+    {
+      "id": "p8_margin_unknown",
+      "n": 8,
+      "words": "We don't know the true cost of a custom sofa",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Cost out one popular custom piece fully once, so you see the real margin",
+        "Include delivery and labour hours, because they are the costs most often missed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a costing sheet for custom pieces kept current as material costs change.",
+        "tool_words": []
+      },
+      "ask_first": "How do you price custom pieces today?",
+      "free_stops": "The costing structure is in the solution document."
+    },
+    {
+      "id": "p9_owner_bottleneck",
+      "n": 9,
+      "words": "Every quote, design and price goes through me",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "List decisions waiting on you for a week, so you see which ones others could take",
+        "Hand standard quotes to one trusted person, so only unusual ones reach you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "approval steps that only send you what needs you.",
+        "tool_words": []
+      },
+      "ask_first": "Who else could approve standard quotes?",
+      "free_stops": "Which decisions route where is in the solution document."
+    }
+  ],
+  "never_say": [
+    "That MDF can be sold as solid wood or other materials misrepresented. Structural, wall-mounting or fire-safety advice; injuries go to medical help first. Contract or legal advice on advances and cancellations. Timber sourcing law or import duty advice. That a delivery date is guaranteed."
+  ],
+  "sample_reply": {
+    "person": "We make sofas and beds to order. Customers keep complaining we're late, and I don't always know where their order is. What can we do?",
+    "pi": "Yes, this is very workable, and you can start this week. 1 Put every open order on one list with its stage and promised date, so the late ones stand out. 2 Ask the polish and upholstery vendors for a return date on each piece, so delays show early. Workzap can do this automatically for you: a job board tracking every order from frame to assembly, including outside vendors, with alerts when one falls behind. Shall I have a solution document and quote prepared for you? You're free to say no.",
+    "language": "english"
+  }
+}

@@ -1,0 +1,220 @@
+{
+  "industry": "hardware_paint_sanitary_and_building_materials_shops",
+  "name": "Hardware, paint, sanitary and building-materials shops",
+  "sector": "7.A Retail and consumer (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_credit_customers",
+      "n": 1,
+      "words": "Contractors take material on udhaar and the khata keeps growing",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Total each contractor's balance and how old it is, because it shows who to chase first",
+        "Agree credit limits with regular contractors, because open-ended udhaar keeps growing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a digital khata per contractor with every credit sale logged at the counter, running balance, statements and automatic WhatsApp reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many contractors take regular udhaar?",
+      "free_stops": "limits, statement timing and reminder flow are kept for the solution document."
+    },
+    {
+      "id": "p2_cash_mismatch",
+      "n": 2,
+      "words": "Credit entries get missed when the shop is busy",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Compare one busy day's slips with the khata, because it shows how many entries are missed",
+        "Make credit entry happen before goods leave, because later it gets forgotten."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "cash_reconciliation"
+        ],
+        "text": "a quick counter entry on phone for every credit sale, matched against the day's slips at closing.",
+        "tool_words": []
+      },
+      "ask_first": "Is the khata kept in a register or on computer?",
+      "free_stops": "the counter entry and close steps go in the solution document."
+    },
+    {
+      "id": "p3_pricing_errors",
+      "n": 3,
+      "words": "Prices change every week from the company and the counter quotes old rates",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Make one person responsible for new price lists, because shared responsibility means nobody updates",
+        "Note the date on every price list at the counter, because staff can then tell which is current."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "upload the brand's new list once and counter and quote prices update immediately, with a margin check.",
+        "tool_words": []
+      },
+      "ask_first": "How do new price lists reach your counter?",
+      "free_stops": "how price lists flow into billing is kept for the solution document."
+    },
+    {
+      "id": "p4_no_visibility",
+      "n": 4,
+      "words": "Ten thousand small items and no idea what's in stock",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Count your fastest-moving items once, because a short list covers most sales",
+        "Label racks by category, because staff then find things without asking you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "a catalogue with rack location and barcode, reorder alerts by sales speed and a dead-stock list.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many items do you keep?",
+      "free_stops": "the catalogue structure and reorder rules go in the solution document."
+    },
+    {
+      "id": "p5_rework",
+      "n": 5,
+      "words": "Tinting mistakes, customer says the shade is wrong and we remix",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Note the formula and base for every tint, because a repeat order can then be matched",
+        "Record each remix and its cause, because it shows where errors start."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a tinting log with formula, base and job, so repeats match and remixes are tracked.",
+        "tool_words": []
+      },
+      "ask_first": "How often does a shade get remixed?",
+      "free_stops": "the tinting log setup is kept for the solution document."
+    },
+    {
+      "id": "p6_order_errors",
+      "n": 6,
+      "words": "Driver says he delivered, contractor says short quantity",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Have the receiver sign the challan at site, because it settles disputes",
+        "Photograph the load before it leaves, because it shows what went."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a delivery challan on phone with photo and receiver confirmation at site.",
+        "tool_words": []
+      },
+      "ask_first": "Do you use your own loaders or hired ones?",
+      "free_stops": "the delivery confirmation flow goes in the solution document."
+    },
+    {
+      "id": "p7_target_missed",
+      "n": 7,
+      "words": "Brand scheme targets missed, we didn't know how close we were",
+      "category": "sales_revenue",
+      "subtype": "target_missed",
+      "quick_ideas": [
+        "Write down each scheme target and where you stand today, because it shows what's still possible",
+        "Check progress mid-month, because the end is too late."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a scheme tracker showing progress against each brand target, with claim paperwork in one place.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many brand schemes are you working towards?",
+      "free_stops": "the tracker setup is kept for the solution document."
+    },
+    {
+      "id": "p8_info_lost_in_whatsapp",
+      "n": 8,
+      "words": "Contractor orders come by WhatsApp voice note and get missed",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Confirm every voice-note order back in writing, because it catches misunderstandings",
+        "Make one person own contractor orders, because shared phones lose them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "contractor order intake on WhatsApp with a structured confirmation and status.",
+        "tool_words": []
+      },
+      "ask_first": "How many contractor orders come in a day?",
+      "free_stops": "the intake and confirmation flow go in the solution document."
+    },
+    {
+      "id": "p9_manual_work",
+      "n": 9,
+      "words": "Quotations for a whole house take hours to write",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Keep your last few big quotes as starting points, because most jobs repeat items",
+        "Note how long each quote takes, because it shows the real cost of the work."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a quotation builder from the catalogue, sent as a PDF on WhatsApp.",
+        "tool_words": []
+      },
+      "ask_first": "How many big quotes do you make in a month?",
+      "free_stops": "the quote builder design is kept for the solution document."
+    },
+    {
+      "id": "p10_cash_flow_tight",
+      "n": 10,
+      "words": "Paying suppliers late because contractors haven't paid us",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "List what's owed to you and what you owe by due date, because it shows the real gap",
+        "Talk to your accountant about the cash plan."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a cash-flow view of receivables against supplier payables due.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Roughly how much of your sales are on credit?",
+      "free_stops": "the cash-flow view setup goes in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any structural, electrical, gas, plumbing or fire-safety advice, or whether a material is suitable for a job. For a gas leak, electrocution, fire or collapse, anything other than \"call emergency services\" PK 1122/15/16, UAE 999/997/998, Canada 911. Help with fake or inflated invoices, or passing non-branded goods off as branded. Advice on building permits, codes or legal recovery of credit. Help with under-invoicing or tax avoidance."
+  ],
+  "sample_reply": {
+    "person": "Thekedar log udhaar le jaate hain aur khata har mahine barhta ja raha hai. Koi tareeqa batao.",
+    "pi": "Ji haan, is ko qaabu mein laaya ja sakta hai. 1. Har thekedar ka balance aur woh kitna purana hai ek dafa nikaal lein, taake pata chale pehle kis se baat karni hai. 2. Regular thekedaron ke saath udhaar ki had tay kar lein, kyun ke bina had ke udhaar barhta hi rehta hai. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai: har udhaar sale counter pe phone se darj ho, balance khud update ho aur WhatsApp pe yaad- dihani apne aap jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

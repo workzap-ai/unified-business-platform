@@ -1,0 +1,218 @@
+{
+  "industry": "beekeeping_and_honey",
+  "name": "Beekeeping and honey",
+  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_complaints",
+      "n": 1,
+      "words": "Customers ask if our honey is real and I have nothing to show them",
+      "category": "customers_retention",
+      "subtype": "complaints",
+      "quick_ideas": [
+        "Gather what you already have, harvest photos and any lab reports, so there is something to show",
+        "Note the source for each batch you sell."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "A batch code on every jar linked to its harvest record, with a page customers can open to see it.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have lab reports for any batches?",
+      "free_stops": "How batch pages are set up and what they show goes in the solution document."
+    },
+    {
+      "id": "p2_serial_batch_tracking",
+      "n": 2,
+      "words": "I can't trace a jar back to which harvest or beekeeper it came from",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Start writing a batch number on every jar filled, so traceability starts now",
+        "Keep a page per batch with source and date."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A harvest and purchase log by batch with source, honey type, weight, date and lab report photo, linked to every jar.",
+        "tool_words": []
+      },
+      "ask_first": "Do you produce yourself, buy in, or both?",
+      "free_stops": "The batch log design is detailed in the solution document."
+    },
+    {
+      "id": "p3_supplier_quality",
+      "n": 3,
+      "words": "Buying from beekeepers, quality and price vary every time",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_quality",
+      "quick_ideas": [
+        "Record each purchase with source code, type, weight and rate, so patterns appear",
+        "Note any problems found later against that purchase."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A supplier history showing each source's purchases, rates and issues over seasons.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many beekeepers do you buy from?",
+      "free_stops": "How sources are compared is kept for the solution document."
+    },
+    {
+      "id": "p4_margin_unknown",
+      "n": 4,
+      "words": "I don't know my cost per kilo after migration, transport and labour",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Add up last season's migration, transport and labour costs in one place, to get a first figure",
+        "Divide against the season's harvest by hand."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A cost per kilo view combining migration, transport, labour and purchase costs, updated as entries come in.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you migrate hives?",
+      "free_stops": "Which costs are included and how is part of the solution document."
+    },
+    {
+      "id": "p5_count_mismatch",
+      "n": 5,
+      "words": "Hive counts on paper don't match what's in the field",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count hives at each location before and after every move, so losses are caught",
+        "Photograph each site count."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A hive register on phone with counts by location and season, checked on every migration.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many hives do you run?",
+      "free_stops": "How counts and moves are logged goes in the solution document."
+    },
+    {
+      "id": "p6_stockout",
+      "n": 6,
+      "words": "Jars and labels ran out before Ramadan orders",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Count jars and labels now and compare with last Ramadan's orders, so you order in time",
+        "Order the gap early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A honey and packaging stock tracker with reorder alerts ahead of Ramadan and gifting seasons.",
+        "tool_words": []
+      },
+      "ask_first": "Who supplies your jars and labels?",
+      "free_stops": "Reorder levels are set out in the solution document."
+    },
+    {
+      "id": "p7_multi_channel_orders",
+      "n": 7,
+      "words": "Orders on WhatsApp and Instagram are all over the place",
+      "category": "orders_fulfilment",
+      "subtype": "multi_channel_orders",
+      "quick_ideas": [
+        "Copy every order into one sheet the day it arrives, so nothing is missed",
+        "Confirm each order back before packing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "One order inbox for WhatsApp, Instagram, website and Daraz, tracked to delivery.",
+        "tool_words": []
+      },
+      "ask_first": "Which channel brings the most orders?",
+      "free_stops": "How channels feed one inbox is detailed in the solution document."
+    },
+    {
+      "id": "p8_cod_remittance",
+      "n": 8,
+      "words": "COD money from couriers comes late",
+      "category": "cash_collections",
+      "subtype": "cod_remittance",
+      "quick_ideas": [
+        "List every delivered COD order and mark which have been paid, so you know what is owed",
+        "Raise the oldest with the courier."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "Courier dispatch and COD reconciliation showing every unpaid delivery.",
+        "tool_words": []
+      },
+      "ask_first": "Do you use one courier or several?",
+      "free_stops": "How COD is matched goes in the solution document."
+    },
+    {
+      "id": "p9_campaign_roi_unknown",
+      "n": 9,
+      "words": "We don't know which of our ads actually brings buyers",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Ask every new buyer where they heard of you, so you get a first picture",
+        "Note the answer with the order."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "Codes and links on each ad and post showing which one brought which order.",
+        "tool_words": []
+      },
+      "ask_first": "Where do you advertise now?",
+      "free_stops": "How codes are set up across your channels is part of the solution document."
+    },
+    {
+      "id": "p10_repeat_low",
+      "n": 10,
+      "words": "Customers buy once and don't return",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Make a list of past buyers who agreed to hear from you, so there is someone to contact",
+        "Get in touch with their permission when a new harvest is in."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "A customer list with seasonal reorder messages sent to those who agreed.",
+        "tool_words": []
+      },
+      "ask_first": "How do you stay in touch with past buyers now?",
+      "free_stops": "Message timing and content are kept for the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on bee health, treatments, medications, swarm control, hive management or forage; refer to a bee specialist or extension service. Any health or medical claim for honey. Advice on labelling law, testing standards, halal or organic certification, or export rules. Any help labelling blended or adulterated honey as pure, faking origin or certificates, or copying another brand's packaging. Recording beekeepers', customers' or helpers' names, IDs or numbers."
+  ],
+  "sample_reply": {
+    "person": "Karak se beri shehad ka kaam hai. Log online poochte hain asli hai ya nahi, mujhe dikhane ke liye kuch chahiye.",
+    "pi": "Ji, bharosa dikhane ka tareeqa banaya ja sakta hai. 1 Ab se har bottle pe batch number likhna shuru karein, taake har jar ka source maloom ho. 2 Jo kuch maujood hai, harvest ki photos aur lab reports, ek jagah jama kar lein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har jar ka batch code us ke harvest record se jura ho aur customer ek page pe us ki tafseel dekh sake. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

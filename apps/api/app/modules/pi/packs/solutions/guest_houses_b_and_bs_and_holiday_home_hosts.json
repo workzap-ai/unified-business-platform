@@ -1,0 +1,219 @@
+{
+  "industry": "guest_houses_b_and_bs_and_holiday_home_hosts",
+  "name": "Guest houses, B&Bs and holiday-home hosts",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_software_not_connected",
+      "n": 1,
+      "words": "Airbnb and Booking.com don't sync in time and I've had two guests for the same dates",
+      "category": "tech_systems",
+      "subtype": "software_not_connected",
+      "quick_ideas": [
+        "Block last-minute bookings on the other platforms by hand straight away, since sync delays bite hardest on short notice",
+        "Keep one master calendar you check before accepting any direct booking."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "one booking calendar across Airbnb, Booking.com and direct bookings for every unit, with an automatic alert the moment two bookings overlap.",
+        "tool_words": []
+      },
+      "ask_first": "How many units, and on how many platforms each?",
+      "free_stops": "How the calendars are connected and the clash rules go in the solution document."
+    },
+    {
+      "id": "p2_handoffs",
+      "n": 2,
+      "words": "Cleaners don't know which units are checking out today",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Send each cleaner tomorrow's turnovers the evening before, so mornings don't depend on your messages",
+        "Ask for a photo of the finished unit, so you know it's ready before the guest arrives."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a daily turnover list sent to each cleaner automatically, updated when bookings change overnight, with tap-to-mark \"cleaned\", photo proof and turnaround times across all units.",
+        "tool_words": []
+      },
+      "ask_first": "Are your cleaners your own staff or freelancers?",
+      "free_stops": "The turnover flow, change alerts and photo checks are detailed in the solution document."
+    },
+    {
+      "id": "p3_chat_overload",
+      "n": 3,
+      "words": "Same guest questions every day: Wi-Fi, parking, where's the key",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Note the questions you answered most this week, since a handful usually make up most messages",
+        "Put the answers in a printed card inside each unit, so guests look there first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a guest WhatsApp assistant that answers common questions from each unit's fact sheet day and night and passes anything else to you.",
+        "tool_words": []
+      },
+      "ask_first": "Which question wakes you up at night most often?",
+      "free_stops": "The fact sheet content and the hand-over rules to you are worked out in the solution document."
+    },
+    {
+      "id": "p4_after_sales",
+      "n": 4,
+      "words": "Guests damage things and I can't prove it was them",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "Ask the cleaner to photograph each unit at check-out before cleaning, so damage can be matched to a stay",
+        "Keep those photos by unit and date."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a check-out inspection with photos linked automatically to each stay, so the record is there whenever a dispute comes up.",
+        "tool_words": []
+      },
+      "ask_first": "Do you take a security deposit now?",
+      "free_stops": "The inspection checklist per unit type stays for the solution document."
+    },
+    {
+      "id": "p5_margin_unknown",
+      "n": 5,
+      "words": "I don't know which unit actually makes money",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Put last month's payout and costs for each unit side by side once, to see which ones carry the others",
+        "Mark any unit whose costs you can't find, since that is where money usually leaks."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a unit-level profit view that pulls payouts, commissions, cleaning, utilities and supplies automatically each month.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Are the units owned, rented or managed for others?",
+      "free_stops": "Which costs are allocated to which unit, and how, is in the solution document."
+    },
+    {
+      "id": "p6_manual_reports",
+      "n": 6,
+      "words": "Owners I manage for want statements and I make them by hand in Excel",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Use the same layout for every owner this month, so you stop rebuilding statements",
+        "Send them all on one fixed date, so owners stop chasing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "owner statements generated automatically from each unit's bookings and costs and sent as a PDF every month.",
+        "tool_words": []
+      },
+      "ask_first": "How many owners do you report to?",
+      "free_stops": "Statement content and data sources are set out in the solution document."
+    },
+    {
+      "id": "p7_wrong_location",
+      "n": 7,
+      "words": "Towels and toiletries short in one unit, piling up in another",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Count linen and toiletries in every unit once, to see where stock has drifted",
+        "Move the extras to where they're short in one run."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "stock per unit with par levels, updated from cleaners' turnovers, with automatic restock alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have one central store or supplies kept in each unit?",
+      "free_stops": "Par levels per unit size and the restock routine stay for the solution document."
+    },
+    {
+      "id": "p8_payroll_errors",
+      "n": 8,
+      "words": "Freelance cleaners charge differently and I can't track what I owe",
+      "category": "people_staff",
+      "subtype": "payroll_errors",
+      "quick_ideas": [
+        "Agree one written rate per turnover type with each cleaner, so payments stop being argued",
+        "Check this week's turnovers with each cleaner before paying."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a cleaner ledger that adds each completed turnover automatically and shows a running balance per cleaner.",
+        "tool_words": []
+      },
+      "ask_first": "Do you pay cleaners per turnover or by the hour?",
+      "free_stops": "Rate rules and settlement cycle go in the solution document."
+    },
+    {
+      "id": "p9_booking_appointments",
+      "n": 9,
+      "words": "Repeat guests want to book direct but I've no system",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Ask happy guests at check-out if they'd like to hear from you directly, and note it only with their permission",
+        "Block any direct booking on your master calendar the moment it's agreed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "a direct-booking page with live availability and a deposit link, feeding the same calendar as the platforms.",
+        "tool_words": [
+          "platform"
+        ]
+      },
+      "ask_first": "Are your units in Dubai, Pakistan or Canada?",
+      "free_stops": "The page, deposit flow and calendar connection are designed in the solution document."
+    },
+    {
+      "id": "p10_licences_renewals",
+      "n": 10,
+      "words": "Permit renewals for every unit are a headache",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "Put every unit's renewal dates in one list, so none surprise you",
+        "For what is actually required, talk to the relevant authority or a licensing adviser."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a renewal tracker per unit that sends reminders automatically and keeps a document checklist for each.",
+        "tool_words": []
+      },
+      "ask_first": "How many units need renewals this year?",
+      "free_stops": "Reminder timing and checklist structure stay for the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on holiday-home permits, DTCM rules, municipal short-term rental bylaws, strata or building rules. Anything on tax on rental income or tenancy law. Help running unlicensed units or listing without a required permit. Any idea involving cameras inside guest areas. A legal view on deposit or damage disputes. Requests for door codes, lockbox codes, Wi-Fi passwords, guest names or ID copies."
+  ],
+  "sample_reply": {
+    "person": "My cleaners never know who's checking out, guests wait in the lobby and leave bad reviews. What can I do about it?",
+    "pi": "Yes, this can be fixed, and you can start this week. 1 Send each cleaner tomorrow's turnovers the evening before, so their morning doesn't depend on your messages. 2 Ask for a photo of every finished unit, so you know it's ready before the guest arrives. Workzap can do this automatically for you: a turnover list that goes to each cleaner every day, updates itself when bookings change, and shows you which units are ready. Shall I prepare a solution document and quote for you? You can say no.",
+    "language": "english"
+  }
+}

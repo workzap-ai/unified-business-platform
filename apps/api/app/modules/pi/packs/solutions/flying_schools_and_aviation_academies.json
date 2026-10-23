@@ -1,0 +1,222 @@
+{
+  "industry": "flying_schools_and_aviation_academies",
+  "name": "Flying schools and aviation academies",
+  "sector": "7.G Transport, mobility and aviation (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_bottleneck",
+      "n": 1,
+      "words": "Students take twice as long because slots keep getting cancelled",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Count last month's cancelled slots once by reason (aircraft, instructor, weather), so you know which cause to tackle first",
+        "Note which students lost the most slots, so you can prioritise them in rebooking."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling",
+          "dashboards_reports"
+        ],
+        "text": "cancellations logged by reason every day, affected students offered the next free slot automatically, and a weekly view of slots lost per aircraft and per course.",
+        "tool_words": []
+      },
+      "ask_first": "Zyada tar slots kis wajah se cancel hote hain, aircraft, instructor ya mausam?",
+      "free_stops": "The rebooking rules and priority order are set out in the solution document."
+    },
+    {
+      "id": "p2_booking_appointments",
+      "n": 2,
+      "words": "Bookings on a whiteboard and WhatsApp, aircraft get double-booked",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Move this week's bookings onto one shared calendar, so there's a single source",
+        "Let only one person confirm bookings for now, so clashes stop while you sort it out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "an online booking board for aircraft, instructors and sims that blocks double bookings and shows availability by phone to staff and students.",
+        "tool_words": []
+      },
+      "ask_first": "Kitne aircraft aur sims ek saath schedule hote hain?",
+      "free_stops": "How resources, rules and student access are set up is designed in the solution document."
+    },
+    {
+      "id": "p3_maintenance_downtime",
+      "n": 3,
+      "words": "Aircraft down for maintenance and students find out when they arrive",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Agree who tells the scheduler the moment an aircraft goes down, so the news has an owner",
+        "Check which students arrived for grounded aircraft last month, so you see the cost of the gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "customer_messaging"
+        ],
+        "text": "when maintenance marks an aircraft unavailable, it drops off the schedule automatically and affected students get a WhatsApp notice with alternatives (the maintenance decision itself stays with your engineers).",
+        "tool_words": []
+      },
+      "ask_first": "Maintenance wale abhi schedule wale ko kaise batate hain?",
+      "free_stops": "How maintenance status links to the schedule is set out in the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "Students fall behind on instalments and keep flying",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List students with overdue instalments once, by student role and reference, so you know the total",
+        "Agree a clear rule for flying while overdue, so instructors aren't left to decide."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an instalment tracker with automatic reminders to the payer and a flag on the booking board when an overdue student tries to book.",
+        "tool_words": []
+      },
+      "ask_first": "Students upfront dete hain, per hour ya instalments mein?",
+      "free_stops": "Reminder timing and the overdue rule are worked out in the solution document."
+    },
+    {
+      "id": "p5_customer_communication",
+      "n": 5,
+      "words": "Parents call every week to ask about progress",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Send each student's payer a short progress note once this month, so the calls drop",
+        "Name one person who answers progress questions, so answers are consistent."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "dashboards_reports"
+        ],
+        "text": "a progress view showing hours flown, stages done and hours remaining per student (no ID or logbook data stored), with an automatic monthly update to the payer with their permission.",
+        "tool_words": []
+      },
+      "ask_first": "Progress ka record abhi kahan rakha jata hai?",
+      "free_stops": "What the progress view shows and how often it's sent is designed in the solution document."
+    },
+    {
+      "id": "p6_lead_followup_slow",
+      "n": 6,
+      "words": "Enquiries from Instagram and WhatsApp sit unanswered for days",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Go through all open enquiries once and reply to every one, so you see how many were waiting",
+        "Make one person responsible for first replies, so nothing waits for \"whoever's free\"."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup",
+          "attribution_codes"
+        ],
+        "text": "every enquiry from ads, website and WhatsApp recorded with its source, follow-ups reminded on time, and a weekly view of which source actually enrols.",
+        "tool_words": []
+      },
+      "ask_first": "Zyada tar enquiries kahan se aati hain?",
+      "free_stops": "Follow-up timing and source tagging are set out in the solution document."
+    },
+    {
+      "id": "p7_payroll_errors",
+      "n": 7,
+      "words": "Instructor pay per hour calculated by hand and disputed",
+      "category": "people_staff",
+      "subtype": "payroll_errors",
+      "quick_ideas": [
+        "Reconcile one instructor's hours for last month against bookings, so you see where differences come from",
+        "Share the hours list with instructors before payday, so disputes come early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "instructor hours and pay calculated automatically from completed sessions, with a monthly statement each instructor can check.",
+        "tool_words": []
+      },
+      "ask_first": "Instructors full-time hain ya per hour?",
+      "free_stops": "The pay rules and session types are configured in the solution document."
+    },
+    {
+      "id": "p8_margin_unknown",
+      "n": 8,
+      "words": "Cost per flying hour unknown",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out one aircraft's cost for last month by hand, so you see which cost dominates",
+        "Compare that with what you charge per hour, so you know if packages still hold up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a cost per flying hour view per aircraft, combining fuel, maintenance, instructor and fixed costs, updated as bills and hours come in.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is saal kaun si cost sab se zyada barhi hai?",
+      "free_stops": "How fixed costs are spread across hours is worked out in the solution document."
+    },
+    {
+      "id": "p9_fuel_leakage",
+      "n": 9,
+      "words": "Fuel uplift doesn't match hours flown",
+      "category": "loss_security",
+      "subtype": "fuel_leakage",
+      "quick_ideas": [
+        "Compare one month's fuel uplift against hours flown per aircraft, so you see if it's one aircraft or all",
+        "Keep uplift slips in one place, so the check is possible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "fuel uplift entered by phone with a photo of the slip, reconciled automatically against hours flown per aircraft each week.",
+        "tool_words": []
+      },
+      "ask_first": "Fuel ka record abhi kaun rakhta hai?",
+      "free_stops": "The reconciliation logic and alert levels are set out in the solution document."
+    },
+    {
+      "id": "p10_licences_renewals",
+      "n": 10,
+      "words": "Insurance and aircraft document renewals catch us by surprise",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List every renewal date you have in one place, so you see what's coming",
+        "Give one person ownership of renewals, so reminders don't depend on memory."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a renewal tracker for insurance, aircraft documents and school approvals with automatic reminders well before each date (what each renewal requires stays with your accountable manager).",
+        "tool_words": []
+      },
+      "ask_first": "Kitni renewals ka hisaab rakhna padta hai, taqreeban?",
+      "free_stops": "Reminder timing and owners per renewal are designed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about airworthiness, flight safety, weather or go/no-go decisions, or a student's readiness for solo or checkride. Anything about syllabus approval, licensing, medical fitness, or how PCAA, GCAA or Transport Canada read their rules. Visa or immigration advice for overseas students; only the business impact. Anything that helps inflate hours, alter logbooks, backdate records or issue certificates. Legal or consumer-law advice on refund disputes, and any storage of student or instructor names, IDs, medical or licence data."
+  ],
+  "sample_reply": {
+    "person": "Students ke slots bohat cancel ho rahe hain, aircraft maintenance mein chala jata hai aur schedule tak khabar hi nahi aati. Koi hal batayein.",
+    "pi": "Ji haan, is ka hal mumkin hai, aur shuruaat is se hoti hai ke khabar kaun deta hai. 1. Maintenance aur scheduling ke beech ek banda tay kar dein jo aircraft down hote hi schedule ko bataye, taa ke students bekaar na aayein. 2. Pichle mahine ke cancel slots ek dafa wajah ke saath gin lein, taa ke pata chale asal masla kahan hai. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: aircraft down mark hote hi schedule se hat jaye, mutasir students ko WhatsApp par agla khaali slot mil jaye, aur har hafte cancellations ka hisaab saamne aa jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

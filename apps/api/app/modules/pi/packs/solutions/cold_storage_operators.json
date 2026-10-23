@@ -1,0 +1,218 @@
+{
+  "industry": "cold_storage_operators",
+  "name": "Cold storage operators",
+  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_count_mismatch",
+      "n": 1,
+      "words": "Client says he stored 500 bags, our register shows 470",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count inward loads with the client or their representative present and both signing, so the starting figure is agreed",
+        "Give a receipt with the count every time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "An inward/outward register on phone by client account code, issuing a WhatsApp receipt with a unique code for every movement.",
+        "tool_words": []
+      },
+      "ask_first": "How is stock recorded when it comes in?",
+      "free_stops": "How receipts and codes are set up is detailed in the solution document."
+    },
+    {
+      "id": "p2_no_visibility",
+      "n": 2,
+      "words": "Stock taken out in parts and the balance per client gets confused",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Keep a running balance per client on its own page, so each part-release reduces a clear figure",
+        "Tell the client the remaining balance at every release."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "A client stock statement sent on WhatsApp after every movement, showing what remains.",
+        "tool_words": []
+      },
+      "ask_first": "Do most clients take stock out in parts?",
+      "free_stops": "How statements are generated is part of the solution document."
+    },
+    {
+      "id": "p3_wrong_location",
+      "n": 3,
+      "words": "Bags end up in the wrong chamber and take hours to find",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Number every chamber and rack clearly, so each lot has an address",
+        "Write chamber and rack on every inward receipt."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A chamber and rack map showing where each client's lot sits, updated with every movement.",
+        "tool_words": []
+      },
+      "ask_first": "How many chambers do you have?",
+      "free_stops": "The map layout is kept for the solution document."
+    },
+    {
+      "id": "p4_fraud",
+      "n": 4,
+      "words": "Gate passes are handwritten and can be copied",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Number gate passes in sequence and check each against the register before release, so copies stand out",
+        "Allow releases on one person's approval only."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A release flow where stock goes out only against a valid receipt code with an approval step.",
+        "tool_words": []
+      },
+      "ask_first": "Who authorises releases at night?",
+      "free_stops": "How codes and approvals work is detailed in the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Rent collection at season end is a fight",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every client's rent due with the agreed rate, so there is one record to point to",
+        "Share the balance with clients during the season, not only at the end."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Rent billing by season or month with balances and reminders sent through the season.",
+        "tool_words": []
+      },
+      "ask_first": "Is rent charged per bag for the season or monthly?",
+      "free_stops": "Billing and reminder setup goes in the solution document."
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "Rates differ client to client and no one remembers what was agreed",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Write each client's agreed rate on their account page now, so it isn't from memory",
+        "Put the rate on every receipt."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Agreed rates stored per client account and applied automatically on every bill.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have a standard rate list?",
+      "free_stops": "How rates link to billing is part of the solution document."
+    },
+    {
+      "id": "p7_maintenance_downtime",
+      "n": 7,
+      "words": "Compressor failed at night and nobody noticed till morning",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Ask the night shift to send a reading and photo of each chamber at set times, so problems surface sooner",
+        "Keep a breakdown book for compressors and generators."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "Connecting temperature sensors, where available, so the owner's phone gets an alert the moment a chamber goes out of range.",
+        "tool_words": []
+      },
+      "ask_first": "Do the chambers have any sensors now?",
+      "free_stops": "Which sensors connect and how alerts are routed goes in the solution document."
+    },
+    {
+      "id": "p8_checklists_not_done",
+      "n": 8,
+      "words": "Temperature logs are filled in at the end of the week",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Make the log a shift task with a time beside each entry, so gaps are visible",
+        "Check the log yourself at random times."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A temperature and power log filled hourly by the shift on phone, flagged automatically if an entry is missed.",
+        "tool_words": []
+      },
+      "ask_first": "Who fills the log now?",
+      "free_stops": "Log intervals and flags are set out in the solution document."
+    },
+    {
+      "id": "p9_utility_costs",
+      "n": 9,
+      "words": "Diesel for generators during load shedding is killing margins",
+      "category": "margin_cost",
+      "subtype": "utility_costs",
+      "quick_ideas": [
+        "Note generator hours beside each fill, so you can see diesel against actual running",
+        "Record load-shedding hours for a week."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A diesel and generator-hours log with cost per chamber per month.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "What backup do you use when power goes?",
+      "free_stops": "How costs are split by chamber is kept for the solution document."
+    },
+    {
+      "id": "p10_manual_reports",
+      "n": 10,
+      "words": "Brands we store for want daily stock reports, we send them by hand",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Agree one fixed report format with each brand, so it isn't rebuilt each time",
+        "Prepare it at one fixed time daily."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A daily stock report emailed to each brand client automatically, from the same inward/outward records.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many brand clients want reports?",
+      "free_stops": "Report contents and delivery are detailed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on refrigeration engineering, ammonia or refrigerant handling, or storage temperatures for any product. Advice on food or pharma storage compliance, insurance claims, contract law or abandoned goods. Any help altering temperature logs, backdating gate passes, releasing stock improperly or hiding stock from tax or customs. Assigning blame in client loss disputes. Storing clients' or labourers' names, CNICs, trade licences or phone numbers."
+  ],
+  "sample_reply": {
+    "person": "Aloo ka cold store hai Okara ke paas. Har saal zameendar boriyan kam hone ki shikayat karte hain, koi solution hai?",
+    "pi": "Ji, is ka hal mumkin hai aur shuruaat foran ho sakti hai. 1 Maal andar aate waqt ginti zameendar ya unke numainde ke saamne karein aur dono dastakhat karein, taake shuruaati adad pe ittefaq ho. 2 Har nikasi pe baqi boriyon ka adad usi waqt bata dein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har aamad aur nikasi ka record, code wali raseed, aur har dafa zameendar ko WhatsApp pe baqi balance. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

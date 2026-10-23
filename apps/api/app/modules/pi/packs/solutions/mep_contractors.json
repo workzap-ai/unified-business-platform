@@ -1,0 +1,221 @@
+{
+  "industry": "mep_contractors",
+  "name": "MEP contractors",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_approvals_slow",
+      "n": 1,
+      "words": "Submittals sit with the consultant for weeks and we can't order material",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "List every open submittal with the date sent, so days waiting are visible",
+        "Send the consultant one consolidated pending list weekly, so follow-up is documented."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A submittal tracker with revision, date sent, consultant status and days waiting, sending reminders and showing the backlog across all projects daily.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many submittals are open across your projects?",
+      "free_stops": "Status stages and reminder rules are in the solution document."
+    },
+    {
+      "id": "p2_documentation",
+      "n": 2,
+      "words": "We lose track of which submittal revision is approved",
+      "category": "compliance_admin",
+      "subtype": "documentation",
+      "quick_ideas": [
+        "Keep one folder per system with only the latest approved revision on top",
+        "Mark superseded files clearly, so site never works from an old one."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Material approval records linked to requisitions, so only approved items and revisions can be ordered.",
+        "tool_words": []
+      },
+      "ask_first": "Who updates the submittal register now?",
+      "free_stops": "How revisions link to ordering is set out in the solution document."
+    },
+    {
+      "id": "p3_shrinkage_theft",
+      "n": 3,
+      "words": "Copper cable keeps disappearing and material drifts between projects",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Count high-value cable drums once against issue records, to size the gap",
+        "Record every move between warehouse and site stores with sender and receiver."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking",
+          "stock_alerts"
+        ],
+        "text": "Warehouse and site store stock with transfer logs confirmed at both ends and a leftover-material register for reuse, with gaps flagged as patterns.",
+        "tool_words": []
+      },
+      "ask_first": "How do you know what's in the site store versus the warehouse?",
+      "free_stops": "The stock structure and alert rules are in the solution document."
+    },
+    {
+      "id": "p4_import_delays",
+      "n": 4,
+      "words": "Imported panels and chillers arrive late and delay testing",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "List imported items with expected arrival next to the programme date they're needed, so clashes show early",
+        "Ask suppliers for a weekly shipment status."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "An import order tracker from PO to warehouse, comparing expected arrival with programme dates for every project.",
+        "tool_words": []
+      },
+      "ask_first": "Which items do you import?",
+      "free_stops": "Tracking stages and alerts are in the solution document."
+    },
+    {
+      "id": "p5_disputed_deductions",
+      "n": 5,
+      "words": "Main contractor deducts back-charges we never agreed to",
+      "category": "cash_collections",
+      "subtype": "disputed_deductions",
+      "quick_ideas": [
+        "Keep every back-charge notice with your response in one register",
+        "Take the contract question itself to a professional adviser."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A billing and retention ledger with a back-charge register and ageing, so the cash impact is clear on every project.",
+        "tool_words": []
+      },
+      "ask_first": "What deductions or delays hurt most?",
+      "free_stops": "Ledger design and reporting are in the solution document."
+    },
+    {
+      "id": "p6_shift_scheduling",
+      "n": 6,
+      "words": "Technicians are on the wrong site and another site is idle",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Put tomorrow's technician-to-site plan on one sheet each evening",
+        "Note each technician's main skill, so the right person goes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A technician deployment board with skills, sending each person their site by WhatsApp daily and showing coverage across projects.",
+        "tool_words": []
+      },
+      "ask_first": "How many technicians and foremen do you have?",
+      "free_stops": "Scheduling rules and the skills matrix are in the solution document."
+    },
+    {
+      "id": "p7_rework",
+      "n": 7,
+      "words": "Testing fails because installation was not done to the drawing",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Ask foremen for photos at key stages before close-up, so issues are seen early",
+        "Review failed tests from the last month to see which system repeats."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Installation and testing checklists per system with photo proof, feeding inspection readiness; technical standards stay with your engineers and the authority.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "What usually causes rework or failed tests?",
+      "free_stops": "Checklist structure per system is in the solution document."
+    },
+    {
+      "id": "p8_handoffs",
+      "n": 8,
+      "words": "As-builts and O&M manuals delay our final payment",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "List every handover document needed per project now, so nothing is left for the end",
+        "Give one person ownership of the handover pack."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A handover document tracker for as-builts, O&M manuals, warranties and certificates, showing what's missing per project.",
+        "tool_words": []
+      },
+      "ask_first": "What's normally left at the end of a project?",
+      "free_stops": "Document lists and status rules are in the solution document."
+    },
+    {
+      "id": "p9_unbilled_variations",
+      "n": 9,
+      "words": "Variations from the main contractor are verbal and we lose track",
+      "category": "cash_collections",
+      "subtype": "unbilled_variations",
+      "quick_ideas": [
+        "Ask for every instruction in writing before work starts",
+        "List current verbal variations with dates and photos."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A variation log with instruction source, photos and approval status, linked to billing.",
+        "tool_words": []
+      },
+      "ask_first": "How are extra works recorded on site today?",
+      "free_stops": "The approval flow and billing link are in the solution document."
+    },
+    {
+      "id": "p10_after_sales",
+      "n": 10,
+      "words": "After handover the client calls us for maintenance and nobody tracks the calls",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "Give clients one service number, so calls land in one place",
+        "Log each call with date and outcome."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "An AMC and service-call module that logs, assigns and tracks every call after handover.",
+        "tool_words": [
+          "module"
+        ]
+      },
+      "ask_first": "Do you hold maintenance contracts after handover?",
+      "free_stops": "Service categories and response rules are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any advice on electrical loads, cable sizing, earthing, fire systems, gas, pressure testing or code compliance; a qualified engineer or the authority decides. Any help faking test certificates, bypassing authority inspections or swapping unapproved materials. Any view on back-charge, retention or payment-term disputes; that is for a professional adviser. Any request to record technicians' names, IDs, visa or salary details. Anything other than emergency services first for electrocution, fire, gas leak, fall or confined-space incident."
+  ],
+  "sample_reply": {
+    "person": "What can we do about submittals? The consultant sits on them for weeks and then the delay lands on us.",
+    "pi": "Yes, there's a good fix here, and you can start this week. 1 Put every open submittal in one list with the date it went out, so days waiting are visible to everyone. 2 Send the consultant that pending list once a week, so your follow-up is on record. Workzap can do this automatically for you: every submittal tracked by revision and status, reminders sent, and a daily view of what's holding each project. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

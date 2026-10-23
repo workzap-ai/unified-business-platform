@@ -1,0 +1,219 @@
+{
+  "industry": "goat_and_sheep_farms",
+  "name": "Goat and sheep farms",
+  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_no_birth_records",
+      "n": 1,
+      "words": "Kitne bachay paida hue aur kitne mar gaye, koi hisaab nahi",
+      "category": "operations_process",
+      "subtype": "no_birth_records",
+      "quick_ideas": [
+        "Write every birth and death the same day against the mother's tag",
+        "Ask the charwaha to send a photo for each, not just a call."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a kidding/lambing log on the phone that builds each doe's and ewe's record of births, twins and losses automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Are the breeding does and ewes tagged today?",
+      "free_stops": "The log fields and performance view are set out in the solution document."
+    },
+    {
+      "id": "p2_count_mismatch",
+      "n": 2,
+      "words": "Headcount never matches between herder and manager",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count at one fixed time every day",
+        "Count together at every handover so both agree the number."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a daily headcount sent with a photo, with a mismatch alert to the owner the same day.",
+        "tool_words": []
+      },
+      "ask_first": "Who counts the animals now, and how often?",
+      "free_stops": "Count timing and alert rules go in the solution document."
+    },
+    {
+      "id": "p3_theft_external",
+      "n": 3,
+      "words": "Animals stolen at night from the shed",
+      "category": "loss_security",
+      "subtype": "theft_external",
+      "quick_ideas": [
+        "Do a dusk headcount after the bara is locked",
+        "Report every theft to the police and note when it happened."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "timed night check-ins with headcount photos, alerting the owner automatically when one is missed.",
+        "tool_words": []
+      },
+      "ask_first": "At what time have losses usually happened?",
+      "free_stops": "Check-in times and alert routing are detailed in the solution document."
+    },
+    {
+      "id": "p4_margin_unknown",
+      "n": 4,
+      "words": "Feed and chara bills keep rising, I don't know cost per animal",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Put one month's feed, labour and vet bills against headcount for a rough cost per animal",
+        "Keep show or breeding animals' costs apart from the meat herd."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "cost per animal and per batch worked out automatically from the bills and headcounts the farm enters.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do the goats graze, or are they fully stall-fed?",
+      "free_stops": "How costs are split between groups is worked out in the solution document."
+    },
+    {
+      "id": "p5_pricing_errors",
+      "n": 5,
+      "words": "Sold Eid goats cheap because I didn't know what I'd spent on them",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Work out what each batch cost before Eid so you know your floor",
+        "Set a minimum price helpers can't go below without asking you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "dashboards_reports — an Eid sale catalogue with photos, weight and the owner's set price, shown next to each animal's running cost.",
+        "tool_words": []
+      },
+      "ask_first": "Who agrees the final price with buyers at Eid?",
+      "free_stops": "How the catalogue links to costs goes in the solution document."
+    },
+    {
+      "id": "p6_lead_followup_slow",
+      "n": 6,
+      "words": "Buyers DM at all hours, I lose them because I reply late",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Show price range, location and visiting times where buyers look first",
+        "Keep a list of who asked about which animal so nobody is forgotten."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Instagram, Facebook and WhatsApp enquiries pulled into one list, with follow-up reminders sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who replies to buyer messages now?",
+      "free_stops": "The follow-up rules and timings stay in the solution document."
+    },
+    {
+      "id": "p7_credit_customers",
+      "n": 7,
+      "words": "Some buyers take animals on promise and pay months later",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Confirm each credit sale and due date to the buyer in writing",
+        "Decide your own limit on credit for new buyers."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a credit ledger that tracks every balance and sends polite reminders on its own before due dates.",
+        "tool_words": []
+      },
+      "ask_first": "How many buyers owe you right now?",
+      "free_stops": "Reminder timing and limits go in the solution document."
+    },
+    {
+      "id": "p8_no_customer_data",
+      "n": 8,
+      "words": "Breeding stock buyers ask for parent records and I have nothing",
+      "category": "customers_retention",
+      "subtype": "no_customer_data",
+      "quick_ideas": [
+        "Start a simple record for each breeding animal from what you know",
+        "Mark gaps as \"not recorded\" rather than guessing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a shareable record card for each breeding animal, filled automatically from the farm's own herd data.",
+        "tool_words": []
+      },
+      "ask_first": "Do you sell breeding animals often, or mainly for Eid?",
+      "free_stops": "The card's contents and how it's shared are set out in the solution document."
+    },
+    {
+      "id": "p9_checklists_not_done",
+      "n": 9,
+      "words": "Nobody checks water and feeding on time when I'm away",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Write down the daily tasks once, the way you already run the farm",
+        "Ask for a photo when each is done."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a daily care checklist with timestamps and photos that flags missed items to the owner automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who runs the farm day to day when you're not there?",
+      "free_stops": "The checklist itself and flag rules stay in the solution document."
+    },
+    {
+      "id": "p10_succession_family",
+      "n": 10,
+      "words": "I keep everything in my head and can't hand over to my son",
+      "category": "planning_growth",
+      "subtype": "succession_family",
+      "quick_ideas": [
+        "Write down buyers, suppliers and what each animal is for",
+        "Let your son take over the daily records first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "erp_nori_platform"
+        ],
+        "text": "one system holding herd, buyer, supplier and cost records, updated daily, so a family successor can pick it up.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "Is your son on the farm now, or in another job?",
+      "free_stops": "What the system covers and how it's handed over goes in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any deworming, vaccine, medicine, feed recipe or breeding advice; suggest their vet. Any ruling on qurbani suitability, or certification of breed purity; suggest their scholar or breed association. Anything that helps falsify parentage, age or tags, or sell sick animals. Promised Eid prices or herd growth. Covert surveillance or confrontation advice about herders, or collecting IDs and bank details."
+  ],
+  "sample_reply": {
+    "person": "Mere paas 150 Beetal bakriyan hain, charwaha zubani batata hai kitne bachay hue aur kitne mare. Koi tareeqa batao.",
+    "pi": "Ji haan, paidaish aur maut ka pakka record isi hafte se shuru kiya ja sakta hai. 1 Har paidaish aur maut usi din bakri ke tag ke saath likhi jaye. 2 Charwaha har aik ki photo bheje, sirf phone pe batana kaafi na ho. Workzap yeh sab aap ke liye khud-ba-khud roz kar sakta hai: har bakri ka record phone pe bane, rozana ginti aaye, aur ginti na mile toh aap ko foran alert mile. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

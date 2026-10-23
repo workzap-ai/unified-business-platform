@@ -1,0 +1,238 @@
+{
+  "industry": "trucking_and_goods_transport_companies",
+  "name": "Trucking and goods transport companies",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_freight_costs",
+      "n": 1,
+      "words": "Trucks come back empty from upcountry most of the time",
+      "category": "margin_cost",
+      "subtype": "freight_costs",
+      "quick_ideas": [
+        "Write down when each truck will be free at its destination, so return loads can be looked for in advance",
+        "List the customers in upcountry cities who send loads back towards your base, so you know who to ask."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A return-load list that matches trucks heading back with pending bookings at destination, updated every day.",
+        "tool_words": []
+      },
+      "ask_first": "Who looks for return loads today — the driver, the munshi, or you?",
+      "free_stops": "How trucks and bookings are matched is designed in the solution document."
+    },
+    {
+      "id": "p2_cash_leakage",
+      "n": 2,
+      "words": "Diesel bills don't match the kilometres driven",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Note the odometer reading at each fuel-up for a week, so litres can be compared with distance",
+        "Move from cash to a pump account where you can, so every litre has a record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "A fuel log comparing litres issued with distance per truck, flagging unusual consumption automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The comparison method and flags are set in the solution document."
+    },
+    {
+      "id": "p3_order_tracking",
+      "n": 3,
+      "words": "Customers call asking where the truck is and I have to call the driver",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "Agree openly with drivers on fixed points where they send a location update, so you aren't calling all day",
+        "Tell customers when to expect updates."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "Trip updates to customers on WhatsApp from tracker locations, sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Update points and message triggers are in the solution document."
+    },
+    {
+      "id": "p4_margin_unknown",
+      "n": 4,
+      "words": "I don't know profit per trip after diesel, tolls, allowance and repairs",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out the full cost of last week's trips on one sheet, so you see which routes pay",
+        "Note which costs are hardest to pin down."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A trip register recording each trip's truck, route, freight, advance, diesel, tolls and expenses, with profit per trip and per truck each month.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How costs are captured per trip is designed in the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Big customers pay after months",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List customer balances by age, so the oldest are chased first",
+        "Send proof of delivery with the invoice, so customers have no reason to wait."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Receivables with ageing and owner-approved reminders, with POD photos attached to each invoice.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing is set in the solution document."
+    },
+    {
+      "id": "p6_cash_mismatch",
+      "n": 6,
+      "words": "To-pay freight collected at destination doesn't all reach the office",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Match this week's to-pay bilties against cash received, so you see the size of the gap",
+        "Name one person at each adda responsible for to-pay cash."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "To-pay freight tracked per bilty and adda, with uncollected or unremitted amounts flagged daily.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The matching rules are set in the solution document."
+    },
+    {
+      "id": "p7_petty_cash",
+      "n": 7,
+      "words": "Driver advances for the trip are never properly settled",
+      "category": "cash_collections",
+      "subtype": "petty_cash",
+      "quick_ideas": [
+        "Settle each driver's advance when the trip ends, so balances don't roll over",
+        "Keep receipts for trip spending, so settlement is quick."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A driver advance and settlement ledger per trip.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The settlement steps are laid out in the solution document."
+    },
+    {
+      "id": "p8_maintenance_downtime",
+      "n": 8,
+      "words": "Trucks break down on the highway because servicing is missed",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Write down when each truck was last serviced, so overdue ones show",
+        "Record tyre serial numbers when fitted, so swaps can be spotted."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A maintenance and tyre register per truck with service- due alerts and tyre serial tracking.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Service intervals and alerts are set in the solution document."
+    },
+    {
+      "id": "p9_licences_renewals",
+      "n": 9,
+      "words": "Vehicle permits and driver documents expire without us noticing",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "Put every expiry date in one calendar, so nothing surprises you",
+        "Name who is responsible for each renewal."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "An expiry calendar for vehicle and driver documents (dates only) with reminders before each.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing is set in the solution document."
+    },
+    {
+      "id": "p10_conversion_low",
+      "n": 10,
+      "words": "I lose bookings because I can't confirm availability quickly",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Keep one list of which trucks are free, on trip or in workshop, so you can answer a booking at once",
+        "Let one person own that list."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A dispatch board showing every truck's status, so bookings are confirmed in one look.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How status is kept current is designed in the solution document."
+    },
+    {
+      "id": "p11_commission_disputes",
+      "n": 11,
+      "words": "Attached vehicle owners argue over their share",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Give each attached owner a written list of trips and freight for the month, so disputes start from facts",
+        "Write down the share rules."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "Attached-vehicle owner statements showing trips, freight and share, produced automatically each month.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How shares are calculated is set in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything that helps overload, falsify logbooks or ELDs, alter bilties or avoid weigh stations. Help carrying undeclared or smuggled goods, including across Afghan or GCC borders. Anything on paying police or officials to avoid challans. Advice on driver fatigue or hours-of-service; insurance and accident liability are for proper advisers. Storing drivers' names, licences or CNICs. After an accident, injury, hijacking or threat, emergency services 1122, 15, Motorway Police 130, 999, 911 come first."
+  ],
+  "sample_reply": {
+    "person": "Mere truck Karachi se Lahore bhare jaate hain lekin wapsi pe zyada tar khali aate hain. Is ka koi hal batao.",
+    "pi": "Ji haan, wapsi ka load behtar plan kiya ja sakta hai, aur shuruaat isi hafte ho sakti hai. 1 Har truck kab Lahore mein free hoga, yeh pehle se likh lein, taake wapsi ka load waqt par dhoonda ja sake. 2 Lahore aur aas paas ke un customers ki list banayein jo Karachi ki taraf maal bhejte hain, taake pata ho kis se baat karni hai. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: wapas aane wale trucks roz pending bookings se apne aap match hon. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

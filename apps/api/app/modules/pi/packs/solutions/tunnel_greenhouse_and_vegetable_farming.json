@@ -1,0 +1,220 @@
+{
+  "industry": "tunnel_greenhouse_and_vegetable_farming",
+  "name": "Tunnel, greenhouse and vegetable farming",
+  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_seasonal_dip",
+      "n": 1,
+      "words": "Cucumber price crashed the week our whole tunnel came on at once",
+      "category": "sales_revenue",
+      "subtype": "seasonal_dip",
+      "quick_ideas": [
+        "Put every tunnel's planting date and expected picking window on one chart, so overlapping weeks show up early",
+        "Line up one non-mandi buyer before your next peak; crop and timing choices are for your agronomist."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A tunnel register and planting calendar that warns you automatically when several tunnels are due to peak in the same week.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How are planting dates decided at the moment?",
+      "free_stops": "How the calendar and warnings are set up for your tunnels goes in the solution document."
+    },
+    {
+      "id": "p2_margin_unknown",
+      "n": 2,
+      "words": "I don't know what each tunnel earns after costs",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Number every tunnel and write the number beside each expense, so costs can be split later",
+        "Record harvest by tunnel for one cycle."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A tunnel register logging costs and harvest against each tunnel daily, with a profit view per tunnel per cycle.",
+        "tool_words": []
+      },
+      "ask_first": "How many tunnels or greenhouses do you run?",
+      "free_stops": "The cost heads and profit view design are part of the solution document."
+    },
+    {
+      "id": "p3_product_defects",
+      "n": 3,
+      "words": "Supermarket rejects part of every delivery and deducts it later",
+      "category": "quality_complaints",
+      "subtype": "product_defects",
+      "quick_ideas": [
+        "Ask the driver to get rejections signed at the door with a photo, so deductions can be checked",
+        "Compare this month's deduction notes against those door records."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "A delivery sheet per buyer recording rejections at the door with photos and matching them against later deductions, every delivery.",
+        "tool_words": []
+      },
+      "ask_first": "Do you get any written rejection note at delivery today?",
+      "free_stops": "How door records and deductions are matched goes in the solution document."
+    },
+    {
+      "id": "p4_orders_lost",
+      "n": 4,
+      "words": "Hotel orders come on WhatsApp at midnight and we miss some",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Keep one number only for buyer orders, so they don't mix with other chats",
+        "Have one person turn messages into a morning list and confirm each buyer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "WhatsApp order intake that turns hotel and restaurant messages into a confirmed order list every morning.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many hotel and restaurant buyers do you supply?",
+      "free_stops": "How messages become a confirmed list is detailed in the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Invoices to restaurants go unpaid for months",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid invoice by buyer and date, so you know who to chase first",
+        "Agree payment terms in writing with new buyers before the first delivery."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A buyer ledger for supermarkets and HORECA that ages every invoice and sends polite reminders when payments fall due.",
+        "tool_words": []
+      },
+      "ask_first": "Who are your slowest payers, supermarkets or restaurants?",
+      "free_stops": "Reminder timing and ledger setup are kept for the solution document."
+    },
+    {
+      "id": "p6_count_mismatch",
+      "n": 6,
+      "words": "Harvested quantity and dispatched quantity never match",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Record harvest at the packing area and loads at the vehicle separately for a week, to see where the gap opens",
+        "Write down rejects and waste so the gap has an explanation."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Daily harvest entry by WhatsApp per tunnel with grade split, matched against dispatch every day.",
+        "tool_words": []
+      },
+      "ask_first": "Who records the daily harvest?",
+      "free_stops": "How harvest and dispatch are matched is part of the solution document."
+    },
+    {
+      "id": "p7_maintenance_downtime",
+      "n": 7,
+      "words": "Pump or drip failure noticed only after the plants suffer",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Add a morning look at pumps and lines to one worker's day, so failures are caught early",
+        "Keep a breakdown book noting what failed and how long the fix took."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A daily equipment check per tunnel with photos, and a maintenance log that shows repeat failures.",
+        "tool_words": []
+      },
+      "ask_first": "How do you find out about a failure today?",
+      "free_stops": "The checklist and log design go in the solution document."
+    },
+    {
+      "id": "p8_checklists_not_done",
+      "n": 8,
+      "words": "Workers don't follow the daily task list in each tunnel",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Put a short task list on each tunnel door, so everyone sees the same jobs",
+        "Review missed items with the team once this week."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A daily task checklist per tunnel with photo proof and supervisor sign-off, showing which tunnels slip.",
+        "tool_words": []
+      },
+      "ask_first": "Is there a supervisor on site every day?",
+      "free_stops": "How tasks, proof and sign-off are set up is detailed in the solution document."
+    },
+    {
+      "id": "p9_utility_costs",
+      "n": 9,
+      "words": "Electricity and cooling bills eat the margin in summer",
+      "category": "margin_cost",
+      "subtype": "utility_costs",
+      "quick_ideas": [
+        "Note meter and generator hours once a week, so you can see which month and source costs most",
+        "Put fuel fills next to generator hours; technical settings belong with your specialist."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A utility and diesel log against pump and generator hours with monthly cost per unit produced.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which cost worries you most: power, water or diesel?",
+      "free_stops": "How readings are captured and costs worked out is kept for the solution document."
+    },
+    {
+      "id": "p10_churn_subscription",
+      "n": 10,
+      "words": "Box subscribers cancel and I don't know why",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Ask everyone who cancels for the reason, so you learn what is going wrong",
+        "Offer a skip-a-week option before cancelling."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "A subscription box system handling weekly orders and skips, with every cancellation reason captured.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "How do subscribers order and pay now?",
+      "free_stops": "How skips, orders and reasons are handled is part of the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on pesticides, fungicides, fertilisers, nutrient solutions, doses, pre-harvest intervals, climate settings or disease identification; refer to an agronomist or extension service. What to grow for profit, or any price prediction. Advice on food-safety, GAP or organic certification rules. Any help relabelling produce as organic or local, or changing harvest dates on labels. Visa or permit advice for seasonal workers; names or numbers of workers or buyers."
+  ],
+  "sample_reply": {
+    "person": "I've got 12 tunnels near Sheikhupura. What can I actually do so the cucumbers don't all hit the mandi in the same week?",
+    "pi": "Yes, this can be managed, and you can make a start this week. 1 Put every tunnel's planting date and expected picking window on one chart, so clashing weeks show up early. 2 Line up one hotel, restaurant or shop buyer before your next peak, and agree crop and timing choices with your agronomist. Workzap can do this automatically for you, with a tunnel calendar that warns you when several tunnels are due to peak together and logs harvest and costs per tunnel every day. Shall I get a solution document and quote prepared for you? You can say no.",
+    "language": "english"
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "industry": "hajj_and_umrah_operators",
+  "name": "Hajj and Umrah operators",
+  "sector": "7.G Transport, mobility and aviation (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_price_increases_supplier",
+      "n": 1,
+      "words": "Saudi hotel and transport costs change after we've sold the package",
+      "category": "margin_cost",
+      "subtype": "price_increases_supplier",
+      "quick_ideas": [
+        "Compare one recent group's costs at sale time and at departure, so you see which line moved most",
+        "Note when each cost was confirmed, so you know where the exposure sits."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a package costing sheet per group with SAR costs and exchange-rate inputs, showing live margin every time a cost or rate changes.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Hotels ka rate aap package bechne se pehle confirm karte hain ya baad mein?",
+      "free_stops": "How costs and exchange rates feed the live margin is set out in the solution document."
+    },
+    {
+      "id": "p2_receivables_late",
+      "n": 2,
+      "words": "Families pay in instalments and some stop near departure",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every booking's instalment status once by reference number, so you see who's behind",
+        "Agree a clear cut-off before departure, so staff aren't deciding case by case."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an instalment tracker per booking reference (no ID data) with automatic reminders and departure cut-off flags.",
+        "tool_words": []
+      },
+      "ask_first": "Zyada tar families upfront dete hain ya instalments mein?",
+      "free_stops": "Reminder timing and cut-off rules are designed in the solution document."
+    },
+    {
+      "id": "p3_cash_flow_tight",
+      "n": 3,
+      "words": "Saudi partners want money before we've collected",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "Put partner due dates next to expected collections for the coming season once, so the gap weeks are visible",
+        "Talk to your accountant about the gap early, so it isn't a surprise."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a partner payment schedule showing what's due to Saudi partners against collections per group, updated daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Saudi partners ko payment kab tak deni hoti hai?",
+      "free_stops": "How collections and payments are matched per group is worked out in the solution document."
+    },
+    {
+      "id": "p4_order_errors",
+      "n": 4,
+      "words": "Room allocation in Excel and families end up split",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Check your last rooming list against what happened on arrival, so you see where splits came from",
+        "Have one person own the final rooming list, so late changes don't get lost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a rooming list builder that keeps family groups together by booking reference and exports clean lists for each hotel.",
+        "tool_words": []
+      },
+      "ask_first": "Rooming list abhi kaun banata hai?",
+      "free_stops": "The grouping rules and hotel export format are designed in the solution document."
+    },
+    {
+      "id": "p5_customer_communication",
+      "n": 5,
+      "words": "Pilgrims' WhatsApp group becomes chaos, nobody reads updates",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Separate announcements from chat for your next group, so important updates aren't buried",
+        "Decide who is allowed to post announcements, so there's one voice."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a broadcast and pinned-update flow for each group during the trip, with read confirmations so you see who missed an update.",
+        "tool_words": []
+      },
+      "ask_first": "Ek group mein taqreeban kitne log hote hain?",
+      "free_stops": "The broadcast setup and read tracking are set out in the solution document."
+    },
+    {
+      "id": "p6_field_team_visibility",
+      "n": 6,
+      "words": "Group leaders on the ground can't reach the office quickly",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Agree the few things group leaders report each day, so reports are useful",
+        "Name one office contact per group, so leaders know who to call."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a daily phone report from each group leader on transport, hotel, issues and expenses with photo receipts, landing in one office view.",
+        "tool_words": []
+      },
+      "ask_first": "Group leaders abhi office ko kaise report karte hain?",
+      "free_stops": "The report fields and office view are designed in the solution document."
+    },
+    {
+      "id": "p7_checklists_not_done",
+      "n": 7,
+      "words": "Pending documents per group get lost track of",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Make one received-or-pending list per group by booking reference, so the gaps are visible",
+        "Give each group's documents one owner, so chasing isn't shared vaguely."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a document checklist per booking (received or pending by type, without storing contents) with deadline alerts per group.",
+        "tool_words": []
+      },
+      "ask_first": "Ek season mein kitne groups chalte hain, taqreeban?",
+      "free_stops": "The checklist types and alert timing are worked out in the solution document."
+    },
+    {
+      "id": "p8_lead_followup_slow",
+      "n": 8,
+      "words": "Hundreds of enquiries before Ramadan and we can't follow up",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Go through open enquiries once and reply to all, so you see how many were waiting",
+        "Note the questions asked most often, so you know what people need answered first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an enquiry tracker for peak season with auto-replies to common package questions and follow-up reminders, with conversion seen per week.",
+        "tool_words": []
+      },
+      "ask_first": "Enquiries zyada WhatsApp pe aati hain ya calls pe?",
+      "free_stops": "The auto-reply content and follow-up timing are designed in the solution document."
+    },
+    {
+      "id": "p9_repeat_low",
+      "n": 9,
+      "words": "Families from last year don't come back",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Ask last season's families how their trip was, so you hear what kept them away",
+        "Keep a list of families who agreed to hear from you, so you can reach them next season."
+      ],
+      "workzap_build": {
+        "keys": [
+          "reviews_collection",
+          "customer_messaging"
+        ],
+        "text": "a post-trip feedback form and an opted-in re-contact flow before each season, with returning families tracked.",
+        "tool_words": []
+      },
+      "ask_first": "Trip ke baad families se feedback lete hain?",
+      "free_stops": "The feedback questions and re-contact timing are set out in the solution document."
+    },
+    {
+      "id": "p10_cod_remittance",
+      "n": 10,
+      "words": "Sub-agents collect money and are slow to pass it on",
+      "category": "cash_collections",
+      "subtype": "cod_remittance",
+      "quick_ideas": [
+        "List what each sub-agent has collected and passed on once, so you see the gap",
+        "Agree a fixed remittance day, so it's expected, not chased."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a sub-agent collections ledger with balances, remittance dates and automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Kitne sub-agents aap ke packages bechte hain?",
+      "free_stops": "The remittance rules and reminders are worked out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Religious rulings or fiqh answers; gently say that's for a scholar. Visa, immigration, quota or Nusuk policy advice, or any view on Saudi or home-country ministry rules. Health, vaccination or fitness-to-travel advice for pilgrims. Anything that helps with quota resale, fake visas or bookings, unlicensed Hajj or misleading package claims (such as overstating hotel distance from the Haram). Any storage of pilgrims' names, passport, CNIC or Emirates ID numbers, photos, mahram or medical details."
+  ],
+  "sample_reply": {
+    "person": "Is saal Makkah ke hotel rates package bechne ke baad barh gaye, poora margin chala gaya. Aage ke liye kya karein?",
+    "pi": "Ji haan, aage ke groups mein is nuqsaan ko pehle se dekha ja sakta hai. 1. Pichle group ki costs sale ke waqt aur departure ke waqt ek dafa aamne saamne rakh lein, taa ke pata chale kaun si line sab se zyada hili. 2. Har cost kab confirm hui thi woh note kar lein, taa ke samajh aaye khatra kahan baitha hai. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har group ki SAR costs aur exchange rate ek sheet mein, aur jaise hi koi rate badle, us group ka margin foran nazar aa jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

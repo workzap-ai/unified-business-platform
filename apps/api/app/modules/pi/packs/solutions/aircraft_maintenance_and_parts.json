@@ -1,0 +1,223 @@
+{
+  "industry": "aircraft_maintenance_and_parts",
+  "name": "Aircraft maintenance MRO and parts",
+  "sector": "7.G Transport, mobility and aviation (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_po_tracking",
+      "n": 1,
+      "words": "Repairs sent abroad disappear for months",
+      "category": "suppliers_purchasing",
+      "subtype": "po_tracking",
+      "quick_ideas": [
+        "List every unit out for repair once with shop and date sent, so you know what's actually out",
+        "Ask the slowest shops for a status this week, so the worst cases surface."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "workflow_automation"
+        ],
+        "text": "a repair-out tracker where every unit has PO, shop and expected return, with automatic chasers when a date passes and overdue units reported weekly.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many units are out for repair at any one time?",
+      "free_stops": "The chaser schedule and status stages are kept for the solution document."
+    },
+    {
+      "id": "p2_no_visibility",
+      "n": 2,
+      "words": "AOG requests at midnight and we can't see stock quickly",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Make sure the night shift can search the stock list on a phone, so they don't wait for morning",
+        "Gather brokers' recent quotes in one place, so sourcing starts faster."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "custom_build"
+        ],
+        "text": "one phone search across own stock, consignment and brokers' last quotes by part number, kept current every day and available round the clock.",
+        "tool_words": []
+      },
+      "ask_first": "Is your stock list in MRO software, an ERP or Excel today?",
+      "free_stops": "How the sources are connected and searched is set out in the solution document."
+    },
+    {
+      "id": "p3_count_mismatch",
+      "n": 3,
+      "words": "System says we have it, the store says we don't",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count your most-used part numbers once and compare with the system, so you see how big the gap is",
+        "Note the likely cause of each mismatch, so you know whether it's booking-out or binning."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "stock_alerts"
+        ],
+        "text": "rolling phone counts by bin with photos, compared to the system automatically and mismatches flagged to the store lead.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "Is the mismatch mostly consumables or rotables?",
+      "free_stops": "The count cycle and mismatch rules are designed in the solution document."
+    },
+    {
+      "id": "p4_expiry_wastage",
+      "n": 4,
+      "words": "Shelf-life items expire on the shelf",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Sort shelf-life stock by expiry date once, so the nearest ones are visible",
+        "Share that list with planners, so they know what's coming up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "expiry lists by bin and part number sent automatically every week before items run out of shelf life (whether any item is usable stays with your quality team).",
+        "tool_words": []
+      },
+      "ask_first": "Which kinds of items expire most often?",
+      "free_stops": "Alert timing and who receives which list are worked out in the solution document."
+    },
+    {
+      "id": "p5_unbilled_work",
+      "n": 5,
+      "words": "Checks run over and findings aren't billed",
+      "category": "cash_collections",
+      "subtype": "unbilled_work",
+      "quick_ideas": [
+        "Compare your last check's findings with its invoice, so you see what slipped",
+        "Get written customer approval for each finding the day it's raised, so billing isn't argued later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "workflow_automation"
+        ],
+        "text": "a check tracker where findings are logged with hours and parts, sent to the customer for approval automatically, and fed straight into the invoice.",
+        "tool_words": []
+      },
+      "ask_first": "How do customers approve extra work today?",
+      "free_stops": "The approval flow and invoice link are designed in the solution document."
+    },
+    {
+      "id": "p6_cost_overruns",
+      "n": 6,
+      "words": "We quote a check and lose money on labour overruns",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Compare quoted and actual hours on a few recent checks of the same type, so you see the pattern",
+        "Ask technicians to note rough hours per task on one check, so you see where time goes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "dashboards_reports"
+        ],
+        "text": "a quote-versus-actual view per check for labour, parts and freight, updated as hours are booked each day.",
+        "tool_words": []
+      },
+      "ask_first": "Are technician hours recorded per task today, or only per shift?",
+      "free_stops": "How hours are captured per task and fed back into quotes is set out in the solution document."
+    },
+    {
+      "id": "p7_hidden_costs",
+      "n": 7,
+      "words": "Cores for exchanges aren't returned on time",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "List every open exchange with its core due date, so nothing is forgotten",
+        "Give one person ownership of core returns, so it's someone's job."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a core return tracker with due dates and automatic warnings before penalties apply.",
+        "tool_words": []
+      },
+      "ask_first": "How many exchange deals are open at a time, roughly?",
+      "free_stops": "Warning timing and handover to shipping are kept for the solution document."
+    },
+    {
+      "id": "p8_handoffs",
+      "n": 8,
+      "words": "Shift handovers lose information",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Use one handover sheet per aircraft for a week, so open items are in one place",
+        "Ask the incoming lead to confirm they've read it, so nothing is assumed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a digital handover log of open items per aircraft, acknowledged by each incoming shift and kept as a history.",
+        "tool_words": []
+      },
+      "ask_first": "Do you run 24/7 shifts or day and evening only?",
+      "free_stops": "The handover fields and acknowledgement flow are designed in the solution document."
+    },
+    {
+      "id": "p9_capacity",
+      "n": 9,
+      "words": "Hangar slots double-booked or sitting empty",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Put every bay on one calendar for the next few months, so clashes and gaps show",
+        "Flag any check running late, so the next booking is warned early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a hangar slot planner showing bays, booked aircraft and the knock-on effect of an overrun, updated daily.",
+        "tool_words": []
+      },
+      "ask_first": "How many bays do you plan across?",
+      "free_stops": "How overruns ripple through the plan is worked out in the solution document."
+    },
+    {
+      "id": "p10_slow_response",
+      "n": 10,
+      "words": "Customers keep calling to ask when their aircraft will be ready",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Send each customer a progress update on a set day this week, so they stop needing to call",
+        "Name one contact per customer for status, so answers are consistent."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "automatic progress messages to each customer as their aircraft or component moves through job stages.",
+        "tool_words": []
+      },
+      "ask_first": "Are most of your customers your own airline or third parties?",
+      "free_stops": "The stages that trigger updates are designed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about whether a part, repair or inspection is acceptable, airworthiness, certification, approval scope, or how PCAA, GCAA, Transport Canada, EASA or FAA would read a rule. Whether a part's paperwork or tag is valid; that is for the quality team and the regulator. Anything that helps backdate sign-offs, alter certificates or move suspected unapproved parts. Advice on export controls, sanctions or customs; suggest they talk to their customs broker or lawyer. Anything that stores engineers' names or licence numbers."
+  ],
+  "sample_reply": {
+    "person": "We've got thirty-odd units out for repair abroad and one guy's Excel sheet is the only record. Is there a better way?",
+    "pi": "Yes, this can be made much clearer, starting this week. 1. List every unit that's out with shop and date sent, so you know exactly what's out today. 2. Ask your slowest shops for a status now, so the worst cases come up first. Workzap can do this automatically for you: every unit tracked from dispatch to return, with chasers sent to shops when a date passes and overdue units reported each week. Shall I put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

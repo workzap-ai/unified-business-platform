@@ -1,0 +1,220 @@
+{
+  "industry": "beef_cattle_fattening_and_feedlots",
+  "name": "Beef cattle fattening and feedlots",
+  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_price_comparison",
+      "n": 1,
+      "words": "I buy calves by eye at the mandi and later realise I overpaid",
+      "category": "suppliers_purchasing",
+      "subtype": "price_comparison",
+      "quick_ideas": [
+        "Note each calf's price, seller and weight where a scale is available",
+        "Look back at last batch's purchase prices against sale prices before the next buying trip."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "dashboards_reports — a batch register that records every calf's source, weight and price at purchase and automatically matches it to its sale, showing which sources and prices paid off.",
+        "tool_words": []
+      },
+      "ask_first": "Is there a scale you can use when buying today?",
+      "free_stops": "How purchases are matched to sales and compared by source goes in the solution document."
+    },
+    {
+      "id": "p2_no_weight_tracking",
+      "n": 2,
+      "words": "We don't weigh animals regularly so I don't know who's gaining",
+      "category": "reporting_visibility",
+      "subtype": "no_weight_tracking",
+      "quick_ideas": [
+        "Set a regular weigh day so gains can be compared",
+        "Take the animals that didn't gain to your vet or nutritionist."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "weigh-day entries on the phone that work out gain per animal and per batch automatically and flag animals below the farm's own target.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have a scale at the farm?",
+      "free_stops": "The weigh-day routine and how targets are flagged are set out in the solution document."
+    },
+    {
+      "id": "p3_hidden_costs",
+      "n": 3,
+      "words": "Last batch looked profitable until I added transport, mortality and labour",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "Keep every bill for a batch in one file, including transport and labour",
+        "Count animals that died as a cost of the batch."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a batch cost sheet that adds feed, labour, transport, vet bills and mortality as they're entered and shows cost per animal and per kg at any time.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is each batch's money kept separate, or mixed with general farm spending?",
+      "free_stops": "Which costs are included and how they're spread per head is worked out in the solution document."
+    },
+    {
+      "id": "p4_theft_internal",
+      "n": 4,
+      "words": "Bagged feed disappears faster than the animals could eat it",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Count bags in and bags issued, and compare the two weekly",
+        "Keep the store locked with one role holding the key, and say openly that counts are checked."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "field_checks — deliveries, daily issue and stock left logged on the phone, with gaps and days of feed remaining calculated automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who has access to the feed store?",
+      "free_stops": "The store log and gap rules stay in the solution document."
+    },
+    {
+      "id": "p5_credit_customers",
+      "n": 5,
+      "words": "Butchers take animals on credit and pay in pieces",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Write down each butcher's animals, agreed price and part payments on the day",
+        "Decide your own limit on unpaid animals per butcher."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a buyer ledger that keeps every butcher's balance up to date and sends polite reminders automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many butchers buy on credit regularly?",
+      "free_stops": "Reminder timing and credit-limit rules go in the solution document."
+    },
+    {
+      "id": "p6_booking_no_show",
+      "n": 6,
+      "words": "Eid customers book with a small advance then don't show",
+      "category": "orders_fulfilment",
+      "subtype": "booking_no_show",
+      "quick_ideas": [
+        "Put the balance due date and what happens after it in writing at booking",
+        "Confirm each delivery slot with the buyer a few days before Eid."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "customer_messaging Eid bookings with advance, reserved animal (tag and photo), slot and balance, with confirmations and reminders sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Are bookings taken only in person, or on WhatsApp too?",
+      "free_stops": "The booking terms and reminder sequence are set out in the solution document."
+    },
+    {
+      "id": "p7_partner_accounting",
+      "n": 7,
+      "words": "Partners each put money in and argue about the profit share",
+      "category": "compliance_admin",
+      "subtype": "partner_accounting",
+      "quick_ideas": [
+        "Write down before the batch what each partner puts in and how profit is worked out; for anything legal, talk to a lawyer",
+        "Give all partners the same figures at the same time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a partner statement per batch that updates automatically from costs and sales and goes to every partner on the same day.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is the profit split agreed in writing today?",
+      "free_stops": "The statement layout and share calculation go in the solution document."
+    },
+    {
+      "id": "p8_theft_external",
+      "n": 8,
+      "words": "Workers sleep at night and we lost an animal to thieves",
+      "category": "loss_security",
+      "subtype": "theft_external",
+      "quick_ideas": [
+        "Do a headcount at dusk and at dawn",
+        "Report any theft to the police and note when it happened."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "timed night check-ins with headcount photos, alerting the owner automatically if one is missed.",
+        "tool_words": []
+      },
+      "ask_first": "Who stays with the animals at night now?",
+      "free_stops": "Check-in times and alert routing are detailed in the solution document."
+    },
+    {
+      "id": "p9_seasonal_planning",
+      "n": 9,
+      "words": "I sell everything at Eid then sit with empty pens for months",
+      "category": "planning_growth",
+      "subtype": "seasonal_planning",
+      "quick_ideas": [
+        "Ask year-round butchers and slaughterhouses what they need in quieter months",
+        "Take last batch's real numbers to your accountant before committing to a second batch."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a season planner built from the farm's own batch dates, costs and sales that keeps the cash needed for an extra batch up to date.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is it cash or buyers that holds back a second batch?",
+      "free_stops": "How the planner uses past batches is worked out in the solution document."
+    },
+    {
+      "id": "p10_info_lost_in_whatsapp",
+      "n": 10,
+      "words": "Everything is on WhatsApp voice notes from the manager",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Ask for the day's numbers in one written message rather than voice notes",
+        "Keep those messages together so the batch history sits in one place."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning WhatsApp summary for the owner with headcount, deaths, feed days left and cash due, built automatically from the manager's entries.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many sites or pens does the manager report on?",
+      "free_stops": "What goes into the morning read and how it's collected stays in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on growth promoters, hormones, injections, rations, medicines, vaccines or withdrawal periods; point to their vet or nutritionist. Any judgement on whether an animal is healthy or fit for slaughter or export. Anything that helps fake weights, sell sick animals, or forge movement, health or export papers. Promised profit, weight gain or batch results. Legal opinions on partner shares, or advice on CCIA tagging, traceability rules or packer contracts in Canada."
+  ],
+  "sample_reply": {
+    "person": "Hum har saal Eid ke liye 80 bachhre fattening karte hain, is dafa profit ka pata hi nahi chala. Koi solution hai?",
+    "pi": "Ji haan, batch ka asal hisaab nikalna bilkul mumkin hai aur kaam isi hafte shuru ho sakta hai. 1 Is batch ke saare bills aik file mein jama karein, transport, mazdoori aur mare hue jaanwar bhi shamil kar ke. 2 Har jaanwar ki khareed ki qeemat aur seller likhein, taake bechte waqt har aik ka hisaab alag dekha ja sake. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: aik batch register jo har kharcha jodta rahe aur har jaanwar aur poore batch ka munafa aap ke phone pe dikhaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

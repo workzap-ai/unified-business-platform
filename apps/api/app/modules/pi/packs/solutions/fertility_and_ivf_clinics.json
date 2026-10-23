@@ -1,0 +1,201 @@
+{
+  "industry": "fertility_and_ivf_clinics",
+  "name": "Fertility and IVF clinics (admin)",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_whatsapp_overload",
+      "n": 1,
+      "words": "Coordinators are on WhatsApp all day answering the same timing questions",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "List the logistics questions coordinators get most, so the repeats are clear",
+        "Ask the clinic to approve one written answer set for logistics only, so everyone answers alike."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a WhatsApp flow that answers logistics questions (timings, location, documents to bring) and confirms appointments, routing anything clinical to staff.",
+        "tool_words": []
+      },
+      "ask_first": "How many coordinators share the load?",
+      "free_stops": "The question set and routing are designed in the solution document."
+    },
+    {
+      "id": "p2_handoffs",
+      "n": 2,
+      "words": "When that coordinator is off, nobody knows who is due when",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Move the schedule from one notebook to a shared view using codes rather than names, so cover is possible",
+        "Do a short handover note before any leave, so nothing is lost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a coordinator scheduling board by patient code (no names on the shared view) with cover handover notes.",
+        "tool_words": []
+      },
+      "ask_first": "Is the schedule kept on paper or software now?",
+      "free_stops": "Code system and handover rules are in the solution document."
+    },
+    {
+      "id": "p3_service_errors",
+      "n": 3,
+      "words": "Package bills don't include add-ons and patients feel surprised",
+      "category": "quality_complaints",
+      "subtype": "service_errors",
+      "quick_ideas": [
+        "Ask finance and the doctors to agree one itemised estimate format, so extras are visible upfront",
+        "Review recent disputes, so the common surprises are known."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an itemised estimate and billing sheet approved by the clinic, so front desk and coordinators quote the same.",
+        "tool_words": []
+      },
+      "ask_first": "Who explains the costs to patients now?",
+      "free_stops": "Estimate structure is in the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "Storage fees go unpaid for years and we don't have a clear list",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Build one list of storage accounts by code with renewal date and amount due, so arrears are known",
+        "Ask your lawyer about what you may do with long-overdue accounts, so you don't act on a guess."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a storage-fee register with renewal dates, invoices, payments and overdue status, with gentle reminders on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "Are storage fees billed annually?",
+      "free_stops": "Reminder sequence is in the solution document; storage law is for your lawyer."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Instalment payments fall behind and nobody follows up gently",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List open instalment plans with due dates, so overdue ones stand out",
+        "Give one person the job of follow-up, so it happens kindly and consistently."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an instalment tracker with polite reminders showing only amount and date.",
+        "tool_words": []
+      },
+      "ask_first": "Do you offer financing through a third party?",
+      "free_stops": "Reminder tone and timing are in the solution document."
+    },
+    {
+      "id": "p6_documentation",
+      "n": 6,
+      "words": "Consent forms are missing signatures on the day of a procedure",
+      "category": "compliance_admin",
+      "subtype": "documentation",
+      "quick_ideas": [
+        "Check next week's procedure dates for pending paperwork, so gaps are found early",
+        "Name who chases each document, so it has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a document checklist per procedure date showing which admin items are pending by role, with reminders, never storing consent content.",
+        "tool_words": []
+      },
+      "ask_first": "Which documents most often aren't ready?",
+      "free_stops": "Checklist items are in the solution document; what consent must include is for your doctors and lawyer."
+    },
+    {
+      "id": "p7_expiry_wastage",
+      "n": 7,
+      "words": "Culture media and lab consumables expire or run out",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "List critical supplies with expiry and stock on hand, so risks are visible",
+        "Note lead times for imported items, so orders go out early enough."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a consumables and media register with lot, expiry and reorder levels, plus an import shipment tracker.",
+        "tool_words": []
+      },
+      "ask_first": "Which supplies would stop work if they ran out?",
+      "free_stops": "Reorder levels are worked out in the solution document."
+    },
+    {
+      "id": "p8_lead_followup_slow",
+      "n": 8,
+      "words": "Enquiries from abroad come at odd hours and get missed",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Count after-hours enquiries for a week, so the gap is known",
+        "Name who answers international enquiries next morning, so each one is picked up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an enquiry inbox with response timers and follow-up reminders, capturing no medical history.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most international enquiries come from?",
+      "free_stops": "Routing set-up is in the solution document."
+    },
+    {
+      "id": "p9_data_scattered",
+      "n": 9,
+      "words": "Monthly numbers come from three systems that don't match",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Pick the few monthly admin numbers you need, so reporting stays focused",
+        "Name one source for each, so there is one answer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "integration — an owner dashboard with enquiries, consultations booked, cycles scheduled, receivables and storage arrears pulled from existing systems.",
+        "tool_words": [
+          "integration",
+          "dashboard",
+          "system"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "Which systems hold billing and scheduling now?",
+      "free_stops": "Data connections are mapped in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about treatment options, success chances, medication, embryos, donors or genetic testing. Interpretations of donor, surrogacy, storage or eligibility law in any country. Help altering records, back-dating consents or arranging treatment against local law. Marketing lines that promise outcomes. Ideas that record names, histories, cycle details or consent content. Counselling; if a patient writes in distressed, be kind and point to their clinic or emergency services."
+  ],
+  "sample_reply": {
+    "person": "Our coordinators spend the whole day answering the same WhatsApp questions about timings and what to bring. Can this be solved?",
+    "pi": "Yes, this can be solved, and you can start this week. 1 List the logistics questions your coordinators get most often, so the repeats are clear. 2 Have the clinic approve one set of logistics answers, so every coordinator says the same thing. Workzap can do this automatically for you with a WhatsApp flow that answers logistics questions and routes anything clinical to your staff. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

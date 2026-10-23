@@ -1,0 +1,216 @@
+{
+  "industry": "furniture_manufacturing_and_woodwork",
+  "name": "Furniture manufacturing and woodwork",
+  "sector": "7.D Manufacturing and industry (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_delivery_late",
+      "n": 1,
+      "words": "Custom orders take two months instead of three weeks",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "List every running custom job with its promised date and current stage, so you see which are late and where they sit",
+        "Note the stage where the last few late jobs got stuck, so that stage gets attention first"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A job tracker for every custom order through design, approval, cutting, assembly, polish, upholstery, delivery and installation, with photos at each stage and a morning list of late jobs.",
+        "tool_words": []
+      },
+      "ask_first": "Which stage usually slips — cutting, polish or waiting for material?",
+      "free_stops": "Stage definitions and how late jobs are flagged are set out in the solution document."
+    },
+    {
+      "id": "p2_order_errors",
+      "n": 2,
+      "words": "Customer measured their room wrong, or we did, and the wardrobe doesn't fit",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Take photos with a tape in frame at the next site visit, so the workshop sees what was measured",
+        "Get the client to confirm final measurements in writing before cutting"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "workflow_automation A site measurement form on phone with sketches and photos, sent straight to the workshop and confirmed by the client on WhatsApp.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The measurement form and confirmation flow are covered in the solution document."
+    },
+    {
+      "id": "p3_pre_orders_custom",
+      "n": 3,
+      "words": "Client keeps changing the design after we've cut",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Get the final design signed off before cutting on your next job, so the starting point is fixed",
+        "Write down each change and its extra cost when it happens"
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A design approval and change-order record with client confirmation on WhatsApp, linked to the job's cost.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How changes are recorded and charged is set out in the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "Advance taken, balance stuck for months after delivery",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every delivered job with balance due and since when, so you know who to chase first",
+        "Agree the balance date with the client before delivery on the next job"
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "An advance and balance tracker per job with scheduled reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing and how contractor retentions are tracked are kept for the solution document."
+    },
+    {
+      "id": "p5_margin_unknown",
+      "n": 5,
+      "words": "I don't know if a custom job made money until it's done",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "For your last finished job, put actual wood, board, hardware and labour next to the quote, so the real margin shows",
+        "Note which cost went over most"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "custom_build Job costing with materials issued and labour per job compared against the quote, plus a quote builder with saved rates.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How labour and materials are captured per job is detailed in the solution document."
+    },
+    {
+      "id": "p6_raw_material_shortage",
+      "n": 6,
+      "words": "Hardware (hinges, runners, handles) runs out mid-job",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "Count hardware and board stock once, so you know what is really there",
+        "Agree a minimum level for the items that stop jobs"
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Yard and store stock for timber, boards, hardware and finishes with reorder alerts.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How minimum levels are set per item is set out in the solution document."
+    },
+    {
+      "id": "p7_chat_overload",
+      "n": 7,
+      "words": "DMs and WhatsApp inquiries get missed",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Gather all open inquiries from Instagram, Facebook and WhatsApp into one list",
+        "Give one person responsibility for first replies"
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "A lead inbox combining Instagram, Facebook, WhatsApp and website inquiries with follow-up reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How leads flow in and are followed up is covered in the solution document."
+    },
+    {
+      "id": "p8_after_sales",
+      "n": 8,
+      "words": "Customers call for after-sales fixes and nobody tracks them",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "List every open after-sales complaint with date and job, so nothing is forgotten",
+        "Make one person responsible for scheduling visits"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "booking_scheduling An after-sales ticket log with visit scheduling and completion photos.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The ticket flow and visit scheduling are set out in the solution document."
+    },
+    {
+      "id": "p9_overstock_dead_stock",
+      "n": 9,
+      "words": "Showroom pieces sit for a year",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "List showroom pieces with how long each has sat there",
+        "Decide which to move, discount or rework"
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Showroom stock with ageing and a photo catalogue that can be shared.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How ageing is tracked and shared is kept for the solution document."
+    },
+    {
+      "id": "p10_owner_bottleneck",
+      "n": 10,
+      "words": "Only the owner can quote, everything waits for him",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Write down your rates for your five most common items, so someone else can start a quote",
+        "Let one person prepare quotes for your review this week"
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A quote builder with saved materials and labour rates, with owner approval in one tap.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How rates are stored and approvals work is detailed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on structural strength, fire ratings, building codes, dust extraction or machine guarding. Any help with illegally sourced timber or avoiding import or forestry rules. Any help with fake or inflated invoices for fit-out contracts. Any judgement on who is right in a dispute with a client or contractor. Any guarantee of delivery dates or that wood will not move. Storing customers' home addresses, phone numbers or carpenters' identities."
+  ],
+  "sample_reply": {
+    "person": "Custom orders mein har dafa delay hota hai, customer naraz hota hai aur balance bhi nahi deta. Koi solution?",
+    "pi": "Ji bilkul, iska hal mumkin hai aur isi hafte shuruaat ho sakti hai. 1 Har chalte custom job ki wada ki hui tareekh aur abhi ki stage ek list mein likh lein, taa ke saaf ho kaun se late hain aur kahan atke hain. 2 Jo jobs deliver ho chuke hain unka baqi balance aur kab se baqi hai, ek jagah likh lein, taa ke pata ho pehle kis se baat karni hai. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har job ki stage-wise photo ke saath tracking, har subah late jobs ki list, aur balance ke reminders apne aap. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

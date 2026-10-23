@@ -1,0 +1,222 @@
+{
+  "industry": "duty_free_and_airport_retail",
+  "name": "Duty-free and airport retail",
+  "sector": "7.A Retail and consumer (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_slow_replenishment",
+      "n": 1,
+      "words": "Shelves empty during the morning wave because replenishment only comes at night",
+      "category": "stock_inventory",
+      "subtype": "slow_replenishment",
+      "quick_ideas": [
+        "Note what sells out first in the morning wave for a week, because it shows what the night team should bring",
+        "Check hourly sales from your POS once, because the gaps follow the flight banks."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "a replenishment planner using sales by SKU per flight wave, producing pick lists for each permitted window.",
+        "tool_words": []
+      },
+      "ask_first": "When are you allowed to bring stock through?",
+      "free_stops": "the planning model and pick-list logic are kept for the solution document."
+    },
+    {
+      "id": "p2_count_mismatch",
+      "n": 2,
+      "words": "Stock counts don't match the records at month end",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count one high-value category fully, because it shows where differences sit",
+        "Check transfers and write-offs for that category, because unrecorded moves cause most gaps."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "small daily counts on phone reconciled with internal movement records, with variance reports; customs matters stay with your compliance team.",
+        "tool_words": []
+      },
+      "ask_first": "How often do you do full counts?",
+      "free_stops": "the count rotation and reconciliation method go in the solution document."
+    },
+    {
+      "id": "p3_shift_scheduling",
+      "n": 3,
+      "words": "Understaffed when several flights leave together, overstaffed at night",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Line up a week of hourly sales against your roster, because it shows where staff are mismatched",
+        "Move breaks out of the main waves, because that's when cover matters."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a roster planner driven by the flight schedule and hourly sales history.",
+        "tool_words": []
+      },
+      "ask_first": "How do you plan rosters today?",
+      "free_stops": "rostering rules are kept for the solution document."
+    },
+    {
+      "id": "p4_handoffs",
+      "n": 4,
+      "words": "Night shift handover misses things",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Write down what every handover must cover, because unwritten handovers drift",
+        "Have both shifts sign it, because it shows what was passed on."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a digital shift handover checklist with sign-off and gaps flagged to the manager.",
+        "tool_words": []
+      },
+      "ask_first": "How is handover done now?",
+      "free_stops": "the checklist content goes in the solution document."
+    },
+    {
+      "id": "p5_cash_mismatch",
+      "n": 5,
+      "words": "Cash in several currencies and the till never balances",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Count each currency separately at one shift close, because it shows which one is off",
+        "Check the exchange rate the till used, because stale rates cause gaps."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation",
+          "workflow_automation"
+        ],
+        "text": "a multi-currency till close with the rate table updated centrally for every outlet.",
+        "tool_words": []
+      },
+      "ask_first": "How many currencies do you accept?",
+      "free_stops": "the close process and rate flow are kept for the solution document."
+    },
+    {
+      "id": "p6_checklists_not_done",
+      "n": 6,
+      "words": "Brand promotions aren't set up on time",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "List every live promotion and check it on the floor once, because it shows what was missed",
+        "Name one person per outlet for promotions, because shared tasks slip."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a promotions checklist per outlet with photo proof of setup.",
+        "tool_words": []
+      },
+      "ask_first": "How do promotions reach the shop today?",
+      "free_stops": "the checklist workflow goes in the solution document."
+    },
+    {
+      "id": "p7_manual_reports",
+      "n": 7,
+      "words": "Brand partners want sell-out data and airport reports take a day each month",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "List every report you send and how long each takes, because it shows the real effort",
+        "Check what your POS can export, because it removes retyping."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports",
+          "integration"
+        ],
+        "text": "brand sell-out and airport reports generated from POS data.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which reports do you send each month?",
+      "free_stops": "report mapping is kept for the solution document; what the airport requires stays with your contract team."
+    },
+    {
+      "id": "p8_transfers_lost",
+      "n": 8,
+      "words": "Transfers between terminal shops get lost",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Match last month's transfers sent against received, because it shows where they vanish",
+        "Have both ends sign every transfer, because it removes doubt."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "inter-outlet transfer slips with scan out and in, flagging sent- not-received.",
+        "tool_words": []
+      },
+      "ask_first": "How many outlets do you run?",
+      "free_stops": "the transfer process goes in the solution document."
+    },
+    {
+      "id": "p9_branches_not_aligned",
+      "n": 9,
+      "words": "Head office instructions reach shop staff late on WhatsApp",
+      "category": "communication_coordination",
+      "subtype": "branches_not_aligned",
+      "quick_ideas": [
+        "Use one channel for instructions only, because chatter buries them",
+        "Ask outlets to confirm each one, because it shows who missed it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "head-office-to-floor messages with read confirmation per outlet.",
+        "tool_words": []
+      },
+      "ask_first": "How do instructions go out now?",
+      "free_stops": "the broadcast setup is kept for the solution document."
+    },
+    {
+      "id": "p10_rent",
+      "n": 10,
+      "words": "Airport rent is eating us and I can't see margin per outlet",
+      "category": "margin_cost",
+      "subtype": "rent",
+      "quick_ideas": [
+        "Put each outlet's sales, rent and staff cost side by side once, because it shows which carry the others",
+        "Talk to your accountant before any contract decision."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "sales, spend per transaction and costs by outlet and hour.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many outlets share the same rent terms?",
+      "free_stops": "the outlet model goes in the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on customs, bond, excise, duty, passenger allowances, alcohol or tobacco licensing, or aviation security. Help moving bonded goods improperly, selling to ineligible passengers or bypassing screening or the pass system. Anything that needs boarding pass, passport, flight or nationality data on individuals, or staff ID and pass numbers. For a security incident, suspicious item, fire or medical emergency, anything other than \"alert airport security or emergency services now\". Legal or financial advice on concession contracts or rent."
+  ],
+  "sample_reply": {
+    "person": "We're a departures concession and our best sellers are gone an hour into the morning wave. Stock can only come through overnight. What can we do?",
+    "pi": "Yes, this can be improved. 1. Note what sells out first in the morning wave for a week, so the night team knows exactly what to bring. 2. Look at hourly sales from your POS once, because the gaps follow the flight banks. Workzap can do this automatically for you: pick lists for each overnight window built from sales per flight wave, every night, for every outlet. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

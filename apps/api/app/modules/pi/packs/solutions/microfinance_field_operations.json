@@ -1,0 +1,222 @@
+{
+  "industry": "microfinance_field_operations",
+  "name": "Microfinance field operations",
+  "sector": "7.L Finance-adjacent, energy and utilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_field_team_visibility",
+      "n": 1,
+      "words": "I do not know where my field officers actually are during the day",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Have each officer share the day's planned groups with the branch each morning, so there is a plan to compare against",
+        "Review planned versus completed visits every evening, so a missed visit surfaces the same day, not a week later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A field visit app where officers see their planned groups, check in openly at each centre meeting and mark visits done or not done with a reason, rolled up per branch daily (no live tracking).",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many field officers does each branch have?",
+      "free_stops": "Check-in design and reason codes are in the solution document."
+    },
+    {
+      "id": "p2_fraud",
+      "n": 2,
+      "words": "Officers say they visited a group but the collection does not match",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Have the group total confirmed at the centre meeting itself, so the figure is agreed before it travels",
+        "Make surprise supervisor visits to a few centres, so the control is seen to exist."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "cash_reconciliation Group-total collection capture at the centre meeting feeding the branch day-end, with mismatches flagged automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Confirmation steps and matching rules are in the solution document; pi notes the control gap, never names individuals."
+    },
+    {
+      "id": "p3_cash_handling_risk",
+      "n": 3,
+      "words": "Officers carry a lot of cash back to branch and it is risky",
+      "category": "cash_collections",
+      "subtype": "cash_handling_risk",
+      "quick_ideas": [
+        "Note what time cash reaches the branch each day, so late returns are visible",
+        "Ask your management which repayment channels the programme already allows besides cash, so less is carried by hand."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A branch day-end cash handover and deposit log with time stamps and variance flags per officer role.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The handover log design is in the solution document; pi records no cash movement routes or times."
+    },
+    {
+      "id": "p4_duplicate_entry",
+      "n": 4,
+      "words": "Collections written in a field register are typed into the MIS days later",
+      "category": "operations_process",
+      "subtype": "duplicate_entry",
+      "quick_ideas": [
+        "Time how long the typing takes each day, so the cost of double entry is clear",
+        "Agree a fixed same-day entry cut-off, so the backlog stops growing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "Collection totals captured on phone at the centre meeting and passed into the MIS, so registers are not retyped.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "What the MIS can accept and how the link works is assessed in the solution document."
+    },
+    {
+      "id": "p5_reports_late",
+      "n": 5,
+      "words": "Overdue figures are a week old by the time head office sees them",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "Pick the two or three aggregate figures head office needs daily, so attention goes to those",
+        "Send them each evening even if rough, so decisions are not waiting for the full report."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A daily branch dashboard of visits planned versus done, collections versus due and deposits made, in aggregate only, with an area comparison view.",
+        "tool_words": [
+          "dashboard"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which figures feed it and from where is in the solution document."
+    },
+    {
+      "id": "p6_manual_reports",
+      "n": 6,
+      "words": "Head office keeps asking for the same report in a different format",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Collect every format requested this quarter in one place, so the overlap is obvious",
+        "Propose one standard format to head office, so branches report once."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "One data source per branch that produces each required report format automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Format mapping is in the solution document."
+    },
+    {
+      "id": "p7_approvals_slow",
+      "n": 7,
+      "words": "Disbursement files wait for approval at the area office for days",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "Note the date each file leaves the branch and arrives back, so the waiting point is visible",
+        "Hand every file over with a list of what is inside, so returns for missing items drop."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "workflow_automation A file movement tracker showing where each file is, who has it and how long it has waited, with a document checklist per file type.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Stages and checklist contents are in the solution document."
+    },
+    {
+      "id": "p8_petty_cash",
+      "n": 8,
+      "words": "Officers' travel and fuel claims are hard to verify",
+      "category": "cash_collections",
+      "subtype": "petty_cash",
+      "quick_ideas": [
+        "Ask officers to claim against their recorded visits, so every claim has a reason attached",
+        "Review claims weekly rather than monthly, so oddities are fresh."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A travel and fuel claim log tied to completed visits, with approval and a flag for claims without matching visits.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Claim rules and approval flow are in the solution document."
+    },
+    {
+      "id": "p9_info_lost_in_whatsapp",
+      "n": 9,
+      "words": "Head office instructions get lost in WhatsApp groups",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Post official instructions in one channel only, so staff know where to look",
+        "Ask each branch to acknowledge important circulars, so you know who has seen them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A circulars channel with read confirmation per branch and reminders to those who have not acknowledged.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Channel set-up is in the solution document."
+    },
+    {
+      "id": "p10_turnover",
+      "n": 10,
+      "words": "Field officers leave after a year and new ones do the paperwork wrong",
+      "category": "people_staff",
+      "subtype": "turnover",
+      "quick_ideas": [
+        "Write down the five things a new officer most often gets wrong, so training targets them",
+        "Pair each new officer with an experienced one for their first weeks, so groups see continuity."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "An officer onboarding checklist with short process guides and a record of which files are returned and why.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Guide content and tracking are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on interest, service charges, loan sizes, products, eligibility or credit decisions. Any recovery tactic, pressure approach or legal action against borrowers. Any request for borrowers' names, CNIC, addresses, phone numbers, loan amounts or repayment histories. Live location tracking of officers or covert monitoring. Anything on SBP or SECP regulation beyond noting reporting effort."
+  ],
+  "sample_reply": {
+    "person": "FOs ki field visits ka koi hisaab nahi rehta, kuch hal hai is ka?",
+    "pi": "Ji, is ka hal mumkin hai aur pehla qadam aap isi hafte khud utha sakte hain. 1 Har officer subah apne din ke groups branch ko bata de, taake shaam ko planned aur mukammal visits mila sakein. 2 Har shaam yeh milan ek baar dekh lein, taake miss hua visit usi din pata chale, hafte baad nahi. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: officers khule taur pe har centre meeting pe check-in karein aur aap ko har branch ki roz ki report mile, borrowers ka koi data liye baghair. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

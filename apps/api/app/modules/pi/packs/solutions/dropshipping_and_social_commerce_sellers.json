@@ -1,0 +1,237 @@
+{
+  "industry": "dropshipping_and_social_commerce_sellers",
+  "name": "Dropshipping and social-commerce sellers Instagram, TikTok, Facebook)",
+  "sector": "7.M Digital economy, social and public sector",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_orders_lost",
+      "n": 1,
+      "words": "Orders come in DMs, comments and WhatsApp and I lose track",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Move each order into one list the moment it is confirmed, not at night",
+        "Ask comment buyers to message you, so orders sit in one place."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a WhatsApp order flow where buyers choose item, size and colour, and every confirmed order lands in one list automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The order flow and catalogue set-up are designed in the solution document."
+    },
+    {
+      "id": "p2_whatsapp_overload",
+      "n": 2,
+      "words": "Hundreds of \"price?\" messages and most never buy",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Show price and sizes on the post itself, so the question isn't needed",
+        "Point enquiries to your WhatsApp catalogue instead of typing details each time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "an automatic first reply with price, sizes and an order link, so you only handle serious buyers.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reply flow and its wording are prepared in the solution document."
+    },
+    {
+      "id": "p3_no_visibility",
+      "n": 3,
+      "words": "Supplier says it's available, then it's out after I take payment",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Confirm availability with the supplier before accepting an advance",
+        "Ask the supplier for a daily stock update, so you sell what exists."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a stock sheet shared with your supplier, showing what is available before you take payment.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the supplier updates it and how it links to orders is covered in the solution document."
+    },
+    {
+      "id": "p4_order_tracking",
+      "n": 4,
+      "words": "I don't know if the supplier actually dispatched",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "Ask the supplier to send the tracking number per order the same day",
+        "Check once each evening for orders with no tracking number yet."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a dispatch tracker with a tracking number per order and WhatsApp alerts when one is overdue.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The tracker and alert rules are detailed in the solution document."
+    },
+    {
+      "id": "p5_payment_methods",
+      "n": 5,
+      "words": "Checking payment screenshots against the bank app takes hours",
+      "category": "cash_collections",
+      "subtype": "payment_methods",
+      "quick_ideas": [
+        "Check bank and wallet credits at two fixed times a day instead of per screenshot",
+        "Dispatch only once the credit shows, not the screenshot, which also stops fake ones."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "an advance-payment log matching wallet and bank credits to orders and flagging unmatched screenshots.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How credits are matched to orders is set out in the solution document."
+    },
+    {
+      "id": "p6_returns_rto",
+      "n": 6,
+      "words": "Customers refuse COD parcels after ordering in a live",
+      "category": "orders_fulfilment",
+      "subtype": "returns_rto",
+      "quick_ideas": [
+        "Confirm every live-sale order with the buyer before booking the courier",
+        "Note which products get refused most, so you know where to ask for an advance."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a live-sale order taker where buyers reply with item codes and every order is confirmed automatically before booking.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The live-sale code system and confirmation steps go in the solution document."
+    },
+    {
+      "id": "p7_campaign_roi_unknown",
+      "n": 7,
+      "words": "I boost posts but can't tell which ones sold",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Ask each buyer where they saw the item and note it with the order",
+        "Compare boost spend against delivered orders each week."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "codes per post or boost tied to orders, showing which content actually sold.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The code set-up and reporting are covered in the solution document."
+    },
+    {
+      "id": "p8_pre_orders_custom",
+      "n": 8,
+      "words": "Pre-orders: no list of who's waiting for what",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Keep one waitlist by item and size with any advance taken",
+        "Contact the waitlist, with their permission, as soon as stock lands."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a pre-order waitlist that sends an \"it's back\" WhatsApp message automatically to buyers who asked.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The waitlist and message flow are designed in the solution document."
+    },
+    {
+      "id": "p9_data_loss",
+      "n": 9,
+      "words": "Everything is on my phone — if it's lost, the business is gone",
+      "category": "tech_systems",
+      "subtype": "data_loss",
+      "quick_ideas": [
+        "Turn on chat backup today",
+        "Keep a copy of your order list somewhere other than the phone."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "order and buyer history kept safely in the cloud, off the phone.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Where and how records are stored is explained in the solution document."
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "I don't know my real profit after courier, returns and boosting",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out once what one order of your best sellers really leaves after courier, returns and boosting",
+        "Recheck supplier prices, since they often rise quietly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a per-order profit view with a weekly WhatsApp summary of orders, delivered, returned and cash pending.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The cost model and summary layout are prepared in the solution document."
+    },
+    {
+      "id": "p11_owner_bottleneck",
+      "n": 11,
+      "words": "Can't take a day off — everything depends on me",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Hand one routine task, like courier booking, to a helper this week",
+        "Agree with helpers on how common questions are answered, so replies stay consistent."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a shared reply library and posting calendar with reminders, so helpers can run the routine without you.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The handover set-up and reply library are built in the solution document."
+    }
+  ],
+  "never_say": [
+    "Promises of reach, followers, virality or sales. Any health or beauty claims for slimming, herbal or skin products. Help with buying followers, fake reviews, replica goods or copying other brands' content. Tracking down, exposing or shaming a buyer who sent a fake screenshot. Tax or registration advice — say \"talk to an accountant\"; never ask for page logins, OTPs or wallet PINs."
+  ],
+  "sample_reply": {
+    "person": "Mera Instagram page hai, orders DMs mein aate hain aur miss ho jate hain. Koi hal batayein.",
+    "pi": "Ji haan, is ka hal mumkin hai aur shuruaat aaj se ho sakti hai. 1 Order confirm hote hi usi waqt ek list mein daal dein, raat ka intezar na karein. 2 Comments wale buyers ko message karne ka kahein, taake sab orders ek jagah rahein. Workzap yeh kaam aap ke liye automatically kar sakta hai: WhatsApp par order flow jahan buyer khud item, size aur colour chune aur har order khud ek list mein aa jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

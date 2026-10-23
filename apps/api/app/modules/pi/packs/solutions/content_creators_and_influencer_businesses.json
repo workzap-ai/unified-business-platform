@@ -1,0 +1,218 @@
+{
+  "industry": "content_creators_and_influencer_businesses",
+  "name": "Content creators and influencer businesses",
+  "sector": "7.M Digital economy, social and public sector",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_receivables_late",
+      "n": 1,
+      "words": "Brands pay months late, some never pay",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid invoice once with its date and brand, so you see who to chase first",
+        "Agree payment terms in writing before starting the next deal, so there is something to point to."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a receivables board showing what each brand owes and for how long, with automatic payment reminders to the brand's finance contact.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many brands owe you at the moment?",
+      "free_stops": "The reminder schedule and board set-up are detailed in the solution document."
+    },
+    {
+      "id": "p2_data_scattered",
+      "n": 2,
+      "words": "I don't know which brand owes me what right now",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Pull every live deal out of email and WhatsApp into one sheet with its stage",
+        "Mark each deal as posted, invoiced or paid, so the gaps are obvious."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a brand deal tracker from enquiry to paid, with each deal's stage and ageing in one place.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The deal stages and how deals flow into invoicing are set out in the solution document."
+    },
+    {
+      "id": "p3_info_lost_in_whatsapp",
+      "n": 3,
+      "words": "Deliverables and deadlines are all over WhatsApp groups",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Put every agreed deliverable and go-live date into one shared calendar",
+        "Share that calendar with your editor, so both of you see the same dates."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a deliverables calendar with go-live dates and approval rounds, sending WhatsApp reminders to you and your editor.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The calendar structure and reminder timings are covered in the solution document."
+    },
+    {
+      "id": "p4_approvals_slow",
+      "n": 4,
+      "words": "Brand asked for endless revisions and I had no limit agreed",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "Agree the number of approval rounds before starting each deal",
+        "Keep a simple count of revisions per deal, so you can raise it when it runs over."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an approval tracker that logs each revision round per deal and flags when the agreed limit is reached.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How rounds are logged and flagged goes in the solution document; contract wording is for your lawyer."
+    },
+    {
+      "id": "p5_contracts_tracking",
+      "n": 5,
+      "words": "Forgot I was exclusive with one brand",
+      "category": "compliance_admin",
+      "subtype": "contracts_tracking",
+      "quick_ideas": [
+        "Write down the exclusivity and usage end dates from each current agreement in one list",
+        "Check that list before saying yes to any new brand."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a terms register for exclusivity windows, usage periods and whitelisting end dates, with alerts before each one expires.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The register fields and alert rules are prepared in the solution document; interpreting terms is for your lawyer."
+    },
+    {
+      "id": "p6_lead_followup_slow",
+      "n": 6,
+      "words": "Inbound brand emails get lost in my DMs",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Point brands to one email or form in your bio, so enquiries arrive in one place",
+        "Reply to every new enquiry within a fixed time, even if only to say you'll come back."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an enquiry form on your link-in-bio page that sorts brand requests into one inbox with follow-up reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The form and sorting set-up are designed in the solution document."
+    },
+    {
+      "id": "p7_manual_reports",
+      "n": 7,
+      "words": "Brand asks for insights screenshots each time and I make reports by hand",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Save insights screenshots into a folder per campaign right after posting",
+        "Keep one standard report layout, so each report starts from the same base."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a campaign report builder that compiles screenshots and figures into a branded PDF for each brand.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The report layout and how figures are gathered are covered in the solution document."
+    },
+    {
+      "id": "p8_accountability",
+      "n": 8,
+      "words": "Editor delivers late so posting is inconsistent",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Give the editor a due date for every piece, not just the go-live date",
+        "Check once a week which pieces are late and why."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an editor task board with due dates, revision counts and handoff status, with reminders before each deadline.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The board and its reminders are set out in the solution document."
+    },
+    {
+      "id": "p9_cash_flow_tight",
+      "n": 9,
+      "words": "Income swings — great months then nothing",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "Note last year's income by month and source, so the slow months are visible",
+        "Line up deals early for the known brand-budget peaks like Ramadan and year-end."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a revenue view by source and month showing seasonality and expected payments.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The view and its inputs are detailed in the solution document; money planning is for your accountant."
+    },
+    {
+      "id": "p10_data_loss",
+      "n": 10,
+      "words": "Footage on random drives — lost a full shoot once",
+      "category": "tech_systems",
+      "subtype": "data_loss",
+      "quick_ideas": [
+        "Pick one place where every shoot is copied the same day",
+        "Keep a second copy of anything not yet delivered."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an asset library structure with backup reminders after every shoot.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The folder structure and backup routine go in the solution document."
+    }
+  ],
+  "never_say": [
+    "Promises of growth, virality, follower numbers or brand rates. Legal advice on contracts, exclusivity, IP, defamation or disclosure — say \"talk to a lawyer\". Advice on UAE advertiser licensing or tax on brand income — say \"check with the licensing authority or your accountant\". Help with buying followers, fake giveaways, undisclosed paid promotion or copying others' content. Asking for children's names, ages or schools in family content, or for account passwords."
+  ],
+  "sample_reply": {
+    "person": "Can you help me sort out chasing brands for payment? It's killing me.",
+    "pi": "Yes, this is very fixable, and you can start this week. 1 List every unpaid invoice once with its date and brand, so you know exactly who to chase first. 2 Agree payment terms in writing before your next deal starts, so there's something clear to point to. Workzap can do the tracking automatically for you: one board showing what each brand owes and for how long, with reminders sent on schedule. Would you like me to prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

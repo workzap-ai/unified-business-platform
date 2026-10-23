@@ -1,0 +1,221 @@
+{
+  "industry": "government_contractors_and_public_sector_suppliers",
+  "name": "Government contractors and public-sector suppliers",
+  "sector": "7.M Digital economy, social and public sector",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_few_leads",
+      "n": 1,
+      "words": "We find out about tenders too late to prepare properly",
+      "category": "marketing_leads",
+      "subtype": "few_leads",
+      "quick_ideas": [
+        "Pick the portals and newspapers that matter to you and check them on fixed days",
+        "Record every tender you see with its deadline in one list."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "a tender tracker capturing opportunities, deadlines, go/no-go decision and outcome.",
+        "tool_words": []
+      },
+      "ask_first": "How do you hear about new tenders now?",
+      "free_stops": "Which sources are tracked and how is set out in the solution document."
+    },
+    {
+      "id": "p2_manual_work",
+      "n": 2,
+      "words": "Bid documents are assembled from scratch every time",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Gather the company profile, certificates and past contract summaries into one folder",
+        "Note the expiry date of each certificate once."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a bid document library with expiry alerts on every certificate and a checklist per tender.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The library structure and checklists are prepared in the solution document."
+    },
+    {
+      "id": "p3_contracts_tracking",
+      "n": 3,
+      "words": "Bank guarantees expire and we forget to renew or release them",
+      "category": "compliance_admin",
+      "subtype": "contracts_tracking",
+      "quick_ideas": [
+        "List every guarantee and security with issue, expiry and release dates",
+        "Set a reminder well before each date."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a guarantee register with issue, expiry and release dates and automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The register and reminder rules go in the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "Payments take months and we don't know which invoice is stuck where",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every submitted invoice with its date and current stage",
+        "Update that list after each follow-up visit, so nothing depends on memory."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an invoice pipeline board showing where each bill sits and how many days it has waited.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The stages and update routine are detailed in the solution document."
+    },
+    {
+      "id": "p5_cash_flow_tight",
+      "n": 5,
+      "words": "Working capital stuck in securities and retention",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "Total up once what is held in securities and retention by contract",
+        "Note when each is due back, so you can plan around it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a cash-flow view combining receivables, securities and supplier commitments.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The view's inputs are set out in the solution document; financing questions are for your accountant."
+    },
+    {
+      "id": "p6_documentation",
+      "n": 6,
+      "words": "Inspection rejects deliveries for small paperwork gaps",
+      "category": "compliance_admin",
+      "subtype": "documentation",
+      "quick_ideas": [
+        "Write down the documents inspection asked for on recent deliveries",
+        "Check every delivery against that list before it leaves."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a delivery and inspection pack per order with challans, photos of goods and signed acceptance scans.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The pack contents per buyer are prepared in the solution document."
+    },
+    {
+      "id": "p7_record_keeping",
+      "n": 7,
+      "words": "Delivery challans and signed receipts get lost",
+      "category": "compliance_admin",
+      "subtype": "record_keeping",
+      "quick_ideas": [
+        "Scan or photograph every signed challan the day it comes back",
+        "File them by contract in one place."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "phone capture of signed challans filed automatically against each contract.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The capture and filing set-up go in the solution document."
+    },
+    {
+      "id": "p8_attendance_lateness",
+      "n": 8,
+      "words": "Manpower contracts — attendance disputes cut our bills",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Keep a daily attendance sheet signed by the client's site supervisor",
+        "Reconcile it weekly, not at month-end."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a site check-in app for deployed staff feeding monthly billing and payroll.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "The check-in and billing link are detailed in the solution document."
+    },
+    {
+      "id": "p9_no_dashboard",
+      "n": 9,
+      "words": "Many contracts running; no single view of deadlines",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Put every contract's delivery dates and penalties in one sheet",
+        "Review it at a short weekly meeting."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a contract register with milestones, inspection status, penalties and retention on one screen.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The register design goes in the solution document."
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "We don't know true profit after delays, guarantees and penalties",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out the real result on one recently closed contract, including penalties and waiting time",
+        "Use that to decide which kinds of tender to go for."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a contract closure report showing profit after delays, securities and penalties.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The costing model is set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything involving bribes, \"speed money\", facilitation payments, bid rigging, fake certificates or inflated bills — pi cannot help with that. Advice on procurement rules, bid challenges, blacklisting or legal recovery — say \"talk to a lawyer\". Tax advice on withholding, sales tax or VAT say \"talk to your accountant\". Typical payment times, margins or win rates. Asking for officials' names, guarantee numbers or bank details."
+  ],
+  "sample_reply": {
+    "person": "Hum hospitals ko medical consumables supply karte hain. Payment mahino nahi aati aur pata nahi file kahan atki hai. Koi hal?",
+    "pi": "Ji haan, is ka hal kiya ja sakta hai aur shuruaat isi hafte ho sakti hai. 1 Har jama shuda invoice ki ek list banayein jis mein tareekh aur maujooda marhala likha ho. 2 Har follow-up ke baad woh list update karein, taake sab kuch yaadasht par na rahe. Workzap yeh kaam aap ke liye automatically kar sakta hai: ek board jahan har bill ka marhala aur intezar ke din nazar aayein, saath reminders. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

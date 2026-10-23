@@ -1,0 +1,219 @@
+{
+  "industry": "game_studios_and_app_businesses",
+  "name": "Game studios and app businesses",
+  "sector": "7.M Digital economy, social and public sector",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_cost_overruns",
+      "n": 1,
+      "words": "Client projects always run over and we eat the extra hours",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Compare estimated against actual hours on your last finished project, so you see where it slipped",
+        "Review each live project's hours against its estimate once a week."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a project tracker showing estimate against actual hours per milestone, with alerts as soon as a project starts to overrun.",
+        "tool_words": []
+      },
+      "ask_first": "How do you estimate a project at the start?",
+      "free_stops": "How hours are captured and alerts are set is covered in the solution document."
+    },
+    {
+      "id": "p2_handoffs",
+      "n": 2,
+      "words": "Client change requests come in verbally, then scope disputes",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Write down every client ask and get it acknowledged before work starts",
+        "Keep all change requests for a project in one list, so scope is clear later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a change-request log where every ask is recorded, estimated and approved by the client before work begins.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The approval flow goes in the solution document; contract terms are for your lawyer."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Foreign clients pay late and we're short for salaries",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List all open invoices with their age, so the oldest get chased first",
+        "Invoice on the day a milestone is signed off, not at month-end."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a receivables ageing board with automated reminders to each client and a view of what's due before payroll.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reminder schedule and runway view are detailed in the solution document."
+    },
+    {
+      "id": "p4_data_scattered",
+      "n": 4,
+      "words": "Revenue sits in AdMob, AppLovin, Play and App Store — no single view",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Pick the few numbers per title you really need and collect them once into one sheet",
+        "Check them on a fixed day, so drops are spotted early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration",
+          "dashboards_reports"
+        ],
+        "text": "a unified revenue view pulling store and ad- network reports into one daily screen per title.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Which sources connect and how is set out in the solution document."
+    },
+    {
+      "id": "p5_info_lost_in_whatsapp",
+      "n": 5,
+      "words": "Bugs get reported on WhatsApp and lost",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Agree that every bug goes into your tracker, not chat",
+        "Have one person move this week's chat reports into the tracker."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a bug intake form that pushes reports straight into the team's tracker.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The form and its connection to your tracker are designed in the solution document."
+    },
+    {
+      "id": "p6_inspection_missing",
+      "n": 6,
+      "words": "Builds go out without proper QA",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Write a short release checklist and use it on the next build",
+        "Make one named role sign off before any submission."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a release checklist with QA sign-off that must be completed before a build is submitted.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The checklist content and sign-off flow are prepared in the solution document."
+    },
+    {
+      "id": "p7_capacity",
+      "n": 7,
+      "words": "We don't know who's overloaded and who's free",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Map who is on which project this week in one sheet",
+        "Review it before saying yes to new work."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a team capacity view showing allocation per person per week.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How allocation is captured and displayed goes in the solution document."
+    },
+    {
+      "id": "p8_performance_unknown",
+      "n": 8,
+      "words": "Timesheets are guesswork, so billing clients is guesswork",
+      "category": "people_staff",
+      "subtype": "performance_unknown",
+      "quick_ideas": [
+        "Ask the team to log hours per project at the end of each day, not each week",
+        "Check logged hours against what was billed on one recent project."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a lightweight daily timesheet via WhatsApp or web, tied straight to client billing.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The timesheet flow and billing link are detailed in the solution document."
+    },
+    {
+      "id": "p9_slow_response",
+      "n": 9,
+      "words": "Support emails and store reviews pile up unanswered",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Give one person fixed daily time for reviews and support",
+        "Group repeated complaints, so the team sees which bug matters most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a support inbox that triages store reviews and emails with saved replies and ageing.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The triage rules and reply library are set out in the solution document."
+    },
+    {
+      "id": "p10_hidden_costs",
+      "n": 10,
+      "words": "Paying for licences and cloud nobody's using",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "List every recurring tool and cloud cost once with its owner",
+        "Cancel or downgrade anything nobody claims."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a subscription and cloud spend register with renewal alerts and owner per item.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The register and alert set-up go in the solution document."
+    }
+  ],
+  "never_say": [
+    "Benchmark retention, eCPM, revenue or salary figures, or promises a title will succeed. Advice on IP ownership, publishing contracts, NDAs or employment law — say \"talk to a lawyer\". Advice on data protection, children's privacy rules or store policy appeals. Tax, remittance or export-of-services advice — say \"talk to your accountant\". Help with fake installs, fake ratings, ad fraud or bypassing store rules; never ask for code, keys or console logins."
+  ],
+  "sample_reply": {
+    "person": "We do client work to fund our own games, but client projects always overrun. Any solution?",
+    "pi": "Yes, there's a clear way to get on top of this, and you can start this week. 1 Compare estimated against actual hours on your last finished project, so you can see where it slipped. 2 Write down every client change request and get it acknowledged before work starts. Workzap can do this automatically for you: a tracker showing estimate against actual hours per milestone, alerts when a project starts overrunning, and a change log the client approves. Would you like me to prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

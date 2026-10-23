@@ -1,0 +1,217 @@
+{
+  "industry": "textile_spinning_and_weaving_mills",
+  "name": "Textile spinning and weaving mills",
+  "sector": "7.D Manufacturing and industry (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_bottleneck",
+      "n": 1,
+      "words": "Looms stand idle half the shift because beams are not ready",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Ask the weaving master for one list of looms due for a new beam in the next few days and give it to preparation, so warping works to real need",
+        "Note the loom hours lost to beam waiting for one week, so the size of the problem is clear"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A beam and preparation tracker that shows every day which looms are close to beam-out and which are waiting, updated by the shift in-charge.",
+        "tool_words": []
+      },
+      "ask_first": "Which part feels slowest — preparation, beams or the looms themselves?",
+      "free_stops": "How beam need is forecast and how preparation is sequenced is set out in the solution document."
+    },
+    {
+      "id": "p2_branch_comparison",
+      "n": 2,
+      "words": "Efficiency on the looms is low but I don't know which shed or shift is worse",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "For one shift, have output written loom-wise with the main stop reason, so weak looms show up",
+        "Compare one day shift and one night shift on the same looms, so the gap is based on a record"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "dashboards_reports A shift log on phone per loom for picks and stop reasons, feeding an automatic morning efficiency view by shed, shift and loom type.",
+        "tool_words": []
+      },
+      "ask_first": "Is daily output recorded by loom or shed, or just as a total?",
+      "free_stops": "How efficiency is calculated and compared across sheds is kept for the solution document."
+    },
+    {
+      "id": "p3_theft_internal",
+      "n": 3,
+      "words": "Waste is sold but the weight on the gate pass never matches",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Weigh one week's waste at the department where it is made and compare with the gate pass, so you know if the gap is real",
+        "Have two people sign the next waste weighing, so one person is not the only record"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A waste register with weighing at source, automatic gate pass matching and a weekly view of waste by department.",
+        "tool_words": []
+      },
+      "ask_first": "Who weighs the waste when it goes out of the gate?",
+      "free_stops": "Where weighing points sit and how mismatches are flagged are covered in the solution document."
+    },
+    {
+      "id": "p4_maintenance_downtime",
+      "n": 4,
+      "words": "Gas pressure drops and we lose a whole shift",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Write down each gas or power interruption this week with hours and looms affected, so lost time is on paper",
+        "Put the most urgent orders on looms that can keep running on backup, so the important work is protected"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "dashboards_reports An energy downtime log recording every interruption and lost hours, shown next to output in the owner's daily view.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How downtime is costed and planned around is detailed in the solution document."
+    },
+    {
+      "id": "p5_serial_batch_tracking",
+      "n": 5,
+      "words": "Yarn lots get mixed and the cloth shows shade variation",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Label every yarn lot in the godown clearly once, so lots cannot be mixed by accident",
+        "Note the yarn lot on the beam card for the next order, so a fault can be traced back"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A lot tracker linking cotton lot to yarn lot to beam to cloth roll, so any roll can be traced in seconds.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How lots are linked through each stage is mapped in the solution document."
+    },
+    {
+      "id": "p6_inspection_missing",
+      "n": 6,
+      "words": "Cloth is rejected for faults and nobody logs which loom made it",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Tag the next batch of rolls with loom number at doffing, so folding knows where each came from",
+        "Sit with the folding team for one day and note fault type against loom, so repeat offenders show up"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A cloth fault log at folding with loom number, fault type and photo, summarised automatically by loom and jobber group.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Fault categories and how they feed back to jobbers are set out in the solution document."
+    },
+    {
+      "id": "p7_credit_customers",
+      "n": 7,
+      "words": "Traders take cloth and pay in instalments over months",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Make one balance list per trader of deliveries, payments and what is still due, so nothing relies on memory",
+        "Decide a credit limit for your biggest traders, so the next delivery has a clear yes or no"
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A receivables ledger per trader and conversion party with ageing, and WhatsApp statements and reminders sent on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "How do you keep track of what each trader owes now?",
+      "free_stops": "How limits are set and how statements are agreed with each party is kept for the solution document."
+    },
+    {
+      "id": "p8_receivables_late",
+      "n": 8,
+      "words": "Conversion parties dispute how many metres we wove",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Pull together yarn received, metres delivered and rate for your most disputed party, so you have one clean record",
+        "Ask for a confirmation on the next delivery note, so the count is agreed on the day"
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "job_tracking A conversion work register for yarn in, metres out, rate and balance per party, with each delivery confirmed and the balance always current.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How confirmations are captured and balances reconciled is covered in the solution document."
+    },
+    {
+      "id": "p9_margin_unknown",
+      "n": 9,
+      "words": "I don't know my real cost per kg of yarn or per metre of cloth",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Put last month's raw material, power and labour totals next to output, so you have a rough cost per kg or metre",
+        "Do it for your two main counts or qualities, so a loss-maker stands out"
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A costing sheet per count or quality that updates with current cotton, power and labour rates and each month's output.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How overheads and waste are spread across counts is detailed in the solution document."
+    },
+    {
+      "id": "p10_owner_bottleneck",
+      "n": 10,
+      "words": "Owner calls three people every morning to know production",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Decide the four or five numbers you actually need each morning, so the calls have a purpose",
+        "Ask one person to collect them for you this week, so you stop being the collector"
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A daily owner summary of output, efficiency, waste, stoppages and dispatches, pulled automatically from the shift logs.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which numbers go in and where they come from is set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any prediction of cotton prices or advice on when to buy or sell commodities. Any advice on gas or power tariffs, gas allocation, sales tax refunds, export rebates or customs; suggest an accountant or the relevant authority. Anything on fire, dust or machine-safety engineering; cotton godown fires and injuries are emergencies. Any help misdeclaring count, weight or origin, or under-invoicing exports. Any judgement on who is right in a dispute with a conversion party or trader. Any guarantee of efficiency gains or lower waste."
+  ],
+  "sample_reply": {
+    "person": "Hamari 48 looms hain, efficiency ka kuch pata nahi chalta, aur beam ke intezar mein looms khari rehti hain. Koi solution hai?",
+    "pi": "Ji haan, iske liye kaafi kuch kiya ja sakta hai, aur shuruaat isi hafte ho sakti hai. 1 Ek shift ke liye production loom-wise likhwa lein aur saath mein rukne ki wajah, taa ke kamzor looms saamne aa jayen. 2 Weaving master se agle kuch din mein beam-out hone wali looms ki ek list le kar preparation ko de dein, taa ke warping asal zaroorat ke mutabiq ho. Workzap yeh sab aap ke liye roz khud-ba-khud kar sakta hai: phone pe loom-wise shift log aur beam tracker, aur har subah shed aur shift ke hisaab se efficiency aap ke WhatsApp pe. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

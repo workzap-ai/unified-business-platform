@@ -1,0 +1,239 @@
+{
+  "industry": "tyre_battery_and_auto_parts_shops",
+  "name": "Tyre, battery and auto-parts shops",
+  "sector": "7.G Transport, mobility and aviation (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_wrong_location",
+      "n": 1,
+      "words": "The system says we have the part, but we can't find it",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Give each shelf or bin a label and note where your fast movers sit, so finding a part doesn't depend on memory",
+        "Put returned and misplaced items back to their labelled spot at closing, so the shelf matches the register."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "custom_build"
+        ],
+        "text": "a part catalogue with car-model lookup and shelf location, so any counter person can find a part, kept in step with every sale.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the catalogue and locations are structured is in the solution document."
+    },
+    {
+      "id": "p2_stockout",
+      "n": 2,
+      "words": "We run out of fast-moving filters and pads every week",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "List the items you ran out of in the last month, so you know your true fast movers",
+        "Set a rough minimum for each and check them every few days, so reorders happen before the shelf is empty."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "reorder alerts on fast movers by shop, sent on WhatsApp before they run out.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reorder levels and how they adjust by season are in the solution document."
+    },
+    {
+      "id": "p3_overstock_dead_stock",
+      "n": 3,
+      "words": "The godown is full of parts for old models nobody drives",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "Walk the godown once and list what hasn't moved in a long time, so dead stock is visible",
+        "Offer that list to workshops you already supply, so some of it turns back into cash."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a dead-stock report by age and value, refreshed weekly, so it never builds up unseen.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How age and value are calculated is in the solution document."
+    },
+    {
+      "id": "p4_expiry_wastage",
+      "n": 4,
+      "words": "Old tyres and batteries sit too long and customers reject them",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Move older tyres and batteries to the front, so they sell first",
+        "Note the date codes on what's in stock once, so you know what's getting old."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "batch and date tracking for tyres and batteries that flags ageing stock and puts older units first.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Ageing rules per item are in the solution document."
+    },
+    {
+      "id": "p5_credit_customers",
+      "n": 5,
+      "words": "Mechanics' udhaar is in a notebook and every settlement is an argument",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Write up each workshop's current balance on one page, so you know the total owed",
+        "Share each balance with the workshop once, so you agree a starting figure."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a credit ledger per workshop with statements sent automatically on WhatsApp and reminders on overdue balances.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many workshops buy from you on credit?",
+      "free_stops": "Statement timing and reminder steps are in the solution document; credit terms are for your accountant."
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "Prices change and my staff sell at last month's rate",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Keep one current rate list that only you or one person updates, so the counter has a single source",
+        "Date every update, so staff know which list is current."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a rate list manager that updates counter prices at every shop when supplier prices change.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How updates flow to each counter is in the solution document."
+    },
+    {
+      "id": "p7_discount_abuse",
+      "n": 7,
+      "words": "Counter staff give discounts to their friends",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Decide what discount each role may give, so the limit is clear",
+        "Ask for anything beyond that to come to you, so exceptions are visible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "discount limits by role with approvals for exceptions, logged on every sale.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Limits and approval paths are in the solution document."
+    },
+    {
+      "id": "p8_after_sales",
+      "n": 8,
+      "words": "Warranty claims for batteries and tyres take ages and we lose track",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "List every open claim with the date it went to the supplier, so you know what's pending",
+        "Chase the oldest claims first, so customers get answers."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a warranty claim tracker per battery or tyre with supplier status and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Claim stages and reminders are in the solution document."
+    },
+    {
+      "id": "p9_cash_mismatch",
+      "n": 9,
+      "words": "Cash in the drawer doesn't match sales",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Count the drawer against the day's sales at closing, so gaps show the same day",
+        "Keep one person on the drawer per shift, so it's clear who is responsible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily cash-up against recorded sales for each shop, sent to the owner each evening.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The cash-up steps are in the solution document."
+    },
+    {
+      "id": "p10_whatsapp_overload",
+      "n": 10,
+      "words": "Customers send part photos on WhatsApp and replies get missed",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Give one person the job of answering WhatsApp enquiries at set times, so nothing sits unread",
+        "Ask customers for the car model and year with the photo, so you can answer in one go."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a WhatsApp enquiry flow capturing the part photo, model and year, routed to a counter person and tracked to sale.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The enquiry flow and routing are in the solution document."
+    },
+    {
+      "id": "p11_owner_blind",
+      "n": 11,
+      "words": "I don't know daily sales until I check the register at night",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Ask each shop for one sales total every evening, so you have a daily number",
+        "Note your top-selling items each week, so you see what drives the business."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a short read of sales and stock by item, brand and shop on WhatsApp each morning, with the one thing to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "What the daily read includes is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Whether a part is safe, compatible or suitable for a vehicle. Anything helping pass off copies as genuine, change tyre date codes or avoid customs or sales tax. Advice on battery acid, lead or used-oil rules; for an acid injury or godown fire, point to emergency services. Currency or price forecasts. Storing credit customers' phone numbers or IDs. Covert surveillance of staff."
+  ],
+  "sample_reply": {
+    "person": "Mechanics ka udhaar notebook mein hai, har baar hisaab pe behes hoti hai, koi hal batao.",
+    "pi": "Haan, is ka hal bilkul nikal sakta hai, aur is hafte shuruaat ho sakti hai. 1 Har workshop ka maujooda baqaya ek page pe likh lein, taake total udhaar saamne ho. 2 Woh balance har workshop ke saath ek baar share kar ke ek figure pe ittefaq kar lein, taake aage behes kam ho. Workzap yeh sab aap ke liye automatically kar sakta hai: har workshop ka khata, WhatsApp pe statement aur overdue pe yaad dehani. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

@@ -1,0 +1,221 @@
+{
+  "industry": "solar_epc_and_installers",
+  "name": "Solar EPC and installers",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_price_increases_supplier",
+      "n": 1,
+      "words": "Panel prices change every week and my old quotes become loss-making",
+      "category": "margin_cost",
+      "subtype": "price_increases_supplier",
+      "quick_ideas": [
+        "Put a clear validity date on every quote, so old prices don't bind you",
+        "Check open quotes against today's supplier prices once, to see which are at risk."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A quote builder that pulls current supplier prices, shows margin before sending and flags every quote as it nears expiry.",
+        "tool_words": []
+      },
+      "ask_first": "How long is a quote valid for today?",
+      "free_stops": "Pricing logic and validity rules are in the solution document."
+    },
+    {
+      "id": "p2_customer_communication",
+      "n": 2,
+      "words": "Customers call every day asking about their net metering status",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Keep one list of every pending file with its current stage, so anyone in the office can answer",
+        "Send each waiting customer one short status update, so they know where things stand."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "customer_messaging"
+        ],
+        "text": "A net metering tracker per customer with stage and documents checklist, sending a WhatsApp update automatically whenever a file moves.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many files are pending right now?",
+      "free_stops": "Stages, document lists and message triggers are in the solution document."
+    },
+    {
+      "id": "p3_serial_batch_tracking",
+      "n": 3,
+      "words": "Serial numbers of panels and inverters are not recorded per customer",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Photograph serial labels at every installation, so warranty claims have proof",
+        "Keep those photos in one folder per job, so they can be found later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "job_tracking"
+        ],
+        "text": "A stock register with serial numbers per panel batch and inverter, linked automatically to each installation and warranty.",
+        "tool_words": []
+      },
+      "ask_first": "Do you hold stock or buy per order?",
+      "free_stops": "How serials link to stock and jobs is in the solution document."
+    },
+    {
+      "id": "p4_lead_quality",
+      "n": 4,
+      "words": "Lots of enquiries, most just want a price to compare",
+      "category": "marketing_leads",
+      "subtype": "lead_quality",
+      "quick_ideas": [
+        "Ask a few qualifying questions before sending anyone for a survey, so surveyor time goes to serious buyers",
+        "Call the most promising leads first each morning."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Lead intake from WhatsApp, Facebook and the website with qualifying questions, follow-up reminders and a daily view of which leads turn into surveys.",
+        "tool_words": []
+      },
+      "ask_first": "How do enquiries come in?",
+      "free_stops": "The question set and lead scoring are in the solution document."
+    },
+    {
+      "id": "p5_manual_work",
+      "n": 5,
+      "words": "Quotes take two days because each one is done in Excel",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Settle on the handful of standard packages you sell most, so most quotes start from a base",
+        "Give one person the quoting job each day, so surveys don't queue."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A survey form on phone that feeds a quote builder directly, so a quote can go out the same day the survey is done.",
+        "tool_words": []
+      },
+      "ask_first": "Who prepares quotes today?",
+      "free_stops": "Package structure and survey fields are in the solution document; system sizing stays with a qualified engineer."
+    },
+    {
+      "id": "p6_shift_scheduling",
+      "n": 6,
+      "words": "Installation crews double-booked, one site waiting all day",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Put tomorrow's jobs per crew on one sheet each evening, so clashes are seen in advance",
+        "Confirm each job with the customer the day before, so crews don't arrive to a closed gate."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A crew board sending daily WhatsApp job sheets and collecting completion check-ins from every crew.",
+        "tool_words": []
+      },
+      "ask_first": "How many installation teams do you have?",
+      "free_stops": "Scheduling rules are in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Customers pay the advance and delay the balance after installation",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every outstanding balance with its install date, so the total owed is clear",
+        "Agree the balance date in writing before installation, so expectations are set."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A payment milestone tracker that sends balance reminders after installation and shows ageing every day.",
+        "tool_words": []
+      },
+      "ask_first": "How is payment split today?",
+      "free_stops": "Milestone structure and reminder timing are in the solution document."
+    },
+    {
+      "id": "p8_record_keeping",
+      "n": 8,
+      "words": "Commissioning photos and test records are on installers' phones",
+      "category": "compliance_admin",
+      "subtype": "record_keeping",
+      "quick_ideas": [
+        "Ask installers to send handover photos to one office number, so records leave personal phones",
+        "Store them per job, so after-sales has them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "An installation and commissioning checklist with photos and readings saved per job automatically.",
+        "tool_words": []
+      },
+      "ask_first": "What gets recorded before handover?",
+      "free_stops": "Checklist content is in the solution document; technical standards stay with your engineer."
+    },
+    {
+      "id": "p9_repeat_low",
+      "n": 9,
+      "words": "Nobody tracks which customers are due panel cleaning or a check-up",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "List past installations by date, so you know who is due",
+        "Contact those who agreed to hear from you, so the service work comes back to you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "loyalty_repeat"
+        ],
+        "text": "A maintenance reminder schedule per installed system, sent automatically to customers who opted in.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "Do you offer cleaning or maintenance visits?",
+      "free_stops": "Reminder timing and service offers are in the solution document."
+    },
+    {
+      "id": "p10_credit_customers",
+      "n": 10,
+      "words": "Dealers in other cities sell our stock but pay late",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List what each dealer owes and since when, so the exposure is clear",
+        "Set a credit limit per dealer, so balances can't keep growing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A dealer ledger with balances, limits and automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How many dealers buy on credit?",
+      "free_stops": "Credit rules and reminders are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any system sizing, roof structure, wiring, earthing, battery or fire safety advice; a qualified engineer decides. Any prediction of savings, payback, generation or that a bill will drop. Any help selling used panels as new, changing serial labels, faking warranties, misdeclaring imports or bribing utility staff. Any request to record customer names, addresses, meter or reference numbers, IDs or bank details. Any view on subsidies, tax or utility policy; electrocution, roof falls or battery fire mean emergency services first."
+  ],
+  "sample_reply": {
+    "person": "Net metering file ke status ke liye roz itni calls aati hain, koi hal hai is ka?",
+    "pi": "Ji haan, is ka seedha hal mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Har pending file ki ek list banayen jis mein us ka current stage likha ho, taake office ka koi bhi banda jawab de sake. 2 Har intezar karne wale customer ko ek dafa status ka chhota sa update bhej dein, taake unhein pata ho baat kahan hai. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har file ka tracker, aur file aage badhte hi customer ko WhatsApp pe update. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

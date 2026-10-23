@@ -1,0 +1,223 @@
+{
+  "industry": "watches_eyewear_and_opticians",
+  "name": "Watches, eyewear and opticians",
+  "sector": "7.A Retail and consumer (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_delivery_late",
+      "n": 1,
+      "words": "Customer comes to collect glasses and the lab hasn't sent them",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "List every job currently at the lab with its promised date, because it shows how many are already late",
+        "Compare the lab's real turnaround with what you promise, because the gap is often in the promise."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "customer_messaging"
+        ],
+        "text": "every lens job tracked from sent to collected, late jobs flagged each morning and a \"ready\" message sent to customers who agree.",
+        "tool_words": []
+      },
+      "ask_first": "Is that an outside lab or your own?",
+      "free_stops": "job stages, chase rules and customer messages are set out in the solution document."
+    },
+    {
+      "id": "p2_rework",
+      "n": 2,
+      "words": "Lens orders go to the lab wrong, and we remake a lot at our cost",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Go through last month's remakes and note the cause of each, because it shows whether the error starts at your counter or the lab",
+        "Have a second person look over job cards before they go out, because most entry errors are caught by fresh eyes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "field_checks"
+        ],
+        "text": "a job card that can't be sent with missing details, a second-person check, and a remake log by cause across branches.",
+        "tool_words": []
+      },
+      "ask_first": "Who fills the job card today, the same person every time?",
+      "free_stops": "the job-card fields and check steps go in the solution document."
+    },
+    {
+      "id": "p3_no_visibility",
+      "n": 3,
+      "words": "Thousands of frame SKUs, no idea which colours and sizes are there",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Count one full wall properly, because it shows how far the records are off",
+        "Pull out styles with no sale in a long time, because they hide what's really available."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "frame stock by style, colour, size and branch with barcode scanning, low-stock alerts and a slow-mover list.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many frame styles do you carry?",
+      "free_stops": "how stock is labelled, scanned and reordered is kept for the solution document."
+    },
+    {
+      "id": "p4_expiry_wastage",
+      "n": 4,
+      "words": "Contact lens boxes expire on the shelf",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Check every box's expiry once and move the earliest to the front, because it stops new stock being sold first",
+        "Note which powers expire most, because those can be ordered in smaller lots."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "batch and expiry tracking with first-expiry-first-out alerts well before boxes expire, across branches.",
+        "tool_words": []
+      },
+      "ask_first": "Do you keep contact lens stock or order per customer?",
+      "free_stops": "alert timing and reorder rules are detailed in the solution document."
+    },
+    {
+      "id": "p5_after_sales",
+      "n": 5,
+      "words": "Watches sent for repair get lost track of, and customers say we scratched them",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "List every watch currently out for service with its date sent, because it shows what's overdue",
+        "Photograph watches at intake from today, because it settles condition disputes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a repair log with intake photos, condition notes, service-centre handoff and return dates, and updates to customers who agree.",
+        "tool_words": []
+      },
+      "ask_first": "Are repairs done in-house or sent to a service centre?",
+      "free_stops": "the intake and handoff process is designed in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Insurance claim forms take half the day, and claims are paid late or rejected",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid claim with its age, because it shows what's really owed",
+        "Note the reason for each recent rejection, because most repeat."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "dashboards_reports"
+        ],
+        "text": "a claim tracker (submitted, rejected with reason, paid) with document checklists and ageing; it holds claim status only, not patient details.",
+        "tool_words": []
+      },
+      "ask_first": "Which part takes longest, filling forms or chasing payment?",
+      "free_stops": "checklists per insurer and the tracking flow go in the solution document."
+    },
+    {
+      "id": "p7_repeat_low",
+      "n": 7,
+      "words": "Nobody reminds customers when it's time for a new eye test",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Start asking customers at collection whether they'd like a reminder, saving contacts only with their permission",
+        "Note which month each opted-in customer is due, because timing matters more than frequency."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "booking_scheduling"
+        ],
+        "text": "reminders sent automatically only to customers who agreed, with a link to book a slot.",
+        "tool_words": []
+      },
+      "ask_first": "Do you keep any record of customers who'd like to hear from you?",
+      "free_stops": "reminder timing and booking flow are kept for the solution document."
+    },
+    {
+      "id": "p8_booking_appointments",
+      "n": 8,
+      "words": "The optometrist is only here a few days, so test bookings clash",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Move all bookings into one shared diary, because clashes come from separate books",
+        "Leave walk-in gaps on the busiest days, because they absorb overruns."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "an online booking page tied to the optometrist's days, with reminders and a daily list for the front desk.",
+        "tool_words": []
+      },
+      "ask_first": "How do people book today?",
+      "free_stops": "slot design and reminder flow go in the solution document."
+    },
+    {
+      "id": "p9_manual_reports",
+      "n": 9,
+      "words": "Brands want monthly sell-out reports and we compile them by hand",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Ask each brand which figures they actually need, because many reports carry extras",
+        "Check whether your POS can export sales by brand, because that removes most retyping."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports",
+          "integration"
+        ],
+        "text": "sell-out reports generated straight from POS data in each brand's format, every month.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "What system do you use for billing?",
+      "free_stops": "the report mapping per brand is kept for the solution document."
+    },
+    {
+      "id": "p10_cash_mismatch",
+      "n": 10,
+      "words": "Battery and strap jobs are cash and never recorded properly",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Record every small job for one week, because it shows how much was going unrecorded",
+        "Count that cash separately at closing, because it stops it mixing with sales."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a quick entry for every small job on phone, matched against the day's cash at close.",
+        "tool_words": []
+      },
+      "ask_first": "Who handles the repair counter cash?",
+      "free_stops": "the entry and close steps go in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any reading of a prescription, lens suggestion for a symptom, or comment on whether someone needs a test; for sudden vision loss, eye injury or chemicals in the eye, say get emergency care now. Anything requiring prescriptions, test results, insurance member IDs or customer identities in the chat. Whether grey-market or parallel imports are legal, or whether a watch is genuine. Help with inflated or false insurance claims, or selling replicas as genuine. Advice on optometrist licensing; say \"check with your regulator or adviser\"."
+  ],
+  "sample_reply": {
+    "person": "Can you suggest a fix for the lab problem? Jobs go out in a paper envelope with a WhatsApp message and half the time they aren't back when the customer arrives.",
+    "pi": "Yes, this can be fixed. 1. List every job currently at the lab with its promised date, so you can see how many are already late. 2. Compare the lab's real turnaround with the dates you give customers, because the gap is often in the promise. Workzap can do this automatically for you: every job tracked from sent to collected, late ones flagged each morning, and customers told when their glasses are ready. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

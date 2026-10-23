@@ -1,0 +1,197 @@
+{
+  "industry": "packaging_and_corrugation",
+  "name": "Packaging and corrugation",
+  "sector": "7.D Manufacturing and industry (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_wrong_location",
+      "n": 1,
+      "words": "Dies and plates can't be found when the repeat order comes",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Label every die and plate once with customer and job, so they can be found",
+        "Give each customer a fixed shelf"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A die and plate register with storage location, condition and customer, searchable on phone.",
+        "tool_words": []
+      },
+      "ask_first": "How often does a repeat order need a new plate?",
+      "free_stops": "Coding and storage layout are set out in the solution document."
+    },
+    {
+      "id": "p2_order_errors",
+      "n": 2,
+      "words": "Boxes made in the wrong size or ply",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Check the next job order against the customer's approved spec before it goes to the floor",
+        "Note where the last few mistakes started"
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "job_tracking A digital job order with size, ply, flute, paper grade, print and die and plate references, sent to the floor from the approved spec.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How job orders flow from sales to machines is covered in the solution document."
+    },
+    {
+      "id": "p3_price_increases_supplier",
+      "n": 3,
+      "words": "Paper reel prices change every month and contracts are fixed",
+      "category": "margin_cost",
+      "subtype": "price_increases_supplier",
+      "quick_ideas": [
+        "Work out cost per box at today's paper rate for your top customers' boxes",
+        "Compare it with what you charge"
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A quote calculator using live paper rates, board area, wastage allowance and printing costs.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the cost is built and updated is detailed in the solution document."
+    },
+    {
+      "id": "p4_raw_material_shortage",
+      "n": 4,
+      "words": "Kraft paper short in the market, we can't start the job",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "Count reel stock once by GSM, BF and width",
+        "Match it against this month's jobs, so shortages show early"
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A reel stock register by GSM, BF, width and supplier with consumption per job and reorder alerts.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How consumption and reorder levels are worked out is set out in the solution document."
+    },
+    {
+      "id": "p5_wastage_cost",
+      "n": 5,
+      "words": "Trim and setup waste too high",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Weigh trim and setup waste per machine for one week",
+        "Note which jobs create the most"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "dashboards_reports A production log per machine for output, setup and trim waste and downtime reasons.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How waste is measured and compared is kept for the solution document."
+    },
+    {
+      "id": "p6_cash_leakage",
+      "n": 6,
+      "words": "Waste paper sold, money and weight don't match",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Weigh the next waste load yourself before it leaves",
+        "Route waste sales through the office only"
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A waste paper weighing and sales register matched with gate passes.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Weighing and matching steps are covered in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Big FMCG customers pay late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every customer with what is due and since when",
+        "Follow up on the oldest few this week"
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A customer ledger with ageing, credit limits and WhatsApp reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing and limits are set out in the solution document."
+    },
+    {
+      "id": "p8_owner_bottleneck",
+      "n": 8,
+      "words": "Quotes take a day because only one person can calculate them",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Write down the rates and allowances that person uses",
+        "Let a second person prepare quotes for review"
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "custom_build A quote calculator anyone in sales can use, with approval in one tap.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the calculator is set up is detailed in the solution document."
+    },
+    {
+      "id": "p9_manual_reports",
+      "n": 9,
+      "words": "Monthly production and waste report is done in Excel by hand",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Decide the few numbers you actually need each month",
+        "Have one person own them"
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A monthly owner report on output, waste, top customers by volume and margin, and overdues, pulled automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which numbers go in and where each comes from is set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any advice on food-contact, pharma or dangerous goods packaging compliance, or box strength specifications for regulated shipments. Any help copying another brand's packaging or printing counterfeit branded boxes. Fake invoices, under-invoicing or misdeclaring imported reels. Any judgement on liability for weak boxes; note the testing and records gap only. Ink or adhesive chemistry; steam burns and godown fires are emergencies. Storing customer contacts or worker identities."
+  ],
+  "sample_reply": {
+    "person": "Repeat order aata hai to purana die aur plate dhoondne mein aadha din lagta hai, kabhi milta hi nahi. Iska koi hal?",
+    "pi": "Ji haan, iska hal mumkin hai aur isi hafte shuruaat ho sakti hai. 1 Har die aur plate pe ek dafa customer aur job ka label laga dein, taa ke woh dhoondna aasaan ho. 2 Har customer ka ek fixed shelf tay kar dein, taa ke cheez hamesha usi jagah mile. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: phone pe die aur plate register jahan har ek ki jagah aur haalat darj ho, aur repeat order aate hi sahi die aur plate ka pata saamne aa jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

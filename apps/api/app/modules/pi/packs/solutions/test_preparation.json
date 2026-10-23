@@ -1,0 +1,242 @@
+{
+  "industry": "test_preparation",
+  "name": "Test preparation O/A Levels, MDCAT, ECAT, IELTS, SAT",
+  "sector": "7.J Education and childcare",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_lead_followup_slow",
+      "n": 1,
+      "words": "When the test date is announced, hundreds of messages come in and we can't reply",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Put cohort dates, branches and how to enrol on one page you can link to, so the same answer isn't typed hundreds of times",
+        "Split the season's enquiries between named staff, so every message has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "customer_messaging A WhatsApp first reply that goes out automatically on announcement day, then hands each enquiry to a counsellor with a follow-up queue and response times measured per branch.",
+        "tool_words": []
+      },
+      "ask_first": "Who answers the messages today — one person or a team?",
+      "free_stops": "The reply flow, hand-off rules and queue timings are kept for the document."
+    },
+    {
+      "id": "p2_seasonal_planning",
+      "n": 2,
+      "words": "The whole year depends on three months before MDCAT",
+      "category": "planning_growth",
+      "subtype": "seasonal_planning",
+      "quick_ideas": [
+        "List which months bring in most of the year's income once, so the quiet months are planned rather than survived",
+        "Choose one off-season offer to test, such as an early-registration or repeater batch, so the halls aren't empty."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A cohort and cash view by month that shows each season's enrolments and collections against the quiet months, updated daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How the season plan is modelled from your past cohorts is in the document."
+    },
+    {
+      "id": "p3_campaign_roi_unknown",
+      "n": 3,
+      "words": "Ad spend triples in season and I can't see which ads filled seats",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Ask every new enrolment where they heard of you, so you get a rough source count this season",
+        "Give each main ad its own WhatsApp link, so enquiries can be told apart."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "Every enquiry tagged to the ad, influencer or branch that brought it and followed to a paid seat, measured across the season.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the codes are set up and tied to enrolments is kept for the document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "Students pay the first installment and disappear after the mock",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List the installments overdue right now, by enrolment number, so the size of the gap is clear",
+        "Decide your own rule for overdue access to test series and recordings, so staff don't decide case by case."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "integration An installment schedule that reminds automatically and pauses or restores online access under the rule you set, with collections measured per cohort.",
+        "tool_words": [
+          "integration"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "The reminder sequence and access rules are set out in the document."
+    },
+    {
+      "id": "p5_refunds",
+      "n": 5,
+      "words": "Refund and transfer requests are handled on WhatsApp with no record",
+      "category": "cash_collections",
+      "subtype": "refunds",
+      "quick_ideas": [
+        "Write every open refund or transfer request into one list, so nothing is forgotten or paid twice",
+        "Have one person approve them, so decisions are consistent; for the wording of your policy, talk to your lawyer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A refund and transfer log with approval and status for every request, reported per cohort.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The request flow and approval steps are kept for the document."
+    },
+    {
+      "id": "p6_fraud",
+      "n": 6,
+      "words": "One paid login, ten users on our recorded lectures",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Check which accounts were used from several places at once, so you know how widespread sharing is",
+        "Reset passwords on the accounts that stand out, so the current sharing stops."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "Device-limited logins and account-number watermarking on videos, with sharing alerts every day.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The sharing signals and how access is limited are kept for the document."
+    },
+    {
+      "id": "p7_stockout",
+      "n": 7,
+      "words": "Printed books run out mid-course",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Compare books in store with confirmed enrolments today, so you know if a reprint is due",
+        "Ask the printer for their real lead time, so orders go out early enough."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Book stock linked to enrolments per branch, with an automatic alert when a reprint is needed in time for the printer.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reorder triggers per title and branch are in the document."
+    },
+    {
+      "id": "p8_manual_work",
+      "n": 8,
+      "words": "Mock papers are checked by hand and results take a week",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Time how long one mock takes to check, so you know what it really costs",
+        "Split the checking by section between instructors, so results come back sooner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "An online mock platform with automatic marking and cohort-level results, without names in owner reports.",
+        "tool_words": [
+          "platform"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "The marking setup and reports are kept for the document."
+    },
+    {
+      "id": "p9_accountability",
+      "n": 9,
+      "words": "Instructors on per-session pay claim sessions that didn't happen",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Compare this month's claims with the timetable before paying, so differences show",
+        "Ask the front desk to note when each session actually starts, so there is a second record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Each session logged and matched to the timetable automatically before pay, with differences flagged per branch.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The matching rules for swaps and cancellations are in the document."
+    },
+    {
+      "id": "p10_discount_abuse",
+      "n": 10,
+      "words": "Influencer discount codes are used by everyone",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Retire the old open codes, so the leak stops",
+        "Give each influencer their own code from now on, so use can be traced."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "Codes per influencer with usage limits and expiry, and each one's enrolments reported automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The code limits and reporting are kept for the document."
+    },
+    {
+      "id": "p11_no_dashboard",
+      "n": 11,
+      "words": "I can't see enrolments, collections and dropouts per cohort in one place",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Choose the three numbers you want per cohort each week, so the report has a shape",
+        "Ask one person to collect them once, so you see where the data lives."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "One owner screen with revenue per cohort, ad spend per enrolment, collections and branch comparison, updated daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How the data is pulled together is set out in the document."
+    }
+  ],
+  "never_say": [
+    "Any guarantee of scores, bands, merit or admission chances, or help writing such claims. Anything about student visas, study permits, points or immigration, even for IELTS and CELPIP students. Any help with leaked papers, proxy test-takers, fake score reports or certificates. Legal advice on piracy or refunds; pi says \"talk to your lawyer\". Any idea that collects students' names, scores, passport numbers or test-booking logins. Covert monitoring of students' devices or webcams."
+  ],
+  "sample_reply": {
+    "person": "MDCAT ki date aati hai to ek din mein sainkron messages aa jate hain aur hum reply nahi kar paate. Iska koi hal hai?",
+    "pi": "Ji haan, ye bilkul theek kiya ja sakta hai aur shuruaat isi hafte ho sakti hai. 1 Cohort dates, branches aur enrolment ka tareeqa ek page pe rakh dein, taake har banda wahi jawab baar baar type na kare. 2 Season ke messages naam ke saath staff mein baant dein, taake har enquiry ka koi zimmedar ho. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai — pehla reply foran, phir counsellor ko hand-off aur follow-up, aur har branch ka response time saamne. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

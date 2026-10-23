@@ -1,0 +1,220 @@
+{
+  "industry": "auto_workshops_and_service_centres",
+  "name": "Auto workshops and service centres",
+  "sector": "7.G Transport, mobility and aviation (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_complaints",
+      "n": 1,
+      "words": "Customer approved one amount, the final bill is higher, then a fight",
+      "category": "customers_retention",
+      "subtype": "complaints",
+      "quick_ideas": [
+        "Put every estimate in writing before work starts, so there's something to point to",
+        "Get the customer's written okay for any extra work, so surprises are agreed first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "workflow_automation"
+        ],
+        "text": "a digital job card where the estimate and any extra work go to the customer on WhatsApp for a one-reply approval, logged on the job every time.",
+        "tool_words": []
+      },
+      "ask_first": "Is the estimate written today, or given verbally?",
+      "free_stops": "The approval flow and job card layout are in the solution document."
+    },
+    {
+      "id": "p2_supplier_late",
+      "n": 2,
+      "words": "Cars sit for days because parts haven't come",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_late",
+      "quick_ideas": [
+        "List every car waiting for a part with the supplier and promised date, so you know who to chase",
+        "Tell the customer the expected date as soon as you have it, so they hear it from you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a parts request tracker showing supplier, expected date and car waiting, with overdue alerts.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Supplier records and alert rules are in the solution document."
+    },
+    {
+      "id": "p3_rework",
+      "n": 3,
+      "words": "Same car comes back next week with the same problem",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Link each comeback to its original job, so patterns show",
+        "Talk through the week's comebacks with the team once, so causes are discussed, not argued."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a comeback log tied to the original job card, showing patterns by job type and mechanic over time.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How comebacks are classified and reviewed is in the solution document."
+    },
+    {
+      "id": "p4_performance_unknown",
+      "n": 4,
+      "words": "I don't know which mechanic is productive and which is sitting",
+      "category": "people_staff",
+      "subtype": "performance_unknown",
+      "quick_ideas": [
+        "Note on each job card who did it and when it started and finished, so work can be counted",
+        "Total jobs per mechanic at the end of the week, so you have a first picture."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a bay board and mechanic view of jobs done, hours booked and comebacks, updated every day.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The measures used and how they're shown are in the solution document."
+    },
+    {
+      "id": "p5_shrinkage_theft",
+      "n": 5,
+      "words": "Parts are taken from stock and never billed",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Issue parts only against a job card, so every part has a home",
+        "Count your fast- moving parts and oils once this week, so you know the starting gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "job_tracking"
+        ],
+        "text": "a parts register where every issue is tied to a job so it reaches the bill, with low-stock alerts.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Issue rules and count routines are in the solution document."
+    },
+    {
+      "id": "p6_customer_communication",
+      "n": 6,
+      "words": "Customers keep calling to ask if the car is ready",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Give a promised time at check-in, so the customer knows when to expect it",
+        "Let the customer know the moment it's ready, so they don't need to call."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "automatic \"car ready\" and delay messages from the job card, with the customer's permission.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Message timing and triggers are in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Fleet companies pay very late and cash is stuck",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List each fleet client's open invoices by age, so you know who to chase first",
+        "Agree one payments contact at each client, so chasing goes to the right person."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a ledger for fleet and insurance accounts with ageing alerts and statements sent automatically every month.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Statement timing and reminder steps are in the solution document; credit terms are for your accountant."
+    },
+    {
+      "id": "p8_checklists_not_done",
+      "n": 8,
+      "words": "No damage photos before work, then the customer says we scratched it",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Photograph every car at check-in, so its condition is on record",
+        "Make that reception's job, so it doesn't depend on a busy mechanic."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "check-in photos on phone saved against each job card with a time stamp, every car, every time.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The photo routine and storage are in the solution document."
+    },
+    {
+      "id": "p9_cash_mismatch",
+      "n": 9,
+      "words": "Cash at the counter is less than the jobs done",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Number job cards and bills in sequence, so a missing one stands out",
+        "Count cash against closed jobs at closing, so gaps show the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily cash-up matching payments to closed jobs, sent to the owner each evening.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The cash-up steps are in the solution document."
+    },
+    {
+      "id": "p10_repeat_low",
+      "n": 10,
+      "words": "Customers forget us after the oil change",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Tell customers their next service date at pickup, so they leave with a reason to return",
+        "Ask permission to remind them, so you can reach out before AC or tyre season."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "booking_scheduling"
+        ],
+        "text": "next-service reminders with booking slots, sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing and booking setup are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any diagnosis, or that a car is safe to drive; refer to a qualified technician, and emergency services if anyone is hurt. Advice on waste oil, coolant, acid or paint disposal rules. Insurance claim advice, or help inflating claims, faking invoices or tampering with emissions or odometers. Labour law, wages or apprentice-age advice. Covert surveillance of staff or naming individuals as thieves. Storing customer plates with names or phone numbers."
+  ],
+  "sample_reply": {
+    "person": "Estimate aur final bill ka jhagra roz hota hai, koi solution do.",
+    "pi": "Haan, is jhagre ka hal mumkin hai, aur aaj se shuruaat ho sakti hai. 1 Kaam shuru hone se pehle har estimate likh kar dein, taake dono ke paas ek hi raqam ho. 2 Extra kaam ke liye pehle customer ki likhit haan lein, taake bill pe koi hairani na ho. Workzap yeh sab aap ke liye automatically kar sakta hai: digital job card jis se estimate aur extra kaam customer ko WhatsApp pe approval ke liye khud jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

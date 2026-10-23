@@ -1,0 +1,242 @@
+{
+  "industry": "edtech_and_online_course_businesses",
+  "name": "Edtech and online course businesses",
+  "sector": "7.J Education and childcare",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_conversion_low",
+      "n": 1,
+      "words": "Webinar sign-ups are high but only a few buy",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Count sign-ups, attendees and buyers for the last webinar, so you see where people drop",
+        "Ask a few non-buyers why once, so you hear it in their words."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A funnel view from ad to sign-up to attendance to purchase, per webinar and course, updated daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How the funnel stages are measured is kept for the document."
+    },
+    {
+      "id": "p2_lead_followup_slow",
+      "n": 2,
+      "words": "Our sales team calls leads days late",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Check how long this week's leads waited for a first call, so the delay is measured",
+        "Give each new lead a named owner, so nobody assumes someone else called."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Leads routed to the sales team the moment they arrive, with speed alerts and call outcomes logged.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The routing and alert rules are in the document."
+    },
+    {
+      "id": "p3_payment_methods",
+      "n": 3,
+      "words": "Card payments fail a lot for Pakistani learners",
+      "category": "cash_collections",
+      "subtype": "payment_methods",
+      "quick_ideas": [
+        "List this month's failed payments by method, so you see which one fails",
+        "Offer a local alternative such as a wallet or bank transfer, so a failed card isn't a lost sale."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "Local payment options connected alongside cards, with failed payments retried and followed up automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The payment setup and retry flow are kept for the document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "Installment buyers stop paying after month two but keep access",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List overdue installment accounts today, so the size of it is clear",
+        "Decide your own rule for overdue access, so it's applied the same way."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "integration An installment manager that reminds automatically and pauses or restores course access under your rule.",
+        "tool_words": [
+          "integration"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "The reminder and access rules are in the document."
+    },
+    {
+      "id": "p5_refunds",
+      "n": 5,
+      "words": "Refund requests come through email, DMs and WhatsApp with no record",
+      "category": "cash_collections",
+      "subtype": "refunds",
+      "quick_ideas": [
+        "Put every open refund request into one list, so none are missed or paid twice",
+        "Have one person decide them, so answers are consistent; for your obligations, talk to your lawyer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A refund and chargeback register with reasons and access history for each case.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The request flow and evidence kept per case are kept for the document."
+    },
+    {
+      "id": "p6_theft_external",
+      "n": 6,
+      "words": "Logins are shared — one account, many viewers",
+      "category": "loss_security",
+      "subtype": "theft_external",
+      "quick_ideas": [
+        "Check which accounts were used from several places at once, so you know how big it is",
+        "Reset the accounts that stand out, so current sharing stops."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "Sharing detection from login signals and per-account watermarking on videos, with alerts every day.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The detection signals are in the document."
+    },
+    {
+      "id": "p7_churn_subscription",
+      "n": 7,
+      "words": "Subscribers cancel after the first month",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Ask recent cancellers for their one main reason, so you know what to fix",
+        "Look at what new subscribers do in their first week, so you see who never really started."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "customer_messaging Churn tracked by cohort and reason, with first-week messages sent automatically to those who haven't started.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The messages and churn reports are kept for the document."
+    },
+    {
+      "id": "p8_slow_response",
+      "n": 8,
+      "words": "Support is flooded with login problems",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Sort a week of support messages by topic, so you see which problems repeat",
+        "Write one clear help page for the top issue, so learners can fix it themselves."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "WhatsApp support intake with automatic answers for login and access issues and response times measured.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The help flow and response targets are in the document."
+    },
+    {
+      "id": "p9_commission_disputes",
+      "n": 9,
+      "words": "Affiliates claim sales we can't verify",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Give each affiliate their own link or code from now on, so sales can be traced",
+        "Agree in writing what counts as a sale, so disputes have a rule."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "Affiliate links and codes tracked to purchases, with monthly commission statements produced automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The tracking and statement setup are kept for the document."
+    },
+    {
+      "id": "p10_software_not_connected",
+      "n": 10,
+      "words": "LMS, payment gateway and CRM don't talk, so we copy-paste",
+      "category": "tech_systems",
+      "subtype": "software_not_connected",
+      "quick_ideas": [
+        "Write down every place data is copied between systems, so you see the real load",
+        "Time one week of copying, so you know what it costs your team."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "LMS, payments and CRM connected so each sale, refund and access change updates everywhere at once.",
+        "tool_words": [
+          "crm"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "Which systems connect and how is set out in the document."
+    },
+    {
+      "id": "p11_no_dashboard",
+      "n": 11,
+      "words": "I can't see revenue, refunds and churn per course in one place",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Choose the few numbers you want per course weekly, so the report has a shape",
+        "Pull them by hand once, so you see where each lives."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "One screen with revenue, refunds, churn and ad spend per course and channel, updated daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How the data is pulled together is kept for the document."
+    }
+  ],
+  "never_say": [
+    "Anything on data-protection or children's privacy law, app-store rules, consumer refund law, tax or fundraising; pi says \"talk to your lawyer or accountant\". Help with dark patterns, fake countdowns, fake reviews or fake enrolment counters. Income or job guarantees in course marketing. Any idea that collects learners' names, emails, phones, logins, payments or progress, and nothing at all about children. Help pirating content or covert tracking of learners' devices. Visa or migration advice for immigration-linked courses."
+  ],
+  "sample_reply": {
+    "person": "Our biggest leak is shared accounts. One student buys, then the whole group logs in. What can we do?",
+    "pi": "Yes, this can be brought under control, and you can start today. 1 Check which accounts were used from several places at once, so you know how widespread it is. 2 Reset the accounts that stand out, so the current sharing stops. Workzap can do this automatically for you, spotting sharing every day and watermarking videos by account. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

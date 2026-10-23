@@ -1,0 +1,243 @@
+{
+  "industry": "warehousing_and_3pl",
+  "name": "Warehousing and 3PL",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_count_mismatch",
+      "n": 1,
+      "words": "Client says they sent more cartons than we counted",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count every inbound against the client's packing list before signing, so gaps are raised at the dock",
+        "Photograph damaged or short cartons on arrival, so you have proof."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "An inbound receiving app that counts against the ASN, captures damage photos and sends the client a discrepancy report the same day.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "The receiving steps are designed in the solution document."
+    },
+    {
+      "id": "p2_wrong_location",
+      "n": 2,
+      "words": "Pickers can't find items because they were put in the wrong place",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Label every bin, so locations can be checked",
+        "Have putaway confirmed with the location written down, so stock is findable."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A location-based stock register with bin labels and putaway confirmation.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The location scheme is set out in the solution document."
+    },
+    {
+      "id": "p3_packing_errors",
+      "n": 3,
+      "words": "Wrong items get shipped to the client's customers",
+      "category": "orders_fulfilment",
+      "subtype": "packing_errors",
+      "quick_ideas": [
+        "Sort pick lists by location, so pickers walk less and grab less wrongly",
+        "Add a second check on high-value orders before sealing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "Pick lists sorted by location with scan-to-confirm, catching wrong items before packing.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The pick and check flow is designed in the solution document."
+    },
+    {
+      "id": "p4_pricing_errors",
+      "n": 4,
+      "words": "We don't charge clients for all the handling we actually do",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Log every extra activity for a week (labelling, repacking, extra labour) per client, so you see what goes unbilled",
+        "Agree in writing with clients what counts as billable handling."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Activity-based billing that captures storage days, pallets, picks, packs and labelling automatically into a monthly invoice per client.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How activities are captured and priced into invoices is set in the solution document."
+    },
+    {
+      "id": "p5_manual_reports",
+      "n": 5,
+      "words": "Billing each client every month takes days in Excel",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "List every sheet that feeds billing, so you see where the days go",
+        "Pick one client to bill from a single sheet next month, as a test."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A billing view that pulls all logged activity per client into one draft invoice ready each month-end.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How the billing data is joined is mapped in the solution document."
+    },
+    {
+      "id": "p6_customer_communication",
+      "n": 6,
+      "words": "Clients want live stock reports and we send Excel once a week",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Ask your top clients which few numbers they actually want, so reports are useful",
+        "Send those numbers more often for one client, as a test."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A client portal or WhatsApp report giving live stock, orders shipped and inbound status.",
+        "tool_words": [
+          "portal"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "What each client sees is set in the solution document."
+    },
+    {
+      "id": "p7_expiry_wastage",
+      "n": 7,
+      "words": "Expired or near-expiry goods get shipped because FEFO isn't followed",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "List batches near expiry for each client, so they can be picked first",
+        "Mark expiry dates clearly at the location."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "FEFO picking rules and expiry alerts per client batch.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Alert rules per client are set in the solution document."
+    },
+    {
+      "id": "p8_integration_marketplace",
+      "n": 8,
+      "words": "Our WMS doesn't connect to clients' Shopify or marketplace accounts",
+      "category": "tech_systems",
+      "subtype": "integration_marketplace",
+      "quick_ideas": [
+        "List which clients send orders by email, WhatsApp or spreadsheet, so you see the retyping load",
+        "Ask the busiest clients which store platforms they use."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "Order intake that accepts client spreadsheets or connects to Shopify and marketplaces, so orders arrive without retyping.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Which connections are made is mapped in the solution document."
+    },
+    {
+      "id": "p9_attendance_lateness",
+      "n": 9,
+      "words": "Daily-wage labour don't turn up on peak days",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Confirm workers the night before each peak day, so gaps are known in time",
+        "Keep a standby list, so there's someone to call."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "Shift scheduling with confirmations and reminders, planned from clients' sale calendars.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The scheduling rules are set in the solution document."
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "I don't know which clients are profitable for the space they take",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Compare one client's revenue against the space and labour they used last month, so you have a first view",
+        "Note clients with lots of handling but low fees."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A client profitability view of revenue vs space and labour used, refreshed monthly.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How costs are assigned to clients is set in the solution document."
+    },
+    {
+      "id": "p11_checklists_not_done",
+      "n": 11,
+      "words": "No one does the daily housekeeping and safety checklist properly",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Use the checklist your safety adviser gives you, so the content is right",
+        "Name who does it each shift."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A daily phone checklist with photo proof per item, with missed checks flagged to the manager.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the checklist is run and reported is designed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on fire safety, racking ratings, forklift certification or hazardous goods storage. Bonded or free-zone rules and customs releases; refer to their clearing agent or the authority. Help adjusting client stock records to hide losses, or storing prohibited or undeclared goods. Labour or agency staffing law and visas. Storing client end-customer names or addresses. For fire, racking collapse or injury, emergency services 1122/16, 997/999, 911 come first."
+  ],
+  "sample_reply": {
+    "person": "We run a 3PL with around twenty clients and monthly billing takes my accountant most of a week. Can this be fixed?",
+    "pi": "Yes, billing can be made much lighter, and you can start this week. 1. List every sheet that feeds billing, so you can see exactly where the days go. 2. Log a week of extra handling per client, so you can see what currently goes unbilled. Workzap can do this automatically for you: storage, picks, packs and labelling captured as they happen and turned into each client's monthly invoice. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

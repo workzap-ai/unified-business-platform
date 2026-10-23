@@ -1,0 +1,220 @@
+{
+  "industry": "ngos_charities_and_trusts",
+  "name": "NGOs, charities and trusts",
+  "sector": "7.M Digital economy, social and public sector",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_cash_mismatch",
+      "n": 1,
+      "words": "Donations come by cash, bank, JazzCash and online — matching them is a nightmare",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Bring every channel's donations for one week into a single list, so gaps show up",
+        "Match that list against bank and wallet statements on one fixed day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a donation register capturing every channel with fund type, matched daily against bank and wallet credits.",
+        "tool_words": []
+      },
+      "ask_first": "What are the main ways donations come in?",
+      "free_stops": "How each channel feeds the register is set out in the solution document."
+    },
+    {
+      "id": "p2_customer_communication",
+      "n": 2,
+      "words": "Donors ask for receipts and we take weeks",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Clear the current receipt backlog in one sitting",
+        "Agree a fixed turnaround for receipts from now on."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "automatic receipts by WhatsApp or email as soon as a donation is recorded.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The receipt flow goes in the solution document; receipting rules are for your accountant."
+    },
+    {
+      "id": "p3_quality_inconsistent",
+      "n": 3,
+      "words": "Zakat and general funds get mixed in one account sheet",
+      "category": "operations_process",
+      "subtype": "quality_inconsistent",
+      "quick_ideas": [
+        "Give each fund its own column in your records, so balances can be seen separately",
+        "Ask your scholars how they want fund separation handled, then record it that way."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a fund balance view showing received, allocated, spent and remaining per fund and project.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The fund structure in the system is designed in the solution document; rulings stay with your scholars."
+    },
+    {
+      "id": "p4_manual_reports",
+      "n": 4,
+      "words": "Grant reports take the whole team a month",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Keep spending tagged by grant and budget line as it happens, not at report time",
+        "Put every report due date in one calendar."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a grant tracker with spending against each budget line, tranche schedule and a donor report generator.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The report templates and tagging set-up are prepared in the solution document."
+    },
+    {
+      "id": "p5_churn_subscription",
+      "n": 5,
+      "words": "Monthly donors drop off and we don't notice",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Check once which regular donors have missed recent months",
+        "Send lapsed donors a thank-you update on what their giving did."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "a recurring donor tracker that flags lapsed donors and schedules thank-you updates.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The flagging rules and update plan go in the solution document."
+    },
+    {
+      "id": "p6_duplicate_entry",
+      "n": 6,
+      "words": "Same family gets help twice from two centres",
+      "category": "operations_process",
+      "subtype": "duplicate_entry",
+      "quick_ideas": [
+        "Use one case code system across all centres, without names in shared lists",
+        "Have centres check the shared list before approving support."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a case workflow using case codes with role-based access and duplicate checks across centres.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The case flow and privacy controls are detailed in the solution document."
+    },
+    {
+      "id": "p7_shrinkage_theft",
+      "n": 7,
+      "words": "Ration packs short or missing at distribution",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Count packs leaving the store and packs handed out, with two people signing",
+        "Compare the two counts after every drive."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "stock_alerts"
+        ],
+        "text": "relief store stock in and out with expiry alerts and distribution counts matched after each drive.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The count and matching process is set out in the solution document."
+    },
+    {
+      "id": "p8_field_team_visibility",
+      "n": 8,
+      "words": "Field staff send updates on WhatsApp and nothing is recorded",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Agree the few things every field update must include",
+        "Have one person log this week's updates into a single sheet."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a phone update form (photos of activities, not people, plus counts and location) feeding one log.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The form fields and log design go in the solution document."
+    },
+    {
+      "id": "p9_seasonal_planning",
+      "n": 9,
+      "words": "Ramadan is our biggest month and we're never ready",
+      "category": "planning_growth",
+      "subtype": "seasonal_planning",
+      "quick_ideas": [
+        "Write down what broke last Ramadan while it is still remembered",
+        "Book volunteers and ration suppliers early, as Ramadan moves earlier each year."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling",
+          "nori_daily_read"
+        ],
+        "text": "a volunteer rota with confirmations, plus a daily Ramadan read of donations, distributions and stock.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The Ramadan plan and daily read layout are prepared in the solution document."
+    },
+    {
+      "id": "p10_licences_renewals",
+      "n": 10,
+      "words": "Registration renewals and filings keep sneaking up on us",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List every renewal, filing and audit date in one calendar",
+        "Give each one a named role responsible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a compliance calendar with reminders and document checklists for each deadline.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The calendar set-up goes in the solution document; what must be filed is for your lawyer or accountant."
+    }
+  ],
+  "never_say": [
+    "Any zakat eligibility or fund-mixing ruling — say \"please ask your scholars\". Advice on registration, tax exemption, receipting rules or audits — say \"talk to your accountant or lawyer\". Anything on routing funds around banking rules or hiding donor sources. Help inflating beneficiary numbers, fabricating reports or misusing restricted funds. Asking for donor or beneficiary names, CNIC/Emirates ID, addresses, health details or photos."
+  ],
+  "sample_reply": {
+    "person": "Ramzan mein donations cash, bank aur JazzCash se aati hain, hisaab nahi milta. Koi hal hai?",
+    "pi": "Ji haan, is ka hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1 Ek hafte ki saari donations har tareeqe se ek hi list mein layein, taake farq saamne aa jaye. 2 Us list ko ek muqarrar din bank aur wallet statement se milayein. Workzap yeh kaam aap ke liye automatically kar sakta hai: har donation fund ke saath ek register mein, roz bank aur wallet se match, aur donor ko receipt khud chali jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

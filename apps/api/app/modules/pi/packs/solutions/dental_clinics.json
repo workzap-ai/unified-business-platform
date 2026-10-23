@@ -1,0 +1,217 @@
+{
+  "industry": "dental_clinics",
+  "name": "Dental clinics",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_conversion_low",
+      "n": 1,
+      "words": "People get a full treatment quote and then just disappear",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "List the last month's treatment quotes by reference and status, so you know how many are waiting",
+        "Call back those who said they'll think about it, with their permission, so the quote isn't forgotten."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "a treatment-plan pipeline (quoted, accepted, in progress, paused, completed) that creates follow-up tasks for reception automatically and shows acceptance by dentist and branch, with no clinical details in messages.",
+        "tool_words": []
+      },
+      "ask_first": "Which treatments are you quoting most, implants, braces or cosmetic work?",
+      "free_stops": "Follow-up timing and stages are set out in the solution document."
+    },
+    {
+      "id": "p2_capacity",
+      "n": 2,
+      "words": "Chairs sit empty in the mornings and we're overbooked after 6",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Map one week of chair bookings by hour, so the real gaps show",
+        "Offer morning slots first to flexible patients, so evenings ease."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a chair-wise calendar with WhatsApp booking, automatic reminders and a waitlist that fills cancellations, with chair use measured daily.",
+        "tool_words": []
+      },
+      "ask_first": "Are your dentists available in the mornings?",
+      "free_stops": "Slot lengths and waitlist rules are set in the solution document."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Braces patients stop paying instalments halfway through",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every open instalment plan with balance and next due date, so overdue ones stand out",
+        "Agree a written schedule with each new plan, so dates are clear from the start."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an instalment tracker that sends due-date reminders, with the patient's permission and showing only amount and date, plus an overdue list for the manager.",
+        "tool_words": []
+      },
+      "ask_first": "Do patients pay at the counter or by transfer?",
+      "free_stops": "Reminder timing and overdue steps are detailed in the solution document."
+    },
+    {
+      "id": "p4_order_tracking",
+      "n": 4,
+      "words": "We send crowns to the lab and lose track of which case is where",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "Start a lab book with case reference, lab and due date, so late cases are visible",
+        "Note the reason for each remake, so you can raise it with the lab."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a lab case tracker with sent, due, received and remake status, alerts on late cases, lab-wise remake counts and invoice matching.",
+        "tool_words": []
+      },
+      "ask_first": "Do you use one dental lab or several?",
+      "free_stops": "The tracking fields and invoice match are set in the solution document."
+    },
+    {
+      "id": "p5_commission_disputes",
+      "n": 5,
+      "words": "Associate dentists argue about their percentage every month",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Put each dentist's split and what counts as production on one signed page, so there is one reference",
+        "Decide how lab costs and remakes are treated, so they stop causing arguments."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a production and commission statement generated automatically from completed procedures and the agreed rules.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is commission on work done or fees collected?",
+      "free_stops": "How the rules are encoded stays for the solution document."
+    },
+    {
+      "id": "p6_repeat_low",
+      "n": 6,
+      "words": "Recall reminders don't go out so patients only come when in pain",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Pull a list of patients overdue for a check-up who agreed to reminders, so you see the size of the gap",
+        "Ask patients at checkout if they want a check-up reminder, so permission is collected."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a recall engine that reminds consenting patients on schedule from their last visit date, with no treatment details, and tracks who rebooked.",
+        "tool_words": []
+      },
+      "ask_first": "Are last-visit dates kept in software or on paper?",
+      "free_stops": "Recall intervals and message flow are set in the solution document."
+    },
+    {
+      "id": "p7_lead_followup_slow",
+      "n": 7,
+      "words": "Instagram brings messages but the reception replies hours later",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Check how long last week's DMs waited for a reply, so the delay is measured once",
+        "Give one person fixed times to answer DMs, so they have an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "attribution_codes — one inbox for Instagram, Facebook, Google and WhatsApp with response timers and source tracking, showing which channel fills chairs.",
+        "tool_words": []
+      },
+      "ask_first": "Who answers the DMs at the moment?",
+      "free_stops": "Routing and tracking set-up is kept for the solution document."
+    },
+    {
+      "id": "p8_discount_abuse",
+      "n": 8,
+      "words": "Receptionist gives discounts without asking",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Share one price list across branches, so quotes match",
+        "Ask for a reason on each discount this week, so you see how often it happens."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "workflow_automation — a daily cash and card close listing every discount with its approver role, across branches.",
+        "tool_words": []
+      },
+      "ask_first": "Do both branches use the same price list now?",
+      "free_stops": "Approval levels and the close format are set in the solution document."
+    },
+    {
+      "id": "p9_serial_batch_tracking",
+      "n": 9,
+      "words": "Implant components are expensive and I can't account for all of them",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Do one count of implant parts against what was used, so the gap is known",
+        "Keep them in one locked place, so access is limited."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a materials and implant register with lot numbers, minimum levels and usage per case reference, with mismatches flagged.",
+        "tool_words": []
+      },
+      "ask_first": "Who has access to implant stock today?",
+      "free_stops": "The register design and checks are in the solution document."
+    },
+    {
+      "id": "p10_record_keeping",
+      "n": 10,
+      "words": "Patient photos for marketing are on staff personal phones",
+      "category": "compliance_admin",
+      "subtype": "record_keeping",
+      "quick_ideas": [
+        "Move marketing photos to one clinic-controlled folder, so they leave personal phones",
+        "Ask your lawyer what consent and storage rules apply, so you know the requirement."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a consented-photo store with access control, replacing personal phones.",
+        "tool_words": []
+      },
+      "ask_first": "Do you collect written consent for marketing photos now?",
+      "free_stops": "Access rules and storage set-up are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Whether a treatment was needed, suitable or done well. Anything on sterilisation standards, radiation safety or materials. Suggestions to bill insurers for work not done, split invoices or back-date treatment. Legal views on photo consent; point to a lawyer. Ideas that send treatment details to patients in messages. Promises that follow-ups will turn a set share of quotes into treatment."
+  ],
+  "sample_reply": {
+    "person": "We quote a lot of implant and braces cases but most never start. How can we fix this?",
+    "pi": "Yes, there's a clear way to get a grip on this, starting this week. 1 List last month's quotes by reference and status, so you know how many are still waiting. 2 Call back the patients who said they'd think about it, with their permission, so no quote is simply forgotten. Workzap can do this automatically for you with a treatment-plan pipeline that creates follow-up tasks for reception and shows how many quotes become treatment. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

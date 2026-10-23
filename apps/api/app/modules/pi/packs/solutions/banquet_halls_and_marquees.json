@@ -1,0 +1,218 @@
+{
+  "industry": "banquet_halls_and_marquees",
+  "name": "Banquet halls and marquees",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_order_errors",
+      "n": 1,
+      "words": "Two of my managers booked the same hall for the same night",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Make one person the only one who can confirm a date, so the register has one owner",
+        "Check the season's bookings once for clashes before families start planning around them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a hall and slot calendar that blocks a date automatically only once the advance is logged, across every hall and marquee.",
+        "tool_words": []
+      },
+      "ask_first": "How many halls or lawns do you book?",
+      "free_stops": "The booking rules per hall and slot and how advances lock dates go in the solution document."
+    },
+    {
+      "id": "p2_deposit_delays",
+      "n": 2,
+      "words": "Advance is taken in cash by the booking guy and I don't see it for days",
+      "category": "cash_collections",
+      "subtype": "deposit_delays",
+      "quick_ideas": [
+        "Ask that every advance is reported to you the same day it's taken, so none sits in a pocket",
+        "Match this season's advances to dates once, to see what hasn't reached you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an advance and payment ledger per event that sends a receipt on WhatsApp the moment money is logged and shows balances due automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Do most clients pay the advance in cash or by transfer?",
+      "free_stops": "The receipt flow and how cash, transfer and balance are tracked per event stay for the solution document."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Client says 400, 550 turn up, then they argue about the extra bill",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Get the final head count from the client in writing before the event, so the bill has something to point to",
+        "Have someone do a real count at the door on the night instead of estimating."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a head-count confirmation the client approves on WhatsApp a set number of days before, with the night's actual count logged against it.",
+        "tool_words": []
+      },
+      "ask_first": "How is the final count agreed with clients now?",
+      "free_stops": "Confirmation timing, counting method and how extras are billed are in the solution document."
+    },
+    {
+      "id": "p4_wastage_cost",
+      "n": 4,
+      "words": "Food is over-cooked and thrown away, or it runs out",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Note what's left over after each event this week, to see which dishes are always over-made",
+        "Cook to the confirmed count rather than the booked one."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a kitchen planner that sets quantities per dish from the confirmed count and logs wastage after every event, measured across the season.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is catering in-house or do outside caterers come in?",
+      "free_stops": "The quantity rules per dish and the wastage tracking stay for the solution document."
+    },
+    {
+      "id": "p5_info_lost_in_whatsapp",
+      "n": 5,
+      "words": "Menu changes by the client don't reach the kitchen",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Keep one written event sheet per booking that the kitchen also sees, so changes have one home",
+        "Have the booking manager confirm the final menu with the kitchen the day before."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an event sheet per booking with menu, count, decor and timings, where every change reaches kitchen, decor and floor teams automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who takes menu changes from the client now?",
+      "free_stops": "Event sheet structure and change alerts per team are designed in the solution document."
+    },
+    {
+      "id": "p6_attendance_lateness",
+      "n": 6,
+      "words": "Daily-wage waiters don't show up on the busiest dates",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Get each waiter's confirmation for the coming peak nights now, so gaps show early",
+        "Keep a standby list for your busiest dates."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a daily-wage roster that sends confirmations automatically, shows who's confirmed per event and logs per-event payouts.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many waiters work a full wedding night?",
+      "free_stops": "Roster rules, standby handling and payout tracking stay for the solution document."
+    },
+    {
+      "id": "p7_shrinkage_theft",
+      "n": 7,
+      "words": "Crockery, chairs and covers go missing every week",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Count crockery and chairs once before and after one event, to see where losses happen",
+        "Make one person responsible for the store after each event."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "post-event counts on the phone for crockery, chairs and decor, with losses tracked per event automatically.",
+        "tool_words": []
+      },
+      "ask_first": "What goes missing most?",
+      "free_stops": "Count lists and loss reporting are set in the solution document."
+    },
+    {
+      "id": "p8_lead_followup_slow",
+      "n": 8,
+      "words": "Hundreds of WhatsApp enquiries for per-head rates and nobody follows up after a visit",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Keep a list of every family who visited the hall and the date they want, so no visit goes cold",
+        "Contact this month's visitors once, to see where each stands."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an enquiry and hall-visit tracker with automatic follow-up reminders and a record of which enquiries became bookings.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most enquiries come from?",
+      "free_stops": "Follow-up timing and the enquiry flow on WhatsApp go in the solution document."
+    },
+    {
+      "id": "p9_seasonal_dip",
+      "n": 9,
+      "words": "Wedding season is full but Ramadan and Muharram are empty",
+      "category": "sales_revenue",
+      "subtype": "seasonal_dip",
+      "quick_ideas": [
+        "List the kinds of events that do happen in quiet months (iftars, corporate dinners, small functions), since they need different selling",
+        "Reach past corporate clients once about those dates."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "WhatsApp messages to past clients (with their permission) about off-season packages, sent on schedule with replies tracked.",
+        "tool_words": []
+      },
+      "ask_first": "Which months are slowest for you?",
+      "free_stops": "Which packages to offer and when to message are planned in the solution document."
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "I don't know per-event profit after food, staff, decor and generator",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out the real cost of one recent wedding on a single page, to see what you kept",
+        "Note which cost has jumped most since you quoted."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a per-event profit report pulling revenue, food, staff, decor and power automatically after every event.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you quote per head or as a package?",
+      "free_stops": "How each cost is captured and allocated per event stays for the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on event-timing laws, one-dish or menu limits, occupancy limits or noise rules. Help evading timing rules, inspections or taxes, or anything involving payments to officials. Food safety or hygiene technical advice. Fire, gas, structural or electrical safety guidance; in any live emergency, call 1122/15 PK, 999/998/997 (UAE or 911 Canada). Legal views on planner commissions or client contracts."
+  ],
+  "sample_reply": {
+    "person": "Har doosri shadi pe guest zyada aa jate hain aur phir bill pe jhagra hota hai. Is ka koi hal hai?",
+    "pi": "Ji, is ka hal mumkin hai, aur is season mein hi farq laya ja sakta hai. 1 Final head count client se event se pehle likhit mein liya jaye, taake bill ke waqt ek pakki baat ho. 2 Event ki raat darwaze pe asal ginti ki jaye, andaze ke bajaye. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: client WhatsApp pe count confirm kare, raat ki ginti us ke saath darj ho, aur extra ka hisaab saaf nazar aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

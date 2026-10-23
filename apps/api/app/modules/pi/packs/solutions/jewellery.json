@@ -1,0 +1,244 @@
+{
+  "industry": "jewellery",
+  "name": "Jewellery (gold, diamond, artificial)",
+  "sector": "7.A Retail and consumer (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_count_mismatch",
+      "n": 1,
+      "words": "Weight in the register and on the scale don't match at month end",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Do one full weigh-in of every tray against its tags, because it shows whether the gap is in a few trays or spread across the stock",
+        "List every piece currently outside the showcase (safe, karigar, exhibition, on approval), because much \"missing\" weight is simply somewhere else."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "nori_daily_read"
+        ],
+        "text": "staff check a tray or two on phone every day by tag and weight, and the owner's morning read shows stock weight by branch with any tray that didn't match.",
+        "tool_words": []
+      },
+      "ask_first": "Do you track by piece tag, by total weight, or both?",
+      "free_stops": "the daily check rotation, tolerance limits and how the register is restructured go in the solution document."
+    },
+    {
+      "id": "p2_theft_internal",
+      "n": 2,
+      "words": "Gold given to the karigar comes back less and we can't tell why",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Settle the full balance with each karigar once, job by job, because it shows whether the difference sits with certain work or is general",
+        "Agree the allowed khot for bridal and other heavy work in writing, because anything above it then stands out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a karigar ledger where every issue and receipt is entered on phone, the running balance updates itself and the owner is alerted the moment a job crosses its allowed khot.",
+        "tool_words": []
+      },
+      "ask_first": "Do your karigars work in-house or do you send work outside?",
+      "free_stops": "how the ledger, approval steps and alert limits are set up is kept for the solution document."
+    },
+    {
+      "id": "p3_pre_orders_custom",
+      "n": 3,
+      "words": "We don't know which custom orders are pending, and the bridal set isn't ready on the promised date",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Write every open order on one list with its promised date and stage, because seeing them together shows which are already at risk",
+        "Agree a rule that the workshop finishes ahead of the customer's date, because wedding season needs a buffer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "every order tracked from bayana to handover with photo, stage and karigar, a \"due this week\" list each morning and status updates to customers who agree to them.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many custom orders run at once in peak season?",
+      "free_stops": "the stages, buffer rules and customer update flow are designed in the solution document."
+    },
+    {
+      "id": "p4_pricing_errors",
+      "n": 4,
+      "words": "Rates change during the day and staff quote yesterday's rate",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Pick one place where the day's rate is announced and make it the only source staff may quote from, because mixed sources cause wrong quotes",
+        "Note on each estimate the rate used, because disputes can then be checked."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "the owner enters the rate once and it reaches tags, billing and every salesperson's phone, time-stamped, across all branches.",
+        "tool_words": []
+      },
+      "ask_first": "How does the rate reach the counter today?",
+      "free_stops": "how the rate flows into billing and tags is kept for the solution document."
+    },
+    {
+      "id": "p5_discount_abuse",
+      "n": 5,
+      "words": "Making charges are negotiated differently by each salesman",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Go through one month of bills by salesman, because it shows who gives away the most mazdoori",
+        "Agree a lowest acceptable making charge per category with your team, because it gives everyone the same starting point."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "dashboards_reports"
+        ],
+        "text": "category rules applied at billing, an approval request to the owner below the limit, and a weekly view of discounts by salesperson.",
+        "tool_words": []
+      },
+      "ask_first": "Who decides making charges today, you or each salesman?",
+      "free_stops": "the actual bands, limits and approval routing go in the solution document."
+    },
+    {
+      "id": "p6_transfers_lost",
+      "n": 6,
+      "words": "Stock went to an exhibition and not everything came back accounted for",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Make a tag-by-tag list of what goes to the next exhibition, because without a list nobody can prove a shortfall",
+        "Have two people sign it out and back, because it removes doubt about who checked."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "tag scan out and in for exhibitions and branch moves, with an instant shortfall list for anything sent but not returned.",
+        "tool_words": []
+      },
+      "ask_first": "Do pieces also move between your branches?",
+      "free_stops": "the checkout and check-in process and its controls are kept for the solution document."
+    },
+    {
+      "id": "p7_credit_customers",
+      "n": 7,
+      "words": "Booking advances are in a diary and sometimes we can't find them",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Copy every advance currently held onto one list and total it, because you'll know exactly what is owed in goods",
+        "Switch to numbered receipts, because a missing number shows a missing entry."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "every advance and booking balance linked to its order, with total advances held shown in the owner's daily read.",
+        "tool_words": []
+      },
+      "ask_first": "Do you also run instalment or booking schemes?",
+      "free_stops": "how advances link to orders and billing is detailed in the solution document."
+    },
+    {
+      "id": "p8_chat_overload",
+      "n": 8,
+      "words": "Instagram DMs ask ‘price?' all day and nobody replies properly",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Count a day's enquiries and how many got a proper reply, because it shows the size of the leak",
+        "Give one person ownership of the inbox, because shared inboxes get ignored."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "lead_followup"
+        ],
+        "text": "one inbox for Instagram and WhatsApp where every enquiry is assigned, answered consistently and followed up on time, with a daily count of missed ones.",
+        "tool_words": []
+      },
+      "ask_first": "Who answers messages today?",
+      "free_stops": "reply flows, catalogue links and follow-up timings are kept for the solution document."
+    },
+    {
+      "id": "p9_after_sales",
+      "n": 9,
+      "words": "Repairs and resizing jobs get lost, or a customer's piece goes missing",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "List every repair piece in the shop right now against its slip, because it shows which ones have no paper trail",
+        "Photograph pieces at intake from today, because it settles condition and identity later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "repair cards with intake photo and weight, stage and karigar, and a message when it's ready to customers who agree.",
+        "tool_words": []
+      },
+      "ask_first": "Are repairs done in-house or sent out?",
+      "free_stops": "the intake and handover process is designed in the solution document."
+    },
+    {
+      "id": "p10_commission_disputes",
+      "n": 10,
+      "words": "Salesmen fight over commission, and the top one left with his customers",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write the commission rule down and share it, because disputes start where the rule is unclear",
+        "Move enquiries from salesmen's phones to a shop record, with customers' permission, because the relationship then stays with the shop."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat",
+          "dashboards_reports"
+        ],
+        "text": "sales credited to each person at billing with commission worked out automatically, and a shop-owned customer list (with permission) that stays when staff leave.",
+        "tool_words": [],
+        "reordered_from": [
+          "dashboards_reports",
+          "loyalty_repeat"
+        ]
+      },
+      "ask_first": "How is commission worked out today?",
+      "free_stops": "the commission logic and customer list setup go in the solution document."
+    },
+    {
+      "id": "p11_cash_handling_risk",
+      "n": 11,
+      "words": "I'm scared about cash in the shop at closing",
+      "category": "cash_collections",
+      "subtype": "cash_handling_risk",
+      "quick_ideas": [
+        "Agree that closing is never done alone, because two people make it safer and clearer",
+        "Move cash out during the day, because less sits in the shop at night; if there's ever a threat, call the police 15 in PK, 999 in the UAE, 911 in Canada)."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a nightly close per branch matching cash, card, transfer and old-gold value against the day's bills, sent to the owner.",
+        "tool_words": []
+      },
+      "ask_first": "Is most payment cash, card, transfer or old-gold exchange?",
+      "free_stops": "the close-out steps and reporting are kept for the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about whether gold is a good buy, where rates are heading, or whether to hold, melt or sell. Any valuation, grading or authentication of pieces or diamond certificates. Advice on VAT on gold, anti-money-laundering, hallmarking or dealer registration; say \"please check with your accountant or compliance adviser\". Help to under-invoice, split invoices, hide cash sales or buy gold without paperwork. Any accusation of a karigar or staff member, or a promise that losses will be recovered."
+  ],
+  "sample_reply": {
+    "person": "Bhai karigar wala masla ka koi hal batao. Har dafa sona kam wapis aata hai, khaas tor pe bridal sets mein.",
+    "pi": "Ji haan, is ka hal bilkul mumkin hai. 1. Har karigar ka poora hisaab ek dafa job ke hisaab se mila lein, is se pata chalega ke farq kuch khaas kaam mein hai ya har jagah. 2. Bridal sets ke liye khot ki had likh kar tay kar lein, taake us se zyada farq foran nazar aaye. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai: har job ka sona diya aur wapis aaya phone pe darj ho, balance khud update ho aur had se zyada farq pe aap ko usi waqt alert mile. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

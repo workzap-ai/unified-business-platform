@@ -1,0 +1,264 @@
+{
+  "industry": "importers_and_trading_houses",
+  "name": "Importers and trading houses",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_margin_unknown",
+      "n": 1,
+      "words": "I don't know my real landed cost until weeks after the container arrives",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Gather every charge already paid on the last container into one place, so you see how much of the cost was knowable on arrival day",
+        "Set a provisional per-item cost with your accountant for the current container, so selling rates rest on this shipment rather than the last one."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A landed-cost tracker where staff log each charge as it is paid and every shipment's per-item cost updates itself automatically, provisional then final.",
+        "tool_words": []
+      },
+      "ask_first": "Who puts the cost together today — you, the accountant or a clerk?",
+      "free_stops": "How charges are spread across items and lines is set out in the solution document."
+    },
+    {
+      "id": "p2_currency_exposure",
+      "n": 2,
+      "words": "The dollar moved and my margin disappeared",
+      "category": "margin_cost",
+      "subtype": "currency_exposure",
+      "quick_ideas": [
+        "Note the exchange rate you assumed on your open quotes, so you can see which ones the latest move has hurt",
+        "For payment timing and currency options, speak to your bank or financial adviser."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A margin view that records the assumed and actual rate for every shipment and flags affected open quotes automatically whenever the rate moves.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you usually quote parties before or after you've paid the supplier?",
+      "free_stops": "Which quotes to flag and when is worked out in the solution document."
+    },
+    {
+      "id": "p3_import_delays",
+      "n": 3,
+      "words": "Containers sit at port because paperwork is late",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "Look back at the last few delayed containers and note which document held each one up, so you know where delays really start",
+        "Ask your clearing agent for one list of everything open with them, so nothing waits silently."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A shipment tracker showing every container's stage and missing documents, sending alerts automatically when arrival is close and papers are incomplete.",
+        "tool_words": []
+      },
+      "ask_first": "Which document is usually the one that arrives late?",
+      "free_stops": "The stages, alert timings and checklist per shipment type go in the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "My money is with parties and they keep stretching it",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Sort today's party balances by how old they are, so you chase the oldest money first",
+        "Agree with your salesmen which parties get no fresh maal until something is paid, so the balance stops growing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A party-wise ledger that ages every balance daily, checks limits when an order is booked, and queues WhatsApp reminders for the owner to approve.",
+        "tool_words": []
+      },
+      "ask_first": "Is the khata kept by you, a munshi or the accountant?",
+      "free_stops": "Limit rules and reminder timing are set out in the solution document."
+    },
+    {
+      "id": "p5_cash_flow_tight",
+      "n": 5,
+      "words": "I pay the supplier in advance but customers pay me late",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "Put the next few supplier payments beside the collections you expect, so the tight weeks are visible early",
+        "For LC, borrowing or banking questions, talk to your bank or accountant."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "dashboards_reports"
+        ],
+        "text": "A weekly cash view that refreshes itself from the credit ledger and shipment dates, showing the coming gap without anyone building it.",
+        "tool_words": [],
+        "reordered_from": [
+          "dashboards_reports",
+          "credit_ledger"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "How the view is laid out and refreshed is covered in the solution document."
+    },
+    {
+      "id": "p6_stockout",
+      "n": 6,
+      "words": "We ran out of the fast sizes while the next container was at sea",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Write down the lead time from order to godown for your fast items, so reorders are timed by that and not by an empty shelf",
+        "Bring orders forward ahead of Chinese New Year and Ramadan, when factories and shipping slow."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A reorder planner that reads past sales and supplier lead times every day and warns automatically when an item must go into the next container.",
+        "tool_words": []
+      },
+      "ask_first": "Do you track stock by item and size, or only by carton?",
+      "free_stops": "The reorder logic per item and supplier is set out in the solution document."
+    },
+    {
+      "id": "p7_count_mismatch",
+      "n": 7,
+      "words": "Godown count never matches what the office thinks we have",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count your most costly few items today, so you see the real size of the gap",
+        "Name the people allowed to release maal, so every movement has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A phone stock register with in/out slips and a daily count routine across every godown, producing a variance report for the owner automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who is allowed to take maal out of the godown today?",
+      "free_stops": "The count routine and slip flow are designed in the solution document."
+    },
+    {
+      "id": "p8_transfers_lost",
+      "n": 8,
+      "words": "Cartons go missing between port, transport and godown",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Have the next load counted at port and again at the godown, so you learn which leg loses cartons",
+        "Ask the transporter to sign the carton count on the bilty, so responsibility is clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "A port-to-godown log with photos at each handoff that flags any load where sent and received counts differ, every time.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The handoff points and proof captured at each are set in the solution document."
+    },
+    {
+      "id": "p9_pricing_errors",
+      "n": 9,
+      "words": "Salesmen give different rates to different parties",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Send one dated rate list to all salesmen, so everyone quotes from the same base",
+        "Decide who may go below list, so exceptions come to one person."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A rate list pushed to salesmen's phones daily, with every quote logged per party and anything below list sent for approval automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Approval rules and the quote log design are in the solution document."
+    },
+    {
+      "id": "p10_software_not_connected",
+      "n": 10,
+      "words": "Accounts in Tally and stock in Excel never agree",
+      "category": "tech_systems",
+      "subtype": "software_not_connected",
+      "quick_ideas": [
+        "Choose one of the two as the master for stock quantities, so there is one version of the truth",
+        "Reconcile your top items once and note the reasons for each gap, so you see where they come from."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "A connection so sales and receipts are entered once and Tally or QuickBooks and the stock register stay in step every day.",
+        "tool_words": []
+      },
+      "ask_first": "Which system does a sale get entered into first?",
+      "free_stops": "What connects, in which direction, is mapped in the solution document."
+    },
+    {
+      "id": "p11_owner_blind",
+      "n": 11,
+      "words": "I find out profit only when the accountant closes the year",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Pick the three numbers you want to see every Monday, so reporting has a clear purpose",
+        "Ask your accountant for last month's margin by product line once, so you know which lines carry the business."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "A short owner read on WhatsApp each morning: stock value, receivables, shipments in transit, top and slow items, and the one thing to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which numbers appear and how they are worked out is set in the solution document."
+    },
+    {
+      "id": "p12_expansion_pains",
+      "n": 12,
+      "words": "My son wants to sell on Daraz but we have no system",
+      "category": "planning_growth",
+      "subtype": "expansion_pains",
+      "quick_ideas": [
+        "Choose a few items that already sell well to start online, so the test is low risk",
+        "Make one person responsible for the online channel, so orders don't fall between people."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "integration"
+        ],
+        "text": "Marketplace order intake that feeds Daraz orders into the same stock as the godown automatically, so trade and online never sell the same maal twice.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The order flow and stock-sharing rules are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on HS codes, duty or tax rates, valuation, SROs, exemptions or import licensing — that is for their clearing agent or tax adviser. Anything that helps lower invoice values, split invoices, or change the declared description or origin; pi declines plainly. Advice on LC terms, FX hedging, borrowing or which bank product to use. Any view on sanctions, dual-use or restricted goods; that needs proper legal or compliance advice. Promises that clearance will be faster, demurrage will stop or margins will improve. Requests for supplier or customer names, bank or LC numbers, CNIC or NTN; family disagreements are noted neutrally."
+  ],
+  "sample_reply": {
+    "person": "Bhai har container ke baad cost do hafte baad aati hai, tab tak andaze se rate chal raha hota hai. Koi hal batao is ka.",
+    "pi": "Ji haan, is ka hal bilkul mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Pichle container ke saare kharche ek jagah jama karein, taake dikhe ke arrival ke din kitni cost pehle se maloom thi. 2 Maujooda container ke liye accountant ke saath ek provisional per-item cost tay kar lein, taake rate isi shipment par bane. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: staff har kharcha phone par daale aur har shipment ki per-item cost roz apne aap update ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

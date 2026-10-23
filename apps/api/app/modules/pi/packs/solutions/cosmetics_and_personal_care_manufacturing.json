@@ -1,0 +1,198 @@
+{
+  "industry": "cosmetics_and_personal_care_manufacturing",
+  "name": "Cosmetics and personal-care manufacturing",
+  "sector": "7.D Manufacturing and industry (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_campaign_roi_unknown",
+      "n": 1,
+      "words": "We spend on influencers and have no idea which ones sell",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Give each influencer their own code or link — shows who actually brings orders",
+        "List this month's PR boxes and paid posts against orders — gives a first picture."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "unique codes and links per influencer, with orders attributed and totalled automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many influencers do you work with in a month?",
+      "free_stops": "The code set-up and attribution rules are in the solution document."
+    },
+    {
+      "id": "p2_returns_rto",
+      "n": 2,
+      "words": "COD orders get refused at the door, RTO is killing us",
+      "category": "orders_fulfilment",
+      "subtype": "returns_rto",
+      "quick_ideas": [
+        "Confirm COD orders on WhatsApp before dispatch — screens out people who won't accept",
+        "Note RTOs by city and courier — shows where returns concentrate."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "an RTO tracker by city, courier and channel, with WhatsApp confirmation sent before every dispatch.",
+        "tool_words": []
+      },
+      "ask_first": "Which courier do most of your orders go through?",
+      "free_stops": "The confirmation flow and rules are in the solution document."
+    },
+    {
+      "id": "p3_cod_remittance",
+      "n": 3,
+      "words": "Courier COD money comes late and never matches our list",
+      "category": "cash_collections",
+      "subtype": "cod_remittance",
+      "quick_ideas": [
+        "Match one courier's remittance file against your orders — shows where money is missing",
+        "Chase the unmatched orders with the courier — recovers what's owed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "courier remittance files matched to orders automatically, with gaps flagged.",
+        "tool_words": []
+      },
+      "ask_first": "How many couriers do you use?",
+      "free_stops": "The matching logic is in the solution document."
+    },
+    {
+      "id": "p4_multi_channel_orders",
+      "n": 4,
+      "words": "Orders from DMs, WhatsApp, website and Daraz — some slip through",
+      "category": "orders_fulfilment",
+      "subtype": "multi_channel_orders",
+      "quick_ideas": [
+        "Put every channel's orders into one list each day — nothing is missed",
+        "Make one person responsible for that list — clear ownership."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "integration"
+        ],
+        "text": "one order inbox pulling website, marketplace and WhatsApp orders together.",
+        "tool_words": []
+      },
+      "ask_first": "Which channel brings most orders?",
+      "free_stops": "The channel connections are in the solution document."
+    },
+    {
+      "id": "p5_consistency_across_branches",
+      "n": 5,
+      "words": "Same product feels different batch to batch",
+      "category": "quality_complaints",
+      "subtype": "consistency_across_branches",
+      "quick_ideas": [
+        "Record the batch number on each complaint — shows whether it's one batch or many",
+        "Keep a retained sample per batch — gives you something to compare."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a batch register with fill date, expiry and channels shipped to, linked to complaints.",
+        "tool_words": []
+      },
+      "ask_first": "Is filling done in-house or outsourced?",
+      "free_stops": "The batch register fields are in the solution document."
+    },
+    {
+      "id": "p6_minimum_orders",
+      "n": 6,
+      "words": "Packaging supplier MOQ forces us to buy jars we can't use",
+      "category": "suppliers_purchasing",
+      "subtype": "minimum_orders",
+      "quick_ideas": [
+        "List packaging stock against usage per SKU shows real months of cover",
+        "Standardise jars across SKUs where possible — fewer, larger orders."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a packaging component board with MOQs, open orders and usage per SKU.",
+        "tool_words": []
+      },
+      "ask_first": "Which packaging item causes the most trouble?",
+      "free_stops": "Cover and reorder levels are in the solution document."
+    },
+    {
+      "id": "p7_margin_unknown",
+      "n": 7,
+      "words": "We don't know true cost per unit including packaging, ads and returns",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Cost your top SKUs including packaging, shipping, ads and returns — shows the real picture",
+        "Compare that with selling price per channel — reveals which channel pays."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "unit economics per SKU and channel on one screen, updated daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Are ads and returns included in your costing now?",
+      "free_stops": "The unit-economics model is in the solution document."
+    },
+    {
+      "id": "p8_repeat_low",
+      "n": 8,
+      "words": "Customers don't reorder after the first purchase",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "List customers who bought once and haven't returned — shows the size of the gap",
+        "Ask a few why, with their permission — tells you what to fix."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "repeat-purchase reminders on WhatsApp for customers who opted in, timed to product use.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have customer numbers with permission to message?",
+      "free_stops": "Reminder timing and messages are in the solution document."
+    },
+    {
+      "id": "p9_chat_overload",
+      "n": 9,
+      "words": "DMs and comments go unanswered for a day",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Make one person responsible for DMs at set times each day — nothing waits too long",
+        "Group common questions — shows what you answer most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "every DM and WhatsApp query recorded with response times measured and reminders until answered.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many messages come in a day?",
+      "free_stops": "The reply flows are in the solution document."
+    }
+  ],
+  "never_say": [
+    "No formulation, ingredient safety, dermatological or medical advice; never say a product is safe. Serious reactions (swelling, breathing problems, eye injury): urge urgent medical help and emergency services; record nothing about the person. No advice on labelling claims, whitening or mercury rules, halal certification or registration. Never help copy another brand's packaging, fake halal or certification marks, or relabel expired stock; decline. Never help write or buy fake reviews. No customer photos, skin conditions or contact details stored; no influencer personal details."
+  ],
+  "sample_reply": {
+    "person": "Is there a solution for this? We send PR boxes to so many influencers and I can't tell if any of it works.",
+    "pi": "Yes, this is very solvable. 1 Give each influencer their own code or link, so orders show who brought them. 2 Put this month's PR boxes and paid posts next to the orders that followed, for a first picture. Workzap can do this automatically for you: unique codes per influencer with every order attributed and a running total of what each one brings in. Shall I have a solution document and quote prepared for you? You're free to say no.",
+    "language": "english"
+  }
+}

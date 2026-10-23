@@ -1,0 +1,236 @@
+{
+  "industry": "electricity_and_power_contractors",
+  "name": "Electricity and power contractors",
+  "sector": "7.L Finance-adjacent, energy and utilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_owner_bottleneck",
+      "n": 1,
+      "words": "Quotes take a week because only I can prepare the BOQ",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Save the items and quantities from your last few BOQs into one list, so staff can start a draft",
+        "Let a staff member prepare the first draft while you only review, so your time goes on checking."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A quote builder with a reusable item library and material rates the owner maintains, so staff draft BOQs for the owner to approve.",
+        "tool_words": []
+      },
+      "ask_first": "How long does it usually take to send a quote?",
+      "free_stops": "Library structure and approval flow are in the solution document."
+    },
+    {
+      "id": "p2_cost_overruns",
+      "n": 2,
+      "words": "We win jobs and then lose money because material went over the estimate",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Note every material issue against the job it is for, so actual use is on record",
+        "Compare it with the estimate midway through each job, so overruns show while there is time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "dashboards_reports A job costing tracker of estimated versus actual material and labour per job, updated from site.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Costing method is in the solution document."
+    },
+    {
+      "id": "p3_transfers_lost",
+      "n": 3,
+      "words": "Cable bought for one site gets used on another and nobody records it",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Record every issue and return at the store by site, so material has an owner",
+        "Return leftovers to the store at job end, so they are not carried quietly to the next site."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "stock_alerts A material issue and return log per site with a store stock register and minimum levels.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Log design is in the solution document."
+    },
+    {
+      "id": "p4_import_delays",
+      "n": 4,
+      "words": "Imported inverters and panels are delayed and installations wait",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "List every open import order with its expected date, so waiting jobs are linked to orders",
+        "Tell affected customers the expected date early, so they hear it from you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "An import order tracker with expected dates linked to the jobs waiting on them.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Tracker set-up is in the solution document."
+    },
+    {
+      "id": "p5_field_team_visibility",
+      "n": 5,
+      "words": "I do not know what each crew did today until I visit the site",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Ask each supervisor for a short daily message of crew present, work done and one photo, so you see progress",
+        "Keep those messages in one place per job, so they can be found later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A daily site report on phone with crew present, work done, photos and issues, plus crew attendance by site.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Report fields are in the solution document."
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "Variation work is done on a verbal request and never billed",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Write down every variation request before work starts, so it can be billed",
+        "Get it approved in writing by the client, so payment is not argued later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A variation request log with approval status and a billing flag.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Approval flow is in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Running bills are late and retentions from old projects are never collected",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every running bill and retention by project with its due date, so you know what is owed",
+        "Give one person the job of chasing them, so it does not fall to whoever is free."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A running bill and retention tracker per project with due dates and automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder rules are in the solution document."
+    },
+    {
+      "id": "p8_regulatory_reporting",
+      "n": 8,
+      "words": "Approval and inspection files take ages and we lose track of where each one is",
+      "category": "compliance_admin",
+      "subtype": "regulatory_reporting",
+      "quick_ideas": [
+        "List every pending file with its current stage and date, so the waiting point is visible",
+        "Check the list weekly, so stuck files are chased."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "An approvals and inspection file tracker by stage with reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Stage set-up is in the solution document; pi gives no advice on approval requirements or eligibility."
+    },
+    {
+      "id": "p9_lead_followup_slow",
+      "n": 9,
+      "words": "Solar leads wait days before anyone calls back",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Put every enquiry into one list with the date it came in, so none is lost",
+        "Give one person the job of calling back the same day, so serious buyers are not left waiting."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "A lead inbox for solar and service enquiries with response timers and qualification notes.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Qualification steps are in the solution document; pi gives no savings or payback claims."
+    },
+    {
+      "id": "p10_after_sales",
+      "n": 10,
+      "words": "Customers call after installation and nobody owns the after-sales visit",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "Log every after-sales call with a named technician, so each one has an owner",
+        "Hand over warranty and handover documents at completion, so disputes have a record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "An after-sales ticket log with assigned technician and a handover pack of documents, warranties and photos.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Ticket and handover pack design are in the solution document."
+    },
+    {
+      "id": "p11_shrinkage_theft",
+      "n": 11,
+      "words": "Tools and meters go missing from sites",
+      "category": "loss_security",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Sign tools out and back in by crew, so each has a holder",
+        "Count tools at the end of each week, so losses are found early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A tool register with check-out and check-in by crew and weekly counts.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Register design is in the solution document; pi notes the control gap, not names."
+    }
+  ],
+  "never_say": [
+    "Anything on electrical design, codes, earthing, protection settings, load or solar sizing. Any tariff, savings, payback, financing or net-metering eligibility claim. Anything that helps with meter tampering, kunda connections, bypassing inspections or fake completion certificates. Any request for customer addresses, meter or account numbers, or workers' IDs. Anything other than emergency services when shock, fire or injury is described."
+  ],
+  "sample_reply": {
+    "person": "Solar ke kaam mein material hamesha estimate se zyada lag jata hai. Is ka koi hal hai?",
+    "pi": "Ji, is ka hal mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1 Store se nikalne wala har material us job ke naam pe likha jaye, taake asal kharch ka record ho. 2 Job ke beech mein ek baar estimate se milaan karein, taake overrun waqt pe nazar aaye. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: har site ka material issue aur wapsi phone pe record ho aur har job ka estimate aur asal kharch aap ko roz saamne nazar aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

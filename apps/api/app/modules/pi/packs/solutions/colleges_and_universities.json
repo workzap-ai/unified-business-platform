@@ -1,0 +1,221 @@
+{
+  "industry": "colleges_and_universities",
+  "name": "Colleges and universities (admin)",
+  "sector": "7.J Education and childcare",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_lead_followup_slow",
+      "n": 1,
+      "words": "Admission enquiries peak for six weeks and we can't call everyone back",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Split enquiries by programme between named counsellors, so no enquiry is everyone's job",
+        "Put the questions applicants ask most onto your website, so counsellors spend their time on real conversations."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Every enquiry and application captured by source, programme and counsellor, with automatic follow-up reminders and a daily funnel view per programme and campus.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most applications start — website, social, walk-in or agents?",
+      "free_stops": "The counsellor assignment rules and funnel stages are kept for the document."
+    },
+    {
+      "id": "p2_conversion_low",
+      "n": 2,
+      "words": "Applicants fill the form but drop off before paying the admission fee",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Try the payment step yourself on a phone, so you see where applicants get stuck",
+        "Contact this week's stalled applicants once, using the number they applied with, so you learn why they stopped."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Stalled applications spotted every day and reminded on a timed sequence until the fee is paid or the applicant opts out, with drop-off measured per programme.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reminder timings and drop-off reasons tracking are in the document."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Installment students fall behind and finance only notices at exams",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Pull a list of installment accounts past due today, by account number, so finance sees the size of it now",
+        "Agree a mid-semester checkpoint with the registrar, so overdue accounts surface long before admit cards."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "An installment tracker that sends due-date reminders automatically and gives finance a weekly early-warning list, with account numbers instead of names in owner reports.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reminder sequence and early-warning thresholds are kept for the document."
+    },
+    {
+      "id": "p4_deposit_delays",
+      "n": 4,
+      "words": "Fee payments come through several banks and matching takes days",
+      "category": "cash_collections",
+      "subtype": "deposit_delays",
+      "quick_ideas": [
+        "Make the fee reference number required on every challan and transfer, so each payment can be traced",
+        "Keep one list of unmatched receipts, so students can clear their own cases."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "integration Reference numbers from every bank matched to fee accounts daily, with unmatched receipts flagged each morning.",
+        "tool_words": [
+          "integration"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "How each bank's statement is read and matched is set out in the document."
+    },
+    {
+      "id": "p5_approvals_slow",
+      "n": 5,
+      "words": "Scholarship and discount approvals sit with three people for weeks",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "Find out who is holding each pending file right now, so stuck ones get moving",
+        "Hold one fixed weekly approval slot, so files don't wait for a free moment."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "One timestamped approval trail for scholarships, discounts and refunds, showing approvers only what they need and measuring turnaround per office.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The approval routing and turnaround targets are kept for the document."
+    },
+    {
+      "id": "p6_payroll_errors",
+      "n": 6,
+      "words": "Visiting faculty claims don't match the timetable",
+      "category": "people_staff",
+      "subtype": "payroll_errors",
+      "quick_ideas": [
+        "Check this month's claims against the published timetable before paying, so you see where the gaps are",
+        "Set one claim deadline per month, so late claims stop piling up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Every claim checked automatically against the timetable and lecture logs before payment, with differences flagged per department.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The matching rules for swaps, make-up lectures and cancellations are in the document."
+    },
+    {
+      "id": "p7_bottleneck",
+      "n": 7,
+      "words": "Room clashes show up in week one",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Let one person control room bookings, so double bookings have one source",
+        "Share the draft timetable with faculty early, so clashes are reported before term."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A timetable and room tool that checks every change for clashes before anything is published.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The clash rules and room-capacity logic are kept for the document."
+    },
+    {
+      "id": "p8_handoffs",
+      "n": 8,
+      "words": "Add/drop changes don't reach finance, so fee bills are wrong",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Send finance the list of this term's add/drop changes once, so this term's bills can be corrected",
+        "Hold fee bills until add/drop closes, so they go out right the first time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "Registrar records and the fee system connected so course changes update fee bills automatically, every day of the add/drop window.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "Which fields sync and how exceptions are handled is in the document."
+    },
+    {
+      "id": "p9_manual_work",
+      "n": 9,
+      "words": "Transcript and verification requests pile up for weeks",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Count the requests waiting today and sort them by type, so you know where the backlog is",
+        "Process the most common type in one batch, so the pile drops fast."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Every request given a reference, tracked to completion and measured for turnaround, with automatic status updates to the requester.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The request stages and status messages are kept for the document."
+    },
+    {
+      "id": "p10_manual_reports",
+      "n": 10,
+      "words": "Board reports are compiled by hand from every office",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Agree with the board the fixed list of numbers it wants, so offices stop guessing",
+        "Give every office the same date to send them, so the report comes together on time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "One board screen filled daily from source data, showing enrolment, collections, dropouts and costs by campus and programme.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How each office's data feeds the screen is set out in the document."
+    }
+  ],
+  "never_say": [
+    "Anything about student visas, study permits or immigration status; pi notes only the letter-processing workload. Advice on accreditation, HEC, CAA/MOE or ministry decisions, or degree equivalence. Employment-law or refund-law guidance; pi says \"talk to your lawyer\". Any idea that asks for student names, IDs, CGPA, transcripts or financial-aid circumstances. Help issuing, backdating or altering degrees, transcripts, attendance or enrolment letters. Promises about enrolment numbers or collections."
+  ],
+  "sample_reply": {
+    "person": "Can you suggest a fix for installment students? Finance finds out who hasn't paid only when admit cards are being printed.",
+    "pi": "Yes, this can be caught much earlier, and you can start this week. 1 Pull today's list of installment accounts past due, by account number only, so finance sees the real size of it. 2 Agree a mid-semester checkpoint with the registrar, so overdue accounts come up long before exams. Workzap can do this automatically for you, with reminders on every due date and a weekly early-warning list for finance. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

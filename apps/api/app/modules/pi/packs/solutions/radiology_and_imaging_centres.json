@@ -1,0 +1,220 @@
+{
+  "industry": "radiology_and_imaging_centres",
+  "name": "Radiology and imaging centres",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_booking_appointments",
+      "n": 1,
+      "words": "No-shows on MRI slots waste our most expensive time",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Confirm tomorrow's MRI and CT slots by message, so cancellations come early",
+        "Keep a short list of patients happy to come at short notice, so freed slots can be filled."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "machine-wise booking with WhatsApp reminders, confirm and cancel replies and a waitlist, with no-shows measured per machine.",
+        "tool_words": []
+      },
+      "ask_first": "Which machine has the most no-shows?",
+      "free_stops": "Slot lengths per study and reminder timing are set in the solution document."
+    },
+    {
+      "id": "p2_customer_communication",
+      "n": 2,
+      "words": "Patients come without the right preparation and we have to reschedule",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Ask your radiologist to approve one written preparation sheet per study type, so instructions come from them",
+        "Count reschedules caused by preparation for a week, so the cost is visible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "preparation reminders sent automatically at booking and the day before, using only text supplied and approved by your radiologist.",
+        "tool_words": []
+      },
+      "ask_first": "Who gives patients preparation instructions now?",
+      "free_stops": "Message timing and sequencing are in the solution document; the content always comes from your radiologist."
+    },
+    {
+      "id": "p3_bottleneck",
+      "n": 3,
+      "words": "Scans are done but reports take two days because the radiologist is backed up",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "List studies awaiting report by age each morning, so the backlog is visible",
+        "Agree which studies are reported first, so urgent referrals aren't stuck behind routine ones."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a reporting worklist board showing studies by age and radiologist role, with escalation when overdue and average report time per day.",
+        "tool_words": []
+      },
+      "ask_first": "Are your radiologists on site or reporting remotely?",
+      "free_stops": "Priority and escalation rules are designed in the solution document."
+    },
+    {
+      "id": "p4_po_tracking",
+      "n": 4,
+      "words": "Teleradiology bills don't match the number of studies we sent",
+      "category": "suppliers_purchasing",
+      "subtype": "po_tracking",
+      "quick_ideas": [
+        "Count studies sent last month and compare with the bill, so the gap is known",
+        "Ask the provider for a study-wise statement, so lines can be matched."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a monthly reconciliation of studies sent versus studies billed, with differences listed.",
+        "tool_words": []
+      },
+      "ask_first": "Do you use one teleradiology provider or more?",
+      "free_stops": "The matching method is in the solution document."
+    },
+    {
+      "id": "p5_maintenance_downtime",
+      "n": 5,
+      "words": "CT went down for four days and the vendor took their time",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List each machine's service contract terms and response time in one place, so you can hold the vendor to them",
+        "Log each breakdown with start and end time, so downtime is on record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a downtime and service log with vendor response times and contract terms on file, with alerts to the owner when a machine goes down.",
+        "tool_words": []
+      },
+      "ask_first": "Are your machines under an AMC?",
+      "free_stops": "Log fields and escalation are set in the solution document; contract disputes go to your lawyer."
+    },
+    {
+      "id": "p6_margin_unknown",
+      "n": 6,
+      "words": "I don't know what each machine actually earns after lease and service",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Total last month's scans and revenue per machine, so you have a base",
+        "Add lease, service and power costs per machine, so the picture is complete."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a per-machine profitability view combining scans, revenue, lease, service and power, updated monthly.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which machines are leased or on revenue-share?",
+      "free_stops": "Cost allocation is worked out in the solution document; for financial decisions talk to your accountant."
+    },
+    {
+      "id": "p7_slow_response",
+      "n": 7,
+      "words": "Patients call ten times asking if the report is ready",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Tell patients at the counter when their report is expected, so they don't need to call",
+        "Count report-status calls for a few days, so the load is measured."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "workflow_automation — a \"report ready\" notice sent to the registered contact with a secure link, with every send logged and no findings in the message.",
+        "tool_words": []
+      },
+      "ask_first": "How are reports handed over now, film, CD or link?",
+      "free_stops": "The delivery flow and link security are set in the solution document."
+    },
+    {
+      "id": "p8_sales_drop",
+      "n": 8,
+      "words": "Doctors who used to refer now send patients to the new centre",
+      "category": "sales_revenue",
+      "subtype": "sales_drop",
+      "quick_ideas": [
+        "List your top referring clinics and their monthly volumes, so drops are visible",
+        "Visit or call the ones that slowed, so you hear the reason."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a referral dashboard showing volume by referring clinic each month, flagging sudden drops.",
+        "tool_words": [
+          "dashboard"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "Is the referring doctor recorded at booking now?",
+      "free_stops": "How referral data is captured at the counter is in the solution document."
+    },
+    {
+      "id": "p9_cash_mismatch",
+      "n": 9,
+      "words": "Cash at the counter doesn't match the scans done",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Do one shift close matching scans done against cash, card and credit, so the gap is sized",
+        "Ask for an approver on every discount, so leakage is visible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily counter close by shift, matching scans with payments and listing discounts by approver role.",
+        "tool_words": []
+      },
+      "ask_first": "Do you run a night shift?",
+      "free_stops": "The close format is in the solution document."
+    },
+    {
+      "id": "p10_data_loss",
+      "n": 10,
+      "words": "Old images are on a server nobody backs up",
+      "category": "tech_systems",
+      "subtype": "data_loss",
+      "quick_ideas": [
+        "Find out when the last full backup was taken, so you know your exposure",
+        "Ask your IT provider to confirm a backup schedule, so it is someone's job."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a backup check that alerts the owner if an archive backup fails or is missed.",
+        "tool_words": []
+      },
+      "ask_first": "Who manages your PACS server?",
+      "free_stops": "The monitoring set-up is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Which scan someone needs, what a scan shows or the quality of a report. Preparation, contrast or radiation advice; these are for the radiologist. Interpretations of radiation-safety licensing or shielding rules. Help issuing reports without a scan, altering findings or billing for scans not done. Legal views on vendor contracts or misdirected reports; point to a lawyer. Ideas that put names, images or report text in messages."
+  ],
+  "sample_reply": {
+    "person": "Our MRI has a week-long waiting list but I see the machine idle after 7pm. What can we do?",
+    "pi": "Yes, there's room to use those evenings, and you can start checking this week. 1 Map one week of MRI use hour by hour, so you know exactly how many evening hours sit idle. 2 List what an evening shift needs in technologist and reporting cover, so the real blocker is clear. Workzap can do the tracking automatically for you with machine-wise booking, a waitlist and a reporting worklist, so evening slots can be filled and measured. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

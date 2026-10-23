@@ -1,0 +1,199 @@
+{
+  "industry": "security_guard_companies",
+  "name": "Security guard companies",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_attendance_lateness",
+      "n": 1,
+      "words": "Posts are left empty at night and clients find out before we do",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Have supervisors call a few random posts at set times each night for a week, so you see how often posts are empty",
+        "Note which sites have gaps, so you know where to focus."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "guard check-in on phone at the post with time and site location, and alerts to the supervisor when a post hasn't checked in.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many guards and sites are you running?",
+      "free_stops": "check-in frequency and alert rules are set out in the solution document."
+    },
+    {
+      "id": "p2_fraud",
+      "n": 2,
+      "words": "Guards sign each other's attendance register",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Compare register signatures with a few surprise visits this week, so you see the size of the problem",
+        "Make clear to guards that attendance is being checked, so the habit stops."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "phone check-in by each guard at the site, tied to time and location, replacing the paper register.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how check-ins are verified is kept for the solution document."
+    },
+    {
+      "id": "p3_accountability",
+      "n": 3,
+      "words": "Supervisors claim they did rounds but I can't verify",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Ask supervisors to send a photo from each site they visit tonight, so rounds leave a record",
+        "Compare that with their claimed rounds once, so you see the gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a supervisor visit log with site check-in and a short checklist per site, plus a nightly summary for the owner.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the checklist and summary format are worked out in the solution document."
+    },
+    {
+      "id": "p4_overtime",
+      "n": 4,
+      "words": "We don't have enough relievers, so guards do double duty",
+      "category": "people_staff",
+      "subtype": "overtime",
+      "quick_ideas": [
+        "Count double duties done this month, so you know the real reliever gap",
+        "List which sites need relievers most often, so cover is planned."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a digital roster by site and shift with a reliever pool and double-duty flags.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the roster rules are set out in the solution document."
+    },
+    {
+      "id": "p5_payroll_errors",
+      "n": 5,
+      "words": "Payroll is a fight every month over absences and fines",
+      "category": "people_staff",
+      "subtype": "payroll_errors",
+      "quick_ideas": [
+        "Write down once how absences and deductions are worked out, so everyone knows the rule",
+        "Share each guard's attendance before payday this month, so disputes come up early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "salary worked out from check-in attendance with transparent deductions and an approval step.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how deductions are shown and approved is kept for the solution document."
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "We bill clients for posts but sometimes the post wasn't covered",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Compare last month's billed posts against attendance once for a few sites, so mismatches show",
+        "Fix any wrong invoice now, so client trust is protected."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a post coverage report reconciling billed posts with actual covered hours every month.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "how coverage and billing are reconciled is set out in the solution document."
+    },
+    {
+      "id": "p7_cash_flow_tight",
+      "n": 7,
+      "words": "Clients pay after months but guards need salary on the 1st",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "List every client invoice with its age, so you know who to chase first",
+        "Send invoices earlier in the month this time, so payment comes sooner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "receivables per client with ageing and scheduled reminders, alongside the coming salary run.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "reminder timings and the cash view are kept for the solution document."
+    },
+    {
+      "id": "p8_shrinkage_theft",
+      "n": 8,
+      "words": "Uniforms and equipment issued are never returned",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Count the kit in your store and at a few posts once, so you know what's out",
+        "Start signing kit out on issue, so returns can be checked."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a kit and equipment register by guard role and post, with issue and return recorded.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the issue and return routine is designed in the solution document."
+    },
+    {
+      "id": "p9_info_lost_in_whatsapp",
+      "n": 9,
+      "words": "Incident reports come in as voice notes and get lost",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Pull this month's incident voice notes into one written list, so nothing is forgotten",
+        "Name one person who receives incident reports, so they have a home."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an incident form via WhatsApp or app with photo, time and post, routed to the supervisor and owner.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "the form fields and routing are worked out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any weapons, tactical, licensing, safety-engineering, legal or labour-law advice. Anything involving falsified attendance, fake training certificates, unlawful underpayment or covert surveillance. That posts will always be covered or incidents prevented. Requests for guard names, IDs, licence or weapon numbers, or client site layouts. Any live threat, robbery, violence or injury: point to police and emergency services first 15 / 1122 in Pakistan, 999 / 998 in UAE, 911 in Canada)."
+  ],
+  "sample_reply": {
+    "person": "Raat ko posts khali hoti hain aur client ko hum se pehle pata chal jata hai. Is ka kya hal hai?",
+    "pi": "Ji haan, is ka hal mumkin hai aur is hafte se shuruaat ki ja sakti hai. 1 Ek hafte tak supervisor raat ko kuch posts ko alag alag waqt pe call karein, taake pata chale khali post kitni baar hoti hai. 2 Jin sites pe gap mile unki ek list bana lein, taake tawajjoh sahi jagah ho. Workzap yeh aap ke liye automatically kar sakta hai: guard post se phone pe check-in kare aur check-in na ho to supervisor ko foran alert jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

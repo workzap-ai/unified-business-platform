@@ -1,0 +1,197 @@
+{
+  "industry": "mobile_phones_and_accessories",
+  "name": "Mobile phones and accessories",
+  "sector": "7.A Retail and consumer (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_serial_batch_tracking",
+      "n": 1,
+      "words": "IMEI ka in aur out ka record nahi",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Note the IMEI of every handset in stock once, so you know exactly what you hold",
+        "Write the IMEI on every bill from today, so returns and warranty claims have proof."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "an IMEI-level stock register with purchase type, cost, condition, sale date and warranty end.",
+        "tool_words": []
+      },
+      "ask_first": "Do you buy used phones from walk-ins?",
+      "free_stops": "How IMEIs are captured and searched is in the solution document."
+    },
+    {
+      "id": "p2_fraud",
+      "n": 2,
+      "words": "Used phone kharidte hain, baad mein pata chalta hai blocked hai",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Write down the checks you do before buying, so every staff member does the same",
+        "Agree that a phone failing any check is not bought, so no one makes an exception under pressure."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a used-phone intake checklist with tests, photos, IMEI and an approval step before purchase.",
+        "tool_words": []
+      },
+      "ask_first": "Who decides whether to buy?",
+      "free_stops": "The checklist and approval step are in the solution document."
+    },
+    {
+      "id": "p3_order_errors",
+      "n": 3,
+      "words": "Repair wala phone dhoondna parta hai, galat phone wapas de diya",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Give every repair a numbered slip and a matching tag on the phone, so each phone has an ID",
+        "Keep repairs in labelled trays by status, so finding a phone takes seconds."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a repair job board with job number, fault, technician, parts and status, and a WhatsApp ready message.",
+        "tool_words": []
+      },
+      "ask_first": "How many repairs a day?",
+      "free_stops": "The job flow and messages are in the solution document."
+    },
+    {
+      "id": "p4_trust_honesty",
+      "n": 4,
+      "words": "Technician kehta hai part badla, verify nahi kar sakte",
+      "category": "people_staff",
+      "subtype": "trust_honesty",
+      "quick_ideas": [
+        "Keep the old part with the job slip, so a replacement can be checked",
+        "Write down parts issued for each job, so stock and jobs can be matched."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a parts register linking each part to a job and supplier, with comebacks tracked.",
+        "tool_words": []
+      },
+      "ask_first": "Who issues parts to the technician?",
+      "free_stops": "How parts are linked and comebacks tracked is in the solution document."
+    },
+    {
+      "id": "p5_no_visibility",
+      "n": 5,
+      "words": "Accessories ke sau items, kuch pata nahi kya para hai",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Count your top accessories once, so you know what's really there",
+        "Give the fast movers a code or barcode, so sales of small items get recorded."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "accessory stock with barcodes, low-stock alerts and a counter- wise daily count.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many accessory items?",
+      "free_stops": "How items are coded and counted is in the solution document."
+    },
+    {
+      "id": "p6_payment_methods",
+      "n": 6,
+      "words": "Cash, card, wallet milte nahi",
+      "category": "cash_collections",
+      "subtype": "payment_methods",
+      "quick_ideas": [
+        "Write each payment method's total separately at closing, so one doesn't hide another",
+        "Use one shop wallet account, so no payment lands on a personal number."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "daily reconciliation across cash, cards and wallets.",
+        "tool_words": []
+      },
+      "ask_first": "Which wallets do you take?",
+      "free_stops": "How each method is matched is in the solution document."
+    },
+    {
+      "id": "p7_pricing_errors",
+      "n": 7,
+      "words": "Salesman ek hi phone ke alag rate batate hain",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Share one price list with all salesmen each morning, so everyone quotes the same",
+        "Note quotes given for a week, so you see how wide the spread is."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a daily price list sent to all salesmen and shops.",
+        "tool_words": []
+      },
+      "ask_first": "How often do your prices change?",
+      "free_stops": "How prices are updated and shared is in the solution document."
+    },
+    {
+      "id": "p8_chat_overload",
+      "n": 8,
+      "words": "OLX/Dubizzle pe messages ka jawab nahi de paate",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Count unanswered messages once, so you know how many buyers are waiting",
+        "Give one person the listings, so replies don't depend on who is free."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "listing enquiries collected in one place with follow-up reminders and stock status.",
+        "tool_words": []
+      },
+      "ask_first": "Where do you list phones?",
+      "free_stops": "How messages are collected and followed up is in the solution document."
+    },
+    {
+      "id": "p9_margin_unknown",
+      "n": 9,
+      "words": "Trade-in ke baad profit ka pata nahi",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out profit on your last few trade-in sales once, so you see whether trade- ins pay",
+        "Include the accessories you bundled, because they are part of the real cost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "profit per handset including trade-in value and bundled accessories.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How often do you take trade-ins?",
+      "free_stops": "How profit per phone is calculated is in the solution document."
+    }
+  ],
+  "never_say": [
+    "How to bypass PTA, change IMEIs, unlock JV or remove iCloud. How to buy or resell stolen phones. To ask for customers' passcodes or account details. Anything on customs, tax or telecom rules; robbery or battery fire goes to emergency services first. That counterfeit accessories can be sold as original."
+  ],
+  "sample_reply": {
+    "person": "Repair ke kaam mein gadbad hai, customer aata hai to phone dhoondna parta hai. Solution batao.",
+    "pi": "Ji haan, iska aasaan shuru hai aur aaj se ho sakta hai. 1 Har repair ko number wali slip aur phone pe wahi number ka tag dein, taa ke har phone ki pehchaan ho. 2 Repair wale phones label wali trays mein rakhein, taa ke dhoondna na pare. Workzap ye aap ke liye khud-ba-khud kar sakta hai: repair board jis mein har job ka number, technician, part aur status ho, aur phone ready hone pe customer ko WhatsApp message. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

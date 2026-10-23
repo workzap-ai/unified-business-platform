@@ -1,0 +1,218 @@
+{
+  "industry": "home_healthcare_and_nursing_agencies",
+  "name": "Home healthcare and nursing agencies",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_attendance_lateness",
+      "n": 1,
+      "words": "A nurse doesn't turn up and I find out when the family calls angry",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Ask every carer to message the coordinator on reaching the shift, so a missing message is the first warning",
+        "Keep a list of who is on standby each night, so a replacement is ready."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "shift check-in and check-out on WhatsApp with location confirmation, and an automatic alert to the coordinator when a check-in is missed.",
+        "tool_words": []
+      },
+      "ask_first": "How long after a shift starts do you usually find out?",
+      "free_stops": "Check-in timing and alert rules are in the solution document."
+    },
+    {
+      "id": "p2_bottleneck",
+      "n": 2,
+      "words": "Finding a replacement at night is chaos on WhatsApp",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "List available staff by area and skill, so you know who to call first",
+        "Note how long each replacement took this week, so the delay is measured."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a replacement request that pings available staff by area and skill and records who accepted, with time-to-replace tracked.",
+        "tool_words": []
+      },
+      "ask_first": "How many coordinators handle night calls?",
+      "free_stops": "Matching rules are in the solution document."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Families pay late, especially after the patient recovers",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every family account with balance and last payment, so overdue ones stand out",
+        "Agree billing dates with each new family, so expectations are set."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a family account ledger with rate, advance, shifts delivered, invoices, payments and balance, sending polite reminders on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "Do families pay monthly or per week?",
+      "free_stops": "Reminder timing and invoice format are in the solution document."
+    },
+    {
+      "id": "p4_cash_mismatch",
+      "n": 4,
+      "words": "Advance and security deposits are tracked in my head",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Write down every open advance and deposit once, so the total is known",
+        "Give each family a receipt for deposits, so both sides have a record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "deposits and advances tracked per family account and settled automatically against the final bill.",
+        "tool_words": []
+      },
+      "ask_first": "How are deposits settled when a placement ends?",
+      "free_stops": "Settlement rules are in the solution document."
+    },
+    {
+      "id": "p5_payroll_errors",
+      "n": 5,
+      "words": "Staff pay is worked out shift by shift in Excel and there are always errors",
+      "category": "people_staff",
+      "subtype": "payroll_errors",
+      "quick_ideas": [
+        "Write the allowance rules for night, overtime and travel on one page, so everyone works from the same rules",
+        "Check one month's pay against confirmed shifts, so errors are found."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a pay calculator from verified shifts with allowances by rule, producing statements every pay period.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Are staff paid monthly or per shift?",
+      "free_stops": "How rules are encoded is in the solution document."
+    },
+    {
+      "id": "p6_serial_batch_tracking",
+      "n": 6,
+      "words": "Rental beds and oxygen machines go out and we lose track of them",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "List every rental item with serial number and current placement, so you know what's out",
+        "Note condition on issue, so returns can be checked."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an equipment rental register with serial, location by placement, condition on issue and return, and rental billing.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many rental items are out now?",
+      "free_stops": "Register fields and billing link are in the solution document."
+    },
+    {
+      "id": "p7_record_keeping",
+      "n": 7,
+      "words": "Staff documents and police verifications expire and nobody notices",
+      "category": "compliance_admin",
+      "subtype": "record_keeping",
+      "quick_ideas": [
+        "List each staff member's document expiry dates by role, without storing ID numbers, so renewals are visible",
+        "Set phone reminders for the nearest dates, so none slip."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a document and training register with expiry reminders by role, storing dates only, not ID numbers.",
+        "tool_words": []
+      },
+      "ask_first": "Who tracks staff documents today?",
+      "free_stops": "Reminder schedule is in the solution document; labour and visa questions go to your adviser."
+    },
+    {
+      "id": "p8_lead_followup_slow",
+      "n": 8,
+      "words": "Enquiries come at midnight from hospitals and nobody answers",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Count after-hours enquiries for a week, so the size of the gap is known",
+        "Name one on-call coordinator per night, so enquiries have an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an after-hours WhatsApp intake that captures care type, area and timing (no names or conditions) for a coordinator callback, with response times tracked.",
+        "tool_words": []
+      },
+      "ask_first": "Do most enquiries come from hospitals or families?",
+      "free_stops": "The intake questions are designed in the solution document."
+    },
+    {
+      "id": "p9_pricing_errors",
+      "n": 9,
+      "words": "Different coordinators promise different rates to families",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Put one rate card on paper and share it with all coordinators, so quotes match",
+        "Review last month's quotes against it, so differences are found."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a rate card master coordinators quote from, with any exception needing approval.",
+        "tool_words": []
+      },
+      "ask_first": "How many coordinators quote rates?",
+      "free_stops": "Exception rules are in the solution document."
+    },
+    {
+      "id": "p10_owner_blind",
+      "n": 10,
+      "words": "I get no clear report of active placements at any time",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "List active placements by area and shift type once, so you have the picture",
+        "Add missed shifts and open complaints to that list, so problems sit alongside it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read with active placements, missed shifts, open complaints, receivables and staff available by area.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you cover one city or several?",
+      "free_stops": "Which numbers appear is set in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any care, medication, feeding, wound or equipment-use advice. Interpretations of visa, sponsorship, labour law or contractor status. Help placing unqualified staff as nurses, faking verifications or billing for shifts not worked. Ideas that record client names, addresses, conditions, or staff ID numbers. Any treatment of suspected abuse or neglect as a routine business problem; point to emergency services or the relevant authority. Promises about fewer missed shifts."
+  ],
+  "sample_reply": {
+    "person": "Sab se bara masla yeh hai ke attendant shift pe nahi pohanchta aur family raat ko 11 baje mujhe call karti hai. Kya karoon?",
+    "pi": "Ji, is ka hal mumkin hai aur shuruat isi hafte ki ja sakti hai. 1 Har attendant shift pe pohanch kar coordinator ko message kare, taake message na aaye to pehli warning wahi ho. 2 Har raat standby staff ki list pehle se bana lein, taake replacement tayyar ho. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: location ke saath check-in, check-in miss hone par foran alert, aur replacement ke liye available staff ko message. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

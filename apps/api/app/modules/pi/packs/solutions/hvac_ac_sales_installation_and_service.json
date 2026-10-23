@@ -1,0 +1,221 @@
+{
+  "industry": "hvac_ac_sales_installation_and_service",
+  "name": "HVAC / AC sales, installation and service",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_chat_overload",
+      "n": 1,
+      "words": "In June we get hundreds of calls and miss half of them",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Add a WhatsApp booking option alongside the phone, so calls aren't the only way in",
+        "Call back every missed number at fixed times, so lost calls get a second chance."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "A WhatsApp booking flow plus missed-call capture, so every enquiry becomes a ticket even at peak, with calls received against handled measured daily.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many calls a day come in at peak?",
+      "free_stops": "Booking flow and overflow set-up are in the solution document."
+    },
+    {
+      "id": "p2_orders_lost",
+      "n": 2,
+      "words": "Bookings are written in a diary and some never get assigned",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Move bookings into one shared list the dispatcher can see, so nothing lives in one diary",
+        "Check unassigned bookings at the end of each day, so none roll over unseen."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A dispatch board assigning jobs by area and skill, with each technician's job list sent on WhatsApp every morning.",
+        "tool_words": []
+      },
+      "ask_first": "Who assigns jobs to technicians today?",
+      "free_stops": "Dispatch rules are in the solution document."
+    },
+    {
+      "id": "p3_pricing_errors",
+      "n": 3,
+      "words": "Technicians quote whatever they like for gas and parts",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Give every technician one fixed rate list, so customers get the same price from anyone",
+        "Ask them to call the office for any price outside it, so exceptions are seen."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A rate card inside the technician app, with any deviation needing office approval on the spot.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Is there a fixed rate list today?",
+      "free_stops": "Rate card structure and approval limits are in the solution document."
+    },
+    {
+      "id": "p4_cash_mismatch",
+      "n": 4,
+      "words": "Cash collected by technicians doesn't match the jobs done",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Match each technician's cash to their completed jobs at day's end, so gaps show the same day",
+        "Give a receipt for every payment, so both sides have a record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "Daily cash reconciliation per technician against completed jobs, with any gap flagged automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How is cash handed back to the office?",
+      "free_stops": "Matching rules and variance flags are in the solution document."
+    },
+    {
+      "id": "p5_performance_unknown",
+      "n": 5,
+      "words": "I don't know how many jobs each technician did today",
+      "category": "people_staff",
+      "subtype": "performance_unknown",
+      "quick_ideas": [
+        "Ask technicians to message the office as each job finishes, so the day's progress is visible",
+        "Count jobs per person at day's end for one week, to get a baseline."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A technician job app recording arrival, photos, work done, parts used and customer confirmation, rolled into a daily jobs-per-technician view.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many technicians are out on a normal day?",
+      "free_stops": "App fields and reports are in the solution document."
+    },
+    {
+      "id": "p6_rework",
+      "n": 6,
+      "words": "The same customer calls back — not cooling again",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Note every repeat call that comes soon after a visit, so the pattern is visible",
+        "Review those with the technician who went, so the cause is understood."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A repeat-fault flag raised automatically when the same unit gets a call again within a set number of days.",
+        "tool_words": []
+      },
+      "ask_first": "How often do repeat calls come in?",
+      "free_stops": "Flag rules are in the solution document."
+    },
+    {
+      "id": "p7_shrinkage_theft",
+      "n": 7,
+      "words": "Parts taken out by technicians are never accounted for",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Log every part and gas cylinder issued to each technician, so stock has an owner",
+        "Match returns and usage once a week, so gaps show early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A parts and gas issue log per technician, matched to jobs, with low-stock alerts before peak season.",
+        "tool_words": []
+      },
+      "ask_first": "Which parts run out most often?",
+      "free_stops": "Issue and matching rules are in the solution document."
+    },
+    {
+      "id": "p8_churn_subscription",
+      "n": 8,
+      "words": "AMCs expire and nobody calls to renew",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "List all AMCs by end date, so renewals are visible",
+        "Call the ones ending soon, so they don't lapse quietly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "customer_messaging"
+        ],
+        "text": "An AMC register that schedules visits and sends renewal reminders automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many AMC customers do you have?",
+      "free_stops": "Visit scheduling and reminder timing are in the solution document."
+    },
+    {
+      "id": "p9_seasonal_dip",
+      "n": 9,
+      "words": "Winter is completely dead and I still pay salaries",
+      "category": "sales_revenue",
+      "subtype": "seasonal_dip",
+      "quick_ideas": [
+        "List past customers who agreed to hear from you, so you have someone to offer work to",
+        "Plan a pre-summer servicing offer for them, so work is booked before the rush."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "An off-season campaign list built from service history and sent at the right time each year.",
+        "tool_words": []
+      },
+      "ask_first": "What does the team do in quiet months?",
+      "free_stops": "Campaign timing and segmentation are in the solution document."
+    },
+    {
+      "id": "p10_reviews_bad",
+      "n": 10,
+      "words": "Online reviews say we never turned up",
+      "category": "customers_retention",
+      "subtype": "reviews_bad",
+      "quick_ideas": [
+        "Give customers a time slot and message if running late, so waiting doesn't turn into anger",
+        "Ask genuinely happy customers for a review, so real experiences are heard."
+      ],
+      "workzap_build": {
+        "keys": [
+          "reviews_collection"
+        ],
+        "text": "Automatic review requests after jobs the customer confirmed as done.",
+        "tool_words": []
+      },
+      "ask_first": "Do customers get a time slot today?",
+      "free_stops": "Timing and message flow are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any guidance on refrigerant handling, gas charging, wiring or mounting units at height. Any diagnosis of faults for customers. Any help faking warranty cards, swapping used parts in while billing new, or under-invoicing. Any recording of customers' names, addresses or numbers, or covert tracking of technicians' phones. Anything other than emergency services first for shock, falls, gas leaks, fire, carbon monoxide or dangerous heat at home."
+  ],
+  "sample_reply": {
+    "person": "Garmiyon mein calls itni hoti hain ke aadhi miss ho jati hain, koi tareeqa batao.",
+    "pi": "Ji bilkul, is ka hal mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Phone ke saath WhatsApp booking ka option bhi de dein, taake sirf call hi rasta na rahe. 2 Miss hone wale numbers ko din mein fixed waqt pe wapas call karein, taake koi customer zaya na ho. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har call aur message ka ticket, aur technicians ko roz ki job list WhatsApp pe. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

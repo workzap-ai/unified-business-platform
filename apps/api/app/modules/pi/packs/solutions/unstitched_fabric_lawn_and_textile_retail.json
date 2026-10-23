@@ -1,0 +1,200 @@
+{
+  "industry": "unstitched_fabric_lawn_and_textile_retail",
+  "name": "Unstitched fabric, lawn and textile retail",
+  "sector": "7.A Retail and consumer (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_no_visibility",
+      "n": 1,
+      "words": "Than se gaz ke hisaab se bechte hain, roll mein kitna bacha pata nahi chalta",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Measure and tag your fastest-moving rolls once, so you know what's left on them",
+        "Note metres sold per roll for a week, so the tags stay roughly right."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a roll-level register with design, colour, metres in, sold and remaining, and alerts when a roll runs low.",
+        "tool_words": []
+      },
+      "ask_first": "Do you sell mostly pre-cut suits or by the metre?",
+      "free_stops": "How each roll is coded and sales are recorded at the counter is in the solution document."
+    },
+    {
+      "id": "p2_wastage_cost",
+      "n": 2,
+      "words": "Cut pieces ka dher lag jaata hai",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Count and sort the cut-piece pile once by length, so you know what's actually sellable",
+        "Put the usable pieces on a visible rack, because hidden stock never sells."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "cut pieces recorded per roll with a running list of sellable lengths and their value.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "What happens to cut pieces today?",
+      "free_stops": "How cut pieces are captured and reported is in the solution document."
+    },
+    {
+      "id": "p3_overstock_dead_stock",
+      "n": 3,
+      "words": "Pichle season ka volume abhi bhi godown mein hai",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "List leftover designs by volume and quantity once, so you know the real size of the problem",
+        "Offer them to wholesale buyers before the new season, so they don't age another year."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "sell-through by design and volume by week of season, showing early which designs will be left over.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How much is left from last season?",
+      "free_stops": "How sell-through is tracked and when designs are flagged is in the solution document."
+    },
+    {
+      "id": "p4_supplier_late",
+      "n": 4,
+      "words": "Printing unit har season launch late karta hai",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_late",
+      "quick_ideas": [
+        "List every design with its printing due date in one place, so you see which part of the launch is at risk",
+        "Ask the printer for sampling approval dates, because delays usually start there."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a printing tracker: designs sent, sampling approved, metres ordered, received and colour-match result, with late alerts.",
+        "tool_words": []
+      },
+      "ask_first": "How late are they usually?",
+      "free_stops": "The stages and alert points are in the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Boutique wale credit pe lete hain aur mahino baad dete hain",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Add up what each wholesale buyer owes once, so you know who is oldest",
+        "Agree a credit limit with your biggest buyers, so balances don't keep growing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a wholesale credit ledger per buyer code with ageing, limits and WhatsApp statements.",
+        "tool_words": []
+      },
+      "ask_first": "How many buyers take goods on credit?",
+      "free_stops": "How buyers are coded, limits enforced and statements sent is in the solution document."
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "Har salesman alag rate deta hai",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Fix a price list for your top designs, so bargaining starts from the same number",
+        "Note the discounts given for a week, so you see how wide the range is."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a fixed price list on the counter tablet or POS with a salesman-wise discount log.",
+        "tool_words": []
+      },
+      "ask_first": "Are prices fixed or bargained today?",
+      "free_stops": "How prices are shown and discounts logged is in the solution document."
+    },
+    {
+      "id": "p7_commission_disputes",
+      "n": 7,
+      "words": "Salesmen ka commission kaagaz pe, hamesha jhagra",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write the commission rule down once, so everyone agrees on the basis",
+        "Note the salesman on each sale for a week, so the total isn't argued later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "commission worked out automatically from sales by salesman code, visible to each salesman.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How is commission worked out now?",
+      "free_stops": "How sales are tied to salesmen and commission calculated is in the solution document."
+    },
+    {
+      "id": "p8_order_errors",
+      "n": 8,
+      "words": "Online launch pe order stock se zyada ho jaate hain",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Count launch stock for online separately once, so the website sells only what's set aside",
+        "Hide sold-out designs by hand on launch day, so customers don't order what's gone."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "an online catalogue sync that hides designs at zero stock across website and shop.",
+        "tool_words": []
+      },
+      "ask_first": "Where do you sell online?",
+      "free_stops": "How shop and online stock are connected is in the solution document."
+    },
+    {
+      "id": "p9_branches_not_aligned",
+      "n": 9,
+      "words": "Bhaiyon ki doosri shops hain, numbers share nahi hote",
+      "category": "communication_coordination",
+      "subtype": "branches_not_aligned",
+      "quick_ideas": [
+        "Agree on three numbers every shop shares weekly, so the family is looking at the same thing",
+        "Compare one week across shops, so the first conversation is about facts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a shared morning read comparing each shop's sales and stock.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many shops are there?",
+      "free_stops": "Which numbers each shop sees and how they're collected is in the solution document."
+    }
+  ],
+  "never_say": [
+    "How to sell replicas or use another brand's name. Anything on export rebates, customs or invoicing. Dye, chemical or wash-safety guidance. Which side is right in a family partnership dispute. That a launch or design will sell out."
+  ],
+  "sample_reply": {
+    "person": "Hum than se gaz ke hisaab se bechte hain, kabhi pata nahi chalta roll mein kitna bacha hai, aur cut pieces ka dher lagta rehta hai. Kya karein?",
+    "pi": "Ji haan, iska saaf hal hai aur shuruaat isi hafte ho sakti hai. 1 Sab se zyada bikne wale rolls ko ek dafa naap ke tag kar dein, taa ke pata ho kitna bacha hai. 2 Cut pieces ka dher ek dafa lambai ke hisaab se chhaant lein aur kaam ke pieces saamne rack pe rakhein, kyunke chhupa hua maal nahi bikta. Workzap ye aap ke liye khud-ba-khud kar sakta hai: har roll ka register jis mein metres andar, bike aur baaki dikhein, cut pieces ka record, aur roll khatam hone se pehle alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

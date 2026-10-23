@@ -1,0 +1,218 @@
+{
+  "industry": "interior_design_and_fit_out",
+  "name": "Interior design and fit-out",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_pre_orders_custom",
+      "n": 1,
+      "words": "Clients keep changing the design after we've started",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Get a written sign-off at the end of each design stage, so changes after it are clearly changes",
+        "Tell clients up front how many revisions are included."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A project file with drawings, revision history and client sign-off at every stage, so each change is counted and visible.",
+        "tool_words": []
+      },
+      "ask_first": "How many revisions does a client usually get?",
+      "free_stops": "Stage gates and sign-off flow are in the solution document."
+    },
+    {
+      "id": "p2_unbilled_variations",
+      "n": 2,
+      "words": "Change orders are agreed on WhatsApp and then disputed",
+      "category": "cash_collections",
+      "subtype": "unbilled_variations",
+      "quick_ideas": [
+        "Confirm every change in one written message with its cost before work starts",
+        "Keep a running list of agreed changes per project."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A change-order flow where the client approves cost on WhatsApp and the item goes straight onto the bill.",
+        "tool_words": []
+      },
+      "ask_first": "Who works out the extra cost when a change comes in?",
+      "free_stops": "The approval and billing steps are in the solution document; disputes go to a lawyer."
+    },
+    {
+      "id": "p3_quality_inconsistent",
+      "n": 3,
+      "words": "Our quotes are wrong because the site measurement was off",
+      "category": "operations_process",
+      "subtype": "quality_inconsistent",
+      "quick_ideas": [
+        "Use the same measurement checklist on every site visit",
+        "Ask for photos with dimensions, so the office can double-check."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A site measurement form on phone with photos and dimensions feeding the quote directly.",
+        "tool_words": []
+      },
+      "ask_first": "Who does the site measurements?",
+      "free_stops": "Form fields and the link to pricing are in the solution document."
+    },
+    {
+      "id": "p4_margin_unknown",
+      "n": 4,
+      "words": "We win jobs at a price that leaves no margin, and can't say if we made money",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Take one finished project and compare quoted against actual material and labour",
+        "Note which items ran over most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A quote builder with a rate library that shows margin before sending, and a project P&L of quoted against actual for every job.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How do you build a quote today?",
+      "free_stops": "Rate library structure and margin rules are in the solution document."
+    },
+    {
+      "id": "p5_import_delays",
+      "n": 5,
+      "words": "Imported tiles and lighting take months and hold up the site",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "List long-lead items per project with order date and need-on-site date",
+        "Order those first, as soon as the design is signed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A procurement tracker showing supplier, lead time and expected delivery against site need date for every item.",
+        "tool_words": []
+      },
+      "ask_first": "Which materials take longest to arrive?",
+      "free_stops": "Tracking stages and alerts are in the solution document."
+    },
+    {
+      "id": "p6_handoffs",
+      "n": 6,
+      "words": "Trades step on each other — painter comes before the electrician finishes",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Write the trade sequence for each site on one page",
+        "Confirm the previous trade is finished before booking the next."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A trade schedule per site in the right sequence, sending each trade its day plan on WhatsApp.",
+        "tool_words": []
+      },
+      "ask_first": "Which trades are in-house and which are subcontracted?",
+      "free_stops": "Sequencing rules per project type are in the solution document."
+    },
+    {
+      "id": "p7_capacity",
+      "n": 7,
+      "words": "Joinery workshop is overloaded while site waits",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Put this week's workshop jobs in order of site need date",
+        "Share that list with project managers."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A workshop job board with stages and completion dates per project.",
+        "tool_words": []
+      },
+      "ask_first": "How do you plan what the workshop makes each week?",
+      "free_stops": "Workshop stages and planning logic are in the solution document."
+    },
+    {
+      "id": "p8_customer_communication",
+      "n": 8,
+      "words": "Clients complain they don't know what's happening on site",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Pick one fixed day a week to send each client a short update with photos",
+        "Name one contact person per client."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "Weekly progress photos and status sent to each client automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How do clients get updates now?",
+      "free_stops": "Update content and timing are in the solution document."
+    },
+    {
+      "id": "p9_receivables_late",
+      "n": 9,
+      "words": "Snag lists drag on and the client holds back the last payment",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Walk the site with the client and agree one final snag list",
+        "Close each item with a photo."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "credit_ledger"
+        ],
+        "text": "Snag and warranty tickets with photos and sign- off, alongside milestone billing with reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Which milestone payment is hardest to collect?",
+      "free_stops": "Snag flow and billing triggers are in the solution document."
+    },
+    {
+      "id": "p10_lead_quality",
+      "n": 10,
+      "words": "Leads come from Instagram but most just want free ideas",
+      "category": "marketing_leads",
+      "subtype": "lead_quality",
+      "quick_ideas": [
+        "Ask a few qualifying questions before any meeting, so serious clients surface",
+        "Be clear that design work starts after a design fee."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Lead intake from Instagram and website with qualifying questions and source tracking.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most enquiries come from?",
+      "free_stops": "Question set and scoring are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any advice on removing walls, load-bearing changes, ceiling loads, gas moves, rewiring or fire-rated materials; a qualified engineer or licensed trade decides. Any help skipping mall or authority approvals or using non-compliant materials. Any view on contract disputes, withheld payments or liability for defects; that is for a lawyer. Any request to record clients' names, home addresses or contact details. Any help copying another studio's designs or using images without permission."
+  ],
+  "sample_reply": {
+    "person": "Is there a way to stop clients changing their minds mid-project and expecting the same price? We redid one kitchen three times.",
+    "pi": "Yes, this can be brought under control, and you can start this week. 1 Get a written sign-off at the end of each design stage, so any later change is clearly a change. 2 Confirm every change in one written message with its cost before work begins. Workzap can do this automatically for you: stage sign-offs, change orders the client approves on WhatsApp, and each one added straight to the bill. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

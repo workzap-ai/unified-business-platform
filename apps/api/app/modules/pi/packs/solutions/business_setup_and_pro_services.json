@@ -1,0 +1,196 @@
+{
+  "industry": "business_setup_and_pro_services",
+  "name": "Business setup and PRO services UAE",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_lead_followup_slow",
+      "n": 1,
+      "words": "Leads come from ads and WhatsApp, and half never get a reply the same day",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Reply today to every enquiry still waiting, so warm leads aren't lost",
+        "Name one person who owns new enquiries each day, so replies stop depending on who looks."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "one lead inbox for website, ads and WhatsApp with assignment, a reply timer and reminders until contact is made.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most of your leads come from?",
+      "free_stops": "assignment rules and reply timings are set out in the solution document."
+    },
+    {
+      "id": "p2_campaign_roi_unknown",
+      "n": 2,
+      "words": "We spend on Google ads and can't tell which leads became clients",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Ask every new lead where they found you, so you start recording source",
+        "Mark the source on this month's won clients once, so you get a first picture."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "tracked links and codes per ad and channel, so every client shows which campaign brought them.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how tracking is set up for your campaigns is kept for the solution document."
+    },
+    {
+      "id": "p3_pricing_errors",
+      "n": 3,
+      "words": "Quotations are made in Word and every consultant prices differently",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Write one standard price list for your main packages, so quotes start from the same base",
+        "Agree who approves discounts, so exceptions are controlled."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a quotation builder from your price list and package templates, with an approval step for discounts.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "package templates and approval rules are designed in the solution document."
+    },
+    {
+      "id": "p4_customer_communication",
+      "n": 4,
+      "words": "Clients keep asking \"where is my licence?",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Send each active client one update on where their case stands, so the calls ease",
+        "Tell new clients once what the main stages are, so they know what to expect."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "customer_messaging — a case tracker with stages for each service, sending clients a WhatsApp update automatically at each stage.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the stages per service and the update flow are worked out in the solution document."
+    },
+    {
+      "id": "p5_licences_renewals",
+      "n": 5,
+      "words": "Licence and visa expiries slip and clients get fined",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List everything expiring across your managed companies in the next two months, so nothing urgent is missed",
+        "Contact those clients this week, so renewals start in time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an expiry calendar for licences, visas, IDs, tenancy registrations and cards across all managed companies, with reminders at several points before each date and renewal quotes drafted automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "reminder timings and the renewal pipeline are set out in the solution document."
+    },
+    {
+      "id": "p6_reports_wrong",
+      "n": 6,
+      "words": "Government fees we pay don't reconcile with what we billed",
+      "category": "reporting_visibility",
+      "subtype": "reports_wrong",
+      "quick_ideas": [
+        "Match last month's government fee payments against client invoices once, so gaps show",
+        "Record fees per case from today, so the picture stays clean."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a government fee ledger per case, reconciled against client invoices and payments.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how fees are recorded and matched is kept for the solution document."
+    },
+    {
+      "id": "p7_cash_flow_tight",
+      "n": 7,
+      "words": "We pay government fees upfront and clients pay later",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "List the fees you've paid but not yet collected, so the size of the gap is clear",
+        "Chase the largest this week, so money comes back."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "client balances per case with fees advanced, invoices and scheduled reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the collection flow is set out in the solution document."
+    },
+    {
+      "id": "p8_field_team_visibility",
+      "n": 8,
+      "words": "PROs run around without a plan and I can't see what they did",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Plan tomorrow's PRO visits on one sheet grouped by location, so trips aren't repeated",
+        "Ask PROs for a short end-of-day list of what was done, so you get a record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a PRO day planner grouping visits by location, with check-in and completion notes from phone.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the planning rules and check-in flow are worked out in the solution document."
+    },
+    {
+      "id": "p9_turnover",
+      "n": 9,
+      "words": "Consultants keep client files on their laptops, and clients leave when they resign",
+      "category": "people_staff",
+      "subtype": "turnover",
+      "quick_ideas": [
+        "Move active case files into one shared firm folder, so they stay with the firm",
+        "Name a backup consultant per large client, so relationships aren't single-threaded."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a client file vault and case history with access by role, so every case stays with the firm.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "access roles and file structure are kept for the solution document."
+    }
+  ],
+  "never_say": [
+    "Any immigration, visa, licensing, legal, corporate tax, VAT or banking advice, or which structure or jurisdiction a client should choose. Anything involving nominee arrangements to hide ownership, shell companies for concealment, fake tenancy or employment, visa selling or bribery. That approvals or licences will be issued by a certain date. Requests for client IDs, passports, licence numbers or bank details."
+  ],
+  "sample_reply": {
+    "person": "We manage renewals for a lot of companies and every month a few slip and the client gets fined. What can we do?",
+    "pi": "Yes, this can be brought under control, starting this week. 1 List everything expiring across your managed companies in the next two months, so nothing urgent is missed. 2 Contact those clients this week, so renewals start in time. Workzap can do this automatically for you: an expiry calendar across every company you manage, with reminders to your team and the client well before each date. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

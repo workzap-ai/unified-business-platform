@@ -1,0 +1,219 @@
+{
+  "industry": "garment_and_knitwear_export_units",
+  "name": "Garment and knitwear export units",
+  "sector": "7.D Manufacturing and industry (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_delivery_late",
+      "n": 1,
+      "words": "We missed the ex-factory date and had to air-ship at our own cost",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Put every live order's ex-factory date and current stage on one page, so you see which ones are already at risk",
+        "Go back through the last missed shipment and note the milestone that slipped first, so you know where to watch"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "dashboards_reports An order and TNA board for every style with milestone dates and status, flagging at-risk orders automatically each morning for merchandisers and the owner.",
+        "tool_words": []
+      },
+      "ask_first": "At which stage do orders usually slip?",
+      "free_stops": "Which milestones are tracked and how risk flags are triggered is set out in the solution document."
+    },
+    {
+      "id": "p2_supplier_late",
+      "n": 2,
+      "words": "Fabric arrived late from the mill so stitching started late",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_late",
+      "quick_ideas": [
+        "List every open fabric and trims PO with promised and actual arrival dates, so you see which supplier slips most",
+        "Mark which ship dates depend on each late PO, so the knock-on is visible straight away"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "stock_alerts A material arrival tracker per order with PO, promised and received dates, sending shortage and delay alerts linked to the ship date.",
+        "tool_words": []
+      },
+      "ask_first": "Which arrives late most often — fabric, trims or accessories?",
+      "free_stops": "How material delays are tied to each order's ship date is mapped in the solution document."
+    },
+    {
+      "id": "p3_data_scattered",
+      "n": 3,
+      "words": "Merchandisers keep the TNA in their own Excel and I can't see all orders",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Ask each merchandiser to share their order list once into one shared file, so you have a single view for the first time",
+        "Agree the handful of milestones every merchandiser must report, so updates look the same"
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "One shared order board that every merchandiser updates, so the owner sees all styles on one screen and order knowledge stays when people leave.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The board layout and who updates what are covered in the solution document."
+    },
+    {
+      "id": "p4_performance_unknown",
+      "n": 4,
+      "words": "Line efficiency varies a lot and I don't know why",
+      "category": "people_staff",
+      "subtype": "performance_unknown",
+      "quick_ideas": [
+        "Have one line record output every hour for a day, so you see when it drops",
+        "Note what was happening at each drop (machine, feeding, style change), so causes are on record"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "dashboards_reports Hourly line output entered on phone by the line in-charge, with efficiency against SMV shown live and summarised daily by line.",
+        "tool_words": []
+      },
+      "ask_first": "How is line output recorded during the day?",
+      "free_stops": "How efficiency is calculated per style and line is detailed in the solution document."
+    },
+    {
+      "id": "p5_inspection_missing",
+      "n": 5,
+      "words": "Defects are found at the end, not inline",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Put one checker inline on your worst line for a day, so you see where defects start",
+        "Note the top three defects from the last failed inspection, so checking focuses on them"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "An inline and final QC app recording defects by type, operation and line with photos, summarised daily so rework is caught early.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "Defect categories and where checkpoints sit are kept for the solution document."
+    },
+    {
+      "id": "p6_wastage_cost",
+      "n": 6,
+      "words": "Cutting wastage is higher than the costing allowed",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "For one style, compare fabric issued to cutting against pieces cut and the costing allowance, so you see the real gap",
+        "Count leftover fabric and panels in the cutting room once, so you know what is sitting there"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "custom_build A cutting register comparing fabric issued, pieces cut and costing allowance per style, with leftovers logged.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How allowances are set and compared per style is set out in the solution document."
+    },
+    {
+      "id": "p7_count_mismatch",
+      "n": 7,
+      "words": "Subcontractor delivered fewer pieces than we sent cut panels for",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Reconcile panels sent and pieces received for each current subcontractor once, so you know who owes what",
+        "Ask for a signed count on the next return, so disputes start small"
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "credit_ledger A subcontractor ledger for pieces sent, received, rejected and paid, flagging any shortfall the day goods come back.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How counts are confirmed and linked to payment is covered in the solution document."
+    },
+    {
+      "id": "p8_refunds",
+      "n": 8,
+      "words": "Buyer deducted a claim and we don't know what for",
+      "category": "cash_collections",
+      "subtype": "refunds",
+      "quick_ideas": [
+        "List every claim and deduction this year against its shipment, so patterns show up",
+        "Ask the buyer for the reason on each open deduction, so nothing is written off blind"
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A buyer payment and claims tracker with ageing and the reason for each deduction, linked to the shipment.",
+        "tool_words": []
+      },
+      "ask_first": "How are claims and deductions tracked today?",
+      "free_stops": "How claims are matched to shipments and followed up is kept for the solution document."
+    },
+    {
+      "id": "p9_margin_unknown",
+      "n": 9,
+      "words": "I don't know the real margin per style once rework and air freight are in",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "For your last shipped style, put actual fabric, rework and freight next to the costing, so the real margin shows",
+        "Pick the style you underquoted last and note what was missed, so the next costing includes it"
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A costing tool that compares actual against costing after every shipment, per style.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Which actual costs are captured and how is detailed in the solution document."
+    },
+    {
+      "id": "p10_website_issues",
+      "n": 10,
+      "words": "No proper catalogue or website for new buyers to see our capability",
+      "category": "marketing_leads",
+      "subtype": "website_issues",
+      "quick_ideas": [
+        "Gather good photos of your lines, products and past styles in one folder, so you have something to send",
+        "Write down what new buyers ask to see first, so the catalogue answers it"
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "A simple capability website and digital lookbook that new buyers can browse and enquire from.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The structure and content of the site are planned in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on social-compliance audits, certifications or how to pass them; never help create or alter attendance, wage or working-hour records. Any advice on LCs, export finance, duty drawback, customs or tax refunds; suggest an accountant or banker. Any help with fake origin labels, misdeclared quantities or under-invoicing. Any help optimising child labour, forced overtime or withheld wages. Any judgement on who is liable in a buyer claim; note the record gap only. Any guarantee of on-time shipment or higher efficiency."
+  ],
+  "sample_reply": {
+    "person": "We keep missing ex-factory because fabric comes late, and I only find out when it's too late. What can we do?",
+    "pi": "Yes, this can be brought under control, and you can start this week. 1 List every open fabric and trims order with its promised and actual arrival date, so you can see which supplier slips most. 2 Next to each one, mark the ship date that depends on it, so a delay shows its knock-on straight away. Workzap can do this automatically for you: a material tracker tied to each order's TNA that alerts you the day fabric slips and shows every at-risk ship date each morning. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

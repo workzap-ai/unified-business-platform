@@ -1,0 +1,223 @@
+{
+  "industry": "florists_and_gifting",
+  "name": "Florists and gifting (incl. luxury gifting and corporate gifting)",
+  "sector": "7.A Retail and consumer (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_expiry_wastage",
+      "n": 1,
+      "words": "Flowers wilt before we sell them and we throw away a lot",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Record what you throw away by stem type for one week, because it shows what you over-buy",
+        "Compare buying with what was actually sold, because buying by feel drives wastage."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "a flower buying planner from past sales and pre-orders, with a wastage log by stem type.",
+        "tool_words": []
+      },
+      "ask_first": "Where do your flowers come from?",
+      "free_stops": "the buying method is kept for the solution document."
+    },
+    {
+      "id": "p2_multi_channel_orders",
+      "n": 2,
+      "words": "Instagram, WhatsApp, website and Talabat orders all come separately and we miss some",
+      "category": "orders_fulfilment",
+      "subtype": "multi_channel_orders",
+      "quick_ideas": [
+        "Put every order from every channel onto one list for a day, because it shows which channel leaks",
+        "Make one person own incoming orders, because shared phones lose them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "one inbox for all channels creating a single job card with design, delivery slot and status.",
+        "tool_words": []
+      },
+      "ask_first": "Which channel brings most orders?",
+      "free_stops": "channel connections and job-card design go in the solution document."
+    },
+    {
+      "id": "p3_order_errors",
+      "n": 3,
+      "words": "Wrong card message or wrong address on the delivery",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Have the customer send delivery and card details themselves rather than staff retyping them, because copying causes mistakes",
+        "Check recent errors for where they began, because the pattern repeats."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "workflow_automation"
+        ],
+        "text": "a confirmation step where the customer enters card and delivery details directly; pi never handles recipient details.",
+        "tool_words": []
+      },
+      "ask_first": "How are card messages captured today?",
+      "free_stops": "the confirmation flow is kept for the solution document."
+    },
+    {
+      "id": "p4_delivery_late",
+      "n": 4,
+      "words": "Same-day orders are delivered late and the occasion is missed",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Look at a busy day's late deliveries by area and slot, because it shows where routing fails",
+        "Set a cut-off time for same-day orders, because late orders push others late."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "field_checks"
+        ],
+        "text": "delivery routing by area and slot with driver proof of delivery and a live late list.",
+        "tool_words": []
+      },
+      "ask_first": "Who delivers, your drivers or an app?",
+      "free_stops": "routing rules and slot design go in the solution document."
+    },
+    {
+      "id": "p5_customer_communication",
+      "n": 5,
+      "words": "Customers want photos before delivery and we forget",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Make the photo part of finishing each order, because it's then hard to skip",
+        "Note how many complaints followed a missing photo, because it shows the value."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "job_tracking"
+        ],
+        "text": "a pre-delivery photo sent to the customer automatically on WhatsApp.",
+        "tool_words": []
+      },
+      "ask_first": "Who sends photos today?",
+      "free_stops": "the photo step setup is kept for the solution document."
+    },
+    {
+      "id": "p6_approvals_slow",
+      "n": 6,
+      "words": "Corporate quotes go back and forth for weeks on WhatsApp and email",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "Ask each corporate client for one person who approves, because many voices slow everything",
+        "Keep each quote version in one place, because confusion causes rework."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a corporate gifting portal where the client approves mock- ups, quantities and branding, with quote versions and approval history.",
+        "tool_words": [
+          "portal"
+        ]
+      },
+      "ask_first": "How do approvals happen now, WhatsApp, email or both?",
+      "free_stops": "the approval flow is designed in the solution document."
+    },
+    {
+      "id": "p7_capacity",
+      "n": 7,
+      "words": "Corporate clients want large branded quantities fast and we can't produce",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Work out how many boxes your team really makes in a day, because it sets honest deadlines",
+        "Agree design lock dates with clients, because late changes eat production time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "dashboards_reports"
+        ],
+        "text": "a production board by delivery date showing load against team capacity.",
+        "tool_words": []
+      },
+      "ask_first": "Do you bring in extra hands in peak weeks?",
+      "free_stops": "capacity planning rules go in the solution document."
+    },
+    {
+      "id": "p8_receivables_late",
+      "n": 8,
+      "words": "Corporate clients pay late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid corporate invoice with its age, because it shows who to chase first",
+        "Agree payment terms before production, because they're harder after delivery."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "corporate receivables with ageing and polite automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How do you follow up now?",
+      "free_stops": "terms and reminder timing are kept for the solution document."
+    },
+    {
+      "id": "p9_raw_material_shortage",
+      "n": 9,
+      "words": "Packaging runs out in peak",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "Count boxes, ribbons and sleeves now against last season's use, because the gap is your order",
+        "Ask suppliers their peak lead time, because it sets your real order date."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "packaging and hamper-item stock with expiry and reorder alerts.",
+        "tool_words": []
+      },
+      "ask_first": "When do you reorder packaging?",
+      "free_stops": "reorder levels are worked out in the solution document."
+    },
+    {
+      "id": "p10_repeat_low",
+      "n": 10,
+      "words": "Corporate clients don't come back next Eid",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "List last year's corporate clients and what occasion they ordered for, because it shows who to approach",
+        "Approach them well before the occasion, because budgets are set early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "a corporate client calendar of past occasions prompting re- engagement in time.",
+        "tool_words": []
+      },
+      "ask_first": "How do you reach past corporate clients now?",
+      "free_stops": "the re-engagement plan goes in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything that requires recipients' names, addresses, phone numbers or card messages in the chat. Advice on anti-bribery limits for corporate gifts, or help disguising gifts or splitting invoices. Advice on flower import permits, phytosanitary rules or food safety of hamper items. Help supplying alcohol where it is illegal, or any licensing advice. Help locating a person or getting someone's address without their consent."
+  ],
+  "sample_reply": {
+    "person": "Before Eid our corporate clients change the design three times and then want hundreds of boxes in a few days. Any solution?",
+    "pi": "Yes, this can be brought under control. 1. Ask each client for one person who approves, because many voices slow everything down. 2. Work out how many boxes your team really makes in a day, so deadlines you agree are honest. Workzap can do this automatically for you: a portal where clients approve designs and quantities with full history, and a production board showing load against your capacity. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

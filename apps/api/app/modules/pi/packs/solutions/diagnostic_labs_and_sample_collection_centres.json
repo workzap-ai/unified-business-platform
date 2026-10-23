@@ -1,0 +1,217 @@
+{
+  "industry": "diagnostic_labs_and_sample_collection_centres",
+  "name": "Diagnostic labs and sample-collection centres",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_delivery_late",
+      "n": 1,
+      "words": "Collection points send samples late and the main lab batches miss the run",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Note the time each batch leaves every collection point and arrives at the lab for a week, so the late routes are clear",
+        "Agree a fixed cut-off time per point, so riders know when to leave."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a sample movement tracker from collection point to rider handover to lab receipt, with time stamps, received counts and late or missing batches flagged daily.",
+        "tool_words": []
+      },
+      "ask_first": "How many collection points does each rider cover?",
+      "free_stops": "Cut-off rules and handover steps are set out in the solution document."
+    },
+    {
+      "id": "p2_bottleneck",
+      "n": 2,
+      "words": "Reports are promised by evening and go out next morning",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Track a few days of samples through each stage, so you see where time is lost",
+        "Promise report times by test group rather than one time for all, so promises are realistic."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "dashboards_reports — a turnaround board showing samples by stage (received, in process, validated, released) by test group, with late items highlighted and average turnaround per branch.",
+        "tool_words": []
+      },
+      "ask_first": "Does the delay start at collection, transport or inside the lab?",
+      "free_stops": "Stage definitions and alert rules are kept for the solution document."
+    },
+    {
+      "id": "p3_service_errors",
+      "n": 3,
+      "words": "Reports sent on WhatsApp to the wrong number",
+      "category": "quality_complaints",
+      "subtype": "service_errors",
+      "quick_ideas": [
+        "Stop sending reports from personal phones, so every send comes from one controlled number",
+        "Add a second-person check before sending, so the contact is verified."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a report-delivery flow that sends only to the registered contact with confirmation steps and logs every send, with no results in the message itself.",
+        "tool_words": []
+      },
+      "ask_first": "Do reports go out from one number or several?",
+      "free_stops": "The verification steps and send log are designed in the solution document; for any privacy obligations, talk to your lawyer."
+    },
+    {
+      "id": "p4_expiry_wastage",
+      "n": 4,
+      "words": "Reagents expire before we use them on low-volume tests",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "List open reagents with expiry and opening dates, so waste is visible",
+        "Compare last month's test volume with pack sizes for low-volume tests, so ordering matches use."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a reagent and kit register with lot, expiry, opening date and usage per test, sending reorder and near-expiry alerts to the lab manager.",
+        "tool_words": []
+      },
+      "ask_first": "Are reagents bought outright or under a rental arrangement?",
+      "free_stops": "Reorder levels per test are worked out in the solution document."
+    },
+    {
+      "id": "p5_deposit_delays",
+      "n": 5,
+      "words": "Franchise collection points collect cash and deposit late",
+      "category": "cash_collections",
+      "subtype": "deposit_delays",
+      "quick_ideas": [
+        "Ask each point for deposit proof against one week of tests booked, so the gap is measured",
+        "Set a fixed deposit day, so expectations are clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily cash close per collection point with deposit-proof upload and a variance list for the owner.",
+        "tool_words": []
+      },
+      "ask_first": "Do franchise points deposit into your account or settle with you monthly?",
+      "free_stops": "The variance rules and franchise reporting are set in the solution document."
+    },
+    {
+      "id": "p6_count_mismatch",
+      "n": 6,
+      "words": "Collection point counts don't match what arrives at the lab",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count samples at dispatch and at receipt for a week, so mismatches are caught at once",
+        "Record each mismatch by point, so patterns show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "sent and received counts per batch, with any sent-not- received sample flagged to both ends the same day.",
+        "tool_words": []
+      },
+      "ask_first": "Who counts samples on arrival at the lab?",
+      "free_stops": "The handover check is specified in the solution document."
+    },
+    {
+      "id": "p7_rider_management",
+      "n": 7,
+      "words": "Riders on home collection reach late and patients cancel",
+      "category": "orders_fulfilment",
+      "subtype": "rider_management",
+      "quick_ideas": [
+        "Group tomorrow's home collections by area before assigning riders, so routes are shorter",
+        "Ask riders to send a quick message on arrival, so you know who reached on time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "field_checks — home-collection booking on WhatsApp with slots, rider assignment, check-in on arrival and live status, with on-time rates per rider.",
+        "tool_words": []
+      },
+      "ask_first": "How do home-collection requests come in now?",
+      "free_stops": "Slot planning and routing logic are in the solution document."
+    },
+    {
+      "id": "p8_credit_customers",
+      "n": 8,
+      "words": "Panel companies pay late and dispute bills",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Send each panel one statement of open tests by reference, so the balance is agreed",
+        "Note disputes by reason, so recurring ones can be fixed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a panel and corporate billing tracker with monthly statements, disputes and ageing, with reminders on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "Which panels take longest to pay?",
+      "free_stops": "Statement format and dispute steps are set in the solution document."
+    },
+    {
+      "id": "p9_pricing_errors",
+      "n": 9,
+      "words": "Price list on the website is different from the counter",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Compare the website, counter and branch price lists once, so differences are found",
+        "Name one person who approves price changes, so there is one source."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "website_digital — one price list master pushed to every branch, the counter and the website so they always match.",
+        "tool_words": []
+      },
+      "ask_first": "How many branches use their own price lists today?",
+      "free_stops": "How the master list connects to each place is mapped in the solution document."
+    },
+    {
+      "id": "p10_reports_late",
+      "n": 10,
+      "words": "I find out about branch volumes once a month from an Excel",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "Ask each branch for one week of daily test counts, so you see the trend sooner",
+        "Pick the few numbers you want daily, so reporting stays simple."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read on the owner's phone with tests, revenue, recollects and average turnaround per branch, and the one number to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Does your LIS cover every branch?",
+      "free_stops": "Which numbers and how they are pulled from the LIS is set in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about results, reference ranges, critical values or which test someone should take. Any view on quality-control, cold-chain or accreditation standards. Help issuing reports without testing, altering results or producing fitness or visa medicals without proper testing. Ways to set up hidden payments to referring doctors. Legal advice on a report sent to the wrong person; point to a lawyer. Ideas that put names, sample IDs or results in messages."
+  ],
+  "sample_reply": {
+    "person": "Hamaray collection points se samples der se aate hain aur lab ka evening run miss ho jata hai. Is ka koi hal hai?",
+    "pi": "Ji, is ka hal mumkin hai aur shuruat isi hafte ho sakti hai. 1 Ek hafte tak har point se batch nikalne aur lab pohanchne ka waqt likhein, taake late routes saamne aa jayein. 2 Har point ka ek fixed cut-off time tay karein, taake rider ko pata ho kab nikalna hai. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: har batch ka collection point se lab tak record, rider handover ke saath, aur late ya missing batch ka roz alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

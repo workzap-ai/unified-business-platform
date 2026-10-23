@@ -1,0 +1,240 @@
+{
+  "industry": "telecom_franchises_and_mobile_network_retailers",
+  "name": "Telecom franchises and mobile-network retailers",
+  "sector": "7.L Finance-adjacent, energy and utilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_target_missed",
+      "n": 1,
+      "words": "We miss monthly targets and only find out on the last two days",
+      "category": "sales_revenue",
+      "subtype": "target_missed",
+      "quick_ideas": [
+        "Check progress against each target type every Monday, so you know by mid- month if you are behind",
+        "Split the monthly target into a weekly figure per outlet, so each manager has a number they can see."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A target tracker updated daily from staff entries showing progress by target type against days left, with a mid-month alert to the owner.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which target is hardest to hit each month?",
+      "free_stops": "How targets are split and tracked per outlet is in the solution document."
+    },
+    {
+      "id": "p2_commission_reconciliation",
+      "n": 2,
+      "words": "Operator incentives never match what we think we earned, and clawbacks hit SIMs we cannot see",
+      "category": "cash_collections",
+      "subtype": "commission_reconciliation",
+      "quick_ideas": [
+        "Keep your own monthly count of sales by incentive type, so there is a figure to check the operator's against",
+        "List every clawback with its month, so you see which periods and sales types it comes from."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "An expected-versus-received incentive view with a clawback log by month and outlet.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Matching logic and clawback analysis are in the solution document; pi does not interpret operator policy."
+    },
+    {
+      "id": "p3_serial_batch_tracking",
+      "n": 3,
+      "words": "SIM kits issued to BAs go missing or are not accounted for",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Sign every kit out and back in by serial number, so each one has a holder",
+        "Count each BA's kits at the end of every week, so gaps are found while they are small."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "transfer_tracking A serialised stock register for kits and handsets showing received, issued by role, sold and returned, with alerts for kits out too long.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Register structure and alert rules are in the solution document."
+    },
+    {
+      "id": "p4_overstock_dead_stock",
+      "n": 4,
+      "words": "Handsets sit for months while popular models are always out",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "List every handset older than two months in stock, so slow stock is visible",
+        "Reorder by what sold last month, not by what the distributor offers."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "nori_daily_read A daily read of stock per outlet with ageing flags for slow handsets and low-stock alerts for fast ones.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Ageing and reorder logic are in the solution document."
+    },
+    {
+      "id": "p5_transfers_lost",
+      "n": 5,
+      "words": "Moving stock between outlets is by phone and nobody records it",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Note every transfer on one shared list when it leaves, so it exists on record",
+        "Have the receiving outlet confirm the count on arrival, so gaps are caught at handover."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "An inter-outlet transfer log with confirm-on-receipt that flags anything sent and not received.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Confirmation steps are in the solution document."
+    },
+    {
+      "id": "p6_field_team_visibility",
+      "n": 6,
+      "words": "Field BAs claim sales but I cannot see what they did",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Ask each BA for a short daily note of places visited and sales made, so there is a record",
+        "Compare it with activations in the portal once a week, so claims and results meet."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A BA daily check-in and sales log by place name (not live tracking) rolled into a weekly view per BA.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Log design and comparison method are in the solution document."
+    },
+    {
+      "id": "p7_commission_disputes",
+      "n": 7,
+      "words": "Staff disagree about whose sale it was for incentive",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write one sale-credit rule and share it with all staff, so disputes go back to the rule",
+        "Record the seller at the time of sale, not at month end."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A staff sales leaderboard with the agreed attribution rule applied to each sale.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How the rule is applied and shown is in the solution document."
+    },
+    {
+      "id": "p8_slow_response",
+      "n": 8,
+      "words": "Long queues for complaints and SIM replacements, and people leave angry",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Tally visitors by reason and hour for two weeks, so you see when complaints peak",
+        "Put a dedicated person on complaints at those hours, so sales customers are not stuck behind them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A queue and visit-reason tally that feeds a staff roster for peak hours per outlet.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Tally categories and roster logic are in the solution document."
+    },
+    {
+      "id": "p9_reviews_bad",
+      "n": 9,
+      "words": "Bad Google reviews about wait times are hurting our outlet",
+      "category": "customers_retention",
+      "subtype": "reviews_bad",
+      "quick_ideas": [
+        "Reply politely to each recent review, so readers see the outlet responds",
+        "Ask satisfied customers in person if they would leave an honest review, so the picture is fuller."
+      ],
+      "workzap_build": {
+        "keys": [
+          "reviews_collection"
+        ],
+        "text": "Automatic review requests to customers who agreed to be contacted after a smooth visit, with a weekly review summary per outlet.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Request timing and wording are in the solution document; reviews only ever come from real customers."
+    },
+    {
+      "id": "p10_data_scattered",
+      "n": 10,
+      "words": "I run four outlets and see their numbers only when managers send screenshots",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Agree the same five figures every outlet sends each evening, so the numbers are comparable",
+        "Ask for them at a fixed time, so you are not chasing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "cash_reconciliation A morning read of sales, stock and cash closing across every outlet, with the one outlet that needs attention.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which figures and how they are collected is in the solution document."
+    },
+    {
+      "id": "p11_returns_handling",
+      "n": 11,
+      "words": "Device returns and warranty cases are tracked on paper and lost",
+      "category": "stock_inventory",
+      "subtype": "returns_handling",
+      "quick_ideas": [
+        "Give every return a case number and one list, so nothing lives on loose paper",
+        "Note who has the device at each step, so customers get a straight answer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A returns and warranty tracker with status and handover by role, reminding staff of cases waiting too long.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Case stages are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about tariffs, packages or operator policy. Anything that helps issue SIMs without verification, re-use fingerprints or use another person's ID. Anything that helps sell grey-market or non-registered handsets, or works around PTA, TDRA or CRTC rules. Any request for customers' identity, numbers, biometric or account details. Any view on operator contract or penalty disputes."
+  ],
+  "sample_reply": {
+    "person": "We keep realising on the 28th that we are behind on gross adds. Is there a fix for this?",
+    "pi": "Yes, there is, and you can start this week on your own. 1 Check progress against each target type every Monday, so you know by mid-month whether you are behind. 2 Turn the monthly target into a weekly number per outlet, so each manager can see their own gap. Workzap can do this automatically for you: a tracker fed by daily staff entries that shows progress against days left for every outlet and BA and alerts you mid-month. Shall I have a solution document and quote prepared for you? You are free to say no.",
+    "language": "english"
+  }
+}

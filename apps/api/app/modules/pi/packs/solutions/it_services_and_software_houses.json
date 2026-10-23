@@ -1,0 +1,218 @@
+{
+  "industry": "it_services_and_software_houses",
+  "name": "IT services and software houses",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_cost_overruns",
+      "n": 1,
+      "words": "Fixed-price projects always run over and we eat the loss",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Compare hours spent against the estimate once for every live fixed-price project, so the overruns are visible now",
+        "Review the worst one with its PM, so you learn where the estimate broke."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a project portfolio screen showing budget burn against progress for every project, updated daily from timesheets, with alerts when a project starts to slip.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Roughly how many fixed-price projects are running right now?",
+      "free_stops": "how burn and progress are measured and when alerts fire are set out in the solution document."
+    },
+    {
+      "id": "p2_hidden_costs",
+      "n": 2,
+      "words": "Clients change requirements mid-sprint and don't want to pay for it",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "List the changes absorbed on your biggest project so far, so you see what was given away",
+        "Send that list to the client once, so a change discussion can start."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a change request log per project with approval, cost and time impact, feeding straight into invoices.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the approval and pricing flow for change requests is kept for the solution document."
+    },
+    {
+      "id": "p3_capacity",
+      "n": 3,
+      "words": "Some devs are on three projects and others are on the bench",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Put everyone's project allocation for the next month on one page, so overloads and bench time show",
+        "Rebalance one overloaded developer, so the benefit is felt straight away."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a resource planner showing each person's allocation by week and bench time, updated as projects change.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how allocation is entered and kept current is designed in the solution document."
+    },
+    {
+      "id": "p4_reports_wrong",
+      "n": 4,
+      "words": "Timesheets are filled on Friday from memory",
+      "category": "reporting_visibility",
+      "subtype": "reports_wrong",
+      "quick_ideas": [
+        "Ask the team to log time daily for one week, so you can compare it with the Friday version",
+        "Show the team once why accurate hours matter for pricing, so they buy in."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "timesheet capture linked to projects and tasks with daily nudges instead of a Friday catch-up.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the nudge timing and how it links to your task tool are worked out in the solution document."
+    },
+    {
+      "id": "p5_tasks_dropped",
+      "n": 5,
+      "words": "We miss deadlines and only find out at the demo",
+      "category": "communication_coordination",
+      "subtype": "tasks_dropped",
+      "quick_ideas": [
+        "Ask each PM for a one-line status on every project this week, so slippage surfaces early",
+        "List the next milestone for each project, so everyone sees what's due."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an owner view of upcoming milestones and projects at risk, refreshed daily so slippage shows weeks before a demo.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "the risk signals used are set out in the solution document."
+    },
+    {
+      "id": "p6_inspection_missing",
+      "n": 6,
+      "words": "Bugs come back after release because QA is rushed",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Write down once the checks every release must pass, so QA isn't left to memory",
+        "Review the last few returned bugs together, so you see what was missed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a release checklist that must be completed and signed off before anything goes to the client, with returned issues logged per release.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the checklist contents and sign-off rules are kept for the solution document."
+    },
+    {
+      "id": "p7_cash_flow_tight",
+      "n": 7,
+      "words": "Milestone payments are held because UAT never formally closes",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "List every milestone waiting on client UAT, so you know what money is held",
+        "Ask each client in writing for a sign-off date, so the request is on record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a milestone billing tracker with UAT sign-off dates, chasers when sign-off stalls and invoices drafted the moment it closes.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "chaser timings and invoice triggers are set out in the solution document."
+    },
+    {
+      "id": "p8_receivables_late",
+      "n": 8,
+      "words": "Foreign clients pay late and remittances take time to land",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid invoice by client and age, so you know where to chase first",
+        "Note when payments usually land after an invoice, so planning reflects reality; for anything about foreign exchange rules, talk to your accountant."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "receivables by client with ageing, reminders and remittance receipt recorded, so you see what's due and what has actually arrived.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the reminder sequence and how receipts are matched are kept for the solution document."
+    },
+    {
+      "id": "p9_handoffs",
+      "n": 9,
+      "words": "When a lead dev leaves, nobody knows how the system works",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Ask each lead to write a one-page overview of their main project, so the basics aren't in one head",
+        "Name a second person on each critical project, so there's always a backup."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a knowledge handover checklist and documentation register per project, with reminders when documents go out of date.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the documentation structure and review routine are designed in the solution document."
+    },
+    {
+      "id": "p10_after_sales",
+      "n": 10,
+      "words": "Support contracts turn into unlimited free work",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "Note the support hours spent on each client last month, so you see who is over",
+        "Compare that once against what the contract covers, so you have facts for the next renewal."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "support ticket intake with hours logged per client against the support contract, flagged when a client goes over.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how tickets and hours are tracked against contracts is worked out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any tax, foreign exchange regulation, legal, IP or contract advice. Anything about routing payments to avoid tax or regulators, pirated software or misrepresenting CVs on bids. That projects will finish on time or on budget. Requests for source code, credentials, server access, client data or employee details."
+  ],
+  "sample_reply": {
+    "person": "We're a mid-sized software house and our fixed-price projects keep going over. I only find out at the end. What can we do?",
+    "pi": "Yes, this can be caught much earlier, starting this week. 1 Compare hours spent against the estimate once for every live fixed-price project, so the overruns are visible now. 2 List the changes your team has absorbed on the biggest one, so you can open a change discussion with that client. Workzap can do this automatically for you: budget burn against progress on every project each day, and every change request logged and priced. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

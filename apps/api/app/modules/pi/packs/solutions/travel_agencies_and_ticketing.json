@@ -1,0 +1,221 @@
+{
+  "industry": "travel_agencies_and_ticketing",
+  "name": "Travel agencies and ticketing",
+  "sector": "7.G Transport, mobility and aviation (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_conversion_low",
+      "n": 1,
+      "words": "Enquiries all day on WhatsApp, half never reply after the quote",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Go through last week's quotes once and mark booked, lost or no reply, so you see where people drop off",
+        "Follow up every no-reply quote once, so you learn whether it's price or timing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "every enquiry from WhatsApp, calls and walk-ins recorded with quote sent, follow-up reminders on time, and a booked or lost reason, with conversion seen per staff member every week.",
+        "tool_words": []
+      },
+      "ask_first": "Zyada tar enquiries kahan se aati hain, WhatsApp, walk-in ya calls?",
+      "free_stops": "Follow-up timing and lost-reason categories are set out in the solution document."
+    },
+    {
+      "id": "p2_refunds",
+      "n": 2,
+      "words": "Refunds take months and we don't know which are pending",
+      "category": "cash_collections",
+      "subtype": "refunds",
+      "quick_ideas": [
+        "Count every pending refund and credit shell once with its age, so you know the real backlog",
+        "Give the oldest ones to one named person, so someone owns them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "customer_messaging"
+        ],
+        "text": "a refund and credit shell tracker with status, age and owner, sending customers an update automatically whenever their refund moves.",
+        "tool_words": []
+      },
+      "ask_first": "Is waqt taqreeban kitne refunds pending honge?",
+      "free_stops": "The refund stages and customer update points are designed in the solution document."
+    },
+    {
+      "id": "p3_orders_lost",
+      "n": 3,
+      "words": "Bookings expire because nobody issued before the time limit",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "List today's open bookings with their time limits once, so you see what's at risk",
+        "Make one person check time limits each morning, so it's someone's job."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a time-limit alert board that reminds the right staff before each booking expires, so it's issued or released in time.",
+        "tool_words": []
+      },
+      "ask_first": "Roz taqreeban kitni bookings hold pe hoti hain?",
+      "free_stops": "How time limits are pulled in and alerted is set out in the solution document."
+    },
+    {
+      "id": "p4_hidden_costs",
+      "n": 4,
+      "words": "ADMs keep arriving for old mistakes",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "Sort the last few months' ADMs by cause, so you see which mistake repeats",
+        "Share the top causes with ticketing staff, so the same error isn't made again."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an ADM log with cause, staff role and cost, showing patterns every month so training goes where the losses are.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "ADMs mahine mein taqreeban kitne aate hain?",
+      "free_stops": "The cause categories and reporting are worked out in the solution document."
+    },
+    {
+      "id": "p5_credit_customers",
+      "n": 5,
+      "words": "Corporate clients and sub-agents owe us and BSP is due first",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List everyone on credit with balance and age once, so you see the total exposure",
+        "Line up their usual payment dates against BSP dates, so you see the tight weeks."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a corporate and sub-agent credit ledger with limits, ageing and automatic reminders timed ahead of BSP dates.",
+        "tool_words": []
+      },
+      "ask_first": "Credit sab se zyada kis ko dete hain, corporates ya sub-agents?",
+      "free_stops": "Credit limits and reminder timing are designed in the solution document."
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "Staff quote different markups to different people",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Compare markups on last week's tickets once, so you see how much they vary",
+        "Agree a simple markup range by route type, so staff know the limits."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "dashboards_reports"
+        ],
+        "text": "standard markup rules applied at quote time, with anything outside the range needing approval and a daily view of markup per staff member.",
+        "tool_words": []
+      },
+      "ask_first": "Markup ka faisla abhi kaun karta hai?",
+      "free_stops": "The markup rules per route and customer type are set out in the solution document."
+    },
+    {
+      "id": "p7_commission_disputes",
+      "n": 7,
+      "words": "Staff commission calculations cause fights every month",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write down the commission rule as it stands, so everyone argues from one version",
+        "Share each person's sales list before payday, so disputes come early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a commission calculator from confirmed sales, with a monthly statement each staff member can check.",
+        "tool_words": []
+      },
+      "ask_first": "Commission profit pe hoti hai ya ticket count pe?",
+      "free_stops": "The commission rules are configured in the solution document."
+    },
+    {
+      "id": "p8_repeat_low",
+      "n": 8,
+      "words": "Years of customers but we never contact them again",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Pull a list of past customers who agreed to hear from you, so you know who you can contact",
+        "Mark which seasons each one usually travels Eid, summer, Umrah), so contact is timely."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a re-contact flow to opted-in past customers before Eid, summer and Umrah seasons, with bookings from each send tracked.",
+        "tool_words": []
+      },
+      "ask_first": "Purane customers ke numbers kahan saved hain?",
+      "free_stops": "The timing, audience groups and tracking are designed in the solution document."
+    },
+    {
+      "id": "p9_cash_mismatch",
+      "n": 9,
+      "words": "Counter cash doesn't match the day's tickets",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Match one week's counter cash against tickets issued per day, so you see when gaps appear",
+        "Make the closing count a two-person job, so differences are noticed the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "daily counter cash matched against tickets issued, by branch, with differences flagged to the owner each evening.",
+        "tool_words": []
+      },
+      "ask_first": "Kitni branches mein cash counter hai?",
+      "free_stops": "The matching rules and alert levels are set out in the solution document."
+    },
+    {
+      "id": "p10_manual_reports",
+      "n": 10,
+      "words": "Daily sales report built from GDS reports and Excel by hand",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Decide the three numbers you want each morning, so the report gets shorter",
+        "Ask who builds it how long it takes, so you know the real cost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read",
+          "integration"
+        ],
+        "text": "a morning read of sales, profit and receipts per branch, pulled from GDS reports and receipts without re-typing.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Aap kaun sa GDS use karte hain?",
+      "free_stops": "How the GDS data is pulled in is worked out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any visa, immigration, work permit or travel-document advice; only the business problem. Anything that helps with fake bookings for visa files, forged documents, fake hotel confirmations or travel on wrong documents. Legal, consumer-law or banking advice on refunds, card fraud or chargebacks; suggest they talk to their lawyer or bank. Anything near exploitation or misrepresentation in labour travel. Any storage of traveller names, passport, CNIC or Emirates ID numbers, visa copies or card details."
+  ],
+  "sample_reply": {
+    "person": "Refunds ka bohat masla hai, customers roz phone karte hain aur humein khud nahi pata kis ka refund kahan atka hai. Kuch batayein.",
+    "pi": "Ji haan, is ko kaafi had tak control mein laaya ja sakta hai. 1. Saare pending refunds aur credit shells ek dafa un ki umar ke saath gin lein, taa ke asal backlog saamne aaye. 2. Sab se purane refunds ek tay shuda bande ke hawale kar dein, taa ke koi un ka zimmedar ho. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har refund ka status, umar aur zimmedar ek jagah nazar aaye, aur status badalte hi customer ko WhatsApp par update khud chala jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

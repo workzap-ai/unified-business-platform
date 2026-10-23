@@ -1,0 +1,225 @@
+{
+  "industry": "airlines",
+  "name": "Airlines (regional and low-cost operations)",
+  "sector": "7.G Transport, mobility and aviation (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_route_load_imbalance",
+      "n": 1,
+      "words": "Domestic sectors fly half empty midweek",
+      "category": "sales_revenue",
+      "subtype": "route_load_imbalance",
+      "quick_ideas": [
+        "Put last month's loads by route and weekday side by side once, so the weak days are seen rather than felt",
+        "Ask counter and call-centre staff which midweek routes people ask about but don't book, so you learn the reason behind the gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read on the owner's WhatsApp every day showing load, revenue and ancillaries per flight, with the weakest midweek sectors flagged automatically across the whole network.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is it a few routes every midweek, or most domestic sectors?",
+      "free_stops": "How to set load thresholds per route and act on them is worked out in the solution document."
+    },
+    {
+      "id": "p2_margin_unknown",
+      "n": 2,
+      "words": "Route profit is unknown after fuel and leases",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out one month's profit for your single busiest route by hand, so you see which cost line moves the result most",
+        "Get commercial and finance to agree which costs belong to a route, so everyone argues from the same list."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a route profitability view that updates daily, combining ticket and ancillary revenue with fuel, lease, handling and catering cost per sector, converted to one currency.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which cost hurts most today, fuel, leases or handling?",
+      "free_stops": "How each shared cost is split across routes is set out in the solution document."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "GSAs abroad remit late and their figures never match ours",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every GSA with amount owed and days outstanding once, so you know who to chase first",
+        "Name one person in finance who owns the GSA check, so mismatches stop falling between teams."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "workflow_automation"
+        ],
+        "text": "a settlement tracker that matches agent sales, BSP statements and receipts every day, ages each balance and sends reminders on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "Is the bigger problem the delay itself, or the figures not matching?",
+      "free_stops": "The matching rules and reminder schedule are kept for the solution document."
+    },
+    {
+      "id": "p4_refunds",
+      "n": 4,
+      "words": "Refunds after cancellations take months",
+      "category": "cash_collections",
+      "subtype": "refunds",
+      "quick_ideas": [
+        "Count your open refunds once and note where each is stuck, so you see which stage is the bottleneck",
+        "Give the oldest ones to a named person, so someone owns them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "customer_messaging"
+        ],
+        "text": "a refund pipeline where every request shows stage, age and owner, and the passenger is updated automatically each time it moves.",
+        "tool_words": []
+      },
+      "ask_first": "Where does a refund usually get stuck, approval, accounts or payout?",
+      "free_stops": "The stages, owners and passenger update points are designed in the solution document."
+    },
+    {
+      "id": "p5_slow_response",
+      "n": 5,
+      "words": "Every delay brings a flood of calls and WhatsApps",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Decide who sends updates during a disruption, so outbound messages don't compete with inbound calls",
+        "Check after your next delay how many calls came from passengers who simply hadn't heard, so you know the size of the gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a disruption flow that notifies every affected booking automatically (contacts used with passengers' permission) and offers a rebooking or refund request link, with response counts tracked.",
+        "tool_words": []
+      },
+      "ask_first": "Do most bookings carry a mobile number today?",
+      "free_stops": "The message flow and rebooking link setup are part of the solution document."
+    },
+    {
+      "id": "p6_basket_small",
+      "n": 6,
+      "words": "Ancillary sales are tiny",
+      "category": "sales_revenue",
+      "subtype": "basket_small",
+      "quick_ideas": [
+        "Make one booking on a phone yourself and note where extras are offered, so you see what passengers see",
+        "Ask check-in staff which extras people ask for at the airport, so you know what demand exists."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "a post-booking page and WhatsApp link where passengers add bags, seats or meals at any time, with ancillary sales reported per route each day.",
+        "tool_words": []
+      },
+      "ask_first": "Do most passengers book on your website or through agents?",
+      "free_stops": "Where and when extras are offered in the journey is set out in the solution document."
+    },
+    {
+      "id": "p7_website_slow_broken",
+      "n": 7,
+      "words": "Website booking breaks at payment",
+      "category": "customer_experience_digital",
+      "subtype": "website_slow_broken",
+      "quick_ideas": [
+        "Try a few test bookings on different phones and banks and note where each fails, so you know if it's one cause or several",
+        "Ask your payment provider for last week's declined attempts, so you see how many sales are leaking."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital",
+          "integration"
+        ],
+        "text": "a booking and payment flow connected to your reservation system, with every failed payment flagged to sales for follow-up the same day.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "Does it fail on certain cards or banks, or for everyone?",
+      "free_stops": "The fix itself and the follow-up flow are scoped in the solution document."
+    },
+    {
+      "id": "p8_shift_scheduling",
+      "n": 8,
+      "words": "Crew roster built in Excel, changes go out on WhatsApp",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Agree that one shared roster is the only current version, so nobody works from an old copy",
+        "Ask crew to confirm the latest change they received, so you see who is missing updates."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling",
+          "workflow_automation"
+        ],
+        "text": "a roster publishing tool where every change reaches the affected roles and needs an acknowledgement, with per diems calculated from the final roster for payroll (duty limits stay with your ops team).",
+        "tool_words": []
+      },
+      "ask_first": "Is the main pain the publishing, or the allowance calculation afterwards?",
+      "free_stops": "The acknowledgement flow and allowance rules are kept for the solution document."
+    },
+    {
+      "id": "p9_field_team_visibility",
+      "n": 9,
+      "words": "Station managers report on their own phones, no common format",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Agree with station managers the four or five things they report each day, so reports become comparable",
+        "Collect them in one place instead of private chats, so nothing is lost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "a phone form each outstation fills daily, rolled into one view at base every morning with missing reports flagged.",
+        "tool_words": []
+      },
+      "ask_first": "How many outstations report to you today?",
+      "free_stops": "The form fields and the base view layout are designed in the solution document."
+    },
+    {
+      "id": "p10_invoice_disputes",
+      "n": 10,
+      "words": "Ground handling invoices higher than agreed",
+      "category": "suppliers_purchasing",
+      "subtype": "invoice_disputes",
+      "quick_ideas": [
+        "Check one recent invoice from your busiest outstation against the agreed rate card, so you know if the gap is rates or services",
+        "Gather all stations' rate cards in one place, so checks are possible at all."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an invoice checker that compares every handling bill with the station's rate card and logged services, flagging differences before payment across all stations.",
+        "tool_words": []
+      },
+      "ask_first": "Are the differences in rates, or in services you don't recognise?",
+      "free_stops": "The checking rules per station are worked out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about airworthiness, maintenance release, MEL items, flight or duty-time limits, crew licensing or safety management; those belong to the accountable managers and the regulator. Any reading of PCAA, GCAA or Transport Canada rules, or ways around slot, route or permit rules. Fuel hedging, lease, tax or employment-law advice; suggest they talk to their financial adviser, accountant or lawyer. Anything that helps alter load sheets, crew hours, logbooks or maintenance records. Comments on competitor airlines or individuals in incidents, and any storage of passenger or crew names, PNRs or passport data."
+  ],
+  "sample_reply": {
+    "person": "Every time a flight is delayed our call centre gets buried and passengers still find out at the airport. Can you suggest a fix?",
+    "pi": "Yes, this can be improved, and it starts with who tells passengers first. 1. Decide one person who sends updates during a disruption, so outbound news isn't stuck behind incoming calls. 2. After the next delay, check how many callers simply hadn't been told, so you know how big the gap is. Workzap can do this automatically for you: every affected booking gets notified the moment a delay is entered, with the passenger's permission, plus a link to request rebooking or a refund. Shall I put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

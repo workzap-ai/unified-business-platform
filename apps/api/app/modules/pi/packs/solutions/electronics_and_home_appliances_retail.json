@@ -1,0 +1,201 @@
+{
+  "industry": "electronics_and_home_appliances_retail",
+  "name": "Electronics and home appliances retail",
+  "sector": "7.A Retail and consumer (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_credit_customers",
+      "n": 1,
+      "words": "Qist wale teen chaar qiston ke baad dena band kar dete hain",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List every installment account with its last payment date once, so you see who is late",
+        "Call the oldest late accounts first, so effort goes where risk is highest."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an installment ledger with account codes, schedule, paid, due and overdue days, and a daily overdue list.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many installment accounts?",
+      "free_stops": "How accounts are coded and overdue lists produced is in the solution document."
+    },
+    {
+      "id": "p2_cash_handling_risk",
+      "n": 2,
+      "words": "Recovery wala cash laata hai, pata nahi sab jama hua ya nahi",
+      "category": "cash_collections",
+      "subtype": "cash_handling_risk",
+      "quick_ideas": [
+        "Match the recovery man's copy with your register once, so you see if they agree",
+        "Give a receipt for every collection, so the customer has proof too."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation",
+          "credit_ledger"
+        ],
+        "text": "collections logged on phone with a WhatsApp receipt to the customer and daily collector cash reconciliation.",
+        "tool_words": []
+      },
+      "ask_first": "When does the collected cash reach you?",
+      "free_stops": "How collections are logged and reconciled is in the solution document."
+    },
+    {
+      "id": "p3_serial_batch_tracking",
+      "n": 3,
+      "words": "Serial number note nahi karte, warranty claim pe behas hoti hai",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Write the serial number on every invoice from today, so claims have proof",
+        "Note serials of godown stock once, so you start with a clean list."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "serial capture at purchase, sale and delivery, linked to invoice and warranty dates.",
+        "tool_words": []
+      },
+      "ask_first": "Do you scan or write serials today?",
+      "free_stops": "How serials are captured and linked is in the solution document."
+    },
+    {
+      "id": "p4_delivery_late",
+      "n": 4,
+      "words": "June mein installation team ek hafte peeche, customers naraz",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "List pending installations by area once, so teams can cover one area per trip",
+        "Give customers a realistic slot, so they aren't left waiting at home."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling",
+          "job_tracking"
+        ],
+        "text": "an installation scheduler by zone and slot, with installer assignment and job completion with photo and customer sign-off.",
+        "tool_words": []
+      },
+      "ask_first": "Do you install yourselves or through outside technicians?",
+      "free_stops": "How zones, slots and assignments are set is in the solution document."
+    },
+    {
+      "id": "p5_after_sales",
+      "n": 5,
+      "words": "Warranty claim brand ke paas hafton lagta hai",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "List every open claim with its date once, so you can chase the oldest",
+        "Give the customer a status update on each, so they hear from you before calling."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "customer_messaging"
+        ],
+        "text": "a claim tracker by brand with status updates sent to the customer.",
+        "tool_words": []
+      },
+      "ask_first": "Which brands take the longest?",
+      "free_stops": "The claim stages and update messages are in the solution document."
+    },
+    {
+      "id": "p6_credit_terms",
+      "n": 6,
+      "words": "Brand ke schemes ka pata nahi kitna milna hai",
+      "category": "suppliers_purchasing",
+      "subtype": "credit_terms",
+      "quick_ideas": [
+        "Write down each brand's current scheme and your sales against it once, so you know what you should be owed",
+        "Ask each brand for its statement, so you can compare the two."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a scheme and rebate tracker: target, achieved, due and received.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many brands do you deal with?",
+      "free_stops": "How sales are matched to each scheme is in the solution document."
+    },
+    {
+      "id": "p7_lead_followup_slow",
+      "n": 7,
+      "words": "Facebook ads se installment leads aati hain, salesman call hi nahi karte",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Count this week's leads and how many got a call, so the gap is clear",
+        "Give each lead to a named salesman, so no lead belongs to nobody."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "every enquiry recorded, assigned and reminded until followed up, with response times visible.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most leads come from?",
+      "free_stops": "How leads are assigned and reminders timed is in the solution document."
+    },
+    {
+      "id": "p8_forecasting",
+      "n": 8,
+      "words": "AC season ka stock jua hai",
+      "category": "planning_growth",
+      "subtype": "forecasting",
+      "quick_ideas": [
+        "Pull last summer's sales by model and tonnage once, so buying starts from facts",
+        "Note which models ran out and when, so you order those earlier."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an AC season planner from past sales by model and tonnage.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Does your POS keep last year's sales by model?",
+      "free_stops": "How the planner uses past seasons is in the solution document."
+    },
+    {
+      "id": "p9_software_not_connected",
+      "n": 9,
+      "words": "Showroom aur godown ki stock list alag hai",
+      "category": "tech_systems",
+      "subtype": "software_not_connected",
+      "quick_ideas": [
+        "Count your top models in both places once, so you see where the lists disagree",
+        "Decide which list is the master, so salesmen quote from one source."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "one stock across showroom, godown and marketplaces.",
+        "tool_words": []
+      },
+      "ask_first": "What software does each use?",
+      "free_stops": "How the systems are connected is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Interest, markup or Shariah rulings on installments, or financing advice. Recovery by threats or seizing goods. Electrical, gas or wiring safety advice; for fire, shock or gas leaks, emergency services first. Selling grey imports as warranty-backed or altering serials. To collect CNICs, guarantor details or cheques."
+  ],
+  "sample_reply": {
+    "person": "Qiston pe saman dete hain, 300 ke qareeb accounts hain, recovery ka koi hisaab nahi. Kya karein?",
+    "pi": "Ji haan, ye theek ho sakta hai, aur is hafte hi shuruaat ho sakti hai. 1 Har account ki aakhri qist ki tareekh ek dafa list kar lein, taa ke pata chale kaun late hai. 2 Recovery wale ki copy apne register se ek dafa mila lein, taa ke dono ka farq saamne aaye. Workzap ye aap ke liye khud-ba-khud kar sakta hai: installment ledger jis mein roz late accounts ki list aaye, aur har collection pe customer ko WhatsApp receipt aur shaam ko cash ka hisaab. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

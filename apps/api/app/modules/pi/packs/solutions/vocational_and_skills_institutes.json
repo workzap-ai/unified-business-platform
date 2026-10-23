@@ -1,0 +1,239 @@
+{
+  "industry": "vocational_and_skills_institutes",
+  "name": "Vocational and skills institutes",
+  "sector": "7.J Education and childcare",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_regulatory_reporting",
+      "n": 1,
+      "words": "Funded programme reports take my staff a week every month",
+      "category": "compliance_admin",
+      "subtype": "regulatory_reporting",
+      "quick_ideas": [
+        "Keep this month's attendance in one place per batch from the start, so the report isn't rebuilt at month-end",
+        "Write down every document the funder asks for once, so nothing is chased at the last minute."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "dashboards_reports Attendance and completion data that builds the funder-format report automatically each month, for every campus.",
+        "tool_words": []
+      },
+      "ask_first": "Is attendance on paper registers or something digital today?",
+      "free_stops": "How the report pack is assembled to your funder's template is kept for the document."
+    },
+    {
+      "id": "p2_cash_flow_tight",
+      "n": 2,
+      "words": "Funder payments come months late and I pay instructors from my pocket",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "List every unpaid funder and corporate invoice with when it was submitted, so you see what is owed",
+        "Map your next three months of cash in and out, so the gap is known in advance; for bridging options, talk to your accountant."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "dashboards_reports A receivables tracker for funder and corporate payments, with expected dates, reminders and a cash-gap view updated daily.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The cash-gap model and follow-up schedule are in the document."
+    },
+    {
+      "id": "p3_churn_subscription",
+      "n": 3,
+      "words": "Trainees drop out after a few weeks and the funder deducts for it",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Note which trainees have missed several sessions in a row, so you can reach them before they're gone",
+        "Call each of them once, or the parent's number given with permission for under- 18s, so you learn the reason."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "An early-warning list built daily from attendance gaps, with dropout counts by course and campus.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The warning rules and follow-up steps are kept for the document."
+    },
+    {
+      "id": "p4_theft_internal",
+      "n": 4,
+      "words": "Welding rods and wire disappear faster than classes use them",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Count the store once this week and compare with what the practicals should have used, so you know the real gap",
+        "Let only one person issue consumables, so usage has one owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "field_checks Issue slips per practical, usage per batch compared with expected every day, and reorder alerts per workshop.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The expected-usage figures and variance rules are in the document."
+    },
+    {
+      "id": "p5_shrinkage_theft",
+      "n": 5,
+      "words": "Tools lent to trainees don't come back",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Number every tool once, so each one can be traced",
+        "Do one end-of-day count of the toolkit this week, so you see what is missing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A tool lending register with check-out and check-in by phone and a daily missing-item report per workshop.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The lending flow and missing-item rules are kept for the document."
+    },
+    {
+      "id": "p6_maintenance_downtime",
+      "n": 6,
+      "words": "Machines sit broken for weeks because nobody logs repairs",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Walk the workshops once and list every machine out of action, so you know the backlog",
+        "Make one person own repairs, so every breakdown has a follow-up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Breakdowns reported by phone with a photo of the machine, repair status tracked and downtime measured per machine and campus.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reporting flow and downtime reports are in the document."
+    },
+    {
+      "id": "p7_checklists_not_done",
+      "n": 7,
+      "words": "Safety checklists are signed but not actually done",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Do one unannounced walk-through against the checklist, so you see the real picture",
+        "Ask a qualified safety professional what the checklist should contain, so it covers the right things."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Checklists completed on a phone with time, location and a photo of the area, and completion measured per workshop every day.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the checks are scheduled and verified is kept for the document."
+    },
+    {
+      "id": "p8_margin_unknown",
+      "n": 8,
+      "words": "We don't know which courses make money once consumables are counted",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out one course's income against its instructor and material cost once, so you have a first answer",
+        "Pick the course you suspect is weakest next, so effort goes where it matters."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "Profit per course and seat, from fees or funding minus instructor and consumable costs, updated as batches run.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How costs are shared across courses is set out in the document."
+    },
+    {
+      "id": "p9_accountability",
+      "n": 9,
+      "words": "Instructor timesheets don't match the class schedule",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Compare last month's timesheets with the schedule once, so differences show",
+        "Agree one rule for swaps and cover, so claims are judged the same way."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Timesheets matched to the timetable automatically before pay, with differences flagged per campus.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The matching rules are kept for the document."
+    },
+    {
+      "id": "p10_kpi_undefined",
+      "n": 10,
+      "words": "Placement promises are made but we don't track who got a job",
+      "category": "reporting_visibility",
+      "subtype": "kpi_undefined",
+      "quick_ideas": [
+        "Decide what counts as \"placed\" once, so everyone reports the same thing",
+        "Count last batch's outcomes by course, so you have a starting figure."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "Placement outcomes recorded as counts by course and campus, kept up to date after each batch.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How outcomes are collected after completion is in the document."
+    },
+    {
+      "id": "p11_lead_followup_slow",
+      "n": 11,
+      "words": "Self-paying enquiries come from TikTok but nobody calls them back",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Collect this month's enquiries into one list, so none are lost in DMs",
+        "Make one person responsible for callbacks, so each one has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Social enquiries captured automatically into a follow-up queue with reminders and a weekly enrolment count.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The capture and follow-up setup are kept for the document."
+    }
+  ],
+  "never_say": [
+    "Anything on funding eligibility, accreditation, certification rules or what a funder will accept. Safety-engineering advice on machines, electrics or fumes; pi says \"talk to a qualified safety professional\", and any injury, fire or gas leak means calling 1122/15/16, 999/997 or 911. Advice on overseas jobs or work visas. Any help with fake attendance, ghost trainees, inflated enrolment or backdated certificates. Job or income guarantees for graduates. Any idea that collects trainees' ID numbers, photos or results."
+  ],
+  "sample_reply": {
+    "person": "The funded batch paperwork is killing us. Can you suggest something so my two staff stop losing a week every month?",
+    "pi": "Yes, that week can be won back, and you can start this month. 1 Keep each batch's attendance in one place from the first day, so the report isn't rebuilt at month-end. 2 Write down every document the programme office asks for once, so nothing is chased at the last minute. Workzap can do this automatically for you, building the funder-format report each month from attendance you already record. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

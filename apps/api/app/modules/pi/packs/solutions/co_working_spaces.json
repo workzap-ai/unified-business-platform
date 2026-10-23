@@ -1,0 +1,217 @@
+{
+  "industry": "co_working_spaces",
+  "name": "Co-working spaces",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_lead_followup_slow",
+      "n": 1,
+      "words": "Enquiries from our website and Instagram sit unanswered for a day",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Reply today to every waiting enquiry with a tour offer, so warm leads aren't lost",
+        "Name who owns enquiries on each shift, so replies don't depend on who's at the desk."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an enquiry inbox from website, social and WhatsApp with tour booking and follow-up reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how full are you right now?",
+      "free_stops": "the follow-up timing and assignment are set out in the solution document."
+    },
+    {
+      "id": "p2_conversion_low",
+      "n": 2,
+      "words": "Lots of tours, few sign-ups",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Follow up once with everyone who toured this month, so undecided people hear from you",
+        "Ask those who didn't sign one question about why, so you get real reasons."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "tour outcomes and reasons recorded for every prospect, with follow-ups scheduled automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the follow-up sequence is kept for the solution document."
+    },
+    {
+      "id": "p3_booking_appointments",
+      "n": 3,
+      "words": "Meeting rooms are double-booked",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Move all bookings into one shared calendar, so there's one source of truth",
+        "Check next week's bookings once for clashes, so you fix them early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "meeting room booking via web or WhatsApp, with clashes blocked automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "booking rules per membership type are set out in the solution document."
+    },
+    {
+      "id": "p4_pricing_errors",
+      "n": 4,
+      "words": "Members use meeting rooms beyond their credits and we never charge",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Compare last month's room use against credits once, so overuse shows",
+        "Tell members once what their credits include, so expectations are clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "credits tracked per member with overage added to invoices automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how credits and overage are calculated is kept for the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Monthly invoices are made by hand and members pay late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every member's balance once, so you know who owes what",
+        "Send each overdue member a statement this week, so payment is requested."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "workflow_automation — recurring invoices with payment links and late-payment reminders sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the billing cycle and reminder timings are worked out in the solution document."
+    },
+    {
+      "id": "p6_refunds",
+      "n": 6,
+      "words": "Deposits and refunds when members leave are always messy",
+      "category": "cash_collections",
+      "subtype": "refunds",
+      "quick_ideas": [
+        "Write one move-out checklist, so every departure is handled the same way",
+        "List current members on notice once, so their move-outs are planned."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a move-out flow covering access card deactivation, deposit settlement and mail redirect.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the checklist steps and approvals are designed in the solution document."
+    },
+    {
+      "id": "p7_churn_subscription",
+      "n": 7,
+      "words": "Members leave after three months",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Ask recent leavers one question about why, so you get real reasons",
+        "Check in once with members nearing their third month, so issues surface early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "a membership register with start and renewal dates, feedback pulses and exit reasons recorded.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the feedback timing is set out in the solution document."
+    },
+    {
+      "id": "p8_maintenance_downtime",
+      "n": 8,
+      "words": "Wi-Fi and AC complaints take days to fix",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List every open complaint with the date reported, so the backlog is visible",
+        "Name one person responsible for closing each, so nothing drifts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "maintenance tickets from members via WhatsApp, tracked until fixed with response times recorded.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the ticket flow and response targets are kept for the solution document."
+    },
+    {
+      "id": "p9_cctv_gaps",
+      "n": 9,
+      "words": "Ex-members still have working access cards",
+      "category": "loss_security",
+      "subtype": "cctv_gaps",
+      "quick_ideas": [
+        "Compare active cards against current members once, so stray cards show",
+        "Switch off any that don't match, so the gap is closed now."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "access card deactivation built into the move-out flow, with a monthly cross-check of cards against members.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how the check links to your access system is worked out in the solution document."
+    },
+    {
+      "id": "p10_branch_comparison",
+      "n": 10,
+      "words": "Two locations run on different spreadsheets",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Agree the same few figures for both sites, so you can compare them",
+        "Fill them in once for last month, so you see which is weaker."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a location screen with occupancy, revenue, costs, collections and complaints per site.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "which figures to track and how they're pulled together is set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any lease, real estate, legal, tax or building-safety advice. Anything involving fake tenancy contracts or addresses for visas or licences. Covert monitoring of members. That occupancy will rise by any amount. Requests for members' names, IDs, company documents, access codes or Wi-Fi passwords. Fire, electrical, gas or medical emergencies: point to emergency services first."
+  ],
+  "sample_reply": {
+    "person": "Our occupancy has been stuck for months. Enquiries come in but replies are slow. What would you do?",
+    "pi": "Yes, there's a clear place to start, this week. 1 Reply today to every waiting enquiry with a tour offer, so warm leads aren't lost. 2 Follow up once with everyone who toured this month, and ask those who didn't sign one question about why. Workzap can do this automatically for you: one enquiry inbox with tour booking, follow-up reminders and reasons recorded for every prospect. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

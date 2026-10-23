@@ -1,0 +1,216 @@
+{
+  "industry": "media_production_and_publishing",
+  "name": "Media production and publishing",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_cost_overruns",
+      "n": 1,
+      "words": "Every shoot goes over budget and we only find out after",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Put the next shoot's budget lines on one sheet and fill actuals daily during the shoot, so overruns show while you can act",
+        "Compare budget and actuals once for the last shoot, so you see where it usually goes over."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "dashboards_reports — a project budget tracker with line items, committed costs and actuals updated from phone during the shoot.",
+        "tool_words": []
+      },
+      "ask_first": "How many shoots are planned this season?",
+      "free_stops": "the budget structure and update routine are set out in the solution document."
+    },
+    {
+      "id": "p2_hidden_costs",
+      "n": 2,
+      "words": "Clients approve the script, then change it on set",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "Note every on-set change on the next shoot, so you know what was added",
+        "Share that list with the client after the shoot, so the cost conversation is based on facts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a change log per project recording client changes with cost impact, feeding billing.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how changes are approved and billed is kept for the solution document."
+    },
+    {
+      "id": "p3_approvals_slow",
+      "n": 3,
+      "words": "Rough cuts go back and forth for weeks",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "Ask each client to name one approver, so feedback stops coming from everyone",
+        "Count rounds on current edits, so you see where time goes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an approval tracker for scripts and edits with rounds counted, timestamps and client reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "reminder timings and round limits are worked out in the solution document."
+    },
+    {
+      "id": "p4_bottleneck",
+      "n": 4,
+      "words": "Editors are the bottleneck, several projects waiting on one person",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "List every project waiting on an editor with its deadline, so priorities are clear",
+        "Move one smaller job to a freelancer, so the queue moves."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a post-production queue showing each editor's projects and deadlines, with alerts when deadlines are at risk.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "queue rules and alerts are set out in the solution document."
+    },
+    {
+      "id": "p5_attendance_lateness",
+      "n": 5,
+      "words": "Crew cancel the night before a shoot",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Confirm every crew member two days before the next shoot, so drop-outs surface earlier",
+        "Keep a short backup list per role, so a cancellation isn't a crisis."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a crew roster and booking with availability, confirmations, reminders and reliability notes.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "confirmation timings and reliability tracking are kept for the solution document."
+    },
+    {
+      "id": "p6_shrinkage_theft",
+      "n": 6,
+      "words": "Equipment goes out on shoots and comes back damaged or missing",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Do one full count of your equipment, so you have a true starting list",
+        "Sign kit out and in for the next shoot, so you know who had what."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "an equipment register with check-out and check-in per shoot, condition notes and missing items flagged.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the check-out routine and maintenance schedule are designed in the solution document."
+    },
+    {
+      "id": "p7_data_loss",
+      "n": 7,
+      "words": "Footage is spread across hard drives and nobody knows which drive has what",
+      "category": "tech_systems",
+      "subtype": "data_loss",
+      "quick_ideas": [
+        "Label every drive and list once which projects are on it, so footage can be found",
+        "Make a second copy of anything that exists on only one drive, so one failure can't wipe it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a footage and asset catalogue mapping projects to drives or cloud storage, with backup status shown.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the catalogue structure and backup routine are set out in the solution document."
+    },
+    {
+      "id": "p8_receivables_late",
+      "n": 8,
+      "words": "Agencies and channels pay months after delivery, but crew want cash on the day",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every delivered project with its invoice status and age, so you know who to chase",
+        "Chase the oldest this week, so cash starts moving."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "receivables per project with milestones, ageing and scheduled reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the milestone billing and reminder flow are kept for the solution document."
+    },
+    {
+      "id": "p9_overstock_dead_stock",
+      "n": 9,
+      "words": "Distributors return lots of unsold copies and we can't plan print runs",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "Compare print run, sales and returns once for your last few titles, so you see the pattern",
+        "Check warehouse stock against distributor statements once, so mismatches show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "dashboards_reports — a publishing stock tracker covering print runs, warehouse stock, distributor stock and returns.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how sales and returns feed print run planning is worked out in the solution document."
+    },
+    {
+      "id": "p10_contracts_tracking",
+      "n": 10,
+      "words": "Contracts and usage rights per project are hard to find later",
+      "category": "compliance_admin",
+      "subtype": "contracts_tracking",
+      "quick_ideas": [
+        "Gather current project contracts into one folder, so they can be found",
+        "Note expiry dates of usage rights once; for what the rights cover, talk to your lawyer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a contracts and usage-rights register per project with expiry reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the register setup is set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any copyright, licensing, defamation, censorship, legal or tax advice. Anything involving plagiarism, pirated content, or using footage or music without rights. That content will get views or a release will succeed. Requests for talent or crew names, personal contract terms, unreleased content or reader data. On-set accidents, fires or stunts going wrong: point to emergency services first."
+  ],
+  "sample_reply": {
+    "person": "Ramzan ki shoots aa rahi hain aur har saal budget nikal jata hai, pata end mein chalta hai. Koi hal batayein.",
+    "pi": "Ji haan, is ka hal mumkin hai aur is season se pehle shuruaat ki ja sakti hai. 1 Agli shoot ke budget lines ek sheet pe rakhein aur shoot ke dauran roz actuals bharein, taake overrun waqt pe nazar aaye. 2 Set pe client ke har change ko likhte jayein, taake baad mein kharche ki baat facts pe ho. Workzap yeh aap ke liye automatically kar sakta hai: phone se roz budget vs actual aur har client change ka cost ke saath record. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

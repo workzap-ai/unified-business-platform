@@ -1,0 +1,196 @@
+{
+  "industry": "leather_goods_and_tanneries",
+  "name": "Leather goods and tanneries",
+  "sector": "7.D Manufacturing and industry (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_capacity",
+      "n": 1,
+      "words": "Eid ul Adha skins arrive all at once and we can't process them fast enough",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Write down last Eid's arrivals by day against what you processed, so you see how big the gap was",
+        "List the area and collector types who deliver, so next Eid's arrivals can be planned in turns"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "An Eid collection tracker for lots by area and collector type, salting date, arrival and processing queue, visible to the owner each day of the peak.",
+        "tool_words": []
+      },
+      "ask_first": "What's the biggest headache in the weeks after Eid ul Adha?",
+      "free_stops": "How arrivals are scheduled and the queue is managed is set out in the solution document."
+    },
+    {
+      "id": "p2_supplier_quality",
+      "n": 2,
+      "words": "Collectors grade hides one way, we grade another, always a fight",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_quality",
+      "quick_ideas": [
+        "Grade the next lot at arrival with the collector present, so the grade is agreed on the spot",
+        "Photograph a few hides from each disputed lot, so there is a record"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A hide intake register for source type, count, weight, grade at receipt and photos, with disputed lots flagged.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Grade definitions and how disputes are recorded are kept for the solution document."
+    },
+    {
+      "id": "p3_cash_flow_tight",
+      "n": 3,
+      "words": "All our cash goes into hides at Eid and we're stretched for months",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "Write down roughly when cash went out at Eid and when it came back from sales, so you see how long it is tied up",
+        "List which buyers owe you now, so collection effort goes where it matters"
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "dashboards_reports A receivables and claims tracker per buyer alongside a view of stock bought and still unsold, kept current every day.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the cash picture is built from stock and receivables is detailed in the solution document; for financing, talk to your accountant or bank."
+    },
+    {
+      "id": "p4_count_mismatch",
+      "n": 4,
+      "words": "Leather stock in sq ft never matches the books",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count one grade or colour fully in sq ft and compare with the books, so you see the size of the gap",
+        "Keep each lot in a marked place, so lots stop getting mixed"
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "job_tracking Leather stock in sq ft by grade, colour and lot across stores, tracked from raw hide to finished with yield at each stage.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How lots are tracked through each stage is mapped in the solution document."
+    },
+    {
+      "id": "p5_wastage_cost",
+      "n": 5,
+      "words": "Cutting yield is low and karigars waste leather",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "For one article, compare leather issued with pieces cut, so you know the real consumption",
+        "Collect offcuts from cutting in one place for a week, so you see how much there is"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A cutting issue and return log per karigar role with expected against actual consumption, and an offcut register.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How expected consumption is set per article is set out in the solution document."
+    },
+    {
+      "id": "p6_count_mismatch",
+      "n": 6,
+      "words": "Pieces sent and pieces returned by subcontractors don't match",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Reconcile what each outside karigar has from you today, so you know what is outstanding",
+        "Ask for a count confirmation on the next return"
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "A subcontractor ledger for pieces sent, received, rejected and paid, flagging shortfalls on the day of return.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How counts are confirmed and tied to payment is covered in the solution document."
+    },
+    {
+      "id": "p7_product_defects",
+      "n": 7,
+      "words": "Colour or finish varies between lots and the buyer rejects",
+      "category": "quality_complaints",
+      "subtype": "product_defects",
+      "quick_ideas": [
+        "Keep an approved swatch for each colour at dispatch, so lots are checked against one standard",
+        "Note which lots were rejected and their process dates, so a pattern can be spotted"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A pre-dispatch check per lot against the approved swatch, with photos and rejection reasons recorded.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Check points and how lots are compared are kept for the solution document."
+    },
+    {
+      "id": "p8_conversion_low",
+      "n": 8,
+      "words": "Buyer samples take too long, we lose the order",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "List open sample requests with request date and current status, so you see which are stuck",
+        "Note what held up the last lost sample, so that step gets attention"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "An order and sample tracker with buyer deadlines and status, alerting when a sample is running late.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How sample stages are tracked and escalated is set out in the solution document."
+    },
+    {
+      "id": "p9_owner_blind",
+      "n": 9,
+      "words": "Owner doesn't know which product line actually makes money",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Work out cost per piece for your two main articles using today's hide and chemical rates, so you have a real comparison",
+        "Compare it with the selling price of each"
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "dashboards_reports A costing sheet per article using current hide and chemical rates, with a monthly margin view by product line.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How yield and overheads are built into cost per article is detailed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any advice on chemicals, chrome, effluent treatment, environmental permits or how to handle inspectors; gas exposure in pits or drums is an emergency. Any help calling synthetic \"genuine leather\", misdeclaring species or origin, or under-invoicing. Any guidance on animal welfare, halal or religious rulings around qurbani skins. Any help optimising child labour or unsafe conditions. Financing advice; suggest an accountant or bank. Storing names of hide collectors, charities, workers or buyers."
+  ],
+  "sample_reply": {
+    "person": "Eid ke baad khaalon ka hisaab bilkul bigar jata hai aur collectors se grade pe roz jhagra hota hai. Koi hal hai?",
+    "pi": "Ji haan, iska hal mumkin hai aur tayyari abhi se shuru ki ja sakti hai. 1 Agla lot aamad pe hi collector ke saamne grade kar lein, taa ke grade usi waqt tay ho jaye. 2 Pichli Eid ki roz-ba-roz aamad aur processing ka mawazna likh lein, taa ke pata chale gap kitna bara tha. Workzap yeh kaam aap ke liye khud- ba-khud kar sakta hai: phone pe hide intake register jahan har lot ki ginti, wazan, grade aur photo aamad pe darj ho, aur Eid ke dino mein har roz processing queue aap ke saamne ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

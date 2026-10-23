@@ -1,0 +1,221 @@
+{
+  "industry": "cleaning_and_janitorial_companies",
+  "name": "Cleaning and janitorial companies",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_attendance_lateness",
+      "n": 1,
+      "words": "Cleaners don't turn up and we find out when the customer calls angry",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Ask every cleaner to send a short \"reached\" message on arrival, so a no-show is known before the customer calls",
+        "Keep one or two standby cleaners each day, so a gap can be filled fast."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Check-in and check-out with location and before/after photos, with an alert to the office the moment a cleaner hasn't checked in on time, for every job every day.",
+        "tool_words": []
+      },
+      "ask_first": "How many cleaners are working for you right now?",
+      "free_stops": "Check-in method, alert timing and standby rules are in the solution document."
+    },
+    {
+      "id": "p2_order_errors",
+      "n": 2,
+      "words": "Bookings come by WhatsApp, calls and the app and we double-book cleaners",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Put every booking, from any channel, into one shared calendar, so clashes show at once",
+        "Make one person responsible for assigning cleaners."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A booking system with a WhatsApp flow and web page that assigns cleaners by area and availability and blocks double bookings automatically.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "How do customers book today?",
+      "free_stops": "Assignment rules and booking flow are in the solution document."
+    },
+    {
+      "id": "p3_consistency_across_branches",
+      "n": 3,
+      "words": "Quality depends completely on which cleaner goes",
+      "category": "quality_complaints",
+      "subtype": "consistency_across_branches",
+      "quick_ideas": [
+        "Write one short checklist per service type, so every cleaner covers the same ground",
+        "Ask for before/after photos of bathrooms and kitchens, so quality can be checked."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "reviews_collection"
+        ],
+        "text": "A job checklist per service type with photo proof and a rating request to the customer after every job, so quality is measured per cleaner.",
+        "tool_words": []
+      },
+      "ask_first": "What do customers complain about most?",
+      "free_stops": "Checklist content and rating flow are in the solution document."
+    },
+    {
+      "id": "p4_cash_handling_risk",
+      "n": 4,
+      "words": "Cash collected by cleaners from homes doesn't reach the office in full",
+      "category": "cash_collections",
+      "subtype": "cash_handling_risk",
+      "quick_ideas": [
+        "Send customers the amount due by message before the job, so both sides know the figure",
+        "Match each cleaner's cash to their completed jobs at day's end."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A cash log per cleaner per day, reconciled automatically against completed home jobs.",
+        "tool_words": []
+      },
+      "ask_first": "How do home customers pay?",
+      "free_stops": "Matching rules and variance flags are in the solution document."
+    },
+    {
+      "id": "p5_shrinkage_theft",
+      "n": 5,
+      "words": "Chemicals and consumables run out fast",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Record what each team or site is issued this week, so usage can be compared",
+        "Compare issues against jobs done once, to spot the outliers."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A consumables issue log per team or site, with usage against jobs done and low-stock alerts.",
+        "tool_words": []
+      },
+      "ask_first": "How are chemicals and supplies given out?",
+      "free_stops": "Usage benchmarks and alert rules are in the solution document; chemical handling follows product safety instructions."
+    },
+    {
+      "id": "p6_accountability",
+      "n": 6,
+      "words": "Contract sites have fewer cleaners than we bill for",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Check headcount at each contract site against the invoice once this week",
+        "Share a daily attendance sheet with the client, so they see it before they check."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "A site headcount register with a daily attendance report sent to the client automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How does the client check the headcount?",
+      "free_stops": "Report format and attendance rules are in the solution document."
+    },
+    {
+      "id": "p7_repeat_low",
+      "n": 7,
+      "words": "Customers book once and never again",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Ask each customer after a job whether they'd like a regular slot",
+        "Contact recent one-off customers who agreed to hear from you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat",
+          "customer_messaging"
+        ],
+        "text": "Repeat-booking reminders and regular- plan options for customers who opted in.",
+        "tool_words": []
+      },
+      "ask_first": "Do you contact customers again after a job?",
+      "free_stops": "Reminder timing and plan structure are in the solution document."
+    },
+    {
+      "id": "p8_receivables_late",
+      "n": 8,
+      "words": "Corporate clients pay after sixty to ninety days",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Invoice on the same date every month, so the clock starts on time",
+        "List unpaid invoices by age and follow up the oldest."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Corporate invoicing and receivables tracking with reminders on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "How long do corporate clients take to pay?",
+      "free_stops": "Reminder schedule and escalation are in the solution document."
+    },
+    {
+      "id": "p9_delivery_cost",
+      "n": 9,
+      "words": "Transport between jobs wastes hours and fuel",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_cost",
+      "quick_ideas": [
+        "Group tomorrow's jobs by area before assigning, so cleaners stay in one zone",
+        "Note travel time for a week, to see the worst routes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "Scheduling that groups jobs by area and orders each team's day.",
+        "tool_words": []
+      },
+      "ask_first": "How do cleaners get to jobs?",
+      "free_stops": "Routing rules are in the solution document."
+    },
+    {
+      "id": "p10_turnover",
+      "n": 10,
+      "words": "Turnover is so high we're always hiring and training",
+      "category": "people_staff",
+      "subtype": "turnover",
+      "quick_ideas": [
+        "Ask leavers why they left, so patterns show",
+        "Pair each new cleaner with an experienced one for the first jobs."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "An onboarding and training checklist for every new hire.",
+        "tool_words": []
+      },
+      "ask_first": "What usually makes cleaners leave?",
+      "free_stops": "The onboarding plan is in the solution document; labour-law questions go to a professional."
+    }
+  ],
+  "never_say": [
+    "Any guidance on mixing chemicals, bleach or acids, mould hazards, or facade and rope-access work. Any help investigating or naming a cleaner accused of theft. Any help hiring without valid permits, withholding passports, underpaying or faking headcount on invoices. Any recording of cleaners' or customers' names, addresses, door codes, keys or ID/visa details. Anything other than emergency services or the poison centre first for chemical exposure, falls, injury or fire."
+  ],
+  "sample_reply": {
+    "person": "Cleaners late jaati hain ya jaati hi nahi, aur pata customer ke gusse wale call se chalta hai. Koi hal batayen.",
+    "pi": "Ji haan, is ka hal mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Har cleaner job pe pohanchte hi office ko ek chhota sa message bheje, taake na pohanchne ka pata customer se pehle chale. 2 Roz ek do standby cleaners rakhein, taake khali jagah jaldi bhari ja sake. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har job ka check-in, aur waqt pe check-in na ho to office ko foran alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

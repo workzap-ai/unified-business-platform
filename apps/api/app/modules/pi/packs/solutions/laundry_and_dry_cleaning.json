@@ -1,0 +1,217 @@
+{
+  "industry": "laundry_and_dry_cleaning",
+  "name": "Laundry and dry-cleaning",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_order_errors",
+      "n": 1,
+      "words": "Customers' clothes get mixed up and go to the wrong person",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Tag every item at drop-off with the order number, so items can't drift between orders",
+        "Check tags against the order before handover, so mix-ups are caught at the counter."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "order intake with QR tags per item and a WhatsApp receipt.",
+        "tool_words": []
+      },
+      "ask_first": "How do you tag items now?",
+      "free_stops": "Tagging setup is in the solution document."
+    },
+    {
+      "id": "p2_inspection_missing",
+      "n": 2,
+      "words": "Nobody checks garments at drop-off, so we can't prove damage was there",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Photograph expensive items at drop-off, so condition is on record",
+        "Note visible stains or tears with the customer present, so disputes are settled early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "photo at drop-off recording condition, linked to the order.",
+        "tool_words": []
+      },
+      "ask_first": "Who handles drop-off?",
+      "free_stops": "Photo rules stay for the solution document."
+    },
+    {
+      "id": "p3_rider_management",
+      "n": 3,
+      "words": "Riders' routes are a mess and pickups get missed",
+      "category": "orders_fulfilment",
+      "subtype": "rider_management",
+      "quick_ideas": [
+        "Group pickups by area and time slot, so riders aren't crossing the city",
+        "Assign one rider per area, so missed pickups have an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a pickup and delivery scheduler with rider routes.",
+        "tool_words": []
+      },
+      "ask_first": "How many riders do you have?",
+      "free_stops": "Routing rules are in the solution document."
+    },
+    {
+      "id": "p4_cod_remittance",
+      "n": 4,
+      "words": "Riders collect cash and some doesn't come back",
+      "category": "cash_collections",
+      "subtype": "cod_remittance",
+      "quick_ideas": [
+        "Settle rider cash every day, so gaps don't pile up",
+        "Match it to the day's deliveries, to see which rider is short."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a rider cash ledger with daily settlement and mismatch flags.",
+        "tool_words": []
+      },
+      "ask_first": "How often do riders settle now?",
+      "free_stops": "Settlement rules stay for the solution document."
+    },
+    {
+      "id": "p5_reports_wrong",
+      "n": 5,
+      "words": "Hotel linen counts never match",
+      "category": "reporting_visibility",
+      "subtype": "reports_wrong",
+      "quick_ideas": [
+        "Count linen at pickup together with the hotel, so both sides agree the number",
+        "Get a signature on return, so the delivery count is on record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a linen count sheet signed by both sides on pickup and delivery.",
+        "tool_words": []
+      },
+      "ask_first": "How many hotel clients do you serve?",
+      "free_stops": "Count flow is in the solution document."
+    },
+    {
+      "id": "p6_credit_customers",
+      "n": 6,
+      "words": "Hotel clients pay late",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List what each client owes and how old it is, so you chase the oldest first",
+        "Send each one statement, since accounts teams pay against paperwork."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "monthly invoice and ageing per B2B client.",
+        "tool_words": []
+      },
+      "ask_first": "What terms did you agree?",
+      "free_stops": "Reminder timing stays for the solution document."
+    },
+    {
+      "id": "p7_chat_overload",
+      "n": 7,
+      "words": "Lots of ‘is my order ready?' messages",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Tell customers you'll message them when it's ready, so they stop asking",
+        "Keep a ready list at the counter, so anyone can answer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "automatic \"ready\" messages and uncollected reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How many orders a day?",
+      "free_stops": "Message flow is in the solution document."
+    },
+    {
+      "id": "p8_maintenance_downtime",
+      "n": 8,
+      "words": "Machines break and repair takes days",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List breakdowns and their causes, to see what keeps failing",
+        "Agree response times with your technician, so repairs have a deadline."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a machine maintenance log and downtime report.",
+        "tool_words": []
+      },
+      "ask_first": "Which machines break most?",
+      "free_stops": "Log setup stays for the solution document."
+    },
+    {
+      "id": "p9_count_mismatch",
+      "n": 9,
+      "words": "Detergent and chemicals used more than they should be",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Note detergent used against loads for a week, to see whether use is out of line",
+        "Issue chemicals from one person, so usage has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a chemical usage log against loads processed.",
+        "tool_words": []
+      },
+      "ask_first": "How do you store chemicals?",
+      "free_stops": "Usage norms are in the solution document."
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "I don't know my cost per piece or kilo",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Add up last month's utilities, labour and supplies, to see your real running cost",
+        "Compare it with how much you processed, since that shows whether your prices cover it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a cost-per-piece and cost-per-kilo view.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you price per piece or kilo?",
+      "free_stops": "Cost allocation stays for the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on solvent handling, chemical safety, boilers or wastewater rules. Collecting customer names, addresses or phone numbers through pi. Legal advice on damage or loss compensation. Help under-reporting cash sales; chemical spills, fires or boiler failures mean emergency services first."
+  ],
+  "sample_reply": {
+    "person": "Every month our hotel clients say we returned fewer sheets than they gave us. How do I fix this?",
+    "pi": "Yes, this can be settled with a clear count. 1 Count linen together with the hotel at pickup, so both sides agree the number. 2 Get a signature when you deliver back, so the return count is on record. Workzap can do this automatically for you: a linen count sheet signed by both sides on pickup and delivery, feeding straight into the monthly invoice. Shall I prepare a solution document and quote for you? You can say no.",
+    "language": "english"
+  }
+}

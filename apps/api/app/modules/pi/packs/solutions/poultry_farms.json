@@ -1,0 +1,220 @@
+{
+  "industry": "poultry_farms",
+  "name": "Poultry farms (broiler and layer)",
+  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_reports_wrong",
+      "n": 1,
+      "words": "Mortality is shown on the board but I think workers under-report",
+      "category": "reporting_visibility",
+      "subtype": "reports_wrong",
+      "quick_ideas": [
+        "Count mortality at one fixed time each day with a photo",
+        "At flock end, check birds placed minus deaths against birds lifted."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "nori_daily_read — daily mortality entered per shed with photo, rolled into the owner's morning read and checked against placement automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who counts and records deaths each day?",
+      "free_stops": "How counts are checked against placement and lifting goes in the solution document."
+    },
+    {
+      "id": "p2_pricing_errors",
+      "n": 2,
+      "words": "Rate gir gaya jab lifting ka time aaya, sara profit chala gaya",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Note the published daily rate next to your own sale rate",
+        "Speak to more than one buyer before lifting day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a daily rate log compared automatically with the farm's sale rates flock after flock.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How is the rate decided on lifting day?",
+      "free_stops": "How rates are collected and compared stays in the solution document."
+    },
+    {
+      "id": "p3_credit_terms",
+      "n": 3,
+      "words": "Dealer gives feed on credit then forces his rate when he buys the birds",
+      "category": "suppliers_purchasing",
+      "subtype": "credit_terms",
+      "quick_ideas": [
+        "Keep your own record of everything taken on credit and the rate given at lifting",
+        "Ask for a written settlement at the end of each flock."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a dealer ledger of chicks, feed and other items on credit, birds lifted, weights, rates and balance, settled flock by flock automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Does the dealer also owe you from earlier flocks?",
+      "free_stops": "The ledger layout and settlement check are set out in the solution document."
+    },
+    {
+      "id": "p4_count_mismatch",
+      "n": 4,
+      "words": "Feed bags received don't match the bill",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count bags off the truck before signing",
+        "Match the count to the bill the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "bags received vs billed logged with photo of the slip, and mismatches flagged to the owner automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who receives feed at each farm?",
+      "free_stops": "The receiving log and flag rules go in the solution document."
+    },
+    {
+      "id": "p5_stockout",
+      "n": 5,
+      "words": "Feed runs out on a Sunday and we wait two days",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Count bags left each evening so a run-out shows early",
+        "Keep a weekend contact for your feed supplier."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "feed stock per shed kept running daily with days-left and an automatic reorder alert.",
+        "tool_words": []
+      },
+      "ask_first": "How many days' feed do you usually keep?",
+      "free_stops": "How days-left and reorder points are worked out stays in the solution document."
+    },
+    {
+      "id": "p6_reports_late",
+      "n": 6,
+      "words": "I don't know my FCR until the flock is sold",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "Note feed issued per shed every day",
+        "Weigh sample birds as your company technical team or vet suggests, so the numbers exist mid-flock."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a running FCR and cost-per-bird view updated daily from the farm's own entries.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Are feed issues written per shed or for the whole farm?",
+      "free_stops": "How the running figures are calculated is detailed in the solution document."
+    },
+    {
+      "id": "p7_maintenance_downtime",
+      "n": 7,
+      "words": "Generator failed at night in summer and we lost birds",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Check the generator starts every day",
+        "Make sure the night worker knows exactly who to call."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "workflow_automation — a night-round checklist with timestamps and a generator log, alerting the owner automatically when a round is missed.",
+        "tool_words": []
+      },
+      "ask_first": "How do you find out about a failure at night today?",
+      "free_stops": "Round timings and alert routing go in the solution document."
+    },
+    {
+      "id": "p8_shrinkage_theft",
+      "n": 8,
+      "words": "Eggs break or go missing between shed and loading",
+      "category": "loss_security",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Count trays at the shed and again at loading",
+        "Note breakages where they happen."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "field_checks — egg counts logged at shed, store and truck, with gaps flagged automatically each day.",
+        "tool_words": []
+      },
+      "ask_first": "Where do the shortages usually show up?",
+      "free_stops": "The count points and gap rules stay in the solution document."
+    },
+    {
+      "id": "p9_margin_unknown",
+      "n": 9,
+      "words": "Integrator's settlement sheet is a mystery to me",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Keep your own copy of chicks placed, feed received, deaths and birds lifted",
+        "Ask for each deduction to be explained in writing; for the contract itself, talk to your accountant or lawyer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a flock record built from the farm's own entries, set beside the settlement automatically so differences stand out.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which part of the settlement is hardest to follow?",
+      "free_stops": "How the comparison is laid out goes in the solution document."
+    },
+    {
+      "id": "p10_field_team_visibility",
+      "n": 10,
+      "words": "I run three farms and get updates by voice note only",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Ask each farm for the day's numbers in one written message",
+        "Use the same few numbers for every farm so they can be compared."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "one automatic morning read across all farms with mortality, feed left, power issues and cash.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Who sends updates from each farm?",
+      "free_stops": "Which numbers go in and how farms are compared is set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any vaccine, medicine, antibiotic, dosing, withdrawal time, feed formula, lighting programme or biosecurity advice; suggest their vet or company technical team. Any disease diagnosis Newcastle, bird flu, gumboro); for a suspected outbreak, suggest their vet and livestock department now. Anything that helps sell birds or eggs that should be withheld, hide mortality from integrators or insurers, or dodge environment or food rules. Predictions of rates or flock profit. Advice on quota or marketing board rules in Canada, or covert surveillance of workers."
+  ],
+  "sample_reply": {
+    "person": "3 broiler sheds hain Sheikhupura mein, daana dealer se udhaar pe aata hai aur wohi apna rate laga ke birds uthata hai. Har flock mein loss. Kya karein?",
+    "pi": "Ji haan, is ka hisaab saaf kiya ja sakta hai, aur kaam isi flock se shuru ho sakta hai. 1 Udhaar pe aane wali har cheez aur lifting ke din ka rate aur wazan apne paas alag likhein. 2 Har roz akhbar ya WhatsApp wala rate bhi saath likhein, taake lifting rate se mila kar dekha ja sake. Workzap yeh sab aap ke liye khud- ba-khud kar sakta hai: dealer ka ledger aur flock register jo udhaar, lifting, rate aur har flock ka asal nateeja roz aik jagah dikhaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

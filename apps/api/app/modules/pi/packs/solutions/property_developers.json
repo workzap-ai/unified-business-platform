@@ -1,0 +1,225 @@
+{
+  "industry": "property_developers",
+  "name": "Property developers",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_double_booking",
+      "n": 1,
+      "words": "Two sales people sold the same unit to different buyers",
+      "category": "stock_inventory",
+      "subtype": "double_booking",
+      "quick_ideas": [
+        "Name one person as the only one who can mark a unit booked, so there is a single point of truth",
+        "Lock the master inventory sheet to view-only for sales and dealers, so nobody sells from an old copy."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A live unit board for every project and phase that locks a unit the moment it is held or booked, so a double sale cannot happen on any channel, any day.",
+        "tool_words": []
+      },
+      "ask_first": "Who is allowed to mark a unit as booked today?",
+      "free_stops": "The status rules, hold expiry logic and lock design are set out in the solution document."
+    },
+    {
+      "id": "p2_instalment_tracking",
+      "n": 2,
+      "words": "We find out an instalment is overdue only at month-end",
+      "category": "cash_collections",
+      "subtype": "instalment_tracking",
+      "quick_ideas": [
+        "Pull next month's due instalments into one list now, so follow-up can start before the date",
+        "Give that list to one named collections person, so chasing has a clear owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "An instalment schedule for every unit that sends WhatsApp reminders before each due date to buyers who agreed to messages, and gives the collections team a daily overdue list by age.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many buyers are behind right now?",
+      "free_stops": "The reminder timing, escalation stages and ageing buckets are in the solution document."
+    },
+    {
+      "id": "p3_cash_flow_tight",
+      "n": 3,
+      "words": "Construction spend is running ahead of collections",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "Put the next two months of expected collections and planned site payments on one page, so gaps are visible early",
+        "Review that page with your accountant before committing new packages."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A per-project view, refreshed daily, of collections received against construction spend and what is due on both sides in the coming weeks.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is the build done by your own construction arm or a main contractor?",
+      "free_stops": "How the forecast is built from instalment plans and package schedules is kept for the solution document."
+    },
+    {
+      "id": "p4_discount_abuse",
+      "n": 4,
+      "words": "Discounts are being given on calls without my approval",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Send every dealer one dated price list and declare older lists void, so quotes match",
+        "Make any discount beyond the standard need your written OK first, so you see every exception."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Price-list control where dealers only ever see the current approved list, and any discount over the limit goes to your phone for approval before a booking is confirmed.",
+        "tool_words": []
+      },
+      "ask_first": "How many dealers or brokers sell for you?",
+      "free_stops": "Approval limits, who can approve what and the audit trail are detailed in the solution document."
+    },
+    {
+      "id": "p5_campaign_roi_unknown",
+      "n": 5,
+      "words": "We spend on Facebook and portals but can't tell which leads booked",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Give each channel its own contact number or form, so the source is known from the first message",
+        "Match last month's bookings back to their source once, to see where buyers really came from."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes",
+          "lead_followup"
+        ],
+        "text": "Every portal, Meta and expo lead lands in one queue tagged with its source, gets a follow-up task, and a report shows which channel turned into bookings each week.",
+        "tool_words": [
+          "portal"
+        ]
+      },
+      "ask_first": "Where do most of your enquiries come from today?",
+      "free_stops": "The tagging set-up per channel and the reporting design belong in the solution document."
+    },
+    {
+      "id": "p6_commission_disputes",
+      "n": 6,
+      "words": "Broker commission disputes every month — who brought which client",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Ask brokers to register each client with you before the site visit, so there is a dated record",
+        "Write the commission rule down once and share it, so disputes are settled against the same rule."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A broker portal that timestamps every lead registration and produces commission statements per broker automatically each month.",
+        "tool_words": [
+          "portal"
+        ]
+      },
+      "ask_first": "How is it decided today who gets commission on a booking?",
+      "free_stops": "Registration rules, conflict handling and statement layout are in the solution document."
+    },
+    {
+      "id": "p7_reports_wrong",
+      "n": 7,
+      "words": "The contractor says one figure for progress, my site engineer says another",
+      "category": "reporting_visibility",
+      "subtype": "reports_wrong",
+      "quick_ideas": [
+        "Agree one fixed list of milestones per block, so \"how far along\" means the same to everyone",
+        "Walk the site against that list once, to set a shared baseline."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A site progress log where the engineer posts milestone status with dated photos per block, and you see planned against actual for every project without calling anyone.",
+        "tool_words": []
+      },
+      "ask_first": "Who tells you how far along the build is today?",
+      "free_stops": "The milestone structure and how progress is weighted are kept for the solution document."
+    },
+    {
+      "id": "p8_customer_communication",
+      "n": 8,
+      "words": "Overseas buyers keep asking for progress photos and nobody sends them",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Pick one fixed day a month for a buyer progress update, so buyers know when to expect news",
+        "Keep one approved set of photos and answers, so every salesperson says the same thing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "A monthly WhatsApp broadcast of progress photos and milestone news to buyers who opted in, pulled straight from the site log.",
+        "tool_words": []
+      },
+      "ask_first": "How do buyers reach you now, and who answers them?",
+      "free_stops": "The message plan, content flow and opt-in handling are in the solution document."
+    },
+    {
+      "id": "p9_after_sales",
+      "n": 9,
+      "words": "Snagging complaints after handover sit for months",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "List all open snags by unit and by trade, so each subcontractor sees their own backlog",
+        "Close an item only with a photo and the buyer's sign-off, so \"fixed\" is provable."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A snagging tracker that assigns every defect to a subcontractor, chases it daily and shows ageing per project; anything structural is flagged for a qualified engineer.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many units are waiting on snag fixes?",
+      "free_stops": "Categories, assignment rules and sign-off flow are set out in the solution document."
+    },
+    {
+      "id": "p10_data_scattered",
+      "n": 10,
+      "words": "Sales, accounts and construction each keep their own sheet",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Agree one unit reference used by all three teams, so the sheets can be matched",
+        "Decide the handful of numbers you want every Monday, so everyone knows what matters."
+      ],
+      "workzap_build": {
+        "keys": [
+          "erp_nori_platform"
+        ],
+        "text": "One system on nori running inventory, instalments, construction cost and handover, with an owner dashboard updated every day.",
+        "tool_words": [
+          "system",
+          "dashboard"
+        ]
+      },
+      "ask_first": "What report do you wish you had every Monday morning?",
+      "free_stops": "Which modules come first and how the data is joined is mapped in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on whether a title, allotment, SPA, cancellation or refund is valid; that is for a lawyer. Any valuation, rental yield, price forecast or view on whether a project \"will sell\". Any view on cracks, settlement or water ingress; a qualified structural engineer must assess them. Any help under-declaring sale value, selling outside escrow, backdating allotments or creating files without land. Any request to record buyer names, CNIC/Emirates ID/passport numbers, file numbers linked to people or bank details."
+  ],
+  "sample_reply": {
+    "person": "Bhai instalments ki recovery ka koi hal batao, second year ke baad log paise dena band kar dete hain aur humein month-end pe pata chalta hai.",
+    "pi": "Haan, is ka hal bilkul mumkin hai, aur shuruaat aap isi hafte kar sakte hain. 1 Agle mahine ke saare due instalments ki ek list abhi nikal lein, taake follow-up due date se pehle shuru ho. 2 Yeh list ek hi collections wale ke zimme lagayen, taake recovery ka ek zimmedar ho. Workzap yeh sab aap ke liye khud- ba-khud chala sakta hai: har unit ke due date se pehle WhatsApp reminder, aur collections team ko roz overdue list. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

@@ -1,0 +1,222 @@
+{
+  "industry": "bakeries_mithai_and_confectionery",
+  "name": "Bakeries, mithai and confectionery",
+  "sector": "7.B Food and beverage",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_expiry_wastage",
+      "n": 1,
+      "words": "Bread and buns left over every night, we sell them as rusk but it's a loss",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Note what's left at closing by item for a week, so production follows real sales",
+        "Bake the slow items in smaller batches through the day, because one big morning bake is where leftovers come from."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a leftover log by item and branch with what was reworked, discounted or discarded, feeding a daily production suggestion automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who decides how much to bake each day?",
+      "free_stops": "How the daily production plan is worked out by day and season goes in the solution document."
+    },
+    {
+      "id": "p2_transfers_lost",
+      "n": 2,
+      "words": "Eid boxes run out at some branches while others have too many",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Pull last Eid's sales by branch from the register, so this year's split starts from evidence",
+        "Agree one person who can move boxes between branches during Eid, so surplus reaches the shortfall quickly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "factory-to-branch dispatch and receiving on phone, with live stock per branch and alerts when one runs low while another is full.",
+        "tool_words": []
+      },
+      "ask_first": "Is last year's Eid sale written down by branch anywhere?",
+      "free_stops": "The festival allocation method and transfer rules stay for the solution document."
+    },
+    {
+      "id": "p3_count_mismatch",
+      "n": 3,
+      "words": "Factory sends to branches on a paper chit and nothing matches",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Have each branch count and sign what arrives, so gaps are caught on the day",
+        "Keep a copy of every chit at the factory, so both sides have the same record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a dispatch and receiving app with variances between factory and branch flagged every day.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Who checks the goods when they reach the branch?",
+      "free_stops": "The dispatch-to-receipt flow and variance rules are detailed in the solution document."
+    },
+    {
+      "id": "p4_margin_unknown",
+      "n": 4,
+      "words": "Ghee, sugar and khoya prices change weekly, and I don't know which sweet makes money",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Cost your top sweets per kilo once from this week's bills, so you see which kilo rate is out of date",
+        "Review the kilo rate on the thinnest items first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "recipe costing per kilo that updates with every ingredient price change and flags sweets below your margin.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "When did you last update the kilo rate?",
+      "free_stops": "The per-kilo costing method and rate review rules go in the solution document."
+    },
+    {
+      "id": "p5_pre_orders_custom",
+      "n": 5,
+      "words": "Custom cake orders come by WhatsApp, Instagram and phone — wrong names on cakes, and some not ready on time",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Write every custom order on one order form with design, message, date and time, so the kitchen works from one sheet",
+        "Read the cake message back to the customer before confirming, because most mistakes happen at intake."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a custom-cake order system with design photo, message, pickup time and advance paid, kitchen tickets, and an automatic WhatsApp confirmation to the customer.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "What usually goes wrong — design, timing or details?",
+      "free_stops": "The order flow from intake to pickup and the confirmation steps are in the solution document."
+    },
+    {
+      "id": "p6_cash_mismatch",
+      "n": 6,
+      "words": "Advance payments for cake orders are noted on paper and get lost",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Give every advance a receipt with an order number, so each payment ties to one order",
+        "Check advances against open orders at closing, so a missing one is caught the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "an advance-payment ledger tied to each order, matched daily with cash collected per branch.",
+        "tool_words": []
+      },
+      "ask_first": "Have advances actually gone missing, or just been hard to trace?",
+      "free_stops": "How advances, balances and daily closing are linked is set out in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Corporate Eid orders — offices pay months late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every corporate customer with what they owe and since when, so you know who to chase first",
+        "Agree payment terms in writing before the next festival order, so expectations are clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "corporate order and receivables tracking with balances by customer label and automatic payment reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How many corporate customers buy on credit?",
+      "free_stops": "The reminder schedule and credit rules per customer stay for the solution document."
+    },
+    {
+      "id": "p8_no_sop",
+      "n": 8,
+      "words": "Karigars leave just before the festival, and the production plan is in the head karigar's head",
+      "category": "operations_process",
+      "subtype": "no_sop",
+      "quick_ideas": [
+        "Write down the main recipes and daily quantities with the head karigar, so the business doesn't depend on one person",
+        "Talk to karigars before the festival about pay and overtime, so it isn't negotiated under pressure."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a daily production plan by product and branch with sign- off by the head karigar, and a festival planner with last year's volumes, staffing and boxes.",
+        "tool_words": []
+      },
+      "ask_first": "Which festival is your biggest?",
+      "free_stops": "The production plan structure and festival planner are detailed in the solution document."
+    },
+    {
+      "id": "p9_no_online_ordering",
+      "n": 9,
+      "words": "We don't take online orders, people message and leave",
+      "category": "customer_experience_digital",
+      "subtype": "no_online_ordering",
+      "quick_ideas": [
+        "Reply to every order message within the hour, because people move on fast",
+        "Share a simple menu with prices on WhatsApp and Instagram, so fewer people need to ask."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "an online ordering page with pre-order slots for festivals, feeding the same order list as the shop.",
+        "tool_words": []
+      },
+      "ask_first": "Do you deliver, or do customers collect?",
+      "free_stops": "The ordering page design and slot rules are covered in the solution document."
+    },
+    {
+      "id": "p10_data_scattered",
+      "n": 10,
+      "words": "Shop sales and factory costs are in different registers",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Bring each branch's daily sales into one sheet, so you see the business as a whole",
+        "Compare sales with factory purchases weekly, so a gap shows early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a short morning read of every branch's sales and product mix alongside factory output, with the one thing to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How do you see daily sales across branches now?",
+      "free_stops": "How shop and factory numbers are joined up goes in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about shelf life, preservatives, colours, labelling or food-safety rules. Allergen or diabetic-suitability claims for any product. Employment-law advice on karigar pay disputes. Help with fake halal or quality certificates, short weight, or under-invoicing corporate gift boxes. That a festival plan will sell out or cut waste by any amount."
+  ],
+  "sample_reply": {
+    "person": "Eid pe har saal kuch branches mein dabbe khatam aur kuch mein bach jate hain. Koi hal batao.",
+    "pi": "Ji haan, is ka hal mumkin hai, aur kaam is Eid se pehle shuru ho sakta hai. 1 Pichli Eid ki branch-wise sale register se nikal lein, taake is saal ka batwara andaze ke bajaye record par ho. 2 Eid ke dauran ek banda tay karein jo branches ke beech dabbe bhej sake, taake jahan bach rahe hain wahan se kami wali branch tak jaldi pohanchein. Workzap ye aap ke liye automatically kar sakta hai: factory se har branch ki dispatch aur receiving phone par, har branch ka live stock, aur jab ek branch mein kami aur doosri mein zyada ho to foran alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

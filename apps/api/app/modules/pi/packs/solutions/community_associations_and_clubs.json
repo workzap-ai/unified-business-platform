@@ -1,0 +1,223 @@
+{
+  "industry": "community_associations_and_clubs",
+  "name": "Community associations and clubs",
+  "sector": "7.M Digital economy, social and public sector",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_receivables_late",
+      "n": 1,
+      "words": "Many members are behind on dues and we chase manually",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Bring every member code's dues status into one list, so you see the full picture",
+        "Send one polite, general reminder to all units in arrears rather than individual chasing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a dues ledger by member code with automated WhatsApp and email reminders and payment links.",
+        "tool_words": []
+      },
+      "ask_first": "How do members usually pay their dues at the moment?",
+      "free_stops": "The reminder schedule and ledger set-up are detailed in the solution document."
+    },
+    {
+      "id": "p2_cash_mismatch",
+      "n": 2,
+      "words": "Payments come by cash, cheque and transfer and we can't match them",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Ask members to quote their member or unit code as the transfer reference",
+        "Match the bank statement against the ledger on one fixed day each month."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a payment matcher linking transfers, cash and cheques to member codes automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The matching rules are set out in the solution document."
+    },
+    {
+      "id": "p3_booking_appointments",
+      "n": 3,
+      "words": "Court bookings on WhatsApp lead to fights over slots",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Keep one booking calendar that only one person can confirm",
+        "Publish simple slot rules, so everyone plays by the same ones."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a facility booking app for courts, hall, pool and BBQ areas with slot rules and member-only checks.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "The slot rules and booking flow are designed in the solution document."
+    },
+    {
+      "id": "p4_info_lost_in_whatsapp",
+      "n": 4,
+      "words": "The WhatsApp group is chaos, important notices get buried",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Start an announcements-only channel separate from the chat group",
+        "Pin key notices so new members can find them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a notice broadcast channel that keeps announcements apart from chatter, with delivery to every member.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The broadcast set-up goes in the solution document."
+    },
+    {
+      "id": "p5_handoffs",
+      "n": 5,
+      "words": "New committee every year, records don't get handed over",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "List every record, contract and account access the committee relies on",
+        "Store them under the association's control, not on personal phones."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a handover pack keeping records and contracts under the association's control with role-based access.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The handover structure and access roles are prepared in the solution document."
+    },
+    {
+      "id": "p6_manual_reports",
+      "n": 6,
+      "words": "Treasurer prepares AGM accounts by hand over weeks",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Keep income and spending categorised monthly, not only at year-end",
+        "Agree with your accountant the format they need well before the AGM."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an AGM financial pack generated from the ledger, plus a budget against spend view.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The pack layout and data flow are detailed in the solution document."
+    },
+    {
+      "id": "p7_accountability",
+      "n": 7,
+      "words": "Security guards don't do rounds and nobody can check",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Agree the rounds and times with the guards openly",
+        "Ask the guard supervisor for a simple daily rounds report."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a guard patrol checkpoint app where guards scan known points with timestamps, plus staff attendance, used openly with staff.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "Checkpoint placement and reporting are set out in the solution document."
+    },
+    {
+      "id": "p8_maintenance_downtime",
+      "n": 8,
+      "words": "Pool pump, gym machines, lifts break and repairs take ages",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Keep one list of open repairs with the date each was reported",
+        "Review it at every committee meeting until each is closed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a complaint and repair tracker with status updates to the member who reported it.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The tracker and status updates are designed in the solution document."
+    },
+    {
+      "id": "p9_cash_leakage",
+      "n": 9,
+      "words": "Event ticket money collected by volunteers in cash, never reconciled",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Count event cash with two people before anyone leaves",
+        "Compare the count with tickets sold the same evening."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "cash_reconciliation"
+        ],
+        "text": "event ticketing with QR entry and sales reconciled to cash at close.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The ticketing and reconciliation set-up go in the solution document."
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "Canteen loses money and we don't know why",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Count canteen cash and key stock at close for a week",
+        "Compare what was bought with what was sold for the top items."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "nori_daily_read"
+        ],
+        "text": "a canteen stock and sales tracker with a daily morning read of cash and stock.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The tracker and daily read are detailed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on bylaws, elections, strata or owners'-association law, or legal action against defaulters — say \"talk to a lawyer\". Taking sides in committee politics or elections. Publicly naming or shaming defaulters, or asking for member names, unit numbers, plates or bank details. Help falsifying AGM accounts, rigging elections or hiding funds. Typical dues or service-charge levels."
+  ],
+  "sample_reply": {
+    "person": "I'm treasurer for our owners' association. Owners are late on service charges and I chase them one by one. Can you help?",
+    "pi": "Yes, this can be made much lighter, and you can start this week. 1 Bring every unit code's payment status into one list, so you can see the whole picture at once. 2 Ask owners to quote their unit code as the transfer reference, so payments match without guesswork. Workzap can do this automatically for you: a dues ledger that matches each payment to its unit and sends reminders on schedule. Would you like me to prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

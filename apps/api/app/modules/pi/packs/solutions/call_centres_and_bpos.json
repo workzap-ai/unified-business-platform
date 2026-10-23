@@ -1,0 +1,221 @@
+{
+  "industry": "call_centres_and_bpos",
+  "name": "Call centres and BPOs",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_attendance_lateness",
+      "n": 1,
+      "words": "Agents come late on night shift and we miss the client's SLA",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Have team leaders do a start-of-shift roll call for a week, so lateness is noticed in minutes rather than next day",
+        "Note who is late and why once, so you see whether transport or rosters are the cause."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a live floor board from dialer and login data showing who is logged in, on break or missing by shift and campaign, with alerts to the team leader.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many seats are you running, and across how many shifts?",
+      "free_stops": "the data sources and alert rules are set out in the solution document."
+    },
+    {
+      "id": "p2_accountability",
+      "n": 2,
+      "words": "Breaks run long and nobody notices until the client complains",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Share the break schedule clearly with every agent, so expectations are known",
+        "Have one team leader check break times on one shift this week, so you see the scale."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "break overrun alerts to the team leader as they happen, under a monitoring policy agents know about, with a daily adherence summary.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "the thresholds and how alerts are routed are kept for the solution document."
+    },
+    {
+      "id": "p3_turnover",
+      "n": 3,
+      "words": "Attrition is so high we're always training new people",
+      "category": "people_staff",
+      "subtype": "turnover",
+      "quick_ideas": [
+        "Ask the last few leavers one question about why, so you get real reasons",
+        "Note at which stage most people leave, so you know where to focus."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "an attrition tracker by stage, reason and team leader, updated with every exit.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how reasons are captured and grouped is worked out in the solution document."
+    },
+    {
+      "id": "p4_shift_scheduling",
+      "n": 4,
+      "words": "Schedules are built by hand and never match call volume",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Look at last month's hourly volume for one campaign once, so you see when the peaks really are",
+        "Compare that against how many agents were scheduled, so mismatches show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a schedule builder using past volume per hour for each campaign to propose shifts.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the forecasting approach and rules are set out in the solution document."
+    },
+    {
+      "id": "p5_inspection_missing",
+      "n": 5,
+      "words": "QA only checks a tiny share of calls",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Make sure every agent gets at least one review this week, so nobody is invisible",
+        "Hold one calibration session with the client, so your scoring matches theirs."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a QA scoring form with random sampling per agent, calibration notes and agent-level trends.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the sampling rules and scoring form are kept for the solution document."
+    },
+    {
+      "id": "p6_manual_reports",
+      "n": 6,
+      "words": "Client reports are made manually in Excel every morning",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "List which figures each client actually needs, so the report shrinks to what matters",
+        "Fix one layout per client, so nobody rebuilds it daily."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "dashboards_reports — a daily client report pulled from the dialer, CRM and QA into each client's format.",
+        "tool_words": [
+          "crm"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "which systems are connected and the report format are designed in the solution document."
+    },
+    {
+      "id": "p7_payroll_errors",
+      "n": 7,
+      "words": "Payroll errors because attendance deductions are calculated by hand",
+      "category": "people_staff",
+      "subtype": "payroll_errors",
+      "quick_ideas": [
+        "Share each agent's attendance summary with them before payroll this month, so disputes come up early",
+        "List last month's corrections once, so you see where errors start."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "attendance data feeding payroll deductions with a review step, and a summary each agent can see.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the review step and how deductions are shown are set out in the solution document."
+    },
+    {
+      "id": "p8_commission_disputes",
+      "n": 8,
+      "words": "Sales commission calculations cause fights every month",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write the commission rule down once and share it with agents, so everyone works from the same rule",
+        "Show each agent their own figures before payday, so questions come early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an incentive calculator with a transparent breakdown agents can see during the month.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "the calculation setup is kept for the solution document."
+    },
+    {
+      "id": "p9_maintenance_downtime",
+      "n": 9,
+      "words": "Internet or power goes down and we lose hours",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Start writing down every outage with start and end time, so you know the real impact",
+        "Note what backup was used each time, so gaps in the backup plan show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "an uptime log for power and internet outages with generator use recorded from phone, and a monthly summary.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "what is logged and how it is reported is worked out in the solution document."
+    },
+    {
+      "id": "p10_theft_internal",
+      "n": 10,
+      "words": "Headsets and equipment go missing",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Count headsets and equipment once per floor, so you know what's actually there",
+        "Start signing equipment out to seats, so there's a record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "an asset register for headsets, PCs and access cards issued and returned, with counts by floor.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the issue and return routine is designed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any labour-law, telemarketing-regulation, data-protection or tax advice. Anything involving deceptive scripts, caller ID spoofing, unconsented robocalls or buying personal data lists. Covert monitoring of staff outside a lawful, known policy. That SLAs will be met or attrition will drop. Requests for agent names, IDs, salaries, call recordings or end-customer data. If anyone is in immediate danger on a shift or in transport, point to emergency services."
+  ],
+  "sample_reply": {
+    "person": "Night shift pe agents late aate hain aur breaks lambe ho jate hain, client SLA pe complaint karta hai. Kya kiya ja sakta hai?",
+    "pi": "Ji haan, is pe kaafi kuch kiya ja sakta hai aur is hafte se shuruaat ho sakti hai. 1 Ek hafte ke liye team leaders shift shuru hote hi roll call karein, taake late aana agle din nahi balke usi waqt nazar aaye. 2 Ek dafa likh lein ke kaun late aaya aur kyun, taake pata chale masla transport ka hai ya roster ka. Workzap yeh aap ke liye automatically kar sakta hai: dialer ke data se live floor board aur breaks lambe hone pe team leader ko foran alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

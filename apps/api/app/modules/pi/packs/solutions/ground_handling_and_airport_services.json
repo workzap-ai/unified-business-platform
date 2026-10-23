@@ -1,0 +1,225 @@
+{
+  "industry": "ground_handling_and_airport_services",
+  "name": "Ground handling and airport services",
+  "sector": "7.G Transport, mobility and aviation (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_penalty_disputes",
+      "n": 1,
+      "words": "Airlines deduct SLA penalties and we can't prove whose fault the delay was",
+      "category": "cash_collections",
+      "subtype": "penalty_disputes",
+      "quick_ideas": [
+        "Take last month's penalties and note which had any ramp record at all, so you see how many were unwinnable",
+        "Ask supervisors to note the time and reason of every delay this week, so you start building evidence."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "a phone turnaround log with step times, delay reasons and photos signed by the supervisor, producing an evidence pack per flight for every penalty dispute.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many penalties land in a typical month?",
+      "free_stops": "Which steps are timed and how the evidence pack is assembled is set out in the solution document."
+    },
+    {
+      "id": "p2_unbilled_work",
+      "n": 2,
+      "words": "Turnarounds we did don't all make it onto the invoice",
+      "category": "cash_collections",
+      "subtype": "unbilled_work",
+      "quick_ideas": [
+        "Match one month's flights handled against invoice lines for your biggest airline, so you see the gap",
+        "Note where missed ones usually fall (night flights, extra services), so you know where to look."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "integration"
+        ],
+        "text": "billing reconciliation that compares flights handled with invoices raised per airline every day and flags anything not yet billed.",
+        "tool_words": []
+      },
+      "ask_first": "Are your contracts per turnaround, per passenger or monthly fixed?",
+      "free_stops": "The matching rules per contract type are worked out in the solution document."
+    },
+    {
+      "id": "p3_cash_flow_tight",
+      "n": 3,
+      "words": "Airlines pay months late and payroll is due every month",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "List what each airline owes by age once, so you know who to chase first",
+        "Line up airline payment dates against payroll dates, so you see the tight weeks in advance."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "dashboards_reports"
+        ],
+        "text": "a receivables tracker per airline with ageing, automatic statement reminders and a view of expected receipts against payroll dates.",
+        "tool_words": []
+      },
+      "ask_first": "Which months feel tightest?",
+      "free_stops": "The reminder schedule and cash view are designed in the solution document."
+    },
+    {
+      "id": "p4_shift_scheduling",
+      "n": 4,
+      "words": "Roster in Excel, staff swap shifts on WhatsApp without telling anyone",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Agree that swaps only count once a supervisor approves, so the roster stays true",
+        "Check one week's actual attendance against the roster, so you see how often it drifts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a shift roster app with swap requests, supervisor approval and check-in, so the live roster is always current across stations.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many staff are on the roster per station?",
+      "free_stops": "The swap and approval rules are set out in the solution document."
+    },
+    {
+      "id": "p5_overtime",
+      "n": 5,
+      "words": "Overtime is out of control during peak waves",
+      "category": "people_staff",
+      "subtype": "overtime",
+      "quick_ideas": [
+        "Pull last month's overtime by station and shift, so you see where it concentrates",
+        "Make one person approve overtime before it's worked, so it's a decision, not a default."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "dashboards_reports"
+        ],
+        "text": "overtime requests approved by phone before the shift, with a weekly report per station and role.",
+        "tool_words": []
+      },
+      "ask_first": "Who approves overtime today?",
+      "free_stops": "Approval limits and the reporting view are worked out in the solution document."
+    },
+    {
+      "id": "p6_maintenance_downtime",
+      "n": 6,
+      "words": "Belt loaders and tugs break down and we find out when the flight arrives",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List every GSE unit with its current status once, so you know what's actually serviceable",
+        "Ask drivers to report faults the moment they notice them, so you hear before the flight does."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "job_tracking"
+        ],
+        "text": "a GSE register with daily phone checks, breakdown reports, repair status and parts orders, visible per station each morning.",
+        "tool_words": []
+      },
+      "ask_first": "Is your GSE owned or leased?",
+      "free_stops": "The daily check items and repair workflow are designed in the solution document."
+    },
+    {
+      "id": "p7_after_sales",
+      "n": 7,
+      "words": "Mishandled bag cases are on paper and passengers keep calling",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "Count open bag cases and their age once, so you see the backlog",
+        "Give each case a reference passengers can quote, so calls get shorter."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "customer_messaging"
+        ],
+        "text": "a baggage case tracker with status and ageing, sending passengers template updates automatically as their case moves.",
+        "tool_words": []
+      },
+      "ask_first": "Who answers passengers when they call today?",
+      "free_stops": "The case stages and update points are set out in the solution document."
+    },
+    {
+      "id": "p8_branch_comparison",
+      "n": 8,
+      "words": "Each station reports differently and I can't compare them",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Agree the handful of numbers every station reports, so comparisons become possible",
+        "Put last month's figures from each station side by side once, so you see the outliers."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a station comparison view of turnarounds, delays, penalties and overtime, built daily from the same phone logs at every station.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many stations do you run?",
+      "free_stops": "The station measures and how they're calculated are designed in the solution document."
+    },
+    {
+      "id": "p9_orders_lost",
+      "n": 9,
+      "words": "Lounge and meet-and-assist bookings get missed",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Gather every booking channel into one list for this week, so you see where misses happen",
+        "Name one person to confirm each booking back to the requester, so nothing goes unacknowledged."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "one booking inbox pulling email, form and WhatsApp requests together, with confirmation and an assigned agent per booking.",
+        "tool_words": []
+      },
+      "ask_first": "Which channel do most bookings come from?",
+      "free_stops": "How channels are pulled in and assigned is set out in the solution document."
+    },
+    {
+      "id": "p10_handoffs",
+      "n": 10,
+      "words": "Shift supervisors don't hand over open issues",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Use one handover sheet per shift for a week, so open issues are written down",
+        "Ask the incoming supervisor to confirm they've read it, so nothing is assumed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a digital handover log of open issues per station, acknowledged by each incoming supervisor and kept as a history.",
+        "tool_words": []
+      },
+      "ask_first": "Where has something slipped between shifts before?",
+      "free_stops": "The handover fields and acknowledgement flow are designed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about ramp or airside safety procedures, dangerous goods, aircraft loading, weight and balance, de-icing or security screening. Any reading of PCAA, GCAA, airport authority or Transport Canada rules. Help bypassing screening, moving unscreened items or obtaining passes improperly, or any angle on influencing officials in tenders. Employment-law advice on contract staff; suggest they talk to their lawyer. Covert investigation of individual staff over baggage theft, and any storage of staff names, pass numbers or passenger details."
+  ],
+  "sample_reply": {
+    "person": "Airlines keep cutting penalties off our invoices and we never have proof it wasn't us. Can you help?",
+    "pi": "Yes, this is fixable, and it starts with what gets recorded at the time of the delay. 1. Go through last month's penalties and see which had any ramp record at all, so you know how many you could never have won. 2. Ask supervisors to note the time and reason of every delay this week, so evidence starts building straight away. Workzap can do this automatically for you: every turnaround timed step by step on a phone, with photos and the supervisor's sign-off, and an evidence pack ready for each flight an airline disputes. Shall I put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

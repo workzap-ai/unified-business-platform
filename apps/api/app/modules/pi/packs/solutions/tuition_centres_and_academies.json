@@ -1,0 +1,220 @@
+{
+  "industry": "tuition_centres_and_academies",
+  "name": "Tuition centres and academies",
+  "sector": "7.J Education and childcare",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_cash_mismatch",
+      "n": 1,
+      "words": "Cash at the desk — the fee card and the register never match",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Give a numbered receipt for every cash payment, so each fee has a trace",
+        "Count the desk cash against receipts yourself at closing once this week, so you see the real gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A fee desk app issuing a digital receipt for every cash, wallet or transfer payment and closing cash per receptionist every day, across branches.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "The daily close steps and variance alerts are kept for the document."
+    },
+    {
+      "id": "p2_receivables_late",
+      "n": 2,
+      "words": "The receptionist chases fees one by one on WhatsApp",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Set one fee due date for every batch, so reminders can go out together",
+        "Send this month's reminder once per batch to parent numbers given with permission, instead of separate chats."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "customer_messaging Monthly reminders sent automatically on WhatsApp, with a live paid/unpaid list per batch by fee card number.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reminder sequence and follow-up rules are in the document."
+    },
+    {
+      "id": "p3_commission_disputes",
+      "n": 3,
+      "words": "Teachers on a share of fees dispute how many students they had",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Agree in writing whether the share counts students attending or students who paid, so there is one rule",
+        "Show each teacher the paid count for their batches before salaries this month, so disputes come up early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A teacher share calculator that counts paid enrolments per teacher automatically every month and sends the figure for sign-off.",
+        "tool_words": []
+      },
+      "ask_first": "Is the share worked out from the register or from fees received?",
+      "free_stops": "The calculation rules for joiners, leavers and part-paid months are kept for the document."
+    },
+    {
+      "id": "p4_lead_followup_slow",
+      "n": 4,
+      "words": "Nobody follows up after the demo class",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Put this month's demo classes into one list, so you see who never heard back",
+        "Make one person responsible for follow-ups, so every demo has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Every enquiry tracked from source to demo to admission, with automatic follow-up reminders and a weekly conversion count per branch.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The follow-up timings and stages are set out in the document."
+    },
+    {
+      "id": "p5_churn_subscription",
+      "n": 5,
+      "words": "Students drop out after exams and we notice only when the fee doesn't come",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Announce the next session before board exams end, so families plan to stay",
+        "Note which fee cards have missed recent weeks, so you can call those families early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "Families tracked by reference across sessions, with likely leavers flagged automatically and reminded about the next session.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The warning signals and re-enrolment messages are kept for the document."
+    },
+    {
+      "id": "p6_margin_shrinking",
+      "n": 6,
+      "words": "Some batches are packed and others have four students",
+      "category": "margin_cost",
+      "subtype": "margin_shrinking",
+      "quick_ideas": [
+        "List every batch with seats filled and teacher cost once, so the thin ones show",
+        "Decide a minimum batch size for opening new slots, so new batches start viable."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A batch board updated daily with seats filled against capacity and cost per batch, room and branch.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How costs are allocated per batch is in the document."
+    },
+    {
+      "id": "p7_info_lost_in_whatsapp",
+      "n": 7,
+      "words": "Timetable changes go to five groups and parents still miss them",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Make one announcement-only list per batch, so changes don't get buried in chat",
+        "Send changes at one fixed time of day, so parents know when to look."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "customer_messaging Timetable and room booking with a clash check, and every change sent automatically to just the batches affected.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The broadcast setup and clash rules are kept for the document."
+    },
+    {
+      "id": "p8_discount_abuse",
+      "n": 8,
+      "words": "Sibling and friend discounts are given verbally",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Write down the discounts you actually allow, so the desk has one rule",
+        "List every discount currently running once, so you see what it is costing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Every discount approved before it applies, with a monthly report by branch.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The approval levels and report format are in the document."
+    },
+    {
+      "id": "p9_branch_comparison",
+      "n": 9,
+      "words": "I can't tell which branch actually makes money",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Write last month's fee income, teacher cost, rent and utilities per branch side by side once, so the gap shows",
+        "Use the same headings for every branch, so they can be compared."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A branch screen updated daily with enrolment, collections, teacher costs, rent and margin per branch.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which figures feed the screen and how is kept for the document."
+    },
+    {
+      "id": "p10_fraud",
+      "n": 10,
+      "words": "Zoom links get shared and non-paying students join",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Change the links for every online batch this month, so old shared links stop working",
+        "Send new links only to families marked paid, so access follows payment."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A unique join link per enrolled family with an automatic attendance count, so shared links are spotted.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How links are issued and checked is set out in the document."
+    }
+  ],
+  "never_say": [
+    "Promises of board results, grades or \"guaranteed A\" claims. Licensing, home-business permit or zoning advice; pi says \"check with your local authority\". Legal advice on teachers taking students; pi says \"talk to your lawyer\". Any help keeping cash fees off the books; pi suggests \"talk to your accountant\". Any idea that records students' names, schools, marks or photos, or secret recording of classes or teachers. Business talk after a child safety concern; pi points to emergency services and the relevant authority."
+  ],
+  "sample_reply": {
+    "person": "Teachers ke hisse ka koi hal batayein. Har mahine end pe jhagra hota hai ke kitne bachay the aur kis ki fees aayi.",
+    "pi": "Ji haan, ye masla kaafi had tak is mahine se hi hal kiya ja sakta hai. 1 Teachers ke saath likh kar tay kar lein ke hissa attend karne walon pe banega ya fees dene walon pe, taake ek hi qaida ho. 2 Is mahine salary se pehle har teacher ko us ke batches ki paid ginti dikha dein, taake ikhtilaaf pehle saamne aa jaye. Workzap ye ginti aur hissa aap ke liye har mahine khud-ba-khud nikaal sakta hai aur teacher ko sign-off ke liye bhej sakta hai. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

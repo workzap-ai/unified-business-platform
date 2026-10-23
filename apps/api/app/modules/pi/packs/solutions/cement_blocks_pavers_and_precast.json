@@ -1,0 +1,197 @@
+{
+  "industry": "cement_blocks_pavers_and_precast",
+  "name": "Cement, blocks, pavers and precast",
+  "sector": "7.D Manufacturing and industry (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_shrinkage_theft",
+      "n": 1,
+      "words": "Cement goes out of the store faster than blocks come out",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Note bags issued and blocks made side by side each day this week — shows whether the gap is real",
+        "Keep the store key with one person — makes every bag traceable."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a daily production log from the yard with cement bags issued alongside, flagging days when usage per block is out of line.",
+        "tool_words": []
+      },
+      "ask_first": "Who holds the store key now?",
+      "free_stops": "The consumption ratios and exception rules are in the solution document."
+    },
+    {
+      "id": "p2_packing_errors",
+      "n": 2,
+      "words": "Breakage during loading and transport, contractor refuses broken pieces",
+      "category": "orders_fulfilment",
+      "subtype": "packing_errors",
+      "quick_ideas": [
+        "Count breakage separately at loading, transport and site for a few trips — shows where it really happens",
+        "Photograph each loaded truck before it leaves — settles disputes at site."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a breakage register by stage with photos, totalled weekly per driver and route.",
+        "tool_words": []
+      },
+      "ask_first": "Where does most breakage happen, loading or at site?",
+      "free_stops": "The capture steps and how disputes are settled are in the solution document."
+    },
+    {
+      "id": "p3_credit_customers",
+      "n": 3,
+      "words": "Contractors take material on credit and disappear after the project",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List every contractor balance with its project — shows which projects are closing soon",
+        "Collect before the final deliveries of a project — the point you still have leverage."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a contractor ledger with limits, ageing and project-linked balances, with automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How many contractors buy on credit?",
+      "free_stops": "Limit rules and collection triggers are in the solution document."
+    },
+    {
+      "id": "p4_order_errors",
+      "n": 4,
+      "words": "Orders come on calls, site address written wrong, wrong delivery",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Ask every customer for a location pin on WhatsApp — removes guesswork for drivers",
+        "Read back each order before closing the call — catches mistakes early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "an order book with site pin, quantity and date, feeding a daily delivery schedule drivers can see.",
+        "tool_words": []
+      },
+      "ask_first": "How many deliveries go out on a normal day?",
+      "free_stops": "The order intake and dispatch set-up are in the solution document."
+    },
+    {
+      "id": "p5_theft_internal",
+      "n": 5,
+      "words": "Drivers do side trips and diesel doesn't add up",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Note meter reading and trips at every diesel issue — gives a first usage picture",
+        "Compare vehicles on the same routes — shows the outlier."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a diesel and trip log per vehicle compared against expected usage, flagging unusual consumption daily.",
+        "tool_words": []
+      },
+      "ask_first": "How is diesel issued now?",
+      "free_stops": "The usage benchmarks and alerts are in the solution document."
+    },
+    {
+      "id": "p6_supplier_quality",
+      "n": 6,
+      "words": "Sand and bajri trucks deliver short but we pay full",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_quality",
+      "quick_ideas": [
+        "Photograph and measure loads on arrival for a week — shows how often they're short",
+        "Pay only against the checked quantity — makes suppliers careful."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "an incoming material check logging truck photo, volume and weighbridge slip, totalled per supplier.",
+        "tool_words": []
+      },
+      "ask_first": "Are loads checked at all when they arrive?",
+      "free_stops": "The checking steps and supplier scorecard are in the solution document."
+    },
+    {
+      "id": "p7_manual_reports",
+      "n": 7,
+      "words": "Daily output is just a number on WhatsApp from the supervisor",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Ask for output by product type, not one total — shows what is really being made",
+        "Add cement issued to the same message — the two numbers check each other."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read of output, cement used, dispatches, cash collected and pending deliveries.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which numbers do you want to see each morning?",
+      "free_stops": "The daily form and which figures go into the read are in the solution document."
+    },
+    {
+      "id": "p8_cash_mismatch",
+      "n": 8,
+      "words": "Cash from walk-in buyers is handled by the munshi and never matches",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Give a numbered slip for every walk-in sale — creates a trail",
+        "Count cash against slips together one evening — shows the size of the gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "walk-in cash matched against dispatch slips every evening, with gaps flagged to the owner.",
+        "tool_words": []
+      },
+      "ask_first": "Do walk-in buyers mostly pay cash or transfer?",
+      "free_stops": "The matching rules and sign-off are in the solution document."
+    },
+    {
+      "id": "p9_few_leads",
+      "n": 9,
+      "words": "Few new leads — builders only come through old contacts",
+      "category": "marketing_leads",
+      "subtype": "few_leads",
+      "quick_ideas": [
+        "Photograph your paver and block designs and put them on a Google Maps listing — buyers can see options before calling",
+        "Ask a few happy contractors for a review, with their permission — gives new buyers confidence."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "a design catalogue page and WhatsApp catalogue with enquiries recorded and followed up.",
+        "tool_words": []
+      },
+      "ask_first": "Do you sell more to contractors or individual home builders?",
+      "free_stops": "The catalogue layout and enquiry flow are in the solution document."
+    }
+  ],
+  "never_say": [
+    "No mix design, strength, curing method or structural advice. No opinion on cube-test results or standards; never help alter test results or certificates. Accidents, crush injuries, truck accidents or wall collapse: stop and point to emergency services. Never help source or hide sand or aggregate from unauthorised mining. Never help with tender \"settings\" or bribes; decline plainly. Drivers and labour: roles and counts only, no names, licences or IDs."
+  ],
+  "sample_reply": {
+    "person": "Koi hal batao, boriyan khatam ho jati hain lekin blocks utne nahi bante.",
+    "pi": "Ji, is ka pata lagana aur rokna dono mumkin hain. 1 Is hafte roz kitni boriyan nikli aur kitne blocks bane, dono saath likhwayein, taake farq saaf nazar aaye. 2 Store ki chaabi ek hi bande ke paas rakhein, taake har bori ka hisaab ho. Workzap yeh aap ke liye roz khud-ba-khud kar sakta hai: yard se phone par production log, saath mein cement issue, aur jis din kharcha zyada ho us din alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

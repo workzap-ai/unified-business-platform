@@ -1,0 +1,204 @@
+{
+  "industry": "kids_wear_toys_and_baby_stores",
+  "name": "Kids wear, toys and baby stores",
+  "sector": "7.A Retail and consumer (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_stockout",
+      "n": 1,
+      "words": "Kids outgrow sizes so fast our age-size stock never matches demand",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Pull sales by age band for last season once, so buying follows the ages that actually sell",
+        "Note age sizes asked for but missing for a week, so you see what you're losing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "an age-size stock grid across stores and online, with sell-through by age band and alerts when a band runs low.",
+        "tool_words": [],
+        "reordered_from": [
+          "dashboards_reports",
+          "stock_alerts"
+        ]
+      },
+      "ask_first": "Which ages run out most?",
+      "free_stops": "How age bands are tracked and reorder alerts set is in the solution document."
+    },
+    {
+      "id": "p2_expiry_wastage",
+      "n": 2,
+      "words": "Formula and baby food near expiry, we only notice when a mother complains",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Check every consumable's expiry once and pull anything close to date, so nothing reaches a customer",
+        "Write expiry dates on the receiving note from now on, so the next check is quicker."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "an expiry and batch register for consumables captured at receiving, with alerts and a near-expiry action list.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many consumable items do you carry?",
+      "free_stops": "How batches are captured and alert timings set are in the solution document."
+    },
+    {
+      "id": "p3_serial_batch_tracking",
+      "n": 3,
+      "words": "We had a recall and couldn't find who bought the item",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "List which gear and electronic toys carry batch or serial numbers, so you know what could be recalled",
+        "Start noting batch numbers on sales of those items, so a lookup is possible next time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "batch and serial capture for gear and electronic toys linked to each sale, so a recall lookup shows which sales are affected.",
+        "tool_words": []
+      },
+      "ask_first": "Do you sell prams, car seats or battery toys?",
+      "free_stops": "How batches are linked to sales and searched is in the solution document."
+    },
+    {
+      "id": "p4_slow_response",
+      "n": 4,
+      "words": "Parents ask on WhatsApp if we have a size and we reply hours later",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Count unanswered stock questions for a few days, so you see how many sales wait",
+        "Give one person the WhatsApp during busy hours, so replies don't depend on whoever is free."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a WhatsApp stock-check flow where staff reply from a live stock lookup and the question becomes an order.",
+        "tool_words": []
+      },
+      "ask_first": "How many WhatsApp queries a day?",
+      "free_stops": "How the stock lookup and reply flow work is in the solution document."
+    },
+    {
+      "id": "p5_no_customer_data",
+      "n": 5,
+      "words": "No idea who our repeat buyers are for diapers and formula",
+      "category": "customers_retention",
+      "subtype": "no_customer_data",
+      "quick_ideas": [
+        "Ask regulars at checkout if they'd like a reminder when their usual pack is due, with their permission, so you start a list honestly",
+        "Note which consumables people buy on a cycle, so reminders are useful."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat",
+          "customer_messaging"
+        ],
+        "text": "an opt-in customer list with purchase intervals and WhatsApp reminders when a repeat buy is likely due.",
+        "tool_words": []
+      },
+      "ask_first": "Do you already keep any customer list?",
+      "free_stops": "How intervals are worked out and reminders timed is in the solution document."
+    },
+    {
+      "id": "p6_pre_orders_custom",
+      "n": 6,
+      "words": "Birthday hamper orders get mixed up or delivered late",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Put all open hamper orders on one list with event date and contents, so nothing relies on memory",
+        "Confirm contents with the buyer a day before packing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a hamper and birthday order tracker with contents, delivery slot and status.",
+        "tool_words": []
+      },
+      "ask_first": "How many hamper orders in a busy week?",
+      "free_stops": "The order stages and confirmation steps are in the solution document."
+    },
+    {
+      "id": "p7_import_delays",
+      "n": 7,
+      "words": "Toy imports stuck before Eid or Christmas",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "List each consignment with its expected arrival against the season date, so you see which are at risk",
+        "Mark which lines arrived late, so next season those are ordered earlier."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an import tracker by consignment with expected arrival against season deadlines and alerts when one slips.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most toys come from?",
+      "free_stops": "How shipments are tracked and flagged is in the solution document."
+    },
+    {
+      "id": "p8_capacity",
+      "n": 8,
+      "words": "School uniform orders all come in two weeks",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Ask schools for expected class sizes early, so stitching starts before the rush",
+        "Stitch a stock of the most common sizes ahead, so the rush is only top-ups."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "credit_ledger"
+        ],
+        "text": "a uniform order board with sizes per class, production status, delivery and school payments tracked.",
+        "tool_words": []
+      },
+      "ask_first": "How many schools do you supply?",
+      "free_stops": "How orders are planned per class and tracked to payment is in the solution document."
+    },
+    {
+      "id": "p9_margin_unknown",
+      "n": 9,
+      "words": "We don't know margin by category",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out margin on your top items in each category once, so you know which category carries the shop",
+        "Use today's exchange rate for imported toys, so old purchase prices don't flatter the margin."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a category margin view (clothing, toys, consumables, gear) with landed cost kept current.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which category do you think earns most?",
+      "free_stops": "How landed cost and margin are calculated is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on infant feeding, formula choice or child health. Toy or car-seat safety standards or certification advice. How to sell recalled, expired or counterfeit products. To use children's photos or collect children's details; any injury goes to medical or emergency help first. Anything on customs for toy imports."
+  ],
+  "sample_reply": {
+    "person": "A customer found an expired formula tin on our shelf last week. How do we stop this happening again?",
+    "pi": "Yes, this can be stopped, and you can start today. 1 Check every consumable's expiry once this week and pull anything close to date, so nothing reaches a customer. 2 Write expiry dates on the receiving note from now on, so future checks take minutes. Workzap can do this automatically for you: an expiry register filled at receiving, with alerts before items near their date and a list of what to pull. Shall I have a solution document and quote prepared for you? You're free to say no.",
+    "language": "english"
+  }
+}

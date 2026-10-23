@@ -1,0 +1,220 @@
+{
+  "industry": "pest_control",
+  "name": "Pest control",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_documentation",
+      "n": 1,
+      "words": "Clients ask for service reports for audits and we can't find them",
+      "category": "compliance_admin",
+      "subtype": "documentation",
+      "quick_ideas": [
+        "Ask technicians to photograph each report and send it to one office number, so nothing stays in a van",
+        "File them per client by month."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "Digital service reports created on the technician's phone, sent to the client instantly and stored for audits, with a monthly audit pack per business client.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many business clients are on regular contracts?",
+      "free_stops": "Report fields and pack layout are in the solution document."
+    },
+    {
+      "id": "p2_checklists_not_done",
+      "n": 2,
+      "words": "Follow-up visits included in the price are forgotten",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Book the follow-up date at the time of the first visit, so it's never left to memory",
+        "Check upcoming follow-ups each Monday."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A job scheduler that creates the follow-up visit automatically for every treatment that includes one.",
+        "tool_words": []
+      },
+      "ask_first": "How are follow-up visits scheduled today?",
+      "free_stops": "Scheduling rules are in the solution document."
+    },
+    {
+      "id": "p3_service_quality",
+      "n": 3,
+      "words": "AMC visits are missed and the restaurant fails its inspection",
+      "category": "customers_retention",
+      "subtype": "service_quality",
+      "quick_ideas": [
+        "List every AMC client's next visit date in one calendar",
+        "Confirm each visit with the client the day before."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling",
+          "workflow_automation"
+        ],
+        "text": "An AMC register with a visit calendar, missed-visit alerts and renewal reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How do you keep track of visit dates now?",
+      "free_stops": "Alert timing and the register design are in the solution document."
+    },
+    {
+      "id": "p4_rework",
+      "n": 4,
+      "words": "Customers call saying the cockroaches are back a week later",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Log every re-treatment with its likely cause",
+        "Review the list monthly to see which jobs repeat."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A re-treatment tracker with cause and cost, to show repeat- complaint patterns by service and technician.",
+        "tool_words": []
+      },
+      "ask_first": "How are re-treatments handled and charged?",
+      "free_stops": "Cause categories are in the solution document; treatment choices stay with the licensed technician."
+    },
+    {
+      "id": "p5_shrinkage_theft",
+      "n": 5,
+      "words": "Chemical stock goes down faster than the jobs justify",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Record what each technician is issued and what they return",
+        "Compare issues against jobs done once."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A product register with issue per technician and usage against completed jobs.",
+        "tool_words": []
+      },
+      "ask_first": "How are products issued to technicians?",
+      "free_stops": "Usage benchmarks are in the solution document; dosage stays with the label and technician."
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "Technicians quote different prices for the same job",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Give everyone one fixed price list by service and property size",
+        "Ask them to call the office before any change."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A fixed price list in the job app, with on-site deviations needing approval.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Who decides the price on site?",
+      "free_stops": "Price list structure and approval limits are in the solution document."
+    },
+    {
+      "id": "p7_churn_subscription",
+      "n": 7,
+      "words": "AMC renewals lapse because nobody reminds the client",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "List AMCs by end date",
+        "Call those ending in the next couple of months."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "Renewal reminders sent ahead of every AMC end date.",
+        "tool_words": []
+      },
+      "ask_first": "How many AMC clients do you have?",
+      "free_stops": "Reminder timing is in the solution document."
+    },
+    {
+      "id": "p8_chat_overload",
+      "n": 8,
+      "words": "Calls come into one phone and get missed in summer",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Add a WhatsApp booking option, so calls aren't the only way in",
+        "Call back missed numbers at fixed times."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "A WhatsApp booking flow capturing pest type, property type, area and preferred slot.",
+        "tool_words": []
+      },
+      "ask_first": "How do customers book a treatment?",
+      "free_stops": "Booking flow design is in the solution document."
+    },
+    {
+      "id": "p9_receivables_late",
+      "n": 9,
+      "words": "Restaurants pay their AMC invoices very late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List unpaid invoices by age",
+        "Send invoices with the service report, so proof travels with the bill."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Receivables tracking with reminders for every business client.",
+        "tool_words": []
+      },
+      "ask_first": "Which clients cause the most delays?",
+      "free_stops": "Reminder schedule is in the solution document."
+    },
+    {
+      "id": "p10_licences_renewals",
+      "n": 10,
+      "words": "Company licence and technician certifications sneak up",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "Put every licence and certification expiry in one calendar",
+        "Give one person ownership."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A licence and certification expiry calendar with alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Who keeps track of expiry dates?",
+      "free_stops": "Alert timing is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any product, dosage, dilution, application method, re-entry time or safety precaution; the licensed technician and label decide. Any answer to health questions like \"is it safe for my baby\"; the business needs consistent approved guidance. Any help using banned or unlabelled chemicals, diluting product, faking reports or working without a licence. Any recording of customers' names, addresses or numbers, or technicians' personal details. Anything other than emergency services, the poison centre or a vet first for suspected poisoning or exposure."
+  ],
+  "sample_reply": {
+    "person": "Is there a better way to handle service reports? Restaurants need them for inspections and ours are handwritten and half go missing.",
+    "pi": "Yes, this can be sorted, and you can start this week. 1 Ask technicians to photograph each report and send it to one office number, so nothing stays in a van. 2 File those by client and month, so any report can be found in minutes. Workzap can do this automatically for you: digital reports made on the technician's phone, sent to the client instantly and stored as an audit pack. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

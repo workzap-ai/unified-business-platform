@@ -1,0 +1,239 @@
+{
+  "industry": "freight_forwarders",
+  "name": "Freight forwarders",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_bottleneck",
+      "n": 1,
+      "words": "Customers want a quote in an hour and it takes us a day to get rates",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Gather current rates for your busiest lanes in one place your team can see, so common quotes need no fresh emails",
+        "Note which step of the last few quotes took longest, so you know what slows you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A rate sheet manager by lane with validity dates and a quick quote builder that produces and logs a branded quote on WhatsApp or email.",
+        "tool_words": []
+      },
+      "ask_first": "Which lanes make up most of your quote requests?",
+      "free_stops": "How rates are held and turned into quotes is designed in the solution document."
+    },
+    {
+      "id": "p2_pricing_errors",
+      "n": 2,
+      "words": "Rates from lines change every week and staff quote old ones",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Mark each rate with its expiry date, so staff can see what's stale",
+        "Agree that no quote goes out on an expired rate."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Rate expiry alerts and a block on quoting from expired rates, running automatically across the team.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The alert and approval rules are set in the solution document."
+    },
+    {
+      "id": "p3_lead_followup_slow",
+      "n": 3,
+      "words": "We quote, then never follow up, and the customer books elsewhere",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "List this month's open quotes, so you see what's still winnable",
+        "Give each open quote to one person to follow up, so it has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "A quote tracker showing every open quote, its age and outcome, with follow-up reminders sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Follow-up timing and outcome tracking are in the solution document."
+    },
+    {
+      "id": "p4_order_tracking",
+      "n": 4,
+      "words": "Customers call all day asking \"where is my container",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "Give each job one named owner in ops, so customers know who to ask",
+        "Tell customers proactively when cargo sails and arrives, so they don't need to call."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "customer_messaging"
+        ],
+        "text": "A shipment board with every job's milestones and automatic WhatsApp updates to the customer when a milestone changes.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The milestones and message triggers are set in the solution document."
+    },
+    {
+      "id": "p5_delivery_late",
+      "n": 5,
+      "words": "Cargo got rolled and we found out after the customer did",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Check this week's bookings against the lines' latest schedules, so rollovers are spotted early",
+        "Tell the customer first when a booking moves, so trust holds."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Rollover and delay alerts on the shipment board that reach ops and the customer automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Where alerts come from and who gets them is designed in the solution document."
+    },
+    {
+      "id": "p6_duplicate_entry",
+      "n": 6,
+      "words": "Same shipment details typed into five documents",
+      "category": "operations_process",
+      "subtype": "duplicate_entry",
+      "quick_ideas": [
+        "List every document you retype the same details into, so the duplication is visible",
+        "Note where typing errors usually appear, so you know the risk."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Single job entry that fills the HBL, invoice, arrival notice and manifest templates automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Which documents are filled, and from what, is mapped in the solution document."
+    },
+    {
+      "id": "p7_margin_unknown",
+      "n": 7,
+      "words": "We don't know profit per job until the line's invoice arrives",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Write an estimated cost for each open job, so you can compare when invoices land",
+        "Note which charges surprised you on recent jobs, so you know what to watch."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A job costing view of estimated vs actual cost and revenue per job, flagging jobs where actuals pass the estimate, plus lane and customer profitability.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How costs are captured per job is set out in the solution document."
+    },
+    {
+      "id": "p8_cash_flow_tight",
+      "n": 8,
+      "words": "We pay the shipping line upfront but customers pay us much later",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "List customer balances by age, so you know who funds your cash gap",
+        "Agree credit terms in writing with your slowest payers, so expectations are clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Customer and agent receivables with ageing, profit-share reconciliation and reminders queued for approval.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Ageing and reminder rules are in the solution document."
+    },
+    {
+      "id": "p9_info_lost_in_whatsapp",
+      "n": 9,
+      "words": "All shipment info sits in one ops person's email",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Move each live job's key updates into one shared place, so anyone can answer a customer",
+        "Ask ops for a short daily handover note, so leave doesn't freeze work."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A shared job history with notes and documents per shipment, so no job is stuck in one inbox.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How job history is captured is designed in the solution document."
+    },
+    {
+      "id": "p10_cost_overruns",
+      "n": 10,
+      "words": "Detention charges pile up because the customer didn't return the empty",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Tell each customer their free-time end date at delivery, so they know the deadline",
+        "List containers out with customers now, so you see which are close to charges."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A detention clock per container with free-time alerts sent to the customer automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Alert timing per container is set in the solution document."
+    },
+    {
+      "id": "p11_few_leads",
+      "n": 11,
+      "words": "Too few new customers; we live off the same old accounts",
+      "category": "marketing_leads",
+      "subtype": "few_leads",
+      "quick_ideas": [
+        "List customers who shipped with you before and stopped, so you know who to call back",
+        "Make sure your website states your lanes and services clearly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital",
+          "lead_followup"
+        ],
+        "text": "A clear website with a rate request form and a lead tracker that records and follows up every enquiry.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The site content and lead flow are planned in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on cargo liability, Incoterms disputes or claims against carriers; suggest legal or insurance advice. Dangerous goods classification or packing; pi never helps hide DG cargo. Help under-declaring weight, misdescribing cargo or altering BLs. Sanctions screening or restricted parties; suggest compliance advice. Customs classification or duty is for a licensed clearing agent. Promises on rates, transit times or booking wins; never store customer or consignee contact details. If an incident causes injury, emergency services come first."
+  ],
+  "sample_reply": {
+    "person": "We lose bookings because quotes take us till next day. Lines email rates, we calculate, customer has gone. Any solution?",
+    "pi": "Yes, quotes can get much quicker, and you can start this week. 1. Gather current rates for your busiest lanes in one place your team can see, so the common quotes need no fresh emails. 2. Look at which step slowed your last few quotes, so you know where the hours go. Workzap can do this automatically for you: a rate sheet by lane with validity alerts and a quote builder that produces and logs a quote in minutes. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

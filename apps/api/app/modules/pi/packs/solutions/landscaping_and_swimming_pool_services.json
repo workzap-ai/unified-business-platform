@@ -1,0 +1,220 @@
+{
+  "industry": "landscaping_and_swimming_pool_services",
+  "name": "Landscaping and swimming-pool services",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_accountability",
+      "n": 1,
+      "words": "Gardeners skip villas and the client says nobody came for two weeks",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Ask teams to send a before/after photo from each visit, so every visit has proof",
+        "Spot-check a few visits against the morning list, so gaps show early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Team check-in and check-out with location and photos for every visit, every day, with missed visits flagged.",
+        "tool_words": []
+      },
+      "ask_first": "After a visit, does the team send anything back?",
+      "free_stops": "Check-in method and proof rules are in the solution document."
+    },
+    {
+      "id": "p2_record_keeping",
+      "n": 2,
+      "words": "I can't prove the pool was cleaned on the day",
+      "category": "compliance_admin",
+      "subtype": "record_keeping",
+      "quick_ideas": [
+        "Ask technicians for a dated photo of each pool after service, so the visit is on record",
+        "Send the client a short visit note, so they hear it from you first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "customer_messaging"
+        ],
+        "text": "A pool service log on phone with tests done, equipment checks and photos, and a visit summary sent to the client automatically (no dosing guidance in the system).",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "How many pools do you service each week?",
+      "free_stops": "Log fields and summary format are in the solution document."
+    },
+    {
+      "id": "p3_route_planning",
+      "n": 3,
+      "words": "Teams waste hours driving back and forth across the city",
+      "category": "orders_fulfilment",
+      "subtype": "route_planning",
+      "quick_ideas": [
+        "Group each team's visits by area, so they stay in one zone",
+        "Put nearby clients on the same weekday, so routes repeat sensibly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A visit schedule per client with recurring frequency, assigned team and route order for each day.",
+        "tool_words": []
+      },
+      "ask_first": "How many teams and vehicles do you have?",
+      "free_stops": "Routing logic is in the solution document."
+    },
+    {
+      "id": "p4_shrinkage_theft",
+      "n": 4,
+      "words": "Pool chemicals run out quickly and I don't know where they go",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Record what each team is issued this week, so stock has an owner",
+        "Compare issues against visits done once, so outliers show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A chemicals, fertiliser and parts register with issue per team and usage per site, flagged when it drifts.",
+        "tool_words": []
+      },
+      "ask_first": "How are chemicals given to teams?",
+      "free_stops": "Usage rules are in the solution document; dosing stays with trained technicians and product labels."
+    },
+    {
+      "id": "p5_maintenance_downtime",
+      "n": 5,
+      "words": "Irrigation breakdowns get reported late and plants die",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Give clients one number for faults, so reports arrive in one place",
+        "Log each fault with date reported and fixed, so slow fixes are visible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Irrigation and pump fault tickets from clients with response tracking across all sites.",
+        "tool_words": []
+      },
+      "ask_first": "How do clients report a broken sprinkler or pump?",
+      "free_stops": "Ticket flow is in the solution document; electrical work on pumps stays with a qualified electrician."
+    },
+    {
+      "id": "p6_unbilled_variations",
+      "n": 6,
+      "words": "Clients add things on site and refuse to pay later",
+      "category": "cash_collections",
+      "subtype": "unbilled_variations",
+      "quick_ideas": [
+        "Get written approval with a price before any extra work, so there's a record",
+        "Keep a list of extras per project, so nothing is forgotten at billing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A variation log on site with client approval on WhatsApp before work starts, linked to the invoice.",
+        "tool_words": []
+      },
+      "ask_first": "How are extras agreed now?",
+      "free_stops": "Approval flow is in the solution document."
+    },
+    {
+      "id": "p7_churn_subscription",
+      "n": 7,
+      "words": "Contracts end and we don't know until the client stops paying",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "List every contract end date, so renewals are visible",
+        "Call clients a couple of months ahead, so you hear concerns while there's time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A contract register with renewal alerts sent ahead of every end date.",
+        "tool_words": []
+      },
+      "ask_first": "What usually makes a client leave?",
+      "free_stops": "Alert timing and the renewal workflow are in the solution document."
+    },
+    {
+      "id": "p8_receivables_late",
+      "n": 8,
+      "words": "Communities and developers pay ninety days late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List unpaid invoices by age, so the oldest are clear",
+        "Send visit proof with each invoice, so approval isn't held up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Invoicing and receivables tracking for communities and developers with reminders on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "Which type of client is slowest to pay?",
+      "free_stops": "Reminder schedule is in the solution document."
+    },
+    {
+      "id": "p9_seasonal_dip",
+      "n": 9,
+      "words": "Winter is dead for pools and we still carry the team",
+      "category": "sales_revenue",
+      "subtype": "seasonal_dip",
+      "quick_ideas": [
+        "List past clients who agreed to hear from you, so you have someone to offer work to",
+        "Plan one off-season service (garden, repairs, pre-season checks), so teams have work."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "Seasonal offers sent from client history at the right time each year.",
+        "tool_words": []
+      },
+      "ask_first": "What do the teams do in the quiet months?",
+      "free_stops": "Campaign timing is in the solution document."
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "I don't know which contracts are worth keeping",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Compare visit time and materials against price for your largest contracts, to see the real result",
+        "Note which ones lose time to travel or extras."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "Per-contract profitability from visits, materials and price, updated monthly.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Roughly how many maintenance clients do you visit each week?",
+      "free_stops": "Cost allocation is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any fertiliser, pesticide, herbicide or pool chemical dosing, plant treatment or water-quality advice. Any electrical advice on pumps or lighting, or structural advice on pool shells or retaining walls. Any help billing visits not done, falsifying pool logs, dumping chemicals or green waste, or hiring without permits. Any recording of clients' names, villa addresses, gate codes or staff names and IDs. Anything other than emergency services first for drowning, a child alone near a pool, electric shock, chemical exposure or heatstroke."
+  ],
+  "sample_reply": {
+    "person": "We look after about 120 villas and clients keep saying the gardener didn't come. How do I fix this?",
+    "pi": "Yes, this can be fixed, and you can start this week. 1 Ask each team to send a before/after photo from every visit, so each visit has proof. 2 Spot-check a few visits against the morning list, so gaps show early. Workzap can do this automatically for you: location check-ins and photos for every visit, and a visit summary sent to each client. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

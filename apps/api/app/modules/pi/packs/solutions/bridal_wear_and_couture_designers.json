@@ -1,0 +1,198 @@
+{
+  "industry": "bridal_wear_and_couture_designers",
+  "name": "Bridal wear and couture designers",
+  "sector": "7.A Retail and consumer (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_order_tracking",
+      "n": 1,
+      "words": "Kisi ko nahi pata kaun sa order kis stage pe hai",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "Put every open order on one list with its stage and event date, so the risky ones stand out",
+        "Ask the adda head for one daily status update, so the register and WhatsApp stop disagreeing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an order board by order code with stages from booking to delivery and countdown alerts when an order falls behind its event date.",
+        "tool_words": []
+      },
+      "ask_first": "How many orders are in progress right now?",
+      "free_stops": "The stages, who updates them and when alerts fire are in the solution document."
+    },
+    {
+      "id": "p2_capacity",
+      "n": 2,
+      "words": "Season mein karigaron ki capacity se zyada booking le lete hain",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Estimate the handwork weeks already booked against the karigars you have, so you see if the season is full",
+        "Keep a few slots unbooked for rush orders, so one surprise doesn't push everything back."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a workshop capacity view of karigar hours available versus booked by week, flagging overbooking before you say yes.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many karigars work on your pieces?",
+      "free_stops": "How hours are estimated per design and capacity is planned is in the solution document."
+    },
+    {
+      "id": "p3_info_lost_in_whatsapp",
+      "n": 3,
+      "words": "Client ne WhatsApp pe colour approve kiya, ab kehti hain nahi kiya",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Save every approval message and photo in one folder per order, so it can be found later",
+        "Ask for a clear written \"approved\" on each design, so a thumbs-up isn't the only record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a design approval step on WhatsApp where the client taps approve and the approval is saved with time against the order.",
+        "tool_words": []
+      },
+      "ask_first": "How do clients approve designs today?",
+      "free_stops": "How approvals and changes are captured and stored is in the solution document."
+    },
+    {
+      "id": "p4_delivery_late",
+      "n": 4,
+      "words": "Delivery dates slip and brides panic before the barat",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Look back at a few late orders once to see which stage they slipped at, because delays usually start in one place",
+        "Build a buffer into promised dates, so the barat isn't the deadline."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "stage-by-stage tracking with alerts when an order is behind relative to its event date, every day.",
+        "tool_words": []
+      },
+      "ask_first": "Where does the delay usually start?",
+      "free_stops": "The buffer rules and alert points per stage are in the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Final payment delivery se pehle chase karni parti hai",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every order's payment stage once, so you know what's due before each trial",
+        "Mention the next payment at each fitting, so it isn't a surprise at delivery."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "workflow_automation"
+        ],
+        "text": "a payment-stage tracker per order with reminders sent before trial and before delivery.",
+        "tool_words": []
+      },
+      "ask_first": "Which payment stage is hardest to collect?",
+      "free_stops": "The payment stages and reminder timing are in the solution document."
+    },
+    {
+      "id": "p6_lead_followup_slow",
+      "n": 6,
+      "words": "Instagram DMs mein enquiries din tak pari rehti hain",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Count unanswered enquiries once, so you know how many leads are sitting",
+        "Give one person the inbox, so replies don't wait for the designer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "one enquiry inbox for Instagram and WhatsApp with response time tracked and follow-up reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Who replies to enquiries today?",
+      "free_stops": "How enquiries are collected and follow-ups timed is in the solution document."
+    },
+    {
+      "id": "p7_shrinkage_theft",
+      "n": 7,
+      "words": "Adda ko diya hua material hisaab mein nahi aata",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Write down materials issued for the next few orders, so you have a baseline",
+        "Count returns when an order finishes, so leftovers come back to stock."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a material issue register per order: fabric, threads and embellishments issued, returned and balance.",
+        "tool_words": []
+      },
+      "ask_first": "Who issues materials to the workshop?",
+      "free_stops": "How materials are issued and reconciled is in the solution document."
+    },
+    {
+      "id": "p8_booking_appointments",
+      "n": 8,
+      "words": "Fittings phone pe book hoti hain aur aapas mein takra jaati hain",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Put all fittings in one shared calendar, so two clients aren't booked for one slot",
+        "Confirm each fitting the day before, so no-shows are fewer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a fitting and trial calendar with reminders and video-consult slots for overseas clients.",
+        "tool_words": []
+      },
+      "ask_first": "How many clients are abroad?",
+      "free_stops": "The booking setup and reminders are in the solution document."
+    },
+    {
+      "id": "p9_owner_bottleneck",
+      "n": 9,
+      "words": "Har cheez designer ki approval ka intezar karti hai",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "List decisions waiting on you for a week, so you see which ones others could take",
+        "Agree which choices the studio manager can approve, so small things stop queueing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "approval steps where only the decisions that need the designer reach her, with everything else moving on its own.",
+        "tool_words": []
+      },
+      "ask_first": "Who runs the studio day to day?",
+      "free_stops": "Which decisions route where is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Contract, refund-law or advance-dispute advice. Anything on customs or under-declaring bridal shipments. That a delivery date is certain. How to copy another designer's work, or post client photos without consent. Labour-law advice on karigar pay; unsafe conditions or child labour are not something pi assists with."
+  ],
+  "sample_reply": {
+    "person": "Shaadiyon ke season mein 40 se zyada bridal orders hote hain aur kisi ko nahi pata kaun sa kahan hai. Koi solution hai?",
+    "pi": "Ji haan, bilkul hai, aur is hafte hi shuruaat ho sakti hai. 1 Saare khule orders ek list pe daal dein, stage aur event date ke saath, taa ke jo khatre mein hain woh saamne aa jaayein. 2 Adda head se roz ek status update lein, taa ke register aur WhatsApp alag alag baat na karein. Workzap ye aap ke liye khud-ba-khud kar sakta hai: har order ka board booking se delivery tak, aur jab koi order event date ke hisaab se peeche ho to alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

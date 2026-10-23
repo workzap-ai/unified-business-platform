@@ -1,0 +1,241 @@
+{
+  "industry": "insurance_agencies_and_brokers",
+  "name": "Insurance agencies and brokers",
+  "sector": "7.L Finance-adjacent, energy and utilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_churn_subscription",
+      "n": 1,
+      "words": "Renewals slip through and we only find out after the policy has lapsed",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Pull every renewal date into one shared list with a named owner per policy, so no renewal belongs to nobody",
+        "Hold one short Monday huddle to hand out the coming month's renewals, so calls start before the due date, not after."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "customer_messaging A renewal register that reminds the owning agent ahead of each due date every day, sends the customer a renewal reminder on WhatsApp with their permission, and shows the owner which renewals were saved or lost by line and agent.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many renewals come up in a normal month?",
+      "free_stops": "The reminder timings, the register layout and the customer message wording go in the solution document."
+    },
+    {
+      "id": "p2_data_scattered",
+      "n": 2,
+      "words": "Renewal dates live in three Excel sheets and nobody owns the list",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Pick one master list and freeze the other sheets as read-only, so there is a single version of the truth",
+        "Decide one person who is accountable for the list being complete, so gaps have an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "erp_nori_platform"
+        ],
+        "text": "A nori system where renewals, leads, quotes and claims live under the agency's account with access by role, updated as staff work rather than copied between sheets.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "Are the sheets split by agent, by line or by insurer?",
+      "free_stops": "How the sheets are merged and which fields matter for each line is detailed in the solution document."
+    },
+    {
+      "id": "p3_lead_followup_slow",
+      "n": 3,
+      "words": "Facebook and WhatsApp leads come in and nobody calls them back in time",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Send every ad form and enquiry to one shared business number instead of personal phones, so leads stop disappearing",
+        "Agree a same-day first-reply rule for every enquiry, because customers tend to go with whoever answers first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "One lead inbox that pulls in WhatsApp, website and ad-form enquiries, assigns each to a producer, times the first response and nudges when a lead sits untouched.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most of your new enquiries come from?",
+      "free_stops": "Assignment rules, response timers and follow-up sequences are set out in the solution document."
+    },
+    {
+      "id": "p4_bottleneck",
+      "n": 4,
+      "words": "Getting quotes from four insurers takes days of emailing and chasing",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Send each quote request to all chosen insurers at the same moment, so the slowest one sets the pace instead of the sum of all",
+        "Keep one line per request showing who has replied, so chasing is targeted rather than guessed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A quote request tracker that records which insurers were asked, chases the ones that have not replied, and shows average reply time per insurer each month.",
+        "tool_words": []
+      },
+      "ask_first": "What part of getting a quote takes the longest?",
+      "free_stops": "The request format and chasing schedule are worked out in the solution document."
+    },
+    {
+      "id": "p5_campaign_roi_unknown",
+      "n": 5,
+      "words": "We spend on ads but cannot say which ones produced policies",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Ask every new enquiry where they heard about you and note it, so each policy has a source",
+        "Give each ad its own contact link or number, so enquiries separate themselves by campaign."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "dashboards_reports Codes and links per ad that follow each enquiry through to a written policy, with a monthly view of enquiries and policies by source.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How codes are set up per platform and tied to policies is in the solution document."
+    },
+    {
+      "id": "p6_commission_reconciliation",
+      "n": 6,
+      "words": "Insurer commission does not match what we expected and reconciling takes weeks",
+      "category": "cash_collections",
+      "subtype": "commission_reconciliation",
+      "quick_ideas": [
+        "Note the expected commission at the time each policy is written, so there is something to check the statement against",
+        "List mismatches per insurer and raise them in one go, so gaps are chased as a batch; talk to your accountant about how to record them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "An expected-versus-received commission ledger by insurer and month that flags every mismatch automatically and keeps a running list of what is still owed.",
+        "tool_words": []
+      },
+      "ask_first": "Is it the amount or the timing of commission that causes more trouble?",
+      "free_stops": "The matching logic and ledger structure are covered in the solution document."
+    },
+    {
+      "id": "p7_commission_disputes",
+      "n": 7,
+      "words": "Sub-agents argue over who brought which customer and what share they are owed",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write the credit rule on one page and get every sub-agent to agree to it, so disputes are settled by the rule, not by memory",
+        "Record who introduced a customer at the first enquiry, not at the sale, so credit is fixed early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A producer and sub-agent credit log that applies the agreed share rule to each policy and sends every sub-agent a monthly statement.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the share rules are encoded and statements produced is in the solution document; pi does not decide who is right in any dispute."
+    },
+    {
+      "id": "p8_info_lost_in_whatsapp",
+      "n": 8,
+      "words": "Claims follow-up is all on WhatsApp and customers keep asking for updates we do not have",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Keep one claims list with stage, next action and owner per case, so updates come from one place",
+        "Give every open claim a fixed update day, so customers hear from you before they chase."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A claims follow-up tracker with stages, owners and next actions that reminds staff when an update is due and shows the owner which claims are stuck.",
+        "tool_words": []
+      },
+      "ask_first": "Where do the documents for one claim usually end up?",
+      "free_stops": "The stage list, update rhythm and customer wording go in the solution document; pi never comments on claim outcomes."
+    },
+    {
+      "id": "p9_order_errors",
+      "n": 9,
+      "words": "Corporate clients send group medical additions and deletions by email and we miss some",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Ask each corporate client to send changes in one fixed format to one address, so nothing arrives in a side thread",
+        "Confirm every change back once the insurer accepts it, so both sides know it is done."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A change-request log per corporate client that tracks each addition or deletion to confirmation and flags any still open.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The request format and confirmation steps are detailed in the solution document."
+    },
+    {
+      "id": "p10_no_dashboard",
+      "n": 10,
+      "words": "No single view of how many policies we wrote this month by line",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Pick the four or five numbers you actually want each month (policies by line, renewals due and lost, leads) so reporting has a target",
+        "Count them by hand once this month, so you see where the data is missing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "An owner screen showing policies written, renewals due and lost, leads and response times by branch and producer, refreshed daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which figures feed the screen and how they are pulled together is in the solution document."
+    },
+    {
+      "id": "p11_theft_internal",
+      "n": 11,
+      "words": "An agent left and took the client list with them",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Move client contact to business numbers and accounts the agency owns, so relationships stay with the firm",
+        "Ask your lawyer what your staff agreements should say about client records."
+      ],
+      "workzap_build": {
+        "keys": [
+          "erp_nori_platform"
+        ],
+        "text": "Client, renewal and claims records held in the agency's own system with role-based access that can be switched off the day someone leaves.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "Access roles and handover steps are set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Which insurer, policy, premium or level of cover a customer should take, or whether they \"need\" cover. Whether a claim will be paid, is genuine, or how policy wording or exclusions should be read. Anything on SECP, UAE Insurance Authority or Canadian provincial regulator requirements; point to their compliance adviser or lawyer. Anything that helps backdate policies, inflate claims, alter documents or split invoices. Any request for policy numbers, customer names, IDs, medical details, vehicle numbers or bank details."
+  ],
+  "sample_reply": {
+    "person": "Bhai renewals ka koi system nahi, har agent apni Excel chalata hai aur policies lapse ho jati hain. Koi hal batao.",
+    "pi": "Ji, is ka hal bilkul mumkin hai, aur shuruaat aap isi hafte khud kar sakte hain. 1 Saari renewal dates ek hi list mein le aayein aur har policy ke saath ek zimmedar ka naam likhein, taake koi renewal be-malik na rahe. 2 Har Monday chhoti si meeting mein agle mahine ki renewals baant dein, taake call due date se pehle ho. Workzap yahi kaam aap ke liye khud-ba-khud roz kar sakta hai: har agent ko waqt pe yaad- dehani, customer ko unki ijazat se WhatsApp reminder, aur aap ke saamne roz ki report ke kaun si renewal bachi aur kaun si lapse hui. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

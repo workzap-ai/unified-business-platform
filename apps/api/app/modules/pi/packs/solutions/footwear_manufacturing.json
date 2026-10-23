@@ -1,0 +1,220 @@
+{
+  "industry": "footwear_manufacturing",
+  "name": "Footwear manufacturing",
+  "sector": "7.D Manufacturing and industry (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_overstock_dead_stock",
+      "n": 1,
+      "words": "We have size 40 and 41 stuck while 42 and 43 sold out",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "Count stock of your top articles by size once, so you see exactly which sizes are stuck",
+        "Write down last season's sales by size for those articles, so the next size mix is based on a record, not a guess"
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "nori_daily_read An article-size matrix showing pairs by article, colour and size across factory, godown and shops, with a daily read of sizes running out or piling up.",
+        "tool_words": []
+      },
+      "ask_first": "How do you see stock by size today?",
+      "free_stops": "How size mix is planned from sales history is set out in the solution document."
+    },
+    {
+      "id": "p2_wrong_location",
+      "n": 2,
+      "words": "Size sets get broken at the godown and dealers refuse half sets",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Count how many broken sets are sitting in the godown now, so you know the scale",
+        "Keep full-set cartons and loose pairs in separate marked areas, so sets stop being opened casually"
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "Size-set carton packing with scan-in and scan-out, so every carton opened or moved is recorded.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How cartons are coded and scanned is covered in the solution document."
+    },
+    {
+      "id": "p3_supplier_late",
+      "n": 3,
+      "words": "Sole supplier delivers late and lasting stops",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_late",
+      "quick_ideas": [
+        "Work out the soles needed for this month's planned pairs and share it with the supplier once, so they get real warning",
+        "Note the last few late deliveries and days lost, so the conversation uses facts"
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Material requirements worked out from planned pairs (soles, uppers, adhesive, boxes) with shortage alerts before lasting stops.",
+        "tool_words": []
+      },
+      "ask_first": "Which material stops production most?",
+      "free_stops": "How requirements are calculated per article and size is detailed in the solution document."
+    },
+    {
+      "id": "p4_maintenance_downtime",
+      "n": 4,
+      "words": "Mould or press breaks and we lose days",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List every mould by article and size with its condition, so you know which are at risk",
+        "Note which moulds failed last season, so they are checked before the next peak"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A mould register by article and size with condition and repair history, and a log of every press breakdown.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Inspection routine and repair priorities are kept for the solution document."
+    },
+    {
+      "id": "p5_inspection_missing",
+      "n": 5,
+      "words": "Defects found only when dealers open cartons",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Put one person on a check before cartons close for sole bonding and finish, so faults are caught inside",
+        "Note the reasons for the last returns, so checking focuses on them"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A pre-dispatch QC checklist with defect types and photos recorded for every lot.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The checklist and how defects are traced to a stage are covered in the solution document."
+    },
+    {
+      "id": "p6_credit_customers",
+      "n": 6,
+      "words": "Dealers take goods on credit and pay after the season",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Make one list of every dealer's balance and oldest bill, so you know where to start",
+        "Check that list before the next Eid dispatch, so credit does not keep stacking up"
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A dealer ledger with ageing, credit limits checked at order time and season-end return tracking.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How limits and return terms are tracked per dealer is set out in the solution document."
+    },
+    {
+      "id": "p7_commission_disputes",
+      "n": 7,
+      "words": "Pairs per worker are disputed every week (piece rate)",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Have the supervisor count and sign pairs per stage at day end for one week, so there is an agreed record",
+        "Show the count to each worker the same day, so disputes start small"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "workflow_automation Daily piece counts per worker role entered by supervisors, feeding a weekly count sheet everyone can see.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How counts are verified and fed into the weekly sheet is detailed in the solution document; for wage rules, talk to your lawyer or accountant."
+    },
+    {
+      "id": "p8_no_sales_visibility",
+      "n": 8,
+      "words": "Own shops' sales aren't visible to the factory until month end",
+      "category": "sales_revenue",
+      "subtype": "no_sales_visibility",
+      "quick_ideas": [
+        "Ask each shop for one day-end sales count by article and size this week, so you see what is moving",
+        "Compare it with what was dispatched to them"
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "integration Own-shop sales synced to the factory daily with size-level sell-through.",
+        "tool_words": [
+          "integration"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How shop sales connect to factory stock is mapped in the solution document."
+    },
+    {
+      "id": "p9_order_errors",
+      "n": 9,
+      "words": "Daraz orders come in with the wrong size picked",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Keep a separate packing shelf for online orders, so they are not picked from mixed stock",
+        "Recheck size against the order before sealing, so errors are caught before dispatch"
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "Online orders in one list with a pick check against article and size before dispatch.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The pick-check flow is set out in the solution document."
+    },
+    {
+      "id": "p10_forecasting",
+      "n": 10,
+      "words": "No planning for which articles to make next season",
+      "category": "planning_growth",
+      "subtype": "forecasting",
+      "quick_ideas": [
+        "List last season's articles with what sold out and what came back, so you start from facts",
+        "Mark which ones to repeat, drop or change"
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A season planning view comparing last season's sales by article and size.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How the view turns into a production plan is detailed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on safety-footwear certification or standards, or orthopaedic or medical fit claims. Any help copying another brand's trademarks or logos, or making counterfeit goods. Anything on adhesive or solvent handling; fumes causing collapse are emergencies. Customs, tax or under-invoicing advice. Any judgement on fairness or legality of piece rates. Any guarantee of sell-through or fewer returns."
+  ],
+  "sample_reply": {
+    "person": "Eid ke liye maal banaya tha, ab chhote size pare hain aur bare size khatam. Agli dafa yeh na ho, koi tareeqa batao.",
+    "pi": "Ji bilkul, iska hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1 Apne main articles ka size-wise stock ek dafa gin lein, taa ke saaf ho kaun se size atke hue hain. 2 Pichle season ki size-wise sale likh lein, taa ke agla size mix record pe bane, andaaze pe nahi. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: factory, godown aur shops ka article aur size-wise stock ek jagah, aur har subah kaun sa size khatam ho raha hai woh aap ke WhatsApp pe. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

@@ -1,0 +1,218 @@
+{
+  "industry": "physiotherapy_and_rehabilitation",
+  "name": "Physiotherapy and rehabilitation",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_churn_subscription",
+      "n": 1,
+      "words": "Patients buy ten sessions, come for four and stop",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "List current packages with sessions left and last visit date, so drop-offs are visible",
+        "Call those who missed two booked sessions, with their permission, so they hear from you early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "customer_messaging — a package tracker that alerts the front desk when someone misses sessions and sends a rebooking prompt with no health details, tracking completion by therapist.",
+        "tool_words": []
+      },
+      "ask_first": "How do you track sessions left today?",
+      "free_stops": "Alert rules and follow-up steps are in the solution document."
+    },
+    {
+      "id": "p2_refunds",
+      "n": 2,
+      "words": "Unused package sessions sit on the books and I don't know what I owe",
+      "category": "cash_collections",
+      "subtype": "refunds",
+      "quick_ideas": [
+        "Total unused sessions across open packages, so the liability is known",
+        "Write down your package expiry policy, so staff answer consistently."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a package ledger showing sessions bought, used, remaining and expiry, with outstanding value updated daily.",
+        "tool_words": []
+      },
+      "ask_first": "Do your packages have an expiry date now?",
+      "free_stops": "Ledger structure and expiry handling are in the solution document; talk to your accountant on how to record it."
+    },
+    {
+      "id": "p3_capacity",
+      "n": 3,
+      "words": "Therapists' diaries have big gaps in the middle of the day",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Map one week of bookings per therapist by hour, so gaps are clear",
+        "Offer midday slots to flexible patients first, so peak hours ease."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "therapist-wise WhatsApp booking with reminders and easy rescheduling, with utilisation measured per therapist.",
+        "tool_words": []
+      },
+      "ask_first": "Which hours stay empty most often?",
+      "free_stops": "Slot rules are set in the solution document."
+    },
+    {
+      "id": "p4_field_team_visibility",
+      "n": 4,
+      "words": "Home-visit therapists say they went but I can't confirm",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Ask home-visit therapists to message on arrival and leaving, so visits are on record",
+        "Cross-check a few visits with the patient side, with permission, so you know the gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a home-visit planner with check-in and check-out by location and visit confirmation, with weekly completed-visit totals.",
+        "tool_words": []
+      },
+      "ask_first": "How many therapists do home visits?",
+      "free_stops": "Check-in rules are in the solution document."
+    },
+    {
+      "id": "p5_commission_disputes",
+      "n": 5,
+      "words": "Per-session therapists dispute how many sessions they did",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Share this week's session count with each therapist, so differences surface early",
+        "Agree one record both sides accept, so there is one count."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a session log feeding a monthly pay statement for per- session staff.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Are therapists paid per session or salaried?",
+      "free_stops": "Pay rules and statement format are in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Direct-billed claims take months to pay",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List open claims by reference, insurer and date sent, so ageing is visible",
+        "Note rejection reasons, so repeat paperwork gaps are fixed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "workflow_automation — a claims tracker with a document checklist per claim type, submission dates, rejections and payments by insurer.",
+        "tool_words": []
+      },
+      "ask_first": "Which insurers or claim types cause the most rejections?",
+      "free_stops": "Checklists per claim type are in the solution document; insurer rules are for your adviser."
+    },
+    {
+      "id": "p7_cash_leakage",
+      "n": 7,
+      "words": "Front desk forgets to collect the co-pay",
+      "category": "cash_collections",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Check one week of visits against co-pays collected, so missed amounts show",
+        "Add co-pay to the checkout step, so it isn't left to memory."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily close matching sessions delivered against co-pays and payments, flagging misses.",
+        "tool_words": []
+      },
+      "ask_first": "Do most patients pay a co-pay or the full fee?",
+      "free_stops": "The close format is in the solution document."
+    },
+    {
+      "id": "p8_sales_drop",
+      "n": 8,
+      "words": "Surgeons who used to send patients have gone quiet",
+      "category": "sales_revenue",
+      "subtype": "sales_drop",
+      "quick_ideas": [
+        "List referral sources with monthly numbers, so drops are visible",
+        "Visit the ones that slowed, so you hear why."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a referral tracker with monthly volume per referring practice, flagging drops.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is the referral source recorded at booking?",
+      "free_stops": "How referrals are captured is in the solution document."
+    },
+    {
+      "id": "p9_lead_followup_slow",
+      "n": 9,
+      "words": "Enquiries on WhatsApp aren't followed up",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Go through last week's enquiries and see how many got a reply, so the gap is measured",
+        "Give one person fixed reply times, so enquiries have an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "one inbox for WhatsApp, Instagram and Google enquiries with response timers and follow-up reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Who replies to enquiries now?",
+      "free_stops": "Routing set-up is in the solution document."
+    },
+    {
+      "id": "p10_manual_work",
+      "n": 10,
+      "words": "Session reminders are sent manually one by one",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Count how long reminders take each day, so the cost is known",
+        "Ask patients at booking if they want reminders, so permission is in place."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "automatic reminders for every booked session, with time and place only, sent to consenting patients.",
+        "tool_words": []
+      },
+      "ask_first": "What do you use for bookings today?",
+      "free_stops": "Reminder timing is set in the solution document."
+    }
+  ],
+  "never_say": [
+    "Exercises, treatments, session counts or return-to-work or sport timing. Whether a treatment is working or an injury is healing. Interpretations of WSIB, motor-accident or insurer rules. Help billing for sessions not delivered or inflating session counts. Ideas that put injuries or progress notes in messages. Promises that packages will be completed more often."
+  ],
+  "sample_reply": {
+    "person": "Most of our patients buy a 10-session package and vanish after 4 or 5. Any way to fix this?",
+    "pi": "Yes, this is very fixable, and you can start this week. 1 List current packages with sessions left and last visit date, so you can see who has dropped off. 2 Call anyone who has missed two booked sessions, with their permission, so they hear from you before they drift away. Workzap can do this automatically for you with a package tracker that alerts the front desk and sends rebooking prompts, measured by therapist. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

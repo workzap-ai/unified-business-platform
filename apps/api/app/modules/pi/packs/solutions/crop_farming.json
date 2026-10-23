@@ -1,0 +1,217 @@
+{
+  "industry": "crop_farming",
+  "name": "Crop farming (wheat, rice, cotton, sugarcane, maize)",
+  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_margin_unknown",
+      "n": 1,
+      "words": "I don't know what each field actually cost me this season",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Give every plot a number and write it beside each expense from today, so costs stop merging into one khata",
+        "Sit down once with last season's register and split the biggest costs by plot, to see which land you are least sure about."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A phone register where every cost the munshi enters is tagged to its plot automatically, building a per-acre cost and income view by crop and season that can be compared year on year.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many separate plots do you farm?",
+      "free_stops": "How the plots, cost heads and per-acre view are set up for your land goes in the solution document."
+    },
+    {
+      "id": "p2_theft_internal",
+      "n": 2,
+      "words": "Diesel for the tube well and tractor keeps going missing",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Note the tractor and tube-well hours beside each diesel fill for one week, so you can see whether fills match running time",
+        "Keep the drums under one key holder and tell the team openly that fills will be checked."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A diesel log for every machine and well that compares each fill with hours run, every day, and flags the entries that don't add up.",
+        "tool_words": []
+      },
+      "ask_first": "Is the tractor your own or hired?",
+      "free_stops": "The matching rules and how the log fits your machines are kept for the solution document."
+    },
+    {
+      "id": "p3_owner_blind",
+      "n": 3,
+      "words": "The munshi tells me the spend on the phone, I can't check it",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Ask for a photo of every bill and diesel slip on WhatsApp the day it is paid, so you see proof rather than a spoken total",
+        "Check one week of photos against the munshi's total before releasing the next week's cash."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "A short WhatsApp read every morning showing yesterday's spend by plot, labour count, crop movements and the one thing to look at, built from the munshi's entries.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How often are you physically at the farm?",
+      "free_stops": "What the morning read contains and how entries reach it is detailed in the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "The sugar mill pays the CPR months late and I borrow for the next crop",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Put every unpaid CPR and arhti sale on one page with its date, so you know exactly what is owed and by whom",
+        "Follow up the oldest item first, politely and in writing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A buyer ledger for mill, arhti and ginner sales that ages every CPR and payment automatically and reminds you when each one is overdue.",
+        "tool_words": []
+      },
+      "ask_first": "Who buys most of your crop?",
+      "free_stops": "How the ledger and reminders are set up for your buyers goes in the solution document."
+    },
+    {
+      "id": "p5_cash_mismatch",
+      "n": 5,
+      "words": "Arhti deducts things from my payment I never agreed to",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Ask for a written slip showing rate, weight and each deduction every time, so there is something to compare",
+        "Write down the deductions you have agreed, so a difference is easy to point to calmly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A sale record per buyer that captures every slip and highlights any deduction outside what was agreed, sale after sale.",
+        "tool_words": []
+      },
+      "ask_first": "Do you get a written slip from the arhti today?",
+      "free_stops": "How slips are captured and checked is part of the solution document."
+    },
+    {
+      "id": "p6_attendance_lateness",
+      "n": 6,
+      "words": "Daily wage payments are in cash and I don't know who actually came",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Ask the munshi for one head-count message each morning per plot, so pay has a record behind it",
+        "Pay this week's wages against that list, using roles or worker numbers rather than personal details."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Daily attendance sent by WhatsApp from each munshi, recorded by role or worker number, turning into a wage sheet at week end.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many people work at peak season?",
+      "free_stops": "The attendance flow and wage sheet design are kept for the solution document."
+    },
+    {
+      "id": "p7_commission_disputes",
+      "n": 7,
+      "words": "Haari settlement every season turns into an argument over the batai",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write each plot's batai terms on one page and give both sides a copy, so the starting point is agreed",
+        "Record shared costs as they happen with a photo of the bill, so the end-of-season total isn't from memory."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A lease and batai tracker that holds every plot's terms, logs shared costs as they come in and sends reminders before settlements fall due.",
+        "tool_words": []
+      },
+      "ask_first": "How much of the land is on batai?",
+      "free_stops": "How terms and shared costs are structured in the tracker goes in the solution document."
+    },
+    {
+      "id": "p8_contracts_tracking",
+      "n": 8,
+      "words": "Leased land payments and dates are in my head and my father's diary",
+      "category": "compliance_admin",
+      "subtype": "contracts_tracking",
+      "quick_ideas": [
+        "Copy every theka into one list with its due dates, so nothing depends on one person remembering",
+        "Photograph the stamp papers into one folder; for questions about the terms themselves, talk to your lawyer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A lease register that sends WhatsApp reminders before every theka payment, season after season.",
+        "tool_words": []
+      },
+      "ask_first": "Are you mostly leasing land in, or also leasing it out?",
+      "free_stops": "The register layout and reminder timing are set out in the solution document."
+    },
+    {
+      "id": "p9_count_mismatch",
+      "n": 9,
+      "words": "Bags in the godown don't match what the munshi says we harvested",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count bags in with two people present and both signing, so the starting figure is trusted",
+        "Do one surprise recount this week to see how big the gap really is."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A harvest and storage register showing bags in and out by location every day, with an alert as soon as the count and records drift apart.",
+        "tool_words": []
+      },
+      "ask_first": "Where is the crop kept after harvest?",
+      "free_stops": "How counts are recorded and when alerts fire is detailed in the solution document."
+    },
+    {
+      "id": "p10_supplier_late",
+      "n": 10,
+      "words": "Couldn't get a harvester on time, it was booked by bigger landlords",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_late",
+      "quick_ideas": [
+        "Confirm a cutting date with two or three operators in writing well before harvest, so you aren't relying on one promise",
+        "Talk to neighbouring farms about booking together, so a machine covers one area in one visit."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A machinery booking list with confirmed dates and automatic reminders to you and the operator before the window opens.",
+        "tool_words": []
+      },
+      "ask_first": "Which crop's harvest is most affected?",
+      "free_stops": "How bookings and reminders are organised for your area goes in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about which seed, fertiliser, pesticide, spray schedule, dose, sowing date or irrigation timing to use; refer to an agronomist or the agriculture extension department. Yield or price forecasts, or advice on when and where to sell. Views on land title, tenancy rights, inheritance, loan terms, crop insurance claims or tax. Any help under-reporting produce to a mill, faking weighbridge slips, hiding income or taking canal water out of turn. Anything that organises or records child labour; names, CNICs or numbers of haaris, labourers or buyers."
+  ],
+  "sample_reply": {
+    "person": "Bhai solution batao. Munshi kharcha phone pe batata hai aur diesel ka hisaab bilkul gol hai, koi tareeqa chahiye check karne ka.",
+    "pi": "Haan, is ka hal mumkin hai aur shuruaat is hafte se ho sakti hai. 1 Munshi se har bill aur diesel parchi usi din WhatsApp pe photo kar ke mangwayein, taake bataye hue total ke peeche saboot ho. 2 Ek hafte tak har diesel bharai ke saath tractor aur tube well ke ghante likhwayein, taake pata chale bharai kaam se milti hai ya nahi. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har plot ka kharcha aur diesel roz darj ho, farq pe alert aaye, aur har subah aap ko WhatsApp pe khulasa mile. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

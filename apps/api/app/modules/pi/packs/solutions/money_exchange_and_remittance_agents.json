@@ -1,0 +1,220 @@
+{
+  "industry": "money_exchange_and_remittance_agents",
+  "name": "Money exchange and remittance agents",
+  "sector": "7.L Finance-adjacent, energy and utilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_cash_mismatch",
+      "n": 1,
+      "words": "Day-end closing never matches on the first count and finding the difference takes an hour",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Count each till by denomination on paper at close, so a difference shows which notes it sits in",
+        "Write a reason next to every short or excess the same evening, so patterns appear instead of fading."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A day-end closing sheet on phone for every till and branch that flags variances automatically, keeps the reason and shows the owner each evening which counters matched.",
+        "tool_words": []
+      },
+      "ask_first": "How many counters run in a normal shift?",
+      "free_stops": "The closing sheet layout and variance rules are in the solution document."
+    },
+    {
+      "id": "p2_cash_leakage",
+      "n": 2,
+      "words": "One counter keeps coming up short and I cannot prove who",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Give each till to one person per shift, so responsibility is never shared",
+        "Count the till with both staff present at every handover, so a gap is tied to a shift, not a guess."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A shift and till handover log with opening float, handover count and closing signed off by role, showing which shift a variance began in.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Handover steps and sign-off rules are covered in the solution document; pi records the control gap, never names staff."
+    },
+    {
+      "id": "p3_cash_handling_risk",
+      "n": 3,
+      "words": "We hold too much cash at the branch overnight and it worries me",
+      "category": "cash_collections",
+      "subtype": "cash_handling_risk",
+      "quick_ideas": [
+        "Agree with your principal or cash-in-transit provider whether collections can be more frequent, so less sits overnight",
+        "Set an owner-decided ceiling for branch cash and note each day it is crossed, so the risk is visible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A daily cash position view per branch against the owner's ceiling, flagging days it was exceeded (security details stay out of the system).",
+        "tool_words": [
+          "system"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How the ceiling is tracked and reported is in the solution document; pi does not record vault or movement details."
+    },
+    {
+      "id": "p4_stockout",
+      "n": 4,
+      "words": "Running out of certain notes or currencies mid-day and turning customers away",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Check note and currency levels at opening and midday, so shortfalls show before the rush",
+        "Note every request you had to turn away, so you know what demand you are missing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A note and currency stock tracker per branch that alerts the owner when a denomination or currency drops below the level they set.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Alert levels and how counts feed the tracker are in the solution document."
+    },
+    {
+      "id": "p5_transfers_lost",
+      "n": 5,
+      "words": "Moving currency between branches is done by phone and the count is sometimes wrong on arrival",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Count and sign at dispatch and again at receipt, so a gap is caught at the handover",
+        "Keep one written transfer record for every movement, so none rely on a phone call."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "An inter-branch transfer log with confirm-on-receipt that flags any transfer sent but not confirmed or received short.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Confirmation steps and exception rules are detailed in the solution document."
+    },
+    {
+      "id": "p6_capacity",
+      "n": 6,
+      "words": "Queues on Fridays and after salary days are so long people walk out",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Tally customers per hour for two weeks, so you see exactly when the queue peaks",
+        "Move breaks and extra staff onto those hours, so capacity follows demand."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A staff roster built from hourly footfall tallies, with shift reminders and late-arrival tracking for peak days.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How tallies turn into a roster is in the solution document."
+    },
+    {
+      "id": "p7_whatsapp_overload",
+      "n": 7,
+      "words": "Customers call and WhatsApp all day asking whether their money has arrived",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Point status questions to the principal's own tracking channel, so staff are not checking one by one",
+        "Make it a rule that no transaction details are taken on WhatsApp, so customer data stays where it belongs."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A standard WhatsApp auto-reply that directs status questions to the principal's tracking channel, handling no transaction data.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reply flow and wording are in the solution document."
+    },
+    {
+      "id": "p8_manual_reports",
+      "n": 8,
+      "words": "Daily reports to the principal take a staff member half a shift",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "List exactly which figures each report needs, so nothing extra is compiled",
+        "Note how long each report takes for a week, so you see where the time goes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A daily report that compiles branch figures from the closing sheets into the format the owner sends, with aggregates only.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Report mapping and formats go in the solution document."
+    },
+    {
+      "id": "p9_pricing_errors",
+      "n": 9,
+      "words": "The rate board changed late and staff used the old rate at the counter",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Name one person per branch responsible for each board update, so it is never assumed someone else did it",
+        "Have them confirm each change to the owner straight away, so a late board is spotted quickly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A rate board update checklist with a time-stamped confirmation per branch, flagging any branch that has not confirmed.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The checklist steps are in the solution document; pi never discusses the rates themselves."
+    },
+    {
+      "id": "p10_turnover",
+      "n": 10,
+      "words": "Counter staff leave after training and new ones make mistakes",
+      "category": "people_staff",
+      "subtype": "turnover",
+      "quick_ideas": [
+        "Write down the opening, handover and closing routine once, so training does not depend on one person",
+        "Pair each new joiner with one experienced staff member for their first shifts, so mistakes are caught early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "An onboarding checklist with short process guides that tracks each new joiner's progress and an incident log showing where mistakes recur.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The checklist content and incident categories are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any exchange rate, rate forecast, timing advice or comparison with other providers. Anything about transfer limits, reporting thresholds, KYC or how to structure transactions; decline plainly. Anything about hawala, hundi or unlicensed transfers. Any compliance or licensing interpretation SBP, CBUAE, FINTRAC; point to the principal's compliance team. Vault locations, cash movement times or other security details, or customer and beneficiary details."
+  ],
+  "sample_reply": {
+    "person": "Can you give me a solution for the evening closing? Every day one of the tills is short or excess and we spend an hour finding it.",
+    "pi": "Yes, this can be brought under control, and you can start this week on your own. 1 Give each till to one person per shift and count it with both people present at every handover, so a difference is tied to one shift. 2 Count by denomination at close and write a reason beside every short or excess that evening, so patterns show. Workzap can do this automatically for you: a handover and closing log on phone for every till that flags variances the moment they happen and gives you one evening summary across counters. Shall I have a solution document and quote prepared for you? You are free to say no.",
+    "language": "english"
+  }
+}

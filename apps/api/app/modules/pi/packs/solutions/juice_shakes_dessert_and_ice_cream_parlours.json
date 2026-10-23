@@ -1,0 +1,199 @@
+{
+  "industry": "juice_shakes_dessert_and_ice_cream_parlours",
+  "name": "Juice, shakes, dessert and ice-cream parlours",
+  "sector": "7.B Food and beverage",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_expiry_wastage",
+      "n": 1,
+      "words": "Mangoes and strawberries go soft and get thrown away",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Note how much fruit you buy and how much is thrown each day, so buying follows real use",
+        "Buy the softest fruits more often in smaller amounts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a daily fruit purchase and wastage log by item and outlet that shows the trend and suggests tomorrow's buying.",
+        "tool_words": []
+      },
+      "ask_first": "Who decides how much fruit to buy?",
+      "free_stops": "How buying quantities are set by day and season goes in the solution document."
+    },
+    {
+      "id": "p2_margin_unknown",
+      "n": 2,
+      "words": "Fruit prices change daily but our menu is fixed, and I don't know scoops per tub",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out the cost of your top drinks from this week's fruit prices, so you see which ones have slipped",
+        "Count scoops from a few tubs, because portion size decides your real cost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "fruit price per kilo and scoop yield per tub logged daily, with cost per glass or scoop worked out automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How often do you change prices now?",
+      "free_stops": "The costing method and repricing approach are detailed in the solution document."
+    },
+    {
+      "id": "p3_maintenance_downtime",
+      "n": 3,
+      "words": "Freezer failed overnight and we lost all stock",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Note freezer temperatures at opening and closing, so a failing unit shows before it dies",
+        "Keep the service contact for each freezer on it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a freezer temperature and power-cut log with alerts when a reading is missed or out of range.",
+        "tool_words": []
+      },
+      "ask_first": "What happens to your freezers when power goes?",
+      "free_stops": "The checking routine and alert set-up stay for the solution document."
+    },
+    {
+      "id": "p4_stockout",
+      "n": 4,
+      "words": "Popular flavours run out on hot weekends, slow ones sit for weeks",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Check flavour stock before each weekend, so popular ones are topped up in time",
+        "Note which flavours haven't moved, so you stop reordering them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "flavour stock by outlet with reorder points and slow-mover flags every day.",
+        "tool_words": []
+      },
+      "ask_first": "Which flavours run out first?",
+      "free_stops": "Reorder points per flavour and outlet are set in the solution document."
+    },
+    {
+      "id": "p5_no_sop",
+      "n": 5,
+      "words": "Each outlet makes falooda differently, staff make shakes bigger than the recipe",
+      "category": "operations_process",
+      "subtype": "no_sop",
+      "quick_ideas": [
+        "Write each recipe with portion sizes and a photo, so every outlet makes the same thing",
+        "Use fixed measures and cups at each station, so portions can't drift."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "recipe cards with portions and photos sent to every outlet and new staff member.",
+        "tool_words": []
+      },
+      "ask_first": "How do new staff learn recipes now?",
+      "free_stops": "The recipe standards and training flow are in the solution document."
+    },
+    {
+      "id": "p6_seasonal_dip",
+      "n": 6,
+      "words": "Winter sales collapse",
+      "category": "sales_revenue",
+      "subtype": "seasonal_dip",
+      "quick_ideas": [
+        "Look at last winter's sales by product, so you see what still sold",
+        "Try one hot dessert or dry-fruit shake, because winter favourites can keep the counter busy."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a seasonal menu planner comparing sales by month and product from your own records.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "What have you tried in the slow months?",
+      "free_stops": "The seasonal menu plan stays for the solution document."
+    },
+    {
+      "id": "p7_cash_mismatch",
+      "n": 7,
+      "words": "Cash short at night at the mall kiosk, and staff eat and drink stock",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Count the till together at shift change, so a gap belongs to one shift",
+        "Set a clear staff-treat rule and log it, so it's visible rather than hidden."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a nightly close per outlet matching cash and card to sales, with staff treats logged by shift.",
+        "tool_words": []
+      },
+      "ask_first": "Where does the cash gap show up most?",
+      "free_stops": "The closing routine and staff-treat rules are in the solution document."
+    },
+    {
+      "id": "p8_branch_comparison",
+      "n": 8,
+      "words": "No idea which outlet is profitable",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Put each outlet's daily sales and rent side by side once, so you see the real picture",
+        "Compare wastage by outlet, because it often differs more than sales."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a short morning read with each outlet's sales, wastage and stock flags, and the one thing to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Can you see each outlet's sales daily now?",
+      "free_stops": "How outlet profitability is calculated goes in the solution document."
+    },
+    {
+      "id": "p9_pre_orders_custom",
+      "n": 9,
+      "words": "Party and wedding dessert-stall orders come on WhatsApp and get mixed up",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Write every event order on one form with date, quantities and advance, so nothing lives only in chat",
+        "Confirm each order back to the client."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "an event order form with date, quantities and advance that feeds one list and confirms to the client automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How do party orders reach you now?",
+      "free_stops": "The event order flow is detailed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about cold-chain rules, temperature-holding standards or food safety. Sugar, diabetes, nutrition or \"healthy\" claims. Advice on colours or additives, or helping hide them. Anything suggesting melted and refrozen stock can be sold. That a season or menu change will lift sales by a set amount."
+  ],
+  "sample_reply": {
+    "person": "Garmiyon mein kabhi aam khatam ho jate hain aur kabhi itne bach jate hain ke kharab ho jate hain. Koi hal batao.",
+    "pi": "Ji haan, ye balance theek kiya ja sakta hai, aur shuruaat kal subah ki khareedari se ho sakti hai. 1 Ek hafte tak roz likhein kitne aam liye aur kitne phenke, taake khareedari asal istemal ke mutabiq ho. 2 Narm hone wala phal thora thora aur zyada baar lein. Workzap ye aap ke liye automatically kar sakta hai: roz ki khareedari aur wastage ka log, har outlet ka trend, aur agle din kitna lena hai us ka andaza khud aap ke samne. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

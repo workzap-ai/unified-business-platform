@@ -1,0 +1,224 @@
+{
+  "industry": "fashion_and_apparel_brands",
+  "name": "Fashion and apparel brands (pret, stitched, western wear)",
+  "sector": "7.A Retail and consumer (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_stockout",
+      "n": 1,
+      "words": "M and L sell out on day one, S and XL sit forever",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Pull sales by size for your last two drops once, so the next size split comes from your own customers rather than the vendor's habit",
+        "Note every size request you couldn't fill during the next launch, so you see the true demand."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "a sell-through view per drop by size and outlet, updated daily, with broken-size alerts and a size curve for the next production order.",
+        "tool_words": [],
+        "reordered_from": [
+          "dashboards_reports",
+          "stock_alerts"
+        ]
+      },
+      "ask_first": "How do you decide the size split when you place an order?",
+      "free_stops": "How the size curve is worked out per category and how alerts trigger are in the solution document."
+    },
+    {
+      "id": "p2_no_visibility",
+      "n": 2,
+      "words": "Website shows in stock but the outlet sold the last piece",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Check your top articles' website stock against outlet stock once, so you see how far apart they are",
+        "Hold back a small online buffer for launch articles, so the website isn't selling the shop's last piece."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "a size-wise stock grid per article across outlets, warehouse and website, synced every few minutes.",
+        "tool_words": []
+      },
+      "ask_first": "What do you use for the website and the store tills?",
+      "free_stops": "How the website and store tills are connected and buffers set is in the solution document."
+    },
+    {
+      "id": "p3_supplier_late",
+      "n": 3,
+      "words": "Stitching vendor is two weeks late and the launch date is fixed",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_late",
+      "quick_ideas": [
+        "List every article with its vendor and promised date in one sheet, so you see which launch is really at risk",
+        "Ask each vendor for a mid-way piece count, so a delay shows early rather than on the due date."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a vendor production tracker with fabric issued, pieces due, received, rejected and days late, with alerts before a launch slips.",
+        "tool_words": []
+      },
+      "ask_first": "How many stitching vendors do you use?",
+      "free_stops": "The production stages, check-in points and alerts are in the solution document."
+    },
+    {
+      "id": "p4_returns_rto",
+      "n": 4,
+      "words": "COD returns are eating us alive, so many RTOs",
+      "category": "orders_fulfilment",
+      "subtype": "returns_rto",
+      "quick_ideas": [
+        "Sort last month's RTOs by city and courier once, so you see where returns cluster",
+        "Confirm high-risk COD orders on WhatsApp before dispatch, so fewer parcels go out to people who won't accept them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "dashboards_reports"
+        ],
+        "text": "order confirmation before dispatch and an RTO analysis by city, courier and repeat history, refreshed every day.",
+        "tool_words": []
+      },
+      "ask_first": "Which couriers do you use?",
+      "free_stops": "Which orders get confirmed, how, and the RTO rules are in the solution document."
+    },
+    {
+      "id": "p5_cod_remittance",
+      "n": 5,
+      "words": "Courier hasn't remitted COD money for weeks",
+      "category": "cash_collections",
+      "subtype": "cod_remittance",
+      "quick_ideas": [
+        "Match one courier statement against your delivered orders, so you know exactly what's owed",
+        "Keep a list of unpaid parcels by date, so follow-ups are specific."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a COD reconciler matching courier statements to orders every day, flagging unpaid and RTO parcels.",
+        "tool_words": []
+      },
+      "ask_first": "How do couriers send you their statements?",
+      "free_stops": "How statements are matched and gaps reported is in the solution document."
+    },
+    {
+      "id": "p6_multi_channel_orders",
+      "n": 6,
+      "words": "Instagram, website and WhatsApp orders all managed separately",
+      "category": "orders_fulfilment",
+      "subtype": "multi_channel_orders",
+      "quick_ideas": [
+        "Count orders per channel for a week, so you know where the work really is",
+        "Put all orders in one shared sheet for now, so packing works from one list."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "one order queue pulling website, Instagram/WhatsApp and marketplace orders with packing slips and status.",
+        "tool_words": []
+      },
+      "ask_first": "Which channel brings the most orders?",
+      "free_stops": "How each channel is pulled in and how packing and dispatch are tracked is in the solution document."
+    },
+    {
+      "id": "p7_after_sales",
+      "n": 7,
+      "words": "Exchange requests in DMs get lost",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "List every open exchange request once, so nothing is forgotten",
+        "Give one person ownership of exchanges, so customers aren't passed around."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an exchange flow on WhatsApp: request logged, approved, reverse pickup booked and new size dispatched, with status visible.",
+        "tool_words": []
+      },
+      "ask_first": "How do customers ask for exchanges today?",
+      "free_stops": "The exchange steps and approval rules are in the solution document."
+    },
+    {
+      "id": "p8_campaign_roi_unknown",
+      "n": 8,
+      "words": "We spend on Meta ads but can't tell which drop they sold",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Give your next campaign its own link or code, so its orders can be counted",
+        "Compare orders on ad days against quiet days once, so you have a rough first read."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes",
+          "dashboards_reports"
+        ],
+        "text": "tagged links and codes per ad and influencer, with orders traced back to each one in a daily report.",
+        "tool_words": []
+      },
+      "ask_first": "Where does most of your ad spend go?",
+      "free_stops": "Which codes per ad and influencer, how they're tracked and the daily report are in the solution document."
+    },
+    {
+      "id": "p9_branch_underperforming",
+      "n": 9,
+      "words": "One mall outlet does half what the others do",
+      "category": "sales_revenue",
+      "subtype": "branch_underperforming",
+      "quick_ideas": [
+        "Compare the weak outlet's best-sellers with your best outlet's once, so you see whether it's range, size or staff",
+        "Count walk-ins there for a few days, so you know if it's footfall or conversion."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an outlet comparison of sales, walk-ins, basket size and stock mix, every day.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "What do you think is different about that outlet?",
+      "free_stops": "Which numbers are compared and how footfall is captured is in the solution document."
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "We don't know true cost per article",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Cost out your top-selling article fully once (fabric, embroidery, stitching, packaging), so you see the real margin",
+        "Note which costs surprised you, because those usually repeat."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "an article costing sheet that keeps landed cost and margin current for every article as input costs change.",
+        "tool_words": []
+      },
+      "ask_first": "Do you produce in-house or through vendors?",
+      "free_stops": "The costing structure and how it updates are in the solution document."
+    }
+  ],
+  "never_say": [
+    "How to copy another brand's designs or use its labels. Anything about customs declarations, duties or splitting parcels. Trademark, IP, influencer contract or labour law advice. To buy followers or post fake reviews. That a drop, ad or influencer will sell out or bring a set number of orders."
+  ],
+  "sample_reply": {
+    "person": "Every Eid collection, M and L are gone in two days and we're stuck with S and XL in all outlets. What can we do?",
+    "pi": "Yes, this can be fixed, and you can start on it this week. 1 Pull sales by size from your last two Eid drops, so the next size split comes from your own customers rather than a fixed ratio. 2 Have outlet staff note every size they couldn't supply during the next launch, so you see the real demand. Workzap can do this automatically for you: a size-wise stock view across outlets and the website, with sell-through by size each day and a size curve ready for your next production order. Shall I have a solution document and quote prepared for you? You're free to say no.",
+    "language": "english"
+  }
+}

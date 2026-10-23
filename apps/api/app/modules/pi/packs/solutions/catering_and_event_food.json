@@ -1,0 +1,197 @@
+{
+  "industry": "catering_and_event_food",
+  "name": "Catering and event food",
+  "sector": "7.B Food and beverage",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_pre_orders_custom",
+      "n": 1,
+      "words": "Client says 500 guests, 650 show up, and we run out; headcount changes the night before",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Set a clear cut-off date for the final headcount and tell the client in writing, so late changes have a known rule",
+        "Agree up front how extra guests are charged, because it's much harder to discuss on the night."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a headcount change log per event with automatic cut-off reminders to the client, linked to the purchase list.",
+        "tool_words": []
+      },
+      "ask_first": "When does the client usually confirm the final count?",
+      "free_stops": "The cut-off and extra-guest terms and how buying adjusts to changes are in the solution document."
+    },
+    {
+      "id": "p2_margin_unknown",
+      "n": 2,
+      "words": "I quote per head but never know if the event actually made money",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Add up the real cost of your last event (food, staff, transport, crockery hire), so you see the true margin once",
+        "Compare it with the quote, because the gap shows which cost you're under-pricing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an event costing sheet that totals purchases, staff, transport and crockery against the quoted price for every event automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which costs are hardest to pin down per event?",
+      "free_stops": "The costing structure and per-head pricing logic go in the solution document."
+    },
+    {
+      "id": "p3_orders_lost",
+      "n": 3,
+      "words": "Bookings tracked on WhatsApp — two events on the same night got confirmed",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Keep every booking in one calendar with its status (enquiry, quoted, advance paid), so there's one truth",
+        "Confirm an event only after checking that calendar, so clashes are caught before they're promised."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "an event booking calendar with status, venue and clash warnings, updated automatically as advances come in.",
+        "tool_words": []
+      },
+      "ask_first": "Has a double-booking actually happened?",
+      "free_stops": "The booking statuses and confirmation flow are set out in the solution document."
+    },
+    {
+      "id": "p4_lead_followup_slow",
+      "n": 4,
+      "words": "Quotes take me days to send and clients go elsewhere",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Keep your standard menus and per-head prices ready in one place, so quotes don't start from scratch",
+        "Reply to every enquiry the same day, even if only to say when the quote will come."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "every enquiry recorded with a quick quote sent on WhatsApp and automatic follow-up reminders until it's booked or closed.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most enquiries come from?",
+      "free_stops": "The quote builder and follow-up timing are detailed in the solution document."
+    },
+    {
+      "id": "p5_theft_external",
+      "n": 5,
+      "words": "Plates, spoons and dishes go missing at every function",
+      "category": "loss_security",
+      "subtype": "theft_external",
+      "quick_ideas": [
+        "Count crockery before and after the next event, so you know what actually goes missing",
+        "Give one person responsibility for crockery at each venue."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "crockery and equipment check-out and check-in counts per event on phone, with a loss report every time.",
+        "tool_words": []
+      },
+      "ask_first": "What goes missing most — plates, cutlery or dishes?",
+      "free_stops": "The count routine and loss tracking per event stay for the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Balance payment after the wedding takes months, and advances are only in my diary",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid balance with event date and amount, so you see who to chase",
+        "Give a written receipt for every advance, so there's a record on both sides."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "advances and balances per event with automatic reminders before and after the event date.",
+        "tool_words": []
+      },
+      "ask_first": "How long do balances usually take?",
+      "free_stops": "The advance and balance terms and reminder schedule are in the solution document."
+    },
+    {
+      "id": "p7_attendance_lateness",
+      "n": 7,
+      "words": "Daily-wage waiters don't turn up on the night, and nobody knows who's in charge at the venue",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Confirm each waiter the day before the event, so no-shows are known in time to replace",
+        "Name one venue lead for every event, so the team and hall know who decides."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a staff roster per event with automatic WhatsApp confirmations the day before, and a run sheet shared with the venue lead.",
+        "tool_words": []
+      },
+      "ask_first": "How many waiters per event are daily-wage?",
+      "free_stops": "The roster and event-day run sheet are detailed in the solution document."
+    },
+    {
+      "id": "p8_fraud",
+      "n": 8,
+      "words": "Purchasing is done by one person and I don't trust the bills",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Ask for a photo of every bill on the day of purchase, so nothing is reconstructed later",
+        "Check one event's bills against market rates, so you know whether there's a real gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "purchase requests and bill photos captured per event with your approval, totalled automatically against the event's budget.",
+        "tool_words": []
+      },
+      "ask_first": "Who buys for each event now?",
+      "free_stops": "The approval rules and bill-checking routine are set out in the solution document."
+    },
+    {
+      "id": "p9_seasonal_dip",
+      "n": 9,
+      "words": "Wedding season we're overbooked, then months dead; leads from Instagram just ask the price and vanish",
+      "category": "sales_revenue",
+      "subtype": "seasonal_dip",
+      "quick_ideas": [
+        "Note which venues, planners and referrals brought past bookings, so you know where your business comes from",
+        "Approach offices for Ramadan iftar and corporate lunches, because they fill the off-season."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "and website_digital — a lead source tracker showing which channel converts, plus a portfolio page with event photos and an enquiry form.",
+        "tool_words": []
+      },
+      "ask_first": "What do you do in the slow months now?",
+      "free_stops": "The off-season offer plan and lead tracking set-up stay for the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on food-transport or holding rules, or event licensing — refer to the relevant authority. Any interpretation of wedding-menu rules in Pakistan, or ways around them. Labour-law advice on daily-wage staff. Help inflating bills to clients or creating fake receipts. That an event will make a set profit or that headcount problems will stop."
+  ],
+  "sample_reply": {
+    "person": "Shaadi season mein guest zyada aa jate hain aur khana kam par jata hai. Is ka koi hal hai?",
+    "pi": "Ji haan, is ka hal hai, aur pehla qadam agle event se hi uthaya ja sakta hai. 1 Final headcount ki ek wazeh cut-off date client ko likh kar dein, taake aakhri waqt ki tabdeeli ka ek tay usool ho. 2 Extra mehmanon ka charge pehle se tay karein, kyunke event wali raat ye baat karna mushkil hota hai. Workzap ye aap ke liye automatically kar sakta hai: har event ka headcount change log, client ko cut-off se pehle khud reminder, aur count ke hisaab se khareedari ki list update. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

@@ -1,0 +1,241 @@
+{
+  "industry": "e_commerce_and_d2c_brands",
+  "name": "E-commerce and D2C brands",
+  "sector": "7.M Digital economy, social and public sector",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_returns_rto",
+      "n": 1,
+      "words": "COD parcels keep coming back and we pay shipping both ways",
+      "category": "orders_fulfilment",
+      "subtype": "returns_rto",
+      "quick_ideas": [
+        "Confirm every COD order with the buyer before booking it, so unconfirmed parcels stop leaving",
+        "Go through last month's returns once by city and product, so you can see where they cluster."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a WhatsApp confirmation flow that messages every COD buyer automatically, holds unconfirmed orders and shows returns by city, courier and product every day.",
+        "tool_words": []
+      },
+      "ask_first": "Do returns come mostly from certain cities or certain products?",
+      "free_stops": "The confirmation flow, hold rules and return-tracking set-up go in the solution document."
+    },
+    {
+      "id": "p2_cod_remittance",
+      "n": 2,
+      "words": "Courier says delivered but the money hasn't come in",
+      "category": "cash_collections",
+      "subtype": "cod_remittance",
+      "quick_ideas": [
+        "Match one courier's latest settlement against your delivered orders, so unpaid parcels show up",
+        "Send the courier one list of all unpaid parcels instead of chasing one by one."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a reconciler that matches every courier settlement to delivered orders each cycle and lists unpaid and short-paid parcels by courier.",
+        "tool_words": []
+      },
+      "ask_first": "Which couriers do you use at the moment?",
+      "free_stops": "How the matching runs across all couriers and order sources is detailed in the solution document."
+    },
+    {
+      "id": "p3_count_mismatch",
+      "n": 3,
+      "words": "Website shows in stock but the shelf is empty",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count your best-sellers by hand and correct the storefront the same day, so cancellations stop",
+        "Note the reason for every manual stock change, so mismatches can be traced."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "live sync between the shelf count and the storefront, with low- stock alerts on best-sellers before they run out.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The sync design and alert levels per product are set out in the solution document."
+    },
+    {
+      "id": "p4_stockout",
+      "n": 4,
+      "words": "Best-sellers sell out right when the ads are running",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Check stock on the products you plan to advertise before each campaign goes live",
+        "Pause ads on an item as soon as it gets low, so spend isn't wasted."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "nori_daily_read"
+        ],
+        "text": "a daily morning read of best-seller stock against running campaigns, with alerts when an advertised item runs low.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Which products to watch and how alerts tie to campaigns is covered in the solution document."
+    },
+    {
+      "id": "p5_packing_errors",
+      "n": 5,
+      "words": "Wrong size or colour going into parcels",
+      "category": "orders_fulfilment",
+      "subtype": "packing_errors",
+      "quick_ideas": [
+        "Give packers a printed slip per order instead of working from chats",
+        "Have a second person check a few sealed parcels each shift, so errors are caught early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a phone pick-and-pack check that flags a wrong item before sealing and records errors by packer and product.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The scan-and-check process and its reports are detailed in the solution document."
+    },
+    {
+      "id": "p6_campaign_roi_unknown",
+      "n": 6,
+      "words": "We spend on Meta every day but don't know which ad sold",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Give each campaign its own tagged link, so orders can be traced back",
+        "Compare spend against delivered orders, not placed orders, because returns change the picture."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes",
+          "dashboards_reports"
+        ],
+        "text": "tags linked to actual delivered orders, shown daily on one screen beside ad spend per campaign.",
+        "tool_words": []
+      },
+      "ask_first": "Which channels are you spending on right now?",
+      "free_stops": "How tags are set up and joined to courier delivery data goes in the solution document."
+    },
+    {
+      "id": "p7_whatsapp_overload",
+      "n": 7,
+      "words": "Customers ask \"where is my parcel\" on WhatsApp all day",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Send the tracking link with every dispatch, so buyers don't need to ask",
+        "Give one person a fixed time slot for tracking queries instead of constant interruptions."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a WhatsApp reply that reads courier tracking and answers parcel questions on its own, all day.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The tracking connection and reply flow are described in the solution document."
+    },
+    {
+      "id": "p8_repeat_low",
+      "n": 8,
+      "words": "People buy once and never come back",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Find which products bring the most repeat buyers and feature them more",
+        "Tell past buyers who agreed to hear from you about new drops, not just discounts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "a repeat-buyer and win-back list (counted in reports, never exposed) with scheduled restock messages to customers who gave permission.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The segments, timing and message plan stay for the solution document."
+    },
+    {
+      "id": "p9_margin_unknown",
+      "n": 9,
+      "words": "I don't know my profit per order after shipping, returns and ads",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out once what is left from one order of your top products after shipping, fees, returns and ads",
+        "Recheck your courier rate card, since rate changes slip by unnoticed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a per-order profit view updated daily from product cost, shipping, payment fees, returns and allocated ad spend.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How each cost is pulled in and allocated is set out in the solution document."
+    },
+    {
+      "id": "p10_multi_channel_orders",
+      "n": 10,
+      "words": "Orders from website, Instagram and Daraz are in three places",
+      "category": "orders_fulfilment",
+      "subtype": "multi_channel_orders",
+      "quick_ideas": [
+        "Copy every confirmed order into one packing list at fixed times, so nothing is missed",
+        "Keep one shared stock figure for items sold on more than one channel."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "integration"
+        ],
+        "text": "a single order inbox pulling website, Instagram and marketplace orders into one packing queue automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Which channels connect and how is detailed in the solution document."
+    },
+    {
+      "id": "p11_seasonal_planning",
+      "n": 11,
+      "words": "Eid rush — we can't plan how much to make or buy",
+      "category": "planning_growth",
+      "subtype": "seasonal_planning",
+      "quick_ideas": [
+        "Pull last Eid's sales by product into one sheet, so this year starts from facts",
+        "Book supplier and courier capacity early, remembering Ramadan moves earlier each year."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a seasonal buying view from last year's sales by SKU, plus a daily owner read on orders, dispatches, returns and cash due during the rush.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The planning model and daily read layout go in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any promise that returns will fall or ROAS will rise, or any benchmark return or conversion rate. Advice on sales tax, VAT, GST/HST, customs or import duty — say \"talk to your accountant\". Legal views on refund or return policy wording or consumer law — say \"talk to a lawyer\". Anything that helps fake reviews, inflate orders, use competitor branding or under-declare parcel values. Blacklisting or profiling buyers by identity, or asking for customer numbers, addresses or store logins."
+  ],
+  "sample_reply": {
+    "person": "Bhai returns ka koi hal batao, COD parcels wapas aa rahe hain aur double shipping lag rahi hai.",
+    "pi": "Ji bilkul, is ka hal kiya ja sakta hai aur shuruaat aap isi hafte kar sakte hain. 1 Har COD order booking se pehle buyer se confirm karein, taake bina confirm parcel na niklein. 2 Pichle mahine ke returns ek dafa sheher aur product ke hisaab se dekhein, taake pata chale masla kahan zyada hai. Workzap yeh sab aap ke liye automatically kar sakta hai: har buyer ko khud confirmation message, bina confirm orders hold, aur roz returns ka hisaab sheher, courier aur product ke saath. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

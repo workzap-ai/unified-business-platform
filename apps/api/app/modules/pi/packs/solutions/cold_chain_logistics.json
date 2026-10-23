@@ -1,0 +1,223 @@
+{
+  "industry": "cold_chain_logistics",
+  "name": "Cold-chain logistics",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_checklists_not_done",
+      "n": 1,
+      "words": "Temperature logs are filled by hand at the end of the shift",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Set fixed reading times on the log, so readings reflect the real time",
+        "Ask for a photo of the display at each reading, so records can be trusted."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A temperature dashboard pulling readings from sensors or loggers per chamber, so a complete record exists without hand-filling.",
+        "tool_words": [
+          "dashboard"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "How readings are captured and stored is designed in the solution document."
+    },
+    {
+      "id": "p2_maintenance_downtime",
+      "n": 2,
+      "words": "We found out about a compressor failure only in the morning",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Assign a named person to night temperature rounds, so someone is watching",
+        "Keep a night technician's contact on hand."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "WhatsApp alarms to the on-duty person when a reading goes out of range, escalating automatically if not acknowledged.",
+        "tool_words": []
+      },
+      "ask_first": "Do the chambers have any sensor or meter that records readings now?",
+      "free_stops": "Alarm levels and escalation rules are set in the solution document."
+    },
+    {
+      "id": "p3_record_keeping",
+      "n": 3,
+      "words": "Client claims goods spoiled in our store and we have no records",
+      "category": "compliance_admin",
+      "subtype": "record_keeping",
+      "quick_ideas": [
+        "Keep temperature records and gate passes for each lot together, so evidence is ready",
+        "Photograph goods' condition on receipt."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A claim file per incident that collects temperature records, photos and handover notes automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "What goes into each claim file is set in the solution document."
+    },
+    {
+      "id": "p4_utility_costs",
+      "n": 4,
+      "words": "Load-shedding means the generator runs half the day",
+      "category": "margin_cost",
+      "subtype": "utility_costs",
+      "quick_ideas": [
+        "Log generator hours and diesel daily for a week, so you know the real cost",
+        "Note which chambers draw most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A power and generator log with hours, diesel and cost per day and per chamber.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How costs are split per chamber is set in the solution document."
+    },
+    {
+      "id": "p5_wrong_location",
+      "n": 5,
+      "words": "We don't know which chamber has whose goods",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Draw a chamber map of where each client's lots sit, so goods can be found",
+        "Tag each lot with its date in."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A chamber-wise stock register by client role, lot, units and date in, with a location map.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The register layout is designed in the solution document."
+    },
+    {
+      "id": "p6_shrinkage_theft",
+      "n": 6,
+      "words": "Clients' bags or crates go missing or get mixed up",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Issue a gate pass for every withdrawal, signed by the client's representative",
+        "Count a few clients' lots this week, so you see where gaps are."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "A gate pass system for goods in and out, linked to each client's stock.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "The gate pass flow is set in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Clients take goods out but rent calculations are disputed",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Send each client a statement of units and days stored, so disputes start from facts",
+        "Agree rent units in writing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A rent calculator by unit and days stored that produces client statements and tracks balances.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How rent is calculated is set in the solution document."
+    },
+    {
+      "id": "p8_product_defects",
+      "n": 8,
+      "words": "Restaurants complain frozen deliveries arrive soft",
+      "category": "quality_complaints",
+      "subtype": "product_defects",
+      "quick_ideas": [
+        "Ask drivers for a photo of the reefer display at each drop, so you see where temperature slips",
+        "Plan multi-drop order so doors open as little as possible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A reefer trip log with temperature trace and door-open events per delivery.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "What the trip log records is designed in the solution document."
+    },
+    {
+      "id": "p9_seasonal_planning",
+      "n": 9,
+      "words": "The store is full in potato season and empty half the year",
+      "category": "planning_growth",
+      "subtype": "seasonal_planning",
+      "quick_ideas": [
+        "Note occupancy by month for last year, so you see the empty months clearly",
+        "List possible off-season clients."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A seasonal capacity planner using past occupancy by month.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How the planner forecasts is set in the solution document."
+    },
+    {
+      "id": "p10_owner_blind",
+      "n": 10,
+      "words": "I can't see temperature across all sites from my phone",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Ask each site for one temperature report a day, so you have a baseline",
+        "Agree what counts as an alarm worth calling you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "An owner phone view across sites: temperatures, alarms, occupancy and receivables.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "What the owner view includes is set in the solution document."
+    }
+  ],
+  "never_say": [
+    "Whether spoiled or out-of-range goods are safe to sell or use; food safety or pharma professionals decide. Help editing temperature logs, re-dating or relabelling goods. Pharma GDP, HACCP or food safety standards; refrigeration engineering or generator sizing. Views on insurance or legal claims over spoilage. Storing client and staff details. For ammonia or refrigerant leaks, fire, or someone trapped in a cold room, emergency services come first."
+  ],
+  "sample_reply": {
+    "person": "Pichle hafte raat ko ek chamber ka compressor band ho gaya aur subah pata chala. Aisa dobara na ho, koi tareeqa batao.",
+    "pi": "Ji haan, raat ke waqt bhi chambers par nazar rakhi ja sakti hai. 1 Raat ke temperature round ke liye ek banda muqarrar karein, taake koi zimmedaar dekh raha ho. 2 Raat ke liye technician ka number har waqt maujood rakhein, taake masla hote hi rabta ho sake. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: reading had se bahar jaye to duty wale ko WhatsApp alarm jaye, aur jawab na aaye to agla banda apne aap alert ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "industry": "surgical_and_dental_instruments_manufacturing",
+  "name": "Surgical and dental instruments manufacturing",
+  "sector": "7.D Manufacturing and industry (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_no_visibility",
+      "n": 1,
+      "words": "Instruments go to five different vendors and we lose track of where a lot is",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "List every lot currently out with vendors, with stage and date sent, so you have one picture today",
+        "Mark which lots are tied to the nearest shipment, so you chase those first"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "transfer_tracking A lot tracker following each lot through forging, machining, heat treatment, filing, polishing, passivation and marking, with vendor and dates.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many lots are with vendors at any time?",
+      "free_stops": "How each stage is recorded and overdue lots flagged is set out in the solution document."
+    },
+    {
+      "id": "p2_count_mismatch",
+      "n": 2,
+      "words": "Pieces sent to the polisher and pieces returned don't match",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count the next return in front of the vendor's person, so the count is agreed on the spot",
+        "Reconcile what each vendor holds today"
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "A vendor issue and receive ledger with counts, shortfalls and payments per stage.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How counts are confirmed and tied to payment is covered in the solution document."
+    },
+    {
+      "id": "p3_serial_batch_tracking",
+      "n": 3,
+      "words": "Buyer wants lot-wise records and we build them by hand after the fact",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "For the next lot, keep one folder where every stage's date and result is added as it happens, so the record builds itself",
+        "Note which documents buyers ask for most"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "workflow_automation A digital batch record built automatically as each stage is completed, exportable per shipment.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "What each record holds and how it is exported is set out in the solution document; regulatory content is for your quality or regulatory adviser."
+    },
+    {
+      "id": "p4_rework",
+      "n": 4,
+      "words": "Rejection rate at final inspection is high and we don't know which stage causes it",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Note the reason for each rejection at final inspection for one week, so a pattern appears",
+        "Trace the most common reason back to the stage that causes it"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "An inspection app recording results per lot and stage, rejection reasons and photos, summarised by stage and vendor.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "Inspection points and rejection categories are kept for the solution document."
+    },
+    {
+      "id": "p5_order_errors",
+      "n": 5,
+      "words": "Laser marking errors, wrong logo on a private label lot",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Check the marking job sheet against the order once more before the next run, so the logo is right",
+        "Keep each buyer's marking instructions in one place"
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A marking job sheet checked against the order and the buyer's item master before marking starts.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How marking instructions are stored and checked is covered in the solution document."
+    },
+    {
+      "id": "p6_packing_errors",
+      "n": 6,
+      "words": "Buyer says shipment short against packing list",
+      "category": "orders_fulfilment",
+      "subtype": "packing_errors",
+      "quick_ideas": [
+        "Have a second person recount the next shipment against the packing list before sealing",
+        "Note where the last shortage happened"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A packing list builder with scan-check against the order before boxes close.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The scan-check flow is set out in the solution document."
+    },
+    {
+      "id": "p7_licences_renewals",
+      "n": 7,
+      "words": "Certificate renewals and audit dates sneak up",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List every certificate, licence and audit date in one place, so nothing is a surprise",
+        "Note who is responsible for each"
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A certificate and audit calendar with reminders well ahead and a document folder.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing and folder structure are kept for the solution document; what each certificate requires is for your regulatory adviser."
+    },
+    {
+      "id": "p8_receivables_late",
+      "n": 8,
+      "words": "Buyers pay months after shipment",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every buyer with what is due and since when",
+        "Call or write to the oldest few this week"
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A buyer receivables ledger with ageing and scheduled reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder schedule and follow-up order are set out in the solution document."
+    },
+    {
+      "id": "p9_lead_followup_slow",
+      "n": 9,
+      "words": "Inquiries from website and B2B platforms aren't followed up",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Gather all open inquiries into one list with date received",
+        "Give one person responsibility for first replies"
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "website_digital An inquiry tracker with reply timers, and an updated digital catalogue searchable by category and catalogue number.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How inquiries flow in and the catalogue is structured are covered in the solution document."
+    },
+    {
+      "id": "p10_owner_bottleneck",
+      "n": 10,
+      "words": "Owner chases each vendor on WhatsApp personally",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Decide which vendor updates you truly need, so others can be handled by staff",
+        "Hand vendor follow-up for one stage to one person this week"
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A daily view of every lot by vendor and stage, so follow-up runs from one screen instead of the owner's phone.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Who owns which follow-up and how it is escalated is set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any help falsifying or \"arranging\" CE, FDA, ISO or other certificates, test reports, markings or batch records. Any regulatory, sterilisation, clinical-use or material advice; suggest a regulatory or quality adviser. Anything on acids or chemicals for passivation; chemical burns are emergencies. Customs, misdeclared goods, origin or value. Storing vendor, worker, buyer or patient details; if a patient was harmed, point to medical help. Any guarantee of fewer rejections or faster audits."
+  ],
+  "sample_reply": {
+    "person": "Our lots go through forging, filing and polishing outside and I never know where they are. Can you help?",
+    "pi": "Yes, this can definitely be organised, and you can start this week. 1 List every lot currently out with vendors, with its stage and the date it left, so you have one clear picture today. 2 Mark which lots belong to the nearest shipment, so those are chased first. Workzap can do this automatically for you: a lot tracker that follows each lot through every vendor stage and flags overdue or short returns each day. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

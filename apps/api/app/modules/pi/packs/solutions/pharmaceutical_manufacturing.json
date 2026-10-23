@@ -1,0 +1,199 @@
+{
+  "industry": "pharmaceutical_manufacturing",
+  "name": "Pharmaceutical manufacturing",
+  "sector": "7.D Manufacturing and industry (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_returns_handling",
+      "n": 1,
+      "words": "Distributors send back near-expiry stock and claim full credit",
+      "category": "stock_inventory",
+      "subtype": "returns_handling",
+      "quick_ideas": [
+        "Check each return's batch against your dispatch records before approving — confirms it was yours",
+        "Put your returns policy in writing to all distributors — removes argument."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a returns and credit-claim workflow with batch checks before approval.",
+        "tool_words": []
+      },
+      "ask_first": "Who approves returns today?",
+      "free_stops": "The approval rules and checks are in the solution document."
+    },
+    {
+      "id": "p2_serial_batch_tracking",
+      "n": 2,
+      "words": "I don't know which batch is lying with which distributor",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Note batch numbers on every dispatch to distributors — builds the trail",
+        "Ask distributors for their stock by batch once — gives a starting picture."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a batch-to-distributor dispatch register so any batch can be located quickly.",
+        "tool_words": []
+      },
+      "ask_first": "How many distributors do you work with?",
+      "free_stops": "The register design is in the solution document."
+    },
+    {
+      "id": "p3_expiry_wastage",
+      "n": 3,
+      "words": "Expired stock write-offs are huge at year end",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "List stock by expiry month across your warehouse — shows what's at risk next",
+        "Dispatch oldest batches first — reduces stock left to expire."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a near-expiry monitor by distributor and batch that flags stock months before expiry.",
+        "tool_words": []
+      },
+      "ask_first": "Do distributors share stock by batch with you?",
+      "free_stops": "The alert timing is in the solution document."
+    },
+    {
+      "id": "p4_import_delays",
+      "n": 4,
+      "words": "API imports stuck at port, a product is short in the market",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "Work out cover in days for each imported input — shows which could stop production next",
+        "Get a weekly status of every open consignment from your clearing agent — no surprises."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a material stock board with lead times and an import consignment tracker by stage.",
+        "tool_words": []
+      },
+      "ask_first": "Which inputs cause the most delays?",
+      "free_stops": "Cover levels and tracked stages are in the solution document."
+    },
+    {
+      "id": "p5_field_team_visibility",
+      "n": 5,
+      "words": "Medical reps report doctor visits but I can't verify any of it",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Compare reps' reported visits with secondary sales in their areas — shows where activity doesn't match results",
+        "Review sample issue against visits — highlights gaps."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a field-force daily reporting app with visit logs, samples issued and stock in hand, used openly with the team.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many reps are in the field?",
+      "free_stops": "The reporting format and manager views are in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Distributors pay late and keep pushing returns to offset balances",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Separate returns from payments on each distributor's statement — makes the real balance visible",
+        "Settle returns only after they're checked — stops offsets you haven't agreed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a distributor ledger with ageing, approved returns and automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Which distributors are slowest to pay?",
+      "free_stops": "The ledger and reminder rules are in the solution document."
+    },
+    {
+      "id": "p7_licences_renewals",
+      "n": 7,
+      "words": "Registration renewals are in an Excel nobody updates",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "Put every renewal date on one calendar with an owner — nothing is forgotten",
+        "Collect the documents for the next few in one folder — saves the last-minute rush."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a renewal calendar with reminders and document storage.",
+        "tool_words": []
+      },
+      "ask_first": "Has a renewal ever been missed?",
+      "free_stops": "The reminder and document set-up is in the solution document."
+    },
+    {
+      "id": "p8_data_scattered",
+      "n": 8,
+      "words": "Sales data from distributors comes late and in different formats",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Send all distributors one standard sheet to fill — makes figures comparable",
+        "Fix a date each month for submission — gets data sooner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration",
+          "dashboards_reports"
+        ],
+        "text": "distributor secondary-sales uploads merged into one report by product and region.",
+        "tool_words": []
+      },
+      "ask_first": "How often do you get secondary sales now?",
+      "free_stops": "The template and merge logic are in the solution document."
+    },
+    {
+      "id": "p9_discount_abuse",
+      "n": 9,
+      "words": "Bonus schemes to distributors are inconsistent and hard to track",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Write down every running scheme on one page — everyone works from the same rules",
+        "Check bonus quantities against orders for one month — shows inconsistencies."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a scheme ledger linking bonus quantities to orders and distributors.",
+        "tool_words": []
+      },
+      "ask_first": "How are schemes recorded against orders now?",
+      "free_stops": "The scheme rules set-up is in the solution document."
+    }
+  ],
+  "never_say": [
+    "No medical, dosing, formulation, stability or clinical advice; never say a product is safe or effective. No advice on DRAP, MOHAP/EDE or Health Canada rules, registration strategy or pricing law. Adverse reactions or patient harm: urge medical care and emergency services, suggest the regulator's reporting channel, record nothing clinical. Never help sell unregistered or expired products, relabel batches, change expiry dates or make fake documents; decline. Never help design improper doctor incentives or divert controlled substances. No patient, doctor or chemist names or numbers; roles and towns only."
+  ],
+  "sample_reply": {
+    "person": "Is ka koi solution hai? Distributors near-expiry stock wapas bhej ke poora credit maangte hain aur humein batch ka pata hi nahi hota.",
+    "pi": "Ji, bilkul hai, aur shuruaat isi hafte ho sakti hai. 1 Har dispatch par batch number note karein, taake wapsi par check ho sake ke batch aap ka tha. 2 Returns policy likhit mein sab distributors ko bhej dein, taake credit par behes kam ho. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: batch-to-distributor register aur near-expiry alerts, jo har return ko approve hone se pehle check kar lein. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

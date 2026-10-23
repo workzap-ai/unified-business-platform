@@ -1,0 +1,219 @@
+{
+  "industry": "elevator_and_escalator_services",
+  "name": "Elevator and escalator services",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_slow_response",
+      "n": 1,
+      "words": "Breakdown calls come in at night and the on-call technician doesn't pick up",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Give every building a second number to call if the duty technician doesn't answer, so no call dead-ends",
+        "Share the night roster with each building, so guards know who is on."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A breakdown line that creates a time-stamped ticket and escalates up the on-call roster automatically, with entrapments escalated to management within minutes.",
+        "tool_words": []
+      },
+      "ask_first": "How many technicians are on call at night?",
+      "free_stops": "Escalation rules and timings are in the solution document."
+    },
+    {
+      "id": "p2_kpi_undefined",
+      "n": 2,
+      "words": "We don't know our average response time to a breakdown",
+      "category": "reporting_visibility",
+      "subtype": "kpi_undefined",
+      "quick_ideas": [
+        "Record time reported and time arrived for every call this week, so you have a first baseline",
+        "Look at the slowest calls, so you see where delay happens."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "Response and fix times measured on every ticket, by building and technician, updated daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How do breakdown calls reach you, day and night?",
+      "free_stops": "KPI definitions and targets are in the solution document."
+    },
+    {
+      "id": "p3_checklists_not_done",
+      "n": 3,
+      "words": "Monthly PM visits are skipped and the client finds out",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Give each technician a written monthly visit list, so every lift has a planned date",
+        "Ask for a photo and time from each visit, so completion is provable."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A PM scheduler with visit lists, a checklist with photo and time proof, and missed visits flagged every day.",
+        "tool_words": []
+      },
+      "ask_first": "How do you confirm a visit actually happened?",
+      "free_stops": "Scheduling rules are in the solution document; checklist content stays with your engineers."
+    },
+    {
+      "id": "p4_unbilled_work",
+      "n": 4,
+      "words": "Expensive parts are used on non-comprehensive contracts and never billed",
+      "category": "cash_collections",
+      "subtype": "unbilled_work",
+      "quick_ideas": [
+        "Check last month's parts against each lift's contract type, so missed charges surface",
+        "Note the contract type on every parts slip, so it's clear at issue time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A parts issue log linked to each lift that flags chargeable parts by contract type and passes them to billing.",
+        "tool_words": []
+      },
+      "ask_first": "How are extra parts billed today?",
+      "free_stops": "Billing rules are in the solution document."
+    },
+    {
+      "id": "p5_licences_renewals",
+      "n": 5,
+      "words": "Inspection certificates for some lifts expired without us noticing",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List every lift's certificate and inspection date in one place, so expiries are visible",
+        "Give one person ownership of renewals, so it is never assumed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "An asset register for every lift and escalator with certificate and AMC expiry alerts sent well ahead.",
+        "tool_words": []
+      },
+      "ask_first": "Who keeps track of inspection due dates?",
+      "free_stops": "Alert timing is in the solution document; certification rules are for the regulator and licensed inspectors."
+    },
+    {
+      "id": "p6_rework",
+      "n": 6,
+      "words": "Same lift breaks down three times in a month",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "List lifts with repeat breakdowns this quarter, so the worst are known",
+        "Have a senior technician review each one, so the root cause is looked at."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Repeat-breakdown alerts per lift that prompt a root-cause review or a modernisation proposal.",
+        "tool_words": []
+      },
+      "ask_first": "How many lifts and escalators are you maintaining?",
+      "free_stops": "Alert thresholds and review flow are in the solution document."
+    },
+    {
+      "id": "p7_serial_batch_tracking",
+      "n": 7,
+      "words": "Technicians take parts and we can't trace which lift they went into",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Write the lift reference on every parts slip, so each part has a destination",
+        "Check high-value parts against slips weekly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "job_tracking"
+        ],
+        "text": "Parts issued against a specific lift, with stock levels and slow-to-source items flagged.",
+        "tool_words": []
+      },
+      "ask_first": "Which parts are hardest to get?",
+      "free_stops": "Parts tracking design is in the solution document."
+    },
+    {
+      "id": "p8_manual_reports",
+      "n": 8,
+      "words": "Clients want monthly reports and we prepare them by hand",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Fix one report layout for all buildings, so it's built the same way",
+        "Collect visit and breakdown data weekly, so month-end isn't a scramble."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "Monthly client reports generated per building from tickets and visits.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "What do building managers ask for every month?",
+      "free_stops": "Report content is in the solution document."
+    },
+    {
+      "id": "p9_receivables_late",
+      "n": 9,
+      "words": "Building managers pay AMC invoices months late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List unpaid invoices by building and age, so the oldest are clear",
+        "Attach the month's visit summary to each invoice, so proof travels with the bill."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "AMC billing and receivables per building with reminders on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "Which clients pay slowest?",
+      "free_stops": "Reminder schedule is in the solution document."
+    },
+    {
+      "id": "p10_lead_followup_slow",
+      "n": 10,
+      "words": "Modernisation quotes go out and we never follow up",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "List open quotes with the date sent, so ageing is visible",
+        "Give each quote a follow-up owner, so none is forgotten."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "A modernisation and installation quote pipeline with follow-up reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How many quotes are open right now?",
+      "free_stops": "Pipeline stages are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any rescue, override, brake release or manual-move instructions, even for a technician. Any safety or compliance judgement; licensed inspectors and engineers decide. Any help issuing certificates without inspection, backdating PM records, bypassing safety devices or bribing inspectors. Any recording of trapped people's, residents', client contacts' or technicians' names. Anything other than emergency services first for an entrapment, injury, shaft fall, smoke or fire."
+  ],
+  "sample_reply": {
+    "person": "What can we do about night breakdown calls? We maintain about 300 lifts and the duty technician doesn't always answer.",
+    "pi": "Yes, this can be fixed, and if anyone is ever stuck in a lift, emergency services come first. 1 Give every building a second number to call when the duty technician doesn't answer, so no call dead-ends. 2 Share the night roster with each building so guards know who is on. Workzap can do this automatically for you: every call time-stamped as a ticket and escalated up the roster if nobody picks up. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

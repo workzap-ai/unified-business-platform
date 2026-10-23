@@ -1,0 +1,201 @@
+{
+  "industry": "dairy_processing",
+  "name": "Dairy processing (milk, yoghurt, cheese)",
+  "sector": "7.B Food and beverage",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_count_mismatch",
+      "n": 1,
+      "words": "Milk intake slips and lab results are on paper and don't match",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Compare one day's slips from each collection point with what the plant received, so you see where the gap starts",
+        "Note the time of each reading, so mismatches can be traced."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a milk intake app at collection points recording supplier code, litres, fat and SNF readings, time and slip photo, synced to the plant.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How do collection records reach the plant now?",
+      "free_stops": "The intake app set-up per collection point is in the solution document."
+    },
+    {
+      "id": "p2_supplier_payments_late",
+      "n": 2,
+      "words": "Farmers complain their payments are wrong or late, and fat test disputes every week",
+      "category": "cash_collections",
+      "subtype": "supplier_payments_late",
+      "quick_ideas": [
+        "Give each farmer a statement by code showing litres, fat and amount, so disputes start from shared numbers",
+        "Keep a log of each dispute with the test record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a farmer payment calculator using your own pricing rule, with statements per supplier code and a dispute log with test history.",
+        "tool_words": []
+      },
+      "ask_first": "How often are farmers paid?",
+      "free_stops": "How the payment rule and statements are set up stays for the solution document."
+    },
+    {
+      "id": "p3_inspection_missing",
+      "n": 3,
+      "words": "Some collection points send watered milk and we find out later",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Record test results at intake for every delivery, so a problem is tied to one point and day",
+        "Review which points have repeated issues. For testing methods, talk to a qualified lab."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a quality record per supplier code with history and flags for repeat issues.",
+        "tool_words": []
+      },
+      "ask_first": "Which tests are recorded at intake?",
+      "free_stops": "The quality record and flag rules are in the solution document."
+    },
+    {
+      "id": "p4_expiry_wastage",
+      "n": 4,
+      "words": "Yoghurt and fresh milk returns from shops are huge",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Note returns by shop, product and reason for a week, so you see the pattern",
+        "Send less to shops that return the most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "returns analysis by shop label, product and reason, updated with every route.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which products come back most?",
+      "free_stops": "How deliveries per shop are adjusted is detailed in the solution document."
+    },
+    {
+      "id": "p5_forecasting",
+      "n": 5,
+      "words": "Production plan doesn't match next day's orders",
+      "category": "planning_growth",
+      "subtype": "forecasting",
+      "quick_ideas": [
+        "Collect next day's orders by a fixed time, so production starts from them",
+        "Compare production with dispatch for a week."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a production plan by product from next-day orders and stock.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How do you decide daily production now?",
+      "free_stops": "The planning logic stays for the solution document."
+    },
+    {
+      "id": "p6_maintenance_downtime",
+      "n": 6,
+      "words": "Chiller or pasteuriser breakdown — whole batch lost",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Note every breakdown with time, machine and loss, so the worst offender shows",
+        "Keep a service date on each key machine."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a cold-chain and equipment log for chillers and vans with downtime and losses.",
+        "tool_words": []
+      },
+      "ask_first": "Where does the cold chain break most — plant, vans or shops?",
+      "free_stops": "The maintenance and cold-chain log set-up is in the solution document."
+    },
+    {
+      "id": "p7_cash_mismatch",
+      "n": 7,
+      "words": "Van drivers' cash and returns don't reconcile",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Settle each van against what was loaded and returned, so gaps belong to one route",
+        "Record returns at the shop, not at the plant later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "route sales and returns settlement per van, with variances flagged daily.",
+        "tool_words": []
+      },
+      "ask_first": "How do drivers settle cash and returns now?",
+      "free_stops": "The settlement routine is detailed in the solution document."
+    },
+    {
+      "id": "p8_churn_subscription",
+      "n": 8,
+      "words": "Home-delivery subscribers pause and forget to restart",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "List paused subscribers with their pause date, so you know who to check on",
+        "Ask when they'd like to restart at the time they pause."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a subscription manager with pause and automatic resume reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How are pauses handled now?",
+      "free_stops": "The reminder plan stays for the solution document."
+    },
+    {
+      "id": "p9_data_scattered",
+      "n": 9,
+      "words": "Can't see daily intake, production and dispatch in one place",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Put one day's intake, production and dispatch side by side, so gaps show",
+        "Pick the one number you'll check each morning."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a short morning read of intake, production, dispatch and returns, with the one thing to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Who puts these numbers together now?",
+      "free_stops": "What goes into the morning read is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Veterinary, animal-health, feed or antibiotic-residue advice. Food-safety standards or adulteration testing methods. Collecting farmers' names, IDs or bank details — farmers are recorded by code. Help concealing adulteration, relabelling expired product or changing dates. Anything on Canadian supply management, quota or pricing rules."
+  ],
+  "sample_reply": {
+    "person": "Hamari 40 collection points hain, parchi pe likha jata hai aur plant tak aate aate sab gadbad ho jata hai. Fat pe farmers se jhagra hota hai. Solution chahiye.",
+    "pi": "Ji haan, is ka hal mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Ek din ki har collection point ki parchiyan plant ki receiving se milayein, taake pata chale gadbad kahan se shuru hoti hai. 2 Har farmer ko code ke saath litres, fat aur raqam ki statement dein, taake jhagra ek hi record se shuru ho. Workzap ye aap ke liye automatically kar sakta hai: collection point par phone se intake, fat aur SNF reading, waqt aur parchi ki photo, sab plant tak foran, aur har supplier code ki payment statement khud tayyar. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

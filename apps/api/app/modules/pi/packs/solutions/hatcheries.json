@@ -1,0 +1,219 @@
+{
+  "industry": "hatcheries",
+  "name": "Hatcheries",
+  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_no_dashboard",
+      "n": 1,
+      "words": "Hatch results are on a register, I can't compare machines or egg sources",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Note egg source and machine against every hatch result",
+        "Look at a month of results side by side."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "hatch results entered per batch, compared automatically by machine and egg source from the hatchery's own data.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many setters and hatchers do you run?",
+      "free_stops": "The entry fields and comparison views go in the solution document."
+    },
+    {
+      "id": "p2_order_errors",
+      "n": 2,
+      "words": "Bookings are on WhatsApp and we overbook some days",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Write each hatch day's capacity down and stop at it",
+        "Take bookings on one number only."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a booking system with a daily capacity limit and written confirmations sent to customers automatically.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "Who takes bookings today?",
+      "free_stops": "Capacity rules and the confirmation flow are set out in the solution document."
+    },
+    {
+      "id": "p3_overstock_dead_stock",
+      "n": 3,
+      "words": "Farmers cancel bookings when the rate drops and chicks are left over",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "Put cancellation terms in writing at booking",
+        "Keep a waiting list to offer cancelled chicks to."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "customer_messaging — cancellations tracked by customer, with waiting-list customers messaged automatically when chicks free up.",
+        "tool_words": []
+      },
+      "ask_first": "Do you take an advance with bookings?",
+      "free_stops": "The terms and waiting-list flow stay in the solution document."
+    },
+    {
+      "id": "p4_complaints",
+      "n": 4,
+      "words": "Customers say we sent fewer chicks than paid for",
+      "category": "customers_retention",
+      "subtype": "complaints",
+      "quick_ideas": [
+        "Have the driver confirm box count at dispatch",
+        "Ask customers to confirm the count on receipt."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a dispatch sheet with box count, driver, times and delivery photo, recorded for every order.",
+        "tool_words": []
+      },
+      "ask_first": "Do you deliver, or do customers collect?",
+      "free_stops": "The dispatch record and confirmation steps go in the solution document."
+    },
+    {
+      "id": "p5_serial_batch_tracking",
+      "n": 5,
+      "words": "Complaints of weak chicks come days later and we can't trace the batch",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Note egg source, machine and hatch date on every dispatch",
+        "Keep complaints against the batch, and take any pattern to your vet."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "each hatch batch traced from egg source and machine to the customers who received it, so a complaint links back automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How do complaints reach you now?",
+      "free_stops": "How batches are linked and traced is detailed in the solution document."
+    },
+    {
+      "id": "p6_supplier_quality",
+      "n": 6,
+      "words": "Breeder farm sends eggs late or with too many cracked",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_quality",
+      "quick_ideas": [
+        "Count cracked and rejected eggs on arrival per source",
+        "Take a month's figures to the supplier."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "egg intake logged by source with counts and photos, summarised per supplier automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many egg sources do you use?",
+      "free_stops": "The intake log and supplier summary go in the solution document."
+    },
+    {
+      "id": "p7_maintenance_downtime",
+      "n": 7,
+      "words": "Power failed during hatch and nobody alerted me",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Make one person on call every night, with numbers posted",
+        "Ask your equipment supplier what alarm outputs your machines already have."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "custom_build — alerts from existing machine or generator alarms routed to on-call staff, with every outage logged.",
+        "tool_words": []
+      },
+      "ask_first": "Do your machines have any alarm output today?",
+      "free_stops": "How alarms are connected and routed stays in the solution document."
+    },
+    {
+      "id": "p8_receivables_late",
+      "n": 8,
+      "words": "Dealers take chicks on credit and pay late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Confirm each credit order and due date in writing",
+        "Set your own credit limit per dealer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a dealer ledger that keeps balances current and sends reminders automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many dealers buy on credit?",
+      "free_stops": "Reminder timing and limits are set out in the solution document."
+    },
+    {
+      "id": "p9_whatsapp_overload",
+      "n": 9,
+      "words": "Lots of phone calls asking ‘is my order ready'",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Tell customers at booking when and how they'll hear",
+        "Send one message when chicks are ready."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "automatic WhatsApp updates when chicks are ready and dispatched.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many orders go out on a busy day?",
+      "free_stops": "The update triggers and messages go in the solution document."
+    },
+    {
+      "id": "p10_checklists_not_done",
+      "n": 10,
+      "words": "Night staff skip checks or logging",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "List the night checks as you already run them",
+        "Ask for a time-stamped entry for each."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a night checklist on the phone with timestamps, alerting the manager when a check is missed.",
+        "tool_words": []
+      },
+      "ask_first": "How do you know the night checks were done today?",
+      "free_stops": "The checklist and alert rules stay in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any incubation setting, chick vaccination, medicine, breeder nutrition or disease advice; suggest their vet or equipment supplier. Anything that helps relabel chick grades or breeds, hide disease, or bypass import permits for eggs or parent stock. Any suggested chick price. Promised hatchability or results. Collecting customers' or drivers' IDs or bank details."
+  ],
+  "sample_reply": {
+    "person": "We run a broiler hatchery near Lahore. Bookings come by phone and WhatsApp into the manager's diary and we keep overbooking. What can we do?",
+    "pi": "Yes, this can be brought under control, starting this week. 1. Fix each hatch day's capacity and stop taking bookings once it's reached. 2. Take all bookings on one number, so there's a single list. Workzap can do this automatically for you: a booking system with a daily capacity limit, written confirmations and ready/dispatched updates sent to every customer. Shall I put together a solution document and quote for you, or would you rather not?",
+    "language": "english"
+  }
+}

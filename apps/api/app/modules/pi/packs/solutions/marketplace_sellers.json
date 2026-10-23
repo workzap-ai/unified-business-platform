@@ -1,0 +1,220 @@
+{
+  "industry": "marketplace_sellers",
+  "name": "Marketplace sellers Daraz, Noon, Amazon)",
+  "sector": "7.M Digital economy, social and public sector",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_cash_mismatch",
+      "n": 1,
+      "words": "Payout is less than I expected and I can't see why",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Line up one month's settlement report against your orders, so each deduction becomes visible",
+        "Group the deductions by type once, so repeat charges stand out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a payout reconciler that reads every settlement automatically and matches each fee, commission, penalty and refund to its order.",
+        "tool_words": []
+      },
+      "ask_first": "Which marketplace's payouts confuse you most?",
+      "free_stops": "How the reconciler reads each marketplace's reports is set out in the solution document."
+    },
+    {
+      "id": "p2_margin_unknown",
+      "n": 2,
+      "words": "Fees keep changing; I don't know my real margin per item",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out what is left from one sale of your top items after commission, shipping, storage and returns",
+        "Flag the items that come out thin or negative for a price or listing review."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a true-margin view per SKU that updates as fees, shipping, storage and returns change.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The cost model per marketplace goes in the solution document."
+    },
+    {
+      "id": "p3_delivery_late",
+      "n": 3,
+      "words": "Penalised for late dispatch because orders came in overnight",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Pack overnight orders first thing each morning before anything else",
+        "Note each late-dispatch warning with its cause, so the pattern becomes clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a dispatch board showing orders at risk of missing handover time, with WhatsApp alerts to packers.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The alert timings and board set-up are detailed in the solution document."
+    },
+    {
+      "id": "p4_transfers_lost",
+      "n": 4,
+      "words": "Stock sent to the marketplace warehouse doesn't match what they received",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Photograph and list every carton before an inbound shipment leaves",
+        "Compare sent against received as soon as the receipt appears, while a claim is still possible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "an inbound tracker comparing sent and received quantities for every shipment, with claim reminders before deadlines pass.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The tracking and claim workflow is covered in the solution document."
+    },
+    {
+      "id": "p5_overstock_dead_stock",
+      "n": 5,
+      "words": "Storage fees eating me on slow items",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "List the items with no recent sales and decide for each to bundle, discount or stop reordering",
+        "Send smaller inbounds of slow movers, so less sits in paid storage."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a reorder view using sales speed and lead time per SKU, flagging slow movers before storage fees build.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reorder rules per SKU are worked out in the solution document."
+    },
+    {
+      "id": "p6_stockout",
+      "n": 6,
+      "words": "Sold out on campaign day and lost ranking",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Put the inbound cut-off for the next big sale in your calendar now",
+        "Plan stock for top items from last campaign's sales rather than guesswork."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a campaign-day checklist covering stock, approved prices and staff rota, sent to the team with reminders before each event.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The checklist and timing for each campaign go in the solution document."
+    },
+    {
+      "id": "p7_integration_marketplace",
+      "n": 7,
+      "words": "Same stock on Daraz and our website and we oversell",
+      "category": "tech_systems",
+      "subtype": "integration_marketplace",
+      "quick_ideas": [
+        "Keep one master stock count and update every channel from it",
+        "Hold back a small buffer on each channel for fast sellers, so one sale doesn't oversell another."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "multi-channel stock sync with buffer rules, so Daraz, Noon, Amazon and your own site draw from one count.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The sync design and buffer rules are set out in the solution document."
+    },
+    {
+      "id": "p8_slow_response",
+      "n": 8,
+      "words": "Buyer questions in seller centre go unanswered for days",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Give one person fixed daily time for seller-centre messages",
+        "Turn the most repeated questions into clearer listing text, so fewer get asked."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a shared reply library and a daily list of unanswered buyer messages by marketplace, with ageing.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reply library and routing are prepared in the solution document."
+    },
+    {
+      "id": "p9_manual_reports",
+      "n": 9,
+      "words": "Every morning I download reports from three portals into Excel",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Decide the few numbers you truly need each day and stop building the rest",
+        "Keep all exports in one dated folder, so nothing is hunted for."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "one combined daily sales view across marketplaces and countries, without downloads.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which reports are pulled and how they combine is detailed in the solution document."
+    },
+    {
+      "id": "p10_no_sop",
+      "n": 10,
+      "words": "Staff member handling the account left and nobody knows the process",
+      "category": "operations_process",
+      "subtype": "no_sop",
+      "quick_ideas": [
+        "Write down the main weekly seller-portal tasks while someone still remembers them",
+        "Make sure the business, not one person, holds the account access."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a task checklist for seller-portal work with reminders, so any staff member can pick it up.",
+        "tool_words": [
+          "portal"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "The task list and handover set-up are built out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about how a suspension appeal, IP complaint or policy dispute will turn out. Typical marketplace fee levels, return rates or ranking promises. Advice on VAT, GST, customs or product certification — say \"talk to your accountant or customs agent\". Help with review manipulation, duplicate accounts, fake orders or others' trademarks in listings. Any request for seller-centre passwords, OTPs, API keys or bank details."
+  ],
+  "sample_reply": {
+    "person": "Can you suggest a fix for our Noon payouts? They never match what we think we sold.",
+    "pi": "Yes, this can be fixed, and you can make a start this week. 1 Line up one month's settlement report against your orders, so every deduction becomes visible. 2 Group those deductions by type once, so repeated charges stand out across Noon and Amazon. Workzap can do this automatically for you: a reconciler that reads each settlement, matches every line to an order and lists anything that doesn't add up. Would you like me to prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

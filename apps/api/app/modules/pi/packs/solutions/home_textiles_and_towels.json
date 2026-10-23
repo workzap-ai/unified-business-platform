@@ -1,0 +1,220 @@
+{
+  "industry": "home_textiles_and_towels",
+  "name": "Home textiles and towels",
+  "sector": "7.D Manufacturing and industry (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_consistency_across_branches",
+      "n": 1,
+      "words": "Towel GSM varies batch to batch and the buyer complains",
+      "category": "quality_complaints",
+      "subtype": "consistency_across_branches",
+      "quick_ideas": [
+        "Check GSM on every batch for one week and note loom and dye lot, so you see where the variation starts",
+        "Keep one approved reference piece per item at packing, so checkers compare against the same standard"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "job_tracking A batch record per dye lot with GSM, shade reference and QC result linked to the order, so every batch is checked and traceable.",
+        "tool_words": []
+      },
+      "ask_first": "Is GSM checked at your end before packing, or only by the buyer?",
+      "free_stops": "Where checks happen and how batches are linked to looms and lots is set out in the solution document."
+    },
+    {
+      "id": "p2_packing_errors",
+      "n": 2,
+      "words": "Wrong barcodes on inserts, buyer threatened a chargeback",
+      "category": "orders_fulfilment",
+      "subtype": "packing_errors",
+      "quick_ideas": [
+        "Before the next cartons close, have one person check barcodes against the order line by line, so errors are caught inside",
+        "Go back over the last error and note where the wrong insert came from, so that step gets fixed"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "workflow_automation A packing checklist per buyer with barcode scan verification against the order and carton labels generated from order data.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The scan-check flow and label format per buyer are covered in the solution document."
+    },
+    {
+      "id": "p3_no_visibility",
+      "n": 3,
+      "words": "So many colour/size combinations, I can't see stock per SKU",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Count your top-selling designs by colour, size and grade once, so you know what is really there",
+        "Label godown shelves by design and colour, so pieces stop being mixed"
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "nori_daily_read SKU-level stock by design, colour, size and A/B grade across godowns and shops, with a daily read of what is low and what is piling up.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How SKUs are coded and counted across locations is detailed in the solution document."
+    },
+    {
+      "id": "p4_cash_leakage",
+      "n": 4,
+      "words": "B-grade goes out of the gate without proper billing",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Count the B-grade in stock today, so you have a starting figure",
+        "Allow B-grade sales only with an invoice from the office, so every sale is recorded"
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A B-grade sales register with an invoice per sale matched to stock and a monthly summary for the owner.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How B-grade stock is matched to sales and gate passes is kept for the solution document."
+    },
+    {
+      "id": "p5_no_sop",
+      "n": 5,
+      "words": "Programme reorder came and we had to reconfirm everything from scratch",
+      "category": "operations_process",
+      "subtype": "no_sop",
+      "quick_ideas": [
+        "Put the specs, accessories and packing instructions of your main programme in one folder, so the next reorder starts there",
+        "Note what had to be reconfirmed last time, so those details get written down first"
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A programme library storing specs, accessories and packing instructions, so a reorder opens with everything already filled in.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "What each programme record holds and how reorders are set up is set out in the solution document."
+    },
+    {
+      "id": "p6_supplier_late",
+      "n": 6,
+      "words": "Processing house we outsource to is always behind",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_late",
+      "quick_ideas": [
+        "List what is with each outside party today and when it is due back, so you see what is overdue",
+        "Note the last few late returns and the delay each time, so the conversation with them uses facts"
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "An outsourced job tracker showing what is at each processing or stitching party and flagging anything not back on time.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How dispatches and returns are recorded and flagged is covered in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Hotels order irregularly and pay late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Make one list of each hotel client's balance and oldest bill, so you know where to start",
+        "Note each hotel's usual reorder gap, so you can call before they run short"
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "customer_messaging A statement of account per hotel client with scheduled reminders, plus par-level reorder prompts sent on WhatsApp with their permission.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing and how par levels are set per hotel are kept for the solution document."
+    },
+    {
+      "id": "p8_multi_channel_orders",
+      "n": 8,
+      "words": "Online orders on Daraz/noon and shop orders get mixed up",
+      "category": "orders_fulfilment",
+      "subtype": "multi_channel_orders",
+      "quick_ideas": [
+        "Gather all open orders from every channel into one list once, so nothing is missed today",
+        "Keep separate shelves for marketplace orders being packed, so they do not mix with shop stock"
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "integration A single order inbox pulling marketplace and shop orders into one list, tracked to dispatch.",
+        "tool_words": [
+          "integration"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "How each channel connects in is mapped in the solution document."
+    },
+    {
+      "id": "p9_seasonal_planning",
+      "n": 9,
+      "words": "Wedding-season bedding sets sold out, then leftover after season",
+      "category": "planning_growth",
+      "subtype": "seasonal_planning",
+      "quick_ideas": [
+        "Write down what sold out and what was left after last season, by design, so you plan from facts",
+        "Note when each design started and stopped selling, so production can start at the right time"
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "Seasonal sales history by design that guides how much of each to produce before the next season.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How the history is read into a production plan is detailed in the solution document."
+    },
+    {
+      "id": "p10_data_scattered",
+      "n": 10,
+      "words": "Every report comes from three different sheets",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Decide the few weekly numbers you actually need, so the report has a purpose",
+        "Have one person own that report this week, so you stop assembling it yourself"
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "An owner weekly summary of output, dispatches, stock by grade and receivables pulled together automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Which numbers go in and where each comes from is set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any advice on dye chemistry, wastewater or environmental compliance, product certifications or label claims. Any help with false fibre content or origin labelling, or misdeclaring shipments. Any customs, tax or export incentive advice; suggest an accountant. Any judgement on who is right in a chargeback dispute. Any guarantee that GSM, shade or packing errors will stop. Storing hotel staff, retail buyer or employee personal details."
+  ],
+  "sample_reply": {
+    "person": "Our towels keep failing GSM with one buyer and we can't tell which batch is the problem. Is there a fix?",
+    "pi": "Yes, this is very fixable, and you can start this week. 1 Check GSM on every batch for one week and note the loom and dye lot each came from, so the source of the variation shows up. 2 Keep one approved reference piece at packing, so every checker compares against the same standard. Workzap can do this automatically for you: a batch record for every dye lot with GSM and QC result linked to the order, so every batch is checked and traceable. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

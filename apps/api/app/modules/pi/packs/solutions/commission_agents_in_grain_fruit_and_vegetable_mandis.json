@@ -1,0 +1,219 @@
+{
+  "industry": "commission_agents_in_grain_fruit_and_vegetable_mandis",
+  "name": "Commission agents (arhti) in grain, fruit and vegetable mandis",
+  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_complaints",
+      "n": 1,
+      "words": "Farmers accuse us of selling their lot at a lower rate than the boli",
+      "category": "customers_retention",
+      "subtype": "complaints",
+      "quick_ideas": [
+        "Give the farmer a slip with the boli rate at the moment of sale, so the record exists before any doubt",
+        "Keep a copy of every slip by date."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "A digital parchi that sends the farmer the lot, weight, boli rate and deductions on WhatsApp instantly, with their permission.",
+        "tool_words": []
+      },
+      "ask_first": "Who writes the rate at the time of boli?",
+      "free_stops": "How the digital parchi is set up for your shop goes in the solution document."
+    },
+    {
+      "id": "p2_manual_work",
+      "n": 2,
+      "words": "Parchis go missing and the munshi rewrites them from memory",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Photograph every parchi into one WhatsApp group the same day, so nothing depends on paper surviving",
+        "Number parchis in sequence."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Parchis entered once on phone and posted straight to the farmer and buyer ledgers, with nothing to rewrite.",
+        "tool_words": []
+      },
+      "ask_first": "How many munshis write parchis?",
+      "free_stops": "How entries flow to the ledgers is detailed in the solution document."
+    },
+    {
+      "id": "p3_credit_customers",
+      "n": 3,
+      "words": "Buyers take maal on credit and some vanish after the season",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List every buyer's balance by age, so the risk is visible before the season ends",
+        "Set a credit limit per buyer and stop fresh credit past it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A buyer ledger with credit limits, ageing and polite reminder messages through the season.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how much of your selling is on credit?",
+      "free_stops": "Limits and reminder rules are kept for the solution document."
+    },
+    {
+      "id": "p4_receivables_late",
+      "n": 4,
+      "words": "I've given peshgi to farmers who then sell through another arhti",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every peshgi with date and the crop it was given against, so you know what is owed back",
+        "Share the balance with the farmer when the crop comes in."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A peshgi tracker linking each advance to the produce the farmer brings in, showing what remains outstanding.",
+        "tool_words": []
+      },
+      "ask_first": "How do you keep track of peshgi now?",
+      "free_stops": "How advances and arrivals are linked goes in the solution document."
+    },
+    {
+      "id": "p5_cash_mismatch",
+      "n": 5,
+      "words": "Cash in the phari doesn't match the bahi at night",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Count cash against the day's entries every evening at a fixed time, so a gap is caught the same day",
+        "Note each payout as it happens."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "An end-of-day cash close against the day's sales and payments, with a mismatch alert.",
+        "tool_words": []
+      },
+      "ask_first": "Who handles cash at the shop?",
+      "free_stops": "How the cash close is built is part of the solution document."
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "Deductions for palledari and fees are calculated differently each time",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Write the deduction rules on one sheet and hang it where munshis work, so everyone uses the same logic",
+        "Check a few parchis this week against it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A deduction calculator with fixed rules applied to every parchi automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Which deduction causes the most disputes?",
+      "free_stops": "How the rules are set up in the calculator is detailed in the solution document."
+    },
+    {
+      "id": "p7_manual_reports",
+      "n": 7,
+      "words": "Farmers want their account statement and it takes the munshi a day",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Keep one running page per farmer account, so a statement is a copy, not a calculation",
+        "Settle the most frequent requesters first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A farmer ledger with sales, deductions, peshgi and payments, giving a one-tap statement.",
+        "tool_words": []
+      },
+      "ask_first": "How often do you settle with farmers?",
+      "free_stops": "The statement design goes in the solution document."
+    },
+    {
+      "id": "p8_orders_lost",
+      "n": 8,
+      "words": "Buyers from other cities order on WhatsApp and orders get missed",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Write every outside order into one list the same day, so nothing lives only in chat",
+        "Confirm each order back before dispatch."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "WhatsApp order intake for outside buyers linked to dispatch and truck tracking.",
+        "tool_words": []
+      },
+      "ask_first": "How many outside buyers order regularly?",
+      "free_stops": "How orders link to dispatch is kept for the solution document."
+    },
+    {
+      "id": "p9_data_loss",
+      "n": 9,
+      "words": "Everything is in bahi, if it's lost we lose everything",
+      "category": "tech_systems",
+      "subtype": "data_loss",
+      "quick_ideas": [
+        "Photograph the current bahi pages and keep them in a second safe place",
+        "Do it weekly from now on."
+      ],
+      "workzap_build": {
+        "keys": [
+          "erp_nori_platform"
+        ],
+        "text": "The bahi, ledgers and parchis on nori with cloud backup and a records export for the accountant.",
+        "tool_words": []
+      },
+      "ask_first": "Does anyone else in the family use the bahi?",
+      "free_stops": "How the move from bahi happens is detailed in the solution document."
+    },
+    {
+      "id": "p10_succession_family",
+      "n": 10,
+      "words": "My son wants to computerise but my father trusts only the bahi",
+      "category": "planning_growth",
+      "subtype": "succession_family",
+      "quick_ideas": [
+        "Run the new record beside the bahi for one season, so trust is built by comparison",
+        "Let the elder check that both match."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "An owner dashboard with today's sales, commission, cash, receivables and munshi-wise entries, readable by every family member who is given access.",
+        "tool_words": [
+          "dashboard"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "Who in the family runs the shop day to day?",
+      "free_stops": "How the side-by-side transition is run goes in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any prediction of mandi rates or advice on when to sell. Advice on mandi rules, market committee regulations, licences, permitted commissions, interest on peshgi or tax. Any help fixing boli rates, under-reporting sales, faking parchis or weights, or laundering cash. Pressure or threat tactics for recovery from farmers or buyers. Storing farmers', buyers' or labourers' names, CNICs, phone numbers or land details."
+  ],
+  "sample_reply": {
+    "person": "Tees saal se arhat ki dukaan hai. Zamindar kehte hain boli zyada lagi aur hum ne kam likhi. Is ka koi hal batao.",
+    "pi": "Ji, is bharose ko record se mazboot kiya ja sakta hai. 1 Boli ke waqt hi zamindar ko rate wali parchi de dein, taake shak se pehle saboot maujood ho. 2 Har parchi ki photo usi din ek jagah mehfooz kar lein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: digital parchi jo boli hote hi lot, wazan, rate aur katauti zamindar ko unki ijazat se WhatsApp pe bhej de. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

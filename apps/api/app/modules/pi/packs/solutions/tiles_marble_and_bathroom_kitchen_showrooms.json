@@ -1,0 +1,242 @@
+{
+  "industry": "tiles_marble_and_bathroom_kitchen_showrooms",
+  "name": "Tiles, marble and bathroom/kitchen showrooms",
+  "sector": "7.A Retail and consumer (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_serial_batch_tracking",
+      "n": 1,
+      "words": "Customer bought tiles in two lots and the shades don't match on the wall",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Record batch and shade for every design currently in stock, because the system only knows the design code",
+        "Agree a rule that one order comes from one batch, because \"closest to the door\" mixes lots."
+      ],
+      "workzap_build": {
+        "keys": [
+          "erp_nori_platform"
+        ],
+        "text": "stock by design, size, batch, shade and caliber with location, so every order is allocated from one batch and repeat orders know which batch the client had.",
+        "tool_words": []
+      },
+      "ask_first": "Does your system record batch today, or only the design?",
+      "free_stops": "the batch allocation rules and warehouse flow are kept for the solution document."
+    },
+    {
+      "id": "p2_wrong_location",
+      "n": 2,
+      "words": "Slabs in the yard, we don't know which are reserved or sold",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Walk the yard once and mark each slab as free, reserved or sold, because it shows what's really available",
+        "Photograph every slab with its dimensions, because it ends \"which one was it\" arguments."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "stock_alerts"
+        ],
+        "text": "a slab register with photos, dimensions, rack location, reserved or sold status and an offcut log.",
+        "tool_words": []
+      },
+      "ask_first": "What happens to offcuts today?",
+      "free_stops": "the slab register structure is kept for the solution document."
+    },
+    {
+      "id": "p3_shrinkage_theft",
+      "n": 3,
+      "words": "Breakage in the warehouse and in delivery, no record of who broke what",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Record every breakage for a month by stage (receiving, warehouse, loading, site), because it shows where it really happens",
+        "Photograph loads before they leave, because it settles site disputes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "a breakage log by stage with photos and monthly cost.",
+        "tool_words": []
+      },
+      "ask_first": "Where do you think most breakage happens?",
+      "free_stops": "the logging process and reporting go in the solution document."
+    },
+    {
+      "id": "p4_manual_work",
+      "n": 4,
+      "words": "Quotes for a full villa take days and have quantity mistakes",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Keep your last few big quotes as starting points, because rooms repeat",
+        "Have a second person check quantities, because errors are costly after cutting."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a room-by-room quotation builder with area plus wastage allowance, linked to live stock and prices, as a PDF.",
+        "tool_words": []
+      },
+      "ask_first": "How long does a full project quote take today?",
+      "free_stops": "the quote builder design is kept for the solution document."
+    },
+    {
+      "id": "p5_lead_followup_slow",
+      "n": 5,
+      "words": "Quote follow-ups get forgotten and the client goes elsewhere",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "List every open quote with the date sent, because it shows which have gone cold",
+        "Note why lost quotes were lost, because reasons repeat."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "a quote pipeline with follow-up reminders and won or lost reasons.",
+        "tool_words": []
+      },
+      "ask_first": "Who follows up on quotes now?",
+      "free_stops": "follow-up timings and stages go in the solution document."
+    },
+    {
+      "id": "p6_rework",
+      "n": 6,
+      "words": "Countertop measurements are wrong and the slab is cut wrong",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Record the cause of every recent re-cut, because it shows whether it starts at site or in the workshop",
+        "Get measurements checked before cutting, because a slab can't be uncut."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "site measurement capture on tablet linked to the fabrication job, with re-cuts logged by cause.",
+        "tool_words": []
+      },
+      "ask_first": "Who takes site measurements?",
+      "free_stops": "the measurement-to-workshop process is kept for the solution document."
+    },
+    {
+      "id": "p7_delivery_late",
+      "n": 7,
+      "words": "Installer teams don't show up on the agreed day",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Put every booked installation on one list, because clashes become visible",
+        "Confirm with the installer the day before, because surprises drop."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling",
+          "job_tracking"
+        ],
+        "text": "an installer schedule with job cards, photos and client sign-off.",
+        "tool_words": []
+      },
+      "ask_first": "Do you install yourselves or through partners?",
+      "free_stops": "scheduling rules and the sign-off flow go in the solution document."
+    },
+    {
+      "id": "p8_import_delays",
+      "n": 8,
+      "words": "Container delayed and the project waits",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "List every container on order with expected dates and the projects waiting on it, because it shows which clients to warn",
+        "Check freight and clearance costs on the last container, because they're often missing from prices."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a container tracker from order to warehouse, with costs landed into item cost.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you import directly?",
+      "free_stops": "the tracker and landed-cost method are kept for the solution document; duty questions go to your clearing agent."
+    },
+    {
+      "id": "p9_receivables_late",
+      "n": 9,
+      "words": "Developers pay on long credit and retentions are held",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every project's balance and retention with its age, because it shows what's really owed",
+        "Match invoices to delivery notes once, because missing papers delay payment."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a project receivables and retention tracker with ageing and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How do project clients usually pay?",
+      "free_stops": "the tracking setup goes in the solution document; disputes go to your lawyer."
+    },
+    {
+      "id": "p10_commission_disputes",
+      "n": 10,
+      "words": "Architect commissions are calculated by hand and disputed",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write down the agreed basis for each trade partner, because disputes start where it's unclear",
+        "Tie each referral to its project, because otherwise attribution is guesswork."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a trade-partner ledger showing referrals, projects and amounts due.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many architects or designers refer to you?",
+      "free_stops": "ledger setup is kept for the solution document; tax treatment goes to your accountant."
+    },
+    {
+      "id": "p11_margin_unknown",
+      "n": 11,
+      "words": "We don't know margin per project after cutting, wastage and installation",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out the real margin on one finished project, because it shows where money leaks",
+        "Record wastage and installation cost on the next one, because they're usually missing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "margin per project including freight, wastage, fabrication and installation.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Can you see the cost of a finished project today?",
+      "free_stops": "the margin model goes in the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on structural loading, waterproofing, slip resistance, installation safety or material suitability. For a site or workshop accident, anything other than \"call emergency services\". Help with fake or inflated invoices, hidden kickbacks or misdeclared imports. Advice on import duty, classification or the tax treatment of referral fees. Legal advice on contract or retention disputes."
+  ],
+  "sample_reply": {
+    "person": "Our biggest headache is shade variation. Clients come back for more and the new batch is a different shade. What can we do?",
+    "pi": "Yes, this is very solvable. 1. Record batch and shade for every design in stock, because the system only tracks design codes. 2. Agree a rule that each order comes from a single batch, so boxes aren't picked by whatever is nearest. Workzap can do this automatically for you: stock held by batch and shade, every order allocated from one batch, and repeat orders matched to the batch the client had. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

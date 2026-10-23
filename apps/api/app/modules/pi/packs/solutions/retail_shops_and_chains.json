@@ -1,0 +1,247 @@
+{
+  "industry": "retail_shops_and_chains",
+  "name": "Retail shops and chains (general merchandise, multi-branch)",
+  "sector": "7.A Retail and consumer (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_footfall_low",
+      "n": 1,
+      "words": "Log shop mein aate hi nahi, footfall gir gayi hai",
+      "category": "sales_revenue",
+      "subtype": "footfall_low",
+      "quick_ideas": [
+        "Refresh each branch's Google Maps listing with current photos and hours, because many walk-ins start with a nearby search",
+        "Count walk-ins at the door by hand for a few days, so you know whether footfall is really down and at which hours."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "attribution_codes"
+        ],
+        "text": "regular WhatsApp messages to opted-in customers for each branch, each with its own branch code, so you see every week which message brought people into which outlet.",
+        "tool_words": []
+      },
+      "ask_first": "Is the drop at every branch or mainly one location?",
+      "free_stops": "Which messages, codes and timings per branch, and how visits are tracked back to them, are in the solution document."
+    },
+    {
+      "id": "p2_conversion_low",
+      "n": 2,
+      "words": "Log aate hain, dekhte hain aur bina khareede chale jaate hain",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Compare a week of hand-counted walk-ins against the number of bills, so you see which branch and hours lose browsers",
+        "Keep a sheet at the counter for items and sizes customers asked for but you didn't have, because the reason is often a missing piece rather than price."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read",
+          "dashboards_reports"
+        ],
+        "text": "a morning read per branch showing walk-ins against bills, basket size and the \"asked for but not available\" list, every day, side by side.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you have any count of how many people walk in each day?",
+      "free_stops": "How walk-ins and lost sales are captured at the counter and turned into the daily read is in the solution document."
+    },
+    {
+      "id": "p3_count_mismatch",
+      "n": 3,
+      "words": "Every stock count, the main branch is short and nobody can explain it",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count one high-risk category in the worst branch yourself, so you know whether the gap is concentrated or spread out",
+        "Check whether returns, damages and transfers out are written down, since many \"shortages\" are unrecorded movements."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "stock_alerts"
+        ],
+        "text": "short daily counts by category on phone with photos, compared automatically with system stock, with the gap tracked per branch and category over time.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "Is the shortage mostly in certain types of maal?",
+      "free_stops": "Which categories to count on which days, and how gaps are flagged, are in the solution document."
+    },
+    {
+      "id": "p4_transfers_lost",
+      "n": 4,
+      "words": "Maal godown se branch bhejte hain, branch kehti hai aaya hi nahi",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Match last month's transfer notes against what each branch says it received, so you see how big the gap really is",
+        "Ask the receiving branch to confirm the next few transfers the same day, so lost notes stop hiding the problem."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a request, dispatch and receive flow on phone where branches tick items in, and anything not received within a set time is flagged to you automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Do transfers go with a paper slip today, or only by phone?",
+      "free_stops": "The transfer steps, who confirms what and the alert timings are in the solution document."
+    },
+    {
+      "id": "p5_stockout",
+      "n": 5,
+      "words": "Ek branch mein fast movers khatam, doosri mein dher laga hai",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Get every branch's count of just your top sellers on one day, so you see where stock is sitting",
+        "Move extra from the fuller branch before buying more, so cash isn't tied up in duplicates."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "transfer_tracking"
+        ],
+        "text": "branch-level stock with reorder levels, an alert when a fast mover runs low anywhere, and a suggested transfer from the branch holding extra.",
+        "tool_words": []
+      },
+      "ask_first": "Is there a central godown, or does each branch buy for itself?",
+      "free_stops": "Reorder levels per item and branch, and how transfers are suggested, are in the solution document."
+    },
+    {
+      "id": "p6_overstock_dead_stock",
+      "n": 6,
+      "words": "A whole room of stuff hasn't sold in a year",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "List the dead stock by rough age once, so you know how much money is sitting there",
+        "Send some of it to a branch where similar items still sell, because a slow item in one area can move in another."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a dead-stock report by age and branch, refreshed automatically, with suggested transfers to branches where each item still sells.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Are these items barcoded or recorded anywhere?",
+      "free_stops": "The ageing rules and how transfer suggestions are worked out are in the solution document."
+    },
+    {
+      "id": "p7_cash_mismatch",
+      "n": 7,
+      "words": "Closing cash never matches the POS by a few thousand",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Count each drawer at shift change for a few days, so a gap points to a shift instead of the whole day",
+        "Separate cash, card and wallet totals on the closing sheet, so one doesn't hide another."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily closing entry on phone compared automatically with the POS, the gap logged per counter, shift and branch, plus days since each branch last deposited.",
+        "tool_words": []
+      },
+      "ask_first": "Is the gap usually the same branch or counter?",
+      "free_stops": "The closing steps, gap limits and deposit alerts are in the solution document."
+    },
+    {
+      "id": "p8_discount_abuse",
+      "n": 8,
+      "words": "Managers give discounts to their own people",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Pull one month's POS discount report by branch, so you see patterns rather than suspicions",
+        "Write down who may give what discount, so managers know the rule exists."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an approval step for discounts above the rule, with voids, returns and discounts logged by counter and shift and alerts when one stands out.",
+        "tool_words": []
+      },
+      "ask_first": "Does your POS record who applied each discount?",
+      "free_stops": "The approval rules, thresholds and exception alerts are in the solution document."
+    },
+    {
+      "id": "p9_reports_late",
+      "n": 9,
+      "words": "Branch reports come a week late, each in a different format",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "Decide the handful of numbers you need every morning, so branches know what matters",
+        "Ask all branches for those same numbers once this week, so you can compare them side by side for the first time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "one WhatsApp message each morning with yesterday's sales, cash vs card, top and bottom items and stock issues for every branch, with no one compiling it.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do all branches use the same POS?",
+      "free_stops": "Which numbers go in the read and how they are pulled from each branch's system are in the solution document."
+    },
+    {
+      "id": "p10_turnover",
+      "n": 10,
+      "words": "Har mahine naye cashier train karne parte hain",
+      "category": "people_staff",
+      "subtype": "turnover",
+      "quick_ideas": [
+        "Ask the last few people who left what pushed them, because the reason is often fixable",
+        "Pair the next new joiner with one experienced person, so training doesn't vary by branch."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "field_checks"
+        ],
+        "text": "onboarding and opening/closing checklists on WhatsApp with photo proof, so routines run the same at every branch whoever is on shift.",
+        "tool_words": []
+      },
+      "ask_first": "Which role is hardest to keep filled?",
+      "free_stops": "The checklists and how missed items reach the area manager are in the solution document."
+    },
+    {
+      "id": "p11_no_online_ordering",
+      "n": 11,
+      "words": "People ask for online order and delivery and we have nothing",
+      "category": "customer_experience_digital",
+      "subtype": "no_online_ordering",
+      "quick_ideas": [
+        "Note how many people ask for delivery this week, so you know the demand is real",
+        "Put your top items in a WhatsApp Business catalogue, so customers can at least see and ask."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "website_digital"
+        ],
+        "text": "WhatsApp, phone and online orders in one place, linked to branch stock and tracked to delivery.",
+        "tool_words": []
+      },
+      "ask_first": "Which cities would you deliver to first?",
+      "free_stops": "How orders flow from each channel to the right branch and to delivery is in the solution document."
+    }
+  ],
+  "never_say": [
+    "That a specific cashier, manager or storekeeper is stealing, or how to watch staff secretly. Anything about FBR POS integration rules, sales tax, VAT or keeping separate books. Lease, rent negotiation or employment law advice. That a listing, display or message will bring a certain number of customers or lift sales. To confront or detain shoplifters; for threats or violence, contact the police first."
+  ],
+  "sample_reply": {
+    "person": "Hamari teen clothing branches hain, Tariq Road wali mein log aate hi kam hain, aur jo aate hain woh bhi dekh ke chale jaate hain. Koi solution batayein.",
+    "pi": "Ji haan, is pe kaafi kuch kiya ja sakta hai, aur shuruaat isi hafte ho sakti hai. 1 Tariq Road branch ki Google Maps listing naye photos aur sahi timing ke saath update karein, kyunke bohot log nazdeeki search se hi aate hain. 2 Kuch din darwaze pe aane walon ki ginti aur bills ki ginti mila ke dekhein, taa ke pata chale kis waqt log bina khareede jaate hain. Workzap ye sab aap ke liye khud-ba-khud kar sakta hai: har branch ka subah ka report jis mein footfall, bills aur \"maanga lekin nahi mila\" ek jagah dikhe, aur customers ki ijazat se un ko branch code wale WhatsApp messages. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

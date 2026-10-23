@@ -1,0 +1,219 @@
+{
+  "industry": "cafes_and_coffee_shops",
+  "name": "Cafés and coffee shops",
+  "sector": "7.B Food and beverage",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_expiry_wastage",
+      "n": 1,
+      "words": "Pastries left at closing every day, we bin them",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Note ordered, sold and binned for each pastry for a week, so the next order isn't a guess",
+        "Order less early in the week than at the weekend, because demand isn't the same every day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a tablet wastage log for pastries and milk that shows the trend by item and day automatically and suggests tomorrow's order from what actually sold.",
+        "tool_words": []
+      },
+      "ask_first": "Are pastries baked in-house or bought in?",
+      "free_stops": "How order quantities are set by day and season is detailed in the solution document."
+    },
+    {
+      "id": "p2_margin_unknown",
+      "n": 2,
+      "words": "I don't know my cost per cup, and bean prices went up",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Cost your best-selling drinks once from your latest bills, so you see which ones have slipped",
+        "Review prices on the thinnest drinks first, where the gap matters most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a cost-per-cup sheet that updates when bean, milk and cup prices change and flags drinks below your target margin.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "When did you last change menu prices?",
+      "free_stops": "The costing breakdown and repricing approach go in the solution document."
+    },
+    {
+      "id": "p3_stockout",
+      "n": 3,
+      "words": "Oat and almond milk run out on weekends, and milk bills keep rising",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Check milk, bean and cup stock on Thursday evening, so the weekend starts full",
+        "Note steamed milk thrown away each shift, because over-filled jugs quietly add up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "par levels for milks, beans, syrups and cups with automatic WhatsApp reorder alerts when anything falls low.",
+        "tool_words": []
+      },
+      "ask_first": "Who checks stock and places orders now?",
+      "free_stops": "The par levels and reorder points per item are set in the solution document."
+    },
+    {
+      "id": "p4_consistency_across_branches",
+      "n": 4,
+      "words": "Coffee tastes different depending on which barista is on, and good baristas leave",
+      "category": "quality_complaints",
+      "subtype": "consistency_across_branches",
+      "quick_ideas": [
+        "Put each drink's recipe in writing at the bar, so taste doesn't depend on who's on",
+        "Ask your best barista what would make them stay, because they rarely say it unless asked."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "recipe cards with photos shared to every new barista, and a daily dial-in check recorded each morning across outlets.",
+        "tool_words": []
+      },
+      "ask_first": "How are recipes taught to new staff now?",
+      "free_stops": "The recipe standards and training flow stay for the solution document."
+    },
+    {
+      "id": "p5_bottleneck",
+      "n": 5,
+      "words": "Morning queue is too long, and office coffee orders on WhatsApp get missed",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Split one person on orders and payment and one on the machine at the rush, so neither waits on the other",
+        "Ask office customers to order by a set time, so their runs don't collide with walk-ins."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a WhatsApp or web pre-order flow with ready-time slots, so office runs and regulars are queued automatically and none are missed.",
+        "tool_words": []
+      },
+      "ask_first": "What time is your busiest rush?",
+      "free_stops": "The pre-order flow and slot set-up are described in the solution document."
+    },
+    {
+      "id": "p6_basket_small",
+      "n": 6,
+      "words": "People sit for hours on one latte, and afternoons are empty",
+      "category": "sales_revenue",
+      "subtype": "basket_small",
+      "quick_ideas": [
+        "Try one afternoon pairing offer in your quietest hours, to give people a reason to come and spend",
+        "Keep a few tables for short stays at peak, so seating turns when it matters."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "sales by hour and top items every evening, so you see which offers actually lift the slow hours.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which hours are the quietest?",
+      "free_stops": "The offer plan by hour and how it's measured are kept for the solution document."
+    },
+    {
+      "id": "p7_cash_mismatch",
+      "n": 7,
+      "words": "Card machine and POS totals never match, and staff give free drinks to friends",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Compare the POS report with the card settlement at closing, so a gap is caught the same night",
+        "Ring every free drink through the POS, so giveaways are visible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a nightly close per outlet matching cash, card and POS, with free drinks and staff meals logged by shift.",
+        "tool_words": []
+      },
+      "ask_first": "Is the closing gap usually in cash or card?",
+      "free_stops": "The closing routine and free-drink rules are set out in the solution document."
+    },
+    {
+      "id": "p8_loyalty",
+      "n": 8,
+      "words": "No idea who our regulars are, and paper loyalty cards get faked",
+      "category": "customers_retention",
+      "subtype": "loyalty",
+      "quick_ideas": [
+        "Ask regulars if they'd like to join a loyalty list by phone number, with their permission, so stamps can't be faked",
+        "Notice and greet repeat faces, because recognition matters as much as the free drink."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "phone-number loyalty at the counter for customers who opt in, with visit history and abuse checks running automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How do you reward regulars now?",
+      "free_stops": "The loyalty rules and reward design go in the solution document."
+    },
+    {
+      "id": "p9_campaign_roi_unknown",
+      "n": 9,
+      "words": "Instagram gets likes but I can't tell if it brings people in",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Ask new customers at the till how they heard of you, because it's the cheapest measure there is",
+        "Run one Instagram-only offer, so you can count who came from it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "codes and links showing which post or message brought which customer, counted automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who runs your social pages?",
+      "free_stops": "How codes are set up per post and tracked through to the till stays for the solution document."
+    },
+    {
+      "id": "p10_owner_blind",
+      "n": 10,
+      "words": "Second outlet's numbers I only see when I go there",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Ask the outlet lead for sales and wastage at closing, so you see it the same night",
+        "Visit at its busiest hour, not when it's quiet, to see it at its real pressure."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a short morning read with both outlets' sales by hour, average ticket and wastage, and the one thing to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do both outlets use the same POS?",
+      "free_stops": "What goes into the daily read and how it's pulled from each POS is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about allergens, dairy alternatives for health reasons, or caffeine and health claims. Food-safety or licensing advice, or how to handle a lease dispute — refer to the authority or a lawyer. Help writing fake reviews or bulk-follow schemes. Covert monitoring of baristas. That an offer or loyalty scheme will bring a set increase in sales."
+  ],
+  "sample_reply": {
+    "person": "honestly I need a fix for pastries. we throw out so many every night and I just guess the order each morning.",
+    "pi": "Yes, this is very fixable, and you can start this week. 1 Note how many of each pastry came in, sold and got binned for seven days, so the order stops being a guess. 2 Order less early in the week than at the weekend, because demand isn't the same every day. Workzap can do this automatically for you, logging wastage on a tablet and showing the trend by item and day, so each morning's order is based on what actually sold. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

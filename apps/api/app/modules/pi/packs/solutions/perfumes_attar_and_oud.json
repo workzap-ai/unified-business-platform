@@ -1,0 +1,220 @@
+{
+  "industry": "perfumes_attar_and_oud",
+  "name": "Perfumes, attar and oud",
+  "sector": "7.A Retail and consumer (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_count_mismatch",
+      "n": 1,
+      "words": "Oils sold by tola are measured by eye and the stock never balances",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Weigh your open oil bottles once and compare with recorded sales, because it shows how far off the measuring is",
+        "Start measuring loose sales instead of judging by eye, because small overpours add up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "stock_alerts"
+        ],
+        "text": "oil stock in ml or tola per grade, deducted with each sale, with automatic variance checks and low-stock alerts per outlet.",
+        "tool_words": []
+      },
+      "ask_first": "Which grades are sold loose?",
+      "free_stops": "the measuring routine and variance limits go in the solution document."
+    },
+    {
+      "id": "p2_theft_internal",
+      "n": 2,
+      "words": "Expensive oud oil goes missing in small amounts",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Weigh your top-grade bottles at one shift change, because it tells you which shift the loss falls in",
+        "Limit who can open top grades, because fewer hands make gaps traceable."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a weigh-in at every shift change on phone for high-value oils, with variance flagged to the owner by outlet and shift.",
+        "tool_words": []
+      },
+      "ask_first": "How many people handle the top grades?",
+      "free_stops": "the control routine and access rules are kept for the solution document."
+    },
+    {
+      "id": "p3_no_sop",
+      "n": 3,
+      "words": "Only the master blender knows the recipes, and the same blend smells different each batch",
+      "category": "operations_process",
+      "subtype": "no_sop",
+      "quick_ideas": [
+        "Get your best-selling blend's ratio written down with the blender, because one recorded recipe is the start",
+        "Give each new batch a number, because it lets you trace a complaint."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a recipe book with ratios, batch number, maker and date, with access limited to people the owner chooses.",
+        "tool_words": []
+      },
+      "ask_first": "Is any recipe written down today?",
+      "free_stops": "how recipes are recorded, protected and linked to batches is detailed in the solution document."
+    },
+    {
+      "id": "p4_raw_material_shortage",
+      "n": 4,
+      "words": "We run out of bottles, caps or boxes before Eid",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "Count your packaging now and compare with what last Eid used, because the gap is your order",
+        "Ask suppliers their Ramadan lead time, because it sets your real order date."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "packaging stock with reorder alerts timed to the season ahead, for every outlet.",
+        "tool_words": []
+      },
+      "ask_first": "How far ahead do you order packaging today?",
+      "free_stops": "reorder levels and seasonal timing go in the solution document."
+    },
+    {
+      "id": "p5_cash_mismatch",
+      "n": 5,
+      "words": "Kiosk cash doesn't match, and every kiosk reports on WhatsApp differently",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Agree one closing format for all kiosks, because mixed formats can't be compared",
+        "Check one kiosk's slips against its cash, because it shows whether the gap is general or local."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation",
+          "nori_daily_read"
+        ],
+        "text": "a kiosk close on phone sent automatically to the owner, cash matched to sales, and one morning read across all outlets.",
+        "tool_words": []
+      },
+      "ask_first": "How many kiosks or shops do you run?",
+      "free_stops": "the close-out fields and checks are kept for the solution document."
+    },
+    {
+      "id": "p6_wastage_cost",
+      "n": 6,
+      "words": "Staff give away too many samples and decants",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Record samples given for one week, because it shows the real cost",
+        "Agree a daily sample allowance per kiosk, because it gives staff a clear limit."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "a sample and decant log per staff member with monthly cost by outlet.",
+        "tool_words": []
+      },
+      "ask_first": "Are samples recorded anywhere today?",
+      "free_stops": "allowance rules and reporting go in the solution document."
+    },
+    {
+      "id": "p7_pre_orders_custom",
+      "n": 7,
+      "words": "Corporate gift orders with custom boxes and names miss deadlines",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Put all open corporate orders on one list with delivery dates, because clashes become visible",
+        "Get written sign-off before production, because late changes cause most misses."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a gift and corporate order tracker with custom details, approval, stage and delivery date.",
+        "tool_words": []
+      },
+      "ask_first": "How do corporate orders reach you?",
+      "free_stops": "the order stages and approval flow are kept for the solution document."
+    },
+    {
+      "id": "p8_rent",
+      "n": 8,
+      "words": "Mall kiosk rent is eating the profit and I don't know which kiosk pays",
+      "category": "margin_cost",
+      "subtype": "rent",
+      "quick_ideas": [
+        "Put each kiosk's sales, rent and staff cost side by side once, because it shows which carry the others",
+        "Talk to your accountant before any lease decision."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "outlet comparison of sales against rent and staff cost per kiosk, updated monthly.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Are your kiosks in the same mall or different ones?",
+      "free_stops": "the comparison model is set up in the solution document."
+    },
+    {
+      "id": "p9_customer_communication",
+      "n": 9,
+      "words": "Customers loved a scent and we can't tell them when it's back",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Start a \"tell me when it's back\" list, saving numbers only with permission",
+        "Note which scents people ask for most, because those drive restock orders."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a consented scent preference list with restock and festival messages sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Which scents run out most often?",
+      "free_stops": "the messaging plan is kept for the solution document."
+    },
+    {
+      "id": "p10_receivables_late",
+      "n": 10,
+      "words": "Wholesale buyers take goods on credit and pay late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Total what each wholesale buyer owes and for how long, because it shows who to chase first",
+        "Agree credit limits before the season, because limits are easier set early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a wholesale credit ledger with ageing and automatic WhatsApp reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How many wholesale buyers take credit?",
+      "free_stops": "limits and reminder timing go in the solution document."
+    }
+  ],
+  "never_say": [
+    "Help to sell clones as genuine branded perfume, or to make fake branded labels or boxes. Whether \"inspired\" names or packaging are legal; say \"check with a lawyer\". Any advice on ingredient safety, allergies or skin reactions; a serious reaction means emergency care. Dangerous-goods advice for shipping or storing alcohol-based perfume; say \"check with your courier or adviser\". Help bypassing customs on oud wood or oils."
+  ],
+  "sample_reply": {
+    "person": "I run six mall kiosks and every night I get sales on WhatsApp in different formats, some totals, some photos of slips. What can I do?",
+    "pi": "Yes, this is very fixable. 1. Agree one closing format for all kiosks, because mixed formats can't be compared. 2. Check one kiosk's slips against its cash, which shows whether the gap is general or local. Workzap can do this automatically for you: each kiosk closes on a phone, cash is matched to sales, and you get one morning summary across every outlet. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

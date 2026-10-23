@@ -1,0 +1,219 @@
+{
+  "industry": "seed_fertiliser_and_pesticide_dealers",
+  "name": "Seed, fertiliser and pesticide dealers",
+  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_credit_customers",
+      "n": 1,
+      "words": "Half my money is stuck with farmers until the harvest",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Total the udhaar by village from the khata, so you see where the money is actually stuck",
+        "Decide who gets fresh credit this season by looking at last season's repayment, not memory."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A farmer credit ledger by account code, with balances by village and harvest season updated with every sale and payment.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how much of your selling is on udhaar?",
+      "free_stops": "How accounts, limits and the village view are structured goes in the solution document."
+    },
+    {
+      "id": "p2_cash_mismatch",
+      "n": 2,
+      "words": "Khata balances don't match what the farmer says he owes",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Give each farmer a written balance when they pay, so disagreements surface early",
+        "Note every payment with the date the moment it is received."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A ledger that sends each farmer a WhatsApp statement after every purchase or payment, with their permission, so both sides see the same balance.",
+        "tool_words": []
+      },
+      "ask_first": "How often do balance disputes come up?",
+      "free_stops": "How statements are sent and confirmed is part of the solution document."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Recovery after the harvest is getting worse every year",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Sort balances by age, so the oldest and largest are followed up first",
+        "Plan recovery visits around each crop's harvest in each village."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A recovery tracker by season and village showing overdue balances and sending polite reminders at harvest time.",
+        "tool_words": []
+      },
+      "ask_first": "Does recovery mostly come after wheat, or spread across crops?",
+      "free_stops": "Reminder timing and the ageing view are kept for the solution document."
+    },
+    {
+      "id": "p4_expiry_wastage",
+      "n": 4,
+      "words": "Expired spray bottles sitting in the godown, company won't take them back",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Do one count of everything expiring in the coming months, so you can raise returns before it is too late",
+        "Move near-expiry stock to the front so older batches sell first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A stock register by product, batch and expiry that alerts you well before expiry and builds the return-to-company list.",
+        "tool_words": []
+      },
+      "ask_first": "Are batch and expiry dates recorded when stock arrives?",
+      "free_stops": "Alert timing and the return list are detailed in the solution document."
+    },
+    {
+      "id": "p5_stockout",
+      "n": 5,
+      "words": "Seed for the season ran out in the first week of sowing",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Look at last season's sales by product and week, so pre-season buying starts from facts",
+        "Note which items ran out first last time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A pre-season buying sheet built from past sales, with alerts when fast lines run low during the season.",
+        "tool_words": []
+      },
+      "ask_first": "Which season caused the shortage, Rabi or Kharif?",
+      "free_stops": "How the buying sheet is worked out from your sales goes in the solution document."
+    },
+    {
+      "id": "p6_credit_terms",
+      "n": 6,
+      "words": "Company scheme claims take months and some are never paid",
+      "category": "suppliers_purchasing",
+      "subtype": "credit_terms",
+      "quick_ideas": [
+        "List every open claim with date lodged and amount, so nothing is forgotten",
+        "Keep copies of the scheme terms with each claim."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A scheme and claim tracker showing targets, claims lodged and received, with reminders on old claims.",
+        "tool_words": []
+      },
+      "ask_first": "How many companies do you have schemes with?",
+      "free_stops": "The tracker setup and follow-up rules are part of the solution document."
+    },
+    {
+      "id": "p7_pricing_errors",
+      "n": 7,
+      "words": "Prices change weekly and staff sell at the old rate",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Keep one current rate list at the counter and date it, so staff know which is valid",
+        "Tell staff that only the dated list is used."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A central rate list pushed to every counter and branch the moment prices change, with rate history.",
+        "tool_words": []
+      },
+      "ask_first": "How many counters or branches do you have?",
+      "free_stops": "How rates are pushed and controlled is detailed in the solution document."
+    },
+    {
+      "id": "p8_theft_internal",
+      "n": 8,
+      "words": "Counter staff take cash and don't enter it",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Count the cash against the day's entries every evening, so a gap is caught the same day",
+        "Make the cash count a fixed routine everyone knows about."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A daily counter sales and cash close for each shop, flagging any mismatch the same evening.",
+        "tool_words": []
+      },
+      "ask_first": "How many people handle cash?",
+      "free_stops": "How the cash close is built for your counters is part of the solution document."
+    },
+    {
+      "id": "p9_orders_lost",
+      "n": 9,
+      "words": "Farmer orders come on WhatsApp voice notes and some get forgotten",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Have one person write each voice-note order into a list the same day",
+        "Confirm each order back to the farmer before dispatch."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "WhatsApp order intake that turns farmer messages into a dispatch list tracked to delivery.",
+        "tool_words": []
+      },
+      "ask_first": "Do you deliver to villages or do farmers collect?",
+      "free_stops": "How messages become tracked orders goes in the solution document."
+    },
+    {
+      "id": "p10_branch_comparison",
+      "n": 10,
+      "words": "Two shops, I don't know which one is making money",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Put one month of sales, credit outstanding and stock for each shop side by side, to get a first picture",
+        "Note which costs are shared between them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A branch dashboard showing sales, margin, credit outstanding and stock value per shop every day.",
+        "tool_words": [
+          "dashboard"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "Do both shops use the same register?",
+      "free_stops": "What the dashboard measures and how is kept for the solution document."
+    }
+  ],
+  "never_say": [
+    "Any product recommendation, dose, mix, spray timing or label interpretation, even to pass on to a farmer; refer to the manufacturer's agronomist or the agriculture extension department. Advice on licensing law, pesticide regulations, banned products, interest or markup on credit, or tax. Any help selling banned, counterfeit or smuggled products, relabelling expired stock, hoarding, overcharging or fake invoices. Pressure or threat tactics for recovery. Storing farmers' names, CNICs, phone numbers or land details; use account codes and counts."
+  ],
+  "sample_reply": {
+    "person": "Okara mein agro dealer hoon. Udhaar ki recovery ka koi pakka hal batao, aur log balance pe bhi jhagarte hain.",
+    "pi": "Ji, is ka pakka intezaam kiya ja sakta hai. 1 Khata se udhaar ko gaon aur purane-pan ke hisaab se alag kar lein, taake sab se purana aur bara balance pehle dekha jaaye. 2 Har adaigi pe kisan ko likha hua balance dein, taake ikhtilaaf usi waqt saamne aa jaaye. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har kisan ka account code pe hisaab, har lein-dein ke baad unki ijazat se WhatsApp statement, aur fasal ke waqt yaad-dihani. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

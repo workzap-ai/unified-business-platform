@@ -1,0 +1,197 @@
+{
+  "industry": "carpets_handicrafts_and_artisan_workshops",
+  "name": "Carpets, handicrafts and artisan workshops",
+  "sector": "7.D Manufacturing and industry (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_cash_flow_tight",
+      "n": 1,
+      "words": "Advances given to karigars and I don't know how much work is done against them",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "List each advance against the piece it was for — shows what's outstanding",
+        "Ask for a progress photo before the next advance — ties money to work."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "an advance ledger per artisan role or contractor, showing advance versus value of work done.",
+        "tool_words": []
+      },
+      "ask_first": "How are advances recorded now?",
+      "free_stops": "How work value is measured against advances is in the solution document."
+    },
+    {
+      "id": "p2_no_visibility",
+      "n": 2,
+      "words": "Contractor says 30 carpets are on looms but I can't verify",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Ask for a dated photo of each piece on the loom — gives you proof",
+        "List every piece with design, size and start date — one picture of WIP."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an artisan WIP board with progress photos and expected completion for every piece.",
+        "tool_words": []
+      },
+      "ask_first": "How do updates reach you today?",
+      "free_stops": "The update routine for home-based artisans is in the solution document."
+    },
+    {
+      "id": "p3_delivery_late",
+      "n": 3,
+      "words": "Export deadline missed and nobody told me",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Set milestones for each export order (on loom, off loom, washing, inspection) — shows slippage early",
+        "Check the slowest pieces each week — time to react."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an order tracker with milestones and alerts when progress lags.",
+        "tool_words": []
+      },
+      "ask_first": "Are most orders custom or from ready stock?",
+      "free_stops": "Milestone set-up is in the solution document."
+    },
+    {
+      "id": "p4_shrinkage_theft",
+      "n": 4,
+      "words": "Wool and dye given to artisans and some disappears",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Record what's issued per piece — makes each issue accountable",
+        "Record what comes back — shows the gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a raw-material issue log per piece with returns recorded.",
+        "tool_words": []
+      },
+      "ask_first": "Who buys the wool, you or the artisans?",
+      "free_stops": "The issue and return rules are in the solution document."
+    },
+    {
+      "id": "p5_product_defects",
+      "n": 5,
+      "words": "Buyer rejected pieces at inspection",
+      "category": "quality_complaints",
+      "subtype": "product_defects",
+      "quick_ideas": [
+        "Do your own inspection before the buyer's — catches defects first",
+        "Photograph each piece at inspection — evidence for later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a pre-shipment inspection checklist with photos per piece.",
+        "tool_words": []
+      },
+      "ask_first": "What do buyers reject most often?",
+      "free_stops": "The checklist content is in the solution document."
+    },
+    {
+      "id": "p6_no_visibility",
+      "n": 6,
+      "words": "Stock of finished carpets isn't photographed or catalogued",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Photograph and measure your finished pieces once — buyers can see what's available",
+        "Note location of each — finding them gets quicker."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "a finished-stock catalogue with photos, sizes, knot count and location, shareable as a link.",
+        "tool_words": []
+      },
+      "ask_first": "How do buyers see your stock now?",
+      "free_stops": "The catalogue set-up is in the solution document."
+    },
+    {
+      "id": "p7_multi_channel_orders",
+      "n": 7,
+      "words": "Online orders come from Etsy, Instagram, WhatsApp and the website",
+      "category": "orders_fulfilment",
+      "subtype": "multi_channel_orders",
+      "quick_ideas": [
+        "Put every channel's orders into one list — nothing missed",
+        "Make one person responsible — clear ownership."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a unified order inbox for Etsy, Instagram, website and WhatsApp.",
+        "tool_words": []
+      },
+      "ask_first": "Which channel sells most?",
+      "free_stops": "Channel connections are in the solution document."
+    },
+    {
+      "id": "p8_slow_response",
+      "n": 8,
+      "words": "International customers ask at night and we reply late",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Clear overnight questions first thing each morning — buyers hear back faster",
+        "Keep answers to common questions ready — speeds replies."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "after-hours acknowledgement collecting buyer questions for the morning, with response times tracked.",
+        "tool_words": []
+      },
+      "ask_first": "Which time zones are your buyers in?",
+      "free_stops": "The message flow is in the solution document."
+    },
+    {
+      "id": "p9_owner_bottleneck",
+      "n": 9,
+      "words": "Everything depends on me — designs, buyers, payments",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "List decisions only you make — shows what could be handed over",
+        "Hand one area to a trusted person — frees your time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read of pieces in progress, overdue pieces, advances outstanding, stock value and open orders.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which area takes most of your time?",
+      "free_stops": "Which figures and handovers to set up is in the solution document."
+    }
+  ],
+  "never_say": [
+    "No labour-law, minimum-wage or artisan contract advice. Child-labour concerns: never help hide them; point to emergency services and child-protection helplines if a child is at risk. No customs, export-regulation, tariff or authentication advice. Never help pass machine-made as hand-made, fake antiques, false origin labels or certificates, or under- invoice exports; decline. Never help trade endangered materials. No artisans' names, IDs, villages or phone numbers; roles and counts only."
+  ],
+  "sample_reply": {
+    "person": "Koi tareeqa batao. Karigaron ko peshgi deta hoon lekin pata nahi chalta kitna kaam hua hai.",
+    "pi": "Ji, is ka hisaab saaf kiya ja sakta hai. 1 Har peshgi ko us piece ke saath likhein jis ke liye di gayi, taake pata ho kitna baqi hai. 2 Agli peshgi se pehle loom par piece ki tareekh wali photo mangwayein, taake paisa kaam se jude. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: peshgi ledger aur WIP board jo har piece ki progress photos ke saath dikhaye ke kis ka kitna kaam hua aur kitni peshgi baqi hai. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

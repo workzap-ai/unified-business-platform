@@ -1,0 +1,222 @@
+{
+  "industry": "property_management_and_rentals",
+  "name": "Property management and rentals",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_bounced_cheques",
+      "n": 1,
+      "words": "Cheques bounce and we find out a week later",
+      "category": "cash_collections",
+      "subtype": "bounced_cheques",
+      "quick_ideas": [
+        "List this month's PDCs by deposit date, so you know which ones to watch",
+        "Check the bank the day after each deposit, so a bounce is caught at once."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A PDC register per unit that reminds you of every deposit date, flags bounces and starts follow-up the same day, kept without cheque numbers or bank details in chat.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many units are you collecting cheques for?",
+      "free_stops": "The register design and follow-up flow are in the solution document."
+    },
+    {
+      "id": "p2_receivables_late",
+      "n": 2,
+      "words": "Arrears keep building and nobody chases until it's three months",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Sort current arrears by how long they've been late, so the oldest get attention first",
+        "For long-running cases, take the process question to a lawyer or the rental dispute authority."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "customer_messaging"
+        ],
+        "text": "A rent roll on the phone with an arrears ageing list and WhatsApp reminders and receipts to tenants who opted in, every month.",
+        "tool_words": []
+      },
+      "ask_first": "At what point does someone start following up today?",
+      "free_stops": "Reminder timing and escalation steps are kept for the solution document."
+    },
+    {
+      "id": "p3_cash_handling_risk",
+      "n": 3,
+      "words": "Caretakers collect rent in cash and some doesn't reach us",
+      "category": "cash_collections",
+      "subtype": "cash_handling_risk",
+      "quick_ideas": [
+        "Give caretakers numbered receipt books, so every payment leaves a trace",
+        "Fix one hand-over time to the office, so cash doesn't sit around."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A caretaker collection log matched daily against expected rent per building, with office confirmation of every hand-over.",
+        "tool_words": []
+      },
+      "ask_first": "How do most tenants pay: cash, cheques or transfer?",
+      "free_stops": "The matching rules and variance flags are in the solution document."
+    },
+    {
+      "id": "p4_manual_reports",
+      "n": 4,
+      "words": "Owner statements take my accountant three days each month",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Use one fixed statement layout for every owner, so it's built the same way each time",
+        "Keep each property's expense receipts in one folder, so nothing is hunted for."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "Owner statements generated per property from the rent roll and expenses, sent on the same date every month.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How do your landlord clients get their statements now?",
+      "free_stops": "Statement structure and fee handling are in the solution document."
+    },
+    {
+      "id": "p5_info_lost_in_whatsapp",
+      "n": 5,
+      "words": "Maintenance requests come by WhatsApp, calls, everywhere, and get lost",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Give tenants one maintenance number, so requests arrive in one place",
+        "Close a job only when the tenant confirms it's fixed, so \"done\" means done."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Maintenance tickets from a WhatsApp flow with photos, assigned to a contractor, closed with photo proof, and a flag when the same fault returns.",
+        "tool_words": []
+      },
+      "ask_first": "How do tenants report a problem today?",
+      "free_stops": "Ticket categories and assignment rules are set out in the solution document."
+    },
+    {
+      "id": "p6_fraud",
+      "n": 6,
+      "words": "Contractors bill us for jobs I can't verify were done",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Pay a contractor invoice only against a logged request, so every bill has a reason",
+        "Ask for before and after photos on jobs, so work is provable."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "workflow_automation"
+        ],
+        "text": "Contractor invoices matched automatically to closed tickets, so only jobs with proof go for payment.",
+        "tool_words": []
+      },
+      "ask_first": "Who decides which contractor goes to a job?",
+      "free_stops": "The matching and approval rules are in the solution document."
+    },
+    {
+      "id": "p7_vacancy_high",
+      "n": 7,
+      "words": "Units sit empty for weeks between tenants",
+      "category": "sales_revenue",
+      "subtype": "vacancy_high",
+      "quick_ideas": [
+        "Start marketing a unit as soon as notice is given, not after move-out",
+        "Book the make-ready trades for the move-out date itself, so the unit isn't waiting on calls."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A make-ready checklist per unit that triggers each trade in turn with target days, and lease-end alerts so re-letting starts early.",
+        "tool_words": []
+      },
+      "ask_first": "What step takes the longest between tenants?",
+      "free_stops": "Trade sequence and target days per unit type are in the solution document."
+    },
+    {
+      "id": "p8_record_keeping",
+      "n": 8,
+      "words": "Move-in and move-out inspections have no photos",
+      "category": "compliance_admin",
+      "subtype": "record_keeping",
+      "quick_ideas": [
+        "Take dated photos of every room at move-in and share them with the tenant",
+        "Refer any question on deposit deductions to a lawyer or the rental dispute authority."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "An inspection app with dated photos per room, stored against each unit for every move-in and move-out.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "What usually causes a deposit argument?",
+      "free_stops": "The inspection checklist and comparison report are in the solution document."
+    },
+    {
+      "id": "p9_double_booking",
+      "n": 9,
+      "words": "Holiday-home calendar double-booked between two platforms",
+      "category": "orders_fulfilment",
+      "subtype": "double_booking",
+      "quick_ideas": [
+        "Check that each platform's calendar is linked to the others, so a booking on one blocks the rest",
+        "Keep a cleaning buffer after each checkout, so the next guest isn't waiting."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling",
+          "integration"
+        ],
+        "text": "Short-let calendars synced across channels, with cleaning and check-in tasks assigned automatically for every stay.",
+        "tool_words": []
+      },
+      "ask_first": "Which platforms are you listed on?",
+      "free_stops": "Channel connections and task rules are in the solution document."
+    },
+    {
+      "id": "p10_contracts_tracking",
+      "n": 10,
+      "words": "Lease renewals sneak up on us",
+      "category": "compliance_admin",
+      "subtype": "contracts_tracking",
+      "quick_ideas": [
+        "Put every lease end date in one calendar, so renewals are seen months ahead",
+        "Check rent increase rules with a lawyer or the relevant authority before any renewal talk."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A lease calendar that alerts the office and owner at chosen lead times for every unit.",
+        "tool_words": []
+      },
+      "ask_first": "How do you keep track of lease end dates now?",
+      "free_stops": "Alert timing and the renewal workflow are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on eviction, rent increases, deposit deductions or lease terms; refer to a lawyer or the rental dispute authority. Any help locking tenants out, cutting utilities, entering without notice or pressuring tenants. Any advice on gas, electrical, fire or structural issues; a gas smell, sparking, flooding or someone trapped means emergency services first. Any help with unregistered rentals, cash rent to avoid tax, illegal subletting or covert guest cameras. Any request to record tenant or landlord names, IDs, cheque numbers or bank details."
+  ],
+  "sample_reply": {
+    "person": "Can you suggest a solution? Our tenants pay with PDCs and we only learn about bounced cheques when the bank statement arrives.",
+    "pi": "Yes, this can be fixed, and you can start this week. 1 List this month's PDCs by deposit date so you know exactly which ones to watch. 2 Check the bank the day after each deposit, so a bounce is caught at once. Workzap can do this automatically for you: deposit reminders for every unit, bounce flags, and an arrears list that updates daily. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

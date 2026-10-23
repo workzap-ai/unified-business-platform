@@ -1,0 +1,224 @@
+{
+  "industry": "courier_and_last_mile_delivery_companies",
+  "name": "Courier and last-mile delivery companies",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_cod_remittance",
+      "n": 1,
+      "words": "Riders bring back COD cash short or late",
+      "category": "cash_collections",
+      "subtype": "cod_remittance",
+      "quick_ideas": [
+        "Settle every rider before they leave for the day, so shortfalls are caught the same day",
+        "Match cash to delivered parcels, not to a rough total, so gaps point to specific parcels."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A daily COD reconciliation of parcels delivered vs cash handed in per rider, flagging shortages on the spot.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The settlement steps and checks are designed in the solution document."
+    },
+    {
+      "id": "p2_complaints",
+      "n": 2,
+      "words": "Merchants complain their COD payments come late",
+      "category": "customers_retention",
+      "subtype": "complaints",
+      "quick_ideas": [
+        "Fix and announce a remittance day, so merchants know when to expect money",
+        "Send each payment with a short statement, so merchants can check it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "customer_messaging"
+        ],
+        "text": "A merchant remittance schedule with statements generated and sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The statement format and schedule are set in the solution document."
+    },
+    {
+      "id": "p3_returns_rto",
+      "n": 3,
+      "words": "RTO is too high, especially on COD orders",
+      "category": "orders_fulfilment",
+      "subtype": "returns_rto",
+      "quick_ideas": [
+        "Note the return reasons on this week's RTO parcels, so you know which cause is biggest",
+        "Ask your largest merchants to confirm COD orders with their customers before handover."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "customer_messaging"
+        ],
+        "text": "A confirmation flow that asks recipients, through the merchant and with their permission, to confirm the order and time before dispatch.",
+        "tool_words": []
+      },
+      "ask_first": "What reasons do riders record most often on returns?",
+      "free_stops": "The confirmation flow and timing are designed in the solution document."
+    },
+    {
+      "id": "p4_accountability",
+      "n": 4,
+      "words": "Riders mark \"customer not answering\" without actually trying",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Call back a few recipients from today's failed deliveries, so you see how often the reason holds",
+        "Agree openly with riders what proof each attempt needs."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A rider app that records each attempt with time, location and proof, agreed with riders and visible to them.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "What counts as a valid attempt is set in the solution document."
+    },
+    {
+      "id": "p5_transfers_lost",
+      "n": 5,
+      "words": "Parcels go missing between hub and rider",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Count parcels into and out of the hub for a few days, so you see where losses happen",
+        "Have riders sign for their runsheet count, so handover has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "A hub scan-in and scan-out log that shows exactly where a parcel was last seen.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The scan points are designed in the solution document."
+    },
+    {
+      "id": "p6_chat_overload",
+      "n": 6,
+      "words": "Customer service WhatsApp is overflowing with \"where is my parcel",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Tally a day's messages by type, so you see what most people ask",
+        "Tell merchants which status updates you'll send, so expectations are clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "job_tracking"
+        ],
+        "text": "Automatic status messages at each parcel milestone, so most questions are answered before they're asked.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The message triggers are set in the solution document."
+    },
+    {
+      "id": "p7_margin_unknown",
+      "n": 7,
+      "words": "Some zones lose money every day",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out one week's parcels, failures and rider cost per zone, so the weakest zone shows",
+        "Note which zones need the most re-attempts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A zone and rider dashboard showing success rate, RTO and cost per parcel, updated daily.",
+        "tool_words": [
+          "dashboard"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How costs are assigned to zones is set in the solution document."
+    },
+    {
+      "id": "p8_commission_disputes",
+      "n": 8,
+      "words": "Rider pay per parcel is always disputed",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write the pay rules on one page and share them, so everyone works from the same rules",
+        "Show riders their counts weekly, so payday has no surprises."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A rider pay calculator per parcel and attempt that riders can see, updating from the day's deliveries.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the rules are built into the calculator is in the solution document."
+    },
+    {
+      "id": "p9_duplicate_entry",
+      "n": 9,
+      "words": "Merchants upload orders in different formats and we re-type them",
+      "category": "operations_process",
+      "subtype": "duplicate_entry",
+      "quick_ideas": [
+        "List the formats you receive, so you see which merchants cause the most retyping",
+        "Share one standard upload sheet with merchants."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "Order upload that accepts merchants' spreadsheets or connects to their Shopify or WooCommerce stores directly.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Which connections are made, and how, is mapped in the solution document."
+    },
+    {
+      "id": "p10_seasonal_planning",
+      "n": 10,
+      "words": "Sale events overwhelm us and everything gets delayed",
+      "category": "planning_growth",
+      "subtype": "seasonal_planning",
+      "quick_ideas": [
+        "Ask your biggest merchants for expected volumes before 11.11, White Friday and Eid, so you plan riders early",
+        "Look at what broke first in the last peak."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A peak-day planner using past sale events to plan rider and hub shifts, with confirmations sent to riders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The planning method is set in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything that tracks riders secretly or monitors their personal phones. Help moving prohibited items, or \"don't ask what's in the parcel\". Help delaying merchants' COD money to use it. Views on rider employment status, visas, labour law or insurance; heat-safety advice in the UAE summer. Storing recipients' or merchants' customers' names, addresses or numbers; promises that RTO will drop. If a rider is hurt, emergency services 1122, 15, 999, 911 come first."
+  ],
+  "sample_reply": {
+    "person": "Our riders keep coming back short on COD cash and merchants are getting angry about late payments. What can we do?",
+    "pi": "Yes, this can be brought under control, and you can start this week. 1. Settle every rider before they leave for the day, so a shortfall is caught the same day. 2. Match the cash against delivered parcels rather than a rough total, so any gap points to specific parcels. Workzap can do this automatically for you: a daily COD reconciliation per rider that flags shortages on the spot and sends merchants their remittance statements on schedule. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

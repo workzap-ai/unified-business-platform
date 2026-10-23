@@ -1,0 +1,220 @@
+{
+  "industry": "corporate_events_and_exhibitions",
+  "name": "Corporate events and exhibitions",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_receivables_late",
+      "n": 1,
+      "words": "Corporate clients pay long after the event and I've already paid vendors",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid invoice with how far past terms it is, so you chase the oldest first",
+        "Find the right person in each client's finance team once and send them the overdue list."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a receivables tracker with ageing per client and polite reminders sent automatically on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "What payment terms do your clients usually agree?",
+      "free_stops": "Reminder timing and escalation steps are set out in the solution document."
+    },
+    {
+      "id": "p2_po_tracking",
+      "n": 2,
+      "words": "We start work on verbal approval and then the PO never comes",
+      "category": "suppliers_purchasing",
+      "subtype": "po_tracking",
+      "quick_ideas": [
+        "Hold fabrication start until a PO or written approval is in, so work isn't at risk",
+        "Check which current jobs have no PO and chase them now."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a PO tracker where no work order is released until the PO is logged, with missing POs flagged daily.",
+        "tool_words": []
+      },
+      "ask_first": "How many active jobs are running without a PO?",
+      "free_stops": "The approval gate and what counts as approval are defined in the solution document."
+    },
+    {
+      "id": "p3_cost_overruns",
+      "n": 3,
+      "words": "Stand fabrication always overshoots the budget",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Compare budget with actual on your last few stands, line by line, to find where overruns come from",
+        "Check fabricator rates again before ordering, not only at quote."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a costing sheet per event with budget against actual by line, updated as costs come in.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is fabrication done in your own workshop?",
+      "free_stops": "The cost lines and update flow are designed in the solution document."
+    },
+    {
+      "id": "p4_shrinkage_theft",
+      "n": 4,
+      "words": "LED screens and AV gear come back missing cables or damaged",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Check equipment out to a named site lead and back in after breakdown, so every item has an owner",
+        "Note damage on return, to see which jobs cause it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "an equipment booking calendar with check-out and check-in per event, flagging items sent but not returned.",
+        "tool_words": []
+      },
+      "ask_first": "How do you track what's out on site now?",
+      "free_stops": "Equipment lists, booking rules and damage notes stay for the solution document."
+    },
+    {
+      "id": "p5_approvals_slow",
+      "n": 5,
+      "words": "Client approvals take forever and then we're rushed",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "Agree an approval deadline with the client at kick-off, linked to build-up dates, so delays have a visible cost",
+        "Send one reminder ahead of that deadline on current jobs, so the rush doesn't land on you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "design approvals with deadlines and automatic reminders, showing which jobs are waiting on whom.",
+        "tool_words": []
+      },
+      "ask_first": "Who on the client side usually holds up approvals?",
+      "free_stops": "Approval stages and reminder timing go in the solution document."
+    },
+    {
+      "id": "p6_info_lost_in_whatsapp",
+      "n": 6,
+      "words": "Last-minute client changes aren't passed to the crew",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Make one person on each job responsible for passing changes to the crew, so changes have one route",
+        "Keep the latest drawing and run sheet in one place, so nobody builds from an old version."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "one project file per event where every change reaches the workshop and site crew automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many people work on a typical build-up?",
+      "free_stops": "File structure and change alerts per role stay for the solution document."
+    },
+    {
+      "id": "p7_attendance_lateness",
+      "n": 7,
+      "words": "Freelance crew don't turn up for overnight build-up, and overtime is disputed",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Confirm crew for the next build-up in writing, so gaps show early",
+        "Have the supervisor note start and finish times on site, so overtime has a record both sides accept."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "and field_checks — a crew roster with confirmations and an overtime log signed off by the supervisor on the phone.",
+        "tool_words": []
+      },
+      "ask_first": "How many crew are freelance?",
+      "free_stops": "Roster and overtime sign-off rules are in the solution document."
+    },
+    {
+      "id": "p8_documentation",
+      "n": 8,
+      "words": "Tender documents take my team a week every time",
+      "category": "compliance_admin",
+      "subtype": "documentation",
+      "quick_ideas": [
+        "Gather your company documents and past project write-ups into one folder, so they're ready to reuse",
+        "Note which sections take longest in each tender."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a proposal library with reusable documents, past projects and standard costing, with checklists per tender.",
+        "tool_words": []
+      },
+      "ask_first": "How many tenders do you send a month?",
+      "free_stops": "Library structure and tender checklists stay for the solution document."
+    },
+    {
+      "id": "p9_manual_work",
+      "n": 9,
+      "words": "Registration on the day is chaos with paper lists",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Split check-in by category, so queues spread out",
+        "Ask the client for the attendee list early, so it's ready before the doors open."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a registration flow with QR badges and on-day check-in, without pi ever handling attendee data.",
+        "tool_words": []
+      },
+      "ask_first": "Do you run registration for clients or for your own expos?",
+      "free_stops": "The registration flow and how client data is handled stay for the solution document."
+    },
+    {
+      "id": "p10_data_scattered",
+      "n": 10,
+      "words": "We do events in Dubai and Pakistan and the books are a mess",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "List all live events with cash in and out per country on one page, so you see the whole position once",
+        "Talk to your accountant about how the two entities should be kept."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a multi-country dashboard showing events, cash and receivables by entity, updated daily.",
+        "tool_words": [
+          "dashboard"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you run separate companies in each country?",
+      "free_stops": "What the dashboard pulls from each country is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on stand structure, rigging, electrical loads or venue fire rules; any injury means emergency services first. Advice on government procurement rules, data protection or tax. Help with kickbacks, collusive bidding or fake experience documents. Customs, duties or classification advice, or anything about under-invoicing. Legal opinions on unpaid invoices or contract scope."
+  ],
+  "sample_reply": {
+    "person": "Most of last quarter's events are still unpaid and I've already paid the vendors. What's the fix?",
+    "pi": "Yes, there's a clear way to get on top of this. 1 List every unpaid invoice with how far past terms it is, so you chase the oldest first. 2 Stop starting work before a PO or written approval is in, so new jobs don't add to the pile. Workzap can do this automatically for you: a tracker that ages every invoice, sends reminders on schedule, and holds work orders until the PO is logged. Shall I prepare a solution document and quote for you? You can say no.",
+    "language": "english"
+  }
+}

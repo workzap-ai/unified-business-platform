@@ -1,0 +1,216 @@
+{
+  "industry": "tailoring_and_alteration_shops",
+  "name": "Tailoring and alteration shops",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_capacity",
+      "n": 1,
+      "words": "Before Eid we take more orders than we can stitch",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Work out how many pieces your team really finishes in a week, so you know your limit",
+        "Stop taking bookings once that limit is reached, since a late suit costs more goodwill than a polite no."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a capacity planner that warns automatically when booked orders exceed what the team can make.",
+        "tool_words": []
+      },
+      "ask_first": "How many karigars work for you?",
+      "free_stops": "Capacity rules are in the solution document."
+    },
+    {
+      "id": "p2_delivery_late",
+      "n": 2,
+      "words": "Customers come on the promised date and the suit isn't ready",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "List every order due this week with its stage, so late ones show early",
+        "Tell customers about delays before they arrive, since a warning upsets them less than an empty hanger."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "and customer_messaging — an order status board with automatic \"ready\" or delay messages.",
+        "tool_words": []
+      },
+      "ask_first": "How do you record orders now?",
+      "free_stops": "Status flow stays for the solution document."
+    },
+    {
+      "id": "p3_orders_lost",
+      "n": 3,
+      "words": "We lose slips and can't find the fabric",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Number every order and tag the fabric with the same number, so the two never separate",
+        "Keep a copy of each slip, so a lost slip isn't a lost order."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a digital order slip with a copy sent to the customer on WhatsApp.",
+        "tool_words": []
+      },
+      "ask_first": "Do customers bring their own fabric?",
+      "free_stops": "Slip setup is in the solution document."
+    },
+    {
+      "id": "p4_rework",
+      "n": 4,
+      "words": "Wrong measurements and the suit has to be redone",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Note every rework and its reason, so patterns show",
+        "See which step causes most, since that is where to fix."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a rework log with reasons to spot patterns.",
+        "tool_words": []
+      },
+      "ask_first": "Who takes measurements?",
+      "free_stops": "Log setup stays for the solution document."
+    },
+    {
+      "id": "p5_payroll_errors",
+      "n": 5,
+      "words": "Piece-rate payments are calculated by hand and disputed",
+      "category": "people_staff",
+      "subtype": "payroll_errors",
+      "quick_ideas": [
+        "Record pieces assigned and finished per karigar daily, so payday isn't rebuilt from memory",
+        "Share totals weekly, so disputes come up early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a piece-rate log with weekly payout calculation.",
+        "tool_words": []
+      },
+      "ask_first": "How often do you pay karigars?",
+      "free_stops": "Payout rules are in the solution document."
+    },
+    {
+      "id": "p6_stockout",
+      "n": 6,
+      "words": "Buttons, linings and threads run out at the worst time",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "List the accessories you use most, so you know what matters",
+        "Stock up before Eid, since suppliers run short too."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "an accessory and fabric tracker with reorder alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Which items run out most?",
+      "free_stops": "Reorder levels stay for the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Advance taken but customer never comes back",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List all uncollected orders, so you know what's sitting there",
+        "Contact each customer once, since many simply forgot."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "automatic reminders for uncollected orders.",
+        "tool_words": []
+      },
+      "ask_first": "How much advance do you take?",
+      "free_stops": "Reminder timing is in the solution document."
+    },
+    {
+      "id": "p8_chat_overload",
+      "n": 8,
+      "words": "Customers keep calling to ask if clothes are ready",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Tell customers you'll message them when it's ready, so they stop calling",
+        "Keep a ready list at the counter, so anyone can answer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "automatic \"ready for collection\" WhatsApp messages.",
+        "tool_words": []
+      },
+      "ask_first": "How many orders do you deliver a day?",
+      "free_stops": "Message flow stays for the solution document."
+    },
+    {
+      "id": "p9_branches_not_aligned",
+      "n": 9,
+      "words": "Main shop and workshop don't know each other's status",
+      "category": "communication_coordination",
+      "subtype": "branches_not_aligned",
+      "quick_ideas": [
+        "Share one daily list between shop and workshop, so both see the same status",
+        "Note orders sent and received, so nothing goes missing in between."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "shop-to-workshop tracking, flagging sent-not-received orders.",
+        "tool_words": []
+      },
+      "ask_first": "How far is the workshop from the shop?",
+      "free_stops": "Tracking setup is in the solution document."
+    },
+    {
+      "id": "p10_cash_mismatch",
+      "n": 10,
+      "words": "Cash in the drawer doesn't match the slips",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Count cash against slips at day end, so gaps show the same day",
+        "Record every advance and balance on the slip, so the drawer can be checked."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "daily cash and slip reconciliation.",
+        "tool_words": []
+      },
+      "ask_first": "Who handles the drawer?",
+      "free_stops": "Reconciliation rules stay for the solution document."
+    }
+  ],
+  "never_say": [
+    "Labour law, piece-rate legality or visa advice. Storing a specific customer's measurements or photos through pi. Anything involving under-age workers. Help copying registered designs or counterfeits. Workshop fire or electrical hazards mean emergency services first."
+  ],
+  "sample_reply": {
+    "person": "Eid se pehle bohat orders le liye, aadhe abhi cut bhi nahi hue. Kya karein?",
+    "pi": "Ji, is ka hal mumkin hai, aur agle Eid se pehle farq laya ja sakta hai. 1 Pata kiya jaye ke team asal mein hafte mein kitne suit bana sakti hai. 2 Jab yeh had poori ho jaye to booking band kar di jaye. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: booking ke waqt hi warning aaye jab orders capacity se barh jayein. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

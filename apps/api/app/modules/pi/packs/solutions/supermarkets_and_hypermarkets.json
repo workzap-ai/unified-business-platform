@@ -1,0 +1,223 @@
+{
+  "industry": "supermarkets_and_hypermarkets",
+  "name": "Supermarkets and hypermarkets",
+  "sector": "7.A Retail and consumer (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_expiry_wastage",
+      "n": 1,
+      "words": "Bread and dairy expire on the shelf because we over-order every day",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Write down leftover bread and dairy by item for a week, so orders can follow real sales instead of a fixed quantity",
+        "Compare weekday and weekend leftovers, because the same order every day rarely fits both."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "suggested daily order quantities for bread, dairy and produce worked out from recent sales by weekday, with near-expiry alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Who decides the daily order today?",
+      "free_stops": "How order quantities are calculated and when alerts fire are in the solution document."
+    },
+    {
+      "id": "p2_wastage_cost",
+      "n": 2,
+      "words": "Fresh produce wastage is huge and nobody records it",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Weigh what each fresh section throws out for a few days, so you see which items cost the most",
+        "Note the reason (overripe, damaged, unsold), because each reason has a different fix."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a phone wastage log by section, item and reason with photos, and a weekly cost total for the owner.",
+        "tool_words": []
+      },
+      "ask_first": "Which fresh section worries you most?",
+      "free_stops": "The wastage categories and weekly report layout are in the solution document."
+    },
+    {
+      "id": "p3_slow_replenishment",
+      "n": 3,
+      "words": "Shelves look empty in the evening even though the godown is full",
+      "category": "stock_inventory",
+      "subtype": "slow_replenishment",
+      "quick_ideas": [
+        "Walk the aisles before the evening rush and note empty facings, so you see which aisles fall behind",
+        "Give named staff named aisles, so refilling isn't everyone's and no one's job."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "workflow_automation"
+        ],
+        "text": "a shelf-gap check on phone where empty facings become refill tasks, assigned and timed every day.",
+        "tool_words": []
+      },
+      "ask_first": "When do shelves usually go empty?",
+      "free_stops": "The aisle check routine and task timings are in the solution document."
+    },
+    {
+      "id": "p4_checklists_not_done",
+      "n": 4,
+      "words": "Receivers sign GRNs without counting cartons",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Count a few deliveries against the order yourself, so you know how often short delivery happens",
+        "Photograph any damaged delivery before the driver leaves, so claims have proof."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "workflow_automation"
+        ],
+        "text": "a receiving check on phone against the PO that records shortages and damage and tracks each distributor claim until credited.",
+        "tool_words": []
+      },
+      "ask_first": "How many deliveries come in on a typical day?",
+      "free_stops": "The receiving steps and the claims tracking are in the solution document."
+    },
+    {
+      "id": "p5_cash_mismatch",
+      "n": 5,
+      "words": "Cashiers' tills are short at night almost every day",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Count tills at shift change for a few days, so the gap points to a shift",
+        "Look at voids done after the customer has left, because these often explain gaps."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "till reconciliation per cashier code and shift, with void and refund exceptions flagged every day.",
+        "tool_words": []
+      },
+      "ask_first": "Is it spread across tills or mostly certain shifts?",
+      "free_stops": "The exception rules and how they are reported are in the solution document."
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "Price changed at the distributor but the shelf label still shows old rate",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Spot-check a handful of labels against the POS, so you know how widespread it is",
+        "Keep one list of the week's price changes, so POS and labels are updated from the same source."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a price-change flow from new distributor rate to POS update to label print list and sign-off.",
+        "tool_words": []
+      },
+      "ask_first": "How do you hear about distributor rate changes today?",
+      "free_stops": "The steps and sign-offs in the price-change flow are in the solution document."
+    },
+    {
+      "id": "p7_basket_small",
+      "n": 7,
+      "words": "Basket size is small, people come for milk and leave",
+      "category": "sales_revenue",
+      "subtype": "basket_small",
+      "quick_ideas": [
+        "Put everyday companions like bread and eggs near milk, because people pick up what they pass",
+        "Look at a few days of receipts to see what regulars usually buy together."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat",
+          "customer_messaging"
+        ],
+        "text": "a customer list (with their permission) showing visits and baskets, and WhatsApp offers sent to regulars automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Do you already run a loyalty card?",
+      "free_stops": "Which offers go to which customers and how baskets are tracked are in the solution document."
+    },
+    {
+      "id": "p8_order_errors",
+      "n": 8,
+      "words": "Pandamart/Talabat orders come in and pickers can't find items",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Note why each problem order went wrong for a week, so you see whether it's stock, picking or substitutions",
+        "Sort picking lists by aisle, so pickers walk the store once."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "app and WhatsApp orders in one queue with aisle-sorted picking lists and substitutions logged and shared with the customer.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Which apps do you take orders from?",
+      "free_stops": "How orders from each app are pulled in and picked is in the solution document."
+    },
+    {
+      "id": "p9_maintenance_downtime",
+      "n": 9,
+      "words": "Freezer breaks down and we lose stock before anyone notices",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Put a temperature sheet on each chiller and freezer, so a failing unit shows up before stock is lost",
+        "Book servicing before summer, because breakdowns cluster in heat."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a chiller and freezer log on phone with alerts when a reading is missed or out of range.",
+        "tool_words": []
+      },
+      "ask_first": "How many chillers and freezers do you run?",
+      "free_stops": "The reading schedule and alert limits are in the solution document."
+    },
+    {
+      "id": "p10_seasonal_planning",
+      "n": 10,
+      "words": "We don't know what to stock up on before Ramadan",
+      "category": "planning_growth",
+      "subtype": "seasonal_planning",
+      "quick_ideas": [
+        "Pull last Ramadan's sales for your top items once, so buying starts from facts",
+        "Confirm supplier lead times now, so stock lands before the rush."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a Ramadan and Eid stock planner from last year's sales by item and week, updated as this year's sales come in.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Does your POS keep last year's sales by item?",
+      "free_stops": "How the planner uses past sales and lead times is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on food safety, hygiene certification, halal or food-licence rules. How to relabel, re-date or repackage expired goods. Ways around official price lists or price controls. That shoplifters should be held or confronted; for food poisoning, gas or fire, go to the authorities or emergency services first. That a change will cut wastage or raise margin by any amount."
+  ],
+  "sample_reply": {
+    "person": "Our bakery and dairy wastage is out of control. We throw away so much every night. Can you suggest a solution?",
+    "pi": "Yes, this is very fixable, and you can start this week. 1 Have the closing supervisor write down leftover bread and dairy by item for a week, so the order follows what actually sold. 2 Compare weekday and weekend leftovers, because one fixed quantity rarely fits both. Workzap can do this automatically for you: a phone wastage log and a suggested daily order for bread, dairy and produce worked out from recent sales, with near-expiry alerts. Shall I have a solution document and quote prepared for you? You're free to say no.",
+    "language": "english"
+  }
+}

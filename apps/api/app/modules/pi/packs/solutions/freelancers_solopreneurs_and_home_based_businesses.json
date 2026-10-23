@@ -1,0 +1,197 @@
+{
+  "industry": "freelancers_solopreneurs_and_home_based_businesses",
+  "name": "Freelancers, solopreneurs and home-based businesses",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_receivables_late",
+      "n": 1,
+      "words": "Clients disappear after I deliver and don't pay",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid job with its date, so you know exactly who to chase",
+        "Ask for a part payment upfront on your next new job, so you're never fully exposed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a simple ledger of every job and payment with polite reminders sent automatically when a payment is late.",
+        "tool_words": []
+      },
+      "ask_first": "Are your clients mostly on a platform, or direct?",
+      "free_stops": "the reminder sequence and payment link setup are kept for the solution document."
+    },
+    {
+      "id": "p2_hidden_costs",
+      "n": 2,
+      "words": "I keep doing extra revisions for free",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "Write down what's included before starting your next job, so extras are easy to spot",
+        "Note every extra request on current jobs, so you can quote them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a scope and revision log per job, so extra requests are visible and can be quoted.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how scope and revisions are tracked is set out in the solution document."
+    },
+    {
+      "id": "p3_margin_unknown",
+      "n": 3,
+      "words": "I don't know if I'm charging enough for my time",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Note your hours on every job this week, so you see what each one really takes",
+        "Compare that once against what you charged, so underpriced work stands out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a phone time logger per job showing hours spent and what each job really earned per hour.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how the earnings view is calculated is kept for the solution document."
+    },
+    {
+      "id": "p4_orders_lost",
+      "n": 4,
+      "words": "Instagram DMs and WhatsApp orders get mixed up and I miss some",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Copy every open order from both apps into one list today, so nothing is sitting only in a chat",
+        "Confirm each order back to the customer once, so details are agreed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "DMs and WhatsApp orders turned into one numbered order list, with details confirmed back to the customer automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how orders are captured from each app is worked out in the solution document."
+    },
+    {
+      "id": "p5_cod_remittance",
+      "n": 5,
+      "words": "Courier delays and COD money coming in late eat my profit",
+      "category": "cash_collections",
+      "subtype": "cod_remittance",
+      "quick_ideas": [
+        "Match delivered orders against courier payments received once, so missing money shows",
+        "List refused or returned orders this month, so you see the real cost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a COD and courier tracker matching delivered orders to money received, with returns recorded.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the matching routine is set out in the solution document."
+    },
+    {
+      "id": "p6_raw_material_shortage",
+      "n": 6,
+      "words": "I run out of ingredients or fabric in the middle of orders",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "Count your key materials once and note what next week's orders need, so shortages show in advance",
+        "Write down a reorder level for your top few items, so you buy before you run out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a materials list with low-stock alerts and supplier reorder notes based on orders coming in.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "reorder levels and alerts are kept for the solution document."
+    },
+    {
+      "id": "p7_forecasting",
+      "n": 7,
+      "words": "All my clients come from one platform and I'm scared it'll dry up",
+      "category": "planning_growth",
+      "subtype": "forecasting",
+      "quick_ideas": [
+        "Ask your best past clients once whether they'd refer you, so you start a second source",
+        "Collect your strongest work samples in one place, so you're ready to pitch off-platform within the platform's rules."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "a simple one-page website or ordering page linked to WhatsApp, so clients can find you directly.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the page content and structure are designed in the solution document."
+    },
+    {
+      "id": "p8_repeat_low",
+      "n": 8,
+      "words": "Customers order once and never come back",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "List your past customers who agreed to hear from you, so you know who to reach",
+        "Send each a short note once about something new, so they remember you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "customer_messaging — a repeat customer list with reminder messages for occasions and re-orders, sent with their permission.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "message timing and occasions are set out in the solution document."
+    },
+    {
+      "id": "p9_owner_blind",
+      "n": 9,
+      "words": "Personal and business money are mixed and I don't know what I made last month",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Write down last month's business income and costs once, so you get a first real figure",
+        "Keep business receipts in one folder from today; for tax or account questions, talk to your accountant."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an income and expense log separating business from personal, with a monthly summary.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "the categories and summary format are kept for the solution document."
+    }
+  ],
+  "never_say": [
+    "Any tax, legal, licensing, immigration, banking, foreign exchange or food-safety advice. Anything involving platform rule evasion, account renting, fake reviews, fake portfolios or under-declaring income. That income or orders will grow by any amount. Requests for card numbers, platform or bank logins, or customers' addresses and numbers. If someone expresses thoughts of self-harm, point them to local emergency or helpline services."
+  ],
+  "sample_reply": {
+    "person": "Main ghar se cakes bechti hoon, orders Instagram aur WhatsApp dono pe aate hain aur kabhi koi order reh jata hai. Koi solution hai?",
+    "pi": "Ji haan, is ka hal mumkin hai aur aaj se shuruaat ki ja sakti hai. 1 Dono apps se saare khule orders aaj ek hi list mein likh lein, taake koi order sirf chat mein na pada rahe. 2 Har order customer ko ek dafa confirm kar dein, taake details pe dono raazi hon. Workzap yeh aap ke liye automatically kar sakta hai: Instagram aur WhatsApp ke orders ek numbered list mein, aur har order ki confirmation customer ko khud chali jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "industry": "spices_dry_fruit_and_nuts_traders",
+  "name": "Spices, dry fruit and nuts traders",
+  "sector": "7.B Food and beverage",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_credit_customers",
+      "n": 1,
+      "words": "Shopkeepers take goods on credit and delay months 100 in a khata",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List the shopkeepers with the oldest balances, so you chase the biggest risk first",
+        "Send each a written statement, because disputes usually start where balances aren't shared."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a credit ledger per shopkeeper label with balances, ageing, statements and automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Who reminds shopkeepers to pay now?",
+      "free_stops": "The credit rules and reminder schedule are in the solution document."
+    },
+    {
+      "id": "p2_count_mismatch",
+      "n": 2,
+      "words": "Godown count never matches the register",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count your top items in the godown once against the register, so you know the size of the gap",
+        "Make every movement in or out signed by one person."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a godown count on phone with variance against the register by item, grade and lot.",
+        "tool_words": []
+      },
+      "ask_first": "When was the last full count?",
+      "free_stops": "The counting routine and variance checks stay for the solution document."
+    },
+    {
+      "id": "p3_overstock_dead_stock",
+      "n": 3,
+      "words": "Old lots sit at the back and some haven't moved since last season",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "Mark each lot with its purchase date, so the oldest goes out first",
+        "List lots that haven't moved, so you can decide what to do before they age further."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a godown register by item, grade and lot with purchase date, showing age and flagging slow lots automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How do you decide which lot goes out first?",
+      "free_stops": "The ageing rules and lot rotation plan are detailed in the solution document."
+    },
+    {
+      "id": "p4_pricing_errors",
+      "n": 4,
+      "words": "Daily rate list goes out by voice notes and people quote old rates",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Send rates as one dated written message each day, so old ones can't be confused",
+        "Ask buyers to quote the date when ordering."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a daily rate list built once and sent as one dated message to buyers who opted in.",
+        "tool_words": []
+      },
+      "ask_first": "How do buyers get your rates now?",
+      "free_stops": "How the rate list is built and sent is set out in the solution document."
+    },
+    {
+      "id": "p5_currency_exposure",
+      "n": 5,
+      "words": "Prices of dry fruit change before winter and the rupee/dirham move ate my margin",
+      "category": "margin_cost",
+      "subtype": "currency_exposure",
+      "quick_ideas": [
+        "Note the rate at order and at payment for your last shipments, so you see where margin went",
+        "Work out landed cost per item, because selling price should follow it. For hedging or financial decisions, talk to your accountant or bank."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "margin per item using actual landed cost, with the currency rate recorded at order and payment.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which items do you import?",
+      "free_stops": "The landed-cost method is detailed in the solution document."
+    },
+    {
+      "id": "p6_import_delays",
+      "n": 6,
+      "words": "Import container held up and Ramadan dates arrived late",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "List upcoming shipments with expected dates, so delays show early",
+        "Order Ramadan stock earlier than last year's late arrival. For customs questions, talk to your clearing agent."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an import shipment tracker with order, supplier, expected dates and status updates.",
+        "tool_words": []
+      },
+      "ask_first": "What usually causes the delays?",
+      "free_stops": "The shipment tracking and seasonal buying plan stay for the solution document."
+    },
+    {
+      "id": "p7_whatsapp_overload",
+      "n": 7,
+      "words": "Orders from retailers come on WhatsApp all day",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Put every order into one list as it arrives, so nothing is lost in chat",
+        "Set cut-off times for same-day dispatch."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a retailer order form via WhatsApp feeding one order list with dispatch status.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many orders come in a day?",
+      "free_stops": "The order form and dispatch flow are in the solution document."
+    },
+    {
+      "id": "p8_integration_marketplace",
+      "n": 8,
+      "words": "Online orders on Daraz/Noon, stock goes negative",
+      "category": "tech_systems",
+      "subtype": "integration_marketplace",
+      "quick_ideas": [
+        "Keep a set amount of stock reserved for online, so shop sales don't eat it",
+        "Update online stock at a fixed time daily."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "stock synced between the shop and online listings automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Which marketplaces do you sell on?",
+      "free_stops": "How the sync works with each marketplace is detailed in the solution document."
+    },
+    {
+      "id": "p9_owner_blind",
+      "n": 9,
+      "words": "No idea what stock I have until I go to the godown, and my son doesn't know the business",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Write down stock value, receivables and top movers once, so the business is on paper",
+        "Sit with your son over those numbers weekly, so he learns it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a short morning read with stock value, receivables, top movers and ageing stock, shared with whoever you choose.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Who else in the family knows the numbers?",
+      "free_stops": "What goes into the morning read and who sees what is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about customs, import duties, labelling, testing standards or adulteration law. Fumigation or pest-control chemical advice. Help with under-invoicing, informal money transfer or smuggling. Help adding dyes or fillers, or mislabelling. That margins or recoveries will improve by any amount."
+  ],
+  "sample_reply": {
+    "person": "Jodia Bazaar mein dukaan hai. Sab se bara masla udhaar hai, 150 dukaandaar hain aur khata hi khata hai. Hal batao.",
+    "pi": "Ji haan, udhaar ka hisaab control mein laya ja sakta hai, aur kaam isi hafte shuru ho sakta hai. 1 Sab se purane balance wale dukaandaaron ki list bana lein, taake pehle wahan zor diya jaye jahan khatra zyada hai. 2 Har dukaandaar ko likhi hui statement bhejein, kyunke ikhtilaaf aksar wahin hota hai jahan balance share nahi hota. Workzap ye aap ke liye automatically kar sakta hai: har dukaandaar ka label ke saath ledger, balance aur kitne din purana hai, statements aur waqt par reminders. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

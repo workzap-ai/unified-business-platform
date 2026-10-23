@@ -1,0 +1,219 @@
+{
+  "industry": "orchards",
+  "name": "Orchards (mango, citrus, dates, apples)",
+  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_receivables_late",
+      "n": 1,
+      "words": "Gave the orchard on theka and the thekedar paid only half",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Write down what has been received and what remains, so the conversation starts from facts",
+        "Send the thekedar that summary politely in writing; for the contract itself, talk to your lawyer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A theka tracker holding every orchard's instalments, sending WhatsApp reminders before each due date and showing what is overdue at a glance.",
+        "tool_words": []
+      },
+      "ask_first": "Were the instalment dates written in the agreement?",
+      "free_stops": "How instalments and reminders are set up for your theka deals goes in the solution document."
+    },
+    {
+      "id": "p2_margin_unknown",
+      "n": 2,
+      "words": "I don't know if theka is better or picking myself",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Put last season's theka amount for each block next to what any self-picked block earned after costs, to get a first comparison",
+        "Note this season's costs by block from the start."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "An orchard register by block that records picks, sales and costs every season, so theka and own-picking compare side by side automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Have you picked any block yourself in the last two seasons?",
+      "free_stops": "Which costs are counted and how the comparison is built stays in the solution document."
+    },
+    {
+      "id": "p3_commission_disputes",
+      "n": 3,
+      "words": "Pickers are paid per crate and the counts get disputed",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Show each picker their count before they leave, so disagreements are settled the same day",
+        "Have the supervisor note counts at set times rather than only at day end."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A picking tally on phone recording crates per picker number per day with the supervisor's count, producing the pay sheet automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who counts the crates during picking now?",
+      "free_stops": "The tally and pay sheet setup is detailed in the solution document."
+    },
+    {
+      "id": "p4_stockout",
+      "n": 4,
+      "words": "We ran out of crates in the middle of picking",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Count crates and cartons on hand now, before the season, so there are no surprises",
+        "Check last season's dispatches to see roughly how many you got through."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A crate and packing material tracker that alerts you before stock falls below what the coming weeks of picking need.",
+        "tool_words": []
+      },
+      "ask_first": "Do you pack yourself or does the buyer bring crates?",
+      "free_stops": "Reorder levels and how usage is tracked go in the solution document."
+    },
+    {
+      "id": "p5_delivery_late",
+      "n": 5,
+      "words": "Too many crates arrive bruised by the time they reach Lahore / Karachi",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Ask buyers to send a photo and count on arrival, so damage is tied to a specific truck",
+        "Note which transporter and route had the most complaints."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "A dispatch register for every truck with the buyer's arrival count and photos, showing route by route where damage happens.",
+        "tool_words": []
+      },
+      "ask_first": "Do you arrange transport or does the buyer?",
+      "free_stops": "How dispatches and arrival checks are linked is part of the solution document."
+    },
+    {
+      "id": "p6_no_sales_visibility",
+      "n": 6,
+      "words": "Fruit sold in the mandi at a rate I never get to see on paper",
+      "category": "sales_revenue",
+      "subtype": "no_sales_visibility",
+      "quick_ideas": [
+        "Ask the arhti for a slip per lot showing rate, weight and deductions, so every sale has a record",
+        "Keep those slips in one place for the season."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A mandi sale reconciliation that sets each dispatch against the rate received and deductions, line by line, every day.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you sell through one arhti or several?",
+      "free_stops": "How slips are reconciled against dispatches is kept for the solution document."
+    },
+    {
+      "id": "p7_consistency_across_branches",
+      "n": 7,
+      "words": "Grading is different every day depending on who is on the line",
+      "category": "quality_complaints",
+      "subtype": "consistency_across_branches",
+      "quick_ideas": [
+        "Put sample photos of each grade where grading happens, so everyone works to the same picture",
+        "Note each buyer complaint against the date and line."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A grading log by day and line with photo checks, linking buyer complaints back to the dispatch they came from.",
+        "tool_words": []
+      },
+      "ask_first": "Do you grade yourself, or does a packing house?",
+      "free_stops": "The grading log design is part of the solution document."
+    },
+    {
+      "id": "p8_owner_blind",
+      "n": 8,
+      "words": "My UAE date farm is run by a manager and I only see totals",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Ask the manager for one daily message with weights, deliveries, workers and spend, so you see more than totals",
+        "Go through it together weekly, as routine rather than suspicion."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "A daily read for owners abroad showing weights, deliveries, labour and spend from the manager's entries, with the one thing to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How often are you at the farm during the season?",
+      "free_stops": "What goes into the daily read and how it is fed is set out in the solution document."
+    },
+    {
+      "id": "p9_whatsapp_overload",
+      "n": 9,
+      "words": "Corporate gift orders for dates in Ramadan pile up on WhatsApp",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Copy every gift order into one sheet the day it arrives, so nothing lives only in a chat",
+        "Confirm each order back to the customer before packing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "One place for WhatsApp and online gift orders, each tracked from confirmation to delivery.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many gift orders come in a busy week?",
+      "free_stops": "How orders are captured and tracked is detailed in the solution document."
+    },
+    {
+      "id": "p10_no_customer_data",
+      "n": 10,
+      "words": "Repeat buyers from last year never hear from us again",
+      "category": "customers_retention",
+      "subtype": "no_customer_data",
+      "quick_ideas": [
+        "List last season's direct buyers who agreed to hear from you, so you have a starting list",
+        "Reach out with their permission when the new crop is near."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "A customer list of past buyers who gave permission, with pre-season WhatsApp messages sent on time each year.",
+        "tool_words": []
+      },
+      "ask_first": "Do you sell any fruit directly to households or offices?",
+      "free_stops": "Message timing and wording are part of the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on sprays, fertilisers, pruning, doses, fruit fly or disease control, ripening chemicals or post- harvest treatments; refer to an agronomist, extension office or plant-protection authority. Advice on phytosanitary rules, export regulations or certificates. Legal views on theka contracts or thekedar disputes. Any help with banned ripening chemicals, mislabelling origin, faking certificates or under-invoicing exports. Seasonal worker visa or programme advice, or accusations against a manager or caretaker."
+  ],
+  "sample_reply": {
+    "person": "Thekedar ka masla phir se na ho, koi solution do. Is saal bhi bagh theke pe dena hai.",
+    "pi": "Ji, is ka intezaam kiya ja sakta hai. 1 Pichle theke ki wasool shuda aur baqi raqam ek safhe pe likh kar thekedar ko tehreeri tor pe bhej dein, taake baat hisaab se shuru ho. 2 Naye theke mein har qist ki tareekh saaf likhwayein, aur qanooni pehlu apne wakeel se dekh lein. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: har qist ka hisaab, tareekh se pehle WhatsApp yaad-dihani, aur baqi raqam ek nazar mein. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

@@ -1,0 +1,220 @@
+{
+  "industry": "chemicals_paints_and_coatings",
+  "name": "Chemicals, paints and coatings",
+  "sector": "7.D Manufacturing and industry (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_consistency_across_branches",
+      "n": 1,
+      "words": "Same shade from two batches looks different and the dealer returns the whole lot",
+      "category": "quality_complaints",
+      "subtype": "consistency_across_branches",
+      "quick_ideas": [
+        "Write the batch number on every dispatch note from now on — lets you trace a returned can",
+        "Keep a retained sample of each batch — gives you something to compare a complaint against."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a batch register linking every batch's date, shade and QC result to the dealers it went to, filled automatically from dispatch.",
+        "tool_words": []
+      },
+      "ask_first": "Are complaints mostly on dealer-tinted shades or factory-made shades?",
+      "free_stops": "The batch-record fields and how complaints are matched are in the solution document."
+    },
+    {
+      "id": "p2_serial_batch_tracking",
+      "n": 2,
+      "words": "I can't trace which batch went to which dealer when a complaint comes",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Note batch ranges on each gate pass — links trucks to batches",
+        "Ask for a photo of the batch code before discussing any claim — stops claims on stock that isn't yours."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a complaint-to-batch tracer where a can's code shows every dealer that batch reached, across all territories.",
+        "tool_words": []
+      },
+      "ask_first": "Is the batch number printed on every pack size, including quarters?",
+      "free_stops": "How codes are captured at dispatch is set out in the solution document."
+    },
+    {
+      "id": "p3_credit_customers",
+      "n": 3,
+      "words": "Dealers owe me a lot and some are six months overdue",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List every dealer's balance by age once — shows who to chase first",
+        "Set a rough credit limit per dealer — gives your SOs a line not to cross."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a dealer ledger with limits, ageing and automatic WhatsApp reminders, flagging orders from dealers over their limit.",
+        "tool_words": []
+      },
+      "ask_first": "Who approves dealer credit today, you or the sales officers?",
+      "free_stops": "Limit rules and the blocking and approval flow are in the solution document."
+    },
+    {
+      "id": "p4_discount_abuse",
+      "n": 4,
+      "words": "Schemes are being misused — dealers claim volume they didn't buy",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Check this month's claims against your own invoices before paying — catches inflated volumes",
+        "Share each scheme's rules in writing with all dealers — removes \"I was told differently\"."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a scheme register that checks every claim against actual purchases before it reaches you for approval.",
+        "tool_words": []
+      },
+      "ask_first": "How many schemes are running at the same time right now?",
+      "free_stops": "The eligibility rules and approval chain are in the solution document."
+    },
+    {
+      "id": "p5_fraud",
+      "n": 5,
+      "words": "Painter coupons are being redeemed twice or faked",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Keep one list of redeemed coupon numbers and check it before payouts — stops double redemption",
+        "Accept only original coupons — cuts out copies."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "unique painter coupon codes redeemable once by WhatsApp, recording role and town only.",
+        "tool_words": []
+      },
+      "ask_first": "Are coupons redeemed at dealers or at your office?",
+      "free_stops": "The code system and redemption checks are in the solution document."
+    },
+    {
+      "id": "p6_currency_exposure",
+      "n": 6,
+      "words": "Resin price jumped with the dollar and I can't pass it on quickly",
+      "category": "margin_cost",
+      "subtype": "currency_exposure",
+      "quick_ideas": [
+        "Recost your top SKUs at today's raw-material rates — shows where the squeeze is worst",
+        "Talk to your accountant or bank about planning imports around currency swings — that's their area."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a cost-per-litre view updated from current raw-material rates and batch yields, flagging products below your target margin.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which raw materials are imported and which are local?",
+      "free_stops": "The costing model and price-review triggers are in the solution document."
+    },
+    {
+      "id": "p7_import_delays",
+      "n": 7,
+      "words": "Pigment consignment stuck at port, production stopped",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "Work out how many days of production each imported input covers — shows which one could stop you next",
+        "Line up one backup supplier for your most critical input — gives you a fallback."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a raw-material board showing stock cover and open consignments, alerting automatically when cover drops low.",
+        "tool_words": []
+      },
+      "ask_first": "Which raw material has stopped production most often?",
+      "free_stops": "Cover levels and the consignment stages tracked are in the solution document."
+    },
+    {
+      "id": "p8_field_team_visibility",
+      "n": 8,
+      "words": "Sales officers report visits but I don't know if they actually went",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Review each SO's visits against orders received once this week — shows where visits don't turn into orders",
+        "Call a few dealers yourself about the last visit — a quick, open check."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "an SO app logging visits with time and location, orders taken and a daily summary to the manager, used openly with the team.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many sales officers are in the field?",
+      "free_stops": "The visit format and manager reports are in the solution document."
+    },
+    {
+      "id": "p9_orders_lost",
+      "n": 9,
+      "words": "Dealer orders come on WhatsApp, calls and through SOs — some get missed",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Make one number the only order line — everything lands in one place",
+        "Confirm every order back to the dealer — catches misses the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "one order book for WhatsApp, calls and SO orders, tracked to dispatch with confirmations sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many dealer orders come in a day?",
+      "free_stops": "The order intake flow and status messages are in the solution document."
+    },
+    {
+      "id": "p10_data_scattered",
+      "n": 10,
+      "words": "Factory supervisor and accounts each keep their own numbers",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Pick the three numbers you want daily — keeps everyone focused",
+        "Settle yesterday's mismatches in one short morning meeting — stops gaps growing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read of sales by territory, receivables, raw-material cover and open complaints from one source.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which numbers disagree most between the two?",
+      "free_stops": "Which figures feed the daily read and from where is in the solution document."
+    }
+  ],
+  "never_say": [
+    "No formulation, recipe, VOC, hazard classification, storage or dangerous-goods transport advice. Never say a product meets or fails PSQCA, ESMA/UAE or Canadian standards. Never help mislabel, re-date expired stock, copy another brand's packaging or under-invoice imports; decline. Spills, fires, fumes or burns: stop and point to emergency services. No advice on effluent or environmental rules; note admin effort only. Never store dealers' or painters' names or numbers; roles and towns only."
+  ],
+  "sample_reply": {
+    "person": "Can you suggest a solution? Dealers keep sending back full cartons over shade complaints and we never know which batch they're from.",
+    "pi": "Yes, this can be solved, and you can start this week. 1 Write the batch number on every dispatch note, so any returned carton can be traced. 2 Keep a retained sample of each batch to compare complaints against. Workzap can do this automatically for you: a batch register that links each batch to the dealers it went to, so one code shows where else it was sent. Shall I have a solution document and quote prepared for you? You're free to say no.",
+    "language": "english"
+  }
+}

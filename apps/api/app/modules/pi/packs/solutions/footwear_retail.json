@@ -1,0 +1,205 @@
+{
+  "industry": "footwear_retail",
+  "name": "Footwear retail",
+  "sector": "7.A Retail and consumer (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_stockout",
+      "n": 1,
+      "words": "Customer ko joota pasand hai lekin uska number nahi hai",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Keep a sheet where staff note each size asked for but not available, so you see the sizes you're losing",
+        "Check which sizes run out first in your top articles, so the next order isn't a fixed set."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "a size grid per article per outlet with a \"lost size\" button for staff and a size curve to guide every order.",
+        "tool_words": []
+      },
+      "ask_first": "How do you decide sizes when you place an order?",
+      "free_stops": "How lost sizes are logged and the size curve is worked out are in the solution document."
+    },
+    {
+      "id": "p2_overstock_dead_stock",
+      "n": 2,
+      "words": "Har article mein sirf 5 aur 11 bachte hain",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "List broken-size articles across outlets once, so you can pull remaining sizes into one place",
+        "Put the leftover sizes online or in one outlet, so they're seen together."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking",
+          "dashboards_reports"
+        ],
+        "text": "broken-size consolidation suggestions with transfers to one outlet or online, tracked to arrival.",
+        "tool_words": []
+      },
+      "ask_first": "How many outlets do you have?",
+      "free_stops": "How consolidation is suggested and transfers are tracked is in the solution document."
+    },
+    {
+      "id": "p3_wrong_location",
+      "n": 3,
+      "words": "Size dhoondne mein back room mein das minute lagte hain",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Arrange one category by article and size once, so you see how much faster it gets",
+        "Label racks clearly, so new staff can find boxes without asking."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "rack and shelf location printed on every box label and searchable at the counter, kept current as stock moves.",
+        "tool_words": []
+      },
+      "ask_first": "How are boxes arranged today?",
+      "free_stops": "The location coding and lookup setup are in the solution document."
+    },
+    {
+      "id": "p4_product_defects",
+      "n": 4,
+      "words": "Sole mahine mein nikal jaata hai, customers gusse mein wapas aate hain",
+      "category": "quality_complaints",
+      "subtype": "product_defects",
+      "quick_ideas": [
+        "Note article and supplier for every claim for a month, so you see whether it's one source",
+        "Raise the pattern with that supplier with your list, so it's facts not arguments."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "dashboards_reports"
+        ],
+        "text": "a claims register by article, supplier, defect and outcome, with totals per supplier.",
+        "tool_words": []
+      },
+      "ask_first": "Is it mostly one supplier or workshop?",
+      "free_stops": "How claims are recorded and supplier totals reported is in the solution document."
+    },
+    {
+      "id": "p5_transfers_lost",
+      "n": 5,
+      "words": "Ek outlet se doosre size bhejte hain, raaste mein gum ho jaata hai",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Note every single-size transfer for a week, so you see where they disappear",
+        "Ask the receiving outlet to confirm arrival, so the gap shows the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "transfer requests for a waiting customer, with dispatch and receipt confirmed and anything missing flagged.",
+        "tool_words": []
+      },
+      "ask_first": "How are transfers recorded today?",
+      "free_stops": "The transfer flow and alerts are in the solution document."
+    },
+    {
+      "id": "p6_conversion_low",
+      "n": 6,
+      "words": "Log try karte hain, chale jaate hain aur online sasta le lete hain",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Ask staff to note why people leave without buying for a week, so you know if it's price, size or style",
+        "Check a few top articles against online prices, so you know where the gap really is."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "dashboards_reports"
+        ],
+        "text": "walk-ins and lost reasons per outlet every day, and follow-up messages to opted-in customers when their size arrives.",
+        "tool_words": [],
+        "reordered_from": [
+          "dashboards_reports",
+          "customer_messaging"
+        ]
+      },
+      "ask_first": "Do you also sell online?",
+      "free_stops": "How reasons are captured and follow-ups sent is in the solution document."
+    },
+    {
+      "id": "p7_margin_shrinking",
+      "n": 7,
+      "words": "Badi sale lagate hain aur aadhi range pe nuksaan hota hai",
+      "category": "margin_cost",
+      "subtype": "margin_shrinking",
+      "quick_ideas": [
+        "Work out cost against sale price on your top sale articles once, so you see where the sale loses money",
+        "Keep loss-making articles out of the next sale, so the sale clears stock without giving margin away."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "margin per article including markdowns, with a check before a sale on how deep each discount can go.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you know the purchase cost of each article?",
+      "free_stops": "How margin and discount depth are calculated is in the solution document."
+    },
+    {
+      "id": "p8_manual_work",
+      "n": 8,
+      "words": "Stocktake mein do din shop band karni parti hai",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Count one section on a quiet morning, so you see how long a partial count takes",
+        "Note which sections are always off, so they're counted more often."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a section-by-section count on phone so stocktakes happen over time without closing the shop.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many articles do you carry?",
+      "free_stops": "The count schedule and how it's compared with stock is in the solution document."
+    },
+    {
+      "id": "p9_integration_marketplace",
+      "n": 9,
+      "words": "Daraz pe stock galat dikhta hai, cancellations aati hain",
+      "category": "tech_systems",
+      "subtype": "integration_marketplace",
+      "quick_ideas": [
+        "Compare marketplace stock with shop stock for your top articles once, so you see how far apart they are",
+        "Remove sizes you can't fulfil, so cancellations stop hurting your rating."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "marketplace stock sync for Daraz, Noon or Amazon from your shop stock.",
+        "tool_words": []
+      },
+      "ask_first": "Which marketplaces do you sell on?",
+      "free_stops": "How stock is synced and how often is in the solution document."
+    }
+  ],
+  "never_say": [
+    "How to sell \"first copy\" shoes under a brand name. That synthetic can be called leather or origin changed. Foot-health or medical footwear advice. To accuse or secretly film staff suspected of swapping pairs. That a sale or display will bring a set number of customers."
+  ],
+  "sample_reply": {
+    "person": "Eid pe aadhe customers wapas jaate hain kyunke unka number nahi hota. Iska koi hal batao.",
+    "pi": "Ji haan, iska hal hai, aur Eid se pehle shuruaat ho sakti hai. 1 Counter pe ek sheet rakhein jahan staff har woh size likhe jo maanga gaya lekin nahi tha, taa ke pata chale asal mein kaun se number kam parte hain. 2 Apne top articles mein dekh lein kaun se sizes sab se pehle khatam hote hain, taa ke agla order fixed set pe na ho. Workzap ye aap ke liye khud-ba-khud kar sakta hai: har article ka size grid har outlet ke liye, staff ke liye \"size nahi mila\" button, aur har order ke liye size ka hisaab. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

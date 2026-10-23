@@ -1,0 +1,241 @@
+{
+  "industry": "general_contractors",
+  "name": "General contractors",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_shrinkage_theft",
+      "n": 1,
+      "words": "Cement and steel go missing from site every month",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Make one storekeeper the only person who signs for deliveries, so receiving has a single owner",
+        "Count cement bags and sariya once this week against the register, to see the real gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "stock_alerts"
+        ],
+        "text": "A site material register on phone with a photo of every delivery challan, issues to work and a running balance per site, with gaps flagged daily as patterns, not accusations.",
+        "tool_words": []
+      },
+      "ask_first": "Who signs for material when it reaches site?",
+      "free_stops": "The receiving flow and variance checks are in the solution document."
+    },
+    {
+      "id": "p2_transfers_lost",
+      "n": 2,
+      "words": "Material is ordered for the wrong site, then lorries shuttle it around",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Note every site-to-site move with who sent and who received, so nothing vanishes in between",
+        "Put the site name on every purchase request."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "An inter-site transfer log where both ends confirm, flagging anything sent but not received across all sites.",
+        "tool_words": []
+      },
+      "ask_first": "How many sites are running right now?",
+      "free_stops": "Confirmation rules and alert timing are set out in the solution document."
+    },
+    {
+      "id": "p3_cost_overruns",
+      "n": 3,
+      "words": "I don't know actual material consumed against the BOQ",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Pick the top few BOQ items and compare issued quantity to work done once, to find the biggest leak",
+        "Review that comparison with the site engineer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A BOQ against actual tracker per item and per site, with variance alerts as material is issued.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which cost runs over most often: material, labour or machinery?",
+      "free_stops": "How consumption is measured against BOQ items is in the solution document."
+    },
+    {
+      "id": "p4_unbilled_variations",
+      "n": 4,
+      "words": "We did extra work on verbal instructions and the client won't pay",
+      "category": "cash_collections",
+      "subtype": "unbilled_variations",
+      "quick_ideas": [
+        "Get a written WhatsApp or email confirmation before any extra work starts, so there's a record",
+        "List all current unbilled extras with dates and photos; for disputes, take professional advice."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A variation register with request, photos, client approval, quantity and billing status, so nothing reaches the running bill unrecorded.",
+        "tool_words": []
+      },
+      "ask_first": "Who signs off extra work before it starts?",
+      "free_stops": "The approval steps and link to billing are in the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Running bills get certified late and retention is stuck for years",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid bill and retention by project with its date, so the full amount owed is visible",
+        "Give one person ownership of chasing certification."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A running bill ledger with certification status and ageing of unpaid bills and retentions, with reminders on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "How long do bills usually take to get certified and paid?",
+      "free_stops": "Ageing stages and follow-up rules are in the solution document; contract claims need professional advice."
+    },
+    {
+      "id": "p6_attendance_lateness",
+      "n": 6,
+      "words": "Thekedar shows fifty workers on the sheet, I count far fewer on site",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Do an unannounced headcount per gang once, to compare against the sheet",
+        "Ask the site in-charge, not the thekedar, to sign daily attendance."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Gang-wise attendance with a photo or location check-in on site, comparing headcount to what each thekedar claims every day, without storing ID details.",
+        "tool_words": []
+      },
+      "ask_first": "Is your labour direct, through thekedars, or both?",
+      "free_stops": "The check-in method and comparison report are in the solution document."
+    },
+    {
+      "id": "p7_payroll_errors",
+      "n": 7,
+      "words": "Wages get disputed every payday",
+      "category": "people_staff",
+      "subtype": "payroll_errors",
+      "quick_ideas": [
+        "Share each gang's attendance total before payday, so disagreements come up early",
+        "Write the overtime rule down once, so it's the same for everyone."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A dihari and wage calculator from daily attendance and overtime, producing a payslip per gang each pay cycle; labour-law questions go to a professional.",
+        "tool_words": []
+      },
+      "ask_first": "How often are wages paid?",
+      "free_stops": "Wage rules and payslip layout are set out in the solution document."
+    },
+    {
+      "id": "p8_approvals_slow",
+      "n": 8,
+      "words": "Purchase requests from site wait days for office approval",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "Set a small-spend limit the site in-charge can approve, so urgent items move",
+        "Batch other requests into one daily approval slot."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A purchase request flow from site to office with limits, phone approvals and a purchase order created automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who approves purchases from site today?",
+      "free_stops": "Approval limits and the PO flow are in the solution document."
+    },
+    {
+      "id": "p9_field_team_visibility",
+      "n": 9,
+      "words": "Daily progress comes in WhatsApp voice notes from each site",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Ask each site for the same five-point update daily, so reports can be compared",
+        "Ask for a couple of dated photos with it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "A daily site report form (manpower, work done, material, issues, photos) that rolls up into one owner dashboard across all sites; it also builds the site diary.",
+        "tool_words": [
+          "dashboard"
+        ]
+      },
+      "ask_first": "What do you wish you could see without calling site?",
+      "free_stops": "The report fields and dashboard design are in the solution document."
+    },
+    {
+      "id": "p10_hidden_costs",
+      "n": 10,
+      "words": "Rented machinery sits idle and we still pay for it",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "List all rented plant with site and rent start date, so idle items stand out",
+        "Ask sites to mark idle days, so returns happen sooner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A plant and machinery log with hours used, idle days, rental charges and service due dates for every machine.",
+        "tool_words": []
+      },
+      "ask_first": "Which machinery do you own and which do you rent?",
+      "free_stops": "How usage is recorded and costed is in the solution document."
+    },
+    {
+      "id": "p11_margin_unknown",
+      "n": 11,
+      "words": "Project finishes and I can't tell if we made money",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "For one finished project, put billed, collected and cost in one sheet, to see the real result",
+        "Agree to track the same three numbers on the next project from day one."
+      ],
+      "workzap_build": {
+        "keys": [
+          "erp_nori_platform"
+        ],
+        "text": "A project P&L per site on nori, pulling bills, collections, material, labour and plant together and updating daily.",
+        "tool_words": []
+      },
+      "ask_first": "How do you compare actual spend to plan today?",
+      "free_stops": "Cost allocation rules and module order are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any structural, scaffolding, excavation, lifting, electrical or fire-safety advice; a qualified engineer or safety officer decides. Anything on contract claims, liquidated damages, bonds or labour law; suggest professional advice. Any help faking attendance, inflating measurements, backdating site diaries, under-invoicing or paying for approvals. Any request to record workers' names, CNIC/Emirates ID, passport or visa details, or wage bank details. Anything other than emergency services first for a site accident, collapse, fall, electrocution or heatstroke."
+  ],
+  "sample_reply": {
+    "person": "Site pe cement aur sariya ka hisaab hi nahi milta, mahine ke end pe pata chalta hai material kahan gaya. Kuch hal batao.",
+    "pi": "Ji, is ka hal bilkul ho sakta hai, aur kuch kaam isi hafte shuru ho sakta hai. 1 Delivery pe sign karne ka haq sirf ek storekeeper ko dein, taake receiving ka ek hi zimmedar ho. 2 Is hafte ek baar cement ki bori aur sariya gin ke register se milayen, taake asal farq saamne aaye. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har delivery challan ki photo, har site ka roz ka material balance, aur farq aate hi alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

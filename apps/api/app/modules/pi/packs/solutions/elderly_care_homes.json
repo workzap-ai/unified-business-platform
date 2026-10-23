@@ -1,0 +1,217 @@
+{
+  "industry": "elderly_care_homes",
+  "name": "Elderly care homes",
+  "sector": "7.I Health and care",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_receivables_late",
+      "n": 1,
+      "words": "Families abroad pay late and it's awkward to chase",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Put all fees and dues in one record by account code, so balances are clear",
+        "Send every family a bill on the same date, so payment is expected rather than chased."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a fee and extras ledger per account code with monthly invoices, local and overseas payments, ageing and polite reminders on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "How do overseas families pay now?",
+      "free_stops": "Reminder tone and timing are in the solution document."
+    },
+    {
+      "id": "p2_hidden_costs",
+      "n": 2,
+      "words": "Extras like diapers and special food aren't billed",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "Note extras used per account for a week, so you see what is missed",
+        "Agree which extras are billable, so staff know."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "credit_ledger — an extras log where staff record billable items, feeding the monthly invoice automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Who records extras today?",
+      "free_stops": "The extras list and billing link are in the solution document."
+    },
+    {
+      "id": "p3_conversion_low",
+      "n": 3,
+      "words": "We have empty rooms but enquiries don't convert",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "List last month's enquiries with what happened next, so drop-off points are clear",
+        "Call back families who visited but didn't decide, with their permission, so they hear from you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an enquiry and admissions pipeline from enquiry to visit, documents, decision and move-in, with follow-up reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Where do most enquiries come from?",
+      "free_stops": "Pipeline stages are in the solution document."
+    },
+    {
+      "id": "p4_attendance_lateness",
+      "n": 4,
+      "words": "Night staff don't show up and day staff have to stay on",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Keep a standby list for night shifts, so cover is ready",
+        "Record no-shows by shift, so patterns show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "field_checks — a roster with shift check-in, missed-check-in alerts, sick-call cover and overtime log.",
+        "tool_words": []
+      },
+      "ask_first": "Are night staff in-house or agency?",
+      "free_stops": "Cover and alert rules are in the solution document."
+    },
+    {
+      "id": "p5_stockout",
+      "n": 5,
+      "words": "Kitchen supplies run out and someone runs to the market",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Do one count of kitchen staples and set minimum levels, so low stock is visible",
+        "Order weekly on a fixed day, so buying is planned."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a kitchen and consumables list with par levels, weekly usage and supplier orders sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Is the kitchen in-house or catered?",
+      "free_stops": "Par levels are worked out in the solution document."
+    },
+    {
+      "id": "p6_theft_internal",
+      "n": 6,
+      "words": "Diapers, gloves and toiletries disappear faster than they should",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Compare a week of issues with occupancy, so unusual use shows",
+        "Keep stock in one locked store with a sign-out sheet, so issues are recorded."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "dashboards_reports — consumables issued by shift and floor against occupancy, with unusual use flagged.",
+        "tool_words": []
+      },
+      "ask_first": "Who has access to the store?",
+      "free_stops": "The comparison method is in the solution document."
+    },
+    {
+      "id": "p7_handoffs",
+      "n": 7,
+      "words": "Handover between shifts is verbal and things get missed",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Use one written handover sheet for operational tasks, so nothing relies on memory",
+        "Have the next shift lead sign it, so receipt is confirmed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a digital handover note with tasks carried over and acknowledged by the next shift lead, without care-plan content.",
+        "tool_words": []
+      },
+      "ask_first": "How many shifts run a day?",
+      "free_stops": "Handover fields are in the solution document; care content stays with your nursing lead."
+    },
+    {
+      "id": "p8_customer_communication",
+      "n": 8,
+      "words": "Families call all day asking for updates and staff get distracted",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Count family calls for a few days, so the load is known",
+        "Set update times for families, so calls are grouped."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a family WhatsApp channel for general notices and visiting arrangements, with a request log answered at set times and no resident health details.",
+        "tool_words": []
+      },
+      "ask_first": "Which questions come up most?",
+      "free_stops": "Channel set-up is in the solution document."
+    },
+    {
+      "id": "p9_maintenance_downtime",
+      "n": 9,
+      "words": "Generator, AC and lift breakdowns are fixed only when they fail",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List each item's last service date, so overdue ones are visible",
+        "Book the most overdue service now, so one risk is closed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a maintenance schedule for generator, AC, lift and fire equipment with service history and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have service contracts?",
+      "free_stops": "Service intervals are set with your vendors in the solution document."
+    },
+    {
+      "id": "p10_owner_blind",
+      "n": 10,
+      "words": "I can't see occupancy, income and staff cost in one place",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Put this month's occupancy, income, staff cost and utilities on one page, so you have a picture",
+        "Add open complaints, so issues sit next to the numbers."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read with occupancy, income, receivables, staff cost, utility cost and open complaints.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you run one home or more?",
+      "free_stops": "Which numbers appear is set in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any care, nursing, medication, nutrition, dementia or end-of-life advice. Any treatment of abuse or neglect as a routine problem; ensure safety, call emergency services and report to the relevant authority. Interpretations of licensing, staffing ratios or inspection standards. Help hiding incidents, faking training records or hiring without required checks. Ideas that record resident names, ages, conditions or room details, or family details. Promises about filling rooms."
+  ],
+  "sample_reply": {
+    "person": "Kai residents ki families bahar mulk mein hain, fees do do mahine late aati hai aur bar bar yaad dilana parta hai. Koi tareeqa batayein.",
+    "pi": "Ji, is ka tareeqa mojood hai aur shuruat isi hafte ki ja sakti hai. 1 Saari fees aur dues ek hi record mein account code ke saath rakhein, taake har balance saaf ho. 2 Har family ko har mahine ek hi tareekh pe bill bhejein, taake payment yaad dilane ke bajaye mutawaqqa ho. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: har mahine invoice, bahar se aane wali payments ka record aur waqt par narm reminders. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

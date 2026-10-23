@@ -1,0 +1,217 @@
+{
+  "industry": "wedding_planners_and_event_management",
+  "name": "Wedding planners and event management",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_pre_orders_custom",
+      "n": 1,
+      "words": "Clients keep changing the decor after we've agreed and won't pay for the changes",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Get every change approved with its cost in writing before your team starts on it, so extras aren't argued later",
+        "Look at your last few weddings once to see which changes went unpaid."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a change-order flow where each client change is logged, priced and approved on WhatsApp before work starts, totalled per event.",
+        "tool_words": []
+      },
+      "ask_first": "How do you agree the original design with clients now?",
+      "free_stops": "The change-order steps and how they tie to the quote are in the solution document."
+    },
+    {
+      "id": "p2_manual_work",
+      "n": 2,
+      "words": "Quotes take me days to put together in Word",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Gather the items you quote most often in one list with current costs, so you stop starting from scratch",
+        "Reuse your last good quote as the base for the next one."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a quote builder with your item library that produces a branded quote in minutes and keeps costs up to date.",
+        "tool_words": []
+      },
+      "ask_first": "How many quotes do you send in a busy month?",
+      "free_stops": "The item library structure and pricing logic stay for the solution document."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Final payment is chased for weeks after the wedding",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Tie payment stages to dates before the event, so the biggest balance isn't left for after",
+        "List every unpaid balance and contact each family once."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a payment schedule per event with reminders sent automatically before each instalment and balances visible in one place.",
+        "tool_words": []
+      },
+      "ask_first": "In how many stages do clients pay you now?",
+      "free_stops": "Stage timing and reminder rules are set out in the solution document."
+    },
+    {
+      "id": "p4_shift_scheduling",
+      "n": 4,
+      "words": "Three events on one night and my team doesn't know who's where",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Put every team member's assignment for the coming weekends in one place, so nobody has to ask you",
+        "Name a lead for each event, so questions don't all come to you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a team scheduling board for overlapping events with confirmations and clash warnings.",
+        "tool_words": []
+      },
+      "ask_first": "How many events do you run on a peak weekend?",
+      "free_stops": "How roles and events are mapped and confirmed goes in the solution document."
+    },
+    {
+      "id": "p5_owner_bottleneck",
+      "n": 5,
+      "words": "Only I know the full plan; if I'm sick the event falls apart",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Write one upcoming event's run sheet down fully, so someone else could run it",
+        "Share it with that event's lead and walk them through it once."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an event file per client with theme, vendors, timings and payments, shared with the team, plus an event-day checklist leads tick off with photos.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have a senior person who could lead an event?",
+      "free_stops": "The event file structure and day-of checklist are designed in the solution document."
+    },
+    {
+      "id": "p6_supplier_late",
+      "n": 6,
+      "words": "Florist or sound vendor shows up late on the day",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_late",
+      "quick_ideas": [
+        "Confirm every vendor's arrival time the day before each event, so problems show while there's time",
+        "Keep a backup vendor for the categories that let you down most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "day-before WhatsApp confirmations sent to every vendor automatically, with late or missing replies flagged to you.",
+        "tool_words": []
+      },
+      "ask_first": "Which vendor type lets you down most?",
+      "free_stops": "The vendor directory and confirmation timing stay for the solution document."
+    },
+    {
+      "id": "p7_shrinkage_theft",
+      "n": 7,
+      "words": "Decor props come back broken or don't come back",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "List what goes out for the next event and check it back in after teardown, so every prop has an owner",
+        "Note damage on return, to see which events or teams cause it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a decor and prop register with check-out and check-in per event, flagging anything sent but not returned.",
+        "tool_words": []
+      },
+      "ask_first": "Is your decor stored in one godown?",
+      "free_stops": "The register setup and damage notes are in the solution document."
+    },
+    {
+      "id": "p8_lead_quality",
+      "n": 8,
+      "words": "Lots of Instagram enquiries but most just want prices and vanish",
+      "category": "marketing_leads",
+      "subtype": "lead_quality",
+      "quick_ideas": [
+        "Note where each serious enquiry came from this month, to see which channel brings real clients",
+        "Follow up once with everyone who had a consultation but didn't book."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "and attribution_codes — an enquiry tracker with source tags and automatic follow-up reminders, showing which posts and ads bring real bookings.",
+        "tool_words": []
+      },
+      "ask_first": "Do you share prices before or after a consultation?",
+      "free_stops": "Source tagging and the follow-up sequence are planned in the solution document."
+    },
+    {
+      "id": "p9_margin_unknown",
+      "n": 9,
+      "words": "I genuinely don't know which events made money",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out the true cost of your last wedding against its quote, to see where money went",
+        "Note the cost that surprised you most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a per-event profit report pulling quote, change orders, vendor bills and labour automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you price as a package or itemised?",
+      "free_stops": "How costs are captured per event stays for the solution document."
+    },
+    {
+      "id": "p10_petty_cash",
+      "n": 10,
+      "words": "Labour team gets paid in cash per event and the numbers never add up",
+      "category": "cash_collections",
+      "subtype": "petty_cash",
+      "quick_ideas": [
+        "Write down who worked and what was paid at each event this week, so there's one record",
+        "Pay from one person only, so cash has one trail."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a labour and freelancer payout ledger per event, with balances updated automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How many labourers work a typical event?",
+      "free_stops": "Payout rules and settlement cycle are in the solution document."
+    }
+  ],
+  "never_say": [
+    "Interpretation of contracts, cancellation terms or vendor and client disputes. Pyrotechnics, rigging, structure or electrical safety advice; any injury on site means emergency services first. Advice on alcohol, music licences or event permits, or help bypassing them. Financial advice on currency for destination weddings. Help with fake or inflated invoices."
+  ],
+  "sample_reply": {
+    "person": "Families keep changing the stage design and then refuse to pay extra. How do I stop this?",
+    "pi": "Yes, this can be brought under control, starting with your next booking. 1 Get every change approved with its cost in writing before your team starts on it, so extras aren't argued afterwards. 2 Look back at your last few weddings once to see which changes went unpaid and why. Workzap can do this automatically for you: each change is logged, priced and approved by the client on WhatsApp before work starts, and added to the event's total. Shall I prepare a solution document and quote for you? You can say no.",
+    "language": "english"
+  }
+}

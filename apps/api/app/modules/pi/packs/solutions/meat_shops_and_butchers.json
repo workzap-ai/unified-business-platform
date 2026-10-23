@@ -1,0 +1,200 @@
+{
+  "industry": "meat_shops_and_butchers",
+  "name": "Meat shops and butchers",
+  "sector": "7.B Food and beverage",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_margin_unknown",
+      "n": 1,
+      "words": "I buy a carcass and don't know how much saleable meat I actually get",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Weigh one carcass in, then the cuts, bone, fat and trim out, so you see your real yield once",
+        "Work out cost per saleable kilo from that, because the board price should follow it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a carcass yield tracker recording purchase weight, cuts, bone, fat and trim for every carcass, with cost per saleable kilo worked out automatically.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is bone and trim weighed separately now?",
+      "free_stops": "The yield method per meat type and how it feeds pricing go in the solution document."
+    },
+    {
+      "id": "p2_price_increases_supplier",
+      "n": 2,
+      "words": "Mutton price changes daily, my board price doesn't",
+      "category": "margin_cost",
+      "subtype": "price_increases_supplier",
+      "quick_ideas": [
+        "Note your buying rate every day, so you see when the board price is out of step",
+        "Review board prices on the cuts you sell most first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a daily price board where you enter the buying rate, the board price per cut follows your own margin rule, and the day's rates go to customers who opted in.",
+        "tool_words": []
+      },
+      "ask_first": "How often does your buying price change?",
+      "free_stops": "The pricing rule per cut and the broadcast set-up stay for the solution document."
+    },
+    {
+      "id": "p3_count_mismatch",
+      "n": 3,
+      "words": "Scale weight and actual sale don't add up at night, and cutters give extra to friends",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Compare weight bought with weight sold at closing once, so you know how big the gap is",
+        "Have every sale weighed and written at the counter, so nothing leaves unrecorded."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a day-end match of scale weights to sales and purchases per shop, with gaps shown by shift.",
+        "tool_words": []
+      },
+      "ask_first": "Who does the cutting and weighing?",
+      "free_stops": "The reconciliation routine and how gaps are traced are in the solution document."
+    },
+    {
+      "id": "p4_maintenance_downtime",
+      "n": 4,
+      "words": "Chiller failed in the night, meat spoiled",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Note chiller temperatures at opening and closing, so a failing unit shows early",
+        "Keep the repair contact and generator fuel level checked daily."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a cold-room temperature and power-cut log with alerts when a reading is missed or out of range.",
+        "tool_words": []
+      },
+      "ask_first": "What happens now when the chiller or power fails?",
+      "free_stops": "The checking routine and alert rules stay for the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Restaurants take meat on credit and pay late, and the ledger in a copy causes disputes",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every restaurant account with its balance and oldest unpaid date, so you know who to chase first",
+        "Give a signed slip with every credit delivery, so disputes have a record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a credit ledger for restaurant and caterer accounts by label, with statements and automatic reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How many restaurants or caterers buy on credit?",
+      "free_stops": "The credit terms and reminder schedule are set out in the solution document."
+    },
+    {
+      "id": "p6_order_errors",
+      "n": 6,
+      "words": "WhatsApp orders for home delivery get missed or packed wrong",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Write every WhatsApp order on one sheet with cut, weight and slot, so the cutter works from one list",
+        "Read the order back before packing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a WhatsApp order flow for cut, weight and delivery slot, with a packing checklist and status for each order.",
+        "tool_words": []
+      },
+      "ask_first": "What goes wrong most often with delivery orders?",
+      "free_stops": "The order flow and packing checks are in the solution document."
+    },
+    {
+      "id": "p7_pre_orders_custom",
+      "n": 7,
+      "words": "Qurbani orders, hissa allocations and timings are chaos",
+      "category": "orders_fulfilment",
+      "subtype": "pre_orders_custom",
+      "quick_ideas": [
+        "Put every Qurbani booking in one list with slot and cutting preference, so the Eid days run from a plan",
+        "Confirm each booking back to the customer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a Qurbani booking system with animal or hissa, slot, cutting preferences, advance and automatic status updates.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "What was hardest last Eid?",
+      "free_stops": "The booking and Eid-day scheduling plan stay for the solution document."
+    },
+    {
+      "id": "p8_overtime",
+      "n": 8,
+      "words": "Eid ul Adha staff demand double and still leave, and skilled butchers are hard to find",
+      "category": "people_staff",
+      "subtype": "overtime",
+      "quick_ideas": [
+        "Agree Eid pay and overtime with cutters well before Eid, so it isn't negotiated under pressure",
+        "Line up a few extra cutters early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "an Eid staffing and overtime plan with shifts and confirmations for each cutter.",
+        "tool_words": []
+      },
+      "ask_first": "How many cutters do you have?",
+      "free_stops": "The staffing and overtime plan are detailed in the solution document."
+    },
+    {
+      "id": "p9_branch_comparison",
+      "n": 9,
+      "words": "Two shops, I can't compare which makes money",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Put both shops' sales and purchases side by side once, so you see the real picture",
+        "Compare wastage by shop, because it often explains the gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a short morning read with each shop's sales, purchases, yield and wastage, and the one thing to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do both shops buy from the same supplier?",
+      "free_stops": "How each shop's profit is calculated goes in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about halal or zabiha certification, slaughter rules or animal welfare law. Veterinary or live-animal handling advice. Food-safety or temperature-standard advice. Help passing off one meat as another, selling spoiled meat or mislabelling origin. That yield tracking will raise profit by any amount."
+  ],
+  "sample_reply": {
+    "person": "Poora bakra leta hun, lekin pata nahi chalta asal mein kitna maal bikne layak nikla. Koi solution hai?",
+    "pi": "Ji haan, ye bilkul maloom kiya ja sakta hai, aur agla bakra hi shuruaat ho sakta hai. 1 Ek bakray ka wazan aate waqt aur phir boti, haddi, charbi aur trim alag alag tol kar likhein, taake asal yield ek baar saamne aaye. 2 Us se bikne layak gosht ki fi kilo laagat nikaalein, kyunke board rate usi ke mutabiq hona chahiye. Workzap ye aap ke liye automatically kar sakta hai: har bakray ka yield record, fi kilo laagat khud hisaab hoti rahe, aur din ke end par khareeda aur bika wazan mila kar dikhaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

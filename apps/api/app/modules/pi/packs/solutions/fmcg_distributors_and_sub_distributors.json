@@ -1,0 +1,241 @@
+{
+  "industry": "fmcg_distributors_and_sub_distributors",
+  "name": "FMCG distributors and sub-distributors",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_field_team_visibility",
+      "n": 1,
+      "words": "Order bookers say they visited shops but I'm not sure they did",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Compare one day's PJP with the shops that actually sent orders, so you see the real coverage gap",
+        "Agree openly with order bookers that visits will be confirmed from the shop, so it is a known rule and not hidden checking."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "An order-booker app that logs each shop visit with time and location, agreed with staff, and shows planned vs visited shops per route every evening.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many order bookers and routes run on a normal day?",
+      "free_stops": "How visits are confirmed and reported is designed in the solution document."
+    },
+    {
+      "id": "p2_order_errors",
+      "n": 2,
+      "words": "Orders written on paper get lost or entered wrong in the DMS",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Number the order slip books, so a missing slip shows up at once",
+        "Have one person do DMS entry, so mistakes can be traced and fixed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "Orders taken at the shop on phone or WhatsApp that flow straight into the godown pick list and DMS entry, with no retyping.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The order flow from shop to DMS is mapped in the solution document."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Scheme claims with the company are months behind and some get rejected",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every open claim with its age, so you see how much money is waiting",
+        "Go through recent rejections for the most common reason, so you fix the biggest gap first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A claims tracker showing each claim's documents, status and age with the principal, and reminding staff automatically about missing papers.",
+        "tool_words": []
+      },
+      "ask_first": "What reason does the company give most often for a rejection?",
+      "free_stops": "The claim stages and document checklist are set in the solution document."
+    },
+    {
+      "id": "p4_credit_customers",
+      "n": 4,
+      "words": "Retailers' udhaar keeps growing and recovery men bring back excuses",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Sort shop balances on each route by age, so recovery starts with the oldest",
+        "Set a credit limit for your largest-balance shops, so new credit stops at a known point."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A retailer ledger with ageing and limits that sends each recovery man his route list every morning and shows the owner promises against collections.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Limit rules and the morning recovery list are designed in the solution document."
+    },
+    {
+      "id": "p5_cash_leakage",
+      "n": 5,
+      "words": "Salesman collected cash but deposited less",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Settle each van the same evening, before staff leave, so a gap is found the day it happens",
+        "Give shops a numbered receipt for every cash payment, so cash can be matched to receipts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A daily van settlement screen showing loaded, delivered, returned, cash and credit per salesman, with any shortfall flagged that evening.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The settlement steps and checks are laid out in the solution document."
+    },
+    {
+      "id": "p6_expiry_wastage",
+      "n": 6,
+      "words": "Expiry stock piles up and the company won't take it back",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Walk the godown once and list what expires in the next few weeks, so it can be pushed on routes in time",
+        "Raise near-expiry stock with the company's area rep early, while it can still be discussed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "An expiry register by batch that alerts automatically before expiry and gives order bookers a daily list of what to push on which route.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Alert timings and the push list rules are in the solution document."
+    },
+    {
+      "id": "p7_stockout",
+      "n": 7,
+      "words": "Fast SKUs run out while slow ones fill the godown",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Rank SKUs by last month's secondary sales, so buying follows what shops actually take",
+        "Share that ranking with the company's area manager, so primary orders reflect it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "Reorder suggestions per SKU from daily secondary sales and lead time, with low-stock alerts sent automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The reorder calculation per SKU is set out in the solution document."
+    },
+    {
+      "id": "p8_margin_unknown",
+      "n": 8,
+      "words": "I don't know which routes are actually profitable",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Write down one week's sales, fuel and van cost per route, so the weakest route shows itself",
+        "Note which vans run light on which days, so loads can be combined."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A route view refreshed daily with sales, margin, fuel and van cost per route, highlighting routes that lose money.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "How costs are assigned to routes is worked out in the solution document."
+    },
+    {
+      "id": "p9_target_missed",
+      "n": 9,
+      "words": "Targets come from the company but I can't see daily progress",
+      "category": "sales_revenue",
+      "subtype": "target_missed",
+      "quick_ideas": [
+        "Write this month's sales so far against target by brand, so you see the gap before month-end",
+        "Share it with order bookers, so they know what is left."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "A morning WhatsApp read: yesterday's sales by brand and order booker against target, cash in, recovery and stock alerts.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "The target breakdown by brand and person is set in the solution document."
+    },
+    {
+      "id": "p10_commission_disputes",
+      "n": 10,
+      "words": "Commission and incentive calculations cause fights every month",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write the incentive rules on one page and share them, so everyone argues from the same rules",
+        "Show each order booker his numbers mid-month, so month-end has no surprises."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "An incentive calculator with rules each order booker can see and running totals that update automatically from sales.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How the rules are encoded and shown is in the solution document."
+    },
+    {
+      "id": "p11_whatsapp_overload",
+      "n": 11,
+      "words": "Shopkeepers WhatsApp me directly for orders and I forget some",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Give shopkeepers one order number that isn't your personal phone, so orders land in one place",
+        "Make one person responsible for confirming every order received there."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "A WhatsApp order intake that turns each shop's message into a tracked order on the godown list, so none is missed.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The intake flow and confirmation steps are designed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything that helps inflate scheme claims, create fake retailer invoices or move stock into another distributor's territory; pi declines. Views on the distributor agreement, termination, territory or security deposit; suggest a lawyer. Sales tax or withholding advice; refer to their tax adviser. Covert tracking of order bookers or salesmen, or storing staff or shopkeeper names, numbers or CNICs. Promises that recovery, claims settlement or targets will improve. Comments on pharma or tobacco regulation; if a van accident hurts someone, emergency services 1122, 999, 911 come first."
+  ],
+  "sample_reply": {
+    "person": "Har shaam van wale salesman ka hisaab karne mein do ghante lagte hain aur cash phir bhi kam nikalta hai. Koi tareeqa batao.",
+    "pi": "Ji haan, shaam ka hisaab tez aur saaf kiya ja sakta hai. 1 Har van ka settlement usi shaam staff ke jaane se pehle karein, taake farq usi din pakra jaye. 2 Dukaanon ko har cash payment par numbered raseed dein, taake cash raseedon se mil sake. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: har salesman ka load, delivery, returns aur cash ek screen par aaye aur farq roz shaam apne aap saamne aa jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

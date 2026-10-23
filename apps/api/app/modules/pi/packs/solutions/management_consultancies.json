@@ -1,0 +1,217 @@
+{
+  "industry": "management_consultancies",
+  "name": "Management consultancies",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_lead_followup_slow",
+      "n": 1,
+      "words": "We write proposals for weeks and can't tell which ones are still alive",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Go through every proposal sent in the last three months once and mark it live, lost or unknown, so you see the real pipeline",
+        "Give each live proposal a named owner, so someone is responsible for the next contact."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "a pipeline tracker with stage, owner and next action date for every proposal, reminding the owner automatically when a follow-up is due.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the stages and follow-up timings for your type of client are set out in the solution document."
+    },
+    {
+      "id": "p2_conversion_low",
+      "n": 2,
+      "words": "Our win rate is low but we don't know why we lose",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Ask your last few lost clients one polite question about why, so you get real reasons",
+        "Note those reasons in one place, so patterns become visible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "dashboards_reports — loss reasons captured every time a bid closes, with a regular view of wins and losses by service line and client type.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how loss reasons are captured and grouped is designed in the solution document."
+    },
+    {
+      "id": "p3_hidden_costs",
+      "n": 3,
+      "words": "Clients keep adding work without paying for it",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "List the extra requests on your largest live engagement, so you see how far it has drifted",
+        "Raise that list with the client once, so the conversation about a change happens."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a scope change log per engagement where each request is recorded, approved and flagged for billing.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the approval and billing steps are kept for the solution document."
+    },
+    {
+      "id": "p4_cost_overruns",
+      "n": 4,
+      "words": "Fixed-fee projects run over by months",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Compare days used against days planned once for each live engagement, so the overruns are on the table",
+        "Review the worst one with its lead, so you catch it earlier next time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "dashboards_reports — an engagement tracker showing effort used against plan every week, with alerts when an engagement starts to slip.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how effort is tracked and when alerts fire are worked out in the solution document."
+    },
+    {
+      "id": "p5_shift_scheduling",
+      "n": 5,
+      "words": "Some consultants are overloaded and others are on the bench",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Put every consultant's bookings for the next eight weeks on one page, so gaps and overloads show",
+        "Use it once to rebalance one overloaded person, so the benefit is felt straight away."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a resource planner showing who is booked where week by week, with bench time and overloads visible to the partners every day.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how bookings are entered and kept current is designed in the solution document."
+    },
+    {
+      "id": "p6_cash_flow_tight",
+      "n": 6,
+      "words": "Milestone invoices go out late because sign-off is stuck",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "List every deliverable that has gone to a client without a sign-off, so you know what is holding invoices",
+        "Ask for each sign-off in writing once, so the request is on record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a milestone billing trigger where the invoice is drafted as soon as a deliverable is signed off, with sign-off chasers and receivables ageing.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the trigger points and chaser timings are set out in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Government clients pay six months late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Check once what paperwork each slow client needs with an invoice, so nothing is sent back for a missing document",
+        "Make one list of overdue invoices by client, so collections has a clear order."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "receivables per client with ageing, document checklists per invoice and scheduled reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the reminder flow and checklists per client type are kept for the solution document."
+    },
+    {
+      "id": "p8_manual_work",
+      "n": 8,
+      "words": "Every proposal is written from scratch and good frameworks sit on someone's laptop",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Collect your best recent proposals and case write-ups into one shared folder, so the team can find them",
+        "Tag them by service line once, so reuse is easy."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a proposal library of past proposals, CVs and case write-ups tagged by service line, searchable by the whole team.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the structure and tagging of the library are designed in the solution document."
+    },
+    {
+      "id": "p9_reports_wrong",
+      "n": 9,
+      "words": "Timesheets are filled in at month-end from memory",
+      "category": "reporting_visibility",
+      "subtype": "reports_wrong",
+      "quick_ideas": [
+        "Ask the team to note time daily for one week, so you can compare it with the usual month-end version",
+        "Share utilisation per person once, so people see why it matters."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a weekly timesheet linked to engagements with daily nudges, showing utilisation per consultant as it happens instead of after month-end.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "the timesheet format and nudge timings are set out in the solution document."
+    },
+    {
+      "id": "p10_supplier_communication",
+      "n": 10,
+      "words": "Associates invoice us late and argue over days worked",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_communication",
+      "quick_ideas": [
+        "Confirm days worked with each associate in writing at the end of this week, so there is an agreed record",
+        "Note the agreed rate for each one in a single list, so invoices can be checked quickly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an associate register with availability, agreed rates and days confirmed weekly, matched automatically against their invoices.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how confirmations and matching work is kept for the solution document."
+    }
+  ],
+  "never_say": [
+    "Any strategy, financial, legal or tax advice for the consultancy or its clients. Anything involving inducements, kickbacks, bid-rigging or obtaining competitors' bids. That win rates or margins will improve by any amount. Requests for client names, tender references or associates' personal or tax details."
+  ],
+  "sample_reply": {
+    "person": "We send a lot of proposals and honestly have no idea which ones are still live. What would you suggest?",
+    "pi": "Yes, this can be sorted, and you can start this week. 1 Go through the last three months of proposals once and mark each live, lost or unknown, so the real pipeline is visible. 2 Give every live one a named owner, so somebody is responsible for the next contact. Workzap can do this automatically for you: a pipeline tracker with stages, owners and follow-up reminders, plus loss reasons recorded every time. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

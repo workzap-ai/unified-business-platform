@@ -1,0 +1,201 @@
+{
+  "industry": "computers_laptops_and_it_hardware_shops",
+  "name": "Computers, laptops and IT hardware shops",
+  "sector": "7.A Retail and consumer (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_pricing_errors",
+      "n": 1,
+      "words": "Quote dete hain, client baad mein confirm karta hai aur rate barh chuka hota hai",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Put a validity date on every quote from today, so an old rate can't be held against you",
+        "Note which items move most in price, so those are quoted with extra care."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a quotation builder with validity date, price-change flag and quote-to-order tracking.",
+        "tool_words": []
+      },
+      "ask_first": "How many quotes a month?",
+      "free_stops": "How quotes are built and flagged is in the solution document."
+    },
+    {
+      "id": "p2_conversion_low",
+      "n": 2,
+      "words": "Pata nahi kaun se quote order bane",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "List last month's quotes and mark which became orders, so you know your real conversion",
+        "Follow up the open ones, because many quotes go quiet rather than say no."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "every quote recorded and followed up on time, with conversion visible.",
+        "tool_words": []
+      },
+      "ask_first": "Who follows up quotes?",
+      "free_stops": "How quotes are tracked and followed up is in the solution document."
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Corporate clients 90 din baad dete hain",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid invoice by age once, so you see who is really holding your cash",
+        "Chase the oldest first, because they are the hardest to recover later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "corporate receivables with ageing, cheque tracking and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How many corporate clients?",
+      "free_stops": "How ageing and reminders are set is in the solution document."
+    },
+    {
+      "id": "p4_order_tracking",
+      "n": 4,
+      "words": "Repair jobs jama ho jaate hain, customers call karte rehte hain",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "List all open jobs with their status once, so the stuck ones stand out",
+        "Update customers on the oldest jobs, so they hear from you before they call."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "customer_messaging"
+        ],
+        "text": "a repair board with WhatsApp status updates.",
+        "tool_words": []
+      },
+      "ask_first": "How many jobs are open now?",
+      "free_stops": "The job stages and updates are in the solution document."
+    },
+    {
+      "id": "p5_after_sales",
+      "n": 5,
+      "words": "RMA mein hafte lagte hain",
+      "category": "customers_retention",
+      "subtype": "after_sales",
+      "quick_ideas": [
+        "List every unit out for RMA with its date, so you see how long customers have waited",
+        "Chase the oldest with the distributor, so the worst delays move first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an RMA tracker per distributor with days pending.",
+        "tool_words": []
+      },
+      "ask_first": "Which distributors are slowest?",
+      "free_stops": "How RMAs are tracked is in the solution document."
+    },
+    {
+      "id": "p6_field_team_visibility",
+      "n": 6,
+      "words": "Field technician ka pata nahi kahan hai, kya kiya",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Ask technicians to send a photo after each visit, so you see what was done",
+        "Keep a job sheet per visit, so extra work can be billed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a job app with tasks, photos, client sign-off and time spent, linked to AMC or billable work.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many technicians go out?",
+      "free_stops": "The job app steps and linking are in the solution document."
+    },
+    {
+      "id": "p7_repeat_low",
+      "n": 7,
+      "words": "Toner orders repeat hain lekin hum yaad nahi dilaate",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "List your repeat office clients and their last order once, so you see who is due",
+        "Call those due this week, so the order comes to you before a competitor."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "reorder reminders based on each client's usual cycle.",
+        "tool_words": []
+      },
+      "ask_first": "How many offices buy consumables?",
+      "free_stops": "How cycles are worked out is in the solution document."
+    },
+    {
+      "id": "p8_serial_batch_tracking",
+      "n": 8,
+      "words": "Serial note nahi karte, return pe pata nahi hamara unit hai",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Note serials on every invoice from today, so a returned unit can be checked",
+        "Record the serials of current stock once, so you start with a clean list."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a serial register with cost, supplier, warranty and sale.",
+        "tool_words": []
+      },
+      "ask_first": "Do you give shop warranty?",
+      "free_stops": "How serials are captured is in the solution document."
+    },
+    {
+      "id": "p9_data_scattered",
+      "n": 9,
+      "words": "Stock Excel mein, rates WhatsApp groups mein",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Put your top items' stock and rate in one sheet once, so you see what you hold and what it's worth",
+        "Update it daily for a week, so you see how fast value moves."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports",
+          "integration"
+        ],
+        "text": "daily rate lists pulled in, stock and price in one view, with alerts on stock losing value.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many distributors send rate lists?",
+      "free_stops": "How rates are pulled in is in the solution document."
+    }
+  ],
+  "never_say": [
+    "How to install pirated software or bypass activation. To ask for customers' passwords or data. How to set up covert surveillance or spyware. Bribes or \"commission\" for tenders. Cybersecurity, data-recovery legal or customs advice."
+  ],
+  "sample_reply": {
+    "person": "Corporate clients ko quote dete hain, do hafte baad confirm karte hain aur tab tak GPU ka rate barh jaata hai. Koi solution?",
+    "pi": "Ji haan, iska hal hai aur aaj se shuru ho sakta hai. 1 Har quote pe validity date likh dein, taa ke purana rate khud khatam ho. 2 Pichle mahine ke quotes dekh lein kaun se order bane, taa ke pata chale kitna kaam ruka hua hai. Workzap ye aap ke liye khud-ba-khud kar sakta hai: quotation builder jis mein validity date ho, rate badalne pe alert aaye, aur har quote ka order banne tak hisaab rahe. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

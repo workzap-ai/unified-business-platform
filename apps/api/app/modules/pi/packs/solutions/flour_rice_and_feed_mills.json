@@ -1,0 +1,218 @@
+{
+  "industry": "flour_rice_and_feed_mills",
+  "name": "Flour, rice and feed mills",
+  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_wastage_cost",
+      "n": 1,
+      "words": "Yield from wheat is dropping and I don't know where the loss is",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Weigh one lot in and its output out separately for a few days, so you see where the gap is",
+        "Note the shift and line for each lot."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A lot-to-output yield tracker showing recovery per lot and per shift every day, with drops flagged.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How do you measure output per lot now?",
+      "free_stops": "How yield is measured and flagged for your mill goes in the solution document."
+    },
+    {
+      "id": "p2_count_mismatch",
+      "n": 2,
+      "words": "Weighbridge slip and supplier's weight never match",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Photograph every kanta parchi at receiving, so you have a record to compare",
+        "Keep a list of differences by supplier."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A raw material receiving log with gross and net weight, moisture cut and slip photo per lot, showing differences by supplier.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have your own weighbridge?",
+      "free_stops": "The receiving log design is part of the solution document."
+    },
+    {
+      "id": "p3_supplier_quality",
+      "n": 3,
+      "words": "Moisture deductions cause a fight with every supplier",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_quality",
+      "quick_ideas": [
+        "Write down the moisture cut agreed with each supplier before delivery, so the rule is known in advance",
+        "Record each reading with the lot."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Moisture readings and cuts recorded per lot and shared with the supplier at receiving.",
+        "tool_words": []
+      },
+      "ask_first": "Who takes the moisture reading?",
+      "free_stops": "How readings and cuts are shared is detailed in the solution document."
+    },
+    {
+      "id": "p4_raw_material_shortage",
+      "n": 4,
+      "words": "Raw material ran out and the mill stood for two days",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "Count raw material daily for a week against daily use, so you know how many days you have left",
+        "Set a level at which purchasing must start."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Raw material and finished goods stock by godown with daily closing and an alert before stock falls below the level you set.",
+        "tool_words": []
+      },
+      "ask_first": "How do you buy raw material now, open market or contracts?",
+      "free_stops": "Alert levels and the stock view are kept for the solution document."
+    },
+    {
+      "id": "p5_shrinkage_theft",
+      "n": 5,
+      "words": "Finished bags in the godown don't match dispatch records",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Do one surprise count against records, so you know the real size of the gap",
+        "Release every load only with a gate pass."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Daily finished goods closing by godown, matched with gate passes, flagging variances.",
+        "tool_words": []
+      },
+      "ask_first": "Who counts finished bags?",
+      "free_stops": "How counts and gate passes are matched goes in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Distributors take maal on credit and pay late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every distributor's balance by age, so the oldest are chased first",
+        "Agree a written credit limit with each."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A distributor ledger with credit limits, ageing and reminders before and after due dates.",
+        "tool_words": []
+      },
+      "ask_first": "How long do distributors usually take to pay?",
+      "free_stops": "Limits and reminder rules are set out in the solution document."
+    },
+    {
+      "id": "p7_pricing_errors",
+      "n": 7,
+      "words": "Prices change daily and invoices go out at the wrong rate",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Keep one dated rate sheet with the invoicing staff, so only today's rate is used",
+        "Have one person approve rate changes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A central rate list pushed to invoicing staff with history, so every invoice uses the current rate.",
+        "tool_words": []
+      },
+      "ask_first": "How many people make invoices?",
+      "free_stops": "How rates reach invoicing is detailed in the solution document."
+    },
+    {
+      "id": "p8_consistency_across_branches",
+      "n": 8,
+      "words": "Poultry farmers complain the feed quality varies batch to batch",
+      "category": "quality_complaints",
+      "subtype": "consistency_across_branches",
+      "quick_ideas": [
+        "Start writing a batch code on each bag, so a complaint can be traced",
+        "Log each complaint with its batch; formulation questions belong with your nutritionist or vet."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Batch records linking every dispatch to its production lot, so complaints trace straight back.",
+        "tool_words": []
+      },
+      "ask_first": "Do bags carry any batch number today?",
+      "free_stops": "How batch codes link to production is part of the solution document."
+    },
+    {
+      "id": "p9_whatsapp_overload",
+      "n": 9,
+      "words": "Dispatch orders from distributors come on WhatsApp and calls",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Have one person write every order into one dispatch list the same day",
+        "Confirm each order back before loading."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "Distributor order intake via WhatsApp feeding the dispatch plan and gate pass.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many distributors order from you?",
+      "free_stops": "How orders flow to dispatch goes in the solution document."
+    },
+    {
+      "id": "p10_reports_late",
+      "n": 10,
+      "words": "Owner sees the numbers only at month end",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "Ask for a short daily message with intake, output, dispatch and cash, so you see the month as it happens",
+        "Pick the one number you most want daily."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "A morning read with intake, output, yield, dispatch, cash and receivables, and the one thing to look at.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which number do you most want to see daily?",
+      "free_stops": "What the morning read contains is kept for the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on feed formulations, additives, medicated feed, antibiotics or fortification levels; refer to a nutritionist, vet or food technologist. Advice on food-safety standards, milling technology, quota allocations, labour or wage law, tax or export rules. Any help with adulteration, passing low grade off as premium, false weights, hoarding, evading quotas, under-invoicing or fake certificates. Comment on government quota or price-control policy. Storing suppliers', distributors', drivers' or workers' names, CNICs or numbers."
+  ],
+  "sample_reply": {
+    "person": "We run a broiler feed mill in Sargodha. Farmers keep saying one batch is fine and the next isn't. What can we do?",
+    "pi": "Yes, you can get on top of this, and the first step is simple. 1 Start putting a batch code on every bag, so any complaint can be traced to its production run. 2 Log each complaint against its batch, and take any formulation question to your nutritionist or vet. Workzap can do this automatically for you, linking every dispatch to its production lot so complaints trace back in one tap and patterns show across distributors. Shall I get a solution document and quote prepared for you? You can say no.",
+    "language": "english"
+  }
+}

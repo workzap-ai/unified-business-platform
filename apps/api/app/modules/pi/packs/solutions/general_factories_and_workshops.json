@@ -1,0 +1,216 @@
+{
+  "industry": "general_factories_and_workshops",
+  "name": "General factories and workshops (made-to-order and made-to-stock)",
+  "sector": "7.D Manufacturing and industry (part 1",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_delivery_late",
+      "n": 1,
+      "words": "Order was promised in two weeks, it's week four and I don't know which stage it's stuck at",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Walk the floor once and write every open order with its promised date and current stage on one board, so you see what is already late",
+        "Check what is queued at your slowest stage before giving the next delivery date, so the promise matches what the floor can do"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A phone job card for every order where the supervisor taps each stage done, with an automatic morning WhatsApp list of open orders, promised dates and days late.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many orders are open right now?",
+      "free_stops": "The stage list, who taps what and how lateness is flagged are set out in the solution document."
+    },
+    {
+      "id": "p2_handoffs",
+      "n": 2,
+      "words": "Job cards go missing between cutting and assembly",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Trace the last few lost cards back to the hand-over where they disappeared, so you know which stage to fix",
+        "Give each stage one fixed rack where the card must sit with the batch, so cards stop travelling in pockets"
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Digital job cards that move from stage to stage on supervisors' phones, so no order depends on a paper slip surviving the floor.",
+        "tool_words": []
+      },
+      "ask_first": "Which stage hands over most often without the card?",
+      "free_stops": "How hand-overs are confirmed and who sees a stalled card is covered in the solution document."
+    },
+    {
+      "id": "p3_raw_material_shortage",
+      "n": 3,
+      "words": "We stopped the line because one raw material ran out and nobody told purchase",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "List the handful of materials that can stop production and agree a minimum level for each with the store keeper, so everyone knows the danger line",
+        "Check this week's open orders against those items once, so a big order does not quietly drain stock"
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A raw material register with minimum levels that alerts purchase and the owner automatically the moment any item falls below, every day.",
+        "tool_words": []
+      },
+      "ask_first": "Which material runs short most often?",
+      "free_stops": "How minimum levels are worked out per item and who gets which alert sits in the solution document."
+    },
+    {
+      "id": "p4_count_mismatch",
+      "n": 4,
+      "words": "The store says we have 200 pieces, physically there are 140",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Do one physical count of your fast-moving items and compare with the books, so you see how big the gap really is",
+        "Mark separate areas for raw material, work in progress and finished goods, so counts stop getting mixed"
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "field_checks A store register on phone recording every receipt and issue against a job, with regular counts and photos that flag any difference from the books automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Where does the count go wrong most — raw material, work in progress or finished goods?",
+      "free_stops": "The counting routine, issue rules and how differences are flagged are kept for the solution document."
+    },
+    {
+      "id": "p5_margin_unknown",
+      "n": 5,
+      "words": "I quote a price but don't really know my cost per piece",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Work out the material, labour and machine time in one piece of your best-selling product, so you have one real cost to compare with your price",
+        "Check which running quotes still use old supplier rates, so you know where margin is slipping now"
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A bill of materials per product that keeps cost per piece current as supplier rates change and feeds every new quote automatically.",
+        "tool_words": []
+      },
+      "ask_first": "How do you work out a price when you quote today?",
+      "free_stops": "How labour, machine time and overheads are built into the cost is detailed in the solution document."
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Dealers take months to pay and some never clear the last bill",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Make one list of every dealer with what they owe and since when, so you know who to chase first",
+        "Look at each dealer's oldest unpaid bill before the next dispatch, so credit stops growing unnoticed"
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A receivables tracker per dealer with ageing of each bill and polite WhatsApp reminders that go out on schedule without anyone remembering.",
+        "tool_words": []
+      },
+      "ask_first": "Is anyone following up on overdue bills today?",
+      "free_stops": "Reminder timing, credit limits and how balances are confirmed with dealers are set out in the solution document."
+    },
+    {
+      "id": "p7_maintenance_downtime",
+      "n": 7,
+      "words": "Machine breaks down and we wait days for the mechanic or part",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Write down the last few breakdowns you remember with machine, days lost and part needed, so the worst machines become obvious",
+        "Find a second mechanic or workshop you could call, so one person's delay does not stop the floor"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A machine log on phone for every breakdown, its duration, cause and part, with an automatic monthly list of the machines that stop the most.",
+        "tool_words": []
+      },
+      "ask_first": "Which machine stops the most?",
+      "free_stops": "Which spares to hold and how a maintenance schedule is set per machine are covered in the solution document."
+    },
+    {
+      "id": "p8_inspection_missing",
+      "n": 8,
+      "words": "Customer rejected a whole lot after delivery",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Put one person on a check before packing for the faults customers raise most, so problems are caught inside the gate",
+        "Photograph a sample of the next lot before dispatch, so you have a record if a dispute starts"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A pre-dispatch quality check on phone with photos and rejection reasons per stage, recorded for every lot and summarised for the owner.",
+        "tool_words": []
+      },
+      "ask_first": "Is anyone checking goods before dispatch now?",
+      "free_stops": "The checklist itself and how rejections are traced to a stage are kept for the solution document."
+    },
+    {
+      "id": "p9_orders_lost",
+      "n": 9,
+      "words": "Orders come on WhatsApp, calls and email and some get forgotten",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Gather every open order from all channels into one list once, so you see what is waiting",
+        "Make one person the owner of that list, so orders stop falling between people"
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "One order book where WhatsApp, phone and email orders land, each linked to a job card and tracked to dispatch automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How orders flow from each channel into production is mapped in the solution document."
+    },
+    {
+      "id": "p10_theft_internal",
+      "n": 10,
+      "words": "Scrap and offcuts are sold by the floor staff and I never see the money",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Weigh this week's scrap yourself before it leaves the gate, so you have a real figure to compare",
+        "Route scrap sales through the office only, so the money arrives in one place"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "cash_reconciliation A scrap register where every weighing and sale is matched to a receipt, with a monthly comparison against production.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Where weighing happens and how weights are matched to sales is detailed in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any guarantee of delivery dates, output or fewer breakdowns. Anything on machine guarding, electrical, boiler or fire safety, or how to \"get through\" an inspection. Any interpretation of labour law, minimum wage, contractor liability, EOBI, WPS or CPP/EI; suggest talking to a lawyer or accountant. Tax, customs or financing advice, or any help with fake invoices, under-invoicing or two sets of books. Any request for worker names, IDs, phone numbers or bank details; always use roles such as \"line supervisor\". Any help optimising child labour or forced overtime."
+  ],
+  "sample_reply": {
+    "person": "Bhai koi hal batao, orders ka hisaab hi nahi rehta, job card gum ho jate hain aur customer ke phone pe pata chalta hai maal tayyar nahi hua.",
+    "pi": "Ji bilkul, iska hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1 Ek dafa floor pe ja kar har khula order, wada kiya hua din aur abhi ki stage ek board pe likh dein, taa ke saaf dikhe kaun se order pehle se late hain. 2 Pichle gum hue job cards ko dekh kar woh stage pehchanein jahan card gum hota hai, taa ke usi jagah ko theek kiya ja sake. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: phone pe digital job card jahan supervisor har stage tap kare, aur har subah aap ko WhatsApp pe late orders ki list apne aap mil jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

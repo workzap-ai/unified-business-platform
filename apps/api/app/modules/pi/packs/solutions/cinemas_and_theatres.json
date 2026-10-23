@@ -1,0 +1,220 @@
+{
+  "industry": "cinemas_and_theatres",
+  "name": "Cinemas and theatres",
+  "sector": "7.H Hospitality, events and personal services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_cash_mismatch",
+      "n": 1,
+      "words": "Box office cash doesn't match ticket counts",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Count cash with the next shift at handover, so a gap belongs to one shift",
+        "Match one day's tickets against cash and card per cashier, to see where gaps start."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily box-office reconciliation by show and cashier, flagging gaps to the owner automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Do you sell only at the counter or through apps too?",
+      "free_stops": "How ticketing data is pulled in and matched is in the solution document."
+    },
+    {
+      "id": "p2_software_not_connected",
+      "n": 2,
+      "words": "Online ticket app numbers and our counter numbers never reconcile",
+      "category": "tech_systems",
+      "subtype": "software_not_connected",
+      "quick_ideas": [
+        "Compare one week of app sales with your own records by show, to see which shows differ",
+        "Note which app's settlement doesn't match what you expected, since that is where to start."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "a reconciliation view matching counter, app and cash or card totals every day.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many ticketing apps sell your seats?",
+      "free_stops": "The data connection and matching rules stay for the solution document."
+    },
+    {
+      "id": "p3_void_refund_abuse",
+      "n": 3,
+      "words": "Complimentary tickets are given out too freely",
+      "category": "loss_security",
+      "subtype": "void_refund_abuse",
+      "quick_ideas": [
+        "Decide who may give a free ticket and why, so comps stop being casual",
+        "Check last week's comps once by staff member, to see whether one name stands out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a comp and refund approval flow with reasons logged and totals in the morning read.",
+        "tool_words": []
+      },
+      "ask_first": "Who can give a free ticket today?",
+      "free_stops": "Approval levels and reasons list go in the solution document."
+    },
+    {
+      "id": "p4_count_mismatch",
+      "n": 4,
+      "words": "Popcorn and drinks stock doesn't match sales",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count drinks and key items at every shift change for a week, to see which shift loses stock",
+        "Make one person sign for the candy bar each shift, so stock has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a concession tracker with opening and closing counts per shift compared to sales, with mismatches and wastage flagged.",
+        "tool_words": []
+      },
+      "ask_first": "Which items go missing most?",
+      "free_stops": "Count routine and wastage logging are designed in the solution document."
+    },
+    {
+      "id": "p5_wastage_cost",
+      "n": 5,
+      "words": "Popcorn and hot food thrown away every night",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Note what's thrown out each night for a week, to see which days you over-make",
+        "Prepare in smaller batches for quiet shows, since a weekday matinee doesn't need a weekend batch."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a wastage log tied to show occupancy, showing which days and shows waste most.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Which items are wasted most?",
+      "free_stops": "How preparation is linked to bookings is in the solution document."
+    },
+    {
+      "id": "p6_seasonal_dip",
+      "n": 6,
+      "words": "Weekday afternoon shows run nearly empty",
+      "category": "sales_revenue",
+      "subtype": "seasonal_dip",
+      "quick_ideas": [
+        "Look at which weekday shows are weakest, since fewer shows can mean fuller halls",
+        "Think of one group, such as students or families, who could fill daytime shows, because they need a different invitation."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "WhatsApp updates to regulars who agreed to hear from you, about weekday shows and offers.",
+        "tool_words": []
+      },
+      "ask_first": "How many screens do you run?",
+      "free_stops": "Which audiences to target and when are planned in the solution document."
+    },
+    {
+      "id": "p7_maintenance_downtime",
+      "n": 7,
+      "words": "Projector or sound breaks during a show",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Write down every failure this month with date and cause, to see what keeps breaking",
+        "Agree with your technician what is checked before the first show, so problems surface before the audience sits."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an equipment log for projectors and sound with downtime recorded and service reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Is your technician on staff or on call?",
+      "free_stops": "Equipment list and service schedule stay for the solution document."
+    },
+    {
+      "id": "p8_manual_reports",
+      "n": 8,
+      "words": "Distributor settlement statements take days by hand",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Use one statement layout for every film and distributor, so you stop rebuilding it",
+        "Record ticket sales per film weekly, so settlement isn't a scramble."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "settlement statements generated automatically per film per week from ticket sales.",
+        "tool_words": []
+      },
+      "ask_first": "How many distributors do you settle with?",
+      "free_stops": "Statement content and data sources go in the solution document."
+    },
+    {
+      "id": "p9_chat_overload",
+      "n": 9,
+      "words": "Customers call asking showtimes all day",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Post the week's showtimes in one place and point every caller to it, so the phone stops ringing for the same thing",
+        "Make one person responsible for keeping it right, since wrong times cause the angriest calls."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a WhatsApp showtime assistant answering \"what's on tonight\" from the live schedule.",
+        "tool_words": []
+      },
+      "ask_first": "Is your website showtime list kept up to date?",
+      "free_stops": "The assistant's answers and schedule connection are in the solution document."
+    },
+    {
+      "id": "p10_branch_comparison",
+      "n": 10,
+      "words": "I can't compare our two locations properly",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Agree the same few numbers from each location daily, so you compare like with like",
+        "Put one week side by side, to see which location needs attention."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read per location with tickets, occupancy, concessions, comps and refunds.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do both locations use the same ticketing system?",
+      "free_stops": "Which numbers and how they're pulled is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Advice on censorship, content approvals, distribution contracts or entertainment tax. Help with piracy, unlicensed screenings or hiding ticket sales. Fire codes or crowd safety guidance; fire, crush or medical emergency means emergency services immediately. Collecting audience names, contacts or card details."
+  ],
+  "sample_reply": {
+    "person": "Candy bar ka maal sales se match nahi karta, khaas taur pe drinks gayab hote hain. Koi hal batayein.",
+    "pi": "Ji, is par jald qaboo paya ja sakta hai. 1 Ek hafte tak har shift badalne par drinks aur khaas items gine jayein, taake pata chale kis shift mein farq aata hai. 2 Har shift mein ek banda candy bar ke stock ka zimmedar ho. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har shift ki ginti sales se mila kar farq foran aap tak pohanche. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

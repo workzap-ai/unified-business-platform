@@ -1,0 +1,218 @@
+{
+  "industry": "steel_re_rolling_mills_and_metal_fabrication",
+  "name": "Steel, re-rolling mills and metal fabrication",
+  "sector": "7.D Manufacturing and industry (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_order_errors",
+      "n": 1,
+      "words": "Weight at our kanta and the customer's kanta never match",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Photograph the weighbridge reading for every truck — gives both sides the same evidence",
+        "Agree in advance with regular parties which kanta counts — ends the argument at the gate."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a weighbridge log where each truck's weights, reading photo, gate pass and invoice are tied together automatically.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have your own weighbridge or use an outside kanta?",
+      "free_stops": "How readings are captured and matched is in the solution document."
+    },
+    {
+      "id": "p2_wastage_cost",
+      "n": 2,
+      "words": "Burning loss is higher than it should be but I can't prove where it goes",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Record scrap charged and output per heat for one week — shows which heats or shifts lose most",
+        "Compare shifts side by side — points to where to look."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a heat and shift yield register showing burning loss per heat daily with trends.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is burning loss recorded per heat or per day now?",
+      "free_stops": "The yield calculation and alert levels are in the solution document."
+    },
+    {
+      "id": "p3_price_increases_supplier",
+      "n": 3,
+      "words": "Booked customers at the old rate, now steel has gone up",
+      "category": "margin_cost",
+      "subtype": "price_increases_supplier",
+      "quick_ideas": [
+        "List every open booking with tons and rate — shows your real exposure",
+        "Set a time limit on how long a booked rate holds — limits future risk."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a rate-booking ledger of booked tons, booked rate, delivered tons and open exposure, updated with each dispatch.",
+        "tool_words": []
+      },
+      "ask_first": "How often do you book at a fixed rate in advance?",
+      "free_stops": "Booking rules and exposure limits are in the solution document."
+    },
+    {
+      "id": "p4_credit_customers",
+      "n": 4,
+      "words": "Dealers delay payment and keep rolling over balances",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Rank dealers by oldest balance once — tells you who to chase first",
+        "Fix a limit per dealer — gives the sales desk a clear line."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a dealer ledger with limits, ageing and automatic reminders, visible to whoever books orders.",
+        "tool_words": []
+      },
+      "ask_first": "What's the oldest balance you're chasing?",
+      "free_stops": "Limit rules and reminder timing are in the solution document."
+    },
+    {
+      "id": "p5_branches_not_aligned",
+      "n": 5,
+      "words": "Customers call for the day's rate and nobody has the same number",
+      "category": "communication_coordination",
+      "subtype": "branches_not_aligned",
+      "quick_ideas": [
+        "Decide one person who sets the day's rate — removes conflicting numbers",
+        "Send that one rate to all sales staff each morning — everyone quotes the same."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a daily rate broadcast of one approved rate to all dealers on WhatsApp, with booking confirmations recorded.",
+        "tool_words": []
+      },
+      "ask_first": "How do you share the day's rate today?",
+      "free_stops": "The approval and broadcast set-up is in the solution document."
+    },
+    {
+      "id": "p6_count_mismatch",
+      "n": 6,
+      "words": "Scrap yard stock is a guess and material walks out at night",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Do one physical count of the yard by type — gives a true starting figure",
+        "Allow no truck out without a gate pass matched to an invoice — closes the obvious leak."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a yard stock board with cycle counts and a digital gate pass that must match an invoice before a truck leaves.",
+        "tool_words": []
+      },
+      "ask_first": "How often is the yard physically counted now?",
+      "free_stops": "Count routine and gate rules are in the solution document."
+    },
+    {
+      "id": "p7_bottleneck",
+      "n": 7,
+      "words": "Fabrication jobs always finish late and I can't see why",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "List open jobs by stage (cutting, welding, painting, installation) once — shows where they stall",
+        "Get photo proof from site at handover — settles \"done or not done\"."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a fabrication tracker by stage with site photos, showing late jobs daily.",
+        "tool_words": []
+      },
+      "ask_first": "Where do jobs usually get delayed?",
+      "free_stops": "Stage set-up and site sign-off flow are in the solution document."
+    },
+    {
+      "id": "p8_cost_overruns",
+      "n": 8,
+      "words": "We quote fabrication jobs by experience and lose on half of them",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Compare actual steel, consumables and labour hours with the quote on recent jobs — shows where estimates go wrong",
+        "Charge separately for drawing changes after cutting — stops rework eating margin."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a job costing template comparing steel weight, consumables, labour and overheads with the quote on every job.",
+        "tool_words": []
+      },
+      "ask_first": "Do you work to client drawings or your own?",
+      "free_stops": "Costing method and change-order terms are in the solution document."
+    },
+    {
+      "id": "p9_commission_disputes",
+      "n": 9,
+      "words": "Welders are paid per piece and disputes happen every week",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Have the supervisor note pieces per worker role at the end of each shift — gives a shared record",
+        "Show the tally to the team before payday — disputes surface early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a piece-rate output log visible to supervisor and staff, totalled automatically for payday.",
+        "tool_words": []
+      },
+      "ask_first": "Who records output on the floor now?",
+      "free_stops": "The output-log set-up is in the solution document."
+    },
+    {
+      "id": "p10_reports_late",
+      "n": 10,
+      "words": "I don't know my cost per ton until the accountant closes",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "Pick the four figures that drive cost per ton (scrap, power, labour, yield) — focuses the daily view",
+        "Ask for those figures weekly instead of monthly — catches problems sooner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read of tons produced, yield, power hours lost, cost-per-ton estimate and receivables.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Who prepares production figures today?",
+      "free_stops": "How the estimate is calculated is in the solution document."
+    }
+  ],
+  "never_say": [
+    "No structural design, weld procedure, load, metallurgy or grade-compliance advice. Burns, falls, crushing, furnace or electrocution accidents: stop and point to emergency services first. Never help tamper with weighbridge readings, under-invoice or adjust weights; decline. Never help process scrap of unknown or suspected stolen origin. No customs, import duty or tax advice; talk to your accountant. Workers and contractors: roles and counts only, never names, CNICs or individual wages."
+  ],
+  "sample_reply": {
+    "person": "Koi solution do yaar. Har truck pe weight ka jhagra hota hai, hamara kanta kuch kehta hai party ka kuch aur.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1 Har truck ki weighbridge reading ki photo lein, taake dono taraf ek hi saboot ho. 2 Regular parties ke saath pehle se tay kar lein ke kis kante ka wazan maana jayega. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: weighbridge log jahan har truck ka wazan, photo, gate pass aur invoice apne aap jud jayein. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

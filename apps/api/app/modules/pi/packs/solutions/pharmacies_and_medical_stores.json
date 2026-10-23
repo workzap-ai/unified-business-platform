@@ -1,0 +1,223 @@
+{
+  "industry": "pharmacies_and_medical_stores",
+  "name": "Pharmacies and medical stores",
+  "sector": "7.A Retail and consumer (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_expiry_wastage",
+      "n": 1,
+      "words": "Expired medicines pile up and we find out too late",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Do one expiry sweep and list what expires in the coming months, because you'll see the exposure",
+        "Start noting expiry when stock arrives, because the bill is the only record today."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "batch- and expiry-level stock with near-expiry alerts and a return- to-distributor tracker, across branches.",
+        "tool_words": []
+      },
+      "ask_first": "How do you find out what's near expiry today?",
+      "free_stops": "alert timing and the return process are kept for the solution document."
+    },
+    {
+      "id": "p2_stockout",
+      "n": 2,
+      "words": "Common medicines go short and customers go elsewhere",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Keep a running shortage list for a week, because it shows which items and which distributors",
+        "Share the list with your distributors, because they can't fill what they don't know."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "workflow_automation"
+        ],
+        "text": "a shortage list shared with distributors on WhatsApp and tracked until filled.",
+        "tool_words": []
+      },
+      "ask_first": "How many distributors do you buy from?",
+      "free_stops": "the shortage workflow goes in the solution document."
+    },
+    {
+      "id": "p3_price_comparison",
+      "n": 3,
+      "words": "Each distributor has different schemes and I can't compare",
+      "category": "suppliers_purchasing",
+      "subtype": "price_comparison",
+      "quick_ideas": [
+        "Compare your top items across distributors once, because it shows who is cheaper after schemes",
+        "Note availability alongside price, because cheap but short doesn't help."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "distributor comparison of price, scheme and availability per item.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How do you decide who to order from each day?",
+      "free_stops": "the comparison method is kept for the solution document."
+    },
+    {
+      "id": "p4_serial_batch_tracking",
+      "n": 4,
+      "words": "Batch numbers aren't recorded at sale, so recalls are a nightmare",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Start recording batch at goods receiving, because that's the easiest point",
+        "Check how the last recall was handled, because it shows the gap."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "field_checks"
+        ],
+        "text": "goods-received check with batch and expiry captured, and recall lookup by batch across branches.",
+        "tool_words": []
+      },
+      "ask_first": "Is batch recorded anywhere when stock comes in?",
+      "free_stops": "the receiving and recall process goes in the solution document."
+    },
+    {
+      "id": "p5_checklists_not_done",
+      "n": 5,
+      "words": "Fridge temperature log is filled late or not at all",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Name one person per shift for the fridge log, because shared duties slip",
+        "Check last month's log for gaps, because it shows which shift misses it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a fridge log on phone with reminders each shift and alerts on missed entries; it records only, with no judgement on stock safety.",
+        "tool_words": []
+      },
+      "ask_first": "Who checks the fridge today?",
+      "free_stops": "reminder and alert setup is kept for the solution document; whether stock is safe is a question for your pharmacist or regulator."
+    },
+    {
+      "id": "p6_count_mismatch",
+      "n": 6,
+      "words": "Thousands of SKUs and the count never matches the shelf",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count one shelf section fully, because it shows how far off the system is",
+        "Check how goods-in are entered, because most gaps start there."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "a cycle-count tool on phone counting a few shelves daily, with variance trends.",
+        "tool_words": []
+      },
+      "ask_first": "How often do you count stock?",
+      "free_stops": "the count rotation goes in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Insurance claims rejected for paperwork reasons",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Note the reason for each recent rejection, because most repeat",
+        "List unpaid claims by age, because it shows what's owed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "dashboards_reports"
+        ],
+        "text": "a claim tracker (submitted, rejected with reason, resubmitted, paid) with ageing, holding claim status only.",
+        "tool_words": []
+      },
+      "ask_first": "Do you bill insurance?",
+      "free_stops": "the claim workflow is kept for the solution document."
+    },
+    {
+      "id": "p8_cash_mismatch",
+      "n": 8,
+      "words": "Cash at closing doesn't match the system",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Check one week of shift closes, because it shows which shift is off",
+        "Have two people at close, because it makes it clearer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a shift close and handover checklist with till reconciliation per branch.",
+        "tool_words": []
+      },
+      "ask_first": "How many shifts do you run?",
+      "free_stops": "the close steps go in the solution document."
+    },
+    {
+      "id": "p9_info_lost_in_whatsapp",
+      "n": 9,
+      "words": "WhatsApp delivery orders get missed during rush",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Count a day's WhatsApp orders and how many were delivered, because it shows the leak",
+        "Make one person own delivery orders, because shared phones lose them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "one delivery inbox for WhatsApp, phone and apps with a stock check before acceptance and rider tracking.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How do delivery orders reach you?",
+      "free_stops": "the intake flow is kept for the solution document."
+    },
+    {
+      "id": "p10_licences_renewals",
+      "n": 10,
+      "words": "Licence renewals and inspections sneak up on us",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List every licence and renewal date in one place, because surprises come from scattered papers",
+        "Name who is responsible for each."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a licence and inspection calendar with reminders.",
+        "tool_words": []
+      },
+      "ask_first": "How many branches hold licences?",
+      "free_stops": "the calendar setup goes in the solution document; what the rules require stays with your regulator or adviser."
+    }
+  ],
+  "never_say": [
+    "Any medical, dosing, interaction, substitution or \"what should I give\" advice; for an emergency or overdose, say call emergency services now PK 1122/115, UAE 998/999, Canada 911. Anything requiring patient names, prescriptions, conditions or insurance member IDs in the chat. Help selling prescription-only or controlled medicines without proper process, altering records, relabelling expired stock or billing insurers for items not dispensed. Regulatory advice on licensing, controlled-drug registers or pricing rules. Whether stock after a cold-chain failure is safe to sell."
+  ],
+  "sample_reply": {
+    "person": "Mera sab se bara masla expiry hai. Har mahine maal expire hota hai aur system mein expiry daalte hi nahi. Kya karoon?",
+    "pi": "Ji haan, is ka hal mumkin hai. 1. Ek dafa poori expiry check kar ke agle kuch mahine mein expire hone wala maal list kar lein, taake asal nuqsan saamne aaye. 2. Maal aate waqt expiry likhna shuru karein, kyun ke abhi sirf bill hi record hai. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai: har batch ki expiry darj ho, waqt se pehle alert aaye aur distributor ko wapsi ka hisaab ek jagah nazar aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

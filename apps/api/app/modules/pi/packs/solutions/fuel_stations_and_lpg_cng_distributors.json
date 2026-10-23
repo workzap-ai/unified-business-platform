@@ -1,0 +1,199 @@
+{
+  "industry": "fuel_stations_and_lpg_cng_distributors",
+  "name": "Fuel stations and LPG/CNG distributors",
+  "sector": "7.G Transport, mobility and aviation (part 2",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_cash_mismatch",
+      "n": 1,
+      "words": "Meter readings and cash never match at shift change",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Take readings and count cash with both shifts present, so differences are agreed on the spot",
+        "Write each shift's variance down, so patterns by shift show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a shift close where attendants enter nozzle readings, cash, card and credit sales, with variances sent to the owner on WhatsApp.",
+        "tool_words": []
+      },
+      "ask_first": "Who takes the readings and counts cash at shift change?",
+      "free_stops": "The shift close steps are in the solution document."
+    },
+    {
+      "id": "p2_count_mismatch",
+      "n": 2,
+      "words": "Dip stock and book stock differ every week",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Record dips, deliveries and sales for each tank on one sheet, so differences can be traced",
+        "Note the gain or loss daily, so you see the trend."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "a tank stock book reconciled daily with gain and loss trends per tank.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How reconciliation is done is in the solution document; technical tank questions are for your supplier."
+    },
+    {
+      "id": "p3_supplier_quality",
+      "n": 3,
+      "words": "Tanker deliveries seem short but we don't check properly",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_quality",
+      "quick_ideas": [
+        "Write down readings before and after every delivery, so each one has a record",
+        "Have the same person check every delivery, so checks are consistent."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a tanker receiving checklist with photos and readings before and after decanting.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The receiving checklist is in the solution document."
+    },
+    {
+      "id": "p4_credit_customers",
+      "n": 4,
+      "words": "Credit customers and transporters owe us and keep delaying",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List each credit customer's balance by age, so you know who to chase",
+        "Send each a statement once, so you agree a figure."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a credit and fleet customer ledger with automatic monthly statements and overdue reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Statement timings and reminders are in the solution document."
+    },
+    {
+      "id": "p5_payment_methods",
+      "n": 5,
+      "words": "Card machine settlements don't match card sales",
+      "category": "cash_collections",
+      "subtype": "payment_methods",
+      "quick_ideas": [
+        "Compare settlements to recorded card sales for a week, so you see where they differ",
+        "Keep card slips with the shift record, so gaps can be traced."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "card settlement reconciliation against recorded card sales.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Matching steps are in the solution document."
+    },
+    {
+      "id": "p6_serial_batch_tracking",
+      "n": 6,
+      "words": "LPG cylinders go out and don't come back",
+      "category": "stock_inventory",
+      "subtype": "serial_batch_tracking",
+      "quick_ideas": [
+        "Count the cylinders you have and those out, so you know the gap",
+        "Note which customer type has which cylinders, so returns can be chased."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a cylinder register by serial and customer type, with return tracking and deposit status.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How cylinders are tracked is in the solution document."
+    },
+    {
+      "id": "p7_orders_lost",
+      "n": 7,
+      "words": "Gas delivery orders come by phone and get missed",
+      "category": "orders_fulfilment",
+      "subtype": "orders_lost",
+      "quick_ideas": [
+        "Write every order in one list as it comes in, so none is forgotten",
+        "Confirm delivery back to the list, so you know what's pending."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "gas orders over WhatsApp with rider assignment and delivery confirmation.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The order flow is in the solution document."
+    },
+    {
+      "id": "p8_reports_late",
+      "n": 8,
+      "words": "Daily sales reach me the next afternoon and I can't compare stations",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "Ask each station for three numbers every evening, so you have a daily picture",
+        "Keep them side by side, so stations can be compared."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read",
+          "dashboards_reports"
+        ],
+        "text": "a morning read of litres, revenue, variances and receivables per station.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "What the daily read includes is in the solution document."
+    },
+    {
+      "id": "p9_checklists_not_done",
+      "n": 9,
+      "words": "The safety checklist exists but attendants don't fill it",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Give the checklist to one person per shift, so it's someone's job",
+        "Check it yourself at random times, so it's taken seriously."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "checklists on phone with photos and time, with missed checks flagged to the owner.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The checklist content is set with your supplier or safety adviser; the tracking is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything about a leak, gas smell, fire or explosion other than to contact emergency services and the supplier's emergency line. Safety-engineering, tank, pressure, storage or calibration advice. Help tampering with dispensers, under-measuring, adulterating, unauthorised cylinders, hoarding or evading price rules. Advice on licensing, regulators, tax or dealer agreements. Fuel prices, margins or industry figures. Storing attendants' names or fleet card numbers or PINs; no covert surveillance."
+  ],
+  "sample_reply": {
+    "person": "Every month the dip shows less diesel than the books. Small amounts but it adds up. What can I do?",
+    "pi": "Yes, this can be brought under control, and you can start this week. 1 Record dips, deliveries and sales for each tank on one sheet, so differences can be traced. 2 Write down readings before and after every tanker delivery, so each one has a record. Workzap can do this automatically for you: a tank stock book reconciled every day, with gain and loss trends per tank sent to you. Shall I get a solution document and quote prepared for you? You're free to say no.",
+    "language": "english"
+  }
+}

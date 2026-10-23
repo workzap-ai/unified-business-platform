@@ -1,0 +1,219 @@
+{
+  "industry": "customs_clearing_agents",
+  "name": "Customs clearing agents",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_customer_communication",
+      "n": 1,
+      "words": "Clients call twenty times a day asking where their file is",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Send each client one status update a day at a fixed time, so they stop calling to ask",
+        "Use the same stage names for every file, so updates are clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "customer_messaging"
+        ],
+        "text": "A file tracker that sends the client a WhatsApp update automatically when their file changes stage.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The stages and message triggers are set in the solution document."
+    },
+    {
+      "id": "p2_data_scattered",
+      "n": 2,
+      "words": "We track file status on a whiteboard and WhatsApp groups",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "List every open file with its stage and days open in one sheet, so stuck files show up",
+        "Name one responsible person per file."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A file tracker showing each consignment's stage, responsible staff and age, with stuck files flagged daily.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The tracker's stages and alerts are designed in the solution document."
+    },
+    {
+      "id": "p3_handoffs",
+      "n": 3,
+      "words": "Clients send incomplete documents and blame us for the delay",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Note the date each document arrives on current files, so the real cause of delay is on record",
+        "Tell clients at the start which documents your team needs, so gaps surface early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A document checklist per file type showing what's received and missing, with reminders sent to the client automatically.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The checklist per file type comes from your team's own practice and is set in the solution document."
+    },
+    {
+      "id": "p4_field_team_visibility",
+      "n": 4,
+      "words": "Field staff don't update the office until evening",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Ask runners to send a short update after each port step, so the office knows in real time",
+        "Ask for a photo of each receipt, so expenses are recorded as they happen."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A runner mobile form logging port actions with time stamps and receipt photos, visible to the office immediately.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "What runners log, and how, is designed in the solution document."
+    },
+    {
+      "id": "p5_cash_flow_tight",
+      "n": 5,
+      "words": "We pay duties and terminal charges from our pocket and clients pay months later",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "Total what you've paid on behalf of clients on open files, so you see how much of your money is out",
+        "Decide as a business policy which clients must deposit an advance before you start."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A client advance ledger of deposits, payments made on their behalf and balance remaining, alerting when an advance runs low.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Advance rules and alert levels are set in the solution document."
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "We forget to bill examination days, extra trips and storage",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Check a few recently closed files for charges never billed, so you see what slips",
+        "Bill as soon as a file closes, while the details are fresh."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "workflow_automation"
+        ],
+        "text": "Expense capture per file so every charge is recorded and a draft invoice is produced automatically when the file closes.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How expenses are captured and billed is designed in the solution document."
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Some clients haven't paid for six months",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List client balances by age, so the oldest are chased first",
+        "Decide which clients get no new file until something is paid."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Receivables ageing by client with reminder messages the owner approves before sending.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing and hold rules are in the solution document."
+    },
+    {
+      "id": "p8_petty_cash",
+      "n": 8,
+      "words": "Petty cash with runners at port is never properly accounted for",
+      "category": "cash_collections",
+      "subtype": "petty_cash",
+      "quick_ideas": [
+        "Settle each runner's cash at the end of the day, so gaps are found the same day",
+        "Keep a receipt for every port payment, so spending can be matched."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A runner petty cash log with receipts and a daily settlement per runner.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "The settlement steps are laid out in the solution document."
+    },
+    {
+      "id": "p9_no_sop",
+      "n": 9,
+      "words": "Every file has a different checklist and new staff forget steps",
+      "category": "operations_process",
+      "subtype": "no_sop",
+      "quick_ideas": [
+        "Have your most experienced person write the steps for your most common file type, so new staff have a reference",
+        "Note the steps new staff miss most, so training targets them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Step checklists per clearance type that staff tick through on each file, so nothing is skipped.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "How your own steps become checklists is set in the solution document."
+    },
+    {
+      "id": "p10_owner_bottleneck",
+      "n": 10,
+      "words": "Too much depends on me personally knowing every file",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Write down the questions staff bring you most, so you see what can be delegated",
+        "Hold a short daily stand-up on stuck files, so problems come to you once."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "An owner's morning read: files open by stage, stuck files, cash paid on behalf of clients, and collections.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "What the morning read includes is set in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on HS codes, valuation, duty or tax amounts, exemptions, SROs, licences or \"the best way to declare\"; they rely on their own licensed expertise or the customs authority's guidance. Any hint about \"speed money\", facilitation payments or \"managing\" examination; pi declines and does not treat it as a problem to solve. Help with misdeclaration, under-invoicing or substituting goods. Any comment on how to get a file assessed, examined or released faster other than through proper process. Views on customs penalties, seizures or appeals; those are for a lawyer. Storing client NTNs, CNICs, Emirates IDs, licence numbers, bank details or passport copies."
+  ],
+  "sample_reply": {
+    "person": "Sir clients din bhar phone karte hain ke file kahan pohanchi. Staff ka aadha din isi mein chala jata hai. Koi solution hai?",
+    "pi": "Ji haan, yeh bilkul kam kiya ja sakta hai, aur shuruaat isi hafte ho sakti hai. 1 Har client ko roz ek muqarrar waqt par ek status update bhejein, taake unhein poochne ki zaroorat na pade. 2 Har file ke liye ek hi tarah ke stage naam rakhein, taake update har dafa saaf ho. Workzap yeh kaam aap ke liye khud-ba- khud kar sakta hai: jab bhi file ka stage badle, client ko WhatsApp par apne aap update chala jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

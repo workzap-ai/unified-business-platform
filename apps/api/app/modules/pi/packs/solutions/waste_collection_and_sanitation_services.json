@@ -1,0 +1,238 @@
+{
+  "industry": "waste_collection_and_sanitation_services",
+  "name": "Waste collection and sanitation services",
+  "sector": "7.L Finance-adjacent, energy and utilities",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_order_tracking",
+      "n": 1,
+      "words": "Customers complain we missed their pickup and we cannot prove we came",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "Ask drivers to take one photo at each stop, so there is proof of service",
+        "Keep a daily list of stops done and missed, so complaints can be checked against it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Route sheets on phone per truck with stops by area or customer reference, marked done with time and photo, plus a proof-of-service summary for customers.",
+        "tool_words": []
+      },
+      "ask_first": "How many trucks run each day?",
+      "free_stops": "Route sheet design and summary format are in the solution document."
+    },
+    {
+      "id": "p2_no_sop",
+      "n": 2,
+      "words": "Routes are in the driver's head, so if he is absent nobody knows the route",
+      "category": "operations_process",
+      "subtype": "no_sop",
+      "quick_ideas": [
+        "Write each route down as an ordered list of stops, so anyone can run it",
+        "Have a stand-in ride along once, so cover is ready."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "booking_scheduling Written routes on phone with a crew assignment board and stand-in planning.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Route set-up is in the solution document."
+    },
+    {
+      "id": "p3_margin_unknown",
+      "n": 3,
+      "words": "Fuel cost per route is a guess",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Record fuel filled and disposal trips per truck for one week, so you have real figures",
+        "Divide by route, so you see which routes cost most; talk to your accountant on how to read it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A cost per route and contract view from fuel, tipping fees, crew and maintenance entered by the owner.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Cost allocation is in the solution document."
+    },
+    {
+      "id": "p4_pricing_errors",
+      "n": 4,
+      "words": "Skips sit at sites past the hire period and we do not bill it",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "List every skip out with its site reference and hire end date, so overdue ones are visible",
+        "Check the list weekly, so extra days are billed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "workflow_automation A skip and bin register with placement date, hire end and overdue alerts for billing.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Register and alert design are in the solution document."
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Households in societies pay late or not at all",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Keep one unpaid list by society, so follow-up is shared",
+        "Send reminders a few days before the due date, with residents' permission, so payment is front of mind."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "customer_messaging A subscriber billing and collection tracker with reminders and online payment links where available.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder timing and wording are in the solution document."
+    },
+    {
+      "id": "p6_deposit_delays",
+      "n": 6,
+      "words": "Collectors take cash door to door and deposits are delayed",
+      "category": "cash_collections",
+      "subtype": "deposit_delays",
+      "quick_ideas": [
+        "Set a fixed deposit day and time for every collector, so late deposits stand out",
+        "Match collections to deposits weekly, so gaps are found early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A collector deposit log with variance flags by collector role.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Matching rules are in the solution document; pi records the control gap, not names."
+    },
+    {
+      "id": "p7_maintenance_downtime",
+      "n": 7,
+      "words": "Trucks break down and a whole area is missed for days",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Note each truck's last service date, so overdue ones are seen",
+        "Agree a backup truck or hire arrangement, so a breakdown does not stop an area."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Vehicle maintenance reminders by date and a breakdown log showing areas affected.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Reminder schedule is in the solution document; pi gives no vehicle safety advice."
+    },
+    {
+      "id": "p8_info_lost_in_whatsapp",
+      "n": 8,
+      "words": "Complaints come via society WhatsApp groups and blow up before we see them",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Give each society one official complaint number, so complaints reach you directly",
+        "Reply to every complaint the same day, so it does not grow in the group."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Complaint intake from WhatsApp into tickets with response timers and a closure photo.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Ticket flow is in the solution document."
+    },
+    {
+      "id": "p9_manual_reports",
+      "n": 9,
+      "words": "Society management asks for monthly service reports and we make them by hand",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "Agree which few figures each society actually wants, so reports are short",
+        "Collect them daily from route sheets, so month end is not a scramble."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A monthly service report generator for societies and commercial clients built from route records and photos.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "",
+      "free_stops": "Report format is in the solution document."
+    },
+    {
+      "id": "p10_attendance_lateness",
+      "n": 10,
+      "words": "Helpers do not turn up, especially after Eid",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Keep a simple daily attendance list per crew, so gaps are known by morning",
+        "Line up stand-ins before Eid, so routes still run."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A crew attendance and daily assignment board with stand- in planning for peak and holiday periods.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Board set-up is in the solution document; pi records no workers' personal details."
+    },
+    {
+      "id": "p11_fraud",
+      "n": 11,
+      "words": "Recyclables go to the kabari and we never know if we got a fair weight",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Weigh recyclables yourself before each sale, so you have your own figure",
+        "Record weight and rate at every sale, so patterns show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A recyclables sales log with weights and rates recorded at each sale and a monthly summary.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "Log design is in the solution document."
+    }
+  ],
+  "never_say": [
+    "Anything on handling, classifying or disposing of hazardous, medical, chemical or industrial waste, protective equipment or confined-space entry. Anything that helps with illegal dumping, burning, mixing waste to avoid fees or bypassing permits. Any request for customer addresses and phone numbers or workers' names, IDs and personal circumstances. Any help with bribery around municipal contracts or permits. Anything other than emergency services when a worker is in a sewer or septic tank in difficulty, or gas, fire or injury is described."
+  ],
+  "sample_reply": {
+    "person": "Society wale har hafte shikayat karte hain ke gaari nahi aayi, aur hamare paas koi saboot nahi hota. Kya karein?",
+    "pi": "Ji, is ka hal mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1 Driver har stop pe ek photo le, taake service ka saboot ho. 2 Rozana done aur missed stops ki list rakhein, taake har shikayat us se mila sakein. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: har truck ka route phone pe, har stop waqt aur photo ke saath mark ho, aur har society ke liye proof-of-service report khud ban jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "language": "roman_urdu"
+  }
+}

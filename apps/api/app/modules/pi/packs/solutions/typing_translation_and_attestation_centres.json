@@ -1,0 +1,220 @@
+{
+  "industry": "typing_translation_and_attestation_centres",
+  "name": "Typing, translation and attestation centres",
+  "sector": "7.K Professional and business services",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "p1_service_quality",
+      "n": 1,
+      "words": "Customers wait an hour at the counter and walk out",
+      "category": "customers_retention",
+      "subtype": "service_quality",
+      "quick_ideas": [
+        "Note arrivals by hour for a few days, so you see when the real peak is",
+        "Move one staff member's break away from that peak, so the queue is shorter when it matters."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a token and queue system with estimated wait times on a screen and on WhatsApp, plus a daily view of waits by hour.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "Roughly how many customers or jobs do you handle in a day?",
+      "free_stops": "the queue setup and staffing view are set out in the solution document."
+    },
+    {
+      "id": "p2_whatsapp_overload",
+      "n": 2,
+      "words": "People keep calling to ask if their documents are ready",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Tell every customer once, at the counter, when to expect their job back, so calls drop",
+        "Message the customers whose jobs are ready today, so they come in without calling."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "customer_messaging — a job tracker by reference number with automatic WhatsApp updates, with the customer's permission, when a job changes stage or is ready.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "which stages send updates is worked out in the solution document."
+    },
+    {
+      "id": "p3_wrong_location",
+      "n": 3,
+      "words": "Original documents get misplaced in the office",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Do one check of every original currently in the office against open jobs, so you know what's where",
+        "Give originals one fixed shelf by job reference, so they stop wandering."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a document custody log showing which originals are in the office, which shelf, and who took them out and when.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the custody routine is kept for the solution document."
+    },
+    {
+      "id": "p4_order_errors",
+      "n": 4,
+      "words": "We gave a customer someone else's documents once",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Agree that every handover is checked against the job reference by a second person, so mix-ups are caught",
+        "Review how the last mix-up happened once, so the gap is closed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "handover recorded against each job reference, so documents can only be marked collected for the matching job.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the handover check is designed in the solution document."
+    },
+    {
+      "id": "p5_delivery_late",
+      "n": 5,
+      "words": "Courier pouches to the embassy go missing or get delayed",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "List every pouch currently out with its send date, so overdue ones show",
+        "Chase the oldest this week, so they come back."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "a courier and dispatch tracker with expected return dates, flagging pouches sent but not received.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the return rules and alerts are set out in the solution document."
+    },
+    {
+      "id": "p6_supplier_late",
+      "n": 6,
+      "words": "Translations come back late from freelancers",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_late",
+      "quick_ideas": [
+        "Give each freelancer a written due time with every job, so lateness is measurable",
+        "Note who was late this month, so you know who to rely on."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a translator assignment board with deadlines, reminders and on- time records per translator.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "assignment and reminder rules are kept for the solution document."
+    },
+    {
+      "id": "p7_rework",
+      "n": 7,
+      "words": "Typing errors cause applications to be rejected and redone",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Have a second person check applications for the most common service this week, so errors are caught before submission",
+        "List this month's rejections by type once, so you see where errors start."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a check step per service before submission, with rejections and rework logged per person and service.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the checks per service are worked out in the solution document."
+    },
+    {
+      "id": "p8_pricing_errors",
+      "n": 8,
+      "words": "Different staff quote different service charges for the same thing",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Write one service charge list and give it to every counter, so customers hear the same price",
+        "Display it where customers can see it, so there's no doubt."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a standard price list in the system, so every counter charges the same and every receipt matches.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "",
+      "free_stops": "how prices and receipts are set up is designed in the solution document."
+    },
+    {
+      "id": "p9_cash_mismatch",
+      "n": 9,
+      "words": "Cash at the counter doesn't match the day's transactions, and government fees don't reconcile",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Count cash against the day's jobs at close for one week, so you see how often it's out",
+        "Keep service charges and government fees in separate columns, so they're not mixed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily reconciliation of service charges, government fees paid and counter cash, by counter and branch.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "how fees and cash are matched is kept for the solution document."
+    },
+    {
+      "id": "p10_credit_customers",
+      "n": 10,
+      "words": "Corporate clients run up balances and pay late",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List each corporate account's balance once, so you know who owes most",
+        "Send each a statement this week, so the amount is in front of them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a corporate account ledger with statements and scheduled reminders.",
+        "tool_words": []
+      },
+      "ask_first": "",
+      "free_stops": "the reminder sequence is set out in the solution document."
+    }
+  ],
+  "never_say": [
+    "Any immigration, visa, legal, labour or attestation-procedure advice, or how to get an approval. Anything involving forgery, altered documents, fake stamps, backdating or paying officials to speed things up. That a document will be ready or approved by a certain date. Requests for customer names, passport, Emirates ID, CNIC, visa or certificate details, or copies of documents."
+  ],
+  "sample_reply": {
+    "person": "Our phones don't stop. Every customer calls several times asking if their attestation is back. Is there a fix for this?",
+    "pi": "Yes, there is, and you can start this week. 1 Tell every customer once at the counter when to expect their job back, so status calls drop. 2 Message today the customers whose jobs are already ready, so they come in without calling. Workzap can do this automatically for you: every job tracked by reference number, with a WhatsApp update to the customer, with their permission, at each stage. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}
