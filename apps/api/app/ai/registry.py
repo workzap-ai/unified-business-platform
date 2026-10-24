@@ -39,6 +39,10 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
     "openai": {
         "router": "gpt-4o-mini",
         "agent": "gpt-4o-mini",
+        # pi's brain mode (chosen 2026-10-24 by running the same Roman Urdu chat on each model
+        # the platform key can use: gpt-5.4 was best but 6-13 s a turn, gpt-5.4-mini 3-6 s with
+        # every rule kept). Pin another one with OPENAI_MODELS={"pi_brain": "..."}.
+        "pi_brain": "gpt-5.4-mini",
         "summarize": "gpt-4o-mini",
         "vision": "gpt-4o-mini",
         "embed": "text-embedding-3-small",
@@ -47,6 +51,7 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
     "gemini": {
         "router": "gemini-2.5-flash-lite",
         "agent": "gemini-2.5-flash",
+        "pi_brain": "gemini-2.5-flash",
         "summarize": "gemini-2.5-flash-lite",
         "vision": "gemini-2.5-flash",
         "video": "gemini-2.5-flash",
@@ -58,6 +63,7 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
     "groq": {
         "router": "openai/gpt-oss-20b",
         "agent": "openai/gpt-oss-120b",
+        "pi_brain": "openai/gpt-oss-120b",
         "summarize": "openai/gpt-oss-20b",
         "transcribe": "whisper-large-v3-turbo",
     },
@@ -65,6 +71,7 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
     "anthropic": {
         "router": "claude-haiku-4-5-20251001",
         "agent": "claude-sonnet-5-5",
+        "pi_brain": "claude-sonnet-5-5",
         "summarize": "claude-haiku-4-5-20251001",
         "vision": "claude-sonnet-5-5",
     },

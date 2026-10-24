@@ -2846,6 +2846,27 @@ def _sentences(text: str) -> list[str]:
     ]
 
 
+def brain_rewrite_request(problem: str) -> str:
+    """The rewrite request in brain mode: only the fault, no instructions from the older brief
+    flow (they made the model answer the instruction instead of the customer)."""
+    return (
+        f"Don't send that draft: {problem}. Write the whole result again for the customer's "
+        "latest message, fix only that, and keep every other rule in the system prompt: one "
+        "question at most and last, no filler about these instructions, and keep the ideas, "
+        "problem notes and facts the context gives you."
+    )
+
+
+def reply_alias(policy: Any) -> str:
+    """The model alias for pi's replies. The default "balanced" becomes the "pi_brain" model in
+    brain mode (a stronger one than the shared default: it has to follow a long rule prompt); any
+    other alias a workspace chose is kept."""
+    chosen = str(policy.ai_config.get("reply_alias") or "balanced")
+    if chosen == "balanced" and flow.brain_mode(policy.response_rules):
+        return "pi_brain"
+    return chosen
+
+
 def repeats_itself(reply: str, context: dict[str, Any]) -> str | None:
     """A sentence pi already wrote in one of its last three replies, or "Shall I send
     this to the team?" asked again while the customer hasn't answered it."""
@@ -3414,7 +3435,7 @@ async def in_one_language(
     try:
         response = await manager.complete(
             scope,
-            alias=policy.ai_config.get("reply_alias", "balanced"),
+            alias=reply_alias(policy),
             purpose="pi_service_language",
             messages=[
                 Message.system(
@@ -4005,7 +4026,7 @@ async def compose_service_turn(
         manager.complete_structured(
             scope,
             ServiceTurn,
-            alias=policy.ai_config.get("reply_alias", "balanced"),
+            alias=reply_alias(policy),
             purpose="pi_service",
             messages=[Message.system(system_text), Message.user(context_json)],
             temperature=float(policy.ai_config.get("temperature", "0.20")),
@@ -4144,7 +4165,7 @@ async def compose_service_turn(
             manager.complete_structured(
                 scope,
                 ServiceTurn,
-                alias=policy.ai_config.get("reply_alias", "balanced"),
+                alias=reply_alias(policy),
                 purpose="pi_service",
                 messages=[
                     # Rebuilt: the checks above may have added flags to the context (lint_slipped).
@@ -4152,7 +4173,9 @@ async def compose_service_turn(
                     Message.user(json.dumps(context, ensure_ascii=False)),
                     Message.assistant(json.dumps({"reply": turn.reply}, ensure_ascii=False)),
                     Message.user(
-                        f"Don't send that draft: {problem}. Rewrite the whole result and fix "
+                        brain_rewrite_request(problem)
+                        if context.get("pi_mode") == "brain"
+                        else f"Don't send that draft: {problem}. Rewrite the whole result and fix "
                         "that. "
                         + (
                             "This is a status question: answer it from project_deals, one '• "
