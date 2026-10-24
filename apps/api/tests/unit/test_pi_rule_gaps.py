@@ -170,6 +170,22 @@ def test_the_ask_first_question_people_answer_less_is_retired():
     assert {good.status, young.status, thin.status} == {"active"}
 
 
+# --- R-VOICE-13: contractions are fine in English --------------------------------------------
+
+
+def test_contractions_are_fine_in_english():
+    from app.modules.pi import constitution
+
+    context = {
+        "latest_customer_message": "my stock keeps running out",
+        "history": [{"role": "ai", "text": "Hi, I'm pi, an AI from Workzap."}],
+    }
+    reply = (
+        "Thanks. I've noted it: stock that's running out. We'll go one shop at a time. Which one?"
+    )
+    assert constitution.lint(reply, context) == []
+
+
 # --- spec 1.9: the order of priority when rules collide ------------------------------------------
 
 

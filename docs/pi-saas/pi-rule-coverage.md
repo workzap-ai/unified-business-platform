@@ -1,202 +1,95 @@
 # pi rule coverage
 
-Every rule ID in `pi-brain-v3.pdf` and where it is enforced today. The specification asks for each
-rule to be (a) a line in the prompt, (b) a guard in code, or (c) an automated test, and for the most
-important ones all three. Status: **code** = guarded in code with tests; **prompt** = only asked of
-the model; **open** = nothing yet (with the phase that closes it). Update this file in the same
-commit that changes a guard. Brain mode = `response_rules.pi_mode = "brain"`.
+How much of the two specification PDFs pi really has, rule by rule: `pi-brain-v3.pdf` (the Brain, 448 pages) and `pi-industry-solutions.pdf` (Addendum 2, 467 pages). The proof is `apps/api/tests/unit/rule_index.json`: for every rule identifier the PDFs define (R-xxx-nn, RT, G, L, E, M, A, X, SL, VAL, Job, the 10.3 rubric, Appendix D, plus the numbered and unnumbered sections that carry requirements) it holds what the rule requires, the page, the code that enforces it and the tests that exercise it. `apps/api/tests/unit/test_pi_rule_index.py` fails when a file, function or test named there disappears, when a rule id in the PDFs is missing from the index, when a status contradicts its evidence, or when this page stops matching the index. This page is written from the index; change the index and this page in the same commit as the guard.
 
-Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redteam.py`) · states
-`flow.py` (`test_pi_flow.py`) · problems `problems.py`, `taxonomy.py` (`test_pi_problem_model.py`,
-`test_pi_brain_problems.py`) · gates `decisions.py` (`test_pi_decisions.py`,
-`test_pi_brain_decisions.py`) · documents `brain_docs.py`, `brain_pdf.py`
-(`test_pi_brain_docs.py`, `test_pi_brain_documents.py`).
+Statuses: **DONE** code and a test that fails if the rule breaks. **PARTIAL** code exists but part of the rule is not enforced. **PROMPT-ONLY** only in the prompt (the handbook text is checked to be there). **HUMAN** needs people or a decision. **MISSING** neither code nor prompt. **CODE-ONLY** (code, no test) is empty today.
 
-## Constitution (Part 1)
+## Counts
 
-| Rule | What | Status | Where |
-|---|---|---|---|
-| R-DISC-01 | First message says it is an AI | code | linter hard rule + `repair` adds the line; fixed opening in `greeting_reply` |
-| R-DISC-02 | "Are you human?" answered in sentence one | code | linter plus a fixed pre-model answer (`safety.identity_asked`) |
-| R-DISC-03 | No human name, body, gender, place | code | linter `HUMAN_CLAIM` (persona names, places, family, meals) |
-| R-DISC-04 | No "a human is reading" unless one took over | code | `flow.hand_to_human` / `hand_back` from the inbox actions in `service.py`; linter rule `TEAM_READS` (hard) |
-| R-DISC-05 | Re-disclose after 30 days | code | `welcome_back(ask=False)`, `redisclose_due` and `with_disclosure` in `service_conversation.py`, also when the person opens with a real message |
-| R-SELL-01, 02 | No fix, product, document or quote while listening | code | linter by state (S0 to S4, S5b), hard |
-| R-SELL-03 | No urgency, scarcity, discount | code | linter, hard (a refusal "I can't give a discount" is allowed) |
-| R-SELL-04 | Direct "can you fix this?" gets one honest line | code+prompt | linter lets the line through when asked; wording is the prompt's |
-| R-SELL-05 | A no is accepted once, no re-offer | code | `decisions` S5 to S5b; S5b only re-offers when the person raises it |
-| R-HONEST-01 | Never invent prices, timelines, features | code | digits and currency blocked in service replies (`price_policy`), money in linter, quote only from reviewer |
-| R-HONEST-02 | Say what is not ready (nori Vision) | code | `safety.Nori.VISION` fixed reply ("coming soon... isn't available yet"), matches spec G15 |
-| R-PROM-01 | No promised results | code | linter (`will increase`, `guarantee`, `you will save`), documents use "would" |
-| R-PROM-02, 03 | Does not decide or forecast for them | prompt | |
-| R-PAY-01 | No payment in chat | code | brain mode ignores `action="payment"` (`run_service_action`); the quote carries a bank transfer only |
-| R-PAY-02 | Never asks for card, CVV, bank login, OTP, PIN, password | code | linter, hard (verbs and "what is your PIN?") |
-| R-PAY-03 | Bank details only on the approved quote | code | linter blocks IBAN and account numbers; details only in `brain_pdf.render_quote` |
-| R-PAY-05 | "Payment received" only when staff confirm | code | linter, hard; only `POST /pi/brain-documents/payments/{id}/confirm` (billing.write) confirms |
-| R-PAY-06 | A payment screenshot is thanked, never confirmed | code | `decisions` S10: "I paid", "done" or an image/document makes the payment `claimed` and tells staff |
-| R-PAY-07 | Refunds and disputes are noted and escalated | code | `safety.Boundary.REFUND` (directed at Workzap, not refunds in the person's own business) -> staff request `refund_dispute` |
-| R-PRIV-01 | Never asks for card, password, third-party details | code | linter (see R-PAY-02) |
-| R-PRIV-02 | Sensitive content redacted from records and logs | code | `safety.redact_pii` + `safety_guard` redact the message log; original encrypted in `pi_quarantine` (0039, 30 days, purged by the sweep); reminder once per kind; card/ID/OTP-only message gets only the reminder |
-| R-PRIV-03 | Never asks for national ID, passport, account numbers | code | linter |
-| R-PRIV-04 | Roles, not third-party names | prompt | |
-| R-PRIV-05 | One contact's chats are never shown to another | code | tenant scope and per-customer records (shared workspaces are open) |
-| R-BOUNDARY (RT14, RT15, RT20, RT22, RT24) | Other people's chats, fake invoices, politics, competitor comparison, outcome promises | code | `safety.boundary_asked`, fixed answers before the model |
-| R-PAY-04 | Claimed bank-detail change: never confirm, escalate | code | `safety.Boundary.BANK_CHANGE`, fixed reply, high-priority staff request marked possible fraud |
-| R-ADV-05 | No general-purpose help (homework, code, jokes) | code | `safety.Boundary.OFF_TOPIC` |
-| R-ROUTE-01 to 05 | Demo, jobs, vendor, partnership, press enquiries routed, not noted as problems; nori facts and pricing answered from fixed text | code | `safety.enquiry_asked`, fixed replies, staff request; `safety.Nori` (VISION, PRICING) for nori questions |
-| R-DISC-05, R-MEM-03 | Returning after a gap: welcome back, re-disclose after 30 days | code | `welcome_back` in `service_conversation.py` |
-| R-PRIV-06 | Says what it keeps, honours deletion | code | `safety.boundary_asked` DELETION: fixed reply plus a high-priority staff request; staff then call `POST /pi/brain-erasure/{customer_id}` (`brain_erase.py`): removes problems, memory notes, quarantine copies, learning scores and message text; keeps quotes, documents, payments and the CRM contact; staff tell the customer in the chat |
-| R-PRIV-07 | Learning only after redaction | code | `learning_bank.redaction_confidence` >= 0.98, `learning.never_learn`; lessons and pack drafts go through `clean_text` / `never_learn` too |
-| R-PRIV-08 | Never pressures for detail | prompt | |
-| R-ADV-01 to 05 | No legal, medical, financial advice; no politics; no off-topic help | code | `safety.advice_asked` (legal, tax, financial, medical, veterinary) answered with fixed text before the model; politics and off-topic stay prompt |
-| R-EMER-01 to 04 | Emergency numbers, stop noting, escalate | code | `safety.emergency` before the model; fixed reply with local numbers (PK, AE, CA/US, all if unknown); X_EMERGENCY; high-priority staff request; next ordinary message returns to S1 |
-| R-META-01 | Not made or endorsed by WhatsApp or Meta | code | `safety.identity_reply` (person, gender, scam, Meta, model, rules, company) |
-| R-BRAND-01 | Workzap only (never Artwing, a.hub) | code | linter, hard; PDFs use Workzap's letterhead |
+index counts: DONE 359, PARTIAL 32, CODE-ONLY 0, PROMPT-ONLY 7, HUMAN 18, MISSING 3
 
-## Voice and conversation (Parts 2 and 3)
+| PDF | Rules | DONE | PARTIAL | CODE-ONLY | PROMPT-ONLY | HUMAN | MISSING |
+|---|---|---|---|---|---|---|---|
+| pi-brain-v3 (Brain) | 338 | 293 | 23 | 0 | 7 | 15 | 0 |
+| pi-industry-solutions (Addendum 2) | 81 | 66 | 9 | 0 | 0 | 3 | 3 |
+| Both | 419 | 359 | 32 | 0 | 7 | 18 | 3 |
 
-| Rule | What | Status | Where |
-|---|---|---|---|
-| R-VOICE-01 | Short (60, summary 160, document cover 120 words) | code | linter, soft |
-| R-VOICE-02, R-ASK-01 | One question, and it is last | code | linter, soft |
-| R-VOICE-03 | No jargon they did not use | code | linter |
-| R-VOICE-04 | Mirror language and register; no same opening twice | code | language guards (`reply_language`) and linter on openings; "mujhe maazrat chahiye" is flagged (say "Maaf kijiye") |
-| R-VOICE-05, 06 | No hype, no scripted empathy, no template phrases | code | linter |
-| R-VOICE-07, 08 | No "!", no emoji (except a tick, or theirs) | code | linter; `repair` fixes it |
-| R-VOICE-09, 10, 12 | WhatsApp formatting; "noted" not "logged"; never lecture | code | linter; R-VOICE-09 also flags a list while listening that repeats a point or has more points than the latest message could hold (not in S4) |
-| R-VOICE-11, 13, 14 | Their names for things; contractions; British spelling | prompt | |
-| R-LANG-01 | "Sorted" is not "solved" | code | linter; summary text |
-| R-LANG-02 | Language per message | code | existing language detection and guards; a bare "no" or "yes please" keeps the chat language, and voice-note transcripts count in `reply_language` |
-| R-LANG-03 | Their words kept, English title for Workzap | code | `ProblemNote` (`user_words`, `title`, `title_local`) |
-| R-LANG-04, 06 | Lakh and crore, dates like "kal" | code | `language.amount_value`/`date_estimate`, called from `problems.apply_ops` on `money_text`/`since_text`; `date_estimate` marks "kal"/"parson" low-confidence, never guessed aloud |
-| R-LANG-05 | Currency from the country | code | quote currency from the number (PKR, AED, CAD) |
-| R-LANG-07, 08 | Voice notes; religious courtesy | partial | transcription exists; courtesy is prompt |
-| R-ASK-02 to 06 | At most 3 clarifying questions; never re-ask; no sensitive asks | prompt | `noted_problems` lists what is missing |
-| R-NOTE-01 to 08, R-CORR-01 to 04 | Notes in their words, groups, corrections applied | code | `problems.py` ops with revisions; titles checked. R-CORR-02: `says_wrong` sets `said_wrong` and the linter flags "I did not understand" as an answer to it; `corrects_noted` (a note exists) tells the prompt to withdraw the problem they mean |
-| R-MEM-01, 02 | Profiles; never ask twice | code | `customer_profile()` merges name/business facts across up to 10 earlier conversations; `constitution._reasks_known_profile` (R-MEM-02) blocks a drafted reply that asks again for a known name, business name, business type or location (EN + Roman Urdu); "I already told you" shows the sorted summary (`SHOW_ME`). Bounded to these 4 facts, not all 15 profile fields, to keep false positives low |
-| R-MEM-03 | Welcome back after a gap | code | `welcome_back` (see R-DISC-05) |
-| R-MEM-06 | Shared workspace | code | migration 0046: `pi_businesses` table + `customers.business_id`/`business_role`/`pending_business_name`/`shares_with_business`/`business_joined_at`/`business_disclosed_at`. `app/modules/pi/business.py`: first to name a business owns it (`join_or_request`), a second contact awaits the owner's/admin's approval (`approve_join`) or a staff link (`staff_link`); `can_approve_for` replaces the standalone flag wherever a contact belongs to a business; the sharing notice is said once at a joined member's next message (`disclosure_due`/wired in `service_conversation.py`); an objection stops sharing (`objects_to_sharing`/`opt_out`); problems different team members raise about the same thing are linked as `duplicate_across_contacts` (wired into `problems.apply_ops`) and counted without naming anyone (`mentioned_by`) — no consent-to-be-named mechanism exists, so a name is never attached, the spec's safe default. Open: no dashboard/API route yet to list or approve pending join requests (`approve_join`/`staff_link` are ready, unwired to any endpoint) |
-| R-MEM-04 | Corrections override, history kept | code | revisions |
-| R-CANT-01 to 03 | "I can't do that" and what next | prompt | |
-| R-OFFER-01 | Offer only after the summary is confirmed | code | `decisions` S4 |
-| R-OFFER-02 | The fixed offer text | code | `decisions.TEXT["offer"]` |
-| R-OFFER-03 | Only an explicit yes starts anything | code | `decisions.classify` at 0.9, hedges refused |
-| R-OFFER-04 | "All or only some?" once | code | `decisions` S5 |
-| R-OFFER-05 | Cost before a quote: honest, no range | code+prompt | cost questions go to the model, numbers blocked |
-| R-OFFER-06 | A member who is not the decider | code | `customers.can_approve`, and `decisions.non_decider` ("I work at", "my boss decides") sets `brief.non_decider`; `_member` asks once whether the decision-maker should receive the document |
-| R-FUP-02 | stop / opt-out ends follow-ups | code | `note_opt_out` in `pi_saas/campaigns.py` |
-| R-FUP-03 | Quiet hours 21:00-09:00 in the person's zone (+92, +971, +1 by area code); Jumu'ah Friday 12:00-14:30 for PK/UAE numbers only | code | `blocked_until`, `person_zone`, `_friday_prayer` in `followups.py`; `blocked_by_time` in `brain_followups.py` |
-| R-FUP-04 | No proactive message within an hour of iftar in Ramadan | code | `iftar_pause`, dates in `whatsapp_config.ramadan` (set per year and country) |
-| R-FUP-01, 05 | No pressure; follow-ups logged | code | `followup_policy.py` (table 3.9.1, a test keeps every text pressure-free), sent by `brain_followups.py` and `followups._silence_nudge`; outside 24 h only approved templates (`followup_templates`, meeting template), staff told when one is missing |
-| Spec 8.3 reward model | Rewards never include offers, approvals or payments | code | `learning.reward`, `NEVER_REWARDED` (eval L5) |
-| Spec 8.9 never-learn list | Learned text must not break the constitution | code | `learning.never_learn` reuses the reply linter (eval L7) |
-| Spec 8.7 risk classes | Lessons about money, privacy, offers, follow-ups are HIGH | code | `learning.risk`, conservative (eval L8) |
-| Spec 8.9 kill switch | Learning frozen unless explicitly switched on | code | `learning.frozen` (eval L10); the nightly run, examples, lessons, packs and wordings all stop while frozen |
-| Spec 8.5 job 9, 9.10 rule 3 | New examples are canaried and rolled back on a guardrail | code | `learning_canary.py` (eval L9) |
-| Spec 8.7, 8.10 | High-risk lessons need a second person | code | `learning_lessons.decide` refuses the author |
-| Spec 8.5 job 5, 8.6 | Drafted packs never go live without a person's care approval and a shadow run | code | `learning_packs.py`, `learning_rules.pack_may_go_live` |
-| Spec 8.5 job 7, 9.10 | Timing settings move one step a week, one at a time; undone when a guardrail rises; rule settings never tuned | code | `learning_tuning.py` (only timing settings), `learning_rules.next_setting_value`, `breached` |
-| Spec 8.5 job 1 | A separate grader model scores whole conversations; a rule break excludes them and is logged as a defect | code (off unless `brain.grader` is true) | `learning_grader.py`, `learning_bank.curate` |
-| Spec 8.10 | A staff correction of a problem counts 5x a customer word in vocabulary learning, and cannot admit a term alone | code | `brain_learning_routes.correct_problem`, `learning_rules.lexicon_terms` |
-| Spec 8.5 job 6, 2.3 | Voice variants only for acknowledge and correct; the opening and the offer are never varied; a variant worse than the canonical wording for 2 weeks is retired | code | `learning_voice.py` (`SEEDS`, `retire_worse`), prompt bullet `voice_hint` |
-| Spec 8.10 | Document edits and quote win/loss notes become HIGH lessons for the drafter only, never the chat | code | `learning_docs.py`, `learning_lessons.relevant` skips scope `document_drafter` |
-| Spec 8.10 | Confirming or rejecting suggested links tunes the linking threshold per industry (one step a week) | code | `learning_links.py`, `brain_config.link_pct`, `problems.apply_ops(link_min)` |
-| Spec 8.11.2 | Problem board picture, tap-to-correct list and progress card: no price, no pitch, business named only if given, text summary always sent | code | `brain_visuals.py`, `brain_visual_queue.py`, `brain_visual_routes.py` (English and Roman Urdu only) |
-| Spec 8.3 scoring | Each reply scored by what followed, text-free | code | `experience_scorer.score_new`, table `pi_experiences` (0040), run by the sweep |
+24 of the 359 DONE rules are exercised only by integration tests (they need the disposable Postgres on port 55432); the rest have a unit test that runs with no database. The index lists each test, so `rule_index.json` shows which. Every identifier family the PDFs define is in the index: R-xxx-nn (155 ids), RT1-29, G1-15, L1-14, E1-9, M1-10, A1-8, X1-5, SL-1..10, VAL-1..6, Job 1-10, Job S1-S8, rubric 1-20 (RUB-n), Appendix D (App.D-n). SPEC-x.y rows are numbered sections of the Brain that have requirements but no rule id; A2-x rows are the same for Addendum 2. The per-industry text of Part 7 and Part 4 is data, covered by SPEC-7.0 and A2-4-DATA.
 
-## Documents, decisions, payment (Part 5)
+## Everything that is not DONE
 
-| Rule | What | Status | Where |
-|---|---|---|---|
-| R-DOC-00 | A reviewer approves everything first | code | `brain_docs.approve` refuses a rule break; `send` refuses unapproved |
-| R-DOC-01 | Section 1 in their words | code | `solution_content` |
-| R-DOC-02, 03, 04 | Every component maps to a problem; every problem addressed or listed; "won't do" never empty | code | `check_solution` |
-| R-DOC-05 | Plain words | code | jargon and sentence length; `brain_docs.reading_grade` (Flesch-Kincaid), flagged over grade 9 |
-| R-DOC-06, 09 | "Would" not "will"; no price in the document | code | `check_solution` |
-| R-DOC-07 | Their language plus an English copy | code | `content` and `content_en`; Urdu script and Arabic draw from English (the PDF font is Latin only) |
-| R-DOC-08 | Workzap branding only | code | PDF letterhead |
-| R-QUOTE-01 | Prices only from Workzap | code | the draft has no price; only a reviewer sets it |
-| R-QUOTE-02 | No negotiation; cheaper is a change request | code+prompt | S8b `change_requests` |
-| R-QUOTE-03 | Explains only what is printed | prompt | `open_quote` is the only source |
-| R-QUOTE-04 | "An offer, not a charge" in the cover | code | cover text and PDF |
-| R-QUOTE-05 | Validity never used as pressure | code | linter (urgency) |
-| R-QUOTE-06 | Bank details only in the approved PDF | code | |
-| R-QUOTE-07 | Currency of the business's country | code | |
-| R-QUOTE-08 | A revision is a new version | code | `brain_docs.revise` |
-| R-QUOTE-09 | "A quote without the document" | open | prompt line to add |
-| R-DEC-01 | Approval needs two confirmations | code | `decisions` S8 |
-| R-DEC-02 | Only `can_approve` approves | code | |
-| R-DEC-03 | Ask for changes: note, confirm, send to Workzap | code | |
-| R-DEC-04 | A no is fine; nothing charged | code | |
-| R-DEC-05 | Cancel before payment is accepted | code | S10 |
-| R-KICK-01 | After staff confirm, pi tells them and offers kickoff times | code | fixed notice (also after the 24-hour window, on their next message); slots come from the existing booking tools |
-| R-KICK-02, 03 | Booked slot confirmed, reminders; no invented agenda | code | a booking moves S11 to S12; `followup_policy` schedules `kickoff_24h`/`kickoff_1h`; fixed "to agree the details" wording (`decisions.py`, `flow.py`) |
-| R-COMPL-01 to 03 | Complaints are feedback, escalated | code | `safety.Boundary.COMPLAINT` fixed reply ("I've passed this to the Workzap team"), staff request raised |
+Who: a lane of work, not a person. Linter hardening session = `constitution.py` and its tests; safety session = `safety.py`, `safety_guard.py`; learning session = the `learning*.py` family; solutions session = `solution*.py`, `packs/solutions`; documents owner = `brain_docs.py`, `brain_pdf.py`; runtime session = `runtime.py`; web session = `apps/web`; prompt owner = the handbook and prompt text; Workzap owner = decisions only the owner can make.
 
-## Red-team (Part 10.2) and what is not covered yet
+| Rule | PDF p. | Status | What is missing | Who |
+|---|---|---|---|---|
+| `A2-1.5-SECRETS` | Add.2 10 | MISSING | pi never reveals Workzap's internal methods, tools, vendors, pricing logic or how catalogue...: Nothing enforces it and it is not in the prompt: the handbook is built from the Brain PDF only, and the linter blocks internal terms (knowledge pack, prompt, rule ids) and named products, not an explanation of how a build works, a vendor Workzap uses or pricing logic. | linter hardening session (linter change) or prompt owner |
+| `A2-FIX-4` | Add.2 14 | MISSING | Part 4 data: rewrite sample replies so no two industries in a sector share an opener and...: 210 of 211 sample replies use 'automatically' (the test pins the count rather than the fix) and 27 fail the value-line check. They seed the example bank through a gate, so the worst are dropped, but the rewrite was never done. | solutions session (data change: needs the owner's go-ahead) |
+| `A2-FIX-5` | Add.2 14 | MISSING | Bridge openers and build phrasings are voice variants that pi learns from owners' responses: Openers rotate and never repeat in a chat, but they are not learned: learning_voice has no variant set for them, so there is no response-based preference. | learning session |
+| `R-PRIV-08` | Brain 13 | PROMPT-ONLY | Never pressures the person for detail they hesitate to give: Only the handbook text (always in the prompt) carries it; nothing detects pressure. | prompt owner (not in scope for code) |
+| `R-VOICE-11` | Brain 16 | PROMPT-ONLY | Names things the way the person names them ('the Gulberg branch', not 'Location 2'): Carried only by the handbook text in the prompt; no check compares pi's names for things with the person's. | prompt owner (not in scope for code) |
+| `R-ASK-04` | Brain 20 | PROMPT-ONLY | Closed or choice questions for brief writers, open questions for long writers: Style profile sets the length; the closed-versus-open choice is prompt-only (question style per person is not tracked as an input). | learning session |
+| `R-ASK-05` | Brain 20 | PROMPT-ONLY | A skipped or ignored question is not re-asked; the field is marked unknown: Nothing compares a new question with questions already ignored; the exact-repeat check (reply_quality) only catches an identical message. | linter hardening session |
+| `R-CANT-01` | Brain 22 | PROMPT-ONLY | When it cannot help it says so plainly in the first sentence ('I can't do that.'): Only the handbook carries it; the fixed boundary replies follow the pattern but no check enforces it on model replies. | prompt owner |
+| `R-CANT-02` | Brain 22 | PROMPT-ONLY | Says what happens next or what pi can do instead: As R-CANT-01. | prompt owner |
+| `X5` | Brain 32 | PROMPT-ONLY | Business distress without danger ('I'm going bankrupt') is not an emergency: acknowledged,...: Code only keeps the flow open and puts the distress guidance (7.N.distress, 6.5) in the prompt; the acknowledgement wording is the model's. | prompt owner |
+| `R-PROM-02` | Brain 12 | PARTIAL | pi never decides for the person; it lays out what it noted and they decide: Only an explicit 'what would you do?' (A8) and 'you should' / 'best practice' phrasing are caught; a decision phrased any other way is left to the prompt. | linter hardening session |
+| `R-PROM-03` | Brain 12 | PARTIAL | pi never forecasts outcomes of the person's business: PROMISE catches 'will increase/boost/grow/double/improve' and 'you'll save/earn' only; other forecast wording ('sales will rise', 'next year you'll be') is prompt-only. | linter hardening session |
+| `R-LANG-05` | Brain 17 | PARTIAL | Currency follows the country (PKR for Pakistan or 'Rs', AED for UAE, CAD for Canada): Quotes take the currency from the phone prefix only; 'Rs' / 'rupay' wording in the chat does not set it. | documents owner |
+| `R-ASK-03` | Brain 20 | PARTIAL | Never asks what the person already said (checks memory first): The linter catches a re-ask of name, business name, business type and location only; other known facts (branches, systems, a problem's detail) are prompt-only. | linter hardening session |
+| `R-MEM-02` | Brain 22 | PARTIAL | Checks memory before asking; never asks a question already answered in any earlier conversation: Bounded to name, business name, business type and location (EN and Roman Urdu); the other profile fields are not checked. | linter hardening session |
+| `R-CORR-03` | Brain 22 | PARTIAL | If a correction merges or splits problems pi says so: The merge/split is applied and recorded; the sentence 'I've split that into two' is the model's wording and is not checked. | prompt owner |
+| `R-QUOTE-03` | Brain 28 | PARTIAL | pi explains the quote only from what is printed on it: Amounts and timelines in a reply are checked against the printed quote; any other claim about the quote is prompt-only. | linter hardening session |
+| `L14` | Brain 445 | PARTIAL | A pack listening section learned from conversations: the golden set still passes at 100%...: The golden and red-team tests run in CI and in scripts/pi_release_gate.py, but promote_shadows does not run them after activating a pack; the replay gate only holds new promotions while its last result fails. | learning session |
+| `8.4.1` | Brain 424 | PARTIAL | Per-person style profile: length, language and script, formality, pace, question style,...: Length, formality, language, emoji and voice notes are adapted. Pace, best question type, detail tolerance (fewer questions for impatient people) and active time of day are not tracked. | learning session |
+| `8.4.3` | Brain 425 | PARTIAL | Live retrieval of 3-5 best past exchanges by situation back-off, re-ranked by similarity,...: Ranking is similarity then reward with one example per business; recency is not a factor. | learning session |
+| `Job 5` | Brain 426 | PARTIAL | Auto-draft packs for 5 unclassified businesses: listening sections shadow then live, care...: New packs are drafted and gated. Existing packs are never extended with newly learned problems, questions or seasons (the spec's last sentence of Job 5). | learning session |
+| `Job 8` | Brain 426 | PARTIAL | The miner proposes short lessons; a risk classifier labels LOW or HIGH; LOW go through the...: Lessons come from staff ('Teach pi') and from the failed-solution-chat audit (Job S7). There is no job where a miner model proposes general lessons from yesterday's conversations. | learning session |
+| `Job 9` | Brain 426 | PARTIAL | The gate: golden and red-team pass 100%, replay of 200 recent conversations, 10% canary for...: Step 1 is a script (scripts/pi_release_gate.py), not run per change; step 2 grades stored replies of recent chats with the linter instead of replaying them through the changed pi with a simulated person. | learning session |
+| `8.8` | Brain 427 | PARTIAL | Redaction before learning: two passes (patterns and a named-entity model), placeholders,...: Pattern redaction and the 0.98 bar are code. There is no named-entity model pass, and the provider data-retention/no-training setting is a human check (Appendix D). | learning session (NER) and Workzap owner (provider setting) |
+| `8.11.1` | Brain 428 | PARTIAL | Brain dashboard panels: learning feed, health, question leaderboard, example bank, lexicon...: Tabs exist for overview (digests, health, freeze), examples, questions, problems, Teach pi, packs, solutions and changes (rollback). Not built: a lexicon explorer, a conversation-trace screen (learning_audit has the data, no route or screen), and comparing two versions on the golden set. | web session |
+| `8.13` | Brain 429 | PARTIAL | Learning metrics on the dashboard: reward, first-time confirmation, questions per problem,...: Reward, confusion, correction, opt-out, first-time confirmation, repeat-question, complaint and rule-break rates (and reward by language) are reported. Questions per noted problem, share of situations with a proven best question, lexicon coverage and time-to-use are not. | learning session |
+| `9.10` | Brain 433 | PARTIAL | Every default number is a config value inside the spec's tested range; numbers that touch a...: Two defaults differ from the spec table: debounce is 5 s (spec 10 s, range 5-20; lowered on purpose on 2026-10-24 for latency) and the link-suggestion threshold is 60% with range 50-85 (spec 75%, range 60-90; pinned by test_the_threshold_starts_at_sixty_and_stays_inside_its_range). The low-confidence threshold (0.6) and the severity weights are fixed constants, not tunable. | Workzap owner (confirm or restore the two defaults) |
+| `A2-FIX-2` | Add.2 14 | PARTIAL | Part 4 data: a view build leads at most one problem in four per industry: About 10 industries stay over the cap because no action key exists among the keys the document lists for those problems; the builder reports them and invents nothing. | solutions session (needs a person to choose builds) |
+| `A2-FIX-3` | Add.2 14 | PARTIAL | Part 4 data: rewrite every Workzap sentence that uses a banned tool word in the phrase-bank...: The builder flags tool words but does not rewrite: 122 of 2103 stored Workzap sentences still contain one. What pi says aloud comes from the catalogue phrase bank, so they are not spoken, but they remain in the data. | solutions session |
+| `A2-2.1` | Add.2 15 | PARTIAL | Retrieval order: the industry's own solutions, overlays, sector neighbours, the generic...: Steps 1 and 5 (the industry's entries as learned, and the learned idea bank) are used. Steps 2 to 4 (overlays, sector neighbours, the generic Addendum 1 library) are not: the library is not in the repository. | solutions session (needs Addendum 1) |
+| `A2-2.4-SECTOR` | Add.2 16 | PARTIAL | One solution test per sector using a sample reply from Part 4: One test runs every sample reply through the value-line check, but it pins the 27 known failures instead of asserting none; there is no per-sector test that passes a sample through the live pipeline. | solutions session |
+| `A2-3.3` | Add.2 19 | PARTIAL | Instant: a solution memory per business; never repeat an idea; swap kind on rejection; learn...: Memory, no-repeat, kind swap and return continuity are built. Learning the owner's taste (practical steps versus 'this will show you the numbers') and leaning that way in their style profile is not. | learning session |
+| `Job S3` | Add.2 20 | PARTIAL | Find new ideas from owners, Workzap's documents, the miner model and neighbouring...: An owner's idea enters only when a reviewer submits it through the route; nothing extracts an idea from an owner's own chat message automatically (spec: extracted, redacted, generalised). | learning session |
+| `A2-3.10` | Add.2 23 | PARTIAL | Solutions metrics: engagement, generic and already-tried rates, didn't-help, unanswered...: Rates, counts, unanswered requests and learned sample replies are reported; time from a new pattern to use and offer acceptance (reported, never optimised) are not. | solutions session |
+| `SL-4` | Add.2 24 | PARTIAL | Owner describes something that worked: a candidate idea is created, redacted, in testing at 10%: Works when a reviewer submits the idea; nothing creates the candidate from the owner's chat message itself (see Job S3). | learning session |
+| `A2-4-DATA` | Add.2 25 | PARTIAL | Part 4: 211 industries and 2103 problems parsed and validated (categories in the taxonomy,...: Camel farms' sample reply is blank (its Arabic page cannot be read by either extractor; a person must transcribe it) and 44 stored quick ideas fail the idea guard and wait for a person. | solutions session and a person to transcribe the page |
+| `SPEC-2.5-OTHER` | Brain 17 | PARTIAL | Hindi/Hinglish, Punjabi, Sindhi, Pashto, Tagalog, Malayalam, Tamil, Bengali and French:...: Only Pashto gets a fixed gentle answer; every other language is left to the model with the prompt text, with no check of the 'ask once' or 'English plus one line' behaviour. | languages session |
+| `SPEC-2.6` | Brain 18 | PARTIAL | Register by person type: crisp for a chain owner, warm and simple for a small shop, careful...: Formality, length and person type (from role and team size) are read and the non-decider is handled; the register wording per type (crisp, calm, plain facts) is left to the prompt. | prompt owner |
+| `SPEC-3.6` | Brain 21 | PARTIAL | Enrichment: update an existing problem silently when related detail arrives, confirm only...: The update operation and its revisions are built; 'confirm only if meaningful' and 'no checklist' are prompt-only. | prompt owner |
+| `SPEC-5.2` | Brain 27 | PARTIAL | Solution document: six sections (problems in their words, what Workzap would build, what it...: Sections 1, 2 and 4 are checked by rule; the 2-pages-per-group limit is not checked. | documents owner |
+| `SPEC-6.3` | Brain 31 | PARTIAL | PII handling: detect cards (Luhn), IBAN, passwords/OTP/PIN, CNIC/Emirates ID/SIN, third-...: Health information and salaries or disciplinary matters of named people are caught only as a name turned into a role (and the child case), not detected as their own kinds. | safety session |
+| `SPEC-6.10` | Brain 33 | PARTIAL | Media and message types: voice notes, images with PII check, files, video unsupported,...: Voice, image, file, video, location, contact card and burst handling are built. A sticker or a reaction is ignored (runtime: 'nothing to answer'): a thumbs-up reaction on a noted line does not confirm it and a cross does not ask what to correct. Edited and deleted messages are not re-processed. | runtime session |
+| `8.12` | Brain 428 | HUMAN | Optional later step: fine-tune a dedicated model from reviewed redacted conversations: Explicitly a later Workzap decision; nothing to build now. | Workzap owner |
+| `App.D-1` | Brain 447 | HUMAN | Human SLA for escalations: what pi may promise (default: nothing specific): A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `App.D-2` | Brain 447 | HUMAN | Approved company profile facts pi may state (E7): A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `App.D-3` | Brain 447 | HUMAN | Which document types may skip human review (recommended: none): A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `App.D-4` | Brain 447 | HUMAN | Retention periods for messages, quarantine and learning data, matching the privacy notice: A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `App.D-5` | Brain 447 | HUMAN | Transcription and image understanding on or off at launch: A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `App.D-6` | Brain 447 | HUMAN | Template messages to register with Meta (follow-ups, kickoff reminders): A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `App.D-7` | Brain 447 | HUMAN | Shared-workspace policy for teams (default on or opt-in): A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `App.D-8` | Brain 448 | HUMAN | Currency and tax lines on quotes per country (finance): A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `App.D-9` | Brain 448 | HUMAN | Whether pi may name the underlying model if asked (E6): A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `App.D-10` | Brain 448 | HUMAN | Ramadan and Eid dates per year and per country (config): A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `App.D-11` | Brain 448 | HUMAN | Served and not-served industries, and the polite decline for the rest: A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `App.D-12` | Brain 448 | HUMAN | Native-speaker reviewers for Roman Urdu, Urdu and Gulf Arabic (2.5.1): who, and how often: A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `App.D-13` | Brain 448 | HUMAN | Starting values for tunable defaults (9.10): accept or set your own: A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
+| `SPEC-2.5.1` | Brain 15 | HUMAN | Language quality assurance: native-speaker review of Roman Urdu, Urdu and Gulf Arabic replies: Needs named reviewers (Appendix D item 12); the fixed lines exist in the three languages and are tested for presence only, not for quality. | Workzap owner |
+| `A2-2.5-1` | Add.2 16 | HUMAN | Confirm the numbers: 2 ideas per message, 4 per conversation before the offer, 2 more after...: Starting values; the owner tightens or loosens after watching real chats. | Workzap owner |
+| `A2-2.5-2` | Add.2 17 | HUMAN | Confirm the solution catalogue (Addendum 1 Part 7.2); industry solutions only name builds...: The catalogue was derived from Addendum 2's phrase bank because Addendum 1 is not in the repository; the owner must confirm it. | Workzap owner |
+| `A2-2.5-3` | Add.2 17 | HUMAN | Who reviews free-rider flags and whether anything happens beyond the dashboard flag...: A decision; the code does nothing beyond logging, which is the recommended default. | Workzap owner |
 
-Covered by tests (`tests/unit/test_pi_redteam.py`): RT1, RT2, RT3, RT4 (as text that cannot move a
-gate), RT5, RT6, RT7, RT12, RT13, RT23, RT24, RT25, RT26.
+## Found and fixed while building the index
 
-Open, in the order they should be built: RT10 and RT28 (emergency classifier), RT6 and RT21 (PII
-detection in the message log), RT8 (changed bank details), RT9 and RT27 and RT20 and RT22 (advice
-and opinion limits), RT14 (other people's chats), RT15 (illegal requests), RT16 and RT17 (deletion
-and opt-out), RT18 (burst debounce), RT19 (languages not supported), RT29 (served trades).
-Golden conversations G1 to G15 (Part 10.1) are built as scripted tests as their phases land:
-G5, G10, G11 and G13 are covered by `test_pi_brain_decisions.py` and `test_pi_brain_documents.py`.
+- R-CONV (promise P2, 'No forms. Just chat.'): `business_form.after_turn` sent the 'Business details' WhatsApp form on pi's second unanswered ask for the business, in brain mode too. Brain mode now skips it (`test_pi_rule_gaps.py::test_brain_mode_never_sends_the_business_form`).
+- Rules that had code but no test got one: R-CANT-03, R-KICK-03, R-VOICE-13, Job S8, spec 1.9 (priority order of the gates), X5 (distress is not an emergency). Prompt-only rules are checked to be in the prompt text (`test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening`).
+- Stale claims in the previous version of this page are gone: the 'open' red-team list (all 29 attacks and all 15 golden conversations have named tests, see `test_pi_part10_coverage.py`), 'R-QUOTE-09 open' (the fixed answer exists and is tested), 'build-fit confirmation is not built' (it is: `test_g10c_build_fit_is_recorded_from_projects_and_confirmed_by_a_reviewer`), and the rows that called R-ASK-02, R-ASK-06, R-PRIV-04, R-VOICE-14, R-LANG-07 and R-LANG-08 prompt-only or partial although the linter, the redactor or the courtesy gate enforce and test them.
+- Code that differs from the spec and is left for the owner (not changed here): the two 9.10 defaults (debounce 5 s, link threshold 60%), listed under `9.10` above.
 
-## Solutions that learn (Addendum 2, Part 3)
+## Keeping it true
 
-Switched on per workspace with `response_rules.brain.solution_mode = true` (off by default; needs
-migration 0043, `docs/pi-saas/migrations-0043.sql`, and learning not frozen for the nightly jobs).
-
-| Rule | What is enforced | Where |
-|---|---|---|
-| R-VAL-01, 02 | Two ideas per message, four per chat before the offer | `value_line.py`; `solution_ideas.choose` caps at two; `solution_context` stops at four |
-| R-VAL-03, 04, 05 | One line, no how-to, no settings, templates or systems | `solution_rules.check_idea` on every seed, owner, miner and drafted idea |
-| R-VAL-06, 07 | Never learnable, not even by a reviewer's lesson | `learning.never_learn` (`VALUE_LINE_ATTEMPT`), `value_line.may_learn` |
-| R-BUILD-01 to 06 | Catalogue builds only, no tool words, "would" not "will" | `solution_rules.check_build_line`; build fit is stored apart (`PiBuildFit`) and never rewarded |
-| Part 3.2 | Offer, approval and payment never enter the solution score | `solution_score.score_of`, `learning.NEVER_REWARDED`, tests in `test_pi_solution_rules.py` |
-| Part 3.3 | Never repeat an idea to a business; swap kind after "already doing"; follow-up counts as the one question | `solution_ideas`, `PiSolutionMemory`, prompt bullet `solution_followup` |
-| Part 3.4 | S1 to S8 inside the nightly gate; nothing runs while learning is frozen | `learning_solutions.py`, `learning_solutions_grow.py`, `learning_nightly.run_workspace` |
-| Part 3.5 | Money or regulated ideas wait in review; catalogue proposals decided by a person | `PiIdeaArm.status = "review"`, `solution_routes.py` |
-| Part 3.7 | Versions `solutions/{industry}@1.N`, per-industry rollback | `solution_versions.py`, `POST /pi/solutions/{industry}/rollback` |
-| Part 3.5, 3.7 | The Solutions panel: learned versions with evidence, per-industry rollback, review queue, ideas table | `apps/web/src/features/pi/workspace/brain-solutions-tab.tsx` (pi brain, Solutions tab), tests `apps/web/tests/pi-solutions*.spec.ts` |
-| R-PRIV-07 | Evidence and regression cases hold redacted text only; erasing a customer removes solution memory and feedback | `solution_rules.redacted`, `brain_erase.py` |
-
-Open: build-fit confirmation from delivered
-projects are not built. Part 1 is built for the live chat in the next section.
-
-## The value line in the live chat (Addendum 2, Part 1)
-
-Same flag as above (`response_rules.brain.solution_mode`, and learning not frozen, because the ideas are
-handed over by the learning context). Off, nothing here changes: pi listens until the offer.
-
-| Rule | What is enforced | Where |
-|---|---|---|
-| Part 1.6, G4 | Someone who asks for a fix gets the ideas in that reply, even while pi is still listening (S1 to S3); a cost question is not a request | `solution_ask.asked_for_ideas`, the `asked` gate in `solution_context._build` |
-| R-SELL-01 (relaxed) | Pitch and document words are allowed only in a reply that was asked for (`solution_asked`) or answers "how exactly?" (`solution_howto`); R-VAL-01 stays hard | `constitution.lint` |
-| Part 1.4 | "How exactly?", "step by step", "which app?": the detail is the solution document, named by the entry's `free_stops`; no steps (R-VAL-04), no app recommended (R-VAL-05) | `solution_ask.covers`, prompt block `BRAIN_ASK`, `constitution._value_line` |
-| Part 1.4, R-OFFER-01 | The application adds the offer after such a reply and moves the chat to S5; the model never makes it, so a later "haan" is the explicit-yes gate | `service_conversation.brain_offer` |
-| Part 1.5 | `signal.possible_free_rider` after three "how exactly?", two declines or a client/agency mention: stored in the brief and logged, pi's tone never changes | `solution_ask.free_rider`, `note_problems` |
-| R-BUILD-03, 04 | The Workzap line once per problem, named as Workzap's (not an unattributed third idea), a bridge opener not repeated in a chat, "automatically" once | `solution_ask.bridge`, `constitution._value_line` (soft: the draft is sent back once, and if it repeats it is sent). Found by the grader on a real simulated chat on 2026-10-24: the pipeline handed over a non-empty opener and the scripted model dropped it, reading as free advice with no Workzap name at all; nothing caught it. `_value_line` now flags a reply with a non-refer_back `solution_build.says` that never says "workzap". |
-| R-BUILD-01, 05, 06 | No tool words unless the person used them; at most two builds in a message; "would", never "will" | `constitution._value_line` (soft, as above) |
-| R-SELL-01, R-OFFER-03, R-OFFER-05 (hard) | Even a reply that was asked for may not pitch nori or a product, recommend, mention a quote or make the offer itself, or name an amount | `constitution._given_turn_limits` |
-| Part 4 | 211 industries, 2103 problems, two quick ideas each, parsed and validated (nothing invented); view-first builds capped and re-ranked where an action is listed | `scripts/build_industry_solutions.py`, `packs/solutions/` |
-
-Regenerated 2026-10-24 with pymupdf instead of pypdf: pypdf misread this PDF's embedded font for
-punctuation (hyphens, parentheses, the bullet, a dropped build-key join), corrupting data across the
-document (two audits found this independently, pp1-246 and pp246-467); pymupdf reads the same glyphs
-correctly. Fixed in the same pass: `view_cap()` no longer counts `reporting_visibility` problems (RBUILD02
-lets them lead with a view without limit; only 10 industries are now genuinely over the cap, each with no
-action key to swap to in its own listed keys, correctly reported and not rewritten), a second build key no
-longer leaks into the build sentence (158 problems, two separator styles), `never_say` is split into real
-bullets everywhere, a hyphen split across the PDF's own line wrap no longer gets a stray space ("sign-
-off"), and the document's own closing sentence no longer leaks into the last sample reply.
-
-Open: one sample reply (Camel farms) is left blank; its Arabic page's font cannot be read correctly by
-either extractor (letters reordered within words) and nothing is invented to replace it — the builder
-reports it as an error until a person transcribes it from the PDF directly. `packs/sector_rules.json`
-(A.1, A.2, D.1 empty rules) is `scripts/build_industry_packs.py`'s output, a different script for the v3
-Brain spec, not Addendum 2; not investigated here. Sector neighbours and the generic Addendum 1 library
-(Part 2.1 steps 3 and 4) are not in the repository.
+Change a guard, change its row in `rule_index.json` (code and tests), run `pytest tests/unit/test_pi_rule_index.py -s` for the summary, and update the table above to match: the last test in that file compares the counts line and every open rule id. A rule is DONE only when a test fails if it breaks; if you remove or rename a test the index names, the test file fails and tells you which rule lost its proof.
