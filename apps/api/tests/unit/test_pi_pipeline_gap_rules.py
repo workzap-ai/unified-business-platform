@@ -412,3 +412,24 @@ def test_a_reply_that_says_noted_without_recording_a_problem_is_sent_back() -> N
     assert noted_without_problem(SimpleNamespace(reply=said, problem_ops=[op])) == ""
     plain = SimpleNamespace(reply="Samajh gaya. Kya aap thora aur bata sakte hain?", problem_ops=[])
     assert noted_without_problem(plain) == ""
+
+
+def test_the_noted_claim_covers_the_other_ways_pi_says_it_noted_something() -> None:
+    """Real sweep 2026-10-25: 'Thanks, that's noted.' and 'I've got that' with nothing recorded."""
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import noted_without_problem
+
+    for said in (
+        "Thanks, that's noted. Is there anything else you want to add?",
+        "I've added that animals aren't weighed regularly. Anything else?",
+        "Thanks, I've got that. What else is slowing you down?",
+        "Shukriya, noted. Kya aap kuch aur batana chahenge?",
+    ):
+        assert noted_without_problem(SimpleNamespace(reply=said, problem_ops=[])), said
+    assert (
+        noted_without_problem(
+            SimpleNamespace(reply="Samajh gaya. Kya hota hai phir?", problem_ops=[])
+        )
+        == ""
+    )

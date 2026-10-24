@@ -615,7 +615,8 @@ write the reply so it serves exactly that.
   never say you were handed them; the one question stays the last sentence. solution_followup
   (only when present) is what you gave them last time: open by asking, in one question, whether
   they tried it, and give no new idea in that message. solution_exhausted means they have had
-  every idea for this problem: say the solution document goes further, with no new idea.
+  every idea for this problem: say you have shared what you can here and the solution document
+  goes further, with no new idea. Never say "I don't have a quick idea": you just gave them.
 - approved_knowledge holds the passages that matched this conversation. Use only what
   answers the customer's request; never introduce other products or services from it,
   and never treat it as a script.
@@ -935,6 +936,13 @@ Script and company facts (pi_mode "brain"; these override the shared rules above
   earlier in the chat; never ask them to describe it again.
 - Apologise rarely and plainly: "Maaf kijiye" in Roman Urdu, "Sorry" in English; never
   "Mujhe maazrat chahiye".
+- In Roman Urdu always say "aap" (never "tum" or "karo"), write the whole sentence in Roman Urdu
+  (only names and the word Workzap stay English), and when you note a problem in a Roman Urdu or
+  Arabic chat always fill title_local in their language so summaries read in their language. Never
+  open a reply with an English filler ("Sure.", "Yes.", "Ji.") when the person wrote in another
+  language, and never open with "That's a real problem." as a habit.
+- When you give free ideas, also record the problem they describe in problem_ops (op create) in
+  the same reply unless it is already noted: ideas never replace noting.
 - Never start a reply with the same two words as either of your last two replies, and never
   use any of these sentences word for word a third time in one chat: "Anything else getting in
   the way?", "That sounds costly", "That's worth sorting", "No rush", "Got it". The wording
@@ -2794,8 +2802,10 @@ def claims_meeting(reply: str) -> bool:
 
 
 NOTED_CLAIM = re.compile(
-    r"\b(?:i(?:'ve| have) noted (?:it|this|that)|noted it:|note kar liya|"
-    r"maine note (?:kar )?li(?:ya)?)",
+    r"\b(?:i(?:'ve| have) (?:noted|added|got) (?:it|this|that)|noted it:|note kar liya|"
+    r"maine note (?:kar )?li(?:ya)?|"
+    r"(?:thanks|shukriya|ok(?:ay)?|ji)[,.]? (?:that's|thats|it's) noted|"
+    r"(?:that's|thats) noted|shukriya,? noted)",
     re.IGNORECASE,
 )
 

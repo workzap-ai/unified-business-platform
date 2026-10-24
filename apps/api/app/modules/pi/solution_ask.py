@@ -13,7 +13,7 @@ import re
 from typing import Any
 
 from app.modules.pi import solutions
-from app.modules.pi.problems import WHAT_NOW
+from app.modules.pi.problems import what_now
 
 # Asking for a fix, in any of the ways owners put it (Part 1.6). A cost question is not one.
 # Always addressed to pi: "fix", "hal", "ideas" or "suggest" alone are part of describing a
@@ -92,9 +92,7 @@ def asked_for_ideas(said: str) -> bool:
     text = said or ""
     if COST.search(text) and not (SOLUTION_ASK.search(text) or SOLUTION_ASK_PLAIN.search(text)):
         return False
-    return bool(
-        SOLUTION_ASK.search(text) or SOLUTION_ASK_PLAIN.search(text) or WHAT_NOW.search(text)
-    )
+    return bool(SOLUTION_ASK.search(text) or SOLUTION_ASK_PLAIN.search(text) or what_now(text))
 
 
 def asked_howto(said: str) -> bool:

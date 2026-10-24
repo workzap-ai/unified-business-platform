@@ -289,3 +289,19 @@ def test_live_chat_push_phrasings_from_2026_10_24_count_as_asking_for_a_fix() ->
     # Describing a problem is still not a request.
     for said in ("we fix phones", "customers ask how much it costs", "koi hal nahi hai"):
         assert not asked_for_ideas(said), said
+
+
+def test_the_owners_own_loss_does_not_count_as_pushing_for_a_fix() -> None:
+    """Real sweep: 'I am not sure how much we lose' brought an early summary and ideas."""
+    from app.modules.pi.problems import what_now
+    from app.modules.pi.solution_ask import asked_for_ideas
+
+    for said in (
+        "Yes, it happens every week and I am not sure how much we lose because of it.",
+        "Haan, har hafte hota hai aur nuksan ka andaza nahi hota.",
+        "kitna nuksan hota hai pata nahi, kabhi kabhi zyada",
+    ):
+        assert not what_now(said), said
+        assert not asked_for_ideas(said), said
+    for said in ("what now?", "so what can you do", "kuch kar sakte ho", "how much would it cost"):
+        assert what_now(said), said

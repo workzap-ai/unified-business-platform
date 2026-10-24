@@ -809,6 +809,17 @@ DONE_SHORT = re.compile(
     re.IGNORECASE,
 )
 ASKS_SUMMARY = re.compile(r"\b(?:summary|khulasa|khulasah|summery)\b", re.IGNORECASE)
+
+
+def what_now(text: str | None) -> bool:
+    """The person pushes for the fix or asks "so what now?". The owner's own loss ("I am not sure
+    how much we lose", "kitna nuksan hota hai") is a statement, not that question: reading it as one
+    gave early summaries and ideas in real chats."""
+    from app.modules.pi.decisions import OWN_MONEY
+
+    return bool(WHAT_NOW.search(OWN_MONEY.sub(" ", text or "")))
+
+
 WHAT_NOW = re.compile(
     r"\b(?:what now|so what can you do|what can you do|what next|how much|how much would|"
     r"ab kya|aage kya|kitna (?:lagega|kharcha)|kya kar sakte)\b"
@@ -899,7 +910,7 @@ def summary_due(
         return "done"  # "abh nh", "bas nh": the answer to "anything else?" in Roman Urdu
     if len((text or "").split()) <= 6 and ASKS_SUMMARY.search(text):
         return "show"  # "summary kosni", "summary dikhao"
-    if WHAT_NOW.search(text):
+    if what_now(text):
         return "what_now"
     if SHOW_ME.search(text):
         return "show"
