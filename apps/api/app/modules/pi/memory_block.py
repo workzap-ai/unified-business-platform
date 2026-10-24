@@ -22,6 +22,7 @@ business that share their problems (spec 4.9, R-MEM-06); nothing else is.
 
 import hashlib
 import json
+import logging
 import re
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -37,6 +38,8 @@ from app.modules.pi import safety
 from app.modules.pi.constitution import QUESTION_MARKS, REASK_FIELDS, _sentences
 from app.modules.pi.models import PiConversation, PiMemory
 from app.shared.scope import WorkspaceScope
+
+logger = logging.getLogger(__name__)
 
 BLOCK_CHARS = 700  # the whole block as JSON, counted in prompt characters
 MAX_ARCHIVED = 30  # old values kept as history per person, oldest dropped
@@ -434,3 +437,29 @@ def memory_reply(block: dict[str, Any], language: str | None, fallback: str) -> 
         f"Here is what I have about you: {listed}. I also keep the problems you've told me and "
         "any documents and quotes. You can ask me to delete all of it."
     )
+
+
+async def refresh_safely(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation, **kwargs: Any
+) -> list[str]:
+    """`refresh` that can never fail the turn: memory is an extra. It runs in a savepoint, so a
+    database error (a missing table before a migration, a constraint) rolls back only the memory
+    write and the reply's own transaction stays healthy."""
+    try:
+        async with session.begin_nested():
+            return await refresh(session, scope, conversation, **kwargs)
+    except Exception:  # noqa: BLE001 - never a reason to lose a reply
+        logger.warning("pi_memory_refresh_failed", exc_info=True)
+        return []
+
+
+async def load_safely(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation, customer: Any
+) -> "Known":
+    """`load` that can never fail the turn: on any error pi knows nothing durable this turn."""
+    try:
+        async with session.begin_nested():
+            return await load(session, scope, conversation, customer)
+    except Exception:  # noqa: BLE001 - never a reason to lose a reply
+        logger.warning("pi_memory_load_failed", exc_info=True)
+        return Known()

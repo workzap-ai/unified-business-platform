@@ -2640,7 +2640,7 @@ async def prepare_context(
     last_chat_at: datetime | None = None
     if flow.brain_mode(policy.response_rules) and conversation.customer_id is not None:
         known = await latency.timed(
-            "ctx.memory", memory_block.load(session, scope, conversation, customer)
+            "ctx.memory", memory_block.load_safely(session, scope, conversation, customer)
         )
         memory_block.merge_profile(known, profile)
         known_block = memory_block.build(
@@ -4684,7 +4684,7 @@ async def save_service_turn(
     if flow.brain_mode(policy.response_rules):
         # Durable memory at customer level, from this turn's own output (spec 3.10): what they
         # said, a correction archiving the old value, their language and voice-note habit.
-        await memory_block.refresh(
+        await memory_block.refresh_safely(
             session,
             scope,
             conversation,
