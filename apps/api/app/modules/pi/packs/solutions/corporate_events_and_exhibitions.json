@@ -137,9 +137,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "booking_scheduling"
+          "booking_scheduling",
+          "field_checks"
         ],
-        "text": "and field_checks — a crew roster with confirmations and an overtime log signed off by the supervisor on the phone.",
+        "text": "a crew roster with confirmations and an overtime log signed off by the supervisor on the phone.",
         "tool_words": []
       },
       "ask_first": "How many crew are freelance?",
@@ -202,19 +203,22 @@
         "text": "a multi-country dashboard showing events, cash and receivables by entity, updated daily.",
         "tool_words": [
           "dashboard"
-        ],
-        "leads_with_view": true
+        ]
       },
       "ask_first": "Do you run separate companies in each country?",
       "free_stops": "What the dashboard pulls from each country is in the solution document."
     }
   ],
   "never_say": [
-    "Advice on stand structure, rigging, electrical loads or venue fire rules; any injury means emergency services first. Advice on government procurement rules, data protection or tax. Help with kickbacks, collusive bidding or fake experience documents. Customs, duties or classification advice, or anything about under-invoicing. Legal opinions on unpaid invoices or contract scope."
+    "Advice on stand structure, rigging, electrical loads or venue fire rules; any injury means emergency services first.",
+    "Advice on government procurement rules, data protection or tax.",
+    "Help with kickbacks, collusive bidding or fake experience documents.",
+    "Customs, duties or classification advice, or anything about under-invoicing.",
+    "Legal opinions on unpaid invoices or contract scope."
   ],
   "sample_reply": {
     "person": "Most of last quarter's events are still unpaid and I've already paid the vendors. What's the fix?",
-    "pi": "Yes, there's a clear way to get on top of this. 1 List every unpaid invoice with how far past terms it is, so you chase the oldest first. 2 Stop starting work before a PO or written approval is in, so new jobs don't add to the pile. Workzap can do this automatically for you: a tracker that ages every invoice, sends reminders on schedule, and holds work orders until the PO is logged. Shall I prepare a solution document and quote for you? You can say no.",
+    "pi": "Yes, there's a clear way to get on top of this. 1) List every unpaid invoice with how far past terms it is, so you chase the oldest first. 2) Stop starting work before a PO or written approval is in, so new jobs don't add to the pile. Workzap can do this automatically for you: a tracker that ages every invoice, sends reminders on schedule, and holds work orders until the PO is logged. Shall I prepare a solution document and quote for you? You can say no.",
     "language": "english"
   }
 }

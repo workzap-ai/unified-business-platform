@@ -59,8 +59,7 @@
           "dashboards_reports"
         ],
         "text": "a coverage log with links, screenshots and outlet type that builds each client's monthly report automatically.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "the report layout and how coverage is captured are kept for the solution document."
@@ -208,11 +207,15 @@
     }
   ],
   "never_say": [
-    "Any legal, defamation, regulatory or crisis-response advice. That a story will get coverage or that PR will deliver a measurable result. Anything involving fake news, smear campaigns, fake reviews, undisclosed paid coverage where unlawful, or bribing officials. Requests for journalists' personal numbers, client confidential plans or unannounced news. If a crisis involves danger to people, point to emergency services first."
+    "Any legal, defamation, regulatory or crisis-response advice.",
+    "That a story will get coverage or that PR will deliver a measurable result.",
+    "Anything involving fake news, smear campaigns, fake reviews, undisclosed paid coverage where unlawful, or bribing officials.",
+    "Requests for journalists' personal numbers, client confidential plans or unannounced news.",
+    "If a crisis involves danger to people, point to emergency services first."
   ],
   "sample_reply": {
     "person": "We lose the first week of every month just compiling coverage reports. Is there a better way?",
-    "pi": "Yes, there is, and you can start this week. 1 Log each piece of coverage the day it appears, tagged with its client, so month-end stops being a hunt. 2 Agree one report layout for every client, so nobody rebuilds it from scratch. Workzap can do this automatically for you: a coverage log that builds each client's monthly report on its own. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, there is, and you can start this week. 1) Log each piece of coverage the day it appears, tagged with its client, so month-end stops being a hunt. 2) Agree one report layout for every client, so nobody rebuilds it from scratch. Workzap can do this automatically for you: a coverage log that builds each client's monthly report on its own. Would you like me to put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

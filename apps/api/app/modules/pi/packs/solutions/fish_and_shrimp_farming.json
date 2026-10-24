@@ -1,7 +1,7 @@
 {
   "industry": "fish_and_shrimp_farming",
   "name": "Fish and shrimp farming (aquaculture)",
-  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -209,11 +209,15 @@
     }
   ],
   "never_say": [
-    "Any feeding rate, water-treatment chemical, medicine, antibiotic, disease, stocking density or pond design advice; suggest their fisheries officer, consultant or vet. Anything that helps hide residue issues, evade export tests, or use unlicensed water or land. Confrontation advice for theft, especially by armed groups; suggest the police. Promised harvests or profits. Collecting workers' or agents' IDs or bank details."
+    "Any feeding rate, water-treatment chemical, medicine, antibiotic, disease, stocking density or pond design advice; suggest their fisheries officer, consultant or vet.",
+    "Anything that helps hide residue issues, evade export tests, or use unlicensed water or land.",
+    "Confrontation advice for theft, especially by armed groups; suggest the police.",
+    "Promised harvests or profits.",
+    "Collecting workers' or agents' IDs or bank details."
   ],
   "sample_reply": {
     "person": "Muzaffargarh mein 12 talab hain rohu aur thaila ke, harvest bohat kam nikla aur raat ko aerator band ho toh subah pata chalta hai. Koi hal?",
-    "pi": "Ji haan, is pe kaam isi hafte se shuru kiya ja sakta hai. 1 Har talab mein kitna bacha daala aur kitne kilo nikle, alag alag likhein, taake farq wala talab saamne aaye. 2 Chowkidar ke raat ke chakkar muqarrar waqt pe hon aur kuch band ho toh woh foran phone kare; machli ek saath mare toh fisheries officer se foran raabta karein. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: talab register aur raat ka check-in system, jahan check-in na aaye toh aap ko foran alert mile. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is pe kaam isi hafte se shuru kiya ja sakta hai. 1) Har talab mein kitna bacha daala aur kitne kilo nikle, alag alag likhein, taake farq wala talab saamne aaye. 2) Chowkidar ke raat ke chakkar muqarrar waqt pe hon aur kuch band ho toh woh foran phone kare; machli ek saath mare toh fisheries officer se foran raabta karein. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: talab register aur raat ka check-in system, jahan check-in na aaye toh aap ko foran alert mile. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

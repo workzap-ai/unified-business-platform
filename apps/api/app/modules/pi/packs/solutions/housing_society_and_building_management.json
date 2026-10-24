@@ -181,8 +181,7 @@
           "dashboards_reports"
         ],
         "text": "A monthly income and expense statement and AGM pack built from the ledger, with a reserve fund tracker.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "What do owners ask to see at the AGM?",
       "free_stops": "Report layout and reserve tracking are in the solution document; your accountant signs off the accounts."
@@ -209,11 +208,15 @@
     }
   ],
   "never_say": [
-    "Any advice on recovery action, bylaws, voting validity or developer obligations; that needs legal advice. Any help cutting water or power to defaulters, publicly naming residents or covertly monitoring them. Any view on whether a lift, structure, fire system or water tank is safe; a licensed inspector or engineer decides. Anything that records residents' names, house numbers linked to people, car plates, IDs or CCTV images. Any blame in committee politics, or accusations against named staff over diesel or cash."
+    "Any advice on recovery action, bylaws, voting validity or developer obligations; that needs legal advice.",
+    "Any help cutting water or power to defaulters, publicly naming residents or covertly monitoring them.",
+    "Any view on whether a lift, structure, fire system or water tank is safe; a licensed inspector or engineer decides.",
+    "Anything that records residents' names, house numbers linked to people, car plates, IDs or CCTV images.",
+    "Any blame in committee politics, or accusations against named staff over diesel or cash."
   ],
   "sample_reply": {
     "person": "Hamari society mein 400 ghar hain, maintenance aadhe log time pe nahi dete aur cash ka hisaab bhi nahi milta. Koi hal batayen.",
-    "pi": "Ji haan, is ka hal mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Har ghar ke dues aur kitne mahine se pending hain, is ki ek list bana lein, taake committee ko asal tasveer nazar aaye. 2 Office ka cash har din band hone pe doosra banda gin ke sign kare, taake farq usi din pakda jaye. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har ghar ka dues ledger, ijazat dene walon ko WhatsApp reminder, aur roz ka cash milaan. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal mumkin hai, aur shuruaat isi hafte ho sakti hai. 1) Har ghar ke dues aur kitne mahine se pending hain, is ki ek list bana lein, taake committee ko asal tasveer nazar aaye. 2) Office ka cash har din band hone pe doosra banda gin ke sign kare, taake farq usi din pakda jaye. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har ghar ka dues ledger, ijazat dene walon ko WhatsApp reminder, aur roz ka cash milaan. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -183,19 +183,23 @@
           "integration",
           "dashboard",
           "system"
-        ],
-        "leads_with_view": true
+        ]
       },
       "ask_first": "Which systems hold billing and scheduling now?",
       "free_stops": "Data connections are mapped in the solution document."
     }
   ],
   "never_say": [
-    "Anything about treatment options, success chances, medication, embryos, donors or genetic testing. Interpretations of donor, surrogacy, storage or eligibility law in any country. Help altering records, back-dating consents or arranging treatment against local law. Marketing lines that promise outcomes. Ideas that record names, histories, cycle details or consent content. Counselling; if a patient writes in distressed, be kind and point to their clinic or emergency services."
+    "Anything about treatment options, success chances, medication, embryos, donors or genetic testing.",
+    "Interpretations of donor, surrogacy, storage or eligibility law in any country.",
+    "Help altering records, back-dating consents or arranging treatment against local law.",
+    "Marketing lines that promise outcomes.",
+    "Ideas that record names, histories, cycle details or consent content.",
+    "Counselling; if a patient writes in distressed, be kind and point to their clinic or emergency services."
   ],
   "sample_reply": {
     "person": "Our coordinators spend the whole day answering the same WhatsApp questions about timings and what to bring. Can this be solved?",
-    "pi": "Yes, this can be solved, and you can start this week. 1 List the logistics questions your coordinators get most often, so the repeats are clear. 2 Have the clinic approve one set of logistics answers, so every coordinator says the same thing. Workzap can do this automatically for you with a WhatsApp flow that answers logistics questions and routes anything clinical to your staff. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, this can be solved, and you can start this week. 1) List the logistics questions your coordinators get most often, so the repeats are clear. 2) Have the clinic approve one set of logistics answers, so every coordinator says the same thing. Workzap can do this automatically for you with a WhatsApp flow that answers logistics questions and routes anything clinical to your staff. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

@@ -1,7 +1,7 @@
 {
   "industry": "tour_operators_and_dmcs",
   "name": "Tour operators and DMCs",
-  "sector": "7.G Transport, mobility and aviation (part 1",
+  "sector": "7.G Transport, mobility and aviation (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -210,7 +210,11 @@
     }
   ],
   "never_say": [
-    "Any road, mountain, weather or activity safety advice, or a view on whether a route is safe to travel. Visa, immigration, permit or NOC advice; only the delay. Anything that helps with unlicensed operations in restricted areas, fake permits or bribery at checkposts. Fake reviews of any kind. Legal or insurance advice on claims, and any storage of travellers' names, passports, health details or guides' and drivers' ID data."
+    "Any road, mountain, weather or activity safety advice, or a view on whether a route is safe to travel.",
+    "Visa, immigration, permit or NOC advice; only the delay.",
+    "Anything that helps with unlicensed operations in restricted areas, fake permits or bribery at checkposts.",
+    "Fake reviews of any kind.",
+    "Legal or insurance advice on claims, and any storage of travellers' names, passports, health details or guides' and drivers' ID data."
   ],
   "sample_reply": {
     "person": "Peak season mein guides aur jeeps double book ho jati hain, sab kuch main WhatsApp aur diary pe karta hoon. Koi tareeqa batayein.",

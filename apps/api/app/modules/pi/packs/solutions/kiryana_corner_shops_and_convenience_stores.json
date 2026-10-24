@@ -1,7 +1,7 @@
 {
   "industry": "kiryana_corner_shops_and_convenience_stores",
   "name": "Kiryana, corner shops and convenience stores (incl. petrol-station marts)",
-  "sector": "7.A Retail and consumer (part 1",
+  "sector": "7.A Retail and consumer (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -189,11 +189,15 @@
     }
   ],
   "never_say": [
-    "Anything on tax, shop licences, tobacco, lottery or alcohol sale law. How to sell age-restricted goods to minors or change expiry dates. To confront or secretly record a helper. Loan or financing advice for clearing distributor dues. To ask for or store neighbours' names and numbers from the khata; in a robbery, fuel or gas emergency, call 15, 999 or 911 first."
+    "Anything on tax, shop licences, tobacco, lottery or alcohol sale law.",
+    "How to sell age-restricted goods to minors or change expiry dates.",
+    "To confront or secretly record a helper.",
+    "Loan or financing advice for clearing distributor dues.",
+    "To ask for or store neighbours' names and numbers from the khata; in a robbery, fuel or gas emergency, call 15, 999 or 911 first."
   ],
   "sample_reply": {
-    "person": "Bhai udhaar ka hisaab hi nahi milta, 7080 ghar hain, log kehte hain humne de diya tha. Koi hal batao.",
-    "pi": "Ji bilkul, iska hal hai, aur shuruaat aaj se ho sakti hai. 1 Is hafte ek dafa saare udhaar balance jor lein, taa ke asal total saamne aaye. 2 Paisa lene ki entry sirf ek banda kare, tareekh aur raqam ke saath, taa ke behas ke waqt saboot ho. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai: phone pe digital udhaar khata jis mein har payment tareekh ke saath ho, aur customer ki ijazat se usko WhatsApp pe apna balance mil jaaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "person": "Bhai udhaar ka hisaab hi nahi milta, 70-80 ghar hain, log kehte hain humne de diya tha. Koi hal batao.",
+    "pi": "Ji bilkul, iska hal hai, aur shuruaat aaj se ho sakti hai. 1) Is hafte ek dafa saare udhaar balance jor lein, taa ke asal total saamne aaye. 2) Paisa lene ki entry sirf ek banda kare, tareekh aur raqam ke saath, taa ke behas ke waqt saboot ho. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai: phone pe digital udhaar khata jis mein har payment tareekh ke saath ho, aur customer ki ijazat se usko WhatsApp pe apna balance mil jaaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

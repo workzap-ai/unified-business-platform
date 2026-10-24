@@ -163,7 +163,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a daily production plan by product and branch with sign- off by the head karigar, and a festival planner with last year's volumes, staffing and boxes.",
+        "text": "a daily production plan by product and branch with sign-off by the head karigar, and a festival planner with last year's volumes, staffing and boxes.",
         "tool_words": []
       },
       "ask_first": "Which festival is your biggest?",
@@ -204,19 +204,22 @@
           "nori_daily_read"
         ],
         "text": "a short morning read of every branch's sales and product mix alongside factory output, with the one thing to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How do you see daily sales across branches now?",
       "free_stops": "How shop and factory numbers are joined up goes in the solution document."
     }
   ],
   "never_say": [
-    "Anything about shelf life, preservatives, colours, labelling or food-safety rules. Allergen or diabetic-suitability claims for any product. Employment-law advice on karigar pay disputes. Help with fake halal or quality certificates, short weight, or under-invoicing corporate gift boxes. That a festival plan will sell out or cut waste by any amount."
+    "Anything about shelf life, preservatives, colours, labelling or food-safety rules.",
+    "Allergen or diabetic-suitability claims for any product.",
+    "Employment-law advice on karigar pay disputes.",
+    "Help with fake halal or quality certificates, short weight, or under-invoicing corporate gift boxes.",
+    "That a festival plan will sell out or cut waste by any amount."
   ],
   "sample_reply": {
     "person": "Eid pe har saal kuch branches mein dabbe khatam aur kuch mein bach jate hain. Koi hal batao.",
-    "pi": "Ji haan, is ka hal mumkin hai, aur kaam is Eid se pehle shuru ho sakta hai. 1 Pichli Eid ki branch-wise sale register se nikal lein, taake is saal ka batwara andaze ke bajaye record par ho. 2 Eid ke dauran ek banda tay karein jo branches ke beech dabbe bhej sake, taake jahan bach rahe hain wahan se kami wali branch tak jaldi pohanchein. Workzap ye aap ke liye automatically kar sakta hai: factory se har branch ki dispatch aur receiving phone par, har branch ka live stock, aur jab ek branch mein kami aur doosri mein zyada ho to foran alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal mumkin hai, aur kaam is Eid se pehle shuru ho sakta hai. 1) Pichli Eid ki branch-wise sale register se nikal lein, taake is saal ka batwara andaze ke bajaye record par ho. 2) Eid ke dauran ek banda tay karein jo branches ke beech dabbe bhej sake, taake jahan bach rahe hain wahan se kami wali branch tak jaldi pohanchein. Workzap ye aap ke liye automatically kar sakta hai: factory se har branch ki dispatch aur receiving phone par, har branch ka live stock, aur jab ek branch mein kami aur doosri mein zyada ho to foran alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

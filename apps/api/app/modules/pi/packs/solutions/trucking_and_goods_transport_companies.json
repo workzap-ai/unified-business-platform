@@ -159,7 +159,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A maintenance and tyre register per truck with service- due alerts and tyre serial tracking.",
+        "text": "A maintenance and tyre register per truck with service-due alerts and tyre serial tracking.",
         "tool_words": []
       },
       "ask_first": "",
@@ -228,11 +228,15 @@
     }
   ],
   "never_say": [
-    "Anything that helps overload, falsify logbooks or ELDs, alter bilties or avoid weigh stations. Help carrying undeclared or smuggled goods, including across Afghan or GCC borders. Anything on paying police or officials to avoid challans. Advice on driver fatigue or hours-of-service; insurance and accident liability are for proper advisers. Storing drivers' names, licences or CNICs. After an accident, injury, hijacking or threat, emergency services 1122, 15, Motorway Police 130, 999, 911 come first."
+    "Anything that helps overload, falsify logbooks or ELDs, alter bilties or avoid weigh stations.",
+    "Help carrying undeclared or smuggled goods, including across Afghan or GCC borders.",
+    "Anything on paying police or officials to avoid challans.",
+    "Advice on driver fatigue or hours-of-service; insurance and accident liability are for proper advisers.",
+    "Storing drivers' names, licences or CNICs. After an accident, injury, hijacking or threat, emergency services (1122, 15, Motorway Police 130, 999, 911) come first."
   ],
   "sample_reply": {
     "person": "Mere truck Karachi se Lahore bhare jaate hain lekin wapsi pe zyada tar khali aate hain. Is ka koi hal batao.",
-    "pi": "Ji haan, wapsi ka load behtar plan kiya ja sakta hai, aur shuruaat isi hafte ho sakti hai. 1 Har truck kab Lahore mein free hoga, yeh pehle se likh lein, taake wapsi ka load waqt par dhoonda ja sake. 2 Lahore aur aas paas ke un customers ki list banayein jo Karachi ki taraf maal bhejte hain, taake pata ho kis se baat karni hai. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: wapas aane wale trucks roz pending bookings se apne aap match hon. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, wapsi ka load behtar plan kiya ja sakta hai, aur shuruaat isi hafte ho sakti hai. 1) Har truck kab Lahore mein free hoga, yeh pehle se likh lein, taake wapsi ka load waqt par dhoonda ja sake. 2) Lahore aur aas paas ke un customers ki list banayein jo Karachi ki taraf maal bhejte hain, taake pata ho kis se baat karni hai. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: wapas aane wale trucks roz pending bookings se apne aap match hon. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

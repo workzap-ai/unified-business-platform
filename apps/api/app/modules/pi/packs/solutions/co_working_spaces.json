@@ -96,9 +96,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "credit_ledger"
+          "credit_ledger",
+          "workflow_automation"
         ],
-        "text": "workflow_automation — recurring invoices with payment links and late-payment reminders sent automatically.",
+        "text": "recurring invoices with payment links and late-payment reminders sent automatically.",
         "tool_words": []
       },
       "ask_first": "",
@@ -199,19 +200,23 @@
           "dashboards_reports"
         ],
         "text": "a location screen with occupancy, revenue, costs, collections and complaints per site.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "which figures to track and how they're pulled together is set out in the solution document."
     }
   ],
   "never_say": [
-    "Any lease, real estate, legal, tax or building-safety advice. Anything involving fake tenancy contracts or addresses for visas or licences. Covert monitoring of members. That occupancy will rise by any amount. Requests for members' names, IDs, company documents, access codes or Wi-Fi passwords. Fire, electrical, gas or medical emergencies: point to emergency services first."
+    "Any lease, real estate, legal, tax or building-safety advice.",
+    "Anything involving fake tenancy contracts or addresses for visas or licences.",
+    "Covert monitoring of members.",
+    "That occupancy will rise by any amount.",
+    "Requests for members' names, IDs, company documents, access codes or Wi-Fi passwords.",
+    "Fire, electrical, gas or medical emergencies: point to emergency services first."
   ],
   "sample_reply": {
     "person": "Our occupancy has been stuck for months. Enquiries come in but replies are slow. What would you do?",
-    "pi": "Yes, there's a clear place to start, this week. 1 Reply today to every waiting enquiry with a tour offer, so warm leads aren't lost. 2 Follow up once with everyone who toured this month, and ask those who didn't sign one question about why. Workzap can do this automatically for you: one enquiry inbox with tour booking, follow-up reminders and reasons recorded for every prospect. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, there's a clear place to start, this week. 1) Reply today to every waiting enquiry with a tour offer, so warm leads aren't lost. 2) Follow up once with everyone who toured this month, and ask those who didn't sign one question about why. Workzap can do this automatically for you: one enquiry inbox with tour booking, follow-up reminders and reasons recorded for every prospect. Would you like me to put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

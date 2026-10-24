@@ -19,8 +19,7 @@
           "nori_daily_read"
         ],
         "text": "a WhatsApp daily close where you send the totals and get a running weekly view of earnings back automatically.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Do you write anything down at closing now?",
       "free_stops": "How the daily close and weekly view are set up is in the solution document."
@@ -189,11 +188,15 @@
     }
   ],
   "never_say": [
-    "Anything about encroachment rules, vending permits, municipal licensing or food-safety rules. Any advice on paying, avoiding or negotiating with officials; never help with bribes or dodging inspections. Asking for wallet PINs, account numbers or OTPs. Help selling expired or adulterated items, or hiding underage helpers. That earnings will go up by any amount."
+    "Anything about encroachment rules, vending permits, municipal licensing or food-safety rules.",
+    "Any advice on paying, avoiding or negotiating with officials; never help with bribes or dodging inspections.",
+    "Asking for wallet PINs, account numbers or OTPs.",
+    "Help selling expired or adulterated items, or hiding underage helpers.",
+    "That earnings will go up by any amount."
   ],
   "sample_reply": {
     "person": "Bhai chai ka khokha hai, raat ko pata hi nahi chalta kitna kamaya. Cash, Easypaisa aur udhaar sab chalta hai. Koi tareeqa batao.",
-    "pi": "Ji haan, roz ki kamai saaf dekhna bilkul mumkin hai, aur shuruaat aaj raat se ho sakti hai. 1 Closing par cash, wallet aur udhaar teeno ka total alag alag likhein, taake din ka ek number ho. 2 Saara udhaar ek hi copy mein har regular ke chhote naam ke saath rakhein, taake koi parchi gum na ho. Workzap ye aap ke liye automatically kar sakta hai: aap raat ko WhatsApp par total bhejein aur hafte bhar ki kamai aur har regular ka udhaar balance khud ban kar aap ke paas aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, roz ki kamai saaf dekhna bilkul mumkin hai, aur shuruaat aaj raat se ho sakti hai. 1) Closing par cash, wallet aur udhaar teeno ka total alag alag likhein, taake din ka ek number ho. 2) Saara udhaar ek hi copy mein har regular ke chhote naam ke saath rakhein, taake koi parchi gum na ho. Workzap ye aap ke liye automatically kar sakta hai: aap raat ko WhatsApp par total bhejein aur hafte bhar ki kamai aur har regular ka udhaar balance khud ban kar aap ke paas aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

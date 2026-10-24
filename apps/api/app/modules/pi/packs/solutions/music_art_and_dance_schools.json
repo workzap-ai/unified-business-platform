@@ -78,7 +78,7 @@
         "keys": [
           "loyalty_repeat"
         ],
-        "text": "Retention tracked by term and discipline as counts, with next- term reminders sent automatically.",
+        "text": "Retention tracked by term and discipline as counts, with next-term reminders sent automatically.",
         "tool_words": []
       },
       "ask_first": "",
@@ -98,7 +98,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "dashboards_reports A room and teacher calendar with self-booking, studio-hire slots and room-hour use measured.",
+        "text": "dashboards_reports — A room and teacher calendar with self-booking, studio-hire slots and room-hour use measured.",
         "tool_words": []
       },
       "ask_first": "",
@@ -179,7 +179,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "customer_messaging Fee reminders sent automatically each term or month, with an overdue count for the office.",
+        "text": "customer_messaging — Fee reminders sent automatically each term or month, with an overdue count for the office.",
         "tool_words": []
       },
       "ask_first": "",
@@ -199,7 +199,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "website_digital Automatic WhatsApp replies with a booking link, and a booking page where parents choose slots.",
+        "text": "website_digital — Automatic WhatsApp replies with a booking link, and a booking page where parents choose slots.",
         "tool_words": []
       },
       "ask_first": "",
@@ -207,11 +207,16 @@
     }
   ],
   "never_say": [
-    "Anything on music copyright or performance licensing, venue capacity or fire safety, or child-performer rules. Consent-law advice on posting children's photos; pi only notes \"need a parent-permission process\". Any idea that records learners' names, photos, recital videos, ages or exam results. Promises of exam grades, or help with fake certificates or counterfeit instruments. Any religious or cultural judgement about music or dance. Business talk after an injury or event emergency; pi points to emergency services."
+    "Anything on music copyright or performance licensing, venue capacity or fire safety, or child-performer rules.",
+    "Consent-law advice on posting children's photos; pi only notes \"need a parent-permission process\".",
+    "Any idea that records learners' names, photos, recital videos, ages or exam results.",
+    "Promises of exam grades, or help with fake certificates or counterfeit instruments.",
+    "Any religious or cultural judgement about music or dance.",
+    "Business talk after an injury or event emergency; pi points to emergency services."
   ],
   "sample_reply": {
     "person": "Make-up classes are driving us mad. Parents say lessons were missed and we have no way to check. What would you suggest?",
-    "pi": "Yes, this can be sorted, and you can start this week. 1 Write one make-up rule and share it with parents, so every request is judged the same way. 2 List the make-ups owed today, so you have a clean starting point. Workzap can do this automatically for you, tracking every missed and make-up lesson under your rule and letting parents book make-ups themselves. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be sorted, and you can start this week. 1) Write one make-up rule and share it with parents, so every request is judged the same way. 2) List the make-ups owed today, so you have a clean starting point. Workzap can do this automatically for you, tracking every missed and make-up lesson under your rule and letting parents book make-ups themselves. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

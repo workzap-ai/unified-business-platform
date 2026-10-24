@@ -180,7 +180,7 @@
           "job_tracking",
           "credit_ledger"
         ],
-        "text": "Snag and warranty tickets with photos and sign- off, alongside milestone billing with reminders.",
+        "text": "Snag and warranty tickets with photos and sign-off, alongside milestone billing with reminders.",
         "tool_words": []
       },
       "ask_first": "Which milestone payment is hardest to collect?",
@@ -208,11 +208,15 @@
     }
   ],
   "never_say": [
-    "Any advice on removing walls, load-bearing changes, ceiling loads, gas moves, rewiring or fire-rated materials; a qualified engineer or licensed trade decides. Any help skipping mall or authority approvals or using non-compliant materials. Any view on contract disputes, withheld payments or liability for defects; that is for a lawyer. Any request to record clients' names, home addresses or contact details. Any help copying another studio's designs or using images without permission."
+    "Any advice on removing walls, load-bearing changes, ceiling loads, gas moves, rewiring or fire-rated materials; a qualified engineer or licensed trade decides.",
+    "Any help skipping mall or authority approvals or using non-compliant materials.",
+    "Any view on contract disputes, withheld payments or liability for defects; that is for a lawyer.",
+    "Any request to record clients' names, home addresses or contact details.",
+    "Any help copying another studio's designs or using images without permission."
   ],
   "sample_reply": {
     "person": "Is there a way to stop clients changing their minds mid-project and expecting the same price? We redid one kitchen three times.",
-    "pi": "Yes, this can be brought under control, and you can start this week. 1 Get a written sign-off at the end of each design stage, so any later change is clearly a change. 2 Confirm every change in one written message with its cost before work begins. Workzap can do this automatically for you: stage sign-offs, change orders the client approves on WhatsApp, and each one added straight to the bill. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be brought under control, and you can start this week. 1) Get a written sign-off at the end of each design stage, so any later change is clearly a change. 2) Confirm every change in one written message with its cost before work begins. Workzap can do this automatically for you: stage sign-offs, change orders the client approves on WhatsApp, and each one added straight to the bill. Shall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

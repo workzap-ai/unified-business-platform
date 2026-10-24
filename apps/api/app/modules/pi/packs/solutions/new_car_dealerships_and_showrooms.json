@@ -1,7 +1,7 @@
 {
   "industry": "new_car_dealerships_and_showrooms",
   "name": "New car dealerships and showrooms",
-  "sector": "7.G Transport, mobility and aviation (part 2",
+  "sector": "7.G Transport, mobility and aviation (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -227,19 +227,23 @@
           "integration"
         ],
         "text": "a short morning read of leads, bookings, deliveries and margin by branch and consultant, pulled from a DMS export so nothing is retyped in Excel.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "Which numbers are pulled and how branches are compared is in the solution document."
     }
   ],
   "never_say": [
-    "Anything on whether \"own money\", premiums or booking cancellations are legal or fair. Advice on car loans, leasing rates, Islamic finance, insurance, duties or tax; refer to the bank, accountant or lawyer. Comment on warranty or recall disputes beyond customer communication. Requests for buyers' CNIC, Emirates ID, licence or bank documents, or salespeople's names. Help with under-invoicing, fake invoices or backdated registration. Market figures on sales, prices or margins."
+    "Anything on whether \"own money\", premiums or booking cancellations are legal or fair.",
+    "Advice on car loans, leasing rates, Islamic finance, insurance, duties or tax; refer to the bank, accountant or lawyer.",
+    "Comment on warranty or recall disputes beyond customer communication.",
+    "Requests for buyers' CNIC, Emirates ID, licence or bank documents, or salespeople's names.",
+    "Help with under-invoicing, fake invoices or backdated registration.",
+    "Market figures on sales, prices or margins."
   ],
   "sample_reply": {
     "person": "Bhai koi solution batao, customer roz call karta hai ke gaari kab aayegi aur showroom mein kisi ko pata hi nahi hota.",
-    "pi": "Haan, is ka hal bilkul mumkin hai, aur shuruaat is hafte aap khud kar sakte hain. 1 Har pending booking ek hi list pe uski maujooda stage ke saath rakhein, taake jo bhi phone uthaye ek hi jawab de. 2 Is hafte status calls sirf ek bande ke zimme kar dein, taake customer idhar udhar na ghoome. Workzap yeh sab aap ke liye automatically kar sakta hai: booking se delivery tak har stage track ho aur customer ko khud WhatsApp update jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is ka hal bilkul mumkin hai, aur shuruaat is hafte aap khud kar sakte hain. 1) Har pending booking ek hi list pe uski maujooda stage ke saath rakhein, taake jo bhi phone uthaye ek hi jawab de. 2) Is hafte status calls sirf ek bande ke zimme kar dein, taake customer idhar udhar na ghoome. Workzap yeh sab aap ke liye automatically kar sakta hai: booking se delivery tak har stage track ho aur customer ko khud WhatsApp update jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

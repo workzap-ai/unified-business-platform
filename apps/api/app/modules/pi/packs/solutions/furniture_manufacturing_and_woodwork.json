@@ -1,7 +1,7 @@
 {
   "industry": "furniture_manufacturing_and_woodwork",
   "name": "Furniture manufacturing and woodwork",
-  "sector": "7.D Manufacturing and industry (part 1",
+  "sector": "7.D Manufacturing and industry (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -36,9 +36,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "field_checks"
+          "field_checks",
+          "workflow_automation"
         ],
-        "text": "workflow_automation A site measurement form on phone with sketches and photos, sent straight to the workshop and confirmed by the client on WhatsApp.",
+        "text": "A site measurement form on phone with sketches and photos, sent straight to the workshop and confirmed by the client on WhatsApp.",
         "tool_words": []
       },
       "ask_first": "",
@@ -96,9 +97,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "custom_build"
         ],
-        "text": "custom_build Job costing with materials issued and labour per job compared against the quote, plus a quote builder with saved rates.",
+        "text": "Job costing with materials issued and labour per job compared against the quote, plus a quote builder with saved rates.",
         "tool_words": []
       },
       "ask_first": "",
@@ -156,9 +158,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "booking_scheduling"
         ],
-        "text": "booking_scheduling An after-sales ticket log with visit scheduling and completion photos.",
+        "text": "An after-sales ticket log with visit scheduling and completion photos.",
         "tool_words": []
       },
       "ask_first": "",
@@ -206,11 +209,16 @@
     }
   ],
   "never_say": [
-    "Anything on structural strength, fire ratings, building codes, dust extraction or machine guarding. Any help with illegally sourced timber or avoiding import or forestry rules. Any help with fake or inflated invoices for fit-out contracts. Any judgement on who is right in a dispute with a client or contractor. Any guarantee of delivery dates or that wood will not move. Storing customers' home addresses, phone numbers or carpenters' identities."
+    "Anything on structural strength, fire ratings, building codes, dust extraction or machine guarding.",
+    "Any help with illegally sourced timber or avoiding import or forestry rules.",
+    "Any help with fake or inflated invoices for fit-out contracts.",
+    "Any judgement on who is right in a dispute with a client or contractor.",
+    "Any guarantee of delivery dates or that wood will not move.",
+    "Storing customers' home addresses, phone numbers or carpenters' identities."
   ],
   "sample_reply": {
     "person": "Custom orders mein har dafa delay hota hai, customer naraz hota hai aur balance bhi nahi deta. Koi solution?",
-    "pi": "Ji bilkul, iska hal mumkin hai aur isi hafte shuruaat ho sakti hai. 1 Har chalte custom job ki wada ki hui tareekh aur abhi ki stage ek list mein likh lein, taa ke saaf ho kaun se late hain aur kahan atke hain. 2 Jo jobs deliver ho chuke hain unka baqi balance aur kab se baqi hai, ek jagah likh lein, taa ke pata ho pehle kis se baat karni hai. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har job ki stage-wise photo ke saath tracking, har subah late jobs ki list, aur balance ke reminders apne aap. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji bilkul, iska hal mumkin hai aur isi hafte shuruaat ho sakti hai. 1) Har chalte custom job ki wada ki hui tareekh aur abhi ki stage ek list mein likh lein, taa ke saaf ho kaun se late hain aur kahan atke hain. 2) Jo jobs deliver ho chuke hain unka baqi balance aur kab se baqi hai, ek jagah likh lein, taa ke pata ho pehle kis se baat karni hai. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har job ki stage-wise photo ke saath tracking, har subah late jobs ki list, aur balance ke reminders apne aap. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

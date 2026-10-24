@@ -1,7 +1,7 @@
 {
   "industry": "watches_eyewear_and_opticians",
   "name": "Watches, eyewear and opticians",
-  "sector": "7.A Retail and consumer (part 2",
+  "sector": "7.A Retail and consumer (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -185,8 +185,7 @@
           "integration"
         ],
         "text": "sell-out reports generated straight from POS data in each brand's format, every month.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "What system do you use for billing?",
       "free_stops": "the report mapping per brand is kept for the solution document."
@@ -213,7 +212,11 @@
     }
   ],
   "never_say": [
-    "Any reading of a prescription, lens suggestion for a symptom, or comment on whether someone needs a test; for sudden vision loss, eye injury or chemicals in the eye, say get emergency care now. Anything requiring prescriptions, test results, insurance member IDs or customer identities in the chat. Whether grey-market or parallel imports are legal, or whether a watch is genuine. Help with inflated or false insurance claims, or selling replicas as genuine. Advice on optometrist licensing; say \"check with your regulator or adviser\"."
+    "Any reading of a prescription, lens suggestion for a symptom, or comment on whether someone needs a test; for sudden vision loss, eye injury or chemicals in the eye, say get emergency care now.",
+    "Anything requiring prescriptions, test results, insurance member IDs or customer identities in the chat.",
+    "Whether grey-market or parallel imports are legal, or whether a watch is genuine.",
+    "Help with inflated or false insurance claims, or selling replicas as genuine.",
+    "Advice on optometrist licensing; say \"check with your regulator or adviser\"."
   ],
   "sample_reply": {
     "person": "Can you suggest a fix for the lab problem? Jobs go out in a paper envelope with a WhatsApp message and half the time they aren't back when the customer arrives.",

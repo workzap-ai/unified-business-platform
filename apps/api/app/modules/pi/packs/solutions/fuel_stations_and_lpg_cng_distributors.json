@@ -1,7 +1,7 @@
 {
   "industry": "fuel_stations_and_lpg_cng_distributors",
   "name": "Fuel stations and LPG/CNG distributors",
-  "sector": "7.G Transport, mobility and aviation (part 2",
+  "sector": "7.G Transport, mobility and aviation (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -161,8 +161,7 @@
           "dashboards_reports"
         ],
         "text": "a morning read of litres, revenue, variances and receivables per station.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "What the daily read includes is in the solution document."
@@ -189,11 +188,16 @@
     }
   ],
   "never_say": [
-    "Anything about a leak, gas smell, fire or explosion other than to contact emergency services and the supplier's emergency line. Safety-engineering, tank, pressure, storage or calibration advice. Help tampering with dispensers, under-measuring, adulterating, unauthorised cylinders, hoarding or evading price rules. Advice on licensing, regulators, tax or dealer agreements. Fuel prices, margins or industry figures. Storing attendants' names or fleet card numbers or PINs; no covert surveillance."
+    "Anything about a leak, gas smell, fire or explosion other than to contact emergency services and the supplier's emergency line.",
+    "Safety-engineering, tank, pressure, storage or calibration advice.",
+    "Help tampering with dispensers, under-measuring, adulterating, unauthorised cylinders, hoarding or evading price rules.",
+    "Advice on licensing, regulators, tax or dealer agreements.",
+    "Fuel prices, margins or industry figures.",
+    "Storing attendants' names or fleet card numbers or PINs; no covert surveillance."
   ],
   "sample_reply": {
     "person": "Every month the dip shows less diesel than the books. Small amounts but it adds up. What can I do?",
-    "pi": "Yes, this can be brought under control, and you can start this week. 1 Record dips, deliveries and sales for each tank on one sheet, so differences can be traced. 2 Write down readings before and after every tanker delivery, so each one has a record. Workzap can do this automatically for you: a tank stock book reconciled every day, with gain and loss trends per tank sent to you. Shall I get a solution document and quote prepared for you? You're free to say no.",
+    "pi": "Yes, this can be brought under control, and you can start this week. 1) Record dips, deliveries and sales for each tank on one sheet, so differences can be traced. 2) Write down readings before and after every tanker delivery, so each one has a record. Workzap can do this automatically for you: a tank stock book reconciled every day, with gain and loss trends per tank sent to you. Shall I get a solution document and quote prepared for you? You're free to say no.",
     "language": "english"
   }
 }

@@ -59,8 +59,7 @@
           "dashboards_reports"
         ],
         "text": "a fund-wise ledger with a simple monthly statement for members and the committee.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "The statement format and ledger set-up go in the solution document."
@@ -210,11 +209,15 @@
     }
   ],
   "never_say": [
-    "Any religious ruling on zakat, waqf use, fund-mixing or rituals — say \"please ask your scholars\". Legal views on trust deeds, waqf law, property or registration — say \"talk to a lawyer\". Taking sides in committee, sectarian or faith matters. Suggesting who may have taken money, or asking for names of congregants, donors, students or staff. Help hiding income, issuing false receipts or channelling funds improperly."
+    "Any religious ruling on zakat, waqf use, fund-mixing or rituals — say \"please ask your scholars\".",
+    "Legal views on trust deeds, waqf law, property or registration — say \"talk to a lawyer\".",
+    "Taking sides in committee, sectarian or faith matters.",
+    "Suggesting who may have taken money, or asking for names of congregants, donors, students or staff.",
+    "Help hiding income, issuing false receipts or channelling funds improperly."
   ],
   "sample_reply": {
     "person": "Assalam o alaikum. Main masjid committee ka treasurer hoon. Jummah ka chanda aur bank deposit match nahi hote, kya hal hai?",
-    "pi": "Walaikum assalam. Ji haan, is ka hal mumkin hai aur shuruaat isi Jummah se ho sakti hai. 1 Har gintee par do log maujood hon aur dono total par dastakhat karein. 2 Ginne ke baad paisa ek muqarrar din bank mein jama ho, taake raqam daftar mein na ruke. Workzap yeh kaam aap ke liye automatically kar sakta hai: gintee ka register jahan dono ginne wale raqam darj karein, total committee ko foran pohanche aur bank deposit se khud match ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Walaikum assalam. Ji haan, is ka hal mumkin hai aur shuruaat isi Jummah se ho sakti hai. 1) Har gintee par do log maujood hon aur dono total par dastakhat karein. 2) Ginne ke baad paisa ek muqarrar din bank mein jama ho, taake raqam daftar mein na ruke. Workzap yeh kaam aap ke liye automatically kar sakta hai: gintee ka register jahan dono ginne wale raqam darj karein, total committee ko foran pohanche aur bank deposit se khud match ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -1,7 +1,7 @@
 {
   "industry": "leather_goods_and_tanneries",
   "name": "Leather goods and tanneries",
-  "sector": "7.D Manufacturing and industry (part 1",
+  "sector": "7.D Manufacturing and industry (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -56,9 +56,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "credit_ledger"
+          "credit_ledger",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports A receivables and claims tracker per buyer alongside a view of stock bought and still unsold, kept current every day.",
+        "text": "A receivables and claims tracker per buyer alongside a view of stock bought and still unsold, kept current every day.",
         "tool_words": []
       },
       "ask_first": "",
@@ -76,9 +77,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "stock_alerts"
+          "stock_alerts",
+          "job_tracking"
         ],
-        "text": "job_tracking Leather stock in sq ft by grade, colour and lot across stores, tracked from raw hide to finished with yield at each stage.",
+        "text": "Leather stock in sq ft by grade, colour and lot across stores, tracked from raw hide to finished with yield at each stage.",
         "tool_words": []
       },
       "ask_first": "",
@@ -176,9 +178,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "custom_build"
+          "custom_build",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports A costing sheet per article using current hide and chemical rates, with a monthly margin view by product line.",
+        "text": "A costing sheet per article using current hide and chemical rates, with a monthly margin view by product line.",
         "tool_words": []
       },
       "ask_first": "",
@@ -186,11 +189,16 @@
     }
   ],
   "never_say": [
-    "Any advice on chemicals, chrome, effluent treatment, environmental permits or how to handle inspectors; gas exposure in pits or drums is an emergency. Any help calling synthetic \"genuine leather\", misdeclaring species or origin, or under-invoicing. Any guidance on animal welfare, halal or religious rulings around qurbani skins. Any help optimising child labour or unsafe conditions. Financing advice; suggest an accountant or bank. Storing names of hide collectors, charities, workers or buyers."
+    "Any advice on chemicals, chrome, effluent treatment, environmental permits or how to handle inspectors; gas exposure in pits or drums is an emergency.",
+    "Any help calling synthetic \"genuine leather\", misdeclaring species or origin, or under-invoicing.",
+    "Any guidance on animal welfare, halal or religious rulings around qurbani skins.",
+    "Any help optimising child labour or unsafe conditions.",
+    "Financing advice; suggest an accountant or bank.",
+    "Storing names of hide collectors, charities, workers or buyers."
   ],
   "sample_reply": {
     "person": "Eid ke baad khaalon ka hisaab bilkul bigar jata hai aur collectors se grade pe roz jhagra hota hai. Koi hal hai?",
-    "pi": "Ji haan, iska hal mumkin hai aur tayyari abhi se shuru ki ja sakti hai. 1 Agla lot aamad pe hi collector ke saamne grade kar lein, taa ke grade usi waqt tay ho jaye. 2 Pichli Eid ki roz-ba-roz aamad aur processing ka mawazna likh lein, taa ke pata chale gap kitna bara tha. Workzap yeh kaam aap ke liye khud- ba-khud kar sakta hai: phone pe hide intake register jahan har lot ki ginti, wazan, grade aur photo aamad pe darj ho, aur Eid ke dino mein har roz processing queue aap ke saamne ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, iska hal mumkin hai aur tayyari abhi se shuru ki ja sakti hai. 1) Agla lot aamad pe hi collector ke saamne grade kar lein, taa ke grade usi waqt tay ho jaye. 2) Pichli Eid ki roz-ba-roz aamad aur processing ka mawazna likh lein, taa ke pata chale gap kitna bara tha. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: phone pe hide intake register jahan har lot ki ginti, wazan, grade aur photo aamad pe darj ho, aur Eid ke dino mein har roz processing queue aap ke saamne ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

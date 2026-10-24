@@ -1,7 +1,7 @@
 {
   "industry": "aircraft_maintenance_and_parts",
-  "name": "Aircraft maintenance MRO and parts",
-  "sector": "7.G Transport, mobility and aviation (part 1",
+  "name": "Aircraft maintenance (MRO) and parts",
+  "sector": "7.G Transport, mobility and aviation (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -213,7 +213,11 @@
     }
   ],
   "never_say": [
-    "Anything about whether a part, repair or inspection is acceptable, airworthiness, certification, approval scope, or how PCAA, GCAA, Transport Canada, EASA or FAA would read a rule. Whether a part's paperwork or tag is valid; that is for the quality team and the regulator. Anything that helps backdate sign-offs, alter certificates or move suspected unapproved parts. Advice on export controls, sanctions or customs; suggest they talk to their customs broker or lawyer. Anything that stores engineers' names or licence numbers."
+    "Anything about whether a part, repair or inspection is acceptable, airworthiness, certification, approval scope, or how PCAA, GCAA, Transport Canada, EASA or FAA would read a rule.",
+    "Whether a part's paperwork or tag is valid; that is for the quality team and the regulator.",
+    "Anything that helps backdate sign-offs, alter certificates or move suspected unapproved parts.",
+    "Advice on export controls, sanctions or customs; suggest they talk to their customs broker or lawyer.",
+    "Anything that stores engineers' names or licence numbers."
   ],
   "sample_reply": {
     "person": "We've got thirty-odd units out for repair abroad and one guy's Excel sheet is the only record. Is there a better way?",

@@ -1,6 +1,6 @@
 {
   "industry": "marketplace_sellers",
-  "name": "Marketplace sellers Daraz, Noon, Amazon)",
+  "name": "Marketplace sellers (Daraz, Noon, Amazon)",
   "sector": "7.M Digital economy, social and public sector",
   "version": "1.0",
   "problems": [
@@ -180,8 +180,7 @@
           "dashboards_reports"
         ],
         "text": "one combined daily sales view across marketplaces and countries, without downloads.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "Which reports are pulled and how they combine is detailed in the solution document."
@@ -210,11 +209,15 @@
     }
   ],
   "never_say": [
-    "Anything about how a suspension appeal, IP complaint or policy dispute will turn out. Typical marketplace fee levels, return rates or ranking promises. Advice on VAT, GST, customs or product certification — say \"talk to your accountant or customs agent\". Help with review manipulation, duplicate accounts, fake orders or others' trademarks in listings. Any request for seller-centre passwords, OTPs, API keys or bank details."
+    "Anything about how a suspension appeal, IP complaint or policy dispute will turn out.",
+    "Typical marketplace fee levels, return rates or ranking promises.",
+    "Advice on VAT, GST, customs or product certification — say \"talk to your accountant or customs agent\".",
+    "Help with review manipulation, duplicate accounts, fake orders or others' trademarks in listings.",
+    "Any request for seller-centre passwords, OTPs, API keys or bank details."
   ],
   "sample_reply": {
     "person": "Can you suggest a fix for our Noon payouts? They never match what we think we sold.",
-    "pi": "Yes, this can be fixed, and you can make a start this week. 1 Line up one month's settlement report against your orders, so every deduction becomes visible. 2 Group those deductions by type once, so repeated charges stand out across Noon and Amazon. Workzap can do this automatically for you: a reconciler that reads each settlement, matches every line to an order and lists anything that doesn't add up. Would you like me to prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be fixed, and you can make a start this week. 1) Line up one month's settlement report against your orders, so every deduction becomes visible. 2) Group those deductions by type once, so repeated charges stand out across Noon and Amazon. Workzap can do this automatically for you: a reconciler that reads each settlement, matches every line to an order and lists anything that doesn't add up. Would you like me to prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

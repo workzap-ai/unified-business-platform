@@ -38,7 +38,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "dashboards_reports A job costing tracker of estimated versus actual material and labour per job, updated from site.",
+        "text": "dashboards_reports — A job costing tracker of estimated versus actual material and labour per job, updated from site.",
         "tool_words": []
       },
       "ask_first": "",
@@ -58,7 +58,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "stock_alerts A material issue and return log per site with a store stock register and minimum levels.",
+        "text": "stock_alerts — A material issue and return log per site with a store stock register and minimum levels.",
         "tool_words": []
       },
       "ask_first": "",
@@ -226,11 +226,15 @@
     }
   ],
   "never_say": [
-    "Anything on electrical design, codes, earthing, protection settings, load or solar sizing. Any tariff, savings, payback, financing or net-metering eligibility claim. Anything that helps with meter tampering, kunda connections, bypassing inspections or fake completion certificates. Any request for customer addresses, meter or account numbers, or workers' IDs. Anything other than emergency services when shock, fire or injury is described."
+    "Anything on electrical design, codes, earthing, protection settings, load or solar sizing.",
+    "Any tariff, savings, payback, financing or net-metering eligibility claim.",
+    "Anything that helps with meter tampering, kunda connections, bypassing inspections or fake completion certificates.",
+    "Any request for customer addresses, meter or account numbers, or workers' IDs.",
+    "Anything other than emergency services when shock, fire or injury is described."
   ],
   "sample_reply": {
     "person": "Solar ke kaam mein material hamesha estimate se zyada lag jata hai. Is ka koi hal hai?",
-    "pi": "Ji, is ka hal mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1 Store se nikalne wala har material us job ke naam pe likha jaye, taake asal kharch ka record ho. 2 Job ke beech mein ek baar estimate se milaan karein, taake overrun waqt pe nazar aaye. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: har site ka material issue aur wapsi phone pe record ho aur har job ka estimate aur asal kharch aap ko roz saamne nazar aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1) Store se nikalne wala har material us job ke naam pe likha jaye, taake asal kharch ka record ho. 2) Job ke beech mein ek baar estimate se milaan karein, taake overrun waqt pe nazar aaye. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: har site ka material issue aur wapsi phone pe record ho aur har job ka estimate aur asal kharch aap ko roz saamne nazar aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

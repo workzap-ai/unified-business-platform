@@ -1,7 +1,7 @@
 {
   "industry": "duty_free_and_airport_retail",
   "name": "Duty-free and airport retail",
-  "sector": "7.A Retail and consumer (part 2",
+  "sector": "7.A Retail and consumer (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -143,8 +143,7 @@
           "integration"
         ],
         "text": "brand sell-out and airport reports generated from POS data.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Which reports do you send each month?",
       "free_stops": "report mapping is kept for the solution document; what the airport requires stays with your contract team."
@@ -163,7 +162,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "inter-outlet transfer slips with scan out and in, flagging sent- not-received.",
+        "text": "inter-outlet transfer slips with scan out and in, flagging sent-not-received.",
         "tool_words": []
       },
       "ask_first": "How many outlets do you run?",
@@ -212,7 +211,11 @@
     }
   ],
   "never_say": [
-    "Advice on customs, bond, excise, duty, passenger allowances, alcohol or tobacco licensing, or aviation security. Help moving bonded goods improperly, selling to ineligible passengers or bypassing screening or the pass system. Anything that needs boarding pass, passport, flight or nationality data on individuals, or staff ID and pass numbers. For a security incident, suspicious item, fire or medical emergency, anything other than \"alert airport security or emergency services now\". Legal or financial advice on concession contracts or rent."
+    "Advice on customs, bond, excise, duty, passenger allowances, alcohol or tobacco licensing, or aviation security.",
+    "Help moving bonded goods improperly, selling to ineligible passengers or bypassing screening or the pass system.",
+    "Anything that needs boarding pass, passport, flight or nationality data on individuals, or staff ID and pass numbers.",
+    "For a security incident, suspicious item, fire or medical emergency, anything other than \"alert airport security or emergency services now\".",
+    "Legal or financial advice on concession contracts or rent."
   ],
   "sample_reply": {
     "person": "We're a departures concession and our best sellers are gone an hour into the morning wave. Stock can only come through overnight. What can we do?",

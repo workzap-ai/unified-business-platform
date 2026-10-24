@@ -26,13 +26,12 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-SELL-04 | Direct "can you fix this?" gets one honest line | code+prompt | linter lets the line through when asked; wording is the prompt's |
 | R-SELL-05 | A no is accepted once, no re-offer | code | `decisions` S5 to S5b; S5b only re-offers when the person raises it |
 | R-HONEST-01 | Never invent prices, timelines, features | code | digits and currency blocked in service replies (`price_policy`), money in linter, quote only from reviewer |
-| R-HONEST-02 | Say what is not ready (nori Vision) | open | needs the approved company profile (Appendix D) |
+| R-HONEST-02 | Say what is not ready (nori Vision) | code | `safety.Nori.VISION` fixed reply ("coming soon... isn't available yet"), matches spec G15 |
 | R-PROM-01 | No promised results | code | linter (`will increase`, `guarantee`, `you will save`), documents use "would" |
 | R-PROM-02, 03 | Does not decide or forecast for them | prompt | |
 | R-PAY-01 | No payment in chat | code | brain mode ignores `action="payment"` (`run_service_action`); the quote carries a bank transfer only |
 | R-PAY-02 | Never asks for card, CVV, bank login, OTP, PIN, password | code | linter, hard (verbs and "what is your PIN?") |
 | R-PAY-03 | Bank details only on the approved quote | code | linter blocks IBAN and account numbers; details only in `brain_pdf.render_quote` |
-| R-PAY-04 | Changed bank details are fraud, escalate | open | P6 (escalation reasons) |
 | R-PAY-05 | "Payment received" only when staff confirm | code | linter, hard; only `POST /pi/brain-documents/payments/{id}/confirm` (billing.write) confirms |
 | R-PAY-06 | A payment screenshot is thanked, never confirmed | code | `decisions` S10: "I paid", "done" or an image/document makes the payment `claimed` and tells staff |
 | R-PAY-07 | Refunds and disputes are noted and escalated | code | `safety.Boundary.REFUND` (directed at Workzap, not refunds in the person's own business) -> staff request `refund_dispute` |
@@ -44,7 +43,7 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-BOUNDARY (RT14, RT15, RT20, RT22, RT24) | Other people's chats, fake invoices, politics, competitor comparison, outcome promises | code | `safety.boundary_asked`, fixed answers before the model |
 | R-PAY-04 | Claimed bank-detail change: never confirm, escalate | code | `safety.Boundary.BANK_CHANGE`, fixed reply, high-priority staff request marked possible fraud |
 | R-ADV-05 | No general-purpose help (homework, code, jokes) | code | `safety.Boundary.OFF_TOPIC` |
-| R-ROUTE-01 | Demo, jobs, vendor, partnership, press enquiries routed, not noted as problems | code | `safety.enquiry_asked`, fixed replies, staff request (nori facts and pricing lines still open) |
+| R-ROUTE-01 to 05 | Demo, jobs, vendor, partnership, press enquiries routed, not noted as problems; nori facts and pricing answered from fixed text | code | `safety.enquiry_asked`, fixed replies, staff request; `safety.Nori` (VISION, PRICING) for nori questions |
 | R-DISC-05, R-MEM-03 | Returning after a gap: welcome back, re-disclose after 30 days | code | `welcome_back` in `service_conversation.py` |
 | R-PRIV-06 | Says what it keeps, honours deletion | code | `safety.boundary_asked` DELETION: fixed reply plus a high-priority staff request; staff then call `POST /pi/brain-erasure/{customer_id}` (`brain_erase.py`): removes problems, memory notes, quarantine copies, learning scores and message text; keeps quotes, documents, payments and the CRM contact; staff tell the customer in the chat |
 | R-PRIV-07 | Learning only after redaction | code | `learning_bank.redaction_confidence` >= 0.98, `learning.never_learn`; lessons and pack drafts go through `clean_text` / `never_learn` too |
@@ -53,7 +52,6 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-EMER-01 to 04 | Emergency numbers, stop noting, escalate | code | `safety.emergency` before the model; fixed reply with local numbers (PK, AE, CA/US, all if unknown); X_EMERGENCY; high-priority staff request; next ordinary message returns to S1 |
 | R-META-01 | Not made or endorsed by WhatsApp or Meta | code | `safety.identity_reply` (person, gender, scam, Meta, model, rules, company) |
 | R-BRAND-01 | Workzap only (never Artwing, a.hub) | code | linter, hard; PDFs use Workzap's letterhead |
-| R-ROUTE-01 to 05 | Every enquiry starts with pi | open | enquiries routing (P6) |
 
 ## Voice and conversation (Parts 2 and 3)
 
@@ -70,7 +68,7 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-LANG-01 | "Sorted" is not "solved" | code | linter; summary text |
 | R-LANG-02 | Language per message | code | existing language detection and guards; a bare "no" or "yes please" keeps the chat language, and voice-note transcripts count in `reply_language` |
 | R-LANG-03 | Their words kept, English title for Workzap | code | `ProblemNote` (`user_words`, `title`, `title_local`) |
-| R-LANG-04, 06 | Lakh and crore, dates like "kal" | open | |
+| R-LANG-04, 06 | Lakh and crore, dates like "kal" | code | `language.amount_value`/`date_estimate`, called from `problems.apply_ops` on `money_text`/`since_text`; `date_estimate` marks "kal"/"parson" low-confidence, never guessed aloud |
 | R-LANG-05 | Currency from the country | code | quote currency from the number (PKR, AED, CAD) |
 | R-LANG-07, 08 | Voice notes; religious courtesy | partial | transcription exists; courtesy is prompt |
 | R-ASK-02 to 06 | At most 3 clarifying questions; never re-ask; no sensitive asks | prompt | `noted_problems` lists what is missing |
@@ -113,7 +111,7 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-DOC-00 | A reviewer approves everything first | code | `brain_docs.approve` refuses a rule break; `send` refuses unapproved |
 | R-DOC-01 | Section 1 in their words | code | `solution_content` |
 | R-DOC-02, 03, 04 | Every component maps to a problem; every problem addressed or listed; "won't do" never empty | code | `check_solution` |
-| R-DOC-05 | Plain words | partial | jargon and sentence length; no reading-age score |
+| R-DOC-05 | Plain words | code | jargon and sentence length; `brain_docs.reading_grade` (Flesch-Kincaid), flagged over grade 9 |
 | R-DOC-06, 09 | "Would" not "will"; no price in the document | code | `check_solution` |
 | R-DOC-07 | Their language plus an English copy | code | `content` and `content_en`; Urdu script and Arabic draw from English (the PDF font is Latin only) |
 | R-DOC-08 | Workzap branding only | code | PDF letterhead |
@@ -132,8 +130,8 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-DEC-04 | A no is fine; nothing charged | code | |
 | R-DEC-05 | Cancel before payment is accepted | code | S10 |
 | R-KICK-01 | After staff confirm, pi tells them and offers kickoff times | code | fixed notice (also after the 24-hour window, on their next message); slots come from the existing booking tools |
-| R-KICK-02, 03 | Booked slot confirmed, reminders; no invented agenda | partial | a booking moves S11 to S12; reminders 24 h and 1 h are P6 |
-| R-COMPL-01 to 03 | Complaints are feedback, escalated | open | P6 |
+| R-KICK-02, 03 | Booked slot confirmed, reminders; no invented agenda | code | a booking moves S11 to S12; `followup_policy` schedules `kickoff_24h`/`kickoff_1h`; fixed "to agree the details" wording (`decisions.py`, `flow.py`) |
+| R-COMPL-01 to 03 | Complaints are feedback, escalated | code | `safety.Boundary.COMPLAINT` fixed reply ("I've passed this to the Workzap team"), staff request raised |
 
 ## Red-team (Part 10.2) and what is not covered yet
 
@@ -186,6 +184,19 @@ handed over by the learning context). Off, nothing here changes: pi listens unti
 | R-SELL-01, R-OFFER-03, R-OFFER-05 (hard) | Even a reply that was asked for may not pitch nori or a product, recommend, mention a quote or make the offer itself, or name an amount | `constitution._given_turn_limits` |
 | Part 4 | 211 industries, 2103 problems, two quick ideas each, parsed and validated (nothing invented); view-first builds capped and re-ranked where an action is listed | `scripts/build_industry_solutions.py`, `packs/solutions/` |
 
-Open: R-BUILD-02 "actions before views" is applied to the data, but 27 industries still lead with a view
-build for more than one problem in four (reported by the builder, not rewritten); sector neighbours and the
-generic Addendum 1 library (Part 2.1 steps 3 and 4) are not in the repository.
+Regenerated 2026-10-24 with pymupdf instead of pypdf: pypdf misread this PDF's embedded font for
+punctuation (hyphens, parentheses, the bullet, a dropped build-key join), corrupting data across the
+document (two audits found this independently, pp1-246 and pp246-467); pymupdf reads the same glyphs
+correctly. Fixed in the same pass: `view_cap()` no longer counts `reporting_visibility` problems (RBUILD02
+lets them lead with a view without limit; only 10 industries are now genuinely over the cap, each with no
+action key to swap to in its own listed keys, correctly reported and not rewritten), a second build key no
+longer leaks into the build sentence (158 problems, two separator styles), `never_say` is split into real
+bullets everywhere, a hyphen split across the PDF's own line wrap no longer gets a stray space ("sign-
+off"), and the document's own closing sentence no longer leaks into the last sample reply.
+
+Open: one sample reply (Camel farms) is left blank; its Arabic page's font cannot be read correctly by
+either extractor (letters reordered within words) and nothing is invented to replace it — the builder
+reports it as an error until a person transcribes it from the PDF directly. `packs/sector_rules.json`
+(A.1, A.2, D.1 empty rules) is `scripts/build_industry_packs.py`'s output, a different script for the v3
+Brain spec, not Addendum 2; not investigated here. Sector neighbours and the generic Addendum 1 library
+(Part 2.1 steps 3 and 4) are not in the repository.

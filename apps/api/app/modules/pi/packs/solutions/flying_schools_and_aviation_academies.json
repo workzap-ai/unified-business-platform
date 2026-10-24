@@ -1,7 +1,7 @@
 {
   "industry": "flying_schools_and_aviation_academies",
   "name": "Flying schools and aviation academies",
-  "sector": "7.G Transport, mobility and aviation (part 1",
+  "sector": "7.G Transport, mobility and aviation (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -212,7 +212,11 @@
     }
   ],
   "never_say": [
-    "Anything about airworthiness, flight safety, weather or go/no-go decisions, or a student's readiness for solo or checkride. Anything about syllabus approval, licensing, medical fitness, or how PCAA, GCAA or Transport Canada read their rules. Visa or immigration advice for overseas students; only the business impact. Anything that helps inflate hours, alter logbooks, backdate records or issue certificates. Legal or consumer-law advice on refund disputes, and any storage of student or instructor names, IDs, medical or licence data."
+    "Anything about airworthiness, flight safety, weather or go/no-go decisions, or a student's readiness for solo or checkride.",
+    "Anything about syllabus approval, licensing, medical fitness, or how PCAA, GCAA or Transport Canada read their rules.",
+    "Visa or immigration advice for overseas students; only the business impact.",
+    "Anything that helps inflate hours, alter logbooks, backdate records or issue certificates.",
+    "Legal or consumer-law advice on refund disputes, and any storage of student or instructor names, IDs, medical or licence data."
   ],
   "sample_reply": {
     "person": "Students ke slots bohat cancel ho rahe hain, aircraft maintenance mein chala jata hai aur schedule tak khabar hi nahi aati. Koi hal batayein.",

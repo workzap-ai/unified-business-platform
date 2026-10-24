@@ -1,7 +1,7 @@
 {
   "industry": "solar_panels_inverters_and_batteries",
   "name": "Solar panels, inverters and batteries (assembly and distribution)",
-  "sector": "7.D Manufacturing and industry (part 2",
+  "sector": "7.D Manufacturing and industry (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -192,11 +192,16 @@
     }
   ],
   "never_say": [
-    "No system sizing, electrical design, wiring, earthing or battery-safety advice. Never estimate savings, payback or bill reductions. No advice on net-metering rules, DISCO/DEWA/utility policies or incentive eligibility. Fires, smoke, swelling batteries, shocks or roof falls: stop and point to emergency services. Never help sell grey-market or refurbished equipment as new, swap serials, fake warranty cards or under-invoice imports; decline. No bill reference numbers, CNIC/Emirates ID or addresses stored."
+    "No system sizing, electrical design, wiring, earthing or battery-safety advice.",
+    "Never estimate savings, payback or bill reductions.",
+    "No advice on net-metering rules, DISCO/DEWA/utility policies or incentive eligibility.",
+    "Fires, smoke, swelling batteries, shocks or roof falls: stop and point to emergency services.",
+    "Never help sell grey-market or refurbished equipment as new, swap serials, fake warranty cards or under-invoice imports; decline.",
+    "No bill reference numbers, CNIC/Emirates ID or addresses stored."
   ],
   "sample_reply": {
     "person": "Koi hal hai? Warranty claim pe har dafa behes hoti hai kyun ke serial number kahin likha hi nahi hota.",
-    "pi": "Ji, is ka hal seedha hai. 1 Har installation par panels, inverter aur battery ke serial note karein, taake har cheez project se jude. 2 Serial labels ki photo le lein, taake claim par saboot ho. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: serial register jo goods-in par serial le aur installation par customer project se jod de, phir claim aate hi record saamne ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal seedha hai. 1) Har installation par panels, inverter aur battery ke serial note karein, taake har cheez project se jude. 2) Serial labels ki photo le lein, taake claim par saboot ho. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: serial register jo goods-in par serial le aur installation par customer project se jod de, phir claim aate hi record saamne ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

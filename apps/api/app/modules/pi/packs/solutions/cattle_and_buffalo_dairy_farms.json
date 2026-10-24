@@ -1,7 +1,7 @@
 {
   "industry": "cattle_and_buffalo_dairy_farms",
   "name": "Cattle and buffalo dairy farms",
-  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -227,11 +227,15 @@
     }
   ],
   "never_say": [
-    "Any medicine, injection, dose, vaccine, withdrawal period, oxytocin use, feed ration or breeding advice; it's always \"that's one for your vet\". Anything that helps milk pass a test, hide water or additives, or meet food-authority standards on paper. Promises that yield, sales or income will rise. Legal opinions on disputes with a dodhi or partner, or advice on land, loans, subsidies, tax or licensing. Any way to secretly watch milkers or staff; controls are always open and agreed."
+    "Any medicine, injection, dose, vaccine, withdrawal period, oxytocin use, feed ration or breeding advice; it's always \"that's one for your vet\".",
+    "Anything that helps milk pass a test, hide water or additives, or meet food-authority standards on paper.",
+    "Promises that yield, sales or income will rise.",
+    "Legal opinions on disputes with a dodhi or partner, or advice on land, loans, subsidies, tax or licensing.",
+    "Any way to secretly watch milkers or staff; controls are always open and agreed."
   ],
   "sample_reply": {
     "person": "Bhai 40 bhainsein hain Landhi mein, doodh har mahine kam ho raha hai aur manager register mein sirf total likhta hai. Koi hal batao.",
-    "pi": "Ji haan, is ka hal bilkul mumkin hai aur shuruaat isi hafte se ki ja sakti hai. 1 Ek hafte ke liye har bhains ka doodh alag likhwayein, taake kam dene wali saamne aa sakein. 2 Jo doodh bikta hai us ka roz dodhi ki parchi se milaan karein, taake farq ho toh pata chale kahan dekhna hai. Workzap yeh sab aap ke liye khud- ba-khud roz kar sakta hai: milker phone pe har bhains ka doodh darj kare, aur aap ko har subah total aur kam dene wali bhainson ki list mil jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal bilkul mumkin hai aur shuruaat isi hafte se ki ja sakti hai. 1) Ek hafte ke liye har bhains ka doodh alag likhwayein, taake kam dene wali saamne aa sakein. 2) Jo doodh bikta hai us ka roz dodhi ki parchi se milaan karein, taake farq ho toh pata chale kahan dekhna hai. Workzap yeh sab aap ke liye khud-ba-khud roz kar sakta hai: milker phone pe har bhains ka doodh darj kare, aur aap ko har subah total aur kam dene wali bhainson ki list mil jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

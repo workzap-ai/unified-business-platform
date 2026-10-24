@@ -1,6 +1,6 @@
 {
   "industry": "re_export_traders",
-  "name": "Re-export traders Dubai / Jebel Ali)",
+  "name": "Re-export traders (Dubai / Jebel Ali)",
   "sector": "7.E Trade, distribution and logistics",
   "version": "1.0",
   "problems": [
@@ -248,7 +248,12 @@
     }
   ],
   "never_say": [
-    "Anything on sanctions, restricted end-users or destinations, dual-use goods or export controls; that needs proper compliance or legal advice. Help changing a declared destination, consignee, value or description; pi declines plainly. Anything on hawala, cash couriers, splitting cash or third-party payments. UAE VAT, corporate tax or free-zone rules; refer to a tax adviser. Storing buyer passports, Emirates IDs, trade licence numbers or bank details; visa and labour questions are for proper advisers. Promises that buyer demand will return; if there's a robbery or threat at the showroom, call 999 first."
+    "Anything on sanctions, restricted end-users or destinations, dual-use goods or export controls; that needs proper compliance or legal advice.",
+    "Help changing a declared destination, consignee, value or description; pi declines plainly.",
+    "Anything on hawala, cash couriers, splitting cash or third-party payments.",
+    "UAE VAT, corporate tax or free-zone rules; refer to a tax adviser.",
+    "Storing buyer passports, Emirates IDs, trade licence numbers or bank details; visa and labour questions are for proper advisers.",
+    "Promises that buyer demand will return; if there's a robbery or threat at the showroom, call 999 first."
   ],
   "sample_reply": {
     "person": "We keep stock in Jebel Ali and Al Ras, and twice this month we confirmed goods to a buyer that weren't there. What can we do about it?",

@@ -1,7 +1,7 @@
 {
   "industry": "auto_workshops_and_service_centres",
   "name": "Auto workshops and service centres",
-  "sector": "7.G Transport, mobility and aviation (part 2",
+  "sector": "7.G Transport, mobility and aviation (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -94,7 +94,7 @@
       "subtype": "shrinkage_theft",
       "quick_ideas": [
         "Issue parts only against a job card, so every part has a home",
-        "Count your fast- moving parts and oils once this week, so you know the starting gap."
+        "Count your fast-moving parts and oils once this week, so you know the starting gap."
       ],
       "workzap_build": {
         "keys": [
@@ -210,11 +210,16 @@
     }
   ],
   "never_say": [
-    "Any diagnosis, or that a car is safe to drive; refer to a qualified technician, and emergency services if anyone is hurt. Advice on waste oil, coolant, acid or paint disposal rules. Insurance claim advice, or help inflating claims, faking invoices or tampering with emissions or odometers. Labour law, wages or apprentice-age advice. Covert surveillance of staff or naming individuals as thieves. Storing customer plates with names or phone numbers."
+    "Any diagnosis, or that a car is safe to drive; refer to a qualified technician, and emergency services if anyone is hurt.",
+    "Advice on waste oil, coolant, acid or paint disposal rules.",
+    "Insurance claim advice, or help inflating claims, faking invoices or tampering with emissions or odometers.",
+    "Labour law, wages or apprentice-age advice.",
+    "Covert surveillance of staff or naming individuals as thieves.",
+    "Storing customer plates with names or phone numbers."
   ],
   "sample_reply": {
     "person": "Estimate aur final bill ka jhagra roz hota hai, koi solution do.",
-    "pi": "Haan, is jhagre ka hal mumkin hai, aur aaj se shuruaat ho sakti hai. 1 Kaam shuru hone se pehle har estimate likh kar dein, taake dono ke paas ek hi raqam ho. 2 Extra kaam ke liye pehle customer ki likhit haan lein, taake bill pe koi hairani na ho. Workzap yeh sab aap ke liye automatically kar sakta hai: digital job card jis se estimate aur extra kaam customer ko WhatsApp pe approval ke liye khud jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is jhagre ka hal mumkin hai, aur aaj se shuruaat ho sakti hai. 1) Kaam shuru hone se pehle har estimate likh kar dein, taake dono ke paas ek hi raqam ho. 2) Extra kaam ke liye pehle customer ki likhit haan lein, taake bill pe koi hairani na ho. Workzap yeh sab aap ke liye automatically kar sakta hai: digital job card jis se estimate aur extra kaam customer ko WhatsApp pe approval ke liye khud jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

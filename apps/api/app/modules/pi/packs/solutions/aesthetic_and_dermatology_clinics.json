@@ -81,8 +81,7 @@
         "text": "an owner dashboard showing package liability, bookings, revenue by service and branch, updated daily.",
         "tool_words": [
           "dashboard"
-        ],
-        "leads_with_view": true
+        ]
       },
       "ask_first": "Do you sell memberships as well as packages?",
       "free_stops": "The liability calculation is set out in the solution document."
@@ -210,11 +209,16 @@
     }
   ],
   "never_say": [
-    "Which treatment suits someone, or anything about side-effects, products, doses or device settings. Whether a result is normal or good. Interpretations of who may inject or rules on advertising medical procedures. Help sourcing unregistered injectables, relabelling products or advertising false results. Fake reviews of any kind. Ideas that put client names, photos or treatment details in messages."
+    "Which treatment suits someone, or anything about side-effects, products, doses or device settings.",
+    "Whether a result is normal or good.",
+    "Interpretations of who may inject or rules on advertising medical procedures.",
+    "Help sourcing unregistered injectables, relabelling products or advertising false results.",
+    "Fake reviews of any kind.",
+    "Ideas that put client names, photos or treatment details in messages."
   ],
   "sample_reply": {
     "person": "We get so many DMs from our Instagram ads but my team replies late and bookings are low. What's the fix?",
-    "pi": "Yes, this is a common fix, and you can start this week. 1 Check how long last week's DMs waited for a reply, so you know the real delay. 2 Give DMs to one person at fixed times instead of the front desk, so they have an owner. Workzap can do this automatically for you with one inbox for all channels, response timers and codes that show which ad brought each booking. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, this is a common fix, and you can start this week. 1) Check how long last week's DMs waited for a reply, so you know the real delay. 2) Give DMs to one person at fixed times instead of the front desk, so they have an owner. Workzap can do this automatically for you with one inbox for all channels, response timers and codes that show which ad brought each booking. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

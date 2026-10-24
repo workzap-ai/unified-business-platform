@@ -177,9 +177,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "lead_followup"
+          "lead_followup",
+          "website_digital"
         ],
-        "text": "and website_digital — a lead source tracker showing which channel converts, plus a portfolio page with event photos and an enquiry form.",
+        "text": "a lead source tracker showing which channel converts, plus a portfolio page with event photos and an enquiry form.",
         "tool_words": []
       },
       "ask_first": "What do you do in the slow months now?",
@@ -187,11 +188,15 @@
     }
   ],
   "never_say": [
-    "Anything on food-transport or holding rules, or event licensing — refer to the relevant authority. Any interpretation of wedding-menu rules in Pakistan, or ways around them. Labour-law advice on daily-wage staff. Help inflating bills to clients or creating fake receipts. That an event will make a set profit or that headcount problems will stop."
+    "Anything on food-transport or holding rules, or event licensing — refer to the relevant authority.",
+    "Any interpretation of wedding-menu rules in Pakistan, or ways around them.",
+    "Labour-law advice on daily-wage staff.",
+    "Help inflating bills to clients or creating fake receipts.",
+    "That an event will make a set profit or that headcount problems will stop."
   ],
   "sample_reply": {
     "person": "Shaadi season mein guest zyada aa jate hain aur khana kam par jata hai. Is ka koi hal hai?",
-    "pi": "Ji haan, is ka hal hai, aur pehla qadam agle event se hi uthaya ja sakta hai. 1 Final headcount ki ek wazeh cut-off date client ko likh kar dein, taake aakhri waqt ki tabdeeli ka ek tay usool ho. 2 Extra mehmanon ka charge pehle se tay karein, kyunke event wali raat ye baat karna mushkil hota hai. Workzap ye aap ke liye automatically kar sakta hai: har event ka headcount change log, client ko cut-off se pehle khud reminder, aur count ke hisaab se khareedari ki list update. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal hai, aur pehla qadam agle event se hi uthaya ja sakta hai. 1) Final headcount ki ek wazeh cut-off date client ko likh kar dein, taake aakhri waqt ki tabdeeli ka ek tay usool ho. 2) Extra mehmanon ka charge pehle se tay karein, kyunke event wali raat ye baat karna mushkil hota hai. Workzap ye aap ke liye automatically kar sakta hai: har event ka headcount change log, client ko cut-off se pehle khud reminder, aur count ke hisaab se khareedari ki list update. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

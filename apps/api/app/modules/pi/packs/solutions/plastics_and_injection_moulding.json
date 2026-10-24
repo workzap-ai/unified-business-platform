@@ -1,7 +1,7 @@
 {
   "industry": "plastics_and_injection_moulding",
   "name": "Plastics and injection moulding",
-  "sector": "7.D Manufacturing and industry (part 1",
+  "sector": "7.D Manufacturing and industry (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -76,9 +76,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "field_checks"
+          "field_checks",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports A machine-wise shift log of shots, rejects and downtime reasons, with a daily view per machine and shift.",
+        "text": "A machine-wise shift log of shots, rejects and downtime reasons, with a daily view per machine and shift.",
         "tool_words": []
       },
       "ask_first": "",
@@ -136,9 +137,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "stock_alerts"
+          "stock_alerts",
+          "nori_daily_read"
         ],
-        "text": "nori_daily_read Finished goods stock by item and colour with dealer order matching and a daily read of what is short.",
+        "text": "Finished goods stock by item and colour with dealer order matching and a daily read of what is short.",
         "tool_words": []
       },
       "ask_first": "",
@@ -197,9 +199,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "website_digital"
+          "website_digital",
+          "customer_messaging"
         ],
-        "text": "customer_messaging A WhatsApp catalogue for dealers with item photos and current availability.",
+        "text": "A WhatsApp catalogue for dealers with item photos and current availability.",
         "tool_words": []
       },
       "ask_first": "",
@@ -207,11 +210,16 @@
     }
   ],
   "never_say": [
-    "Any advice on food-contact, medical-grade or child-safe compliance, additives or formulations. Any help labelling recycled material as virgin or misrepresenting grade. Any guidance on plastic bans, environmental rules or how to avoid them. Customs, tax or under-invoicing help. Accusations against individual operators; note the record gap only. Electrical or machine safety advice; burns and crush injuries are emergencies."
+    "Any advice on food-contact, medical-grade or child-safe compliance, additives or formulations.",
+    "Any help labelling recycled material as virgin or misrepresenting grade.",
+    "Any guidance on plastic bans, environmental rules or how to avoid them.",
+    "Customs, tax or under-invoicing help.",
+    "Accusations against individual operators; note the record gap only.",
+    "Electrical or machine safety advice; burns and crush injuries are emergencies."
   ],
   "sample_reply": {
     "person": "Dana ka rate har hafte badalta hai aur dealers ko purane rate pe maal ja raha hai. Kya karein?",
-    "pi": "Ji haan, iska hal mumkin hai aur isi hafte shuruaat ho sakti hai. 1 Apne main items ka per piece cost aaj ke resin rate pe ek dafa nikaal lein, taa ke pata chale kaun se item ab ghaate pe ja rahe hain. 2 Us cost ko dealers ki mojooda rate list ke saath rakh kar dekh lein. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: per piece cost calculator jo resin rate badalte hi update ho, aur dealers ki rate list bhi uske saath apne aap tayyar ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, iska hal mumkin hai aur isi hafte shuruaat ho sakti hai. 1) Apne main items ka per piece cost aaj ke resin rate pe ek dafa nikaal lein, taa ke pata chale kaun se item ab ghaate pe ja rahe hain. 2) Us cost ko dealers ki mojooda rate list ke saath rakh kar dekh lein. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: per piece cost calculator jo resin rate badalte hi update ho, aur dealers ki rate list bhi uske saath apne aap tayyar ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -1,7 +1,7 @@
 {
   "industry": "beekeeping_and_honey",
   "name": "Beekeeping and honey",
-  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "sector": "7.C Agriculture, livestock and rural (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -208,11 +208,15 @@
     }
   ],
   "never_say": [
-    "Advice on bee health, treatments, medications, swarm control, hive management or forage; refer to a bee specialist or extension service. Any health or medical claim for honey. Advice on labelling law, testing standards, halal or organic certification, or export rules. Any help labelling blended or adulterated honey as pure, faking origin or certificates, or copying another brand's packaging. Recording beekeepers', customers' or helpers' names, IDs or numbers."
+    "Advice on bee health, treatments, medications, swarm control, hive management or forage; refer to a bee specialist or extension service.",
+    "Any health or medical claim for honey.",
+    "Advice on labelling law, testing standards, halal or organic certification, or export rules.",
+    "Any help labelling blended or adulterated honey as pure, faking origin or certificates, or copying another brand's packaging.",
+    "Recording beekeepers', customers' or helpers' names, IDs or numbers."
   ],
   "sample_reply": {
     "person": "Karak se beri shehad ka kaam hai. Log online poochte hain asli hai ya nahi, mujhe dikhane ke liye kuch chahiye.",
-    "pi": "Ji, bharosa dikhane ka tareeqa banaya ja sakta hai. 1 Ab se har bottle pe batch number likhna shuru karein, taake har jar ka source maloom ho. 2 Jo kuch maujood hai, harvest ki photos aur lab reports, ek jagah jama kar lein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har jar ka batch code us ke harvest record se jura ho aur customer ek page pe us ki tafseel dekh sake. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, bharosa dikhane ka tareeqa banaya ja sakta hai. 1) Ab se har bottle pe batch number likhna shuru karein, taake har jar ka source maloom ho. 2) Jo kuch maujood hai, harvest ki photos aur lab reports, ek jagah jama kar lein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har jar ka batch code us ke harvest record se jura ho aur customer ek page pe us ki tafseel dekh sake. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

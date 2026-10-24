@@ -18,7 +18,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "dashboards_reports A rental fleet register showing each unit's capacity, status, site area and due-back date, updated from dispatch and return checks.",
+        "text": "dashboards_reports — A rental fleet register showing each unit's capacity, status, site area and due-back date, updated from dispatch and return checks.",
         "tool_words": []
       },
       "ask_first": "Roughly how many units are in your rental fleet?",
@@ -78,7 +78,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "booking_scheduling Breakdown call intake via WhatsApp with technician assignment from the on-call rota, response time and closure.",
+        "text": "booking_scheduling — Breakdown call intake via WhatsApp with technician assignment from the on-call rota, response time and closure.",
         "tool_words": []
       },
       "ask_first": "",
@@ -98,7 +98,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "field_checks A PM schedule by running hours or dates per AMC customer, with reminders and visit sign-off on phone.",
+        "text": "field_checks — A PM schedule by running hours or dates per AMC customer, with reminders and visit sign-off on phone.",
         "tool_words": []
       },
       "ask_first": "",
@@ -227,11 +227,15 @@
     }
   ],
   "never_say": [
-    "Anything on generator sizing, wiring, earthing, load calculations, exhaust, ventilation or fuel storage. Anything that helps with grid tapping, illegal connections, bypassing meters or avoiding environmental or noise rules. Anything on what to charge for rental or service. Anything that helps under-invoice or misdeclare imports. Anything other than emergency services when carbon monoxide, fire, shock or explosion is described."
+    "Anything on generator sizing, wiring, earthing, load calculations, exhaust, ventilation or fuel storage.",
+    "Anything that helps with grid tapping, illegal connections, bypassing meters or avoiding environmental or noise rules.",
+    "Anything on what to charge for rental or service.",
+    "Anything that helps under-invoice or misdeclare imports.",
+    "Anything other than emergency services when carbon monoxide, fire, shock or explosion is described."
   ],
   "sample_reply": {
     "person": "Our rental units come back with less fuel and damaged panels and we can never prove it. What can we do?",
-    "pi": "Yes, this is fixable, and you can start this week on your own. 1 Take photos and note running hours and fuel level every time a unit leaves the yard, so there is a starting record. 2 Get the site contact to sign at delivery and at return, so both sides agree on the condition. Workzap can do this automatically for you: a dispatch and return checklist on phone that compares the two records for every unit and shows you which hires came back short. Shall I have a solution document and quote prepared for you? You are free to say no.",
+    "pi": "Yes, this is fixable, and you can start this week on your own. 1) Take photos and note running hours and fuel level every time a unit leaves the yard, so there is a starting record. 2) Get the site contact to sign at delivery and at return, so both sides agree on the condition. Workzap can do this automatically for you: a dispatch and return checklist on phone that compares the two records for every unit and shows you which hires came back short. Shall I have a solution document and quote prepared for you? You are free to say no.",
     "language": "english"
   }
 }

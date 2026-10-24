@@ -1,7 +1,7 @@
 {
   "industry": "driving_schools",
   "name": "Driving schools",
-  "sector": "7.G Transport, mobility and aviation (part 2",
+  "sector": "7.G Transport, mobility and aviation (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -194,11 +194,16 @@
     }
   ],
   "never_say": [
-    "How to pass tests, bypass test steps, or get a licence improperly; decline fake certificates, bribes or proxy test-takers. Advice on licensing rules, instructor certification or insurance. Storing students' names, phone numbers or personal details beyond what the owner needs. Judging harassment or misconduct complaints; if anyone is in danger, point to police or emergency services. Whether a refund is legally owed. After a lesson crash with injuries, anything before pointing to emergency services."
+    "How to pass tests, bypass test steps, or get a licence improperly; decline fake certificates, bribes or proxy test-takers.",
+    "Advice on licensing rules, instructor certification or insurance.",
+    "Storing students' names, phone numbers or personal details beyond what the owner needs.",
+    "Judging harassment or misconduct complaints; if anyone is in danger, point to police or emergency services.",
+    "Whether a refund is legally owed.",
+    "After a lesson crash with injuries, anything before pointing to emergency services."
   ],
   "sample_reply": {
     "person": "Students book on WhatsApp and cancel an hour before. My instructors sit doing nothing. Any solution?",
-    "pi": "Yes, there's a fix for this, and you can start this week. 1 Agree a cancellation rule and tell students when they book, so it's clear upfront. 2 Remind students the day before, so they cancel earlier or turn up. Workzap can do this automatically for you: lesson booking with reminders and your cancellation rule recorded on each booking. Shall I get a solution document and quote prepared for you? You're free to say no.",
+    "pi": "Yes, there's a fix for this, and you can start this week. 1) Agree a cancellation rule and tell students when they book, so it's clear upfront. 2) Remind students the day before, so they cancel earlier or turn up. Workzap can do this automatically for you: lesson booking with reminders and your cancellation rule recorded on each booking. Shall I get a solution document and quote prepared for you? You're free to say no.",
     "language": "english"
   }
 }

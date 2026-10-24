@@ -1,7 +1,7 @@
 {
   "industry": "electrical_goods",
   "name": "Electrical goods (fans, cables, switches, lighting)",
-  "sector": "7.D Manufacturing and industry (part 2",
+  "sector": "7.D Manufacturing and industry (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -184,19 +184,23 @@
           "nori_daily_read"
         ],
         "text": "a morning read of sales by region and model, stock cover, warranty claims and receivables.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Where is sales data entered today?",
       "free_stops": "Which figures feed the daily read is in the solution document."
     }
   ],
   "never_say": [
-    "No electrical safety, wiring, load-rating or certification advice. Never say a product meets or fails a standard. Never help put false certification marks, fake ratings or another brand's name on products; decline. Shocks, electrical fires or burns: stop and point to emergency services. Never help dispose of stolen copper or under-invoice imports; decline. No customer or electrician names or numbers in registers; roles only."
+    "No electrical safety, wiring, load-rating or certification advice.",
+    "Never say a product meets or fails a standard.",
+    "Never help put false certification marks, fake ratings or another brand's name on products; decline.",
+    "Shocks, electrical fires or burns: stop and point to emergency services.",
+    "Never help dispose of stolen copper or under-invoice imports; decline.",
+    "No customer or electrician names or numbers in registers; roles only."
   ],
   "sample_reply": {
     "person": "Koi hal batao. Summer mein pankhay pooray nahi hotay aur September ke baad godown bhara hota hai.",
-    "pi": "Ji, is ka hal mumkin hai, aur pichle season ka data hi kaafi madad karega. 1 Pichle saal ki sales model aur hafte ke hisaab se dekhein, taake pata chale demand asal mein kab shuru hoti hai. 2 Season se pehle har model ka stock target tay karein, taake planning andaze se na ho. Workzap yeh aap ke liye khud-ba- khud chala sakta hai: model-wise season build plan jo roz dikhaye ke plan ke muqable kahan khade hain. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai, aur pichle season ka data hi kaafi madad karega. 1) Pichle saal ki sales model aur hafte ke hisaab se dekhein, taake pata chale demand asal mein kab shuru hoti hai. 2) Season se pehle har model ka stock target tay karein, taake planning andaze se na ho. Workzap yeh aap ke liye khud-ba-khud chala sakta hai: model-wise season build plan jo roz dikhaye ke plan ke muqable kahan khade hain. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

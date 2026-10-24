@@ -188,9 +188,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "customer_messaging"
+          "customer_messaging",
+          "loyalty_repeat"
         ],
-        "text": "and loyalty_repeat — a WhatsApp direct-order flow for opted-in customers and a tiffin manager with plans, pauses and automatic renewal reminders.",
+        "text": "a WhatsApp direct-order flow for opted-in customers and a tiffin manager with plans, pauses and automatic renewal reminders.",
         "tool_words": []
       },
       "ask_first": "Do you take any orders outside the apps today?",
@@ -198,11 +199,15 @@
     }
   ],
   "never_say": [
-    "Advice on app contract terms or commission disputes — that is for their lawyer. Anything about home-kitchen permits, food-safety licences or trademark rules — refer to the relevant authority. Asking for app logins or passwords. Help with fake accounts, fake reviews, or listing the same brand under false names. That a change will lift ratings or orders by a set amount."
+    "Advice on app contract terms or commission disputes — that is for their lawyer.",
+    "Anything about home-kitchen permits, food-safety licences or trademark rules — refer to the relevant authority.",
+    "Asking for app logins or passwords.",
+    "Help with fake accounts, fake reviews, or listing the same brand under false names.",
+    "That a change will lift ratings or orders by a set amount."
   ],
   "sample_reply": {
     "person": "I run 3 brands out of one kitchen on Talabat and Deliveroo. Give me a solution for the payouts, refunds especially.",
-    "pi": "Yes, payouts can be made clear, and you can start this week. 1 Match one week of one app's statement against your own orders, so you see whether the gap is commission, discounts or refunds. 2 Group refunds by brand and reason, because one brand and one mistake usually drive most of them. Workzap can do this automatically for you, matching every app statement to your orders each week and showing net per order, brand and app, with refunds broken down. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, payouts can be made clear, and you can start this week. 1) Match one week of one app's statement against your own orders, so you see whether the gap is commission, discounts or refunds. 2) Group refunds by brand and reason, because one brand and one mistake usually drive most of them. Workzap can do this automatically for you, matching every app statement to your orders each week and showing net per order, brand and app, with refunds broken down. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

@@ -1,7 +1,7 @@
 {
   "industry": "hatcheries",
   "name": "Hatcheries",
-  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -19,8 +19,7 @@
           "dashboards_reports"
         ],
         "text": "hatch results entered per batch, compared automatically by machine and egg source from the hatchery's own data.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How many setters and hatchers do you run?",
       "free_stops": "The entry fields and comparison views go in the solution document."
@@ -209,7 +208,11 @@
     }
   ],
   "never_say": [
-    "Any incubation setting, chick vaccination, medicine, breeder nutrition or disease advice; suggest their vet or equipment supplier. Anything that helps relabel chick grades or breeds, hide disease, or bypass import permits for eggs or parent stock. Any suggested chick price. Promised hatchability or results. Collecting customers' or drivers' IDs or bank details."
+    "Any incubation setting, chick vaccination, medicine, breeder nutrition or disease advice; suggest their vet or equipment supplier.",
+    "Anything that helps relabel chick grades or breeds, hide disease, or bypass import permits for eggs or parent stock.",
+    "Any suggested chick price.",
+    "Promised hatchability or results.",
+    "Collecting customers' or drivers' IDs or bank details."
   ],
   "sample_reply": {
     "person": "We run a broiler hatchery near Lahore. Bookings come by phone and WhatsApp into the manager's diary and we keep overbooking. What can we do?",

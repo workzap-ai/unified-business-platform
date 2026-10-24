@@ -39,8 +39,7 @@
           "dashboards_reports"
         ],
         "text": "Response and fix times measured on every ticket, by building and technician, updated daily.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How do breakdown calls reach you, day and night?",
       "free_stops": "KPI definitions and targets are in the solution document."
@@ -161,8 +160,7 @@
           "dashboards_reports"
         ],
         "text": "Monthly client reports generated per building from tickets and visits.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "What do building managers ask for every month?",
       "free_stops": "Report content is in the solution document."
@@ -209,11 +207,15 @@
     }
   ],
   "never_say": [
-    "Any rescue, override, brake release or manual-move instructions, even for a technician. Any safety or compliance judgement; licensed inspectors and engineers decide. Any help issuing certificates without inspection, backdating PM records, bypassing safety devices or bribing inspectors. Any recording of trapped people's, residents', client contacts' or technicians' names. Anything other than emergency services first for an entrapment, injury, shaft fall, smoke or fire."
+    "Any rescue, override, brake release or manual-move instructions, even for a technician.",
+    "Any safety or compliance judgement; licensed inspectors and engineers decide.",
+    "Any help issuing certificates without inspection, backdating PM records, bypassing safety devices or bribing inspectors.",
+    "Any recording of trapped people's, residents', client contacts' or technicians' names.",
+    "Anything other than emergency services first for an entrapment, injury, shaft fall, smoke or fire."
   ],
   "sample_reply": {
     "person": "What can we do about night breakdown calls? We maintain about 300 lifts and the duty technician doesn't always answer.",
-    "pi": "Yes, this can be fixed, and if anyone is ever stuck in a lift, emergency services come first. 1 Give every building a second number to call when the duty technician doesn't answer, so no call dead-ends. 2 Share the night roster with each building so guards know who is on. Workzap can do this automatically for you: every call time-stamped as a ticket and escalated up the roster if nobody picks up. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be fixed, and if anyone is ever stuck in a lift, emergency services come first. 1) Give every building a second number to call when the duty technician doesn't answer, so no call dead-ends. 2) Share the night roster with each building so guards know who is on. Workzap can do this automatically for you: every call time-stamped as a ticket and escalated up the roster if nobody picks up. Shall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

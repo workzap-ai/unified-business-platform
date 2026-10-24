@@ -156,9 +156,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "lead_followup"
+          "lead_followup",
+          "attribution_codes"
         ],
-        "text": "and attribution_codes — an enquiry tracker with source tags and automatic follow-up reminders, showing which posts and ads bring real bookings.",
+        "text": "an enquiry tracker with source tags and automatic follow-up reminders, showing which posts and ads bring real bookings.",
         "tool_words": []
       },
       "ask_first": "Do you share prices before or after a consultation?",
@@ -207,11 +208,15 @@
     }
   ],
   "never_say": [
-    "Interpretation of contracts, cancellation terms or vendor and client disputes. Pyrotechnics, rigging, structure or electrical safety advice; any injury on site means emergency services first. Advice on alcohol, music licences or event permits, or help bypassing them. Financial advice on currency for destination weddings. Help with fake or inflated invoices."
+    "Interpretation of contracts, cancellation terms or vendor and client disputes.",
+    "Pyrotechnics, rigging, structure or electrical safety advice; any injury on site means emergency services first.",
+    "Advice on alcohol, music licences or event permits, or help bypassing them.",
+    "Financial advice on currency for destination weddings.",
+    "Help with fake or inflated invoices."
   ],
   "sample_reply": {
     "person": "Families keep changing the stage design and then refuse to pay extra. How do I stop this?",
-    "pi": "Yes, this can be brought under control, starting with your next booking. 1 Get every change approved with its cost in writing before your team starts on it, so extras aren't argued afterwards. 2 Look back at your last few weddings once to see which changes went unpaid and why. Workzap can do this automatically for you: each change is logged, priced and approved by the client on WhatsApp before work starts, and added to the event's total. Shall I prepare a solution document and quote for you? You can say no.",
+    "pi": "Yes, this can be brought under control, starting with your next booking. 1) Get every change approved with its cost in writing before your team starts on it, so extras aren't argued afterwards. 2) Look back at your last few weddings once to see which changes went unpaid and why. Workzap can do this automatically for you: each change is logged, priced and approved by the client on WhatsApp before work starts, and added to the event's total. Shall I prepare a solution document and quote for you? You can say no.",
     "language": "english"
   }
 }

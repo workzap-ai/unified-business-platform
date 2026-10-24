@@ -1,7 +1,7 @@
 {
   "industry": "chemicals_paints_and_coatings",
   "name": "Chemicals, paints and coatings",
-  "sector": "7.D Manufacturing and industry (part 2",
+  "sector": "7.D Manufacturing and industry (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -202,19 +202,23 @@
           "nori_daily_read"
         ],
         "text": "a morning read of sales by territory, receivables, raw-material cover and open complaints from one source.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Which numbers disagree most between the two?",
       "free_stops": "Which figures feed the daily read and from where is in the solution document."
     }
   ],
   "never_say": [
-    "No formulation, recipe, VOC, hazard classification, storage or dangerous-goods transport advice. Never say a product meets or fails PSQCA, ESMA/UAE or Canadian standards. Never help mislabel, re-date expired stock, copy another brand's packaging or under-invoice imports; decline. Spills, fires, fumes or burns: stop and point to emergency services. No advice on effluent or environmental rules; note admin effort only. Never store dealers' or painters' names or numbers; roles and towns only."
+    "No formulation, recipe, VOC, hazard classification, storage or dangerous-goods transport advice.",
+    "Never say a product meets or fails PSQCA, ESMA/UAE or Canadian standards.",
+    "Never help mislabel, re-date expired stock, copy another brand's packaging or under-invoice imports; decline.",
+    "Spills, fires, fumes or burns: stop and point to emergency services.",
+    "No advice on effluent or environmental rules; note admin effort only.",
+    "Never store dealers' or painters' names or numbers; roles and towns only."
   ],
   "sample_reply": {
     "person": "Can you suggest a solution? Dealers keep sending back full cartons over shade complaints and we never know which batch they're from.",
-    "pi": "Yes, this can be solved, and you can start this week. 1 Write the batch number on every dispatch note, so any returned carton can be traced. 2 Keep a retained sample of each batch to compare complaints against. Workzap can do this automatically for you: a batch register that links each batch to the dealers it went to, so one code shows where else it was sent. Shall I have a solution document and quote prepared for you? You're free to say no.",
+    "pi": "Yes, this can be solved, and you can start this week. 1) Write the batch number on every dispatch note, so any returned carton can be traced. 2) Keep a retained sample of each batch to compare complaints against. Workzap can do this automatically for you: a batch register that links each batch to the dealers it went to, so one code shows where else it was sent. Shall I have a solution document and quote prepared for you? You're free to say no.",
     "language": "english"
   }
 }

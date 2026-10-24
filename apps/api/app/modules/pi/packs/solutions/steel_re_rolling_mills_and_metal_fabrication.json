@@ -1,7 +1,7 @@
 {
   "industry": "steel_re_rolling_mills_and_metal_fabrication",
   "name": "Steel, re-rolling mills and metal fabrication",
-  "sector": "7.D Manufacturing and industry (part 2",
+  "sector": "7.D Manufacturing and industry (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -200,19 +200,23 @@
           "nori_daily_read"
         ],
         "text": "a morning read of tons produced, yield, power hours lost, cost-per-ton estimate and receivables.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Who prepares production figures today?",
       "free_stops": "How the estimate is calculated is in the solution document."
     }
   ],
   "never_say": [
-    "No structural design, weld procedure, load, metallurgy or grade-compliance advice. Burns, falls, crushing, furnace or electrocution accidents: stop and point to emergency services first. Never help tamper with weighbridge readings, under-invoice or adjust weights; decline. Never help process scrap of unknown or suspected stolen origin. No customs, import duty or tax advice; talk to your accountant. Workers and contractors: roles and counts only, never names, CNICs or individual wages."
+    "No structural design, weld procedure, load, metallurgy or grade-compliance advice.",
+    "Burns, falls, crushing, furnace or electrocution accidents: stop and point to emergency services first.",
+    "Never help tamper with weighbridge readings, under-invoice or adjust weights; decline.",
+    "Never help process scrap of unknown or suspected stolen origin.",
+    "No customs, import duty or tax advice; talk to your accountant.",
+    "Workers and contractors: roles and counts only, never names, CNICs or individual wages."
   ],
   "sample_reply": {
     "person": "Koi solution do yaar. Har truck pe weight ka jhagra hota hai, hamara kanta kuch kehta hai party ka kuch aur.",
-    "pi": "Ji, is ka hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1 Har truck ki weighbridge reading ki photo lein, taake dono taraf ek hi saboot ho. 2 Regular parties ke saath pehle se tay kar lein ke kis kante ka wazan maana jayega. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: weighbridge log jahan har truck ka wazan, photo, gate pass aur invoice apne aap jud jayein. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1) Har truck ki weighbridge reading ki photo lein, taake dono taraf ek hi saboot ho. 2) Regular parties ke saath pehle se tay kar lein ke kis kante ka wazan maana jayega. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: weighbridge log jahan har truck ka wazan, photo, gate pass aur invoice apne aap jud jayein. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

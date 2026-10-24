@@ -1,7 +1,7 @@
 {
   "industry": "goat_and_sheep_farms",
   "name": "Goat and sheep farms",
-  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -209,11 +209,15 @@
     }
   ],
   "never_say": [
-    "Any deworming, vaccine, medicine, feed recipe or breeding advice; suggest their vet. Any ruling on qurbani suitability, or certification of breed purity; suggest their scholar or breed association. Anything that helps falsify parentage, age or tags, or sell sick animals. Promised Eid prices or herd growth. Covert surveillance or confrontation advice about herders, or collecting IDs and bank details."
+    "Any deworming, vaccine, medicine, feed recipe or breeding advice; suggest their vet.",
+    "Any ruling on qurbani suitability, or certification of breed purity; suggest their scholar or breed association.",
+    "Anything that helps falsify parentage, age or tags, or sell sick animals.",
+    "Promised Eid prices or herd growth.",
+    "Covert surveillance or confrontation advice about herders, or collecting IDs and bank details."
   ],
   "sample_reply": {
     "person": "Mere paas 150 Beetal bakriyan hain, charwaha zubani batata hai kitne bachay hue aur kitne mare. Koi tareeqa batao.",
-    "pi": "Ji haan, paidaish aur maut ka pakka record isi hafte se shuru kiya ja sakta hai. 1 Har paidaish aur maut usi din bakri ke tag ke saath likhi jaye. 2 Charwaha har aik ki photo bheje, sirf phone pe batana kaafi na ho. Workzap yeh sab aap ke liye khud-ba-khud roz kar sakta hai: har bakri ka record phone pe bane, rozana ginti aaye, aur ginti na mile toh aap ko foran alert mile. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, paidaish aur maut ka pakka record isi hafte se shuru kiya ja sakta hai. 1) Har paidaish aur maut usi din bakri ke tag ke saath likhi jaye. 2) Charwaha har aik ki photo bheje, sirf phone pe batana kaafi na ho. Workzap yeh sab aap ke liye khud-ba-khud roz kar sakta hai: har bakri ka record phone pe bane, rozana ginti aaye, aur ginti na mile toh aap ko foran alert mile. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

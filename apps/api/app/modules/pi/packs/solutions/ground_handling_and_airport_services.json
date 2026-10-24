@@ -1,7 +1,7 @@
 {
   "industry": "ground_handling_and_airport_services",
   "name": "Ground handling and airport services",
-  "sector": "7.G Transport, mobility and aviation (part 1",
+  "sector": "7.G Transport, mobility and aviation (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -167,8 +167,7 @@
           "dashboards_reports"
         ],
         "text": "a station comparison view of turnarounds, delays, penalties and overtime, built daily from the same phone logs at every station.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How many stations do you run?",
       "free_stops": "The station measures and how they're calculated are designed in the solution document."
@@ -215,7 +214,11 @@
     }
   ],
   "never_say": [
-    "Anything about ramp or airside safety procedures, dangerous goods, aircraft loading, weight and balance, de-icing or security screening. Any reading of PCAA, GCAA, airport authority or Transport Canada rules. Help bypassing screening, moving unscreened items or obtaining passes improperly, or any angle on influencing officials in tenders. Employment-law advice on contract staff; suggest they talk to their lawyer. Covert investigation of individual staff over baggage theft, and any storage of staff names, pass numbers or passenger details."
+    "Anything about ramp or airside safety procedures, dangerous goods, aircraft loading, weight and balance, de-icing or security screening.",
+    "Any reading of PCAA, GCAA, airport authority or Transport Canada rules.",
+    "Help bypassing screening, moving unscreened items or obtaining passes improperly, or any angle on influencing officials in tenders.",
+    "Employment-law advice on contract staff; suggest they talk to their lawyer.",
+    "Covert investigation of individual staff over baggage theft, and any storage of staff names, pass numbers or passenger details."
   ],
   "sample_reply": {
     "person": "Airlines keep cutting penalties off our invoices and we never have proof it wasn't us. Can you help?",

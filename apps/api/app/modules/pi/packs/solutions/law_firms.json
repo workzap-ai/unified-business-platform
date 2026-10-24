@@ -16,9 +16,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "workflow_automation"
         ],
-        "text": "workflow_automation — a shared hearing diary by matter that the clerk updates from his phone after each hearing, with a morning WhatsApp summary of today's and tomorrow's dates to every lawyer.",
+        "text": "a shared hearing diary by matter that the clerk updates from his phone after each hearing, with a morning WhatsApp summary of today's and tomorrow's dates to every lawyer.",
         "tool_words": []
       },
       "ask_first": "Is the diary kept on paper, or already in a sheet?",
@@ -187,11 +188,16 @@
     }
   ],
   "never_say": [
-    "Any legal view, comment on a case's merits, strategy or likely outcome. Any interpretation of law, court procedure or limitation rules. Anything touching backdating, forged documents or influencing courts, police or officials. Regulatory advice on trust or client accounts. That hearings will never be missed again. Requests for client names, opposing parties, case numbers or case facts."
+    "Any legal view, comment on a case's merits, strategy or likely outcome.",
+    "Any interpretation of law, court procedure or limitation rules.",
+    "Anything touching backdating, forged documents or influencing courts, police or officials.",
+    "Regulatory advice on trust or client accounts.",
+    "That hearings will never be missed again.",
+    "Requests for client names, opposing parties, case numbers or case facts."
   ],
   "sample_reply": {
     "person": "Dates are our biggest problem. Everything is in the munshi's diary and we've missed hearings when he's away. Can you suggest a fix?",
-    "pi": "Yes, this can be fixed, and you can start this week. 1 Copy the next month of hearing dates once into a shared calendar with the responsible lawyer named on each, so the diary is no longer the only copy. 2 Name a backup clerk for when the munshi is on leave, so dates keep being updated. Workzap can do this automatically for you: a shared diary the clerk updates from his phone after every hearing, with a morning summary to each lawyer. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, this can be fixed, and you can start this week. 1) Copy the next month of hearing dates once into a shared calendar with the responsible lawyer named on each, so the diary is no longer the only copy. 2) Name a backup clerk for when the munshi is on leave, so dates keep being updated. Workzap can do this automatically for you: a shared diary the clerk updates from his phone after every hearing, with a morning summary to each lawyer. Would you like me to put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

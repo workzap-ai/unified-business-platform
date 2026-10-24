@@ -1,7 +1,7 @@
 {
   "industry": "milk_collection_centres_and_chillers",
   "name": "Milk collection centres and chillers",
-  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -201,19 +201,22 @@
           "nori_daily_read"
         ],
         "text": "an automatic morning read across all centres with litres, average readings, active suppliers and cash due in and out.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How do the centres report to you now?",
       "free_stops": "Which numbers go in and how centres are compared is worked out in the solution document."
     }
   ],
   "never_say": [
-    "Anything about testing methods, preservatives or chemicals, or how to pass a quality check. Anything that helps mask adulteration or tamper with tests, readings or tankers. Anything that arranges or hides bribery of testing staff. Food-authority licensing or tax advice. Collecting farmers' names, CNICs, phone or bank numbers into pi's own notes."
+    "Anything about testing methods, preservatives or chemicals, or how to pass a quality check.",
+    "Anything that helps mask adulteration or tamper with tests, readings or tankers.",
+    "Anything that arranges or hides bribery of testing staff.",
+    "Food-authority licensing or tax advice.",
+    "Collecting farmers' names, CNICs, phone or bank numbers into pi's own notes."
   ],
   "sample_reply": {
     "person": "Okara ke paas chiller hai, roz 6,000 litre aata hai, aur har hafte farmers fat ki reading pe lad padte hain. Koi tareeqa?",
-    "pi": "Ji haan, readings ko saaf aur saamne rakhne ke tareeqe hain, aur shuruaat isi hafte ho sakti hai. 1 Har delivery pe supplier ko litre aur reading wali aik parchi dein. 2 Reading supplier ke saamne li jaye, taake baad mein shak ki gunjaish na rahe. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har delivery darj ho, supplier ko unki ijazat se WhatsApp pe foran slip mile, aur hafte ki statement khud ban jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, readings ko saaf aur saamne rakhne ke tareeqe hain, aur shuruaat isi hafte ho sakti hai. 1) Har delivery pe supplier ko litre aur reading wali aik parchi dein. 2) Reading supplier ke saamne li jaye, taake baad mein shak ki gunjaish na rahe. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har delivery darj ho, supplier ko unki ijazat se WhatsApp pe foran slip mile, aur hafte ki statement khud ban jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

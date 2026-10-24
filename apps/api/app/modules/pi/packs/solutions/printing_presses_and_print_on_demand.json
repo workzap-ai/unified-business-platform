@@ -1,7 +1,7 @@
 {
   "industry": "printing_presses_and_print_on_demand",
   "name": "Printing presses and print-on-demand",
-  "sector": "7.D Manufacturing and industry (part 2",
+  "sector": "7.D Manufacturing and industry (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -207,11 +207,16 @@
     }
   ],
   "never_say": [
-    "Never advise whether a customer may print a brand logo, trademark or copyrighted design. Never comment on election or political printing limits. Never help print fake degrees, IDs, stamps, receipts, certificates, currency or counterfeit packaging; decline plainly. No colour-management engineering or chemical, solvent or machine-safety advice; injuries or fire go to emergency services 1122/15 PK, 999/997/998 UAE, 911 Canada). Never collect wedding guest lists, student data, names printed on cards, or customer artwork. Never record named accusations about operators side-printing."
+    "Never advise whether a customer may print a brand logo, trademark or copyrighted design.",
+    "Never comment on election or political printing limits.",
+    "Never help print fake degrees, IDs, stamps, receipts, certificates, currency or counterfeit packaging; decline plainly.",
+    "No colour-management engineering or chemical, solvent or machine-safety advice; injuries or fire go to emergency services (1122/15 PK, 999/997/998 UAE, 911 Canada).",
+    "Never collect wedding guest lists, student data, names printed on cards, or customer artwork.",
+    "Never record named accusations about operators side-printing."
   ],
   "sample_reply": {
     "person": "Bhai reprints ne tang kar diya hai. Corporate party proof OK kar ke baad mein rang ka masla nikaal deti hai. Koi hal batao.",
-    "pi": "Ji, is ka hal bilkul mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Har job ka ek approved proof version likhit mein lock karein, taake baad mein behes na ho ke kaunsi file OK hui thi. 2 Quote par pehle se tay kar lein ke approval ke baad reprint ka kharcha kaun uthayega. Workzap yeh sab aap ke liye khud-ba- khud chala sakta hai: har job par proof approval link jo approved file aur waqt job card ke saath lock kar de, aur har job ka status roz phone par. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal bilkul mumkin hai, aur shuruaat isi hafte ho sakti hai. 1) Har job ka ek approved proof version likhit mein lock karein, taake baad mein behes na ho ke kaunsi file OK hui thi. 2) Quote par pehle se tay kar lein ke approval ke baad reprint ka kharcha kaun uthayega. Workzap yeh sab aap ke liye khud-ba-khud chala sakta hai: har job par proof approval link jo approved file aur waqt job card ke saath lock kar de, aur har job ka status roz phone par. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

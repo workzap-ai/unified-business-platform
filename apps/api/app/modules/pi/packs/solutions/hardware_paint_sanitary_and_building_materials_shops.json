@@ -1,7 +1,7 @@
 {
   "industry": "hardware_paint_sanitary_and_building_materials_shops",
   "name": "Hardware, paint, sanitary and building-materials shops",
-  "sector": "7.A Retail and consumer (part 2",
+  "sector": "7.A Retail and consumer (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -210,11 +210,15 @@
     }
   ],
   "never_say": [
-    "Any structural, electrical, gas, plumbing or fire-safety advice, or whether a material is suitable for a job. For a gas leak, electrocution, fire or collapse, anything other than \"call emergency services\" PK 1122/15/16, UAE 999/997/998, Canada 911. Help with fake or inflated invoices, or passing non-branded goods off as branded. Advice on building permits, codes or legal recovery of credit. Help with under-invoicing or tax avoidance."
+    "Any structural, electrical, gas, plumbing or fire-safety advice, or whether a material is suitable for a job.",
+    "For a gas leak, electrocution, fire or collapse, anything other than \"call emergency services\" (PK 1122/15/16, UAE 999/997/998, Canada 911).",
+    "Help with fake or inflated invoices, or passing non-branded goods off as branded.",
+    "Advice on building permits, codes or legal recovery of credit.",
+    "Help with under-invoicing or tax avoidance."
   ],
   "sample_reply": {
     "person": "Thekedar log udhaar le jaate hain aur khata har mahine barhta ja raha hai. Koi tareeqa batao.",
-    "pi": "Ji haan, is ko qaabu mein laaya ja sakta hai. 1. Har thekedar ka balance aur woh kitna purana hai ek dafa nikaal lein, taake pata chale pehle kis se baat karni hai. 2. Regular thekedaron ke saath udhaar ki had tay kar lein, kyun ke bina had ke udhaar barhta hi rehta hai. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai: har udhaar sale counter pe phone se darj ho, balance khud update ho aur WhatsApp pe yaad- dihani apne aap jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ko qaabu mein laaya ja sakta hai. 1. Har thekedar ka balance aur woh kitna purana hai ek dafa nikaal lein, taake pata chale pehle kis se baat karni hai. 2. Regular thekedaron ke saath udhaar ki had tay kar lein, kyun ke bina had ke udhaar barhta hi rehta hai. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai: har udhaar sale counter pe phone se darj ho, balance khud update ho aur WhatsApp pe yaad-dihani apne aap jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

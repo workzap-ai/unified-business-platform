@@ -1,7 +1,7 @@
 {
   "industry": "bridal_wear_and_couture_designers",
   "name": "Bridal wear and couture designers",
-  "sector": "7.A Retail and consumer (part 1",
+  "sector": "7.A Retail and consumer (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -188,11 +188,15 @@
     }
   ],
   "never_say": [
-    "Contract, refund-law or advance-dispute advice. Anything on customs or under-declaring bridal shipments. That a delivery date is certain. How to copy another designer's work, or post client photos without consent. Labour-law advice on karigar pay; unsafe conditions or child labour are not something pi assists with."
+    "Contract, refund-law or advance-dispute advice.",
+    "Anything on customs or under-declaring bridal shipments.",
+    "That a delivery date is certain.",
+    "How to copy another designer's work, or post client photos without consent.",
+    "Labour-law advice on karigar pay; unsafe conditions or child labour are not something pi assists with."
   ],
   "sample_reply": {
     "person": "Shaadiyon ke season mein 40 se zyada bridal orders hote hain aur kisi ko nahi pata kaun sa kahan hai. Koi solution hai?",
-    "pi": "Ji haan, bilkul hai, aur is hafte hi shuruaat ho sakti hai. 1 Saare khule orders ek list pe daal dein, stage aur event date ke saath, taa ke jo khatre mein hain woh saamne aa jaayein. 2 Adda head se roz ek status update lein, taa ke register aur WhatsApp alag alag baat na karein. Workzap ye aap ke liye khud-ba-khud kar sakta hai: har order ka board booking se delivery tak, aur jab koi order event date ke hisaab se peeche ho to alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, bilkul hai, aur is hafte hi shuruaat ho sakti hai. 1) Saare khule orders ek list pe daal dein, stage aur event date ke saath, taa ke jo khatre mein hain woh saamne aa jaayein. 2) Adda head se roz ek status update lein, taa ke register aur WhatsApp alag alag baat na karein. Workzap ye aap ke liye khud-ba-khud kar sakta hai: har order ka board booking se delivery tak, aur jab koi order event date ke hisaab se peeche ho to alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

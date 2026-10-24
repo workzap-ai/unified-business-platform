@@ -1,7 +1,7 @@
 {
   "industry": "flour_rice_and_feed_mills",
   "name": "Flour, rice and feed mills",
-  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "sector": "7.C Agriculture, livestock and rural (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -200,19 +200,22 @@
           "nori_daily_read"
         ],
         "text": "A morning read with intake, output, yield, dispatch, cash and receivables, and the one thing to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Which number do you most want to see daily?",
       "free_stops": "What the morning read contains is kept for the solution document."
     }
   ],
   "never_say": [
-    "Advice on feed formulations, additives, medicated feed, antibiotics or fortification levels; refer to a nutritionist, vet or food technologist. Advice on food-safety standards, milling technology, quota allocations, labour or wage law, tax or export rules. Any help with adulteration, passing low grade off as premium, false weights, hoarding, evading quotas, under-invoicing or fake certificates. Comment on government quota or price-control policy. Storing suppliers', distributors', drivers' or workers' names, CNICs or numbers."
+    "Advice on feed formulations, additives, medicated feed, antibiotics or fortification levels; refer to a nutritionist, vet or food technologist.",
+    "Advice on food-safety standards, milling technology, quota allocations, labour or wage law, tax or export rules.",
+    "Any help with adulteration, passing low grade off as premium, false weights, hoarding, evading quotas, under-invoicing or fake certificates.",
+    "Comment on government quota or price-control policy.",
+    "Storing suppliers', distributors', drivers' or workers' names, CNICs or numbers."
   ],
   "sample_reply": {
     "person": "We run a broiler feed mill in Sargodha. Farmers keep saying one batch is fine and the next isn't. What can we do?",
-    "pi": "Yes, you can get on top of this, and the first step is simple. 1 Start putting a batch code on every bag, so any complaint can be traced to its production run. 2 Log each complaint against its batch, and take any formulation question to your nutritionist or vet. Workzap can do this automatically for you, linking every dispatch to its production lot so complaints trace back in one tap and patterns show across distributors. Shall I get a solution document and quote prepared for you? You can say no.",
+    "pi": "Yes, you can get on top of this, and the first step is simple. 1) Start putting a batch code on every bag, so any complaint can be traced to its production run. 2) Log each complaint against its batch, and take any formulation question to your nutritionist or vet. Workzap can do this automatically for you, linking every dispatch to its production lot so complaints trace back in one tap and patterns show across distributors. Shall I get a solution document and quote prepared for you? You can say no.",
     "language": "english"
   }
 }

@@ -199,19 +199,23 @@
           "nori_daily_read"
         ],
         "text": "a morning read with occupancy, income, receivables, staff cost, utility cost and open complaints.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Do you run one home or more?",
       "free_stops": "Which numbers appear is set in the solution document."
     }
   ],
   "never_say": [
-    "Any care, nursing, medication, nutrition, dementia or end-of-life advice. Any treatment of abuse or neglect as a routine problem; ensure safety, call emergency services and report to the relevant authority. Interpretations of licensing, staffing ratios or inspection standards. Help hiding incidents, faking training records or hiring without required checks. Ideas that record resident names, ages, conditions or room details, or family details. Promises about filling rooms."
+    "Any care, nursing, medication, nutrition, dementia or end-of-life advice.",
+    "Any treatment of abuse or neglect as a routine problem; ensure safety, call emergency services and report to the relevant authority.",
+    "Interpretations of licensing, staffing ratios or inspection standards.",
+    "Help hiding incidents, faking training records or hiring without required checks.",
+    "Ideas that record resident names, ages, conditions or room details, or family details.",
+    "Promises about filling rooms."
   ],
   "sample_reply": {
     "person": "Kai residents ki families bahar mulk mein hain, fees do do mahine late aati hai aur bar bar yaad dilana parta hai. Koi tareeqa batayein.",
-    "pi": "Ji, is ka tareeqa mojood hai aur shuruat isi hafte ki ja sakti hai. 1 Saari fees aur dues ek hi record mein account code ke saath rakhein, taake har balance saaf ho. 2 Har family ko har mahine ek hi tareekh pe bill bhejein, taake payment yaad dilane ke bajaye mutawaqqa ho. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: har mahine invoice, bahar se aane wali payments ka record aur waqt par narm reminders. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka tareeqa mojood hai aur shuruat isi hafte ki ja sakti hai. 1) Saari fees aur dues ek hi record mein account code ke saath rakhein, taake har balance saaf ho. 2) Har family ko har mahine ek hi tareekh pe bill bhejein, taake payment yaad dilane ke bajaye mutawaqqa ho. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: har mahine invoice, bahar se aane wali payments ka record aur waqt par narm reminders. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

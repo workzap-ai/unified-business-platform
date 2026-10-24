@@ -40,7 +40,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "cash_reconciliation Group-total collection capture at the centre meeting feeding the branch day-end, with mismatches flagged automatically.",
+        "text": "cash_reconciliation — Group-total collection capture at the centre meeting feeding the branch day-end, with mismatches flagged automatically.",
         "tool_words": []
       },
       "ask_first": "",
@@ -103,8 +103,7 @@
         "text": "A daily branch dashboard of visits planned versus done, collections versus due and deposits made, in aggregate only, with an area comparison view.",
         "tool_words": [
           "dashboard"
-        ],
-        "leads_with_view": true
+        ]
       },
       "ask_first": "",
       "free_stops": "Which figures feed it and from where is in the solution document."
@@ -124,8 +123,7 @@
           "dashboards_reports"
         ],
         "text": "One data source per branch that produces each required report format automatically.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "Format mapping is in the solution document."
@@ -144,7 +142,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "workflow_automation A file movement tracker showing where each file is, who has it and how long it has waited, with a document checklist per file type.",
+        "text": "workflow_automation — A file movement tracker showing where each file is, who has it and how long it has waited, with a document checklist per file type.",
         "tool_words": []
       },
       "ask_first": "",
@@ -212,11 +210,15 @@
     }
   ],
   "never_say": [
-    "Anything on interest, service charges, loan sizes, products, eligibility or credit decisions. Any recovery tactic, pressure approach or legal action against borrowers. Any request for borrowers' names, CNIC, addresses, phone numbers, loan amounts or repayment histories. Live location tracking of officers or covert monitoring. Anything on SBP or SECP regulation beyond noting reporting effort."
+    "Anything on interest, service charges, loan sizes, products, eligibility or credit decisions.",
+    "Any recovery tactic, pressure approach or legal action against borrowers.",
+    "Any request for borrowers' names, CNIC, addresses, phone numbers, loan amounts or repayment histories.",
+    "Live location tracking of officers or covert monitoring.",
+    "Anything on SBP or SECP regulation beyond noting reporting effort."
   ],
   "sample_reply": {
     "person": "FOs ki field visits ka koi hisaab nahi rehta, kuch hal hai is ka?",
-    "pi": "Ji, is ka hal mumkin hai aur pehla qadam aap isi hafte khud utha sakte hain. 1 Har officer subah apne din ke groups branch ko bata de, taake shaam ko planned aur mukammal visits mila sakein. 2 Har shaam yeh milan ek baar dekh lein, taake miss hua visit usi din pata chale, hafte baad nahi. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: officers khule taur pe har centre meeting pe check-in karein aur aap ko har branch ki roz ki report mile, borrowers ka koi data liye baghair. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai aur pehla qadam aap isi hafte khud utha sakte hain. 1) Har officer subah apne din ke groups branch ko bata de, taake shaam ko planned aur mukammal visits mila sakein. 2) Har shaam yeh milan ek baar dekh lein, taake miss hua visit usi din pata chale, hafte baad nahi. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: officers khule taur pe har centre meeting pe check-in karein aur aap ko har branch ki roz ki report mile, borrowers ka koi data liye baghair. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

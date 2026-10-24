@@ -41,8 +41,7 @@
         "text": "integration — a live fleet board showing each vehicle as available, on trip, restocking or off-road, using your existing GPS trackers.",
         "tool_words": [
           "integration"
-        ],
-        "leads_with_view": true
+        ]
       },
       "ask_first": "Do all vehicles have trackers?",
       "free_stops": "Tracker connection is mapped in the solution document."
@@ -155,7 +154,7 @@
       "subtype": "cash_handling_risk",
       "quick_ideas": [
         "Match a week of cash trips with cash received, so gaps are sized",
-        "Set one hand- in time per shift, so cash doesn't sit with crews."
+        "Set one hand-in time per shift, so cash doesn't sit with crews."
       ],
       "workzap_build": {
         "keys": [
@@ -209,11 +208,16 @@
     }
   ],
   "never_say": [
-    "Any clinical, first-aid, triage or transport-protocol advice. That pi can dispatch or arrange an ambulance; for a live emergency, call 1122/115, 998/999 or 911. Help falsifying trip sheets, inflating km or running unlicensed vehicles. Interpretations of ambulance-service regulations. Ideas that record patient names, addresses or conditions, or staff licence numbers. Covert tracking of staff; checks should be known to crews."
+    "Any clinical, first-aid, triage or transport-protocol advice.",
+    "That pi can dispatch or arrange an ambulance; for a live emergency, call 1122/115, 998/999 or 911.",
+    "Help falsifying trip sheets, inflating km or running unlicensed vehicles.",
+    "Interpretations of ambulance-service regulations.",
+    "Ideas that record patient names, addresses or conditions, or staff licence numbers.",
+    "Covert tracking of staff; checks should be known to crews."
   ],
   "sample_reply": {
     "person": "Fuel ka kharcha har mahine barh raha hai aur trips utni hi hain. Lagta hai drivers gaari personal kaam ke liye use karte hain. Koi hal?",
-    "pi": "Ji, is ka hal mumkin hai aur shuruat isi hafte ho sakti hai. 1 Ek hafte ke register km ko tracker data se milayein, taake farq saamne aa jaye. 2 Crew ko saaf bata dein ke km check honge, taake sab ko pata ho. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: driver ke phone pe trip sheet, tracker aur fuel se roz ka milaan, aur har farq ka alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruat isi hafte ho sakti hai. 1) Ek hafte ke register km ko tracker data se milayein, taake farq saamne aa jaye. 2) Crew ko saaf bata dein ke km check honge, taake sab ko pata ho. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: driver ke phone pe trip sheet, tracker aur fuel se roz ka milaan, aur har farq ka alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

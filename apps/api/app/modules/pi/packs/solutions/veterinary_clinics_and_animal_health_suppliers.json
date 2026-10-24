@@ -1,7 +1,7 @@
 {
   "industry": "veterinary_clinics_and_animal_health_suppliers",
   "name": "Veterinary clinics and animal-health suppliers",
-  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -208,7 +208,11 @@
     }
   ],
   "never_say": [
-    "Any diagnosis, treatment, dosing, prescribing or drug advice, even to a vet asking. Anything on drug scheduling, prescription rules or registration. Anything that helps sell unregistered, smuggled, expired or restricted medicines, relabel stock or falsify controlled-drug records. Fake or incentivised reviews; review requests go only to real clients. Storing pet owners' or farmers' personal details or medical record contents in pi's notes."
+    "Any diagnosis, treatment, dosing, prescribing or drug advice, even to a vet asking.",
+    "Anything on drug scheduling, prescription rules or registration.",
+    "Anything that helps sell unregistered, smuggled, expired or restricted medicines, relabel stock or falsify controlled-drug records.",
+    "Fake or incentivised reviews; review requests go only to real clients.",
+    "Storing pet owners' or farmers' personal details or medical record contents in pi's notes."
   ],
   "sample_reply": {
     "person": "I run a small-animal clinic in Dubai with two vets. Clients keep forgetting vaccine boosters and then blame us. Can you help?",

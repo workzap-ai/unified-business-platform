@@ -182,19 +182,22 @@
           "nori_daily_read"
         ],
         "text": "a short morning read with each shop's sales, purchases, yield and wastage, and the one thing to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Do both shops buy from the same supplier?",
       "free_stops": "How each shop's profit is calculated goes in the solution document."
     }
   ],
   "never_say": [
-    "Anything about halal or zabiha certification, slaughter rules or animal welfare law. Veterinary or live-animal handling advice. Food-safety or temperature-standard advice. Help passing off one meat as another, selling spoiled meat or mislabelling origin. That yield tracking will raise profit by any amount."
+    "Anything about halal or zabiha certification, slaughter rules or animal welfare law.",
+    "Veterinary or live-animal handling advice.",
+    "Food-safety or temperature-standard advice.",
+    "Help passing off one meat as another, selling spoiled meat or mislabelling origin.",
+    "That yield tracking will raise profit by any amount."
   ],
   "sample_reply": {
     "person": "Poora bakra leta hun, lekin pata nahi chalta asal mein kitna maal bikne layak nikla. Koi solution hai?",
-    "pi": "Ji haan, ye bilkul maloom kiya ja sakta hai, aur agla bakra hi shuruaat ho sakta hai. 1 Ek bakray ka wazan aate waqt aur phir boti, haddi, charbi aur trim alag alag tol kar likhein, taake asal yield ek baar saamne aaye. 2 Us se bikne layak gosht ki fi kilo laagat nikaalein, kyunke board rate usi ke mutabiq hona chahiye. Workzap ye aap ke liye automatically kar sakta hai: har bakray ka yield record, fi kilo laagat khud hisaab hoti rahe, aur din ke end par khareeda aur bika wazan mila kar dikhaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, ye bilkul maloom kiya ja sakta hai, aur agla bakra hi shuruaat ho sakta hai. 1) Ek bakray ka wazan aate waqt aur phir boti, haddi, charbi aur trim alag alag tol kar likhein, taake asal yield ek baar saamne aaye. 2) Us se bikne layak gosht ki fi kilo laagat nikaalein, kyunke board rate usi ke mutabiq hona chahiye. Workzap ye aap ke liye automatically kar sakta hai: har bakray ka yield record, fi kilo laagat khud hisaab hoti rahe, aur din ke end par khareeda aur bika wazan mila kar dikhaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

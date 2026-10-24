@@ -1,7 +1,7 @@
 {
   "industry": "car_rental_and_chauffeur_services",
   "name": "Car rental and chauffeur services",
-  "sector": "7.G Transport, mobility and aviation (part 2",
+  "sector": "7.G Transport, mobility and aviation (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -123,7 +123,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a chauffeur duty roster with pickup confirmations and duty- hour logs.",
+        "text": "a chauffeur duty roster with pickup confirmations and duty-hour logs.",
         "tool_words": []
       },
       "ask_first": "",
@@ -193,11 +193,16 @@
     }
   ],
   "never_say": [
-    "Advice on rental contracts, liability, insurance excess or contesting fines. Help moving fines to the wrong person, falsifying accident records or avoiding tolls. Requests for passports, IDs, licences or card details. Covert tracking of drivers' phones. Advice on licensing, investors' returns or financing. After an accident or passenger emergency, anything before pointing to emergency services."
+    "Advice on rental contracts, liability, insurance excess or contesting fines.",
+    "Help moving fines to the wrong person, falsifying accident records or avoiding tolls.",
+    "Requests for passports, IDs, licences or card details.",
+    "Covert tracking of drivers' phones.",
+    "Advice on licensing, investors' returns or financing.",
+    "After an accident or passenger emergency, anything before pointing to emergency services."
   ],
   "sample_reply": {
     "person": "Fines keep showing up weeks after we've released the deposit. Any solution for this?",
-    "pi": "Yes, there's a way to get on top of this, and you can start this week. 1 Note how long fines usually take to appear, so you can see whether your deposit hold matches. 2 Match each fine to its rental by car and time, so you know who it belongs to. Workzap can do this automatically for you: every fine and toll matched to its rental and each deposit tracked from hold to release. Shall I get a solution document and quote prepared for you? You're free to say no.",
+    "pi": "Yes, there's a way to get on top of this, and you can start this week. 1) Note how long fines usually take to appear, so you can see whether your deposit hold matches. 2) Match each fine to its rental by car and time, so you know who it belongs to. Workzap can do this automatically for you: every fine and toll matched to its rental and each deposit tracked from hold to release. Shall I get a solution document and quote prepared for you? You're free to say no.",
     "language": "english"
   }
 }

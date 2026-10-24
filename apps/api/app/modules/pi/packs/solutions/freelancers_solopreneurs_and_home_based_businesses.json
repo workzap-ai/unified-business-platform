@@ -156,9 +156,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "loyalty_repeat"
+          "loyalty_repeat",
+          "customer_messaging"
         ],
-        "text": "customer_messaging — a repeat customer list with reminder messages for occasions and re-orders, sent with their permission.",
+        "text": "a repeat customer list with reminder messages for occasions and re-orders, sent with their permission.",
         "tool_words": []
       },
       "ask_first": "",
@@ -179,19 +180,22 @@
           "dashboards_reports"
         ],
         "text": "an income and expense log separating business from personal, with a monthly summary.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "the categories and summary format are kept for the solution document."
     }
   ],
   "never_say": [
-    "Any tax, legal, licensing, immigration, banking, foreign exchange or food-safety advice. Anything involving platform rule evasion, account renting, fake reviews, fake portfolios or under-declaring income. That income or orders will grow by any amount. Requests for card numbers, platform or bank logins, or customers' addresses and numbers. If someone expresses thoughts of self-harm, point them to local emergency or helpline services."
+    "Any tax, legal, licensing, immigration, banking, foreign exchange or food-safety advice.",
+    "Anything involving platform rule evasion, account renting, fake reviews, fake portfolios or under-declaring income.",
+    "That income or orders will grow by any amount.",
+    "Requests for card numbers, platform or bank logins, or customers' addresses and numbers.",
+    "If someone expresses thoughts of self-harm, point them to local emergency or helpline services."
   ],
   "sample_reply": {
     "person": "Main ghar se cakes bechti hoon, orders Instagram aur WhatsApp dono pe aate hain aur kabhi koi order reh jata hai. Koi solution hai?",
-    "pi": "Ji haan, is ka hal mumkin hai aur aaj se shuruaat ki ja sakti hai. 1 Dono apps se saare khule orders aaj ek hi list mein likh lein, taake koi order sirf chat mein na pada rahe. 2 Har order customer ko ek dafa confirm kar dein, taake details pe dono raazi hon. Workzap yeh aap ke liye automatically kar sakta hai: Instagram aur WhatsApp ke orders ek numbered list mein, aur har order ki confirmation customer ko khud chali jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal mumkin hai aur aaj se shuruaat ki ja sakti hai. 1) Dono apps se saare khule orders aaj ek hi list mein likh lein, taake koi order sirf chat mein na pada rahe. 2) Har order customer ko ek dafa confirm kar dein, taake details pe dono raazi hon. Workzap yeh aap ke liye automatically kar sakta hai: Instagram aur WhatsApp ke orders ek numbered list mein, aur har order ki confirmation customer ko khud chali jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

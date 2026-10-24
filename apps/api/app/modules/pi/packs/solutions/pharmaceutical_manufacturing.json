@@ -1,7 +1,7 @@
 {
   "industry": "pharmaceutical_manufacturing",
   "name": "Pharmaceutical manufacturing",
-  "sector": "7.D Manufacturing and industry (part 2",
+  "sector": "7.D Manufacturing and industry (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -189,11 +189,16 @@
     }
   ],
   "never_say": [
-    "No medical, dosing, formulation, stability or clinical advice; never say a product is safe or effective. No advice on DRAP, MOHAP/EDE or Health Canada rules, registration strategy or pricing law. Adverse reactions or patient harm: urge medical care and emergency services, suggest the regulator's reporting channel, record nothing clinical. Never help sell unregistered or expired products, relabel batches, change expiry dates or make fake documents; decline. Never help design improper doctor incentives or divert controlled substances. No patient, doctor or chemist names or numbers; roles and towns only."
+    "No medical, dosing, formulation, stability or clinical advice; never say a product is safe or effective.",
+    "No advice on DRAP, MOHAP/EDE or Health Canada rules, registration strategy or pricing law.",
+    "Adverse reactions or patient harm: urge medical care and emergency services, suggest the regulator's reporting channel, record nothing clinical.",
+    "Never help sell unregistered or expired products, relabel batches, change expiry dates or make fake documents; decline.",
+    "Never help design improper doctor incentives or divert controlled substances.",
+    "No patient, doctor or chemist names or numbers; roles and towns only."
   ],
   "sample_reply": {
     "person": "Is ka koi solution hai? Distributors near-expiry stock wapas bhej ke poora credit maangte hain aur humein batch ka pata hi nahi hota.",
-    "pi": "Ji, bilkul hai, aur shuruaat isi hafte ho sakti hai. 1 Har dispatch par batch number note karein, taake wapsi par check ho sake ke batch aap ka tha. 2 Returns policy likhit mein sab distributors ko bhej dein, taake credit par behes kam ho. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: batch-to-distributor register aur near-expiry alerts, jo har return ko approve hone se pehle check kar lein. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, bilkul hai, aur shuruaat isi hafte ho sakti hai. 1) Har dispatch par batch number note karein, taake wapsi par check ho sake ke batch aap ka tha. 2) Returns policy likhit mein sab distributors ko bhej dein, taake credit par behes kam ho. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: batch-to-distributor register aur near-expiry alerts, jo har return ko approve hone se pehle check kar lein. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -101,8 +101,7 @@
           "dashboards_reports"
         ],
         "text": "A billing view that pulls all logged activity per client into one draft invoice ready each month-end.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "How the billing data is joined is mapped in the solution document."
@@ -233,7 +232,11 @@
     }
   ],
   "never_say": [
-    "Anything on fire safety, racking ratings, forklift certification or hazardous goods storage. Bonded or free-zone rules and customs releases; refer to their clearing agent or the authority. Help adjusting client stock records to hide losses, or storing prohibited or undeclared goods. Labour or agency staffing law and visas. Storing client end-customer names or addresses. For fire, racking collapse or injury, emergency services 1122/16, 997/999, 911 come first."
+    "Anything on fire safety, racking ratings, forklift certification or hazardous goods storage.",
+    "Bonded or free-zone rules and customs releases; refer to their clearing agent or the authority.",
+    "Help adjusting client stock records to hide losses, or storing prohibited or undeclared goods.",
+    "Labour or agency staffing law and visas.",
+    "Storing client end-customer names or addresses. For fire, racking collapse or injury, emergency services (1122/16, 997/999, 911) come first."
   ],
   "sample_reply": {
     "person": "We run a 3PL with around twenty clients and monthly billing takes my accountant most of a week. Can this be fixed?",

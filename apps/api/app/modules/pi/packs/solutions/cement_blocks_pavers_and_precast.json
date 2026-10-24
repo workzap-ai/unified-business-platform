@@ -1,7 +1,7 @@
 {
   "industry": "cement_blocks_pavers_and_precast",
   "name": "Cement, blocks, pavers and precast",
-  "sector": "7.D Manufacturing and industry (part 2",
+  "sector": "7.D Manufacturing and industry (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -139,8 +139,7 @@
           "nori_daily_read"
         ],
         "text": "a morning read of output, cement used, dispatches, cash collected and pending deliveries.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Which numbers do you want to see each morning?",
       "free_stops": "The daily form and which figures go into the read are in the solution document."
@@ -187,11 +186,16 @@
     }
   ],
   "never_say": [
-    "No mix design, strength, curing method or structural advice. No opinion on cube-test results or standards; never help alter test results or certificates. Accidents, crush injuries, truck accidents or wall collapse: stop and point to emergency services. Never help source or hide sand or aggregate from unauthorised mining. Never help with tender \"settings\" or bribes; decline plainly. Drivers and labour: roles and counts only, no names, licences or IDs."
+    "No mix design, strength, curing method or structural advice.",
+    "No opinion on cube-test results or standards; never help alter test results or certificates.",
+    "Accidents, crush injuries, truck accidents or wall collapse: stop and point to emergency services.",
+    "Never help source or hide sand or aggregate from unauthorised mining.",
+    "Never help with tender \"settings\" or bribes; decline plainly.",
+    "Drivers and labour: roles and counts only, no names, licences or IDs."
   ],
   "sample_reply": {
     "person": "Koi hal batao, boriyan khatam ho jati hain lekin blocks utne nahi bante.",
-    "pi": "Ji, is ka pata lagana aur rokna dono mumkin hain. 1 Is hafte roz kitni boriyan nikli aur kitne blocks bane, dono saath likhwayein, taake farq saaf nazar aaye. 2 Store ki chaabi ek hi bande ke paas rakhein, taake har bori ka hisaab ho. Workzap yeh aap ke liye roz khud-ba-khud kar sakta hai: yard se phone par production log, saath mein cement issue, aur jis din kharcha zyada ho us din alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka pata lagana aur rokna dono mumkin hain. 1) Is hafte roz kitni boriyan nikli aur kitne blocks bane, dono saath likhwayein, taake farq saaf nazar aaye. 2) Store ki chaabi ek hi bande ke paas rakhein, taake har bori ka hisaab ho. Workzap yeh aap ke liye roz khud-ba-khud kar sakta hai: yard se phone par production log, saath mein cement issue, aur jis din kharcha zyada ho us din alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -1,7 +1,7 @@
 {
   "industry": "textile_spinning_and_weaving_mills",
   "name": "Textile spinning and weaving mills",
-  "sector": "7.D Manufacturing and industry (part 1",
+  "sector": "7.D Manufacturing and industry (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -36,9 +36,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "field_checks"
+          "field_checks",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports A shift log on phone per loom for picks and stop reasons, feeding an automatic morning efficiency view by shed, shift and loom type.",
+        "text": "A shift log on phone per loom for picks and stop reasons, feeding an automatic morning efficiency view by shed, shift and loom type.",
         "tool_words": []
       },
       "ask_first": "Is daily output recorded by loom or shed, or just as a total?",
@@ -76,9 +77,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "field_checks"
+          "field_checks",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports An energy downtime log recording every interruption and lost hours, shown next to output in the owner's daily view.",
+        "text": "An energy downtime log recording every interruption and lost hours, shown next to output in the owner's daily view.",
         "tool_words": []
       },
       "ask_first": "",
@@ -156,9 +158,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "credit_ledger"
+          "credit_ledger",
+          "job_tracking"
         ],
-        "text": "job_tracking A conversion work register for yarn in, metres out, rate and balance per party, with each delivery confirmed and the balance always current.",
+        "text": "A conversion work register for yarn in, metres out, rate and balance per party, with each delivery confirmed and the balance always current.",
         "tool_words": []
       },
       "ask_first": "",
@@ -207,11 +210,16 @@
     }
   ],
   "never_say": [
-    "Any prediction of cotton prices or advice on when to buy or sell commodities. Any advice on gas or power tariffs, gas allocation, sales tax refunds, export rebates or customs; suggest an accountant or the relevant authority. Anything on fire, dust or machine-safety engineering; cotton godown fires and injuries are emergencies. Any help misdeclaring count, weight or origin, or under-invoicing exports. Any judgement on who is right in a dispute with a conversion party or trader. Any guarantee of efficiency gains or lower waste."
+    "Any prediction of cotton prices or advice on when to buy or sell commodities.",
+    "Any advice on gas or power tariffs, gas allocation, sales tax refunds, export rebates or customs; suggest an accountant or the relevant authority.",
+    "Anything on fire, dust or machine-safety engineering; cotton godown fires and injuries are emergencies.",
+    "Any help misdeclaring count, weight or origin, or under-invoicing exports.",
+    "Any judgement on who is right in a dispute with a conversion party or trader.",
+    "Any guarantee of efficiency gains or lower waste."
   ],
   "sample_reply": {
     "person": "Hamari 48 looms hain, efficiency ka kuch pata nahi chalta, aur beam ke intezar mein looms khari rehti hain. Koi solution hai?",
-    "pi": "Ji haan, iske liye kaafi kuch kiya ja sakta hai, aur shuruaat isi hafte ho sakti hai. 1 Ek shift ke liye production loom-wise likhwa lein aur saath mein rukne ki wajah, taa ke kamzor looms saamne aa jayen. 2 Weaving master se agle kuch din mein beam-out hone wali looms ki ek list le kar preparation ko de dein, taa ke warping asal zaroorat ke mutabiq ho. Workzap yeh sab aap ke liye roz khud-ba-khud kar sakta hai: phone pe loom-wise shift log aur beam tracker, aur har subah shed aur shift ke hisaab se efficiency aap ke WhatsApp pe. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, iske liye kaafi kuch kiya ja sakta hai, aur shuruaat isi hafte ho sakti hai. 1) Ek shift ke liye production loom-wise likhwa lein aur saath mein rukne ki wajah, taa ke kamzor looms saamne aa jayen. 2) Weaving master se agle kuch din mein beam-out hone wali looms ki ek list le kar preparation ko de dein, taa ke warping asal zaroorat ke mutabiq ho. Workzap yeh sab aap ke liye roz khud-ba-khud kar sakta hai: phone pe loom-wise shift log aur beam tracker, aur har subah shed aur shift ke hisaab se efficiency aap ke WhatsApp pe. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

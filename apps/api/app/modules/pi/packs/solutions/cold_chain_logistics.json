@@ -205,19 +205,22 @@
           "nori_daily_read"
         ],
         "text": "An owner phone view across sites: temperatures, alarms, occupancy and receivables.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "What the owner view includes is set in the solution document."
     }
   ],
   "never_say": [
-    "Whether spoiled or out-of-range goods are safe to sell or use; food safety or pharma professionals decide. Help editing temperature logs, re-dating or relabelling goods. Pharma GDP, HACCP or food safety standards; refrigeration engineering or generator sizing. Views on insurance or legal claims over spoilage. Storing client and staff details. For ammonia or refrigerant leaks, fire, or someone trapped in a cold room, emergency services come first."
+    "Whether spoiled or out-of-range goods are safe to sell or use; food safety or pharma professionals decide.",
+    "Help editing temperature logs, re-dating or relabelling goods.",
+    "Pharma GDP, HACCP or food safety standards; refrigeration engineering or generator sizing.",
+    "Views on insurance or legal claims over spoilage.",
+    "Storing client and staff details. For ammonia or refrigerant leaks, fire, or someone trapped in a cold room, emergency services come first."
   ],
   "sample_reply": {
     "person": "Pichle hafte raat ko ek chamber ka compressor band ho gaya aur subah pata chala. Aisa dobara na ho, koi tareeqa batao.",
-    "pi": "Ji haan, raat ke waqt bhi chambers par nazar rakhi ja sakti hai. 1 Raat ke temperature round ke liye ek banda muqarrar karein, taake koi zimmedaar dekh raha ho. 2 Raat ke liye technician ka number har waqt maujood rakhein, taake masla hote hi rabta ho sake. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: reading had se bahar jaye to duty wale ko WhatsApp alarm jaye, aur jawab na aaye to agla banda apne aap alert ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, raat ke waqt bhi chambers par nazar rakhi ja sakti hai. 1) Raat ke temperature round ke liye ek banda muqarrar karein, taake koi zimmedaar dekh raha ho. 2) Raat ke liye technician ka number har waqt maujood rakhein, taake masla hote hi rabta ho sake. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: reading had se bahar jaye to duty wale ko WhatsApp alarm jaye, aur jawab na aaye to agla banda apne aap alert ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

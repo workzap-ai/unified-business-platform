@@ -1,7 +1,7 @@
 {
   "industry": "packaging_and_corrugation",
   "name": "Packaging and corrugation",
-  "sector": "7.D Manufacturing and industry (part 1",
+  "sector": "7.D Manufacturing and industry (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -36,9 +36,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "workflow_automation"
+          "workflow_automation",
+          "job_tracking"
         ],
-        "text": "job_tracking A digital job order with size, ply, flute, paper grade, print and die and plate references, sent to the floor from the approved spec.",
+        "text": "A digital job order with size, ply, flute, paper grade, print and die and plate references, sent to the floor from the approved spec.",
         "tool_words": []
       },
       "ask_first": "",
@@ -96,9 +97,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "field_checks"
+          "field_checks",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports A production log per machine for output, setup and trim waste and downtime reasons.",
+        "text": "A production log per machine for output, setup and trim waste and downtime reasons.",
         "tool_words": []
       },
       "ask_first": "",
@@ -156,9 +158,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "workflow_automation"
+          "workflow_automation",
+          "custom_build"
         ],
-        "text": "custom_build A quote calculator anyone in sales can use, with approval in one tap.",
+        "text": "A quote calculator anyone in sales can use, with approval in one tap.",
         "tool_words": []
       },
       "ask_first": "",
@@ -179,19 +182,23 @@
           "dashboards_reports"
         ],
         "text": "A monthly owner report on output, waste, top customers by volume and margin, and overdues, pulled automatically.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "Which numbers go in and where each comes from is set out in the solution document."
     }
   ],
   "never_say": [
-    "Any advice on food-contact, pharma or dangerous goods packaging compliance, or box strength specifications for regulated shipments. Any help copying another brand's packaging or printing counterfeit branded boxes. Fake invoices, under-invoicing or misdeclaring imported reels. Any judgement on liability for weak boxes; note the testing and records gap only. Ink or adhesive chemistry; steam burns and godown fires are emergencies. Storing customer contacts or worker identities."
+    "Any advice on food-contact, pharma or dangerous goods packaging compliance, or box strength specifications for regulated shipments.",
+    "Any help copying another brand's packaging or printing counterfeit branded boxes.",
+    "Fake invoices, under-invoicing or misdeclaring imported reels.",
+    "Any judgement on liability for weak boxes; note the testing and records gap only.",
+    "Ink or adhesive chemistry; steam burns and godown fires are emergencies.",
+    "Storing customer contacts or worker identities."
   ],
   "sample_reply": {
     "person": "Repeat order aata hai to purana die aur plate dhoondne mein aadha din lagta hai, kabhi milta hi nahi. Iska koi hal?",
-    "pi": "Ji haan, iska hal mumkin hai aur isi hafte shuruaat ho sakti hai. 1 Har die aur plate pe ek dafa customer aur job ka label laga dein, taa ke woh dhoondna aasaan ho. 2 Har customer ka ek fixed shelf tay kar dein, taa ke cheez hamesha usi jagah mile. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: phone pe die aur plate register jahan har ek ki jagah aur haalat darj ho, aur repeat order aate hi sahi die aur plate ka pata saamne aa jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, iska hal mumkin hai aur isi hafte shuruaat ho sakti hai. 1) Har die aur plate pe ek dafa customer aur job ka label laga dein, taa ke woh dhoondna aasaan ho. 2) Har customer ka ek fixed shelf tay kar dein, taa ke cheez hamesha usi jagah mile. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: phone pe die aur plate register jahan har ek ki jagah aur haalat darj ho, aur repeat order aate hi sahi die aur plate ka pata saamne aa jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

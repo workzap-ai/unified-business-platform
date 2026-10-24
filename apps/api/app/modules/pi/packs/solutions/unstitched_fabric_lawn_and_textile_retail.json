@@ -1,7 +1,7 @@
 {
   "industry": "unstitched_fabric_lawn_and_textile_retail",
   "name": "Unstitched fabric, lawn and textile retail",
-  "sector": "7.A Retail and consumer (part 1",
+  "sector": "7.A Retail and consumer (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -190,11 +190,15 @@
     }
   ],
   "never_say": [
-    "How to sell replicas or use another brand's name. Anything on export rebates, customs or invoicing. Dye, chemical or wash-safety guidance. Which side is right in a family partnership dispute. That a launch or design will sell out."
+    "How to sell replicas or use another brand's name.",
+    "Anything on export rebates, customs or invoicing.",
+    "Dye, chemical or wash-safety guidance.",
+    "Which side is right in a family partnership dispute.",
+    "That a launch or design will sell out."
   ],
   "sample_reply": {
     "person": "Hum than se gaz ke hisaab se bechte hain, kabhi pata nahi chalta roll mein kitna bacha hai, aur cut pieces ka dher lagta rehta hai. Kya karein?",
-    "pi": "Ji haan, iska saaf hal hai aur shuruaat isi hafte ho sakti hai. 1 Sab se zyada bikne wale rolls ko ek dafa naap ke tag kar dein, taa ke pata ho kitna bacha hai. 2 Cut pieces ka dher ek dafa lambai ke hisaab se chhaant lein aur kaam ke pieces saamne rack pe rakhein, kyunke chhupa hua maal nahi bikta. Workzap ye aap ke liye khud-ba-khud kar sakta hai: har roll ka register jis mein metres andar, bike aur baaki dikhein, cut pieces ka record, aur roll khatam hone se pehle alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, iska saaf hal hai aur shuruaat isi hafte ho sakti hai. 1) Sab se zyada bikne wale rolls ko ek dafa naap ke tag kar dein, taa ke pata ho kitna bacha hai. 2) Cut pieces ka dher ek dafa lambai ke hisaab se chhaant lein aur kaam ke pieces saamne rack pe rakhein, kyunke chhupa hua maal nahi bikta. Workzap ye aap ke liye khud-ba-khud kar sakta hai: har roll ka register jis mein metres andar, bike aur baaki dikhein, cut pieces ka record, aur roll khatam hone se pehle alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

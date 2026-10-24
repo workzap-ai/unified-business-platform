@@ -61,8 +61,7 @@
         "text": "A daily ticket dashboard of open, overdue and average fix time by area and technician.",
         "tool_words": [
           "dashboard"
-        ],
-        "leads_with_view": true
+        ]
       },
       "ask_first": "",
       "free_stops": "KPI definitions and the dashboard are in the solution document."
@@ -103,7 +102,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "customer_messaging An unpaid list with automatic reminders to subscribers who agreed to messages, and an online payment link where available.",
+        "text": "customer_messaging — An unpaid list with automatic reminders to subscribers who agreed to messages, and an online payment link where available.",
         "tool_words": []
       },
       "ask_first": "",
@@ -123,7 +122,7 @@
         "keys": [
           "integration"
         ],
-        "text": "dashboards_reports A reconciliation report comparing active connections on the panel with billed connections, flagging each mismatch.",
+        "text": "dashboards_reports — A reconciliation report comparing active connections on the panel with billed connections, flagging each mismatch.",
         "tool_words": []
       },
       "ask_first": "",
@@ -143,7 +142,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "job_tracking An equipment register of routers and ONUs issued, installed and recovered on disconnection by serial number, with reorder alerts for fibre and splitters.",
+        "text": "job_tracking — An equipment register of routers and ONUs issued, installed and recovered on disconnection by serial number, with reorder alerts for fibre and splitters.",
         "tool_words": []
       },
       "ask_first": "",
@@ -203,7 +202,7 @@
         "keys": [
           "loyalty_repeat"
         ],
-        "text": "dashboards_reports A churn log with reason codes on disconnection and an early-warning list of subscribers with repeat faults.",
+        "text": "dashboards_reports — A churn log with reason codes on disconnection and an early-warning list of subscribers with repeat faults.",
         "tool_words": []
       },
       "ask_first": "",
@@ -211,11 +210,15 @@
     }
   ],
   "never_say": [
-    "Any network engineering, electrical, pole or line safety advice; in an emergency point to emergency services. Any package pricing advice. Anything involving pirated channels, unlicensed content, illegal resale or bypassing PTA, TDRA or CRTC. Any request for subscriber names, addresses, phone numbers, logins, payment details, panel passwords or IP details. Any suggestion of covert monitoring of staff."
+    "Any network engineering, electrical, pole or line safety advice; in an emergency point to emergency services.",
+    "Any package pricing advice.",
+    "Anything involving pirated channels, unlicensed content, illegal resale or bypassing PTA, TDRA or CRTC.",
+    "Any request for subscriber names, addresses, phone numbers, logins, payment details, panel passwords or IP details.",
+    "Any suggestion of covert monitoring of staff."
   ],
   "sample_reply": {
     "person": "Complaints ka koi nizaam nahi, technician apni marzi se ja rahe hain. Is ka koi hal batayein.",
-    "pi": "Ji, is ka hal bilkul mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1 Har complaint, chahe kahin se aaye, ek list mein number aur waqt ke saath likhein, taake koi phone mein na reh jaye. 2 Subah kaam sab se purani complaint se shuru karke baantein, taake lamba intezar pehle khatam ho. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: WhatsApp pe aane wali har complaint numbered ticket ban jaye, technician ko phone pe tarteeb se kaam mile, aur aap ko roz pata chale har complaint kitni der mein theek hui. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal bilkul mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1) Har complaint, chahe kahin se aaye, ek list mein number aur waqt ke saath likhein, taake koi phone mein na reh jaye. 2) Subah kaam sab se purani complaint se shuru karke baantein, taake lamba intezar pehle khatam ho. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: WhatsApp pe aane wali har complaint numbered ticket ban jaye, technician ko phone pe tarteeb se kaam mile, aur aap ko roz pata chale har complaint kitni der mein theek hui. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

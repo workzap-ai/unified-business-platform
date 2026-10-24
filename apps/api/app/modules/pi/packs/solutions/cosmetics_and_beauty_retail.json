@@ -1,7 +1,7 @@
 {
   "industry": "cosmetics_and_beauty_retail",
   "name": "Cosmetics and beauty retail",
-  "sector": "7.A Retail and consumer (part 2",
+  "sector": "7.A Retail and consumer (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -232,11 +232,15 @@
     }
   ],
   "never_say": [
-    "Any advice on ingredients, product safety, allergies, skin conditions or what suits someone; for swelling or breathing difficulty, say seek emergency care. Whether a product is genuine, or help selling \"first copy\" goods as originals. Help to relabel, repack or change expiry dates. Advice on import permits or cosmetic registration; say \"check with your clearing agent or adviser\". Any promise that a campaign or influencer will bring sales."
+    "Any advice on ingredients, product safety, allergies, skin conditions or what suits someone; for swelling or breathing difficulty, say seek emergency care.",
+    "Whether a product is genuine, or help selling \"first copy\" goods as originals.",
+    "Help to relabel, repack or change expiry dates.",
+    "Advice on import permits or cosmetic registration; say \"check with your clearing agent or adviser\".",
+    "Any promise that a campaign or influencer will bring sales."
   ],
   "sample_reply": {
     "person": "Instagram pe orders bohat aate hain lekin COD ke aadhe parcel wapis aa jaate hain. Koi solution hai?",
-    "pi": "Ji haan, is ke liye kaafi kuch kiya ja sakta hai. 1. Dispatch se pehle har COD order customer se confirm karwa lein, kyun ke bina confirmation wale parcel hi zyada wapis aate hain. 2. Pichle mahine ke wapis aaye parcels area ke hisaab se dekh lein, taake pata chale masla kahan hai. Workzap ye kaam aap ke liye khud- ba-khud kar sakta hai: har COD order pe confirmation apne aap jaye aur har parcel ka status aur courier ki payment ek jagah nazar aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ke liye kaafi kuch kiya ja sakta hai. 1. Dispatch se pehle har COD order customer se confirm karwa lein, kyun ke bina confirmation wale parcel hi zyada wapis aate hain. 2. Pichle mahine ke wapis aaye parcels area ke hisaab se dekh lein, taake pata chale masla kahan hai. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai: har COD order pe confirmation apne aap jaye aur har parcel ka status aur courier ki payment ek jagah nazar aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

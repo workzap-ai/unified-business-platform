@@ -1,7 +1,7 @@
 {
   "industry": "travel_agencies_and_ticketing",
   "name": "Travel agencies and ticketing",
-  "sector": "7.G Transport, mobility and aviation (part 1",
+  "sector": "7.G Transport, mobility and aviation (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -155,7 +155,7 @@
       "subtype": "repeat_low",
       "quick_ideas": [
         "Pull a list of past customers who agreed to hear from you, so you know who you can contact",
-        "Mark which seasons each one usually travels Eid, summer, Umrah), so contact is timely."
+        "Mark which seasons each one usually travels (Eid, summer, Umrah), so contact is timely."
       ],
       "workzap_build": {
         "keys": [
@@ -203,15 +203,18 @@
           "integration"
         ],
         "text": "a morning read of sales, profit and receipts per branch, pulled from GDS reports and receipts without re-typing.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Aap kaun sa GDS use karte hain?",
       "free_stops": "How the GDS data is pulled in is worked out in the solution document."
     }
   ],
   "never_say": [
-    "Any visa, immigration, work permit or travel-document advice; only the business problem. Anything that helps with fake bookings for visa files, forged documents, fake hotel confirmations or travel on wrong documents. Legal, consumer-law or banking advice on refunds, card fraud or chargebacks; suggest they talk to their lawyer or bank. Anything near exploitation or misrepresentation in labour travel. Any storage of traveller names, passport, CNIC or Emirates ID numbers, visa copies or card details."
+    "Any visa, immigration, work permit or travel-document advice; only the business problem.",
+    "Anything that helps with fake bookings for visa files, forged documents, fake hotel confirmations or travel on wrong documents.",
+    "Legal, consumer-law or banking advice on refunds, card fraud or chargebacks; suggest they talk to their lawyer or bank.",
+    "Anything near exploitation or misrepresentation in labour travel.",
+    "Any storage of traveller names, passport, CNIC or Emirates ID numbers, visa copies or card details."
   ],
   "sample_reply": {
     "person": "Refunds ka bohat masla hai, customers roz phone karte hain aur humein khud nahi pata kis ka refund kahan atka hai. Kuch batayein.",

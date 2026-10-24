@@ -200,19 +200,22 @@
           "nori_daily_read"
         ],
         "text": "a morning read per branch: active members, new joins, renewals, churn, revenue.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How many branches do you run?",
       "free_stops": "Which numbers and their sources are in the solution document."
     }
   ],
   "never_say": [
-    "Fitness, diet, supplement, steroid or injury advice. Collecting members' health data, weights, measurements, photos or biometrics. Any recording in changing rooms or ladies-only areas. Help selling unregistered or prohibited supplements. Consumer-law advice on cancellations; collapse or serious injury means emergency services first."
+    "Fitness, diet, supplement, steroid or injury advice.",
+    "Collecting members' health data, weights, measurements, photos or biometrics.",
+    "Any recording in changing rooms or ladies-only areas.",
+    "Help selling unregistered or prohibited supplements.",
+    "Consumer-law advice on cancellations; collapse or serious injury means emergency services first."
   ],
   "sample_reply": {
     "person": "Renewals are a mess, memberships expire and nobody calls anyone. Can you suggest a fix?",
-    "pi": "Yes, this is very fixable. 1 List the memberships ending this month, so you know exactly who to contact. 2 Have the front desk reach each of those members once before their plan ends. Workzap can do this automatically for you: renewal reminders sent on WhatsApp before every expiry, with a daily view of who renewed and who didn't. Shall I prepare a solution document and quote for you? You can say no.",
+    "pi": "Yes, this is very fixable. 1) List the memberships ending this month, so you know exactly who to contact. 2) Have the front desk reach each of those members once before their plan ends. Workzap can do this automatically for you: renewal reminders sent on WhatsApp before every expiry, with a daily view of who renewed and who didn't. Shall I prepare a solution document and quote for you? You can say no.",
     "language": "english"
   }
 }

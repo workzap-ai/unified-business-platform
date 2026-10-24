@@ -1,7 +1,7 @@
 {
   "industry": "nurseries_horticulture_and_landscaping_supply",
   "name": "Nurseries, horticulture and landscaping supply",
-  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "sector": "7.C Agriculture, livestock and rural (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -208,11 +208,15 @@
     }
   ],
   "never_say": [
-    "Advice on plant care, watering, fertiliser, pesticide or herbicide choice or doses, or pest and disease treatment; refer to a horticulturist or extension service. Advice on plant import permits, quarantine or biosecurity rules, irrigation engineering or contract law. Any help importing plants without permits, mislabelling species or origin, or bypassing tender rules. Anything about tender \"commission\" or bribery. Recording customer names, villa addresses, phone numbers or staff IDs."
+    "Advice on plant care, watering, fertiliser, pesticide or herbicide choice or doses, or pest and disease treatment; refer to a horticulturist or extension service.",
+    "Advice on plant import permits, quarantine or biosecurity rules, irrigation engineering or contract law.",
+    "Any help importing plants without permits, mislabelling species or origin, or bypassing tender rules.",
+    "Anything about tender \"commission\" or bribery.",
+    "Recording customer names, villa addresses, phone numbers or staff IDs."
   ],
   "sample_reply": {
     "person": "We run a nursery and do villa landscaping in Dubai. Maintenance clients keep saying the team didn't turn up. What can I do?",
-    "pi": "Yes, you can fix this by giving every visit proof. 1 Ask crews to send a photo at the start and end of each visit, so there is a record whenever a client asks. 2 Share the week's visit list with the supervisor every Monday, so missed visits show up early. Workzap can do this automatically for you, with a visit scheduler where crews check in with photos, the supervisor sees gaps daily and each client gets a monthly report. Shall I get a solution document and quote prepared for you? You can say no.",
+    "pi": "Yes, you can fix this by giving every visit proof. 1) Ask crews to send a photo at the start and end of each visit, so there is a record whenever a client asks. 2) Share the week's visit list with the supervisor every Monday, so missed visits show up early. Workzap can do this automatically for you, with a visit scheduler where crews check in with photos, the supervisor sees gaps daily and each client gets a monthly report. Shall I get a solution document and quote prepared for you? You can say no.",
     "language": "english"
   }
 }

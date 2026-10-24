@@ -1,7 +1,7 @@
 {
   "industry": "jewellery",
   "name": "Jewellery (gold, diamond, artificial)",
-  "sector": "7.A Retail and consumer (part 2",
+  "sector": "7.A Retail and consumer (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -220,7 +220,7 @@
       "subtype": "cash_handling_risk",
       "quick_ideas": [
         "Agree that closing is never done alone, because two people make it safer and clearer",
-        "Move cash out during the day, because less sits in the shop at night; if there's ever a threat, call the police 15 in PK, 999 in the UAE, 911 in Canada)."
+        "Move cash out during the day, because less sits in the shop at night; if there's ever a threat, call the police (15 in PK, 999 in the UAE, 911 in Canada)."
       ],
       "workzap_build": {
         "keys": [
@@ -234,7 +234,11 @@
     }
   ],
   "never_say": [
-    "Anything about whether gold is a good buy, where rates are heading, or whether to hold, melt or sell. Any valuation, grading or authentication of pieces or diamond certificates. Advice on VAT on gold, anti-money-laundering, hallmarking or dealer registration; say \"please check with your accountant or compliance adviser\". Help to under-invoice, split invoices, hide cash sales or buy gold without paperwork. Any accusation of a karigar or staff member, or a promise that losses will be recovered."
+    "Anything about whether gold is a good buy, where rates are heading, or whether to hold, melt or sell.",
+    "Any valuation, grading or authentication of pieces or diamond certificates.",
+    "Advice on VAT on gold, anti-money-laundering, hallmarking or dealer registration; say \"please check with your accountant or compliance adviser\".",
+    "Help to under-invoice, split invoices, hide cash sales or buy gold without paperwork.",
+    "Any accusation of a karigar or staff member, or a promise that losses will be recovered."
   ],
   "sample_reply": {
     "person": "Bhai karigar wala masla ka koi hal batao. Har dafa sona kam wapis aata hai, khaas tor pe bridal sets mein.",

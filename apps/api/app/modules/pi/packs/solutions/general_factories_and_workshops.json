@@ -1,7 +1,7 @@
 {
   "industry": "general_factories_and_workshops",
   "name": "General factories and workshops (made-to-order and made-to-stock)",
-  "sector": "7.D Manufacturing and industry (part 1",
+  "sector": "7.D Manufacturing and industry (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -76,9 +76,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "stock_alerts"
+          "stock_alerts",
+          "field_checks"
         ],
-        "text": "field_checks A store register on phone recording every receipt and issue against a job, with regular counts and photos that flag any difference from the books automatically.",
+        "text": "A store register on phone recording every receipt and issue against a job, with regular counts and photos that flag any difference from the books automatically.",
         "tool_words": []
       },
       "ask_first": "Where does the count go wrong most — raw material, work in progress or finished goods?",
@@ -196,9 +197,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "field_checks"
+          "field_checks",
+          "cash_reconciliation"
         ],
-        "text": "cash_reconciliation A scrap register where every weighing and sale is matched to a receipt, with a monthly comparison against production.",
+        "text": "A scrap register where every weighing and sale is matched to a receipt, with a monthly comparison against production.",
         "tool_words": []
       },
       "ask_first": "",
@@ -206,11 +208,16 @@
     }
   ],
   "never_say": [
-    "Any guarantee of delivery dates, output or fewer breakdowns. Anything on machine guarding, electrical, boiler or fire safety, or how to \"get through\" an inspection. Any interpretation of labour law, minimum wage, contractor liability, EOBI, WPS or CPP/EI; suggest talking to a lawyer or accountant. Tax, customs or financing advice, or any help with fake invoices, under-invoicing or two sets of books. Any request for worker names, IDs, phone numbers or bank details; always use roles such as \"line supervisor\". Any help optimising child labour or forced overtime."
+    "Any guarantee of delivery dates, output or fewer breakdowns.",
+    "Anything on machine guarding, electrical, boiler or fire safety, or how to \"get through\" an inspection.",
+    "Any interpretation of labour law, minimum wage, contractor liability, EOBI, WPS or CPP/EI; suggest talking to a lawyer or accountant.",
+    "Tax, customs or financing advice, or any help with fake invoices, under-invoicing or two sets of books.",
+    "Any request for worker names, IDs, phone numbers or bank details; always use roles such as \"line supervisor\".",
+    "Any help optimising child labour or forced overtime."
   ],
   "sample_reply": {
     "person": "Bhai koi hal batao, orders ka hisaab hi nahi rehta, job card gum ho jate hain aur customer ke phone pe pata chalta hai maal tayyar nahi hua.",
-    "pi": "Ji bilkul, iska hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1 Ek dafa floor pe ja kar har khula order, wada kiya hua din aur abhi ki stage ek board pe likh dein, taa ke saaf dikhe kaun se order pehle se late hain. 2 Pichle gum hue job cards ko dekh kar woh stage pehchanein jahan card gum hota hai, taa ke usi jagah ko theek kiya ja sake. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: phone pe digital job card jahan supervisor har stage tap kare, aur har subah aap ko WhatsApp pe late orders ki list apne aap mil jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji bilkul, iska hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1) Ek dafa floor pe ja kar har khula order, wada kiya hua din aur abhi ki stage ek board pe likh dein, taa ke saaf dikhe kaun se order pehle se late hain. 2) Pichle gum hue job cards ko dekh kar woh stage pehchanein jahan card gum hota hai, taa ke usi jagah ko theek kiya ja sake. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: phone pe digital job card jahan supervisor har stage tap kare, aur har subah aap ko WhatsApp pe late orders ki list apne aap mil jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

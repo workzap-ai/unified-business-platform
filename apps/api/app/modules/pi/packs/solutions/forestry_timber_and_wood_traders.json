@@ -1,7 +1,7 @@
 {
   "industry": "forestry_timber_and_wood_traders",
   "name": "Forestry, timber and wood traders",
-  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "sector": "7.C Agriculture, livestock and rural (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -200,19 +200,22 @@
           "nori_daily_read"
         ],
         "text": "A morning read across yards with sales, stock value, receivables and yield, and the one thing to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How do you hear from the other yard now?",
       "free_stops": "What the read covers is kept for the solution document."
     }
   ],
   "never_say": [
-    "Advice on felling rules, forest laws, protected species, transit permits, import duties or tax. Advice on timber treatment chemicals, sawmill safety engineering or wood grading standards. Any help moving timber without permits, faking transit passes, mislabelling species or origin, under- invoicing imports or evading customs. Anything about bribes for permits; taking sides in disputes with landowners or officials. Recording names, CNICs or numbers of suppliers, landowners, customers, drivers or workers."
+    "Advice on felling rules, forest laws, protected species, transit permits, import duties or tax.",
+    "Advice on timber treatment chemicals, sawmill safety engineering or wood grading standards.",
+    "Any help moving timber without permits, faking transit passes, mislabelling species or origin, under-invoicing imports or evading customs.",
+    "Anything about bribes for permits; taking sides in disputes with landowners or officials.",
+    "Recording names, CNICs or numbers of suppliers, landowners, customers, drivers or workers."
   ],
   "sample_reply": {
     "person": "Lakkar mandi mein do yard hain. Carpenter udhaar pe maal le jaate hain aur mahinon nahi dete, koi solution batao.",
-    "pi": "Ji, is ka hal mumkin hai aur shuruaat is hafte ho sakti hai. 1 Dono yard ka udhaar ek fehrist mein purane-pan ke hisaab se jama karein, taake poori raqam aur sab se purane balance saamne hon. 2 Har baqaida grahak ki udhaar ki had tay kar dein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: dono yard ka ek hi udhaar khata, had aur muddat ke saath, aur waqt pe yaad-dihani ke paigham. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruaat is hafte ho sakti hai. 1) Dono yard ka udhaar ek fehrist mein purane-pan ke hisaab se jama karein, taake poori raqam aur sab se purane balance saamne hon. 2) Har baqaida grahak ki udhaar ki had tay kar dein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: dono yard ka ek hi udhaar khata, had aur muddat ke saath, aur waqt pe yaad-dihani ke paigham. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

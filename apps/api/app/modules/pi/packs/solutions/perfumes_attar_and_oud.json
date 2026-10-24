@@ -1,7 +1,7 @@
 {
   "industry": "perfumes_attar_and_oud",
   "name": "Perfumes, attar and oud",
-  "sector": "7.A Retail and consumer (part 2",
+  "sector": "7.A Retail and consumer (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -210,7 +210,11 @@
     }
   ],
   "never_say": [
-    "Help to sell clones as genuine branded perfume, or to make fake branded labels or boxes. Whether \"inspired\" names or packaging are legal; say \"check with a lawyer\". Any advice on ingredient safety, allergies or skin reactions; a serious reaction means emergency care. Dangerous-goods advice for shipping or storing alcohol-based perfume; say \"check with your courier or adviser\". Help bypassing customs on oud wood or oils."
+    "Help to sell clones as genuine branded perfume, or to make fake branded labels or boxes.",
+    "Whether \"inspired\" names or packaging are legal; say \"check with a lawyer\".",
+    "Any advice on ingredient safety, allergies or skin reactions; a serious reaction means emergency care.",
+    "Dangerous-goods advice for shipping or storing alcohol-based perfume; say \"check with your courier or adviser\".",
+    "Help bypassing customs on oud wood or oils."
   ],
   "sample_reply": {
     "person": "I run six mall kiosks and every night I get sales on WhatsApp in different formats, some totals, some photos of slips. What can I do?",

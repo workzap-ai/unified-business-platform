@@ -1,7 +1,7 @@
 {
   "industry": "seed_fertiliser_and_pesticide_dealers",
   "name": "Seed, fertiliser and pesticide dealers",
-  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "sector": "7.C Agriculture, livestock and rural (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -201,19 +201,22 @@
         "text": "A branch dashboard showing sales, margin, credit outstanding and stock value per shop every day.",
         "tool_words": [
           "dashboard"
-        ],
-        "leads_with_view": true
+        ]
       },
       "ask_first": "Do both shops use the same register?",
       "free_stops": "What the dashboard measures and how is kept for the solution document."
     }
   ],
   "never_say": [
-    "Any product recommendation, dose, mix, spray timing or label interpretation, even to pass on to a farmer; refer to the manufacturer's agronomist or the agriculture extension department. Advice on licensing law, pesticide regulations, banned products, interest or markup on credit, or tax. Any help selling banned, counterfeit or smuggled products, relabelling expired stock, hoarding, overcharging or fake invoices. Pressure or threat tactics for recovery. Storing farmers' names, CNICs, phone numbers or land details; use account codes and counts."
+    "Any product recommendation, dose, mix, spray timing or label interpretation, even to pass on to a farmer; refer to the manufacturer's agronomist or the agriculture extension department.",
+    "Advice on licensing law, pesticide regulations, banned products, interest or markup on credit, or tax.",
+    "Any help selling banned, counterfeit or smuggled products, relabelling expired stock, hoarding, overcharging or fake invoices.",
+    "Pressure or threat tactics for recovery.",
+    "Storing farmers' names, CNICs, phone numbers or land details; use account codes and counts."
   ],
   "sample_reply": {
     "person": "Okara mein agro dealer hoon. Udhaar ki recovery ka koi pakka hal batao, aur log balance pe bhi jhagarte hain.",
-    "pi": "Ji, is ka pakka intezaam kiya ja sakta hai. 1 Khata se udhaar ko gaon aur purane-pan ke hisaab se alag kar lein, taake sab se purana aur bara balance pehle dekha jaaye. 2 Har adaigi pe kisan ko likha hua balance dein, taake ikhtilaaf usi waqt saamne aa jaaye. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har kisan ka account code pe hisaab, har lein-dein ke baad unki ijazat se WhatsApp statement, aur fasal ke waqt yaad-dihani. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka pakka intezaam kiya ja sakta hai. 1) Khata se udhaar ko gaon aur purane-pan ke hisaab se alag kar lein, taake sab se purana aur bara balance pehle dekha jaaye. 2) Har adaigi pe kisan ko likha hua balance dein, taake ikhtilaaf usi waqt saamne aa jaaye. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har kisan ka account code pe hisaab, har lein-dein ke baad unki ijazat se WhatsApp statement, aur fasal ke waqt yaad-dihani. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

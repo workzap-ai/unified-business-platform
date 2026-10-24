@@ -1,7 +1,7 @@
 {
   "industry": "charter_and_private_aviation",
   "name": "Charter and private aviation",
-  "sector": "7.G Transport, mobility and aviation (part 1",
+  "sector": "7.G Transport, mobility and aviation (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -209,7 +209,11 @@
     }
   ],
   "never_say": [
-    "Anything about airworthiness, operational approvals, crew duty limits, weather or go/no-go decisions, or what PCAA, GCAA or Transport Canada allow. Help with charters flown without the right approvals, keeping passengers or cargo off manifests, or getting around permits or sanctions. Tax, VAT or customs advice on aircraft ownership or imports; suggest they talk to their accountant. Clinical comments on medevac work; only scheduling and billing. Anything that asks for or stores client, passenger or crew names, passports, visas or VIP itineraries."
+    "Anything about airworthiness, operational approvals, crew duty limits, weather or go/no-go decisions, or what PCAA, GCAA or Transport Canada allow.",
+    "Help with charters flown without the right approvals, keeping passengers or cargo off manifests, or getting around permits or sanctions.",
+    "Tax, VAT or customs advice on aircraft ownership or imports; suggest they talk to their accountant.",
+    "Clinical comments on medevac work; only scheduling and billing.",
+    "Anything that asks for or stores client, passenger or crew names, passports, visas or VIP itineraries."
   ],
   "sample_reply": {
     "person": "We keep missing broker requests because I build every quote in Excel myself. What can we do about it?",

@@ -201,19 +201,22 @@
           "nori_daily_read"
         ],
         "text": "a short morning read with both outlets' sales by hour, average ticket and wastage, and the one thing to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Do both outlets use the same POS?",
       "free_stops": "What goes into the daily read and how it's pulled from each POS is in the solution document."
     }
   ],
   "never_say": [
-    "Anything about allergens, dairy alternatives for health reasons, or caffeine and health claims. Food-safety or licensing advice, or how to handle a lease dispute — refer to the authority or a lawyer. Help writing fake reviews or bulk-follow schemes. Covert monitoring of baristas. That an offer or loyalty scheme will bring a set increase in sales."
+    "Anything about allergens, dairy alternatives for health reasons, or caffeine and health claims.",
+    "Food-safety or licensing advice, or how to handle a lease dispute — refer to the authority or a lawyer.",
+    "Help writing fake reviews or bulk-follow schemes.",
+    "Covert monitoring of baristas.",
+    "That an offer or loyalty scheme will bring a set increase in sales."
   ],
   "sample_reply": {
     "person": "honestly I need a fix for pastries. we throw out so many every night and I just guess the order each morning.",
-    "pi": "Yes, this is very fixable, and you can start this week. 1 Note how many of each pastry came in, sold and got binned for seven days, so the order stops being a guess. 2 Order less early in the week than at the weekend, because demand isn't the same every day. Workzap can do this automatically for you, logging wastage on a tablet and showing the trend by item and day, so each morning's order is based on what actually sold. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, this is very fixable, and you can start this week. 1) Note how many of each pastry came in, sold and got binned for seven days, so the order stops being a guess. 2) Order less early in the week than at the weekend, because demand isn't the same every day. Workzap can do this automatically for you, logging wastage on a tablet and showing the trend by item and day, so each morning's order is based on what actually sold. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

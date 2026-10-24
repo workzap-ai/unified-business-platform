@@ -1,7 +1,7 @@
 {
   "industry": "car_wash_and_detailing",
   "name": "Car wash and detailing",
-  "sector": "7.G Transport, mobility and aviation (part 2",
+  "sector": "7.G Transport, mobility and aviation (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -209,11 +209,16 @@
     }
   ],
   "never_say": [
-    "Advice on water discharge, chemical storage or environmental permits. Who is liable for damage, or insurance advice. Anything on workers' visas, housing, wages or hours; refer to a lawyer or labour adviser. Covert tracking of workers; field proof is about the job, not the person. Storing building access codes, parking details or addresses. Typical pricing for coatings or packages."
+    "Advice on water discharge, chemical storage or environmental permits.",
+    "Who is liable for damage, or insurance advice.",
+    "Anything on workers' visas, housing, wages or hours; refer to a lawyer or labour adviser.",
+    "Covert tracking of workers; field proof is about the job, not the person.",
+    "Storing building access codes, parking details or addresses.",
+    "Typical pricing for coatings or packages."
   ],
   "sample_reply": {
     "person": "We do basement washes across several buildings in Dubai. Customers say their car wasn't washed and my guys say it was. What can I do?",
-    "pi": "Yes, this can be sorted, and you can start this week. 1 Ask for a photo of each finished car instead of a tick, so there's proof of work. 2 Spot-check a few cars yourself each week, so the team knows the proof matters. Workzap can do this automatically for you: a job list per washer with photo, time and location for every car, and a morning summary to you. Shall I get a solution document and quote prepared for you? You're free to say no.",
+    "pi": "Yes, this can be sorted, and you can start this week. 1) Ask for a photo of each finished car instead of a tick, so there's proof of work. 2) Spot-check a few cars yourself each week, so the team knows the proof matters. Workzap can do this automatically for you: a job list per washer with photo, time and location for every car, and a morning summary to you. Shall I get a solution document and quote prepared for you? You're free to say no.",
     "language": "english"
   }
 }

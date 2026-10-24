@@ -80,8 +80,7 @@
           "dashboards_reports"
         ],
         "text": "a grant tracker with spending against each budget line, tranche schedule and a donor report generator.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "The report templates and tagging set-up are prepared in the solution document."
@@ -210,11 +209,15 @@
     }
   ],
   "never_say": [
-    "Any zakat eligibility or fund-mixing ruling — say \"please ask your scholars\". Advice on registration, tax exemption, receipting rules or audits — say \"talk to your accountant or lawyer\". Anything on routing funds around banking rules or hiding donor sources. Help inflating beneficiary numbers, fabricating reports or misusing restricted funds. Asking for donor or beneficiary names, CNIC/Emirates ID, addresses, health details or photos."
+    "Any zakat eligibility or fund-mixing ruling — say \"please ask your scholars\".",
+    "Advice on registration, tax exemption, receipting rules or audits — say \"talk to your accountant or lawyer\".",
+    "Anything on routing funds around banking rules or hiding donor sources.",
+    "Help inflating beneficiary numbers, fabricating reports or misusing restricted funds.",
+    "Asking for donor or beneficiary names, CNIC/Emirates ID, addresses, health details or photos."
   ],
   "sample_reply": {
     "person": "Ramzan mein donations cash, bank aur JazzCash se aati hain, hisaab nahi milta. Koi hal hai?",
-    "pi": "Ji haan, is ka hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1 Ek hafte ki saari donations har tareeqe se ek hi list mein layein, taake farq saamne aa jaye. 2 Us list ko ek muqarrar din bank aur wallet statement se milayein. Workzap yeh kaam aap ke liye automatically kar sakta hai: har donation fund ke saath ek register mein, roz bank aur wallet se match, aur donor ko receipt khud chali jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1) Ek hafte ki saari donations har tareeqe se ek hi list mein layein, taake farq saamne aa jaye. 2) Us list ko ek muqarrar din bank aur wallet statement se milayein. Workzap yeh kaam aap ke liye automatically kar sakta hai: har donation fund ke saath ek register mein, roz bank aur wallet se match, aur donor ko receipt khud chali jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

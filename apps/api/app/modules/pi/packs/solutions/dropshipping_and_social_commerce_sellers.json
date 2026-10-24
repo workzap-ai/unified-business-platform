@@ -1,6 +1,6 @@
 {
   "industry": "dropshipping_and_social_commerce_sellers",
-  "name": "Dropshipping and social-commerce sellers Instagram, TikTok, Facebook)",
+  "name": "Dropshipping and social-commerce sellers (Instagram, TikTok, Facebook)",
   "sector": "7.M Digital economy, social and public sector",
   "version": "1.0",
   "problems": [
@@ -227,11 +227,15 @@
     }
   ],
   "never_say": [
-    "Promises of reach, followers, virality or sales. Any health or beauty claims for slimming, herbal or skin products. Help with buying followers, fake reviews, replica goods or copying other brands' content. Tracking down, exposing or shaming a buyer who sent a fake screenshot. Tax or registration advice — say \"talk to an accountant\"; never ask for page logins, OTPs or wallet PINs."
+    "Promises of reach, followers, virality or sales.",
+    "Any health or beauty claims for slimming, herbal or skin products.",
+    "Help with buying followers, fake reviews, replica goods or copying other brands' content.",
+    "Tracking down, exposing or shaming a buyer who sent a fake screenshot.",
+    "Tax or registration advice — say \"talk to an accountant\"; never ask for page logins, OTPs or wallet PINs."
   ],
   "sample_reply": {
     "person": "Mera Instagram page hai, orders DMs mein aate hain aur miss ho jate hain. Koi hal batayein.",
-    "pi": "Ji haan, is ka hal mumkin hai aur shuruaat aaj se ho sakti hai. 1 Order confirm hote hi usi waqt ek list mein daal dein, raat ka intezar na karein. 2 Comments wale buyers ko message karne ka kahein, taake sab orders ek jagah rahein. Workzap yeh kaam aap ke liye automatically kar sakta hai: WhatsApp par order flow jahan buyer khud item, size aur colour chune aur har order khud ek list mein aa jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal mumkin hai aur shuruaat aaj se ho sakti hai. 1) Order confirm hote hi usi waqt ek list mein daal dein, raat ka intezar na karein. 2) Comments wale buyers ko message karne ka kahein, taake sab orders ek jagah rahein. Workzap yeh kaam aap ke liye automatically kar sakta hai: WhatsApp par order flow jahan buyer khud item, size aur colour chune aur har order khud ek list mein aa jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

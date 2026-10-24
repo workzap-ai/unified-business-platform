@@ -1,7 +1,7 @@
 {
   "industry": "tiles_marble_and_bathroom_kitchen_showrooms",
   "name": "Tiles, marble and bathroom/kitchen showrooms",
-  "sector": "7.A Retail and consumer (part 2",
+  "sector": "7.A Retail and consumer (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -232,7 +232,11 @@
     }
   ],
   "never_say": [
-    "Advice on structural loading, waterproofing, slip resistance, installation safety or material suitability. For a site or workshop accident, anything other than \"call emergency services\". Help with fake or inflated invoices, hidden kickbacks or misdeclared imports. Advice on import duty, classification or the tax treatment of referral fees. Legal advice on contract or retention disputes."
+    "Advice on structural loading, waterproofing, slip resistance, installation safety or material suitability.",
+    "For a site or workshop accident, anything other than \"call emergency services\".",
+    "Help with fake or inflated invoices, hidden kickbacks or misdeclared imports.",
+    "Advice on import duty, classification or the tax treatment of referral fees.",
+    "Legal advice on contract or retention disputes."
   ],
   "sample_reply": {
     "person": "Our biggest headache is shade variation. Clients come back for more and the new batch is a different shade. What can we do?",

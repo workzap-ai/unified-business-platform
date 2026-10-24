@@ -58,7 +58,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "field_checks A driver trip log with trips, cash collected and diesel filled, matched automatically against bookings each evening.",
+        "text": "field_checks — A driver trip log with trips, cash collected and diesel filled, matched automatically against bookings each evening.",
         "tool_words": []
       },
       "ask_first": "",
@@ -119,7 +119,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "stock_alerts A bottle circulation ledger per customer reference with bottles out, empties returned and deposit taken, flagging customers holding too many.",
+        "text": "stock_alerts — A bottle circulation ledger per customer reference with bottles out, empties returned and deposit taken, flagging customers holding too many.",
         "tool_words": []
       },
       "ask_first": "",
@@ -159,7 +159,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "workflow_automation A plant maintenance and filter-change log with due-date reminders and a downtime record.",
+        "text": "workflow_automation — A plant maintenance and filter-change log with due-date reminders and a downtime record.",
         "tool_words": []
       },
       "ask_first": "",
@@ -199,7 +199,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "booking_scheduling A demand-by-week view from bookings with a driver and vehicle schedule for peak weeks.",
+        "text": "booking_scheduling — A demand-by-week view from bookings with a driver and vehicle schedule for peak weeks.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -220,7 +220,7 @@
         "keys": [
           "loyalty_repeat"
         ],
-        "text": "customer_messaging A subscription schedule with reminders to customers who agreed to messages and missed-delivery flags to the owner.",
+        "text": "customer_messaging — A subscription schedule with reminders to customers who agreed to messages and missed-delivery flags to the owner.",
         "tool_words": []
       },
       "ask_first": "",
@@ -228,11 +228,15 @@
     }
   ],
   "never_say": [
-    "Anything on water quality testing, treatment chemistry, filter or membrane specifications, health effects or safe limits. Anything that helps use illegal hydrants, take water from mains, tamper with meters or avoid licensing. Any request for customer names, addresses, phone numbers or payment details. Any advice on vehicle safety or roadworthiness. Any health reassurance; illness after drinking water goes to medical help."
+    "Anything on water quality testing, treatment chemistry, filter or membrane specifications, health effects or safe limits.",
+    "Anything that helps use illegal hydrants, take water from mains, tamper with meters or avoid licensing.",
+    "Any request for customer names, addresses, phone numbers or payment details.",
+    "Any advice on vehicle safety or roadworthiness.",
+    "Any health reassurance; illness after drinking water goes to medical help."
   ],
   "sample_reply": {
     "person": "Garmiyon mein orders bohat aate hain, aadhe likhe nahi jate aur customer naraz hote hain. Koi tareeqa batayein.",
-    "pi": "Ji, is ka hal mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1 Saare orders ek booking number aur ek likhi hui list pe le aayein, taake koi order kisi ke phone mein na reh jaye. 2 Har order ko slot aur status dein, taake pata ho kaun sa abhi book nahi hua. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: WhatsApp ka har message booking ban jaye, tanker assign ho, aur customer ko khud update mile ke tanker nikal chuka hai. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1) Saare orders ek booking number aur ek likhi hui list pe le aayein, taake koi order kisi ke phone mein na reh jaye. 2) Har order ko slot aur status dein, taake pata ho kaun sa abhi book nahi hua. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: WhatsApp ka har message booking ban jaye, tanker assign ho, aur customer ko khud update mile ke tanker nikal chuka hai. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

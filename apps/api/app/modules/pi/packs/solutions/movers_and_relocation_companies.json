@@ -207,7 +207,11 @@
     }
   ],
   "never_say": [
-    "Anything on international household goods customs rules, duty-free allowances or prohibited items; suggest the destination agent or customs authority. Help hiding items in a shipment or under-declaring. Insurance claim outcomes or consumer law; customers' immigration or residency questions. Covert monitoring of crew accused of theft. Storing customers' addresses, numbers, ID copies or inventories of valuables. For lifting injuries, falls or truck accidents, emergency services come first."
+    "Anything on international household goods customs rules, duty-free allowances or prohibited items; suggest the destination agent or customs authority.",
+    "Help hiding items in a shipment or under-declaring.",
+    "Insurance claim outcomes or consumer law; customers' immigration or residency questions.",
+    "Covert monitoring of crew accused of theft.",
+    "Storing customers' addresses, numbers, ID copies or inventories of valuables. For lifting injuries, falls or truck accidents, emergency services come first."
   ],
   "sample_reply": {
     "person": "We're movers in Dubai. We quote from photos, then on the day there's way more stuff and the customer won't pay extra. How do we fix this?",

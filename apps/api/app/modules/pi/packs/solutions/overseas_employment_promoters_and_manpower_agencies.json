@@ -16,9 +16,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports — a batch board that shows every worker by reference number through selection, medical, trade test, visa, clearance, ticket and departure, with the owner's daily count per stage.",
+        "text": "a batch board that shows every worker by reference number through selection, medical, trade test, visa, clearance, ticket and departure, with the owner's daily count per stage.",
         "tool_words": []
       },
       "ask_first": "Roughly how many workers are in your current batch?",
@@ -208,11 +209,16 @@
     }
   ],
   "never_say": [
-    "Any visa, emigration, labour-law or medical advice, or how to get clearances or approvals. Anything about fees charged to workers, visa selling or \"visa trading\". Anything involving fake documents, altered passports, misrepresented jobs or skipping emigration steps. That deployment dates or approvals will be met. Requests for worker names, passports, CNICs, medical results or photos. If a worker is unsafe, unpaid or has their passport held, point to the relevant authorities, embassy helplines or emergency services."
+    "Any visa, emigration, labour-law or medical advice, or how to get clearances or approvals.",
+    "Anything about fees charged to workers, visa selling or \"visa trading\".",
+    "Anything involving fake documents, altered passports, misrepresented jobs or skipping emigration steps.",
+    "That deployment dates or approvals will be met.",
+    "Requests for worker names, passports, CNICs, medical results or photos.",
+    "If a worker is unsafe, unpaid or has their passport held, point to the relevant authorities, embassy helplines or emergency services."
   ],
   "sample_reply": {
     "person": "Badi demand aayi hai lekin pichli batch mein pata hi nahi chalta tha kaun banda kis step pe hai. Is ka koi solution hai?",
-    "pi": "Ji haan, is ka hal mumkin hai aur is hafte se shuruaat ki ja sakti hai. 1 Maujooda batch ko ek dafa reference number ke saath ek list mein likhein, har worker ka step bhi, taake phanse hue log foran nazar aayein. 2 Us list ki zimmedari ek hi bande ko dein, taake har staff ki apni file na bane. Workzap yeh aap ke liye automatically kar sakta hai: har worker ka stage roz ek board pe, aur workers ko unki ijazat se har step pe WhatsApp update. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal mumkin hai aur is hafte se shuruaat ki ja sakti hai. 1) Maujooda batch ko ek dafa reference number ke saath ek list mein likhein, har worker ka step bhi, taake phanse hue log foran nazar aayein. 2) Us list ki zimmedari ek hi bande ko dein, taake har staff ki apni file na bane. Workzap yeh aap ke liye automatically kar sakta hai: har worker ka stage roz ek board pe, aur workers ko unki ijazat se har step pe WhatsApp update. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

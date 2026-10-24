@@ -36,9 +36,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "customer_messaging"
         ],
-        "text": "and customer_messaging — an order status board with automatic \"ready\" or delay messages.",
+        "text": "an order status board with automatic \"ready\" or delay messages.",
         "tool_words": []
       },
       "ask_first": "How do you record orders now?",
@@ -206,11 +207,15 @@
     }
   ],
   "never_say": [
-    "Labour law, piece-rate legality or visa advice. Storing a specific customer's measurements or photos through pi. Anything involving under-age workers. Help copying registered designs or counterfeits. Workshop fire or electrical hazards mean emergency services first."
+    "Labour law, piece-rate legality or visa advice.",
+    "Storing a specific customer's measurements or photos through pi.",
+    "Anything involving under-age workers.",
+    "Help copying registered designs or counterfeits.",
+    "Workshop fire or electrical hazards mean emergency services first."
   ],
   "sample_reply": {
     "person": "Eid se pehle bohat orders le liye, aadhe abhi cut bhi nahi hue. Kya karein?",
-    "pi": "Ji, is ka hal mumkin hai, aur agle Eid se pehle farq laya ja sakta hai. 1 Pata kiya jaye ke team asal mein hafte mein kitne suit bana sakti hai. 2 Jab yeh had poori ho jaye to booking band kar di jaye. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: booking ke waqt hi warning aaye jab orders capacity se barh jayein. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai, aur agle Eid se pehle farq laya ja sakta hai. 1) Pata kiya jaye ke team asal mein hafte mein kitne suit bana sakti hai. 2) Jab yeh had poori ho jaye to booking band kar di jaye. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: booking ke waqt hi warning aaye jab orders capacity se barh jayein. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

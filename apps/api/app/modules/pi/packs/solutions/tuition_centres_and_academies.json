@@ -40,7 +40,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "customer_messaging Monthly reminders sent automatically on WhatsApp, with a live paid/unpaid list per batch by fee card number.",
+        "text": "customer_messaging — Monthly reminders sent automatically on WhatsApp, with a live paid/unpaid list per batch by fee card number.",
         "tool_words": []
       },
       "ask_first": "",
@@ -141,7 +141,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "customer_messaging Timetable and room booking with a clash check, and every change sent automatically to just the batches affected.",
+        "text": "customer_messaging — Timetable and room booking with a clash check, and every change sent automatically to just the batches affected.",
         "tool_words": []
       },
       "ask_first": "",
@@ -182,8 +182,7 @@
           "dashboards_reports"
         ],
         "text": "A branch screen updated daily with enrolment, collections, teacher costs, rent and margin per branch.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "Which figures feed the screen and how is kept for the document."
@@ -210,11 +209,16 @@
     }
   ],
   "never_say": [
-    "Promises of board results, grades or \"guaranteed A\" claims. Licensing, home-business permit or zoning advice; pi says \"check with your local authority\". Legal advice on teachers taking students; pi says \"talk to your lawyer\". Any help keeping cash fees off the books; pi suggests \"talk to your accountant\". Any idea that records students' names, schools, marks or photos, or secret recording of classes or teachers. Business talk after a child safety concern; pi points to emergency services and the relevant authority."
+    "Promises of board results, grades or \"guaranteed A\" claims.",
+    "Licensing, home-business permit or zoning advice; pi says \"check with your local authority\".",
+    "Legal advice on teachers taking students; pi says \"talk to your lawyer\".",
+    "Any help keeping cash fees off the books; pi suggests \"talk to your accountant\".",
+    "Any idea that records students' names, schools, marks or photos, or secret recording of classes or teachers.",
+    "Business talk after a child safety concern; pi points to emergency services and the relevant authority."
   ],
   "sample_reply": {
     "person": "Teachers ke hisse ka koi hal batayein. Har mahine end pe jhagra hota hai ke kitne bachay the aur kis ki fees aayi.",
-    "pi": "Ji haan, ye masla kaafi had tak is mahine se hi hal kiya ja sakta hai. 1 Teachers ke saath likh kar tay kar lein ke hissa attend karne walon pe banega ya fees dene walon pe, taake ek hi qaida ho. 2 Is mahine salary se pehle har teacher ko us ke batches ki paid ginti dikha dein, taake ikhtilaaf pehle saamne aa jaye. Workzap ye ginti aur hissa aap ke liye har mahine khud-ba-khud nikaal sakta hai aur teacher ko sign-off ke liye bhej sakta hai. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, ye masla kaafi had tak is mahine se hi hal kiya ja sakta hai. 1) Teachers ke saath likh kar tay kar lein ke hissa attend karne walon pe banega ya fees dene walon pe, taake ek hi qaida ho. 2) Is mahine salary se pehle har teacher ko us ke batches ki paid ginti dikha dein, taake ikhtilaaf pehle saamne aa jaye. Workzap ye ginti aur hissa aap ke liye har mahine khud-ba-khud nikaal sakta hai aur teacher ko sign-off ke liye bhej sakta hai. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

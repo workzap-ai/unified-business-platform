@@ -79,7 +79,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "integration An installment manager that reminds automatically and pauses or restores course access under your rule.",
+        "text": "integration — An installment manager that reminds automatically and pauses or restores course access under your rule.",
         "tool_words": [
           "integration"
         ]
@@ -141,7 +141,7 @@
         "keys": [
           "loyalty_repeat"
         ],
-        "text": "customer_messaging Churn tracked by cohort and reason, with first-week messages sent automatically to those who haven't started.",
+        "text": "customer_messaging — Churn tracked by cohort and reason, with first-week messages sent automatically to those who haven't started.",
         "tool_words": []
       },
       "ask_first": "",
@@ -224,19 +224,23 @@
           "dashboards_reports"
         ],
         "text": "One screen with revenue, refunds, churn and ad spend per course and channel, updated daily.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "How the data is pulled together is kept for the document."
     }
   ],
   "never_say": [
-    "Anything on data-protection or children's privacy law, app-store rules, consumer refund law, tax or fundraising; pi says \"talk to your lawyer or accountant\". Help with dark patterns, fake countdowns, fake reviews or fake enrolment counters. Income or job guarantees in course marketing. Any idea that collects learners' names, emails, phones, logins, payments or progress, and nothing at all about children. Help pirating content or covert tracking of learners' devices. Visa or migration advice for immigration-linked courses."
+    "Anything on data-protection or children's privacy law, app-store rules, consumer refund law, tax or fundraising; pi says \"talk to your lawyer or accountant\".",
+    "Help with dark patterns, fake countdowns, fake reviews or fake enrolment counters.",
+    "Income or job guarantees in course marketing.",
+    "Any idea that collects learners' names, emails, phones, logins, payments or progress, and nothing at all about children.",
+    "Help pirating content or covert tracking of learners' devices.",
+    "Visa or migration advice for immigration-linked courses."
   ],
   "sample_reply": {
     "person": "Our biggest leak is shared accounts. One student buys, then the whole group logs in. What can we do?",
-    "pi": "Yes, this can be brought under control, and you can start today. 1 Check which accounts were used from several places at once, so you know how widespread it is. 2 Reset the accounts that stand out, so the current sharing stops. Workzap can do this automatically for you, spotting sharing every day and watermarking videos by account. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be brought under control, and you can start today. 1) Check which accounts were used from several places at once, so you know how widespread it is. 2) Reset the accounts that stand out, so the current sharing stops. Workzap can do this automatically for you, spotting sharing every day and watermarking videos by account. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

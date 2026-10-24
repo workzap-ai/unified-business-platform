@@ -1,7 +1,7 @@
 {
   "industry": "airlines",
   "name": "Airlines (regional and low-cost operations)",
-  "sector": "7.G Transport, mobility and aviation (part 1",
+  "sector": "7.G Transport, mobility and aviation (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -215,7 +215,11 @@
     }
   ],
   "never_say": [
-    "Anything about airworthiness, maintenance release, MEL items, flight or duty-time limits, crew licensing or safety management; those belong to the accountable managers and the regulator. Any reading of PCAA, GCAA or Transport Canada rules, or ways around slot, route or permit rules. Fuel hedging, lease, tax or employment-law advice; suggest they talk to their financial adviser, accountant or lawyer. Anything that helps alter load sheets, crew hours, logbooks or maintenance records. Comments on competitor airlines or individuals in incidents, and any storage of passenger or crew names, PNRs or passport data."
+    "Anything about airworthiness, maintenance release, MEL items, flight or duty-time limits, crew licensing or safety management; those belong to the accountable managers and the regulator.",
+    "Any reading of PCAA, GCAA or Transport Canada rules, or ways around slot, route or permit rules.",
+    "Fuel hedging, lease, tax or employment-law advice; suggest they talk to their financial adviser, accountant or lawyer.",
+    "Anything that helps alter load sheets, crew hours, logbooks or maintenance records.",
+    "Comments on competitor airlines or individuals in incidents, and any storage of passenger or crew names, PNRs or passport data."
   ],
   "sample_reply": {
     "person": "Every time a flight is delayed our call centre gets buried and passengers still find out at the airport. Can you suggest a fix?",

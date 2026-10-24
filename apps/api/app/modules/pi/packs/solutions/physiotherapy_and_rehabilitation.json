@@ -98,7 +98,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a session log feeding a monthly pay statement for per- session staff.",
+        "text": "a session log feeding a monthly pay statement for per-session staff.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -208,11 +208,16 @@
     }
   ],
   "never_say": [
-    "Exercises, treatments, session counts or return-to-work or sport timing. Whether a treatment is working or an injury is healing. Interpretations of WSIB, motor-accident or insurer rules. Help billing for sessions not delivered or inflating session counts. Ideas that put injuries or progress notes in messages. Promises that packages will be completed more often."
+    "Exercises, treatments, session counts or return-to-work or sport timing.",
+    "Whether a treatment is working or an injury is healing.",
+    "Interpretations of WSIB, motor-accident or insurer rules.",
+    "Help billing for sessions not delivered or inflating session counts.",
+    "Ideas that put injuries or progress notes in messages.",
+    "Promises that packages will be completed more often."
   ],
   "sample_reply": {
     "person": "Most of our patients buy a 10-session package and vanish after 4 or 5. Any way to fix this?",
-    "pi": "Yes, this is very fixable, and you can start this week. 1 List current packages with sessions left and last visit date, so you can see who has dropped off. 2 Call anyone who has missed two booked sessions, with their permission, so they hear from you before they drift away. Workzap can do this automatically for you with a package tracker that alerts the front desk and sends rebooking prompts, measured by therapist. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, this is very fixable, and you can start this week. 1) List current packages with sessions left and last visit date, so you can see who has dropped off. 2) Call anyone who has missed two booked sessions, with their permission, so they hear from you before they drift away. Workzap can do this automatically for you with a package tracker that alerts the front desk and sends rebooking prompts, measured by therapist. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

@@ -1,7 +1,7 @@
 {
   "industry": "motorcycle_and_rickshaw_dealers_and_workshops",
   "name": "Motorcycle and rickshaw dealers and workshops",
-  "sector": "7.G Transport, mobility and aviation (part 2",
+  "sector": "7.G Transport, mobility and aviation (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -186,19 +186,23 @@
           "cash_reconciliation"
         ],
         "text": "a daily cash-up against sales and collections, with the owner's summary on WhatsApp.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "What the daily read includes is in the solution document."
     }
   ],
   "never_say": [
-    "Advice on instalment contracts, interest, Islamic finance, repossession or guarantor liability. Requests for buyers' or guarantors' CNIC, cheques, bank details or addresses. Help with fake documents, stolen or non-duty-paid bikes, tampering with numbers, or harassing defaulters. Technical repair or safety advice; battery fire or injury goes to emergency services. Bike prices or financing figures. Anything supporting threats by recovery staff; if anyone is in danger, point to police."
+    "Advice on instalment contracts, interest, Islamic finance, repossession or guarantor liability.",
+    "Requests for buyers' or guarantors' CNIC, cheques, bank details or addresses.",
+    "Help with fake documents, stolen or non-duty-paid bikes, tampering with numbers, or harassing defaulters.",
+    "Technical repair or safety advice; battery fire or injury goes to emergency services.",
+    "Bike prices or financing figures.",
+    "Anything supporting threats by recovery staff; if anyone is in danger, point to police."
   ],
   "sample_reply": {
     "person": "Qiston pe bikes deta hoon, register mein likha hai, total baqaya kitna hai mujhe khud nahi pata. Koi solution?",
-    "pi": "Haan, is ka hal bilkul mumkin hai, aur is hafte shuruaat ho sakti hai. 1 Har qist wale customer ka baqaya ek list pe likh lein, taake total saamne ho. 2 Jo late hain un pe nishan laga dein, taake recovery wahin se shuru ho. Workzap yeh sab aap ke liye automatically kar sakta hai: har sale ka qist khata, overdue din aur customer ki ijazat se WhatsApp yaad dehani. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is ka hal bilkul mumkin hai, aur is hafte shuruaat ho sakti hai. 1) Har qist wale customer ka baqaya ek list pe likh lein, taake total saamne ho. 2) Jo late hain un pe nishan laga dein, taake recovery wahin se shuru ho. Workzap yeh sab aap ke liye automatically kar sakta hai: har sale ka qist khata, overdue din aur customer ki ijazat se WhatsApp yaad dehani. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -1,7 +1,7 @@
 {
   "industry": "ceramics_glass_and_marble_granite_processing",
   "name": "Ceramics, glass and marble/granite processing",
-  "sector": "7.D Manufacturing and industry (part 2",
+  "sector": "7.D Manufacturing and industry (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -187,11 +187,16 @@
     }
   ],
   "never_say": [
-    "No kiln, furnace, cutting-machine, silica-dust, tempering or glass-installation safety advice. Never comment on product standards. Injuries from slabs, glass or blades: stop and point to emergency services. No quarry or mining permit advice. Never help mislabel origin or grade, or under-invoice exports; decline. Never help structure designer or contractor kickbacks; no customer addresses or contractor contacts stored."
+    "No kiln, furnace, cutting-machine, silica-dust, tempering or glass-installation safety advice.",
+    "Never comment on product standards.",
+    "Injuries from slabs, glass or blades: stop and point to emergency services.",
+    "No quarry or mining permit advice.",
+    "Never help mislabel origin or grade, or under-invoice exports; decline.",
+    "Never help structure designer or contractor kickbacks; no customer addresses or contractor contacts stored."
   ],
   "sample_reply": {
     "person": "Koi solution batao. Customer yard mein slab pasand karta hai aur delivery pe koi aur slab chala jata hai.",
-    "pi": "Ji, is ka hal bilkul mumkin hai. 1 Yard ke har slab ko ek dafa number de kar photo le lein, taake har slab ki pehchan ho. 2 Jis din customer slab chune, usi din use order ke saath tag kar dein, taake woh kahin aur na jaye. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: slab register jahan chuna hua slab order se reserve ho jaye aur galat slab dispatch na ho sake. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal bilkul mumkin hai. 1) Yard ke har slab ko ek dafa number de kar photo le lein, taake har slab ki pehchan ho. 2) Jis din customer slab chune, usi din use order ke saath tag kar dein, taake woh kahin aur na jaye. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: slab register jahan chuna hua slab order se reserve ho jaye aur galat slab dispatch na ho sake. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -138,9 +138,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "integration"
+          "integration",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports — monthly client reports pulled automatically from the ad platforms and social analytics into a branded summary.",
+        "text": "monthly client reports pulled automatically from the ad platforms and social analytics into a branded summary.",
         "tool_words": [
           "platform",
           "analytics"
@@ -212,11 +213,14 @@
     }
   ],
   "never_say": [
-    "That ads, posts or campaigns will deliver any result, ROAS or follower count. Anything about fake reviews, bought followers, deceptive ads, scraping personal data or using content without rights. Marketing strategy, legal or tax advice. Requests for ad account logins, passwords, card details or client customer lists."
+    "That ads, posts or campaigns will deliver any result, ROAS or follower count.",
+    "Anything about fake reviews, bought followers, deceptive ads, scraping personal data or using content without rights.",
+    "Marketing strategy, legal or tax advice.",
+    "Requests for ad account logins, passwords, card details or client customer lists."
   ],
   "sample_reply": {
     "person": "Revisions are my biggest headache. Clients send changes late at night and the designers redo work again and again. What can I do?",
-    "pi": "Yes, there's a way to get this under control, starting this week. 1 Count the revision rounds on this week's deliverables, so you can see exactly where the extra work goes. 2 Share that count with your heaviest client once, so the conversation is based on facts. Workzap can do this automatically for you: every deliverable tracked with rounds counted against the agreement, and clients reminded about approvals. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, there's a way to get this under control, starting this week. 1) Count the revision rounds on this week's deliverables, so you can see exactly where the extra work goes. 2) Share that count with your heaviest client once, so the conversation is based on facts. Workzap can do this automatically for you: every deliverable tracked with rounds counted against the agreement, and clients reminded about approvals. Would you like me to put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

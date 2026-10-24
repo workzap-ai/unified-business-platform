@@ -58,7 +58,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "live sync between the shelf count and the storefront, with low- stock alerts on best-sellers before they run out.",
+        "text": "live sync between the shelf count and the storefront, with low-stock alerts on best-sellers before they run out.",
         "tool_words": []
       },
       "ask_first": "",
@@ -231,11 +231,15 @@
     }
   ],
   "never_say": [
-    "Any promise that returns will fall or ROAS will rise, or any benchmark return or conversion rate. Advice on sales tax, VAT, GST/HST, customs or import duty — say \"talk to your accountant\". Legal views on refund or return policy wording or consumer law — say \"talk to a lawyer\". Anything that helps fake reviews, inflate orders, use competitor branding or under-declare parcel values. Blacklisting or profiling buyers by identity, or asking for customer numbers, addresses or store logins."
+    "Any promise that returns will fall or ROAS will rise, or any benchmark return or conversion rate.",
+    "Advice on sales tax, VAT, GST/HST, customs or import duty — say \"talk to your accountant\".",
+    "Legal views on refund or return policy wording or consumer law — say \"talk to a lawyer\".",
+    "Anything that helps fake reviews, inflate orders, use competitor branding or under-declare parcel values.",
+    "Blacklisting or profiling buyers by identity, or asking for customer numbers, addresses or store logins."
   ],
   "sample_reply": {
     "person": "Bhai returns ka koi hal batao, COD parcels wapas aa rahe hain aur double shipping lag rahi hai.",
-    "pi": "Ji bilkul, is ka hal kiya ja sakta hai aur shuruaat aap isi hafte kar sakte hain. 1 Har COD order booking se pehle buyer se confirm karein, taake bina confirm parcel na niklein. 2 Pichle mahine ke returns ek dafa sheher aur product ke hisaab se dekhein, taake pata chale masla kahan zyada hai. Workzap yeh sab aap ke liye automatically kar sakta hai: har buyer ko khud confirmation message, bina confirm orders hold, aur roz returns ka hisaab sheher, courier aur product ke saath. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji bilkul, is ka hal kiya ja sakta hai aur shuruaat aap isi hafte kar sakte hain. 1) Har COD order booking se pehle buyer se confirm karein, taake bina confirm parcel na niklein. 2) Pichle mahine ke returns ek dafa sheher aur product ke hisaab se dekhein, taake pata chale masla kahan zyada hai. Workzap yeh sab aap ke liye automatically kar sakta hai: har buyer ko khud confirmation message, bina confirm orders hold, aur roz returns ka hisaab sheher, courier aur product ke saath. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

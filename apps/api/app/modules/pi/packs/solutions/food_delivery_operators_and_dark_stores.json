@@ -16,12 +16,11 @@
       ],
       "workzap_build": {
         "keys": [
-          "stock_alerts"
-        ],
-        "text": "and integration — hub stock with bin locations, cycle counts and variance alerts, synced to your listings automatically.",
-        "tool_words": [
+          "stock_alerts",
           "integration"
-        ]
+        ],
+        "text": "hub stock with bin locations, cycle counts and variance alerts, synced to your listings automatically.",
+        "tool_words": []
       },
       "ask_first": "How often is the hub counted?",
       "free_stops": "The count routine and sync set-up are in the solution document."
@@ -184,19 +183,22 @@
           "nori_daily_read"
         ],
         "text": "a daily hub comparison on WhatsApp with orders, late deliveries, stock issues and COD outstanding.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How many hubs do you run?",
       "free_stops": "What goes into the daily read is in the solution document."
     }
   ],
   "never_say": [
-    "Anything about labour or gig-worker law, rider visas, insurance, vehicle licensing or traffic rules. Covert tracking of riders' personal phones or tracking outside work. Regulatory advice on pharmacy or age-restricted items. Help hiding rider cash shortages, charging riders unlawfully or manipulating reported delivery times. That delivery times or costs will improve by a set amount."
+    "Anything about labour or gig-worker law, rider visas, insurance, vehicle licensing or traffic rules.",
+    "Covert tracking of riders' personal phones or tracking outside work.",
+    "Regulatory advice on pharmacy or age-restricted items.",
+    "Help hiding rider cash shortages, charging riders unlawfully or manipulating reported delivery times.",
+    "That delivery times or costs will improve by a set amount."
   ],
   "sample_reply": {
     "person": "We run 4 dark stores in Lahore. Biggest headache is COD cash from riders, some hold it for days. Need a fix.",
-    "pi": "Yes, COD cash can be brought under control, and you can start this week. 1 Settle each rider's COD at the end of every shift, so cash doesn't sit with them. 2 Keep a record of expected cash per rider per shift, so any gap is clear. Workzap can do this automatically for you, with a COD settlement tool per rider ID showing expected against handed in at every hub and how long any cash has been outstanding. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, COD cash can be brought under control, and you can start this week. 1) Settle each rider's COD at the end of every shift, so cash doesn't sit with them. 2) Keep a record of expected cash per rider per shift, so any gap is clear. Workzap can do this automatically for you, with a COD settlement tool per rider ID showing expected against handed in at every hub and how long any cash has been outstanding. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

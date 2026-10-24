@@ -1,7 +1,7 @@
 {
   "industry": "tyre_battery_and_auto_parts_shops",
   "name": "Tyre, battery and auto-parts shops",
-  "sector": "7.G Transport, mobility and aviation (part 2",
+  "sector": "7.G Transport, mobility and aviation (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -221,19 +221,23 @@
           "nori_daily_read"
         ],
         "text": "a short read of sales and stock by item, brand and shop on WhatsApp each morning, with the one thing to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "What the daily read includes is in the solution document."
     }
   ],
   "never_say": [
-    "Whether a part is safe, compatible or suitable for a vehicle. Anything helping pass off copies as genuine, change tyre date codes or avoid customs or sales tax. Advice on battery acid, lead or used-oil rules; for an acid injury or godown fire, point to emergency services. Currency or price forecasts. Storing credit customers' phone numbers or IDs. Covert surveillance of staff."
+    "Whether a part is safe, compatible or suitable for a vehicle.",
+    "Anything helping pass off copies as genuine, change tyre date codes or avoid customs or sales tax.",
+    "Advice on battery acid, lead or used-oil rules; for an acid injury or godown fire, point to emergency services.",
+    "Currency or price forecasts.",
+    "Storing credit customers' phone numbers or IDs.",
+    "Covert surveillance of staff."
   ],
   "sample_reply": {
     "person": "Mechanics ka udhaar notebook mein hai, har baar hisaab pe behes hoti hai, koi hal batao.",
-    "pi": "Haan, is ka hal bilkul nikal sakta hai, aur is hafte shuruaat ho sakti hai. 1 Har workshop ka maujooda baqaya ek page pe likh lein, taake total udhaar saamne ho. 2 Woh balance har workshop ke saath ek baar share kar ke ek figure pe ittefaq kar lein, taake aage behes kam ho. Workzap yeh sab aap ke liye automatically kar sakta hai: har workshop ka khata, WhatsApp pe statement aur overdue pe yaad dehani. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is ka hal bilkul nikal sakta hai, aur is hafte shuruaat ho sakti hai. 1) Har workshop ka maujooda baqaya ek page pe likh lein, taake total udhaar saamne ho. 2) Woh balance har workshop ke saath ek baar share kar ke ek figure pe ittefaq kar lein, taake aage behes kam ho. Workzap yeh sab aap ke liye automatically kar sakta hai: har workshop ka khata, WhatsApp pe statement aur overdue pe yaad dehani. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

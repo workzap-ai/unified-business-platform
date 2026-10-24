@@ -1,7 +1,7 @@
 {
   "industry": "footwear_retail",
   "name": "Footwear retail",
-  "sector": "7.A Retail and consumer (part 1",
+  "sector": "7.A Retail and consumer (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -195,11 +195,15 @@
     }
   ],
   "never_say": [
-    "How to sell \"first copy\" shoes under a brand name. That synthetic can be called leather or origin changed. Foot-health or medical footwear advice. To accuse or secretly film staff suspected of swapping pairs. That a sale or display will bring a set number of customers."
+    "How to sell \"first copy\" shoes under a brand name.",
+    "That synthetic can be called leather or origin changed.",
+    "Foot-health or medical footwear advice.",
+    "To accuse or secretly film staff suspected of swapping pairs.",
+    "That a sale or display will bring a set number of customers."
   ],
   "sample_reply": {
     "person": "Eid pe aadhe customers wapas jaate hain kyunke unka number nahi hota. Iska koi hal batao.",
-    "pi": "Ji haan, iska hal hai, aur Eid se pehle shuruaat ho sakti hai. 1 Counter pe ek sheet rakhein jahan staff har woh size likhe jo maanga gaya lekin nahi tha, taa ke pata chale asal mein kaun se number kam parte hain. 2 Apne top articles mein dekh lein kaun se sizes sab se pehle khatam hote hain, taa ke agla order fixed set pe na ho. Workzap ye aap ke liye khud-ba-khud kar sakta hai: har article ka size grid har outlet ke liye, staff ke liye \"size nahi mila\" button, aur har order ke liye size ka hisaab. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, iska hal hai, aur Eid se pehle shuruaat ho sakti hai. 1) Counter pe ek sheet rakhein jahan staff har woh size likhe jo maanga gaya lekin nahi tha, taa ke pata chale asal mein kaun se number kam parte hain. 2) Apne top articles mein dekh lein kaun se sizes sab se pehle khatam hote hain, taa ke agla order fixed set pe na ho. Workzap ye aap ke liye khud-ba-khud kar sakta hai: har article ka size grid har outlet ke liye, staff ke liye \"size nahi mila\" button, aur har order ke liye size ka hisaab. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

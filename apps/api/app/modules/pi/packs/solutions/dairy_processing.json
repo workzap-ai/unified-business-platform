@@ -183,19 +183,22 @@
           "nori_daily_read"
         ],
         "text": "a short morning read of intake, production, dispatch and returns, with the one thing to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Who puts these numbers together now?",
       "free_stops": "What goes into the morning read is in the solution document."
     }
   ],
   "never_say": [
-    "Veterinary, animal-health, feed or antibiotic-residue advice. Food-safety standards or adulteration testing methods. Collecting farmers' names, IDs or bank details — farmers are recorded by code. Help concealing adulteration, relabelling expired product or changing dates. Anything on Canadian supply management, quota or pricing rules."
+    "Veterinary, animal-health, feed or antibiotic-residue advice.",
+    "Food-safety standards or adulteration testing methods.",
+    "Collecting farmers' names, IDs or bank details — farmers are recorded by code.",
+    "Help concealing adulteration, relabelling expired product or changing dates.",
+    "Anything on Canadian supply management, quota or pricing rules."
   ],
   "sample_reply": {
     "person": "Hamari 40 collection points hain, parchi pe likha jata hai aur plant tak aate aate sab gadbad ho jata hai. Fat pe farmers se jhagra hota hai. Solution chahiye.",
-    "pi": "Ji haan, is ka hal mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Ek din ki har collection point ki parchiyan plant ki receiving se milayein, taake pata chale gadbad kahan se shuru hoti hai. 2 Har farmer ko code ke saath litres, fat aur raqam ki statement dein, taake jhagra ek hi record se shuru ho. Workzap ye aap ke liye automatically kar sakta hai: collection point par phone se intake, fat aur SNF reading, waqt aur parchi ki photo, sab plant tak foran, aur har supplier code ki payment statement khud tayyar. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal mumkin hai, aur shuruaat isi hafte ho sakti hai. 1) Ek din ki har collection point ki parchiyan plant ki receiving se milayein, taake pata chale gadbad kahan se shuru hoti hai. 2) Har farmer ko code ke saath litres, fat aur raqam ki statement dein, taake jhagra ek hi record se shuru ho. Workzap ye aap ke liye automatically kar sakta hai: collection point par phone se intake, fat aur SNF reading, waqt aur parchi ki photo, sab plant tak foran, aur har supplier code ki payment statement khud tayyar. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

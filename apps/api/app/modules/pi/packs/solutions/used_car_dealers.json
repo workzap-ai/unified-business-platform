@@ -1,7 +1,7 @@
 {
   "industry": "used_car_dealers",
   "name": "Used car dealers",
-  "sector": "7.G Transport, mobility and aviation (part 2",
+  "sector": "7.G Transport, mobility and aviation (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -19,7 +19,7 @@
           "stock_alerts",
           "dashboards_reports"
         ],
-        "text": "an ageing board for every car with days- in-stock alerts and the money tied up in each, updated daily across plots.",
+        "text": "an ageing board for every car with days-in-stock alerts and the money tied up in each, updated daily across plots.",
         "tool_words": []
       },
       "ask_first": "Roughly how many cars are on the lot right now?",
@@ -214,11 +214,16 @@
     }
   ],
   "never_say": [
-    "Anything about rolling back odometers, hiding accident or flood history, or forging transfer papers; decline plainly. Advice on disclosure duties, warranties, consumer law or buyer disputes; refer to a lawyer. Valuations of a specific car or market prices. Advice on instalments, financing or tax; refer to the accountant. Storing sellers' or buyers' IDs, registration documents or bank details. Taking sides in partner money disputes; if a car may be stolen, that is for the police."
+    "Anything about rolling back odometers, hiding accident or flood history, or forging transfer papers; decline plainly.",
+    "Advice on disclosure duties, warranties, consumer law or buyer disputes; refer to a lawyer.",
+    "Valuations of a specific car or market prices.",
+    "Advice on instalments, financing or tax; refer to the accountant.",
+    "Storing sellers' or buyers' IDs, registration documents or bank details.",
+    "Taking sides in partner money disputes; if a car may be stolen, that is for the police."
   ],
   "sample_reply": {
     "person": "Plot pe aadhi gaariyan mahino se khari hain, koi tareeqa batao ke paisa nikle aur pata chale kis gaari pe kya laga.",
-    "pi": "Haan, dono ka hal nikal sakta hai, aur shuruaat is hafte ho sakti hai. 1 Har gaari ki plot pe aane ki tareekh likh kar purani se nayi tarteeb mein rakhein, taake phansa hua paisa saamne ho. 2 Har gaari ke bill usi din ek jagah jama karein, taake bechte waqt asal kharcha maloom ho. Workzap yeh sab aap ke liye automatically kar sakta hai: har gaari ke din, kharcha aur munafa roz dikhe aur purani gaariyon pe alert aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, dono ka hal nikal sakta hai, aur shuruaat is hafte ho sakti hai. 1) Har gaari ki plot pe aane ki tareekh likh kar purani se nayi tarteeb mein rakhein, taake phansa hua paisa saamne ho. 2) Har gaari ke bill usi din ek jagah jama karein, taake bechte waqt asal kharcha maloom ho. Workzap yeh sab aap ke liye automatically kar sakta hai: har gaari ke din, kharcha aur munafa roz dikhe aur purani gaariyon pe alert aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -1,7 +1,7 @@
 {
   "industry": "tunnel_greenhouse_and_vegetable_farming",
   "name": "Tunnel, greenhouse and vegetable farming",
-  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "sector": "7.C Agriculture, livestock and rural (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -210,11 +210,15 @@
     }
   ],
   "never_say": [
-    "Anything on pesticides, fungicides, fertilisers, nutrient solutions, doses, pre-harvest intervals, climate settings or disease identification; refer to an agronomist or extension service. What to grow for profit, or any price prediction. Advice on food-safety, GAP or organic certification rules. Any help relabelling produce as organic or local, or changing harvest dates on labels. Visa or permit advice for seasonal workers; names or numbers of workers or buyers."
+    "Anything on pesticides, fungicides, fertilisers, nutrient solutions, doses, pre-harvest intervals, climate settings or disease identification; refer to an agronomist or extension service.",
+    "What to grow for profit, or any price prediction.",
+    "Advice on food-safety, GAP or organic certification rules.",
+    "Any help relabelling produce as organic or local, or changing harvest dates on labels.",
+    "Visa or permit advice for seasonal workers; names or numbers of workers or buyers."
   ],
   "sample_reply": {
     "person": "I've got 12 tunnels near Sheikhupura. What can I actually do so the cucumbers don't all hit the mandi in the same week?",
-    "pi": "Yes, this can be managed, and you can make a start this week. 1 Put every tunnel's planting date and expected picking window on one chart, so clashing weeks show up early. 2 Line up one hotel, restaurant or shop buyer before your next peak, and agree crop and timing choices with your agronomist. Workzap can do this automatically for you, with a tunnel calendar that warns you when several tunnels are due to peak together and logs harvest and costs per tunnel every day. Shall I get a solution document and quote prepared for you? You can say no.",
+    "pi": "Yes, this can be managed, and you can make a start this week. 1) Put every tunnel's planting date and expected picking window on one chart, so clashing weeks show up early. 2) Line up one hotel, restaurant or shop buyer before your next peak, and agree crop and timing choices with your agronomist. Workzap can do this automatically for you, with a tunnel calendar that warns you when several tunnels are due to peak together and logs harvest and costs per tunnel every day. Shall I get a solution document and quote prepared for you? You can say no.",
     "language": "english"
   }
 }

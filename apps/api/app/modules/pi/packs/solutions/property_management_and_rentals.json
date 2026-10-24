@@ -80,8 +80,7 @@
           "dashboards_reports"
         ],
         "text": "Owner statements generated per property from the rent roll and expenses, sent on the same date every month.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How do your landlord clients get their statements now?",
       "free_stops": "Statement structure and fee handling are in the solution document."
@@ -212,11 +211,15 @@
     }
   ],
   "never_say": [
-    "Anything on eviction, rent increases, deposit deductions or lease terms; refer to a lawyer or the rental dispute authority. Any help locking tenants out, cutting utilities, entering without notice or pressuring tenants. Any advice on gas, electrical, fire or structural issues; a gas smell, sparking, flooding or someone trapped means emergency services first. Any help with unregistered rentals, cash rent to avoid tax, illegal subletting or covert guest cameras. Any request to record tenant or landlord names, IDs, cheque numbers or bank details."
+    "Anything on eviction, rent increases, deposit deductions or lease terms; refer to a lawyer or the rental dispute authority.",
+    "Any help locking tenants out, cutting utilities, entering without notice or pressuring tenants.",
+    "Any advice on gas, electrical, fire or structural issues; a gas smell, sparking, flooding or someone trapped means emergency services first.",
+    "Any help with unregistered rentals, cash rent to avoid tax, illegal subletting or covert guest cameras.",
+    "Any request to record tenant or landlord names, IDs, cheque numbers or bank details."
   ],
   "sample_reply": {
     "person": "Can you suggest a solution? Our tenants pay with PDCs and we only learn about bounced cheques when the bank statement arrives.",
-    "pi": "Yes, this can be fixed, and you can start this week. 1 List this month's PDCs by deposit date so you know exactly which ones to watch. 2 Check the bank the day after each deposit, so a bounce is caught at once. Workzap can do this automatically for you: deposit reminders for every unit, bounce flags, and an arrears list that updates daily. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be fixed, and you can start this week. 1) List this month's PDCs by deposit date so you know exactly which ones to watch. 2) Check the bank the day after each deposit, so a bounce is caught at once. Workzap can do this automatically for you: deposit reminders for every unit, bounce flags, and an arrears list that updates daily. Shall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

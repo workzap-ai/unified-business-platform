@@ -1,7 +1,7 @@
 {
   "industry": "orchards",
   "name": "Orchards (mango, citrus, dates, apples)",
-  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "sector": "7.C Agriculture, livestock and rural (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -161,8 +161,7 @@
           "nori_daily_read"
         ],
         "text": "A daily read for owners abroad showing weights, deliveries, labour and spend from the manager's entries, with the one thing to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How often are you at the farm during the season?",
       "free_stops": "What goes into the daily read and how it is fed is set out in the solution document."
@@ -209,11 +208,15 @@
     }
   ],
   "never_say": [
-    "Anything on sprays, fertilisers, pruning, doses, fruit fly or disease control, ripening chemicals or post- harvest treatments; refer to an agronomist, extension office or plant-protection authority. Advice on phytosanitary rules, export regulations or certificates. Legal views on theka contracts or thekedar disputes. Any help with banned ripening chemicals, mislabelling origin, faking certificates or under-invoicing exports. Seasonal worker visa or programme advice, or accusations against a manager or caretaker."
+    "Anything on sprays, fertilisers, pruning, doses, fruit fly or disease control, ripening chemicals or post-harvest treatments; refer to an agronomist, extension office or plant-protection authority.",
+    "Advice on phytosanitary rules, export regulations or certificates.",
+    "Legal views on theka contracts or thekedar disputes.",
+    "Any help with banned ripening chemicals, mislabelling origin, faking certificates or under-invoicing exports.",
+    "Seasonal worker visa or programme advice, or accusations against a manager or caretaker."
   ],
   "sample_reply": {
     "person": "Thekedar ka masla phir se na ho, koi solution do. Is saal bhi bagh theke pe dena hai.",
-    "pi": "Ji, is ka intezaam kiya ja sakta hai. 1 Pichle theke ki wasool shuda aur baqi raqam ek safhe pe likh kar thekedar ko tehreeri tor pe bhej dein, taake baat hisaab se shuru ho. 2 Naye theke mein har qist ki tareekh saaf likhwayein, aur qanooni pehlu apne wakeel se dekh lein. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: har qist ka hisaab, tareekh se pehle WhatsApp yaad-dihani, aur baqi raqam ek nazar mein. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka intezaam kiya ja sakta hai. 1) Pichle theke ki wasool shuda aur baqi raqam ek safhe pe likh kar thekedar ko tehreeri tor pe bhej dein, taake baat hisaab se shuru ho. 2) Naye theke mein har qist ki tareekh saaf likhwayein, aur qanooni pehlu apne wakeel se dekh lein. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: har qist ka hisaab, tareekh se pehle WhatsApp yaad-dihani, aur baqi raqam ek nazar mein. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

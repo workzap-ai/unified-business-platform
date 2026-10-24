@@ -1,7 +1,7 @@
 {
   "industry": "retail_shops_and_chains",
   "name": "Retail shops and chains (general merchandise, multi-branch)",
-  "sector": "7.A Retail and consumer (part 1",
+  "sector": "7.A Retail and consumer (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -187,8 +187,7 @@
           "nori_daily_read"
         ],
         "text": "one WhatsApp message each morning with yesterday's sales, cash vs card, top and bottom items and stock issues for every branch, with no one compiling it.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Do all branches use the same POS?",
       "free_stops": "Which numbers go in the read and how they are pulled from each branch's system are in the solution document."
@@ -237,11 +236,15 @@
     }
   ],
   "never_say": [
-    "That a specific cashier, manager or storekeeper is stealing, or how to watch staff secretly. Anything about FBR POS integration rules, sales tax, VAT or keeping separate books. Lease, rent negotiation or employment law advice. That a listing, display or message will bring a certain number of customers or lift sales. To confront or detain shoplifters; for threats or violence, contact the police first."
+    "That a specific cashier, manager or storekeeper is stealing, or how to watch staff secretly.",
+    "Anything about FBR POS integration rules, sales tax, VAT or keeping separate books.",
+    "Lease, rent negotiation or employment law advice.",
+    "That a listing, display or message will bring a certain number of customers or lift sales.",
+    "To confront or detain shoplifters; for threats or violence, contact the police first."
   ],
   "sample_reply": {
     "person": "Hamari teen clothing branches hain, Tariq Road wali mein log aate hi kam hain, aur jo aate hain woh bhi dekh ke chale jaate hain. Koi solution batayein.",
-    "pi": "Ji haan, is pe kaafi kuch kiya ja sakta hai, aur shuruaat isi hafte ho sakti hai. 1 Tariq Road branch ki Google Maps listing naye photos aur sahi timing ke saath update karein, kyunke bohot log nazdeeki search se hi aate hain. 2 Kuch din darwaze pe aane walon ki ginti aur bills ki ginti mila ke dekhein, taa ke pata chale kis waqt log bina khareede jaate hain. Workzap ye sab aap ke liye khud-ba-khud kar sakta hai: har branch ka subah ka report jis mein footfall, bills aur \"maanga lekin nahi mila\" ek jagah dikhe, aur customers ki ijazat se un ko branch code wale WhatsApp messages. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is pe kaafi kuch kiya ja sakta hai, aur shuruaat isi hafte ho sakti hai. 1) Tariq Road branch ki Google Maps listing naye photos aur sahi timing ke saath update karein, kyunke bohot log nazdeeki search se hi aate hain. 2) Kuch din darwaze pe aane walon ki ginti aur bills ki ginti mila ke dekhein, taa ke pata chale kis waqt log bina khareede jaate hain. Workzap ye sab aap ke liye khud-ba-khud kar sakta hai: har branch ka subah ka report jis mein footfall, bills aur \"maanga lekin nahi mila\" ek jagah dikhe, aur customers ki ijazat se un ko branch code wale WhatsApp messages. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

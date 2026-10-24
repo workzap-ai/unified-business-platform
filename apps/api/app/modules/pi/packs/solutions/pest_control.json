@@ -80,7 +80,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "A re-treatment tracker with cause and cost, to show repeat- complaint patterns by service and technician.",
+        "text": "A re-treatment tracker with cause and cost, to show repeat-complaint patterns by service and technician.",
         "tool_words": []
       },
       "ask_first": "How are re-treatments handled and charged?",
@@ -210,11 +210,15 @@
     }
   ],
   "never_say": [
-    "Any product, dosage, dilution, application method, re-entry time or safety precaution; the licensed technician and label decide. Any answer to health questions like \"is it safe for my baby\"; the business needs consistent approved guidance. Any help using banned or unlabelled chemicals, diluting product, faking reports or working without a licence. Any recording of customers' names, addresses or numbers, or technicians' personal details. Anything other than emergency services, the poison centre or a vet first for suspected poisoning or exposure."
+    "Any product, dosage, dilution, application method, re-entry time or safety precaution; the licensed technician and label decide.",
+    "Any answer to health questions like \"is it safe for my baby\"; the business needs consistent approved guidance.",
+    "Any help using banned or unlabelled chemicals, diluting product, faking reports or working without a licence.",
+    "Any recording of customers' names, addresses or numbers, or technicians' personal details.",
+    "Anything other than emergency services, the poison centre or a vet first for suspected poisoning or exposure."
   ],
   "sample_reply": {
     "person": "Is there a better way to handle service reports? Restaurants need them for inspections and ours are handwritten and half go missing.",
-    "pi": "Yes, this can be sorted, and you can start this week. 1 Ask technicians to photograph each report and send it to one office number, so nothing stays in a van. 2 File those by client and month, so any report can be found in minutes. Workzap can do this automatically for you: digital reports made on the technician's phone, sent to the client instantly and stored as an audit pack. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be sorted, and you can start this week. 1) Ask technicians to photograph each report and send it to one office number, so nothing stays in a van. 2) File those by client and month, so any report can be found in minutes. Workzap can do this automatically for you: digital reports made on the technician's phone, sent to the client instantly and stored as an audit pack. Shall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

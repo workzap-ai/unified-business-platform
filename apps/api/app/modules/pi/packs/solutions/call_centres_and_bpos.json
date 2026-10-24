@@ -118,9 +118,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "integration"
+          "integration",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports — a daily client report pulled from the dialer, CRM and QA into each client's format.",
+        "text": "a daily client report pulled from the dialer, CRM and QA into each client's format.",
         "tool_words": [
           "crm"
         ]
@@ -211,11 +212,16 @@
     }
   ],
   "never_say": [
-    "Any labour-law, telemarketing-regulation, data-protection or tax advice. Anything involving deceptive scripts, caller ID spoofing, unconsented robocalls or buying personal data lists. Covert monitoring of staff outside a lawful, known policy. That SLAs will be met or attrition will drop. Requests for agent names, IDs, salaries, call recordings or end-customer data. If anyone is in immediate danger on a shift or in transport, point to emergency services."
+    "Any labour-law, telemarketing-regulation, data-protection or tax advice.",
+    "Anything involving deceptive scripts, caller ID spoofing, unconsented robocalls or buying personal data lists.",
+    "Covert monitoring of staff outside a lawful, known policy.",
+    "That SLAs will be met or attrition will drop.",
+    "Requests for agent names, IDs, salaries, call recordings or end-customer data.",
+    "If anyone is in immediate danger on a shift or in transport, point to emergency services."
   ],
   "sample_reply": {
     "person": "Night shift pe agents late aate hain aur breaks lambe ho jate hain, client SLA pe complaint karta hai. Kya kiya ja sakta hai?",
-    "pi": "Ji haan, is pe kaafi kuch kiya ja sakta hai aur is hafte se shuruaat ho sakti hai. 1 Ek hafte ke liye team leaders shift shuru hote hi roll call karein, taake late aana agle din nahi balke usi waqt nazar aaye. 2 Ek dafa likh lein ke kaun late aaya aur kyun, taake pata chale masla transport ka hai ya roster ka. Workzap yeh aap ke liye automatically kar sakta hai: dialer ke data se live floor board aur breaks lambe hone pe team leader ko foran alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is pe kaafi kuch kiya ja sakta hai aur is hafte se shuruaat ho sakti hai. 1) Ek hafte ke liye team leaders shift shuru hote hi roll call karein, taake late aana agle din nahi balke usi waqt nazar aaye. 2) Ek dafa likh lein ke kaun late aaya aur kyun, taake pata chale masla transport ka hai ya roster ka. Workzap yeh aap ke liye automatically kar sakta hai: dialer ke data se live floor board aur breaks lambe hone pe team leader ko foran alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

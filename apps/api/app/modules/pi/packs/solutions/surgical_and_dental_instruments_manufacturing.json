@@ -1,7 +1,7 @@
 {
   "industry": "surgical_and_dental_instruments_manufacturing",
   "name": "Surgical and dental instruments manufacturing",
-  "sector": "7.D Manufacturing and industry (part 1",
+  "sector": "7.D Manufacturing and industry (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -16,9 +16,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "transfer_tracking"
         ],
-        "text": "transfer_tracking A lot tracker following each lot through forging, machining, heat treatment, filing, polishing, passivation and marking, with vendor and dates.",
+        "text": "A lot tracker following each lot through forging, machining, heat treatment, filing, polishing, passivation and marking, with vendor and dates.",
         "tool_words": []
       },
       "ask_first": "Roughly how many lots are with vendors at any time?",
@@ -56,9 +57,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "workflow_automation"
         ],
-        "text": "workflow_automation A digital batch record built automatically as each stage is completed, exportable per shipment.",
+        "text": "A digital batch record built automatically as each stage is completed, exportable per shipment.",
         "tool_words": []
       },
       "ask_first": "",
@@ -178,9 +180,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "lead_followup"
+          "lead_followup",
+          "website_digital"
         ],
-        "text": "website_digital An inquiry tracker with reply timers, and an updated digital catalogue searchable by category and catalogue number.",
+        "text": "An inquiry tracker with reply timers, and an updated digital catalogue searchable by category and catalogue number.",
         "tool_words": []
       },
       "ask_first": "",
@@ -209,11 +212,16 @@
     }
   ],
   "never_say": [
-    "Any help falsifying or \"arranging\" CE, FDA, ISO or other certificates, test reports, markings or batch records. Any regulatory, sterilisation, clinical-use or material advice; suggest a regulatory or quality adviser. Anything on acids or chemicals for passivation; chemical burns are emergencies. Customs, misdeclared goods, origin or value. Storing vendor, worker, buyer or patient details; if a patient was harmed, point to medical help. Any guarantee of fewer rejections or faster audits."
+    "Any help falsifying or \"arranging\" CE, FDA, ISO or other certificates, test reports, markings or batch records.",
+    "Any regulatory, sterilisation, clinical-use or material advice; suggest a regulatory or quality adviser.",
+    "Anything on acids or chemicals for passivation; chemical burns are emergencies.",
+    "Customs, misdeclared goods, origin or value.",
+    "Storing vendor, worker, buyer or patient details; if a patient was harmed, point to medical help.",
+    "Any guarantee of fewer rejections or faster audits."
   ],
   "sample_reply": {
     "person": "Our lots go through forging, filing and polishing outside and I never know where they are. Can you help?",
-    "pi": "Yes, this can definitely be organised, and you can start this week. 1 List every lot currently out with vendors, with its stage and the date it left, so you have one clear picture today. 2 Mark which lots belong to the nearest shipment, so those are chased first. Workzap can do this automatically for you: a lot tracker that follows each lot through every vendor stage and flags overdue or short returns each day. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can definitely be organised, and you can start this week. 1) List every lot currently out with vendors, with its stage and the date it left, so you have one clear picture today. 2) Mark which lots belong to the nearest shipment, so those are chased first. Workzap can do this automatically for you: a lot tracker that follows each lot through every vendor stage and flags overdue or short returns each day. Shall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

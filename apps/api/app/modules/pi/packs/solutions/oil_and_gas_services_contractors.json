@@ -38,7 +38,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "dashboards_reports An overtime and hours approval log matched to client-approved hours, flagging mismatches before an invoice goes out.",
+        "text": "dashboards_reports — An overtime and hours approval log matched to client-approved hours, flagging mismatches before an invoice goes out.",
         "tool_words": []
       },
       "ask_first": "",
@@ -78,7 +78,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A certification and pass expiry matrix by role and certificate type with advance alerts IDs stay in the company's own secured records).",
+        "text": "A certification and pass expiry matrix by role and certificate type with advance alerts (IDs stay in the company's own secured records).",
         "tool_words": []
       },
       "ask_first": "",
@@ -138,7 +138,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "workflow_automation An equipment and tool register with location, status and calibration or inspection due dates and reminders.",
+        "text": "workflow_automation — An equipment and tool register with location, status and calibration or inspection due dates and reminders.",
         "tool_words": []
       },
       "ask_first": "",
@@ -179,7 +179,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "dashboards_reports A site daily report form with progress, photos and issues that compiles into the client's format.",
+        "text": "dashboards_reports — A site daily report form with progress, photos and issues that compiles into the client's format.",
         "tool_words": []
       },
       "ask_first": "",
@@ -207,11 +207,15 @@
     }
   ],
   "never_say": [
-    "Any HSE, process safety, well control, permit-to-work, hazardous-area, H2S or engineering advice. Anything that helps forge or backdate certificates, timesheets or inspection reports. Any request for workers' passports, visas, IDs or medical fitness records, or client confidential data. Any contract interpretation, or help with bribery or \"facilitation\" around tenders. Anything other than emergency services and site emergency response for leaks, fire, gas exposure or injury."
+    "Any HSE, process safety, well control, permit-to-work, hazardous-area, H2S or engineering advice.",
+    "Anything that helps forge or backdate certificates, timesheets or inspection reports.",
+    "Any request for workers' passports, visas, IDs or medical fitness records, or client confidential data.",
+    "Any contract interpretation, or help with bribery or \"facilitation\" around tenders.",
+    "Anything other than emergency services and site emergency response for leaks, fire, gas exposure or injury."
   ],
   "sample_reply": {
     "person": "Timesheets come in late from site and the client rejects half our invoices. Can you suggest a solution?",
-    "pi": "Yes, this can be improved, and you can start this week on your own. 1 Ask site supervisors to send signed timesheets weekly rather than at month end, so invoicing is not held back. 2 Check hours against the client's approved figures before each invoice goes out, so mismatches are caught in-house. Workzap can do this automatically for you: timesheets captured and signed off at site that flow straight into invoicing, with mismatches flagged before anything reaches the client. Shall I have a solution document and quote prepared for you? You are free to say no.",
+    "pi": "Yes, this can be improved, and you can start this week on your own. 1) Ask site supervisors to send signed timesheets weekly rather than at month end, so invoicing is not held back. 2) Check hours against the client's approved figures before each invoice goes out, so mismatches are caught in-house. Workzap can do this automatically for you: timesheets captured and signed off at site that flow straight into invoicing, with mismatches flagged before anything reaches the client. Shall I have a solution document and quote prepared for you? You are free to say no.",
     "language": "english"
   }
 }

@@ -18,7 +18,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "doctor-wise WhatsApp booking that sends reminders automatically every day, takes confirm and cancel replies, fills freed slots from a waitlist and tracks no- shows by doctor and branch, with no medical details in any message.",
+        "text": "doctor-wise WhatsApp booking that sends reminders automatically every day, takes confirm and cancel replies, fills freed slots from a waitlist and tracks no-shows by doctor and branch, with no medical details in any message.",
         "tool_words": []
       },
       "ask_first": "Are most of your no-shows in the morning sessions or the evening clinic?",
@@ -179,7 +179,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "workflow_automation — a shared inbox that tags every message, tracks response time, answers routine logistics and routes anything urgent to staff with an emergency- number notice.",
+        "text": "workflow_automation — a shared inbox that tags every message, tracks response time, answers routine logistics and routes anything urgent to staff with an emergency-number notice.",
         "tool_words": []
       },
       "ask_first": "How many people reply from the clinic number now?",
@@ -220,19 +220,23 @@
           "nori_daily_read"
         ],
         "text": "a morning read on the owner's phone with visits by doctor, branch and shift, revenue by cash, panel and insurance, and the one number to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Do you run one branch or more?",
       "free_stops": "Which numbers appear and how they are pulled is set out in the solution document."
     }
   ],
   "never_say": [
-    "Anything about diagnoses, prescriptions, referrals or whether a doctor's decision was right. Suggestions to adjust claim codes, back-date visits or issue sick notes without a visit. Interpretations of DHA, DOH, MOHAP, PMDC or provincial college rules; point to the regulator or an adviser. Ideas that put a patient's name with a condition, test or result in any message. Who is right in a doctor-pay dispute. Promises that waiting times or no-shows will fall by any amount."
+    "Anything about diagnoses, prescriptions, referrals or whether a doctor's decision was right.",
+    "Suggestions to adjust claim codes, back-date visits or issue sick notes without a visit.",
+    "Interpretations of DHA, DOH, MOHAP, PMDC or provincial college rules; point to the regulator or an adviser.",
+    "Ideas that put a patient's name with a condition, test or result in any message.",
+    "Who is right in a doctor-pay dispute.",
+    "Promises that waiting times or no-shows will fall by any amount."
   ],
   "sample_reply": {
     "person": "Bhai shaam ko clinic mein bohat rush hota hai, log do do ghante wait karte hain aur phir Google pe ganday reviews. Koi hal batao.",
-    "pi": "Ji, is ka hal mumkin hai aur shuruat isi hafte ki ja sakti hai. 1 Ek hafte tak har ghante ke tokens likhein, taake asal rush ka waqt saamne aa jaye. 2 Doctor late hon to reception waiting patients ko bata de, taake log bina khabar ke na baithe rahein. Workzap yeh sab aap ke liye khud-ba-khud bana sakta hai: WhatsApp booking, reminders aur har doctor ki waiting dikhane wala board, roz ke hisaab ke saath aur bina kisi patient ki detail ke. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruat isi hafte ki ja sakti hai. 1) Ek hafte tak har ghante ke tokens likhein, taake asal rush ka waqt saamne aa jaye. 2) Doctor late hon to reception waiting patients ko bata de, taake log bina khabar ke na baithe rahein. Workzap yeh sab aap ke liye khud-ba-khud bana sakta hai: WhatsApp booking, reminders aur har doctor ki waiting dikhane wala board, roz ke hisaab ke saath aur bina kisi patient ki detail ke. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

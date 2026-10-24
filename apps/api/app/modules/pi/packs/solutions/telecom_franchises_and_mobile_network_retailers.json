@@ -11,7 +11,7 @@
       "category": "sales_revenue",
       "subtype": "target_missed",
       "quick_ideas": [
-        "Check progress against each target type every Monday, so you know by mid- month if you are behind",
+        "Check progress against each target type every Monday, so you know by mid-month if you are behind",
         "Split the monthly target into a weekly figure per outlet, so each manager has a number they can see."
       ],
       "workzap_build": {
@@ -60,7 +60,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "transfer_tracking A serialised stock register for kits and handsets showing received, issued by role, sold and returned, with alerts for kits out too long.",
+        "text": "transfer_tracking — A serialised stock register for kits and handsets showing received, issued by role, sold and returned, with alerts for kits out too long.",
         "tool_words": []
       },
       "ask_first": "",
@@ -80,7 +80,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "nori_daily_read A daily read of stock per outlet with ageing flags for slow handsets and low-stock alerts for fast ones.",
+        "text": "nori_daily_read — A daily read of stock per outlet with ageing flags for slow handsets and low-stock alerts for fast ones.",
         "tool_words": []
       },
       "ask_first": "",
@@ -201,9 +201,8 @@
         "keys": [
           "nori_daily_read"
         ],
-        "text": "cash_reconciliation A morning read of sales, stock and cash closing across every outlet, with the one outlet that needs attention.",
-        "tool_words": [],
-        "leads_with_view": true
+        "text": "cash_reconciliation — A morning read of sales, stock and cash closing across every outlet, with the one outlet that needs attention.",
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "Which figures and how they are collected is in the solution document."
@@ -230,11 +229,15 @@
     }
   ],
   "never_say": [
-    "Anything about tariffs, packages or operator policy. Anything that helps issue SIMs without verification, re-use fingerprints or use another person's ID. Anything that helps sell grey-market or non-registered handsets, or works around PTA, TDRA or CRTC rules. Any request for customers' identity, numbers, biometric or account details. Any view on operator contract or penalty disputes."
+    "Anything about tariffs, packages or operator policy.",
+    "Anything that helps issue SIMs without verification, re-use fingerprints or use another person's ID.",
+    "Anything that helps sell grey-market or non-registered handsets, or works around PTA, TDRA or CRTC rules.",
+    "Any request for customers' identity, numbers, biometric or account details.",
+    "Any view on operator contract or penalty disputes."
   ],
   "sample_reply": {
     "person": "We keep realising on the 28th that we are behind on gross adds. Is there a fix for this?",
-    "pi": "Yes, there is, and you can start this week on your own. 1 Check progress against each target type every Monday, so you know by mid-month whether you are behind. 2 Turn the monthly target into a weekly number per outlet, so each manager can see their own gap. Workzap can do this automatically for you: a tracker fed by daily staff entries that shows progress against days left for every outlet and BA and alerts you mid-month. Shall I have a solution document and quote prepared for you? You are free to say no.",
+    "pi": "Yes, there is, and you can start this week on your own. 1) Check progress against each target type every Monday, so you know by mid-month whether you are behind. 2) Turn the monthly target into a weekly number per outlet, so each manager can see their own gap. Workzap can do this automatically for you: a tracker fed by daily staff entries that shows progress against days left for every outlet and BA and alerts you mid-month. Shall I have a solution document and quote prepared for you? You are free to say no.",
     "language": "english"
   }
 }

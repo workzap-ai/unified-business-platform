@@ -38,7 +38,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "booking_scheduling Written routes on phone with a crew assignment board and stand-in planning.",
+        "text": "booking_scheduling — Written routes on phone with a crew assignment board and stand-in planning.",
         "tool_words": []
       },
       "ask_first": "",
@@ -79,7 +79,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "workflow_automation A skip and bin register with placement date, hire end and overdue alerts for billing.",
+        "text": "workflow_automation — A skip and bin register with placement date, hire end and overdue alerts for billing.",
         "tool_words": []
       },
       "ask_first": "",
@@ -99,7 +99,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "customer_messaging A subscriber billing and collection tracker with reminders and online payment links where available.",
+        "text": "customer_messaging — A subscriber billing and collection tracker with reminders and online payment links where available.",
         "tool_words": []
       },
       "ask_first": "",
@@ -180,8 +180,7 @@
           "dashboards_reports"
         ],
         "text": "A monthly service report generator for societies and commercial clients built from route records and photos.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "Report format is in the solution document."
@@ -200,7 +199,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "A crew attendance and daily assignment board with stand- in planning for peak and holiday periods.",
+        "text": "A crew attendance and daily assignment board with stand-in planning for peak and holiday periods.",
         "tool_words": []
       },
       "ask_first": "",
@@ -228,11 +227,15 @@
     }
   ],
   "never_say": [
-    "Anything on handling, classifying or disposing of hazardous, medical, chemical or industrial waste, protective equipment or confined-space entry. Anything that helps with illegal dumping, burning, mixing waste to avoid fees or bypassing permits. Any request for customer addresses and phone numbers or workers' names, IDs and personal circumstances. Any help with bribery around municipal contracts or permits. Anything other than emergency services when a worker is in a sewer or septic tank in difficulty, or gas, fire or injury is described."
+    "Anything on handling, classifying or disposing of hazardous, medical, chemical or industrial waste, protective equipment or confined-space entry.",
+    "Anything that helps with illegal dumping, burning, mixing waste to avoid fees or bypassing permits.",
+    "Any request for customer addresses and phone numbers or workers' names, IDs and personal circumstances.",
+    "Any help with bribery around municipal contracts or permits.",
+    "Anything other than emergency services when a worker is in a sewer or septic tank in difficulty, or gas, fire or injury is described."
   ],
   "sample_reply": {
     "person": "Society wale har hafte shikayat karte hain ke gaari nahi aayi, aur hamare paas koi saboot nahi hota. Kya karein?",
-    "pi": "Ji, is ka hal mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1 Driver har stop pe ek photo le, taake service ka saboot ho. 2 Rozana done aur missed stops ki list rakhein, taake har shikayat us se mila sakein. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: har truck ka route phone pe, har stop waqt aur photo ke saath mark ho, aur har society ke liye proof-of-service report khud ban jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1) Driver har stop pe ek photo le, taake service ka saboot ho. 2) Rozana done aur missed stops ki list rakhein, taake har shikayat us se mila sakein. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: har truck ka route phone pe, har stop waqt aur photo ke saath mark ho, aur har society ke liye proof-of-service report khud ban jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

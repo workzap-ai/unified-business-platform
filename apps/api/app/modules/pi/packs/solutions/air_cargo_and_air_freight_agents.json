@@ -1,7 +1,7 @@
 {
   "industry": "air_cargo_and_air_freight_agents",
   "name": "Air cargo and air-freight agents",
-  "sector": "7.G Transport, mobility and aviation (part 1",
+  "sector": "7.G Transport, mobility and aviation (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -73,7 +73,7 @@
       "subtype": "margin_unknown",
       "quick_ideas": [
         "Take one finished shipment and list every charge against the sell rate, so you see which ones arrive late",
-        "Note which charges (storage, handling, DO appear unexpectedly most often, so you can ask about them upfront."
+        "Note which charges (storage, handling, DO) appear unexpectedly most often, so you can ask about them upfront."
       ],
       "workzap_build": {
         "keys": [
@@ -204,15 +204,18 @@
           "dashboards_reports"
         ],
         "text": "a daily read of shipments, revenue and margin by lane, customer and salesperson, so the month end is already done.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Mahine ka hisaab abhi kis software mein hota hai?",
       "free_stops": "The report measures and data sources are designed in the solution document."
     }
   ],
   "never_say": [
-    "Anything on customs classification, duties, tariffs, export or import licensing, sanctions or dangerous goods acceptance; suggest they talk to their clearing agent or customs adviser. Anything that helps under-declare, misdeclare, undervalue, hide items or avoid inspection. Handling or temperature advice for pharma and perishables. Legal advice on claims with airlines or customers. Anything that stores shipper or consignee IDs, NTN/CNIC/Emirates ID numbers, bank details or personal addresses."
+    "Anything on customs classification, duties, tariffs, export or import licensing, sanctions or dangerous goods acceptance; suggest they talk to their clearing agent or customs adviser.",
+    "Anything that helps under-declare, misdeclare, undervalue, hide items or avoid inspection.",
+    "Handling or temperature advice for pharma and perishables.",
+    "Legal advice on claims with airlines or customers.",
+    "Anything that stores shipper or consignee IDs, NTN/CNIC/Emirates ID numbers, bank details or personal addresses."
   ],
   "sample_reply": {
     "person": "Customers saara din call karte hain ke cargo kahan hai, mere staff ka poora din isi mein nikal jata hai. Koi hal hai?",

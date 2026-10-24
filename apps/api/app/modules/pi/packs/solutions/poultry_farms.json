@@ -1,7 +1,7 @@
 {
   "industry": "poultry_farms",
   "name": "Poultry farms (broiler and layer)",
-  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -120,8 +120,7 @@
           "dashboards_reports"
         ],
         "text": "a running FCR and cost-per-bird view updated daily from the farm's own entries.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Are feed issues written per shed or for the whole farm?",
       "free_stops": "How the running figures are calculated is detailed in the solution document."
@@ -210,11 +209,15 @@
     }
   ],
   "never_say": [
-    "Any vaccine, medicine, antibiotic, dosing, withdrawal time, feed formula, lighting programme or biosecurity advice; suggest their vet or company technical team. Any disease diagnosis Newcastle, bird flu, gumboro); for a suspected outbreak, suggest their vet and livestock department now. Anything that helps sell birds or eggs that should be withheld, hide mortality from integrators or insurers, or dodge environment or food rules. Predictions of rates or flock profit. Advice on quota or marketing board rules in Canada, or covert surveillance of workers."
+    "Any vaccine, medicine, antibiotic, dosing, withdrawal time, feed formula, lighting programme or biosecurity advice; suggest their vet or company technical team.",
+    "Any disease diagnosis (Newcastle, bird flu, gumboro); for a suspected outbreak, suggest their vet and livestock department now.",
+    "Anything that helps sell birds or eggs that should be withheld, hide mortality from integrators or insurers, or dodge environment or food rules.",
+    "Predictions of rates or flock profit.",
+    "Advice on quota or marketing board rules in Canada, or covert surveillance of workers."
   ],
   "sample_reply": {
     "person": "3 broiler sheds hain Sheikhupura mein, daana dealer se udhaar pe aata hai aur wohi apna rate laga ke birds uthata hai. Har flock mein loss. Kya karein?",
-    "pi": "Ji haan, is ka hisaab saaf kiya ja sakta hai, aur kaam isi flock se shuru ho sakta hai. 1 Udhaar pe aane wali har cheez aur lifting ke din ka rate aur wazan apne paas alag likhein. 2 Har roz akhbar ya WhatsApp wala rate bhi saath likhein, taake lifting rate se mila kar dekha ja sake. Workzap yeh sab aap ke liye khud- ba-khud kar sakta hai: dealer ka ledger aur flock register jo udhaar, lifting, rate aur har flock ka asal nateeja roz aik jagah dikhaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hisaab saaf kiya ja sakta hai, aur kaam isi flock se shuru ho sakta hai. 1) Udhaar pe aane wali har cheez aur lifting ke din ka rate aur wazan apne paas alag likhein. 2) Har roz akhbar ya WhatsApp wala rate bhi saath likhein, taake lifting rate se mila kar dekha ja sake. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: dealer ka ledger aur flock register jo udhaar, lifting, rate aur har flock ka asal nateeja roz aik jagah dikhaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

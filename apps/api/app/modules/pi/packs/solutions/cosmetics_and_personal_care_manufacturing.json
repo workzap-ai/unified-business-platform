@@ -1,7 +1,7 @@
 {
   "industry": "cosmetics_and_personal_care_manufacturing",
   "name": "Cosmetics and personal-care manufacturing",
-  "sector": "7.D Manufacturing and industry (part 2",
+  "sector": "7.D Manufacturing and industry (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -112,7 +112,7 @@
       "category": "suppliers_purchasing",
       "subtype": "minimum_orders",
       "quick_ideas": [
-        "List packaging stock against usage per SKU shows real months of cover",
+        "List packaging stock against usage per SKU — shows real months of cover",
         "Standardise jars across SKUs where possible — fewer, larger orders."
       ],
       "workzap_build": {
@@ -188,11 +188,16 @@
     }
   ],
   "never_say": [
-    "No formulation, ingredient safety, dermatological or medical advice; never say a product is safe. Serious reactions (swelling, breathing problems, eye injury): urge urgent medical help and emergency services; record nothing about the person. No advice on labelling claims, whitening or mercury rules, halal certification or registration. Never help copy another brand's packaging, fake halal or certification marks, or relabel expired stock; decline. Never help write or buy fake reviews. No customer photos, skin conditions or contact details stored; no influencer personal details."
+    "No formulation, ingredient safety, dermatological or medical advice; never say a product is safe.",
+    "Serious reactions (swelling, breathing problems, eye injury): urge urgent medical help and emergency services; record nothing about the person.",
+    "No advice on labelling claims, whitening or mercury rules, halal certification or registration.",
+    "Never help copy another brand's packaging, fake halal or certification marks, or relabel expired stock; decline.",
+    "Never help write or buy fake reviews.",
+    "No customer photos, skin conditions or contact details stored; no influencer personal details."
   ],
   "sample_reply": {
     "person": "Is there a solution for this? We send PR boxes to so many influencers and I can't tell if any of it works.",
-    "pi": "Yes, this is very solvable. 1 Give each influencer their own code or link, so orders show who brought them. 2 Put this month's PR boxes and paid posts next to the orders that followed, for a first picture. Workzap can do this automatically for you: unique codes per influencer with every order attributed and a running total of what each one brings in. Shall I have a solution document and quote prepared for you? You're free to say no.",
+    "pi": "Yes, this is very solvable. 1) Give each influencer their own code or link, so orders show who brought them. 2) Put this month's PR boxes and paid posts next to the orders that followed, for a first picture. Workzap can do this automatically for you: unique codes per influencer with every order attributed and a running total of what each one brings in. Shall I have a solution document and quote prepared for you? You're free to say no.",
     "language": "english"
   }
 }

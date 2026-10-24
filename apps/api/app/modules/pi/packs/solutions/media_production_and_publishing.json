@@ -16,9 +16,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports — a project budget tracker with line items, committed costs and actuals updated from phone during the shoot.",
+        "text": "a project budget tracker with line items, committed costs and actuals updated from phone during the shoot.",
         "tool_words": []
       },
       "ask_first": "How many shoots are planned this season?",
@@ -176,9 +177,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "stock_alerts"
+          "stock_alerts",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports — a publishing stock tracker covering print runs, warehouse stock, distributor stock and returns.",
+        "text": "a publishing stock tracker covering print runs, warehouse stock, distributor stock and returns.",
         "tool_words": []
       },
       "ask_first": "",
@@ -206,11 +208,15 @@
     }
   ],
   "never_say": [
-    "Any copyright, licensing, defamation, censorship, legal or tax advice. Anything involving plagiarism, pirated content, or using footage or music without rights. That content will get views or a release will succeed. Requests for talent or crew names, personal contract terms, unreleased content or reader data. On-set accidents, fires or stunts going wrong: point to emergency services first."
+    "Any copyright, licensing, defamation, censorship, legal or tax advice.",
+    "Anything involving plagiarism, pirated content, or using footage or music without rights.",
+    "That content will get views or a release will succeed.",
+    "Requests for talent or crew names, personal contract terms, unreleased content or reader data.",
+    "On-set accidents, fires or stunts going wrong: point to emergency services first."
   ],
   "sample_reply": {
     "person": "Ramzan ki shoots aa rahi hain aur har saal budget nikal jata hai, pata end mein chalta hai. Koi hal batayein.",
-    "pi": "Ji haan, is ka hal mumkin hai aur is season se pehle shuruaat ki ja sakti hai. 1 Agli shoot ke budget lines ek sheet pe rakhein aur shoot ke dauran roz actuals bharein, taake overrun waqt pe nazar aaye. 2 Set pe client ke har change ko likhte jayein, taake baad mein kharche ki baat facts pe ho. Workzap yeh aap ke liye automatically kar sakta hai: phone se roz budget vs actual aur har client change ka cost ke saath record. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal mumkin hai aur is season se pehle shuruaat ki ja sakti hai. 1) Agli shoot ke budget lines ek sheet pe rakhein aur shoot ke dauran roz actuals bharein, taake overrun waqt pe nazar aaye. 2) Set pe client ke har change ko likhte jayein, taake baad mein kharche ki baat facts pe ho. Workzap yeh aap ke liye automatically kar sakta hai: phone se roz budget vs actual aur har client change ka cost ke saath record. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

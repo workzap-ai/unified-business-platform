@@ -1,7 +1,7 @@
 {
   "industry": "sports_goods_manufacturing",
-  "name": "Sports goods manufacturing Sialkot cluster)",
-  "sector": "7.D Manufacturing and industry (part 1",
+  "name": "Sports goods manufacturing (Sialkot cluster)",
+  "sector": "7.D Manufacturing and industry (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -36,9 +36,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "attribution_codes"
+          "attribution_codes",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports Source tracking on every inquiry and order, showing which platform or channel actually brings business.",
+        "text": "Source tracking on every inquiry and order, showing which platform or channel actually brings business.",
         "tool_words": [
           "platform"
         ]
@@ -78,9 +79,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "workflow_automation"
         ],
-        "text": "workflow_automation A custom order spec sheet per order with logo files, colours, sizes, names and numbers and the approved mock-up, checked before production.",
+        "text": "A custom order spec sheet per order with logo files, colours, sizes, names and numbers and the approved mock-up, checked before production.",
         "tool_words": []
       },
       "ask_first": "",
@@ -178,9 +180,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "loyalty_repeat"
+          "loyalty_repeat",
+          "customer_messaging"
         ],
-        "text": "customer_messaging A buyer list with order history and timely reorder reminders, sent with their permission.",
+        "text": "A buyer list with order history and timely reorder reminders, sent with their permission.",
         "tool_words": []
       },
       "ask_first": "",
@@ -198,22 +201,31 @@
       ],
       "workzap_build": {
         "keys": [
+          "custom_build",
           "dashboards_reports"
         ],
-        "text": "custom_build A product-line margin view including freight and sample costs.",
+        "text": "A product-line margin view including freight and sample costs.",
         "tool_words": [],
-        "leads_with_view": true
+        "reordered_from": [
+          "dashboards_reports",
+          "custom_build"
+        ]
       },
       "ask_first": "",
       "free_stops": "How freight, samples and currency effects are built in is detailed in the solution document."
     }
   ],
   "never_say": [
-    "Any help making counterfeit branded goods or using club, league or tournament logos without rights. Any advice on certification standards, product testing or claims like \"official match ball\". Customs, tax, misdeclared value or under-invoicing help. Any help optimising child labour in stitching. Advice on Amazon or Alibaba appeals or platform policy. Any promise of more orders or better conversion."
+    "Any help making counterfeit branded goods or using club, league or tournament logos without rights.",
+    "Any advice on certification standards, product testing or claims like \"official match ball\".",
+    "Customs, tax, misdeclared value or under-invoicing help.",
+    "Any help optimising child labour in stitching.",
+    "Advice on Amazon or Alibaba appeals or platform policy.",
+    "Any promise of more orders or better conversion."
   ],
   "sample_reply": {
     "person": "We get lots of Alibaba inquiries but very few orders, and samples take too long. What would you suggest?",
-    "pi": "Yes, there is a lot that can be done here, starting this week. 1 List every open inquiry with the date it arrived and give one person responsibility for first replies, so buyers are not left waiting. 2 Note what held up your last lost sample, so that step gets attention first. Workzap can do this automatically for you: one inbox for Alibaba, email and WhatsApp leads with reply timers, and a sample tracker that flags anything running late. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, there is a lot that can be done here, starting this week. 1) List every open inquiry with the date it arrived and give one person responsibility for first replies, so buyers are not left waiting. 2) Note what held up your last lost sample, so that step gets attention first. Workzap can do this automatically for you: one inbox for Alibaba, email and WhatsApp leads with reply timers, and a sample tracker that flags anything running late. Shall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

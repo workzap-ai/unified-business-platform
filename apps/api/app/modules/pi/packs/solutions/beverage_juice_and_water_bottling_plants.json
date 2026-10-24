@@ -176,22 +176,26 @@
       ],
       "workzap_build": {
         "keys": [
-          "dashboards_reports"
+          "dashboards_reports",
+          "credit_ledger"
         ],
-        "text": "and credit_ledger — a route profitability report (sales, diesel, driver cost, breakages) and an office receivables ledger with reminders.",
-        "tool_words": [],
-        "leads_with_view": true
+        "text": "a route profitability report (sales, diesel, driver cost, breakages) and an office receivables ledger with reminders.",
+        "tool_words": []
       },
       "ask_first": "How long do office customers take to pay?",
       "free_stops": "The route profit method and reminder schedule are in the solution document."
     }
   ],
   "never_say": [
-    "Anything about water-quality standards, test parameters or treatment chemicals. Licensing or food-authority advice; contamination or recall steps — point to the authority and qualified advisers. Covert tracking of drivers' personal phones. Help refilling competitors' branded bottles, faking test reports or skipping licensing. That losses will fall by a set amount."
+    "Anything about water-quality standards, test parameters or treatment chemicals.",
+    "Licensing or food-authority advice; contamination or recall steps — point to the authority and qualified advisers.",
+    "Covert tracking of drivers' personal phones.",
+    "Help refilling competitors' branded bottles, faking test reports or skipping licensing.",
+    "That losses will fall by a set amount."
   ],
   "sample_reply": {
     "person": "We do 19-litre water delivery in Sharjah and Ajman. Bottles just disappear. What can we do?",
-    "pi": "Yes, you can get control of your bottles, and you can start this week. 1 Count the bottles in the plant and on vans once, so you know how many are really out. 2 Have drivers note empties collected at every stop, so each account has a balance. Workzap can do this automatically for you, with a bottle and dispenser register by account number updated from every route, showing delivered, returned and outstanding. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, you can get control of your bottles, and you can start this week. 1) Count the bottles in the plant and on vans once, so you know how many are really out. 2) Have drivers note empties collected at every stop, so each account has a balance. Workzap can do this automatically for you, with a bottle and dispenser register by account number updated from every route, showing delivered, returned and outstanding. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

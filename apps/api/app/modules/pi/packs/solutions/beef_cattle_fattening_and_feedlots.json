@@ -1,7 +1,7 @@
 {
   "industry": "beef_cattle_fattening_and_feedlots",
   "name": "Beef cattle fattening and feedlots",
-  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -119,7 +119,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "customer_messaging Eid bookings with advance, reserved animal (tag and photo), slot and balance, with confirmations and reminders sent automatically.",
+        "text": "customer_messaging — Eid bookings with advance, reserved animal (tag and photo), slot and balance, with confirmations and reminders sent automatically.",
         "tool_words": []
       },
       "ask_first": "Are bookings taken only in person, or on WhatsApp too?",
@@ -210,11 +210,15 @@
     }
   ],
   "never_say": [
-    "Anything on growth promoters, hormones, injections, rations, medicines, vaccines or withdrawal periods; point to their vet or nutritionist. Any judgement on whether an animal is healthy or fit for slaughter or export. Anything that helps fake weights, sell sick animals, or forge movement, health or export papers. Promised profit, weight gain or batch results. Legal opinions on partner shares, or advice on CCIA tagging, traceability rules or packer contracts in Canada."
+    "Anything on growth promoters, hormones, injections, rations, medicines, vaccines or withdrawal periods; point to their vet or nutritionist.",
+    "Any judgement on whether an animal is healthy or fit for slaughter or export.",
+    "Anything that helps fake weights, sell sick animals, or forge movement, health or export papers.",
+    "Promised profit, weight gain or batch results.",
+    "Legal opinions on partner shares, or advice on CCIA tagging, traceability rules or packer contracts in Canada."
   ],
   "sample_reply": {
     "person": "Hum har saal Eid ke liye 80 bachhre fattening karte hain, is dafa profit ka pata hi nahi chala. Koi solution hai?",
-    "pi": "Ji haan, batch ka asal hisaab nikalna bilkul mumkin hai aur kaam isi hafte shuru ho sakta hai. 1 Is batch ke saare bills aik file mein jama karein, transport, mazdoori aur mare hue jaanwar bhi shamil kar ke. 2 Har jaanwar ki khareed ki qeemat aur seller likhein, taake bechte waqt har aik ka hisaab alag dekha ja sake. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: aik batch register jo har kharcha jodta rahe aur har jaanwar aur poore batch ka munafa aap ke phone pe dikhaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, batch ka asal hisaab nikalna bilkul mumkin hai aur kaam isi hafte shuru ho sakta hai. 1) Is batch ke saare bills aik file mein jama karein, transport, mazdoori aur mare hue jaanwar bhi shamil kar ke. 2) Har jaanwar ki khareed ki qeemat aur seller likhein, taake bechte waqt har aik ka hisaab alag dekha ja sake. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: aik batch register jo har kharcha jodta rahe aur har jaanwar aur poore batch ka munafa aap ke phone pe dikhaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

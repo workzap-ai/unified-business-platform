@@ -118,7 +118,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "sent and received counts per batch, with any sent-not- received sample flagged to both ends the same day.",
+        "text": "sent and received counts per batch, with any sent-not-received sample flagged to both ends the same day.",
         "tool_words": []
       },
       "ask_first": "Who counts samples on arrival at the lab?",
@@ -199,19 +199,23 @@
           "nori_daily_read"
         ],
         "text": "a morning read on the owner's phone with tests, revenue, recollects and average turnaround per branch, and the one number to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Does your LIS cover every branch?",
       "free_stops": "Which numbers and how they are pulled from the LIS is set in the solution document."
     }
   ],
   "never_say": [
-    "Anything about results, reference ranges, critical values or which test someone should take. Any view on quality-control, cold-chain or accreditation standards. Help issuing reports without testing, altering results or producing fitness or visa medicals without proper testing. Ways to set up hidden payments to referring doctors. Legal advice on a report sent to the wrong person; point to a lawyer. Ideas that put names, sample IDs or results in messages."
+    "Anything about results, reference ranges, critical values or which test someone should take.",
+    "Any view on quality-control, cold-chain or accreditation standards.",
+    "Help issuing reports without testing, altering results or producing fitness or visa medicals without proper testing.",
+    "Ways to set up hidden payments to referring doctors.",
+    "Legal advice on a report sent to the wrong person; point to a lawyer.",
+    "Ideas that put names, sample IDs or results in messages."
   ],
   "sample_reply": {
     "person": "Hamaray collection points se samples der se aate hain aur lab ka evening run miss ho jata hai. Is ka koi hal hai?",
-    "pi": "Ji, is ka hal mumkin hai aur shuruat isi hafte ho sakti hai. 1 Ek hafte tak har point se batch nikalne aur lab pohanchne ka waqt likhein, taake late routes saamne aa jayein. 2 Har point ka ek fixed cut-off time tay karein, taake rider ko pata ho kab nikalna hai. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: har batch ka collection point se lab tak record, rider handover ke saath, aur late ya missing batch ka roz alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruat isi hafte ho sakti hai. 1) Ek hafte tak har point se batch nikalne aur lab pohanchne ka waqt likhein, taake late routes saamne aa jayein. 2) Har point ka ek fixed cut-off time tay karein, taake rider ko pata ho kab nikalna hai. Workzap yeh kaam aap ke liye khud-ba-khud kar sakta hai: har batch ka collection point se lab tak record, rider handover ke saath, aur late ya missing batch ka roz alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

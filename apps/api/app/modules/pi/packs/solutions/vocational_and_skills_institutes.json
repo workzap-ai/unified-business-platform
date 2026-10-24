@@ -18,7 +18,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "dashboards_reports Attendance and completion data that builds the funder-format report automatically each month, for every campus.",
+        "text": "dashboards_reports — Attendance and completion data that builds the funder-format report automatically each month, for every campus.",
         "tool_words": []
       },
       "ask_first": "Is attendance on paper registers or something digital today?",
@@ -38,7 +38,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "dashboards_reports A receivables tracker for funder and corporate payments, with expected dates, reminders and a cash-gap view updated daily.",
+        "text": "dashboards_reports — A receivables tracker for funder and corporate payments, with expected dates, reminders and a cash-gap view updated daily.",
         "tool_words": []
       },
       "ask_first": "",
@@ -52,7 +52,7 @@
       "subtype": "churn_subscription",
       "quick_ideas": [
         "Note which trainees have missed several sessions in a row, so you can reach them before they're gone",
-        "Call each of them once, or the parent's number given with permission for under- 18s, so you learn the reason."
+        "Call each of them once, or the parent's number given with permission for under-18s, so you learn the reason."
       ],
       "workzap_build": {
         "keys": [
@@ -79,7 +79,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "field_checks Issue slips per practical, usage per batch compared with expected every day, and reorder alerts per workshop.",
+        "text": "field_checks — Issue slips per practical, usage per batch compared with expected every day, and reorder alerts per workshop.",
         "tool_words": []
       },
       "ask_first": "",
@@ -201,8 +201,7 @@
           "dashboards_reports"
         ],
         "text": "Placement outcomes recorded as counts by course and campus, kept up to date after each batch.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "How outcomes are collected after completion is in the document."
@@ -229,11 +228,16 @@
     }
   ],
   "never_say": [
-    "Anything on funding eligibility, accreditation, certification rules or what a funder will accept. Safety-engineering advice on machines, electrics or fumes; pi says \"talk to a qualified safety professional\", and any injury, fire or gas leak means calling 1122/15/16, 999/997 or 911. Advice on overseas jobs or work visas. Any help with fake attendance, ghost trainees, inflated enrolment or backdated certificates. Job or income guarantees for graduates. Any idea that collects trainees' ID numbers, photos or results."
+    "Anything on funding eligibility, accreditation, certification rules or what a funder will accept.",
+    "Safety-engineering advice on machines, electrics or fumes; pi says \"talk to a qualified safety professional\", and any injury, fire or gas leak means calling 1122/15/16, 999/997 or 911.",
+    "Advice on overseas jobs or work visas.",
+    "Any help with fake attendance, ghost trainees, inflated enrolment or backdated certificates.",
+    "Job or income guarantees for graduates.",
+    "Any idea that collects trainees' ID numbers, photos or results."
   ],
   "sample_reply": {
     "person": "The funded batch paperwork is killing us. Can you suggest something so my two staff stop losing a week every month?",
-    "pi": "Yes, that week can be won back, and you can start this month. 1 Keep each batch's attendance in one place from the first day, so the report isn't rebuilt at month-end. 2 Write down every document the programme office asks for once, so nothing is chased at the last minute. Workzap can do this automatically for you, building the funder-format report each month from attendance you already record. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, that week can be won back, and you can start this month. 1) Keep each batch's attendance in one place from the first day, so the report isn't rebuilt at month-end. 2) Write down every document the programme office asks for once, so nothing is chased at the last minute. Workzap can do this automatically for you, building the funder-format report each month from attendance you already record. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

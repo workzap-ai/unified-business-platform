@@ -139,9 +139,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "booking_scheduling"
+          "booking_scheduling",
+          "credit_ledger"
         ],
-        "text": "and credit_ledger — a bridal register with date lock, advance log and trial scheduling.",
+        "text": "a bridal register with date lock, advance log and trial scheduling.",
         "tool_words": []
       },
       "ask_first": "How far ahead do brides book?",
@@ -159,9 +160,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "customer_messaging"
+          "customer_messaging",
+          "loyalty_repeat"
         ],
-        "text": "and loyalty_repeat — a consented client list with visit history and festive reminders.",
+        "text": "a consented client list with visit history and festive reminders.",
         "tool_words": []
       },
       "ask_first": "Do you keep any client list now?",
@@ -202,19 +204,22 @@
           "nori_daily_read"
         ],
         "text": "a morning read per branch: services, revenue, average bill, product cost.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Do both branches bill the same way?",
       "free_stops": "Which numbers and sources go in the solution document."
     }
   ],
   "never_say": [
-    "Advice on skin reactions, allergies, burns or chemical treatments; the client should get medical help. Collecting clients' names, photos, numbers or skin details. Any recording in ladies salons beyond noting counter CCTV gaps. Help selling counterfeit or unregistered products. Employment-law advice on staff disputes."
+    "Advice on skin reactions, allergies, burns or chemical treatments; the client should get medical help.",
+    "Collecting clients' names, photos, numbers or skin details.",
+    "Any recording in ladies salons beyond noting counter CCTV gaps.",
+    "Help selling counterfeit or unregistered products.",
+    "Employment-law advice on staff disputes."
   ],
   "sample_reply": {
     "person": "Mere parlour mein stylists ki commission har mahine jhagre ka masla ban jati hai. Is ka hal batayein.",
-    "pi": "Ji, is jhagre ko khatam karna mumkin hai. 1 Billing ke waqt har service stylist ke naam ke saath darj ki jaye, taake hisaab baad mein yaad se na bane. 2 Har stylist ko hafte mein ek dafa us ka tally dikhaya jaye, taake farq jaldi saamne aaye. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har service se commission khud jure aur mahine ke aakhir mein statement tayyar mile. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is jhagre ko khatam karna mumkin hai. 1) Billing ke waqt har service stylist ke naam ke saath darj ki jaye, taake hisaab baad mein yaad se na bane. 2) Har stylist ko hafte mein ek dafa us ka tally dikhaya jaye, taake farq jaldi saamne aaye. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har service se commission khud jure aur mahine ke aakhir mein statement tayyar mile. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

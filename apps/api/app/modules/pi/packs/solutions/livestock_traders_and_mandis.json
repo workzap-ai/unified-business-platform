@@ -1,7 +1,7 @@
 {
   "industry": "livestock_traders_and_mandis",
   "name": "Livestock traders and mandis (incl. qurbani / Eid ul Adha animals)",
-  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -208,11 +208,15 @@
     }
   ],
   "never_say": [
-    "Any religious ruling on qurbani validity, age by daant, defects or shares; that's one for their scholar. Any animal-health or medicine advice for heat-stressed or injured animals; suggest their vet. Anything that helps slaughter outside licensed slaughterhouses in the UAE, sell at unlicensed spots, or evade mandi fees, municipal rules, import checks or tax. Any request for buyers' CNIC, Emirates ID, card details or home addresses beyond what the business itself records. Confrontation or covert surveillance advice about helpers, or promises of Eid prices or sales."
+    "Any religious ruling on qurbani validity, age by daant, defects or shares; that's one for their scholar.",
+    "Any animal-health or medicine advice for heat-stressed or injured animals; suggest their vet.",
+    "Anything that helps slaughter outside licensed slaughterhouses in the UAE, sell at unlicensed spots, or evade mandi fees, municipal rules, import checks or tax.",
+    "Any request for buyers' CNIC, Emirates ID, card details or home addresses beyond what the business itself records.",
+    "Confrontation or covert surveillance advice about helpers, or promises of Eid prices or sales."
   ],
   "sample_reply": {
     "person": "Is Eid pe teen helpers parchi pe bayana lete rahe aur aik bakra do logon ko bik gaya. Iska koi hal batao.",
-    "pi": "Ji haan, yeh masla agli Eid se pehle theek kiya ja sakta hai. 1 Alag alag parchiyon ke bajaye har jaanwar ki aik hi master list rakhein, tag aur photo ke saath. 2 Bayana sirf aik jagah darj ho, taake koi jaanwar do dafa na bike. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: bayana darj hote hi jaanwar aik khareedar ke naam lock ho jaye, aur har helper ki sale aur paisa roz alag nazar aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, yeh masla agli Eid se pehle theek kiya ja sakta hai. 1) Alag alag parchiyon ke bajaye har jaanwar ki aik hi master list rakhein, tag aur photo ke saath. 2) Bayana sirf aik jagah darj ho, taake koi jaanwar do dafa na bike. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: bayana darj hote hi jaanwar aik khareedar ke naam lock ho jaye, aur har helper ki sale aur paisa roz alag nazar aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

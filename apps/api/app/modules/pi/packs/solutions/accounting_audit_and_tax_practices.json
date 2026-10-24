@@ -16,9 +16,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "workflow_automation"
         ],
-        "text": "workflow_automation — a season board where every client job moves through documents requested, received, in progress, review, filed and billed, with polite chasers going out automatically for missing papers and a daily count of what is still outstanding.",
+        "text": "a season board where every client job moves through documents requested, received, in progress, review, filed and billed, with polite chasers going out automatically for missing papers and a daily count of what is still outstanding.",
         "tool_words": []
       },
       "ask_first": "Roughly how many of your clients are monthly retainers versus one-off filings?",
@@ -56,9 +57,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports — a partner screen updated every day showing jobs by stage and staff member, with any file that hasn't moved for several days flagged automatically.",
+        "text": "a partner screen updated every day showing jobs by stage and staff member, with any file that hasn't moved for several days flagged automatically.",
         "tool_words": []
       },
       "ask_first": "",
@@ -72,7 +74,7 @@
       "subtype": "owner_bottleneck",
       "quick_ideas": [
         "Count how many files are waiting for your review today and how long each has waited, so you see the real size of the queue",
-        "Agree with your seniors which simple work types they first- check before it reaches you, within your professional rules."
+        "Agree with your seniors which simple work types they first-check before it reaches you, within your professional rules."
       ],
       "workzap_build": {
         "keys": [
@@ -116,9 +118,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports — a simple phone timesheet linked to each job, rolled up daily into fee versus hours per client, with fixed-fee clients flagged when they run over.",
+        "text": "a simple phone timesheet linked to each job, rolled up daily into fee versus hours per client, with fixed-fee clients flagged when they run over.",
         "tool_words": []
       },
       "ask_first": "",
@@ -186,11 +189,15 @@
     }
   ],
   "never_say": [
-    "Any view on a client's tax position, what they owe, or how to reduce tax. Any interpretation of FBR, FTA or CRA rules or deadlines beyond \"check with the authority or your own professional judgement\". Anything that helps backdate documents, alter records or hide income. That deadlines will never be missed again or that season will be stress-free. Requests for client names, NTNs, TRNs, CNICs, Emirates IDs, SINs or bank statements."
+    "Any view on a client's tax position, what they owe, or how to reduce tax.",
+    "Any interpretation of FBR, FTA or CRA rules or deadlines beyond \"check with the authority or your own professional judgement\".",
+    "Anything that helps backdate documents, alter records or hide income.",
+    "That deadlines will never be missed again or that season will be stress-free.",
+    "Requests for client names, NTNs, TRNs, CNICs, Emirates IDs, SINs or bank statements."
   ],
   "sample_reply": {
     "person": "Season sar pe hai aur sab kuch mere review pe atak jata hai, clients bhi papers late bhejte hain. Koi solution batayein.",
-    "pi": "Ji haan, is ka hal mumkin hai aur is hafte se shuruaat ki ja sakti hai. 1 Har client ko ek dafa papers ki list aur ek jaldi wali \"papers by\" tareekh bhej dein, taake aakhri hafte ka dabaav aage aa jaye. 2 Aaj ek dafa gin lein ke kitni files aap ke review ka intezar kar rahi hain aur kab se, taake asal queue saamne aa jaye. Workzap yeh sab aap ke liye automatically kar sakta hai: har client job ka stage, missing papers ke reminders aur aap ki review queue roz ek screen pe. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal mumkin hai aur is hafte se shuruaat ki ja sakti hai. 1) Har client ko ek dafa papers ki list aur ek jaldi wali \"papers by\" tareekh bhej dein, taake aakhri hafte ka dabaav aage aa jaye. 2) Aaj ek dafa gin lein ke kitni files aap ke review ka intezar kar rahi hain aur kab se, taake asal queue saamne aa jaye. Workzap yeh sab aap ke liye automatically kar sakta hai: har client job ka stage, missing papers ke reminders aur aap ki review queue roz ek screen pe. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

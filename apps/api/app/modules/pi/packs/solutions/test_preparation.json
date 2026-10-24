@@ -1,6 +1,6 @@
 {
   "industry": "test_preparation",
-  "name": "Test preparation O/A Levels, MDCAT, ECAT, IELTS, SAT",
+  "name": "Test preparation (O/A Levels, MDCAT, ECAT, IELTS, SAT)",
   "sector": "7.J Education and childcare",
   "version": "1.0",
   "problems": [
@@ -18,7 +18,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "customer_messaging A WhatsApp first reply that goes out automatically on announcement day, then hands each enquiry to a counsellor with a follow-up queue and response times measured per branch.",
+        "text": "customer_messaging — A WhatsApp first reply that goes out automatically on announcement day, then hands each enquiry to a counsellor with a follow-up queue and response times measured per branch.",
         "tool_words": []
       },
       "ask_first": "Who answers the messages today — one person or a team?",
@@ -79,7 +79,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "integration An installment schedule that reminds automatically and pauses or restores online access under the rule you set, with collections measured per cohort.",
+        "text": "integration — An installment schedule that reminds automatically and pauses or restores online access under the rule you set, with collections measured per cohort.",
         "tool_words": [
           "integration"
         ]
@@ -224,19 +224,23 @@
           "dashboards_reports"
         ],
         "text": "One owner screen with revenue per cohort, ad spend per enrolment, collections and branch comparison, updated daily.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "How the data is pulled together is set out in the document."
     }
   ],
   "never_say": [
-    "Any guarantee of scores, bands, merit or admission chances, or help writing such claims. Anything about student visas, study permits, points or immigration, even for IELTS and CELPIP students. Any help with leaked papers, proxy test-takers, fake score reports or certificates. Legal advice on piracy or refunds; pi says \"talk to your lawyer\". Any idea that collects students' names, scores, passport numbers or test-booking logins. Covert monitoring of students' devices or webcams."
+    "Any guarantee of scores, bands, merit or admission chances, or help writing such claims.",
+    "Anything about student visas, study permits, points or immigration, even for IELTS and CELPIP students.",
+    "Any help with leaked papers, proxy test-takers, fake score reports or certificates.",
+    "Legal advice on piracy or refunds; pi says \"talk to your lawyer\".",
+    "Any idea that collects students' names, scores, passport numbers or test-booking logins.",
+    "Covert monitoring of students' devices or webcams."
   ],
   "sample_reply": {
     "person": "MDCAT ki date aati hai to ek din mein sainkron messages aa jate hain aur hum reply nahi kar paate. Iska koi hal hai?",
-    "pi": "Ji haan, ye bilkul theek kiya ja sakta hai aur shuruaat isi hafte ho sakti hai. 1 Cohort dates, branches aur enrolment ka tareeqa ek page pe rakh dein, taake har banda wahi jawab baar baar type na kare. 2 Season ke messages naam ke saath staff mein baant dein, taake har enquiry ka koi zimmedar ho. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai — pehla reply foran, phir counsellor ko hand-off aur follow-up, aur har branch ka response time saamne. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, ye bilkul theek kiya ja sakta hai aur shuruaat isi hafte ho sakti hai. 1) Cohort dates, branches aur enrolment ka tareeqa ek page pe rakh dein, taake har banda wahi jawab baar baar type na kare. 2) Season ke messages naam ke saath staff mein baant dein, taake har enquiry ka koi zimmedar ho. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai — pehla reply foran, phir counsellor ko hand-off aur follow-up, aur har branch ka response time saamne. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

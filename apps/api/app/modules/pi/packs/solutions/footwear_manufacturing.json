@@ -1,7 +1,7 @@
 {
   "industry": "footwear_manufacturing",
   "name": "Footwear manufacturing",
-  "sector": "7.D Manufacturing and industry (part 1",
+  "sector": "7.D Manufacturing and industry (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -16,9 +16,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "stock_alerts"
+          "stock_alerts",
+          "nori_daily_read"
         ],
-        "text": "nori_daily_read An article-size matrix showing pairs by article, colour and size across factory, godown and shops, with a daily read of sizes running out or piling up.",
+        "text": "An article-size matrix showing pairs by article, colour and size across factory, godown and shops, with a daily read of sizes running out or piling up.",
         "tool_words": []
       },
       "ask_first": "How do you see stock by size today?",
@@ -136,9 +137,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "field_checks"
+          "field_checks",
+          "workflow_automation"
         ],
-        "text": "workflow_automation Daily piece counts per worker role entered by supervisors, feeding a weekly count sheet everyone can see.",
+        "text": "Daily piece counts per worker role entered by supervisors, feeding a weekly count sheet everyone can see.",
         "tool_words": []
       },
       "ask_first": "",
@@ -156,13 +158,15 @@
       ],
       "workzap_build": {
         "keys": [
+          "integration",
           "nori_daily_read"
         ],
-        "text": "integration Own-shop sales synced to the factory daily with size-level sell-through.",
-        "tool_words": [
+        "text": "Own-shop sales synced to the factory daily with size-level sell-through.",
+        "tool_words": [],
+        "reordered_from": [
+          "nori_daily_read",
           "integration"
-        ],
-        "leads_with_view": true
+        ]
       },
       "ask_first": "",
       "free_stops": "How shop sales connect to factory stock is mapped in the solution document."
@@ -210,11 +214,16 @@
     }
   ],
   "never_say": [
-    "Anything on safety-footwear certification or standards, or orthopaedic or medical fit claims. Any help copying another brand's trademarks or logos, or making counterfeit goods. Anything on adhesive or solvent handling; fumes causing collapse are emergencies. Customs, tax or under-invoicing advice. Any judgement on fairness or legality of piece rates. Any guarantee of sell-through or fewer returns."
+    "Anything on safety-footwear certification or standards, or orthopaedic or medical fit claims.",
+    "Any help copying another brand's trademarks or logos, or making counterfeit goods.",
+    "Anything on adhesive or solvent handling; fumes causing collapse are emergencies.",
+    "Customs, tax or under-invoicing advice.",
+    "Any judgement on fairness or legality of piece rates.",
+    "Any guarantee of sell-through or fewer returns."
   ],
   "sample_reply": {
     "person": "Eid ke liye maal banaya tha, ab chhote size pare hain aur bare size khatam. Agli dafa yeh na ho, koi tareeqa batao.",
-    "pi": "Ji bilkul, iska hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1 Apne main articles ka size-wise stock ek dafa gin lein, taa ke saaf ho kaun se size atke hue hain. 2 Pichle season ki size-wise sale likh lein, taa ke agla size mix record pe bane, andaaze pe nahi. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: factory, godown aur shops ka article aur size-wise stock ek jagah, aur har subah kaun sa size khatam ho raha hai woh aap ke WhatsApp pe. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji bilkul, iska hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1) Apne main articles ka size-wise stock ek dafa gin lein, taa ke saaf ho kaun se size atke hue hain. 2) Pichle season ki size-wise sale likh lein, taa ke agla size mix record pe bane, andaaze pe nahi. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: factory, godown aur shops ka article aur size-wise stock ek jagah, aur har subah kaun sa size khatam ho raha hai woh aap ke WhatsApp pe. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

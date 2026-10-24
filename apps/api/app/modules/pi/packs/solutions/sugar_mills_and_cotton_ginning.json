@@ -1,7 +1,7 @@
 {
   "industry": "sugar_mills_and_cotton_ginning",
   "name": "Sugar mills and cotton ginning",
-  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "sector": "7.C Agriculture, livestock and rural (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -185,8 +185,7 @@
           "dashboards_reports"
         ],
         "text": "A daily crushing or ginning report generated automatically for owners and the board.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How long does the report take now?",
       "free_stops": "Report contents and data sources are kept for the solution document."
@@ -213,11 +212,15 @@
     }
   ],
   "never_say": [
-    "Advice on cane support prices, cane laws, grower payment obligations, sugar pricing, export or import policy. Advice on cotton grading standards, factory safety engineering, environmental or effluent rules, tax or credit. Any help manipulating weighbridges, under-recording cane, issuing fake CPRs, hoarding, mis-declaring stock or evading sales tax. Comment on politically sensitive topics such as sugar prices or government action. Storing growers', middlemen's, buyers' or workers' names, CNICs, bank details or numbers."
+    "Advice on cane support prices, cane laws, grower payment obligations, sugar pricing, export or import policy.",
+    "Advice on cotton grading standards, factory safety engineering, environmental or effluent rules, tax or credit.",
+    "Any help manipulating weighbridges, under-recording cane, issuing fake CPRs, hoarding, mis-declaring stock or evading sales tax.",
+    "Comment on politically sensitive topics such as sugar prices or government action.",
+    "Storing growers', middlemen's, buyers' or workers' names, CNICs, bank details or numbers."
   ],
   "sample_reply": {
     "person": "Rahim Yar Khan mein ginning factory hai. Phutti waale trash ki katauti pe har dafa larte hain, koi hal batao.",
-    "pi": "Ji, is ka hal mumkin hai aur yeh is hafte se shuru ho sakta hai. 1 Har gaari ki trash aur nami ki katauti photo ke saath likh kar usi waqt supplier ko dikha dein, taake faisla saaf nazar aaye. 2 Katauti ka tareeqa supplier ke saath pehle se tay kar ke likh lein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har gaari ki aamad, wazan aur katauti photo ke saath darj ho aur supplier ko foran WhatsApp pe pohanch jaaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai aur yeh is hafte se shuru ho sakta hai. 1) Har gaari ki trash aur nami ki katauti photo ke saath likh kar usi waqt supplier ko dikha dein, taake faisla saaf nazar aaye. 2) Katauti ka tareeqa supplier ke saath pehle se tay kar ke likh lein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har gaari ki aamad, wazan aur katauti photo ke saath darj ho aur supplier ko foran WhatsApp pe pohanch jaaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

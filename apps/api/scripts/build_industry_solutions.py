@@ -41,13 +41,39 @@ from app.modules.pi.solutions import (  # noqa: E402
 )
 
 PACKS = Path(__file__).resolve().parents[1] / "app" / "modules" / "pi" / "packs"
-PART4 = "Part 4  Industry solutions"
+PART4 = re.compile(r"^Part 4\s*[—–-]?\s*Industry solutions$")
 PAGE = re.compile(r"^=====PAGE \d+=====$")
 SECTOR = re.compile(r"^7\.[A-Z] ")
 PROBLEM = re.compile(r"^(\d+)\.\s+(.*)$")
-BUILD_KEYS = re.compile(
-    r"^((?:[a-z]+(?:_[a-z]+)*)(?:\s*\+\s*[a-z]+(?:_[a-z]+)*)*)\s*[^\w\s+]?\s*(.*)$", re.S
-)
+KEY_TOKEN = re.compile(r"^([a-z]+(?:_[a-z]+)*)\b")
+JOINER = re.compile(r"^\s*(?:\+|,|and)\s*")
+SEPARATOR = re.compile(r"^\s*[—–-]\s*")
+
+
+def split_build(raw: str) -> tuple[list[str], str] | None:
+    """The build keys and the sentence that follows, however the PDF wrote the join: "a + b",
+    "a, b", "a and b", or a bare space where the "+" glyph was lost in extraction. Each token is
+    checked against the real catalogue as it is consumed, so ordinary prose beginning with a
+    plain word is never mistaken for a build key."""
+    rest = raw
+    keys: list[str] = []
+    while True:
+        token = KEY_TOKEN.match(rest)
+        if not token or token.group(1) not in CATALOGUE:
+            break
+        keys.append(token.group(1))
+        rest = rest[token.end() :]
+        joined = JOINER.match(rest)
+        if joined and KEY_TOKEN.match(rest[joined.end() :]):
+            rest = rest[joined.end() :]
+            continue
+        break
+    if not keys:
+        return None
+    sep = SEPARATOR.match(rest)
+    return keys, (rest[sep.end() :] if sep else rest).strip()
+
+
 MONEY = re.compile(
     r"\b(?:rs\.?|pkr|aed|cad|usd)\s*\d|\d\s*(?:%|percent|per cent)|[$₨]\s*\d"
     r"|\d[\d,.]*\s*(?:rupees?|dirhams?)\b",
@@ -68,18 +94,24 @@ def slug(name: str) -> str:
 
 
 def extract(pdf: Path) -> list[str]:
-    from pypdf import PdfReader
+    """pypdf resolves this PDF's embedded font cmap wrong for punctuation (hyphens, en/em
+    dashes, parentheses, pluses, the bullet, curly quotes all come back as private-use-area
+    glyphs, differently per font subset): pymupdf reads the same glyphs correctly. Needs
+    `pip install pymupdf`; this script is a one-off generator, not imported by the app, so it
+    is not in the hash-locked requirements files."""
+    import pymupdf
 
     lines: list[str] = []
-    for page in PdfReader(str(pdf)).pages:
-        lines += (page.extract_text() or "").split("\n")
+    for n, page in enumerate(pymupdf.open(str(pdf)), start=1):
+        lines.append(f"=====PAGE {n}=====")
+        lines += (page.get_text() or "").split("\n")
     return lines
 
 
 def clean_line(line: str) -> str:
     line = line.replace("ʼ", "'").replace("’", "'").replace("“", '"').replace("”", '"')
     line = line.replace("ˮ", '"').replace("\x00", "")
-    line = re.sub(r"[-]", "", line)  # private-use glyphs the PDF font leaves behind
+    line = re.sub(r"[-]", "", line)  # defensive: none expected from pymupdf
     return re.sub(r"\s+", " ", line).strip()
 
 
@@ -91,7 +123,7 @@ def contents(lines: list[str]) -> list[tuple[str, str]]:
     for raw in lines:
         line = clean_line(raw)
         if not begun:
-            begun = line == PART4.replace("  ", " ") or line.startswith("Part 4 Industry")
+            begun = bool(PART4.match(line))
             continue
         if SECTOR.match(line):
             sector = line
@@ -107,7 +139,7 @@ def contents(lines: list[str]) -> list[tuple[str, str]]:
 def start_of_part4(lines: list[str]) -> int:
     seen = 0
     for i, raw in enumerate(lines):
-        if clean_line(raw).startswith("Part 4 Industry solutions"):
+        if PART4.match(clean_line(raw)):
             seen += 1
             if seen == 2:  # the first is the table of contents
                 return i
@@ -149,6 +181,39 @@ FIELDS = (
 )
 
 
+def glue(before: str, text: str) -> str:
+    """Join two line fragments the way the PDF meant them: a compound word split across its own
+    visual line wrap ("sign-" / "off") gets no space, unless what follows the hyphen is "and"/"or"
+    ("pre- and post-harvest"), which is correct English, not a wrap."""
+    coordinator = re.match(r"^(?:and|or)\b", text, re.IGNORECASE)
+    sep = "" if re.search(r"[a-z]-$", before) and not coordinator else " "
+    return (before + sep + text).strip()
+
+
+def smart_join(parts: list[str]) -> str:
+    text = ""
+    for part in parts:
+        text = glue(text, part) if text else part
+    return text
+
+
+ARABIC_LETTER = re.compile(r"[؀-ۿ]")
+
+
+def garbled_script(text: str) -> bool:
+    """An Arabic page whose font the extractor could not read: real Arabic prose runs several
+    letters per word, so a majority of one-or-two-letter "words" is the signature of per-glyph
+    reordering gone wrong. Short English words are completely normal, so this only applies where
+    the text is itself mostly Arabic script."""
+    letters = [c for c in text if c.isalpha()]
+    if len(letters) < 40 or sum(1 for c in letters if ARABIC_LETTER.match(c)) / len(letters) < 0.5:
+        return False
+    words = [w.strip(".,()،؟!") for w in text.split()]
+    words = [w for w in words if w]
+    short = sum(1 for w in words if len(w) <= 2)
+    return short / len(words) > 0.3
+
+
 def parse_entry(entry: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
     errors: list[str] = []
     title = entry["title"]
@@ -164,7 +229,7 @@ def parse_entry(entry: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
         nonlocal current
         if current is None:
             return
-        current[field] = (current.get(field, "") + " " + text).strip()
+        current[field] = glue(current.get(field, ""), text)
 
     for line in entry["lines"]:
         if line.startswith("Never say in this industry"):
@@ -179,7 +244,7 @@ def parse_entry(entry: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
             if fresh:
                 never.append(bullet.group(1) if bullet else line)
             else:
-                never[-1] = (never[-1] + " " + line).strip()
+                never[-1] = glue(never[-1], line)
             continue
         if mode == "sample":
             if line.startswith("> Person:"):
@@ -213,10 +278,19 @@ def parse_entry(entry: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
         errors += errs
         if parsed:
             out_problems.append(parsed)
-    reply_text = " ".join(reply).strip()
-    person_text = " ".join(person).strip()
+    reply_text = smart_join(reply)
+    # The document's own closing sentence leaks into the last industry's sample (end matter).
+    reply_text = re.sub(
+        r"\s*Every sample conversation in this addendum is Illustrative\.?\s*$", "", reply_text
+    )
+    person_text = smart_join(person)
     if not reply_text or not person_text:
         errors.append(f"{title}: sample reply missing")
+    elif garbled_script(reply_text) or garbled_script(person_text):
+        # The PDF's font for this page could not be read correctly (letters reordered within
+        # words); nothing here is invented to replace it, so the sample is left out and reported.
+        errors.append(f"{title}: the sample reply's script could not be extracted correctly")
+        reply_text = person_text = ""
     sample = {
         "person": person_text,
         "pi": reply_text,
@@ -244,11 +318,10 @@ def parse_problem(title: str, raw: dict[str, Any]) -> tuple[dict[str, Any] | Non
     ideas = [i.strip() for i in re.split(r"\s·\s", raw.get("quick", "")) if i.strip()]
     if len(ideas) != 2:
         errors.append(f"{where}: {len(ideas)} quick ideas, exactly 2 are required")
-    built = BUILD_KEYS.match(raw.get("build", ""))
+    built = split_build(raw.get("build", ""))
     if not built:
         return None, errors + [f"{where}: no build keys in {raw.get('build', '')[:60]!r}"]
-    keys = [k.strip() for k in built.group(1).split("+")]
-    text = built.group(2).strip().lstrip("—–- ").strip()
+    keys, text = built
     for key in keys:
         if key not in CATALOGUE:
             errors.append(f"{where}: build key {key!r} is not in the catalogue")
@@ -285,11 +358,18 @@ def parse_problem(title: str, raw: dict[str, Any]) -> tuple[dict[str, Any] | Non
 
 
 def view_cap(problems: list[dict[str, Any]], title: str) -> list[str]:
-    """At most one problem in four may lead with a view build; report the rest (not rewritten)."""
-    if not problems:
+    """At most one problem in four may lead with a view build; report the rest (not rewritten).
+
+    RBUILD02: a view leads without limit when the problem itself is about not seeing
+    (category reporting_visibility) — only a view leading for some OTHER kind of problem counts
+    against the cap. A problem with no action key among its own listed keys (e.g. both keys are
+    views) is reported too: nothing is invented to replace it.
+    """
+    capped = [p for p in problems if p["category"] != VISIBILITY]
+    if not capped:
         return []
-    allowed = max(1, len(problems) // VIEW_SHARE)
-    leading = [p for p in problems if p["workzap_build"]["keys"][0] in VIEW_BUILDS]
+    allowed = max(1, len(capped) // VIEW_SHARE)
+    leading = [p for p in capped if p["workzap_build"]["keys"][0] in VIEW_BUILDS]
     over = len(leading) - allowed
     for p in leading:
         p["workzap_build"]["leads_with_view"] = True

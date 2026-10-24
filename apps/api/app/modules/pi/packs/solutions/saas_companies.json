@@ -16,11 +16,15 @@
       ],
       "workzap_build": {
         "keys": [
+          "customer_messaging",
           "dashboards_reports"
         ],
-        "text": "customer_messaging — an onboarding tracker showing each new account's progress through key setup steps, with nudges by email or WhatsApp, with their permission, when someone stalls.",
+        "text": "an onboarding tracker showing each new account's progress through key setup steps, with nudges by email or WhatsApp, with their permission, when someone stalls.",
         "tool_words": [],
-        "leads_with_view": true
+        "reordered_from": [
+          "dashboards_reports",
+          "customer_messaging"
+        ]
       },
       "ask_first": "Is your sales mostly self-serve or demo-led?",
       "free_stops": "which steps to track and when nudges go out are set out in the solution document."
@@ -178,14 +182,13 @@
       ],
       "workzap_build": {
         "keys": [
-          "dashboards_reports"
+          "dashboards_reports",
+          "integration"
         ],
-        "text": "integration — a subscription metrics screen pulling from your billing system each day, showing MRR, new, expansion and churn by plan and market.",
+        "text": "a subscription metrics screen pulling from your billing system each day, showing MRR, new, expansion and churn by plan and market.",
         "tool_words": [
-          "integration",
           "system"
-        ],
-        "leads_with_view": true
+        ]
       },
       "ask_first": "",
       "free_stops": "metric definitions and data connections are set out in the solution document."
@@ -212,11 +215,15 @@
     }
   ],
   "never_say": [
-    "Any privacy-law, tax, fundraising, valuation or legal advice. Dark patterns such as hard-to-cancel flows or hidden charges, or using data without consent. Fake reviews or misleading investor metrics. That churn will fall or MRR will grow by any amount. Requests for customer lists, user data, API keys, admin credentials or card details."
+    "Any privacy-law, tax, fundraising, valuation or legal advice.",
+    "Dark patterns such as hard-to-cancel flows or hidden charges, or using data without consent.",
+    "Fake reviews or misleading investor metrics.",
+    "That churn will fall or MRR will grow by any amount.",
+    "Requests for customer lists, user data, API keys, admin credentials or card details."
   ],
   "sample_reply": {
     "person": "Signups are decent but churn is bad. People leave after a couple of months. Any ideas?",
-    "pi": "Yes, there's plenty that can be done, starting this week. 1 Call a few recent cancellers and ask one question about why, so you get real reasons instead of blank fields. 2 Decide what \"first real value\" looks like in your product, so you can see who never got there. Workzap can do this automatically for you: a customer health view that flags at-risk accounts early, plus onboarding nudges when new users stall. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, there's plenty that can be done, starting this week. 1) Call a few recent cancellers and ask one question about why, so you get real reasons instead of blank fields. 2) Decide what \"first real value\" looks like in your product, so you can see who never got there. Workzap can do this automatically for you: a customer health view that flags at-risk accounts early, plus onboarding nudges when new users stall. Would you like me to put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

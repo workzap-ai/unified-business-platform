@@ -1,7 +1,7 @@
 {
   "industry": "florists_and_gifting",
   "name": "Florists and gifting (incl. luxury gifting and corporate gifting)",
-  "sector": "7.A Retail and consumer (part 2",
+  "sector": "7.A Retail and consumer (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -122,7 +122,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a corporate gifting portal where the client approves mock- ups, quantities and branding, with quote versions and approval history.",
+        "text": "a corporate gifting portal where the client approves mock-ups, quantities and branding, with quote versions and approval history.",
         "tool_words": [
           "portal"
         ]
@@ -205,7 +205,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "a corporate client calendar of past occasions prompting re- engagement in time.",
+        "text": "a corporate client calendar of past occasions prompting re-engagement in time.",
         "tool_words": []
       },
       "ask_first": "How do you reach past corporate clients now?",
@@ -213,7 +213,11 @@
     }
   ],
   "never_say": [
-    "Anything that requires recipients' names, addresses, phone numbers or card messages in the chat. Advice on anti-bribery limits for corporate gifts, or help disguising gifts or splitting invoices. Advice on flower import permits, phytosanitary rules or food safety of hamper items. Help supplying alcohol where it is illegal, or any licensing advice. Help locating a person or getting someone's address without their consent."
+    "Anything that requires recipients' names, addresses, phone numbers or card messages in the chat.",
+    "Advice on anti-bribery limits for corporate gifts, or help disguising gifts or splitting invoices.",
+    "Advice on flower import permits, phytosanitary rules or food safety of hamper items.",
+    "Help supplying alcohol where it is illegal, or any licensing advice.",
+    "Help locating a person or getting someone's address without their consent."
   ],
   "sample_reply": {
     "person": "Before Eid our corporate clients change the design three times and then want hundreds of boxes in a few days. Any solution?",

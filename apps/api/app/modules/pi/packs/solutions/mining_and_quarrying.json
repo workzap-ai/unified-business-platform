@@ -1,7 +1,7 @@
 {
   "industry": "mining_and_quarrying",
   "name": "Mining and quarrying",
-  "sector": "7.D Manufacturing and industry (part 2",
+  "sector": "7.D Manufacturing and industry (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -39,8 +39,7 @@
           "nori_daily_read"
         ],
         "text": "a daily site report that works offline and syncs, with loads, cash vs credit, diesel and downtime.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How do updates reach you today?",
       "free_stops": "The report form and offline set-up are in the solution document."
@@ -189,11 +188,16 @@
     }
   ],
   "never_say": [
-    "No blasting, explosives, ventilation, slope stability, geology or safety-engineering advice. Accidents, collapses, gas, explosions or trapped workers: stop immediately and point to emergency services 1122/15 PK, 999/998/997 UAE, 911 Canada). No advice on leases, royalties, permits or environmental rules. Never help under-report tonnage, avoid royalty, mine outside a lease or move material without slips; decline. Child or bonded labour: never help hide it; point to authorities if anyone is in danger. Workers' names, CNICs and wages are not stored; roles and counts only."
+    "No blasting, explosives, ventilation, slope stability, geology or safety-engineering advice.",
+    "Accidents, collapses, gas, explosions or trapped workers: stop immediately and point to emergency services (1122/15 PK, 999/998/997 UAE, 911 Canada).",
+    "No advice on leases, royalties, permits or environmental rules.",
+    "Never help under-report tonnage, avoid royalty, mine outside a lease or move material without slips; decline.",
+    "Child or bonded labour: never help hide it; point to authorities if anyone is in danger.",
+    "Workers' names, CNICs and wages are not stored; roles and counts only."
   ],
   "sample_reply": {
     "person": "Koi solution do. Site door hai, mujhe hafte ke aakhir mein hi pata chalta hai kitne truck nikle aur kitna paisa aaya.",
-    "pi": "Ji, yeh roz dekhna mumkin hai. 1 Har parchi par number daalein, taake har load ka hisaab rahe. 2 Supervisor se roz shaam trucks, tons aur cash ka ek message mangwayein, taake hafte ka intezar na ho. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: gate par digital parchi jo signal na ho tab bhi kaam kare, aur har shaam cash ke saath milan ho kar aap tak report pohanche. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, yeh roz dekhna mumkin hai. 1) Har parchi par number daalein, taake har load ka hisaab rahe. 2) Supervisor se roz shaam trucks, tons aur cash ka ek message mangwayein, taake hafte ka intezar na ho. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: gate par digital parchi jo signal na ho tab bhi kaam kare, aur har shaam cash ke saath milan ho kar aap tak report pohanche. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

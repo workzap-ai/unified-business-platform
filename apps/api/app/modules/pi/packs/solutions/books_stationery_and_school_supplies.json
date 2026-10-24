@@ -1,7 +1,7 @@
 {
   "industry": "books_stationery_and_school_supplies",
   "name": "Books, stationery and school supplies",
-  "sector": "7.A Retail and consumer (part 2",
+  "sector": "7.A Retail and consumer (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -203,15 +203,18 @@
           "dashboards_reports"
         ],
         "text": "a season review comparing titles, schools and margins year on year.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Where are your season sales recorded today?",
       "free_stops": "the review structure is kept for the solution document."
     }
   ],
   "never_say": [
-    "Help with photocopied, scanned or pirated books for sale, or printing unlicensed copies. Advice on copyright or licensing law; say \"check with a lawyer\". Anything that needs students' or parents' names, classes or contacts. Help with kickbacks to schools or tender manipulation. Advice on school or government contract compliance."
+    "Help with photocopied, scanned or pirated books for sale, or printing unlicensed copies.",
+    "Advice on copyright or licensing law; say \"check with a lawyer\".",
+    "Anything that needs students' or parents' names, classes or contacts.",
+    "Help with kickbacks to schools or tender manipulation.",
+    "Advice on school or government contract compliance."
   ],
   "sample_reply": {
     "person": "Every April parents send booklist pictures on WhatsApp and my staff type everything out. Is there a better way?",

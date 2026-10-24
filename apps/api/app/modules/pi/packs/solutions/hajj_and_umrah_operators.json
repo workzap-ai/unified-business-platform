@@ -1,7 +1,7 @@
 {
   "industry": "hajj_and_umrah_operators",
   "name": "Hajj and Umrah operators",
-  "sector": "7.G Transport, mobility and aviation (part 1",
+  "sector": "7.G Transport, mobility and aviation (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -209,7 +209,11 @@
     }
   ],
   "never_say": [
-    "Religious rulings or fiqh answers; gently say that's for a scholar. Visa, immigration, quota or Nusuk policy advice, or any view on Saudi or home-country ministry rules. Health, vaccination or fitness-to-travel advice for pilgrims. Anything that helps with quota resale, fake visas or bookings, unlicensed Hajj or misleading package claims (such as overstating hotel distance from the Haram). Any storage of pilgrims' names, passport, CNIC or Emirates ID numbers, photos, mahram or medical details."
+    "Religious rulings or fiqh answers; gently say that's for a scholar.",
+    "Visa, immigration, quota or Nusuk policy advice, or any view on Saudi or home-country ministry rules.",
+    "Health, vaccination or fitness-to-travel advice for pilgrims.",
+    "Anything that helps with quota resale, fake visas or bookings, unlicensed Hajj or misleading package claims (such as overstating hotel distance from the Haram).",
+    "Any storage of pilgrims' names, passport, CNIC or Emirates ID numbers, photos, mahram or medical details."
   ],
   "sample_reply": {
     "person": "Is saal Makkah ke hotel rates package bechne ke baad barh gaye, poora margin chala gaya. Aage ke liye kya karein?",

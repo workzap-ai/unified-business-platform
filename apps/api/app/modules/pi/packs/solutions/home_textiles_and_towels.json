@@ -1,7 +1,7 @@
 {
   "industry": "home_textiles_and_towels",
   "name": "Home textiles and towels",
-  "sector": "7.D Manufacturing and industry (part 1",
+  "sector": "7.D Manufacturing and industry (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -16,9 +16,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "field_checks"
+          "field_checks",
+          "job_tracking"
         ],
-        "text": "job_tracking A batch record per dye lot with GSM, shade reference and QC result linked to the order, so every batch is checked and traceable.",
+        "text": "A batch record per dye lot with GSM, shade reference and QC result linked to the order, so every batch is checked and traceable.",
         "tool_words": []
       },
       "ask_first": "Is GSM checked at your end before packing, or only by the buyer?",
@@ -36,9 +37,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "field_checks"
+          "field_checks",
+          "workflow_automation"
         ],
-        "text": "workflow_automation A packing checklist per buyer with barcode scan verification against the order and carton labels generated from order data.",
+        "text": "A packing checklist per buyer with barcode scan verification against the order and carton labels generated from order data.",
         "tool_words": []
       },
       "ask_first": "",
@@ -56,9 +58,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "stock_alerts"
+          "stock_alerts",
+          "nori_daily_read"
         ],
-        "text": "nori_daily_read SKU-level stock by design, colour, size and A/B grade across godowns and shops, with a daily read of what is low and what is piling up.",
+        "text": "SKU-level stock by design, colour, size and A/B grade across godowns and shops, with a daily read of what is low and what is piling up.",
         "tool_words": []
       },
       "ask_first": "",
@@ -136,9 +139,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "credit_ledger"
+          "credit_ledger",
+          "customer_messaging"
         ],
-        "text": "customer_messaging A statement of account per hotel client with scheduled reminders, plus par-level reorder prompts sent on WhatsApp with their permission.",
+        "text": "A statement of account per hotel client with scheduled reminders, plus par-level reorder prompts sent on WhatsApp with their permission.",
         "tool_words": []
       },
       "ask_first": "",
@@ -156,12 +160,11 @@
       ],
       "workzap_build": {
         "keys": [
-          "order_capture"
-        ],
-        "text": "integration A single order inbox pulling marketplace and shop orders into one list, tracked to dispatch.",
-        "tool_words": [
+          "order_capture",
           "integration"
-        ]
+        ],
+        "text": "A single order inbox pulling marketplace and shop orders into one list, tracked to dispatch.",
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "How each channel connects in is mapped in the solution document."
@@ -202,19 +205,23 @@
           "dashboards_reports"
         ],
         "text": "An owner weekly summary of output, dispatches, stock by grade and receivables pulled together automatically.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "Which numbers go in and where each comes from is set out in the solution document."
     }
   ],
   "never_say": [
-    "Any advice on dye chemistry, wastewater or environmental compliance, product certifications or label claims. Any help with false fibre content or origin labelling, or misdeclaring shipments. Any customs, tax or export incentive advice; suggest an accountant. Any judgement on who is right in a chargeback dispute. Any guarantee that GSM, shade or packing errors will stop. Storing hotel staff, retail buyer or employee personal details."
+    "Any advice on dye chemistry, wastewater or environmental compliance, product certifications or label claims.",
+    "Any help with false fibre content or origin labelling, or misdeclaring shipments.",
+    "Any customs, tax or export incentive advice; suggest an accountant.",
+    "Any judgement on who is right in a chargeback dispute.",
+    "Any guarantee that GSM, shade or packing errors will stop.",
+    "Storing hotel staff, retail buyer or employee personal details."
   ],
   "sample_reply": {
     "person": "Our towels keep failing GSM with one buyer and we can't tell which batch is the problem. Is there a fix?",
-    "pi": "Yes, this is very fixable, and you can start this week. 1 Check GSM on every batch for one week and note the loom and dye lot each came from, so the source of the variation shows up. 2 Keep one approved reference piece at packing, so every checker compares against the same standard. Workzap can do this automatically for you: a batch record for every dye lot with GSM and QC result linked to the order, so every batch is checked and traceable. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this is very fixable, and you can start this week. 1) Check GSM on every batch for one week and note the loom and dye lot each came from, so the source of the variation shows up. 2) Keep one approved reference piece at packing, so every checker compares against the same standard. Workzap can do this automatically for you: a batch record for every dye lot with GSM and QC result linked to the order, so every batch is checked and traceable. Shall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

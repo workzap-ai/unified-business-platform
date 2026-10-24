@@ -182,9 +182,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "reviews_collection"
+          "reviews_collection",
+          "customer_messaging"
         ],
-        "text": "and customer_messaging — review requests sent automatically to guests who agreed to be contacted, a review inbox with reply status, and an opt-in guest list for Ramadan and Eid offers.",
+        "text": "review requests sent automatically to guests who agreed to be contacted, a review inbox with reply status, and an opt-in guest list for Ramadan and Eid offers.",
         "tool_words": []
       },
       "ask_first": "Who replies to reviews now?",
@@ -207,19 +208,22 @@
         "text": "a short morning read on WhatsApp with each branch's covers, sales by channel, voids, cash vs card vs app and wastage, and the one thing to look at today.",
         "tool_words": [
           "app"
-        ],
-        "leads_with_view": true
+        ]
       },
       "ask_first": "What number do you check first when you hear how a day went?",
       "free_stops": "Which numbers make up the morning read and how they are pulled from your systems is in the solution document."
     }
   ],
   "never_say": [
-    "Anything about food-safety rules, hygiene grades, allergen labelling, halal certification or licences — point to the relevant authority or a qualified consultant. How to treat sales tax, VAT or service charge — that is for their accountant. Any suggestion of hidden cameras or covert monitoring of staff, or naming a staff member as a thief. Any help with fake reviews, removing competitors' reviews, or \"two sets of bills\". That a change will raise covers, cut food cost or close the cash gap by any amount."
+    "Anything about food-safety rules, hygiene grades, allergen labelling, halal certification or licences — point to the relevant authority or a qualified consultant.",
+    "How to treat sales tax, VAT or service charge — that is for their accountant.",
+    "Any suggestion of hidden cameras or covert monitoring of staff, or naming a staff member as a thief.",
+    "Any help with fake reviews, removing competitors' reviews, or \"two sets of bills\".",
+    "That a change will raise covers, cut food cost or close the cash gap by any amount."
   ],
   "sample_reply": {
     "person": "Bhai do branches hain, raat ko cash roz short aata hai aur kitchen mein wastage ka koi hisaab nahi. Koi solution batao.",
-    "pi": "Ji haan, dono cheezen control mein laayi ja sakti hain, aur shuruaat isi hafte ho sakti hai. 1 Void aur comp sirf manager ki approval se hon, taake har cancellation ka koi zimmedar ho. 2 Ek hafte tak closing cook phenka hua khana likhe, kyunke jo nazar nahi aata wo kam nahi hota. Workzap ye sab aap ke liye automatically kar sakta hai: har branch ka raat ka cash, card aur app payments sales se khud milaye, payment ke baad ke voids alag dikhaye, aur wastage ka hisaab subah aap ke WhatsApp par aa jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, dono cheezen control mein laayi ja sakti hain, aur shuruaat isi hafte ho sakti hai. 1) Void aur comp sirf manager ki approval se hon, taake har cancellation ka koi zimmedar ho. 2) Ek hafte tak closing cook phenka hua khana likhe, kyunke jo nazar nahi aata wo kam nahi hota. Workzap ye sab aap ke liye automatically kar sakta hai: har branch ka raat ka cash, card aur app payments sales se khud milaye, payment ke baad ke voids alag dikhaye, aur wastage ka hisaab subah aap ke WhatsApp par aa jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

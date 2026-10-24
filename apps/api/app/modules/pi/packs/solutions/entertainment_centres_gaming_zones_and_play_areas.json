@@ -79,8 +79,7 @@
           "dashboards_reports"
         ],
         "text": "a machine earnings report showing revenue and downtime days per machine every day.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How many machines or attractions do you have?",
       "free_stops": "Ranking rules and how card data is mapped to machines stay for the solution document."
@@ -137,9 +136,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "customer_messaging"
+          "customer_messaging",
+          "loyalty_repeat"
         ],
-        "text": "and loyalty_repeat — a consented parent list with visit history and WhatsApp messages for holidays and new attractions.",
+        "text": "a consented parent list with visit history and WhatsApp messages for holidays and new attractions.",
         "tool_words": []
       },
       "ask_first": "Do you have memberships or only walk-in tickets?",
@@ -200,19 +200,22 @@
           "nori_daily_read"
         ],
         "text": "a morning read per branch with sales, footfall, spend per visitor and downtime, and the one thing to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How many branches do you run?",
       "free_stops": "Which numbers and where they come from is defined in the solution document."
     }
   ],
   "never_say": [
-    "Ride or equipment safety, supervision ratios or child-protection law advice. Anything about the legality of prize or redemption games. Collecting children's names, ages, photos or parents' details. Any recording in toilets or changing areas. Any injury, lost child or fire: emergency services and the venue's own procedure first; any concern about a child's safety with staff goes to the authorities."
+    "Ride or equipment safety, supervision ratios or child-protection law advice.",
+    "Anything about the legality of prize or redemption games.",
+    "Collecting children's names, ages, photos or parents' details.",
+    "Any recording in toilets or changing areas.",
+    "Any injury, lost child or fire: emergency services and the venue's own procedure first; any concern about a child's safety with staff goes to the authorities."
   ],
   "sample_reply": {
     "person": "I'm sure some cash at our game zone card counter is going missing. What can I do?",
-    "pi": "Yes, this can be checked and tightened quickly. 1 Pull one week of card sales by cashier from your card system and compare it with the cash handed in, to see where the gaps sit. 2 Count the drawer together with the next cashier at every shift change, so each gap belongs to one shift. Workzap can do this automatically for you: a daily match of card sales, top-ups and cash by cashier, with any gap sent to you on WhatsApp. Shall I prepare a solution document and quote for you? You can say no.",
+    "pi": "Yes, this can be checked and tightened quickly. 1) Pull one week of card sales by cashier from your card system and compare it with the cash handed in, to see where the gaps sit. 2) Count the drawer together with the next cashier at every shift change, so each gap belongs to one shift. Workzap can do this automatically for you: a daily match of card sales, top-ups and cash by cashier, with any gap sent to you on WhatsApp. Shall I prepare a solution document and quote for you? You can say no.",
     "language": "english"
   }
 }

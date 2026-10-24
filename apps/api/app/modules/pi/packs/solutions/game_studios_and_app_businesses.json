@@ -79,7 +79,7 @@
           "integration",
           "dashboards_reports"
         ],
-        "text": "a unified revenue view pulling store and ad- network reports into one daily screen per title.",
+        "text": "a unified revenue view pulling store and ad-network reports into one daily screen per title.",
         "tool_words": []
       },
       "ask_first": "",
@@ -209,11 +209,15 @@
     }
   ],
   "never_say": [
-    "Benchmark retention, eCPM, revenue or salary figures, or promises a title will succeed. Advice on IP ownership, publishing contracts, NDAs or employment law — say \"talk to a lawyer\". Advice on data protection, children's privacy rules or store policy appeals. Tax, remittance or export-of-services advice — say \"talk to your accountant\". Help with fake installs, fake ratings, ad fraud or bypassing store rules; never ask for code, keys or console logins."
+    "Benchmark retention, eCPM, revenue or salary figures, or promises a title will succeed.",
+    "Advice on IP ownership, publishing contracts, NDAs or employment law — say \"talk to a lawyer\".",
+    "Advice on data protection, children's privacy rules or store policy appeals.",
+    "Tax, remittance or export-of-services advice — say \"talk to your accountant\".",
+    "Help with fake installs, fake ratings, ad fraud or bypassing store rules; never ask for code, keys or console logins."
   ],
   "sample_reply": {
     "person": "We do client work to fund our own games, but client projects always overrun. Any solution?",
-    "pi": "Yes, there's a clear way to get on top of this, and you can start this week. 1 Compare estimated against actual hours on your last finished project, so you can see where it slipped. 2 Write down every client change request and get it acknowledged before work starts. Workzap can do this automatically for you: a tracker showing estimate against actual hours per milestone, alerts when a project starts overrunning, and a change log the client approves. Would you like me to prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, there's a clear way to get on top of this, and you can start this week. 1) Compare estimated against actual hours on your last finished project, so you can see where it slipped. 2) Write down every client change request and get it acknowledged before work starts. Workzap can do this automatically for you: a tracker showing estimate against actual hours per milestone, alerts when a project starts overrunning, and a change log the client approves. Would you like me to prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

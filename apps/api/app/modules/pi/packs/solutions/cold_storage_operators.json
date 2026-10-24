@@ -1,7 +1,7 @@
 {
   "industry": "cold_storage_operators",
   "name": "Cold storage operators",
-  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "sector": "7.C Agriculture, livestock and rural (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -200,19 +200,22 @@
           "dashboards_reports"
         ],
         "text": "A daily stock report emailed to each brand client automatically, from the same inward/outward records.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How many brand clients want reports?",
       "free_stops": "Report contents and delivery are detailed in the solution document."
     }
   ],
   "never_say": [
-    "Advice on refrigeration engineering, ammonia or refrigerant handling, or storage temperatures for any product. Advice on food or pharma storage compliance, insurance claims, contract law or abandoned goods. Any help altering temperature logs, backdating gate passes, releasing stock improperly or hiding stock from tax or customs. Assigning blame in client loss disputes. Storing clients' or labourers' names, CNICs, trade licences or phone numbers."
+    "Advice on refrigeration engineering, ammonia or refrigerant handling, or storage temperatures for any product.",
+    "Advice on food or pharma storage compliance, insurance claims, contract law or abandoned goods.",
+    "Any help altering temperature logs, backdating gate passes, releasing stock improperly or hiding stock from tax or customs.",
+    "Assigning blame in client loss disputes.",
+    "Storing clients' or labourers' names, CNICs, trade licences or phone numbers."
   ],
   "sample_reply": {
     "person": "Aloo ka cold store hai Okara ke paas. Har saal zameendar boriyan kam hone ki shikayat karte hain, koi solution hai?",
-    "pi": "Ji, is ka hal mumkin hai aur shuruaat foran ho sakti hai. 1 Maal andar aate waqt ginti zameendar ya unke numainde ke saamne karein aur dono dastakhat karein, taake shuruaati adad pe ittefaq ho. 2 Har nikasi pe baqi boriyon ka adad usi waqt bata dein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har aamad aur nikasi ka record, code wali raseed, aur har dafa zameendar ko WhatsApp pe baqi balance. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruaat foran ho sakti hai. 1) Maal andar aate waqt ginti zameendar ya unke numainde ke saamne karein aur dono dastakhat karein, taake shuruaati adad pe ittefaq ho. 2) Har nikasi pe baqi boriyon ka adad usi waqt bata dein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har aamad aur nikasi ka record, code wali raseed, aur har dafa zameendar ko WhatsApp pe baqi balance. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

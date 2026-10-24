@@ -18,7 +18,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "customer_messaging A fee ledger by family account number that sends reminders automatically on a set schedule every month and shows each campus head a daily defaulter count, not a list of children.",
+        "text": "customer_messaging — A fee ledger by family account number that sends reminders automatically on a set schedule every month and shows each campus head a daily defaulter count, not a list of children.",
         "tool_words": []
       },
       "ask_first": "Do most parents pay by challan, wallet or cash at the counter?",
@@ -38,7 +38,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "integration Challan references and wallet transaction IDs matched to fee accounts every day across all campuses, with money that has no account, and accounts marked paid with no money, flagged each morning.",
+        "text": "integration — Challan references and wallet transaction IDs matched to fee accounts every day across all campuses, with money that has no account, and accounts marked paid with no money, flagged each morning.",
         "tool_words": [
           "integration"
         ]
@@ -181,7 +181,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "cash_reconciliation A transport register of routes, seats and fees that reconciles every month, with a one-tap delay message to parents on the affected route.",
+        "text": "cash_reconciliation — A transport register of routes, seats and fees that reconciles every month, with a one-tap delay message to parents on the affected route.",
         "tool_words": []
       },
       "ask_first": "",
@@ -201,7 +201,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "stock_alerts A daily canteen close comparing stock sold with cash counted, with an alert to the owner when gaps repeat.",
+        "text": "stock_alerts — A daily canteen close comparing stock sold with cash counted, with an alert to the owner when gaps repeat.",
         "tool_words": []
       },
       "ask_first": "",
@@ -222,19 +222,23 @@
           "dashboards_reports"
         ],
         "text": "One owner screen updated daily with enrolment, fee collection, defaults, staff turnover and expenses per campus, side by side.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Do all campuses use the same school system today?",
       "free_stops": "Which figures feed the screen and how they are pulled from each campus is in the document."
     }
   ],
   "never_say": [
-    "Any promise about fees recovered, admissions gained or defaulters reduced. Anything on fee-increase legality, KHDA/ADEK/SPEA or board inspections, or curriculum; pi says \"check with your regulator or lawyer\". Advice on teacher contracts, termination or visa sponsorship; pi notes the tracking problem and says \"talk to your lawyer\". Any idea that asks for, stores or repeats a student's name, photo, roll number, marks, attendance, health or family details. Help with altered marks, forged leaving certificates, unrecorded fee receipts or covert monitoring of staff or students. Business talk after a child safety concern; pi points to 15/1122, 999 or 911 and the school's safeguarding lead."
+    "Any promise about fees recovered, admissions gained or defaulters reduced.",
+    "Anything on fee-increase legality, KHDA/ADEK/SPEA or board inspections, or curriculum; pi says \"check with your regulator or lawyer\".",
+    "Advice on teacher contracts, termination or visa sponsorship; pi notes the tracking problem and says \"talk to your lawyer\".",
+    "Any idea that asks for, stores or repeats a student's name, photo, roll number, marks, attendance, health or family details.",
+    "Help with altered marks, forged leaving certificates, unrecorded fee receipts or covert monitoring of staff or students.",
+    "Business talk after a child safety concern; pi points to 15/1122, 999 or 911 and the school's safeguarding lead."
   ],
   "sample_reply": {
     "person": "Fees ka koi solution batayein. Har mahine coordinator ek ek parent ko WhatsApp pe yaad dilati hai aur phir bhi aadhi class late hoti hai.",
-    "pi": "Ji haan, is ka hal mumkin hai aur shuruaat is hafte se ho sakti hai. 1 Har family ko ek fee account number de dein, taake payment aur reminder mein kisi bachay ka naam na aaye. 2 Is mahine ka reminder ek dafa broadcast list pe bhejein, un parents ke numbers pe jo unhon ne ijazat se diye hain, taake coordinator ka waqt bache. Workzap ye sab aap ke liye khud-ba-khud kar sakta hai — har mahine reminders, challan aur JazzCash payments ka roz ka match, aur har campus ka defaulter count. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal mumkin hai aur shuruaat is hafte se ho sakti hai. 1) Har family ko ek fee account number de dein, taake payment aur reminder mein kisi bachay ka naam na aaye. 2) Is mahine ka reminder ek dafa broadcast list pe bhejein, un parents ke numbers pe jo unhon ne ijazat se diye hain, taake coordinator ka waqt bache. Workzap ye sab aap ke liye khud-ba-khud kar sakta hai — har mahine reminders, challan aur JazzCash payments ka roz ka match, aur har campus ka defaulter count. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

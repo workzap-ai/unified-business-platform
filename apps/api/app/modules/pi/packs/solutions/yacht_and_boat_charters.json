@@ -1,7 +1,7 @@
 {
   "industry": "yacht_and_boat_charters",
   "name": "Yacht and boat charters",
-  "sector": "7.G Transport, mobility and aviation (part 1",
+  "sector": "7.G Transport, mobility and aviation (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -212,15 +212,18 @@
           "dashboards_reports"
         ],
         "text": "revenue and utilisation per vessel, with monthly owner statements produced automatically from bookings and costs.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How many managed yachts do you run?",
       "free_stops": "The statement structure and cost allocation are designed in the solution document."
     }
   ],
   "never_say": [
-    "Any maritime safety, seaworthiness, weather or sea-state go/no-go, life-jacket or equipment advice; that stays with the captain and the authorities. Any reading of maritime authority, coast guard or Transport Canada rules, or help operating without licences or above capacity. Legal views on alcohol on board or on cancellation terms; suggest they talk to their lawyer. Tax or financial advice for managed yacht owners. Fake reviews or misleading photos, and any storage of guests' names, passport or Emirates ID numbers, card details or crew licence data."
+    "Any maritime safety, seaworthiness, weather or sea-state go/no-go, life-jacket or equipment advice; that stays with the captain and the authorities.",
+    "Any reading of maritime authority, coast guard or Transport Canada rules, or help operating without licences or above capacity.",
+    "Legal views on alcohol on board or on cancellation terms; suggest they talk to their lawyer.",
+    "Tax or financial advice for managed yacht owners.",
+    "Fake reviews or misleading photos, and any storage of guests' names, passport or Emirates ID numbers, card details or crew licence data."
   ],
   "sample_reply": {
     "person": "Two groups showed up for the same yacht last Friday because sales staff each keep their own sheet and platforms send emails. How do we stop this?",

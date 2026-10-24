@@ -1,7 +1,7 @@
 {
   "industry": "camel_farms",
-  "name": "Camel farms UAE and Cholistan)",
-  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "name": "Camel farms (UAE and Cholistan)",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -201,19 +201,22 @@
           "nori_daily_read"
         ],
         "text": "an automatic morning read with milk, headcount, births, deaths, deliveries and cash, from the entries staff already make.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "If you could see one number every morning, what would it be?",
       "free_stops": "What goes into the morning read is worked out in the solution document."
     }
   ],
   "never_say": [
-    "Any medicine, doping, performance-enhancer, training, breeding or embryo advice; suggest their vet. Anything that helps get around racing or competition rules, doping tests, microchip or registration, or milk-quality checks. Immigration, visa or labour-law advice about expatriate staff, or storing passport or Emirates ID numbers. Anything that helps with smuggling or unlicensed movement across borders. Prices or values of racing or beauty camels, or opinions on inheritance and family ownership."
+    "Any medicine, doping, performance-enhancer, training, breeding or embryo advice; suggest their vet.",
+    "Anything that helps get around racing or competition rules, doping tests, microchip or registration, or milk-quality checks.",
+    "Immigration, visa or labour-law advice about expatriate staff, or storing passport or Emirates ID numbers.",
+    "Anything that helps with smuggling or unlicensed movement across borders.",
+    "Prices or values of racing or beauty camels, or opinions on inheritance and family ownership."
   ],
   "sample_reply": {
-    "person": "اﻟﺤﻞ؟ ﺳﻮ .ﻣﻪ ﺣﺮء ﺮﺣﻊ واﻟﻤﺼﻊ ﻞ اﻟﺤﻠ ﺣﻠﻮٮ، ﺎﻪ ﺳﮟ ﻬﺎ اﻟﻌﮟ ﯽ ﻋﺮﻪ ﻋﺪى",
-    "pi": "(٢ .ﺣﻠﻬﺎ ﻞ ﺎﻪ أى ﮟ ﻋﺴﺎں أﺳﻮع، ﻟﻤﺪە ﻟﺤﺎﻟﻬﺎ ﺎﻪ ﻛﻞ ﺣﻠ ﺴﺤﻞ اﻟﺮاﻋﯽ ﺣﻞ (١ .ﻫﺎلٔﺳﻮع ﻣﮟ ﻪ ﺪأ وﺪر ﺣﻞ، ﯽ أﻛﺪ اﻟﻄﺮى ﻟﻄ ارﺣﻊ اﻟﺴ ﺲ ﻜﺮر وإدا واﻟﺴ، ﺎﻟﻜﻤﻪ ﻣﻜﻮٮ رﺺ ﻛﻞ اﻟﻤﺼﻊ ﻣﮟ اﻃﻠ. Workzap ﺴﻜﻞ ﻟ ﻛﻠﻪ ﻫﺪا ﺴﻮى ﺪر وﻋﺎدى ﺳﻌﺮ، وﻋﺮص ﺣﻞ وﻪ ﻟ أﺣﻬﺮ ﯽ .ﺻﺢ ﻛﻞ ﻣﻠﺤﺺ وﻮﺻﻠ اﻟﻤﺮﻮﺻﻪ، واﻟﻜﻤﺎٮ ﺎﻪ ﻛﻞ ﻟﺤﻠ اﻟﻠﻮں ﻋﻠﯽ ﺳﺤﻞ :ﻮم ﻛﻞ ﻠﺎٔﯽ ﯽ؟ ﻣﺎ ﻟﻮ",
-    "language": "arabic"
+    "person": "",
+    "pi": "",
+    "language": "english"
   }
 }

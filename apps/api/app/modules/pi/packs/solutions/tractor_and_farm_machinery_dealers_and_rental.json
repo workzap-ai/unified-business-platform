@@ -1,7 +1,7 @@
 {
   "industry": "tractor_and_farm_machinery_dealers_and_rental",
   "name": "Tractor and farm machinery dealers and rental",
-  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "sector": "7.C Agriculture, livestock and rural (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -201,19 +201,22 @@
         "text": "A branch dashboard showing sales, rental utilisation, workshop revenue, parts and outstanding amounts every day.",
         "tool_words": [
           "dashboard"
-        ],
-        "leads_with_view": true
+        ]
       },
       "ask_first": "How many branches and workshops do you have?",
       "free_stops": "What the dashboard measures is kept for the solution document."
     }
   ],
   "never_say": [
-    "Advice on repair procedures, safety modifications, removing guards or technical specs. Advice on financing, interest, leasing law, instalment law, repossession, registration, tax or import duties. Any agronomy advice on field operations. Any help tampering with hour meters, forging registration or import papers, passing used machines off as new or avoiding customs duty. Encouraging \"own money\" premiums; recording customers', operators' or guarantors' names, CNICs or licence numbers."
+    "Advice on repair procedures, safety modifications, removing guards or technical specs.",
+    "Advice on financing, interest, leasing law, instalment law, repossession, registration, tax or import duties.",
+    "Any agronomy advice on field operations.",
+    "Any help tampering with hour meters, forging registration or import papers, passing used machines off as new or avoiding customs duty.",
+    "Encouraging \"own money\" premiums; recording customers', operators' or guarantors' names, CNICs or licence numbers."
   ],
   "sample_reply": {
     "person": "Hamare 6 harvester kiraye pe chalte hain. Driver acre zyada batate hain aur paisa kam aata hai, iska kya hal hai?",
-    "pi": "Haan, is ka hal mumkin hai aur kaam is hafte shuru ho sakta hai. 1 Har kaam khatam hote hi driver se WhatsApp pe photo ke saath acre ka paigham mangwayein, aur kisan se usi thread mein tasdeeq le lein, taake waqt pe record ban jaaye. 2 Hafte ke aakhir mein har machine ke kaam ko jama hue paise se mila lein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har kaam ka location, acre, tasdeeq aur wasooli roz darj ho aur farq pe alert aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is ka hal mumkin hai aur kaam is hafte shuru ho sakta hai. 1) Har kaam khatam hote hi driver se WhatsApp pe photo ke saath acre ka paigham mangwayein, aur kisan se usi thread mein tasdeeq le lein, taake waqt pe record ban jaaye. 2) Hafte ke aakhir mein har machine ke kaam ko jama hue paise se mila lein. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har kaam ka location, acre, tasdeeq aur wasooli roz darj ho aur farq pe alert aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

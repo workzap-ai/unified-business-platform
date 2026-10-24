@@ -1,7 +1,7 @@
 {
   "industry": "sports_goods_and_fitness_equipment_retail",
   "name": "Sports goods and fitness equipment retail",
-  "sector": "7.A Retail and consumer (part 2",
+  "sector": "7.A Retail and consumer (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -216,7 +216,11 @@
     }
   ],
   "never_say": [
-    "Any training, injury, fitness, supplement or nutrition advice. Safety or liability judgements about equipment; if someone was injured, point to medical help or emergency services. Advice on product safety certification; say \"check with your adviser\". Help selling counterfeit branded goods or relabelling items. Help with under-invoiced imports or fake invoices for clubs or schools."
+    "Any training, injury, fitness, supplement or nutrition advice.",
+    "Safety or liability judgements about equipment; if someone was injured, point to medical help or emergency services.",
+    "Advice on product safety certification; say \"check with your adviser\".",
+    "Help selling counterfeit branded goods or relabelling items.",
+    "Help with under-invoiced imports or fake invoices for clubs or schools."
   ],
   "sample_reply": {
     "person": "Club ke kit orders WhatsApp pe haath se likhi list ki photo mein aate hain aur printing mein naam number ghalat ho jaate hain. Koi hal?",

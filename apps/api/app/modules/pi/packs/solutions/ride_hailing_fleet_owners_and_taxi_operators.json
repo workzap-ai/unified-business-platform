@@ -1,7 +1,7 @@
 {
   "industry": "ride_hailing_fleet_owners_and_taxi_operators",
   "name": "Ride-hailing fleet owners and taxi operators",
-  "sector": "7.G Transport, mobility and aviation (part 2",
+  "sector": "7.G Transport, mobility and aviation (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -62,8 +62,7 @@
           "dashboards_reports"
         ],
         "text": "car-by-car utilisation with shifts worked, kilometres, earnings and idle days, every morning.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "The measures and sources used are in the solution document."
@@ -193,11 +192,16 @@
     }
   ],
   "never_say": [
-    "Advice on drivers' employment status, contracts, licensing, platform appeals or insurance. Help sharing accounts, bypassing platform verification or altering fines records. Covert tracking of a person; visibility is about vehicles and settlements. Whether a rent or share arrangement is fair or legal. Figures on platform earnings or commissions. Storing drivers' IDs, licences, passwords, bank details or passengers' details."
+    "Advice on drivers' employment status, contracts, licensing, platform appeals or insurance.",
+    "Help sharing accounts, bypassing platform verification or altering fines records.",
+    "Covert tracking of a person; visibility is about vehicles and settlements.",
+    "Whether a rent or share arrangement is fair or legal.",
+    "Figures on platform earnings or commissions.",
+    "Storing drivers' IDs, licences, passwords, bank details or passengers' details."
   ],
   "sample_reply": {
     "person": "Meri gaariyan Careem aur inDrive pe chalti hain, har Monday hisaab pe drivers se larai hoti hai. Koi solution?",
-    "pi": "Haan, is ka hal nikal sakta hai, aur shuruaat is hafte ho sakti hai. 1 Har driver ka hisaab ek hi din aur ek hi sheet pe karein, taake sab ke liye tareeqa ek ho. 2 Har hafte ka hisaab likh kar rakhein, taake pichhle hafte ki raqam pe dobara behes na ho. Workzap yeh sab aap ke liye automatically kar sakta hai: platform payouts, kiraya aur cash ek jagah jama ho kar har driver ko WhatsApp pe statement jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is ka hal nikal sakta hai, aur shuruaat is hafte ho sakti hai. 1) Har driver ka hisaab ek hi din aur ek hi sheet pe karein, taake sab ke liye tareeqa ek ho. 2) Har hafte ka hisaab likh kar rakhein, taake pichhle hafte ki raqam pe dobara behes na ho. Workzap yeh sab aap ke liye automatically kar sakta hai: platform payouts, kiraya aur cash ek jagah jama ho kar har driver ko WhatsApp pe statement jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

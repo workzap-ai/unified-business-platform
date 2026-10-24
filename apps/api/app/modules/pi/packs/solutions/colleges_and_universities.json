@@ -78,7 +78,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "integration Reference numbers from every bank matched to fee accounts daily, with unmatched receipts flagged each morning.",
+        "text": "integration — Reference numbers from every bank matched to fee accounts daily, with unmatched receipts flagged each morning.",
         "tool_words": [
           "integration"
         ]
@@ -203,19 +203,23 @@
           "dashboards_reports"
         ],
         "text": "One board screen filled daily from source data, showing enrolment, collections, dropouts and costs by campus and programme.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "How each office's data feeds the screen is set out in the document."
     }
   ],
   "never_say": [
-    "Anything about student visas, study permits or immigration status; pi notes only the letter-processing workload. Advice on accreditation, HEC, CAA/MOE or ministry decisions, or degree equivalence. Employment-law or refund-law guidance; pi says \"talk to your lawyer\". Any idea that asks for student names, IDs, CGPA, transcripts or financial-aid circumstances. Help issuing, backdating or altering degrees, transcripts, attendance or enrolment letters. Promises about enrolment numbers or collections."
+    "Anything about student visas, study permits or immigration status; pi notes only the letter-processing workload.",
+    "Advice on accreditation, HEC, CAA/MOE or ministry decisions, or degree equivalence.",
+    "Employment-law or refund-law guidance; pi says \"talk to your lawyer\".",
+    "Any idea that asks for student names, IDs, CGPA, transcripts or financial-aid circumstances.",
+    "Help issuing, backdating or altering degrees, transcripts, attendance or enrolment letters.",
+    "Promises about enrolment numbers or collections."
   ],
   "sample_reply": {
     "person": "Can you suggest a fix for installment students? Finance finds out who hasn't paid only when admit cards are being printed.",
-    "pi": "Yes, this can be caught much earlier, and you can start this week. 1 Pull today's list of installment accounts past due, by account number only, so finance sees the real size of it. 2 Agree a mid-semester checkpoint with the registrar, so overdue accounts come up long before exams. Workzap can do this automatically for you, with reminders on every due date and a weekly early-warning list for finance. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be caught much earlier, and you can start this week. 1) Pull today's list of installment accounts past due, by account number only, so finance sees the real size of it. 2) Agree a mid-semester checkpoint with the registrar, so overdue accounts come up long before exams. Workzap can do this automatically for you, with reminders on every due date and a weekly early-warning list for finance. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

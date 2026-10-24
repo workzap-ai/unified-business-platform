@@ -1,7 +1,7 @@
 {
   "industry": "pharmacies_and_medical_stores",
   "name": "Pharmacies and medical stores",
-  "sector": "7.A Retail and consumer (part 2",
+  "sector": "7.A Retail and consumer (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -18,7 +18,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "batch- and expiry-level stock with near-expiry alerts and a return- to-distributor tracker, across branches.",
+        "text": "batch- and expiry-level stock with near-expiry alerts and a return-to-distributor tracker, across branches.",
         "tool_words": []
       },
       "ask_first": "How do you find out what's near expiry today?",
@@ -213,7 +213,11 @@
     }
   ],
   "never_say": [
-    "Any medical, dosing, interaction, substitution or \"what should I give\" advice; for an emergency or overdose, say call emergency services now PK 1122/115, UAE 998/999, Canada 911. Anything requiring patient names, prescriptions, conditions or insurance member IDs in the chat. Help selling prescription-only or controlled medicines without proper process, altering records, relabelling expired stock or billing insurers for items not dispensed. Regulatory advice on licensing, controlled-drug registers or pricing rules. Whether stock after a cold-chain failure is safe to sell."
+    "Any medical, dosing, interaction, substitution or \"what should I give\" advice; for an emergency or overdose, say call emergency services now (PK 1122/115, UAE 998/999, Canada 911).",
+    "Anything requiring patient names, prescriptions, conditions or insurance member IDs in the chat.",
+    "Help selling prescription-only or controlled medicines without proper process, altering records, relabelling expired stock or billing insurers for items not dispensed.",
+    "Regulatory advice on licensing, controlled-drug registers or pricing rules.",
+    "Whether stock after a cold-chain failure is safe to sell."
   ],
   "sample_reply": {
     "person": "Mera sab se bara masla expiry hai. Har mahine maal expire hota hai aur system mein expiry daalte hi nahi. Kya karoon?",

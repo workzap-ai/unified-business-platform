@@ -143,7 +143,7 @@
           "loyalty_repeat",
           "customer_messaging"
         ],
-        "text": "Repeat-booking reminders and regular- plan options for customers who opted in.",
+        "text": "Repeat-booking reminders and regular-plan options for customers who opted in.",
         "tool_words": []
       },
       "ask_first": "Do you contact customers again after a job?",
@@ -211,11 +211,15 @@
     }
   ],
   "never_say": [
-    "Any guidance on mixing chemicals, bleach or acids, mould hazards, or facade and rope-access work. Any help investigating or naming a cleaner accused of theft. Any help hiring without valid permits, withholding passports, underpaying or faking headcount on invoices. Any recording of cleaners' or customers' names, addresses, door codes, keys or ID/visa details. Anything other than emergency services or the poison centre first for chemical exposure, falls, injury or fire."
+    "Any guidance on mixing chemicals, bleach or acids, mould hazards, or facade and rope-access work.",
+    "Any help investigating or naming a cleaner accused of theft.",
+    "Any help hiring without valid permits, withholding passports, underpaying or faking headcount on invoices.",
+    "Any recording of cleaners' or customers' names, addresses, door codes, keys or ID/visa details.",
+    "Anything other than emergency services or the poison centre first for chemical exposure, falls, injury or fire."
   ],
   "sample_reply": {
     "person": "Cleaners late jaati hain ya jaati hi nahi, aur pata customer ke gusse wale call se chalta hai. Koi hal batayen.",
-    "pi": "Ji haan, is ka hal mumkin hai, aur shuruaat isi hafte ho sakti hai. 1 Har cleaner job pe pohanchte hi office ko ek chhota sa message bheje, taake na pohanchne ka pata customer se pehle chale. 2 Roz ek do standby cleaners rakhein, taake khali jagah jaldi bhari ja sake. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har job ka check-in, aur waqt pe check-in na ho to office ko foran alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal mumkin hai, aur shuruaat isi hafte ho sakti hai. 1) Har cleaner job pe pohanchte hi office ko ek chhota sa message bheje, taake na pohanchne ka pata customer se pehle chale. 2) Roz ek do standby cleaners rakhein, taake khali jagah jaldi bhari ja sake. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: har job ka check-in, aur waqt pe check-in na ho to office ko foran alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

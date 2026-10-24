@@ -96,9 +96,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "job_tracking"
+          "job_tracking",
+          "dashboards_reports"
         ],
-        "text": "dashboards_reports — source and recruiter credit recorded the moment a candidate enters, with a commission view each recruiter can see.",
+        "text": "source and recruiter credit recorded the moment a candidate enters, with a commission view each recruiter can see.",
         "tool_words": []
       },
       "ask_first": "",
@@ -207,11 +208,15 @@
     }
   ],
   "never_say": [
-    "Any visa, work permit, immigration or labour-law advice, or salary benchmarking as advice. Anything involving fake experience letters, forged degrees or false references. Help with filtering candidates by religion, nationality or gender where unlawful, or charging candidates unlawful fees. That candidates will always join or that time-to-fill will drop by any amount. Requests for candidate CVs, names, numbers, ID or salary details."
+    "Any visa, work permit, immigration or labour-law advice, or salary benchmarking as advice.",
+    "Anything involving fake experience letters, forged degrees or false references.",
+    "Help with filtering candidates by religion, nationality or gender where unlawful, or charging candidates unlawful fees.",
+    "That candidates will always join or that time-to-fill will drop by any amount.",
+    "Requests for candidate CVs, names, numbers, ID or salary details."
   ],
   "sample_reply": {
     "person": "Clients feedback dene mein hafte laga dete hain aur candidates nikal jate hain. Koi hal batayein.",
-    "pi": "Ji haan, is ka hal mumkin hai aur is hafte se kaam shuru kiya ja sakta hai. 1 Har shortlist ke saath client se feedback ki ek tareekh tay karein, taake follow up ka buniyaad ho. 2 Aaj ek dafa woh sab shortlists likh lein jin ka feedback ruka hua hai, taake pata ho ke kis client ko pehle yaad dilana hai. Workzap yeh aap ke liye automatically kar sakta hai: feedback ruke to client ko khud reminder, aur candidates ko har stage pe unki ijazat se update. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, is ka hal mumkin hai aur is hafte se kaam shuru kiya ja sakta hai. 1) Har shortlist ke saath client se feedback ki ek tareekh tay karein, taake follow up ka buniyaad ho. 2) Aaj ek dafa woh sab shortlists likh lein jin ka feedback ruka hua hai, taake pata ho ke kis client ko pehle yaad dilana hai. Workzap yeh aap ke liye automatically kar sakta hai: feedback ruke to client ko khud reminder, aur candidates ko har stage pe unki ijazat se update. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

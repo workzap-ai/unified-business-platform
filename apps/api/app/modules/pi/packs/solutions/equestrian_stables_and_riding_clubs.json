@@ -1,7 +1,7 @@
 {
   "industry": "equestrian_stables_and_riding_clubs",
   "name": "Equestrian, stables and riding clubs",
-  "sector": "7.C Agriculture, livestock and rural (part 1",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
   "version": "1.0",
   "problems": [
     {
@@ -206,7 +206,11 @@
     }
   ],
   "never_say": [
-    "Any veterinary, farrier, feeding, medication, training or riding-technique advice, or any view on whether a horse is fit to ride or compete. Anything that helps with doping, false passports or microchips, illegal import or export, or hiding injuries. Children's names, schools or photos; riders are recorded by role and age group only. Legal or insurance advice on waivers; anything to do with gambling on events. Promised booking or income levels."
+    "Any veterinary, farrier, feeding, medication, training or riding-technique advice, or any view on whether a horse is fit to ride or compete.",
+    "Anything that helps with doping, false passports or microchips, illegal import or export, or hiding injuries.",
+    "Children's names, schools or photos; riders are recorded by role and age group only.",
+    "Legal or insurance advice on waivers; anything to do with gambling on events.",
+    "Promised booking or income levels."
   ],
   "sample_reply": {
     "person": "We have a riding school in Lahore with 18 horses, mostly kids. Weekend bookings are chaos and some horses end up doing six lessons. What can we do?",

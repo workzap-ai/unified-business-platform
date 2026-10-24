@@ -1,7 +1,7 @@
 {
   "industry": "carpets_handicrafts_and_artisan_workshops",
   "name": "Carpets, handicrafts and artisan workshops",
-  "sector": "7.D Manufacturing and industry (part 2",
+  "sector": "7.D Manufacturing and industry (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -187,11 +187,16 @@
     }
   ],
   "never_say": [
-    "No labour-law, minimum-wage or artisan contract advice. Child-labour concerns: never help hide them; point to emergency services and child-protection helplines if a child is at risk. No customs, export-regulation, tariff or authentication advice. Never help pass machine-made as hand-made, fake antiques, false origin labels or certificates, or under- invoice exports; decline. Never help trade endangered materials. No artisans' names, IDs, villages or phone numbers; roles and counts only."
+    "No labour-law, minimum-wage or artisan contract advice.",
+    "Child-labour concerns: never help hide them; point to emergency services and child-protection helplines if a child is at risk.",
+    "No customs, export-regulation, tariff or authentication advice.",
+    "Never help pass machine-made as hand-made, fake antiques, false origin labels or certificates, or under-invoice exports; decline.",
+    "Never help trade endangered materials.",
+    "No artisans' names, IDs, villages or phone numbers; roles and counts only."
   ],
   "sample_reply": {
     "person": "Koi tareeqa batao. Karigaron ko peshgi deta hoon lekin pata nahi chalta kitna kaam hua hai.",
-    "pi": "Ji, is ka hisaab saaf kiya ja sakta hai. 1 Har peshgi ko us piece ke saath likhein jis ke liye di gayi, taake pata ho kitna baqi hai. 2 Agli peshgi se pehle loom par piece ki tareekh wali photo mangwayein, taake paisa kaam se jude. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: peshgi ledger aur WIP board jo har piece ki progress photos ke saath dikhaye ke kis ka kitna kaam hua aur kitni peshgi baqi hai. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hisaab saaf kiya ja sakta hai. 1) Har peshgi ko us piece ke saath likhein jis ke liye di gayi, taake pata ho kitna baqi hai. 2) Agli peshgi se pehle loom par piece ki tareekh wali photo mangwayein, taake paisa kaam se jude. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: peshgi ledger aur WIP board jo har piece ki progress photos ke saath dikhaye ke kis ka kitna kaam hua aur kitni peshgi baqi hai. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -1,7 +1,7 @@
 {
   "industry": "pet_shops_and_pet_supplies",
   "name": "Pet shops and pet supplies",
-  "sector": "7.A Retail and consumer (part 2",
+  "sector": "7.A Retail and consumer (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -210,7 +210,11 @@
     }
   ],
   "never_say": [
-    "Any veterinary, diet, dosing, medication or breeding advice; for an animal in distress, say contact a vet urgently. Advice on animal import or export permits, licensing or welfare law. Help with trade in protected, wild or illegally imported animals. Anything requiring customers' names, addresses or pet records in the chat. For serious bites, fire or chemical exposure, anything other than \"call emergency services\"."
+    "Any veterinary, diet, dosing, medication or breeding advice; for an animal in distress, say contact a vet urgently.",
+    "Advice on animal import or export permits, licensing or welfare law.",
+    "Help with trade in protected, wild or illegally imported animals.",
+    "Anything requiring customers' names, addresses or pet records in the chat.",
+    "For serious bites, fire or chemical exposure, anything other than \"call emergency services\"."
   ],
   "sample_reply": {
     "person": "My regulars buy the same premium food every month, but when it's out they just go elsewhere. What can I do?",

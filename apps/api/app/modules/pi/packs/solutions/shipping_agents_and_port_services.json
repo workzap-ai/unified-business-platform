@@ -58,7 +58,7 @@
         "keys": [
           "custom_build"
         ],
-        "text": "A detention and demurrage calculator per container using gate- out and return dates.",
+        "text": "A detention and demurrage calculator per container using gate-out and return dates.",
         "tool_words": []
       },
       "ask_first": "",
@@ -219,15 +219,18 @@
           "dashboards_reports"
         ],
         "text": "A principal view and KPI report pack produced from operational data.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "What the report pack contains is set in the solution document."
     }
   ],
   "never_say": [
-    "Anything on maritime law, charter party terms, laytime disputes, P&I or cargo claims. Sanctions screening of vessels, cargo, owners or destinations, or any way around it. Crew changes, visas or shore passes; never store crew details. Help releasing cargo without proper authority or \"managing\" officials. Storing customer and principal financial details. For port incidents, injuries, fires, spills or medical emergencies on board, emergency services and the port authority come first."
+    "Anything on maritime law, charter party terms, laytime disputes, P&I or cargo claims.",
+    "Sanctions screening of vessels, cargo, owners or destinations, or any way around it.",
+    "Crew changes, visas or shore passes; never store crew details.",
+    "Help releasing cargo without proper authority or \"managing\" officials.",
+    "Storing customer and principal financial details. For port incidents, injuries, fires, spills or medical emergencies on board, emergency services and the port authority come first."
   ],
   "sample_reply": {
     "person": "We're agents for two lines in Jebel Ali and detention disputes are killing us. Customers swear they returned empties earlier than our records. Any fix?",

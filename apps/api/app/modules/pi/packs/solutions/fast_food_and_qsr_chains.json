@@ -16,15 +16,18 @@
       ],
       "workzap_build": {
         "keys": [
+          "integration",
           "dashboards_reports"
         ],
-        "text": "and integration — a multi-branch dashboard pulling POS data from every outlet, including franchisees on other systems, by hour and channel every day.",
+        "text": "a multi-branch dashboard pulling POS data from every outlet, including franchisees on other systems, by hour and channel every day.",
         "tool_words": [
-          "integration",
           "dashboard",
           "system"
         ],
-        "leads_with_view": true
+        "reordered_from": [
+          "dashboards_reports",
+          "integration"
+        ]
       },
       "ask_first": "Are the franchised branches on the same POS as your own?",
       "free_stops": "How each POS is connected and what franchisees must share is set out in the solution document."
@@ -122,9 +125,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "integration"
+          "integration",
+          "cash_reconciliation"
         ],
-        "text": "and cash_reconciliation — all app orders on one screen beside POS sales, and each app's payout reconciled every day with commission, refunds and missed orders shown.",
+        "text": "all app orders on one screen beside POS sales, and each app's payout reconciled every day with commission, refunds and missed orders shown.",
         "tool_words": [
           "app"
         ]
@@ -187,8 +191,7 @@
           "nori_daily_read"
         ],
         "text": "a short morning read on WhatsApp of every branch's sales, channel mix, discounts and stock flags, with the one branch to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "What one number would you check every morning?",
       "free_stops": "What goes into the morning read and how branch data is pulled is in the solution document."
@@ -205,9 +208,10 @@
       ],
       "workzap_build": {
         "keys": [
-          "attribution_codes"
+          "attribution_codes",
+          "loyalty_repeat"
         ],
-        "text": "and loyalty_repeat — codes showing which channel brought each order, an LTO tracker measured automatically, and phone-number loyalty for opted-in customers.",
+        "text": "codes showing which channel brought each order, an LTO tracker measured automatically, and phone-number loyalty for opted-in customers.",
         "tool_words": []
       },
       "ask_first": "How do you judge whether a deal or LTO worked today?",
@@ -215,11 +219,15 @@
     }
   ],
   "never_say": [
-    "Advice on franchise agreements, royalties or disputes with franchisees — that is for their lawyer. Anything on food-safety certification, oil-disposal rules or allergens — refer to the authority or a qualified consultant. Tracking crew or riders' personal phones without their knowledge. Help suppressing sales from royalty reports or tax. Any promise that ticket times, sales or margins will improve by a set amount."
+    "Advice on franchise agreements, royalties or disputes with franchisees — that is for their lawyer.",
+    "Anything on food-safety certification, oil-disposal rules or allergens — refer to the authority or a qualified consultant.",
+    "Tracking crew or riders' personal phones without their knowledge.",
+    "Help suppressing sales from royalty reports or tax.",
+    "Any promise that ticket times, sales or margins will improve by a set amount."
   ],
   "sample_reply": {
-    "person": "We have nine branches, four franchised. I need a solution I never know what the franchise ones are really selling, and two use their own POS.",
-    "pi": "Yes, you can get proper visibility, and the first steps can start this week. 1 Ask every franchisee for the same few numbers on a fixed day, so their reports can at least be compared. 2 Visit one franchised branch at peak and compare what you see with what they send. Workzap can do this automatically for you, pulling sales from every outlet, including the two on their own POS, into one dashboard by hour and channel, with a short morning read on WhatsApp. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "person": "We have nine branches, four franchised. I need a solution — I never know what the franchise ones are really selling, and two use their own POS.",
+    "pi": "Yes, you can get proper visibility, and the first steps can start this week. 1) Ask every franchisee for the same few numbers on a fixed day, so their reports can at least be compared. 2) Visit one franchised branch at peak and compare what you see with what they send. Workzap can do this automatically for you, pulling sales from every outlet, including the two on their own POS, into one dashboard by hour and channel, with a short morning read on WhatsApp. Shall I get a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

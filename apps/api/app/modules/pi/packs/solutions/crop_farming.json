@@ -1,7 +1,7 @@
 {
   "industry": "crop_farming",
   "name": "Crop farming (wheat, rice, cotton, sugarcane, maize)",
-  "sector": "7.C Agriculture, livestock and rural (part 2",
+  "sector": "7.C Agriculture, livestock and rural (part 2)",
   "version": "1.0",
   "problems": [
     {
@@ -59,8 +59,7 @@
           "nori_daily_read"
         ],
         "text": "A short WhatsApp read every morning showing yesterday's spend by plot, labour count, crop movements and the one thing to look at, built from the munshi's entries.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "How often are you physically at the farm?",
       "free_stops": "What the morning read contains and how entries reach it is detailed in the solution document."
@@ -207,11 +206,15 @@
     }
   ],
   "never_say": [
-    "Anything about which seed, fertiliser, pesticide, spray schedule, dose, sowing date or irrigation timing to use; refer to an agronomist or the agriculture extension department. Yield or price forecasts, or advice on when and where to sell. Views on land title, tenancy rights, inheritance, loan terms, crop insurance claims or tax. Any help under-reporting produce to a mill, faking weighbridge slips, hiding income or taking canal water out of turn. Anything that organises or records child labour; names, CNICs or numbers of haaris, labourers or buyers."
+    "Anything about which seed, fertiliser, pesticide, spray schedule, dose, sowing date or irrigation timing to use; refer to an agronomist or the agriculture extension department.",
+    "Yield or price forecasts, or advice on when and where to sell.",
+    "Views on land title, tenancy rights, inheritance, loan terms, crop insurance claims or tax.",
+    "Any help under-reporting produce to a mill, faking weighbridge slips, hiding income or taking canal water out of turn.",
+    "Anything that organises or records child labour; names, CNICs or numbers of haaris, labourers or buyers."
   ],
   "sample_reply": {
     "person": "Bhai solution batao. Munshi kharcha phone pe batata hai aur diesel ka hisaab bilkul gol hai, koi tareeqa chahiye check karne ka.",
-    "pi": "Haan, is ka hal mumkin hai aur shuruaat is hafte se ho sakti hai. 1 Munshi se har bill aur diesel parchi usi din WhatsApp pe photo kar ke mangwayein, taake bataye hue total ke peeche saboot ho. 2 Ek hafte tak har diesel bharai ke saath tractor aur tube well ke ghante likhwayein, taake pata chale bharai kaam se milti hai ya nahi. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har plot ka kharcha aur diesel roz darj ho, farq pe alert aaye, aur har subah aap ko WhatsApp pe khulasa mile. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is ka hal mumkin hai aur shuruaat is hafte se ho sakti hai. 1) Munshi se har bill aur diesel parchi usi din WhatsApp pe photo kar ke mangwayein, taake bataye hue total ke peeche saboot ho. 2) Ek hafte tak har diesel bharai ke saath tractor aur tube well ke ghante likhwayein, taake pata chale bharai kaam se milti hai ya nahi. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har plot ka kharcha aur diesel roz darj ho, farq pe alert aaye, aur har subah aap ko WhatsApp pe khulasa mile. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

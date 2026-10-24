@@ -161,8 +161,7 @@
           "nori_daily_read"
         ],
         "text": "a short morning read with each outlet's sales, wastage and stock flags, and the one thing to look at.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Can you see each outlet's sales daily now?",
       "free_stops": "How outlet profitability is calculated goes in the solution document."
@@ -189,11 +188,15 @@
     }
   ],
   "never_say": [
-    "Anything about cold-chain rules, temperature-holding standards or food safety. Sugar, diabetes, nutrition or \"healthy\" claims. Advice on colours or additives, or helping hide them. Anything suggesting melted and refrozen stock can be sold. That a season or menu change will lift sales by a set amount."
+    "Anything about cold-chain rules, temperature-holding standards or food safety.",
+    "Sugar, diabetes, nutrition or \"healthy\" claims.",
+    "Advice on colours or additives, or helping hide them.",
+    "Anything suggesting melted and refrozen stock can be sold.",
+    "That a season or menu change will lift sales by a set amount."
   ],
   "sample_reply": {
     "person": "Garmiyon mein kabhi aam khatam ho jate hain aur kabhi itne bach jate hain ke kharab ho jate hain. Koi hal batao.",
-    "pi": "Ji haan, ye balance theek kiya ja sakta hai, aur shuruaat kal subah ki khareedari se ho sakti hai. 1 Ek hafte tak roz likhein kitne aam liye aur kitne phenke, taake khareedari asal istemal ke mutabiq ho. 2 Narm hone wala phal thora thora aur zyada baar lein. Workzap ye aap ke liye automatically kar sakta hai: roz ki khareedari aur wastage ka log, har outlet ka trend, aur agle din kitna lena hai us ka andaza khud aap ke samne. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, ye balance theek kiya ja sakta hai, aur shuruaat kal subah ki khareedari se ho sakti hai. 1) Ek hafte tak roz likhein kitne aam liye aur kitne phenke, taake khareedari asal istemal ke mutabiq ho. 2) Narm hone wala phal thora thora aur zyada baar lein. Workzap ye aap ke liye automatically kar sakta hai: roz ki khareedari aur wastage ka log, har outlet ka trend, aur agle din kitna lena hai us ka andaza khud aap ke samne. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -18,7 +18,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "customer_messaging A renewal register that reminds the owning agent ahead of each due date every day, sends the customer a renewal reminder on WhatsApp with their permission, and shows the owner which renewals were saved or lost by line and agent.",
+        "text": "customer_messaging — A renewal register that reminds the owning agent ahead of each due date every day, sends the customer a renewal reminder on WhatsApp with their permission, and shows the owner which renewals were saved or lost by line and agent.",
         "tool_words": []
       },
       "ask_first": "Roughly how many renewals come up in a normal month?",
@@ -100,7 +100,7 @@
         "keys": [
           "attribution_codes"
         ],
-        "text": "dashboards_reports Codes and links per ad that follow each enquiry through to a written policy, with a monthly view of enquiries and policies by source.",
+        "text": "dashboards_reports — Codes and links per ad that follow each enquiry through to a written policy, with a monthly view of enquiries and policies by source.",
         "tool_words": []
       },
       "ask_first": "",
@@ -201,8 +201,7 @@
           "dashboards_reports"
         ],
         "text": "An owner screen showing policies written, renewals due and lost, leads and response times by branch and producer, refreshed daily.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "Which figures feed the screen and how they are pulled together is in the solution document."
@@ -231,11 +230,15 @@
     }
   ],
   "never_say": [
-    "Which insurer, policy, premium or level of cover a customer should take, or whether they \"need\" cover. Whether a claim will be paid, is genuine, or how policy wording or exclusions should be read. Anything on SECP, UAE Insurance Authority or Canadian provincial regulator requirements; point to their compliance adviser or lawyer. Anything that helps backdate policies, inflate claims, alter documents or split invoices. Any request for policy numbers, customer names, IDs, medical details, vehicle numbers or bank details."
+    "Which insurer, policy, premium or level of cover a customer should take, or whether they \"need\" cover.",
+    "Whether a claim will be paid, is genuine, or how policy wording or exclusions should be read.",
+    "Anything on SECP, UAE Insurance Authority or Canadian provincial regulator requirements; point to their compliance adviser or lawyer.",
+    "Anything that helps backdate policies, inflate claims, alter documents or split invoices.",
+    "Any request for policy numbers, customer names, IDs, medical details, vehicle numbers or bank details."
   ],
   "sample_reply": {
     "person": "Bhai renewals ka koi system nahi, har agent apni Excel chalata hai aur policies lapse ho jati hain. Koi hal batao.",
-    "pi": "Ji, is ka hal bilkul mumkin hai, aur shuruaat aap isi hafte khud kar sakte hain. 1 Saari renewal dates ek hi list mein le aayein aur har policy ke saath ek zimmedar ka naam likhein, taake koi renewal be-malik na rahe. 2 Har Monday chhoti si meeting mein agle mahine ki renewals baant dein, taake call due date se pehle ho. Workzap yahi kaam aap ke liye khud-ba-khud roz kar sakta hai: har agent ko waqt pe yaad- dehani, customer ko unki ijazat se WhatsApp reminder, aur aap ke saamne roz ki report ke kaun si renewal bachi aur kaun si lapse hui. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal bilkul mumkin hai, aur shuruaat aap isi hafte khud kar sakte hain. 1) Saari renewal dates ek hi list mein le aayein aur har policy ke saath ek zimmedar ka naam likhein, taake koi renewal be-malik na rahe. 2) Har Monday chhoti si meeting mein agle mahine ki renewals baant dein, taake call due date se pehle ho. Workzap yahi kaam aap ke liye khud-ba-khud roz kar sakta hai: har agent ko waqt pe yaad-dehani, customer ko unki ijazat se WhatsApp reminder, aur aap ke saamne roz ki report ke kaun si renewal bachi aur kaun si lapse hui. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

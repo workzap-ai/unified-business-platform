@@ -38,7 +38,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "nori_daily_read A midday and evening read of cash against float per counter, with a heads-up on days that usually tip one way.",
+        "text": "nori_daily_read — A midday and evening read of cash against float per counter, with a heads-up on days that usually tip one way.",
         "tool_words": []
       },
       "ask_first": "",
@@ -98,7 +98,7 @@
         "keys": [
           "custom_build"
         ],
-        "text": "nori_daily_read A simple counter log on phone (transaction type and amount only, no customer data) with totals by platform and an end-of-day WhatsApp summary to the owner.",
+        "text": "nori_daily_read — A simple counter log on phone (transaction type and amount only, no customer data) with totals by platform and an end-of-day WhatsApp summary to the owner.",
         "tool_words": [
           "platform"
         ]
@@ -229,19 +229,22 @@
           "nori_daily_read"
         ],
         "text": "A short morning read for the owner of every counter's totals, day-close result and incidents, with the one thing to look at today.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "",
       "free_stops": "Summary content and multi-shop view are in the solution document."
     }
   ],
   "never_say": [
-    "Anything about wallet fees, transaction limits, account opening rules or platform policy. Anything that bypasses biometric verification, uses one person's ID for another, splits transactions or does off-record transactions. Any request for customer numbers, wallet numbers, CNIC, PINs, OTPs, transaction IDs, or the agent's own login. When or where cash is moved. Anything during a robbery or threat other than pointing to emergency services."
+    "Anything about wallet fees, transaction limits, account opening rules or platform policy.",
+    "Anything that bypasses biometric verification, uses one person's ID for another, splits transactions or does off-record transactions.",
+    "Any request for customer numbers, wallet numbers, CNIC, PINs, OTPs, transaction IDs, or the agent's own login.",
+    "When or where cash is moved.",
+    "Anything during a robbery or threat other than pointing to emergency services."
   ],
   "sample_reply": {
     "person": "Float roz dopehar tak khatam ho jata hai aur customer doosri dukaan chale jate hain, koi hal batayein.",
-    "pi": "Ji, is ka hal mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1 Ek hafte tak note karein float kis waqt khatam hota hai, taake asal khatre ka waqt pata chale. 2 Us waqt se pehle top-up karein, zero pe pohanchne ke baad nahi, taake rush ka waqt cover ho. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: counter ke totals se float aur cash ka level dekh kar khatam hone se pehle alert, aur har shaam aap ko poore din ki summary. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka hal mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1) Ek hafte tak note karein float kis waqt khatam hota hai, taake asal khatre ka waqt pata chale. 2) Us waqt se pehle top-up karein, zero pe pohanchne ke baad nahi, taake rush ka waqt cover ho. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: counter ke totals se float aur cash ka level dekh kar khatam hone se pehle alert, aur har shaam aap ko poore din ki summary. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

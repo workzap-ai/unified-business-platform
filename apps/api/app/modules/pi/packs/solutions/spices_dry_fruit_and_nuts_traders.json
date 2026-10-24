@@ -7,7 +7,7 @@
     {
       "id": "p1_credit_customers",
       "n": 1,
-      "words": "Shopkeepers take goods on credit and delay months 100 in a khata",
+      "words": "Shopkeepers take goods on credit and delay months — 100+ in a khata",
       "category": "cash_collections",
       "subtype": "credit_customers",
       "quick_ideas": [
@@ -180,19 +180,22 @@
           "nori_daily_read"
         ],
         "text": "a short morning read with stock value, receivables, top movers and ageing stock, shared with whoever you choose.",
-        "tool_words": [],
-        "leads_with_view": true
+        "tool_words": []
       },
       "ask_first": "Who else in the family knows the numbers?",
       "free_stops": "What goes into the morning read and who sees what is in the solution document."
     }
   ],
   "never_say": [
-    "Anything about customs, import duties, labelling, testing standards or adulteration law. Fumigation or pest-control chemical advice. Help with under-invoicing, informal money transfer or smuggling. Help adding dyes or fillers, or mislabelling. That margins or recoveries will improve by any amount."
+    "Anything about customs, import duties, labelling, testing standards or adulteration law.",
+    "Fumigation or pest-control chemical advice.",
+    "Help with under-invoicing, informal money transfer or smuggling.",
+    "Help adding dyes or fillers, or mislabelling.",
+    "That margins or recoveries will improve by any amount."
   ],
   "sample_reply": {
     "person": "Jodia Bazaar mein dukaan hai. Sab se bara masla udhaar hai, 150 dukaandaar hain aur khata hi khata hai. Hal batao.",
-    "pi": "Ji haan, udhaar ka hisaab control mein laya ja sakta hai, aur kaam isi hafte shuru ho sakta hai. 1 Sab se purane balance wale dukaandaaron ki list bana lein, taake pehle wahan zor diya jaye jahan khatra zyada hai. 2 Har dukaandaar ko likhi hui statement bhejein, kyunke ikhtilaaf aksar wahin hota hai jahan balance share nahi hota. Workzap ye aap ke liye automatically kar sakta hai: har dukaandaar ka label ke saath ledger, balance aur kitne din purana hai, statements aur waqt par reminders. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, udhaar ka hisaab control mein laya ja sakta hai, aur kaam isi hafte shuru ho sakta hai. 1) Sab se purane balance wale dukaandaaron ki list bana lein, taake pehle wahan zor diya jaye jahan khatra zyada hai. 2) Har dukaandaar ko likhi hui statement bhejein, kyunke ikhtilaaf aksar wahin hota hai jahan balance share nahi hota. Workzap ye aap ke liye automatically kar sakta hai: har dukaandaar ka label ke saath ledger, balance aur kitne din purana hai, statements aur waqt par reminders. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }
