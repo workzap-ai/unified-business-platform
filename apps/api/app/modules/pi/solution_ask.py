@@ -36,6 +36,22 @@ SOLUTION_ASK = re.compile(
     r"|(?:کوئی\s+)?حل\s+(?:بتائیں|بتاو|بتاؤ|دیں|دو|چاہیے|چاہئے)|مجھے\s+(?:کوئی\s+)?حل\s+چاہی",
     re.IGNORECASE,
 )
+# The same ask in the plain ways owners write it. Each needs the ask itself ("any solution?" at the
+# end, "what can we do about it"), so "any idea why they leave" and "we fix phones" stay problems.
+SOLUTION_ASK_PLAIN = re.compile(
+    r"\bany (?:solutions?|suggestions?|ideas?|advice|fix(?:es)?|way(?: out)?|help)\s*[?.!]*\s*$"
+    r"|\bany (?:solutions?|suggestions?|ideas?|advice|fix(?:es)?|way(?: out)?|help) (?:for|to|on) (?:this|it|that)\b"
+    r"|\bany (?:solutions?|suggestions?|ideas?)\s*[?]"
+    r"|\bwhat (?:can|could|should|do) (?:we|i) do(?: about (?:it|this|that|these))?\b"
+    r"|\bhow (?:can|could|should|do|would) (?:we|i) (?:fix|solve|handle|deal with|stop|reduce|prevent|avoid|improve|sort out|manage) (?:it|this|that|these|them)\b"
+    r"|\bhow (?:to|do i|do we) (?:fix|solve|handle|stop|sort out) (?:it|this|that)\b"
+    r"|\bwhat (?:do|would|will) you (?:suggest|recommend|advise)\b"
+    r"|\b(?:suggest|recommend) (?:something|anything|a (?:way|fix|solution))\b"
+    r"|\b(?:iska|is ka|isay|ise|isko|inka|in ka) (?:hal|solution|ilaj)\b"
+    r"|\b(?:theek|thik|sahi|hal) (?:kaise )?(?:karein|karen|kare|karun|karu|hoga)\b"
+    r"|\bkya (?:karein|karen|kare|karna hai|karna chahiye)\b",
+    re.IGNORECASE,
+)
 COST = re.compile(r"\b(?:how much|kitna|kitne|price|pricing|cost|qeemat|kharcha|quote)\b", re.I)
 # "how exactly?", "step by step", "which app?" (Part 1.4): the detail is the solution document.
 HOWTO = re.compile(
@@ -67,9 +83,11 @@ IN_THE_DOCUMENT = re.compile(
 def asked_for_ideas(said: str) -> bool:
     """They want a fix now: "solution do", "kuch kar sakte ho?", "what can you do?"."""
     text = said or ""
-    if COST.search(text) and not SOLUTION_ASK.search(text):
+    if COST.search(text) and not (SOLUTION_ASK.search(text) or SOLUTION_ASK_PLAIN.search(text)):
         return False
-    return bool(SOLUTION_ASK.search(text) or WHAT_NOW.search(text))
+    return bool(
+        SOLUTION_ASK.search(text) or SOLUTION_ASK_PLAIN.search(text) or WHAT_NOW.search(text)
+    )
 
 
 def asked_howto(said: str) -> bool:

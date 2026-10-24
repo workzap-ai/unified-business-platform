@@ -196,7 +196,12 @@ async def _give(
         conversation_id=conversation.id,
     )
     if not choice.arms:
-        return {"solution_exhausted": True} if choice.exhausted else None
+        # "Nothing new left" is only true when this business was given ideas for the problem; an
+        # entry with no usable idea (its seed ideas failed the idea guard) is "no idea yet".
+        given = await solution_ideas.remembered(
+            session, scope, conversation.customer_id, str(problem["id"])
+        )
+        return {"solution_exhausted": True} if choice.exhausted and given else None
     used["ideas"] = [str(a.id) for a in choice.arms]
     used["problem_id"] = problem["id"]
     used["state"] = conversation.flow_state

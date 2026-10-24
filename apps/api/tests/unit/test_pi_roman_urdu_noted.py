@@ -119,3 +119,66 @@ def test_asking_for_the_document_early_shows_the_summary_first() -> None:
     )
     assert problems.summary_due("haan document aur quote chahiye", 1, 1) == "document_asked"
     assert problems.summary_due("the shop is busy", 2, 1) is None
+
+
+def test_plain_ways_of_asking_for_a_fix_are_asks() -> None:
+    from app.modules.pi import solution_ask
+
+    for said in (
+        "any solution? what can we do about it?",
+        "any solution?",
+        "what can we do about it?",
+        "how can I fix this?",
+        "what do you suggest?",
+        "any ideas?",
+        "how do we solve this",
+        "isko theek kaise karein?",
+        "iska hal kya hai",
+    ):
+        assert solution_ask.asked_for_ideas(said), said
+
+
+def test_describing_a_problem_is_not_asking_for_a_fix() -> None:
+    from app.modules.pi import solution_ask
+
+    for said in (
+        "we fix phones and laptops",
+        "no idea why customers leave",
+        "any idea why the stock goes missing at night",
+        "how much does it cost",
+    ):
+        assert not solution_ask.asked_for_ideas(said), said
+
+
+def test_handed_ideas_are_written_by_the_application_when_the_model_left_them_out() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import brain_ideas
+
+    context = {
+        "reply_language": "en",
+        "solution_ideas": ["Mark the oldest unpaid accounts first.", "Add up every balance once"],
+    }
+    turn = SimpleNamespace(
+        reply="Noted. What else is getting in the way?",
+        _summary=False,
+        _decision=None,
+        request_human=False,
+        awaiting_customer=False,
+    )
+    brain_ideas(turn, context)
+    assert turn.reply.startswith("Sure.") and turn.reply.count("•") == 2
+
+    turn.reply = "Sure.\n• Do one.\n• Do two."
+    brain_ideas(turn, context)
+    assert turn.reply.count("•") == 2 and "Mark the oldest" not in turn.reply
+
+    roman = SimpleNamespace(
+        reply="Theek hai.",
+        _summary=False,
+        _decision=None,
+        request_human=False,
+        awaiting_customer=False,
+    )
+    brain_ideas(roman, {**context, "reply_language": "roman_ur"})
+    assert roman.reply == "Theek hai."

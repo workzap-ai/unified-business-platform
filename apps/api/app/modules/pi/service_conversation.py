@@ -42,6 +42,7 @@ from app.modules.pi import (
     safety,
     solution_ask,
     solution_context,
+    solution_rules,
     solutions,
     spec_handbook,
     style,
@@ -1817,6 +1818,26 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     context["fixed_lines"] = [ln for ln in turn.reply.splitlines() if any(c.isdigit() for c in ln)]
     turn.awaiting_customer = True
     turn._summary = True
+
+
+def brain_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """The ideas the application chose for this turn reach the person even when the model left
+    them out of its reply ("Noted. What else is getting in the way?" after "any solution?").
+    They were vetted when they were loaded, so the application writes them itself, as a short list.
+    Only for English replies: translating them is the model's job, and a half-English reply to a
+    Roman Urdu or Arabic speaker would break the language rule."""
+    ideas = [str(i) for i in context.get("solution_ideas") or []][:2]
+    if not ideas or turn._summary or turn._decision is not None or turn.request_human:
+        return
+    if str(context.get("reply_language") or "en") != "en":
+        return
+    if solution_rules.count_ideas(turn.reply) >= 1 or solution_rules.has_safety_referral(
+        turn.reply
+    ):
+        return
+    lines = "\n".join(f"• {idea.rstrip('. ')}." for idea in ideas)
+    turn.reply = f"Sure.\n{lines}"
+    turn.awaiting_customer = True
 
 
 def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -4282,6 +4303,7 @@ async def compose_service_turn(
         turn.projects = []
         brain_summary(turn, context)
         brain_decision(turn, context)
+        brain_ideas(turn, context)
         brain_offer(turn, context)
     if expected in NAMES and mixed_line(turn.reply, str(expected)):
         latency.count("model_calls")
