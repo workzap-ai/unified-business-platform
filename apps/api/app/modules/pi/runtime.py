@@ -37,8 +37,8 @@ from app.modules.pi.configuration import seed_agents, settings_cache_for_turn, s
 from app.modules.pi.graph import AGENTS, RouteState, keyword_intent, route_message
 from app.modules.pi.guard import ReplyRejected, rate_limited, validate_reply
 from app.modules.pi.language import (
+    BRAIN_ACK_NOTICES,
     BRAIN_HANDOFF_NOTICES,
-    BRAIN_TEAM_CHECK_NOTICES,
     HANDOFF_NOTICES,
     MEDIA_NOTICES,
     MEDIA_UNREADABLE_NOTICES,
@@ -1266,9 +1266,12 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             service_context["operator_review_required"] = bool(
                 keyword_handoff or (fast_intent and fast_intent[0] in review_intents)
             )
-            from app.modules.pi_customer.engine import map_request_note
+            from app.modules.pi_customer.engine import MAP_NOTE, map_request_note
 
-            if note := map_request_note(policy.whatsapp_config, ctx["settings"], body):
+            note = map_request_note(policy.whatsapp_config, ctx["settings"], body)
+            # Brain mode sends no map picture from the chat reader (it skips brain workspaces), so
+            # the model must not say one is on its way: the sorted summary carries the board.
+            if note and not (service_context.get("pi_mode") == "brain" and note == MAP_NOTE):
                 service_context["problem_map_request"] = note
         inbound_snapshot = conversation.last_inbound_at
         await session.commit()
@@ -1613,10 +1616,12 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             if not outbound:
                 notices = TEAM_CHECK_NOTICES
                 if (service_context or {}).get("pi_mode") == "brain":
+                    # A rejected or unsure draft is not a reason to promise that the team will
+                    # confirm: pi only acknowledges (the team question is raised either way).
                     notices = {
                         "provider_failure": TECH_DOWN_NOTICES,
                         "tool_failure": TOOL_FAIL_NOTICES,
-                    }.get(handoff_reason, BRAIN_TEAM_CHECK_NOTICES)
+                    }.get(handoff_reason, BRAIN_ACK_NOTICES)
                 text = _localized(notices, typed, conversation.language)
                 sent = await agent_ctx.tool("router", "send_whatsapp_message", {"body": text})
                 if sent.ok and sent.data is not None:
@@ -1679,7 +1684,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         from app.modules.pi.buttons import add_consent_buttons
 
         await add_consent_buttons(session, scope, outbound)
-        if service_turn is not None and getattr(service_turn, "_summary", False):
+        if service_turn is not None and (
+            getattr(service_turn, "_summary", False) or getattr(service_turn, "_board", False)
+        ):
             from app.modules.pi import brain_visual_queue
 
             outbound = await brain_visual_queue.attach_board(

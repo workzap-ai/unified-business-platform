@@ -29,7 +29,7 @@ class Answer(StrEnum):
 
 YES_WORDS = (
     r"yes|yeah|yep|yup|yess+|sure|of course|please do|go ahead|go for it|do it|"
-    r"haan|han|haa|ji|ji haan|ji han|jee|theek hai|thik hai|theek|bilkul|zaroor|zarur|"
+    r"haan|han|hn|hnn|haa+n|haa|ji|ji haan|ji han|jee|theek hai|thik hai|theek|bilkul|zaroor|zarur|"
     r"kar do|kardo|bhej do|bana do|bana dein|bhej dein|kar dein|"
     r"نعم|ايوه|أيوه|اي|أكيد|تمام|جي|جی|ہاں|ٹھیک ہے|ٹھیک|بالکل|کر دیں|کر دو|"
     r"👍|✅|🙏"
@@ -52,7 +52,7 @@ HEDGE = re.compile(
 _YES = re.compile(rf"^\W*(?:(?:{YES_WORDS})\W*){{1,3}}$", re.IGNORECASE)
 _YES_LEAD = re.compile(rf"^\W*(?:{YES_WORDS})\b", re.IGNORECASE)
 _YES_REQUEST = re.compile(
-    r"(?:document|quote|quotation|proposal|solution).*(?:bana|banwa|bhej|send|prepare|make|create|dein|den|do)"
+    r"(?:document|quote|quotation|proposal|solution).*(?:bana|banwa|bhej|send|prepare|make|create|dein|den|do|chahiye|chahie|chahiay)"
     r"|(?:bana|banwa|bhej|send|prepare|make|create).*(?:document|quote|quotation|proposal|solution)",
     re.IGNORECASE,
 )
@@ -397,12 +397,15 @@ def decide(
         return None
 
     if state == State.S5_READINESS:
-        if facts.get("changed"):
+        asks_document = _ok(answer, Answer.YES) and bool(_YES_REQUEST.search(message))
+        if facts.get("changed") and not asks_document:
+            # A bare "yes" while a problem was added or changed may answer that problem; a yes
+            # that asks for the document itself ("haan document aur quote chahiye") stands.
             return None
         if brief.get("scope_asked") and not brief.get("scope_done"):
             refs = list(facts.get("chosen_refs") or [])
-            if ALL.search(message) and not refs:
-                refs = list(facts.get("problem_refs") or [])
+            if (ALL.search(message) or _ok(answer, Answer.YES)) and not refs:
+                refs = list(facts.get("problem_refs") or [])  # a plain yes, or "all", is all
             if refs:
                 return _prepare(
                     language, facts, refs, {"scope_done": True}, brief.get("offer_yes_id")

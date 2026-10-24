@@ -228,6 +228,11 @@ BRAIN_TEAM_CHECK_NOTICES = {
     "roman_ur": "Noted. Ise Workzap ki team se check kiya ja raha hai, wo yahin tasdeeq karein ge.",
     "ar": "تم. أتحقق من ذلك مع فريق Workzap وسيؤكدون لك هنا.",
 }
+BRAIN_ACK_NOTICES = {
+    "en": "Thanks, I've got that. Is there anything else getting in the way?",
+    "roman_ur": "Shukriya, samajh gaya. Aur koi cheez rukawat bani hui hai?",
+    "ar": "شكرًا، فهمت. هل هناك شيء آخر يعيق عملك؟",
+}
 MEDIA_NOTICES = {
     "en": "Thanks for the attachment. A member of our team will review it and reply here.",
     "roman_ur": "Attachment bhejne ka shukriya. Hamari team ise dekh kar yahan jawab degi.",

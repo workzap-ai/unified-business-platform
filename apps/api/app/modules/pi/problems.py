@@ -782,6 +782,12 @@ ASKS_DOCUMENT = re.compile(
     r"|\b(?:document|quote|quotation|proposal)\b.{0,25}\b(?:chahiye|bana|banao|bhejo|do)\b",
     re.IGNORECASE,
 )
+DONE_SHORT = re.compile(
+    r"\b(?:abh?|abhi) (?:nh|nhi|nahi|nahin)\b"
+    r"|\b(?:bas|aur|or|kuch) (?:nh|nhi|nahi|nahin)\b|\b(?:nh|nhi) bas\b",
+    re.IGNORECASE,
+)
+ASKS_SUMMARY = re.compile(r"\b(?:summary|khulasa|khulasah|summery)\b", re.IGNORECASE)
 WHAT_NOW = re.compile(
     r"\b(?:what now|so what can you do|what can you do|what next|how much|how much would|"
     r"ab kya|aage kya|kitna (?:lagega|kharcha)|kya kar sakte)\b"
@@ -847,6 +853,13 @@ def corrects_noted(text: str, noted: int) -> bool:
     return noted > 0 and says_wrong(text)
 
 
+def asks_for_map(text: str) -> bool:
+    """The person asks for their problem map (pi Customer's wording, shared with that module)."""
+    from app.modules.pi_customer.engine import MAP_ASK  # local: pi_customer imports this module
+
+    return bool(MAP_ASK.search(text or ""))
+
+
 def summary_due(
     text: str,
     noted: int,
@@ -860,10 +873,17 @@ def summary_due(
         return None
     if DONE.search(text):
         return "done"
+    short = len((text or "").split()) <= 4
+    if short and DONE_SHORT.search(text):
+        return "done"  # "abh nh", "bas nh": the answer to "anything else?" in Roman Urdu
+    if len((text or "").split()) <= 6 and ASKS_SUMMARY.search(text):
+        return "show"  # "summary kosni", "summary dikhao"
     if WHAT_NOW.search(text):
         return "what_now"
     if SHOW_ME.search(text):
         return "show"
+    if asks_for_map(text):
+        return "map"  # "show my problem map": the sorted summary, with the board picture
     if ASKS_DOCUMENT.search(text):
         return "document_asked"  # the offer comes after a confirmed summary, never before
     if since_summary >= trigger:

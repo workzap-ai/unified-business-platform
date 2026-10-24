@@ -280,6 +280,7 @@ class ServiceTurn(BaseModel):
     _ask_team: bool = PrivateAttr(default=False)
     # Brain mode: the sorted summary replaced the reply; the trade question was due.
     _summary: bool = PrivateAttr(default=False)
+    _board: bool = PrivateAttr(default=False)  # the notes were shown again, no state change
     _asked_shape: bool = PrivateAttr(default=False)
     # Brain mode: a fixed reply and move chosen by the decision gates (pi/decisions.py).
     _decision: Any = PrivateAttr(default=None)
@@ -1775,11 +1776,12 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     sorted summary (spec 3.7), built from what is noted plus this turn's new problems."""
     turn._asked_shape = bool(context.get("shape_question_due"))
     state = flow.parse((context.get("flow") or {}).get("state"))
-    if state not in (
+    listening = state in (
         flow.State.S1_LISTENING,
         flow.State.S2_CLARIFYING,
         flow.State.S3_NOTED,
-    ):
+    )
+    if not listening and (state is None or state in flow.EXCEPTIONS or state == flow.State.S0_NEW):
         return
     created = [op.note for op in turn.problem_ops if op.op == "create" and op.note]
     items = [
@@ -1808,6 +1810,8 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     why = problems.summary_due(said, len(items), since, trigger, quiet, quiet_limit)
     if not why:
         return
+    if not listening and why not in ("map", "show"):
+        return  # after the summary only an explicit ask to see the notes shows them again
     if solution_turn(context):
         return  # solution mode: they asked for a fix, so they get the ideas (Part 1.6)
     language = str(context.get("reply_language") or "en")
@@ -1817,19 +1821,20 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     # The group counts are figures pi wrote itself: the no-digits rule must let them through.
     context["fixed_lines"] = [ln for ln in turn.reply.splitlines() if any(c.isdigit() for c in ln)]
     turn.awaiting_customer = True
-    turn._summary = True
+    if listening:
+        turn._summary = True
+    else:
+        turn._board = True  # shown again with its board picture; the chat stays where it is
 
 
 def brain_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """The ideas the application chose for this turn reach the person even when the model left
     them out of its reply ("Noted. What else is getting in the way?" after "any solution?").
     They were vetted when they were loaded, so the application writes them itself, as a short list.
-    Only for English replies: translating them is the model's job, and a half-English reply to a
-    Roman Urdu or Arabic speaker would break the language rule."""
+    The list is written in English; for another language the reply-language fixer that runs right
+    after this translates the whole reply."""
     ideas = [str(i) for i in context.get("solution_ideas") or []][:2]
     if not ideas or turn._summary or turn._decision is not None or turn.request_human:
-        return
-    if str(context.get("reply_language") or "en") != "en":
         return
     if solution_rules.count_ideas(turn.reply) >= 1 or solution_rules.has_safety_referral(
         turn.reply
@@ -1837,6 +1842,41 @@ def brain_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     lines = "\n".join(f"• {idea.rstrip('. ')}." for idea in ideas)
     turn.reply = f"Sure.\n{lines}"
+    turn.awaiting_customer = True
+
+
+NO_IDEA_LINES = {  # noqa: E501
+    "en": "Yes. I don't have a quick idea for this one that I can give here. Workzap can set out what it would build in a solution document.",  # noqa: E501
+    "roman_ur": "Ji. Is ke liye mere paas abhi koi chhota idea nahi jo yahan de sakun. Workzap solution document mein likh sakta hai ke wo kya banayega.",  # noqa: E501
+    "ar": "نعم. ليست لدي فكرة سريعة لهذه المشكلة يمكنني تقديمها هنا. يمكن لـ Workzap أن يوضح في وثيقة الحل ما الذي سيبنيه.",  # noqa: E501
+}
+
+
+NO_IDEA_AGAIN = {  # noqa: E501
+    "en": "That is all I can give here for now. The solution document is where Workzap sets out what it would build, and you can say no to it.",  # noqa: E501
+    "roman_ur": "Abhi yahan itna hi de sakta hoon. Workzap kya banayega, ye solution document mein hota hai, aur aap mana bhi kar sakte hain.",  # noqa: E501
+    "ar": "هذا كل ما يمكنني تقديمه هنا الآن. تفاصيل ما ستبنيه Workzap في وثيقة الحل، ويمكنك الرفض.",  # noqa: E501
+}
+
+
+def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """They asked for a fix and the industry has no free idea for the problem (no industry yet, or
+    no matching entry): the application says so plainly, in their language, and the offer line
+    follows. The model's own try used to be "Noted. What else is getting in the way?"."""
+    if not context.get("solution_asked_no_ideas") or context.get("solution_ideas"):
+        return
+    if turn._summary or turn._decision is not None or turn.request_human:
+        return
+    if solution_rules.has_safety_referral(turn.reply):
+        return
+    language = str(context.get("reply_language") or "en")
+    line = NO_IDEA_LINES.get(language, NO_IDEA_LINES["en"])
+    told = [
+        str(h.get("text") or "") for h in (context.get("history") or []) if h.get("role") == "ai"
+    ]
+    if any(line in said for said in told[-6:]):
+        line = NO_IDEA_AGAIN.get(language, NO_IDEA_AGAIN["en"])  # not the same words twice
+    turn.reply = line
     turn.awaiting_customer = True
 
 
@@ -4304,6 +4344,7 @@ async def compose_service_turn(
         brain_summary(turn, context)
         brain_decision(turn, context)
         brain_ideas(turn, context)
+        brain_no_ideas(turn, context)
         brain_offer(turn, context)
     if expected in NAMES and mixed_line(turn.reply, str(expected)):
         latency.count("model_calls")

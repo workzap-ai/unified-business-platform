@@ -181,4 +181,126 @@ def test_handed_ideas_are_written_by_the_application_when_the_model_left_them_ou
         awaiting_customer=False,
     )
     brain_ideas(roman, {**context, "reply_language": "roman_ur"})
-    assert roman.reply == "Theek hai."
+    # the list is written in English; the reply-language step after it rewrites the whole reply
+    assert roman.reply.startswith("Sure.") and roman.reply.count("•") == 2
+
+
+def test_haan_document_aur_quote_chahiye_is_a_yes_to_the_offer() -> None:
+    from app.modules.pi import decisions
+    from app.modules.pi.flow import State
+
+    facts = {
+        "problem_count": 1,
+        "group_count": 1,
+        "brief": {"offer_asked": True},
+        "changed": False,
+        "message_id": "x",
+    }
+    decided = decisions.decide(
+        State.S5_READINESS, "haan document aur quote chahiye", "roman_ur", facts
+    )
+    assert decided is not None and decided.next_state == State.S6_PREPARING
+
+
+def test_more_plain_asks_for_a_fix_and_for_the_map() -> None:
+    from app.modules.pi import problems, solution_ask
+
+    for said in (
+        "Can you give my problem solution",
+        "Give more ideas please",
+        "Mujhe solution dw Meri problems ka",
+        "Hal tw btao",
+        "First give me your solution idea",
+    ):
+        assert solution_ask.asked_for_ideas(said), said
+    assert not solution_ask.asked_for_ideas("hal nahi mil raha")
+    assert problems.summary_due("Show my problem map", 2, 0) == "map"
+    assert problems.summary_due("Can you send again my problem map?", 1, 0) == "map"
+
+
+def test_a_plain_yes_after_all_or_some_means_all() -> None:
+    from app.modules.pi import decisions
+    from app.modules.pi.flow import State
+
+    facts = {
+        "problem_count": 3,
+        "group_count": 2,
+        "problem_refs": ["a", "b", "c"],
+        "chosen_refs": [],
+        "brief": {"offer_asked": True, "scope_asked": True, "offer_yes_id": "m1"},
+        "changed": False,
+        "message_id": "m2",
+    }
+    decided = decisions.decide(
+        State.S5_READINESS, "Hn mujeh solution document chahiye", "roman_ur", facts
+    )
+    assert decided is not None and decided.next_state == State.S6_PREPARING
+
+
+def test_no_idea_for_the_problem_is_said_plainly() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import brain_no_ideas
+
+    turn = SimpleNamespace(
+        reply="Noted. Aur kya masla aa raha hai?",
+        _summary=False,
+        _decision=None,
+        request_human=False,
+        awaiting_customer=False,
+    )
+    brain_no_ideas(turn, {"solution_asked_no_ideas": True, "reply_language": "roman_ur"})
+    assert turn.reply.startswith("Ji. ") and "solution document" in turn.reply
+
+
+def test_short_roman_urdu_nothing_more_and_summary_asks() -> None:
+    from app.modules.pi import problems
+
+    assert problems.summary_due("Abh NH", 2, 1) == "done"
+    assert problems.summary_due("bas nh", 2, 1) == "done"
+    assert problems.summary_due("Summary kosni", 2, 1) == "show"
+    assert problems.summary_due("abh nahi hota ye masla ab kaafi kam hai bahut", 2, 1) is None
+
+
+def test_a_yes_that_asks_for_the_document_stands_when_a_problem_was_touched() -> None:
+    from app.modules.pi import decisions
+    from app.modules.pi.flow import State
+
+    facts = {
+        "problem_count": 2,
+        "group_count": 1,
+        "problem_refs": ["a", "b"],
+        "brief": {"offer_asked": True},
+        "changed": True,
+        "message_id": "m3",
+    }
+    decided = decisions.decide(
+        State.S5_READINESS, "haan document aur quote chahiye", "roman_ur", facts
+    )
+    assert decided is not None and decided.next_state == State.S6_PREPARING
+    assert decisions.decide(State.S5_READINESS, "wait, one more thing", "en", facts) is None
+    assert decisions.decide(State.S5_READINESS, "yes", "en", facts) is None
+
+
+def test_the_no_idea_line_is_not_repeated_word_for_word() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import NO_IDEA_LINES, brain_no_ideas
+
+    def turn() -> SimpleNamespace:
+        return SimpleNamespace(
+            reply="x",
+            _summary=False,
+            _decision=None,
+            request_human=False,
+            awaiting_customer=False,
+        )
+
+    first = turn()
+    context = {"solution_asked_no_ideas": True, "reply_language": "en", "history": []}
+    brain_no_ideas(first, context)
+    assert first.reply == NO_IDEA_LINES["en"]
+    second = turn()
+    context["history"] = [{"role": "ai", "text": first.reply}]
+    brain_no_ideas(second, context)
+    assert second.reply != first.reply and "solution document" in second.reply
