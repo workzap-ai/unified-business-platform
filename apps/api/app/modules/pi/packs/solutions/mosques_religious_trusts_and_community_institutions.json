@@ -101,7 +101,7 @@
       "category": "operations_process",
       "subtype": "quality_inconsistent",
       "quick_ideas": [
-        "Record construction, running and charity money in separate columns from today",
+        "Record construction, running and charity money separately from today, so each fund's balance is clear",
         "Ask your scholars how they want the funds kept, then record it that way."
       ],
       "workzap_build": {

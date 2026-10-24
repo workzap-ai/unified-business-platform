@@ -71,7 +71,7 @@
       "subtype": "integration_marketplace",
       "quick_ideas": [
         "Put all tablets at the pass with one person accepting orders, so nothing is left unseen",
-        "Write direct WhatsApp orders on the same ticket as app orders, so the kitchen sees one queue."
+        "Write direct WhatsApp orders on the same tickets as aggregator orders, so the kitchen sees one queue."
       ],
       "workzap_build": {
         "keys": [

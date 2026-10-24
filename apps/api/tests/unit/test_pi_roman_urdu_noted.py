@@ -486,3 +486,63 @@ def test_english_bullets_in_a_roman_urdu_chat_are_recognised() -> None:
         "Sure.\n• Har janwar ka milk alag likho, taake low yielder samne aa jaye."
     )
     assert not english_bullets("Theek hai, no bullets here at all.")
+
+
+def test_a_person_who_now_runs_a_different_business_changes_the_industry() -> None:
+    from decimal import Decimal
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import industry_context
+
+    def customer() -> SimpleNamespace:
+        return SimpleNamespace(
+            industry_primary="cattle_and_buffalo_dairy_farms",
+            industry_secondary=[],
+            industry_confidence=Decimal("0.98"),
+        )
+
+    cattle = [
+        "Mere paas Karachi mein cattle farm hai. Mere 40 janwar hain",
+        "janwar ka kharcha samajh nahi aata, cattle farm ka profit",
+    ]
+    said = "Meri clothing shop hai. Sales ho rahi hain lekin profit kahan ja raha hai pata nahi."
+    changed = customer()
+    industry_context(changed, [*cattle, said], latest=said)
+    assert changed.industry_primary == "retail_shops_and_chains"
+    stays = customer()
+    passing = "my cashier is late and I saw a pharmacy next door"
+    industry_context(stays, [*cattle, passing], latest=passing)
+    assert stays.industry_primary == "cattle_and_buffalo_dairy_farms"
+    still = customer()
+    ask = "Solution dein"
+    industry_context(still, [*cattle, ask], latest=ask)
+    assert still.industry_primary == "cattle_and_buffalo_dairy_farms"
+
+
+def test_a_handed_back_chat_with_a_real_message_is_not_answered_with_the_hello_alone() -> None:
+    from app.modules.pi.service_conversation import _brain_gate
+
+    context = {
+        "pi_mode": "brain",
+        "reply_language": "roman_ur",
+        "handback_notice": True,
+        "history": [{"role": "ai", "text": "x"}],
+    }
+    hello = _brain_gate(context, "ji")
+    assert hello is not None and "phir se pi" in hello.reply
+    real = _brain_gate(
+        context, "Meri clothing shop hai, sales ho rahi hain lekin profit kahan jata hai pata nahi"
+    )
+    assert real is None or "phir se pi" not in real.reply
+
+
+def test_an_app_request_alone_is_not_an_ask_for_ideas_but_with_the_word_idea_it_is() -> None:
+    from app.modules.pi.service_conversation import asked_without_ideas
+
+    base = {"flow": {"state": "S3_NOTED"}}
+    plain = {**base, "latest_customer_message": "can you make an app for this?"}
+    assert asked_without_ideas(plain) is False
+    urdu = {**base, "latest_customer_message": "Mujhe ek app bnwana hai CCTV ka, usky liye idea ?"}
+    assert asked_without_ideas(urdu) is True
+    assert asked_without_ideas({**base, "latest_customer_message": "Ap dein solution"}) is True
+    assert asked_without_ideas({**base, "latest_customer_message": "mera dukan ka hisaab"}) is False

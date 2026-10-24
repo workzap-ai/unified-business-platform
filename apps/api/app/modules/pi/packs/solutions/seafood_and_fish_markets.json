@@ -193,7 +193,7 @@
       "subtype": "documentation",
       "quick_ideas": [
         "List the documents each shipment needs and who prepares each, so nothing waits on an unknown owner",
-        "Note vessel cut-off dates the moment an order is confirmed. For the rules themselves, check with your clearing agent."
+        "Note vessel cut-off dates the moment an order is confirmed, so paperwork starts before the deadline."
       ],
       "workzap_build": {
         "keys": [

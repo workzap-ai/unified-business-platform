@@ -11,7 +11,7 @@
       "category": "tech_systems",
       "subtype": "software_not_connected",
       "quick_ideas": [
-        "Block last-minute bookings on the other platforms by hand straight away, since sync delays bite hardest on short notice",
+        "Block last-minute bookings on the other booking sites by hand straight away, since calendar delays bite hardest on short notice",
         "Keep one master calendar you check before accepting any direct booking."
       ],
       "workzap_build": {

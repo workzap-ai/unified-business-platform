@@ -49,7 +49,16 @@ STATEMENT = re.compile(
     r"|\b(?:i|we)\s+(?:work|worked|working)\s+(?:at|in|for)\b"
     r"|\b(?:my|our)\s+(?:boss|father|brother|family|uncle|partner)\s+(?:\w+\s+){0,2}?"
     r"(?:own|owns|run|runs|manage|manages)\b"
-    r"|\b(?:mera|meri|hamara|hamari|humara|humari)\b"
+    # "we're an airline", "I'm a tailor", "own a car repair shop", "we process milk"
+    r"|\b(?:i'm|im|we're|i am|we are)\s+an?\b"
+    r"|^\s*(?:own|run|have)\s+an?\b"
+    r"|\b(?:i|we)\s+(?:process|breed|raise|trade|distribute|bottle|print|pack|ship|transport|"
+    r"deliver|clean|cater|host|train|treat|teach|hatch|fatten|bake|stitch|tailor|"
+    r"dye|weave|knit|mill|grind|fabricate|assemble|recruit|insure|ferment|brew)\b"
+    r"|\b(?:mera|meri|mere|hamara|hamari|hamare|humara|humari|humare)\b"
+    r"|\b(?:ki|ka|ke)\s+(?:dukaan|dukan|shop|factory|farm|agency|company|clinic|centre|center|"
+    r"school|kaarkhana|karkhana|godown|showroom|office|firm)\s+(?:hai|hain|he|chalata|chalate|chalati)\b"
+    r"|\b(?:dealer|supplier|distributor|contractor|beopari|thekedar|darzi)\s+(?:hoon|hun|hain)\b"
     # Arabic and Urdu script: "we have", "I own", "I run", "my", "our", "the business of"
     r"|\b(?:عندي|عندنا|لدي|لدينا|أملك|املك|نملك|أدير|ادير|ندير|صاحب|مالك)\b"
     r"|\b(?:میرا|میری|میرے|ہمارا|ہماری|ہمارے)\b|(?:چلاتا|چلاتی|چلاتے)\s+(?:ہوں|ہیں)"
@@ -61,6 +70,17 @@ STATEMENT = re.compile(
     r"|(?:بیچتے|بناتے|کرتے)\s+ہیں",
     re.IGNORECASE,
 )
+
+# pi asking what the business is (prompt line "What kind of business is it?" and its translations)
+TRADE_QUESTION = re.compile(
+    r"\b(?:kind|type|sort) of (?:business|work|company|shop)\b|\bwhat (?:business|trade)\b"
+    r"|\bwhat (?:do you|does your (?:business|company)) (?:do|sell|make)\b"
+    r"|\b(?:kis|kaun ?si|konsi|kaunsa|konsa)\s+(?:qism|type|tarah|kism)\b"
+    r"|\b(?:business|karobar|kaam)\s+(?:kis|kya|kaunsa|konsa)\b|\bkya kaam karte\b"
+    r"|ما نوع|ما هو (?:نشاط|عمل)|کس (?:قسم|طرح) کا|کیا کام کرتے",
+    re.IGNORECASE,
+)
+ANSWER_MAX_WORDS = 20  # longer replies are a story, judged clause by clause as usual
 
 NAME_STOP = frozenset(
     "and the for with shops shop services service companies company businesses business "
@@ -106,6 +126,7 @@ class Detection:
     industries: list[str] = field(default_factory=list)
     overlays: list[str] = field(default_factory=list)
     scores: dict[str, float] = field(default_factory=dict)
+    stated: bool = False  # the person states their own trade or role in the primary's clause
 
     @property
     def primary(self) -> str | None:
@@ -307,20 +328,42 @@ def _qualifies(
     return count >= 2 and (named or (total >= UNNAMED_MIN_SCORE and strongest >= UNNAMED_MIN_TERM))
 
 
+def trade_answers(said: Sequence[tuple[bool, str]]) -> list[str]:
+    """The person's messages that answer pi's "What kind of business is it?" directly. `said` is
+    the chat oldest first as (from_pi, text). A short reply to that question is a statement of the
+    trade even without "I run" ("small city hotel", "genset rental", "joote ki dukaan")."""
+    answers: list[str] = []
+    asked = False
+    for from_pi, text in said:
+        if from_pi:
+            asked = bool(TRADE_QUESTION.search(text or ""))
+        elif asked:
+            if text and len(text.split()) <= ANSWER_MAX_WORDS:
+                answers.append(text)
+            asked = False
+    return answers
+
+
 def detect(
     texts: Iterable[str],
     known: Sequence[str] = (),
     limit: int = MAX_PACKS,
+    answers: Sequence[str] = (),
 ) -> Detection:
     """Choose up to `limit` industry packs (primary first) and the overlays that apply.
 
     `texts` are what the person said (their own words only). `known` are packs already stored
-    for the business; they get a bonus so the primary does not flip on one stray word.
+    for the business; they get a bonus so the primary does not flip on one stray word. `answers`
+    are their replies to pi's question about the kind of business (`trade_answers`): each counts
+    as a statement of the trade.
     """
     packs = load_packs()
+    texts = list(texts)
+    texts += [a for a in answers if a not in texts]
     joined = " . ".join(texts)
     normal = _normal(joined)
     statement_clauses = _statement_clauses(joined)
+    statement_clauses += [f" {_normal(a)} " for a in answers if a.strip()]
 
     def stated_for(term: str) -> bool:
         """The person states their trade or role in the same clause as this trade word."""
@@ -392,7 +435,10 @@ def detect(
             continue
         if industries_so_far < limit:
             chosen.append(key)
-    return Detection(chosen, overlays, {k: round(scores[k], 2) for k in [*chosen, *overlays]})
+    stated = bool(chosen) and stated_for(evidence[chosen[0]][3])
+    return Detection(
+        chosen, overlays, {k: round(scores[k], 2) for k in [*chosen, *overlays]}, stated
+    )
 
 
 def _areas(category: str | None) -> tuple[str, ...]:

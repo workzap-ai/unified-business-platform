@@ -132,7 +132,7 @@
       "subtype": "currency_exposure",
       "quick_ideas": [
         "Note the rate at order and at payment for your last shipments, so you see where margin went",
-        "Work out landed cost per item, because selling price should follow it. For hedging or financial decisions, talk to your accountant or bank."
+        "Work out landed cost per item, because the selling price should follow it."
       ],
       "workzap_build": {
         "keys": [
@@ -163,7 +163,7 @@
       "subtype": "import_delays",
       "quick_ideas": [
         "List upcoming shipments with expected dates, so delays show early",
-        "Order Ramadan stock earlier than last year's late arrival. For customs questions, talk to your clearing agent."
+        "Order Ramadan stock earlier than last year's late arrival, so a delay at port does not empty your shelves."
       ],
       "workzap_build": {
         "keys": [

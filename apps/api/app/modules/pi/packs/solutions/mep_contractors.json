@@ -41,7 +41,7 @@
       "category": "compliance_admin",
       "subtype": "documentation",
       "quick_ideas": [
-        "Keep one folder per system with only the latest approved revision on top",
+        "Keep one folder per service, electrical, plumbing or HVAC, with only the latest approved revision on top",
         "Mark superseded files clearly, so site never works from an old one."
       ],
       "workzap_build": {
@@ -193,7 +193,7 @@
       "subtype": "rework",
       "quick_ideas": [
         "Ask foremen for photos at key stages before close-up, so issues are seen early",
-        "Review failed tests from the last month to see which system repeats."
+        "Review failed tests from the last month to see which service keeps failing."
       ],
       "workzap_build": {
         "keys": [

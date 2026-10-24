@@ -259,7 +259,7 @@
       "subtype": "serial_batch_tracking",
       "quick_ideas": [
         "Note line, shift and date for every batch, so a complaint can be traced",
-        "Check QC is recorded at the time on every shift. For recall steps, go to the authority and qualified advisers."
+        "Check that QC is recorded at the time on every shift, so each batch can be traced when a question comes."
       ],
       "workzap_build": {
         "keys": [

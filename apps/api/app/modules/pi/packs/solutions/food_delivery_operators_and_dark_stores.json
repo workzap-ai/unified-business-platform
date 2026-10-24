@@ -11,7 +11,7 @@
       "category": "stock_inventory",
       "subtype": "count_mismatch",
       "quick_ideas": [
-        "Count your top-selling items against the system once, so you see the size of the gap",
+        "Count your top-selling items on the shelf against what the records say once, so you see the size of the gap",
         "Fix bin locations for those items, so pickers find them."
       ],
       "workzap_build": {

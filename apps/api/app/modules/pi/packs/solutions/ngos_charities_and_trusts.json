@@ -71,7 +71,7 @@
       "category": "operations_process",
       "subtype": "quality_inconsistent",
       "quick_ideas": [
-        "Give each fund its own column in your records, so balances can be seen separately",
+        "Keep each fund's money in its own section of your records, so balances can be seen separately",
         "Ask your scholars how they want fund separation handled, then record it that way."
       ],
       "workzap_build": {
@@ -162,7 +162,7 @@
       "category": "operations_process",
       "subtype": "duplicate_entry",
       "quick_ideas": [
-        "Use one case code system across all centres, without names in shared lists",
+        "Use one way of numbering cases across all centres, without names in shared lists",
         "Have centres check the shared list before approving support."
       ],
       "workzap_build": {

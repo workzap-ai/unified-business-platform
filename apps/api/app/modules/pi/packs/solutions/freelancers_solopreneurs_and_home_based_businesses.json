@@ -101,7 +101,7 @@
       "category": "orders_fulfilment",
       "subtype": "orders_lost",
       "quick_ideas": [
-        "Copy every open order from both apps into one list today, so nothing is sitting only in a chat",
+        "Copy every open order from both chat inboxes into one list today, so nothing is sitting only in a chat",
         "Confirm each order back to the customer once, so details are agreed."
       ],
       "workzap_build": {

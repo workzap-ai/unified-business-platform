@@ -131,7 +131,7 @@
       "category": "loss_security",
       "subtype": "cash_leakage",
       "quick_ideas": [
-        "Compare the khata with the platform's own statement once a day, so unrecorded transactions show up",
+        "Compare the khata with the wallet company's own statement once a day, so unrecorded transactions show up",
         "Ask that only type and amount are noted, never customer details, so the record is quick enough to keep."
       ],
       "workzap_build": {
@@ -224,7 +224,7 @@
       "subtype": "complaints",
       "quick_ideas": [
         "Hand over or show a receipt for every transaction, so there is proof at the counter",
-        "Direct unresolved cases to the platform's own helpline, so the counter is not the dispute desk."
+        "Direct unresolved cases to the wallet company's own helpline, so the counter is not the dispute desk."
       ],
       "workzap_build": {
         "keys": [
@@ -283,7 +283,7 @@
       "subtype": "margin_unknown",
       "quick_ideas": [
         "Write down what the counter costs you each month in staff time and space, so you have one side of the sum",
-        "Total a month of commission per platform, so you have the other side; talk to your accountant on how to read it."
+        "Total a month of commission per wallet company, so you see the other side of the account."
       ],
       "workzap_build": {
         "keys": [

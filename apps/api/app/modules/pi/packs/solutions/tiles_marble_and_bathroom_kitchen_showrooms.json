@@ -11,7 +11,7 @@
       "category": "stock_inventory",
       "subtype": "serial_batch_tracking",
       "quick_ideas": [
-        "Record batch and shade for every design currently in stock, because the system only knows the design code",
+        "Record batch and shade for every design currently in stock, because your records only know the design code",
         "Agree a rule that one order comes from one batch, because \"closest to the door\" mixes lots."
       ],
       "workzap_build": {

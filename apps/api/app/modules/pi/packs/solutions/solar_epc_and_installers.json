@@ -193,7 +193,7 @@
       "category": "cash_collections",
       "subtype": "receivables_late",
       "quick_ideas": [
-        "List every outstanding balance with its install date, so the total owed is clear",
+        "List every outstanding balance with the date the job was finished, so the total owed is clear",
         "Agree the balance date in writing before installation, so expectations are set."
       ],
       "workzap_build": {

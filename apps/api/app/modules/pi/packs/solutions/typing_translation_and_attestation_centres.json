@@ -257,7 +257,7 @@
       "subtype": "cash_mismatch",
       "quick_ideas": [
         "Count cash against the day's jobs at close for one week, so you see how often it's out",
-        "Keep service charges and government fees in separate columns, so they're not mixed."
+        "Keep service charges and government fees in separate totals, so they're not mixed."
       ],
       "workzap_build": {
         "keys": [

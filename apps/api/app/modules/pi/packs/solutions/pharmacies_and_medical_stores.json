@@ -164,7 +164,7 @@
       "category": "stock_inventory",
       "subtype": "count_mismatch",
       "quick_ideas": [
-        "Count one shelf section fully, because it shows how far off the system is",
+        "Count one shelf section fully, because it shows how far off your stock records are",
         "Check how goods-in are entered, because most gaps start there."
       ],
       "workzap_build": {

@@ -253,7 +253,7 @@
       "subtype": "utility_costs",
       "quick_ideas": [
         "Note meter and generator hours once a week, so you can see which month and source costs most",
-        "Put fuel fills next to generator hours; technical settings belong with your specialist."
+        "Write fuel fills next to generator hours each day, so you see what each tunnel's heating really burns."
       ],
       "workzap_build": {
         "keys": [

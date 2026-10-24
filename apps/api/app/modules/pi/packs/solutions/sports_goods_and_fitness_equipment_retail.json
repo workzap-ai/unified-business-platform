@@ -73,7 +73,7 @@
       "subtype": "delivery_late",
       "quick_ideas": [
         "Put every pending delivery on one list with the promised date, because late ones become visible",
-        "Have technicians report back after each install, because the shop often doesn't know it's done."
+        "Have technicians report back after each fitting, because the shop often doesn't know it's done."
       ],
       "workzap_build": {
         "keys": [

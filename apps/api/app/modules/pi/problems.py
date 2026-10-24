@@ -47,6 +47,21 @@ SOLUTION_TITLE = re.compile(
     re.IGNORECASE,
 )
 
+# The person asking pi to prepare the document or quote is a decision, never a business problem
+# (a real run noted "Document and quote creation is slow" from "yes, prepare the document").
+DOCUMENT_REQUEST = re.compile(
+    r"\b(?:prepare|send|make|give|get|create|bana(?:o|iye|dein|do|den)?|banwa(?:o|dein|do|iye)?|"
+    r"bhej(?:o|iye|dein|do)?|tayyar)\b.{0,40}\b(?:document|quote|quotation|proposal)\b"
+    r"|\b(?:document|quote|quotation|proposal)\b.{0,40}\b(?:bana(?:o|iye|dein|do|den)?|banwa|"
+    r"bhej(?:o|iye|dein|do)?|chahiye|tayyar)\b",
+    re.IGNORECASE,
+)
+
+
+def is_document_request(words: list[str]) -> bool:
+    return bool(DOCUMENT_REQUEST.search(" ".join(words)))
+
+
 REDACTIONS = (
     (re.compile(r"\b(?:\d[ -]?){13,19}\b"), "[card number removed]"),
     (re.compile(r"\b784-\d{4}-\d{7}-\d\b"), "[ID removed]"),
@@ -193,6 +208,11 @@ def check_ops(ops: list[ProblemOp], known_refs: set[str], noted_in_reply: bool) 
                 issues.append(f'"{note.title}" has no user_words (their own words, verbatim)')
             if not note.category.strip():
                 issues.append(f'"{note.title}" has no category')
+            if is_document_request(note.user_words):
+                issues.append(
+                    f'"{note.title}" is their request for the document or quote, not a problem: '
+                    "do not note it"
+                )
             if Decimal(str(note.confidence)) < taxonomy.CONFIRM_BELOW and not noted_in_reply:
                 issues.append(
                     f'"{note.title}" has low confidence: ask one question to confirm it first'

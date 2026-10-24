@@ -72,7 +72,7 @@
       "subtype": "churn_subscription",
       "quick_ideas": [
         "Note which trainees have missed several sessions in a row, so you can reach them before they're gone",
-        "Call each of them once, or the parent's number given with permission for under-18s, so you learn the reason."
+        "Call each of them once, or a parent where the student is a minor and agreed, so you learn the reason."
       ],
       "workzap_build": {
         "keys": [

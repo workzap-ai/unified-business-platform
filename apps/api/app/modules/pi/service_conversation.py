@@ -1682,7 +1682,9 @@ def _brain_gate(
             "R-EMER",
         )
     chat_level = not earlier_message  # greetings, identity, advice: only for the newest message
-    if chat_level and context.get("handback_notice"):  # a person handed the chat back
+    # A person handed the chat back: pi says who it is again. A message with substance (a problem,
+    # a question) is still answered: the compose step puts the line in front of the answer.
+    if chat_level and context.get("handback_notice") and len(re.findall(r"\w+", text or "")) <= 5:
         return fixed(
             safety.handback_reply(language), None, [], {"handback_notice": False}, "R-DISC-04"
         )
@@ -1866,6 +1868,29 @@ def english_bullets(reply: str) -> bool:
     )
 
 
+BUILD_REQUEST = re.compile(
+    r"\b(?:make|build|create|develop|design)\b[^.?!]{0,30}\b(?:app|application|software|website|system|portal|bot|dashboard)\b"
+    r"|\b(?:app|software|website|system|portal)\b[^.?!]{0,30}\b(?:bn\w*|ban\w*|banwa\w*|bnwa\w*)\b",
+    re.IGNORECASE,
+)
+IDEA_WORDS = re.compile(r"\b(?:ideas?|solutions?|hal|suggest\w*|mashwara|advice)\b", re.IGNORECASE)
+
+
+def asked_without_ideas(context: dict[str, Any]) -> bool:
+    """They asked for a fix and no entry's ideas were handed over: the industry has none for this
+    problem, or the chat is past the point where the entries are consulted (the summary was shown,
+    the offer is open). Read from the message itself, so the state never silences the answer."""
+    if context.get("solution_ideas") or context.get("solution_howto"):
+        return False
+    if context.get("solution_asked_no_ideas"):
+        return True
+    state = str((context.get("flow") or {}).get("state") or "")
+    said = str(context.get("latest_customer_message") or "")
+    if BUILD_REQUEST.search(said) and not IDEA_WORDS.search(said):
+        return False  # "can you make an app for this?" is answered as the spec's G4, not with ideas
+    return state in solution_ask.ASKABLE and solution_ask.asked_for_ideas(said)
+
+
 async def brain_free_ideas(
     manager: LLMManager,
     scope: WorkspaceScope,
@@ -1877,7 +1902,7 @@ async def brain_free_ideas(
     """They asked for a fix and no industry entry fits (or they told the problem and asked in one
     message): the model gives two ideas of its own, vetted by the idea guard, instead of "no quick
     idea". The ideas count against the chat's idea budget like any other."""
-    if not context.get("solution_asked_no_ideas") or context.get("solution_ideas"):
+    if not asked_without_ideas(context):
         return
     if turn._summary or turn._decision is not None or turn.request_human:
         return
@@ -1942,7 +1967,7 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """They asked for a fix and the industry has no free idea for the problem (no industry yet, or
     no matching entry): the application says so plainly, in their language, and the offer line
     follows. The model's own try used to be "Noted. What else is getting in the way?"."""
-    if not context.get("solution_asked_no_ideas") or context.get("solution_ideas"):
+    if not asked_without_ideas(context):
         return
     if turn._summary or turn._decision is not None or turn.request_human or turn._free:
         return
@@ -2291,6 +2316,8 @@ def industry_context(
     max_chars: int = industry_packs.DEFAULT_BUDGET,
     categories: Sequence[str] = (),
     country: str | None = None,
+    latest: str = "",
+    answers: Sequence[str] = (),
 ) -> dict[str, Any]:
     """Pick the customer's industry packs and remember them on their record.
 
@@ -2301,7 +2328,16 @@ def industry_context(
     and phrases rotate through the pack's areas turn by turn.
     """
     stored = [k for k in [customer.industry_primary, *(customer.industry_secondary or [])] if k]
-    found = industry_packs.detect(texts, known=stored)
+    found = industry_packs.detect(texts, known=stored, answers=answers)
+    if stored and latest:
+        # The stored trade keeps the choice steady between messages, but a person who now says
+        # plainly that they run a different business ("I own a clothing business") changes it:
+        # the old messages must not outvote what they have just said.
+        fresh = industry_packs.detect(
+            [latest], known=[], answers=[a for a in answers if a == latest]
+        )
+        if fresh.stated and fresh.primary not in stored and fresh.confidence >= 0.5:
+            found = fresh
     if not found.industries and not found.overlays:
         return {}
     if found.industries and [customer.industry_primary, *customer.industry_secondary] != [
@@ -2361,6 +2397,11 @@ async def industry_context_for(
         texts,
         categories=categories[-3:],  # the latest few groups
         country=safety.country_of(customer.phone or customer.whatsapp_id),
+        latest=message.body[:600] if message.body else "",
+        answers=industry_packs.trade_answers(
+            [(m.direction == "outbound", m.body or "") for m in reversed(rows)]
+            + [(False, message.body or "")]
+        ),
     )
     if not found and not customer.industry_primary:
         # Spec 7.O: no pack fits, so keep the person's own description (the nightly run
@@ -4426,6 +4467,12 @@ async def compose_service_turn(
         await brain_free_ideas(manager, scope, conversation, policy, turn, context)
         brain_no_ideas(turn, context)
         brain_offer(turn, context)
+    if context.get("handback_notice") and not turn.request_human and turn._decision is None:
+        short = safety.handback_reply(str(context.get("reply_language") or "en"))
+        turn.reply = f"{short.rsplit('. ', 1)[0]}. {turn.reply}"
+        brief = dict(conversation.service_brief or {})
+        brief["handback_notice"] = False
+        conversation.service_brief = brief
     if expected in NAMES and expected != "en" and not turn._english and english_bullets(turn.reply):
         turn._english = True  # the model left a list of ideas in English: it is translated below
     if expected in NAMES and (
