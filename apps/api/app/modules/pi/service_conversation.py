@@ -36,6 +36,7 @@ from app.modules.pi import (
     learning_context,
     price_policy,
     problems,
+    reply_voice,
     safety,
     solution_ask,
     solution_context,
@@ -3994,6 +3995,7 @@ async def compose_service_turn(
     turn = result.value
     turn._attempts = result.response.attempts
     turn.reply = tidy_list_numbers(turn.reply)
+    turn.reply = reply_voice.localise_noted(turn.reply, context.get("reply_language"))
     send_now(turn, context)
     meeting_yes(turn, context)
     mode = price_policy.price_mode(policy.response_rules, service=True)
@@ -4063,6 +4065,11 @@ async def compose_service_turn(
         )
     strict = flow.strict_voice(policy.response_rules)
     if strict and (broke := constitution.lint(turn.reply, context)):
+        if (quiet := constitution.quiet_fix(turn.reply, broke, context)) is not None:
+            turn.reply = quiet  # two questions: keep the last, no second model call
+            latency.count("quiet_fixes")
+            broke = []
+    if strict and broke:
         # A style slip is fixed quietly, and the missing AI line is added by the application; any
         # other hard rule that needed a rewrite is a defect worth scoring.
         if [v for v in constitution.hard(broke) if v.rule != "R-DISC-01"]:

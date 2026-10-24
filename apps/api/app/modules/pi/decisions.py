@@ -51,6 +51,11 @@ HEDGE = re.compile(
 )
 _YES = re.compile(rf"^\W*(?:(?:{YES_WORDS})\W*){{1,3}}$", re.IGNORECASE)
 _YES_LEAD = re.compile(rf"^\W*(?:{YES_WORDS})\b", re.IGNORECASE)
+_YES_REQUEST = re.compile(
+    r"(?:document|quote|quotation|proposal|solution).*(?:bana|banwa|bhej|send|prepare|make|create|dein|den|do)"
+    r"|(?:bana|banwa|bhej|send|prepare|make|create).*(?:document|quote|quotation|proposal|solution)",
+    re.IGNORECASE,
+)
 _NO = re.compile(rf"^\W*(?:{NO_WORDS})\W*$", re.IGNORECASE)
 _NO_LEAD = re.compile(rf"^\W*(?:{NO_WORDS})\b", re.IGNORECASE)
 _LATER = re.compile(rf"\b(?:{LATER_WORDS})\b|(?:{LATER_WORDS})", re.IGNORECASE)
@@ -320,6 +325,11 @@ def classify(message: str) -> tuple[Answer, float]:
         return Answer.YES, 0.97
     if _YES_LEAD.match(said) and len(said.split()) <= 4:
         return Answer.YES, 0.92
+    if _YES_LEAD.match(said) and len(said.split()) <= 10 and _YES_REQUEST.search(said):
+        return (
+            Answer.YES,
+            0.92,
+        )  # "haan document aur quote bana dein": a yes that asks for the offer
     return Answer.UNCLEAR, 0.4
 
 

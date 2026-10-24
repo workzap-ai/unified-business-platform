@@ -1183,9 +1183,11 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
     if words > cap:
         add(Violation("R-VOICE-01", f"too long: {words} words, the limit is {cap}"))
     elif cap == normal_cap and words > int(
-        (context.get("style") or {}).get("reply_up_to_words") or cap
+        int((context.get("style") or {}).get("reply_up_to_words") or cap) * MIRROR_GRACE
     ):
-        # They write short: stay near one and a half times their length (spec 8.4.1).
+        # They write short: stay near one and a half times their length (spec 8.4.1). A few words
+        # over is not worth a second model call (real chat 2026-10-24: 28 words for a limit of 25
+        # sent a whole draft back), so the check fires from MIRROR_GRACE times the limit.
         reach = context["style"]["reply_up_to_words"]
         add(Violation("R-VOICE-01", f"they write short: about {reach} words at most, not {words}"))
     hype = _contains(reply, tuple(p for p in HYPE if p not in heard))
@@ -1405,6 +1407,22 @@ def repair(reply: str, context: dict[str, Any]) -> str:
 def _split_ends(reply: str) -> list[tuple[bool, str]]:
     """The reply as (is_bullet, line) pairs."""
     return [(line.lstrip().startswith(BULLET), line) for line in reply.split("\n")]
+
+
+MIRROR_GRACE = 1.4  # how far over "they write short" a reply may run before it is sent back
+QUIET_FIXABLE = frozenset({"R-VOICE-02"})  # slips the application can repair without the model
+
+
+def quiet_fix(reply: str, broke: list[Violation], context: dict[str, Any]) -> str | None:
+    """A reply whose only problem is more than one question, or the question not last, repaired in
+    place: the last question kept at the end, the others dropped. Same meaning, no model call.
+    None when something else is wrong too, or when the repair does not make the reply clean."""
+    if not broke or any(v.rule not in QUIET_FIXABLE for v in broke):
+        return None
+    fixed = _one_question_last(reply, _cap(context, "word_cap", WORD_CAP)).strip()
+    if not fixed or fixed == reply.strip() or lint(fixed, context):
+        return None
+    return fixed
 
 
 def _one_question_last(reply: str, cap: int = WORD_CAP) -> str:

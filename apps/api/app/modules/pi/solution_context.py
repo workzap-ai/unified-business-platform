@@ -331,14 +331,17 @@ async def _build(
         return {}
     entries = await solution_ideas.entries(session, scope, industry)
     problem = None
-    if noted:
-        latest = noted[-1]
+    # The latest noted problem first, then the earlier ones: a person who then mentions something
+    # off the page ("staff forget the entry") still gets ideas for the problem that does match.
+    for item in reversed(noted or []):
         problem = solution_ideas.match_problem(
             entries,
-            str(latest.get("group") or ""),
+            str(item.get("group") or ""),
             "",
-            str(latest.get("title") or ""),
+            str(item.get("title") or ""),
         )
+        if problem is not None:
+            break
     if problem is None and reacting:
         problem = {e["id"]: e for e in entries}.get(str(brief.get("solution_last_problem") or ""))
     offerable = (conversation.flow_state or "") in solution_ask.OFFERABLE
