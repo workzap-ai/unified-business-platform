@@ -82,6 +82,7 @@ def test_every_rule_id_the_pdfs_define_is_in_the_index():
         ("X", 5),
         ("SL-", 10),
         ("VAL-", 6),
+        ("P", 26),
     ):
         expected = {f"{family}{n}" for n in range(1, count + 1)}
         assert expected <= ids, f"{family}: {sorted(expected - ids)}"

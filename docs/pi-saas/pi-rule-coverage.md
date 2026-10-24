@@ -6,15 +6,15 @@ Statuses: **DONE** code and a test that fails if the rule breaks. **PARTIAL** co
 
 ## Counts
 
-index counts: DONE 359, PARTIAL 32, CODE-ONLY 0, PROMPT-ONLY 7, HUMAN 18, MISSING 3
+index counts: DONE 378, PARTIAL 36, CODE-ONLY 0, PROMPT-ONLY 10, HUMAN 18, MISSING 3
 
 | PDF | Rules | DONE | PARTIAL | CODE-ONLY | PROMPT-ONLY | HUMAN | MISSING |
 |---|---|---|---|---|---|---|---|
-| pi-brain-v3 (Brain) | 338 | 293 | 23 | 0 | 7 | 15 | 0 |
+| pi-brain-v3 (Brain) | 364 | 312 | 27 | 0 | 10 | 15 | 0 |
 | pi-industry-solutions (Addendum 2) | 81 | 66 | 9 | 0 | 0 | 3 | 3 |
-| Both | 419 | 359 | 32 | 0 | 7 | 18 | 3 |
+| Both | 445 | 378 | 36 | 0 | 10 | 18 | 3 |
 
-24 of the 359 DONE rules are exercised only by integration tests (they need the disposable Postgres on port 55432); the rest have a unit test that runs with no database. The index lists each test, so `rule_index.json` shows which. Every identifier family the PDFs define is in the index: R-xxx-nn (155 ids), RT1-29, G1-15, L1-14, E1-9, M1-10, A1-8, X1-5, SL-1..10, VAL-1..6, Job 1-10, Job S1-S8, rubric 1-20 (RUB-n), Appendix D (App.D-n). SPEC-x.y rows are numbered sections of the Brain that have requirements but no rule id; A2-x rows are the same for Addendum 2. The per-industry text of Part 7 and Part 4 is data, covered by SPEC-7.0 and A2-4-DATA.
+24 of the 378 DONE rules are exercised only by integration tests (they need the disposable Postgres on port 55432); the rest have a unit test that runs with no database. The index lists each test, so `rule_index.json` shows which. Every identifier family the PDFs define is in the index: R-xxx-nn (155 ids), RT1-29, G1-15, L1-14, E1-9, M1-10, A1-8, X1-5, SL-1..10, VAL-1..6, Job 1-10, Job S1-S8, rubric 1-20 (RUB-n), Appendix D (App.D-n). SPEC-x.y rows are numbered sections of the Brain that have requirements but no rule id; A2-x rows are the same for Addendum 2. The per-industry text of Part 7 and Part 4 is data, covered by SPEC-7.0 and A2-4-DATA.
 
 ## Everything that is not DONE
 
@@ -32,6 +32,9 @@ Who: a lane of work, not a person. Linter hardening session = `constitution.py` 
 | `R-CANT-01` | Brain 22 | PROMPT-ONLY | When it cannot help it says so plainly in the first sentence ('I can't do that.'): Only the handbook carries it; the fixed boundary replies follow the pattern but no check enforces it on model replies. | prompt owner |
 | `R-CANT-02` | Brain 22 | PROMPT-ONLY | Says what happens next or what pi can do instead: As R-CANT-01. | prompt owner |
 | `X5` | Brain 32 | PROMPT-ONLY | Business distress without danger ('I'm going bankrupt') is not an emergency: acknowledged,...: Code only keeps the flow open and puts the distress guidance (7.N.distress, 6.5) in the prompt; the acknowledgement wording is the model's. | prompt owner |
+| `P3` | Brain 10 | PROMPT-ONLY | Public promise: pi asks one question at a time and does not rush: R-ASK-03 is PARTIAL; R-ASK-04 is PROMPT-ONLY; R-ASK-05 is PROMPT-ONLY. | linter hardening session |
+| `P16` | Brain 10 | PROMPT-ONLY | Public promise: pi never asks for card numbers, passwords, other people's personal details...: R-PRIV-08 is PROMPT-ONLY. | prompt owner (not in scope for code) |
+| `P20` | Brain 11 | PROMPT-ONLY | Public promise: If pi gets something wrong it corrects its note; if it cannot help it says...: R-CORR-03 is PARTIAL; R-CANT-01 is PROMPT-ONLY; R-CANT-02 is PROMPT-ONLY. | prompt owner |
 | `R-PROM-02` | Brain 12 | PARTIAL | pi never decides for the person; it lays out what it noted and they decide: Only an explicit 'what would you do?' (A8) and 'you should' / 'best practice' phrasing are caught; a decision phrased any other way is left to the prompt. | linter hardening session |
 | `R-PROM-03` | Brain 12 | PARTIAL | pi never forecasts outcomes of the person's business: PROMISE catches 'will increase/boost/grow/double/improve' and 'you'll save/earn' only; other forecast wording ('sales will rise', 'next year you'll be') is prompt-only. | linter hardening session |
 | `R-LANG-05` | Brain 17 | PARTIAL | Currency follows the country (PKR for Pakistan or 'Rs', AED for UAE, CAD for Canada): Quotes take the currency from the phone prefix only; 'Rs' / 'rupay' wording in the chat does not set it. | documents owner |
@@ -64,6 +67,10 @@ Who: a lane of work, not a person. Linter hardening session = `constitution.py` 
 | `SPEC-5.2` | Brain 27 | PARTIAL | Solution document: six sections (problems in their words, what Workzap would build, what it...: Sections 1, 2 and 4 are checked by rule; the 2-pages-per-group limit is not checked. | documents owner |
 | `SPEC-6.3` | Brain 31 | PARTIAL | PII handling: detect cards (Luhn), IBAN, passwords/OTP/PIN, CNIC/Emirates ID/SIN, third-...: Health information and salaries or disciplinary matters of named people are caught only as a name turned into a role (and the child case), not detected as their own kinds. | safety session |
 | `SPEC-6.10` | Brain 33 | PARTIAL | Media and message types: voice notes, images with PII check, files, video unsupported,...: Voice, image, file, video, location, contact card and burst handling are built. A sticker or a reaction is ignored (runtime: 'nothing to answer'): a thumbs-up reaction on a noted line does not confirm it and a cross does not ask what to correct. Edited and deleted messages are not re-processed. | runtime session |
+| `P5` | Brain 10 | PARTIAL | Public promise: pi tells you what it noted so you can correct it: R-CORR-03 is PARTIAL. | prompt owner |
+| `P6` | Brain 10 | PARTIAL | Public promise: Nothing gets lost: pi remembers so you do not repeat yourself: R-MEM-02 is PARTIAL. | linter hardening session |
+| `P11` | Brain 10 | PARTIAL | Public promise: Quote: what's included, what it costs, how long, how payment works; an offer...: R-QUOTE-03 is PARTIAL. | linter hardening session |
+| `P18` | Brain 10 | PARTIAL | Public promise: pi cannot promise a result; it notes, sorts and shows, and does not decide...: R-PROM-02 is PARTIAL; R-PROM-03 is PARTIAL. | linter hardening session |
 | `8.12` | Brain 428 | HUMAN | Optional later step: fine-tune a dedicated model from reviewed redacted conversations: Explicitly a later Workzap decision; nothing to build now. | Workzap owner |
 | `App.D-1` | Brain 447 | HUMAN | Human SLA for escalations: what pi may promise (default: nothing specific): A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |
 | `App.D-2` | Brain 447 | HUMAN | Approved company profile facts pi may state (E7): A decision or a person, not code. Code defaults are safe until it is made. | Workzap owner |

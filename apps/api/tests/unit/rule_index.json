@@ -1,7 +1,7 @@
 {
  "version": 1,
  "generated": "2026-10-25",
- "about": "Rule-by-rule index of pi-brain-v3.pdf (448 pages, source 'brain') and pi-industry-solutions.pdf (Addendum 2, 467 pages, source 'addendum2'): what each rule requires, which code enforces it and which tests exercise it. Paths are relative to apps/api. Regenerate by hand when a guard changes; tests/unit/test_pi_rule_index.py fails if a path or test named here disappears.",
+ "about": "Rule-by-rule index of pi-brain-v3.pdf (448 pages, source 'brain') and pi-industry-solutions.pdf (Addendum 2, 467 pages, source 'addendum2'): what each rule requires, which code enforces it and which tests exercise it. Paths are relative to apps/api. Edit it by hand when a guard changes; tests/unit/test_pi_rule_index.py fails if a path or test named here disappears.",
  "statuses": {
   "DONE": "code, and at least one test that fails if the rule breaks",
   "PARTIAL": "code exists but part of the rule is not enforced; 'gap' says which part",
@@ -8274,6 +8274,581 @@
     "tests/unit/test_pi_industry_packs.py::test_overlays_load_alongside_the_industry",
     "tests/unit/test_pi_moderation.py::test_regulated_trades_are_recognised_from_what_the_person_says",
     "tests/unit/test_pi_moderation.py::test_nothing_is_declined_until_leadership_has_set_the_served_list"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P1",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: pi is an AI and says so in its first message and whenever asked; no human name or photo",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/safety.py::identity_asked",
+    "app/modules/pi/service_conversation.py::redisclose_due"
+   ],
+   "tests": [
+    "tests/unit/test_pi_constitution.py::test_the_first_message_must_say_it_is_an_ai",
+    "tests/unit/test_pi_constitution.py::test_asked_if_it_is_a_person_the_first_sentence_says_ai",
+    "tests/unit/test_pi_constitution.py::test_pi_never_claims_to_be_human",
+    "tests/unit/test_pi_audit_fixes.py::test_pi_never_says_a_person_reads_the_chat",
+    "tests/unit/test_pi_front_door.py::test_after_more_than_thirty_days_pi_says_who_it_is_again"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P2",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: No forms: just chat, describe a problem in your own words",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/business_form.py::after_turn"
+   ],
+   "tests": [
+    "tests/unit/test_pi_rule_gaps.py::test_brain_mode_never_sends_the_business_form"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P3",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: pi asks one question at a time and does not rush",
+   "status": "PROMPT-ONLY",
+   "code": [
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/constitution.py::_reasks_known_profile",
+    "app/modules/pi/style.py",
+    "app/modules/pi/spec_handbook.py",
+    "app/modules/pi/constitution.py::_asks_for_what_it_never_asks"
+   ],
+   "tests": [
+    "tests/unit/test_pi_constitution.py::test_one_question_and_it_comes_last",
+    "tests/unit/test_pi_audit_fixes.py::test_after_three_clarifying_questions_pi_must_note_what_it_has",
+    "tests/unit/test_pi_constitution.py::test_never_re_asks_a_known_profile_fact",
+    "tests/unit/test_pi_style.py::test_a_short_writer_gets_a_short_answer_but_never_too_short_to_hold_a_note",
+    "tests/unit/test_pi_spec_handbook.py::test_the_guidance_follows_the_stage_and_the_topic",
+    "tests/unit/test_pi_linter_hardening.py::test_asking_for_revenue_balances_or_salaries_is_hard"
+   ],
+   "gap": "R-ASK-03 is PARTIAL; R-ASK-04 is PROMPT-ONLY; R-ASK-05 is PROMPT-ONLY.",
+   "owner": "linter hardening session",
+   "unit_tested": true
+  },
+  {
+   "id": "P4",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: pi notes each problem and groups it with similar ones so patterns show up",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/problems.py::title_problem"
+   ],
+   "tests": [
+    "tests/unit/test_pi_problem_model.py::test_title_rules"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P5",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: pi tells you what it noted so you can correct it",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/problems.py::title_problem",
+    "app/modules/pi/problems.py::apply_ops",
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/learning.py::reward"
+   ],
+   "tests": [
+    "tests/unit/test_pi_problem_model.py::test_title_rules",
+    "tests/unit/test_pi_problem_model.py::test_saying_a_note_is_wrong_is_a_correction",
+    "tests/unit/test_pi_constitution.py::test_a_correction_is_never_met_with_i_did_not_understand",
+    "tests/integration/test_pi_brain_problems.py::test_merge_split_link_withdraw_and_rename_a_group",
+    "tests/unit/test_pi_learning.py::test_confusion_correction_frustration_cost_reward"
+   ],
+   "gap": "R-CORR-03 is PARTIAL.",
+   "owner": "prompt owner",
+   "unit_tested": true
+  },
+  {
+   "id": "P6",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: Nothing gets lost: pi remembers so you do not repeat yourself",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/service_conversation.py::customer_profile",
+    "app/modules/pi/constitution.py::_reasks_known_profile",
+    "app/modules/pi/service_conversation.py::welcome_back",
+    "app/modules/pi/problems.py::apply_ops",
+    "app/modules/pi/safety.py::boundary_asked",
+    "app/modules/pi/business.py::join_or_request"
+   ],
+   "tests": [
+    "tests/integration/test_pi_customer_profile.py::test_the_customer_is_remembered_across_chats",
+    "tests/unit/test_pi_constitution.py::test_never_re_asks_a_known_profile_fact",
+    "tests/unit/test_pi_front_door.py::test_a_shorter_gap_welcomes_back_without_the_disclosure",
+    "tests/integration/test_pi_brain_problems.py::test_a_correction_is_a_revision_and_the_latest_wording_wins",
+    "tests/unit/test_pi_languages_gates.py::test_what_do_you_keep_has_the_specs_fixed_answer",
+    "tests/unit/test_pi_business.py::test_can_approve_for_a_business_member_follows_the_role"
+   ],
+   "gap": "R-MEM-02 is PARTIAL.",
+   "owner": "linter hardening session",
+   "unit_tested": true
+  },
+  {
+   "id": "P7",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: pi puts your problem first: nothing is suggested while you explain",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/decisions.py::_decline"
+   ],
+   "tests": [
+    "tests/unit/test_pi_constitution.py::test_no_pitching_while_listening",
+    "tests/unit/test_pi_constitution.py::test_no_urgency_scarcity_or_discounts_in_any_state",
+    "tests/unit/test_pi_constitution.py::test_a_direct_question_gets_one_honest_line_not_a_description",
+    "tests/unit/test_pi_decisions.py::test_no_to_the_offer_is_accepted_without_persuasion"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P8",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: pi does not pitch while you describe; when sorted it asks if you want a document and quote; you can say no",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/decisions.py::_decline",
+    "app/modules/pi/decisions.py::decide",
+    "app/modules/pi/decisions.py::text",
+    "app/modules/pi/decisions.py::classify",
+    "app/modules/pi/decisions.py::cost_asked",
+    "app/modules/pi/decisions.py::non_decider"
+   ],
+   "tests": [
+    "tests/unit/test_pi_constitution.py::test_no_pitching_while_listening",
+    "tests/unit/test_pi_constitution.py::test_no_urgency_scarcity_or_discounts_in_any_state",
+    "tests/unit/test_pi_constitution.py::test_a_direct_question_gets_one_honest_line_not_a_description",
+    "tests/unit/test_pi_decisions.py::test_no_to_the_offer_is_accepted_without_persuasion",
+    "tests/unit/test_pi_decisions.py::test_after_the_summary_a_confirmation_brings_the_offer",
+    "tests/unit/test_pi_decisions.py::test_the_offer_buttons_ride_on_the_offer_and_the_confirm_question",
+    "tests/unit/test_pi_decisions.py::test_a_plain_yes_is_an_explicit_yes",
+    "tests/unit/test_pi_decisions.py::test_with_two_groups_pi_asks_all_or_some_once",
+    "tests/unit/test_pi_decisions.py::test_a_cost_question_goes_to_the_model_not_the_gate",
+    "tests/unit/test_pi_pipeline_gap_rules.py::test_a_person_who_is_not_the_decider_is_detected"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P9",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: pi will not send a document or quote unless you say yes",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/decisions.py::classify"
+   ],
+   "tests": [
+    "tests/unit/test_pi_decisions.py::test_a_plain_yes_is_an_explicit_yes"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P10",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: Solution document: your problems in your words, what Workzap would build, what it covers and won't do",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/brain_docs.py::solution_content",
+    "app/modules/pi/brain_docs.py::check_solution",
+    "app/modules/pi/brain_pdf.py::_header"
+   ],
+   "tests": [
+    "tests/unit/test_pi_brain_docs.py::test_section_one_uses_the_persons_words_and_the_facts_in_one_line",
+    "tests/unit/test_pi_brain_docs.py::test_every_component_must_serve_a_known_problem",
+    "tests/unit/test_pi_brain_docs.py::test_every_problem_is_addressed_or_listed_under_wont_do",
+    "tests/unit/test_pi_brain_docs.py::test_wont_do_is_never_empty",
+    "tests/unit/test_pi_brain_docs.py::test_a_sentence_that_is_too_long_is_caught",
+    "tests/unit/test_pi_brain_docs.py::test_prices_promises_and_jargon_are_caught",
+    "tests/unit/test_pi_brain_docs.py::test_a_document_in_the_persons_language_keeps_an_english_copy",
+    "tests/unit/test_pi_brain_docs.py::test_the_pdfs_carry_the_text_and_only_the_quote_carries_bank_details"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P11",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: Quote: what's included, what it costs, how long, how payment works; an offer not a charge",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/brain_docs.py::quote_content",
+    "app/modules/pi/decisions.py::_review",
+    "app/modules/pi/brain_docs.py::open_quote",
+    "app/modules/pi/brain_docs.py::send",
+    "app/modules/pi/constitution.py::URGENCY",
+    "app/modules/pi/brain_pdf.py::render_quote",
+    "app/modules/pi/brain_docs.py::currency_for",
+    "app/modules/pi/brain_docs.py::revise",
+    "app/modules/pi/safety.py::boundary_asked"
+   ],
+   "tests": [
+    "tests/unit/test_pi_brain_docs.py::test_the_quote_is_a_skeleton_with_no_price_and_no_date",
+    "tests/unit/test_pi_decisions.py::test_ask_for_changes_and_say_no",
+    "tests/unit/test_pi_linter_hardening.py::test_an_amount_needs_an_approved_quote_or_their_own_number",
+    "tests/unit/test_pi_brain_docs.py::test_the_cover_message_and_the_three_decision_buttons",
+    "tests/unit/test_pi_constitution.py::test_no_urgency_scarcity_or_discounts_in_any_state",
+    "tests/unit/test_pi_brain_docs.py::test_the_pdfs_carry_the_text_and_only_the_quote_carries_bank_details",
+    "tests/unit/test_pi_brain_docs.py::test_the_currency_follows_the_number",
+    "tests/unit/test_pi_brain_docs.py::test_a_documents_ref_and_version_suffix",
+    "tests/unit/test_pi_languages_gates.py::test_a_quote_without_the_document_has_the_fixed_answer"
+   ],
+   "gap": "R-QUOTE-03 is PARTIAL.",
+   "owner": "linter hardening session",
+   "unit_tested": true
+  },
+  {
+   "id": "P12",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: You can approve, ask for changes or say no; no is fine and nothing is charged",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/decisions.py::_review",
+    "app/modules/pi/decisions.py::decide"
+   ],
+   "tests": [
+    "tests/unit/test_pi_decisions.py::test_approval_needs_two_confirmations",
+    "tests/unit/test_pi_decisions.py::test_only_someone_who_can_approve_approves",
+    "tests/unit/test_pi_decisions.py::test_ask_for_changes_and_say_no",
+    "tests/unit/test_pi_decisions.py::test_cancelling_before_payment_is_accepted_and_told_to_workzap"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P13",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: You can stop at any point before paying, no reason needed",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/decisions.py::_review"
+   ],
+   "tests": [
+    "tests/unit/test_pi_decisions.py::test_ask_for_changes_and_say_no"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P14",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: Payment by bank transfer with details on the approved quote; never inside the chat",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/service_conversation.py::run_service_action",
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/safety.py::boundary_asked",
+    "app/modules/pi/decisions.py::decide"
+   ],
+   "tests": [
+    "tests/unit/test_pi_redteam.py::test_pay_by_card_in_the_chat_is_never_started_in_brain_mode",
+    "tests/unit/test_pi_constitution.py::test_pi_never_asks_for_card_password_otp_or_id",
+    "tests/unit/test_pi_constitution.py::test_pi_never_types_bank_details",
+    "tests/unit/test_pi_safety_trades.py::test_a_changed_bank_account_is_never_confirmed",
+    "tests/unit/test_pi_constitution.py::test_pi_never_says_payment_arrived_unless_staff_confirmed",
+    "tests/unit/test_pi_decisions.py::test_saying_they_paid_is_only_a_claim",
+    "tests/unit/test_pi_real_chat_fixes.py::test_roman_urdu_refund_and_changed_bank_details_reach_their_gates"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P15",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: Workzap confirms when the transfer arrives, then begins with a kickoff",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/brain_payments.py::confirm",
+    "app/modules/pi/brain_payments.py::kickoff_booked",
+    "app/modules/pi/decisions.py::text"
+   ],
+   "tests": [
+    "tests/unit/test_pi_constitution.py::test_pi_never_says_payment_arrived_unless_staff_confirmed",
+    "tests/unit/test_pi_decisions.py::test_cancelling_beats_a_claim_and_the_notice_waits_in_s11",
+    "tests/unit/test_pi_followup_policy.py::test_kickoff_reminders_come_24_hours_and_1_hour_before",
+    "tests/unit/test_pi_rule_gaps.py::test_the_kickoff_is_only_described_as_agreeing_the_details"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P16",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: pi never asks for card numbers, passwords, other people's personal details or payment",
+   "status": "PROMPT-ONLY",
+   "code": [
+    "app/modules/pi/constitution.py::_asks_for_what_it_never_asks",
+    "app/modules/pi/safety.py::redact_pii",
+    "app/modules/pi/safety.py::boundary_asked",
+    "app/modules/pi/learning.py::never_learn",
+    "app/modules/pi/spec_handbook.py"
+   ],
+   "tests": [
+    "tests/unit/test_pi_constitution.py::test_pi_never_asks_for_card_password_otp_or_id",
+    "tests/unit/test_pi_safety.py::test_a_card_number_is_removed_only_when_it_is_a_card",
+    "tests/unit/test_pi_linter_hardening.py::test_asking_for_ids_is_hard",
+    "tests/unit/test_pi_linter_hardening.py::test_asking_for_staff_or_customer_details_is_hard",
+    "tests/unit/test_pi_languages_gates.py::test_every_boundary_has_an_answer_in_every_language",
+    "tests/unit/test_pi_safety.py::test_things_pi_will_not_do",
+    "tests/unit/test_pi_learning_bank.py::test_plain_replies_pass_the_redaction_gate",
+    "tests/unit/test_pi_spec_handbook.py::test_the_constitution_and_the_voice_are_always_there"
+   ],
+   "gap": "R-PRIV-08 is PROMPT-ONLY.",
+   "owner": "prompt owner (not in scope for code)",
+   "unit_tested": true
+  },
+  {
+   "id": "P17",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: pi cannot give legal, medical or financial advice and says what it can do instead",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/safety.py::advice_asked",
+    "app/modules/pi/safety.py::advice_reply",
+    "app/modules/pi/constitution.py::OPINION",
+    "app/modules/pi/constitution.py::OFF_TOPIC"
+   ],
+   "tests": [
+    "tests/unit/test_pi_safety.py::test_advice_that_is_not_pis_to_give",
+    "tests/unit/test_pi_safety.py::test_advice_is_turned_down_in_plain_words_with_who_to_ask",
+    "tests/unit/test_pi_linter_hardening.py::test_noting_a_tax_problem_is_not_advice",
+    "tests/unit/test_pi_linter_hardening.py::test_politics_religion_competitors_are_hard",
+    "tests/unit/test_pi_front_door.py::test_bank_change_and_off_topic"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P18",
+   "source": "brain",
+   "page": 10,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: pi cannot promise a result; it notes, sorts and shows, and does not decide for you",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/safety.py::boundary_asked",
+    "app/modules/pi/constitution.py::PROMISE"
+   ],
+   "tests": [
+    "tests/unit/test_pi_constitution.py::test_pi_never_promises_a_result",
+    "tests/unit/test_pi_languages_gates.py::test_the_specs_money_and_advice_cases_have_fixed_answers"
+   ],
+   "gap": "R-PROM-02 is PARTIAL; R-PROM-03 is PARTIAL.",
+   "owner": "linter hardening session",
+   "unit_tested": true
+  },
+  {
+   "id": "P19",
+   "source": "brain",
+   "page": 11,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: pi is not built for emergencies",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/safety.py::emergency",
+    "app/modules/pi/service_conversation.py::_brain_gate"
+   ],
+   "tests": [
+    "tests/unit/test_pi_safety.py::test_an_emergency_is_recognised",
+    "tests/unit/test_pi_pipeline_gap_rules.py::test_an_emergency_earlier_in_a_burst_still_gets_the_emergency_reply",
+    "tests/unit/test_pi_pipeline_gap_rules.py::test_each_reason_has_its_own_kind_and_emergencies_and_bank_claims_are_urgent",
+    "tests/unit/test_pi_safety.py::test_self_harm_wins_over_other_words"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P20",
+   "source": "brain",
+   "page": 11,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: If pi gets something wrong it corrects its note; if it cannot help it says so and what happens next",
+   "status": "PROMPT-ONLY",
+   "code": [
+    "app/modules/pi/problems.py::apply_ops",
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/learning.py::reward",
+    "app/modules/pi/spec_handbook.py",
+    "app/modules/pi/service_conversation.py::ask_team"
+   ],
+   "tests": [
+    "tests/unit/test_pi_problem_model.py::test_saying_a_note_is_wrong_is_a_correction",
+    "tests/unit/test_pi_constitution.py::test_a_correction_is_never_met_with_i_did_not_understand",
+    "tests/integration/test_pi_brain_problems.py::test_merge_split_link_withdraw_and_rename_a_group",
+    "tests/unit/test_pi_learning.py::test_confusion_correction_frustration_cost_reward",
+    "tests/unit/test_pi_spec_handbook.py::test_the_guidance_follows_the_stage_and_the_topic",
+    "tests/unit/test_pi_rule_gaps.py::test_cant_help_is_an_escalation_reason_with_a_ticket_text_and_kind"
+   ],
+   "gap": "R-CORR-03 is PARTIAL; R-CANT-01 is PROMPT-ONLY; R-CANT-02 is PROMPT-ONLY.",
+   "owner": "prompt owner",
+   "unit_tested": true
+  },
+  {
+   "id": "P21",
+   "source": "brain",
+   "page": 11,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: 'Sorted' means noted and grouped, not solved",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::lint"
+   ],
+   "tests": [
+    "tests/unit/test_pi_constitution.py::test_sorted_is_never_solved"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P22",
+   "source": "brain",
+   "page": 11,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: pi is not made, run or endorsed by WhatsApp or Meta",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/safety.py::identity_reply"
+   ],
+   "tests": [
+    "tests/unit/test_pi_safety.py::test_the_identity_answers_are_the_specs_words"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P23",
+   "source": "brain",
+   "page": 11,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: Every enquiry to Workzap starts with pi",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/safety.py::enquiry_asked"
+   ],
+   "tests": [
+    "tests/unit/test_pi_front_door.py::test_enquiries_that_are_not_problems"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P24",
+   "source": "brain",
+   "page": 11,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: Something not right? Tell pi in the chat",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/safety.py::boundary_asked",
+    "app/modules/pi/safety.py::boundary_reply",
+    "app/modules/pi/learning.py::reward"
+   ],
+   "tests": [
+    "tests/unit/test_pi_moderation.py::test_complaints_and_illegal_asks",
+    "tests/unit/test_pi_moderation.py::test_the_complaint_reply_follows_the_spec_and_promises_nothing",
+    "tests/unit/test_pi_learning.py::test_confusion_correction_frustration_cost_reward"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P25",
+   "source": "brain",
+   "page": 11,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: Any made-up example is labelled Illustrative",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::_style_soft"
+   ],
+   "tests": [
+    "tests/unit/test_pi_linter_hardening.py::test_made_up_examples_are_labelled_illustrative"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P26",
+   "source": "brain",
+   "page": 11,
+   "area": "public promises (0.2)",
+   "statement": "Public promise: Workzap says plainly what is not ready (nori Vision is coming soon)",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/safety.py::nori_asked"
+   ],
+   "tests": [
+    "tests/unit/test_pi_nori_facts.py::test_nori_questions"
    ],
    "gap": "",
    "owner": "",
