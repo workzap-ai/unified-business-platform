@@ -29,3 +29,30 @@ def test_handed_ideas_must_be_given() -> None:
         "Haan.\n1. Sirf ek banda entry kare.\n2. Har payment par tareekh likhein.", context
     )
     assert not any(v.rule == "R-VAL-08" for v in listed)
+
+
+def test_a_code_on_its_way_is_an_invented_flow() -> None:
+    context = {"pi_mode": "brain", "history": [{"role": "ai"}]}
+    bad = constitution.lint(
+        "Please don't send codes here. A fresh sign-in code is on its way.", context
+    )
+    assert any(v.rule == "R-INVENT-01" and v.hard for v in bad)
+    ok = constitution.lint("Please don't send codes here. I never need one.", context)
+    assert not any(v.rule == "R-INVENT-01" for v in ok)
+
+
+def test_a_customers_complain_message_is_not_a_complaint_about_pi() -> None:
+    from app.modules.pi.runtime import ADDRESSES_PI
+
+    assert not ADDRESSES_PI.search("customers complain about waiting")
+    assert ADDRESSES_PI.search("your service is terrible")
+    assert ADDRESSES_PI.search("aap ne jawab nahi diya")
+
+
+def test_boundary_line_does_not_ask_again_what_the_problem_is() -> None:
+    from app.modules.pi import safety
+
+    fresh = safety.boundary_reply(safety.Boundary.OUTCOME, "en", False)
+    again = safety.boundary_reply(safety.Boundary.OUTCOME, "en", True)
+    assert fresh.endswith("What's the problem?")
+    assert again.endswith("What else is getting in the way?")

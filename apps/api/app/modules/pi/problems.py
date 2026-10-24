@@ -348,7 +348,13 @@ class ProblemBook:
         for existing in await self.active():
             same = existing.title.casefold() == title.casefold()
             alike = existing.category == category_now and same_symptom(existing.title, title)
-            if same or alike:
+            # One symptom with several facets is one problem (spec 4.3): the same category and
+            # sub-type is the same symptom, whatever words the model chose for the title.
+            subtype_now = _snake(note.subtype)
+            facet = bool(subtype_now) and (
+                existing.category == category_now and existing.subtype == subtype_now
+            )
+            if same or alike or facet:
                 await self.update(existing, note, "enrichment", message_id)
                 return existing, False
         words, redacted = _words(note.user_words)

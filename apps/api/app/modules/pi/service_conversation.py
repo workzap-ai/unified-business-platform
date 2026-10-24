@@ -1741,7 +1741,7 @@ def _brain_gate(
         if chat_level or effects:
             move = flow.State.X_OUT_OF_SCOPE if limit == safety.Boundary.WRONG_NUMBER else None
             return fixed(
-                safety.boundary_reply(limit, language),
+                safety.boundary_reply(limit, language, bool(context.get("noted_problems"))),
                 move,
                 list(effects),
                 dict(marks),

@@ -2054,8 +2054,21 @@ def boundary_asked(text: str) -> Boundary | None:
     return None
 
 
-def boundary_reply(kind: Boundary, language: str | None) -> str:
-    return BOUNDARY_TEXT.get(language or "en", BOUNDARY_TEXT["en"])[kind]
+ASKS_WHAT_PROBLEM = {
+    "en": ("What's the problem?", "What else is getting in the way?"),
+    "roman_ur": ("Masla kya hai?", "Aur kya cheez rukawat bani hui hai?"),
+    "ar": ("ما المشكلة؟", "ما الذي يعيق عملك أيضًا؟"),
+}
+
+
+def boundary_reply(kind: Boundary, language: str | None, noted: bool = False) -> str:
+    """The fixed line for a limit. When problems are already noted, "What's the problem?" would
+    ask again what they have told (R-MEM-02), so the question asks for what else."""
+    text = BOUNDARY_TEXT.get(language or "en", BOUNDARY_TEXT["en"])[kind]
+    asked, instead = ASKS_WHAT_PROBLEM.get(language or "en", ASKS_WHAT_PROBLEM["en"])
+    if noted and text.endswith(asked):
+        return text[: -len(asked)] + instead
+    return text
 
 
 # --- enquiries that are not problems: pi is Workzap's front door (R-ROUTE-01, spec 6.9) ----------

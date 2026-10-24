@@ -332,6 +332,10 @@ ABSENCE = re.compile(
     r"(?:\bno\b|\bwithout\b|\bnot\b|\bnahi\b|\bnever\b|\bmissing\b|\black of\b|\bno written\b)\W+(?:\w+\W+){0,3}$",
     re.IGNORECASE,
 )
+CODE_PROMISE = re.compile(
+    r"\b(?:code|otp|pin)\b[^.?!\n]{0,40}\b(?:on its way|is (?:being )?sent|will (?:arrive|come)|is coming)\b",
+    re.IGNORECASE,
+)
 ENGLISH_NOTED = re.compile(r"\bI(?:'ve| have) noted\b|^\s*Thanks\.\s", re.IGNORECASE)
 NOTING = re.compile(r"\bnoted?\b|note kar|likh liya|likh liye", re.IGNORECASE)
 ATTRIBUTIVE_NOUNS = re.compile(
@@ -1303,6 +1307,15 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 "R-LANG-02",
                 'translate the English "noted" sentence into Roman Urdu ("note kar liya"): '
                 "no English sentence inside a Roman Urdu reply",
+            )
+        )
+    if CODE_PROMISE.search(reply):
+        add(
+            Violation(
+                "R-INVENT-01",
+                "pi never sends or receives sign-in codes or OTPs in this chat: do not say a code "
+                "is on its way, only that you never need one",
+                True,
             )
         )
     limit = int((context.get("brain_settings") or {}).get("max_clarify") or 0)

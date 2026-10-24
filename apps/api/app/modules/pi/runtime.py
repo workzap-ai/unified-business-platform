@@ -102,6 +102,13 @@ logger = logging.getLogger(__name__)
 MEDIA_NOTICE = MEDIA_NOTICES["en"]
 
 
+# A complaint is about Workzap only when the message speaks to pi or names Workzap.
+ADDRESSES_PI = re.compile(
+    r"\b(?:you|your|you're|youre|workzap|pi)\b|\b(?:aap|aapki|aapka|aapke|tum|tumhari|tumhara)\b",
+    re.IGNORECASE,
+)
+
+
 def _localized(notices: dict[str, str], body: str | None, known: str | None) -> str:
     """A fixed notice in the language of the customer's message (or the chat's last one)."""
     return notice_in(notices, detect_language(body) or known)
@@ -1243,6 +1250,15 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             service_context["typed_message"] = typed[:4000]
             if pii_guard is not None:
                 service_context["pii"] = pii_guard
+            if (
+                service_context.get("pi_mode") == "brain"
+                and fast_intent
+                and fast_intent[0] == "complaint"
+                and not ADDRESSES_PI.search(typed)
+            ):
+                # "Our customers complain about waiting" is a problem they describe about their
+                # business, not a complaint about Workzap: it is noted, not handed to a person.
+                review_intents -= {"complaint"}
             service_context["operator_review_required"] = bool(
                 keyword_handoff or (fast_intent and fast_intent[0] in review_intents)
             )
