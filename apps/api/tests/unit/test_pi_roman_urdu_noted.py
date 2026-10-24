@@ -663,3 +663,36 @@ def test_a_near_problem_gives_ideas_but_not_its_build_line() -> None:
     assert solution_ideas.is_strong_match(
         entry, entry["category"], entry["subtype"], entry["words"]
     )
+
+
+def test_a_person_who_cannot_approve_is_not_shown_the_summary_for_asking_for_the_quote() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import brain_summary
+
+    def turn() -> SimpleNamespace:
+        return SimpleNamespace(
+            reply="Noted.",
+            problem_ops=[],
+            _summary=False,
+            _board=False,
+            _asked_shape=False,
+            awaiting_customer=False,
+        )
+
+    base = {
+        "flow": {"state": "S3_NOTED"},
+        "latest_customer_message": "send the quote",
+        "noted_problems": [
+            {"group": "stock_inventory", "title": "Stock runs out"},
+            {"group": "people_staff", "title": "Cashiers are late"},
+        ],
+        "problems_since_summary": 2,
+        "reply_language": "en",
+    }
+    blocked = turn()
+    brain_summary(blocked, {**base, "can_approve": False})
+    assert not blocked._summary
+    allowed = turn()
+    brain_summary(allowed, {**base, "can_approve": True})
+    assert allowed._summary

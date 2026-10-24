@@ -1850,6 +1850,10 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     why = problems.summary_due(said, len(items), since, trigger, quiet, quiet_limit)
     if not why:
         return
+    if why == "document_asked" and (
+        not context.get("can_approve", True) or (context.get("brief") or {}).get("non_decider")
+    ):
+        return
     if not listening and why not in ("map", "show"):
         return  # after the summary only an explicit ask to see the notes shows them again
     if solution_turn(context):
