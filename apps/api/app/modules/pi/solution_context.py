@@ -53,6 +53,11 @@ def switched_on(response_rules: dict[str, Any] | None) -> bool:
     )
 
 
+def _sector(industry: str | None) -> str | None:
+    """The sector of an industry ("7.I Health and care"); it decides the Workzap line wording."""
+    return str((solutions.load(industry or "") or {}).get("sector") or "") or None
+
+
 def given_so_far(conversation: PiConversation) -> int:
     """Ideas handed over in this chat. Kept in the brief, apart from the stamps, which are
     trimmed to the last few: a long chat must never reset the count (R-VAL-02)."""
@@ -226,7 +231,9 @@ async def _give(
     )
     used["recorded"] = True
     line = (
-        solution_ask.bridge(dict(conversation.service_brief or {}), problem, language)
+        solution_ask.bridge(
+            dict(conversation.service_brief or {}), problem, language, _sector(industry)
+        )
         if (asked or next_kind == "worked") and build_line
         else None  # a near-problem's build line would read as an irrelevant template
     )
@@ -367,7 +374,9 @@ async def _build(
         problem = {e["id"]: e for e in entries}.get(str(brief.get("solution_last_problem") or ""))
     offerable = (conversation.flow_state or "") in solution_ask.OFFERABLE
     if howto:
-        line = solution_ask.bridge(dict(conversation.service_brief or {}), problem, language)
+        line = solution_ask.bridge(
+            dict(conversation.service_brief or {}), problem, language, _sector(industry)
+        )
         brief = solution_ask.remember_bridge(dict(conversation.service_brief or {}), line)
         brief["howto_asked"] = int(brief.get("howto_asked") or 0) + 1
         conversation.service_brief = brief

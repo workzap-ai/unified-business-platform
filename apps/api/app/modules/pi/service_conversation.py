@@ -1877,6 +1877,24 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         turn._board = True  # shown again with its board picture; the chat stays where it is
 
 
+def strip_dangling_opener(turn: "ServiceTurn") -> None:
+    """A reply must not stop on the Workzap line's opener ("...Workzap could set it up so"): the
+    model sometimes leaves the build itself out (found in a real-model school chat)."""
+    openers = sorted(
+        {o for pair in solutions.BRIDGE_OPENERS for o in pair.values() if o}, key=len, reverse=True
+    )
+    kept: list[str] = []
+    for line in turn.reply.split("\n"):
+        tail = line.rstrip()
+        cut = next((o for o in openers if tail.endswith(o)), None)
+        if cut is not None:
+            tail = tail[: -len(cut)].rstrip()
+            if not tail:
+                continue
+        kept.append(tail if cut is not None else line)
+    turn.reply = "\n".join(kept).strip()
+
+
 def brain_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """The ideas the application chose for this turn reach the person even when the model left
     them out of its reply ("Noted. What else is getting in the way?" after "any solution?").
@@ -2054,6 +2072,13 @@ NO_IDEA_AGAIN = {  # noqa: E501
 }
 
 
+NO_IDEA_THIRD = {  # noqa: E501
+    "en": "I hear you asking for a solution. I have nothing more to give for free here, and the solution document is where Workzap works it out for your business.",  # noqa: E501
+    "roman_ur": "Main samajhta hoon ke aap solution chahte hain. Yahan muft dene ke liye mere paas aur kuch nahi, aur aap ke business ke liye poora hal solution document mein Workzap likhta hai.",  # noqa: E501
+    "ar": "أفهم أنك تطلب حلاً. ليس لدي المزيد لأقدمه مجاناً هنا، وتفاصيل الحل لعملك تجدها في وثيقة الحل التي تعدها Workzap.",  # noqa: E501
+}
+
+
 def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """They asked for a fix and the industry has no free idea for the problem (no industry yet, or
     no matching entry): the application says so plainly, in their language, and the offer line
@@ -2077,7 +2102,14 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     ]
     if any(line in said for said in told[-6:]):
         line = NO_IDEA_AGAIN.get(language, NO_IDEA_AGAIN["en"])  # not the same words twice
+        if any(line in said for said in told[-6:]):
+            line = NO_IDEA_THIRD.get(language, NO_IDEA_THIRD["en"])
     turn.reply = with_disclosure(line, context, language)
+    at_offer = (context.get("flow") or {}).get("state") == "S5_READINESS"
+    if at_offer and not solution_ask.already_offers(turn.reply):
+        # The chat is already at the offer (brain_offer only adds it from the listening states):
+        # a person who keeps asking for a fix gets the open question again, never a dead end.
+        turn.reply = f"{turn.reply}\n\n{solution_ask.offer_line(language)}"
     turn.awaiting_customer = True
 
 
@@ -4636,6 +4668,7 @@ async def compose_service_turn(
         turn.projects = []
         brain_summary(turn, context)
         brain_decision(turn, context)
+        strip_dangling_opener(turn)
         brain_ideas(turn, context)
         await brain_free_ideas(manager, scope, conversation, policy, turn, context)
         brain_prose_ideas(turn, context)

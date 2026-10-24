@@ -158,10 +158,48 @@ def banned_tool_words(text: str, said: str = "") -> list[str]:
     return found
 
 
-def build_phrase(key: str, language: str = "en") -> str:
-    """What the owner would notice for one catalogue build, in their language."""
+# The phrase bank is worded for shops ("new stock", "every branch", "best-seller"). In a clinic, a
+# school or a factory that reads as another business's idea, so outside the sectors below these
+# builds are said in the same "who gets what, when" style without the shop words.
+SHOP_WORDED_SECTORS = ("7.A", "7.B", "7.E")  # retail, food, trade and distribution
+NEUTRAL_PHRASES: dict[str, dict[str, str]] = {
+    "dashboards_reports": {
+        "en": "The numbers that matter reach your phone each morning, without asking anyone",
+        "roman_ur": "Zaroori hisaab har subah aap ke phone par, kisi se pooche baghair",
+    },
+    "stock_alerts": {
+        "en": "The person in charge gets a message the day supplies run low",
+        "roman_ur": "Saaman kam hone ke din hi zimmedar ko message mil jaye",
+    },
+    "transfer_tracking": {
+        "en": "Anything handed from one place to another that doesn't arrive gets flagged to you the same day",
+        "roman_ur": "Ek jagah se doosri bheji cheez na pohnche to usi din aap ko pata chale",
+    },
+    "cash_reconciliation": {
+        "en": "Each evening you'd see if cash and payments match",
+        "roman_ur": "Har shaam pata chale cash aur payments barabar hain ya nahi",
+    },
+    "customer_messaging": {
+        "en": "Past customers hear from you when it is time for their next visit",
+        "roman_ur": "Purane customers ko agli visit ke waqt par message pohanch jaye",
+    },
+}
+
+
+def shop_worded(sector: str | None) -> bool:
+    """True when the industry's sector is one where the phrase bank's shop words fit (or unknown)."""
+    return not sector or str(sector).startswith(SHOP_WORDED_SECTORS)
+
+
+def build_phrase(key: str, language: str = "en", sector: str | None = None) -> str:
+    """What the owner would notice for one catalogue build, in their language. `sector` is the
+    industry's sector ("7.I Health and care"): outside the shop sectors the shop-worded builds use
+    their neutral wording."""
+    lang = "roman_ur" if language == "roman_ur" else "en"
+    if not shop_worded(sector) and key in NEUTRAL_PHRASES:
+        return NEUTRAL_PHRASES[key][lang]
     entry = CATALOGUE.get(key) or CATALOGUE["custom_build"]
-    return entry["roman_ur" if language == "roman_ur" else "en"]
+    return entry[lang]
 
 
 @dataclass(frozen=True)

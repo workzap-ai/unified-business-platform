@@ -64,10 +64,25 @@ def match_problem(
     """The numbered problem of an industry closest to a noted problem, by category, sub-type and
     wording (Part 2.1). None when nothing is close enough: pi then falls back and gives no idea."""
     said = _words(words)
+    # A word of theirs that only ONE entry of this industry uses ("udhaar" in a kiryana shop) says
+    # which problem they mean, and outweighs a sub-type the model guessed wrong ("cash_mismatch").
+    own: dict[int, int] = {}
+    for word in (w for w in said if len(w) >= 5):
+        owners = [i for i, e in enumerate(problems) if word in _words(e.get("words", ""))]
+        if len(owners) == 1:
+            own[owners[0]] = own.get(owners[0], 0) + 1
+    # Only when the model's sub-type points at a real entry of this industry that shares none of
+    # their words: a sub-type this industry has no entry for says nothing about a wrong guess.
+    if own and not any(
+        subtype and e.get("subtype") == subtype and not said & _words(e.get("words", ""))
+        for e in problems
+    ):
+        own = {}
     best: tuple[float, dict[str, Any]] | None = None
-    for entry in problems:
+    for index, entry in enumerate(problems):
         score = 4.0 if subtype and entry.get("subtype") == subtype else 0.0
         score += 2.0 if category and entry.get("category") == category else 0.0
+        score += 4.0 * min(own.get(index, 0), 2)
         theirs = _words(entry.get("words", ""))
         if said and theirs:
             # Their phrase is short and the entry's long: a shared share of the SHORTER one (the

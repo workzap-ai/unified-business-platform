@@ -114,7 +114,10 @@ def covers(problem: dict[str, Any] | None) -> str:
 
 
 def bridge(
-    brief: dict[str, Any], problem: dict[str, Any] | None, language: str
+    brief: dict[str, Any],
+    problem: dict[str, Any] | None,
+    language: str,
+    sector: str | None = None,
 ) -> dict[str, Any] | None:
     """The Workzap line for one problem (Part 1.9): the build said as what the owner would notice,
     with the next bridge opener not yet used in this chat. Once per problem: a problem that already
@@ -134,7 +137,7 @@ def bridge(
     ]
     index = order[0] if order else len(solutions.BRIDGE_OPENERS) - 1  # the one with no opener
     return {
-        "says": solutions.build_phrase(keys[0], language),
+        "says": solutions.build_phrase(keys[0], language, sector),
         "opener": solutions.BRIDGE_OPENERS[index][key],
         "_index": index,
         "_problem": str(problem.get("id")),
