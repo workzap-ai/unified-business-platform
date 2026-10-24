@@ -16,7 +16,7 @@ same chat and a returning customer's "it worked" is heard.
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.exc import IntegrityError, ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import (
@@ -109,11 +109,19 @@ async def build(
     `solution_asked_no_ideas`, `solution_next`, `solution_not_tried` (each may be missing); fills
     `used` with the stamp for the nightly scoring. Never raises: before migration 0043 is applied
     the tables are missing and pi simply gives no ideas."""
-    try:
-        async with session.begin_nested():
-            return await _build(session, scope, conversation, said, noted, used, now)
-    except ProgrammingError:
-        return {}
+    for attempt in (1, 2):
+        try:
+            async with session.begin_nested():
+                return await _build(session, scope, conversation, said, noted, used, now)
+        except ProgrammingError:
+            return {}
+        except IntegrityError:
+            # Two messages of one business at once both seeded the same industry (its first
+            # version, its idea arms). The other one won: look again, it is there now. Never let
+            # a seeding race cost the person their reply.
+            if attempt == 2:
+                return {}
+    return {}
 
 
 async def _instant(

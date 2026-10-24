@@ -313,3 +313,36 @@ def test_a_reply_that_already_says_it_is_an_ai_is_not_given_the_line_twice() -> 
     assert with_disclosure(own, {"history": []}, "roman_ur") == own
     other = "Aap ka masla kya hai?"
     assert with_disclosure(other, {"history": []}, "roman_ur") != other
+
+
+async def test_a_seeding_race_never_costs_the_reply() -> None:
+    from sqlalchemy.exc import IntegrityError
+
+    from app.modules.pi import solution_context
+
+    calls = {"n": 0}
+
+    class Nested:
+        async def __aenter__(self) -> None:
+            return None
+
+        async def __aexit__(self, *exc: object) -> bool:
+            return False
+
+    class FakeSession:
+        def begin_nested(self) -> Nested:
+            return Nested()
+
+    async def fake_build(*args: object, **kwargs: object) -> dict[str, object]:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise IntegrityError("insert", {}, Exception("uq_pi_solution_versions"))
+        return {"solution_ideas": ["x"]}
+
+    original = solution_context._build
+    solution_context._build = fake_build  # type: ignore[assignment]
+    try:
+        out = await solution_context.build(FakeSession(), None, None, "any solution?", [], {})  # type: ignore[arg-type]
+    finally:
+        solution_context._build = original
+    assert out == {"solution_ideas": ["x"]} and calls["n"] == 2
