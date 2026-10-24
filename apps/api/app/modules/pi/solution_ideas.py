@@ -107,6 +107,19 @@ def match_problem(
     return None
 
 
+def is_strong_match(entry: dict[str, Any], category: str, subtype: str, words: str = "") -> bool:
+    """Whether this entry matches the noted problem by the main rule (sub-type, category and the
+    owner's own wording reach MATCH_AT). The fallbacks above give ideas for a near problem, but the
+    build line of a near problem would read as an irrelevant template."""
+    said = _words(words)
+    score = 4.0 if subtype and entry.get("subtype") == subtype else 0.0
+    score += 2.0 if category and entry.get("category") == category else 0.0
+    theirs = _words(entry.get("words", ""))
+    if said and theirs:
+        score += 3.0 * len(said & theirs) / min(len(said), len(theirs))
+    return score >= MATCH_AT
+
+
 def _where_arm(scope: WorkspaceScope) -> tuple[Any, ...]:
     return (
         PiIdeaArm.tenant_id == scope.tenant_id,

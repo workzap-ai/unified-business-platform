@@ -604,3 +604,62 @@ def test_an_explicit_document_yes_with_an_offer_open_is_the_offers_yes_from_any_
         assert decided is not None and decided.next_state == State.S6_PREPARING, step
     no_offer = decisions.decide(State.S3_NOTED, said, "en", {**facts, "brief": {}})
     assert no_offer is None or no_offer.next_state != State.S6_PREPARING
+
+
+def test_only_a_complaint_about_pi_or_workzap_counts_as_one() -> None:
+    from app.modules.pi.runtime import COMPLAINT_ABOUT_PI
+
+    about_the_business = (
+        "Can you suggest a solution? Dealers keep sending back full cartons over shade complaints",
+        "Can you suggest a fix for installment students? Finance finds out who hasn't paid late",
+        "our customers complain about waiting",
+        "Customers ki shikayat aati hain delivery late ki",
+    )
+    for text in about_the_business:
+        assert not COMPLAINT_ABOUT_PI.search(text), text
+    about_pi = (
+        "I want to complain about this service",
+        "You did not reply to me yesterday",
+        "your service is terrible",
+        "meri shikayat hai",
+        "Aap ne mera masla hal nahi kiya",
+    )
+    for text in about_pi:
+        assert COMPLAINT_ABOUT_PI.search(text), text
+
+
+def test_after_ideas_were_given_the_no_idea_line_is_the_truthful_one() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import NO_MORE_IDEAS, brain_no_ideas
+
+    turn = SimpleNamespace(
+        reply="x",
+        _summary=False,
+        _decision=None,
+        request_human=False,
+        awaiting_customer=False,
+        _free=False,
+    )
+    context = {
+        "solution_asked_no_ideas": True,
+        "reply_language": "en",
+        "ideas_given": 2,
+        "history": [{"role": "ai", "text": "Hi, I am pi."}],
+    }
+    brain_no_ideas(turn, context)
+    assert turn.reply == NO_MORE_IDEAS["en"] and "don't have" not in turn.reply
+
+
+def test_a_near_problem_gives_ideas_but_not_its_build_line() -> None:
+    from app.modules.pi import solution_ideas, solutions
+
+    entries = solutions.load("kiryana_corner_shops_and_convenience_stores")["problems"]
+    entry = solution_ideas.match_problem(entries, "accounting_errors", "", "Udhaar hisaab gadbad")
+    assert entry is not None
+    assert not solution_ideas.is_strong_match(
+        entry, "accounting_errors", "", "Udhaar hisaab gadbad"
+    )
+    assert solution_ideas.is_strong_match(
+        entry, entry["category"], entry["subtype"], entry["words"]
+    )

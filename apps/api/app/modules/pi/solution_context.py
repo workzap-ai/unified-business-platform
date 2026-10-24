@@ -181,6 +181,7 @@ async def _give(
     asked: bool,
     offerable: bool,
     next_kind: str = "",
+    build_line: bool = True,
 ) -> dict[str, Any] | None:
     """Choose, record and hand over the ideas for one problem inside every cap. None when there is
     nothing to give (the budget is spent, or nothing new is left for this business)."""
@@ -226,8 +227,8 @@ async def _give(
     used["recorded"] = True
     line = (
         solution_ask.bridge(dict(conversation.service_brief or {}), problem, language)
-        if asked or next_kind == "worked"
-        else None
+        if (asked or next_kind == "worked") and build_line
+        else None  # a near-problem's build line would read as an irrelevant template
     )
     brief = solution_ask.remember_bridge(
         {
@@ -344,23 +345,24 @@ async def _build(
         return {}
     entries = await solution_ideas.entries(session, scope, industry)
     problem = None
+    strong = False  # the entry matches by the main rule, not only by a near-problem fallback
     # The latest noted problem first, then the earlier ones: a person who then mentions something
     # off the page ("staff forget the entry") still gets ideas for the problem that does match.
     for item in reversed(noted or []):
-        problem = solution_ideas.match_problem(
-            entries,
-            str(item.get("group") or ""),
-            str(item.get("subtype") or ""),
-            " ".join(
-                [
-                    str(item.get("title") or ""),
-                    str(item.get("title_local") or ""),
-                    *[str(w) for w in item.get("user_words") or []],
-                ]
-            ),
+        group, subtype = str(item.get("group") or ""), str(item.get("subtype") or "")
+        said_words = " ".join(
+            [
+                str(item.get("title") or ""),
+                str(item.get("title_local") or ""),
+                *[str(w) for w in item.get("user_words") or []],
+            ]
         )
+        problem = solution_ideas.match_problem(entries, group, subtype, said_words)
         if problem is not None:
+            strong = solution_ideas.is_strong_match(problem, group, subtype, said_words)
             break
+    if problem is None and reacting:
+        strong = True  # the entry the ideas were already given for
     if problem is None and reacting:
         problem = {e["id"]: e for e in entries}.get(str(brief.get("solution_last_problem") or ""))
     offerable = (conversation.flow_state or "") in solution_ask.OFFERABLE
@@ -404,6 +406,7 @@ async def _build(
         scope,
         conversation,
         industry=industry,
+        build_line=strong,
         problem=problem,
         language=language,
         used=used,

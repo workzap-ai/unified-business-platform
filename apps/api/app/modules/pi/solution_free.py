@@ -83,6 +83,7 @@ async def free_ideas(
     earlier: list[str],
     industry: str | None,
     never_say: list[str],
+    already_said: list[str] | None = None,
 ) -> list[str]:
     """Two vetted ideas for what the person described, or [] (the model failed or nothing passed)."""
     user = json.dumps(
@@ -91,6 +92,7 @@ async def free_ideas(
             "owner_earlier_messages": earlier[-4:],
             "industry": industry or "not known yet",
             "never_say_list": never_say[:8],
+            "pi_already_said_do_not_repeat_or_reword": (already_said or [])[-8:],
         },
         ensure_ascii=False,
     )

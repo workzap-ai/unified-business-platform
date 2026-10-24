@@ -441,6 +441,12 @@ def detect(
     )
 
 
+def evidence_score(text: str, key: str) -> float:
+    """How much of this text points at one pack (0 when nothing does)."""
+    found = _evidence(text).get(key)
+    return float(found[0]) if found else 0.0
+
+
 def _areas(category: str | None) -> tuple[str, ...]:
     if not category:
         return ()

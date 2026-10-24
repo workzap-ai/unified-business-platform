@@ -1956,6 +1956,13 @@ async def brain_free_ideas(
         for h in context.get("history") or []
         if h.get("role") == "customer"
     ]
+    already = [
+        ln.lstrip("• ").strip()
+        for h in context.get("history") or []
+        if h.get("role") == "ai"
+        for ln in str(h.get("text") or "").splitlines()
+        if ln.lstrip().startswith("•")
+    ][-8:]
     said = str(context.get("latest_customer_message") or "")
     ideas = await latency.timed(
         "model.free_ideas",
@@ -1968,6 +1975,7 @@ async def brain_free_ideas(
             earlier=customer,
             industry=industry,
             never_say=never_say,
+            already_said=already,
         ),
     )
     ideas = ideas[:left]
@@ -1991,6 +1999,11 @@ NO_IDEA_LINES = {  # noqa: E501
 }
 
 
+NO_MORE_IDEAS = {  # noqa: E501
+    "en": "Those are the ideas I have for this here. The solution document goes further, and you can say no to it.",  # noqa: E501
+    "roman_ur": "Is masle ke liye yahan itne hi ideas hain. Solution document is se aage jata hai, aur aap mana bhi kar sakte hain.",  # noqa: E501
+    "ar": "هذه هي الأفكار التي لدي هنا لهذه المشكلة. وثيقة الحل تذهب أبعد، ويمكنك الرفض.",  # noqa: E501
+}
 NO_IDEA_AGAIN = {  # noqa: E501
     "en": "That is all I can give here for now. The solution document is where Workzap sets out what it would build, and you can say no to it.",  # noqa: E501
     "roman_ur": "Abhi yahan itna hi de sakta hoon. Workzap kya banayega, ye solution document mein hota hai, aur aap mana bhi kar sakte hain.",  # noqa: E501
@@ -2010,6 +2023,12 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     language = str(context.get("reply_language") or "en")
     line = NO_IDEA_LINES.get(language, NO_IDEA_LINES["en"])
+    if int(context.get("ideas_given") or 0) > 0 or context.get("solution_why") in (
+        "budget",
+        "none_left",
+    ):
+        # Ideas were already handed over for this chat: "I have no quick idea" would be untrue.
+        line = NO_MORE_IDEAS.get(language, NO_MORE_IDEAS["en"])
     told = [
         str(h.get("text") or "") for h in (context.get("history") or []) if h.get("role") == "ai"
     ]
@@ -2403,7 +2422,15 @@ def industry_context(
         fresh = industry_packs.detect(
             [latest], known=[], answers=[a for a in answers if a == latest]
         )
-        if fresh.stated and fresh.primary not in stored and fresh.confidence >= 0.5:
+        if (
+            fresh.stated
+            and fresh.primary not in stored
+            and fresh.confidence >= 0.5
+            # clearly stronger than what the statement says about the trade already stored: a line
+            # that also fits the stored pack ("breakage") must not flip it
+            and industry_packs.evidence_score(latest, stored[0])
+            < 0.5 * fresh.scores.get(fresh.primary or "", 0.0)
+        ):
             found = fresh
     if not found.industries and not found.overlays:
         return {}

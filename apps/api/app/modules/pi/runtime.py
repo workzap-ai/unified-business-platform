@@ -102,6 +102,15 @@ logger = logging.getLogger(__name__)
 MEDIA_NOTICE = MEDIA_NOTICES["en"]
 
 
+# A complaint is about pi or Workzap only when it says so ("my complaint is", "your service").
+COMPLAINT_ABOUT_PI = re.compile(  # noqa: E501
+    r"\b(?:(?:i|we) (?:want|would like|need) to (?:complain|file a complaint|report you)|"
+    r"(?:my|our) complaint (?:is|about|against)|i(?:'m| am| are| was) (?:unhappy|not happy|angry|upset|disappointed) (?:with|about) (?:you|workzap|pi)|"  # noqa: E501
+    r"(?:you|workzap|pi) (?:have not|haven't|did not|didn't|never|failed|ignored|lied|are (?:useless|rude|bad|wrong))|"  # noqa: E501
+    r"your (?:service|team|support|staff|reply|replies|bot) (?:is|was|are|were|has|have|sucks)|worst service)\b"  # noqa: E501
+    r"|\b(?:meri|hamari|humari) shikayat\b|\b(?:aap|workzap|pi) ne\b[^.?!]{0,30}\b(?:nahi|ghalat|jhoot|bura)\b",  # noqa: E501
+    re.IGNORECASE,
+)
 # A complaint is about Workzap only when the message speaks to pi or names Workzap.
 ADDRESSES_PI = re.compile(
     r"\b(?:you|your|you're|youre|workzap|pi)\b|\b(?:aap|aapki|aapka|aapke|tum|tumhari|tumhara)\b",
@@ -1250,19 +1259,16 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             service_context["typed_message"] = typed[:4000]
             if pii_guard is not None:
                 service_context["pii"] = pii_guard
-            if service_context.get("pi_mode") == "brain" and not ADDRESSES_PI.search(typed):
-                # "Families pay late" describes their business: a payment word is not a payment
-                # matter for a person unless the message speaks to pi or Workzap.
+            if service_context.get("pi_mode") == "brain":
+                # "Families pay late", "students who haven't paid": a payment word describes their
+                # business. Refunds, bank-detail changes and "I paid" have their own gates, so the
+                # word alone never moves the chat to a person.
                 review_intents -= {"payment", "invoice"}
-            if (
-                service_context.get("pi_mode") == "brain"
-                and fast_intent
-                and fast_intent[0] == "complaint"
-                and not ADDRESSES_PI.search(typed)
-            ):
-                # "Our customers complain about waiting" is a problem they describe about their
-                # business, not a complaint about Workzap: it is noted, not handed to a person.
-                review_intents -= {"complaint"}
+                if not COMPLAINT_ABOUT_PI.search(typed):
+                    # "Dealers keep sending cartons back over shade complaints", "our customers
+                    # complain about waiting": a problem they describe about their business, noted,
+                    # not a complaint about pi or Workzap handed to a person (it silenced the chat).
+                    review_intents -= {"complaint"}
             service_context["operator_review_required"] = bool(
                 keyword_handoff or (fast_intent and fast_intent[0] in review_intents)
             )
