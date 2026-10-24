@@ -26,6 +26,7 @@ from app.modules.navigation.models import NavigationPreference
 from app.modules.notifications.models import Notification, NotificationRead
 from app.modules.orders.models import Order, OrderLine
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
+from app.modules.pi.business_models import PiBusiness
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_models import (
     PiLearnedPack,
@@ -147,6 +148,7 @@ __all__ = [
     "PiSolutionMemory",
     "PiSolutionVersion",
     "PiQuarantine",
+    "PiBusiness",
     "PiProblem",
     "PiProblemGroup",
     "PiProblemLink",

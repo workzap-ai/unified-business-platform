@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import taxonomy
+from app.modules.pi import business, taxonomy
 from app.modules.pi.language import amount_value, date_estimate
 from app.modules.pi.problem_models import (
     PiProblem,
@@ -564,6 +564,8 @@ async def apply_ops(
                 refs[short_ref(problem.id)] = problem
                 if fresh and problem.category == taxonomy.OTHER:
                     await _taxonomy_review(session, scope, problem)  # 4.6 rule 4
+                if fresh:
+                    await business.link_duplicates_for_problem(session, scope, problem)
             elif op.op == "update" and op.ref in refs and op.note:
                 changed = await book.update(
                     refs[op.ref],

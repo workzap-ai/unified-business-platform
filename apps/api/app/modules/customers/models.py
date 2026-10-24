@@ -29,6 +29,11 @@ class Customer(WorkspaceRow):
         CheckConstraint("source IN ('manual', 'whatsapp', 'import')", name="source"),
         CheckConstraint("length(btrim(name)) > 0", name="name_nonempty"),
         CheckConstraint("phone IS NULL OR phone ~ '^\\+[0-9]{7,15}$'", name="phone_e164"),
+        CheckConstraint(
+            "business_role IS NULL OR business_role IN ('owner', 'admin', 'member')",
+            name="business_role",
+        ),
+        scoped_fk("customers", "business_id", "pi_businesses"),
         Index(
             "uq_customers_phone",
             "tenant_id",
@@ -72,6 +77,20 @@ class Customer(WorkspaceRow):
     industry_confidence: Mapped[Decimal | None] = mapped_column(Numeric(3, 2), nullable=True)
     # May say yes to a document and approve a quote (the owner, or an authorised admin).
     can_approve: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    # Shared workspace (pi Brain spec 4.9): the business this contact belongs to, once approved.
+    business_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    business_role: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    # Named a business that already has an owner: awaiting the owner's or an admin's approval.
+    pending_business_name: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    # False once they ask that their problems stay private to them (spec 4.9, "if they object").
+    shares_with_business: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    business_joined_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    # Set once pi has told them "shared with the owner" at their first message after joining.
+    business_disclosed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
 
 class CustomerNote(WorkspaceRow):

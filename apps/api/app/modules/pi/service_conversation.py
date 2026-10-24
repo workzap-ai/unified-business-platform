@@ -27,6 +27,7 @@ from app.modules.pi import (
     brain_config,
     brain_docs,
     brain_payments,
+    business,
     constitution,
     decisions,
     flow,
@@ -1346,7 +1347,25 @@ async def brain_problems(
         customer = await latency.timed(
             "brain.customer", session.get(Customer, conversation.customer_id)
         )
-    context["can_approve"] = bool(customer.can_approve) if customer is not None else True
+    context["can_approve"] = business.can_approve_for(customer) if customer is not None else True
+    if customer is not None and business.disclosure_due(customer):
+        # Spec 4.9: told once, at the first message after joining a shared business.
+        from app.modules.pi.business_models import PiBusiness
+
+        joined = await latency.timed(
+            "brain.business", session.get(PiBusiness, customer.business_id)
+        )
+        if joined is not None:
+            context["business_disclosure_name"] = joined.name
+            business.mark_disclosed(customer)
+    if (
+        customer is not None
+        and customer.business_id is not None
+        and customer.shares_with_business
+        and message is not None
+        and business.objects_to_sharing(message.body or "")
+    ):
+        business.opt_out(customer)  # spec 4.9: "if they object, keep their problems private"
     if customer is not None:
         context["customer_country"] = safety.country_of(customer.phone or customer.whatsapp_id)
     if message is not None:
@@ -4314,6 +4333,11 @@ async def compose_service_turn(
     if (context.get("pii") or {}).get("notice"):
         turn.reply = f"{context['pii']['notice']} {turn.reply}"  # R-PRIV-02: said once
     if context.get("pi_mode") == "brain" and not turn._greeting_only:
+        if business_name := context.get("business_disclosure_name"):
+            # R-MEM-06, spec 4.9: said once, at the first message after joining a business.
+            lang = "roman_ur" if context.get("reply_language") == "roman_ur" else "en"
+            notice = business.disclosure_text(str(business_name), lang)
+            turn.reply = f"{notice} {turn.reply}"
         # R-MEM-03, R-DISC-05: someone back after a gap is welcomed and, after more than 30 days,
         # told again that this is pi, the AI, even when they open with a real message. In code,
         # not in the prompt; the count is pi's own figure.
@@ -4599,6 +4623,13 @@ async def remember_customer(
         customer.name = profile["name"][:160]
     if profile.get("business_name") and not customer.company:
         customer.company = profile["business_name"][:160]
+    if (
+        profile.get("business_name")
+        and customer.business_id is None
+        and not customer.pending_business_name
+    ):
+        # Spec 4.9: the first to name a business owns it; anyone after that awaits approval.
+        await business.join_or_request(session, scope, customer, profile["business_name"])
 
 
 async def customer_for(
