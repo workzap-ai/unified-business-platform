@@ -51,6 +51,11 @@ async def after_turn(
     mood: str,
 ) -> None:
     """Count pi's asks for the business; on the second unanswered ask, send the form."""
+    from app.modules.pi import flow as pi_flow
+
+    if pi_flow.brain_mode(policy.response_rules):
+        return  # "No forms. Just chat." (spec 0.2 P2, R-CONV): brain mode never sends the form
+
     from app.core.config import get_settings
     from app.modules.notifications.service import notify
     from app.modules.pi_saas import flows
