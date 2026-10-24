@@ -71,7 +71,8 @@ async def test_a_new_conversation_after_a_closed_one_still_knows_the_person(
     first = await pi.conversation()
     first.status = "closed"
     await business_db.commit()
-    await say(pi, "hello again", "mem-5")
+    # a real message, not a bare greeting (a greeting gets the fixed welcome-back and no model call)
+    await say(pi, "stock runs out in two shops again", "mem-5")
     conversations = list(await business_db.scalars(select(PiConversation)))
     assert len(conversations) == 2
     block = contexts_of(prompts)[-1].get("what_i_know") or {}
