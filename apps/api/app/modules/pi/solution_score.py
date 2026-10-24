@@ -56,6 +56,17 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         ),
     ),
     (
+        # "Did anything start?" answered with no (Part 3.3): not a score, a cue to ask once what got
+        # in the way. Worth 0, never a signal in the reward model.
+        "idea_not_tried",
+        re.compile(
+            r"\b(?:abhi tak nahi|abhi nahi kiya|nahi kiya|nahi ho saka|time nahi mila|waqt nahi mila|"
+            r"not yet|haven'?t (?:tried|started|done)|did ?n'?t (?:try|get to|start)|couldn'?t get to|"
+            r"nahi shuru|shuru nahi)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
         "idea_impatient",
         re.compile(
             r"\b(?:jaldi|bas karo|time waste|waste of time|enough|stop asking|sawal hi|kitne sawal|"
@@ -130,7 +141,7 @@ def classify(text: str, *, new_problems: bool = False) -> Reaction | None:
         return None
     for signal, pattern in _RULES:
         if pattern.search(said):
-            return Reaction(signal, SCORES[signal], FLAGS.get(signal, ""))
+            return Reaction(signal, SCORES.get(signal, 0), FLAGS.get(signal, ""))
     if style.confused(said):
         return Reaction("idea_confused", SCORES["idea_confused"], "")
     if new_problems:

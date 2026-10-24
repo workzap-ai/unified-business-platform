@@ -6,6 +6,7 @@ evidence for it. Rolling an industry back undoes its latest live version, and on
 the others are untouched. The seed (@1.0) is never rolled back.
 """
 
+import re
 from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
@@ -116,6 +117,62 @@ async def current_sample(
     return dict(seed["sample_reply"]) if seed else None
 
 
+SAMPLE_SOURCES = ("solution_sample", "solution_learned")  # example-bank sources of sample replies
+_OFFER = re.compile(r"solution document|quote|say no|mana bhi|banwa", re.IGNORECASE)
+_MARKER = re.compile(r"(?:(?<=\s)|^)[1-9][.)]?\s+(?=[A-Za-z\"'])")
+
+
+def sample_body(pi_text: str) -> str:
+    """What a sample reply teaches the example bank: the reply without the offer sentences (the
+    application appends the offer, the model never writes it) and with numbered ideas as bullets
+    (a list marker is not a figure the redaction check should mistrust)."""
+    sentences = re.split(r"(?<=[.?!])\s+", (pi_text or "").strip())
+    while sentences and _OFFER.search(sentences[-1]):
+        sentences.pop()
+    return _MARKER.sub("• ", " ".join(sentences))[:500]
+
+
+async def sample_examples(
+    session: AsyncSession, scope: WorkspaceScope, industry_key: str, pi_text: str | None = None
+) -> list[Any]:
+    """The example-bank rows a sample reply of this industry fed (all of them, or the one whose
+    reply is `pi_text`)."""
+    from app.modules.pi.learning_models import PiLearningExample
+
+    rows = list(
+        await session.scalars(
+            select(PiLearningExample).where(
+                PiLearningExample.tenant_id == scope.tenant_id,
+                PiLearningExample.environment_id == scope.environment_id,
+                PiLearningExample.source.in_(SAMPLE_SOURCES),
+            )
+        )
+    )
+    wanted = sample_body(pi_text) if pi_text else None
+    return [
+        r
+        for r in rows
+        if (r.situation or {}).get("industry") == industry_key
+        and (wanted is None or r.reply_text == wanted)
+    ]
+
+
+async def _undo_sample(
+    session: AsyncSession, scope: WorkspaceScope, industry_key: str, sample: dict[str, Any]
+) -> None:
+    """Rolling back a sample_reply version: the example it fed leaves the bank and the one it
+    replaced (a learned one; the seed's own never left) comes back as a candidate."""
+    for row in await sample_examples(
+        session, scope, industry_key, (sample.get("to") or {}).get("pi")
+    ):
+        row.status = "retired"
+    before = (sample.get("from") or {}).get("pi")
+    if before:
+        for row in await sample_examples(session, scope, industry_key, before):
+            if row.status == "retired":
+                row.status = "candidate"
+
+
 async def rollback(
     session: AsyncSession, scope: WorkspaceScope, industry_key: str
 ) -> PiSolutionVersion:
@@ -129,7 +186,29 @@ async def rollback(
         raise BusinessRuleViolation(
             "NOTHING_TO_ROLL_BACK", "This industry is already on its starting version", 409
         )
-    target = live[-1]
+    return await undo(
+        session,
+        scope,
+        industry_key,
+        live[-1],
+        live[-2].version if len(live) > 1 else BASE,
+        kind="solution_rollback",
+    )
+
+
+async def undo(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    industry_key: str,
+    target: PiSolutionVersion,
+    back_to: str,
+    *,
+    kind: str,
+    why: str = "",
+) -> PiSolutionVersion:
+    """Undo one learned version of an industry: its added and retired ideas, its drafted problem
+    entry and its sample reply (the sample reply in force falls back to the one before it, and the
+    example the version fed to the bank is retired). Also the way an automatic rollback goes."""
     diff = target.diff or {}
     for entry in diff.get("added") or []:
         arm = await session.get(PiIdeaArm, UUID(str(entry)))
@@ -144,20 +223,20 @@ async def rollback(
         arm = await session.get(PiIdeaArm, UUID(str(arm_id)))
         if arm is not None and arm.status != "retired":
             arm.status, arm.retired_reason = "retired", f"rolled back from @{target.version}"
+    sample = diff.get("sample_reply") or {}
+    if sample:
+        await _undo_sample(session, scope, industry_key, sample)
     target.status, target.rolled_back_at = "rolled_back", datetime.now(UTC)
     session.add(
         PiLearningChange(
             tenant_id=scope.tenant_id,
             environment_id=scope.environment_id,
-            kind="solution_rollback",
+            kind=kind,
             risk="low",
             before={"industry": industry_key, "version": target.version},
-            after={
-                "industry": industry_key,
-                "version": live[-2].version if len(live) > 1 else BASE,
-            },
+            after={"industry": industry_key, "version": back_to},
             status="live",
-            reason=f"rolled back solutions/{industry_key}@{target.version}",
+            reason=(why or f"rolled back solutions/{industry_key}@{target.version}")[:300],
         )
     )
     await session.flush()

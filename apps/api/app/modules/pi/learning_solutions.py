@@ -29,11 +29,18 @@ from app.modules.pi import (
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.language import detect_language
 from app.modules.pi.models import PiAgentRun, PiConversation, PiMessage
-from app.modules.pi.solution_models import PiIdeaArm, PiIdeaFeedback, PiIdeaSource
+from app.modules.pi.solution_models import (
+    PiIdeaArm,
+    PiIdeaFeedback,
+    PiIdeaSource,
+    PiSolutionVersion,
+)
 from app.shared.scope import WorkspaceScope
 
 OVERLAP_AT = 0.35  # of an idea's words that must be in the reply for it to count as given
-SETTLE_AFTER = timedelta(hours=6)  # S1 waits this long for the person's answer
+STAMP_WINDOW = timedelta(days=14)  # a stamp stays open this long for a reaction (Part 3.3)
+LATE_SIGNALS = frozenset({"idea_worked", "idea_no_help"})  # what a late return may still score
+LATE_MESSAGES = 20
 NEXT_MESSAGES = 3  # the reaction may come a message or two later
 MIN_FEEDBACK = 20  # before an idea can be retired
 ASK_ENGAGED_WORDS = 8
@@ -95,8 +102,12 @@ async def _reply_of(
     return reply, asked
 
 
-async def _next_texts(session: AsyncSession, reply: PiMessage) -> list[tuple[UUID, str]]:
-    rows = await session.scalars(
+async def _next_texts(
+    session: AsyncSession, reply: PiMessage, *, late: bool = False
+) -> list[tuple[UUID, str]]:
+    """What the person said after the reply: the first few messages, or with `late` the ones that
+    come after those within the stamp window (someone coming back to say it worked)."""
+    query = (
         select(PiMessage)
         .where(
             PiMessage.conversation_id == reply.conversation_id,
@@ -104,9 +115,13 @@ async def _next_texts(session: AsyncSession, reply: PiMessage) -> list[tuple[UUI
             PiMessage.created_at > reply.created_at,
         )
         .order_by(PiMessage.created_at)
-        .limit(NEXT_MESSAGES)
     )
-    return [(m.id, m.body or "") for m in rows if (m.body or "").strip()]
+    if late:
+        query = query.where(PiMessage.created_at <= reply.created_at + STAMP_WINDOW)
+        query = query.offset(NEXT_MESSAGES).limit(LATE_MESSAGES)
+    else:
+        query = query.limit(NEXT_MESSAGES)
+    return [(m.id, m.body or "") for m in await session.scalars(query) if (m.body or "").strip()]
 
 
 async def _arms(session: AsyncSession, ids: list[str]) -> list[PiIdeaArm]:
@@ -122,10 +137,13 @@ async def settle(
     now: datetime,
     *,
     final: bool,
+    current: str | None = None,
 ) -> str:
     """Settle one stamp that offered ideas: remember what was given, and score it by what the
-    person said next. `final` False is the instant look at the first message after the ideas;
-    True is the nightly catch-up. Returns what happened."""
+    person said next. `final` False is the instant look at the first message after the ideas
+    (`current` is that message when it may not be stored yet); True is the nightly catch-up. A
+    stamp stays open until a reaction or STAMP_WINDOW, so a late "it worked" still counts.
+    Returns what happened."""
     if stamp.get("ideas_scored") or conversation.customer_id is None:
         return "done"
     reply, asked = await _reply_of(session, stamp)
@@ -134,7 +152,10 @@ async def settle(
     arms = await _arms(session, stamp.get("ideas") or [])
     given = reply_gave(reply.body or "", arms)
     nexts = await _next_texts(session, reply)
+    if current and current.strip() and all(text != current for _, text in nexts):
+        nexts = [*nexts, (reply.id, current)][:NEXT_MESSAGES]
     reaction = None
+    reaction_message: UUID | None = None
     # At the readiness step pi asks about the solution document: a "yes" or "makes sense" there
     # answers the offer, not the ideas, and an offer never scores (Part 3.2).
     asked_offer = (
@@ -147,12 +168,17 @@ async def settle(
         if reaction is not None:
             reaction_message = message_id
             break
-    if reaction is None and not final and not nexts:
-        return "waiting"
+    if reaction is None and final and not asked_offer:
+        # someone back after days to say "it worked" or "it did not help" (Part 3.2)
+        for message_id, text in await _next_texts(session, reply, late=True):
+            late = solution_score.classify(text)
+            if late is not None and late.signal in LATE_SIGNALS:
+                reaction, reaction_message = late, message_id
+                break
     if reaction is None and not final:
         return "waiting"  # a plain next message: wait for the nightly look
-    if reaction is None and not nexts and now - reply.created_at < SETTLE_AFTER:
-        return "waiting"
+    if reaction is None and now - reply.created_at < STAMP_WINDOW:
+        return "waiting"  # nothing yet: the stamp stays open until a reaction or the window ends
     if given and not stamp.get("recorded"):
         await solution_ideas.record_given(
             session,
@@ -162,18 +188,19 @@ async def settle(
             arms=given,
             now=reply.created_at,
         )
-        if reaction is not None:
-            await solution_ideas.react(
-                session,
-                scope,
-                customer_id=conversation.customer_id,
-                arms=given,
-                reaction=reaction,
-                message_id=reply.id,
-            )
-            await _add_signal(session, reply, reaction)
-            stamp["reaction"] = reaction.signal
-            stamp["reaction_message_id"] = str(reaction_message)
+    if given and reaction is not None:
+        await solution_ideas.react(
+            session,
+            scope,
+            customer_id=conversation.customer_id,
+            arms=given,
+            reaction=reaction,
+            message_id=reaction_message,
+        )
+        await _add_signal(session, reply, reaction)
+        await _after_reaction(session, scope, given, reaction)
+        stamp["reaction_message_id"] = str(reaction_message)
+        stamp["reaction"] = reaction.signal
     if stamp.get("ask_arm"):
         await _settle_ask(session, scope, conversation, stamp, nexts, reply)
     stamp["ideas_scored"] = True
@@ -212,10 +239,48 @@ async def _settle_ask(
     )
 
 
+async def _after_reaction(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    arms: list[PiIdeaArm],
+    reaction: solution_score.Reaction,
+) -> None:
+    """What a reaction sets going besides its score: an idea that was tried and did not help has
+    its fit for that problem reviewed (Part 3.2)."""
+    if reaction.signal == "idea_no_help":
+        for arm in arms:
+            await solution_ideas.flag_fit(
+                session, scope, arm, why="tried by an owner and it did not help: is the fit right?"
+            )
+
+
+async def react_to_followup(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    *,
+    customer_id: UUID,
+    arm_ids: list[str],
+    said: str,
+) -> solution_score.Reaction | None:
+    """The instant reaction to "Welcome back, did anything start?" (Part 3.3): classify what the
+    person said and apply it to the ideas the follow-up asked about."""
+    reaction = solution_score.classify(said)
+    if reaction is None:
+        return None
+    arms = await _arms(session, arm_ids)
+    await solution_ideas.react(
+        session, scope, customer_id=customer_id, arms=arms, reaction=reaction, message_id=None
+    )
+    await _after_reaction(session, scope, arms, reaction)
+    return reaction
+
+
 async def _add_signal(
     session: AsyncSession, reply: PiMessage, reaction: solution_score.Reaction
 ) -> None:
     """The reaction adds to the reward of pi's reply (the reward model of Part 8.3)."""
+    if reaction.signal in solution_ideas.NO_FEEDBACK:
+        return
     row = await session.scalar(select(PiExperience).where(PiExperience.message_id == reply.id))
     if row is None or any(s.startswith("idea_") for s in row.signals or []):
         return
@@ -233,7 +298,7 @@ async def score_replies(
         select(PiConversation).where(
             PiConversation.tenant_id == scope.tenant_id,
             PiConversation.environment_id == scope.environment_id,
-            PiConversation.last_message_at >= now - timedelta(days=10),
+            PiConversation.last_message_at >= now - STAMP_WINDOW - timedelta(days=1),
         )
     )
     for conversation in rows:
@@ -291,11 +356,165 @@ async def update_leaderboards(session: AsyncSession, scope: WorkspaceScope) -> d
             arm.alpha += 1
         elif _is_failure(row.score):
             arm.beta += 1
-        if arm.status == "testing" and arm.uses >= 50:
-            arm.status, arm.traffic_cap = "active", 1.0
         touched.add(arm.id)
     await session.flush()
     return {"feedback": len(rows), "ideas": len(touched)}
+
+
+# --- the 10% canary of an idea ------------------------------------------------------------------
+
+PROMOTE_USES = 50
+PEER_MIN_FEEDBACK = 5  # a live idea needs this much feedback to be the one a newcomer must match
+
+
+def success_rate(arm: PiIdeaArm) -> float:
+    n = int((arm.stats or {}).get("n", 0))
+    return (arm.alpha - 1) / n if n else 0.0
+
+
+def mean_score(arm: PiIdeaArm) -> float:
+    s = arm.stats or {}
+    n = int(s.get("n", 0))
+    return int(s.get("score_sum", 0)) / n if n else 0.0
+
+
+async def canary_view(session: AsyncSession, scope: WorkspaceScope) -> list[dict[str, Any]]:
+    """Every idea still on its 10% start with how it is doing against the best live idea of its
+    problem, and what the next nightly run will do with it (Part 3.4: 10% canary)."""
+    testing = list(
+        await session.scalars(
+            select(PiIdeaArm).where(
+                *solution_ideas._where_arm(scope), PiIdeaArm.status == "testing"
+            )
+        )
+    )
+    live = list(
+        await session.scalars(
+            select(PiIdeaArm).where(*solution_ideas._where_arm(scope), PiIdeaArm.status == "active")
+        )
+    )
+    out = []
+    for arm in sorted(testing, key=lambda a: (a.industry_key, a.problem_id, a.arm_key)):
+        peers = [
+            p
+            for p in live
+            if (p.industry_key, p.problem_id, p.language, p.kind == solution_ideas.ASK)
+            == (arm.industry_key, arm.problem_id, arm.language, arm.kind == solution_ideas.ASK)
+            and int((p.stats or {}).get("n", 0)) >= PEER_MIN_FEEDBACK
+        ]
+        best = max((success_rate(p) for p in peers), default=0.0)
+        mine, score = success_rate(arm), mean_score(arm)
+        if arm.uses < PROMOTE_USES:
+            decision = "watching"
+        elif score >= 0 and mine >= best:
+            decision = "promote"
+        else:
+            decision = "hold"
+        out.append(
+            {
+                "id": arm.id,
+                "industry": arm.industry_key,
+                "problem": arm.problem_id,
+                "text": arm.text,
+                "source": arm.source,
+                "traffic": arm.traffic_cap,
+                "uses": arm.uses,
+                "feedback": int((arm.stats or {}).get("n", 0)),
+                "mean_score": round(score, 2),
+                "success_rate": round(mine, 2),
+                "best_live_rate": round(best, 2),
+                "decision": decision,
+            }
+        )
+    return out
+
+
+async def promote_ideas(session: AsyncSession, scope: WorkspaceScope) -> dict[str, int]:
+    """testing to active, only for an idea that has had PROMOTE_USES uses, a non-negative score
+    and a success rate at least that of the best live idea of its problem. The nightly gate must
+    be passing (the caller checks `learning_gate.allows`)."""
+    promoted = held = 0
+    by_id = {row["id"]: row for row in await canary_view(session, scope)}
+    for arm_id, row in by_id.items():
+        if row["decision"] == "watching":
+            continue
+        arm = await session.get(PiIdeaArm, arm_id)
+        if arm is None:
+            continue
+        if row["decision"] == "promote":
+            arm.status, arm.traffic_cap = "active", 1.0
+            promoted += 1
+        else:
+            held += 1
+    await session.flush()
+    return {"promoted": promoted, "held": held}
+
+
+async def evaluate_versions(
+    session: AsyncSession, scope: WorkspaceScope, now: datetime | None = None
+) -> dict[str, Any]:
+    """Automatic rollback (Part 3.4): a learned version whose new ideas have been used 50 times
+    and score worse than the seed ideas of the same problems goes back, as a person's rollback
+    would (rolling back is always allowed, even while the release gate fails)."""
+    rolled: list[str] = []
+    industries = sorted(
+        set(
+            await session.scalars(
+                select(PiSolutionVersion.industry_key).where(
+                    PiSolutionVersion.tenant_id == scope.tenant_id,
+                    PiSolutionVersion.environment_id == scope.environment_id,
+                    PiSolutionVersion.version != solution_versions.BASE,
+                    PiSolutionVersion.status == "live",
+                )
+            )
+        )
+    )
+    for industry in industries:
+        arms = list(
+            await session.scalars(
+                select(PiIdeaArm).where(
+                    *solution_ideas._where_arm(scope),
+                    PiIdeaArm.industry_key == industry,
+                    PiIdeaArm.kind != solution_ideas.ASK,
+                )
+            )
+        )
+        by_id = {str(a.id): a for a in arms}
+        for version in await solution_versions.versions(session, scope, industry):
+            if version.status != "live" or version.version == solution_versions.BASE:
+                continue
+            diff = version.diff or {}
+            ids = [str(i) for i in diff.get("added") or []] + [
+                str(i) for i in (diff.get("add_problem") or {}).get("arm_ids") or []
+            ]
+            mine = [by_id[i] for i in ids if i in by_id]
+            if not mine or sum(a.uses for a in mine) < PROMOTE_USES:
+                continue
+            n = sum(int((a.stats or {}).get("n", 0)) for a in mine)
+            if n == 0:
+                continue
+            ours = sum(int((a.stats or {}).get("score_sum", 0)) for a in mine) / n
+            problems = {a.problem_id for a in mine}
+            seeds = [a for a in arms if a.source == "seed" and a.problem_id in problems] or [
+                a for a in arms if a.source == "seed"
+            ]
+            base_n = sum(int((a.stats or {}).get("n", 0)) for a in seeds)
+            if base_n == 0:
+                continue
+            baseline = sum(int((a.stats or {}).get("score_sum", 0)) for a in seeds) / base_n
+            if ours < baseline:
+                await solution_versions.undo(
+                    session,
+                    scope,
+                    industry,
+                    version,
+                    solution_versions.BASE,
+                    kind="solution_auto_rollback",
+                    why=f"solutions/{industry}@{version.version} scored {ours:.2f} against the "
+                    f"seed's {baseline:.2f} after {sum(a.uses for a in mine)} uses",
+                )
+                rolled.append(f"{industry}@{version.version}")
+    return {"rolled_back": rolled}
 
 
 # --- S4: retire ideas that do not earn their place ----------------------------------------------
@@ -475,3 +694,36 @@ async def add_candidate(
     )
     await session.flush()
     return arm
+
+
+# --- weekly review items (Part 3.5) -------------------------------------------------------------
+
+OWNERS_FOR_REVIEW = 2
+
+
+async def flag_unhelpful(session: AsyncSession, scope: WorkspaceScope) -> dict[str, int]:
+    """An idea that two or more different owners said did not help goes to a reviewer: is the
+    idea wrong, or the fit? One open item per idea."""
+    owners: dict[UUID, set[UUID]] = {}
+    for arm_id, customer_id in await session.execute(
+        select(PiIdeaFeedback.idea_arm_id, PiIdeaFeedback.customer_id).where(
+            PiIdeaFeedback.tenant_id == scope.tenant_id,
+            PiIdeaFeedback.environment_id == scope.environment_id,
+            PiIdeaFeedback.signal == "idea_no_help",
+        )
+    ):
+        owners.setdefault(arm_id, set()).add(customer_id)
+    flagged = 0
+    for arm_id, people in owners.items():
+        if len(people) < OWNERS_FOR_REVIEW:
+            continue
+        arm = await session.get(PiIdeaArm, arm_id)
+        if arm is not None and await solution_ideas.flag_fit(
+            session,
+            scope,
+            arm,
+            why=f"{len(people)} owners said it did not help: is the idea wrong, or the fit?",
+            owners=len(people),
+        ):
+            flagged += 1
+    return {"flagged": flagged}

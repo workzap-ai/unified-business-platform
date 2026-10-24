@@ -35,6 +35,9 @@ class GateResult:
     mean: float = 0.0
     by_language: dict[str, float] = field(default_factory=dict)
     broken: list[str] = field(default_factory=list)  # conversation ids with a rule break
+    # the stored solution regression cases (Addendum 2, Job S7): how many were replayed, how many
+    # the linter still catches, and the ids of those it used to catch and no longer does
+    regressions: dict[str, Any] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -44,6 +47,7 @@ class GateResult:
             "mean": self.mean,
             "by_language": self.by_language,
             "broken": self.broken[:20],
+            "regressions": self.regressions,
         }
 
 
@@ -142,14 +146,78 @@ async def replay(
     by_language: dict[str, list[float]] = {}
     for language, g in graded:
         by_language.setdefault(language, []).append(g.mean)
+    regressions = await replay_regressions(session, scope)
+    reasons = list(verdict.reasons)
+    if regressions["slipped"]:
+        reasons.append(
+            f"{len(regressions['slipped'])} solution regression case(s) the linter used to catch "
+            "are no longer caught"
+        )
     return GateResult(
-        ok=verdict.ok,
-        reasons=verdict.reasons,
+        ok=verdict.ok and not regressions["slipped"],
+        reasons=reasons,
         conversations=len(graded),
         mean=round(sum(g.mean for _, g in graded) / len(graded), 2) if graded else 0.0,
         by_language={k: round(sum(v) / len(v), 2) for k, v in by_language.items()},
         broken=broken,
+        regressions=regressions,
     )
+
+
+REGRESSION = "solution_regression"
+
+
+async def replay_regressions(
+    session: AsyncSession, scope: WorkspaceScope | None = None, n: int = SAMPLE
+) -> dict[str, Any]:
+    """Replay the stored solution regression cases (Job S7, stored redacted in the change log)
+    through the linter. A case is "caught" when the linter flags pi's stored reply as a hard
+    violation. Each case remembers its last replay, so one that was caught and no longer is shows
+    up as slipped, and fails the gate. Cases with no stored reply are skipped."""
+    query = (
+        select(PiLearningChange)
+        .where(PiLearningChange.kind == REGRESSION, PiLearningChange.status == "live")
+        .order_by(PiLearningChange.created_at.desc())
+        .limit(n)
+    )
+    if scope is not None:
+        query = query.where(
+            PiLearningChange.tenant_id == scope.tenant_id,
+            PiLearningChange.environment_id == scope.environment_id,
+        )
+    out: dict[str, Any] = {"cases": 0, "caught": 0, "uncaught": 0, "slipped": []}
+    for case in await session.scalars(query):
+        reply = str((case.before or {}).get("pi") or "").strip()
+        if not reply:
+            continue
+        person = str((case.before or {}).get("person") or "")
+        context = {
+            "pi_mode": "brain",
+            "strict_voice": True,
+            "flow": {"state": "S4_SORTED_SUMMARY"},
+            # the opening line is the application's and came earlier in the chat
+            "history": [
+                {"role": "ai", "text": "I'm pi, an AI from Workzap."},
+                *([{"role": "customer", "text": person}] if person else []),
+            ],
+            "latest_customer_message": person,
+        }
+        hard = constitution.hard(constitution.lint(reply, context))
+        was = ((case.after or {}).get("replay") or {}).get("caught")
+        out["cases"] += 1
+        out["caught" if hard else "uncaught"] += 1
+        if was is True and not hard:
+            out["slipped"].append(str(case.id))
+        case.after = {
+            **(case.after or {}),
+            "replay": {
+                "at": datetime.now(UTC).isoformat(),
+                "caught": bool(hard),
+                "rules": sorted({v.rule for v in hard})[:5],
+            },
+        }
+    await session.flush()
+    return out
 
 
 async def record(

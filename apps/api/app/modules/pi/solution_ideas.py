@@ -17,12 +17,22 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import learning, solution_rules, solution_score, solution_versions, solutions
+from app.modules.pi import (
+    learning,
+    solution_rules,
+    solution_score,
+    solution_versions,
+    solutions,
+    value_line,
+)
 from app.modules.pi.language import detect_language
+from app.modules.pi.learning_models import PiLearningChange
 from app.modules.pi.solution_models import PiIdeaArm, PiIdeaFeedback, PiIdeaSource, PiSolutionMemory
 from app.shared.scope import WorkspaceScope
 
 ASK = "ask_first"  # the kind of an arm that is a question, not an idea
+NO_FEEDBACK = frozenset({"idea_not_tried"})  # a cue for pi, not a score for the idea
+FIT_REVIEW = "idea_fit_review"  # the change-log kind of a weekly review item for an idea's fit
 LIVE = ("active", "testing")
 MATCH_AT = 3.0
 STOP = frozenset(
@@ -178,11 +188,25 @@ async def choose(
     customer_id: UUID,
     count: int = 2,
     rng: random.Random | None = None,
+    conversation_id: UUID | None = None,
 ) -> Choice:
     """The ideas to give this business for this problem: never one it has been given, tried or
     rejected; of a different kind from any it rejected; best-scoring more often, new ones tried
-    some of the time. `count` is two (the value line); a caller cannot raise it."""
-    count = min(count, 2)
+    some of the time. `count` is two (the value line); a caller cannot raise it. With a
+    `conversation_id` the ideas already handed over in that chat for this problem count against
+    IDEAS_PER_PROBLEM (R-VAL-01: two per problem, never a third)."""
+    count = min(count, value_line.IDEAS_PER_MESSAGE)
+    if conversation_id is not None:
+        given_here = len(
+            [
+                m
+                for m in await remembered(session, scope, customer_id, problem_id)
+                if m.conversation_id == conversation_id
+            ]
+        )
+        count = min(count, value_line.IDEAS_PER_PROBLEM - given_here)
+        if count <= 0:
+            return Choice([], exhausted=True)
     rows = list(
         await session.scalars(
             select(PiIdeaArm).where(
@@ -294,6 +318,8 @@ async def react(
     memory = {m.idea_arm_id: m for m in await remembered(session, scope, customer_id)}
     done = 0
     for arm in arms:
+        if reaction.signal in NO_FEEDBACK:
+            continue
         session.add(
             PiIdeaFeedback(
                 tenant_id=scope.tenant_id,
@@ -367,7 +393,10 @@ async def continuity(
     if not texts:
         return None
     worked = any(m.reported_result == "worked" for m in latest)
+    tried = any(m.said_will_try or m.reaction == "tried" for m in latest)
     return {
+        "tried": tried,
+        "no_help": any(m.reported_result == "no_change" for m in latest),
         "ideas": texts,
         "arm_ids": [str(m.idea_arm_id) for m in latest],
         "problem_id": latest[0].problem_id,
@@ -375,3 +404,59 @@ async def continuity(
         "worked": worked,
         "unanswered": all(m.reaction == "none" for m in latest),
     }
+
+
+async def note_builds(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    *,
+    customer_id: UUID,
+    problem_id: str,
+    keys: list[str],
+) -> int:
+    """Remember which catalogue builds pi named for this problem (`builds_mentioned`). Memory only:
+    it never reaches a score (Part 3.6)."""
+    rows = await remembered(session, scope, customer_id, problem_id)
+    for row in rows:
+        row.builds_mentioned = sorted({*(row.builds_mentioned or []), *keys})
+    await session.flush()
+    return len(rows)
+
+
+async def flag_fit(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    arm: PiIdeaArm,
+    *,
+    why: str,
+    owners: int = 1,
+) -> bool:
+    """A review item: is this idea wrong for the problem, or is the fit wrong (Part 3.2 and 3.5)?
+    One open item per idea. False when one is already waiting."""
+    waiting = await session.scalar(
+        select(PiLearningChange.id).where(
+            PiLearningChange.tenant_id == scope.tenant_id,
+            PiLearningChange.environment_id == scope.environment_id,
+            PiLearningChange.kind == FIT_REVIEW,
+            PiLearningChange.target_id == arm.id,
+            PiLearningChange.status == "review",
+        )
+    )
+    if waiting is not None:
+        return False
+    session.add(
+        PiLearningChange(
+            tenant_id=scope.tenant_id,
+            environment_id=scope.environment_id,
+            kind=FIT_REVIEW,
+            speed="weekly",
+            risk="low",
+            target_id=arm.id,
+            before={"industry": arm.industry_key, "problem": arm.problem_id},
+            after={"owners": owners},
+            status="review",
+            reason=why[:300],
+        )
+    )
+    await session.flush()
+    return True
