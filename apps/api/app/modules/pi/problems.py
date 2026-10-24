@@ -171,6 +171,19 @@ def same_symptom(a: str, b: str, threshold: float = 0.8) -> bool:
     return len(smaller) >= 3 and smaller <= larger
 
 
+def json_safe(value: Any) -> Any:
+    """`value` as something a JSONB column can store (UUIDs, dates and decimals become text)."""
+    if isinstance(value, UUID | Decimal):
+        return str(value)
+    if isinstance(value, datetime) or hasattr(value, "isoformat"):
+        return value.isoformat()
+    if isinstance(value, dict):
+        return {k: json_safe(v) for k, v in value.items()}
+    if isinstance(value, list | tuple | set):
+        return [json_safe(v) for v in value]
+    return value
+
+
 def short_ref(problem_id: UUID) -> str:
     return str(problem_id)[:8]
 
@@ -460,7 +473,8 @@ class ProblemBook:
 
         def put(name: str, value: Any) -> None:
             if getattr(problem, name) != value:
-                diff[name] = [getattr(problem, name), value]
+                # the revision diff is stored as JSON: a category change carries a group UUID
+                diff[name] = [json_safe(getattr(problem, name)), json_safe(value)]
                 setattr(problem, name, value)
 
         if note.title.strip():
