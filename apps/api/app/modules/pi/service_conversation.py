@@ -3697,8 +3697,7 @@ def polished(reply: str) -> str:
     reply = reply.replace("**", "*")
     # A status line's project name is plain ("• Website: ..."), never bold.
     reply = re.sub(r"^• \*([^*\n]+)\*:", r"• \1:", reply, flags=re.MULTILINE)
-    # The owner's own words are quoted plainly: bold is for the summary's group names, never a sentence.
-    # never a whole sentence (a real sweep had pi bolding the owner's sentence back at them).
+    # The owner's own words are quoted plainly: bold is for the summary's group names only.
     reply = BOLD_SENTENCE.sub(r"\1", reply)
     links = URL_PART.findall(reply)
     text = URL_PART.sub("\x00", reply)

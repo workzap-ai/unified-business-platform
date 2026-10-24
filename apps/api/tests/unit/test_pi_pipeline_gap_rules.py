@@ -440,8 +440,6 @@ def test_a_whole_sentence_is_never_bold_but_the_summary_group_names_are() -> Non
     from app.modules.pi.service_conversation import polished
 
     quoted = "Noted: *cars come back with scratches the customer says were there*. What next?"
-        "Noted: *cars come back with scratches the customer says were already there*. What next?"
-    )
     assert "*" not in polished(quoted)
     assert "*har hafte stock ka mismatch hota hai*" not in polished(
         "Samajh gaya: *har hafte stock ka mismatch hota hai*. Phir?"
