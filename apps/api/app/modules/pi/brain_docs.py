@@ -665,6 +665,12 @@ async def approve(
             ref_id=doc.id,
         )
         doc.content = {**doc.content, "en_file_id": str(copy.id)}
+    if doc.kind == "solution":
+        from app.modules.pi import learning_solutions_grow
+
+        await learning_solutions_grow.note_build_fit(
+            session, scope, doc.customer_id, "document_approved"
+        )
     return doc
 
 

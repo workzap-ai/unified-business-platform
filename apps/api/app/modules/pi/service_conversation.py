@@ -990,13 +990,40 @@ application adds after it, so you ask none.
   apologise for not giving more, never make them feel stingy. No question: the application adds
   the offer.
 - solution_never_say (when present) are things never to say in this industry.
+- solution_asked_no_ideas is true: they asked for a fix but no idea fits yet. Say yes plainly, then
+  say in one or two lines what you have noted (solution_noted), and that Workzap can prepare a
+  solution document for it. Give no idea, no price and no how-to, and do not ask another digging
+  question. The application adds the offer.
+- solution_next is "worked": they said an idea worked. Be glad in one line, give the solution_ideas
+  as the next steps (never the earlier ones), then the Workzap line from solution_build.
+  solution_next is "swap" or "more": acknowledge in one line without defending the old idea, then
+  give the solution_ideas, a different kind of idea.
+- solution_not_tried is true: they did not try the ideas. Do not nag and give no idea; ask once,
+  plainly, what got in the way (time, staff, unclear). That is the one question.
+- solution_followup.worked or solution_followup.no_help is true and solution_ideas is present: say
+  the follow-up in one line, then give the ideas as above. This overrides "no new idea in that
+  message" for a follow-up.
 """
+
+
+SOLUTION_KEYS = (
+    "solution_howto",
+    "solution_asked_no_ideas",
+    "solution_next",
+    "solution_not_tried",
+    "solution_followup",
+)
+
+
+def solution_turn(context: dict[str, Any]) -> bool:
+    """This turn is about the free ideas: asked for, none fits, or a follow-up on earlier ones."""
+    return bool(context.get("solution_asked")) or any(k in context for k in SOLUTION_KEYS)
 
 
 def system_for(context: dict[str, Any]) -> str:
     """The prompt: the shared rules, plus the brain rules in brain mode."""
     if context.get("pi_mode") == "brain":
-        asked = context.get("solution_asked") or "solution_howto" in context
+        asked = solution_turn(context)
         return (
             SYSTEM + BRAIN_PROBLEMS + BRAIN_DECISIONS + BRAIN_VOICE + (BRAIN_ASK if asked else "")
         )
@@ -1717,7 +1744,7 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     why = problems.summary_due(said, len(items), since, trigger, quiet, quiet_limit)
     if not why:
         return
-    if context.get("solution_asked") or "solution_howto" in context:
+    if solution_turn(context):
         return  # solution mode: they asked for a fix, so they get the ideas (Part 1.6)
     language = str(context.get("reply_language") or "en")
     turn.reply = problems.summary_message(items, language)
@@ -1735,7 +1762,13 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     explicit-yes gate. The model never writes the offer."""
     if turn._summary or turn._decision is not None:
         return
-    if not (context.get("solution_asked") or "solution_howto" in context):
+    # The offer follows a request for a fix, a "how exactly?" and a request no idea could meet; a
+    # follow-up on earlier ideas or "I did not try them" gets no offer.
+    if not (
+        context.get("solution_asked")
+        or "solution_howto" in context
+        or context.get("solution_asked_no_ideas")
+    ):
         return
     state = (context.get("flow") or {}).get("state")
     created = [op for op in turn.problem_ops if op.op == "create"]
@@ -1867,6 +1900,12 @@ async def apply_decision(
             )  # fmt: skip
     if "record_approval" in decision.effects:
         brief["approval"] = {**(brief.get("approval") or {}), "at": now}
+        if conversation.customer_id is not None:
+            from app.modules.pi import learning_solutions_grow
+
+            await learning_solutions_grow.note_build_fit(
+                session, scope, conversation.customer_id, "quote_accepted"
+            )
         await brain_payments.open_for(
             session, scope, conversation, str((brief["approval"] or {}).get("quote"))
         )

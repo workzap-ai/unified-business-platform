@@ -1062,3 +1062,22 @@ async def run_all(
         **{"catalogue_" + k: v for k, v in (await propose_catalogue(session, scope, now)).items()},
     }
     return digest
+
+
+async def note_build_fit(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    customer_id: UUID,
+    event: str,
+    project_id: UUID | None = None,
+) -> None:
+    """`record_build_fit` for the places where the event happens (document approved, quote
+    accepted): it can never fail the turn or the approval, and a workspace whose solution tables
+    are not migrated yet is simply skipped."""
+    try:
+        async with session.begin_nested():
+            await record_build_fit(
+                session, scope, customer_id=customer_id, event=event, project_id=project_id
+            )
+    except Exception:  # noqa: BLE001 - learning is an extra, never a reason to fail the event
+        logger.warning("pi_build_fit_skipped", exc_info=True)
