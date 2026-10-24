@@ -576,9 +576,31 @@ def test_how_exactly_gets_the_document_answer_when_the_model_says_noted() -> Non
     brain_howto(generic, context)
     assert "solution document: it covers how accounts are coded" in generic.reply
     assert generic._english and "?" not in generic.reply
-    fine = turn("The detail is in the solution document. It covers the reminders.")
-    brain_howto(fine, context)
-    assert fine.reply.startswith("The detail is in the solution document. It covers")
+    invented = turn(
+        "Workzap aisa intezam kar sakta hai ke traceability fields aur reconciliation steps ho."
+    )
+    brain_howto(invented, context)  # steps and invented capabilities never reach the person
+    assert "reconciliation" not in invented.reply and "solution document" in invented.reply
     app = turn("Noted.")
     brain_howto(app, {**context, "solution_howto": {"covers": "", "which_app": True}})
     assert app.reply.startswith("I don't recommend specific apps.")
+
+
+def test_an_explicit_document_yes_with_an_offer_open_is_the_offers_yes_from_any_step() -> None:
+    from app.modules.pi import decisions
+    from app.modules.pi.flow import State
+
+    facts = {
+        "problem_count": 3,
+        "group_count": 1,
+        "problem_refs": ["a", "b", "c"],
+        "brief": {"offer_asked": True},
+        "changed": False,
+        "message_id": "m9",
+    }
+    said = "Yes please, prepare the document and the quote."
+    for step in (State.S3_NOTED, State.S4_SORTED_SUMMARY):
+        decided = decisions.decide(step, said, "en", facts)
+        assert decided is not None and decided.next_state == State.S6_PREPARING, step
+    no_offer = decisions.decide(State.S3_NOTED, said, "en", {**facts, "brief": {}})
+    assert no_offer is None or no_offer.next_state != State.S6_PREPARING

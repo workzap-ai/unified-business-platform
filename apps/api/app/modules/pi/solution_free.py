@@ -34,8 +34,11 @@ Give exactly two ideas, written in plain English (they are translated for the ow
 - gives no medical, veterinary, legal, tax or financial advice, and nothing about doses, feed
   formulas, treatment, filings or investments;
 - never contains anything from the never_say list.
-The first idea measures (count, compare or note something once, so the owner sees the real size of
-the problem); the second changes the routine (one person, one place, one fixed time).
+Build each idea from the owner's own words and nouns (their products, animals, orders, files,
+people, places): an idea that would fit any business is not an idea. Do not use the stock patterns
+"count X from one busy day" or "assign one person at a fixed time"; say what is different for THIS
+problem. One idea looks at something to see the real size of the problem, the other changes how a
+specific thing is done or kept.
 Answer with a JSON object only: {"ideas": ["first idea", "second idea"]}"""
 
 JSON_OBJECT = re.compile(r"\{.*\}", re.DOTALL)

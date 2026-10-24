@@ -874,6 +874,10 @@ problem: ask what it would fix and note that; keep the wish in requested_solutio
   (what they think the cause is: never a judgement about a named person), confidence 0 to 1.
 - One message with several problems with different symptoms: one create each. One symptom with
   several facets (stock out in shop B and D) is one problem.
+- Their answer to your own follow-up question (how often, where, how much, since when) or any
+  later detail about a problem already in noted_problems is an "update" of THAT problem, never a
+  new one: one thing going wrong is one record, however many messages describe it. A new
+  "create" is only for a different thing going wrong.
 - Their later detail or a correction: op "update" with the ref from noted_problems and only the
   fields that changed (reason "correction" or "enrichment"). Same symptom told twice: op
   "merge" (ref kept, refs folded in). Different symptoms that may share a root: op "link".
@@ -2020,11 +2024,12 @@ MENTIONS_DOCUMENT = re.compile(r"document|وثيقة|مستند|دستاویز",
 
 def brain_howto(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """They asked "how exactly?", "step by step" or "which app?" (Addendum 1.4): the detail is the
-    solution document, named by what it covers, with no steps and no tool. The model sometimes
-    answers "noted, anything else?" instead (seen on a real-model sweep): the application then
-    writes the answer itself; the offer follows from brain_offer."""
+    solution document, named by what it covers, with no steps and no tool. The model's own words
+    here kept going wrong on a real-model sweep over every industry ("noted, anything else?",
+    steps and fields named, a capability invented), so the application always writes this answer;
+    the offer follows from brain_offer and the language step translates it."""
     howto = context.get("solution_howto")
-    if not howto or MENTIONS_DOCUMENT.search(turn.reply):
+    if not howto:
         return
     if turn._summary or turn._decision is not None or turn.request_human or turn._free:
         return

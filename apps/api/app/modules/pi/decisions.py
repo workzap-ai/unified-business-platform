@@ -381,6 +381,17 @@ def decide(
     ):
         return _member(language, facts, brief)  # "send the quote" from a non-decider (R-OFFER-06)
 
+    if (
+        state in (State.S1_LISTENING, State.S2_CLARIFYING, State.S3_NOTED, State.S4_SORTED_SUMMARY)
+        and brief.get("offer_asked")
+        and facts.get("problem_count")
+        and _ok(answer, Answer.YES)
+        and _YES_REQUEST.search(message)
+    ):
+        # The offer is open, a later problem moved the chat back to listening, and now they ask
+        # for the document and quote: that is the offer's yes, whatever step the chat fell back to.
+        state = State.S5_READINESS
+
     if state == State.S4_SORTED_SUMMARY:
         if facts.get("changed") or not facts.get("problem_count"):
             return None
