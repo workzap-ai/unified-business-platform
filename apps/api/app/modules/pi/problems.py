@@ -702,6 +702,7 @@ async def noted_context(
                 "ref": short_ref(problem.id),
                 "title": problem.title,
                 "title_local": problem.title_local or "",
+                "user_words": [str(w)[:200] for w in (problem.user_words or [])[:2]],
                 "where": list((problem.scope or {}).get("where") or [])[:4],
                 "group": problem.category,
                 "subtype": problem.subtype or "",

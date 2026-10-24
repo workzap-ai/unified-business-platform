@@ -343,7 +343,13 @@ async def _build(
             entries,
             str(item.get("group") or ""),
             str(item.get("subtype") or ""),
-            f"{item.get('title') or ''} {item.get('title_local') or ''}",
+            " ".join(
+                [
+                    str(item.get("title") or ""),
+                    str(item.get("title_local") or ""),
+                    *[str(w) for w in item.get("user_words") or []],
+                ]
+            ),
         )
         if problem is not None:
             break

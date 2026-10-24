@@ -1597,8 +1597,8 @@ def with_disclosure(
         context
     ):
         return reply
-    if SAYS_AI.search(reply):
-        return reply
+    if SAYS_AI.search(reply) or constitution._discloses(reply):
+        return reply  # it already says so, in its own words: not twice
     if after:
         return f"{reply}\n{DISCLOSURE_TAIL.get(language, DISCLOSURE_TAIL['en'])}"
     return f"{DISCLOSURE_LINE.get(language, DISCLOSURE_LINE['en'])} {reply}"

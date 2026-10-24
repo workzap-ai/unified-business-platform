@@ -304,3 +304,12 @@ def test_the_no_idea_line_is_not_repeated_word_for_word() -> None:
     context["history"] = [{"role": "ai", "text": first.reply}]
     brain_no_ideas(second, context)
     assert second.reply != first.reply and "solution document" in second.reply
+
+
+def test_a_reply_that_already_says_it_is_an_ai_is_not_given_the_line_twice() -> None:
+    from app.modules.pi.service_conversation import with_disclosure
+
+    own = "Hi, main pi hoon, Workzap se AI. Aap ka masla kya hai?"
+    assert with_disclosure(own, {"history": []}, "roman_ur") == own
+    other = "Aap ka masla kya hai?"
+    assert with_disclosure(other, {"history": []}, "roman_ur") != other
