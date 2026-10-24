@@ -334,3 +334,25 @@ def test_a_quote_past_its_date_is_not_approved_as_it_stands():
     fresh = {**quote, "valid_until": (date.today() + timedelta(days=5)).isoformat()}
     ok = d.decide(S.S8_REVIEW, "Approve", "en", facts(open_quote=fresh))
     assert ok is not None and "Just to confirm" in ok.reply
+
+
+def test_the_owners_own_loss_is_not_a_price_question() -> None:
+    """Real chat 2026-10-24: 'I am not sure how much we lose' got 'the cost depends on what would
+    be built'."""
+    from app.modules.pi import decisions
+
+    for said in (
+        "Yes, it happens every week and I am not sure how much we lose because of it.",
+        "Haan, har hafte hota hai aur nuksan ka andaza nahi hota, kitna nuksan hota hai pata nahi.",
+        "we can't tell how much we spend on riders each month",
+    ):
+        assert not decisions.cost_asked(said), said
+    for said in (
+        "how much will it cost?",
+        "how much would this be",
+        "Is ka kharcha kitna hoga?",
+        "kitna lagega?",
+        "what is the price",
+        "how much do you charge, and how much do we lose now?",
+    ):
+        assert decisions.cost_asked(said), said

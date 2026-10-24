@@ -674,8 +674,21 @@ COST_ANSWER = {
 }
 
 
+# The owner's own loss or spend is not a question about Workzap's price: "I am not sure how much we
+# lose", "kitna nuksan hota hai". Found in real chats (a cost answer given to a statement).
+OWN_MONEY = re.compile(
+    r"\bhow much\b(?:\s+\w+){0,3}?\s+(?:lose|lost|losing|spend|spent|spending|earn|earning|waste|wasting|"
+    r"make|making|miss|missing|leak|leaking|pay|paying|sell|selling|save|saving)\b"
+    r"|\b(?:kitna|kitni|kitne)\b(?:\s+\w+){0,3}?\s+(?:nuksan|nuqsan|loss|zaya|waste|kamate|kamata|"
+    r"kamati|bachte|bachta|kharch\s+kar|kharcha\s+kar|bik)\w*",
+    re.IGNORECASE,
+)
+
+
 def cost_asked(text: str) -> bool:
-    return bool(COST_ASKED.search(text or ""))
+    """A question about what Workzap would charge. Sentences about the owner's own loss or spend
+    ("how much we lose", "kitna nuksan") do not count."""
+    return bool(COST_ASKED.search(OWN_MONEY.sub(" ", text or "")))
 
 
 def cost_answer(language: str | None) -> str:
