@@ -18,10 +18,7 @@ from app.modules.pi.solutions import (
 
 MONEY = re.compile(r"\d\s*(?:%|percent)|\b(?:rs\.?|pkr|aed|usd)\s*\d|[$₨]\s*\d", re.IGNORECASE)
 INDUSTRIES = solutions.industries()
-# The PDF's font for this one page could not be read correctly (Arabic letters reordered within
-# words, confirmed with two extractors); nothing is invented to replace it, so the sample is
-# blank and the builder reports it as an error until a person transcribes it from the PDF itself.
-NO_SAMPLE = {"camel_farms"}
+NO_SAMPLE: set[str] = set()  # camel_farms was transcribed by hand from the PDF page image
 
 
 def test_every_industry_has_solutions_linked_to_its_pack():
@@ -113,3 +110,12 @@ def test_most_sectors_have_an_addendum_scope_merged_into_sector_rules():
         assert data[key].get("rules") == "", key  # unchanged: build_industry_packs.py's own field
         assert len(data[key]["addendum_scope"]) > 30, key
     assert "food- safety" not in data["B.1"]["addendum_scope"]  # a line-wrap hyphen, not two words
+
+
+def test_the_camel_farms_arabic_sample_was_transcribed_from_the_page():
+    """No extractor reads this page's Arabic font; the text was read from the rendered page."""
+    sample = load("camel_farms")["sample_reply"]
+    assert sample["language"] == "arabic"
+    assert sample["person"].startswith("عندي عزبة في العين") and sample["person"].endswith("؟")
+    assert "١)" in sample["pi"] and "٢)" in sample["pi"] and "Workzap" in sample["pi"]
+    assert sample["pi"].rstrip().endswith("؟")  # one question, last

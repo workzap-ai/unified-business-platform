@@ -199,6 +199,16 @@ def smart_join(parts: list[str]) -> str:
 
 ARABIC_LETTER = re.compile(r"[؀-ۿ]")
 
+# Pages whose Arabic font no extractor reads correctly (letters reordered inside words) are
+# transcribed by hand from the rendered PDF page (Part 4, Camel farms, p119, read as an image on
+# 2026-10-25) and used instead of the garbled text. Keyed by the start of the industry title.
+MANUAL_SAMPLES = {
+    "camel farms": (
+        "عندي عزبة في العين فيها ستين ناقة حلوب، الحليب يقل والمصنع يرجع جزء منه. شو الحل؟",
+        "أكيد في حل، وتقدر تبدأ فيه من هالأسبوع. ١) خل الراعي يسجل حليب كل ناقة لحالها لمدة أسبوع، عشان يبين أي ناقة يقل حليبها. ٢) اطلب من المصنع رفض مكتوب بالكمية والسبب، وإذا تكرر نفس السبب ارجع لطبيبك البيطري. Workzap يقدر يسوي هذا كله لك بشكل تلقائي كل يوم: سجل على التلفون لحليب كل ناقة والكميات المرفوضة، ويوصلك ملخص كل صبح. تبي أجهز لك وثيقة حل وعرض سعر، وعادي لو ما تبي؟",  # noqa: E501 (a hand transcription, kept on one line)
+    ),
+}
+
 
 def garbled_script(text: str) -> bool:
     """An Arabic page whose font the extractor could not read: real Arabic prose runs several
@@ -287,10 +297,14 @@ def parse_entry(entry: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
     if not reply_text or not person_text:
         errors.append(f"{title}: sample reply missing")
     elif garbled_script(reply_text) or garbled_script(person_text):
-        # The PDF's font for this page could not be read correctly (letters reordered within
-        # words); nothing here is invented to replace it, so the sample is left out and reported.
-        errors.append(f"{title}: the sample reply's script could not be extracted correctly")
-        reply_text = person_text = ""
+        manual = next((v for k, v in MANUAL_SAMPLES.items() if title.lower().startswith(k)), None)
+        if manual is not None:
+            person_text, reply_text = manual  # a person's transcription from the page image
+        else:
+            # The PDF's font for this page could not be read correctly (letters reordered within
+            # words); nothing is invented to replace it, so the sample is left out and reported.
+            errors.append(f"{title}: the sample reply's script could not be extracted correctly")
+            reply_text = person_text = ""
     sample = {
         "person": person_text,
         "pi": reply_text,
