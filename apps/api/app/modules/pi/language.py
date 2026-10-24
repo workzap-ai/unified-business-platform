@@ -55,6 +55,36 @@ ARABIC_SCRIPT = re.compile(r"[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]")
 DEVANAGARI = re.compile(r"[ऀ-ॿ]")
 LATIN_WORD = re.compile(r"[a-z]+(?:'[a-z]+)?")
 
+# Scripts pi has no fixed notices for: the reply is written by the model in the same language
+# (Chinese, Japanese, Korean, Russian...), never in the language the chat used before.
+OTHER_SCRIPTS: tuple[tuple[str, "re.Pattern[str]"], ...] = (
+    ("Japanese", re.compile(r"[぀-ヿ]")),
+    ("Korean", re.compile(r"[가-힯]")),
+    ("Chinese (Simplified)", re.compile(r"[㐀-鿿]")),
+    ("Russian", re.compile(r"[Ѐ-ӿ]")),
+    ("Thai", re.compile(r"[฀-๿]")),
+    ("Hebrew", re.compile(r"[֐-׿]")),
+    ("Greek", re.compile(r"[Ͱ-Ͽ]")),
+)
+
+
+def other_script(text: str | None) -> str | None:
+    """The language name when the text is mostly in a script pi keeps no fixed notices for."""
+    text = text or ""
+    latin = len(re.findall(r"[A-Za-z]", text))
+    for name, pattern in OTHER_SCRIPTS:
+        if len(pattern.findall(text)) >= max(2, latin // 3):
+            return name
+    return None
+
+
+def in_script(text: str | None, name: str) -> bool:
+    """The text is written mostly in that other language's script (a reply is checked with this)."""
+    pattern = dict(OTHER_SCRIPTS).get(name)
+    letters = len(re.findall(r"[^\W\d_]", text or ""))
+    return bool(pattern) and len(pattern.findall(text or "")) * 2 >= letters
+
+
 NAMES = {
     "en": "English",
     "roman_ur": "Roman Urdu (Urdu/Hindi written in English letters)",

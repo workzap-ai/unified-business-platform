@@ -61,6 +61,8 @@ from app.modules.pi.language import (
     detect_language,
     english_greeting,
     festival_wish,
+    in_script,
+    other_script,
     returning_greeting,
     salam,
 )
@@ -418,7 +420,8 @@ class ServiceTurn(BaseModel):
 
 SYSTEM = """You are pi (always lowercase), a company's AI assistant on WhatsApp. You help
 the company's customers with what THEY bring up and keep track of it for the team.
-Language (strict): when the context has reply_language, write the WHOLE reply in
+Language (strict): when the context has reply_language_other, write the WHOLE reply in that
+language. Else when the context has reply_language, write the WHOLE reply in
 reply_language_name and set language to reply_language. The system detected it from the
 customer's own latest words; it overrides earlier messages, the conversation summary, the
 business's language and knowledge passages. Without it, reply in the customer's CURRENT
@@ -1010,8 +1013,10 @@ They asked for a fix, or for the detail (Addendum 2, the value line; this overri
 about asking directly for a fix for THIS reply). The one question of this reply is the offer the
 application adds after it, so you ask none.
 - solution_asked is true: they asked for a solution. Say yes plainly first ("Theek hai, seedha
-  solution." / "Sure."), then give the solution_ideas as a short numbered list: at most two, one
-  line each (what plus why, about 25 words), in your own words and their language. No steps, no
+  solution." / "Sure."), then give the solution_ideas as two plain sentences, one per line, the
+  first starting "First," and the second "Second," (in their language: "Pehle," / "Doosra,"), never
+  dots, dashes or numbers: at most two, one line each
+  (what plus why, about 25 words), in your own words and their language. No steps, no
   settings, no wording to copy, no app or tool to use, no numbers, never a third idea even if they
   ask for more. Never say you were handed them.
 - solution_build is the Workzap line, said as what the owner would notice (who gets what, when).
@@ -1884,7 +1889,7 @@ def brain_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         turn.reply
     ):
         return
-    lines = "\n".join(f"• {idea.rstrip('. ')}." for idea in ideas)
+    lines = solution_rules.idea_lines(ideas)
     language = str(context.get("reply_language") or "en")
     turn.reply = with_disclosure(f"Sure.\n{lines}", context, language)
     turn._english = True
@@ -1961,12 +1966,10 @@ async def brain_free_ideas(
         if h.get("role") == "customer"
     ]
     already = [
-        ln.lstrip("• ").strip()
+        str(h.get("text") or "")[:400]
         for h in context.get("history") or []
         if h.get("role") == "ai"
-        for ln in str(h.get("text") or "").splitlines()
-        if ln.lstrip().startswith("•")
-    ][-8:]
+    ][-3:]
     said = str(context.get("latest_customer_message") or "")
     ideas = await latency.timed(
         "model.free_ideas",
@@ -1980,14 +1983,18 @@ async def brain_free_ideas(
             industry=industry,
             never_say=never_say,
             already_said=already,
+            problems=[
+                str(p.get("title") or "")
+                for p in context.get("noted_problems") or []
+                if p.get("title")
+            ],
         ),
     )
     ideas = ideas[:left]
     if not ideas:
         return
     language = str(context.get("reply_language") or "en")
-    bullets = "\n".join(f"\u2022 {idea}" for idea in ideas)
-    turn.reply = with_disclosure("Sure.\n" + bullets, context, language)
+    turn.reply = with_disclosure("Sure.\n" + solution_rules.idea_lines(ideas), context, language)
     turn._english = True
     turn.awaiting_customer = True
     turn._free = True
@@ -3029,6 +3036,11 @@ def reply_language(
         for m in rows
         if m.sender_type == "customer" and m.message_type in ("text", "audio") and m.body
     ]
+    for earlier in texts[:3]:
+        if detect_language(earlier):
+            break
+        if other := other_script(earlier):
+            return {"reply_language_other": other}
     detected = [detect_language(t) for t in texts[:3]]
     # A very short English-looking answer ("Yes all", "Not well") inside a Roman Urdu chat
     # follows the chat: English words alone do not switch the language (R-VOICE-04).
@@ -3754,7 +3766,8 @@ async def in_one_language(
             purpose="pi_service_language",
             messages=[
                 Message.system(
-                    f"Rewrite this WhatsApp reply entirely in {NAMES[expected]}. Keep its "
+                    f"Rewrite this WhatsApp reply entirely in "
+                    f"{NAMES.get(expected, expected)}. Keep its "
                     "meaning, line breaks, '• ' points, links and names exactly; add nothing. "
                     "Reply with the rewritten text only."
                 ),
@@ -3766,7 +3779,7 @@ async def in_one_language(
     except Exception:  # noqa: BLE001 - the checks below still guard the reply
         return reply
     fixed = str(response.text or "").strip()
-    return fixed if fixed and not mixed_line(fixed, expected) else reply
+    return fixed if fixed and (expected not in NAMES or not mixed_line(fixed, expected)) else reply
 
 
 def project_words(text: str) -> set[str]:
@@ -4602,6 +4615,13 @@ async def compose_service_turn(
         brief = dict(conversation.service_brief or {})
         brief["handback_notice"] = False
         conversation.service_brief = brief
+    other_language = str(context.get("reply_language_other") or "")
+    if other_language and (turn._english or not in_script(turn.reply, other_language)):
+        latency.count("model_calls")
+        turn.reply = await latency.timed(
+            "model.language",
+            in_one_language(manager, scope, policy, conversation, turn.reply, other_language),
+        )
     if expected in NAMES and expected != "en" and not turn._english and english_bullets(turn.reply):
         turn._english = True  # the model left a list of ideas in English: it is translated below
     if expected in NAMES and (

@@ -34,6 +34,9 @@ Give exactly two ideas, written in plain English (they are translated for the ow
 - gives no medical, veterinary, legal, tax or financial advice, and nothing about doses, feed
   formulas, treatment, filings or investments;
 - never contains anything from the never_say list.
+The business and the problem are set by owner_first_message and problems_noted: when the latest
+message names none ("more ideas", "aur idea"), give ideas for THAT business and problem, never for
+another trade, and never a stock, profit or general-business idea unless that is the problem.
 Build each idea from the owner's own words and nouns (their products, animals, orders, files,
 people, places): an idea that would fit any business is not an idea. Do not use the stock patterns
 "count X from one busy day" or "assign one person at a fixed time"; say what is different for THIS
@@ -84,11 +87,14 @@ async def free_ideas(
     industry: str | None,
     never_say: list[str],
     already_said: list[str] | None = None,
+    problems: list[str] | None = None,
 ) -> list[str]:
     """Two vetted ideas for what the person described, or [] (the model failed or nothing passed)."""
     user = json.dumps(
         {
             "owner_latest_message": said,
+            "owner_first_message": (earlier[:1] or [""])[0][:500],
+            "problems_noted": [p[:120] for p in (problems or [])[-4:]],
             "owner_earlier_messages": earlier[-4:],
             "industry": industry or "not known yet",
             "never_say_list": never_say[:8],

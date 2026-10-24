@@ -46,6 +46,8 @@ SOLUTION_ASK_PLAIN = re.compile(
     r"|\bhow (?:can|could|should|do|would) (?:we|i) (?:fix|solve|handle|deal with|stop|reduce|prevent|avoid|improve|sort out|manage) (?:it|this|that|these|them)\b"
     r"|\bhow (?:to|do i|do we) (?:fix|solve|handle|stop|sort out) (?:it|this|that)\b"
     r"|\b(?:more|other|another|some|few|different) (?:ideas?|solutions?|suggestions?|options?)\b"
+    r"|\b(?:aur|or|ek aur|mazeed|mzeed|aur koi|or koi|koi aur|dusra|dosra|doosra)\s+(?:idea|ideas|solution|hal|mashwara|suggestion)s?\b"
+    r"|\b(?:idea|ideas|suggestion|suggestions)\s+(?:dw|dy|do|dein|den|dena|de|dijiye|btao|batao|chahiye|chahye)\b"
     r"|\b(?:can you )?(?:give|provide|share|send|show|tell) (?:me |us )?(?:my |our |the |a |your )?(?:problem |problems )?(?:solutions?|fix|ideas?|suggestions?)\b"
     r"|\b(?:problem|problems|masla|masle|masail) (?:ka |ke |ki )?(?:solution|hal)\b"
     r"|\bhal (?:tw |to |zara |bhi |kya )?(?:batao|btao|bataiye|bataen|hai)\b"

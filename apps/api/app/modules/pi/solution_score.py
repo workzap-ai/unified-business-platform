@@ -35,7 +35,10 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         "idea_generic",
         re.compile(
             r"\b(?:sab ko pata hai|sabko pata hai|ye to sab|everyone knows|too generic|too obvious|"
-            r"kuch naya batao|kuch naya bataiye|something new|tell me something new|obvious hai)\b",
+            r"kuch naya batao|kuch naya bataiye|something new|tell me something new|obvious hai|"
+            r"(?:pasand|psnd|pasnd|psand|pasan)\s*(?:nahi|nahin|nai|nhi|nh|ni)|(?:acha|achi|achay|theek|thik|"
+            r"sahi)\s*(?:nahi|nahin|nai|nhi|nh|ni)\s*(?:lag|hai|he)|bekar|bekaar|useless|"
+            r"not (?:useful|helpful|good|great)|(?:don'?t|do not|didn'?t) like|kaam ke nahi)\b",
             re.IGNORECASE,
         ),
     ),

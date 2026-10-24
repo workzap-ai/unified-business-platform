@@ -339,6 +339,18 @@ def count_ideas(text: str, bullets: bool = True) -> int:
     return max(marked, len(NUMBERED.findall(text or "")), prose_ideas(text))
 
 
+ORDINALS = ("First", "Second")
+
+
+def idea_lines(ideas: list[str]) -> str:
+    """Ideas as plain sentences, one per line, in prose by position ("First, ... Second, ..."),
+    never dots or numbers: they read as a person talking. Counted by `prose_ideas`."""
+    clean = [" ".join(str(i).split()).rstrip(". ") + "." for i in ideas if str(i).strip()][:2]
+    if len(clean) == 1:
+        return clean[0]
+    return "\n".join(f"{ORDINALS[n]}, {i[:1].lower()}{i[1:]}" for n, i in enumerate(clean))
+
+
 def idea_items(text: str) -> list[str]:
     """The listed ideas of a reply, one string each (the first sentence of an inline numbered one)."""
     items = []
