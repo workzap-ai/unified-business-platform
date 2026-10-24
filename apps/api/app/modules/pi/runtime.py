@@ -31,7 +31,7 @@ from app.ai.types import Message, TextPart, VideoPart
 from app.modules.business_settings.capabilities import business_permissions
 from app.modules.customers.service import CustomerService
 from app.modules.environments.models import Environment
-from app.modules.pi import price_policy
+from app.modules.pi import latency, price_policy
 from app.modules.pi.agents import AgentContext, run_specialists
 from app.modules.pi.configuration import seed_agents, settings_row
 from app.modules.pi.graph import AGENTS, RouteState, keyword_intent, route_message
@@ -704,6 +704,7 @@ def _show_typing(
 
 
 async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
+    latency.begin()
     outbound: list[str] = []
     proposals_for: list[UUID] = []  # Leads pi writes a proposal for, after commit.
     async with ctx["sessions"]() as session:
@@ -813,7 +814,8 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             from app.modules.pi import brain_config
 
             await session.commit()
-            await asyncio.sleep(brain_config.value(policy.response_rules, "debounce_seconds"))
+            with latency.stage("debounce"):
+                await asyncio.sleep(brain_config.value(policy.response_rules, "debounce_seconds"))
             await session.refresh(message)
         if policy.response_rules.get("pi_mode") == "brain" and await newer_waiting(
             session, message
@@ -1147,13 +1149,16 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 message.media = {**message.media, "links": links}
                 await session.commit()
         service_context = (
-            await prepare_context(
-                session,
-                scope,
-                conversation,
-                message,
-                policy,
-                embedder=make_embedder(ctx["settings"], ctx.get("http")),
+            await latency.timed(
+                "prepare_context",
+                prepare_context(
+                    session,
+                    scope,
+                    conversation,
+                    message,
+                    policy,
+                    embedder=make_embedder(ctx["settings"], ctx.get("http")),
+                ),
             )
             if service_discovery
             else None
@@ -1231,12 +1236,15 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 "injection": False,
             }
             try:
-                service_turn = await compose_service_turn(
-                    build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"]),
-                    scope,
-                    conversation,
-                    policy,
-                    service_context,
+                service_turn = await latency.timed(
+                    "compose_service_turn",
+                    compose_service_turn(
+                        build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"]),
+                        scope,
+                        conversation,
+                        policy,
+                        service_context,
+                    ),
                 )
             except ReplyRejected as exc:
                 service_rejection = exc.code
@@ -1635,8 +1643,16 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             )
         )
         outbound += [str(f) for f in forms]
-        await session.commit()
-    await enqueue_sends(ctx, outbound)
+        with latency.stage("final_commit"):
+            await session.commit()
+    with latency.stage("enqueue_send"):
+        await enqueue_sends(ctx, outbound)
+    latency.emit(
+        logger,
+        conversation_id=str(conversation.id),
+        message_id=str(message_id),
+        replied=bool(outbound),
+    )
     decided = getattr(service_turn, "_decision", None) if service_turn is not None else None
     if decided is not None and "request_solution" in decided.effects:
         from app.modules.pi_saas.jobs import enqueue_brain_documents

@@ -32,6 +32,7 @@ from app.modules.pi import (
     flow,
     followup_policy,
     industry_packs,
+    latency,
     learning_context,
     price_policy,
     problems,
@@ -109,6 +110,17 @@ def _flag(value: Any) -> bool:
     if isinstance(value, str):
         return value.strip().lower() in {"true", "yes", "1"}
     return bool(value)
+
+
+# Context keys placed first in the prompt's JSON (see prepare_context).
+STATIC_FIRST = ("spec_guidance",)
+
+
+class _Lookup:
+    """Marks "look the customer up yourself" (None already means "there is no such customer")."""
+
+
+LOOKUP = _Lookup()
 
 
 # Fixed choices: anything else a model writes falls back to the safe first value, so
@@ -1271,11 +1283,22 @@ async def brain_problems(
     message: PiMessage | None = None,
     rows: list[PiMessage] | None = None,
     embedder: Any = None,
+    noted_problems: list[dict[str, Any]] | None = None,
+    customer: Any = LOOKUP,
 ) -> dict[str, Any]:
-    """What pi has noted so far for this customer (brain mode), for the prompt."""
+    """What pi has noted so far for this customer (brain mode), for the prompt.
+
+    `noted_problems` is what `problems.noted_context` returns and `customer` the record, when
+    the caller already read them this turn (prepare_context reads each once)."""
     if not flow.brain_mode(policy.response_rules) or conversation.customer_id is None:
         return {}
-    noted = await problems.noted_context(session, scope, conversation.customer_id)
+    noted = (
+        noted_problems
+        if noted_problems is not None
+        else await latency.timed(
+            "brain.noted", problems.noted_context(session, scope, conversation.customer_id)
+        )
+    )
     brief = conversation.service_brief or {}
     context: dict[str, Any] = {"noted_problems": noted}
     served = (policy.response_rules.get("brain") or {}).get("served_industries")
@@ -1313,9 +1336,12 @@ async def brain_problems(
             **brief,
             "patterns_said": [*list(brief.get("patterns_said") or []), hint["key"]],
         }
-    from app.modules.customers.models import Customer
+    if isinstance(customer, _Lookup):
+        from app.modules.customers.models import Customer
 
-    customer = await session.get(Customer, conversation.customer_id)
+        customer = await latency.timed(
+            "brain.customer", session.get(Customer, conversation.customer_id)
+        )
     context["can_approve"] = bool(customer.can_approve) if customer is not None else True
     if customer is not None:
         context["customer_country"] = safety.country_of(customer.phone or customer.whatsapp_id)
@@ -1324,7 +1350,9 @@ async def brain_problems(
     if brief.get("scope_asked") and not brief.get("scope_done"):
         context["choose_problems"] = True
     if conversation.customer_id is not None:
-        quote = await brain_docs.open_quote(session, scope, conversation.customer_id)
+        quote = await latency.timed(
+            "brain.open_quote", brain_docs.open_quote(session, scope, conversation.customer_id)
+        )
         if quote is not None:
             context["open_quote"] = quote
     context.update(matching_the_person(conversation, message, rows or []))
@@ -1332,15 +1360,18 @@ async def brain_problems(
         context["days_away"] = away
     if learning_context.active(policy.response_rules):
         context.update(
-            await learning_context.build(
-                session,
-                scope,
-                conversation,
-                message,
-                noted,
-                embedder=embedder,
-                canary_percent=brain_config.value(policy.response_rules, "canary_percent"),
-                solution_mode=solution_context.switched_on(policy.response_rules),
+            await latency.timed(
+                "brain.learning",
+                learning_context.build(
+                    session,
+                    scope,
+                    conversation,
+                    message,
+                    noted,
+                    embedder=embedder,
+                    canary_percent=brain_config.value(policy.response_rules, "canary_percent"),
+                    solution_mode=solution_context.switched_on(policy.response_rules),
+                ),
             )
         )
     # The specification itself, in its own words, for this stage and topic (spec Appendix A).
@@ -2125,25 +2156,30 @@ async def industry_context_for(
     rows: list[PiMessage],
     profile: dict[str, str],
     policy: PiSettings,
+    customer: Any = LOOKUP,
+    noted_problems: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """The industry knowledge for this turn; empty unless the workspace turned packs on."""
+    """The industry knowledge for this turn; empty unless the workspace turned packs on.
+
+    `customer` and `noted_problems` are what prepare_context already read this turn."""
     if (
         not (policy.knowledge_config or {}).get("industry_packs")
         or conversation.customer_id is None
     ):
         return {}
-    from app.modules.customers.models import Customer
-
-    customer = await WorkspaceRepository(session, Customer, scope).find(
-        Customer.id == conversation.customer_id
-    )
+    if isinstance(customer, _Lookup):
+        customer = await customer_for(session, scope, conversation)
     if customer is None:
         return {}
     texts = industry_texts(message, rows, profile, conversation.service_brief)
     categories: list[str] = []
     if flow.brain_mode(policy.response_rules):
         # what was just noted decides which questions and "heard as" phrases are shown
-        noted = await problems.noted_context(session, scope, conversation.customer_id)
+        noted = (
+            noted_problems
+            if noted_problems is not None
+            else await problems.noted_context(session, scope, conversation.customer_id)
+        )
         for item in noted:
             if item.get("group") and item["group"] not in categories:
                 categories.append(item["group"])
@@ -2195,84 +2231,116 @@ async def prepare_context(
     policy: PiSettings,
     embedder: Any = None,
 ) -> dict[str, Any]:
-    tools = await ToolRegistry(session).enabled_tools(scope, "requirement")
+    tools = await latency.timed(
+        "ctx.tools", ToolRegistry(session).enabled_tools(scope, "requirement")
+    )
     rows = list(
-        await session.scalars(
-            WorkspaceRepository(session, PiMessage, scope)
-            .select()
-            .where(
-                PiMessage.conversation_id == conversation.id,
-                PiMessage.id != message.id,
-                # "queued": pi's own reply that is still being sent is part of the chat.
-                PiMessage.status.in_(["processed", "queued", "sent", "delivered", "read"]),
-            )
-            .order_by(PiMessage.created_at.desc(), PiMessage.id.desc())
-            .limit(20)
+        await latency.timed(
+            "ctx.history",
+            session.scalars(
+                WorkspaceRepository(session, PiMessage, scope)
+                .select()
+                .where(
+                    PiMessage.conversation_id == conversation.id,
+                    PiMessage.id != message.id,
+                    # "queued": pi's own reply that is still being sent is part of the chat.
+                    PiMessage.status.in_(["processed", "queued", "sent", "delivered", "read"]),
+                )
+                .order_by(PiMessage.created_at.desc(), PiMessage.id.desc())
+                .limit(20)
+            ),
         )
     )
     offerings = (
         list(
-            await session.scalars(
-                WorkspaceRepository(session, CatalogProduct, scope)
-                .select()
-                .where(CatalogProduct.pi_visible.is_(True), CatalogProduct.status == "active")
-                .order_by(CatalogProduct.name)
-                .limit(40)
+            await latency.timed(
+                "ctx.offerings",
+                session.scalars(
+                    WorkspaceRepository(session, CatalogProduct, scope)
+                    .select()
+                    .where(CatalogProduct.pi_visible.is_(True), CatalogProduct.status == "active")
+                    .order_by(CatalogProduct.name)
+                    .limit(40)
+                ),
             )
         )
         if scope.can("catalog.read") and "search_products" in tools
         else []
     )
-    tenant = await session.get(Tenant, scope.tenant_id)
-    profile, returning = await customer_profile(session, scope, conversation)
+    tenant = await latency.timed("ctx.tenant", session.get(Tenant, scope.tenant_id))
+    # The customer record is read once and shared with the profile, industry and brain steps.
+    customer = await latency.timed("ctx.customer", customer_for(session, scope, conversation))
+    profile, returning = await latency.timed(
+        "ctx.profile", customer_profile(session, scope, conversation, customer)
+    )
     memories = (
         list(
-            await session.scalars(
-                WorkspaceRepository(session, PiMemory, scope)
-                .select()
-                .where(
-                    PiMemory.customer_id == conversation.customer_id, PiMemory.status == "active"
-                )
-                .order_by(PiMemory.created_at.desc())
-                .limit(5)
+            await latency.timed(
+                "ctx.memories",
+                session.scalars(
+                    WorkspaceRepository(session, PiMemory, scope)
+                    .select()
+                    .where(
+                        PiMemory.customer_id == conversation.customer_id,
+                        PiMemory.status == "active",
+                    )
+                    .order_by(PiMemory.created_at.desc())
+                    .limit(5)
+                ),
             )
         )
         if scope.can("pi.memory.read") and "search_customer_memory" in tools
         else []
     )
     knowledge = []
-    features = (await enabled_products(session, scope)).get("pi", set())
+    features = (await latency.timed("ctx.products", enabled_products(session, scope))).get(
+        "pi", set()
+    )
     if "search_knowledge_base" in tools and "knowledge" in features:
         # Match on the conversation, not only the latest line: a short follow-up ("aur
         # price?") still finds what the earlier messages were about.
         recent = [m.body[:400] for m in rows if m.sender_type == "customer"][:2]
         query = " ".join([message.body[:600], *recent, brief_words(conversation.service_brief)])
         library = KnowledgeService(session, scope)
-        knowledge = await library.search(query, int(policy.knowledge_config.get("top_k", 5)))
+        knowledge = await latency.timed(
+            "ctx.knowledge", library.search(query, int(policy.knowledge_config.get("top_k", 5)))
+        )
         if len(knowledge) < 2:
             # Nothing matched well: pi still knows what the company is and does.
             seen = {k["snippet"] for k in knowledge}
-            knowledge += [k for k in await library.overview(2) if k["snippet"] not in seen]
+            knowledge += [
+                k
+                for k in await latency.timed("ctx.knowledge_overview", library.overview(2))
+                if k["snippet"] not in seen
+            ]
     # First names of the company's people, so a message addressed to one is recognised.
     team = sorted(
         {
             (name or "").split()[0]
-            for name in await session.scalars(
-                select(PlatformUser.display_name)
-                .join(Membership, Membership.user_id == PlatformUser.id)
-                .where(Membership.tenant_id == scope.tenant_id, Membership.status == "active")
-                .limit(40)
+            for name in await latency.timed(
+                "ctx.team",
+                session.scalars(
+                    select(PlatformUser.display_name)
+                    .join(Membership, Membership.user_id == PlatformUser.id)
+                    .where(Membership.tenant_id == scope.tenant_id, Membership.status == "active")
+                    .limit(40)
+                ),
             )
             if (name or "").strip()
         }
     )
-    agent = await WorkspaceRepository(session, PiAgent, scope).find(PiAgent.key == "requirement")
-    version = (
-        await WorkspaceRepository(session, PiAgentVersion, scope).find(
-            PiAgentVersion.agent_id == agent.id, PiAgentVersion.version == agent.current_version
-        )
-        if agent
-        else None
+    # The agent and its current version in one round trip (was two: agent, then version).
+    version = await latency.timed(
+        "ctx.agent_version",
+        WorkspaceRepository(session, PiAgentVersion, scope).find(
+            PiAgentVersion.agent_id.in_(
+                select(PiAgent.id).where(
+                    WorkspaceRepository(session, PiAgent, scope).predicate(),
+                    PiAgent.key == "requirement",
+                    PiAgent.current_version == PiAgentVersion.version,
+                )
+            )
+        ),
     )
     bookable: list[dict[str, Any]] = []
     customer_bookings: list[dict[str, str]] = []
@@ -2313,21 +2381,60 @@ async def prepare_context(
             {"booking_id": str(b.id), "label": work.label(b.starts_at, b.timezone)}
             for b in upcoming
         ]
-    industry = await industry_context_for(
-        session, scope, conversation, message, rows, profile, policy
+    # What was noted is read once: the industry step and the brain step both use it.
+    noted = (
+        await latency.timed(
+            "ctx.noted", problems.noted_context(session, scope, conversation.customer_id)
+        )
+        if flow.brain_mode(policy.response_rules) and conversation.customer_id is not None
+        else None
     )
-    brain = await brain_problems(
-        session, scope, conversation, policy, bool(industry), message, rows, embedder
+    industry = await latency.timed(
+        "ctx.industry",
+        industry_context_for(
+            session,
+            scope,
+            conversation,
+            message,
+            rows,
+            profile,
+            policy,
+            customer=customer,
+            noted_problems=noted,
+        ),
     )
-    team_notes = await _team_notes(session, scope, conversation.id)  # read once, used twice below
+    brain = await latency.timed(
+        "ctx.brain",
+        brain_problems(
+            session,
+            scope,
+            conversation,
+            policy,
+            bool(industry),
+            message,
+            rows,
+            embedder,
+            noted_problems=noted,
+            customer=customer,
+        ),
+    )
+    # read once, used twice below
+    team_notes = await latency.timed("ctx.team_notes", _team_notes(session, scope, conversation.id))
     return {
+        # First on purpose: the context is sent as JSON text right after the (fixed) system
+        # prompt, so the largest block that barely changes between turns (the handbook's core
+        # sections) forms one unbroken prefix that providers with automatic prompt caching
+        # (OpenAI, Gemini) can reuse. JSON key order carries no meaning for the model's rules.
+        **{key: brain[key] for key in STATIC_FIRST if key in brain},
         **industry,
         **solution_lint_context(industry, policy, conversation),
         **brain,
         "bookable_services": bookable,
         "customer_bookings": customer_bookings,
         "work_tools": sorted(tools & {"create_ticket", "create_task", "request_payment"}),
-        "payment_methods": await _payment_methods(session, scope, tools),
+        "payment_methods": await latency.timed(
+            "ctx.payments", _payment_methods(session, scope, tools)
+        ),
         "company": tenant.name if tenant else "",
         "offerings": [p.name for p in offerings],  # Deliberately no catalog prices.
         "customer_memory": [m.content for m in memories],
@@ -2359,7 +2466,7 @@ async def prepare_context(
             else None
         ),
         "latest_message_kind": message.message_type,
-        **await _deal_context(session, scope, conversation),
+        **await latency.timed("ctx.deals", _deal_context(session, scope, conversation)),
         "team_members": team,
         "latest_customer_message": message.body[:4000],
         "shared_links": (message.media or {}).get("links") or [],
@@ -2378,7 +2485,7 @@ async def prepare_context(
             policy.timezone,
             datetime.now(UTC),
         ),
-        "google_meet_ready": await _meet_ready(session, scope),
+        "google_meet_ready": await latency.timed("ctx.meet", _meet_ready(session, scope)),
         "followups_enabled": policy.whatsapp_config.get("reminder_enabled", True),
     }
 
@@ -3868,18 +3975,24 @@ async def compose_service_turn(
         if any(c.isdigit() for c in turn.reply):  # the welcome-back count is pi's own figure
             context["fixed_lines"] = [*context.get("fixed_lines", []), turn.reply]
         return turn
-    result = await manager.complete_structured(
-        scope,
-        ServiceTurn,
-        alias=policy.ai_config.get("reply_alias", "balanced"),
-        purpose="pi_service",
-        messages=[
-            Message.system(system_for(context)),
-            Message.user(json.dumps(context, ensure_ascii=False)),
-        ],
-        temperature=float(policy.ai_config.get("temperature", "0.20")),
-        max_tokens=4096,  # thinking models (Gemini 3.x) count their thinking here too
-        conversation_id=conversation.id,
+    # Built once: the rewrite below sends the very same system text and context again.
+    with latency.stage("prompt.assemble"):
+        system_text = system_for(context)
+        context_json = json.dumps(context, ensure_ascii=False)
+    latency.count("prompt_chars", len(system_text) + len(context_json))
+    latency.count("model_calls")
+    result = await latency.timed(
+        "model.reply",
+        manager.complete_structured(
+            scope,
+            ServiceTurn,
+            alias=policy.ai_config.get("reply_alias", "balanced"),
+            purpose="pi_service",
+            messages=[Message.system(system_text), Message.user(context_json)],
+            temperature=float(policy.ai_config.get("temperature", "0.20")),
+            max_tokens=4096,  # thinking models (Gemini 3.x) count their thinking here too
+            conversation_id=conversation.id,
+        ),
     )
     turn = result.value
     turn._attempts = result.response.attempts
@@ -3973,15 +4086,24 @@ async def compose_service_turn(
         and context.get("pi_mode") == "brain"
         and critique_mod.switched_on(policy.response_rules)
     ):
-        problem = await critique_mod.critique(manager, scope, context, turn.reply) or problem
+        latency.count("model_calls")
+        problem = (
+            await latency.timed(
+                "model.critique", critique_mod.critique(manager, scope, context, turn.reply)
+            )
+            or problem
+        )
     if problem:
         # One self-correction: show the model its draft and why it can't be sent.
-        retry = await manager.complete_structured(
+        latency.count("model_calls")
+        latency.count("rewrites")
+        retry = await latency.timed("model.rewrite", manager.complete_structured(
             scope,
             ServiceTurn,
             alias=policy.ai_config.get("reply_alias", "balanced"),
             purpose="pi_service",
             messages=[
+                # Rebuilt: the checks above may have added flags to the context (lint_slipped).
                 Message.system(system_for(context)),
                 Message.user(json.dumps(context, ensure_ascii=False)),
                 Message.assistant(json.dumps({"reply": turn.reply}, ensure_ascii=False)),
@@ -4009,7 +4131,7 @@ async def compose_service_turn(
             temperature=float(policy.ai_config.get("temperature", "0.20")),
             max_tokens=4096,
             conversation_id=conversation.id,
-        )
+        ))
         turn = retry.value
         turn._attempts = [*result.response.attempts, *retry.response.attempts]
         turn.reply = without_filler(tidy_list_numbers(turn.reply))
@@ -4082,8 +4204,10 @@ async def compose_service_turn(
         brain_decision(turn, context)
         brain_offer(turn, context)
     if expected in NAMES and mixed_line(turn.reply, str(expected)):
-        turn.reply = await in_one_language(
-            manager, scope, policy, conversation, turn.reply, str(expected)
+        latency.count("model_calls")
+        turn.reply = await latency.timed(
+            "model.language",
+            in_one_language(manager, scope, policy, conversation, turn.reply, str(expected)),
         )
     latest_language = detect_language(str(context.get("latest_customer_message", "")))
     if latest_language == expected and (
@@ -4447,12 +4571,30 @@ async def remember_customer(
         customer.company = profile["business_name"][:160]
 
 
-async def customer_profile(
+async def customer_for(
     session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation
+) -> Any:
+    """The chat's customer record (None for an unattached chat). prepare_context reads it once
+    and hands it to every step that used to read it again."""
+    from app.modules.customers.models import Customer
+
+    if conversation.customer_id is None:
+        return None
+    return await WorkspaceRepository(session, Customer, scope).find(
+        Customer.id == conversation.customer_id
+    )
+
+
+async def customer_profile(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    customer: Any = LOOKUP,
 ) -> tuple[dict[str, str], bool]:
     """What is already known about the customer (their record, this chat and their
-    earlier chats), and whether they are returning (they chatted before)."""
-    from app.modules.customers.models import Customer
+    earlier chats), and whether they are returning (they chatted before).
+
+    `customer` is the record when the caller has already read it (None: there is none)."""
 
     profile: dict[str, str] = {}
     returning = False
@@ -4471,9 +4613,8 @@ async def customer_profile(
             returning = True
             earlier_profile = (row.service_brief or {}).get("customer_profile") or {}
             profile = merge_profile(profile, earlier_profile)
-        customer = await WorkspaceRepository(session, Customer, scope).find(
-            Customer.id == conversation.customer_id
-        )
+        if isinstance(customer, _Lookup):
+            customer = await customer_for(session, scope, conversation)
         if customer is not None:
             if customer.name and not PLACEHOLDER_NAME.search(customer.name):
                 profile.setdefault("name", customer.name)
