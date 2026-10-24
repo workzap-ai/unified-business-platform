@@ -136,7 +136,9 @@ def test_the_extractor_runs_only_when_the_reply_model_wrote_no_problem():
     assert not pe.wants_extraction(base, "Samajh gaya.", ["an op"])
     assert not pe.wants_extraction({**base, "flow": {"state": "S5_READINESS"}}, "x", [])
     assert not pe.wants_extraction({**base, "latest_customer_message": "haan theek"}, "x", [])
-    assert not pe.wants_extraction({**base, "solution_asked": True}, "x", [])
+    assert not pe.wants_extraction(
+        {**base, "solution_asked": True, "noted_problems": [{"ref": "p1"}]}, "x", []
+    )
     assert not pe.wants_extraction({**base, "pi_mode": "standard"}, "x", [])
 
 

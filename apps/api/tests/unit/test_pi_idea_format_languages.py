@@ -67,3 +67,52 @@ def test_disliked_ideas_ask_for_a_different_kind(text: str) -> None:
 )
 def test_more_ideas_in_roman_urdu_is_an_ask(text: str) -> None:
     assert solution_ask.asked_for_ideas(text)
+
+
+def _turn(reply: str):  # noqa: ANN202
+    from types import SimpleNamespace
+
+    return SimpleNamespace(reply=reply, _summary=False, _free=False)
+
+
+def test_model_bullets_become_prose_for_handed_ideas() -> None:
+    from app.modules.pi.service_conversation import asked_without_ideas, brain_prose_ideas
+
+    turn = _turn("Theek hai.\n• Sheets alag rakhein.\n• Roz update karein.\n\nKya main banwa doon?")
+    brain_prose_ideas(turn, {"solution_ideas": ["x"], "reply_language": "roman_ur"})
+    assert turn.reply.splitlines()[1] == "Pehle, sheets alag rakhein."
+    assert turn.reply.splitlines()[2] == "Doosra, roz update karein."
+    assert asked_without_ideas(
+        {
+            "ideas_given": 2,
+            "latest_customer_message": "Idea psnd NH aiya",
+            "flow": {"state": "S3_NOTED"},
+        }
+    )
+
+
+def test_summary_lists_and_other_languages_keep_their_dots() -> None:
+    from app.modules.pi.service_conversation import brain_prose_ideas
+
+    summary = _turn("Noted:\n• one\n• two")
+    summary._summary = True
+    brain_prose_ideas(summary, {"solution_ideas": ["x"], "reply_language": "en"})
+    assert "•" in summary.reply
+    arabic = _turn("نعم\n• أ\n• ب")
+    brain_prose_ideas(arabic, {"solution_ideas": ["x"], "reply_language": "ar"})
+    assert "•" in arabic.reply
+
+
+@pytest.mark.parametrize("text", ["给我一些建议", "有什么办法解决这个问题", "我们该如何解决"])
+def test_chinese_ask_for_ideas(text: str) -> None:
+    assert solution_ask.asked_for_ideas(text)
+
+
+def test_a_message_that_tells_the_problem_and_asks_for_a_fix_is_still_extracted() -> None:
+    from app.modules.pi import problem_extract
+
+    said = "Orders get missed, staff make mistakes, I cannot track sales. Can you help me fix this?"
+    base = {"pi_mode": "brain", "flow": {"state": "S1_LISTENING"}, "latest_customer_message": said}
+    assert problem_extract.wants_extraction({**base, "solution_asked_no_ideas": True}, "", [])
+    noted = {**base, "solution_asked": True, "noted_problems": [{"ref": "p1"}]}
+    assert not problem_extract.wants_extraction(noted, "", [])

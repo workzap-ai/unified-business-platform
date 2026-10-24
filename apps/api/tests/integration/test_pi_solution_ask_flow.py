@@ -100,7 +100,7 @@ async def test_a_push_for_a_fix_gets_two_ideas_then_the_applications_offer(
     assert len(bodies) == 1, bodies
     [body] = bodies
     await business_db.refresh(conversation)
-    bullets = [line for line in body.splitlines() if line.startswith("•")]
+    bullets = [line for line in body.splitlines() if line.startswith(("First,", "Second,", "•"))]
     assert 1 <= len(bullets) <= 2  # R-VAL-01
     assert body.rstrip().endswith(solution_ask.offer_line("en"))
     assert conversation.flow_state == "S5_READINESS"

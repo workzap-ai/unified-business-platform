@@ -77,8 +77,14 @@ def wants_extraction(context: dict[str, Any], reply: str, ops: list[Any]) -> boo
     said = str(context.get("latest_customer_message", ""))
     if len(re.findall(r"\w+", said)) < MIN_WORDS:
         return False
-    if context.get("solution_asked") or "solution_howto" in context:
+    if "solution_howto" in context:
         return False
+    if (context.get("solution_asked") or context.get("solution_asked_no_ideas")) and context.get(
+        "noted_problems"
+    ):
+        return False  # "give me a solution" about problems already noted: nothing new to note
+    # A first message that tells the problems AND asks for a fix ("...can you help me find a
+    # solution?") must still note them: the ideas never replace noting.
     return True
 
 

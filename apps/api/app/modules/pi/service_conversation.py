@@ -45,6 +45,7 @@ from app.modules.pi import (
     solution_context,
     solution_free,
     solution_rules,
+    solution_score,
     solutions,
     spec_handbook,
     style,
@@ -1920,6 +1921,33 @@ BUILD_REQUEST = re.compile(
 IDEA_WORDS = re.compile(r"\b(?:ideas?|solutions?|hal|suggest\w*|mashwara|advice)\b", re.IGNORECASE)
 
 
+DIFFERENT_IDEA_SIGNALS = frozenset(
+    {"idea_generic", "idea_no_help", "idea_already_doing", "idea_not_possible", "idea_more"}
+)
+
+BULLET_LINE = re.compile(r"^\s*[•*-]\s+(.*)$")
+POSITIONS = {"roman_ur": ("Pehle", "Doosra"), "en": ("First", "Second")}
+
+
+def brain_prose_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """A reply that hands over the entries' ideas as dots reads them as plain sentences instead
+    ("First, ... Second, ..."), in English or Roman Urdu. Other languages and every other kind of
+    list (the problems of a summary) stay as they are."""
+    if not (context.get("solution_ideas") or turn._free) or turn._summary:
+        return
+    marks = POSITIONS.get(str(context.get("reply_language") or "en"))
+    lines = turn.reply.splitlines()
+    found = [n for n, line in enumerate(lines) if BULLET_LINE.match(line)]
+    contiguous = found == list(range(found[0], found[0] + len(found))) if found else False
+    if not marks or not 1 <= len(found) <= 2 or not contiguous:
+        return
+    for position, n in zip(marks, found, strict=False):
+        found_line = BULLET_LINE.match(lines[n])
+        text = (found_line.group(1) if found_line else lines[n]).strip()
+        lines[n] = text if len(found) == 1 else f"{position}, {text[:1].lower()}{text[1:]}"
+    turn.reply = chr(10).join(lines)
+
+
 def asked_without_ideas(context: dict[str, Any]) -> bool:
     """They asked for a fix and no entry's ideas were handed over: the industry has none for this
     problem, or the chat is past the point where the entries are consulted (the summary was shown,
@@ -1930,6 +1958,10 @@ def asked_without_ideas(context: dict[str, Any]) -> bool:
         return True
     state = str((context.get("flow") or {}).get("state") or "")
     said = str(context.get("latest_customer_message") or "")
+    if int(context.get("ideas_given") or 0) > 0 and state in solution_ask.ASKABLE:
+        reaction = solution_score.classify(said)  # "idea pasand nahi aya": a different idea
+        if reaction is not None and reaction.signal in DIFFERENT_IDEA_SIGNALS:
+            return True
     if BUILD_REQUEST.search(said) and not IDEA_WORDS.search(said):
         return False  # "can you make an app for this?" is answered as the spec's G4, not with ideas
     return state in solution_ask.ASKABLE and solution_ask.asked_for_ideas(said)
@@ -4606,6 +4638,7 @@ async def compose_service_turn(
         brain_decision(turn, context)
         brain_ideas(turn, context)
         await brain_free_ideas(manager, scope, conversation, policy, turn, context)
+        brain_prose_ideas(turn, context)
         brain_no_ideas(turn, context)
         brain_howto(turn, context)
         brain_offer(turn, context)
