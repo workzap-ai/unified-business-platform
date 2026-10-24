@@ -20,6 +20,8 @@ def scripted(monkeypatch, *replies):
     prompts: list[str] = []
 
     async def complete(self, scope, output, **kwargs):
+        if kwargs.get("purpose") == "pi_problem_extract":  # the separate note extractor: empty
+            return SimpleNamespace(value=output(), response=SimpleNamespace(attempts=[]))
         prompts.append(kwargs["messages"][-1].text())
         value = queue.pop(0) if len(queue) > 1 else queue[0]
         return SimpleNamespace(value=value, response=SimpleNamespace(attempts=[]))

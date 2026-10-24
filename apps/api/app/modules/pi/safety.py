@@ -709,6 +709,13 @@ ROLE_NAME = re.compile(
     rf"Chaudhry|Begum|Sahib|Saheb|Muhammad|Mohammad)\.?\s+)?(?!(?:{_NOT_NAMES})\b)[A-Z][a-z]{{1,}}"
     rf"(?:\s+(?!(?:{_NOT_NAMES})\b)[A-Z][a-z]{{1,}}){{0,2}}"
 )
+ROMAN_ROLE_NAME = re.compile(
+    r"(?P<pre>\b(?i:manager|munshi|accountant|supervisor|staff|employee|mazdoor|driver|cashier|"
+    r"waiter|biwi|wife|shohar|husband|bhai|behan|beta|beti|father|mother|boss|malik|supplier|"
+    r"customer|client|partner|doctor|nurse|teacher)\s+(?i:ka|ki|ke)\s+(?i:naam|name)\s+"
+    r"(?:(?i:hai|he)\s+)?)"
+    rf"(?!(?:{_NOT_NAMES})\b)[A-Z][a-z]{{1,}}(?:\s+(?!(?:{_NOT_NAMES})\b)[A-Z][a-z]{{1,}}){{0,2}}"
+)
 DOCTOR_NAME = re.compile(
     rf"\b(?:Dr\.?|Doctor)\s+(?!(?:{_NOT_NAMES})\b)[A-Z][a-z]{{1,}}(?:\s+[A-Z][a-z]{{1,}})?"
 )
@@ -846,6 +853,12 @@ def redact_pii(text: str) -> Redaction:
 
     clean = ROLE_NAME.sub(named, clean)
     clean = DOCTOR_NAME.sub(named, clean)
+
+    def roman_named(match: re.Match[str]) -> str:
+        add(Pii.NAME)
+        return f"{match.group('pre')}[name removed]"
+
+    clean = ROMAN_ROLE_NAME.sub(roman_named, clean)
     return Redaction(clean, kinds)
 
 
@@ -1524,7 +1537,9 @@ BOUNDARY_PATTERNS: tuple[tuple[Boundary, re.Pattern[str]], ...] = (
             r"|(?:give|send) (?:me )?(?:a |my )?(?:refund|money back)"
             r"|refund (?:me|my (?:money|payment|transfer))"
             r"|(?:dispute|contest) (?:the |this |my )?(?:payment|charge|invoice|transfer)"
-            r"|charge ?back|apne paise wapis|paise wapis (?:do|karo|chahiye)|refund chahiye)\b",
+            r"|charge ?back|apne paise wapis|paise wapis (?:do|karo|chahiye)|refund chahiye"
+            r"|pais(?:a|e|on)\s+wapa(?:s|is)\s+(?:do|dedo|de do|karo|kar do|chahiye|chahie)"
+            r"|(?:rakam|raqam)\s+wapa(?:s|is)\s+(?:do|dedo|karo|kar do|chahiye))\b",
             re.IGNORECASE,
         ),
     ),
@@ -1866,6 +1881,11 @@ _BANK_CHANGE_MORE = _rx(
         r"other|alternate|alternative|changed)\s+(?:bank )?account",
         r"(?:naye|naya|dusre|doosre|alag|badle hue)\s+(?:bank )?account\s+(?:mein|me|main|par)\s+(?:pay|paise|payment|"
         r"transfer|bhej|jama)",
+        r"\b(?:naya|naye|new|changed|badla hua)\s+(?:bank\s+)?account(?:\s+number)?\b[^.?!\n]{0,60}"
+        r"\b(?:payment|pay|paise|transfer|jama|bhej|workzap)\b",
+        r"\bworkzap\s+(?:ka|ke)\s+(?:naya|naye|new)\s+(?:bank\s+)?account",
+        r"\b(?:payment|pay|paise|transfer)\b[^.?!\n]{0,30}\b(?:naya|naye|new)\s+(?:bank\s+)?account\b",
+        r"\buse\s+(?:this|the|our)\s+(?:new|different|other)\s+(?:bank\s+)?account\b",
     ),
     (
         r"(?:ادفع|حوّل|حول|سدد|الدفع|التحويل|تحويل|سداد|الرجاء التحويل)[^.?!\n]{0,30}حساب\s*(?:بنكي\s*)?(?:جديد|مختلف|آخر)|"

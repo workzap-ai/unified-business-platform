@@ -35,6 +35,7 @@ from app.modules.pi import (
     latency,
     learning_context,
     price_policy,
+    problem_extract,
     problems,
     reply_voice,
     safety,
@@ -1809,7 +1810,8 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     if state not in solution_ask.OFFERABLE or not (context.get("noted_problems") or created):
         return
     language = str(context.get("reply_language") or "en")
-    turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language)}"
+    if not solution_ask.already_offers(turn.reply):
+        turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language)}"
     turn.awaiting_customer = True
     turn._decision = decisions.Decision(
         None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
@@ -3995,7 +3997,9 @@ async def compose_service_turn(
     turn = result.value
     turn._attempts = result.response.attempts
     turn.reply = tidy_list_numbers(turn.reply)
-    turn.reply = reply_voice.localise_noted(turn.reply, context.get("reply_language"))
+    turn.reply = reply_voice.localise_noted(
+        turn.reply, context.get("reply_language"), reply_voice.noted_before(context)
+    )
     send_now(turn, context)
     meeting_yes(turn, context)
     mode = price_policy.price_mode(policy.response_rules, service=True)
@@ -4012,6 +4016,20 @@ async def compose_service_turn(
         problem = f"{later}, and also: {problem}" if problem else later
     if made_up := invented(turn.reply, context, turn.action == "booking"):
         problem = f"{made_up}, and also: {problem}" if problem else made_up
+    if (
+        brain
+        and not turn.problem_ops
+        and problem_extract.wants_extraction(context, turn.reply, turn.problem_ops)
+    ):
+        # The reply model wrote no problem record: a short separate call fills the gap, so the
+        # whole prompt is not sent back for a rewrite just to note it (and nothing is lost).
+        found = await latency.timed(
+            "model.extract", problem_extract.extract(manager, scope, context)
+        )
+        latency.count("model_calls")
+        if found:
+            turn.problem_ops = found
+            latency.count("extracted_problems", len(found))
     if brain and (ghost := noted_without_problem(turn)):
         problem = f"{ghost}, and also: {problem}" if problem else ghost
     if empty := says_nothing(turn.reply):
@@ -4143,6 +4161,9 @@ async def compose_service_turn(
         turn = retry.value
         turn._attempts = [*result.response.attempts, *retry.response.attempts]
         turn.reply = without_filler(tidy_list_numbers(turn.reply))
+        turn.reply = reply_voice.localise_noted(
+            turn.reply, context.get("reply_language"), reply_voice.noted_before(context)
+        )
         meeting = arranged_meeting(context)
         latest_words = str(context.get("latest_customer_message", ""))
         if (

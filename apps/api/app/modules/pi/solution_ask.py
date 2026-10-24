@@ -28,7 +28,12 @@ SOLUTION_ASK = re.compile(
     r"can you (?:build|create) (?:it|this|that)|"
     r"(?:tumhare|aapke|apke) paas (?:koi )?(?:solution|hal)|mujhe (?:koi )?(?:solution|hal) chahiye|"
     r"(?:kuch|kya) kar sakte|kar sakte (?:ho|hain) ya nahi|kya karun|kya karna chahiye|"
-    r"(?:koi )?mashwara (?:do|dein|chahiye)|kuch batao)\b",
+    r"(?:koi )?mashwara (?:do|dein|chahiye)|kuch batao"
+    r"|hal (?:batao|btao|bataiye|bataen|dein|do|chahiye)|(?:koi )?hal bata\w*)\b"
+    # Arabic and Urdu script: "give me a solution", "any solution?", "what is the solution"
+    r"|(?:اعطيني|أعطني|عطيني|اعطني|أبغى|ابغى|أريد|اريد|ابي|أبي)\s+(?:لي\s+)?(?:حل|حلا|حلاً|الحل)"
+    r"|(?:وش|ما|ايش|إيش)\s+(?:هو\s+)?الحل|(?:هل )?(?:عندك|عندكم)\s+حل"
+    r"|(?:کوئی\s+)?حل\s+(?:بتائیں|بتاو|بتاؤ|دیں|دو|چاہیے|چاہئے)|مجھے\s+(?:کوئی\s+)?حل\s+چاہی",
     re.IGNORECASE,
 )
 COST = re.compile(r"\b(?:how much|kitna|kitne|price|pricing|cost|qeemat|kharcha|quote)\b", re.I)
@@ -37,7 +42,9 @@ HOWTO = re.compile(
     r"\bhow exactly\b|\bstep[- ]by[- ]step\b"
     r"|\b(?:ye|yeh|ise|isay|iska|ye sab)\b(?: \w+){0,4} kaise\b[^.!]*[?]|\bexactly kaise\b"
     r"|\b(?:kaunsa|kaunsi|konsa|konsi) (?:software|app|tool|system)\b"
-    r"|\b(?:which|what) (?:app|software|tool|system)\b",
+    r"|\b(?:which|what) (?:app|software|tool|system)\b"
+    r"|كيف\s+بالضبط|كيف\s+بالتحديد|بالتفصيل\s+كيف|أي\s+(?:تطبيق|برنامج)"
+    r"|یہ\s+کیسے|اسے\s+کیسے|بالکل\s+کیسے|کون\s*سا\s+(?:سافٹ ?ویئر|ایپ|ٹول)",
     re.IGNORECASE,
 )
 WHICH_APP = re.compile(
@@ -136,6 +143,7 @@ def free_rider(brief: dict[str, Any], said: str) -> bool:
 OFFER_AFTER = {
     "en": "Shall I get a solution document and a quote made for you? You can say no.",
     "roman_ur": "Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "ar": "هل أجهّز لك وثيقة حل وعرض سعر؟ يمكنك أن تقول لا.",
 }
 OFFERABLE = ("S1_LISTENING", "S2_CLARIFYING", "S3_NOTED", "S4_SORTED_SUMMARY")
 # Where a request for a fix or for the detail may be answered: while listening, and at the offer
@@ -144,4 +152,17 @@ ASKABLE = (*OFFERABLE, "S5_READINESS", "S5b_DECLINED")
 
 
 def offer_line(language: str | None) -> str:
-    return OFFER_AFTER["roman_ur" if language == "roman_ur" else "en"]
+    return OFFER_AFTER.get(language or "en", OFFER_AFTER["en"])
+
+
+OFFERS_DOCUMENT = re.compile(
+    r"(?:solution document|document (?:and|aur|&) (?:a |an )?quote|quote (?:and|aur) (?:a )?document)"
+    r"[^.?!\n]{0,80}[?؟]\s*$",
+    re.IGNORECASE,
+)
+
+
+def already_offers(reply: str) -> bool:
+    """The reply already ends by asking whether to prepare the solution document and quote (a
+    model sometimes writes the offer itself): the application must not add its own on top."""
+    return bool(OFFERS_DOCUMENT.search((reply or "").rstrip()))

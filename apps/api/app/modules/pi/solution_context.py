@@ -337,8 +337,8 @@ async def _build(
         problem = solution_ideas.match_problem(
             entries,
             str(item.get("group") or ""),
-            "",
-            str(item.get("title") or ""),
+            str(item.get("subtype") or ""),
+            f"{item.get('title') or ''} {item.get('title_local') or ''}",
         )
         if problem is not None:
             break

@@ -38,6 +38,8 @@ def adaptive(monkeypatch, make):
     last: dict = {}
 
     async def complete(self, scope, output, **kwargs):
+        if kwargs.get("purpose") == "pi_problem_extract":  # the separate note extractor: empty
+            return SimpleNamespace(value=output(), response=SimpleNamespace(attempts=[]))
         text = kwargs["messages"][-1].text()
         prompts.append(text)
         if text.startswith("{"):

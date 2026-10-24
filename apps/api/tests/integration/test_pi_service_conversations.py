@@ -54,6 +54,8 @@ def mock_turns(monkeypatch, *turns):
     last: list = []
 
     async def complete(self, scope, output, **kwargs):
+        if kwargs.get("purpose") == "pi_problem_extract":  # the separate note extractor: empty
+            return SimpleNamespace(value=output(), response=SimpleNamespace(attempts=[]))
         assert scope is not None and kwargs["purpose"] == "pi_service"
         if kwargs["messages"][-1].text().startswith("Don't send that draft"):
             # pi's self-check asked for a rewrite: these tests script one reply per turn.

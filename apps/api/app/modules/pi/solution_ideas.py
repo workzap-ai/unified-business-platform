@@ -44,8 +44,18 @@ STOP = frozenset(
 )
 
 
+def _stem(word: str) -> str:
+    """A crude stem so "booking", "bookings" and "booked" meet ("double-book" shares "book")."""
+    for tail in ("ings", "ing", "ed", "es", "s"):
+        if word.endswith(tail) and len(word) - len(tail) >= 4:
+            return word[: -len(tail)]
+    return word
+
+
 def _words(text: str) -> set[str]:
-    return {w for w in re.findall(r"[a-z]{4,}", (text or "").lower()) if w not in STOP}
+    return {_stem(w) for w in re.findall(r"[a-z]{4,}", (text or "").lower()) if w not in STOP} - {
+        ""
+    }
 
 
 def match_problem(
@@ -60,10 +70,17 @@ def match_problem(
         score += 2.0 if category and entry.get("category") == category else 0.0
         theirs = _words(entry.get("words", ""))
         if said and theirs:
-            score += 3.0 * len(said & theirs) / len(said | theirs)
+            # Their phrase is short and the entry's long: a shared share of the SHORTER one (the
+            # overlap coefficient), not of the union, which no short phrase could ever reach.
+            score += 3.0 * len(said & theirs) / min(len(said), len(theirs))
         if best is None or score > best[0]:
             best = (score, entry)
-    return best[1] if best is not None and best[0] >= MATCH_AT else None
+    if best is not None and best[0] >= MATCH_AT:
+        return best[1]
+    # No shared words and no sub-type: when the industry has exactly one entry in the problem's
+    # category, that is the match (a wrong idea is worse than none, so never with two or more).
+    same = [e for e in problems if category and e.get("category") == category]
+    return same[0] if len(same) == 1 else None
 
 
 def _where_arm(scope: WorkspaceScope) -> tuple[Any, ...]:
