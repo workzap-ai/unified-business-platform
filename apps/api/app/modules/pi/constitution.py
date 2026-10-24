@@ -431,6 +431,76 @@ def _relists(reply: str, context: dict[str, Any]) -> bool:
     )
 
 
+# R-MEM-02 (spec 3.10): never ask again for a `customer_profile` fact already known, this chat or
+# an earlier one. Bounded to the handful of facts a customer most notices being asked twice; a
+# narrower, well-tested set beats a generic "did I ask about any of 15 fields" guess that risks
+# false positives on an unrelated question.
+REASK_FIELDS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    (
+        "name",
+        re.compile(
+            r"\bwhat(?:'s| is) your name\b|\bmay i (?:have|know|get) your name\b"
+            r"|\bwho am i (?:speaking|chatting|talking) (?:to|with)\b"
+            r"|\baap\s*ka\s*naam\b|\bap\s*ka\s*naam\b|\bapka\s*naam\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "business_name",
+        re.compile(
+            r"\bname of your (?:business|company|shop|store)\b"
+            r"|\bwhat(?:'s| is) your (?:business|company|shop|store)(?:'s)? (?:called|name)\b"
+            r"|\bbusiness\s*ka\s*naam\b|\bcompany\s*ka\s*naam\b|\bdukan\s*ka\s*naam\b"
+            r"|\bshop\s*ka\s*naam\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "business_type",
+        re.compile(
+            r"\bwhat (?:does|do) your business do\b|\bwhat (?:kind|type) of business\b"
+            r"|\bwhat industry\b|\bkis\s*(?:tarah|type)\s*(?:ka|ki)\s*business\b"
+            r"|\bbusiness\s*kya\s*karte\b|\bkaam\s*kya\s*karte\s*(?:hain|ho)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "location",
+        re.compile(
+            r"\bwhere are you (?:based|located)\b|\bwhich city\b|\bwhat city\b"
+            r"|\bkis\s*shehar\b|\bkahan\s*se\s*(?:ho|hain)\b",
+            re.IGNORECASE,
+        ),
+    ),
+)
+
+
+# Mirrors service_conversation.PLACEHOLDER_NAME; kept local to avoid a circular import.
+_PLACEHOLDER_PROFILE_VALUE = re.compile(
+    r"^(whatsapp|customer|unknown)\b|^\+?\d[\d ]+$", re.IGNORECASE
+)
+
+
+def _reasks_known_profile(reply: str, context: dict[str, Any], add: Any) -> None:
+    profile = context.get("customer_profile") or {}
+    if not isinstance(profile, dict):
+        return
+    for sentence in _sentences(reply):
+        if not sentence.endswith(QUESTION_MARKS):
+            continue
+        for field, pattern in REASK_FIELDS:
+            known = str(profile.get(field) or "").strip()
+            if known and not _PLACEHOLDER_PROFILE_VALUE.search(known) and pattern.search(sentence):
+                add(
+                    Violation(
+                        "R-MEM-02",
+                        f'they already told you their {field.replace("_", " ")} ("{known}"): '
+                        "do not ask again, use what you already know",
+                    )
+                )
+                return
+
+
 # A reply that was asked for may carry the ideas, the Workzap line and, for "how exactly?", the
 # solution document. It may not pitch a product, recommend, offer a quote itself (the application
 # adds the offer) or name an amount: those stay hard.
@@ -1170,6 +1240,7 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 "confirm only the new problem this message adds, in one short line",
             )
         )
+    _reasks_known_profile(reply, context, add)
     if context.get("said_wrong") and NOT_UNDERSTOOD.search(reply):
         add(
             Violation(

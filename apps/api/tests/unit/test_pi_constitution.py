@@ -383,3 +383,32 @@ def test_a_complaint_about_the_questions_gets_no_document_talk_but_a_direct_ask_
     assert "R-SELL-01" in {v.rule for v in c.hard(c.lint(reply, complaint))}
     pitch = "We can build an app for that. Is that everything?"
     assert "R-SELL-01" in {v.rule for v in c.hard(c.lint(pitch, asked))}
+
+
+@pytest.mark.parametrize(
+    "reply,field,value",
+    [
+        ("Thanks for that. What is your name?", "name", "Ata"),
+        ("Noted. Ap ka naam kya hai?", "name", "Ata"),
+        ("Got it. What is your business called?", "business_name", "Ata Traders"),
+        ("Theek hai. Business ka naam kya hai?", "business_name", "Ata Traders"),
+        ("I see. What kind of business is this?", "business_type", "kiryana store"),
+        ("Samjha. Which city are you based in?", "location", "Lahore"),
+    ],
+)
+def test_never_re_asks_a_known_profile_fact(reply, field, value):
+    known = {field: value}
+    assert "R-MEM-02" in {v.rule for v in c.lint(reply, context(customer_profile=known))}
+    assert "R-MEM-02" not in {v.rule for v in c.lint(reply, context())}
+
+
+def test_profile_reask_check_does_not_flag_unrelated_or_unknown_questions():
+    profile = {"name": "Ata", "business_name": "Ata Traders"}
+    # A genuinely different question about a field that IS known stays clear.
+    assert "R-MEM-02" not in rules(
+        "Noted. Is this happening at every branch?", customer_profile=profile
+    )
+    # The same question about a field that is NOT yet known is still allowed.
+    assert "R-MEM-02" not in rules("Thanks. Which city are you based in?", customer_profile=profile)
+    # A placeholder value (never really answered) does not count as known.
+    assert "R-MEM-02" not in rules("What is your name?", customer_profile={"name": "WhatsApp User"})

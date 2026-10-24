@@ -73,7 +73,7 @@ Files: linter `constitution.py` (tests `test_pi_constitution.py`, `test_pi_redte
 | R-LANG-07, 08 | Voice notes; religious courtesy | partial | transcription exists; courtesy is prompt |
 | R-ASK-02 to 06 | At most 3 clarifying questions; never re-ask; no sensitive asks | prompt | `noted_problems` lists what is missing |
 | R-NOTE-01 to 08, R-CORR-01 to 04 | Notes in their words, groups, corrections applied | code | `problems.py` ops with revisions; titles checked. R-CORR-02: `says_wrong` sets `said_wrong` and the linter flags "I did not understand" as an answer to it; `corrects_noted` (a note exists) tells the prompt to withdraw the problem they mean |
-| R-MEM-01, 02 | Profiles; never ask twice | partial | profile and `noted_problems`; "I already told you" shows the sorted summary (`SHOW_ME`); no cross-conversation memory check |
+| R-MEM-01, 02 | Profiles; never ask twice | code | `customer_profile()` merges name/business facts across up to 10 earlier conversations; `constitution._reasks_known_profile` (R-MEM-02) blocks a drafted reply that asks again for a known name, business name, business type or location (EN + Roman Urdu); "I already told you" shows the sorted summary (`SHOW_ME`). Bounded to these 4 facts, not all 15 profile fields, to keep false positives low |
 | R-MEM-03 | Welcome back after a gap | code | `welcome_back` (see R-DISC-05) |
 | R-MEM-06 | Shared workspace | open | |
 | R-MEM-04 | Corrections override, history kept | code | revisions |
