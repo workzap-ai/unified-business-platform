@@ -77,6 +77,16 @@ def match_problem(
             best = (score, entry)
     if best is not None and best[0] >= MATCH_AT:
         return best[1]
+    # Same category and at least one word in common with a numbered problem: close enough to
+    # give its free ideas (a person's "udhaar" is the pack's "credit customers" problem).
+    if category and said:
+        near = [
+            (len(said & _words(e.get("words", ""))), e)
+            for e in problems
+            if e.get("category") == category and said & _words(e.get("words", ""))
+        ]
+        if near:
+            return max(near, key=lambda pair: pair[0])[1]
     # No shared words and no sub-type: when the industry has exactly one entry in the problem's
     # category, that is the match (a wrong idea is worse than none, so never with two or more).
     same = [e for e in problems if category and e.get("category") == category]

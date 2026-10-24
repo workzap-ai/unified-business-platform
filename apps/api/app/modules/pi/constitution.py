@@ -332,6 +332,7 @@ ABSENCE = re.compile(
     r"(?:\bno\b|\bwithout\b|\bnot\b|\bnahi\b|\bnever\b|\bmissing\b|\black of\b|\bno written\b)\W+(?:\w+\W+){0,3}$",
     re.IGNORECASE,
 )
+ENGLISH_NOTED = re.compile(r"\bI(?:'ve| have) noted\b|^\s*Thanks\.\s", re.IGNORECASE)
 NOTING = re.compile(r"\bnoted?\b|note kar|likh liya|likh liye", re.IGNORECASE)
 ATTRIBUTIVE_NOUNS = re.compile(
     r"\s+(?:count|number|minimum|headcount|guests?|deposit|amount)\b", re.IGNORECASE
@@ -582,6 +583,14 @@ def _value_line_every_reply(
         return
     said = _customer_words(context)
     referral = solution_rules.has_safety_referral(reply)
+    if handed and not count and not referral and "solution_howto" not in context:
+        add(
+            Violation(
+                "R-VAL-08",
+                "they asked for a fix and you were handed solution_ideas: say yes, then give them "
+                "as a short numbered list (at most two), instead of asking another question",
+            )
+        )
     if "solution_howto" not in context:  # a "how exactly" reply is checked by _value_line
         for why in solution_rules.check_sample_reply(reply, said, carried or not listing):
             rule = next((r for key, r in VALUE_LINE_RULES if key in why), "R-VAL-04")
@@ -1288,6 +1297,14 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         add(Violation("R-VOICE-10", 'say "noted", not logged, ticketed or captured'))
     if re.search("[؀-ۿ]", reply) and re.search(r"\bnoted\b", reply, re.IGNORECASE):
         add(Violation("R-LANG-02", 'translate "noted": no English word inside an Arabic reply'))
+    if str(context.get("reply_language") or "") == "roman_ur" and ENGLISH_NOTED.search(reply):
+        add(
+            Violation(
+                "R-LANG-02",
+                'translate the English "noted" sentence into Roman Urdu ("note kar liya"): '
+                "no English sentence inside a Roman Urdu reply",
+            )
+        )
     limit = int((context.get("brain_settings") or {}).get("max_clarify") or 0)
     if (
         limit
