@@ -38,6 +38,7 @@ from app.modules.pi import (
     safety,
     solution_ask,
     solution_context,
+    solutions,
     spec_handbook,
     style,
     taxonomy,
@@ -2126,6 +2127,27 @@ async def industry_context_for(
     return found
 
 
+def solution_lint_context(
+    industry: dict[str, Any], policy: PiSettings, conversation: PiConversation
+) -> dict[str, Any]:
+    """What the reply linter needs on EVERY brain reply when solution mode is on: the ideas this
+    chat has already had (the budget check) and the industry's never-say lines (R-NEVER-IND).
+    solution_context overrides these on a turn where it hands ideas over."""
+    rules = policy.response_rules or {}
+    if (
+        rules.get("pi_mode") != "brain"
+        or (rules.get("brain") or {}).get("solution_mode") is not True
+    ):
+        return {}
+    out: dict[str, Any] = {
+        "ideas_given": int((conversation.service_brief or {}).get("ideas_given") or 0)
+    }
+    keys = industry.get("industry_keys") or []
+    if keys:
+        out["solution_never_say"] = solutions.never_say(list(keys[:1]))[:6]
+    return out
+
+
 async def prepare_context(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -2260,6 +2282,7 @@ async def prepare_context(
     )
     return {
         **industry,
+        **solution_lint_context(industry, policy, conversation),
         **brain,
         "bookable_services": bookable,
         "customer_bookings": customer_bookings,
