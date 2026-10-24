@@ -85,13 +85,19 @@ async def test_profile_a_brain_turn(api, business_db, monkeypatch, caplog, capsy
                 f"wall={r.wall_ms:7.1f}ms model_calls={r.model_calls} "
                 f"prompt_chars={r.prompt_chars} stages={r.stages_ms}"
             )
-        print(f"SQL statements, {len(lines)} turns: {profile.total} ({profile.total / len(lines):.1f}/turn)")
+        print(
+            f"SQL statements, {len(lines)} turns: {profile.total} "
+            f"({profile.total / len(lines):.1f}/turn)"
+        )
         print("per stage:", dict(profile.per_stage.most_common()))
         print("top statements:", profile.statements.most_common(25))
         for text in prompts:
             if not text.startswith("{"):
                 print("REWRITE ASKED:", text[:300])
-        print("context size by key (last turn):", dict(sorted(SIZES[-1].items(), key=lambda kv: -kv[1])[:12]))
+        print(
+            "context size by key (last turn):",
+            dict(sorted(SIZES[-1].items(), key=lambda kv: -kv[1])[:12]),
+        )
         if os.environ.get("PI_PROFILE_SEQUENCE"):
             print(chr(10).join(list(profile.sequence.values())[-1]))
     await pi.close()

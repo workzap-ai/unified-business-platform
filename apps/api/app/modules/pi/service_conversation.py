@@ -112,10 +112,6 @@ def _flag(value: Any) -> bool:
     return bool(value)
 
 
-# Context keys placed first in the prompt's JSON (see prepare_context).
-STATIC_FIRST = ("spec_guidance",)
-
-
 class _Lookup:
     """Marks "look the customer up yourself" (None already means "there is no such customer")."""
 
@@ -2421,11 +2417,6 @@ async def prepare_context(
     # read once, used twice below
     team_notes = await latency.timed("ctx.team_notes", _team_notes(session, scope, conversation.id))
     return {
-        # First on purpose: the context is sent as JSON text right after the (fixed) system
-        # prompt, so the largest block that barely changes between turns (the handbook's core
-        # sections) forms one unbroken prefix that providers with automatic prompt caching
-        # (OpenAI, Gemini) can reuse. JSON key order carries no meaning for the model's rules.
-        **{key: brain[key] for key in STATIC_FIRST if key in brain},
         **industry,
         **solution_lint_context(industry, policy, conversation),
         **brain,
@@ -4097,41 +4088,44 @@ async def compose_service_turn(
         # One self-correction: show the model its draft and why it can't be sent.
         latency.count("model_calls")
         latency.count("rewrites")
-        retry = await latency.timed("model.rewrite", manager.complete_structured(
-            scope,
-            ServiceTurn,
-            alias=policy.ai_config.get("reply_alias", "balanced"),
-            purpose="pi_service",
-            messages=[
-                # Rebuilt: the checks above may have added flags to the context (lint_slipped).
-                Message.system(system_for(context)),
-                Message.user(json.dumps(context, ensure_ascii=False)),
-                Message.assistant(json.dumps({"reply": turn.reply}, ensure_ascii=False)),
-                Message.user(
-                    f"Don't send that draft: {problem}. Rewrite the whole result and fix "
-                    "that. "
-                    + (
-                        "This is a status question: answer it from project_deals, one '• "
-                        "Project: status, next step' line per project, and nothing else. "
-                        if asks_status
-                        else "If their latest message gives details or changes a project, "
-                        "never list project statuses: repeat what they asked for in short "
-                        "'• ' points (with the details they just gave) and ask the one "
-                        "thing still needed or whether that is everything; list every "
-                        "project they described in these last messages, never drop one. "
-                    )
-                    + "Otherwise, if the brief was already "
-                    "confirmed, answer in one short line "
-                    "with what happens next. If the brief is complete but not yet "
-                    "confirmed, confirm it in short points, say what happens next, set "
-                    "ready_for_team=true and awaiting_customer=false. If one detail is "
-                    "truly required to start (and was never asked), ask only for that."
-                ),
-            ],
-            temperature=float(policy.ai_config.get("temperature", "0.20")),
-            max_tokens=4096,
-            conversation_id=conversation.id,
-        ))
+        retry = await latency.timed(
+            "model.rewrite",
+            manager.complete_structured(
+                scope,
+                ServiceTurn,
+                alias=policy.ai_config.get("reply_alias", "balanced"),
+                purpose="pi_service",
+                messages=[
+                    # Rebuilt: the checks above may have added flags to the context (lint_slipped).
+                    Message.system(system_for(context)),
+                    Message.user(json.dumps(context, ensure_ascii=False)),
+                    Message.assistant(json.dumps({"reply": turn.reply}, ensure_ascii=False)),
+                    Message.user(
+                        f"Don't send that draft: {problem}. Rewrite the whole result and fix "
+                        "that. "
+                        + (
+                            "This is a status question: answer it from project_deals, one '• "
+                            "Project: status, next step' line per project, and nothing else. "
+                            if asks_status
+                            else "If their latest message gives details or changes a project, "
+                            "never list project statuses: repeat what they asked for in short "
+                            "'• ' points (with the details they just gave) and ask the one "
+                            "thing still needed or whether that is everything; list every "
+                            "project they described in these last messages, never drop one. "
+                        )
+                        + "Otherwise, if the brief was already "
+                        "confirmed, answer in one short line "
+                        "with what happens next. If the brief is complete but not yet "
+                        "confirmed, confirm it in short points, say what happens next, set "
+                        "ready_for_team=true and awaiting_customer=false. If one detail is "
+                        "truly required to start (and was never asked), ask only for that."
+                    ),
+                ],
+                temperature=float(policy.ai_config.get("temperature", "0.20")),
+                max_tokens=4096,
+                conversation_id=conversation.id,
+            ),
+        )
         turn = retry.value
         turn._attempts = [*result.response.attempts, *retry.response.attempts]
         turn.reply = without_filler(tidy_list_numbers(turn.reply))
