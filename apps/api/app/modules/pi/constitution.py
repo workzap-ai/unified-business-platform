@@ -336,6 +336,8 @@ CODE_PROMISE = re.compile(
     r"\b(?:code|otp|pin)\b[^.?!\n]{0,40}\b(?:on its way|is (?:being )?sent|will (?:arrive|come)|is coming)\b",
     re.IGNORECASE,
 )
+ON_ITS_WAY = re.compile(r"\bon its way\b", re.IGNORECASE)
+SIGN_IN_WORDS = re.compile(r"\b(?:codes?|otp|pins?|passwords?)\b", re.IGNORECASE)
 ENGLISH_NOTED = re.compile(r"\bI(?:'ve| have) noted\b|^\s*Thanks\.\s", re.IGNORECASE)
 NOTING = re.compile(r"\bnoted?\b|note kar|likh liya|likh liye", re.IGNORECASE)
 ATTRIBUTIVE_NOUNS = re.compile(
@@ -1309,7 +1311,10 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 "no English sentence inside a Roman Urdu reply",
             )
         )
-    if CODE_PROMISE.search(reply):
+    if CODE_PROMISE.search(reply) or (
+        ON_ITS_WAY.search(reply)
+        and (SIGN_IN_WORDS.search(reply) or SIGN_IN_WORDS.search(_customer_words(context)))
+    ):
         add(
             Violation(
                 "R-INVENT-01",

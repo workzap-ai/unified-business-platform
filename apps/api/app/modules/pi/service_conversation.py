@@ -4498,6 +4498,13 @@ async def save_service_turn(
         before_meeting.get("starts_at"),
         before_meeting.get("change_to"),
     )
+    if flow.brain_mode(policy.response_rules) and not (
+        asks_for_meeting(message.body) or MEETING_WORDS.search(message.body)
+    ):
+        # Brain mode: a meeting is raised only when the person's own message asks for one ("haan
+        # har hafte" answers a question about how often, and once raised a meeting and a link).
+        turn.meeting_requested = False
+        new_time = False
     if (
         (turn.meeting_requested or new_time)
         and turn.action != "booking"

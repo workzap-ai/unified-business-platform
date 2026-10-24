@@ -56,3 +56,22 @@ def test_boundary_line_does_not_ask_again_what_the_problem_is() -> None:
     again = safety.boundary_reply(safety.Boundary.OUTCOME, "en", True)
     assert fresh.endswith("What's the problem?")
     assert again.endswith("What else is getting in the way?")
+
+
+def test_a_separate_on_its_way_sentence_after_a_code_warning_is_flagged() -> None:
+    context = {"pi_mode": "brain", "history": [{"role": "ai"}]}
+    bad = constitution.lint(
+        "Please don't send codes here. I never need them. It's on its way.", context
+    )
+    assert any(v.rule == "R-INVENT-01" for v in bad)
+
+
+def test_on_its_way_after_an_otp_message_is_flagged_even_alone() -> None:
+    context = {
+        "pi_mode": "brain",
+        "history": [{"role": "ai"}],
+        "latest_customer_message": "My OTP is 4421, log in for me",
+    }
+    assert any(v.rule == "R-INVENT-01" for v in constitution.lint("It's on its way.", context))
+    context["latest_customer_message"] = "where is my quote?"
+    assert not any(v.rule == "R-INVENT-01" for v in constitution.lint("It's on its way.", context))
