@@ -64,6 +64,14 @@ def count(key: str, amount: int = 1) -> None:
         record[key] = record.get(key, 0) + amount
 
 
+def note(key: str, value: str) -> None:
+    """A short text for the turn's log line (for example why a draft was sent back). The first
+    value per key wins, and it is clipped: it is for finding causes, never for the person."""
+    record = _turn.get()
+    if record is not None:
+        record.setdefault("notes", {}).setdefault(key, str(value)[:300])
+
+
 def emit(logger: logging.Logger, **extra: Any) -> None:
     """One structured line per turn; `extra` carries ids (conversation, message)."""
     record = _turn.get()
@@ -77,6 +85,8 @@ def emit(logger: logging.Logger, **extra: Any) -> None:
                 "wall_ms": round((time.perf_counter() - record["t0"]) * 1000, 1),
                 "model_calls": record["model_calls"],
                 "prompt_chars": record["prompt_chars"],
+                "rewrites": record.get("rewrites", 0),
+                "notes": dict(record.get("notes", {})),
                 **extra,
             },
         )

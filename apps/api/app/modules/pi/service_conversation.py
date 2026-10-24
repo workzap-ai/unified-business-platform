@@ -4088,6 +4088,7 @@ async def compose_service_turn(
         # One self-correction: show the model its draft and why it can't be sent.
         latency.count("model_calls")
         latency.count("rewrites")
+        latency.note("rewrite_reason", problem)
         retry = await latency.timed(
             "model.rewrite",
             manager.complete_structured(
