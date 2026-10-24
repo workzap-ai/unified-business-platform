@@ -2319,6 +2319,7 @@ async def prepare_context(
     brain = await brain_problems(
         session, scope, conversation, policy, bool(industry), message, rows, embedder
     )
+    team_notes = await _team_notes(session, scope, conversation.id)  # read once, used twice below
     return {
         **industry,
         **solution_lint_context(industry, policy, conversation),
@@ -2363,7 +2364,7 @@ async def prepare_context(
         "latest_customer_message": message.body[:4000],
         "shared_links": (message.media or {}).get("links") or [],
         "shared_documents": shared_documents(message, rows),
-        "team_notes": await _team_notes(session, scope, conversation.id),
+        "team_notes": team_notes,
         **reply_language(conversation, message, rows),
         "tone": policy.response_rules.get("tone", "friendly"),
         **brain_context(policy, conversation, rows),
@@ -2373,7 +2374,7 @@ async def prepare_context(
         ),
         "meeting_over": meeting_over(
             conversation.service_brief or {},
-            await _team_notes(session, scope, conversation.id),
+            team_notes,
             policy.timezone,
             datetime.now(UTC),
         ),

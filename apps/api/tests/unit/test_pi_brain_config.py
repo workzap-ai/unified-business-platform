@@ -8,7 +8,7 @@ from app.modules.pi.problems import summary_due
 
 
 def test_defaults_come_from_the_spec_table():
-    assert bc.value({}, "debounce_seconds") == 10
+    assert bc.value({}, "debounce_seconds") == 5  # lowered from 10 (2026-10-24, latency)
     assert bc.value(None, "summary_trigger") == 7
     assert bc.value({}, "redisclose_days") == 30
     assert bc.value({}, "followup_silence_hours") == 20

@@ -10,7 +10,9 @@ from typing import Any
 
 # key: (default, lowest tested value, highest tested value)
 TUNABLES: dict[str, tuple[int, int, int]] = {
-    "debounce_seconds": (10, 5, 20),
+    # Lowered 10 -> 5 (2026-10-24, live-chat latency complaints): still the tested floor, so pi
+    # waits half as long to see if a burst of messages is still coming before it starts replying.
+    "debounce_seconds": (5, 5, 20),
     "max_clarify": (3, 1, 3),
     "summary_trigger": (7, 5, 10),
     "quiet_before_summary": (2, 1, 3),  # "anything else?" replies with nothing new, then a summary
