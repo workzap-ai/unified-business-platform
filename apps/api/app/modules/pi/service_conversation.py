@@ -3684,6 +3684,8 @@ def says_nothing(reply: str) -> str | None:
 OWN_VIDEO_LINK = re.compile(r"https://meet\.jit\.si/\S+")
 GOOGLE_MEET_WORDS = re.compile(r"\bGoogle Meet(?: meeting)?(?= link| meeting|\b)", re.IGNORECASE)
 URL_PART = re.compile(r"https?://\S+")
+# Four or more words between asterisks and no group count after them: a bolded sentence.
+BOLD_SENTENCE = re.compile(r"\*(\S+(?: \S+){3,}?[^*\n]{0,160})\*(?!\s*\(\d)")
 
 
 def polished(reply: str) -> str:
@@ -3695,6 +3697,9 @@ def polished(reply: str) -> str:
     reply = reply.replace("**", "*")
     # A status line's project name is plain ("• Website: ..."), never bold.
     reply = re.sub(r"^• \*([^*\n]+)\*:", r"• \1:", reply, flags=re.MULTILINE)
+    # The owner's own words are quoted plainly: bold is for the summary's group names, never a sentence.
+    # never a whole sentence (a real sweep had pi bolding the owner's sentence back at them).
+    reply = BOLD_SENTENCE.sub(r"\1", reply)
     links = URL_PART.findall(reply)
     text = URL_PART.sub("\x00", reply)
     text = re.sub(r"!+(?=\s|$)", ".", text)
