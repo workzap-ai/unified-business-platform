@@ -376,11 +376,68 @@ def view_cap(problems: list[dict[str, Any]], title: str) -> list[str]:
     return [f"{title}: {over} view-first problem(s) over the cap of {allowed}"] if over > 0 else []
 
 
+SECTOR_HEADING = re.compile(r"^7\.([A-Z])\s+(.+?)(?:\s*\(part\s*(\d+)\))?$")
+SCOPE_START = re.compile(
+    r"^(?:Nothing|None of|Everything stays|Personal data stays|Safety,|"
+    r"Safety,? labour law|If (?:a child|anyone)|Every idea stays)",
+    re.IGNORECASE,
+)
+SCOPE_MID = re.compile(
+    r"\b(?:pi|it)\b.{0,200}?\b(?:never|stays|stops|points to|keeps|sends .{0,40} to)\b",
+    re.IGNORECASE,
+)
+
+
+def sector_scopes(lines: list[str]) -> dict[str, str]:
+    """Each Addendum 2 sector's own scope-limit sentences (Part 4's intro paragraphs, which Part
+    2 of this script otherwise discards): never built from the v3 Brain spec, so packs/
+    sector_rules.json has no "rules" for a sector whose BASE intro never says "pi" (A.1, A.2,
+    D.1), even though the addendum's own sector intro states limits for every one of them."""
+    body = [clean_line(raw) for raw in lines[start_of_part4(lines) :]]
+    body = [line for line in body if line and not PAGE.match(line)]
+    sectors = [(i, line) for i, line in enumerate(body) if SECTOR.match(line)]
+    marks = [i for i, line in enumerate(body) if line == "Top problems and solutions:"]
+    scopes: dict[str, str] = {}
+    for i, heading in sectors:
+        match = SECTOR_HEADING.match(heading)
+        following = next((m for m in marks if m > i), None)
+        if not match or following is None:
+            continue
+        intro = smart_join(body[i + 1 : following - 1])
+        sentences = [s for s in re.split(r"(?<=[.!?])\s+", intro) if s.strip()]
+        scope = [s for s in sentences if SCOPE_START.match(s) or SCOPE_MID.search(s)]
+        if scope:
+            key = f"{match.group(1)}.{match.group(3) or 1}"
+            scopes[key] = smart_join(scope)
+    return scopes
+
+
+def update_sector_rules(scopes: dict[str, str], path: Path) -> list[str]:
+    """Add each sector's addendum scope sentence to packs/sector_rules.json, built separately by
+    scripts/build_industry_packs.py from the v3 Brain spec. Only a new "addendum_scope" field is
+    added; nothing already there (built from a different PDF) is touched or removed."""
+    if not path.exists():
+        return [f"sector_rules.json not found at {path}, scopes not merged"]
+    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    warnings = []
+    for key, scope in scopes.items():
+        if key not in data:
+            warnings.append(f"sector {key} has no matching entry in sector_rules.json")
+            continue
+        data[key]["addendum_scope"] = scope
+    missing = sorted(set(data) - set(scopes))
+    if missing:
+        warnings.append(f"no addendum scope found for sector(s): {', '.join(missing)}")
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return warnings
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("pdf", type=Path)
     parser.add_argument("--out", type=Path, default=PACKS / "solutions")
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--sector-rules", type=Path, default=PACKS / "sector_rules.json")
     args = parser.parse_args()
     lines = extract(args.pdf)
     titles = contents(lines)
@@ -429,11 +486,14 @@ def main() -> None:
         for p in args.out.glob("*.json")
         for pr in json.loads(p.read_text(encoding="utf-8"))["problems"]
     )
+    scopes = sector_scopes(lines)
+    warnings += update_sector_rules(scopes, args.sector_rules)
     report = {
         "industries": written,
         "problems": total,
         "tool_word_sentences": flagged,
         "lead_builds": dict(usage.most_common()),
+        "sector_scopes_found": len(scopes),
         "warnings": warnings,
         "errors": errors,
     }

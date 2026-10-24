@@ -98,3 +98,18 @@ def test_the_pack_files_are_valid_utf8_json_with_the_expected_keys():
             "never_say",
             "sample_reply",
         } <= set(data)
+
+
+def test_most_sectors_have_an_addendum_scope_merged_into_sector_rules():
+    # packs/sector_rules.json is built by scripts/build_industry_packs.py from the v3 Brain spec;
+    # some sectors' own intro there never says "pi", so their "rules" field is empty even though
+    # Addendum 2's own sector intro (Part 4) states real limits. This merges those in without
+    # touching anything build_industry_packs.py wrote.
+    path = industry_packs.PACKS_DIR.parent / "sector_rules.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    with_scope = {k: v for k, v in data.items() if v.get("addendum_scope")}
+    assert len(with_scope) >= 16  # all but A.2, whose own addendum intro states no real limit
+    for key in ("A.1", "D.1", "G.2", "H.1"):  # previously empty "rules", all have a real limit
+        assert data[key].get("rules") == "", key  # unchanged: build_industry_packs.py's own field
+        assert len(data[key]["addendum_scope"]) > 30, key
+    assert "food- safety" not in data["B.1"]["addendum_scope"]  # a line-wrap hyphen, not two words
