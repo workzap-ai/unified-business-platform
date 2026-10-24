@@ -195,6 +195,11 @@ INJECTION = re.compile(
 VALUE_LINE_ATTEMPT = re.compile(
     r"\b(?:give|share|offer|send|allow|raise|increase|up to|more than|at least)\b[^.?!]{0,30}\b"
     r"(?:3|three|4|four|5|five|six|many|more|unlimited|all)\b[^.?!]{0,15}\bideas?\b"
+    r"|\b(?:a|an|the|one) (?:third|fourth|fifth|sixth|extra|additional|bonus|another)\b[^.?!]{0,15}\bideas?\b"
+    r"|\b(?:one|two|a few|some) more ideas?\b|\b(?:extra|additional|bonus) ideas?\b"
+    r"|\bmore ideas? (?:per|each|every|a|for free)\b"
+    r"|\b(?:full|complete|entire|whole)\b[^.?!]{0,12}\bhow[- ]?to\b|\bhow[- ]?to\b[^.?!]{0,25}\bfor free\b"
+    r"|\bfor free\b[^.?!]{0,25}\bhow[- ]?to\b"
     r"|\bideas? (?:per|a|each) (?:message|problem|conversation)\b"
     r"|\b(?:no|without a?) limit on (?:the )?ideas?\b"
     r"|\bstep[- ]by[- ]step (?:instructions?|guide|plan|steps)\b"

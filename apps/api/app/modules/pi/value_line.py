@@ -6,6 +6,8 @@ give away the how (Part 1.7 and 3.8): nothing here reads a setting, and `brain_c
 for any of it. Only a person changing this file changes it.
 """
 
+import re
+
 IDEAS_PER_MESSAGE = 2  # R-VAL-01: two ideas per message, two per problem, never a third
 IDEAS_PER_PROBLEM = 2
 IDEAS_BEFORE_OFFER = 4  # R-VAL-02: four free ideas per conversation before the offer
@@ -32,6 +34,18 @@ PROTECTED_SETTINGS = frozenset(
 )
 
 
+# Any setting whose name mentions the free part, the how-to, the offer or a budget or limit on
+# them is the value line under another name ("max_ideas", "free_ideas_per_message", "idea_count").
+PROTECTED_WORDS = re.compile(
+    r"idea|value|free|how_?to|offer|budget|limit|never|protected|r_?val|r_?build", re.IGNORECASE
+)
+
+
 def may_learn(setting: str) -> bool:
     """False for every setting that is part of the value line."""
-    return setting not in PROTECTED_SETTINGS and not setting.startswith(("ideas_", "value_line"))
+    name = (setting or "").strip()
+    return (
+        name not in PROTECTED_SETTINGS
+        and not name.startswith(("ideas_", "value_line"))
+        and not PROTECTED_WORDS.search(name)
+    )

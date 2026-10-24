@@ -165,7 +165,10 @@ def test_a_how_exactly_answer_has_no_steps_and_no_app():
     assert "R-VAL-04" in {v.rule for v in c.hard(lint(steps, solution_howto=howto))}
     app = "Aap Canva use an app jaise tool install karein ya use an app like Zapier."
     assert "R-VAL-05" in {v.rule for v in c.hard(lint(app, solution_howto=howto))}
-    assert "R-VAL-05" not in {v.rule for v in lint(app, solution_howto={"which_app": False})}
+    # a named product is a vendor whether or not they asked "which app" (gap closed 2026-10-24)
+    assert "R-VAL-05" in {v.rule for v in lint(app, solution_howto={"which_app": False})}
+    plain = "Ye solution document mein detail se hota hai: har ad ka alag code aur roz ki report."
+    assert "R-VAL-05" not in {v.rule for v in lint(plain, solution_howto={"which_app": False})}
 
 
 def test_the_workzap_line_rules_for_the_live_reply():

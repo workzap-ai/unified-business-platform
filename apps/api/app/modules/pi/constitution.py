@@ -446,15 +446,127 @@ AMOUNT_WORDS = re.compile(
     r"|\b(?:rupees|dollars|dirhams|lakhs?|crores?)\b",
     re.IGNORECASE,
 )
-WORKZAP_WILL = re.compile(r"\bWorkzap will\b|\bho jayega\b", re.IGNORECASE)
+# RBUILD06: "would", never "will" (ho jayega): no promised results about what Workzap builds.
+WORKZAP_WILL = re.compile(
+    r"\bWorkzap will\b|\bho jaye ?ga\b|\bho jayegi\b|\bho jayenge\b"
+    r"|\b(?:it|this|that|everything) will (?:fix|stop|solve|save|sort|help|reduce|increase|improve|"
+    r"work|bring|make|grow|end|cut|take care|run|go away)\b"
+    r"|\byou(?:'ll| will) (?:see|get|notice|save|stop|never)\b|\bwill (?:fix|stop|save)\b",
+    re.IGNORECASE,
+)
 VALUE_LINE_RULES = (
     ("more than two", "R-VAL-01"),
     ("how-to", "R-VAL-04"),
     ("tool words", "R-BUILD-01"),
     ("automatically", "R-BUILD-04"),
     ("personal data", "R-PRIV-07"),
+    ("named product", "R-VAL-05"),
     ("claim", "R-PROM-01"),
 )
+# Where the value line is checked on every brain reply: the summary, the readiness question and
+# after a declined offer (a reply that carries ideas is checked wherever it is, before the build).
+VALUE_LINE_STATES = frozenset({flow.State.S4_SORTED_SUMMARY, flow.State.S5_READINESS})
+VALUE_LINE_STATES |= {flow.State.S5B_DECLINED}
+BEFORE_OFFER_STATES = frozenset(flow.LISTENING | {flow.State.S5_READINESS})
+LEADS_SOMEWHERE = re.compile(
+    r"\bworkzap\b|\bsolution documents?\b|\bquotes?\b|\bkya main\b|\bshall i\b|\bwant (?:me|a|the)\b",
+    re.IGNORECASE,
+)
+SOFT_VALUE_WHYS = ("tool words", '"automatically"')
+
+
+def _ideas_followed(reply: str, ideas: list[str]) -> bool:
+    """Whether a reply gives at least one of the handed ideas (most of its longer words are there)."""
+    said = set(re.findall(r"[a-z]{4,}", reply.lower()))
+    for idea in ideas:
+        words = set(re.findall(r"[a-z]{4,}", str(idea).lower()))
+        if words and len(words & said) / len(words) >= 0.4:
+            return True
+    return False
+
+
+def _value_line_every_reply(
+    reply: str, context: dict[str, Any], state: flow.State | None, given: bool, add: Any
+) -> None:
+    """Addendum 2, 1.3 and 1.8 on every brain reply that is not still plain listening, and on any
+    reply that carries ideas: count, how-to, tools, products, claims (hard); budget, idea length,
+    nothing to lead to and over-withholding (soft). Safety referrals are never held back (R-VAL-07)."""
+    from app.modules.pi import learning, solution_rules, solutions, value_line  # local: cycle
+
+    industry = context.get("industry_key") or context.get("industry")
+    never = context.get("solution_never_say")
+    if not isinstance(never, list) and isinstance(industry, str):
+        never = solutions.never_say([industry])
+    if isinstance(never, list) and never:
+        hit = solution_rules.never_say_hit(reply, [str(n) for n in never])
+        if hit:
+            add(Violation("R-NEVER-IND", f'never said in this industry ("{hit}"): drop it', True))
+    handed = [str(i) for i in context.get("solution_ideas") or []]
+    brain = context.get("pi_mode") == "brain" or "flow" in context
+    carried = bool(handed) or "solution_followup" in context
+    listing = state in flow.LISTENING
+    # a sorted summary and a listening reply use dashes for problems, not ideas
+    count = solution_rules.count_ideas(reply, bullets=carried or not listing)
+    in_scope = state is None or listing or state in VALUE_LINE_STATES
+    if not (carried or (brain and (state in VALUE_LINE_STATES or (count and in_scope)))):
+        return
+    said = _customer_words(context)
+    referral = solution_rules.has_safety_referral(reply)
+    if "solution_howto" not in context:  # a "how exactly" reply is checked by _value_line
+        for why in solution_rules.check_sample_reply(reply, said, carried or not listing):
+            rule = next((r for key, r in VALUE_LINE_RULES if key in why), "R-VAL-04")
+            if "a claim" in why and not (
+                solution_rules.claim_hits(reply, said, figures_only=True)
+                or learning.PERSON_OR_COMPETITOR.search(reply)
+            ):
+                continue  # words like "guaranteed" are judged by R-PROM-01 with their usage in mind
+            soft = not carried and any(key in why for key in SOFT_VALUE_WHYS)
+            add(Violation(rule, f"free ideas: {why}", not soft))
+    if solution_rules.long_idea(reply, bool(count or carried)) and not referral:
+        add(Violation("R-VAL-03", "one line per idea, about 25 words: what and why, no sub-steps"))
+    if not given and WORKZAP_WILL.search(reply) and (count or carried):
+        add(Violation("R-BUILD-06", '"would" or "could", never "will": no promised results', True))
+    ideas_given = int(context.get("ideas_given") or 0)
+    total = ideas_given + (0 if handed else count)
+    if (
+        total > value_line.IDEAS_BEFORE_OFFER
+        and state in BEFORE_OFFER_STATES
+        and not referral
+        and not context.get("offer_made")
+    ):
+        add(
+            Violation(
+                "R-VAL-02",
+                f"{ideas_given} ideas were already given: no more than "
+                f"{value_line.IDEAS_BEFORE_OFFER} before the offer, so lead to the solution document",
+            )
+        )
+    gave = bool(count) or (bool(handed) and _ideas_followed(reply, handed))
+    if (
+        gave
+        and not referral
+        and not LEADS_SOMEWHERE.search(reply)
+        and not any(mark in reply for mark in QUESTION_MARKS)
+    ):
+        add(
+            Violation(
+                "R-VAL-06",
+                "ideas with nothing to lead to: end with the Workzap line, the offer or one question",
+            )
+        )
+    if (
+        context.get("solution_asked")
+        and handed
+        and not gave
+        and LEADS_SOMEWHERE.search(reply)
+        and not referral
+    ):
+        add(
+            Violation(
+                "R-SOL-01",
+                "they asked for a solution: give the ideas first, never a pitch with no idea",
+            )
+        )
 
 
 def _given_turn_limits(reply: str, context: dict[str, Any], add: Any) -> None:
@@ -482,7 +594,7 @@ def _given_turn_limits(reply: str, context: dict[str, Any], add: Any) -> None:
     if AMOUNT_WORDS.search(reply):
         add(Violation("R-OFFER-05", "never an amount, a range or a price before the quote", True))
     if WORKZAP_WILL.search(reply):
-        add(Violation("R-BUILD-06", '"would" or "could", never "will": no promised results'))
+        add(Violation("R-BUILD-06", '"would" or "could", never "will": no promised results', True))
 
 
 def _value_line(reply: str, context: dict[str, Any], add: Any) -> None:
@@ -992,12 +1104,12 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
     state = flow.parse((context.get("flow") or {}).get("state"))
     if URGENCY.search(reply) or _offers_discount(reply, heard):
         add(Violation("R-SELL-03", "no urgency, scarcity or discounts to move a decision", True))
+    # Solution mode (Addendum 2, 1.4 and 1.6): they asked for a fix or for the detail, so this
+    # reply may carry the ideas, the Workzap line and the document. The value-line checks below
+    # still apply.
+    given = bool(context.get("solution_asked")) or "solution_howto" in context
     if state in flow.NO_OFFER:
         requested = bool(ASKED_FOR_HELP.search(str(context.get("latest_customer_message", ""))))
-        # Solution mode (Addendum 2, 1.4 and 1.6): they asked for a fix or for the detail, so
-        # this reply may carry the ideas, the Workzap line and the document. The value-line
-        # checks below still apply.
-        given = bool(context.get("solution_asked")) or "solution_howto" in context
         if given:
             _given_turn_limits(reply, context, add)
         elif PITCH_WORDS.search(reply) or (
@@ -1025,12 +1137,9 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
     _advice_and_policy(reply, heard, add)
     _style_soft(reply, context, heard, state, add)
 
-    # The value line (R-VAL, R-BUILD): checked whenever pi was handed free ideas or a follow-up.
-    if "solution_ideas" in context or "solution_followup" in context:
-        from app.modules.pi import solution_rules  # local: it imports learning, which imports this
-
-        for why in solution_rules.check_sample_reply(reply, _customer_words(context)):
-            add(Violation("R-VAL-01", f"free ideas: {why}", True))
+    # The value line (R-VAL, R-BUILD): whenever pi was handed free ideas or a follow-up, on every
+    # brain reply after plain listening, and on any reply that carries ideas.
+    _value_line_every_reply(reply, context, state, given, add)
 
     # Voice (R-VOICE)
     asked = sum(reply.count(mark) for mark in QUESTION_MARKS)
