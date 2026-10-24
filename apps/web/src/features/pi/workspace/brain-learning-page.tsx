@@ -15,6 +15,7 @@ import {
 import { EmptyState, ErrorState } from "@/components/app/states";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { useUrlState } from "@/hooks/use-url-state";
+import { SolutionsTab } from "./brain-solutions-tab";
 import {
   brainLearningService,
   type LearnedPack,
@@ -29,6 +30,7 @@ const TABS = [
   { key: "problems", label: "Problems" },
   { key: "lessons", label: "Teach pi" },
   { key: "packs", label: "Industry packs" },
+  { key: "solutions", label: "Solutions" },
   { key: "changes", label: "Changes" },
 ] as const;
 
@@ -82,6 +84,7 @@ function BrainLearningView() {
       {tab === "problems" && <Problems />}
       {tab === "lessons" && <Lessons />}
       {tab === "packs" && <Packs />}
+      {tab === "solutions" && <SolutionsTab />}
       {tab === "changes" && <Changes />}
     </PageShell>
   );

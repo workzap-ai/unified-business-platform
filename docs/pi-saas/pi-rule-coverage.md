@@ -163,9 +163,10 @@ migration 0043, `docs/pi-saas/migrations-0043.sql`, and learning not frozen for 
 | Part 3.4 | S1 to S8 inside the nightly gate; nothing runs while learning is frozen | `learning_solutions.py`, `learning_solutions_grow.py`, `learning_nightly.run_workspace` |
 | Part 3.5 | Money or regulated ideas wait in review; catalogue proposals decided by a person | `PiIdeaArm.status = "review"`, `solution_routes.py` |
 | Part 3.7 | Versions `solutions/{industry}@1.N`, per-industry rollback | `solution_versions.py`, `POST /pi/solutions/{industry}/rollback` |
+| Part 3.5, 3.7 | The Solutions panel: learned versions with evidence, per-industry rollback, review queue, ideas table | `apps/web/src/features/pi/workspace/brain-solutions-tab.tsx` (pi brain, Solutions tab), tests `apps/web/tests/pi-solutions*.spec.ts` |
 | R-PRIV-07 | Evidence and regression cases hold redacted text only; erasing a customer removes solution memory and feedback | `solution_rules.redacted`, `brain_erase.py` |
 
-Open: the Solutions panel in the web app (the API is ready) and build-fit confirmation from delivered
+Open: build-fit confirmation from delivered
 projects are not built. Part 1 is built for the live chat in the next section.
 
 ## The value line in the live chat (Addendum 2, Part 1)
