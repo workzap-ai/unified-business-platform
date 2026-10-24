@@ -1397,6 +1397,15 @@ async def brain_problems(
                 ),
             )
         )
+    elif solution_context.switched_on(policy.response_rules) and message is not None:
+        # Learning is frozen (nothing is scored, drafted or promoted) but the free ideas of the
+        # industry's own entries are still served: frozen stops learning, not the product.
+        context.update(
+            await latency.timed(
+                "brain.solutions",
+                solution_context.build(session, scope, conversation, message.body or "", noted, {}),
+            )
+        )
     # The specification itself, in its own words, for this stage and topic (spec Appendix A).
     context["spec_guidance"] = spec_handbook.guidance(
         conversation.flow_state or "S1_LISTENING",

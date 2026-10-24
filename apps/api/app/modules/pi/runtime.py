@@ -1250,6 +1250,10 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             service_context["typed_message"] = typed[:4000]
             if pii_guard is not None:
                 service_context["pii"] = pii_guard
+            if service_context.get("pi_mode") == "brain" and not ADDRESSES_PI.search(typed):
+                # "Families pay late" describes their business: a payment word is not a payment
+                # matter for a person unless the message speaks to pi or Workzap.
+                review_intents -= {"payment", "invoice"}
             if (
                 service_context.get("pi_mode") == "brain"
                 and fast_intent

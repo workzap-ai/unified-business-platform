@@ -75,10 +75,18 @@ CORRECTING = re.compile(
 )
 
 
+NOTHING_WRONG = re.compile(r"\bnothing (?:is )?(?:wrong|missing)\b", re.IGNORECASE)
+
+
+def _correcting(message: str) -> bool:
+    """Something is still wrong or missing ("nothing missing" says the opposite)."""
+    return bool(CORRECTING.search(NOTHING_WRONG.sub("", message)))
+
+
 def summary_ok(message: str) -> bool:
     """The person accepted the summary as it stands (not "ok but P2 is wrong")."""
     said = " ".join(message.split())
-    return bool(SUMMARY_OK.match(said)) and not CORRECTING.search(said)
+    return bool(SUMMARY_OK.match(said)) and not _correcting(said)
 
 
 ALL = re.compile(
@@ -376,7 +384,10 @@ def decide(
     if state == State.S4_SORTED_SUMMARY:
         if facts.get("changed") or not facts.get("problem_count"):
             return None
-        if summary_ok(message) or (_ok(answer, Answer.YES) and not CORRECTING.search(message)):
+        # "Is anything wrong or missing?" answered "no" or "no, that's right" (spec G5) means the
+        # summary stands, exactly as "yes that's right" does.
+        confirmed = (_ok(answer, Answer.YES) or _ok(answer, Answer.NO)) and not _correcting(message)
+        if summary_ok(message) or confirmed:
             return Decision(
                 text("offer", language),
                 State.S5_READINESS,

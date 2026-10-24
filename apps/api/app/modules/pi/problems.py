@@ -146,7 +146,14 @@ def _tokens(title: str) -> set[str]:
 def same_symptom(a: str, b: str, threshold: float = 0.8) -> bool:
     """Two titles that say the same thing in nearly the same words (spec 4.4, merge)."""
     left, right = _tokens(a), _tokens(b)
-    return bool(left and right) and len(left & right) / len(left | right) >= threshold
+    if not (left and right):
+        return False
+    if len(left & right) / len(left | right) >= threshold:
+        return True
+    # One title is the other plus a qualifier ("running out" / "running out in shops"): the same
+    # symptom told twice, which the summary must not list as two problems.
+    smaller, larger = sorted((left, right), key=len)
+    return len(smaller) >= 3 and smaller <= larger
 
 
 def short_ref(problem_id: UUID) -> str:
@@ -355,7 +362,14 @@ class ProblemBook:
                 existing.category == category_now and existing.subtype == subtype_now
             )
             if same or alike or facet:
-                await self.update(existing, note, "enrichment", message_id)
+                # The first title stands: a second wording of the same symptom adds detail, it
+                # never renames the problem the person already saw confirmed.
+                await self.update(
+                    existing,
+                    note.model_copy(update={"title": "", "title_local": ""}),
+                    "enrichment",
+                    message_id,
+                )
                 return existing, False
         words, redacted = _words(note.user_words)
         category = taxonomy.normalise_category(note.category.strip())
@@ -763,6 +777,11 @@ DONE = re.compile(
     r"nahi aur kuch|that's it for now)\b",
     re.IGNORECASE,
 )
+ASKS_DOCUMENT = re.compile(
+    r"\b(?:send|give|prepare|make|bana|banao|chahiye)\b.{0,25}\b(?:document|quote|quotation|proposal)\b"
+    r"|\b(?:document|quote|quotation|proposal)\b.{0,25}\b(?:chahiye|bana|banao|bhejo|do)\b",
+    re.IGNORECASE,
+)
 WHAT_NOW = re.compile(
     r"\b(?:what now|so what can you do|what can you do|what next|how much|how much would|"
     r"ab kya|aage kya|kitna (?:lagega|kharcha)|kya kar sakte)\b"
@@ -845,6 +864,8 @@ def summary_due(
         return "what_now"
     if SHOW_ME.search(text):
         return "show"
+    if ASKS_DOCUMENT.search(text):
+        return "document_asked"  # the offer comes after a confirmed summary, never before
     if since_summary >= trigger:
         return "many"
     if quiet_replies >= quiet_limit and since_summary >= 1:

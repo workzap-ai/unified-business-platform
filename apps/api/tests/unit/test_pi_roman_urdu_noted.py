@@ -75,3 +75,47 @@ def test_on_its_way_after_an_otp_message_is_flagged_even_alone() -> None:
     assert any(v.rule == "R-INVENT-01" for v in constitution.lint("It's on its way.", context))
     context["latest_customer_message"] = "where is my quote?"
     assert not any(v.rule == "R-INVENT-01" for v in constitution.lint("It's on its way.", context))
+
+
+def test_a_title_with_a_qualifier_is_the_same_symptom() -> None:
+    from app.modules.pi.problems import same_symptom
+
+    assert same_symptom("Best-selling items running out", "Best-selling items running out in shops")
+    assert same_symptom("Missed appointments", "Missed appointments.")
+    assert not same_symptom("Cashiers are late", "Stock runs out in two shops")
+
+
+def test_no_thats_right_confirms_the_summary() -> None:
+    from app.modules.pi import decisions
+    from app.modules.pi.flow import State
+
+    facts = {"problem_count": 2, "brief": {}, "changed": False}
+    for said in ("no that's right", "no", "no, nothing missing"):
+        decided = decisions.decide(State.S4_SORTED_SUMMARY, said, "en", facts)
+        assert decided is not None and decided.next_state == State.S5_READINESS
+    assert decisions.decide(State.S4_SORTED_SUMMARY, "no, P2 is wrong", "en", facts) is None
+
+
+def test_a_shop_is_not_a_mine_collapse() -> None:
+    from app.modules.pi import safety
+
+    assert safety.emergency("میری دکان میں مال کا حساب نہیں ملتا") is None
+
+
+def test_a_word_only_one_problem_uses_finds_the_idea_whatever_the_category() -> None:
+    from app.modules.pi import solution_ideas, solutions
+
+    entries = solutions.load("kiryana_corner_shops_and_convenience_stores")["problems"]
+    found = solution_ideas.match_problem(entries, "accounting_errors", "", "Udhaar hisaab gadbad")
+    assert found is not None and found["subtype"] == "credit_customers"
+    assert solution_ideas.match_problem(entries, "accounting_errors", "", "Mausam kharab") is None
+
+
+def test_asking_for_the_document_early_shows_the_summary_first() -> None:
+    from app.modules.pi import problems
+
+    assert (
+        problems.summary_due("yes please prepare the document and quote", 2, 2) == "document_asked"
+    )
+    assert problems.summary_due("haan document aur quote chahiye", 1, 1) == "document_asked"
+    assert problems.summary_due("the shop is busy", 2, 1) is None

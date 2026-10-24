@@ -90,7 +90,21 @@ def match_problem(
     # No shared words and no sub-type: when the industry has exactly one entry in the problem's
     # category, that is the match (a wrong idea is worse than none, so never with two or more).
     same = [e for e in problems if category and e.get("category") == category]
-    return same[0] if len(same) == 1 else None
+    if len(same) == 1:
+        return same[0]
+    # Whatever category the model chose: a word that only ONE numbered problem of this industry
+    # uses ("udhaar" in a kiryana shop) says which problem the person means.
+    votes: dict[int, int] = {}
+    for word in (w for w in said if len(w) >= 5):
+        owners = [i for i, e in enumerate(problems) if word in _words(e.get("words", ""))]
+        if len(owners) == 1:
+            votes[owners[0]] = votes.get(owners[0], 0) + 1
+    if votes:
+        best_vote = max(votes.values())
+        winners = [i for i, n in votes.items() if n == best_vote]
+        if len(winners) == 1:
+            return problems[winners[0]]
+    return None
 
 
 def _where_arm(scope: WorkspaceScope) -> tuple[Any, ...]:
