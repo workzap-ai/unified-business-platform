@@ -248,3 +248,28 @@ def test_how_exactly_reasons_carry_their_own_rule_ids():
     assert "R-VAL-01" in {v.rule for v in c.hard(lint(three, solution_howto=howto))}
     tools = "Workzap would build a dashboard for you."
     assert "R-BUILD-01" in {v.rule for v in lint(tools, solution_howto=howto)}
+
+
+def test_the_build_line_must_actually_name_workzap_not_read_as_a_third_idea():
+    # Found by the grader on a real simulation: the data handed over was correct, but the
+    # rendered reply dropped the opener and never said Workzap at all (R-BUILD-03).
+    build = {
+        "says": "Har customer ka baqaya likha rahe aur waqt par narmi se yaad-dahani chali jaye",
+        "opener": solutions.BRIDGE_OPENERS[0]["roman_ur"],
+    }
+    unattributed = (
+        "Theek hai, seedha solution.\n• Idea ek.\n• Idea do.\n"
+        "Har customer ka baqaya likha rahe aur waqt par narmi se yaad-dahani chali jaye"
+    )
+    assert "R-BUILD-03" in rules(unattributed, solution_asked=True, solution_build=build)
+    named = (
+        "Theek hai, seedha solution.\n• Idea ek.\n• Idea do.\n"
+        f"{build['opener']}, Workzap har customer ka baqaya likha rahe."
+    )
+    assert "R-BUILD-03" not in rules(named, solution_asked=True, solution_build=build)
+    # A referred-back line (already said once) needs no re-attribution.
+    assert "R-BUILD-03" not in rules(
+        unattributed, solution_asked=True, solution_build={"refer_back": True}
+    )
+    # No solution_build at all (e.g. the problem has no build keys): nothing to check.
+    assert "R-BUILD-03" not in rules(unattributed, solution_asked=True)

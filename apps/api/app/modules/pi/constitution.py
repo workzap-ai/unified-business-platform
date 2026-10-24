@@ -526,6 +526,22 @@ def _value_line(reply: str, context: dict[str, Any], add: Any) -> None:
         add(
             Violation("R-BUILD-05", "one build in a message, two at most, never a list of features")
         )
+    build = context.get("solution_build")
+    if (
+        isinstance(build, dict)
+        and build.get("says")
+        and not build.get("refer_back")
+        and "workzap" not in lowered
+    ):
+        # Part 1.9: the point of the line is to tell them this is Workzap's build, not free
+        # advice indistinguishable from the ideas above it. Dropping the name defeats that.
+        add(
+            Violation(
+                "R-BUILD-03",
+                'say it is Workzap who would do this ("Workzap would...", "Workzap could..."), '
+                "not an unattributed third idea",
+            )
+        )
 
 
 # --- R-HONEST-01: no invented timelines, clients, case studies, statistics or team members ---------
