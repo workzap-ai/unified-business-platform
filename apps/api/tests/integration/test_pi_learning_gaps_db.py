@@ -162,7 +162,9 @@ async def test_a_failing_gate_holds_new_canaries_and_new_lessons(api, business_d
     business_db.add(ripe)
     await business_db.flush()
     await learning_gate.record(
-        business_db, scope, learning_gate.GateResult(False, ["1 conversation(s) broke a rule"])
+        business_db,
+        scope,
+        learning_gate.GateResult(False, ["1 conversation(s) broke a rule"], conversations=5),
     )
     assert not await learning_gate.allows(business_db, scope)
     held = await learning_bank.activate(business_db, scope, datetime.now(UTC))
@@ -233,7 +235,9 @@ async def test_a_promotion_waits_while_the_gate_is_failing(api, business_db, mon
         business_db, scope, "When stock is mentioned, ask which route first", {}, None, "pi"
     )
     monkeypatch.setattr(learning_canary, "judge", lambda *a, **k: ("promote", {}))
-    await learning_gate.record(business_db, scope, learning_gate.GateResult(False, ["mean 1.2"]))
+    await learning_gate.record(
+        business_db, scope, learning_gate.GateResult(False, ["mean 1.2"], conversations=5)
+    )
     result = await learning_canary.evaluate_lessons(
         business_db, scope, datetime.now(UTC) + timedelta(days=9), min_days=2, min_uses=30
     )
@@ -425,4 +429,18 @@ async def test_the_replay_gate_reads_stored_conversations_and_blocks_a_rule_brea
     assert not broken.ok and broken.broken
     row = await learning_gate.record(business_db, scope, broken)
     assert row.status == "failed" and not await learning_gate.allows(business_db, scope)
+    await pi.close()
+
+
+async def test_an_empty_replay_does_not_hold_back_learning(api, business_db, monkeypatch):
+    """Production 2026-10-24: 'nothing was graded' was recorded as a failing gate."""
+    from app.modules.pi import learning_gate
+
+    adaptive(monkeypatch, model)
+    pi = await workspace(api, business_db)
+    scope = pi.scope()
+    empty = learning_gate.GateResult(ok=False, reasons=["nothing was graded"], conversations=0)
+    row = await learning_gate.record(business_db, scope, empty)
+    assert row.status == "skipped"
+    assert await learning_gate.allows(business_db, scope)
     await pi.close()

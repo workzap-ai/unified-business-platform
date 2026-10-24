@@ -164,8 +164,16 @@ async def record(
         before={},
         after={"step": step, **result.as_dict()},
         evidence={"at": datetime.now(UTC).isoformat()},
-        status="passed" if result.ok else "failed",
-        reason=("gate passed" if result.ok else "gate failed: " + "; ".join(result.reasons))[:300],
+        # Nothing graded is "nothing to check", not a failing release: it must never hold back
+        # learning on a workspace that has no scored conversations yet (a fresh deployment).
+        status="passed" if result.ok else ("skipped" if result.conversations == 0 else "failed"),
+        reason=(
+            "gate passed"
+            if result.ok
+            else "gate skipped: nothing graded yet"
+            if result.conversations == 0
+            else "gate failed: " + "; ".join(result.reasons)
+        )[:300],
     )
     session.add(row)
     await session.flush()
