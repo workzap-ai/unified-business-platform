@@ -78,3 +78,25 @@ def test_a_bare_no_after_voice_notes_keeps_their_language() -> None:
     rows = [said("Hum Facebook ad chalate hain, footfall nahi aata", "audio"), said("hello")]
     found = reply_language(SimpleNamespace(), said("no"), rows)  # type: ignore[arg-type]
     assert found["reply_language"] == "roman_ur"
+
+
+def test_short_english_looking_answers_keep_a_roman_urdu_chat_in_roman_urdu() -> None:
+    """Production chat 2026-10-24: "Yes all" and "Not well" flipped a Roman Urdu chat to English."""
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import reply_language
+
+    def said(body: str) -> SimpleNamespace:
+        return SimpleNamespace(sender_type="customer", message_type="text", body=body)
+
+    rows = [
+        said("Mai ek software chahiye asa Jo video editing khud kry wo bht expensive hai"),
+        said("Ap solution dw"),
+    ]
+    for short in ("Yes all", "Not well", "ok sure"):
+        found = reply_language(SimpleNamespace(), said(short), rows)  # type: ignore[arg-type]
+        assert found["reply_language"] == "roman_ur", short
+    # A real English sentence switches the language, as before.
+    sentence = said("Actually can we continue this conversation in English please")
+    found = reply_language(SimpleNamespace(), sentence, rows)  # type: ignore[arg-type]
+    assert found["reply_language"] == "en"

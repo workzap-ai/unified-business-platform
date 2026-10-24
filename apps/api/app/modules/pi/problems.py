@@ -763,7 +763,12 @@ WHAT_NOW = re.compile(
     # questions, or saying "koi hal hai nahi", is still describing a problem.
     r"|\bkuch kar sakte (?:ho|hain? ya nahi)\b"
     r"|\bkya solution (?:hai|he|hy)\b|\b(?:tumhare|aapke|apke) paas (?:koi )?(?:solution|hal)\b"
-    r"|\bsolution (?:do|dein|de do|dedo|batao|btao|bataen|chahiye)\b"
+    r"|\bsolution (?:do|dw|dein|de do|dedo|dena|dijiye|dijie|batao|btao|bataen|chahiye)\b"
+    # Asking pi to build it ("yehi bnwao", "ye bana do", "can you build this for me").
+    r"|\b(?:ye|yeh|yehi|yahi|ise|isay|wo|woh)(?: \w+){0,2} "
+    r"(?:bnwao|banwao|bnao|banao|bana do|bna do|bnwa do|banwa do)\b"
+    r"|\b(?:ap|aap|tum) (?:ye |yeh |mere liye )?(?:bnwa|banwa|bana|bna)(?:o| do| dein| den)\b"
+    r"|\b(?:can|could) you (?:build|make|create) (?:it|this|that)\b"
     r"|\bsawal(?:at)? hi (?:pooch|puch)\w*\s+(?:rah|rh)(?:o|oge|ogi|ega|egi)\b"
     r"|\b(?:aap|ap|tum) (?:itne|kitne) sawal\b"
     r"|\b(?:give|tell) me (?:a |the |your )?(?:solution|fix|answer)\W*$"

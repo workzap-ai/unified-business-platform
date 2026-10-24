@@ -22,7 +22,10 @@ SOLUTION_ASK = re.compile(
     r"\b(?:can you (?:tell me|give me|help|fix|make|suggest|do something)|could you (?:help|fix)|"
     r"do you have (?:a |any )?(?:solution|fix|idea)|(?:give|tell) me (?:a |the |some |your )?"
     r"(?:solution|fix|ideas?)|what can you do|what would you build|what should i do|"
-    r"solution (?:do|dein|de do|dedo|batao|btao|chahiye)|kya solution (?:hai|he)|"
+    r"solution (?:do|dw|dein|de do|dedo|dena|dijiye|dijie|batao|btao|chahiye)|kya solution (?:hai|he)|"
+    r"(?:ye|yeh|yehi|yahi|ise|isay|wo|woh)(?: \w+){0,2} (?:bnwao|banwao|bnao|banao|bana do|bna do|bnwa do|banwa do)|"
+    r"(?:ap|aap|tum) (?:ye |yeh |mere liye )?(?:bnwa|banwa|bana|bna)(?:o| do| dein| den)|"
+    r"can you (?:build|create) (?:it|this|that)|"
     r"(?:tumhare|aapke|apke) paas (?:koi )?(?:solution|hal)|mujhe (?:koi )?(?:solution|hal) chahiye|"
     r"(?:kuch|kya) kar sakte|kar sakte (?:ho|hain) ya nahi|kya karun|kya karna chahiye|"
     r"(?:koi )?mashwara (?:do|dein|chahiye)|kuch batao)\b",

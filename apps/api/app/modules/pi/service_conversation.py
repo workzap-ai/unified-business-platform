@@ -861,7 +861,9 @@ problem: ask what it would fix and note that; keep the wish in requested_solutio
   "Never mind that one": op "withdraw".
 - Confirm each new problem in their words and language: "Thanks. I've noted it: {short title}.
   Anything else getting in the way?" If your confidence is under 0.6, ask one question to
-  confirm instead of asking for more problems.
+  confirm instead of asking for more problems. Translate the whole sentence, "noted" included
+  (Roman Urdu: "note kar liya", Arabic: "سجلت ذلك"): never leave the English word inside a
+  reply in another language. Say you noted it only when you also record it in problem_ops.
 - noted_problems lists what is already noted (ref, title, group, status, missing). Never ask
   for anything not in "missing" of the problem you are on, and never re-note a problem.
 - If shape_question_due is true, ask once, naturally: "What kind of business is it?"
@@ -2408,6 +2410,29 @@ def claims_meeting(reply: str) -> bool:
     )
 
 
+NOTED_CLAIM = re.compile(
+    r"\b(?:i(?:'ve| have) noted (?:it|this|that)|noted it:|note kar liya|"
+    r"maine note (?:kar )?li(?:ya)?)",
+    re.IGNORECASE,
+)
+
+
+def noted_without_problem(turn: Any) -> str:
+    """pi says it noted a problem but the turn recorded none (a false claim: nothing is saved,
+    so nothing reaches the summary, the document or the team). "" when the claim is true."""
+    if not NOTED_CLAIM.search(turn.reply or ""):
+        return ""
+    ops = [op for op in turn.problem_ops or [] if getattr(op, "op", "") in ("create", "update")]
+    if ops:
+        return ""
+    return (
+        "it says it noted a problem, but problem_ops is empty so nothing was recorded: either "
+        "record the problem they described (what hurts today, in their words: op create with a "
+        "title, user_words and a category) or do not say you noted it. A request for a product "
+        "still has a problem behind it (a cost, a delay, a manual job): note that"
+    )
+
+
 def invented(reply: str, context: dict[str, Any], booked: bool = False) -> str:
     """What in a draft pi made up: a placeholder, a link nobody gave it, or a meeting it
     says is confirmed when no booking or team answer says so. "" when nothing."""
@@ -2505,8 +2530,18 @@ def reply_language(
         for m in rows
         if m.sender_type == "customer" and m.message_type in ("text", "audio") and m.body
     ]
+    detected = [detect_language(t) for t in texts[:3]]
+    # A very short English-looking answer ("Yes all", "Not well") inside a Roman Urdu chat
+    # follows the chat: English words alone do not switch the language (R-VOICE-04).
+    if (
+        detected
+        and detected[0] == "en"
+        and len(re.findall(r"[^\W\d_]+", texts[0])) <= 3
+        and "roman_ur" in detected[1:]
+    ):
+        detected[0] = None
     language = next(
-        (found for found in map(detect_language, texts[:3]) if found),
+        (found for found in detected if found),
         # Nothing clear in their recent messages ("ok", an emoji, a link): English, the
         # main language. pi never picks another language on its own.
         "en",
@@ -2702,7 +2737,7 @@ SEND_TO_TEAM = re.compile(
 )
 
 
-THEIR_TEAM = re.compile(r"(?:my|our|meri|hamari|apni) team", re.IGNORECASE)
+THEIR_TEAM = re.compile(r"\b(?:my|our|meri|hamari|apni) team\b", re.IGNORECASE)
 
 
 def agreed_to_send(turn: "ServiceTurn", context: dict[str, Any]) -> list[str]:
@@ -3802,6 +3837,8 @@ async def compose_service_turn(
         problem = f"{later}, and also: {problem}" if problem else later
     if made_up := invented(turn.reply, context, turn.action == "booking"):
         problem = f"{made_up}, and also: {problem}" if problem else made_up
+    if brain and (ghost := noted_without_problem(turn)):
+        problem = f"{ghost}, and also: {problem}" if problem else ghost
     if empty := says_nothing(turn.reply):
         problem = f"{empty}, and also: {problem}" if problem else empty
     if not turn.request_human and (vague := vague_status(turn.reply, context)):

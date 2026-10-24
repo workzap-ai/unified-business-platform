@@ -423,3 +423,13 @@ def test_the_golden_scripted_replies_still_pass():
     assert c.hard(c.lint(g4, ctx(latest="can you make an app for this?"))) == []
     g9 = "Kharcha is par depend karta hai ke kya banaya jaye. Woh quote par likha hota hai, aap ke faisle se pehle, aur quote muft hai, koi charge nahi."
     assert c.hard(c.lint(g9, ctx(latest="bhai ye batao kitna kharcha hoga?"))) == []
+
+
+def test_an_arabic_reply_never_keeps_the_english_word_noted() -> None:
+    """Production chat 2026-10-24: 'لقد noted: ...' went out in an Arabic reply."""
+    from app.modules.pi import constitution
+
+    bad = constitution.lint("لقد noted: نفس البنت الي في الصورة. هل هناك شيء آخر؟", {})
+    assert any(v.rule == "R-LANG-02" for v in bad)
+    good = constitution.lint("سجلت ذلك: نفس البنت الي في الصورة. هل هناك شيء آخر؟", {})
+    assert not any(v.rule == "R-LANG-02" for v in good)

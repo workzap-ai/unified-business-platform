@@ -396,3 +396,19 @@ def test_every_alert_kind_fits_the_notification_column():
     for kind in saas_models.REQUEST_KINDS:
         assert len(team_requests.notification_kind(kind)) <= 32, kind
     assert len("pi.request.unclaimed") <= 32
+
+
+def test_a_reply_that_says_noted_without_recording_a_problem_is_sent_back() -> None:
+    """Production chat 2026-10-24: 'I've noted it: ...' with zero problems stored."""
+    from types import SimpleNamespace
+
+    from app.modules.pi.problems import ProblemNote, ProblemOp
+    from app.modules.pi.service_conversation import noted_without_problem
+
+    said = "Thanks. I've noted it: software that edits videos. Anything else getting in the way?"
+    empty = SimpleNamespace(reply=said, problem_ops=[])
+    assert "problem_ops is empty" in noted_without_problem(empty)
+    op = ProblemOp(op="create", note=ProblemNote(title="Credits cost too much", user_words=["x"]))
+    assert noted_without_problem(SimpleNamespace(reply=said, problem_ops=[op])) == ""
+    plain = SimpleNamespace(reply="Samajh gaya. Kya aap thora aur bata sakte hain?", problem_ops=[])
+    assert noted_without_problem(plain) == ""

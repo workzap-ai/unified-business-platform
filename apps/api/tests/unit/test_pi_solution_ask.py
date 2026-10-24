@@ -273,3 +273,16 @@ def test_the_build_line_must_actually_name_workzap_not_read_as_a_third_idea():
     )
     # No solution_build at all (e.g. the problem has no build keys): nothing to check.
     assert "R-BUILD-03" not in rules(unattributed, solution_asked=True)
+
+
+def test_live_chat_push_phrasings_from_2026_10_24_count_as_asking_for_a_fix() -> None:
+    """Production chat: 'Ap solution dw' and 'B's yehi agy bnwao' were treated as plain answers."""
+    from app.modules.pi.problems import WHAT_NOW
+    from app.modules.pi.solution_ask import asked_for_ideas
+
+    for said in ("Ap solution dw", "B's yehi agy bnwao", "ye bana do", "can you build this for me"):
+        assert asked_for_ideas(said), said
+        assert WHAT_NOW.search(said), said
+    # Describing a problem is still not a request.
+    for said in ("we fix phones", "customers ask how much it costs", "koi hal nahi hai"):
+        assert not asked_for_ideas(said), said

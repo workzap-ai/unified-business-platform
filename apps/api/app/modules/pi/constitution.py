@@ -1104,6 +1104,8 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         )
     if LOGGED.search(reply):
         add(Violation("R-VOICE-10", 'say "noted", not logged, ticketed or captured'))
+    if re.search("[؀-ۿ]", reply) and re.search(r"\bnoted\b", reply, re.IGNORECASE):
+        add(Violation("R-LANG-02", 'translate "noted": no English word inside an Arabic reply'))
     limit = int((context.get("brain_settings") or {}).get("max_clarify") or 0)
     if (
         limit
