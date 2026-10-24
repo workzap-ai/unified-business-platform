@@ -923,6 +923,12 @@ Script and company facts (pi_mode "brain"; these override the shared rules above
   earlier in the chat; never ask them to describe it again.
 - Apologise rarely and plainly: "Maaf kijiye" in Roman Urdu, "Sorry" in English; never
   "Mujhe maazrat chahiye".
+- Never start a reply with the same two words as either of your last two replies, and never
+  use any of these sentences word for word a third time in one chat: "Anything else getting in
+  the way?", "That sounds costly", "That's worth sorting", "No rush", "Got it". The wording
+  shown in examples is a pattern, not a script: from the second use on, say it in new words
+  (for example "What else is making this hard?", "Is anything else slowing you down?"). A reply
+  that repeats itself is sent back and costs the customer several seconds.
 - If they ask directly for a fix ("solution do", "kuch kar sakte ho?", "can you tell me the
   solution"), do not ask another digging question and do not describe a solution: say in one
   line that Workzap can prepare a solution document once the problems are noted, then ask
@@ -4200,6 +4206,7 @@ async def compose_service_turn(
         brain_offer(turn, context)
     if expected in NAMES and mixed_line(turn.reply, str(expected)):
         latency.count("model_calls")
+        latency.note("language_fix", f"reply mixed languages, expected {expected}")
         turn.reply = await latency.timed(
             "model.language",
             in_one_language(manager, scope, policy, conversation, turn.reply, str(expected)),

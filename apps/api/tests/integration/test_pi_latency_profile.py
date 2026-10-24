@@ -188,3 +188,42 @@ async def test_seed_agents_inserts_only_what_is_missing(api, business_db):
     )
     assert new_versions == versions
     await pi.close()
+
+
+async def test_a_turn_with_extra_model_calls_leaves_an_audit_event_with_the_reason(
+    api, business_db, monkeypatch
+):
+    """The cause of slow replies must be readable in the database (live debugging)."""
+    from sqlalchemy import select
+
+    from app.modules.audit.models import AuditEvent
+    from app.modules.pi import runtime
+
+    adaptive(monkeypatch, scripted_turn)
+    pi = await workspace(api, business_db)
+    await say(pi, "Hi", "lat-x1")
+    conversation = await pi.conversation()
+    scope = pi.scope()
+
+    latency.begin()
+    latency.count("model_calls")
+    await runtime.log_extra_model_calls(business_db, scope, conversation, "m1")
+    assert not list(
+        await business_db.scalars(
+            select(AuditEvent).where(AuditEvent.action == "pi.turn.extra_model_calls")
+        )
+    )  # one model call: nothing is written
+
+    latency.count("model_calls")
+    latency.count("rewrites")
+    latency.note("rewrite_reason", "the question must be the last sentence")
+    await runtime.log_extra_model_calls(business_db, scope, conversation, "m2")
+    [event_row] = (
+        await business_db.scalars(
+            select(AuditEvent).where(AuditEvent.action == "pi.turn.extra_model_calls")
+        )
+    ).all()
+    assert event_row.details["model_calls"] == 2
+    assert event_row.details["reason"] == "the question must be the last sentence"
+    latency.emit(logging.getLogger("test"))
+    await pi.close()

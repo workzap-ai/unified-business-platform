@@ -673,6 +673,37 @@ async def log_injection(
     )
 
 
+async def log_extra_model_calls(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation, message_id: Any
+) -> None:
+    """A turn that needed more than one model call writes one audit event with why (the draft that
+    was sent back), so the cause of slow replies can be read in the database. It is written in the
+    reply's own transaction, only for such turns, and a failure here never fails the reply."""
+    record = latency.current()
+    if record is None or int(record.get("model_calls") or 0) <= 1:
+        return
+    from app.modules.audit.service import record as audit
+
+    try:
+        async with session.begin_nested():
+            await audit(
+                session,
+                "pi.turn.extra_model_calls",
+                scope=scope,
+                entity_type="pi_conversation",
+                entity_id=conversation.id,
+                details={
+                    "message_id": str(message_id),
+                    "model_calls": int(record.get("model_calls") or 0),
+                    "rewrites": int(record.get("rewrites") or 0),
+                    "reason": (record.get("notes") or {}).get("rewrite_reason", ""),
+                    "stages_ms": {k: round(v) for k, v in (record.get("stages_ms") or {}).items()},
+                },
+            )
+    except Exception:  # noqa: BLE001 - diagnostics must never fail a reply
+        logger.warning("pi_extra_model_calls_not_logged", exc_info=True)
+
+
 async def enqueue_sends(ctx: dict[str, Any], message_ids: list[str]) -> None:
     for outbound_id in message_ids:
         if ctx.get("redis"):
@@ -1643,6 +1674,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             )
         )
         outbound += [str(f) for f in forms]
+        await log_extra_model_calls(session, scope, conversation, message_id)
         with latency.stage("final_commit"):
             await session.commit()
     with latency.stage("enqueue_send"):
