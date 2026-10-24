@@ -16,12 +16,12 @@ from typing import Any
 # --- where the person is ---------------------------------------------------------------------
 
 NUMBERS = {
-    "PK": {"police": "15", "ambulance": "1122", "fire": "16"},
+    "PK": {"police": "15", "ambulance": "1122", "ambulance_alt": "115", "fire": "16"},
     "AE": {"police": "999", "ambulance": "998", "fire": "997"},
     "CA": {"police": "911", "ambulance": "911", "fire": "911"},
 }
 ALL_COUNTRIES = (
-    "Pakistan 15 (police), 1122 (rescue and ambulance), 16 (fire); UAE 999 (police), 998 "
+    "Pakistan 15 (police), 1122 (rescue and ambulance), 115 (ambulance), 16 (fire); UAE 999 (police), 998 "
     "(ambulance), 997 (fire); Canada 911"
 )
 

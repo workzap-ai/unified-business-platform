@@ -514,3 +514,12 @@ def test_opt_out_phrases(said):
 )
 def test_opt_out_ignores_ordinary_talk(said):
     assert not s.opt_out_asked(said)
+
+
+def test_pakistan_ambulance_115_is_a_known_emergency_number() -> None:
+    """Addendum 2, 7.I names '1122 or 115 in Pakistan'."""
+    from app.modules.pi import safety as s
+
+    assert s.NUMBERS["PK"]["ambulance_alt"] == "115"
+    assert "115" in s.ALL_COUNTRIES
+    assert "1122" in s.emergency_reply(s.Emergency.MEDICAL, "PK", "en")

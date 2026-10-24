@@ -19,7 +19,7 @@ HOWTO = re.compile(
     r"\bstep\s*(?:1|one)\b|\bstep[- ]by[- ]step\b|\bpehle\b.{1,60}\bphir\b|\bfirst\b.{1,60}\bthen\b"
     r"|\bsettings?\b|\bformulas?\b|\bcolumns?\b|\btemplates?\b|\bcopy (?:this|the following)\b"
     r"|\bspreadsheet\b|\bgoogle sheets?\b|\bexcel\b|\bclick\b|\bpaste\b|\bscript\b"
-    r"|[“\"][^”\"]{30,}[”\"]|\bwrite exactly\b|\bhere'?s exactly\b|\b1\)\s",
+    r"|[“\"][^”\"]{30,}[”\"]|\bwrite exactly\b|\bhere'?s exactly\b|\b3\)\s",
     re.IGNORECASE,
 )
 # No invented claims: percentages, money, promised results.
@@ -198,6 +198,32 @@ def idea_kind(text: str) -> str:
     return "other"
 
 
+REFERRAL_WORDS = re.compile(
+    r"\b(?:emergency|police|ambulance|poison (?:centre|center|control)|fire brigade|"
+    r"qualified (?:lab|professional|engineer|vet|doctor|electrician)|licensed (?:professional|engineer)|"
+    r"talk to (?:the|a) (?:authority|regulator|vet|doctor|lawyer|accountant|scholar))\b",
+    re.IGNORECASE,
+)
+
+
+def is_safety_referral(text: str) -> bool:
+    """An idea that points the person to emergency services or a qualified professional (R-VAL-07:
+    safety is never held back, whatever the budget). Named emergency numbers count too."""
+    said = text or ""
+    if REFERRAL_WORDS.search(said):
+        return True
+    numbers = {n for country in safety.NUMBERS.values() for n in _numbers_of(country)}
+    return any(re.search(rf"(?<!\d){re.escape(n)}(?!\d)", said) for n in numbers if len(n) >= 2)
+
+
+def _numbers_of(value: object) -> list[str]:
+    if isinstance(value, dict):
+        return [n for v in value.values() for n in _numbers_of(v)]
+    if isinstance(value, (list, tuple, set)):
+        return [n for v in value for n in _numbers_of(v)]
+    return re.findall(r"\d{2,4}", str(value))
+
+
 @dataclass
 class Verdict:
     reject: list[str] = field(default_factory=list)
@@ -221,20 +247,23 @@ def check_idea(text: str, said: str = "") -> Verdict:
         return out
     if "\n" in (text or "").strip():
         out.reject.append("more than one line (R-VAL-03)")
-    limit = value_line.IDEA_MAX_WORDS + value_line.IDEA_WORD_SLACK
+    # R-VAL-07: safety is never held back, so a safety referral (emergency numbers, "call the
+    # police", "a qualified lab") may run a sentence or two longer and carry its numbers.
+    referral = is_safety_referral(one)
+    limit = value_line.IDEA_MAX_WORDS + value_line.IDEA_WORD_SLACK + (25 if referral else 0)
     if len(one.split()) > limit:
         out.reject.append(f"longer than one line: over {limit} words (R-VAL-03)")
     if "?" in one or "؟" in one:
         out.reject.append(
             "a question inside an idea (R-ASK: the one question is pi's last sentence)"
         )
-    if len(re.findall(r"[.!]" + chr(92) + "s+" + chr(92) + "S", one)) > 0:
+    if not referral and len(re.findall(r"[.!]" + chr(92) + "s+" + chr(92) + "S", one)) > 0:
         out.reject.append("more than one sentence (R-VAL-03)")
     if solutions.banned_tool_words(one, said):
         out.reject.append("tool words or a build named for free (R-BUILD-01)")
     if HOWTO.search(one):  # an idea never asks, so every marker counts (the idea check is strict)
         out.reject.append("how-to, steps, settings or wording to copy (R-VAL-04, R-VAL-05)")
-    if CLAIMS.search(one) or re.search(chr(92) + "d", one):
+    if (CLAIMS.search(one) or re.search(chr(92) + "d", one)) and not referral:
         # any figure is an invented claim in a free idea; the seeds carry none
         out.reject.append("a number, percentage, amount or promised result (no invented claims)")
     if VENDOR.search(one) or learning.PERSON_OR_COMPETITOR.search(one) or named_products(one, said):
