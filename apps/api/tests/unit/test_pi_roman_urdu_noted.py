@@ -546,3 +546,39 @@ def test_an_app_request_alone_is_not_an_ask_for_ideas_but_with_the_word_idea_it_
     assert asked_without_ideas(urdu) is True
     assert asked_without_ideas({**base, "latest_customer_message": "Ap dein solution"}) is True
     assert asked_without_ideas({**base, "latest_customer_message": "mera dukan ka hisaab"}) is False
+
+
+def test_how_exactly_gets_the_document_answer_when_the_model_says_noted() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import brain_howto
+
+    def turn(reply: str) -> SimpleNamespace:
+        return SimpleNamespace(
+            reply=reply,
+            _summary=False,
+            _decision=None,
+            request_human=False,
+            awaiting_customer=False,
+            _free=False,
+            _english=False,
+        )
+
+    context = {
+        "reply_language": "en",
+        "history": [{"role": "ai", "text": "Hi, I am pi."}],
+        "solution_howto": {
+            "covers": "How accounts are coded, limits set and reminders sent",
+            "which_app": False,
+        },
+    }
+    generic = turn("Thanks, that's noted. Is there anything else you want to add?")
+    brain_howto(generic, context)
+    assert "solution document: it covers how accounts are coded" in generic.reply
+    assert generic._english and "?" not in generic.reply
+    fine = turn("The detail is in the solution document. It covers the reminders.")
+    brain_howto(fine, context)
+    assert fine.reply.startswith("The detail is in the solution document. It covers")
+    app = turn("Noted.")
+    brain_howto(app, {**context, "solution_howto": {"covers": "", "which_app": True}})
+    assert app.reply.startswith("I don't recommend specific apps.")

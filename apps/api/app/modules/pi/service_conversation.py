@@ -2015,6 +2015,37 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     turn.awaiting_customer = True
 
 
+MENTIONS_DOCUMENT = re.compile(r"document|وثيقة|مستند|دستاویز", re.IGNORECASE)
+
+
+def brain_howto(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """They asked "how exactly?", "step by step" or "which app?" (Addendum 1.4): the detail is the
+    solution document, named by what it covers, with no steps and no tool. The model sometimes
+    answers "noted, anything else?" instead (seen on a real-model sweep): the application then
+    writes the answer itself; the offer follows from brain_offer."""
+    howto = context.get("solution_howto")
+    if not howto or MENTIONS_DOCUMENT.search(turn.reply):
+        return
+    if turn._summary or turn._decision is not None or turn.request_human or turn._free:
+        return
+    if solution_rules.has_safety_referral(turn.reply):
+        return
+    covers = " ".join(str(howto.get("covers") or "").split()).strip(" .")
+    line = (
+        f"The detail is in the solution document: it covers {covers[:1].lower()}{covers[1:]}."
+        if covers
+        else "The detail is in the solution document."
+    )
+    if howto.get("which_app"):
+        line = f"I don't recommend specific apps. {line}"
+    language = str(context.get("reply_language") or "en")
+    turn.reply = with_disclosure(
+        f"{line} Workzap would set the whole thing up for you.", context, language
+    )
+    turn._english = True
+    turn.awaiting_customer = True
+
+
 def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """After free ideas on request, or a "how exactly?" answer, the application makes the offer
     itself and moves the chat to S5 (Part 1.4 and 1.6), so a later "haan" goes through the
@@ -4523,6 +4554,7 @@ async def compose_service_turn(
         brain_ideas(turn, context)
         await brain_free_ideas(manager, scope, conversation, policy, turn, context)
         brain_no_ideas(turn, context)
+        brain_howto(turn, context)
         brain_offer(turn, context)
     if context.get("handback_notice") and not turn.request_human and turn._decision is None:
         short = safety.handback_reply(str(context.get("reply_language") or "en"))
