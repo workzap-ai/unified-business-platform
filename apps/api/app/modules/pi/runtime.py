@@ -33,7 +33,7 @@ from app.modules.customers.service import CustomerService
 from app.modules.environments.models import Environment
 from app.modules.pi import latency, price_policy
 from app.modules.pi.agents import AgentContext, run_specialists
-from app.modules.pi.configuration import seed_agents, settings_row
+from app.modules.pi.configuration import seed_agents, settings_cache_for_turn, settings_row
 from app.modules.pi.graph import AGENTS, RouteState, keyword_intent, route_message
 from app.modules.pi.guard import ReplyRejected, rate_limited, validate_reply
 from app.modules.pi.language import (
@@ -707,7 +707,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
     latency.begin()
     outbound: list[str] = []
     proposals_for: list[UUID] = []  # Leads pi writes a proposal for, after commit.
-    async with ctx["sessions"]() as session:
+    async with ctx["sessions"]() as session, settings_cache_for_turn(session):
         event = await session.scalar(
             select(WhatsAppWebhookEvent)
             .where(WhatsAppWebhookEvent.id == UUID(event_id))

@@ -1,9 +1,12 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from copy import deepcopy
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import event, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -182,7 +185,46 @@ class VersionInput(BaseModel):
     note: str = Field(default="", max_length=200)
 
 
+_TURN_CACHE = "pi_settings_turn_cache"
+
+
+@asynccontextmanager
+async def settings_cache_for_turn(session: AsyncSession) -> AsyncIterator[None]:
+    """Let `settings_row` answer from memory between two commits of this session.
+
+    A pi turn asks for the settings about eight times (each call was an upsert plus a read, two
+    round trips to a remote database). Inside this block the first call reads them and later
+    calls return the same row until the session commits or rolls back, which is exactly when a
+    fresh read could see anything new. Only the turn runner uses it; every other caller, and any
+    code after the block, keeps reading every time."""
+    cache: dict[tuple[UUID, UUID], PiSettings] = {}
+    session.info[_TURN_CACHE] = cache
+
+    def clear(_session: Any, *_: Any) -> None:
+        cache.clear()
+
+    for name in ("after_commit", "after_rollback"):
+        event.listen(session.sync_session, name, clear)
+    try:
+        yield
+    finally:
+        for name in ("after_commit", "after_rollback"):
+            event.remove(session.sync_session, name, clear)
+        session.info.pop(_TURN_CACHE, None)
+
+
 async def settings_row(session: AsyncSession, scope: WorkspaceScope) -> PiSettings:
+    cache: dict[tuple[UUID, UUID], PiSettings] | None = session.info.get(_TURN_CACHE)
+    key = (scope.tenant_id, scope.environment_id)
+    if cache is not None and key in cache:
+        return cache[key]
+    row = await _read_settings_row(session, scope)
+    if cache is not None:
+        cache[key] = row
+    return row
+
+
+async def _read_settings_row(session: AsyncSession, scope: WorkspaceScope) -> PiSettings:
     values = deepcopy(DEFAULTS)
     values["provider_config"] = {}
     await session.execute(
@@ -283,7 +325,16 @@ async def update_settings(
 
 
 async def seed_agents(session: AsyncSession, scope: WorkspaceScope) -> None:
+    # One read of what exists, then an insert only for what is missing (was one insert per key,
+    # every turn). The insert keeps its ON CONFLICT guard for a concurrent first turn.
+    existing = set(
+        await session.scalars(
+            select(PiAgent.key).where(WorkspaceRepository(session, PiAgent, scope).predicate())
+        )
+    )
     for key in AGENT_KEYS:
+        if key in existing:
+            continue
         agent_id = await session.scalar(
             insert(PiAgent)
             .values(
