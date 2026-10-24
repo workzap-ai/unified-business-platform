@@ -435,7 +435,14 @@ def sector_key(pack: dict[str, Any]) -> str:
 def sector_rules(pack: dict[str, Any]) -> str:
     """The never-rules of the pack's sector, as the specification words them (7.C to 7.M). They
     bind every pack of the sector, however the pack itself was reached (primary or secondary)."""
-    return str(sector_intros().get(sector_key(pack), {}).get("rules") or "")
+    entry = sector_intros().get(sector_key(pack), {})
+    rules = str(entry.get("rules") or "").strip()
+    # The Industry Solutions addendum states its own scope limit for the sector (Part 4 intros):
+    # it adds to the Brain spec's rules, never replaces them, and is not repeated when equal.
+    scope = str(entry.get("addendum_scope") or "").strip()
+    if scope and scope.lower() not in rules.lower():
+        rules = f"{rules} {scope}".strip()
+    return rules
 
 
 _SENTENCE = re.compile(r"(?<=[.!?])\s+(?=[A-Z“\"(])")

@@ -238,3 +238,20 @@ def test_the_handbook_carries_every_sector_intro_and_can_add_them_for_a_customer
     assert "never asks for or records any patient" not in spec_handbook.guidance(
         "S1_LISTENING", "hello"
     )
+
+
+def test_the_addendum_scope_of_each_sector_reaches_every_pack_of_that_sector() -> None:
+    """Addendum 2 Part 4 intros: e.g. 7.G part 2 (nothing here touches finance terms, licensing,
+    safety engineering or the legality of trade practices) and 7.H (roles, not names)."""
+    from app.modules.pi import industry_packs as ip
+
+    intros = ip.sector_intros()
+    with_scope = {k for k, v in intros.items() if v.get("addendum_scope")}
+    assert len(with_scope) >= 16
+    checked = 0
+    for pack in ip.load_packs().values():
+        scope = str(intros.get(ip.sector_key(pack), {}).get("addendum_scope") or "")
+        if scope:
+            assert scope.lower() in ip.sector_rules(pack).lower()
+            checked += 1
+    assert checked > 100
